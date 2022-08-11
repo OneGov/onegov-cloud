@@ -22,11 +22,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
-        'polymorphic_identity': None,
+        'polymorphic_identity': 'generic',
     }
 
     es_public = True
@@ -156,11 +156,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line.value = self.email
 
         if 'phone' not in exclude and self.phone:
-            line = result.add('tel')
+            line = result.add('tel;type=work')
             line.value = self.phone
 
         if 'phone_direct' not in exclude and self.phone_direct:
-            line = result.add('tel')
+            line = result.add('tel;type=work;type=pref')
             line.value = self.phone_direct
 
         if 'website' not in exclude and self.website:

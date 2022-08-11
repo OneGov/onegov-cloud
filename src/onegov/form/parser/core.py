@@ -875,7 +875,7 @@ def parse_field_block(field_block, field_classes,
         choices = [next(i for i in f.items()) for f in field]
 
         for choice, dependencies in choices:
-            choice.dependencies = dependencies
+            choice['dependencies'] = dependencies
 
         choices = [c[0] for c in choices]
 

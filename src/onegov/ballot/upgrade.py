@@ -583,3 +583,87 @@ def change_total_voters_count(context):
             'party_results', 'total_voters_count',
             new_column_name='voters_count_percentage'
         )
+
+
+@upgrade_task('Add party id column')
+def add_party_id_column(context):
+    if not context.has_column('party_results', 'party_id'):
+        context.operations.add_column(
+            'party_results',
+            Column('party_id', Text())
+        )
+
+
+@upgrade_task('Add party name translations')
+def add_party_name_translations(context):
+    if context.has_column('party_results', 'name'):
+        context.operations.alter_column(
+            'party_results', 'name',
+            nullable=True
+        )
+
+    if not context.has_column('party_results', 'name_translations'):
+        context.add_column_with_defaults(
+            table='party_results',
+            column=Column('name_translations', HSTORE, nullable=False),
+            default=lambda x: {}
+        )
+
+    if (
+        context.has_column('party_results', 'name_translations')
+        and context.has_column('party_results', 'name')
+    ):
+        context.operations.execute("""
+            UPDATE party_results SET name_translations = hstore('de_CH', name);
+        """)
+
+
+@upgrade_task(
+    'Remove obsolete party names',
+    requires='onegov.ballot:Add party name translations',
+)
+def remove_obsolete_party_names(context):
+    if context.has_column('party_results', 'name'):
+        context.operations.drop_column('party_results', 'name')
+
+    if context.has_column('party_results', 'party_id'):
+        context.operations.execute("""
+            DELETE FROM party_results WHERE party_id is NULL;
+        """)
+
+        context.operations.alter_column(
+            'party_results', 'party_id', nullable=False
+        )
+
+
+@upgrade_task('Add gender column')
+def add_gender_column(context):
+    if not context.has_column('candidates', 'gender'):
+        context.operations.add_column(
+            'candidates',
+            Column(
+                'gender',
+                Enum('male', 'female', 'undetermined',
+                     name='candidate_gender'),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task('Add year of birth column')
+def add_year_of_birth_column(context):
+    if not context.has_column('candidates', 'year_of_birth'):
+        context.operations.add_column(
+            'candidates',
+            Column('year_of_birth', Integer(), nullable=True)
+        )
+
+
+@upgrade_task('Add exapts columns')
+def add_exapts_columns(context):
+    for table in ('election_results', 'ballot_results'):
+        if not context.has_column(table, 'expats'):
+            context.operations.add_column(
+                table,
+                Column('expats', Integer(), nullable=True)
+            )

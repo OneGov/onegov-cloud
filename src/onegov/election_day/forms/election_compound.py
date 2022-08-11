@@ -121,7 +121,6 @@ class ElectionCompoundForm(Form):
         label=_("Link"),
         fieldset=_("Related link")
     )
-
     related_link_label_de = StringField(
         label=_("Link label german"),
         fieldset=_("Related link"),
@@ -142,6 +141,7 @@ class ElectionCompoundForm(Form):
         fieldset=_("Related link"),
         render_kw={'lang': 'rm'}
     )
+
     explanations_pdf = UploadField(
         label=_("Explanations (PDF)"),
         validators=[
@@ -149,6 +149,26 @@ class ElectionCompoundForm(Form):
             FileSizeLimit(100 * 1024 * 1024)
         ],
         fieldset=_("Related link")
+    )
+
+    upper_apportionment_pdf = UploadField(
+        label=_("Upper apportionment (PDF)"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024)
+        ],
+        fieldset=_("Related link"),
+        depends_on=('pukelsheim', 'y'),
+    )
+
+    lower_apportionment_pdf = UploadField(
+        label=_("Lower apportionment (PDF)"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024)
+        ],
+        fieldset=_("Related link"),
+        depends_on=('pukelsheim', 'y'),
     )
 
     pukelsheim = BooleanField(
@@ -176,6 +196,16 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    show_seat_allocation = BooleanField(
+        label=_("Seat allocation"),
+        description=_(
+            "Shows a tab with the comparison of seat allocation as a bar "
+            "chart. Requires party results."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True),
+    )
+
     show_list_groups = BooleanField(
         label=_("List groups"),
         description=_(
@@ -185,18 +215,6 @@ class ElectionCompoundForm(Form):
         fieldset=_("Views"),
         render_kw=dict(force_simple=True),
         depends_on=('pukelsheim', 'y'),
-    )
-
-    show_lists = BooleanField(
-        label=_("Lists"),
-        description=_(
-            "Shows a tab with aggregated list results over all elections. "
-            "Only useful if the lists correspond to the list groups. Only if "
-            "Doppelter Pukelsheim. Always rounded."
-        ),
-        fieldset=_("Views"),
-        depends_on=('pukelsheim', 'y'),
-        render_kw=dict(force_simple=True)
     )
 
     show_party_strengths = BooleanField(
@@ -327,8 +345,8 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        model.show_seat_allocation = self.show_seat_allocation.data
         model.show_list_groups = self.show_list_groups.data
-        model.show_lists = self.show_lists.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
         model.pukelsheim = self.pukelsheim.data
@@ -377,14 +395,20 @@ class ElectionCompoundForm(Form):
             link_labels['rm_CH'] = self.related_link_label_rm.data
         model.related_link_label = link_labels
 
-        action = getattr(self.explanations_pdf, 'action', '')
-        if action == 'delete':
-            del model.explanations_pdf
-        if action == 'replace' and self.explanations_pdf.data:
-            model.explanations_pdf = (
-                self.explanations_pdf.raw_data[-1].file,
-                self.explanations_pdf.raw_data[-1].filename,
-            )
+        for file in (
+            'explanations_pdf',
+            'upper_apportionment_pdf',
+            'lower_apportionment_pdf'
+        ):
+            field = getattr(self, file)
+            action = getattr(field, 'action', '')
+            if action == 'delete':
+                delattr(model, file)
+            if action == 'replace' and field.data:
+                setattr(model, file, (
+                    field.raw_data[-1].file,
+                    field.raw_data[-1].filename,
+                ))
 
         model.colors = self.parse_colors(self.colors.data)
 
@@ -401,13 +425,19 @@ class ElectionCompoundForm(Form):
         self.related_link_label_it.data = link_labels.get('it_CH', '')
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
-        file = model.explanations_pdf
-        if file:
-            self.explanations_pdf.data = {
-                'filename': file.reference.filename,
-                'size': file.reference.file.content_length,
-                'mimetype': file.reference.content_type
-            }
+        for file in (
+            'explanations_pdf',
+            'upper_apportionment_pdf',
+            'lower_apportionment_pdf'
+        ):
+            field = getattr(self, file)
+            file = getattr(model, file)
+            if file:
+                field.data = {
+                    'filename': file.reference.filename,
+                    'size': file.reference.file.content_length,
+                    'mimetype': file.reference.content_type
+                }
 
         self.domain.data = model.domain
         self.domain_elections.data = model.domain_elections
@@ -419,8 +449,8 @@ class ElectionCompoundForm(Form):
         self.manually_completed.data = model.manually_completed
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
+        self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
-        self.show_lists.data = model.show_lists
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
         self.region_elections.data = []

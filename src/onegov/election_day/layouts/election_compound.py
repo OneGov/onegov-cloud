@@ -13,12 +13,17 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'list-groups', 'lists', 'superregions', 'districts', 'candidates',
+        'seat-allocation',
+        'list-groups',
+        'superregions',
+        'districts',
+        'candidates',
         'statistics'
     )
 
     majorz = False
     proporz = True
+    type = 'compound'
 
     @cached_property
     def table_link(self):
@@ -32,8 +37,8 @@ class ElectionCompoundLayout(DetailLayout):
     def all_tabs(self):
         """ Return the tabs in order of their appearance. """
         return (
+            'seat-allocation',
             'list-groups',
-            'lists',
             'superregions',
             'districts',
             'candidates',
@@ -43,11 +48,9 @@ class ElectionCompoundLayout(DetailLayout):
             'data'
         )
 
-    @property
+    @cached_property
     def results(self):
-        for e in self.model.elections:
-            for result in e.results:
-                yield result
+        return self.model.results
 
     @cached_property
     def has_districts(self):
@@ -80,10 +83,10 @@ class ElectionCompoundLayout(DetailLayout):
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
 
+        if tab == 'seat-allocation':
+            return _("Seat allocation")
         if tab == 'list-groups':
             return _("List groups")
-        if tab == 'lists':
-            return _("Lists")
         if tab == 'superregions':
             return self.label('superregions')
         if tab == 'districts':
@@ -109,16 +112,16 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         if tab == 'superregions':
             return self.has_superregions
+        if tab == 'seat-allocation':
+            return (
+                self.model.show_seat_allocation is True
+                and self.has_party_results
+            )
         if tab == 'list-groups':
             return (
                 self.model.show_list_groups is True
                 and self.model.pukelsheim is True
                 and self.has_party_results
-            )
-        if tab == 'lists':
-            return (
-                self.model.show_lists is True
-                and self.model.pukelsheim is True
             )
         if tab == 'party-strengths':
             return (
@@ -184,6 +187,7 @@ class ElectionCompoundLayout(DetailLayout):
             svg_filename(
                 self.model,
                 self.tab,
+                self.request.locale,
                 last_modified=self.last_modified
             )
         )

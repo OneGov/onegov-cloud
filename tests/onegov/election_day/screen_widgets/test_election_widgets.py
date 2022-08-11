@@ -1,5 +1,6 @@
 from chameleon import PageTemplate
 from datetime import date
+from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import Election
@@ -167,66 +168,65 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
 
-    assert data == {
-        'candidates': [
-            ('Hegglin', 'Peter', True, 'CVP', 10693, None, None),
-            ('Eder', 'Joachim', True, 'FDP', 10103, None, None),
-            ('Brandenberg', 'Manuel', False, 'SVP', 4845, None, None),
-            ('Gysel', 'Barbara', False, 'SP', 2890, None, None),
-            ('Lustenberger', 'Andreas', False, 'Grüne', 2541, None, None),
-            ('Thöni', 'Stefan', False, 'Piraten', 746, None, None)
-        ],
-        'candidates_by_entites': (
-            [
-                ('Brandenberg', 'Manuel', 4845),
-                ('Eder', 'Joachim', 10103),
-                ('Gysel', 'Barbara', 2890),
-                ('Hegglin', 'Peter', 10693),
-                ('Lustenberger', 'Andreas', 2541),
-                ('Thöni', 'Stefan', 746)
-            ],
-            [
-                ('Baar', [
-                    ('Baar', 'Brandenberg', 'Manuel', 2100),
-                    ('Baar', 'Eder', 'Joachim', 4237),
-                    ('Baar', 'Gysel', 'Barbara', 1264),
-                    ('Baar', 'Hegglin', 'Peter', 4207),
-                    ('Baar', 'Lustenberger', 'Andreas', 1269),
-                    ('Baar', 'Thöni', 'Stefan', 320)
-                ]),
-                ('Cham', [
-                    ('Cham', 'Brandenberg', 'Manuel', 1404),
-                    ('Cham', 'Eder', 'Joachim', 2726),
-                    ('Cham', 'Gysel', 'Barbara', 888),
-                    ('Cham', 'Hegglin', 'Peter', 2905),
-                    ('Cham', 'Lustenberger', 'Andreas', 685),
-                    ('Cham', 'Thöni', 'Stefan', 232)
-                ]),
-                ('Hünenberg', [
-                    ('Hünenberg', 'Brandenberg', 'Manuel', 881),
-                    ('Hünenberg', 'Eder', 'Joachim', 2098),
-                    ('Hünenberg', 'Gysel', 'Barbara', 540),
-                    ('Hünenberg', 'Hegglin', 'Peter', 2205),
-                    ('Hünenberg', 'Lustenberger', 'Andreas', 397),
-                    ('Hünenberg', 'Thöni', 'Stefan', 140)
-                ]),
-                ('Menzingen', [
-                    ('Menzingen', 'Brandenberg', 'Manuel', 460),
-                    ('Menzingen', 'Eder', 'Joachim', 1042),
-                    ('Menzingen', 'Gysel', 'Barbara', 198),
-                    ('Menzingen', 'Hegglin', 'Peter', 1376),
-                    ('Menzingen', 'Lustenberger', 'Andreas', 190),
-                    ('Menzingen', 'Thöni', 'Stefan', 54)
-                ])
-            ]
-        ),
-        'election': model,
-        'embed': False,
-        'entities': 'Baar, Cham, Hünenberg, Menzingen',
-        'layout': layout,
-        'model': model,
-        'request': request,
-    }
+    assert data['candidates'] == [
+        ('Hegglin', 'Peter', True, 'CVP', 10693, Decimal('63.3'), None, None),
+        ('Eder', 'Joachim', True, 'FDP', 10103, Decimal('59.8'), None, None),
+        ('Brandenberg', 'Manuel', False, 'SVP', 4845, Decimal('28.7'), None,
+         None),
+        ('Gysel', 'Barbara', False, 'SP', 2890, Decimal('17.1'), None, None),
+        ('Lustenberger', 'Andreas', False, 'Grüne', 2541, Decimal('15.0'),
+         None, None),
+        ('Thöni', 'Stefan', False, 'Piraten', 746, Decimal('4.4'), None, None)
+    ]
+
+    assert [c[1:] for c in data['candidates_by_entites'][0]] == [
+        ('Hegglin', 'Peter', 10693),
+        ('Eder', 'Joachim', 10103),
+        ('Brandenberg', 'Manuel', 4845),
+        ('Gysel', 'Barbara', 2890),
+        ('Lustenberger', 'Andreas', 2541),
+        ('Thöni', 'Stefan', 746)
+    ]
+    assert data['candidates_by_entites'][1] == [
+        ('Baar', [
+            ('Baar', 'Hegglin', 'Peter', 4207),
+            ('Baar', 'Eder', 'Joachim', 4237),
+            ('Baar', 'Brandenberg', 'Manuel', 2100),
+            ('Baar', 'Gysel', 'Barbara', 1264),
+            ('Baar', 'Lustenberger', 'Andreas', 1269),
+            ('Baar', 'Thöni', 'Stefan', 320)
+        ]),
+        ('Cham', [
+            ('Cham', 'Hegglin', 'Peter', 2905),
+            ('Cham', 'Eder', 'Joachim', 2726),
+            ('Cham', 'Brandenberg', 'Manuel', 1404),
+            ('Cham', 'Gysel', 'Barbara', 888),
+            ('Cham', 'Lustenberger', 'Andreas', 685),
+            ('Cham', 'Thöni', 'Stefan', 232)
+        ]),
+        ('Hünenberg', [
+            ('Hünenberg', 'Hegglin', 'Peter', 2205),
+            ('Hünenberg', 'Eder', 'Joachim', 2098),
+            ('Hünenberg', 'Brandenberg', 'Manuel', 881),
+            ('Hünenberg', 'Gysel', 'Barbara', 540),
+            ('Hünenberg', 'Lustenberger', 'Andreas', 397),
+            ('Hünenberg', 'Thöni', 'Stefan', 140)
+        ]),
+        ('Menzingen', [
+            ('Menzingen', 'Hegglin', 'Peter', 1376),
+            ('Menzingen', 'Eder', 'Joachim', 1042),
+            ('Menzingen', 'Brandenberg', 'Manuel', 460),
+            ('Menzingen', 'Gysel', 'Barbara', 198),
+            ('Menzingen', 'Lustenberger', 'Andreas', 190),
+            ('Menzingen', 'Thöni', 'Stefan', 54)
+        ])
+    ]
+    assert data['election'] == model
+    assert data['embed'] == False
+    assert data['entities'] == 'Baar, Cham, Hünenberg, Menzingen'
+    assert data['layout'] == layout
+    assert data['model'] == model
+    assert data['request'] == request
 
     result = transform_structure(widgets, structure)
     result = PageTemplate(result)(**data)
@@ -293,125 +293,124 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     default = {'layout': layout, 'request': request}
     data = inject_variables(widgets, layout, structure, default, False)
 
-    assert data == {
-        'candidates': [
-            ('Hegglin', 'Peter', True, 'CVP', 24132, None, None),
-            ('Eder', 'Joachim', True, 'FDP', 23620, None, None),
-            ('Brandenberg', 'Manuel', False, 'SVP', 10997, None, None),
-            ('Gysel', 'Barbara', False, 'SP', 6612, None, None),
-            ('Lustenberger', 'Andreas', False, 'Grüne', 5691, None, None),
-            ('Thöni', 'Stefan', False, 'Piraten', 1709, None, None)
-        ],
-        'candidates_by_entites': (
-            [
-                ('Brandenberg', 'Manuel', 10997),
-                ('Eder', 'Joachim', 23620),
-                ('Gysel', 'Barbara', 6612),
-                ('Hegglin', 'Peter', 24132),
-                ('Lustenberger', 'Andreas', 5691),
-                ('Thöni', 'Stefan', 1709)
-            ],
-            [
-                ('Baar', [
-                    ('Baar', 'Brandenberg', 'Manuel', 2100),
-                    ('Baar', 'Eder', 'Joachim', 4237),
-                    ('Baar', 'Gysel', 'Barbara', 1264),
-                    ('Baar', 'Hegglin', 'Peter', 4207),
-                    ('Baar', 'Lustenberger', 'Andreas', 1269),
-                    ('Baar', 'Thöni', 'Stefan', 320)
-                ]),
-                ('Cham', [
-                    ('Cham', 'Brandenberg', 'Manuel', 1404),
-                    ('Cham', 'Eder', 'Joachim', 2726),
-                    ('Cham', 'Gysel', 'Barbara', 888),
-                    ('Cham', 'Hegglin', 'Peter', 2905),
-                    ('Cham', 'Lustenberger', 'Andreas', 685),
-                    ('Cham', 'Thöni', 'Stefan', 232)
-                ]),
-                ('Hünenberg', [
-                    ('Hünenberg', 'Brandenberg', 'Manuel', 881),
-                    ('Hünenberg', 'Eder', 'Joachim', 2098),
-                    ('Hünenberg', 'Gysel', 'Barbara', 540),
-                    ('Hünenberg', 'Hegglin', 'Peter', 2205),
-                    ('Hünenberg', 'Lustenberger', 'Andreas', 397),
-                    ('Hünenberg', 'Thöni', 'Stefan', 140)
-                ]),
-                ('Menzingen', [
-                    ('Menzingen', 'Brandenberg', 'Manuel', 460),
-                    ('Menzingen', 'Eder', 'Joachim', 1042),
-                    ('Menzingen', 'Gysel', 'Barbara', 198),
-                    ('Menzingen', 'Hegglin', 'Peter', 1376),
-                    ('Menzingen', 'Lustenberger', 'Andreas', 190),
-                    ('Menzingen', 'Thöni', 'Stefan', 54)
-                ]),
-                ('Neuheim', [
-                    ('Neuheim', 'Brandenberg', 'Manuel', 235),
-                    ('Neuheim', 'Eder', 'Joachim', 453),
-                    ('Neuheim', 'Gysel', 'Barbara', 92),
-                    ('Neuheim', 'Hegglin', 'Peter', 511),
-                    ('Neuheim', 'Lustenberger', 'Andreas', 94),
-                    ('Neuheim', 'Thöni', 'Stefan', 26)
-                ]),
-                ('Oberägeri', [
-                    ('Oberägeri', 'Brandenberg', 'Manuel', 656),
-                    ('Oberägeri', 'Eder', 'Joachim', 1380),
-                    ('Oberägeri', 'Gysel', 'Barbara', 191),
-                    ('Oberägeri', 'Hegglin', 'Peter', 1276),
-                    ('Oberägeri', 'Lustenberger', 'Andreas', 150),
-                    ('Oberägeri', 'Thöni', 'Stefan', 72)
-                ]),
-                ('Risch', [
-                    ('Risch', 'Brandenberg', 'Manuel', 1041),
-                    ('Risch', 'Eder', 'Joachim', 1797),
-                    ('Risch', 'Gysel', 'Barbara', 391),
-                    ('Risch', 'Hegglin', 'Peter', 1730),
-                    ('Risch', 'Lustenberger', 'Andreas', 362),
-                    ('Risch', 'Thöni', 'Stefan', 137)
-                ]),
-                ('Steinhausen', [
-                    ('Steinhausen', 'Brandenberg', 'Manuel', 789),
-                    ('Steinhausen', 'Eder', 'Joachim', 1827),
-                    ('Steinhausen', 'Gysel', 'Barbara', 523),
-                    ('Steinhausen', 'Hegglin', 'Peter', 1883),
-                    ('Steinhausen', 'Lustenberger', 'Andreas', 490),
-                    ('Steinhausen', 'Thöni', 'Stefan', 171)
-                ]),
-                ('Unterägeri', [
-                    ('Unterägeri', 'Brandenberg', 'Manuel', 860),
-                    ('Unterägeri', 'Eder', 'Joachim', 2054),
-                    ('Unterägeri', 'Gysel', 'Barbara', 320),
-                    ('Unterägeri', 'Hegglin', 'Peter', 1779),
-                    ('Unterägeri', 'Lustenberger', 'Andreas', 258),
-                    ('Unterägeri', 'Thöni', 'Stefan', 85)
-                ]),
-                ('Walchwil', [
-                    ('Walchwil', 'Brandenberg', 'Manuel', 416),
-                    ('Walchwil', 'Eder', 'Joachim', 756),
-                    ('Walchwil', 'Gysel', 'Barbara', 151),
-                    ('Walchwil', 'Hegglin', 'Peter', 801),
-                    ('Walchwil', 'Lustenberger', 'Andreas', 93),
-                    ('Walchwil', 'Thöni', 'Stefan', 39)
-                ]),
-                ('Zug', [
-                    ('Zug', 'Brandenberg', 'Manuel', 2155),
-                    ('Zug', 'Eder', 'Joachim', 5250),
-                    ('Zug', 'Gysel', 'Barbara', 2054),
-                    ('Zug', 'Hegglin', 'Peter', 5459),
-                    ('Zug', 'Lustenberger', 'Andreas', 1703),
-                    ('Zug', 'Thöni', 'Stefan', 433)
-                ])
-            ]
-        ),
-        'election': model,
-        'embed': False,
-        'entities': (
-            'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
-            'Steinhausen, Unterägeri, Walchwil, Zug'
-        ),
-        'layout': layout,
-        'model': model,
-        'request': request,
-    }
+    assert data['candidates'] == [
+        ('Hegglin', 'Peter', True, 'CVP', 24132, Decimal('62.3'), None, None),
+        ('Eder', 'Joachim', True, 'FDP', 23620, Decimal('61.0'), None, None),
+        ('Brandenberg', 'Manuel', False, 'SVP', 10997, Decimal('28.4'), None,
+         None),
+        ('Gysel', 'Barbara', False, 'SP', 6612, Decimal('17.1'), None, None),
+        ('Lustenberger', 'Andreas', False, 'Grüne', 5691, Decimal('14.7'),
+         None, None),
+        ('Thöni', 'Stefan', False, 'Piraten', 1709, Decimal('4.4'), None, None)
+    ]
+    assert [c[1:] for c in data['candidates_by_entites'][0]] == [
+        ('Hegglin', 'Peter', 24132),
+        ('Eder', 'Joachim', 23620),
+        ('Brandenberg', 'Manuel', 10997),
+        ('Gysel', 'Barbara', 6612),
+        ('Lustenberger', 'Andreas', 5691),
+        ('Thöni', 'Stefan', 1709)
+    ]
+    assert data['candidates_by_entites'][1] == [
+        ('Baar', [
+            ('Baar', 'Hegglin', 'Peter', 4207),
+            ('Baar', 'Eder', 'Joachim', 4237),
+            ('Baar', 'Brandenberg', 'Manuel', 2100),
+            ('Baar', 'Gysel', 'Barbara', 1264),
+            ('Baar', 'Lustenberger', 'Andreas', 1269),
+            ('Baar', 'Thöni', 'Stefan', 320)
+        ]),
+        ('Cham', [
+            ('Cham', 'Hegglin', 'Peter', 2905),
+            ('Cham', 'Eder', 'Joachim', 2726),
+            ('Cham', 'Brandenberg', 'Manuel', 1404),
+            ('Cham', 'Gysel', 'Barbara', 888),
+            ('Cham', 'Lustenberger', 'Andreas', 685),
+            ('Cham', 'Thöni', 'Stefan', 232)
+        ]),
+        ('Hünenberg', [
+            ('Hünenberg', 'Hegglin', 'Peter', 2205),
+            ('Hünenberg', 'Eder', 'Joachim', 2098),
+            ('Hünenberg', 'Brandenberg', 'Manuel', 881),
+            ('Hünenberg', 'Gysel', 'Barbara', 540),
+            ('Hünenberg', 'Lustenberger', 'Andreas', 397),
+            ('Hünenberg', 'Thöni', 'Stefan', 140)
+        ]),
+        ('Menzingen', [
+            ('Menzingen', 'Hegglin', 'Peter', 1376),
+            ('Menzingen', 'Eder', 'Joachim', 1042),
+            ('Menzingen', 'Brandenberg', 'Manuel', 460),
+            ('Menzingen', 'Gysel', 'Barbara', 198),
+            ('Menzingen', 'Lustenberger', 'Andreas', 190),
+            ('Menzingen', 'Thöni', 'Stefan', 54)
+        ]),
+        ('Neuheim', [
+            ('Neuheim', 'Hegglin', 'Peter', 511),
+            ('Neuheim', 'Eder', 'Joachim', 453),
+            ('Neuheim', 'Brandenberg', 'Manuel', 235),
+            ('Neuheim', 'Gysel', 'Barbara', 92),
+            ('Neuheim', 'Lustenberger', 'Andreas', 94),
+            ('Neuheim', 'Thöni', 'Stefan', 26)
+        ]),
+        ('Oberägeri', [
+            ('Oberägeri', 'Hegglin', 'Peter', 1276),
+            ('Oberägeri', 'Eder', 'Joachim', 1380),
+            ('Oberägeri', 'Brandenberg', 'Manuel', 656),
+            ('Oberägeri', 'Gysel', 'Barbara', 191),
+            ('Oberägeri', 'Lustenberger', 'Andreas', 150),
+            ('Oberägeri', 'Thöni', 'Stefan', 72)
+        ]),
+        ('Risch', [
+            ('Risch', 'Hegglin', 'Peter', 1730),
+            ('Risch', 'Eder', 'Joachim', 1797),
+            ('Risch', 'Brandenberg', 'Manuel', 1041),
+            ('Risch', 'Gysel', 'Barbara', 391),
+            ('Risch', 'Lustenberger', 'Andreas', 362),
+            ('Risch', 'Thöni', 'Stefan', 137)
+        ]),
+        ('Steinhausen', [
+            ('Steinhausen', 'Hegglin', 'Peter', 1883),
+            ('Steinhausen', 'Eder', 'Joachim', 1827),
+            ('Steinhausen', 'Brandenberg', 'Manuel', 789),
+            ('Steinhausen', 'Gysel', 'Barbara', 523),
+            ('Steinhausen', 'Lustenberger', 'Andreas', 490),
+            ('Steinhausen', 'Thöni', 'Stefan', 171)
+        ]),
+        ('Unterägeri', [
+            ('Unterägeri', 'Hegglin', 'Peter', 1779),
+            ('Unterägeri', 'Eder', 'Joachim', 2054),
+            ('Unterägeri', 'Brandenberg', 'Manuel', 860),
+            ('Unterägeri', 'Gysel', 'Barbara', 320),
+            ('Unterägeri', 'Lustenberger', 'Andreas', 258),
+            ('Unterägeri', 'Thöni', 'Stefan', 85)
+        ]),
+        ('Walchwil', [
+            ('Walchwil', 'Hegglin', 'Peter', 801),
+            ('Walchwil', 'Eder', 'Joachim', 756),
+            ('Walchwil', 'Brandenberg', 'Manuel', 416),
+            ('Walchwil', 'Gysel', 'Barbara', 151),
+            ('Walchwil', 'Lustenberger', 'Andreas', 93),
+            ('Walchwil', 'Thöni', 'Stefan', 39)
+        ]),
+        ('Zug', [
+            ('Zug', 'Hegglin', 'Peter', 5459),
+            ('Zug', 'Eder', 'Joachim', 5250),
+            ('Zug', 'Brandenberg', 'Manuel', 2155),
+            ('Zug', 'Gysel', 'Barbara', 2054),
+            ('Zug', 'Lustenberger', 'Andreas', 1703),
+            ('Zug', 'Thöni', 'Stefan', 433)
+        ])
+    ]
+
+    assert data['election'] == model
+    assert data['embed'] == False
+    assert data['entities'] == (
+        'Baar, Cham, Hünenberg, Menzingen, Neuheim, Oberägeri, Risch, '
+        'Steinhausen, Unterägeri, Walchwil, Zug'
+    )
+    assert data['layout'] == layout
+    assert data['model'] == model
+    assert data['request'] == request
 
     result = transform_structure(widgets, structure)
     result = PageTemplate(result)(**data)
@@ -606,56 +605,57 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
 
     assert data == {
         'candidates': [
-            ('Lustenberger', 'Andreas', False, '', 1514, 'ALG', '1'),
-            ('Estermann', 'Astrid', False, '', 491, 'ALG', '1'),
-            ('Schriber-Neiger', 'Hanni', False, '', 423, 'ALG', '1'),
-            ('Schuler', 'Hubert', False, '', 1918, 'SP', '10'),
-            ('Bürgi Dellsperger', 'Christina', False, '', 1202, 'SP', '10'),
-            ('Sivaganesan', 'Rupan', False, '', 691, 'SP', '10'),
-            ('Hutter Elsener', 'Simone', False, '', 412, 'SP Frauen', '11'),
-            ('Hug', 'Malaika', False, '', 340, 'SP Frauen', '11'),
-            ('Mäder Beglinger', 'Anne', False, '', 237, 'SP Frauen', '11'),
-            ('Krasnici', 'Denis', False, '', 258, 'SP Juso', '12'),
-            ('Spescha', 'Anna', False, '', 202, 'SP Juso', '12'),
-            ('Koepfli', 'Virginia', False, '', 102, 'SP Juso', '12'),
-            ('Dzaferi', 'Zari', False, '', 1355, 'SP Männer', '13'),
-            ('Freimann', 'Fabian', False, '', 218, 'SP Männer', '13'),
-            ('Suter', 'Guido', False, '', 188, 'SP Männer', '13'),
-            ('Sönmez', 'Sehriban', False, '', 54, 'SP Migrant.', '14'),
-            ('Coralic', 'Fadila', False, '', 50, 'SP Migrant.', '14'),
-            ('Simsek', 'Deniz', False, '', 38, 'SP Migrant.', '14'),
-            ('Aeschi', 'Thomas', True, '', 7731, 'SVP', '15'),
-            ('Werner', 'Thomas', False, '', 2914, 'SVP', '15'),
-            ('Villiger', 'Thomas', False, '', 2571, 'SVP', '15'),
-            ('Pfisterer', 'Luc', False, '', 105, 'SVP Int.', '16'),
-            ('Bucher', 'Rinaldo', False, '', 69, 'SVP Int.', '16'),
-            ('Hornickel', 'Alexander', False, '', 46, 'SVP Int.', '16'),
-            ('Risi', 'Adrian', False, '', 1153, 'SVP WuG', '17'),
-            ('Brunner', 'Philip C.', False, '', 471, 'SVP WuG', '17'),
-            ('Gertsch', 'Beat', False, '', 268, 'SVP WuG', '17'),
-            ('Widmer', 'Fabienne', False, '', 101, 'ALG Junge', '2'),
-            ('Gut', 'Christina', False, '', 74, 'ALG Junge', '2'),
-            ('Perucchi', 'Alessandro', False, '', 66, 'ALG Junge', '2'),
-            ('Haas', 'Esther', False, '', 301, 'ALG Bildung', '3'),
-            ('Odermatt', 'Anastas', False, '', 221, 'ALG Bildung', '3'),
-            ('Zimmermann Gibson', 'Tabea', False, '', 207, 'ALG Bildung', '3'),
-            ('Pfister', 'Gerhard', True, '', 6719, 'CVP', '4'),
-            ('Barmet-Schelbert', 'Monika', False, '', 1996, 'CVP', '4'),
-            ('Hausheer', 'Andreas', False, '', 1340, 'CVP', '4'),
-            ('Bieri', 'Anna', False, '', 2407, 'CVP Junge', '5'),
-            ('Iten', 'Christoph', False, '', 587, 'CVP Junge', '5'),
-            ('Kremmel', 'Corina', False, '', 525, 'CVP Junge', '5'),
-            ('Pezzatti', 'Bruno', True, '', 4309, 'FDP Ost', '6'),
-            ('Ingold', 'Gabriela', False, '', 1083, 'FDP Ost', '6'),
-            ('Mollet', 'Patrick', False, '', 705, 'FDP Ost', '6'),
-            ('Grüter', 'Arno', False, '', 897, 'FDP West', '7'),
-            ('Gygli', 'Daniel', False, '', 717, 'FDP West', '7'),
-            ('Siegrist', 'Birgitt', False, '', 493, 'FDP West', '7'),
-            ('Stadlin', 'Daniel', False, '', 731, 'glp', '8'),
-            ('Kottelat Schloesing', 'Michèle', False, '', 508, 'glp', '8'),
-            ('Soltermann', 'Claus', False, '', 451, 'glp', '8'),
-            ('Mauchle', 'Florian', False, '', 260, 'Piraten', '9'),
-            ('Thöni', 'Stefan', False, '', 211, 'Piraten', '9')
+            ('Lustenberger', 'Andreas', False, '', 1514, 0, 'ALG', '1'),
+            ('Estermann', 'Astrid', False, '', 491, 0, 'ALG', '1'),
+            ('Schriber-Neiger', 'Hanni', False, '', 423, 0, 'ALG', '1'),
+            ('Schuler', 'Hubert', False, '', 1918, 0, 'SP', '10'),
+            ('Bürgi Dellsperger', 'Christina', False, '', 1202, 0, 'SP', '10'),
+            ('Sivaganesan', 'Rupan', False, '', 691, 0, 'SP', '10'),
+            ('Hutter Elsener', 'Simone', False, '', 412, 0, 'SP Frauen', '11'),
+            ('Hug', 'Malaika', False, '', 340, 0, 'SP Frauen', '11'),
+            ('Mäder Beglinger', 'Anne', False, '', 237, 0, 'SP Frauen', '11'),
+            ('Krasnici', 'Denis', False, '', 258, 0, 'SP Juso', '12'),
+            ('Spescha', 'Anna', False, '', 202, 0, 'SP Juso', '12'),
+            ('Koepfli', 'Virginia', False, '', 102, 0, 'SP Juso', '12'),
+            ('Dzaferi', 'Zari', False, '', 1355, 0, 'SP Männer', '13'),
+            ('Freimann', 'Fabian', False, '', 218, 0, 'SP Männer', '13'),
+            ('Suter', 'Guido', False, '', 188, 0, 'SP Männer', '13'),
+            ('Sönmez', 'Sehriban', False, '', 54, 0, 'SP Migrant.', '14'),
+            ('Coralic', 'Fadila', False, '', 50, 0, 'SP Migrant.', '14'),
+            ('Simsek', 'Deniz', False, '', 38, 0, 'SP Migrant.', '14'),
+            ('Aeschi', 'Thomas', True, '', 7731, 0, 'SVP', '15'),
+            ('Werner', 'Thomas', False, '', 2914, 0, 'SVP', '15'),
+            ('Villiger', 'Thomas', False, '', 2571, 0, 'SVP', '15'),
+            ('Pfisterer', 'Luc', False, '', 105, 0, 'SVP Int.', '16'),
+            ('Bucher', 'Rinaldo', False, '', 69, 0, 'SVP Int.', '16'),
+            ('Hornickel', 'Alexander', False, '', 46, 0, 'SVP Int.', '16'),
+            ('Risi', 'Adrian', False, '', 1153, 0, 'SVP WuG', '17'),
+            ('Brunner', 'Philip C.', False, '', 471, 0, 'SVP WuG', '17'),
+            ('Gertsch', 'Beat', False, '', 268, 0, 'SVP WuG', '17'),
+            ('Widmer', 'Fabienne', False, '', 101, 0, 'ALG Junge', '2'),
+            ('Gut', 'Christina', False, '', 74, 0, 'ALG Junge', '2'),
+            ('Perucchi', 'Alessandro', False, '', 66, 0, 'ALG Junge', '2'),
+            ('Haas', 'Esther', False, '', 301, 0, 'ALG Bildung', '3'),
+            ('Odermatt', 'Anastas', False, '', 221, 0, 'ALG Bildung', '3'),
+            ('Zimmermann Gibson', 'Tabea', False, '', 207, 0, 'ALG Bildung',
+             '3'),
+            ('Pfister', 'Gerhard', True, '', 6719, 0, 'CVP', '4'),
+            ('Barmet-Schelbert', 'Monika', False, '', 1996, 0, 'CVP', '4'),
+            ('Hausheer', 'Andreas', False, '', 1340, 0, 'CVP', '4'),
+            ('Bieri', 'Anna', False, '', 2407, 0, 'CVP Junge', '5'),
+            ('Iten', 'Christoph', False, '', 587, 0, 'CVP Junge', '5'),
+            ('Kremmel', 'Corina', False, '', 525, 0, 'CVP Junge', '5'),
+            ('Pezzatti', 'Bruno', True, '', 4309, 0, 'FDP Ost', '6'),
+            ('Ingold', 'Gabriela', False, '', 1083, 0, 'FDP Ost', '6'),
+            ('Mollet', 'Patrick', False, '', 705, 0, 'FDP Ost', '6'),
+            ('Grüter', 'Arno', False, '', 897, 0, 'FDP West', '7'),
+            ('Gygli', 'Daniel', False, '', 717, 0, 'FDP West', '7'),
+            ('Siegrist', 'Birgitt', False, '', 493, 0, 'FDP West', '7'),
+            ('Stadlin', 'Daniel', False, '', 731, 0, 'glp', '8'),
+            ('Kottelat Schloesing', 'Michèle', False, '', 508, 0, 'glp', '8'),
+            ('Soltermann', 'Claus', False, '', 451, 0, 'glp', '8'),
+            ('Mauchle', 'Florian', False, '', 260, 0, 'Piraten', '9'),
+            ('Thöni', 'Stefan', False, '', 211, 0, 'Piraten', '9')
         ],
         'election': model,
         'embed': False,
@@ -765,56 +765,57 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
 
     assert data == {
         'candidates': [
-            ('Lustenberger', 'Andreas', False, '', 3240, 'ALG', '1'),
-            ('Estermann', 'Astrid', False, '', 1327, 'ALG', '1'),
-            ('Schriber-Neiger', 'Hanni', False, '', 1206, 'ALG', '1'),
-            ('Schuler', 'Hubert', False, '', 3859, 'SP', '10'),
-            ('Bürgi Dellsperger', 'Christina', False, '', 2987, 'SP', '10'),
-            ('Sivaganesan', 'Rupan', False, '', 1874, 'SP', '10'),
-            ('Hutter Elsener', 'Simone', False, '', 929, 'SP Frauen', '11'),
-            ('Hug', 'Malaika', False, '', 684, 'SP Frauen', '11'),
-            ('Mäder Beglinger', 'Anne', False, '', 561, 'SP Frauen', '11'),
-            ('Spescha', 'Anna', False, '', 555, 'SP Juso', '12'),
-            ('Krasnici', 'Denis', False, '', 550, 'SP Juso', '12'),
-            ('Koepfli', 'Virginia', False, '', 218, 'SP Juso', '12'),
-            ('Dzaferi', 'Zari', False, '', 2303, 'SP Männer', '13'),
-            ('Suter', 'Guido', False, '', 545, 'SP Männer', '13'),
-            ('Freimann', 'Fabian', False, '', 394, 'SP Männer', '13'),
-            ('Coralic', 'Fadila', False, '', 144, 'SP Migrant.', '14'),
-            ('Sönmez', 'Sehriban', False, '', 117, 'SP Migrant.', '14'),
-            ('Simsek', 'Deniz', False, '', 82, 'SP Migrant.', '14'),
-            ('Aeschi', 'Thomas', True, '', 17034, 'SVP', '15'),
-            ('Werner', 'Thomas', False, '', 7206, 'SVP', '15'),
-            ('Villiger', 'Thomas', False, '', 5629, 'SVP', '15'),
-            ('Pfisterer', 'Luc', False, '', 269, 'SVP Int.', '16'),
-            ('Bucher', 'Rinaldo', False, '', 168, 'SVP Int.', '16'),
-            ('Hornickel', 'Alexander', False, '', 132, 'SVP Int.', '16'),
-            ('Risi', 'Adrian', False, '', 2607, 'SVP WuG', '17'),
-            ('Brunner', 'Philip C.', False, '', 1159, 'SVP WuG', '17'),
-            ('Gertsch', 'Beat', False, '', 607, 'SVP WuG', '17'),
-            ('Widmer', 'Fabienne', False, '', 345, 'ALG Junge', '2'),
-            ('Gut', 'Christina', False, '', 235, 'ALG Junge', '2'),
-            ('Perucchi', 'Alessandro', False, '', 222, 'ALG Junge', '2'),
-            ('Odermatt', 'Anastas', False, '', 637, 'ALG Bildung', '3'),
-            ('Haas', 'Esther', False, '', 559, 'ALG Bildung', '3'),
-            ('Zimmermann Gibson', 'Tabea', False, '', 490, 'ALG Bildung', '3'),
-            ('Pfister', 'Gerhard', True, '', 16134, 'CVP', '4'),
-            ('Barmet-Schelbert', 'Monika', False, '', 4093, 'CVP', '4'),
-            ('Hausheer', 'Andreas', False, '', 3606, 'CVP', '4'),
-            ('Bieri', 'Anna', False, '', 3908, 'CVP Junge', '5'),
-            ('Iten', 'Christoph', False, '', 1394, 'CVP Junge', '5'),
-            ('Kremmel', 'Corina', False, '', 1163, 'CVP Junge', '5'),
-            ('Pezzatti', 'Bruno', True, '', 10174, 'FDP Ost', '6'),
-            ('Ingold', 'Gabriela', False, '', 3637, 'FDP Ost', '6'),
-            ('Mollet', 'Patrick', False, '', 2190, 'FDP Ost', '6'),
-            ('Grüter', 'Arno', False, '', 1706, 'FDP West', '7'),
-            ('Gygli', 'Daniel', False, '', 1378, 'FDP West', '7'),
-            ('Siegrist', 'Birgitt', False, '', 1142, 'FDP West', '7'),
-            ('Stadlin', 'Daniel', False, '', 1823, 'glp', '8'),
-            ('Kottelat Schloesing', 'Michèle', False, '', 1256, 'glp', '8'),
-            ('Soltermann', 'Claus', False, '', 1043, 'glp', '8'),
-            ('Mauchle', 'Florian', False, '', 629, 'Piraten', '9'),
-            ('Thöni', 'Stefan', False, '', 488, 'Piraten', '9')
+            ('Lustenberger', 'Andreas', False, '', 3240, 0, 'ALG', '1'),
+            ('Estermann', 'Astrid', False, '', 1327, 0, 'ALG', '1'),
+            ('Schriber-Neiger', 'Hanni', False, '', 1206, 0, 'ALG', '1'),
+            ('Schuler', 'Hubert', False, '', 3859, 0, 'SP', '10'),
+            ('Bürgi Dellsperger', 'Christina', False, '', 2987, 0, 'SP', '10'),
+            ('Sivaganesan', 'Rupan', False, '', 1874, 0, 'SP', '10'),
+            ('Hutter Elsener', 'Simone', False, '', 929, 0, 'SP Frauen', '11'),
+            ('Hug', 'Malaika', False, '', 684, 0, 'SP Frauen', '11'),
+            ('Mäder Beglinger', 'Anne', False, '', 561, 0, 'SP Frauen', '11'),
+            ('Spescha', 'Anna', False, '', 555, 0, 'SP Juso', '12'),
+            ('Krasnici', 'Denis', False, '', 550, 0, 'SP Juso', '12'),
+            ('Koepfli', 'Virginia', False, '', 218, 0, 'SP Juso', '12'),
+            ('Dzaferi', 'Zari', False, '', 2303, 0, 'SP Männer', '13'),
+            ('Suter', 'Guido', False, '', 545, 0, 'SP Männer', '13'),
+            ('Freimann', 'Fabian', False, '', 394, 0, 'SP Männer', '13'),
+            ('Coralic', 'Fadila', False, '', 144, 0, 'SP Migrant.', '14'),
+            ('Sönmez', 'Sehriban', False, '', 117, 0, 'SP Migrant.', '14'),
+            ('Simsek', 'Deniz', False, '', 82, 0, 'SP Migrant.', '14'),
+            ('Aeschi', 'Thomas', True, '', 17034, 0, 'SVP', '15'),
+            ('Werner', 'Thomas', False, '', 7206, 0, 'SVP', '15'),
+            ('Villiger', 'Thomas', False, '', 5629, 0, 'SVP', '15'),
+            ('Pfisterer', 'Luc', False, '', 269, 0, 'SVP Int.', '16'),
+            ('Bucher', 'Rinaldo', False, '', 168, 0, 'SVP Int.', '16'),
+            ('Hornickel', 'Alexander', False, '', 132, 0, 'SVP Int.', '16'),
+            ('Risi', 'Adrian', False, '', 2607, 0, 'SVP WuG', '17'),
+            ('Brunner', 'Philip C.', False, '', 1159, 0, 'SVP WuG', '17'),
+            ('Gertsch', 'Beat', False, '', 607, 0, 'SVP WuG', '17'),
+            ('Widmer', 'Fabienne', False, '', 345, 0, 'ALG Junge', '2'),
+            ('Gut', 'Christina', False, '', 235, 0, 'ALG Junge', '2'),
+            ('Perucchi', 'Alessandro', False, '', 222, 0, 'ALG Junge', '2'),
+            ('Odermatt', 'Anastas', False, '', 637, 0, 'ALG Bildung', '3'),
+            ('Haas', 'Esther', False, '', 559, 0, 'ALG Bildung', '3'),
+            ('Zimmermann Gibson', 'Tabea', False, '', 490, 0, 'ALG Bildung',
+             '3'),
+            ('Pfister', 'Gerhard', True, '', 16134, 0, 'CVP', '4'),
+            ('Barmet-Schelbert', 'Monika', False, '', 4093, 0, 'CVP', '4'),
+            ('Hausheer', 'Andreas', False, '', 3606, 0, 'CVP', '4'),
+            ('Bieri', 'Anna', False, '', 3908, 0, 'CVP Junge', '5'),
+            ('Iten', 'Christoph', False, '', 1394, 0, 'CVP Junge', '5'),
+            ('Kremmel', 'Corina', False, '', 1163, 0, 'CVP Junge', '5'),
+            ('Pezzatti', 'Bruno', True, '', 10174, 0, 'FDP Ost', '6'),
+            ('Ingold', 'Gabriela', False, '', 3637, 0, 'FDP Ost', '6'),
+            ('Mollet', 'Patrick', False, '', 2190, 0, 'FDP Ost', '6'),
+            ('Grüter', 'Arno', False, '', 1706, 0, 'FDP West', '7'),
+            ('Gygli', 'Daniel', False, '', 1378, 0, 'FDP West', '7'),
+            ('Siegrist', 'Birgitt', False, '', 1142, 0, 'FDP West', '7'),
+            ('Stadlin', 'Daniel', False, '', 1823, 0, 'glp', '8'),
+            ('Kottelat Schloesing', 'Michèle', False, '', 1256, 0, 'glp', '8'),
+            ('Soltermann', 'Claus', False, '', 1043, 0, 'glp', '8'),
+            ('Mauchle', 'Florian', False, '', 629, 0, 'Piraten', '9'),
+            ('Thöni', 'Stefan', False, '', 488, 0, 'Piraten', '9')
         ],
         'election': model,
         'embed': False,

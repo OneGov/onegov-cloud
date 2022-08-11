@@ -70,11 +70,13 @@ Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Fo
 
 ### Rohdaten
 
+#### Kandidierendenresultate
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+Die Rohdaten der Kandidierenden sind in den folgenden Formaten verfügbar:
 
 Format|URL
 ---|---
@@ -97,6 +99,7 @@ Name|Beschreibung
 `entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Die Anzahl Stimmberechtigter der Gemeinde.
+`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 `entity_blank_ballots`|Die Anzahl leerer Stimmzettel der Gemeinde.
 `entity_invalid_ballots`|Die Anzahl ungültiger Stimmzettel der Gemeinde.
@@ -115,18 +118,21 @@ Name|Beschreibung
 `candidate_first_name`|Der Vorname des Kandidierenden.
 `candidate_id`|Die ID des Kandidierenden.
 `candidate_elected`|Wahr, falls der Kandidierenden gewählt wurde.
+`candidate_party`|Der Name der Partei.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
 `panachage_votes_from_list_XX`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 
-### Parteiresultate
+#### Parteiresultate
 
 ```
 URL: /election/{id}/data-parties-{format}
 ```
 
-Die Rohdaten, die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
+Die Rohdaten der Parteien sind in den folgenden Formaten verfügbar:
 
 Format|URL
 ---|---
@@ -140,7 +146,8 @@ Name|Description
 ---|---
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
-`name`|Der Name der Partei.
+`name`|Der Name der Partei in der Standardsprache.
+`name_{locale}`|Übersetzter Name der Partei, z. B. `name_de_ch` für den deutschen Namen.
 `id`|ID der Partei (beliebige Zahl).
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
@@ -184,11 +191,12 @@ Name|Beschreibung
 `status`|Zwischenergebnisse (`interim`), Endergebnisse (`final`) oder unbekannt (`unknown`).
 `type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
-`entity_name`|Der Name der Gemeinde.
-`entity_district`|Wahlkreis/Bezirk/Region der Gemeinde.
+`name`|Der Name der Gemeinde.
+`district`|Wahlkreis/Bezirk/Region der Gemeinde.
 `counted`|Wahr, wenn das Resultat ausgezählt wurde. Falsch, wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja-Stimmen
 `nays`|Die Anzahl Nein-Stimmen
 `invalid`|Die Anzahl ungültiger Stimmen
 `empty`|Die Anzahl leerer Stimmen
 `eligible_voters`|Die Anzahl Stimmberechtigter
+`expats`|Anzahl Auslandschweizer der Gemeinde.

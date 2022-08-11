@@ -15,13 +15,13 @@ from onegov.form.fields import TimeField
 
 
 WEEKDAYS = (
-    (str(MO.weekday), _("Mo")),
-    (str(TU.weekday), _("Tu")),
-    (str(WE.weekday), _("We")),
-    (str(TH.weekday), _("Th")),
-    (str(FR.weekday), _("Fr")),
-    (str(SA.weekday), _("Sa")),
-    (str(SU.weekday), _("Su")),
+    (MO.weekday, _("Mo")),
+    (TU.weekday, _("Tu")),
+    (WE.weekday, _("We")),
+    (TH.weekday, _("Th")),
+    (FR.weekday, _("Fr")),
+    (SA.weekday, _("Sa")),
+    (SU.weekday, _("Su")),
 )
 
 
@@ -83,7 +83,7 @@ class AllocationFormHelpers(object):
 
         return datetime.combine(d, t)
 
-    def is_excluded(self, date):
+    def is_excluded(self, dt):
         return False
 
 
@@ -215,6 +215,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     except_for = MultiCheckboxField(
         label=_("Except for"),
         choices=WEEKDAYS,
+        coerce=int,
         render_kw={
             'prefix_label': False,
             'class_': 'oneline-checkboxes'
@@ -231,9 +232,31 @@ class AllocationForm(Form, AllocationFormHelpers):
         default='yes',
         fieldset=_("Date"))
 
+    during_school_holidays = RadioField(
+        label=_("During school holidays"),
+        choices=(
+            ('yes', _("Yes")),
+            ('no', _("No"))
+        ),
+        default='yes',
+        fieldset=_("Date"))
+
+    access = RadioField(
+        label=_("Access"),
+        choices=(
+            ('public', _("Public")),
+            ('private', _("Only by privileged users")),
+            ('member', _("Only by privileged users and members")),
+        ),
+        default='public',
+        fieldset=_("Security")
+    )
+
     def on_request(self):
         if not self.request.app.org.holidays:
             self.delete_field('on_holidays')
+        if not self.request.app.org.has_school_holidays:
+            self.delete_field('during_school_holidays')
 
     def ensure_start_before_end(self):
         if self.start.data and self.end.data:
@@ -245,7 +268,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     def weekdays(self):
         """ The rrule weekdays derived from the except_for field. """
         exceptions = {x for x in (self.except_for.data or tuple())}
-        return [int(d[0]) for d in WEEKDAYS if d[0] not in exceptions]
+        return [d[0] for d in WEEKDAYS if d[0] not in exceptions]
 
     @cached_property
     def exceptions(self):
@@ -260,8 +283,28 @@ class AllocationForm(Form, AllocationFormHelpers):
 
         return self.request.app.org.holidays
 
-    def is_excluded(self, date):
-        return date.date() in self.exceptions
+    @cached_property
+    def ranged_exceptions(self):
+        if not hasattr(self, 'request'):
+            return ()
+
+        if not self.during_school_holidays:
+            return ()
+
+        if self.during_school_holidays.data == 'yes':
+            return ()
+
+        return tuple(self.request.app.org.school_holidays)
+
+    def is_excluded(self, dt):
+        date = dt.date()
+        if date in self.exceptions:
+            return True
+
+        for start, end in self.ranged_exceptions:
+            if start <= date <= end:
+                return True
+        return False
 
     @property
     def dates(self):
@@ -291,7 +334,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     @property
     def data(self):
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
-        raise NotImplementedError
+        return {'access': self.access.data}
 
 
 class AllocationEditForm(Form, AllocationFormHelpers):
@@ -309,6 +352,26 @@ class AllocationEditForm(Form, AllocationFormHelpers):
         validators=[InputRequired()],
         fieldset=_("Date")
     )
+
+    access = RadioField(
+        label=_("Access"),
+        choices=(
+            ('public', _("Public")),
+            ('private', _("Only by privileged users")),
+            ('member', _("Only by privileged users and members")),
+        ),
+        default='public',
+        fieldset=_("Security")
+    )
+
+    @property
+    def data(self):
+        """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
+        return {'access': self.access.data}
+
+    def apply_data(self, data):
+        if data and 'access' in data:
+            self.access.data = data['access']
 
 
 class Daypasses(object):
@@ -336,7 +399,6 @@ class DaypassAllocationForm(AllocationForm, Daypasses):
 
     whole_day = True
     partly_available = False
-    data = None
 
     @property
     def quota(self):
@@ -359,7 +421,6 @@ class DaypassAllocationEditForm(AllocationEditForm, Daypasses):
 
     whole_day = True
     partly_available = False
-    data = None
 
     @property
     def quota(self):
@@ -382,6 +443,7 @@ class DaypassAllocationEditForm(AllocationEditForm, Daypasses):
         self.date.data = start.date()
 
     def apply_model(self, model):
+        self.apply_data(model.data)
         self.date.data = model.display_start().date()
         self.daypasses.data = model.quota
         self.daypasses_limit.data = model.quota_limit
@@ -443,8 +505,6 @@ class RoomAllocationForm(AllocationForm):
     def quota(self):
         return self.per_time_slot.data
 
-    data = None
-
     @property
     def whole_day(self):
         return self.as_whole_day.data == 'yes'
@@ -494,7 +554,6 @@ class DailyItemAllocationForm(AllocationForm, DailyItemFields):
 
     whole_day = True
     partly_available = False
-    data = None
 
     @property
     def quota(self):
@@ -516,7 +575,6 @@ class DailyItemAllocationForm(AllocationForm, DailyItemFields):
 class DailyItemAllocationEditForm(AllocationEditForm, DailyItemFields):
     whole_day = True
     partly_available = False
-    data = None
 
     @property
     def quota(self):
@@ -539,6 +597,7 @@ class DailyItemAllocationEditForm(AllocationEditForm, DailyItemFields):
         self.date.data = start.date()
 
     def apply_model(self, model):
+        self.apply_data(model.data)
         self.date.data = model.display_start().date()
         self.items.data = model.quota
         self.item_limit.data = model.quota_limit
@@ -596,8 +655,6 @@ class RoomAllocationEditForm(AllocationEditForm):
     def quota(self):
         return self.per_time_slot.data
 
-    data = None
-
     @property
     def whole_day(self):
         return self.as_whole_day.data == 'yes'
@@ -627,6 +684,7 @@ class RoomAllocationEditForm(AllocationEditForm):
         self.end_time.data = end.time()
 
     def apply_model(self, model):
+        self.apply_data(model.data)
         self.apply_dates(model.display_start(), model.display_end())
         self.as_whole_day.data = model.whole_day and 'yes' or 'no'
         self.per_time_slot.data = model.quota

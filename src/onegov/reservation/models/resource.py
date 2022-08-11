@@ -70,7 +70,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     #: the payment method
     payment_method = content_property()
@@ -114,7 +114,8 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     pick_up = content_property()
 
     __mapper_args__ = {
-        "polymorphic_on": 'type'
+        "polymorphic_on": 'type',
+        'polymorphic_identity': 'generic'
     }
 
     allocations = relationship(

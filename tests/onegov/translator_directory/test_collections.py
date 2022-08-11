@@ -1,17 +1,19 @@
+from onegov.gis import Coordinates
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import INTERPRETING_TYPES, \
     PROFESSIONAL_GUILDS
+from onegov.user import UserCollection
 from tests.onegov.translator_directory.shared import create_languages, \
-    create_translator
+    create_translator, translator_data
 
 
-def test_translator_search(session):
+def test_translator_collection_search(translator_app):
     interpreting_types = list(INTERPRETING_TYPES.keys())
     guild_types = list(PROFESSIONAL_GUILDS.keys())
     seba = create_translator(
-        session,
+        translator_app,
         email='sm@mh.ch',
         first_name='Sebastian Hans',
         last_name='Meier Hugentobler',
@@ -21,7 +23,7 @@ def test_translator_search(session):
     )
 
     mary = create_translator(
-        session,
+        translator_app,
         email='mary@t.ch',
         first_name='Mary Astiana',
         last_name='Sitkova Lavrova',
@@ -30,7 +32,7 @@ def test_translator_search(session):
         expertise_professional_guilds_other=['Geologie']
     )
 
-    translators = TranslatorCollection(session)
+    translators = TranslatorCollection(translator_app)
 
     # term
     translators.search = 'Lavrov'
@@ -68,18 +70,29 @@ def test_translator_search(session):
     translators.guilds = ['Geologie']
     assert translators.query().all() == [mary]
 
+    # state
+    seba.state = 'proposed'
+    translators.guilds = []
+    translators.state = 'proposed'
+    assert translators.query().all() == [seba]
 
-def test_translator_collection(session):
+
+def test_translator_collection(translator_app):
+    session = translator_app.session()
     langs = create_languages(session)
-    collection = TranslatorCollection(session)
-    james = create_translator(session, email='james@memo.com', last_name='Z')
+    collection = TranslatorCollection(translator_app)
+    james = create_translator(
+        translator_app, email='james@memo.com', last_name='Z'
+    )
 
     translator = session.query(collection.model_class).one()
     assert translator == collection.by_id(translator.id)
     assert collection.query().all() == [translator]
 
     # Adds second translator
-    bob = create_translator(session, email='bob@memo.com', last_name='X')
+    bob = create_translator(
+        translator_app, email='bob@memo.com', last_name='X'
+    )
 
     # Test filter spoken language
     collection.spoken_langs = [langs[0].id]
@@ -120,11 +133,105 @@ def test_translator_collection(session):
     assert collection.query().all() == [james, bob]
 
 
-def test_collection_wrong_user_input(session):
+def test_translator_collection_coordinates(translator_app):
+    translators = TranslatorCollection(translator_app)
+    trs = translators.add(
+        **translator_data,
+        coordinates=Coordinates()
+    )
+    # somehow, the instance has to be created in order to have deferred content
+    # def add() would not have been overwritten
+    assert trs.coordinates == Coordinates()
+
+
+def test_translator_collection_wrong_user_input(translator_app):
     # Prevent wrong user input from going to the db query
-    coll = TranslatorCollection(session, order_by='nothing', order_desc='hey')
+    coll = TranslatorCollection(
+        translator_app, order_by='nothing', order_desc='hey'
+    )
     assert coll.order_desc is False
     assert coll.order_by == 'last_name'
+
+
+def test_translator_collection_update(translator_app):
+    session = translator_app.session()
+    collection = TranslatorCollection(translator_app)
+    users = UserCollection(session)
+
+    # Create
+    translator_a = collection.add(first_name='A', last_name='A', email=None)
+    translator_b = collection.add(first_name='B', last_name='B', email='b@b.b')
+    translator_x = collection.add(first_name='C', last_name='C', email='x@x.x',
+                                  update_user=False)
+    assert not translator_a.user
+    assert translator_b.user.username == 'b@b.b'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+    assert not translator_x.user
+
+    # Correct role and state
+    translator_b.user.active = False
+    translator_b.user.role = 'member'
+    session.flush()
+    session.expire_all()
+    collection.update_user(translator_a, translator_a.email)
+    collection.update_user(translator_b, translator_b.email)
+    session.flush()
+    session.expire_all()
+    assert not translator_a.user
+    assert translator_b.user.username == 'b@b.b'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+
+    # Add / Deactivate
+    collection.update_user(translator_a, 'a@a.a')
+    collection.update_user(translator_b, None)
+    translator_a.email = 'a@a.a'
+    translator_b.email = None
+    session.flush()
+    session.expire_all()
+    user_b = users.by_username('b@b.b')
+    assert translator_a.user.username == 'a@a.a'
+    assert translator_a.user.role == 'translator'
+    assert translator_a.user.active is True
+    assert not translator_b.user
+    assert not user_b.active
+
+    # Delete / Reactivate
+    user_b.role = 'member'
+    session.flush()
+    session.expire_all()
+    collection.delete(translator_a)
+    collection.update_user(translator_b, 'b@b.b')
+    translator_b.email = 'b@b.b'
+    session.flush()
+    session.expire_all()
+    user_a = users.by_username('a@a.a')
+    assert not user_a.active
+    assert not user_a.translator
+    assert translator_b.user.username == 'b@b.b'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+
+    # Change
+    collection.update_user(translator_b, 'c@c.c')
+    translator_b.email = 'c@c.c'
+    session.flush()
+    session.expire_all()
+    assert translator_b.user.username == 'c@c.c'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+    assert user_b.username == 'c@c.c'
+
+    collection.update_user(translator_b, 'a@a.a')
+    translator_b.email = 'a@a.a'
+    session.flush()
+    session.expire_all()
+    assert translator_b.user.username == 'a@a.a'
+    assert translator_b.user.role == 'translator'
+    assert translator_b.user.active
+    assert user_a.translator == translator_b
+    assert not user_b.translator
 
 
 def test_language_collection(session):

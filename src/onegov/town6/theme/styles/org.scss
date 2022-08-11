@@ -97,6 +97,10 @@ body {
     width: 100%;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 .off-canvas-content {
     display: flex;
     flex-direction: column;
@@ -111,6 +115,9 @@ main {
     min-height: 100%;
 }
 
+.content {
+    padding-bottom: 3rem;
+}
 
 article {
     background: $white;
@@ -217,6 +224,7 @@ footer {
 
     hr {
         @include hairline;
+        margin: 1.25rem 0 !important;
     }
 
     img {
@@ -432,9 +440,29 @@ $formlist-padding: .75rem 0;
 
 .forms-list {
     margin-top: 0 !important;
+
     li:last-of-type {
         border: 0;
         padding-bottom: 1.5rem;
+    }
+
+    .list-hint {
+        border-bottom: 0 !important;
+        border-top: 1px solid #e0e3e5;
+        color: #707070;
+        margin-bottom: .2em;
+        max-width: 90%;
+
+        & > div {
+            &.hint-stop::before {
+                color: #b2232f;
+            }
+
+            &::before {
+                font-weight: bold;
+                margin-right: .5rem;
+            }
+        }
     }
 }
 
@@ -528,7 +556,6 @@ $pageref-color-hover: $iron;
 
     &> *:last-child {
         margin-bottom: 0 !important;
-        border: 1px blue !important;
     }
 }
 
@@ -541,7 +568,7 @@ $pageref-color-hover: $iron;
         border-top: 1px solid #e1e4e6;
         padding-top: 1rem;
     }
-}   
+}
 
 /*
     Sort topics
@@ -586,4 +613,41 @@ body:not(.editor-layout) {
     .orbit.slider {
         margin-bottom: -2rem;
     }
+}
+
+/*
+    Accessibility
+*/
+.visually-hidden {
+    @include element-invisible;
+}
+
+/*
+    External links
+*/
+a > i.fa-external-link-alt {
+    margin-left: .3rem;
+}
+
+.page-links, .forms-list {
+    .edit-link .fa-edit {
+        color: #cacaca;
+        display: block;
+    }
+}
+
+.partners i.fa-external-link-alt::before {
+    position: absolute;
+}
+
+/*
+    Edit-bar
+*/
+.is-dropdown-submenu {
+    max-height: 60vh;
+    overflow: auto;/* to get scroll */
+}
+
+section#content h2 {
+    margin-top: 2rem !important;
 }

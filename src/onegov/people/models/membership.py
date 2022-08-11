@@ -24,11 +24,11 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: subclasses of this class. See
     #: `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     __mapper_args__ = {
         'polymorphic_on': type,
-        'polymorphic_identity': None,
+        'polymorphic_identity': 'generic',
     }
 
     es_public = True
@@ -84,8 +84,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def siblings_by_agency(self):
-        """ Returns a query that includes all siblings by agency, including the item
-        itself ordered by `order_within_agency`.
+        """ Returns a query that includes all siblings by agency, including
+        the item itself ordered by `order_within_agency`.
         """
         query = object_session(self).query(self.__class__)
         query = query.order_by(self.__class__.order_within_agency)
@@ -94,8 +94,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def siblings_by_person(self):
-        """ Returns a query that includes all siblings by person, including the item
-        itself ordered by `order_within_person`.
+        """ Returns a query that includes all siblings by person, including
+        the item itself ordered by `order_within_person`.
         """
         query = object_session(self).query(self.__class__)
         query = query.order_by(self.__class__.order_within_person)

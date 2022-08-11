@@ -97,7 +97,7 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    expats = BooleanField(
+    has_expats = BooleanField(
         label=_("Expats"),
         description=_("The election contains seperate results for expats."),
         render_kw=dict(force_simple=True)
@@ -315,7 +315,7 @@ class ElectionForm(Form):
         model.absolute_majority = self.absolute_majority.data or None
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
-        model.expats = self.expats.data
+        model.has_expats = self.has_expats.data
 
         titles = {}
         if self.election_de.data:
@@ -404,7 +404,7 @@ class ElectionForm(Form):
         self.absolute_majority.data = model.absolute_majority
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit
-        self.expats.data = model.expats
+        self.has_expats.data = model.has_expats
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)

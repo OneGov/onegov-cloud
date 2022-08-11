@@ -98,7 +98,7 @@ def es_agency_app(request):
 @fixture(scope='function')
 def client(agency_app):
     client = Client(agency_app)
-    client.skip_first_form = True
+    client.skip_n_forms = 1
     client.use_intercooler = True
     return client
 
@@ -106,6 +106,6 @@ def client(agency_app):
 @fixture(scope='function')
 def client_with_es(es_agency_app):
     client = Client(es_agency_app)
-    client.skip_first_form = True
+    client.skip_n_forms = 1
     client.use_intercooler = True
     return client

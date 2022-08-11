@@ -40,7 +40,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     #:
     #: this is independent from the :attr:`onegov.file.models.File.type`
     #: attribute on the :class:`~onegov.file.models.File`.
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     files = relationship(
         'File',
@@ -50,5 +50,6 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     )
 
     __mapper_args__ = {
-        'polymorphic_on': 'type'
+        'polymorphic_on': 'type',
+        'polymorphic_identity': 'generic'
     }

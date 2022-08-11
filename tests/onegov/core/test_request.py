@@ -68,6 +68,23 @@ def test_return_to_mixin():
     assert r.redirect('http://safe').location == 'http://safe'
 
 
+def test_vhm_root_application_url():
+
+    request = CoreRequest(environ={
+        'wsgi.url_scheme': 'https',
+        'PATH_INFO': '/',
+        'SCRIPT_NAME': '/town/example',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https',
+        'HTTP_HOST': 'example.com',
+        'HTTP_X_VHM_ROOT': '/town/example/',
+    }, app=Bunch())
+
+    assert request.x_vhm_root == '/town/example'
+    assert request.application_url == 'https://example.com/'
+
+
 def test_return_to(redis_url):
 
     class App(Framework):
@@ -161,7 +178,7 @@ def test_has_permission(redis_url):
 
         user = request.params.get('user')
         if user:
-            user = Bunch(id=user, group_id=None, role=None)
+            user = Bunch(username=user, group_id=None, role=None)
 
         if request.has_permission(self, permission, user):
             return 'true'

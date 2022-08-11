@@ -70,11 +70,13 @@ Rimanda i dati della visualizzazione principale in forma strutturata.
 
 ### Dati grezzi
 
+#### Risultati dei candidati
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+I dati grezzi dei candidati sono disponibili nei formati seguenti:
 
 Formato|URL
 ---|---
@@ -97,6 +99,7 @@ Nome|Descrizione
 `entity_district`|Il distretto del comune.
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero degli aventi diritto al voto di questo comune.
+`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
 `entity_received_ballots`|Numero di schede ricevute per questo comune.
 `entity_blank_ballots`|Numero di schede bianche per questo comune.
 `entity_invalid_ballots`|Numero di schede nulle per questo comune.
@@ -115,18 +118,21 @@ Nome|Descrizione
 `candidate_first_name`|Nome del candidato.
 `candidate_id`|L'identificativo del candidato.
 `candidate_elected`|Vero se il candidato è stato eletto.
+`candidate_party`|Il nome del partito.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
 `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 I comuni non ancora contati non sono inclusi.
 
-### Risultati dei partiti
+#### Risultati dei partiti
 
 ```
 URL: /election/{id}/data-parties-{format}
 ```
 
-I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati seguenti:
+I dati grezzi dei partiti sono disponibili nei formati seguenti:
 
 Formato|URL
 ---|---
@@ -139,7 +145,8 @@ Nome|Descrizione
 ---|---
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
-`name`|Il nome del partito.
+`name`|Il nome del partito nella lingua definita come standard.
+`name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco.
 `id`|ID del partito.
 `color`|Il colore del partito.
 `mandates`|Il numero di mandati.
@@ -183,11 +190,12 @@ Nome|Descrizione
 `status`|Risultati provvisori (`interim`), risultati finali (`final`) o ignoto (`unknown`).
 `type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
 `entity_id`|ID del comune/dell'ubicazione. Un valore `0` rappresenta gli espatriati.
-`entity_name`|Nome del comune.
-`entity_district`|Il distretto del comune.
+`name`|Nome del comune.
+`district`|Il distretto del comune.
 `counted`|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 `yeas`|Numero di voti favorevoli
 `nays`|Numero di voti contrari
 `invalid`|Numero di voti nulli
 `empty`|Numero di voti in bianco
 `eligible_voters`|Numero di aventi diritto di voto
+`expats`|Anzahl Auslandschweizer der Gemeinde.

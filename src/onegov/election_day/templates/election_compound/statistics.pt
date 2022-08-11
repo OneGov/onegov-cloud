@@ -11,8 +11,8 @@
 
         <tal:block tal:condition="layout.visible">
 
-            <h2 i18n:translate tal:condition="election_compound.completed">Results</h2>
-            <h2 i18n:translate tal:condition="not: election_compound.completed">Intermediate results</h2>
+            <h2 i18n:translate tal:condition="layout.completed">Results</h2>
+            <h2 i18n:translate tal:condition="not: layout.completed">Intermediate results</h2>
 
             <div metal:use-macro="layout.macros['election_compound_factoids']" />
 
@@ -20,9 +20,10 @@
 
             <h3 tal:content="layout.title()" />
 
-            <tal:block metal:use-macro="layout.macros['election-statistics-table']"/>
+            <tal:block metal:use-macro="layout.macros['election-compound-statistics-table']"/>
             <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link" />
 
+            <tal:block metal:use-macro="layout.macros['candidate-statistics']"/>
 
         </tal:block>
 

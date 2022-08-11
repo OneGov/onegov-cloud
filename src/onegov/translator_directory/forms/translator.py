@@ -1,37 +1,53 @@
-import json
 import re
 
 from cached_property import cached_property
-from wtforms import SelectField, StringField, BooleanField, TextAreaField, \
-    RadioField, FloatField
-from wtforms.fields.html5 import DateField, EmailField, IntegerField
-from wtforms.validators import (
-    InputRequired, Email, Optional, ValidationError, Length
-)
-
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField, MultiCheckboxField, \
-    TagsField
-
-from onegov.form.validators import ValidPhoneNumber, \
-    ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
+from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TagsField
+from onegov.form.validators import Stdnum
+from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidSwissSocialSecurityNumber
 from onegov.gis import CoordinatesField
-from onegov.gis.utils import MapboxRequests
-from onegov.translator_directory import _, log
+from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.collections.translator import order_cols, \
+from onegov.translator_directory.collections.translator import order_cols
+from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.constants import (
-    full_text_max_chars, GENDERS, ADMISSIONS,
-    INTERPRETING_TYPES, PROFESSIONAL_GUILDS
-)
-from onegov.translator_directory.models.translator import Translator, \
-    mother_tongue_association_table, \
-    spoken_association_table, written_association_table, \
+from onegov.translator_directory.constants import ADMISSIONS
+from onegov.translator_directory.constants import full_text_max_chars
+from onegov.translator_directory.constants import GENDERS
+from onegov.translator_directory.constants import INTERPRETING_TYPES
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
+from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
+from onegov.translator_directory.models.translator import \
     certificate_association_table
-from onegov.translator_directory.utils import parse_directions_result
+from onegov.translator_directory.models.translator import \
+    monitoring_association_table
+from onegov.translator_directory.models.translator import \
+    mother_tongue_association_table
+from onegov.translator_directory.models.translator import \
+    spoken_association_table
+from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.models.translator import \
+    written_association_table
+from wtforms import BooleanField
+from wtforms import FloatField
+from wtforms import RadioField
+from wtforms import SelectField
+from wtforms import StringField
+from wtforms import TextAreaField
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import IntegerField
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import Length
+from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 class FormChoicesMixin:
@@ -46,7 +62,7 @@ class FormChoicesMixin:
 
     @property
     def available_additional_guilds(self):
-        translators = TranslatorCollection(self.request.session)
+        translators = TranslatorCollection(self.request.app)
         return translators.available_additional_professional_guilds
 
     @cached_property
@@ -88,7 +104,7 @@ class FormChoicesMixin:
             for k, v in PROFESSIONAL_GUILDS.items()
         ]
         result.extend([(k, k) for k in self.available_additional_guilds])
-        return sorted(result, key=lambda x: x[0].upper())
+        return sorted(result, key=lambda x: x[1].upper())
 
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
@@ -102,7 +118,7 @@ class EditorTranslatorForm(Form, FormChoicesMixin):
         model.pers_id = self.pers_id.data or None
 
 
-class TranslatorForm(Form, FormChoicesMixin):
+class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
 
     pers_id = IntegerField(
         label=_('Personal ID'),
@@ -279,6 +295,16 @@ class TranslatorForm(Form, FormChoicesMixin):
         choices=[]
     )
 
+    monitoring_languages_ids = ChosenSelectMultipleField(
+        label=_('Monitoring languages'),
+        validators=[StrictOptional()],
+        choices=[]
+    )
+
+    occupation = StringField(
+        label=_('Current professional activity')
+    )
+
     expertise_professional_guilds = MultiCheckboxField(
         label=_('Expertise by professional guild'),
         choices=[
@@ -333,7 +359,7 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     @property
     def cert_collection(self):
-        return LanguageCollection(self.request.session)
+        return LanguageCertificateCollection(self.request.session)
 
     @property
     def certificates(self):
@@ -351,10 +377,15 @@ class TranslatorForm(Form, FormChoicesMixin):
     def written_languages(self):
         return self.lang_collection.by_ids(self.written_languages_ids.data)
 
+    @property
+    def monitoring_languages(self):
+        return self.lang_collection.by_ids(self.monitoring_languages_ids.data)
+
     special_fields = {
         'mother_tongues_ids': mother_tongue_association_table,
         'spoken_languages_ids': spoken_association_table,
         'written_languages_ids': written_association_table,
+        'monitoring_languages_ids': monitoring_association_table,
         'certificates_ids': certificate_association_table
     }
 
@@ -366,16 +397,21 @@ class TranslatorForm(Form, FormChoicesMixin):
         self.mother_tongues_ids.choices = self.language_choices
         self.spoken_languages_ids.choices = self.language_choices
         self.written_languages_ids.choices = self.language_choices
+        self.monitoring_languages_ids.choices = self.language_choices
         self.certificates_ids.choices = self.certificate_choices
+        self.hide(self.drive_distance)
 
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
-            exclude={'csrf_token', *self.special_fields.keys()})
+            exclude={'csrf_token', *self.special_fields.keys()}
+        )
 
+        data['email'] = data['email'] or None
         data['mother_tongues'] = self.mother_tongues
         data['spoken_languages'] = self.spoken_languages
         data['written_languages'] = self.written_languages
+        data['monitoring_languages'] = self.monitoring_languages
         data['certificates'] = self.certificates
         return data
 
@@ -404,6 +440,9 @@ class TranslatorForm(Form, FormChoicesMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
+        translators = TranslatorCollection(self.request.app)
+        translators.update_user(model, self.email.data)
+
         model.first_name = self.first_name.data
         model.last_name = self.last_name.data
         model.iban = self.iban.data
@@ -435,12 +474,14 @@ class TranslatorForm(Form, FormChoicesMixin):
         model.education_as_interpreter = self.education_as_interpreter.data
         model.comments = self.comments.data or None
         model.for_admins_only = self.for_admins_only.data
+        model.occupation = self.occupation.data
         model.operation_comments = self.operation_comments.data or None
         model.coordinates = self.coordinates.data
 
         self.update_association(model, 'mother_tongues', '_ids')
         self.update_association(model, 'spoken_languages', '_ids')
         self.update_association(model, 'written_languages', '_ids')
+        self.update_association(model, 'monitoring_languages', '_ids')
         self.update_association(model, 'certificates', '_ids')
 
         model.expertise_professional_guilds = \
@@ -449,72 +490,6 @@ class TranslatorForm(Form, FormChoicesMixin):
             self.expertise_professional_guilds_other.data
         model.expertise_interpreting_types = \
             self.expertise_interpreting_types.data
-
-    def ensure_updated_driving_distance(self):
-
-        if not self.coordinates.data:
-            return
-        # also includes the zoom...
-        if isinstance(self.model, Translator) and \
-                self.model.coordinates == self.coordinates.data:
-            return
-
-        def to_tuple(coordinate):
-            return coordinate.lat, coordinate.lon
-
-        if not self.request.app.coordinates:
-            self.drive_distance.errors.append(
-                _("Home location is not configured. "
-                  "Please complete location settings first")
-            )
-            return False
-
-        response = self.directions_api.directions([
-            to_tuple(self.request.app.coordinates),
-            to_tuple(self.coordinates.data)
-        ])
-
-        if response.status_code == 422:
-            message = response.json()['message']
-            self.drive_distance.errors.append(message)
-            log.warning(f'ensure_update_driving_distance: {message}')
-            return False
-
-        if response.status_code != 200:
-            self.drive_distance.errors.append(
-                _('Error in requesting directions from Mapbox (${status})',
-                  mapping={'status': response.status_code})
-            )
-            log.warning(f'Failed to fetch directions for translator '
-                        f'{self.model.id}, '
-                        f'status {response.status_code}, '
-                        f'url: {response.url}')
-            log.warning(json.dumps(response.json(), indent=2))
-            return False
-
-        data = response.json()
-
-        if data['code'] == 'NoRoute':
-            self.drive_distance.errors.append(
-                _('Could not find a route. Check the address again')
-            )
-            return False
-
-        if data['code'] == 'NoSegment':
-            self.drive_distance.errors.append(
-                _('Check if the location of the translator is near a road')
-            )
-            return False
-
-        self.drive_distance.data = parse_directions_result(response)
-
-    @property
-    def directions_api(self):
-        return MapboxRequests(
-            self.request.app.mapbox_token,
-            endpoint='directions',
-            profile='driving'
-        )
 
 
 class TranslatorSearchForm(Form, FormChoicesMixin):

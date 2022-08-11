@@ -7,6 +7,7 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from onegov.election_day.formats.common import validate_gender
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.mappings import INTERNAL_MAJORZ_HEADERS
 from sqlalchemy.orm import object_session
@@ -37,6 +38,9 @@ def parse_election_result(line, errors, entities, election, principal):
         entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
         eligible_voters = validate_integer(line, 'entity_eligible_voters')
+        expats = validate_integer(
+            line, 'entity_expats', optional=True, default=None
+        )
         received_ballots = validate_integer(line, 'entity_received_ballots')
         blank_ballots = validate_integer(line, 'entity_blank_ballots')
         invalid_ballots = validate_integer(line, 'entity_invalid_ballots')
@@ -74,6 +78,7 @@ def parse_election_result(line, errors, entities, election, principal):
                     entity_id=entity_id,
                     counted=counted,
                     eligible_voters=eligible_voters,
+                    expats=expats,
                     received_ballots=received_ballots,
                     blank_ballots=blank_ballots,
                     invalid_ballots=invalid_ballots,
@@ -89,10 +94,13 @@ def parse_candidate(line, errors, election_id):
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
         party = line.candidate_party
+        gender = validate_gender(line)
+        year_of_birth = validate_integer(
+            line, 'candidate_year_of_birth', optional=True, default=None
+        )
 
     except ValueError as e:
         errors.append(e.args[0])
-
     except Exception:
         errors.append(_("Invalid candidate values"))
     else:
@@ -103,7 +111,9 @@ def parse_candidate(line, errors, election_id):
             family_name=family_name,
             first_name=first_name,
             elected=elected,
-            party=party
+            party=party,
+            gender=gender,
+            year_of_birth=year_of_birth
         )
 
 
@@ -162,7 +172,7 @@ def import_election_internal_majorz(election, principal, file, mimetype):
         candidate_result = parse_candidate_result(line, line_errors)
 
         # Skip expats if not enabled
-        if result and result['entity_id'] == 0 and not election.expats:
+        if result and result['entity_id'] == 0 and not election.has_expats:
             continue
 
         # Pass the errors and continue to next line
@@ -191,7 +201,7 @@ def import_election_internal_majorz(election, principal, file, mimetype):
 
     # Add the missing entities
     remaining = set(entities.keys())
-    if election.expats:
+    if election.has_expats:
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:

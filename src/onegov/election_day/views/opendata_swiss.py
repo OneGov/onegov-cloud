@@ -82,6 +82,10 @@ def view_rdf(self, request):
         return text.interpolate(text)
 
     for item in sorted(items, key=lambda i: i.date, reverse=True):
+
+        if not item.completed:
+            continue
+
         is_vote = isinstance(item, Vote)
 
         # IDs
@@ -107,7 +111,8 @@ def view_rdf(self, request):
         )
         sub(
             ds, 'dct:accrualPeriodicity',
-            {'rdf:resource': 'http://purl.org/cld/freq/irregular'}
+            {'rdf:resource': 'http://publications.europa.eu/resource/'
+             'authority/frequency/IRREG'}
         )
 
         # Theme
@@ -117,7 +122,10 @@ def view_rdf(self, request):
         )
 
         # Landing page
-        sub(ds, 'dcat:landingPage', {}, request.link(item, 'data'))
+        sub(
+            ds, 'dcat:landingPage',
+            {'rdf:resource': request.link(item, 'data')}
+        )
 
         # Keywords
         for keyword in (
@@ -227,8 +235,10 @@ def view_rdf(self, request):
 
         # Publisher
         pub = sub(ds, 'dct:publisher')
-        pub = sub(pub, 'rdf:Description')
-        sub(pub, 'rdfs:label', {}, publisher_name)
+        pub = sub(pub, 'foaf:Organization')
+        sub(pub, 'foaf:name', {}, publisher_name)
+
+        #  Contact point
         mail = sub(ds, 'dcat:contactPoint')
         mail = sub(mail, 'vcard:Organization')
         sub(mail, 'vcard:fn', {}, publisher_name)
@@ -295,16 +305,8 @@ def view_rdf(self, request):
             )
 
             # URLs
-            sub(
-                dist, 'dcat:accessURL',
-                {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#anyURI'},
-                url
-            )
-            sub(
-                dist, 'dcat:downloadURL',
-                {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#anyURI'},
-                url
-            )
+            sub(dist, 'dcat:accessURL', {'rdf:resource': url})
+            sub(dist, 'dcat:downloadURL', {'rdf:resource': url})
 
             # Legal
             sub(

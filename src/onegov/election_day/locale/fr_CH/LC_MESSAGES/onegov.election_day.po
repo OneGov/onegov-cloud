@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-05 15:55+0200\n"
+"POT-Creation-Date: 2022-08-10 16:20+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -93,6 +93,10 @@ msgstr ""
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Pas un alphanumerique: ${col}"
+
+#, python-format
+msgid "Invalid gender: ${value}"
+msgstr "Sexe non valide : ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -403,6 +407,12 @@ msgstr "Achèvement"
 msgid "Completed"
 msgstr "Complété"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Répartition haute (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Répartition basse (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
@@ -426,6 +436,19 @@ msgstr "Nombres de votants exacts"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Affiche le nombre exact de votants au lieu des valeurs arrondies."
 
+msgid "Seat allocation"
+msgstr "Attribution des sièges"
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+"Affiche un onglet avec la comparaison de l'attribution des sièges sous forme "
+"de graphique à barres. Nécessite les résultats des partis."
+
+msgid "Views"
+msgstr "Vues"
+
 msgid "List groups"
 msgstr "Groupes de listes"
 
@@ -436,21 +459,6 @@ msgstr ""
 "Affiche un onglet avec les résultats du groupe de liste. Requiert les "
 "résultats des partis avec le nombre de votants. Uniquement pour Doppelter "
 "Pukelsheim."
-
-msgid "Views"
-msgstr "Vues"
-
-msgid "Lists"
-msgstr "Listes"
-
-msgid ""
-"Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-"Always rounded."
-msgstr ""
-"Affiche un onglet avec les résultats agrégés des listes pour toutes les "
-"élections. Seulement utile si les listes correspondent aux groupes de "
-"listes. Uniquement pour Doppelter Pukelsheim. Toujours arrondis."
 
 msgid "Party strengths"
 msgstr "Force des partis"
@@ -483,6 +491,9 @@ msgstr "Webhooks"
 
 msgid "Votes"
 msgstr "Votations"
+
+msgid "Compounds of elections"
+msgstr "Composantes des élections"
 
 msgid "Select at least one election or vote."
 msgstr "Sélectionnez au moins une élection ou un vote."
@@ -590,6 +601,9 @@ msgstr "Titre de le contre-projet"
 msgid "Title of the tie breaker"
 msgstr "Titre de le jeu décisif"
 
+msgid "Lists"
+msgstr "Listes"
+
 msgid "Candidates"
 msgstr "Candidats"
 
@@ -613,9 +627,6 @@ msgstr "Résultats finaux"
 
 msgid "Counter proposal accepted"
 msgstr "Contre-projet accepté"
-
-msgid "Compounds of elections"
-msgstr "Composantes des élections"
 
 msgid "Upload tokens"
 msgstr "Upload tokens"
@@ -707,6 +718,12 @@ msgstr "Région"
 msgid "superregions_label_bl"
 msgstr "Régions"
 
+msgid "Seats"
+msgstr "Sièges"
+
+msgid "Mandates"
+msgstr "Mandats"
+
 msgid "Quarter"
 msgstr "Quartier"
 
@@ -762,6 +779,9 @@ msgstr "Compté"
 msgid "Updated"
 msgstr "Actualisé"
 
+msgid "No results yet"
+msgstr "Pas de résultats à l'heure actuelle"
+
 msgid "Result"
 msgstr "Résultat"
 
@@ -786,8 +806,8 @@ msgstr "Résultats intermédiaires"
 msgid "No candidacies."
 msgstr "Aucune candidature."
 
-msgid "Download"
-msgstr "Télécharger"
+msgid "Download diagram"
+msgstr "Télécharger le diagramme"
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -803,17 +823,20 @@ msgstr ""
 "largeur des barres et des connexions est proportionnelle aux votes, les "
 "barres de couleur bleue contiennent le nombre de mandats."
 
-msgid "Embed heatmap"
+msgid "Embed map"
 msgstr "Intégrer la carte"
 
-msgid "Download heatmap"
+msgid "Download map"
 msgstr "Télécharger la carte"
 
-msgid "Embed"
-msgstr "Intégration"
+msgid "Download"
+msgstr "Télécharger"
 
-msgid "Voters count"
-msgstr "Nombre de votants"
+msgid "No candidates elected yet."
+msgstr "Aucun candidat n'a encore été élu."
+
+msgid "Note on the voters count"
+msgstr "Note sur le nombre d'électeurs"
 
 #. Default: The number of votes of a party is divided by the number of seats to
 #. be allocated in the district concerned. The result is called the voters
@@ -821,10 +844,15 @@ msgstr "Nombre de votants"
 #. election is finished as soon as the number of mandates appears.
 msgid "figcaption_list_groups"
 msgstr ""
-"Le nombre de voix des partis pour une liste est divisé par le nombre de "
-"sièges à attribuer dans la circonscription électorale en question. Le "
-"résultat est appelé le nombre d'électeurs sur la liste. Le nombre de votants "
-"est réparti entre les groupes de listes."
+"Dans une première étape - appelée répartition supérieure - on considère "
+"d'abord tous les suffrages exprimés au niveau cantonal. Les sièges sont "
+"ensuite répartis entre les différents partis en fonction des parts de "
+"suffrages obtenues. Pour que les voix obtenues par les partis dans les "
+"différentes circonscriptions électorales soient comparables au niveau "
+"cantonal et que chaque voix ait le même poids, une pondération est "
+"nécessaire. Pour ce faire, les voix obtenues par un parti sont divisées par "
+"le nombre de sièges à pourvoir dans la circonscription électorale "
+"correspondante. Le résultat de cette opération est le nombre d'électeurs."
 
 msgid "The file is invalid."
 msgstr ""
@@ -864,6 +892,15 @@ msgstr "Mot de passe oublié?"
 
 msgid "Reset password"
 msgstr "Réinitialiser mot de passe"
+
+msgid "female"
+msgstr "femelle"
+
+msgid "male"
+msgstr "homme"
+
+msgid "undetermined"
+msgstr "indéterminé"
 
 msgid "Actions"
 msgstr "Actions"
@@ -941,11 +978,8 @@ msgstr "Connexion de sous-listes"
 msgid "Subtotal"
 msgstr "Sous-total"
 
-msgid "Mandates"
-msgstr "Mandats"
-
-msgid "Seats"
-msgstr "Sièges"
+msgid "Party"
+msgstr "Parti"
 
 msgid "eligible Voters"
 msgstr "Electeurs"
@@ -971,9 +1005,6 @@ msgstr "Participation électorale"
 msgid "Candidate"
 msgstr "Candidat"
 
-msgid "Party"
-msgstr "Parti"
-
 msgid "List"
 msgstr "Liste"
 
@@ -995,6 +1026,15 @@ msgstr "Candidats élus seulement"
 msgid "List group"
 msgstr "Groupe de listes"
 
+msgid "Voters count"
+msgstr "Nombre de votants"
+
+msgid "Embed diagram"
+msgstr "Intégrer un diagramme"
+
+msgid "Embed table"
+msgstr "Intégrer le tableau"
+
 msgid "${counted} of ${total}"
 msgstr "${counted} de ${total}"
 
@@ -1012,9 +1052,6 @@ msgstr "Page suivante"
 
 msgid "You are here"
 msgstr "Vous êtes ici"
-
-msgid "No results yet"
-msgstr "Pas de résultats à l'heure actuelle"
 
 msgid "Alerts"
 msgstr "Alertes"
@@ -1077,19 +1114,19 @@ msgstr "Télécharger tous les résultats dans un PDF :"
 msgid "PDF Results"
 msgstr "PDF Résultats"
 
-msgid ""
-"The raw data used to display the results is available in the following "
-"formats:"
-msgstr ""
-"Les données brutes utilisées pour afficher les résultats sont disponibles "
-"dans les formats suivants:"
+msgid "Candidate results"
+msgstr "Résultats des candidats"
 
-msgid ""
-"The raw data used to display the party results is available in the following "
-"formats:"
+msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
-"Les données brutes utilisées pour afficher les résultats des partis sont "
-"disponibles dans les formats suivants:"
+"Les données brutes des candidats sont disponibles dans les formats suivants :"
+
+msgid "The raw data are available in the following formats:"
+msgstr "Les données brutes sont disponibles dans les formats suivants :"
+
+msgid "The raw data of the parties are available in the following formats:"
+msgstr ""
+"Les données brutes des parties sont disponibles dans les formats suivants :"
 
 msgid "The format of the data is described here:"
 msgstr "Le format des données est décrit ici:"
@@ -1156,6 +1193,12 @@ msgstr ""
 "aux votes inchangés (y compris la liste vierge), les barres du côté droit "
 "aux résultats finale. La largeur des barres et des connexions est "
 "proportionnelle aux votes."
+
+msgid "Count"
+msgstr "Compter"
+
+msgid "Average age"
+msgstr "Âge moyen"
 
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"
@@ -1444,9 +1487,8 @@ msgid "Results deleted."
 msgstr "Résultats supprimés."
 
 #, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr ""
-"Voulez-vous vraiment effacer tous les résultats par parti de \"${item}\" ?"
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Voulez-vous vraiment effacer tous les résultats de \"${item}\" ?"
 
 #, python-format
 msgid "${count} files deleted."
@@ -1469,25 +1511,6 @@ msgstr "Composante supprimée."
 msgid "Delete compound"
 msgstr "Supprimez la composante"
 
-msgid "Election added."
-msgstr "Élection ajoutée."
-
-msgid "Election modified."
-msgstr "Élection modifiée."
-
-msgid "Edit election"
-msgstr "Modifier l’élection"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Voulez-vous vraiment effacer tous les résultats de \"${item}\" ?"
-
-msgid "Election deleted."
-msgstr "Élection supprimée."
-
-msgid "Delete election"
-msgstr "Supprimer l'élection"
-
 msgid "Notifications triggered."
 msgstr "Notifications activées."
 
@@ -1500,6 +1523,21 @@ msgstr ""
 
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Voulez-vous vraiment réactiver les notifications ?"
+
+msgid "Election added."
+msgstr "Élection ajoutée."
+
+msgid "Election modified."
+msgstr "Élection modifiée."
+
+msgid "Edit election"
+msgstr "Modifier l’élection"
+
+msgid "Election deleted."
+msgstr "Élection supprimée."
+
+msgid "Delete election"
+msgstr "Supprimer l'élection"
 
 msgid "Screen added."
 msgstr "Écran ajouté."

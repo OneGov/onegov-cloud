@@ -7,9 +7,24 @@ from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
+from onegov.election_day.utils.election_compound import \
+    get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
+
+
+@ElectionDayApp.view(
+    model=ElectionCompound,
+    request_method='HEAD',
+    permission=Public
+)
+def view_election_compound_head(self, request):
+
+    @request.after
+    def add_headers(response):
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
 
 
 @ElectionDayApp.html(
@@ -38,6 +53,7 @@ def view_election_compound_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
+    session = request.app.session()
     embed = {'districts-map': request.link(self, 'districts-map')}
     media = {'charts': {}}
     layout = ElectionCompoundLayout(self, request)
@@ -52,7 +68,8 @@ def view_election_compound_json(self, request):
         if layout.svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 
-    elected_candidates = get_elected_candidates(self, request.app.session())
+    elected_candidates = get_elected_candidates(self, session).all()
+    candidate_statistics = get_candidate_statistics(self, elected_candidates)
     districts = {
         election.id: {
             'name': election.domain_segment,
@@ -97,6 +114,7 @@ def view_election_compound_json(self, request):
                 'district': districts[candidate.election_id]['name']
             } for candidate in elected_candidates
         ],
+        'candidate_statistics': candidate_statistics,
         'parties': parties,
         'related_link': self.related_link,
         'title': self.title_translations,

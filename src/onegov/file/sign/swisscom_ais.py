@@ -1,7 +1,8 @@
+import io
 import os
 
-from AIS import AIS
-from AIS import PDF
+from AIS import AIS, PDF
+from contextlib import suppress
 from onegov.file.sign.generic import SigningService
 
 
@@ -22,12 +23,17 @@ class SwisscomAIS(SigningService, service_name='swisscom_ais'):
         self.client = AIS(customer, key_static, cert_file, cert_key)
 
     def sign(self, infile, outfile):
-        with self.materialise(infile) as fp:
-            pdf = PDF(fp.name)
-            self.client.sign_one_pdf(pdf)
+        with suppress(io.UnsupportedOperation):
+            infile.seek(0)
 
-        with open(pdf.out_filename, 'rb') as fp:
-            for chunk in iter(lambda: fp.read(4096), b''):
-                outfile.write(chunk)
+        # NOTE: We gain nothing from a chunked read, since we need to
+        #       keep the entire file in memory anyways.
+        inout_stream = io.BytesIO(infile.read())
+
+        pdf = PDF(inout_stream=inout_stream)
+        self.client.sign_one_pdf(pdf)
+
+        # NOTE: Same with the chunked write, the file is already in memory
+        outfile.write(inout_stream.getvalue())
 
         return f'swisscom_ais/{self.customer}/{self.client.last_request_id}'

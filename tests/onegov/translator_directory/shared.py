@@ -9,6 +9,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.models.translator import GENDERS
 
 translator_data = dict(
+    state='published',
     pers_id=1234,
     first_name='Hugo',
     last_name='Benito',
@@ -26,11 +27,14 @@ translator_data = dict(
     bank_name='R-BS',
     bank_address='Bullstreet 5',
     account_owner='Hugo Benito',
+    iban='',
     email='hugo@benito.com',
     tel_mobile='079 000 00 00',
     tel_office='041 444 44 44',
     tel_private=None,
     availability='always',
+    occupation='baker',
+    operation_comments='',
     confirm_name_reveal=None,
     date_of_application=date.today() - timedelta(days=100),
     date_of_decision=date.today() - timedelta(days=50),
@@ -60,7 +64,7 @@ def create_certificates(session):
     return certs
 
 
-def create_translator(session, email=None, **kwargs):
+def create_translator(translator_app, email=None, **kwargs):
     data = deepcopy(translator_data)
     for key in kwargs:
         if key in data:
@@ -68,11 +72,11 @@ def create_translator(session, email=None, **kwargs):
     if email:
         data['email'] = email
 
-    return TranslatorCollection(session).add(**data)
+    return TranslatorCollection(translator_app).add(**data)
 
 
-def create_translators(session, count=1):
-    translators = TranslatorCollection(session)
+def create_translators(translator_app, count=1):
+    translators = TranslatorCollection(translator_app)
     results = []
     for i in range(count):
         data = deepcopy(translator_data)

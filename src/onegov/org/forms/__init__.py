@@ -17,6 +17,7 @@ from onegov.org.forms.newsletter import NewsletterSendForm
 from onegov.org.forms.newsletter import NewsletterTestForm
 from onegov.org.forms.page import LinkForm, PageForm
 from onegov.org.forms.person import PersonForm
+from onegov.org.forms.reservation import FindYourSpotForm
 from onegov.org.forms.reservation import ReservationForm
 from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
@@ -30,6 +31,7 @@ from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
 from onegov.org.forms.settings import ModuleSettingsForm
 from onegov.org.forms.signup import SignupForm
+from onegov.org.forms.text_module import TextModuleForm
 from onegov.org.forms.ticket import InternalTicketChatMessageForm
 from onegov.org.forms.ticket import TicketAssignmentForm
 from onegov.org.forms.ticket import TicketChatMessageForm
@@ -51,6 +53,7 @@ __all__ = [
     'EventForm',
     'EventImportForm',
     'ExportForm',
+    'FindYourSpotForm',
     'FooterSettingsForm',
     'FormDefinitionForm',
     'FormRegistrationWindowForm',
@@ -79,6 +82,7 @@ __all__ = [
     'RoomAllocationEditForm',
     'RoomAllocationForm',
     'SignupForm',
+    'TextModuleForm',
     'TicketAssignmentForm',
     'TicketChatMessageForm',
     'TicketNoteForm',

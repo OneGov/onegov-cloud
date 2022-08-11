@@ -3,7 +3,34 @@ from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
-from onegov.election_day.utils.election_compound import get_list_results
+from onegov.election_day.utils.parties import get_party_results
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-seat-allocation-table',
+    category='election_compound'
+)
+class ElectionCompoundSeatAllocationTableWidget(ModelBoundWidget):
+    tag = 'election-compound-seat-allocation-table'
+    template = """
+        <xsl:template match="election-compound-seat-allocation-table">
+            <div class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['election-compound-seat-allocation-table']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-compound-seat-allocation-table class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        years, parties = get_party_results(model)
+        return {
+            'election_compound': model,
+            'years': years[:2],
+            'parties': parties,
+        }
 
 
 @ElectionDayApp.screen_widget(
@@ -66,32 +93,6 @@ class ElectionCompoundListGroupsTableWidget(ModelBoundWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='election-compound-lists-table',
-    category='election_compound'
-)
-class ElectionCompoundListsTableWidget(ModelBoundWidget):
-    tag = 'election-compound-lists-table'
-    template = """
-        <xsl:template match="election-compound-lists-table">
-            <div class="{@class}" tal:define="names '{@names}'">
-                <tal:block
-                    metal:use-macro="layout.macros['election-compound-lists-table']"
-                    />
-            </div>
-        </xsl:template>
-    """
-    usage = '<election-compound-lists-table class="" names=","/>'
-
-    def get_variables(self, layout):
-        model = self.model or layout.model
-        lists = get_list_results(model)
-        return {
-            'election': model,
-            'lists': lists
-        }
-
-
-@ElectionDayApp.screen_widget(
     tag='election-compound-districts-table',
     category='election_compound'
 )
@@ -112,7 +113,6 @@ class ElectionCompoundDistrictsTableWidget(ModelBoundWidget):
         model = self.model or layout.model
         return {
             'election_compound': model,
-            'lists': get_list_results(model)
         }
 
 
@@ -137,20 +137,18 @@ class ElectionCompoundListGroupsChartWidget(ChartWidget):
 
 
 @ElectionDayApp.screen_widget(
-    tag='election-compound-lists-chart',
+    tag='election-compound-seat-allocation-chart',
     category='election_compound'
 )
-class ElectionCompoundListsChartWidget(ChartWidget):
-    tag = 'election-compound-lists-chart'
+class ElectionCompoundSeatAllocationChartWidget(ChartWidget):
+    tag = 'election-compound-seat-allocation-chart'
     template = """
-        <xsl:template match="election-compound-lists-chart">
-            <div class="{@class}"
-                 tal:define="limit '0{@limit}'; names '{@names}'"
-                 >
+        <xsl:template match="election-compound-seat-allocation-chart">
+            <div class="{@class}">
                 <tal:block
-                    metal:use-macro="layout.macros['lists-chart']"
+                    metal:use-macro="layout.macros['seat-allocation-chart']"
                     />
             </div>
         </xsl:template>
     """
-    usage = '<election-compound-lists-chart limit="" names="," class=""/>'
+    usage = '<election-compound-seat-allocation-chart class=""/>'

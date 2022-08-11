@@ -1,0 +1,61 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="small-12 medium-8 large-6 columns">
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+        <div class="row" tal:condition="room_slots is not None">
+            <a id="results"></a>
+            <h2 i18n:translate>All dates</h2>
+            <div class="reservation-list"
+                data-whole-day="false"
+                data-reservations="${request.link(layout.model, name='reservations')}"
+                data-reservationform="${request.link(layout.model, name='form')}">
+                <table>
+                <thead>
+                    <tr>
+                        <th i18n:translate>Date</th>
+                        <th tal:repeat="room rooms" title="${room.title}" data-resource="${room.name}">${room.title}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="item room_slots.items()"
+                        data-date="${item[0].isoformat()}">
+                        <th>${layout.format_date(item[0], 'weekday_long')}<br/>${layout.format_date(item[0], 'date')}</th>
+                        <td tal:repeat="room rooms">
+                        <tal:b tal:define="slots item[1].get(room.id, [])">
+                            <div tal:repeat="slot slots"
+                                class="event ${slot.css_class}"
+                                data-start="${slot.event_start}"
+                                data-end="${slot.event_end}"
+                                data-partly-available="${slot.partly_available}"
+                                data-whole-day="${slot.whole_day}"
+                                data-quota="${slot.quota}"
+                                data-quota-left="${slot.quota_left}"
+                                data-reserveurl="${slot.reserveurl}">
+                                ${slot.event_time}<br/>
+                                ${slot.available}
+                            </div>
+                            <div tal:condition="not slots" class="event event-unavailable">
+                                &nbsp;<br/>
+                                <span i18n:translate>Unavailable</span>
+                            </div>
+                        </tal:b>
+                        </td>
+                    </tr>
+                    <tr tal:condition="not room_slots">
+                        <td class="text-center" colspan="${len(rooms)+1}" i18n:translate>
+                            No dates found
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </tal:b>
+</div>

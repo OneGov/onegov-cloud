@@ -58,7 +58,6 @@ def unsubscribe(request):
     # tokens are valid for 30 days
     max_age = 60 * 60 * 24 * 30
     salt = 'unsubscribe'
-    newsletters = {'daily_ticket_statistics'}
 
     data = request.load_url_safe_token(
         request.params.get('token'), max_age=max_age, salt=salt
@@ -69,8 +68,9 @@ def unsubscribe(request):
         if user:
             if not user.data:
                 user.data = {}
-            for newsletter in newsletters:
-                user.data[newsletter] = False
+
+            # change any other regular e-mails related settings here
+            user.data['ticket_statistics'] = 'never'
             return True
 
     return False

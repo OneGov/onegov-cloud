@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-03-01 13:21+0100\n"
+"POT-Creation-Date: 2022-05-24 15:51+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -385,6 +385,18 @@ msgstr "Richiesto"
 
 msgid "Published"
 msgstr "Pubblicato"
+
+msgid "Daily"
+msgstr "Giornaliera"
+
+msgid "Weekly"
+msgstr "Settimanale"
+
+msgid "Monthly"
+msgstr "Mensile"
+
+msgid "Never"
+msgstr "Mai"
 
 msgid "Mr."
 msgstr "Signor"
@@ -1187,11 +1199,20 @@ msgstr ""
 "Non è possibile registrare un tempo di blocco se i partecipanti sono "
 "limitati a un'offerta al giorno."
 
-msgid "Send a daily status e-mail."
-msgstr "Inviare un'e-mail di stato giornaliero."
+msgid "Send a periodic status e-mail."
+msgstr "Invia un'e-mail di stato periodica."
 
 msgid "General"
 msgstr "Generale"
+
+msgid "Daily (exluding the weekend)"
+msgstr "Giornaliera (escluso il fine settimana)"
+
+msgid "Weekly (on mondays)"
+msgstr "Settimanale (di lunedì)"
+
+msgid "Monthly (on first monday of the month)"
+msgstr "Mensile (il primo lunedì del mese)"
 
 msgid "Salutation"
 msgstr "Appellativo"
@@ -1409,6 +1430,9 @@ msgstr "Aiutare"
 
 msgid "Register as Volunteer"
 msgstr "Registrazione come aiutante"
+
+msgid "Sort"
+msgstr ""
 
 msgid "Half day"
 msgstr "Mezza giornata"
@@ -2027,6 +2051,9 @@ msgstr ""
 "una buona ripartizione, è possibile registrare il bambino per più attività "
 "di ${count}."
 
+msgid "Each child can be registered for up to ${count} activities."
+msgstr "Ad ogni bambino può essere iscritto a fino a ${count} attività."
+
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
 "additional charges."
@@ -2452,6 +2479,9 @@ msgstr "L'attività è stata rifiutata"
 
 msgid "Your ticket has been opened"
 msgstr "Il biglietto è stato aperto"
+
+msgid "New ticket"
+msgstr ""
 
 msgid "Thank you for your proposal!"
 msgstr "Grazie per la vostra applicazione!"

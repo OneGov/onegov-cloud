@@ -7,6 +7,7 @@ from onegov.event import Event
 from onegov.form import FormDefinition
 from onegov.org.forms import DaypassAllocationForm
 from onegov.org.forms import EventForm
+from onegov.org.forms import FindYourSpotForm
 from onegov.org.forms import FormRegistrationWindowForm
 from onegov.org.forms import ManageUserGroupForm
 from onegov.org.forms import RoomAllocationEditForm
@@ -18,6 +19,7 @@ from onegov.ticket import TicketPermission
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from unittest.mock import MagicMock
+from uuid import UUID
 from webob.multidict import MultiDict
 
 
@@ -55,7 +57,7 @@ def test_daypass_single_date():
     assert form.whole_day == True
     assert form.quota == 4
     assert form.quota_limit == 1
-    assert not form.data
+    assert form.data == {'access': 'public'}
 
 
 def test_daypass_multiple_dates():
@@ -99,7 +101,7 @@ def test_room_single_date():
     assert form.whole_day == False
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert not form.data
+    assert form.data == {'access': 'public'}
 
 
 def test_room_whole_day():
@@ -113,7 +115,22 @@ def test_room_whole_day():
     assert form.whole_day == True
     assert form.quota == 1
     assert form.quota_limit == 1
-    assert not form.data
+    assert form.data == {'access': 'public'}
+
+
+def test_room_access():
+    form = RoomAllocationForm(data={
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
+        'as_whole_day': 'yes',
+        'access': 'private'
+    })
+
+    assert form.dates == [(datetime(2015, 8, 4), datetime(2015, 8, 4))]
+    assert form.whole_day == True
+    assert form.quota == 1
+    assert form.quota_limit == 1
+    assert form.data == {'access': 'private'}
 
 
 def test_room_multiple_dates():
@@ -243,7 +260,8 @@ def test_edit_room_allocation_form():
         display_start=lambda: datetime(2015, 1, 1, 12),
         display_end=lambda: datetime(2015, 1, 1, 18),
         whole_day=False,
-        quota=1
+        quota=1,
+        data=None,
     ))
 
     assert form.dates == (
@@ -278,6 +296,75 @@ def test_edit_room_allocation_form_whole_day():
 
     assert form.validate()
     assert not form.errors
+
+
+def test_find_your_spot_form_single_room():
+    request = Bunch(POST=MultiDict([
+        ('start', date.today().isoformat()),
+        ('end', date.today().isoformat()),
+        ('start_time', '08:00'),
+        ('end_time', '09:00'),
+        ('weekdays', '1'),
+        ('weekdays', '4'),
+        ('on_holidays', 'yes'),
+        ('during_school_holidays', 'yes'),
+    ]))
+    form = FindYourSpotForm(request.POST)
+    form.request = request
+    form.apply_rooms([Bunch(
+        id=UUID('01234567-0123-0123-0123-000000000001'),
+        title='Room 1'
+    )])
+    assert form.validate()
+    assert form.start.data == date.today()
+    assert form.end.data == date.today()
+    assert form.start_time.data == time(8, 0)
+    assert form.end_time.data == time(9, 0)
+    assert not form.rooms
+    assert form.weekdays.data == [1, 4]
+    assert form.on_holidays.data == 'yes'
+    assert form.during_school_holidays.data == 'yes'
+
+
+def test_find_your_spot_form_multiple_rooms():
+    rooms = [
+        Bunch(
+            id=UUID('01234567-0123-0123-0123-000000000001'),
+            title='Room 1'
+        ),
+        Bunch(
+            id=UUID('01234567-0123-0123-0123-000000000002'),
+            title='Room 2'
+        ),
+        Bunch(
+            id=UUID('01234567-0123-0123-0123-000000000003'),
+            title='Room 3'
+        ),
+    ]
+    request = Bunch(POST=MultiDict([
+        ('start', date.today().isoformat()),
+        ('end', date.today().isoformat()),
+        ('start_time', '08:00'),
+        ('end_time', '09:00'),
+        ('rooms', '01234567-0123-0123-0123-000000000001'),
+        ('rooms', '01234567-0123-0123-0123-000000000003'),
+        ('weekdays', '1'),
+        ('weekdays', '4'),
+        ('on_holidays', 'yes'),
+        ('during_school_holidays', 'yes'),
+    ]))
+    form = FindYourSpotForm(request.POST)
+    form.request = request
+    form.apply_rooms(rooms)
+    assert form.validate()
+    assert form.start.data == date.today()
+    assert form.end.data == date.today()
+    assert form.start_time.data == time(8, 0)
+    assert form.end_time.data == time(9, 0)
+    assert form.rooms.data == [rooms[0].id, rooms[2].id]
+    assert form.weekdays.data == [1, 4]
+    assert form.on_holidays.data == 'yes'
+    assert form.during_school_holidays.data == 'yes'
 
 
 def test_event_form_update_apply():
@@ -496,7 +583,11 @@ def test_user_group_form(session):
     )
     session.flush()
 
-    request = Bunch(session=session, current_user=None)
+    request = Bunch(
+        session=session,
+        app=Bunch(session=lambda: session),
+        current_user=None
+    )
     form = ManageUserGroupForm()
     form.request = request
     form.on_request()

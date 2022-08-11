@@ -14,11 +14,8 @@ from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 2
     use_intercooler = True
-
-    def login_member(self, to=None):
-        return self.login('member@example.org', 'hunter2', to)
 
     def bound_reserve(self, allocation):
 
@@ -87,8 +84,16 @@ def es_town_app(request):
     yield create_town_app(request, use_elasticsearch=True)
 
 
-def create_town_app(request, use_elasticsearch):
-    app = create_app(TownApp, request, use_elasticsearch=False)
+@pytest.fixture(scope='function')
+def client_with_es(es_town_app):
+    client = Client(es_town_app)
+    client.skip_n_forms = 1
+    client.use_intercooler = True
+    return client
+
+
+def create_town_app(request, use_elasticsearch=False):
+    app = create_app(TownApp, request, use_elasticsearch)
     app.configure_payment_providers(**{
         'payment_providers_enabled': True,
         'payment_provider_defaults': {
@@ -121,6 +126,11 @@ def create_town_app(request, use_elasticsearch):
         username='editor@example.org',
         password_hash=test_password,
         role='editor'
+    ))
+    session.add(User(
+        username='member@example.org',
+        password_hash=test_password,
+        role='member'
     ))
 
     transaction.commit()

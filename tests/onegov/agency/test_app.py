@@ -60,7 +60,8 @@ def test_app_custom(agency_app):
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
-                        'Archived Tickets', 'Hidden contents']},
+                        'Text modules', 'Archived Tickets',
+                        'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]
@@ -70,8 +71,8 @@ def test_app_custom(agency_app):
     assert as_text(get_global_tools(request)) == [
         {'Account': ['User Profile', 'Logout']},
         {'Management': ['Timeline', 'Files', 'Images', 'Payments',
-                        'Settings', 'Users', 'User groups', 'Link Check',
-                        'Archived Tickets', 'Hidden contents']},
+                        'Text modules', 'Settings', 'Users', 'User groups',
+                        'Link Check', 'Archived Tickets', 'Hidden contents']},
         {'Tickets': ['My Tickets', 'Open Tickets', 'Pending Tickets',
                      'Closed Tickets']}
     ]

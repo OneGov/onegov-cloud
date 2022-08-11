@@ -12,6 +12,7 @@ from onegov.agency.forms import PersonMutationForm
 from onegov.agency.layout import ExtendedPersonCollectionLayout
 from onegov.agency.layout import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
+from onegov.agency.utils import emails_for_new_ticket
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.form import Form
@@ -312,6 +313,18 @@ def report_person_change(self, request, form):
             receivers=(form.submitter_email.data, ),
             ticket=ticket
         )
+
+        for email in emails_for_new_ticket(self, request):
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(email, ),
+                content={
+                    'model': ticket
+                }
+            )
 
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))

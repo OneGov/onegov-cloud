@@ -69,11 +69,13 @@ Returns the data of the main view in a structured form.
 
 ### Raw data
 
+#### Candidate results
+
 ```
 URL: /election/{id}/data-{format}
 ```
 
-The raw data used to display the results of elections is available in the following formats:
+The raw data of the candidates are available in the following formats:
 
 Format|URL
 ---|---
@@ -96,6 +98,7 @@ Name|Description
 `entity_district`|The district of the municipality.
 `entity_counted`|`True` if the result was counted.
 `entity_eligible_voters`|The number of people eligible to vote for this municipality.
+`entity_expats`|Number of expats for this municipality.
 `entity_received_ballots`|The number of received ballots for this municipality.
 `entity_blank_ballots`|The number of blank ballots for this municipality.
 `entity_invalid_ballots`|The number of invalid ballots for this municipality.
@@ -114,6 +117,9 @@ Name|Description
 `candidate_first_name`|The first name of the candidate.
 `candidate_id`|The ID of the candidate.
 `candidate_elected`|True if the candidate has been elected.
+`candidate_party`|The name of the party.
+`candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
+`candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
 `panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
@@ -125,7 +131,7 @@ Not yet counted municipalities are not included.
 URL: /election/{id}/data-parties-{format}
 ```
 
-The raw data used to display the results of elections is available in the following formats:
+The raw data of the parties are available in the following formats:
 
 Format|URL
 ---|---
@@ -138,7 +144,8 @@ Name|Description
 ---|---
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
-`name`|The name of the party.
+`name`|The name of the party in the default language.
+`name_{locale}`|Translated name of the party, e.g. `name_de_ch` for the German name.
 `id`|ID of the party.
 `color`|The color of the party.
 `mandates`|The number of mandates.
@@ -190,3 +197,4 @@ Name|Description
 `invalid`|The number of invalid votes.
 `empty`|The number of empty votes.
 `eligible_voters`|The number of people eligible to vote.
+`expats`|Number of expats.

@@ -269,9 +269,9 @@
     </div>
 </metal:partners>
 
-<metal:partners define-macro="partner-cards" i18n:domain="onegov.town6">
+<metal:partners define-macro="partner-cards" i18n:domain="onegov.town6" tal:define="subpage subpage|False">
     <div class="partners grid-x grid-padding-x">
-        <div class="cell small-12" tal:condition="show_title|True">
+        <div class="cell small-12" tal:condition="show_title|True and not subpage">
             <h3 tal:condition="not: title" i18n:translate>Partner</h3>
             <h3 tal:condition="title">${title}</h3>
         </div>
@@ -572,6 +572,9 @@
     <tal:b condition="item.access == 'private'|False">
         <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
     </tal:b>
+    <tal:b condition="item.access == 'member'|False">
+        <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
+    </tal:b>
     <tal:b condition="item.access == 'secret'|False">
         <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
     </tal:b>
@@ -584,16 +587,29 @@
 </metal:publication_hint>
 
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
-    <tal:b condition="item.access == 'private'|False">
-        <div class="grid-x">
-            <div class="small-12 cell">
-                <div class="panel">
-                    <p i18n:translate>
-                        This site is not public.
-                    </p>
+    <tal:b tal:switch="item.access|False">
+        <tal:b tal:case="'private'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel callout">
+                        <p i18n:translate>
+                            This site is not public.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </tal:b>
+        <tal:b tal:case="'member'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel callout">
+                        <p i18n:translate>
+                            This site is not public but it can be seen by members.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </tal:b>
     </tal:b>
 </metal:access_hint_long>
 
@@ -1346,7 +1362,7 @@
     <ul>
         <li>
             <tal:b condition="result.signed">
-                <span i18n:translate>Digitally signed</span>,
+                <span i18n:translate>Has a digital seal</span>,
             </tal:b>
             <span>
                 <tal:b i18n:translate tal:condition="result.stats.get('pages', 0) == 1">
@@ -1682,22 +1698,29 @@
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.town6">
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False">
-        <h2 tal:condition="len(grouped) > 1" id="${group}">
+        <a class="category-anchor" id="${group}"></a>
+        <h2 tal:condition="len(grouped) > 1">
             ${group}
             <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
         </h2>
 
         <ul class="forms-list more-list">
             <li tal:repeat="record grouped[group]">
-                <a class="list-title" tal:attributes="href link_func(record)">
-                        ${record.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+            <tal:b tal:define="link edit_link(record)|nothing">
+               
+                <a class="list-title" tal:attributes="href link_func(record); target link">
+                        ${record.title} 
+                        <tal:block condition="external_link(record)|nothing"> 
+                        </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                 </a>
-                <tal:b tal:define="link edit_link(record)|nothing">
-                    <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
-                </tal:b>
-                <tal:b tal:define="lead record.meta.get('lead')">
-                    <div tal:condition="lead" class="list-lead" tal:content="structure layout.linkify(lead)"></div>
-                </tal:b>
+                <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                     tal:content="structure lead">
+                </div>
+                <div class="list-hint hints" tal:define="hint hint(record)|False"
+                     tal:content="structure hint" tal:condition="hint">
+                </div>
+                 <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+            </tal:b>
             </li>
         </ul>
     </tal:b>
@@ -1747,7 +1770,7 @@
     <div class="file-status">
 
         <tal:b condition="request.app.enable_yubikey and file.reference['content_type'] == 'application/pdf'">
-            <h3 i18n:translate>Digital Signature</h3>
+            <h3 i18n:translate>Digital seal</h3>
             <div class="signature">
                 <div class="file-status-tag">
                     <metal:b use-macro="layout.macros['signature_status']" />
@@ -1911,18 +1934,18 @@
             <i class="fa fa-fw fa-lock" aria-hidden="true"></i>
 
             <span i18n:translate>
-                Digitally signed by <tal:b i18n:name="signee">${layout.get_user_title(file.signature_metadata['signee'])}</tal:b>
+                Digital seal applied by <tal:b i18n:name="signee">${layout.get_user_title(file.signature_metadata['signee'])}</tal:b>
                 on <span class="nowrap" i18n:name="date">${layout.format_date(layout.parse_isodate(file.signature_metadata['timestamp']), 'datetime_long')}</span>
             </span>
         </div>
         <tal:b condition="not file.signed and may_sign">
             <a tal:condition="not:file.signed" class="is-not-signed signature-status"
                 role="button"
-                data-prompt="Please enter your yubikey to digitally sign this file"
+                data-prompt="Please enter your yubikey to apply a digital seal to this file"
                 data-prompt-ok="Sign"
                 data-prompt-cancel="Cancel"
                 data-prompt-placeholder="Plug your YubiKey into a USB slot and press it."
-                data-prompt-info="Published and digitally signed documents can be discovered through the site-search and in the list of digitally signed documents. This action will be logged and cannot be undone."
+                data-prompt-info="Published documents with a digital seal can be discovered through the site-search and in the list of documents with a digital seal. This action will be logged and cannot be undone."
                 data-prompt-success="(function(value) {
                     var url = '${request.link(file, 'sign')}?csrf-token=${layout.csrf_token}';
                     var elt = $(this);
@@ -1945,11 +1968,11 @@
                 <i class="fa fa-fw fa-unlock" aria-hidden="true"></i>
 
                 <span i18n:translate class="hide-on-hover">
-                    Unsigned
+                    Without digital seal
                 </span>
 
                 <span i18n:translate class="show-on-hover">
-                    Sign now
+                    Apply digital seal now
                 </span>
             </a>
         </tal:b>
@@ -1958,11 +1981,11 @@
                 <i class="fa fa-fw fa-lock" aria-hidden="true"></i>
 
                 <span i18n:translate class="hide-on-hover">
-                    Unsigned
+                    Without digital seal
                 </span>
 
                 <span i18n:translate class="show-on-hover">
-                    You are not authorised to digitally sign documents
+                    You are not authorised to apply digital seals to documents
                 </span>
             </div>
         </tal:b>
@@ -2028,7 +2051,7 @@
             </div>
             <div i18n:translate>
                 <span i18n:name="name">${name}</span>
-                was digitally signed on
+                was provided with a digital seal on
                 <span i18n:name="date">${layout.format_date(date, 'datetime')}</span>
             </div>
         </tal:b>

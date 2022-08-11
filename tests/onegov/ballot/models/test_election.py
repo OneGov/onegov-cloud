@@ -159,6 +159,29 @@ def test_election_summarized_properties(session):
         number_of_mandates=2
     )
 
+    assert election.eligible_voters == 0
+    assert election.counted_eligible_voters == 0
+    assert election.expats == 0
+    assert election.received_ballots == 0
+    assert election.counted_received_ballots == 0
+    assert election.accounted_ballots == 0
+    assert election.blank_ballots == 0
+    assert election.invalid_ballots == 0
+    assert election.accounted_votes == 0
+    assert election.turnout == 0
+
+    # OGC-533
+    # assert session.query(Election.eligible_voters).scalar() == 0
+    # assert session.query(Election.counted_eligible_voters).scalar() == 0
+    # assert session.query(Election.expats).scalar() == 0
+    # assert session.query(Election.received_ballots).scalar() == 0
+    # assert session.query(Election.counted_received_ballots).scalar() == 0
+    # assert session.query(Election.accounted_ballots).scalar() == 0
+    # assert session.query(Election.blank_ballots).scalar() == 0
+    # assert session.query(Election.invalid_ballots).scalar() == 0
+    # assert session.query(Election.accounted_votes).scalar() == 0
+    # assert session.query(Election.turnout).scalar() == 0
+
     for x in range(1, 4):
         election.results.append(
             ElectionResult(
@@ -166,6 +189,7 @@ def test_election_summarized_properties(session):
                 entity_id=x,
                 counted=True,
                 eligible_voters=100 * x,
+                expats=10 * x,
                 received_ballots=80 * x,
                 blank_ballots=4 * x,
                 invalid_ballots=3 * x,
@@ -179,14 +203,25 @@ def test_election_summarized_properties(session):
 
     assert election.eligible_voters == 600
     assert election.counted_eligible_voters == 600
+    assert election.expats == 60
     assert election.received_ballots == 480
-    assert election.counted_received_ballots == election.received_ballots
+    assert election.counted_received_ballots == 480
     assert election.accounted_ballots == 438
     assert election.blank_ballots == 24
     assert election.invalid_ballots == 18
     assert election.accounted_votes == 858
-    trnout = election.received_ballots / election.counted_eligible_voters * 100
-    assert election.turnout == trnout
+    assert election.turnout == 80.0
+
+    assert session.query(Election.eligible_voters).scalar() == 600
+    assert session.query(Election.counted_eligible_voters).scalar() == 600
+    assert session.query(Election.expats).scalar() == 60
+    assert session.query(Election.received_ballots).scalar() == 480
+    assert session.query(Election.counted_received_ballots).scalar() == 480
+    assert session.query(Election.accounted_ballots).scalar() == 438
+    assert session.query(Election.blank_ballots).scalar() == 24
+    assert session.query(Election.invalid_ballots).scalar() == 18
+    assert session.query(Election.accounted_votes).scalar() == 858
+    # assert session.query(Election.turnout).scalar() == 80.0  OGC-533
 
     # Test turnout calculation
     x = 5
@@ -207,7 +242,8 @@ def test_election_summarized_properties(session):
     assert election.eligible_voters != election.counted_eligible_voters
 
     # turnout should not change due to a new incomplete result
-    assert election.turnout == trnout
+    assert election.turnout == 80.0
+    # assert session.query(Election.turnout).scalar() == 80.0 OGC-533
 
 
 def test_election_derived_properties(session):
@@ -503,6 +539,8 @@ def test_election_export(session):
         family_name='Quimby',
         first_name='Joe',
         party='Republican Party',
+        gender='male',
+        year_of_birth=1970
     )
     candidate_2 = Candidate(
         id=uuid4(),
@@ -518,13 +556,14 @@ def test_election_export(session):
     session.add(election)
     session.flush()
 
-    assert election.export() == []
+    assert election.export(['de_CH']) == []
 
     election_result = ElectionResult(
         name='name',
         entity_id=1,
         counted=True,
         eligible_voters=1000,
+        expats=35,
         received_ballots=500,
         blank_ballots=10,
         invalid_ballots=5,
@@ -548,13 +587,12 @@ def test_election_export(session):
 
     session.flush()
 
-    exports = election.export()\
+    export = election.export(['de_CH', 'fr_CH', 'it_CH'])
 
-    assert exports[0] == {
+    assert export[0] == {
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -567,6 +605,7 @@ def test_election_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -580,13 +619,14 @@ def test_election_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_gender': '',
+        'candidate_year_of_birth': '',
         'candidate_votes': 111,
     }
-    assert exports[1] == {
+    assert export[1] == {
         'election_title_de_CH': 'Wahl',
         'election_title_fr_CH': '',
         'election_title_it_CH': 'Elezione',
-        'election_title_rm_CH': '',
         'election_date': '2015-06-14',
         'election_domain': 'federation',
         'election_type': 'majorz',
@@ -599,6 +639,7 @@ def test_election_export(session):
         'entity_id': 1,
         'entity_counted': True,
         'entity_eligible_voters': 1000,
+        'entity_expats': 35,
         'entity_received_ballots': 500,
         'entity_blank_ballots': 10,
         'entity_invalid_ballots': 5,
@@ -612,6 +653,8 @@ def test_election_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_gender': 'male',
+        'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
     }
 

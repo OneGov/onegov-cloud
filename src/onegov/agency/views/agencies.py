@@ -14,6 +14,7 @@ from onegov.agency.layout import AgencyLayout
 from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
+from onegov.agency.utils import emails_for_new_ticket
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.templates import render_macro
@@ -481,6 +482,18 @@ def report_agency_change(self, request, form):
             receivers=(form.submitter_email.data, ),
             ticket=ticket
         )
+
+        for email in emails_for_new_ticket(self, request):
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(email, ),
+                content={
+                    'model': ticket
+                }
+            )
 
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))

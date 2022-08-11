@@ -1,5 +1,7 @@
 from onegov.core.orm import Base
+from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column
 from sqlalchemy import Integer
@@ -37,11 +39,18 @@ class PartyResult(Base, TimestampMixin):
         Numeric(12, 2), nullable=True, default=lambda: 0
     )
 
-    #: the name of the party
-    name = Column(Text, nullable=False)
+    #: all translations of the party name
+    name_translations = Column(HSTORE, nullable=False)
+
+    #: the name of the party (uses the locale of the request, falls back to the
+    #: default locale of the app)
+    name = translation_hybrid(name_translations)
 
     #: the year
     year = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the color code
     color = Column(Text, nullable=True)
+
+    #: the id of the party
+    party_id = Column(Text, nullable=False)

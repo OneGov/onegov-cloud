@@ -27,6 +27,7 @@ from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from purl import URL
+import yaml
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -44,7 +45,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     boardlet = directive(directives.Boardlet)
 
     #: cronjob settings
-    send_daily_ticket_statistics = True
+    send_ticket_statistics = True
 
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
@@ -159,9 +160,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return PublicationCollection(self.session()).query().count()
 
     def prepare_email(self, reply_to=None, **kwargs):
-        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`, setting
-        the reply_to address by using the reply address from the organisation
-        settings.
+        """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`,
+        setting  the reply_to address by using the reply address from
+        the organisation settings.
 
         """
         category = kwargs.get('category', 'marketing')
@@ -180,6 +181,30 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     @property
     def font_family(self):
         return self.theme_options.get('font-family-sans-serif')
+
+    @property
+    def custom_event_tags(self):
+        return self.cache.get_or_create(
+            'custom_event_tags', self.load_custom_event_tags
+        )
+
+    def load_custom_event_tags(self):
+        fs = self.filestorage
+        if fs.exists('eventsettings.yml'):
+            with fs.open('eventsettings.yml', 'r') as f:
+                return yaml.safe_load(f).get('event_tags', None)
+
+    @property
+    def custom_event_form_lead(self):
+        return self.cache.get_or_create(
+            'custom_event_lead', self.load_custom_event_form_lead
+        )
+
+    def load_custom_event_form_lead(self):
+        fs = self.filestorage
+        if fs.exists('eventsettings.yml'):
+            with fs.open('eventsettings.yml', 'r') as f:
+                return yaml.safe_load(f).get('event_form_lead', None)
 
     def checkout_button(self, button_label, title, price, email, locale):
         provider = self.default_payment_provider
@@ -356,6 +381,7 @@ def get_public_ticket_messages():
         'submission',
         'ticket',
         'ticket_chat',
+        'translator_mutation'
     )
 
 
@@ -393,6 +419,12 @@ def get_fullcalendar_asset():
     yield 'fullcalendar.fr.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@OrgApp.webasset('reservationlist')
+def get_reservation_list_asset():
+    yield 'reservationlist.jsx'
+    yield 'reservationlist_custom.js'
 
 
 @OrgApp.webasset('code_editor')

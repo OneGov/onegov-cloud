@@ -5,14 +5,15 @@ from onegov.translator_directory import _
 from onegov.core.elements import Block, Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.org.models import Organisation
 from onegov.translator_directory.collections.documents import \
     TranslatorDocumentCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.constants import member_can_see, \
-    editor_can_see, GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, \
-    INTERPRETING_TYPES
+from onegov.translator_directory.constants import \
+    member_can_see, editor_can_see, translator_can_see, \
+    GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, INTERPRETING_TYPES
 
 
 class DefaultLayout(BaseLayout):
@@ -44,11 +45,15 @@ class DefaultLayout(BaseLayout):
     def show(self, attribute_name):
         """Some attributes on the translator are hidden for less privileged
         users"""
-        if self.request.is_member:
-            return attribute_name in member_can_see
+        if self.request.is_admin:
+            return True
         if self.request.is_editor:
             return attribute_name in editor_can_see
-        return True
+        if self.request.is_member:
+            return attribute_name in member_can_see
+        if self.request.is_translator:
+            return attribute_name in translator_can_see
+        return False
 
     def color_class(self, count):
         """ Depending how rare a language is offered by translators,
@@ -63,7 +68,9 @@ class DefaultLayout(BaseLayout):
         return key
 
     def format_interpreting_type(self, key):
-        return self.request.translate(INTERPRETING_TYPES[key])
+        if key in INTERPRETING_TYPES:
+            return self.request.translate(INTERPRETING_TYPES[key])
+        return key
 
 
 class TranslatorLayout(DefaultLayout):
@@ -142,6 +149,11 @@ class TranslatorLayout(DefaultLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
                     attrs={'class': 'create-excel'}
@@ -150,21 +162,48 @@ class TranslatorLayout(DefaultLayout):
         elif self.request.is_member:
             return [
                 Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                ),
+                Link(
                     _('Voucher template'),
                     self.request.link(self.request.app.org, name='voucher'),
                     attrs={'class': 'create-excel'}
                 )
             ]
+        elif self.request.is_translator:
+            return [
+                Link(
+                    _('Report change'),
+                    self.request.link(self.model, name='report-change'),
+                    attrs={'class': 'report-change'}
+                )
+            ]
 
     @cached_property
     def breadcrumbs(self):
-        links = super().breadcrumbs + [
-            Link(
-                text=_('Translators'),
-                url=self.request.class_link(TranslatorCollection)
-            ),
-            Link(text=self.model.title)
-        ]
+        links = super().breadcrumbs
+        if self.request.is_translator:
+            links.append(
+                Link(
+                    text=_('Personal Information'),
+                    url=self.request.link(self.model)
+                ),
+            )
+        else:
+            links.append(
+                Link(
+                    text=_('Translators'),
+                    url=self.request.class_link(TranslatorCollection)
+                ),
+            )
+            links.append(
+                Link(
+                    text=self.model.title,
+                    url=self.request.link(self.model)
+                )
+            )
 
         return links
 
@@ -175,9 +214,45 @@ class EditTranslatorLayout(TranslatorLayout):
         return _('Edit translator')
 
     @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
         links.append(Link(_('Edit')))
+        return links
+
+
+class ReportTranslatorChangesLayout(TranslatorLayout):
+    @cached_property
+    def title(self):
+        return _('Report change')
+
+    @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Report change')))
+        return links
+
+
+class ApplyTranslatorChangesLayout(TranslatorLayout):
+    @cached_property
+    def title(self):
+        return _('Report change')
+
+    @cached_property
+    def editbar_links(self):
+        return []
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Apply proposed changes')))
         return links
 
 
@@ -210,13 +285,6 @@ class TranslatorCollectionLayout(DefaultLayout):
                             ),
                             attrs={'class': 'new-person'}
                         ),
-                        Link(
-                            text=_("Add language"),
-                            url=self.request.class_link(
-                                LanguageCollection, name='new'
-                            ),
-                            attrs={'class': 'new-language'}
-                        )
                     )
                 ),
                 Link(
@@ -391,3 +459,63 @@ class AddLanguageLayout(LanguageLayout):
     @property
     def editbar_links(self):
         return []
+
+
+class AccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.link(self.model.ticket)
+            )
+        )
+        return links
+
+
+class RequestAccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.class_link(
+                    Organisation, name='request-accreditation'
+                )
+            )
+        )
+        return links
+
+
+class GrantAccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.link(self.model.ticket)
+            )
+        )
+        links.append(Link(_('Grant accreditation')))
+        return links
+
+
+class RefuseAccreditationLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(
+                text=_('Accreditation'),
+                url=self.request.link(self.model.ticket)
+            )
+        )
+        links.append(Link(_('Refuse accreditation')))
+        return links

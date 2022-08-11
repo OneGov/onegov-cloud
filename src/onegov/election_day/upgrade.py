@@ -13,6 +13,7 @@ from onegov.election_day.models import Subscriber
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
 from sqlalchemy import Text
 
 
@@ -287,11 +288,11 @@ def enable_expats(context):
         ballot = vote.ballots.first()
         if ballot:
             if ballot.results.filter_by(entity_id=0).first():
-                vote.expats = True
+                vote.has_expats = True
 
     for election in context.session.query(Election):
         if election.results.filter_by(entity_id=0).first():
-            election.expats = True
+            election.has_expats = True
 
 
 @upgrade_task('Adds active column to subscriber')
@@ -301,3 +302,28 @@ def add_active_column_to_subscriver(context):
             'subscribers',
             Column('active', Boolean, nullable=True)
         )
+
+
+@upgrade_task('Add election compound notification')
+def add_election_compound_notification(context):
+    if not context.has_column('notifications', 'election_compound_id'):
+        context.operations.add_column(
+            'notifications',
+            Column(
+                'election_compound_id',
+                Text,
+                ForeignKey('election_compounds.id', onupdate='CASCADE'),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task('Make election day models polymorphic type non-nullable')
+def make_election_day_models_polymorphic_type_non_nullable(context):
+    for table in ('notifications', 'subscribers'):
+        if context.has_table(table):
+            context.operations.execute(f"""
+                UPDATE {table} SET type = 'generic' WHERE type IS NULL;
+            """)
+
+            context.operations.alter_column(table, 'type', nullable=False)

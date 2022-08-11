@@ -75,7 +75,7 @@ def import_vote_internal(vote, principal, file, mimetype):
                 added_entity_ids[ballot_type].add(entity_id)
 
         # Skip expats if not enabled
-        if entity_id == 0 and not vote.expats:
+        if entity_id == 0 and not vote.has_expats:
             continue
 
         # Counted
@@ -99,7 +99,15 @@ def import_vote_internal(vote, principal, file, mimetype):
         except ValueError as e:
             line_errors.append(e.args[0])
 
-        # the empty votes
+        # the expats
+        try:
+            expats = validate_integer(
+                line, 'expats', optional=True, default=None
+            )
+        except ValueError as e:
+            line_errors.append(e.args[0])
+
+        # the expats
         try:
             empty = validate_integer(line, 'empty')
         except ValueError as e:
@@ -139,6 +147,7 @@ def import_vote_internal(vote, principal, file, mimetype):
                     yeas=yeas,
                     nays=nays,
                     eligible_voters=eligible_voters,
+                    expats=expats,
                     entity_id=entity_id,
                     empty=empty,
                     invalid=invalid
@@ -154,7 +163,7 @@ def import_vote_internal(vote, principal, file, mimetype):
     # Add the missing entities
     for ballot_type in ballot_types:
         remaining = set(entities.keys())
-        if vote.expats:
+        if vote.has_expats:
             remaining.add(0)
         remaining -= added_entity_ids[ballot_type]
         for entity_id in remaining:

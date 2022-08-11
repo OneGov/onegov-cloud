@@ -73,19 +73,6 @@
                 <span aria-hidden="true">&times;</span>
             </button>
 
-            <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                <div class="input-group">
-                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200">
-                    <div class="input-group-button">
-                        <input type="submit" class="button" value="Search" i18n:attributes="value">
-                    </div>
-                </div>
-                <div class="typeahead">
-                      <div class="cell small-12" data-typeahead-container>
-                      </div>
-                </div>
-            </form>
-
             <!-- Menu -->
             <div metal:use-macro="layout.macros['side_navigation']"></div>
         </div>
@@ -136,22 +123,62 @@
                     </div>
                     <div data-sticky-container id="nav-bar">
                         <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="globals:bottom" data-stick-to="top">
-                            <div class="grid-container navigation">
-                                <div class="grid-x">
-                                    <div class="large-2 small-2 cell">
-                                        <button data-toggle="offCanvas"><i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span></button>
-                                    </div>
-                                    <div class="large-8 small-8 cell middle">
-                                        <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-                                            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-                                            <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
-                                        </a>
-                                    </div>
-                                    <div class="large-2 small-2 cell right-side">
-                                        <button data-toggle="offCanvas" tal:attributes="title layout.search_keybindings_help"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
+                            
+
+                                <div class="grid-container navigation">
+                                    <div class="grid-x">
+                                        <div class="large-2 small-2 cell">
+                                            <button tal:condition="layout.root_pages" data-toggle="offCanvas">
+                                                <i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span>
+                                            </button>
+                                        </div>
+                                        <div class="large-8 small-8 cell middle">
+                                            <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+                                                <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                                                <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
+                                            </a>
+                                        </div>
+                                        <div class="large-2 small-2 cell right-side">
+                                            <form class="searchbox header-searchbox show-for-medium" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                                                <div class="input-group">
+                                                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                                                    <div class="typeahead">
+                                                        <div class="cell small-12" data-typeahead-container>
+                                                        </div>
+                                                    </div>
+                                                    <div class="input-group-button">
+                                                        <button type="submit" class="button search-button">
+                                                            <i class="fa fa-search"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <div class="accordion search-header-mobile" data-accordion data-allow-all-closed="true">
+                                                <div class="accordion-item" data-accordion-item>
+                                                    <a href="#" class="accordion-title show-for-small-only"><i class="fa fa-search"></i></a>
+                                                    <div class="accordion-content" data-tab-content >
+                                                        <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                                                            <div class="input-group">
+                                                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                                                                <div class="input-group-button">
+                                                                    <button type="submit" class="button search-button" i18n:translate="">
+                                                                        Perform Search
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="typeahead">
+                                                                <div class="cell small-12" data-typeahead-container>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+
+                            
                             <div class="grid-container fluid edit-bar-container" tal:condition="layout.editbar_links">
                                 <div class="grid-x">
                                     <div class="cell small-12">
@@ -218,7 +245,7 @@
                                 <div class="grid-container">
                                     <div class="grid-x grid-padding-x grid-padding-y">
                                         <div class="cell small-12">
-                                            <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners"/>
+                                            <metal:block use-macro="layout.macros['partner-cards']" tal:define="partners layout.partners; subpage layout.show_partners"/>
                                         </div>
                                     </div>
                                 </div>

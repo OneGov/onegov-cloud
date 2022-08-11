@@ -67,6 +67,7 @@ Name|Beschreibung
 `entity_id`|BFS Nummer der Gemeinde oder ID des Stadtteils. Der Wert `0` kann für Auslandslebende verwendet werden.
 `entity_counted`|`True`, wenn das Resultat ausgezählt wurde.
 `entity_eligible_voters`|Anzahl Stimmberechtigte der Einheit.
+`entity_expats`|Anzahl Auslandslebende der Einheit. Optional.
 `entity_received_ballots`|Anzahl abgegebene Stimmzettel der Einheit.
 `entity_blank_ballots`|Anzahl leere Stimmzettel der Einheit.
 `entity_invalid_ballots`|Anzahl ungültige Stimmzettel der Einheit.
@@ -83,6 +84,8 @@ Name|Beschreibung
 `candidate_first_name`|Vorname des Kandidaten.
 `candidate_elected`|True, falls der Kandidierenden gewählt wurde.
 `candidate_party`|Der Name der Partei.
+`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
+`candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
 `candidate_votes`|Anzahl Kandidierendenstimmen in der Einheit.
 
 #### Panaschierdaten
@@ -91,7 +94,7 @@ Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hin
 
 Name|Beschreibung
 ---|---
-`panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.  
+`panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 #### Temporäre Resultate
 
@@ -235,13 +238,16 @@ Name|Beschreibung
 ---|---
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
-`name`|Der Name der Partei.
+`name`|Der Name der Partei in der Standardsprache. Optional*.
+`name_{locale}`|Übersetzter Name der Partei, z. B. `name_de_ch` für den deutschen Namen. Optional*.
 `id`|ID der Partei (beliebige Zahl).
 `color`|Die Farbe der Partei.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.
 `voters_count_percentage`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl (prozentual), nur für verbundene Wahlen.
+
+*Stellen Sie sicher, dass Sie den Namen der Partei in der Standardsprache entweder in der Spalte `name` oder `name_{default_locale}` angeben.
 
 Die Resultate können Panaschierdaten enthalten, indem pro Partei eine Spalte hinzugefügt wird:
 

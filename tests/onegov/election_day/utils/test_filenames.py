@@ -70,32 +70,24 @@ def test_svg_filename(session):
 
         ts = 1388577600
         he = '4b9e99d2bd5e48d9a569e5f82175d1d2ed59105f8d82a12dc51b673ff12dc1f2'
-        assert svg_filename(election, 'chart') == \
-            f'election-{he}.{ts}.chart.any.svg'
         assert svg_filename(election, 'chart', 'de') == \
             f'election-{he}.{ts}.chart.de.svg'
         assert svg_filename(election, 'chart', 'rm') == \
             f'election-{he}.{ts}.chart.rm.svg'
 
         hc = '2ef359817c8f8a7354e201f891cd7c11a13f4e025aa25239c3ad0cabe58bc49b'
-        assert svg_filename(compound, 'chart') == \
-            f'elections-{hc}.{ts}.chart.any.svg'
         assert svg_filename(compound, 'chart', 'de') == \
             f'elections-{hc}.{ts}.chart.de.svg'
         assert svg_filename(compound, 'chart', 'rm') == \
             f'elections-{hc}.{ts}.chart.rm.svg'
 
         hv = 'ab274474a6aa82c100dddca63977facb556f66f489fb558c044a456f9ba919ce'
-        assert svg_filename(vote, 'chart') == \
-            f'vote-{hv}.{ts}.chart.any.svg'
         assert svg_filename(vote, 'chart', 'de') == \
             f'vote-{hv}.{ts}.chart.de.svg'
         assert svg_filename(vote, 'chart', 'rm') == \
             f'vote-{hv}.{ts}.chart.rm.svg'
 
         hb = str(ballot.id)
-        assert svg_filename(ballot, 'chart') == \
-            f'ballot-{hb}.{ts}.chart.any.svg'
         assert svg_filename(ballot, 'chart', 'de') == \
             f'ballot-{hb}.{ts}.chart.de.svg'
         assert svg_filename(ballot, 'chart', 'rm') == \

@@ -31,6 +31,10 @@ def test_disable_users(client):
 def test_change_role(client):
     client.login_admin()
 
+    user = client.spawn()
+    user.login_editor()
+    assert user.get('/userprofile').status_code == 200
+
     client.app.enable_yubikey = True
 
     editor = client.get('/usermanagement').click('Ansicht', index=1)
@@ -39,21 +43,28 @@ def test_change_role(client):
 
     editor.form['role'] = 'member'
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
+    user.login_editor()
 
     editor.form['role'] = 'admin'
     editor.form['state'] = 'inactive'
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
+    user.login_editor()
 
     editor.form['role'] = 'admin'
     editor.form['state'] = 'active'
     editor.form['yubikey'] = 'cccccccdefgh'
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
+    user.login_editor()
 
     client.app.enable_yubikey = False
     editor.form['role'] = 'admin'
     editor.form['state'] = 'active'
     editor.form['yubikey'] = ''
     assert editor.form.submit().status_code == 302
+    assert user.get('/userprofile', expect_errors=True).status_code == 403
 
 
 def test_user_source(client):
@@ -107,7 +118,7 @@ def test_add_new_user_without_activation_email(client):
 
     assert "existiert bereits" in new.form.submit()
 
-    new.form['username'] = 'member@example.org'
+    new.form['username'] = 'secondadmin@example.org'
     new.form['role'] = 'admin'
 
     assert "müssen zwingend einen YubiKey" in new.form.submit()
@@ -120,7 +131,7 @@ def test_add_new_user_without_activation_email(client):
     password = added.pyquery('.panel strong').text()
 
     login = client.spawn().get('/auth/login')
-    login.form['username'] = 'member@example.org'
+    login.form['username'] = 'secondadmin@example.org'
     login.form['password'] = password
     assert login.form.submit().status_code == 302
 
@@ -131,7 +142,7 @@ def test_add_new_user_with_activation_email(client):
     client.app.enable_yubikey = False
 
     new = client.get('/usermanagement').click('Benutzer', href='new')
-    new.form['username'] = 'member@example.org'
+    new.form['username'] = 'newmember@example.org'
     new.form['role'] = 'member'
     new.form['send_activation_email'] = True
     added = new.form.submit()
@@ -144,12 +155,12 @@ def test_add_new_user_with_activation_email(client):
         r'(http://localhost/auth/reset-password[^)]+)', email).group()
 
     page = client.spawn().get(reset)
-    page.form['email'] = 'member@example.org'
+    page.form['email'] = 'newmember@example.org'
     page.form['password'] = 'p@ssw0rd'
     page.form.submit()
 
     login = client.spawn().get('/auth/login')
-    login.form['username'] = 'member@example.org'
+    login.form['username'] = 'newmember@example.org'
     login.form['password'] = 'p@ssw0rd'
     assert login.form.submit().status_code == 302
 
@@ -167,12 +178,12 @@ def test_edit_user_settings(client):
     users = UserCollection(client.app.session())
     assert not users.by_username('new@example.org').data
 
-    edit = client.get('/usermanagement').click('Ansicht', index=2)
+    edit = client.get('/usermanagement').click('Ansicht', index=3)
     edit = edit.click('Bearbeiten')
     assert "new@example.org" in edit
 
-    edit.form.get('daily_ticket_statistics').checked = False
+    edit.form['ticket_statistics'] = 'never'
     edit.form.submit()
 
-    assert not users.by_username('new@example.org')\
-        .data['daily_ticket_statistics']
+    assert users.by_username('new@example.org')\
+        .data['ticket_statistics'] == 'never'

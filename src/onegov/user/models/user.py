@@ -25,10 +25,11 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: subclasses of this class. See
     #: `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    type = Column(Text, nullable=True)
+    type = Column(Text, nullable=False, default=lambda: 'generic')
 
     __mapper_args__ = {
-        'polymorphic_on': type
+        'polymorphic_on': type,
+        'polymorphic_identity': 'generic',
     }
 
     es_properties = {
@@ -248,12 +249,12 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the phone number of this user
     phone_number = data_property()
 
-    def cleanup_sessions(self, request):
+    def cleanup_sessions(self, app):
         """ Removes stored sessions not valid anymore. """
 
         self.sessions = self.sessions or {}
         for session_id in list(self.sessions.keys()):
-            if not remembered(request.app, session_id):
+            if not remembered(app, session_id):
                 del self.sessions[session_id]
 
     def save_current_session(self, request):
@@ -266,7 +267,7 @@ class User(Base, TimestampMixin, ORMSearchable):
             'agent': request.user_agent
         }
 
-        self.cleanup_sessions(request)
+        self.cleanup_sessions(request.app)
 
     def remove_current_session(self, request):
         """ Removes the current browser session. """
@@ -275,13 +276,16 @@ class User(Base, TimestampMixin, ORMSearchable):
         if self.sessions and token and token in self.sessions:
             del self.sessions[token]
 
-        self.cleanup_sessions(request)
+        self.cleanup_sessions(request.app)
 
-    def logout_all_sessions(self, request):
+    def logout_all_sessions(self, app):
         """ Terminates all open browser sessions. """
 
         self.sessions = self.sessions or {}
+        count = len(self.sessions)
         for session_id in self.sessions:
-            forget(request.app, session_id)
+            forget(app, session_id)
 
-        self.cleanup_sessions(request)
+        self.cleanup_sessions(app)
+
+        return count

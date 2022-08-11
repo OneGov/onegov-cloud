@@ -7,7 +7,6 @@ from onegov.ballot import ProporzElection
 from onegov.election_day.forms import ElectionCompoundForm
 from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import DummyPostData
-from tests.onegov.election_day.common import DummyPostData
 from tests.onegov.election_day.common import DummyRequest
 from wtforms.validators import InputRequired
 
@@ -117,8 +116,10 @@ def test_election_compound_form_validate(session):
     assert form.validate()
 
 
-def test_election_compound_form_model(election_day_app_zg, related_link_labels,
-                                      explanations_pdf):
+def test_election_compound_form_model(
+    election_day_app_zg, related_link_labels, explanations_pdf,
+    upper_apportionment_pdf, lower_apportionment_pdf
+):
     session = election_day_app_zg.session()
 
     date_ = date(2001, 1, 1)
@@ -142,9 +143,11 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
     model.related_link_label = related_link_labels
-    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
+    model.explanations_pdf = (explanations_pdf, 'e.pdf')
+    model.upper_apportionment_pdf = (upper_apportionment_pdf, 'u.pdf')
+    model.lower_apportionment_pdf = (lower_apportionment_pdf, 'l.pdf')
+    model.show_seat_allocation = True
     model.show_list_groups = True
-    model.show_lists = True
     model.show_party_strengths = True
     model.show_party_panachage = True
     model.elections = [e_r]
@@ -175,8 +178,10 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     assert form.related_link_label_it.data == 'IT'
     assert form.related_link_label_rm.data == 'RM'
     assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
+    assert form.upper_apportionment_pdf.data['mimetype'] == 'application/pdf'
+    assert form.lower_apportionment_pdf.data['mimetype'] == 'application/pdf'
+    assert form.show_seat_allocation.data is True
     assert form.show_list_groups.data is True
-    assert form.show_lists.data is True
     assert form.show_party_strengths.data is True
     assert form.show_party_panachage.data is True
     assert form.region_elections.data == ['e-r']
@@ -202,8 +207,10 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
     form.explanations_pdf.action = 'delete'
+    form.upper_apportionment_pdf.action = 'delete'
+    form.lower_apportionment_pdf.action = 'delete'
+    form.show_seat_allocation.data = False
     form.show_list_groups.data = False
-    form.show_lists.data = False
     form.show_party_strengths.data = False
     form.show_party_panachage.data = False
     form.region_elections.data = ['e-r']
@@ -236,13 +243,15 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
     assert model.explanations_pdf is None
+    assert model.upper_apportionment_pdf is None
+    assert model.lower_apportionment_pdf is None
     assert model.pukelsheim is False
     assert model.completes_manually is False
     assert model.manually_completed is False
     assert model.voters_counts is False
     assert model.exact_voters_counts is False
+    assert form.show_seat_allocation.data is False
     assert form.show_list_groups.data is False
-    assert form.show_lists.data is False
     assert form.show_party_strengths.data is False
     assert form.show_party_panachage.data is False
     assert sorted([e.id for e in model.elections]) == ['e-d']
@@ -257,18 +266,43 @@ def test_election_compound_form_model(election_day_app_zg, related_link_labels,
     form.update_model(model)
     assert sorted([e.id for e in model.elections]) == ['e-m']
 
-    form.explanations_pdf.action = 'upload'
-
     field_storage = FieldStorage()
-    field_storage.file = BytesIO('my-file'.encode())
+    field_storage.file = BytesIO('my-file-e'.encode())
     field_storage.type = 'image/png'  # ignored
-    field_storage.filename = 'my-file.pdf'
+    field_storage.filename = 'my-file-e.pdf'
+    form.explanations_pdf.action = 'upload'
     form.explanations_pdf.process(
         DummyPostData({'explanations_pdf': field_storage})
+    )
+
+    field_storage = FieldStorage()
+    field_storage.file = BytesIO('my-file-u'.encode())
+    field_storage.type = 'image/png'  # ignored
+    field_storage.filename = 'my-file-u.pdf'
+    form.upper_apportionment_pdf.action = 'upload'
+    form.upper_apportionment_pdf.process(
+        DummyPostData({'upper_apportionment_pdf': field_storage})
+    )
+
+    field_storage = FieldStorage()
+    field_storage.file = BytesIO('my-file-l'.encode())
+    field_storage.type = 'image/png'  # ignored
+    field_storage.filename = 'my-file-l.pdf'
+    form.lower_apportionment_pdf.action = 'upload'
+    form.lower_apportionment_pdf.process(
+        DummyPostData({'lower_apportionment_pdf': field_storage})
     )
 
     form.update_model(model)
 
     assert model.explanations_pdf.name == 'explanations_pdf'
-    assert model.explanations_pdf.reference.filename == 'my-file.pdf'
-    assert model.explanations_pdf.reference.file.read() == b'my-file'
+    assert model.explanations_pdf.reference.filename == 'my-file-e.pdf'
+    assert model.explanations_pdf.reference.file.read() == b'my-file-e'
+
+    assert model.upper_apportionment_pdf.name == 'upper_apportionment_pdf'
+    assert model.upper_apportionment_pdf.reference.filename == 'my-file-u.pdf'
+    assert model.upper_apportionment_pdf.reference.file.read() == b'my-file-u'
+
+    assert model.lower_apportionment_pdf.name == 'lower_apportionment_pdf'
+    assert model.lower_apportionment_pdf.reference.filename == 'my-file-l.pdf'
+    assert model.lower_apportionment_pdf.reference.file.read() == b'my-file-l'

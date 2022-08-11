@@ -1,5 +1,6 @@
 import os
 
+from freezegun import freeze_time
 from lxml.html import document_fromstring
 from onegov.ballot import ProporzElection
 from onegov.election_day.collections import ArchivedResultCollection
@@ -217,12 +218,13 @@ def test_view_clear_results(election_day_app_zg):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client, canton='zg')
-    upload_proporz_election(client, canton='zg')
-    upload_election_compound(client, canton='zg')
-    upload_party_results(client)
-    upload_party_results(client, slug='elections/elections')
-    upload_vote(client, canton='zg')
+    with freeze_time('2023-01-01'):
+        upload_majorz_election(client, canton='zg')
+        upload_proporz_election(client, canton='zg')
+        upload_election_compound(client, canton='zg')
+        upload_party_results(client)
+        upload_party_results(client, slug='elections/elections')
+        upload_vote(client, canton='zg')
 
     urls = (
         '/election/majorz-election/candidates',
@@ -239,10 +241,12 @@ def test_view_clear_results(election_day_app_zg):
         '/elections/elections/statistics',
         '/elections/elections/parties-panachage',
         '/elections/elections/party-strengths',
+        '/elections/elections/seat-allocation',
         '/vote/vote/entities'
     )
 
     assert all(['Noch keine Resultate' not in client.get(url) for url in urls])
+    assert '01.01.2023' in client.get('/archive/2022')
 
     client.get('/election/majorz-election/clear').form.submit().follow()
     client.get('/election/proporz-election/clear').form.submit().follow()
@@ -252,6 +256,7 @@ def test_view_clear_results(election_day_app_zg):
     client.get('/vote/vote/clear').form.submit().follow()
 
     assert all(['Noch keine Resultate' in client.get(url) for url in urls])
+    assert '01.01.2023' not in client.get('/archive/2022')
 
 
 def test_view_manage_upload_tokens(election_day_app_zg):

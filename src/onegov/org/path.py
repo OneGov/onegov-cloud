@@ -4,6 +4,8 @@ import sedate
 
 from datetime import date
 from onegov.chat import MessageCollection
+from onegov.chat import TextModule
+from onegov.chat import TextModuleCollection
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import json_converter
 from onegov.directory import Directory
@@ -57,6 +59,7 @@ from onegov.org.models import Topic
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
+from onegov.org.models.resource import FindYourSpotCollection
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -312,6 +315,11 @@ def get_ticket_note(app, id):
 @OrgApp.path(model=ResourceCollection, path='/resources')
 def get_resources(app):
     return app.libres_resources
+
+
+@OrgApp.path(model=FindYourSpotCollection, path='/find-your-spot')
+def get_find_my_spot(app, group=None):
+    return FindYourSpotCollection(app.libres_context, group=group)
 
 
 @OrgApp.path(model=Resource, path='/resource/{name}', converters=dict(
@@ -571,6 +579,22 @@ def get_messages(app, channel_id='*', type='*',
 
 
 @OrgApp.path(
+    model=TextModuleCollection,
+    path='/text-modules')
+def get_text_modules(app):
+    return TextModuleCollection(app.session())
+
+
+@OrgApp.path(
+    model=TextModule,
+    path='/text-module/{id}',
+    converters=dict(id=UUID)
+)
+def get_text_module(app, id):
+    return TextModuleCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
     model=DirectoryCollection,
     path='/directories')
 def get_directories(app):
@@ -681,8 +705,8 @@ def get_dashboard(request):
 
 
 @OrgApp.path(model=ExternalLinkCollection, path='/external-links')
-def get_external_link_collection(request):
-    return ExternalLinkCollection(request.session)
+def get_external_link_collection(request, type=None):
+    return ExternalLinkCollection(request.session, type=type)
 
 
 @OrgApp.path(model=ExternalLink, path='/external-link/{id}',

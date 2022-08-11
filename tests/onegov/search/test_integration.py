@@ -196,22 +196,24 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         query = request.params.get('q')
         if query:
             if query.startswith('#'):
-                return request.app.es_client.search(index='_all', body={
-                    'query': {
+                return request.app.es_client.search(
+                    index='_all',
+                    query={
                         'match': {
                             'es_tags': query.lstrip('#'),
                         }
                     }
-                })
+                )
             else:
-                return request.app.es_client.search(index='_all', body={
-                    'query': {
+                return request.app.es_client.search(
+                    index='_all',
+                    query={
                         'multi_match': {
                             'query': query,
                             'fields': ['title', 'body']
                         }
                     }
-                })
+                )
         else:
             return request.app.es_client.search(index='_all')
 

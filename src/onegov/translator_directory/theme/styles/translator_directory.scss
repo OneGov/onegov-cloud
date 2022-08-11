@@ -8,6 +8,7 @@ $dark-orange:  #be860e;
 .edit-bar {
     .create-excel::before { @include icon('\f1c3'); }
     .documents::before { @include icon('\f016')}
+    .report-change::before { @include icon('\f2bc')}
 }
 
 .location-settings {
@@ -102,4 +103,32 @@ table.translator-documents {
     tr > th:first-of-type {
         font-size: 1.2rem;
     }
+}
+
+#fieldset-proposed-changes .long-field-help {
+    color: $jumbo;
+
+    p {
+        color: $jumbo;
+    }
+}
+
+.field-type-coordinatesfield .long-field-help {
+    @include panel($callout-panel-bg);
+}
+
+.hints .hint {
+    font-size: 1em;
+
+    &.hint-text {
+        margin-bottom: 1em;
+        margin-left: 0;
+    }
+
+    &.hint-bullet {
+        margin-bottom: .375em;
+
+        &::before { content: "-"; }
+    }
+
 }

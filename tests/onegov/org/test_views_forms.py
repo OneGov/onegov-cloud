@@ -631,7 +631,8 @@ def test_registration_ticket_workflow(client):
 
     count = 0
 
-    def register(client, data_in_email, accept_ticket=True, url='/form/meetup'):
+    def register(client, data_in_email, accept_ticket=True,
+                 url='/form/meetup'):
         nonlocal count
         count += 1
         with freeze_time(f'2018-01-01 00:00:{count:02d}'):

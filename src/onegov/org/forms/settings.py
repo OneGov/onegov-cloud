@@ -1,3 +1,4 @@
+import datetime
 import re
 
 from cached_property import cached_property
@@ -26,6 +27,8 @@ from wtforms_components import ColorField
 
 from onegov.ticket import handlers
 from onegov.user import User
+
+from .user import AVAILABLE_ROLES
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
@@ -363,18 +366,16 @@ class FaviconSettingsForm(Form):
 
 
 class LinksSettingsForm(Form):
-    open_files_target_blank = BooleanField(
-        label=_("Open files in separate window"),
-        description=_(
-            'User will stay on the page when opening images and files')
-    )
-
     disable_page_refs = BooleanField(
         label=_("Disable page references"),
         description=_(
             "Disable showing the copy link '#' for the site reference. "
             "The references themselves will still work. "
             "Those references are only showed for logged in users.")
+    )
+
+    open_files_target_blank = BooleanField(
+        label=_("Open files in separate window")
     )
 
 
@@ -681,6 +682,11 @@ class HolidaySettingsForm(Form):
             name='holiday-settings-preview'
         ))
 
+    school_holidays = TextAreaField(
+        label=_("School holidays"),
+        description=("12.03.2022 - 21.03.2022"),
+        render_kw={'rows': 10})
+
     def validate_other_holidays(self, field):
         if not field.data:
             return
@@ -702,19 +708,78 @@ class HolidaySettingsForm(Form):
             if date.count('.') > 1:
                 raise ValidationError(_("Please enter only day and month"))
 
+    def parse_date(self, date):
+        day, month, year = date.split('.')
+        try:
+            return datetime.date(int(year), int(month), int(day))
+        except (ValueError, TypeError):
+            raise ValidationError(_(
+                "${date} is not a valid date",
+                mapping={'date': date}
+            ))
+
+    def validate_school_holidays(self, field):
+        if not field.data:
+            return
+
+        for line in field.data.splitlines():
+
+            if not line.strip():
+                continue
+
+            if line.count('-') < 1:
+                raise ValidationError(
+                    _("Format: Day.Month.Year - Day.Month.Year")
+                )
+            if line.count('-') > 1:
+                raise ValidationError(_("Please enter one date pair per line"))
+
+            start, end = line.split('-')
+            if start.count('.') != 2:
+                raise ValidationError(
+                    _("Format: Day.Month.Year - Day.Month.Year")
+                )
+            if end.count('.') != 2:
+                raise ValidationError(
+                    _("Format: Day.Month.Year - Day.Month.Year")
+                )
+
+            start_date = self.parse_date(start)
+            end_date = self.parse_date(end)
+            if end_date <= start_date:
+                raise ValidationError(
+                    _("End date needs to be after start date")
+                )
+
     @property
     def holiday_settings(self):
 
-        def parse_line(line):
+        def parse_other_holidays_line(line):
             date, desc = line.strip().split('-')
             day, month = date.split('.')
 
             return int(month), int(day), desc.strip()
 
+        def parse_school_holidays_line(line):
+            start, end = line.strip().split('-')
+            start_day, start_month, start_year = start.split('.')
+            end_day, end_month, end_year = end.split('.')
+
+            return (
+                int(start_year), int(start_month), int(start_day),
+                int(end_year), int(end_month), int(end_day)
+            )
+
         return {
             'cantons': self.cantonal_holidays.data,
+            'school': (
+                parse_school_holidays_line(l)
+                for l in self.school_holidays.data.splitlines()
+                if l.strip()
+            ),
             'other': (
-                parse_line(l) for l in self.other_holidays.data.splitlines()
+                parse_other_holidays_line(l)
+                for l in self.other_holidays.data.splitlines()
                 if l.strip()
             )
         }
@@ -726,22 +791,44 @@ class HolidaySettingsForm(Form):
         def format_other(d):
             return f'{d[1]:02d}.{d[0]:02d} - {d[2]}'
 
+        def format_school(d):
+            return (
+                f'{d[2]:02d}.{d[1]:02d}.{d[0]:04d} - '
+                f'{d[5]:02d}.{d[4]:02d}.{d[3]:04d}'
+            )
+
         self.cantonal_holidays.data = data.get(
             'cantons', ())
 
         self.other_holidays.data = '\n'.join(
             format_other(d) for d in data.get('other', ()))
 
+        self.school_holidays.data = '\n'.join(
+            format_school(d) for d in data.get('school', ()))
+
     def populate_obj(self, model):
-        super().populate_obj(model)
         model.holiday_settings = self.holiday_settings
 
     def process_obj(self, model):
-        super().process_obj(model)
         self.holiday_settings = model.holiday_settings
 
 
 class OrgTicketSettingsForm(Form):
+
+    email_for_new_tickets = StringField(
+        label=_("Email adress for notifications "
+                "about newly opened tickets"),
+        description=("info@example.ch")
+    )
+
+    ticket_auto_accept_style = RadioField(
+        label=_("Accept request and close ticket automatically based on:"),
+        choices=(
+            ('category', _("Ticket category")),
+            ('role', _("User role")),
+        ),
+        default='category'
+    )
 
     ticket_auto_accepts = MultiCheckboxField(
         label=_("Accept request and close ticket automatically "
@@ -750,6 +837,17 @@ class OrgTicketSettingsForm(Form):
                       "in state pending. Also note, that after the ticket is "
                       "closed, the submitter can't send any messages."),
         choices=[],
+        depends_on=('ticket_auto_accept_style', 'category')
+    )
+
+    ticket_auto_accept_roles = MultiCheckboxField(
+        label=_("Accept request and close ticket automatically "
+                "for these user roles"),
+        description=_("If auto-accepting is not possible, the ticket will be "
+                      "in state pending. Also note, that after the ticket is "
+                      "closed, the submitter can't send any messages."),
+        choices=AVAILABLE_ROLES,
+        depends_on=('ticket_auto_accept_style', 'role')
     )
 
     auto_closing_user = ChosenSelectField(

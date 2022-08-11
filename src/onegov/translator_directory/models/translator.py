@@ -6,7 +6,7 @@ from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
@@ -16,9 +16,10 @@ from onegov.translator_directory.models.certificate import \
 
 from onegov.translator_directory.models.language import \
     mother_tongue_association_table, spoken_association_table, \
-    written_association_table
+    written_association_table, monitoring_association_table
 
 
+# todo: remove me!?
 class ESMixin(ORMSearchable):
 
     es_properties = {
@@ -43,6 +44,16 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     __tablename__ = 'translators'
 
     id = Column(UUID, primary_key=True, default=uuid4)
+
+    state = Column(
+        Enum(
+            'proposed',
+            'published',
+            name='translator_state'
+        ),
+        nullable=False,
+        default='published'
+    )
 
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
@@ -84,7 +95,15 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     account_owner = Column(Text)
     iban = Column(Text)
 
-    email = Column(Text)
+    email = Column(Text, unique=True)
+
+    # the user account related to this translator
+    user = relationship(
+        'User',
+        primaryjoin='foreign(Translator.email) == User.username',
+        uselist=False,
+        backref=backref('translator', uselist=False, passive_deletes='all')
+    )
 
     tel_mobile = Column(Text,)
     tel_private = Column(Text)
@@ -110,6 +129,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     )
     written_languages = relationship(
         "Language", secondary=written_association_table, backref='writers')
+    monitoring_languages = relationship(
+        "Language", secondary=monitoring_association_table, backref='monitors')
 
     # Nachweis der Voraussetzungen
     proof_of_preconditions = Column(Text)

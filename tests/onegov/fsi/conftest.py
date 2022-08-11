@@ -31,7 +31,7 @@ from tests.shared import Client as BaseClient
 class Client(BaseClient):
 
     use_intercooler = True
-    skip_first_form = True
+    skip_n_forms = 1
 
     def login_member(self, to=None):
         return self.login('member@example.org', global_password, to)

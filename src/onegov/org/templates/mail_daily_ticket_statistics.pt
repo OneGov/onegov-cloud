@@ -19,10 +19,10 @@
         </ul>
 
         <p>
-            <span i18n:translate tal:condition="currently_open != 1">There are currently <span tal:replace='currently_open' i18n:name='currently_open' /> tickets open and</span>
-            <span i18n:translate tal:condition="currently_open == 1">There is currently <span tal:replace='currently_open' i18n:name='currently_open' /> ticket open and</span>
-            <span tal:condition="currently_pending != 1">${currently_pending} <span i18n:translate>tickets are pending.</span></span>
-            <span tal:condition="currently_pending == 1">${currently_pending} <span i18n:translate>ticket is pending.</span></span>
+            <span i18n:translate tal:condition="currently_open != 1">There are currently <span tal:replace='currently_open' i18n:name='currently_open' /> tickets <a href="${open_link}" i18n:name="open_n" i18n:translate="open_n">open</a> and</span>
+            <span i18n:translate tal:condition="currently_open == 1">There is currently 1 ticket <a href="${open_link}" i18n:name="open_1" i18n:translate="open_1">open</a> and</span>
+            <span tal:condition="currently_pending != 1">${currently_pending} <span i18n:translate>tickets are <a href="${pending_link}" i18n:name="pending_n" i18n:translate="pending_n">pending</a>.</span></span>
+            <span tal:condition="currently_pending == 1"><span i18n:translate>1 ticket is <a href="${pending_link}" i18n:name="pending_1" i18n:translate="pending_1">pending</a>.</span></span>
         </p>
 
         <p i18n:translate tal:condition="is_monday">Have a great week!</p>
@@ -39,7 +39,7 @@
                 <a href="${unsubscribe}" i18n:translate>unsubscribe</a>.
             </strong>
             <span i18n:translate>
-                Or by changing the settings in your user profile.
+                Or you can receive it less frequently by changing the settings in your user profile.
             </span>
     </tal:b>
 </div>

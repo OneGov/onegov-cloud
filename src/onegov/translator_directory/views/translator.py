@@ -1,24 +1,31 @@
 from datetime import datetime
 from io import BytesIO
-
-from webob.exc import HTTPNotFound
-from xlsxwriter import Workbook
-
-from onegov.org.models import Organisation
-from onegov.translator_directory import _
+from morepath import redirect
+from morepath.request import Response
+from onegov.core.custom import json
 from onegov.core.security import Secret, Personal, Private
+from onegov.core.templates import render_template
+from onegov.org.layout import DefaultMailLayout
+from onegov.org.mail import send_ticket_mail
+from onegov.org.models import Organisation
+from onegov.org.models import TicketMessage
+from onegov.ticket import TicketCollection
+from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
     INTERPRETING_TYPES, ADMISSIONS, GENDERS
+from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
+    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout, \
+    ReportTranslatorChangesLayout
 from onegov.translator_directory.models.translator import Translator
-from morepath.request import Response
-from onegov.core.custom import json
+from uuid import uuid4
+from webob.exc import HTTPNotFound
+from xlsxwriter import Workbook
 
 
 @TranslatorDirectoryApp.form(
@@ -30,9 +37,32 @@ from onegov.core.custom import json
 )
 def add_new_translator(self, request, form):
 
+    form.delete_field('date_of_decision')
+    form.delete_field('for_admins_only')
+    form.delete_field('proof_of_preconditions')
+
     if form.submitted(request):
-        translator = self.add(**form.get_useful_data())
+        data = form.get_useful_data()
+        translator = self.add(**data)
         request.success(_('Added a new translator'))
+
+        if translator.user:
+            subject = request.translate(
+                _('An account was created for you')
+            )
+            content = render_template('mail_new_user.pt', request, {
+                'user': translator.user,
+                'org': request.app.org,
+                'layout': DefaultMailLayout(translator.user, request),
+                'title': subject
+            })
+            request.app.send_transactional_email(
+                subject=subject,
+                receivers=(translator.user.username, ),
+                content=content,
+            )
+            request.success(_('Activation E-Mail sent'))
+
         return request.redirect(request.link(translator))
 
     layout = AddTranslatorLayout(self, request)
@@ -148,6 +178,8 @@ def export_translator_directory(self, request):
         request.translate(_("Mother tongues")),
         request.translate(_("Spoken languages")),
         request.translate(_("Written languages")),
+        request.translate(_("Monitoring languages")),
+        request.translate(_("Current professional activity")),
         request.translate(_("Expertise by professional guild")),
         request.translate(_("Expertise by interpreting type")),
         request.translate(_("Proof of preconditions")),
@@ -191,6 +223,8 @@ def export_translator_directory(self, request):
             format_languages(trs.mother_tongues),
             format_languages(trs.spoken_languages),
             format_languages(trs.written_languages),
+            format_languages(trs.monitoring_languages),
+            trs.occupation or '',
             format_guilds(trs.expertise_professional_guilds_all),
             format_interpreting_types(trs.expertise_interpreting_types),
             trs.proof_of_preconditions or '',
@@ -297,10 +331,10 @@ def edit_translator_as_editor(self, request, form):
     request_method='DELETE',
     permission=Secret
 )
-def delete_course_event(self, request):
+def delete_translator(self, request):
 
     request.assert_valid_csrf_token()
-    TranslatorCollection(request.session).delete(self)
+    TranslatorCollection(request.app).delete(self)
     request.success(_('Translator successfully deleted'))
 
 
@@ -321,3 +355,59 @@ def get_static_excel_file(self, request):
         ),
         content_disposition=f'inline; filename={file.filename}'
     )
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    name='report-change',
+    template='form.pt',
+    permission=Personal,
+    form=TranslatorMutationForm
+)
+def report_translator_change(self, request, form):
+    if form.submitted(request):
+        session = request.session
+        with session.no_autoflush:
+            ticket = TicketCollection(session).open_ticket(
+                handler_code='TRN',
+                handler_id=uuid4().hex,
+                handler_data={
+                    'id': str(self.id),
+                    'submitter_email': request.current_username,
+                    'submitter_message': form.submitter_message.data,
+                    'proposed_changes': form.proposed_changes
+                }
+            )
+            TicketMessage.create(ticket, request, 'opened')
+            ticket.create_snapshot(request)
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(request.current_username, ),
+            ticket=ticket,
+            send_self=True
+        )
+        if request.email_for_new_tickets:
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened_info.pt',
+                subject=_("New ticket"),
+                ticket=ticket,
+                receivers=(request.email_for_new_tickets, ),
+                content={
+                    'model': ticket
+                }
+            )
+
+        request.success(_("Thank you for your submission!"))
+        return redirect(request.link(ticket, 'status'))
+
+    layout = ReportTranslatorChangesLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': layout.title,
+        'form': form
+    }

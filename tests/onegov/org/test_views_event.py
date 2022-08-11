@@ -2,6 +2,7 @@ import babel.dates
 import os
 import pytest
 import transaction
+import yaml
 
 from datetime import datetime, date, timedelta
 from onegov.event.models import Event
@@ -295,7 +296,22 @@ def test_submit_event(client, skip_opening_email):
     assert message['To'] == "test@example.org"
     assert ticket_nr in message['TextBody']
 
-    assert "Zugriff verweigert" in preview_page.form.submit(expect_errors=True)
+    # Make corrections
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['description'] = "My event is exceptional."
+    preview_page = form_page.form.submit().follow()
+    assert "My event is exceptional." in preview_page
+
+    session = client.app.session()
+    event = session.query(Event).filter_by(title="My Event").one()
+    event.meta['session_ids'] = []
+    session.flush()
+    transaction.commit()
+
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['location'] = "A special place"
+    preview_page = form_page.form.submit().follow()
+    assert "A special place" in preview_page
 
     # Accept ticket
     client.login_editor()
@@ -309,11 +325,12 @@ def test_submit_event(client, skip_opening_email):
     assert ticket_nr in ticket_page
     assert "test@example.org" in ticket_page
     assert "My Event" in ticket_page
-    assert "My event is an event." in ticket_page
-    assert "Location" in ticket_page
+    assert "My event is exceptional." in ticket_page
+    assert "A special place" in ticket_page
     assert "The Organizer" in ticket_page
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
+    assert "Veranstaltung bearbeitet" in ticket_page
 
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
@@ -328,21 +345,41 @@ def test_submit_event(client, skip_opening_email):
         assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
             ticket_page
 
+    client.logout()
+
+    # Make some more corrections
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['organizer'] = "A carful organizer"
+    preview_page = form_page.form.submit().follow()
+    assert "My event is exceptional." in preview_page
+
+    session = client.app.session()
+    event = session.query(Event).filter_by(title="My Event").one()
+    event.meta['session_ids'] = []
+    session.flush()
+    transaction.commit()
+
+    form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
+    form_page.form['title'] = "My special event"
+    preview_page = form_page.form.submit().follow()
+    assert "A special place" in preview_page
+
     # Publish event
+    client.login_editor()
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
 
-    assert "My Event" in client.get('/events')
+    assert "My special event" in client.get('/events')
 
     assert len(os.listdir(client.app.maildir)) == 2
     message = client.get_email(1)
     assert message['To'] == "test@example.org"
     message = message['TextBody']
-    assert "My Event" in message
-    assert "My event is an event." in message
-    assert "Location" in message
+    assert "My special event" in message
+    assert "My event is exceptional." in message
+    assert "A special place" in message
     assert "Ausstellung" in message
     assert "Bibliothek" in message
-    assert "The Organizer" in message
+    assert "A carful organizer" in message
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
@@ -357,6 +394,15 @@ def test_submit_event(client, skip_opening_email):
     message = client.get_email(2)
     assert message['To'] == "test@example.org"
     assert "Ihre Anfrage wurde abgeschlossen" in message['TextBody']
+
+    client.logout()
+
+    # Make sure, no more corrections can be done
+    confirmation_page = client.get(confirmation_page.request.url)
+    assert "Ihr Anliegen wurde abgeschlossen" in confirmation_page
+    assert "Bearbeiten Sie diese Veranstaltung." not in confirmation_page
+    assert client.get(form_page.request.url, expect_errors=True).status_code \
+        == 403
 
 
 def test_edit_event(client):
@@ -484,6 +530,7 @@ def test_import_export_events(client):
     page.form['price'] = "CHF 75.-"
     page.form['organizer'] = "Sinfonieorchester"
     page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['tags'] = ["Music", "Tradition"]
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = "18:00"
     page.form['end_time'] = "22:00"
@@ -496,6 +543,8 @@ def test_import_export_events(client):
     page = page.click("Veranstaltung annehmen").follow()
 
     assert "Weihnachtssingen" in client.get('/events')
+    assert "Music" in client.get('/events')
+    assert "Tradition" in client.get('/events')
 
     # Export
     page = client.get('/events').click("Export")
@@ -545,3 +594,104 @@ def test_import_export_events(client):
     assert {event.meta['submitter_email'] for event in events} == {
         'sinfonieorchester@govikon.org', 'editor@example.org'
     }
+
+
+def test_import_export_events_with_custom_tags(client):
+    session = client.app.session()
+    for event in session.query(Event):
+        session.delete(event)
+    transaction.commit()
+
+    fs = client.app.filestorage
+    data = {
+        'event_tags': ['Singing', 'Christmas']
+    }
+    with fs.open('eventsettings.yml', 'w') as f:
+        yaml.dump(data, f)
+
+    # Submit and publish an event
+    page = client.get('/events').click("Veranstaltung melden")
+    event_date = date.today() + timedelta(days=1)
+    page.form['email'] = "sinfonieorchester@govikon.org"
+    page.form['title'] = "Weihnachtssingen"
+    page.form['description'] = "Das Govikoner Sinfonieorchester lädt ein."
+    page.form['location'] = "Konzertsaal"
+    page.form['price'] = "CHF 75.-"
+    page.form['organizer'] = "Sinfonieorchester"
+    page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['tags'] = ["Singing", "Christmas"]
+    page.form['start_date'] = event_date.isoformat()
+    page.form['start_time'] = "18:00"
+    page.form['end_time'] = "22:00"
+    page.form['repeat'] = 'without'
+    page.form.submit().follow().form.submit().follow()
+
+    client.login_editor()
+
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    page = page.click("Veranstaltung annehmen").follow()
+
+    assert "Weihnachtssingen" in client.get('/events')
+    assert "Singing" in client.get('/events')
+    assert "Christmas" in client.get('/events')
+
+    # Export
+    page = client.get('/events').click("Export")
+    page.form['file_format'] = 'xlsx'
+    page = page.form.submit()
+
+    file = Upload(
+        'file',
+        page.body,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+    # Import (Dry run)
+    page = client.get('/events').click("Import")
+    page.form['dry_run'] = True
+    page.form['file'] = file
+    page = page.form.submit()
+    assert "1 Veranstaltungen werden importiert" in page
+    assert session.query(Event).count() == 1
+
+    # Import
+    page = client.get('/events').click("Import")
+    page.form['file'] = file
+    page = page.form.submit().follow()
+    assert "1 Veranstaltungen importiert" in page
+    assert session.query(Event).count() == 2
+
+    # Re-Import with clear
+    page = client.get('/events').click("Import")
+    page.form['file'] = file
+    page.form['clear'] = True
+    page = page.form.submit().follow()
+    assert "1 Veranstaltungen importiert" in page
+    assert session.query(Event).count() == 2
+
+    events = session.query(Event).all()
+    assert events[0].title == events[1].title
+    assert events[0].description == events[1].description
+    assert events[0].location == events[1].location
+    assert events[0].price == events[1].price
+    assert events[0].organizer == events[1].organizer
+    assert events[0].organizer_email == events[1].organizer_email
+    assert events[0].tags == events[1].tags
+    assert events[0].start == events[1].start
+    assert events[0].end == events[1].end
+    assert events[0].timezone == events[1].timezone
+    assert {event.meta['submitter_email'] for event in events} == {
+        'sinfonieorchester@govikon.org', 'editor@example.org'
+    }
+
+
+def test_event_form_with_custom_lead(client):
+    fs = client.app.filestorage
+    data = {
+        'event_form_lead': 'A completely different lead text'
+    }
+    with fs.open('eventsettings.yml', 'w') as f:
+        yaml.dump(data, f)
+
+    page = client.get('/events').click("Veranstaltung melden")
+    assert 'A completely different lead text' in page

@@ -1,13 +1,10 @@
 from collections import OrderedDict
-from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.election import Election
-from onegov.ballot.models.election.list import List
-from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
+from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -15,21 +12,17 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
+from onegov.core.utils import Bunch
 from onegov.core.utils import groupbylist
-from sqlalchemy import cast
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
-from sqlalchemy import desc
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
-from sqlalchemy import Integer
-from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.expression import literal_column
 from uuid import uuid4
 
 
@@ -239,6 +232,27 @@ class ElectionCompound(
         return False
 
     @property
+    def results(self):
+        return [
+            Bunch(
+                domain_segment=election.domain_segment,
+                domain_supersegment=election.domain_supersegment,
+                counted=election.counted,
+                turnout=election.turnout,
+                eligible_voters=election.eligible_voters,
+                expats=election.expats,
+                counted_eligible_voters=election.counted_eligible_voters,
+                received_ballots=election.received_ballots,
+                counted_received_ballots=election.counted_received_ballots,
+                accounted_ballots=election.accounted_ballots,
+                blank_ballots=election.blank_ballots,
+                invalid_ballots=election.invalid_ballots,
+                accounted_votes=election.accounted_votes,
+            )
+            for election in self.elections
+        ]
+
+    @property
     def completed(self):
         """ Returns True, if all elections are completed. """
 
@@ -265,85 +279,21 @@ class ElectionCompound(
 
         return result
 
-    def get_list_results(self, limit=None, names=None):
-        """ Returns the aggregated number of mandates and voters count of all
-        the lists.
-
-        These results are only comparable for elections using the Doppelter
-        Pukelsheim system and are therefore only provided in this case.
-
-        Sorts the results by number of mandates if the election is completed,
-        by voters count else.
-
-        """
-
-        if not self.pukelsheim:
-            return []
-
-        order_by = 'voters_count'
-        if self.completed:
-            order_by = 'number_of_mandates'
-
-        session = object_session(self)
-
-        # Query number of mandates
-        mandates = session.query(
-            List.name.label('name'),
-            func.sum(List.number_of_mandates).label('number_of_mandates'),
-            literal_column('0').label('voters_count')
-        )
-        mandates = mandates.join(ElectionCompound.associations)
-        mandates = mandates.filter(ElectionCompound.id == self.id)
-        if names:
-            mandates = mandates.filter(List.name.in_(names))
-        mandates = mandates.join(Election, List)
-        mandates = mandates.group_by(List.name)
-
-        # Query voters counts
-        voters_counts = session.query(
-            List.name.label('name'),
-            literal_column('0').label('number_of_mandates'),
-            func.sum(
-                func.round(
-                    cast(ListResult.votes, Numeric).op('/')(
-                        cast(Election.number_of_mandates, Numeric)
-                    )
-                )
-            ).label('voters_count'),
-        )
-        voters_counts = voters_counts.join(ElectionCompound.associations)
-        voters_counts = voters_counts.filter(ElectionCompound.id == self.id)
-        if names:
-            voters_counts = voters_counts.filter(List.name.in_(names))
-        voters_counts = voters_counts.join(Election, List, ListResult)
-        voters_counts = voters_counts.group_by(List.name)
-
-        # Combine
-        union = mandates.union_all(voters_counts).subquery('union')
-        query = session.query(
-            union.c.name.label('name'),
-            cast(func.sum(union.c.number_of_mandates), Integer).label(
-                'number_of_mandates'
-            ),
-            cast(func.sum(union.c.voters_count), Integer).label(
-                'voters_count'
-            )
-        )
-        query = query.group_by(union.c.name)
-        query = query.order_by(desc(order_by), union.c.name)
-        if limit and limit > 0:
-            query = query.limit(limit)
-        return query.all()
-
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
     related_link_label = meta_property('related_link_label')
 
+    #: additional file in case of Doppelter Pukelsheim
+    upper_apportionment_pdf = named_file()
+
+    #: additional file in case of Doppelter Pukelsheim
+    lower_apportionment_pdf = named_file()
+
+    #: may be used to enable/disable the visibility of the seat allocation
+    show_seat_allocation = meta_property('show_seat_allocation')
+
     #: may be used to enable/disable the visibility of the list groups
     show_list_groups = meta_property('show_list_groups')
-
-    #: may be used to enable/disable the visibility of the aggreagted lists
-    show_lists = meta_property('show_lists')
 
     #: may be used to enable/disable the visibility of party strengths
     show_party_strengths = meta_property('show_party_strengths')
@@ -352,13 +302,9 @@ class ElectionCompound(
     show_party_panachage = meta_property('show_party_panachage')
 
     def clear_results(self):
-        """ Clears all own results. """
+        """ Clears all related results. """
 
         self.last_result_change = None
-        result = [x.last_result_change for x in self.elections]
-        result = [x for x in result if x]
-        if result:
-            self.last_result_change = max(result)
 
         session = object_session(self)
         for result in self.party_results:
@@ -366,7 +312,10 @@ class ElectionCompound(
         for result in self.panachage_results:
             session.delete(result)
 
-    def export(self):
+        for election in self.elections:
+            election.clear_results()
+
+    def export(self, locales):
         """ Returns all data connected to this election compound as list with
         dicts.
 
@@ -383,17 +332,16 @@ class ElectionCompound(
         """
 
         common = OrderedDict()
-        for locale in election_day_i18n_used_locales:
-            common[f'compound_title_{locale}'] = \
-                self.title_translations.get(locale, '')
-        for locale, title in self.title_translations.items():
-            common[f'compound_title_{locale}'] = (title or '').strip()
+        for locale in locales:
+            common[f'compound_title_{locale}'] = self.title_translations.get(
+                locale, ''
+            )
         common['compound_date'] = self.date.isoformat()
         common['compound_mandates'] = self.number_of_mandates
 
         rows = []
         for election in self.elections:
-            for row in election.export():
+            for row in election.export(locales):
                 rows.append(
                     OrderedDict(list(common.items()) + list(row.items()))
                 )

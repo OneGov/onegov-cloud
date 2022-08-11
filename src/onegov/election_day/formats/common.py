@@ -295,15 +295,6 @@ def validate_numeric(line, col, precision, scale, treat_none_as_default=True,
                            mapping={'col': col}))
 
 
-def validate_empty(line, col, treat_empty_as_default=True, default=''):
-    result = getattr(line, col)
-    if result:
-        return result
-    elif treat_empty_as_default:
-        return default
-    raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
-
-
 def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     """ Used to validate list_id that can also be alphanumeric.
      Example: 03B.04
@@ -318,3 +309,12 @@ def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     elif treat_empty_as_default:
         return default
     raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
+
+
+def validate_gender(line):
+    result = getattr(line, 'candidate_gender', None) or None
+    if result not in (None, 'male', 'female', 'undetermined'):
+        raise ValueError(
+            _('Invalid gender: ${value}', mapping={'value': result})
+        )
+    return result

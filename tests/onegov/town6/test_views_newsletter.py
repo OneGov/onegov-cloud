@@ -80,7 +80,7 @@ def test_unsubscribe_link(client):
     client.post(url)
 
     user = UserCollection(session).by_username('editor@example.org')
-    assert user.data['daily_ticket_statistics'] == False
+    assert user.data['ticket_statistics'] == 'never'
 
     # unknown user
     token = client.app.request_class.new_url_safe_token(

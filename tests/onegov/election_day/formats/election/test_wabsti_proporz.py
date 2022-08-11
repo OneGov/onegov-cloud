@@ -438,8 +438,8 @@ def test_import_wabsti_proporz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for expats in (False, True):
-        election.expats = expats
+    for has_expats in (False, True):
+        election.has_expats = has_expats
         for entity_id in (9170, 0):
             errors = import_election_wabsti_proporz(
                 election, principal,
@@ -470,7 +470,7 @@ def test_import_wabsti_proporz_expats(session):
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
             candidate = election.candidates.first()
-            if expats:
+            if has_expats:
                 assert errors == []
                 assert candidate.results.one().election_result.entity_id == 0
                 assert candidate.votes == 50

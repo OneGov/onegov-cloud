@@ -5,7 +5,7 @@ from onegov.core.cache import lru_cache
 from onegov.core.security import Public
 from onegov.user.auth.core import Auth
 from onegov.user.auth.provider import AUTHENTICATION_PROVIDERS, AzureADProvider
-from onegov.user.auth.provider import AuthenticationProvider
+from onegov.user.auth.provider import AuthenticationProvider, SAML2Provider
 from onegov.user.auth.provider import Conclusion
 from onegov.user.auth.provider import provider_by_name
 from webob.exc import HTTPUnauthorized
@@ -149,6 +149,13 @@ def handle_authentication(self, request):
     permission=Public,
     name='redirect'
 )
+# saml2 idp's may require POST on authorisation
+@UserApp.view(
+    model=AuthenticationProvider,
+    permission=Public,
+    name='redirect',
+    request_method='POST'
+)
 def handle_provider_authorisation(self, request):
     response = self.request_authorisation(request)
 
@@ -177,13 +184,23 @@ def handle_provider_authorisation(self, request):
     permission=Public,
     name='logout'
 )
+# same here
+@UserApp.view(
+    model=AuthenticationProvider,
+    permission=Public,
+    name='logout',
+    request_method='POST'
+)
 def handle_provider_logout(self, request):
-    """ We contact Microsoft that the user wants to log out and redirecting
+    """ We contact the provider that the user wants to log out and redirecting
     him to our main logout view. """
 
     if isinstance(self, AzureADProvider):
-        request.browsser_session['logout_to'] = self.to
+        request.browser_session['logout_to'] = self.to
         return morepath.redirect(self.logout_url(request))
+    elif isinstance(self, SAML2Provider):
+        client = self.tenants.client(request.app)
+        return client.handle_slo(self, request)
 
     raise NotImplementedError
 

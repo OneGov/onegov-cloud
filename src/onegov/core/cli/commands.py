@@ -81,12 +81,10 @@ def delete(group_context):
 })
 @click.option('--queue', default='postmark',
               help="The name of the queue to process")
-@click.option('--token', default='',
-              help="Deprecated, does nothing")
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
 @pass_group_context
-def sendmail(group_context, queue, token, limit):
+def sendmail(group_context, queue, limit):
     """ Sends mail from a specific mail queue. """
 
     queues = group_context.config.mail_queues

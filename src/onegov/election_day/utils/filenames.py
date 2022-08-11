@@ -31,7 +31,7 @@ def pdf_filename(item, locale, last_modified=None):
     )
 
 
-def svg_filename(item, type_, locale=None, last_modified=None):
+def svg_filename(item, type_, locale, last_modified=None):
     """ Generates a filename from an election, ballot or vote::
 
         ['election' or 'vote']-[hash of id].[type_].[timestamp].[locale].svg
@@ -46,4 +46,4 @@ def svg_filename(item, type_, locale=None, last_modified=None):
         hash = sha256(item.id.encode('utf-8')).hexdigest()
         ts = int((last_modified or item.last_modified).timestamp())
 
-    return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale or 'any')
+    return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale)

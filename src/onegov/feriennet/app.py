@@ -16,7 +16,6 @@ from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
 from onegov.org.app import get_public_ticket_messages \
     as default_public_ticket_messages
 from onegov.user import User, UserCollection
-from onegov.feriennet import _
 
 BANNER_TEMPLATE = """
 <div class="sponsor-banner">
@@ -95,9 +94,16 @@ class FeriennetApp(OrgApp):
         """ Randomly returns the html to one of the available booking banners.
 
         """
+        language = request.locale[:2]
         candidates = [
             sponsor for sponsor in self.sponsors
-            if getattr(sponsor, 'banners', None) and id in sponsor.banners
+            if (
+                getattr(sponsor, 'banners', None)
+                and id in sponsor.banners
+                and sponsor.banners.get('bookings', {}).get('src', {}).get(
+                    language, None
+                )
+            )
         ]
 
         if not candidates:
@@ -106,12 +112,14 @@ class FeriennetApp(OrgApp):
         winner = random.choice(candidates)
         winner = winner.compiled(request)
 
+        info = winner.banners[id].get('info', None)
+
         return BANNER_TEMPLATE.format(
             id=id,
             src=winner.url_for(request, winner.banners[id]['src']),
             url=winner.banners[id]['url'],
             tracker=winner.banners[id].get('tracker', ''),
-            info=request.translate(_('Partner of Pro Juventute'))
+            info=info if info else ""
         )
 
     def configure_organisation(self, **cfg):

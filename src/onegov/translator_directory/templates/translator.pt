@@ -3,6 +3,9 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <div class="panel callout" tal:condition="model.state == 'proposed'">
+            <p i18n:translate>This translator is in the accreditation process!</p>
+        </div>
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
@@ -108,6 +111,10 @@
                                 <dt i18n:translate>Comments on possible field of application</dt>
                                 <dd>${model.operation_comments}</dd>
                             </dl>
+                            <dl class="field-display" tal:condition="layout.show('confirm_name_reveal')">
+                                <dt i18n:translate>Name revealing confirmation</dt>
+                                <dd>${layout.format_boolean(model.confirm_name_reveal)}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.date_of_application and layout.show('date_of_application')">
                                 <dt i18n:translate>Date of application</dt>
                                 <dd>${layout.format_date(model.date_of_application, 'date')}</dd>
@@ -140,6 +147,18 @@
                                     </span>
                                 </dd>
                             </dl>
+                            <dl class="field-display" tal:condition="model.monitoring_languages and layout.show('monitoring_languages')">
+                                <dt i18n:translate>Monitoring languages</dt>
+                                <dd>
+                                    <span tal:repeat="lang model.monitoring_languages" tal:attributes="class layout.color_class(lang.monitors_count)">
+                                        ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                                    </span>
+                                </dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.occupation and layout.show('occupation')">
+                                <dt i18n:translate>Current professional activity</dt>
+                                <dd >${model.occupation}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
                                 <dt i18n:translate>Proof of preconditions</dt>
                                 <dd >${model.proof_of_preconditions}</dd>
@@ -163,6 +182,10 @@
                             <dl class="field-display" tal:condition="request.is_admin">
                                 <dt i18n:translate>Hidden</dt>
                                 <dd >${layout.format_boolean(model.for_admins_only)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="request.is_admin and model.user">
+                                <dt i18n:translate>User</dt>
+                                <dd ><a href="${request.link(model.user)}">${model.user.title}</a></dd>
                             </dl>
                        </tal:b>
                     </div>

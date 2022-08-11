@@ -41,7 +41,8 @@ def test_step_layout_extension(sequences):
         def step_position(self):
             return 1
 
-    @sequences.registered_step(2, 'Middle', cls_after='MiddleLayout', cls_before='StartLayout')
+    @sequences.registered_step(2, 'Middle', cls_after='MiddleLayout',
+                               cls_before='StartLayout')
     class MiddleLayout(BaseLayout, StepsLayoutExtension):
         @property
         def step_position(self):

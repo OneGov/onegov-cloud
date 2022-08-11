@@ -1,5 +1,6 @@
 """ Contains the model describing the organisation proper. """
 
+from datetime import date
 from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
@@ -101,7 +102,10 @@ class Organisation(Base, TimestampMixin):
     always_show_partners = meta_property(default=False)
 
     # Ticket options
+    email_for_new_tickets = meta_property()
+    ticket_auto_accept_style = meta_property()
     ticket_auto_accepts = meta_property()
+    ticket_auto_accept_roles = meta_property()
     tickets_skip_opening_email = meta_property()
     tickets_skip_closing_email = meta_property()
     mute_all_tickets = meta_property()
@@ -185,6 +189,20 @@ class Organisation(Base, TimestampMixin):
             cantons=self.holiday_settings.get('cantons', ()),
             other=self.holiday_settings.get('other', ())
         )
+
+    @property
+    def has_school_holidays(self):
+        """ Returns whether any school holidays have been configured
+        """
+        return bool(self.holiday_settings.get('school', ()))
+
+    @property
+    def school_holidays(self):
+        """ Returns an iterable that yields date pairs of start
+        and end dates of school holidays
+        """
+        for y1, m1, d1, y2, m2, d2 in self.holiday_settings.get('school', ()):
+            yield date(y1, m1, d1), date(y2, m2, d2)
 
     @contact.setter
     def contact(self, value):

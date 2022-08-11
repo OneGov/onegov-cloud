@@ -96,4 +96,3 @@ def test_period(scenario):
         assert period.wishlist_phase
         assert period.is_currently_prebooking
         assert not period.is_prebooking_in_past
-

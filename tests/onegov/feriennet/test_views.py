@@ -13,6 +13,7 @@ from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.feriennet.utils import NAME_SEPARATOR
 from onegov.file import FileCollection
+from onegov.gis import Coordinates
 from onegov.pay import Payment
 from psycopg2.extras import NumericRange
 from tests.shared import utils
@@ -114,6 +115,43 @@ def test_view_permissions():
         onegov.feriennet, onegov.feriennet.FeriennetApp)
 
 
+def test_view_hint_max_activities(client, scenario):
+    client.login_admin()
+
+    scenario.add_period(
+        title='Testperiod',
+        active=True,
+        confirmable=True,
+        finalizable=True,
+        max_bookings_per_attendee=4,
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    page = client.get('/')
+    page = page.click('Wunschliste')
+    assert "Teilnehmende werden in bis zu 4 Angebot(e) eingeteilt." in page
+    assert "bis zu 4 Angebot(e) angemeldet werden." not in page
+
+    period_settings = client.get('/periods')
+    period_settings.click('Deaktivieren')
+
+    scenario.add_period(
+        title='Testperiod2',
+        active=True,
+        confirmable=False,
+        finalizable=True,
+        max_bookings_per_attendee=4,
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    page = client.get('/')
+    page = page.click('Wunschliste')
+    assert "bis zu 4 Angebot(e) angemeldet werden." in page
+    assert "Teilnehmende werden in bis zu 4 Angebot(e) eingeteilt." not in page
+
+
 def test_activity_permissions(client, scenario):
     anon = client.spawn()
     admin = client.spawn()
@@ -135,6 +173,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities/json')
+    assert "Learn How to Program" not in editor.get('/activities/json')
+    assert "Learn How to Program" not in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
@@ -144,6 +185,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities/json')
+    assert "Learn How to Program" not in editor.get('/activities/json')
+    assert "Learn How to Program" not in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
 
@@ -153,6 +197,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" in anon.get('/activities/json')
+    assert "Learn How to Program" in editor.get('/activities/json')
+    assert "Learn How to Program" in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=200)
     assert admin.get(url, status=200)
@@ -163,6 +210,9 @@ def test_activity_permissions(client, scenario):
     assert "Learn How to Program" in editor.get('/activities')
     assert "Learn How to Program" not in anon.get('/activities')
     assert "Learn How to Program" in admin.get('/activities')
+    assert "Learn How to Program" not in anon.get('/activities/json')
+    assert "Learn How to Program" not in editor.get('/activities/json')
+    assert "Learn How to Program" not in admin.get('/activities/json')
     assert editor.get(url, status=200)
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
@@ -387,6 +437,32 @@ def test_activity_filter_duration(client, scenario):
 
     assert "Retreat" in full_day
     assert "Retreat" not in many_day
+
+
+def test_activity_filter_weeks(client, scenario):
+    scenario.add_period(
+        prebooking_start=datetime(2022, 2, 1),
+        prebooking_end=datetime(2022, 2, 28),
+        booking_start=datetime(2022, 3, 1),
+        booking_end=datetime(2022, 3, 31),
+        execution_start=datetime(2022, 4, 1),
+        execution_end=datetime(2022, 4, 30)
+    )
+
+    scenario.add_activity(title="Camping", state='accepted')
+    scenario.add_occasion(
+        start=datetime(2022, 4, 4, 8),
+        end=datetime(2022, 4, 21, 12),
+    )
+
+    scenario.commit()
+
+    page = client.get('/activities')
+
+    # test if all weeks are in the filter, not just the first
+    assert "04.04.2022 - 10.04.2022" in page
+    assert "11.04.2022 - 17.04.2022" in page
+    assert "18.04.2022 - 24.04.2022" in page
 
 
 def test_activity_filter_age_ranges(client, scenario):
@@ -1849,6 +1925,7 @@ def test_main_views_without_period(client):
     # if there isn't we must be sure to not show an exeption (this happens
     # because we tend to be very optimistic about periods being there)
     assert client.get('/activities').status_code == 200
+    assert client.get('/activities/json').status_code == 200
     assert client.get('/my-bookings').status_code == 200
     assert client.get('/notifications').status_code == 200
 
@@ -2603,7 +2680,8 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('110.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    help = [e.text.strip() for e in page.pyquery('.item-text')[:-2]]
+    assert help == [
         'Ferienpass',
         'Fishing',
     ]
@@ -2615,7 +2693,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Ferienpass',
         'Fishing',
         'Ferienpass',
@@ -2631,7 +2709,7 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
     page = client.get('/my-bills')
     assert str(page).count('220.00 Ausstehend') == 0
     assert str(page).count('230.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Ferienpass',
         'Fishing',
         'Hunting',
@@ -2681,7 +2759,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('100.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
     ]
 
@@ -2692,7 +2770,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('150.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
         'Hunting',
     ]
@@ -2704,7 +2782,7 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     page = client.get('/my-bills')
     assert str(page).count('250.00 Ausstehend') == 1
-    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-2]] == [
         'Fishing',
         'Hunting',
         'Fishing',
@@ -2848,3 +2926,65 @@ def test_view_qrbill(client, scenario):
 
     page = client.get('/my-bills?username=admin@example.org')
     assert '<img class="qr-bill" src="data:image/svg+xml;base64,' in page
+
+
+def test_activities_json(client, scenario):
+    scenario.add_period(title="Ferienpass 2022", confirmed=True)
+    activity = scenario.add_activity(
+        title='Backen',
+        lead='Backen mit Johann.',
+        state='accepted',
+        location='Bäckerei Govikon, Rathausplatz, 4001 Govikon',
+        tags=['Farm', 'Adventure'],
+        content={}
+    )
+    activity.coordinates = Coordinates(1.1, 2.2)
+    occasion = scenario.add_occasion(
+        age=(1, 11),
+        cost=None,
+        spots=(4, 5),
+    )
+    start_date = occasion.dates[0].localized_start.date().isoformat()
+    scenario.add_occasion(
+        age=(10, 15),
+        cost=100,
+        spots=(0, 10),
+    )
+    scenario.commit()
+
+    assert client.get('/activities/json').json == {
+        'period_name': 'Ferienpass 2022',
+        'wish_phase_start': scenario.date_offset(-1).isoformat(),
+        'wish_phase_end': date.today().isoformat(),
+        'booking_phase_start': date.today().isoformat(),
+        'booking_phase_end': scenario.date_offset(+10).isoformat(),
+        'deadline_days': None,
+        'activities': [{
+            'age': {'min': 1, 'max': 15},
+            'coordinate': {'lat': 1.1, 'lon': 2.2},
+            'cost': {'min': 0.0, 'max': 100.0},
+            'dates': [
+                {
+                    'start_date': start_date,
+                    'start_time': '00:00:00',
+                    'end_date': start_date,
+                    'end_time': '01:00:00'
+                },
+                {
+                    'start_date': start_date,
+                    'start_time': '01:00:00',
+                    'end_date': start_date,
+                    'end_time': '02:00:00'
+                },
+            ],
+            'image': {'thumbnail': None, 'full': None},
+            'lead': 'Backen mit Johann.',
+            'location': 'Bäckerei Govikon, Rathausplatz, 4001 Govikon',
+            'provider': 'Govikon',
+            'spots': 15,
+            'tags': ['Abenteuer', 'Bauernhof', 'Halbtägig'],
+            'title': 'Backen',
+            'url': 'http://localhost/activity/backen',
+            'zip_code': 4001
+        }]
+    }

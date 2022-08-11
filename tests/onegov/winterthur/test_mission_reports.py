@@ -1,11 +1,85 @@
 from datetime import datetime as dt
 from onegov.winterthur.collections import MissionReportCollection
+from onegov.winterthur.models import MissionReport
+from onegov.winterthur.models import MissionReportVehicle
+from onegov.winterthur.models import MissionReportVehicleUse
 from sedate import replace_timezone
 from tests.shared import Client as BaseClient
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 1
+
+
+def test_mission_report_models(session):
+    date = replace_timezone(dt.now(), timezone='Europe/Zurich')
+    reports = {
+        'Luzern': MissionReport(
+            date=date, duration=5, nature='Brand',
+            location='Luzern', personnel=10, backup=5
+        ),
+        'Kriens': MissionReport(
+            date=date, duration=10, nature='Brand',
+            location='Kriens', personnel=5, backup=2
+        )
+    }
+    vehicles = {
+        'Florian 1': MissionReportVehicle(
+            name='Florian 1', description='Tanklöschfahrzeug'
+        ),
+        'Florian 2': MissionReportVehicle(
+            name='Florian 2', description='Tanklöschfahrzeug'
+        ),
+        'Florian 10': MissionReportVehicle(
+            name='Florian 10', description='Personentransporter'
+        ),
+        'Thor': MissionReportVehicle(name='Thor', description='Boot')
+    }
+    for obj in reports.values():
+        session.add(obj)
+    for obj in vehicles.values():
+        session.add(obj)
+    session.flush()
+
+    assert all([report.used_vehicles == [] for report in reports.values()])
+    assert all([vehicle.uses == [] for vehicle in vehicles.values()])
+
+    uses = {
+        'Luzern-Florian 1': MissionReportVehicleUse(
+            mission_report=reports['Luzern'],
+            vehicle=vehicles['Florian 1']
+        ),
+        'Luzern-Florian 2': MissionReportVehicleUse(
+            mission_report=reports['Luzern'],
+            vehicle=vehicles['Florian 2']
+        ),
+        'Luzern-Thor': MissionReportVehicleUse(
+            mission_report=reports['Luzern'],
+            vehicle=vehicles['Thor']
+        ),
+        'Kriens-Florian 1': MissionReportVehicleUse(
+            mission_report=reports['Kriens'],
+            vehicle=vehicles['Florian 1']
+        ),
+        'Kriens-Florian 10': MissionReportVehicleUse(
+            mission_report=reports['Kriens'],
+            vehicle=vehicles['Florian 10']
+        )
+    }
+    for obj in uses.values():
+        session.add(obj)
+    session.flush()
+
+    assert len(reports['Luzern'].used_vehicles) == 3
+    assert len(reports['Kriens'].used_vehicles) == 2
+    assert len(vehicles['Florian 1'].uses) == 2
+    assert len(vehicles['Florian 2'].uses) == 1
+    assert len(vehicles['Florian 10'].uses) == 1
+    assert len(vehicles['Thor'].uses) == 1
+
+    session.delete(reports['Luzern'])
+    session.flush()
+    assert session.query(MissionReportVehicle).count() == 4
 
 
 def test_mission_report_collection(session):

@@ -24,6 +24,7 @@ $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f3ff';
 $new-daily-item-icon: '\f518';
+$new-resource-link-icon: '\f0c1';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f1fa';
@@ -41,6 +42,7 @@ $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $new-stripe-connect-icon: '\f1f5';
 $new-user-icon: '\f234';
+$new-text-module-icon: '\f249';
 $paste-link-icon: '\f0ea';
 $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
@@ -160,6 +162,7 @@ $qr-code-icon: '\f029';
     .no-tickets::before { @include icon('\f145'); }
     .link-check::before { @include icon-bold('\f0fa'); }
     .ticket-archive::before { @include icon-bold('\f1c6'); }
+    .text-modules::before { @include icon('\f249'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -276,6 +279,71 @@ $transition-duration: .1s;
     }
 }
 
+#offCanvas .side-navigation {
+    margin-top: 3rem;
+}
+
+.header-searchbox {
+    input {
+        border-bottom: 1px solid #ddd;
+        border-left: 0;
+        border-right: 0;
+        border-top: 0;
+        box-shadow: none;
+    }
+
+    .search-button {
+        background: transparent !important;
+        padding: 0 .5rem;
+    }
+
+    .typeahead {
+        position: absolute;
+        top: 50%;
+    }
+
+    .input-group-field:not(:focus) + .typeahead {
+        display: none;
+    }
+}
+
+.search-header-mobile {
+    i {
+        margin-right: 0 !important;
+    }
+
+    .is-active > .accordion-title::before {
+        content: "";
+    }
+
+    .accordion-title {
+        border: 0 !important;
+        font-size: inherit;
+        padding: 0;
+
+        &::before {
+            content: "";
+        }
+
+        &:hover,
+        &:focus {
+            background: transparent;
+        }
+    }
+
+    .accordion-content {
+        left: 0;
+        position: absolute;
+        top: 100%;
+        width: 100%;
+        z-index: 1;
+    }
+}
+
+body#page-search .search-header-mobile .accordion-title {
+    display: none !important;
+}
+
 
 $editbar-bg-color: $black;
 $editbar-bg-color-active: lighten($black, 15%);
@@ -363,6 +431,7 @@ $editbar-fg-color-active: $white;
     .new-room::before { @include icon-bold($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
     .new-user::before { @include icon-bold($new-user-icon); }
+    .new-text-module::before { @include icon($new-text-module-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon-bold($paste-link-icon); }
     .payment-provider::before { @include icon-bold($payment-provider-icon); }
@@ -378,6 +447,7 @@ $editbar-fg-color-active: $white;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
+    .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
 }

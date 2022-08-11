@@ -345,7 +345,7 @@ class ActivityCollection(RangedPagination):
         if o._criterion is not None:
             query = query.filter(model_class.id.in_(o.subquery()))
 
-        return query
+        return query.order_by(self.model_class.order)
 
     def for_filter(self, **keywords):
         """ Returns a new collection instance.
@@ -458,14 +458,23 @@ class ActivityCollection(RangedPagination):
         if not period:
             return
 
-        weeknumbers = {n[0] for n in self.session.execute(text("""
+        weeknumbers = {n[:2] for n in self.session.execute(text("""
             SELECT DISTINCT
-                EXTRACT(week FROM start::date)
+                EXTRACT(week FROM start::date),
+                EXTRACT(week FROM "end"::date)
             FROM OCCASION_DATES
                 LEFT JOIN occasions
                 ON occasion_id = occasions.id
             WHERE period_id = :period_id
         """), {'period_id': period.id})}
+
+        weeknumbers = {
+            tuple(
+                range(int(start), int(end) + 1)
+            ) for start, end in weeknumbers
+        }
+
+        weeknumbers = {week for weeks in weeknumbers for week in weeks}
 
         weeks = sedate.weekrange(period.execution_start, period.execution_end)
 

@@ -10,9 +10,18 @@
     i.fas {
         border-radius: 50px;
         display: inline-block;
-        height: 3ex;
+        font-size: 1.5rem;
+        margin-right: 1rem;
         text-align: center;
-        width: 3ex;
+    }
+
+    .card:hover {
+        background: $primary-color;
+        transition: all 200ms linear;
+
+        .card-section > * {
+            color: $white;
+        }
     }
 }
 

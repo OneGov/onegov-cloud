@@ -2,10 +2,9 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sqlalchemy import Column, Boolean
-
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import Column, Boolean, Enum
 
 
 @upgrade_task('Change withholding tax column to boolean')
@@ -56,4 +55,32 @@ def add_self_employed_column(context):
             table='translators',
             column=Column('self_employed', Boolean),
             default=lambda x: False
+        )
+
+
+@upgrade_task('Add unique constraint to translator email')
+def add_unique_constraint_to_translator_email(context):
+    if not context.has_table('translators'):
+        return
+    if context.has_column('translators', 'email'):
+        context.operations.execute(
+            "UPDATE translators SET email=NULL WHERE email='';"
+        )
+        context.operations.create_unique_constraint(
+            'unique_translators_email', 'translators', ['email']
+        )
+
+
+@upgrade_task('Add translator type')
+def add_translator_type(context):
+    if not context.has_table('translators'):
+        return
+    if not context.has_column('translators', 'state'):
+        state = Enum('proposed', 'published', name='translator_state')
+        if not context.has_enum('translator_state'):
+            state.create(context.operations.get_bind())
+        context.add_column_with_defaults(
+            table='translators',
+            column=Column('state', state, nullable=False, default='published'),
+            default=lambda x: 'published'
         )

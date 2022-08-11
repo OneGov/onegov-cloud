@@ -3,8 +3,8 @@ from onegov.election_day.screen_widgets.election_compound import (
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
-    ElectionCompoundListsChartWidget,
-    ElectionCompoundListsTableWidget,
+    ElectionCompoundSeatAllocationChartWidget,
+    ElectionCompoundSeatAllocationTableWidget
 )
 from onegov.election_day.screen_widgets.election import (
     AllocatedMandatesWidget,
@@ -67,8 +67,8 @@ __all__ = (
     'ElectionCompoundDistrictsTableWidget',
     'ElectionCompoundListGroupsChartWidget',
     'ElectionCompoundListGroupsTableWidget',
-    'ElectionCompoundListsChartWidget',
-    'ElectionCompoundListsTableWidget',
+    'ElectionCompoundSeatAllocationChartWidget',
+    'ElectionCompoundSeatAllocationTableWidget',
     'ElectionListsChartWidget',
     'ElectionListsTableWidget',
     'ElectionTurnoutWidget',

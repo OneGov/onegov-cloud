@@ -339,24 +339,32 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert '/election/proporz-election/party-strengths-data' in chart
 
     export = client.get('/election/proporz-election/data-parties-csv').text
-    lines = export.split('\r\n')
-    assert lines[0].startswith(
-        'year,name,id,total_votes,color,mandates,votes'
-    )
-    assert lines[1].startswith('2022,BDP,0,11270,#efb52c,1,60387')
-    assert lines[2].startswith('2022,CVP,1,11270,#ff6300,1,49117')
-    assert lines[3].startswith('2022,FDP,2,11270,#0571b0,0,35134')
+    lines = [l for l in export.split('\r\n') if l]
+    assert lines == [
+        'year,id,name,name_de_CH,name_fr_CH,name_it_CH,name_rm_CH,'
+        'total_votes,color,mandates,votes,'
+        'voters_count,voters_count_percentage,panachage_votes_from_1,'
+        'panachage_votes_from_2,panachage_votes_from_3,'
+        'panachage_votes_from_999',
+        '2022,1,BDP,BDP,,,,11270,#efb52c,1,60387,603.01,41.73,,11,12,100',
+        '2022,2,CVP,CVP,,,,11270,#ff6300,1,49117,491.02,33.98,21,,22,200',
+        '2022,3,FDP,FDP,,,,11270,#0571b0,0,35134,351.04,24.29,31,32,,300',
+    ]
 
     export = client.get('/election/proporz-election/data-parties-json').json
     assert export == [
         {
             'color': '#efb52c',
-            'id': 0,
+            'id': '1',
             'mandates': 1,
             'name': 'BDP',
-            'panachage_votes_from_0': None,
-            'panachage_votes_from_1': 11,
-            'panachage_votes_from_2': 12,
+            'name_de_CH': 'BDP',
+            'name_fr_CH': None,
+            'name_it_CH': None,
+            'name_rm_CH': None,
+            'panachage_votes_from_1': None,
+            'panachage_votes_from_2': 11,
+            'panachage_votes_from_3': 12,
             'panachage_votes_from_999': 100,
             'total_votes': 11270,
             'voters_count': 603.01,
@@ -366,12 +374,16 @@ def test_view_election_party_strengths(election_day_app_gr):
         },
         {
             'color': '#ff6300',
-            'id': 1,
+            'id': '2',
             'mandates': 1,
             'name': 'CVP',
-            'panachage_votes_from_0': 21,
-            'panachage_votes_from_1': None,
-            'panachage_votes_from_2': 22,
+            'name_de_CH': 'CVP',
+            'name_fr_CH': None,
+            'name_it_CH': None,
+            'name_rm_CH': None,
+            'panachage_votes_from_1': 21,
+            'panachage_votes_from_2': None,
+            'panachage_votes_from_3': 22,
             'panachage_votes_from_999': 200,
             'total_votes': 11270,
             'voters_count': 491.02,
@@ -381,12 +393,16 @@ def test_view_election_party_strengths(election_day_app_gr):
         },
         {
             'color': '#0571b0',
-            'id': 2,
+            'id': '3',
             'mandates': 0,
             'name': 'FDP',
-            'panachage_votes_from_0': 31,
-            'panachage_votes_from_1': 32,
-            'panachage_votes_from_2': None,
+            'name_de_CH': 'FDP',
+            'name_fr_CH': None,
+            'name_it_CH': None,
+            'name_rm_CH': None,
+            'panachage_votes_from_1': 31,
+            'panachage_votes_from_2': 32,
+            'panachage_votes_from_3': None,
             'panachage_votes_from_999': 300,
             'total_votes': 11270,
             'voters_count': 351.04,
@@ -396,15 +412,15 @@ def test_view_election_party_strengths(election_day_app_gr):
         }
     ]
 
-    # Historical data
+    # Historical data with translations
     csv_parties = (
-        'year,name,id,total_votes,color,mandates,votes\r\n'
-        '2022,BDP,0,60000,#efb52c,1,10000\r\n'
-        '2022,CVP,1,60000,#ff6300,1,30000\r\n'
-        '2022,FDP,2,60000,#4068c8,0,20000\r\n'
-        '2011,BDP,0,40000,#efb52c,1,1000\r\n'
-        '2011,CVP,1,40000,#ff6300,1,15000\r\n'
-        '2011,FDP,2,40000,#4068c8,1,10000\r\n'
+        'year,name,name_fr_ch,id,total_votes,color,mandates,votes\r\n'
+        '2022,BDP,,1,60000,#efb52c,1,10000\r\n'
+        '2022,Die Mitte,Le Centre,2,60000,#ff6300,1,30000\r\n'
+        '2022,FDP,,3,60000,#4068c8,0,20000\r\n'
+        '2011,BDP,,1,40000,#efb52c,1,1000\r\n'
+        '2011,CVP,PDC,2,40000,#ff6300,1,15000\r\n'
+        '2011,FDP,,3,40000,#4068c8,1,10000\r\n'
     ).encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload-party-results')
@@ -414,7 +430,7 @@ def test_view_election_party_strengths(election_day_app_gr):
 
     parties = client.get('/election/proporz-election/party-strengths-data')
     parties = parties.json
-    assert parties['groups'] == ['BDP', 'CVP', 'FDP']
+    assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
     assert parties['labels'] == ['2011', '2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 5
@@ -426,30 +442,30 @@ def test_view_election_party_strengths(election_day_app_gr):
     }
     assert parties['2011-BDP']['color'] == '#efb52c'
     assert parties['2022-BDP']['color'] == '#efb52c'
-    assert parties['2011-CVP']['color'] == '#ff6300'
-    assert parties['2022-CVP']['color'] == '#ff6300'
+    assert parties['2011-Die Mitte']['color'] == '#ff6300'
+    assert parties['2022-Die Mitte']['color'] == '#ff6300'
     assert parties['2011-FDP']['color'] == '#4068c8'
     assert parties['2022-FDP']['color'] == '#4068c8'
 
     assert parties['2011-BDP']['active'] is False
-    assert parties['2011-CVP']['active'] is False
+    assert parties['2011-Die Mitte']['active'] is False
     assert parties['2011-FDP']['active'] is False
     assert parties['2022-BDP']['active'] is True
-    assert parties['2022-CVP']['active'] is True
+    assert parties['2022-Die Mitte']['active'] is True
     assert parties['2022-FDP']['active'] is True
 
     assert parties['2011-BDP']['value']['front'] == 1
-    assert parties['2011-CVP']['value']['front'] == 1
+    assert parties['2011-Die Mitte']['value']['front'] == 1
     assert parties['2011-FDP']['value']['front'] == 1
     assert parties['2022-BDP']['value']['front'] == 1
-    assert parties['2022-CVP']['value']['front'] == 1
+    assert parties['2022-Die Mitte']['value']['front'] == 1
     assert parties['2022-FDP']['value']['front'] == 0
 
     assert parties['2011-BDP']['value']['back'] == 2.5
-    assert parties['2011-CVP']['value']['back'] == 37.5
+    assert parties['2011-Die Mitte']['value']['back'] == 37.5
     assert parties['2011-FDP']['value']['back'] == 25
     assert parties['2022-BDP']['value']['back'] == 16.7
-    assert parties['2022-CVP']['value']['back'] == 50
+    assert parties['2022-Die Mitte']['value']['back'] == 50
     assert parties['2022-FDP']['value']['back'] == 33.3
 
     results = client.get('/election/proporz-election/party-strengths').text
@@ -464,6 +480,16 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert '25.0%' in results
     assert '33.3%' in results
     assert '8.3%' in results
+
+    # translations
+    client.get('/locale/fr_CH')
+    parties = client.get('/election/proporz-election/party-strengths-data')
+    parties = parties.json
+    assert parties['groups'] == ['BDP', 'Le Centre', 'FDP']
+    results = client.get('/election/proporz-election/party-strengths').text
+    assert 'Le Centre' in results
+    assert 'PDC' in results
+    assert 'BDP' in results
 
 
 def test_view_election_connections(election_day_app_gr):

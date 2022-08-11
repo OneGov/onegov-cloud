@@ -58,7 +58,7 @@ article.content .side-panel {
 
         p {
             margin: 0;
-            padding-bottom: 1rem;
+            padding-bottom: 3rem;
         }
     }
 
@@ -76,4 +76,14 @@ article.content .side-panel {
             padding-top: 0;
         }
     }
+
+    .focus-link > i.fa-external-link-alt {
+        margin-left: 1rem;
+        margin-top: -4rem;
+        position: absolute;
+    }
+}
+
+.partners .fas.fa-external-link-alt.fa-xs {
+    display: none;
 }

@@ -9,7 +9,9 @@ def test_collection_filter(session):
     msgs.add(channel_id='private', text='U female?')
 
     public = MessageCollection(session, channel_id='public')
-    assert public.query().count() == 3
+    all_public = public.query().all()
+    assert len(all_public) == 3
+    assert all_public == sorted(all_public, key=lambda m: m.id)
 
     private = MessageCollection(session, channel_id='private')
     assert private.query().count() == 1

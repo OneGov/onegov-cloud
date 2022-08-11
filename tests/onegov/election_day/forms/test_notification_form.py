@@ -1,5 +1,6 @@
 from datetime import date
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
 from onegov.election_day.forms import TriggerNotificationForm
@@ -42,6 +43,7 @@ def test_notifications_form(session):
     form.on_request()
     assert form.notifications.choices == []
     assert form.elections.choices == []
+    assert form.election_compounds.choices == []
     assert form.votes.choices == []
     assert form.latest_date(session) is None
     assert not form.validate()
@@ -100,6 +102,14 @@ def test_notifications_form(session):
             date=date(2015, 1, 10)
         )
     )
+    session.add(
+        ElectionCompound(
+            title='Elections',
+            shortcode='a',
+            domain='federation',
+            date=date(2015, 2, 1)
+        )
+    )
     session.flush()
 
     # Test on_request
@@ -120,8 +130,12 @@ def test_notifications_form(session):
         ('majorz-election-2', 'Majorz Election 2'),
         ('majorz-election-1', 'Majorz Election 1')
     ]
+    assert form.election_compounds.choices == [
+        ('elections', 'Elections'),
+    ]
     assert form.vote_models(session) == []
     assert form.election_models(session) == []
+    assert form.election_compound_models(session) == []
 
     # Test submit
     form = TriggerNotificationsForm(
@@ -136,17 +150,21 @@ def test_notifications_form(session):
         DummyPostData({
             'notifications': ['email'],
             'votes': ['vote-3', 'vote-2'],
-            'elections': ['majorz-election-2']
+            'elections': ['majorz-election-2'],
+            'election_compounds': ['elections']
         })
     )
     form.request = DummyRequest(session=session)
     form.request.app.principal.email_notification = True
     form.on_request()
     assert form.validate()
-    assert [vote.id for vote in form.vote_models(session)] == [
+    assert [x.id for x in form.vote_models(session)] == [
         'vote-3',
         'vote-2'
     ]
-    assert [election.id for election in form.election_models(session)] == [
+    assert [x.id for x in form.election_models(session)] == [
         'majorz-election-2',
+    ]
+    assert [x.id for x in form.election_compound_models(session)] == [
+        'elections',
     ]

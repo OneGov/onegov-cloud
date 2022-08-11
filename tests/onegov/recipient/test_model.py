@@ -4,6 +4,12 @@ from onegov.recipient.model import GenericRecipient
 
 def test_recipient_model_order(session):
     session.add(GenericRecipient(
+        name="Peter's Url",
+        medium="http",
+        address="http://example.org/push",
+        extra="POST"
+    ))
+    session.add(GenericRecipient(
         name="Peter's Cellphone",
         medium="phone",
         address="+12 345 67 89"
@@ -15,16 +21,10 @@ def test_recipient_model_order(session):
         address="peter@example.org"
     ))
 
-    session.add(GenericRecipient(
-        name="Peter's Url",
-        medium="http",
-        address="http://example.org/push",
-        extra="POST"
-    ))
-
     session.flush()
 
-    email, phone, url = session.query(GenericRecipient).all()
+    collection = GenericRecipientCollection(session, type=None)
+    email, phone, url = collection.query().all()
     assert email.order == 'peter-s-cellphone'
     assert phone.order == 'peter-s-e-mail'
     assert url.order == 'peter-s-url'

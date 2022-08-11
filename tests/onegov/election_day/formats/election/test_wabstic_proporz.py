@@ -37,7 +37,7 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
         dataset_name='nationalratswahl-2015',
         number_of_mandates=12,
         date_=date(2015, 10, 18),
-        expats=True,
+        has_expats=True,
     )
 
     assert not errors
@@ -384,8 +384,8 @@ def test_import_wabstic_proporz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for expats in (False, True):
-        election.expats = expats
+    for has_expats in (False, True):
+        election.has_expats = has_expats
         for entity_id in ('9170', '0'):
             errors = import_election_wabstic_proporz(
                 election, principal, '0', '0',
@@ -522,7 +522,7 @@ def test_import_wabstic_proporz_expats(session):
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
             result = election.results.filter_by(entity_id=0).first()
-            if expats:
+            if has_expats:
                 assert errors == []
                 assert result.blank_ballots == 1
             else:

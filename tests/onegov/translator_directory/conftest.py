@@ -5,39 +5,28 @@ from onegov.fsi.initial_content import create_new_organisation
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.user import User
 from sqlalchemy.orm.session import close_all_sessions
-from tests.onegov.fsi.common import global_password
-from tests.onegov.fsi.common import hashed_password as _hashed_password
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
+from onegov.core.crypto import hash_password
 
 
 class Client(BaseClient):
 
     use_intercooler = True
-    skip_first_form = True
+    skip_n_forms = 1
 
     def login_member(self, to=None):
-        return self.login('member@example.org', global_password, to)
-
-
-@pytest.fixture(scope='session')
-def plain_password():
-    return global_password
-
-
-@pytest.fixture(scope='session')
-def hashed_password():
-    return _hashed_password
+        return self.login('member@example.org', 'hunter2', to)
 
 
 @pytest.fixture(scope='function')
-def translator_app(request, hashed_password):
-    yield create_translator_app(request, False, hashed_password)
+def translator_app(request):
+    yield create_translator_app(request, False)
 
 
 @pytest.fixture(scope='function')
-def es_translator_app(request, hashed_password):
-    yield create_translator_app(request, True, hashed_password)
+def es_translator_app(request):
+    yield create_translator_app(request, True)
 
 
 @pytest.fixture(scope='function')
@@ -50,7 +39,7 @@ def client_with_es(es_translator_app):
     return Client(es_translator_app)
 
 
-def create_translator_app(request, use_elasticsearch, hashed_password):
+def create_translator_app(request, use_elasticsearch):
 
     app = create_app(
         app_class=TranslatorDirectoryApp,
@@ -70,18 +59,18 @@ def create_translator_app(request, use_elasticsearch, hashed_password):
 
     session.add(User(
         username='admin@example.org',
-        password_hash=hashed_password,
+        password_hash=hash_password('hunter2'),
         role='admin'
     ))
     session.add(User(
         username='editor@example.org',
-        password_hash=hashed_password,
+        password_hash=hash_password('hunter2'),
         role='editor'
     ))
 
     session.add(User(
         username='member@example.org',
-        password_hash=hashed_password,
+        password_hash=hash_password('hunter2'),
         role='member'
     ))
 

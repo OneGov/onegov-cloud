@@ -4,15 +4,11 @@ import yaml
 from click.testing import CliRunner
 from datetime import date
 from decimal import Decimal
-from io import BytesIO
-from onegov.core.crypto import random_token
-from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
 from onegov.swissvotes.cli import cli
 from onegov.swissvotes.external_resources.posters import MfgPosters
 from onegov.swissvotes.external_resources.posters import SaPosters
 from onegov.swissvotes.models import SwissVote
-from onegov.swissvotes.models import SwissVoteFile
 from pathlib import Path
 from transaction import commit
 from unittest.mock import patch

@@ -26,7 +26,7 @@ def test_import_wabsti_vote(session):
 
     # Test federal results
     principal = create_principal(principal)
-    vote.expats = True
+    vote.has_expats = True
     for number, yeas, nays, yeas_p, nays_p, turnout in (
         (1, 102759, 91138, 53.0, 47.0, 61.7),
         (2, 90715, 106942, 45.9, 54.1, 62.4),
@@ -283,8 +283,8 @@ def test_import_wabsti_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
 
-    for expats in (False, True):
-        vote.expats = expats
+    for has_expats in (False, True):
+        vote.has_expats = has_expats
         errors = import_vote_wabsti(
             vote, principal, 0,
             BytesIO((
@@ -345,7 +345,7 @@ def test_import_wabsti_vote_expats(session):
             'text/plain'
         )
         errors = [(e.line, e.error.interpolate()) for e in errors]
-        if expats:
+        if has_expats:
             assert errors == [(3, '0 was found twice')]
         else:
             assert errors == [(None, 'No data found')]
@@ -394,7 +394,7 @@ def test_import_wabsti_vote_expats(session):
         )
         errors = [(e.line, e.error.interpolate()) for e in errors]
         result = vote.proposal.results.filter_by(entity_id=0).first()
-        if expats:
+        if has_expats:
             assert errors == []
             assert result.yeas == 20
         else:

@@ -124,6 +124,9 @@ class ExtendedBrowser(InjectedBrowserExtension):
     def login_editor(self, to=None):
         self.login('editor@example.org', 'hunter2', to)
 
+    def login_member(self, to=None):
+        self.login('member@example.org', 'hunter2', to)
+
     def logout(self):
         self.visit('/auth/logout')
 
@@ -163,7 +166,7 @@ class ExtendedBrowser(InjectedBrowserExtension):
             dict(source='network', rgxp="favicon.ico"),
             dict(source='console-api', rgxp="crbug/1173575"),
             dict(level='WARNING', rgxp="facebook"),
-            dict(level='WARNING', rgxp=re.escape('react-with-addons.js')), # forms app
+            dict(level='WARNING', rgxp=re.escape('react-with-addons.js')),
             dict(level='SEVERE', rgxp=re.escape("api.mapbox.com")),
         ]
 

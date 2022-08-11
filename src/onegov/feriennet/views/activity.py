@@ -2,11 +2,13 @@ import sedate
 
 from datetime import date, timedelta
 from itertools import groupby
+from onegov.activity import Activity
 from onegov.activity import Booking
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
 from onegov.activity.models import ACTIVITY_STATES, DAYS
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Personal
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -25,12 +27,14 @@ from onegov.feriennet.models import VolunteerCart
 from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
-from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
 from purl import URL
+from re import search
 from sedate import dtrange, overlaps
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import undefer
 from webob import exc
 
 
@@ -310,6 +314,15 @@ def activity_min_cost(activity, request):
     return min(o.total_cost for o in occasions)
 
 
+def activity_max_cost(activity, request):
+    occasions = period_bound_occasions(activity, request)
+
+    if not occasions:
+        return None
+
+    return max(o.total_cost for o in occasions)
+
+
 def is_filtered(filters):
     for links in filters.values():
         for link in links:
@@ -409,6 +422,105 @@ def view_activities(self, request):
         'current_location': request.link(
             self.by_page_range((0, self.pages[-1])))
     }
+
+
+@FeriennetApp.json(
+    model=VacationActivityCollection,
+    name='json',
+    permission=Public
+)
+def view_activities_as_json(self, request):
+
+    self.filter.states = {'accepted'}
+
+    active_period = request.app.active_period
+
+    def image(activity):
+        url = (activity.meta or {}).get('thumbnail')
+        return {
+            'thumbnail': url,
+            'full': url.replace('/thumbnail', '') if url else None
+        }
+
+    def age(activity):
+        ages = activity_ages(activity, request)
+        min_age = min(age.lower for age in ages) if ages else None
+        max_age = max(age.upper - 1 for age in ages) if ages else None
+        return {'min': min_age, 'max': max_age}
+
+    def cost(activity):
+        min_cost = activity_min_cost(activity, request)
+        max_cost = activity_max_cost(activity, request)
+        return {
+            'min': float(min_cost) if min_cost is not None else 0.0,
+            'max': float(max_cost) if max_cost is not None else 0.0
+        }
+
+    def dates(activity):
+        occasion_dates = []
+        for occasion in activity.occasions:
+            for occasion_date in occasion.dates:
+                start = occasion_date.localized_start
+                end = occasion_date.localized_end
+                occasion_dates.append({
+                    'start_date': start.date().isoformat(),
+                    'start_time': start.time().isoformat(),
+                    'end_date': end.date().isoformat(),
+                    'end_time': end.time().isoformat(),
+                })
+        return occasion_dates
+
+    def zip_code(activity):
+        match = search(r'(\d){4}', activity.location or '')
+        return int(match.group()) if match else None
+
+    def coordinates(activity):
+        lat = activity.coordinates.lat if activity.coordinates else None
+        lon = activity.coordinates.lon if activity.coordinates else None
+        return {'lat': lat, 'lon': lon}
+
+    def tags(activity):
+        durations = sum({o.duration for o in activity.occasions})
+        return activity.ordered_tags(request, durations)
+
+    provider = request.app.org.title
+
+    if active_period:
+        wish_start = None
+        wish_end = None
+        if active_period.confirmable:
+            wish_start = active_period.prebooking_start.isoformat()
+            wish_end = active_period.prebooking_end.isoformat()
+
+        return {
+            'period_name': active_period.title,
+            'wish_phase_start': wish_start,
+            'wish_phase_end': wish_end,
+            'booking_phase_start': active_period.booking_start.isoformat(),
+            'booking_phase_end': active_period.booking_end.isoformat(),
+            'deadline_days': active_period.deadline_days,
+            'activities': [
+                {
+                    'provider': provider,
+                    'url': request.link(activity),
+                    'title': activity.title,
+                    'lead': (activity.meta or {}).get('lead', ''),
+                    'image': image(activity),
+                    'age': age(activity),
+                    'cost': cost(activity),
+                    'spots': activity_spots(activity, request),
+                    'dates': dates(activity),
+                    'location': activity.location,
+                    'zip_code': zip_code(activity),
+                    'coordinate': coordinates(activity),
+                    'tags': tags(activity),
+                } for activity in self.query().options(
+                    joinedload(Activity.occasions),
+                    undefer(Activity.content))
+            ]
+        }
+    else:
+        return {}
 
 
 @FeriennetApp.html(
@@ -756,6 +868,17 @@ def propose_activity(self, request):
             or request.current_username != self.username
         )
     )
+    if request.email_for_new_tickets:
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened_info.pt',
+            subject=_("New ticket"),
+            ticket=ticket,
+            receivers=(request.email_for_new_tickets, ),
+            content={
+                'model': ticket
+            }
+        )
 
     request.success(_("Thank you for your proposal!"))
 
