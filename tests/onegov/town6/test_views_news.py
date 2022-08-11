@@ -1,30 +1,159 @@
+from datetime import datetime
+from freezegun import freeze_time
 
 
 def test_news(client):
     client.login_admin().follow()
 
-    page = client.get('/news')
-    page = page.click('Nachricht')
-    page.form['title'] = "We have a new homepage"
-    page.form['lead'] = "It is very good"
-    page.form['text'] = "It is lots of fun"
-    page = page.form.submit().follow()
+    with freeze_time("2021-12-30 8:00"):
+        page = client.get('/news').click('Nachricht')
+        page.form['title'] = 'News created 30.12.2021, no publication date'
+        page.form['lead'] = 'Lead'
+        page.form['text'] = 'hashtag #one'
+        assert '30. Dezember 2021' in page.form.submit().follow()
 
-    assert "We have a new homepage" in page.text
-    assert "It is very good" in page.text
-    assert "It is lots of fun" in page.text
+        page = client.get('/news').click('Nachricht')
+        page.form['title'] = 'News created 30.12.2021, published 31.12.2021'
+        page.form['lead'] = 'Lead'
+        page.form['text'] = 'hashtag #two'
+        page.form['publication_start'] = datetime(2021, 12, 31, 8).isoformat()
+        assert '31. Dezember 2021' in page.form.submit().follow()
 
-    page = client.get('/news')
-    assert "We have a new homepage" in page.text
-    assert "It is very good" in page.text
-    assert "It is lots of fun" not in page.text
+        page = client.get('/news').click('Nachricht')
+        page.form['title'] = 'News created 30.12.2021, published 1.1.2022'
+        page.form['lead'] = 'Lead'
+        page.form['text'] = 'hashtag #three'
+        page.form['publication_start'] = datetime(2022, 1, 1, 8).isoformat()
+        assert '1. Januar 2022' in page.form.submit().follow()
 
-    page = client.get('/news/we-have-a-new-homepage')
-    client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
+    with freeze_time('2022-1-2 8:00'):
+        page = client.get('/news').click('Nachricht')
+        page.form['title'] = 'News created 2.1.2022, no publication date'
+        page.form['lead'] = 'Lead'
+        page.form['text'] = 'hashtag #one'
+        assert '2. Januar 2022' in page.form.submit().follow()
+
+        page = client.get('/news').click('Nachricht')
+        page.form['title'] = 'News created 2.1.2022, published 31.12.2021'
+        page.form['lead'] = 'Lead'
+        page.form['text'] = 'hashtag #two'
+        page.form['publication_start'] = datetime(2021, 12, 31, 8).isoformat()
+        assert '31. Dezember 2021' in page.form.submit().follow()
+
+        page = client.get('/news').click('Nachricht')
+        page.form['title'] = 'News created 2.1.2022, published 1.1.2022'
+        page.form['lead'] = 'Lead'
+        page.form['text'] = 'hashtag #three'
+        page.form['publication_start'] = datetime(2022, 1, 1, 8).isoformat()
+        assert '1. Januar 2022' in page.form.submit().follow()
+
+    # No filter
     page = client.get('/news')
-    assert "We have a new homepage" not in page.text
-    assert "It is very good" not in page.text
-    assert "It is lots of fun" not in page.text
+    assert 'News created 30.12.2021, no publication date' in page
+    assert 'News created 30.12.2021, published 31.12.2021' in page
+    assert 'News created 30.12.2021, published 1.1.2022' in page
+    assert 'News created 2.1.2022, no publication date' in page
+    assert 'News created 2.1.2022, published 31.12.2021' in page
+    assert 'News created 2.1.2022, published 1.1.2022' in page
+
+    # 2020
+    page = client.get('/news?filter_years=2020')
+    assert 'News created 30.12.2021, no publication date' not in page
+    assert 'News created 30.12.2021, published 31.12.2021' not in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' not in page
+    assert 'News created 2.1.2022, published 31.12.2021' not in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
+
+    # 2021
+    page = client.get('/news?filter_years=2021')
+    assert 'News created 30.12.2021, no publication date' in page
+    assert 'News created 30.12.2021, published 31.12.2021' in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' not in page
+    assert 'News created 2.1.2022, published 31.12.2021' in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
+
+    # 2022
+    page = client.get('/news?filter_years=2022')
+    assert 'News created 30.12.2021, no publication date' not in page
+    assert 'News created 30.12.2021, published 31.12.2021' not in page
+    assert 'News created 30.12.2021, published 1.1.2022' in page
+    assert 'News created 2.1.2022, no publication date' in page
+    assert 'News created 2.1.2022, published 31.12.2021' not in page
+    assert 'News created 2.1.2022, published 1.1.2022' in page
+
+    # 2023
+    page = client.get('/news?filter_years=2023')
+    assert 'News created 30.12.2021, no publication date' not in page
+    assert 'News created 30.12.2021, published 31.12.2021' not in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' not in page
+    assert 'News created 2.1.2022, published 31.12.2021' not in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
+
+    # 2021 & 2022
+    page = client.get('/news?filter_years=2021&filter_years=2022')
+    assert 'News created 30.12.2021, no publication date' in page
+    assert 'News created 30.12.2021, published 31.12.2021' in page
+    assert 'News created 30.12.2021, published 1.1.2022' in page
+    assert 'News created 2.1.2022, no publication date' in page
+    assert 'News created 2.1.2022, published 31.12.2021' in page
+    assert 'News created 2.1.2022, published 1.1.2022' in page
+
+    # #one
+    page = client.get('/news?filter_tags=one')
+    assert 'News created 30.12.2021, no publication date' in page
+    assert 'News created 30.12.2021, published 31.12.2021' not in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' in page
+    assert 'News created 2.1.2022, published 31.12.2021' not in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
+
+    # #two
+    page = client.get('/news?filter_tags=two')
+    assert 'News created 30.12.2021, no publication date' not in page
+    assert 'News created 30.12.2021, published 31.12.2021' in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' not in page
+    assert 'News created 2.1.2022, published 31.12.2021' in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
+
+    # #three
+    page = client.get('/news?filter_tags=three')
+    assert 'News created 30.12.2021, no publication date' not in page
+    assert 'News created 30.12.2021, published 31.12.2021' not in page
+    assert 'News created 30.12.2021, published 1.1.2022' in page
+    assert 'News created 2.1.2022, no publication date' not in page
+    assert 'News created 2.1.2022, published 31.12.2021' not in page
+    assert 'News created 2.1.2022, published 1.1.2022' in page
+
+    # #four
+    page = client.get('/news?filter_tags=four')
+    assert 'News created 30.12.2021, no publication date' not in page
+    assert 'News created 30.12.2021, published 31.12.2021' not in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' not in page
+    assert 'News created 2.1.2022, published 31.12.2021' not in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
+
+    # #one & #two
+    page = client.get('/news?filter_tags=one&filter_tags=two')
+    assert 'News created 30.12.2021, no publication date' in page
+    assert 'News created 30.12.2021, published 31.12.2021' in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' in page
+    assert 'News created 2.1.2022, published 31.12.2021' in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
+
+    # 2021 & #one
+    page = client.get('/news?filter_years=2021&filter_tags=one')
+    assert 'News created 30.12.2021, no publication date' in page
+    assert 'News created 30.12.2021, published 31.12.2021' not in page
+    assert 'News created 30.12.2021, published 1.1.2022' not in page
+    assert 'News created 2.1.2022, no publication date' not in page
+    assert 'News created 2.1.2022, published 31.12.2021' not in page
+    assert 'News created 2.1.2022, published 1.1.2022' not in page
 
 
 def test_hide_news(client):
