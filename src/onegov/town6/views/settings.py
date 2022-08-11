@@ -87,7 +87,7 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
         homepage_video = StringField(
             label=_("Homepage video"),
             fieldset=_("Video"),
-            render_kw={'class_': 'image-url'}
+            render_kw={'class_': 'file-url'}
         )
 
     return move_fields(
