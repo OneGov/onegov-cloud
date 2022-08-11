@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-08 14:50+0200\n"
+"POT-Creation-Date: 2022-08-10 16:20+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -780,6 +780,9 @@ msgstr "Dumbrà ora"
 msgid "Updated"
 msgstr "Actualisà"
 
+msgid "No results yet"
+msgstr "Anc nagins resultats avant maun"
+
 msgid "Result"
 msgstr "Resultat"
 
@@ -1052,9 +1055,6 @@ msgstr "Proxima pagina"
 msgid "You are here"
 msgstr "Pagina actuala"
 
-msgid "No results yet"
-msgstr "Anc nagins resultats avant maun"
-
 msgid "Alerts"
 msgstr "Communicaziuns"
 
@@ -1122,6 +1122,9 @@ msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
 "Las datas nunelavuradas da las candidatas e dals candidats èn disponiblas en "
 "ils suandants formats:"
+
+msgid "The raw data are available in the following formats:"
+msgstr "Las datas nunelavuradas èn disponiblas en ils suandants formats:"
 
 msgid "The raw data of the parties are available in the following formats:"
 msgstr ""

@@ -23,6 +23,7 @@ class ElectionCompoundLayout(DetailLayout):
 
     majorz = False
     proporz = True
+    type = 'compound'
 
     @cached_property
     def table_link(self):
