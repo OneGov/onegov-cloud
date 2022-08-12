@@ -399,7 +399,7 @@ def test_accreditation_form(translator_app):
         'date_of_birth': '1970-01-01',
         'hometown': 'Zug',
         'nationality': 'CH',
-        'marital_status': 'married',
+        'marital_status': 'verheiratet',
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'address': 'Downing Street 5',
         'zip_code': '4000',
@@ -520,7 +520,7 @@ def test_accreditation_form(translator_app):
     }
     assert form.get_ticket_data() == {
         'hometown': 'Zug',
-        'marital_status': 'married',
+        'marital_status': 'verheiratet',
         'profession': 'Baker',
         'admission_course_completed': False,
         'admission_course_agreement': True,
