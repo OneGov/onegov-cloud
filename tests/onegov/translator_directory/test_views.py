@@ -1122,7 +1122,7 @@ def test_view_accreditation(client):
         page.form['date_of_birth'] = '1970-01-01'
         page.form['hometown'] = 'Zug'
         page.form['nationality'] = 'CH'
-        page.form['marital_status'] = 'married'
+        page.form['marital_status'] = 'verheiratet'
         page.form['coordinates'] = encode_map_value({
             'lat': 1, 'lon': 2, 'zoom': 12
         })
@@ -1195,7 +1195,7 @@ def test_view_accreditation(client):
         assert '01.01.1970' in page
         assert 'Zug' in page
         assert 'CH' in page
-        assert 'married' in page
+        assert 'verheiratet' in page
         assert '2.0 km' in page
         assert 'Downing Street 5' in page
         assert '4000' in page
