@@ -36,7 +36,7 @@ class DefaultLayout(BaseLayout):
         return f'{number} km'
 
     def format_boolean(self, val):
-        assert isinstance(val, bool)
+        assert isinstance(val, bool) or val is None
         return self.request.translate((_('Yes') if val else _('No')))
 
     def format_admission(self, val):
@@ -502,7 +502,7 @@ class GrantAccreditationLayout(DefaultLayout):
                 url=self.request.link(self.model.ticket)
             )
         )
-        links.append(Link(_('Grant accreditation')))
+        links.append(Link(_('Grant admission')))
         return links
 
 
@@ -517,5 +517,5 @@ class RefuseAccreditationLayout(DefaultLayout):
                 url=self.request.link(self.model.ticket)
             )
         )
-        links.append(Link(_('Refuse accreditation')))
+        links.append(Link(_('Refuse admission')))
         return links

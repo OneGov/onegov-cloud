@@ -102,7 +102,7 @@ def grant_accreditation(self, request, form):
     if form.submitted(request):
         self.grant()
         AccreditationMessage.create(self.ticket, request, 'granted')
-        request.success(_("Accreditation granted."))
+        request.success(_("Admission granted."))
 
         # store a PDF of the ticket on the translator
         content = TicketPdf.from_ticket(request, self.ticket)
@@ -143,7 +143,7 @@ def grant_accreditation(self, request, form):
 
     return {
         'layout': layout,
-        'title': _('Grant accreditation'),
+        'title': _('Grant admission'),
         'form': form
     }
 
@@ -158,7 +158,7 @@ def grant_accreditation(self, request, form):
 def refuse_accreditation(self, request, form):
     if form.submitted(request):
         self.refuse()
-        request.success(_("Accreditation refused."))
+        request.success(_("Admission refused."))
         AccreditationMessage.create(self.ticket, request, 'refused')
         if 'return-to' in request.GET:
             return request.redirect(request.url)
@@ -168,6 +168,6 @@ def refuse_accreditation(self, request, form):
 
     return {
         'layout': layout,
-        'title': _('Refuse accreditation'),
+        'title': _('Refuse admission'),
         'form': form
     }

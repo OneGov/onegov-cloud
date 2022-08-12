@@ -1252,8 +1252,8 @@ def test_view_accreditation(client):
     # Request accredtitation
     page = request_accreditation()
 
-    # Refuse accreditation
-    page = page.click('Akkreditierung verweigern').form.submit().follow()
+    # Refuse admission
+    page = page.click('Zulassung verweigern').form.submit().follow()
     assert 'Der hinterlegte Datensatz wurde entfernt' in page
 
     page.click('Ticket abschliessen')
@@ -1265,9 +1265,9 @@ def test_view_accreditation(client):
     # Request accredtitation
     page = request_accreditation()
 
-    # Grant accreditation
-    page = page.click('Akkreditierung erteilen').form.submit().follow()
-    assert 'Akkreditierung erteilt' in page
+    # Grant admission
+    page = page.click('Zulassung erteilen').form.submit().follow()
+    assert 'Zulassung erteilt' in page
     assert 'Aktivierungs-Email verschickt' in page
 
     mail = client.get_email(0, flush_queue=True)
