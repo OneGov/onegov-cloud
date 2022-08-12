@@ -648,11 +648,11 @@ msgstr "Sprache löschen"
 msgid "Accreditation"
 msgstr "Akkreditierung"
 
-msgid "Grant accreditation"
-msgstr "Akkreditierung erteilen"
+msgid "Grant admission"
+msgstr "Zulassung erteilen"
 
-msgid "Refuse accreditation"
-msgstr "Akkreditierung verweigern"
+msgid "Refuse admission"
+msgstr "Zulassung verweigern"
 
 msgid "Mutation"
 msgstr "Mutation"
@@ -729,17 +729,17 @@ msgstr "Koordinaten"
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
-msgid "Accreditation granted."
-msgstr "Akkreditierung erteilt."
+msgid "Admission granted."
+msgstr "Zulassung erteilt."
 
-msgid "Accreditation refused."
-msgstr "Akkreditierung verweigert."
+msgid "Admission refused."
+msgstr "Zulassung verweigert."
 
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
 
-msgid "This translator is in the accreditation process!"
-msgstr "Dieser Übersetzer ist im Akkreditierungsverfahren!"
+msgid "This translator is in the admission process!"
+msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
 
 msgid "Certificates"
 msgstr "Zertifikate"
