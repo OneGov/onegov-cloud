@@ -3,8 +3,6 @@ import tempfile
 
 from cgi import FieldStorage
 from datetime import datetime
-from gzip import GzipFile
-from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
@@ -22,6 +20,14 @@ from onegov.form.validators import ValidPhoneNumber
 from unittest.mock import patch
 
 
+class DummyPostData(dict):
+    def getlist(self, key):
+        v = self[key]
+        if not isinstance(v, (list, tuple)):
+            v = [v]
+        return v
+
+
 def create_file(mimetype, filename, content):
     fs = FieldStorage()
     fs.file = tempfile.TemporaryFile("wb+")
@@ -33,26 +39,117 @@ def create_file(mimetype, filename, content):
 
 
 def test_upload_file():
+    form = Form()
     field = UploadField()
-    field = field.bind(Form(), 'upload')
+    field = field.bind(form, 'upload')
 
-    textfile = create_file('text/plain', 'test.txt', b'foobar')
+    # Test process fieldstorage
+    textfile = create_file('text/plain', 'C:/mydata/test.txt', b'foobar')
     data = field.process_fieldstorage(textfile)
-
     assert data['filename'] == 'test.txt'
     assert data['mimetype'] == 'text/plain'
     assert data['size']
     assert data['data']
+    assert dictionary_to_binary(data) == b'foobar'
 
-    textfile = create_file('text/plain', 'C:/mydata/test.txt', b'foobar')
+    textfile = create_file('text/plain', 'test.txt', b'foobar')
     data = field.process_fieldstorage(textfile)
     assert data['filename'] == 'test.txt'
-
-    def decompress(data):
-        with GzipFile(filename='', mode='r', fileobj=BytesIO(data)) as f:
-            return f.read()
-
+    assert data['mimetype'] == 'text/plain'
+    assert data['size']
+    assert data['data']
     assert dictionary_to_binary(data) == b'foobar'
+
+    # Test rendering
+    assert 'without-data' in field()
+
+    field.data = data
+    assert 'without-data' in field(force_simple=True)
+
+    html = field()
+    assert 'with-data' in html
+    assert 'Uploaded file: test.txt (6 Bytes) ✓' in html
+    assert 'keep' in html
+    assert 'type="file"' in html
+    assert 'value="test.txt"' in html
+
+    # Test submit
+    field.process(DummyPostData({}))
+    assert field.validate(form)
+    assert not field.data
+
+    field.process(DummyPostData({'upload': 'abcd'}))
+    assert field.validate(form)  # fails silently
+    assert not field.data
+
+    # ... simple
+    field.process(DummyPostData({'upload': textfile}))
+    assert field.validate(form)
+    assert dictionary_to_binary(field.data) == b'foobar'
+
+    # ... with select
+    field.process(DummyPostData({'upload': ['keep', textfile]}))
+    assert field.validate(form)
+    assert field.action == 'keep'
+    assert not field.data
+
+    field.process(DummyPostData({'upload': ['delete', textfile]}))
+    assert field.validate(form)
+    assert field.action == 'delete'
+    assert not field.data
+
+    field.process(DummyPostData({'upload': ['replace', textfile]}))
+    assert field.validate(form)
+    assert field.action == 'replace'
+    assert field.data['filename'] == 'test.txt'
+    assert field.data['mimetype'] == 'text/plain'
+    assert field.data['size']
+    assert dictionary_to_binary(field.data) == b'foobar'
+
+    # ... with select and previous
+    textfile = create_file('text/plain', 'new.txt', b'foobaz')
+
+    field.process(DummyPostData({'upload': [
+        'keep',
+        textfile,
+        data['mimetype'],
+        data['filename'],
+        data['size'],
+        data['data']
+    ]}))
+    assert field.validate(form)
+    assert field.action == 'keep'
+    assert field.data['filename'] == 'test.txt'
+    assert field.data['mimetype'] == 'text/plain'
+    assert field.data['size']
+    assert dictionary_to_binary(field.data) == b'foobar'
+
+    field.process(DummyPostData({'upload': [
+        'delete',
+        textfile,
+        data['mimetype'],
+        data['filename'],
+        data['size'],
+        data['data']
+    ]}))
+    assert field.validate(form)
+    assert field.action == 'delete'
+    assert not field.data
+
+    field.process(DummyPostData({'upload': [
+        'replace',
+        textfile,
+        data['mimetype'],
+        data['filename'],
+        data['size'],
+        data['data']
+    ]}))
+    assert field.validate(form)
+    assert field.action == 'replace'
+    assert field.data['filename'] == 'new.txt'
+    assert field.data['mimetype'] == 'text/plain'
+    assert field.data['size']
+    assert dictionary_to_binary(field.data) == b'foobaz'
 
 
 def test_multi_checkbox_field_disabled():
@@ -164,13 +261,6 @@ def test_chosen_select_multiple_field():
 
 
 def test_date_time_local_field():
-
-    class DummyPostData(dict):
-        def getlist(self, key):
-            v = self[key]
-            if not isinstance(v, (list, tuple)):
-                v = [v]
-            return v
 
     form = Form()
     field = DateTimeLocalField()

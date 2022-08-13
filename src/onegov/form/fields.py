@@ -110,7 +110,16 @@ class UploadField(FileField):
         # the upload widget optionally includes an action with the request,
         # indicating if the existing file should be replaced, kept or deleted
         if valuelist:
-            if len(valuelist) == 2:
+            if len(valuelist) == 6:
+                self.action = valuelist[0]
+                fieldstorage = valuelist[1]
+                self.data = {
+                    'mimetype': valuelist[2],
+                    'filename': valuelist[3],
+                    'size': int(valuelist[4]),
+                    'data': valuelist[5]
+                }
+            elif len(valuelist) == 2:
                 self.action, fieldstorage = valuelist
             else:
                 self.action = 'replace'

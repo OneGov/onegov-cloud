@@ -120,13 +120,24 @@ class UploadWidget(FileInput):
                 </div>
             """.format(input_html))
         else:
+            preview = ''
             src = self.image_source(field)
-
-            if not src:
-                preview = ''
-            else:
+            if src:
                 preview = f"""
                     <div class="uploaded-image"><img src="{src}"></div>
+                """
+
+            previous = ''
+            if field.data:
+                previous = f"""
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data['mimetype']}">
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data['filename']}">
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data['size']}">
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data['data']}">
                 """
 
             return HTMLString("""
@@ -160,6 +171,8 @@ class UploadWidget(FileInput):
                             </div>
                         </li>
                     </ul>
+
+                    {previous}
                 </div>
             """.format(
                 # be careful, we do our own html generation here without any
@@ -174,6 +187,7 @@ class UploadWidget(FileInput):
                 delete_label=field.gettext(_('Delete file')),
                 replace_label=field.gettext(_('Replace file')),
                 preview=preview,
+                previous=previous
             ))
 
 

@@ -351,7 +351,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -362,7 +361,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -373,7 +371,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -388,7 +385,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -399,7 +395,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -410,7 +405,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -421,7 +415,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -433,7 +426,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -448,7 +440,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
@@ -460,20 +451,17 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
         fieldset=_('Documents')
     )
 
     submission_hint = PanelField(
         text=_('Your data will be treated with strict confidentiality.'),
         kind='',
-        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
     remarks = TextAreaField(
         label=_('Remarks'),
-        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
