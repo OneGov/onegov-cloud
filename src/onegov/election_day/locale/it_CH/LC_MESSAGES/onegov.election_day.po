@@ -96,7 +96,7 @@ msgstr "Non alfanumerico: ${col}"
 
 #, python-format
 msgid "Invalid gender: ${value}"
-msgstr ""
+msgstr "Genere non valido: ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr "Questo formato non supporta risultati separati per gli espatriati"
@@ -442,6 +442,8 @@ msgid ""
 "Shows a tab with the comparison of seat allocation as a bar chart. Requires "
 "party results."
 msgstr ""
+"Visualizzazione di una scheda con la ripartizione dei seggi sotto forma di "
+"un diagramma a barre. Sono necessari risultati di partito."
 
 msgid "Views"
 msgstr "Visualizzazioni"
@@ -886,13 +888,13 @@ msgid "Reset password"
 msgstr "Ripristina password"
 
 msgid "female"
-msgstr ""
+msgstr "femminile"
 
 msgid "male"
-msgstr ""
+msgstr "maschile"
 
 msgid "undetermined"
-msgstr ""
+msgstr "altro"
 
 msgid "Actions"
 msgstr "Azioni"
@@ -1184,10 +1186,10 @@ msgstr ""
 "connessioni è proporzionale ai voti."
 
 msgid "Count"
-msgstr ""
+msgstr "Numero"
 
 msgid "Average age"
-msgstr ""
+msgstr "Età media"
 
 msgid "View all details online"
 msgstr "Visualizza tutti i dettagli online"

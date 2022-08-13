@@ -97,7 +97,7 @@ msgstr "Betg alfanumeric: ${col}"
 
 #, python-format
 msgid "Invalid gender: ${value}"
-msgstr ""
+msgstr "Schlattaina nunvalaivla: ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -446,6 +446,8 @@ msgid ""
 "Shows a tab with the comparison of seat allocation as a bar chart. Requires "
 "party results."
 msgstr ""
+"Mussa ina carta da register cun la repartiziun dals sezs en furma d'in "
+"diagram a travs. Pretenda resultats da partidas."
 
 msgid "Views"
 msgstr "Vistas"
@@ -896,13 +898,13 @@ msgid "Reset password"
 msgstr "Redefinir il pled-clav"
 
 msgid "female"
-msgstr ""
+msgstr "feminin"
 
 msgid "male"
-msgstr ""
+msgstr "masculin"
 
 msgid "undetermined"
-msgstr ""
+msgstr "nundeterminà"
 
 msgid "Actions"
 msgstr "Acziuns"
@@ -1200,10 +1202,10 @@ msgstr ""
 "proporziunala a las vuschs."
 
 msgid "Count"
-msgstr ""
+msgstr "Dumber"
 
 msgid "Average age"
-msgstr ""
+msgstr "Vegliadetgna media"
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
