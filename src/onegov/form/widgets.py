@@ -111,6 +111,7 @@ class UploadWidget(FileInput):
 
     def __call__(self, field, **kwargs):
         force_simple = kwargs.pop('force_simple', False)
+        resend_upload = kwargs.pop('resend_upload', False)
         input_html = super().__call__(field, **kwargs)
 
         if force_simple or field.errors or not field.data:
@@ -128,7 +129,7 @@ class UploadWidget(FileInput):
                 """
 
             previous = ''
-            if field.data:
+            if field.data and resend_upload:
                 previous = f"""
                     <input type="hidden" name="{field.id}"
                            value="{field.data.get('mimetype', '')}">

@@ -38,7 +38,7 @@ def create_file(mimetype, filename, content):
     return fs
 
 
-def test_upload_file():
+def test_upload_field():
     def create_field():
         form = Form()
         field = UploadField()
@@ -93,16 +93,20 @@ def test_upload_file():
     assert 'Uploaded file: baz.txt (3 Bytes) ✓' in html
     assert 'keep' in html
     assert 'type="file"' in html
+    assert 'value="baz.txt"' not in html
+
+    html = field(resend_upload=True)
+    assert 'with-data' in html
+    assert 'Uploaded file: baz.txt (3 Bytes) ✓' in html
+    assert 'keep' in html
+    assert 'type="file"' in html
     assert 'value="baz.txt"' in html
 
     # Test submit
     form, field = create_field()
     field.process(DummyPostData({}))
     assert field.validate(form)
-    assert field.action is None
     assert field.data == {}
-    assert field.file is None
-    assert field.filename is None
 
     form, field = create_field()
     field.process(DummyPostData({'upload': 'abcd'}))
@@ -131,9 +135,6 @@ def test_upload_file():
     field.process(DummyPostData({'upload': ['keep', textfile]}))
     assert field.validate(form)
     assert field.action == 'keep'
-    assert field.data == {}
-    assert field.filename is None
-    assert field.file is None
 
     form, field = create_field()
     textfile = create_file('text/plain', 'foobar.txt', b'foobar')
@@ -141,8 +142,6 @@ def test_upload_file():
     assert field.validate(form)
     assert field.action == 'delete'
     assert field.data == {}
-    assert field.filename is None
-    assert field.file is None
 
     form, field = create_field()
     textfile = create_file('text/plain', 'foobar.txt', b'foobar')
@@ -156,7 +155,7 @@ def test_upload_file():
     assert field.filename == 'foobar.txt'
     assert field.file.read() == b'foobar'
 
-    # ... with select and previous
+    # ... with select and keep upload
     previous = field.data.copy()
     form, field = create_field()
     textfile = create_file('text/plain', 'foobaz.txt', b'foobaz')
@@ -174,8 +173,6 @@ def test_upload_file():
     assert field.data['mimetype'] == 'text/plain'
     assert field.data['size'] == 6
     assert dictionary_to_binary(field.data) == b'foobar'
-    assert field.filename == 'foobar.txt'
-    assert field.file.read() == b'foobar'
 
     field.process(DummyPostData({'upload': [
         'delete',
@@ -188,8 +185,6 @@ def test_upload_file():
     assert field.validate(form)
     assert field.action == 'delete'
     assert field.data == {}
-    assert field.filename == 'foobar.txt'
-    assert field.file.read() == b'foobar'
 
     field.process(DummyPostData({'upload': [
         'replace',
