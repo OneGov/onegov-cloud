@@ -79,7 +79,7 @@ Nome|Descrizione
 `invalid`|Numero di voti nulli
 `empty`|Numero di voti in bianco
 `eligible_voters`|Numero di aventi diritto di voto
-`expats`|Anzahl Auslandschweizer. Optional.
+`expats`|Numero di espatriati dell'unità. Facoltativo.
 
 
 #### Risultati temporanei

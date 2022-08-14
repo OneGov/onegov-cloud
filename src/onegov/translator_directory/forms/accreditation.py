@@ -84,9 +84,14 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         validators=[InputRequired()],
     )
 
-    marital_status = StringField(
+    marital_status = ChosenSelectField(
         label=_('Marital status'),
         fieldset=_('Personal Information'),
+        choices=(
+            ('ledig', 'ledig'),
+            ('verheiratet', 'verheiratet'),
+            ('geschieden', 'geschieden'),
+        ),
         validators=[InputRequired()],
     )
 

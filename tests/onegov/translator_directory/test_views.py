@@ -1131,7 +1131,7 @@ def test_view_accreditation(client):
         page.form['date_of_birth'] = '1970-01-01'
         page.form['hometown'] = 'Zug'
         page.form['nationality'] = 'CH'
-        page.form['marital_status'] = 'married'
+        page.form['marital_status'] = 'verheiratet'
         page.form['coordinates'] = encode_map_value({
             'lat': 1, 'lon': 2, 'zoom': 12
         })
@@ -1204,7 +1204,7 @@ def test_view_accreditation(client):
         assert '01.01.1970' in page
         assert 'Zug' in page
         assert 'CH' in page
-        assert 'married' in page
+        assert 'verheiratet' in page
         assert '2.0 km' in page
         assert 'Downing Street 5' in page
         assert '4000' in page
@@ -1258,8 +1258,8 @@ def test_view_accreditation(client):
     # Request accredtitation
     page = request_accreditation()
 
-    # Refuse accreditation
-    page = page.click('Akkreditierung verweigern').form.submit().follow()
+    # Refuse admission
+    page = page.click('Zulassung verweigern').form.submit().follow()
     assert 'Der hinterlegte Datensatz wurde entfernt' in page
 
     page.click('Ticket abschliessen')
@@ -1271,9 +1271,9 @@ def test_view_accreditation(client):
     # Request accredtitation
     page = request_accreditation()
 
-    # Grant accreditation
-    page = page.click('Akkreditierung erteilen').form.submit().follow()
-    assert 'Akkreditierung erteilt' in page
+    # Grant admission
+    page = page.click('Zulassung erteilen').form.submit().follow()
+    assert 'Zulassung erteilt' in page
     assert 'Aktivierungs-Email verschickt' in page
 
     mail = client.get_email(0, flush_queue=True)
