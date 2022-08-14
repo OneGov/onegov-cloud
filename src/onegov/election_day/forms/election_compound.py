@@ -405,10 +405,7 @@ class ElectionCompoundForm(Form):
             if action == 'delete':
                 delattr(model, file)
             if action == 'replace' and field.data:
-                setattr(model, file, (
-                    field.raw_data[-1].file,
-                    field.raw_data[-1].filename,
-                ))
+                setattr(model, file, (field.file, field.filename,))
 
         model.colors = self.parse_colors(self.colors.data)
 

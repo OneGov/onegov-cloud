@@ -53,7 +53,7 @@ class SwissvoteDatasetField(UploadField):
         mapper = ColumnMapperDataset()
 
         try:
-            workbook = load_workbook(self.raw_data[0].file, data_only=True)
+            workbook = load_workbook(self.file, data_only=True)
         except Exception:
             raise ValueError(_("Not a valid XLSX file."))
 

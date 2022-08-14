@@ -21,7 +21,7 @@ class UserManualForm(Form):
             del model.pdf
         if action == 'replace':
             if self.pdf.data:
-                model.pdf = self.pdf.raw_data[-1].file.read()
+                model.pdf = self.pdf.file.read()
 
     def apply_model(self, model):
         if model.exists:

@@ -131,13 +131,13 @@ class UploadWidget(FileInput):
             if field.data:
                 previous = f"""
                     <input type="hidden" name="{field.id}"
-                           value="{field.data['mimetype']}">
+                           value="{field.data.get('mimetype', '')}">
                     <input type="hidden" name="{field.id}"
-                           value="{field.data['filename']}">
+                           value="{field.data.get('filename', '')}">
                     <input type="hidden" name="{field.id}"
-                           value="{field.data['size']}">
+                           value="{field.data.get('size', '')}">
                     <input type="hidden" name="{field.id}"
-                           value="{field.data['data']}">
+                           value="{field.data.get('data', '')}">
                 """
 
             return HTMLString("""
