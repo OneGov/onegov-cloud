@@ -11,6 +11,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
 from onegov.user import UserCollection
 from openpyxl import load_workbook
+from pdftotext import PDF
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
@@ -37,6 +38,14 @@ def upload_pdf(filename):
     file.seek(0)
 
     return Upload(filename, file.read(), 'application/pdf')
+
+
+def check_pdf(page, filename, link):
+    response = page.click(link, index=0)
+    headers = dict(response.headers)
+    assert filename in headers['Content-Disposition']
+    assert headers['Content-Type'] == 'application/pdf'
+    assert filename in ''.join(PDF(BytesIO(response.body)))
 
 
 def test_view_translator(client):
@@ -1231,21 +1240,18 @@ def test_view_accreditation(client):
         assert '"admission-course-agreement">Ja' in page
         assert 'Some remarks' in page
 
-        def check_pdf(filename, link):
-            headers = dict(page.click(link, index=0).headers)
-            assert filename in headers['Content-Disposition']
-            assert headers['Content-Type'] == 'application/pdf'
-
-        check_pdf('1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
-        check_pdf('2.pdf', 'Kurzes Motivationsschreiben.pdf')
-        check_pdf('3.pdf', 'Lebenslauf.pdf')
-        check_pdf('4.pdf', 'Zertifikate.pdf')
-        check_pdf('5.pdf', 'AHV-Ausweis.pdf')
-        check_pdf('6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
-        check_pdf('7.pdf', 'Aktuelles Passfoto.pdf')
-        check_pdf('8.pdf', 'Aktueller Auszug aus dem Betreibungsregister.pdf')
-        check_pdf('9.pdf', 'Aktueller Auszug aus dem Zentralstrafregister.pdf')
-        check_pdf('A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+        check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+        check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
+        check_pdf(page, '3.pdf', 'Lebenslauf.pdf')
+        check_pdf(page, '4.pdf', 'Zertifikate.pdf')
+        check_pdf(page, '5.pdf', 'AHV-Ausweis.pdf')
+        check_pdf(page, '6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
+        check_pdf(page, '7.pdf', 'Aktuelles Passfoto.pdf')
+        check_pdf(page, '8.pdf',
+                  'Aktueller Auszug aus dem Betreibungsregister.pdf')
+        check_pdf(page, '9.pdf',
+                  'Aktueller Auszug aus dem Zentralstrafregister.pdf')
+        check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
 
         return page
 
@@ -1356,10 +1362,8 @@ def test_view_accreditation_errors(directions, client):
     assert upload[3].value == '2.pdf'
     assert upload[4].value
     assert upload[5].value
-    return
 
     # final try
-    page = client.get('/request-accreditation')
     page.form['first_name'] = 'Hugo'
     page.form['gender'] = 'M'
     page.form['hometown'] = 'Zug'
@@ -1460,18 +1464,15 @@ def test_view_accreditation_errors(directions, client):
     assert '"admission-course-agreement">Ja' in page
     assert 'Some remarks' in page
 
-    def check_pdf(filename, link):
-        headers = dict(page.click(link, index=0).headers)
-        assert filename in headers['Content-Disposition']
-        assert headers['Content-Type'] == 'application/pdf'
-
-    check_pdf('1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
-    check_pdf('2.pdf', 'Kurzes Motivationsschreiben.pdf')
-    check_pdf('3.pdf', 'Lebenslauf.pdf')
-    check_pdf('4.pdf', 'Zertifikate.pdf')
-    check_pdf('5.pdf', 'AHV-Ausweis.pdf')
-    check_pdf('6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
-    check_pdf('7.pdf', 'Aktuelles Passfoto.pdf')
-    check_pdf('8.pdf', 'Aktueller Auszug aus dem Betreibungsregister.pdf')
-    check_pdf('9.pdf', 'Aktueller Auszug aus dem Zentralstrafregister.pdf')
-    check_pdf('A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+    check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+    check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
+    check_pdf(page, '3.pdf', 'Lebenslauf.pdf')
+    check_pdf(page, '4.pdf', 'Zertifikate.pdf')
+    check_pdf(page, '5.pdf', 'AHV-Ausweis.pdf')
+    check_pdf(page, '6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
+    check_pdf(page, '7.pdf', 'Aktuelles Passfoto.pdf')
+    check_pdf(page, '8.pdf',
+              'Aktueller Auszug aus dem Betreibungsregister.pdf')
+    check_pdf(page, '9.pdf',
+              'Aktueller Auszug aus dem Zentralstrafregister.pdf')
+    check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
