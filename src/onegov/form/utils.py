@@ -37,23 +37,16 @@ def extract_text_from_html(html):
     return _html_tags.sub('', html)
 
 
-def use_required_attribute_in_html_inputs(use):
-    used = wtforms.widgets.core.html_params is original_html_params
+def disable_required_attribute_in_html_inputs():
+    """ Replaces the required attribute with aria-required. """
 
-    if use == used:
-        return
+    def patched_html_params(**kwargs):
+        if kwargs.pop('required', None):
+            kwargs['aria_required'] = True
+        return original_html_params(**kwargs)
 
-    if use:
-        function = original_html_params
-    else:
-        def patched_html_params(**kwargs):
-            kwargs.pop('required', None)
-            return original_html_params(**kwargs)
-
-        function = patched_html_params
-
-    wtforms.widgets.core.html_params = function
-    wtforms.widgets.core.Input.html_params = staticmethod(function)
+    wtforms.widgets.core.html_params = patched_html_params
+    wtforms.widgets.core.Input.html_params = staticmethod(patched_html_params)
 
 
 class decimal_range(object):
