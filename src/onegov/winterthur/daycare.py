@@ -7,6 +7,7 @@ from cached_property import cached_property
 from collections import defaultdict
 from collections import OrderedDict
 from decimal import Decimal, localcontext
+from markupsafe import Markup
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryCollection
@@ -18,7 +19,6 @@ from ordered_set import OrderedSet
 from wtforms.fields import Field, BooleanField, SelectField
 from wtforms.fields.html5 import DecimalField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
-from wtforms.widgets.core import HTMLString
 
 
 SERVICE_DAYS = {
@@ -610,7 +610,7 @@ class DaycareServicesWidget(object):
         self.field = field
         self.services = field.services
 
-        return HTMLString(self.template.render(this=self))
+        return Markup(self.template.render(this=self))
 
     def is_selected(self, service, day):
         return self.services.is_selected(service.id, day)
