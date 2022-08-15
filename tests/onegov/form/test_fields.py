@@ -354,7 +354,7 @@ def test_css_field():
     field = field.bind(form, 'css')
     field.data = ''
 
-    assert field() == '<textarea id="css" name="css"></textarea>'
+    assert '<textarea id="css" name="css">' in field()
     assert field.validate(form)
 
     field.data = '* { x'

@@ -3,6 +3,7 @@ import humanize
 
 from contextlib import suppress
 from html import escape
+from markupsafe import Markup
 from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
@@ -12,7 +13,7 @@ from wtforms.widgets import ListWidget
 from wtforms.widgets import Select
 from wtforms.widgets import TextArea
 from wtforms.widgets import TextInput
-from wtforms.widgets.core import HTMLString, html_params
+from wtforms.widgets.core import html_params
 
 
 class OrderedListWidget(ListWidget):
@@ -115,7 +116,7 @@ class UploadWidget(FileInput):
         input_html = super().__call__(field, **kwargs)
 
         if force_simple or field.errors or not field.data:
-            return HTMLString("""
+            return Markup("""
                 <div class="upload-widget without-data">
                     {}
                 </div>
@@ -137,7 +138,7 @@ class UploadWidget(FileInput):
                            value="{field.data.get('data', '')}">
                 """
 
-            return HTMLString("""
+            return Markup("""
                 <div class="upload-widget with-data">
                     <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
 
@@ -238,7 +239,7 @@ class TextAreaWithTextModules(TextArea):
             return input_html
 
         field.meta.request.include('text-module-picker')
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             id=field.id,
             label=field.gettext(_('Text modules')),
             text_modules=text_modules,
@@ -320,7 +321,7 @@ class IconWidget(TextInput):
                 return '900'
             return 'regular'
 
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             iconfont=iconfont,
             icons=icons,
             id=field.id,
@@ -363,7 +364,7 @@ class PreviewWidget(object):
     def __call__(self, field, **kwargs):
         field.meta.request.include('preview-widget-handler')
 
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             url=callable(field.url) and field.url(field.meta) or field.url,
             fields=field.fields,
             events=field.events,
@@ -385,7 +386,7 @@ class PanelWidget(object):
         )
         text = text.replace('">', '" ' + html_params(**kwargs) + '>')
         text = text.replace('\n', '<br>')
-        return HTMLString(text)
+        return Markup(text)
 
 
 class HoneyPotWidget(TextInput):

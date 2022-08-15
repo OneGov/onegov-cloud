@@ -65,8 +65,8 @@ def test_parse_text():
     assert isinstance(form.country.validators[1], validators.Length)
 
     assert form.comment.label.text == 'Comment'
-    assert form.comment.widget(form.comment) == (
-        '<textarea id="comment" name="comment" rows="8"></textarea>')
+    assert '<textarea id="comment" name="comment" rows="8">' in \
+        form.comment.widget(form.comment)
 
     assert form.zipcode.label.text == 'Zipcode'
     assert len(form.zipcode.validators) == 3
