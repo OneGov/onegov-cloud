@@ -154,7 +154,7 @@ setup(
         'watchdog',
         'webob',
         'webtest',
-        'wtforms<=2.2.1',
+        'wtforms<3',
         'wtforms-components',
         'xlrd',
         'xlsxwriter',
