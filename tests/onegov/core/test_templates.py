@@ -1,14 +1,13 @@
 import textwrap
-
 import morepath
 import os
 import os.path
 import polib
 
-from onegov.core.framework import Framework
 from onegov.core import utils
+from onegov.core.framework import Framework
 from onegov.core.layout import ChameleonLayout
-from onegov.core.templates import render_macro, BOOLEAN_HTML_ATTRS
+from onegov.core.templates import render_macro, PageTemplate
 from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
 
@@ -188,7 +187,6 @@ def test_boolean_attrs_directly():
     """
     See https://github.com/malthe/chameleon/issues/318
     """
-    from chameleon.zpt.template import PageTemplate
     ts = textwrap.dedent("""
      <select>
         <option value="1" tal:attributes="selected True">Selected</option>
@@ -196,7 +194,7 @@ def test_boolean_attrs_directly():
         <option value="3" tal:attributes="selected None">OK</option>
     </select>
     """)
-    page = PageTemplate(ts, boolean_attributes=BOOLEAN_HTML_ATTRS)()
+    page = PageTemplate(ts)()
     assert '<option value="1" selected="selected">Selected</option>' in page
     assert '<option value="2">Not selected</option>' in page
     assert '<option value="3">OK</option>' in page

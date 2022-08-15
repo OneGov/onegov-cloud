@@ -36,7 +36,9 @@ path.
 import os.path
 
 from cached_property import cached_property
-from chameleon import PageTemplateLoader, PageTemplateFile
+from chameleon import PageTemplate as PageTemplateBase
+from chameleon import PageTemplateFile
+from chameleon import PageTemplateLoader
 from chameleon.astutil import Builtin
 from chameleon.tal import RepeatDict
 from chameleon.utils import Scope, decode_string
@@ -64,6 +66,13 @@ BOOLEAN_HTML_ATTRS = frozenset(
         "defer",
     ]
 )
+
+
+class PageTemplate(PageTemplateBase):
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('boolean_attributes', BOOLEAN_HTML_ATTRS)
+        super().__init__(*args, **kwargs)
 
 
 def get_default_vars(request, content, suppress_global_variables=False):
@@ -128,7 +137,12 @@ class MacrosLookup(object):
         self.lookup = {
             name: template
             for template in (
-                PageTemplateFile(path, search_paths, auto_reload=AUTO_RELOAD)
+                PageTemplateFile(
+                    path,
+                    search_paths,
+                    auto_reload=AUTO_RELOAD,
+                    boolean_attributes=BOOLEAN_HTML_ATTRS
+                )
                 for path in reversed(list(paths))
             )
             for name in template.macros.names
