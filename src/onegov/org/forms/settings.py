@@ -321,9 +321,11 @@ class FooterSettingsForm(Form):
         ])
 
         if summed_cols != 12:
-            self.errors['global-errors'] = [(
-                _("The sum of all the footer columns must be equal to 12")
-            )]
+            for col in ('left', 'center', 'right'):
+                field = getattr(self, f'footer_{col}_width')
+                field.errors.append(
+                    _("The sum of all the footer columns must be equal to 12")
+                )
             return False
 
 
