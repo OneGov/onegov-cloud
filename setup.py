@@ -98,6 +98,7 @@ setup(
         'libres',
         'libsass',
         'lxml',
+        'markupsafe',
         'mistletoe',
         'mistune',
         'more.content_security',
