@@ -66,7 +66,7 @@ def test_parse_text():
 
     assert form.comment.label.text == 'Comment'
     assert '<textarea id="comment" name="comment" rows="8">' in \
-        form.comment.widget(form.comment)
+        form.comment.widget(form.comment, **form.comment.render_kw)
 
     assert form.zipcode.label.text == 'Zipcode'
     assert len(form.zipcode.validators) == 3
@@ -422,10 +422,16 @@ def test_dependent_validation():
     assert not form.errors
 
     assert 'data-depends-on="payment/Bill"' in (
-        form.payment_address.widget(form.payment_address))
+        form.payment_address.widget(
+            form.payment_address, **form.payment_address.render_kw
+        )
+    )
     assert 'data-depends-on="payment/Credit Card"' in (
         form.payment_credit_card_number.widget(
-            form.payment_credit_card_number))
+            form.payment_credit_card_number,
+            **form.payment_credit_card_number.render_kw
+        )
+    )
 
 
 def test_nested_regression():
