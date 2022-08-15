@@ -54,12 +54,14 @@ class SearchForm(Form):
     legal_form = MultiCheckboxField(
         label=_("Legal form"),
         coerce=int,
+        choices=[],
         render_kw={'size': 6, 'clear': False}
     )
 
     result = MultiCheckboxField(
         label=_("Voting result"),
         coerce=int,
+        choices=[],
         render_kw={'size': 6}
     )
 
@@ -76,6 +78,7 @@ class SearchForm(Form):
     position_federal_council = MultiCheckboxField(
         label=_("Position of the Federal Council"),
         fieldset=_("Other Filters"),
+        choices=[],
         coerce=int,
         render_kw={'size': 3, 'clear': False}
     )
@@ -83,6 +86,7 @@ class SearchForm(Form):
     position_national_council = MultiCheckboxField(
         label=_("Position of the National Council"),
         fieldset=_("Other Filters"),
+        choices=[],
         coerce=int,
         render_kw={'size': 3, 'clear': False}
     )
@@ -90,6 +94,7 @@ class SearchForm(Form):
     position_council_of_states = MultiCheckboxField(
         label=_("Position of the Council of States"),
         fieldset=_("Other Filters"),
+        choices=[],
         coerce=int,
         render_kw={'size': 3}
     )

@@ -525,7 +525,7 @@ def test_optional_date():
     ]))
 
     form.validate()
-    assert form.errors == {'date': ['Not a valid date value']}
+    assert form.errors == {'date': ['Not a valid date value.']}
 
     form = form_class(MultiDict([
         ('date', '')

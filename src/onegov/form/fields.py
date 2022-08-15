@@ -30,6 +30,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 from wtforms.widgets import CheckboxInput
 
 FIELDS_NO_RENDERED_PLACEHOLDER = (
@@ -218,7 +219,7 @@ class CssField(TextAreaField):
             try:
                 CSSStyleSheet().cssText = self.data
             except Exception as e:
-                raise ValueError(str(e))
+                raise ValidationError(str(e))
 
 
 class TagsField(StringField):
@@ -389,4 +390,4 @@ class HoneyPotField(StringField):
     def post_validate(self, form, validation_stopped):
         if self.data:
             log.info(f'Honeypot used by {form.request.client_addr}')
-            raise ValueError('Invalid value')
+            raise ValidationError('Invalid value')

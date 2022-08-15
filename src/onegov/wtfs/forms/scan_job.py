@@ -603,7 +603,8 @@ class UnrestrictedScanJobsForm(ScanJobsForm):
 
     municipality_id = ChosenSelectMultipleField(
         label=_("Municipality"),
-        fieldset=_("Filter")
+        fieldset=_("Filter"),
+        choices=[]
     )
 
     def on_request(self):

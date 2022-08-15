@@ -312,12 +312,12 @@ class WTFormsClassBuilder(object):
         # if the dependency is not fulfilled, the field may be empty
         # but it must still validate otherwise (invalid = nok, empty = ok)
         validator = If(dependency.unfulfilled, StrictOptional())
-        validator.field_flags = ('required', )
+        validator.field_flags = {'required': True}
         validators.insert(0, validator)
 
         # if the dependency is fulfilled, the field is required
         validator = If(dependency.fulfilled, DataRequired())
-        validator.field_flags = ('required', )
+        validator.field_flags = {'required': True}
         validators.insert(0, validator)
 
     def validators_add_optional(self, validators):

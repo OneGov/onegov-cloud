@@ -66,7 +66,7 @@ class ArchiveSearchFormVote(ArchiveSearchForm):
     def on_request(self):
         super().on_request()
         principal = self.request.app.principal
-        self.domains.choices = principal.domains_vote.items()
+        self.domains.choices = list(principal.domains_vote.items())
 
     def apply_model(self, model):
         super().apply_model(model)
