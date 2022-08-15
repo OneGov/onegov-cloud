@@ -3,8 +3,8 @@ from onegov.form import Form
 from onegov.wtfs import _
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
-from wtforms import RadioField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import RadioField
 from wtforms.validators import InputRequired
 
 

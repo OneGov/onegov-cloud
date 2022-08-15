@@ -1,19 +1,20 @@
-import importlib
-import re
-
 import humanize
+import importlib
 import phonenumbers
+import re
 
 from cgi import FieldStorage
 from mimetypes import types_map
 from onegov.form import _
-from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError, \
-    FieldCompileError
+from onegov.form.errors import DuplicateLabelError
+from onegov.form.errors import FieldCompileError
+from onegov.form.errors import InvalidFormSyntax
 from stdnum.exceptions import ValidationError as StdnumValidationError
-from wtforms import ValidationError
 from wtforms.fields import SelectField
-from wtforms.validators import InputRequired, Optional, StopValidation
-from wtforms.compat import string_types
+from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import StopValidation
+from wtforms.validators import ValidationError
 
 
 class Stdnum(object):
@@ -186,7 +187,7 @@ class StrictOptional(Optional):
         if not value:
             return True
 
-        if isinstance(value, string_types):
+        if isinstance(value, str):
             return not self.string_check(value)
 
         return False

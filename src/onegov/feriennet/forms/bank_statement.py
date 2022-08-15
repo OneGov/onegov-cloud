@@ -4,8 +4,8 @@ from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
 from sqlalchemy import desc
-from wtforms import SelectField, ValidationError
-from wtforms.validators import InputRequired, DataRequired
+from wtforms.fields import SelectField
+from wtforms.validators import InputRequired, DataRequired, ValidationError
 
 
 class BankStatementImportForm(Form):

@@ -32,7 +32,7 @@ widget variables need to be injected before rendering::
 """
 
 from lxml import etree
-from wtforms import ValidationError
+from wtforms.validators import ValidationError
 
 
 XSLT_BASE = """<?xml version="1.0" encoding="UTF-8"?>

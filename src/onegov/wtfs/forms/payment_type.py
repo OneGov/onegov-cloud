@@ -1,5 +1,5 @@
 from onegov.form import Form
-from wtforms import FloatField
+from wtforms.fields import FloatField
 from wtforms.validators import InputRequired
 
 

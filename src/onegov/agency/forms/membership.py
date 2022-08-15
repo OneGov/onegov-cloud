@@ -4,8 +4,9 @@ from onegov.agency.models import ExtendedPerson
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from sqlalchemy import func
-from wtforms import StringField, ValidationError
-from wtforms import validators
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 
 
 def duplicates(iterable):
@@ -24,7 +25,7 @@ class MembershipForm(Form):
     title = StringField(
         label=_("Title"),
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ],
     )
 
@@ -32,7 +33,7 @@ class MembershipForm(Form):
         label=_("Person"),
         choices=[],
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ]
     )
 

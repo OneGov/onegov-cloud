@@ -6,10 +6,10 @@ from onegov.swissvotes.fields import PolicyAreaField
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import PolicyAreaDefinition
 from onegov.swissvotes.models.vote import SwissVote
-from wtforms import HiddenField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import HiddenField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
 
 
 class SearchForm(Form):
@@ -54,12 +54,14 @@ class SearchForm(Form):
     legal_form = MultiCheckboxField(
         label=_("Legal form"),
         coerce=int,
+        choices=[],
         render_kw={'size': 6, 'clear': False}
     )
 
     result = MultiCheckboxField(
         label=_("Voting result"),
         coerce=int,
+        choices=[],
         render_kw={'size': 6}
     )
 
@@ -76,6 +78,7 @@ class SearchForm(Form):
     position_federal_council = MultiCheckboxField(
         label=_("Position of the Federal Council"),
         fieldset=_("Other Filters"),
+        choices=[],
         coerce=int,
         render_kw={'size': 3, 'clear': False}
     )
@@ -83,6 +86,7 @@ class SearchForm(Form):
     position_national_council = MultiCheckboxField(
         label=_("Position of the National Council"),
         fieldset=_("Other Filters"),
+        choices=[],
         coerce=int,
         render_kw={'size': 3, 'clear': False}
     )
@@ -90,6 +94,7 @@ class SearchForm(Form):
     position_council_of_states = MultiCheckboxField(
         label=_("Position of the Council of States"),
         fieldset=_("Other Filters"),
+        choices=[],
         coerce=int,
         render_kw={'size': 3}
     )

@@ -1,9 +1,9 @@
 from onegov.feriennet import _
 from onegov.form import Form
+from wtforms.fields import DateField
+from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, Email
 
 

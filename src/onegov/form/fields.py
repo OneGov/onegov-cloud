@@ -20,17 +20,18 @@ from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import UploadWidget
-from wtforms import FileField
-from wtforms import SelectField
-from wtforms import SelectMultipleField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import widgets
 from wtforms_components import TimeField as DefaultTimeField
+from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.fields import Field
-from wtforms.fields.html5 import DateTimeLocalField as DateTimeLocalFieldBase
+from wtforms.fields import FileField
+from wtforms.fields import SelectField
+from wtforms.fields import SelectMultipleField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
+from wtforms.widgets import CheckboxInput
 
 FIELDS_NO_RENDERED_PLACEHOLDER = (
     'MultiCheckboxField', 'RadioField', 'OrderedMultiCheckboxField',
@@ -58,7 +59,7 @@ class MultiCheckboxField(SelectMultipleField):
     contains_labels = True
 
     def __init__(self, *args, **kwargs):
-        kwargs['option_widget'] = widgets.CheckboxInput()
+        kwargs['option_widget'] = CheckboxInput()
         super().__init__(*args, **kwargs)
 
     def __iter__(self):
@@ -218,7 +219,7 @@ class CssField(TextAreaField):
             try:
                 CSSStyleSheet().cssText = self.data
             except Exception as e:
-                raise ValueError(str(e))
+                raise ValidationError(str(e))
 
 
 class TagsField(StringField):
@@ -389,4 +390,4 @@ class HoneyPotField(StringField):
     def post_validate(self, form, validation_stopped):
         if self.data:
             log.info(f'Honeypot used by {form.request.client_addr}')
-            raise ValueError('Invalid value')
+            raise ValidationError('Invalid value')

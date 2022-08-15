@@ -3,15 +3,16 @@ from sedate import utcnow, to_timezone
 
 from onegov.core.html_diff import render_html_diff
 from onegov.form.extensions import FormExtension
-from onegov.form.submissions import prepare_for_submission
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import TimezoneDateTimeField
 from onegov.form.fields import UploadField
+from onegov.form.submissions import prepare_for_submission
 from onegov.form.validators import StrictOptional, ValidPhoneNumber
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from wtforms.fields import TextAreaField, StringField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired, InputRequired
 
 

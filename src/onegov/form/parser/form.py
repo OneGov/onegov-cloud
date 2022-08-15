@@ -10,21 +10,21 @@ from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
-from wtforms import PasswordField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import DecimalField
-from wtforms.fields.html5 import EmailField
-from wtforms.fields.html5 import IntegerField
-from wtforms.fields.html5 import URLField
+from wtforms_components import Email, If, TimeField
+from wtforms.fields import DateField
+from wtforms.fields import DecimalField
+from wtforms.fields import EmailField
+from wtforms.fields import IntegerField
+from wtforms.fields import PasswordField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
 from wtforms.validators import Regexp
 from wtforms.validators import URL
-from wtforms_components import Email, If, TimeField
 
 
 # increasing the default filesize is *strongly discouarged*, as we are not
@@ -312,12 +312,12 @@ class WTFormsClassBuilder(object):
         # if the dependency is not fulfilled, the field may be empty
         # but it must still validate otherwise (invalid = nok, empty = ok)
         validator = If(dependency.unfulfilled, StrictOptional())
-        validator.field_flags = ('required', )
+        validator.field_flags = {'required': True}
         validators.insert(0, validator)
 
         # if the dependency is fulfilled, the field is required
         validator = If(dependency.fulfilled, DataRequired())
-        validator.field_flags = ('required', )
+        validator.field_flags = {'required': True}
         validators.insert(0, validator)
 
     def validators_add_optional(self, validators):

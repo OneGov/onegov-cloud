@@ -1,20 +1,21 @@
-from sqlalchemy.orm import object_session
-
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from wtforms import StringField, TextAreaField, validators, BooleanField
-from wtforms.fields.html5 import URLField
-
 from onegov.page import Page
+from sqlalchemy.orm import object_session
+from wtforms.fields import BooleanField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
+from wtforms.validators import InputRequired
 
 
 class PageBaseForm(Form):
     """ Defines the base form for all pages. """
     title = StringField(
         label=_("Title"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         render_kw={'autofocus': ''}
     )
 
@@ -23,7 +24,7 @@ class LinkForm(PageBaseForm):
     """ Defines the form for pages with the 'link' trait. """
     url = URLField(
         label=_("URL"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         render_kw={'class_': 'image-url file-url internal-url'}
     )
 
@@ -49,7 +50,7 @@ class PageUrlForm(Form):
 
     name = StringField(
         label=_('Url path'),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     test = BooleanField(

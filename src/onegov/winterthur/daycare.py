@@ -16,8 +16,10 @@ from onegov.org.models import Organisation
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
-from wtforms.fields import Field, BooleanField, SelectField
-from wtforms.fields.html5 import DecimalField
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import Field
+from wtforms.fields import SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
 
 

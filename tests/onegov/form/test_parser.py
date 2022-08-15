@@ -8,14 +8,15 @@ from onegov.form.parser.grammar import field_help_identifier
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
-from wtforms import FileField
-from wtforms import validators
-from wtforms.fields.html5 import (
-    DateField,
-    EmailField,
-    URLField,
-)
 from wtforms_components import TimeField
+from wtforms.fields import DateField
+from wtforms.fields import EmailField
+from wtforms.fields import FileField
+from wtforms.fields import URLField
+from wtforms.validators import DataRequired
+from wtforms.validators import Length
+from wtforms.validators import Optional
+from wtforms.validators import Regexp
 
 
 def parse(expr, text):
@@ -53,16 +54,16 @@ def test_parse_text():
     assert form.first_name.label.text == 'First name'
     assert form.first_name.description == 'Fill in all in UPPER case'
     assert len(form.first_name.validators) == 1
-    assert isinstance(form.first_name.validators[0], validators.DataRequired)
+    assert isinstance(form.first_name.validators[0], DataRequired)
 
     assert form.last_name.label.text == 'Last name'
     assert len(form.last_name.validators) == 1
-    assert isinstance(form.country.validators[0], validators.Optional)
+    assert isinstance(form.country.validators[0], Optional)
 
     assert form.country.label.text == 'Country'
     assert len(form.country.validators) == 2
-    assert isinstance(form.country.validators[0], validators.Optional)
-    assert isinstance(form.country.validators[1], validators.Length)
+    assert isinstance(form.country.validators[0], Optional)
+    assert isinstance(form.country.validators[1], Length)
 
     assert form.comment.label.text == 'Comment'
     assert '<textarea id="comment" name="comment" rows="8">' in \
@@ -70,14 +71,14 @@ def test_parse_text():
 
     assert form.zipcode.label.text == 'Zipcode'
     assert len(form.zipcode.validators) == 3
-    assert isinstance(form.zipcode.validators[0], validators.Optional)
-    assert isinstance(form.zipcode.validators[1], validators.Length)
-    assert isinstance(form.zipcode.validators[2], validators.Regexp)
+    assert isinstance(form.zipcode.validators[0], Optional)
+    assert isinstance(form.zipcode.validators[1], Length)
+    assert isinstance(form.zipcode.validators[2], Regexp)
 
     assert form.currency.label.text == 'Currency'
     assert len(form.currency.validators) == 2
-    assert isinstance(form.currency.validators[0], validators.Optional)
-    assert isinstance(form.currency.validators[1], validators.Regexp)
+    assert isinstance(form.currency.validators[0], Optional)
+    assert isinstance(form.currency.validators[1], Regexp)
     assert form.currency.description == 'like EUR, CHF'
 
 
@@ -524,7 +525,7 @@ def test_optional_date():
     ]))
 
     form.validate()
-    assert form.errors == {'date': ['Not a valid date value']}
+    assert form.errors == {'date': ['Not a valid date value.']}
 
     form = form_class(MultiDict([
         ('date', '')

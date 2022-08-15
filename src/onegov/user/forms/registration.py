@@ -1,7 +1,12 @@
 from onegov.form import Form
 from onegov.user import _
 from onegov.user.collections import MIN_PASSWORD_LENGTH
-from wtforms import StringField, PasswordField, validators
+from wtforms.fields import PasswordField
+from wtforms.fields import StringField
+from wtforms.validators import Email
+from wtforms.validators import EqualTo
+from wtforms.validators import InputRequired
+from wtforms.validators import Length
 
 
 class RegistrationForm(Form):
@@ -9,14 +14,14 @@ class RegistrationForm(Form):
 
     username = StringField(
         label=_("E-Mail Address"),
-        validators=[validators.InputRequired(), validators.Email()]
+        validators=[InputRequired(), Email()]
     )
 
     password = PasswordField(
         label=_("Password"),
         validators=[
-            validators.InputRequired(),
-            validators.Length(min=MIN_PASSWORD_LENGTH, message=_(
+            InputRequired(),
+            Length(min=MIN_PASSWORD_LENGTH, message=_(
                 "The password must be at least eight characters long"
             ))
         ]
@@ -24,7 +29,7 @@ class RegistrationForm(Form):
 
     confirm = PasswordField(
         label=_("Password Confirmation"),
-        validators=[validators.InputRequired(), validators.EqualTo(
+        validators=[InputRequired(), EqualTo(
             'password', message=_("Passwords must match")
         )]
     )
@@ -37,7 +42,7 @@ class RegistrationForm(Form):
     # need a more sophisticated approach in the future.
     roboter_falle = StringField(
         label=_("Please leave this field empty"),
-        validators=[validators.Length(max=0, message=_(
+        validators=[Length(max=0, message=_(
             "The field is not empty"
         ))]
     )
