@@ -5,7 +5,6 @@ from onegov.pay import Price
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired
-from wtforms.widgets import TextArea
 from wtforms_components import TimeField
 
 
