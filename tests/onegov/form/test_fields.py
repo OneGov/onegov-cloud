@@ -162,9 +162,7 @@ def test_upload_field():
     field.process(DummyPostData({'upload': [
         'keep',
         textfile,
-        previous['mimetype'],
         previous['filename'],
-        previous['size'],
         previous['data']
     ]}))
     assert field.validate(form)
@@ -177,9 +175,7 @@ def test_upload_field():
     field.process(DummyPostData({'upload': [
         'delete',
         textfile,
-        previous['mimetype'],
         previous['filename'],
-        previous['size'],
         previous['data']
     ]}))
     assert field.validate(form)
@@ -189,9 +185,7 @@ def test_upload_field():
     field.process(DummyPostData({'upload': [
         'replace',
         textfile,
-        previous['mimetype'],
         previous['filename'],
-        previous['size'],
         previous['data']
     ]}))
     assert field.validate(form)

@@ -1338,37 +1338,36 @@ def test_view_accreditation_errors(directions, client):
     assert page.form['last_name'].value == 'Benito'
     upload = page.form.fields['declaration_of_authorization']
     assert upload[0].value == 'keep'
-    assert upload[2].value == 'application/pdf'
-    assert upload[3].value == '1.pdf'
-    assert upload[4].value
-    assert upload[5].value
+    assert upload[2].value == '1.pdf'
+    assert upload[3].value
 
     # second try
     page.form['date_of_birth'] = '1970-01-01'
     page.form['letter_of_motivation'] = upload_pdf('2.pdf')
+    page.form['resume'] = upload_pdf('3.pdf')
     page = page.form.submit()
     assert 'Das Formular enthält Fehler' in page
     assert page.form['last_name'].value == 'Benito'
     assert page.form['date_of_birth'].value == '1970-01-01'
     upload = page.form.fields['declaration_of_authorization']
     assert upload[0].value == 'keep'
-    assert upload[2].value == 'application/pdf'
-    assert upload[3].value == '1.pdf'
-    assert upload[4].value
-    assert upload[5].value
+    assert upload[2].value == '1.pdf'
+    assert upload[3].value
     upload = page.form.fields['letter_of_motivation']
     assert upload[0].value == 'keep'
-    assert upload[2].value == 'application/pdf'
-    assert upload[3].value == '2.pdf'
-    assert upload[4].value
-    assert upload[5].value
+    assert upload[2].value == '2.pdf'
+    assert upload[3].value
+    upload = page.form.fields['resume']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '3.pdf'
+    assert upload[3].value
 
     # final try
     page.form['first_name'] = 'Hugo'
     page.form['gender'] = 'M'
     page.form['hometown'] = 'Zug'
     page.form['nationality'] = 'CH'
-    page.form['marital_status'] = 'married'
+    page.form['marital_status'] = 'verheiratet'
     page.form['coordinates'] = encode_map_value({
         'lat': 1, 'lon': 2, 'zoom': 12
     })
@@ -1406,7 +1405,8 @@ def test_view_accreditation_errors(directions, client):
     page.form['agency_references'] = 'Some ref'
     page.form['admission_course_completed'] = False
     page.form['admission_course_agreement'] = True
-    page.form['resume'] = upload_pdf('3.pdf')
+    page.form.get('resume', 0).select('replace')
+    page.form.get('resume', 1).value = upload_pdf('3_new.pdf')
     page.form['certificates'] = upload_pdf('4.pdf')
     page.form['social_security_card'] = upload_pdf('5.pdf')
     page.form['passport'] = upload_pdf('6.pdf')
@@ -1428,7 +1428,7 @@ def test_view_accreditation_errors(directions, client):
     assert '01.01.1970' in page
     assert 'Zug' in page
     assert 'CH' in page
-    assert 'married' in page
+    assert 'verheiratet' in page
     assert '2.0 km' in page
     assert 'Downing Street 5' in page
     assert '4000' in page
@@ -1466,7 +1466,7 @@ def test_view_accreditation_errors(directions, client):
 
     check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
     check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
-    check_pdf(page, '3.pdf', 'Lebenslauf.pdf')
+    check_pdf(page, '3_new.pdf', 'Lebenslauf.pdf')
     check_pdf(page, '4.pdf', 'Zertifikate.pdf')
     check_pdf(page, '5.pdf', 'AHV-Ausweis.pdf')
     check_pdf(page, '6.pdf', 'ID, Pass oder Ausländerausweis.pdf')

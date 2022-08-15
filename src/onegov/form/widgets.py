@@ -132,11 +132,7 @@ class UploadWidget(FileInput):
             if field.data and resend_upload:
                 previous = f"""
                     <input type="hidden" name="{field.id}"
-                           value="{field.data.get('mimetype', '')}">
-                    <input type="hidden" name="{field.id}"
                            value="{field.data.get('filename', '')}">
-                    <input type="hidden" name="{field.id}"
-                           value="{field.data.get('size', '')}">
                     <input type="hidden" name="{field.id}"
                            value="{field.data.get('data', '')}">
                 """

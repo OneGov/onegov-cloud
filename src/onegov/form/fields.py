@@ -5,6 +5,7 @@ import sedate
 from cssutils.css import CSSStyleSheet
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
+from onegov.core.utils import dictionary_to_binary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log
@@ -109,16 +110,14 @@ class UploadField(FileField):
     def process_formdata(self, valuelist):
 
         if valuelist:
-            if len(valuelist) == 6:
+            if len(valuelist) == 4:
                 # resend_upload
                 self.action = valuelist[0]
                 fieldstorage = valuelist[1]
-                self.data = {
-                    'mimetype': valuelist[2],
-                    'filename': valuelist[3],
-                    'size': int(valuelist[4]),
-                    'data': valuelist[5]
-                }
+                self.data = binary_to_dictionary(
+                    dictionary_to_binary({'data': valuelist[3]}),
+                    valuelist[2]
+                )
             elif len(valuelist) == 2:
                 # force_simple
                 self.action, fieldstorage = valuelist
