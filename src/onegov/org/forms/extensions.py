@@ -198,8 +198,12 @@ class ChangeRequestFormExtension(FormExtension, name='change-request'):
                     if self.is_different(field):
                         return
 
-                self.errors['global-errors'] = [
-                    _("Please provide at least one change")]
+                for name, field in self._fields.items():
+                    if name == 'csrf_token':
+                        continue
+                    field.errors.append(
+                        _("Please provide at least one change")
+                    )
 
                 return False
 

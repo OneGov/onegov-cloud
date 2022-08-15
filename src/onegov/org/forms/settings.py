@@ -8,7 +8,6 @@ from wtforms.validators import NumberRange, InputRequired
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form import with_options
 from onegov.form.fields import MultiCheckboxField, TagsField, \
     ChosenSelectField
 from onegov.form.fields import PreviewField
@@ -322,9 +321,11 @@ class FooterSettingsForm(Form):
         ])
 
         if summed_cols != 12:
-            self.errors['global-errors'] = [(
-                _("The sum of all the footer columns must be equal to 12")
-            )]
+            for col in ('left', 'center', 'right'):
+                field = getattr(self, f'footer_{col}_width')
+                field.errors.append(
+                    _("The sum of all the footer columns must be equal to 12")
+                )
             return False
 
 
@@ -540,9 +541,8 @@ class HomepageSettingsForm(Form):
                 correct_msg = 'line {}'.format(correct_line)
                 correct_msg = ERROR_LINE_RE.sub(correct_msg, e.msg)
 
-                field.widget = with_options(
-                    field.widget, **{'data-highlight-line': correct_line}
-                )
+                field.render_kw = field.render_kw or {}
+                field.render_kw['data-highlight-line'] = correct_line
 
                 raise ValidationError(correct_msg)
 

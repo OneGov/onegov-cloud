@@ -25,6 +25,7 @@ class SearchForm(Form):
             (1, _("Yes")),
             (0, _("No")),
         ),
+        default=1,
         coerce=bool,
         render_kw={'size': 6},
         description=_(
