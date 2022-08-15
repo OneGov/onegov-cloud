@@ -7,7 +7,7 @@ from onegov.org.forms import HomepageSettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_homepage_settings
 from onegov.town.app import TownApp
-from wtforms import BooleanField, StringField, IntegerField
+from wtforms.fields import BooleanField, StringField, IntegerField
 
 
 def get_custom_settings_form(model, request, homepage_settings_form=None):

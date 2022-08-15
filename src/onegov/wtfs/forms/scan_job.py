@@ -9,14 +9,14 @@ from onegov.wtfs import _
 from onegov.wtfs.fields import HintField
 from onegov.wtfs.models import Municipality, ScanJob
 from onegov.wtfs.models import PickupDate
-from wtforms import HiddenField
-from wtforms import IntegerField
-from wtforms import RadioField
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms import TextAreaField
 from wtforms_components import DateRange, If, Chain
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import HiddenField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional

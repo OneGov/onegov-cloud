@@ -7,7 +7,10 @@ from onegov.core.utils import linkify, _email_regex
 from onegov.form import Form
 from onegov.form.fields import HtmlField
 from onegov.fsi import _
-from wtforms import StringField, BooleanField, TextAreaField, IntegerField
+from wtforms.fields import BooleanField
+from wtforms.fields import IntegerField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.widgets import TextInput

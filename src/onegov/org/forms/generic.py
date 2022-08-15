@@ -1,11 +1,12 @@
 from morepath.request import Response
-from onegov.form import Form
-from onegov.org import _
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
-from wtforms import RadioField, validators
-from wtforms.fields.html5 import DateField
+from onegov.form import Form
+from onegov.org import _
+from wtforms.fields import DateField
+from wtforms.fields import RadioField
+from wtforms.validators import InputRequired
 
 
 class DateRangeForm(Form):
@@ -13,12 +14,12 @@ class DateRangeForm(Form):
 
     start = DateField(
         label=_("Start"),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     end = DateField(
         label=_("End"),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     def validate(self):
@@ -45,7 +46,7 @@ class ExportForm(Form):
         ],
         default='csv',
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ]
     )
 
@@ -97,7 +98,7 @@ class PaymentMethodForm(Form):
         label=_("Payment Method"),
         fieldset=_("Payments"),
         default='manual',
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         choices=[
             ('manual', _("No credit card payments")),
             ('free', _("Credit card payments optional")),

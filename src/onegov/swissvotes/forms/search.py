@@ -6,10 +6,10 @@ from onegov.swissvotes.fields import PolicyAreaField
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import PolicyAreaDefinition
 from onegov.swissvotes.models.vote import SwissVote
-from wtforms import HiddenField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import HiddenField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
 
 
 class SearchForm(Form):

@@ -22,13 +22,16 @@ from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.ticket import TicketCollection
 from sedate import replace_timezone, to_timezone
-from wtforms import BooleanField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import validators
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import EmailField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import DataRequired
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import Optional
 
 
 TAGS = [
@@ -84,13 +87,13 @@ class EventForm(Form):
     email = EmailField(
         label=_("Submitter"),
         description="max.muster@example.org",
-        validators=[validators.InputRequired(), validators.Email()]
+        validators=[InputRequired(), Email()]
     )
 
     title = StringField(
         label=_("Title"),
         description=_("Concerto in the castle garden"),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     description = TextAreaField(
@@ -103,7 +106,7 @@ class EventForm(Form):
         label=_("Image"),
         file_class=EventFile,
         validators=[
-            validators.Optional(),
+            Optional(),
             WhitelistedMimeType({
                 'image/gif',
                 'image/jpeg',
@@ -117,7 +120,7 @@ class EventForm(Form):
         label=_("Additional Information (PDF)"),
         file_class=EventFile,
         validators=[
-            validators.Optional(),
+            Optional(),
             WhitelistedMimeType({
                 'application/pdf',
             }),
@@ -128,7 +131,7 @@ class EventForm(Form):
     location = StringField(
         label=_("Venue"),
         description="Pilatusstrasse 3, 6000 Luzern",
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     price = TextAreaField(
@@ -140,13 +143,13 @@ class EventForm(Form):
     organizer = StringField(
         label=_("Organizer"),
         description=_("Music society"),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     organizer_email = EmailField(
         label=_("Organizer E-Mail"),
         description=_("Shown as contact address"),
-        validators=[validators.Optional(), validators.Email()]
+        validators=[Optional(), Email()]
     )
 
     coordinates = CoordinatesField(
@@ -162,20 +165,20 @@ class EventForm(Form):
 
     start_date = DateField(
         label=_("Date"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         default=date.today
     )
 
     start_time = TimeField(
         label=_("From"),
         description="18:00",
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     end_time = TimeField(
         label=_("To"),
         description="19:15",
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     repeat = RadioField(
@@ -197,7 +200,7 @@ class EventForm(Form):
 
     end_date = DateField(
         label=_("Until date"),
-        validators=[validators.Optional()],
+        validators=[Optional()],
         depends_on=('repeat', 'weekly')
     )
 
@@ -446,7 +449,7 @@ class EventImportForm(Form):
     file = UploadField(
         label=_("Import"),
         validators=[
-            validators.DataRequired(),
+            DataRequired(),
             WhitelistedMimeType({
                 'application/excel',
                 'application/vnd.ms-excel',

@@ -3,31 +3,34 @@ import re
 
 from cached_property import cached_property
 from lxml import etree
-from wtforms.validators import NumberRange, InputRequired
-
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, TagsField, \
-    ChosenSelectField
+from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
+from onegov.form.fields import TagsField
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.theme import user_options
-from onegov.ticket import TicketPermission
-from purl import URL
-from wtforms import BooleanField, StringField, TextAreaField, RadioField, \
-    FloatField
-from wtforms import ValidationError
-from wtforms import validators
-from wtforms.fields.html5 import EmailField, URLField, IntegerField
-from wtforms_components import ColorField
-
 from onegov.ticket import handlers
+from onegov.ticket import TicketPermission
 from onegov.user import User
-
-from .user import AVAILABLE_ROLES
+from purl import URL
+from wtforms_components import ColorField
+from wtforms.fields import BooleanField
+from wtforms.fields import EmailField
+from wtforms.fields import FloatField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import ValidationError
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
@@ -37,7 +40,7 @@ class GeneralSettingsForm(Form):
 
     name = StringField(
         label=_("Name"),
-        validators=[validators.InputRequired()])
+        validators=[InputRequired()])
 
     logo_url = StringField(
         label=_("Logo"),
@@ -50,7 +53,7 @@ class GeneralSettingsForm(Form):
         render_kw={'class_': 'image-url'})
 
     reply_to = EmailField(
-        _("E-Mail Reply Address (Reply-To)"), [validators.InputRequired()],
+        _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
         description=_("Replies to automated e-mails go to this address."))
 
     primary_color = ColorField(
@@ -59,7 +62,7 @@ class GeneralSettingsForm(Form):
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
         choices=[],
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     locales = RadioField(
@@ -69,7 +72,7 @@ class GeneralSettingsForm(Form):
             ('fr_CH', _("French")),
             ('it_CH', _("Italian"))
         ),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     @property
@@ -134,21 +137,21 @@ class FooterSettingsForm(Form):
         label=_("Column width left side"),
         fieldset=_("Footer Division"),
         default=3,
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     footer_center_width = IntegerField(
         label=_("Column width for the center"),
         fieldset=_("Footer Division"),
         default=5,
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     footer_right_width = IntegerField(
         label=_("Column width right side"),
         fieldset=_("Footer Division"),
         default=4,
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     contact = TextAreaField(
@@ -516,7 +519,7 @@ class HomepageSettingsForm(Form):
 
     redirect_path = StringField(
         label=_("Path"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         depends_on=('redirect_homepage_to', 'path'))
 
     def validate_redirect_path(self, field):

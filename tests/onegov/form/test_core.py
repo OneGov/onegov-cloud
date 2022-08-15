@@ -2,11 +2,13 @@ from decimal import Decimal
 from onegov.form import Form, merge_forms, move_fields
 from onegov.form.fields import HoneyPotField
 from onegov.pay import Price
-from wtforms import RadioField, StringField, TextAreaField, validators
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired
-from wtforms.widgets import TextArea
 from wtforms_components import TimeField
+from wtforms.fields import EmailField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 
 
 class DummyPostData(dict):
@@ -35,7 +37,7 @@ class DummyField(object):
 def test_submitted():
 
     class TestForm(Form):
-        test = StringField("Test", [validators.DataRequired()])
+        test = StringField("Test", [DataRequired()])
 
     request = DummyRequest({})
     assert not TestForm(request.POST).submitted(request)
@@ -60,7 +62,7 @@ def test_useful_data():
 def test_match_fields():
 
     class TestForm(Form):
-        name = StringField("Name", [validators.DataRequired()])
+        name = StringField("Name", [DataRequired()])
         email = EmailField("E-Mail")
         comment = TextAreaField("Comment")
 

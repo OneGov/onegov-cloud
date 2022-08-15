@@ -1,8 +1,8 @@
+from onegov.election_day import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
-from wtforms.fields.html5 import DateField
-from wtforms import StringField
-from onegov.election_day import _
+from wtforms.fields import DateField
+from wtforms.fields import StringField
 
 
 class ArchiveSearchForm(Form):

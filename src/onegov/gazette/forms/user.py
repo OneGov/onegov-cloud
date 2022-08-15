@@ -7,8 +7,8 @@ from onegov.user import User, UserGroupCollection
 from onegov.user import UserGroup
 from sqlalchemy import cast
 from sqlalchemy import String
-from wtforms import RadioField
-from wtforms import StringField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 

@@ -4,8 +4,8 @@ from onegov.gazette import _
 from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.validators import UnusedColumnKeyValue
-from wtforms import BooleanField
-from wtforms import StringField
+from wtforms.fields import BooleanField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

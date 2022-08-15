@@ -1,10 +1,10 @@
-from onegov.org import _
-from onegov.org.forms.generic import DateRangeForm, ExportForm
 from onegov.form import merge_forms
 from onegov.form.fields import MultiCheckboxField
-from wtforms import RadioField
-from wtforms import validators
-from wtforms.fields.html5 import DateField
+from onegov.org import _
+from onegov.org.forms.generic import DateRangeForm, ExportForm
+from wtforms.fields import RadioField
+from wtforms.validators import InputRequired
+from wtforms.fields import DateField
 
 
 class FormSubmissionsExport(merge_forms(DateRangeForm, ExportForm)):
@@ -26,13 +26,13 @@ class FormSubmissionsExport(merge_forms(DateRangeForm, ExportForm)):
 
     start = DateField(
         label=_("Start"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         depends_on=('selection', 'date')
     )
 
     end = DateField(
         label=_("End"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         depends_on=('selection', 'date')
     )
 
