@@ -8,9 +8,9 @@ from onegov.gazette.models import IssueName
 from onegov.gazette.validators import UnusedColumnKeyValue
 from sedate import standardize_date
 from sedate import to_timezone
-from wtforms import HiddenField
-from wtforms import IntegerField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import HiddenField
+from wtforms.fields import IntegerField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 

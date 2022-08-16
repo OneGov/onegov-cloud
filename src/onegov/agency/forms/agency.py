@@ -13,8 +13,8 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from sqlalchemy import func
-from wtforms import StringField
-from wtforms import validators
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
 
 
 class ExtendedAgencyForm(Form):
@@ -23,7 +23,7 @@ class ExtendedAgencyForm(Form):
     title = StringField(
         label=_("Title"),
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ],
     )
 
@@ -133,7 +133,7 @@ class MoveAgencyForm(Form):
         label=_("Destination"),
         choices=[],
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ]
     )
 
@@ -160,7 +160,7 @@ class MoveAgencyForm(Form):
 
         parent_id = None
         parent = None
-        if self.parent_id.data.isdigit():
+        if self.parent_id.data and self.parent_id.data.isdigit():
             parent_id = int(self.parent_id.data)
             parent = agencies.by_id(parent_id)
         model.name = agencies.get_unique_child_name(model.title, parent)

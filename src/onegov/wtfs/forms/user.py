@@ -7,9 +7,9 @@ from onegov.form.validators import UniqueColumnValue
 from onegov.user import User
 from onegov.wtfs import _
 from onegov.wtfs.models import Municipality
-from wtforms import BooleanField
-from wtforms import RadioField
-from wtforms import StringField
+from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 

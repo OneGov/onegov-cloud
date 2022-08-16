@@ -5,6 +5,7 @@ from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
 from onegov.swissvotes.models import ColumnMapperMetadata
 from openpyxl import load_workbook
+from wtforms.validators import ValidationError
 
 
 class SwissvoteMetadataField(UploadField):
@@ -52,23 +53,23 @@ class SwissvoteMetadataField(UploadField):
         try:
             workbook = load_workbook(self.file, data_only=True)
         except Exception:
-            raise ValueError(_("Not a valid XLSX file."))
+            raise ValidationError(_("Not a valid XLSX file."))
 
         if len(workbook.worksheets) < 1:
-            raise ValueError(_("No data."))
+            raise ValidationError(_("No data."))
 
         if 'Metadaten zu Scans' not in workbook.sheetnames:
-            raise ValueError(_("Sheet 'Metadaten zu Scans' is missing."))
+            raise ValidationError(_("Sheet 'Metadaten zu Scans' is missing."))
 
         sheet = workbook['Metadaten zu Scans']
 
         if sheet.max_row <= 1:
-            raise ValueError(_("No data."))
+            raise ValidationError(_("No data."))
 
         headers = [column.value for column in next(sheet.rows)]
         missing = set(mapper.columns.values()) - set(headers)
         if missing:
-            raise ValueError(_(
+            raise ValidationError(_(
                 "Some columns are missing: ${columns}.",
                 mapping={'columns': ', '.join(missing)}
             ))
@@ -133,7 +134,7 @@ class SwissvoteMetadataField(UploadField):
                     data[bfs_number][filename] = metadata
 
         if errors:
-            raise ValueError(_(
+            raise ValidationError(_(
                 "Some cells contain invalid values: ${errors}.",
                 mapping={
                     'errors': '; '.join([

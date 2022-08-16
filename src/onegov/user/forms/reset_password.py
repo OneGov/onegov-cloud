@@ -1,7 +1,12 @@
 from onegov.form import Form
 from onegov.user import _
 from onegov.user import UserCollection
-from wtforms import HiddenField, StringField, PasswordField, validators
+from wtforms.fields import HiddenField
+from wtforms.fields import PasswordField
+from wtforms.fields import StringField
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import Length
 
 
 class RequestPasswordResetForm(Form):
@@ -9,7 +14,7 @@ class RequestPasswordResetForm(Form):
 
     email = StringField(
         label=_("E-Mail Address"),
-        validators=[validators.InputRequired(), validators.Email()],
+        validators=[InputRequired(), Email()],
         render_kw={'autofocus': True}
     )
 
@@ -19,12 +24,12 @@ class PasswordResetForm(Form):
 
     email = StringField(
         label=_("E-Mail Address"),
-        validators=[validators.InputRequired(), validators.Email()],
+        validators=[InputRequired(), Email()],
         render_kw={'autofocus': True}
     )
     password = PasswordField(
         label=_("New Password"),
-        validators=[validators.InputRequired(), validators.Length(min=8)],
+        validators=[InputRequired(), Length(min=8)],
         render_kw={'autocomplete': 'new-password'}
     )
     token = HiddenField()

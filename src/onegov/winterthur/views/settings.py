@@ -9,8 +9,10 @@ from onegov.org.views.settings import handle_generic_settings
 from onegov.winterthur import _
 from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.daycare import Services
-from wtforms.fields import BooleanField, RadioField, TextAreaField
-from wtforms.fields.html5 import DecimalField
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import RadioField
+from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, ValidationError
 from yaml.error import YAMLError
 

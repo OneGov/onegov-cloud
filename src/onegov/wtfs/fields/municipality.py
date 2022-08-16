@@ -3,6 +3,7 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.wtfs import _
+from wtforms.validators import ValidationError
 
 
 class MunicipalityDataUploadField(UploadField):
@@ -40,7 +41,7 @@ class MunicipalityDataUploadField(UploadField):
                 data[bfs_number] = {'dates': dates}
 
         if errors:
-            raise ValueError(_(
+            raise ValidationError(_(
                 "Some rows contain invalid values: ${errors}.",
                 mapping={'errors': ', '.join((str(e) for e in errors))}
             ))

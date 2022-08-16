@@ -19,11 +19,11 @@ from onegov.translator_directory.constants import INTERPRETING_TYPES
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
 from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
 from onegov.translator_directory.layout import DefaultLayout
-from wtforms import FloatField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import IntegerField
+from wtforms.fields import DateField
+from wtforms.fields import FloatField
+from wtforms.fields import IntegerField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import Optional
 
 

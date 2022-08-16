@@ -1,7 +1,9 @@
 from onegov.form import Form
 from onegov.user import _
-from wtforms import RadioField, validators
-from wtforms.fields.html5 import IntegerField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
 
 
 class SignupLinkForm(Form):
@@ -9,7 +11,7 @@ class SignupLinkForm(Form):
 
     role = RadioField(
         label=_("Role"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         choices=[
             ('member', ("Member")),
             ('editor', _("Editor")),
@@ -19,7 +21,7 @@ class SignupLinkForm(Form):
 
     max_age = RadioField(
         label=_("Expires in"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         choices=[
             ('hour', _("1 hour")),
             ('day', _("24 hours")),
@@ -31,8 +33,8 @@ class SignupLinkForm(Form):
     max_uses = IntegerField(
         label=_("Number of Signups"),
         validators=[
-            validators.InputRequired(),
-            validators.NumberRange(1, 10000)
+            InputRequired(),
+            NumberRange(1, 10000)
         ],
     )
 

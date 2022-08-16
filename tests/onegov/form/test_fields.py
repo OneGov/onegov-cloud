@@ -312,7 +312,7 @@ def test_date_time_local_field():
     field = DateTimeLocalField()
     field = field.bind(form, 'dt')
 
-    assert field.format == '%Y-%m-%dT%H:%M'
+    assert field.format == ['%Y-%m-%dT%H:%M']
     field.data = datetime(2010, 1, 2, 3, 4)
     assert "2010-01-02T03:04" in field()
 

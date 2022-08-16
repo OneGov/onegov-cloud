@@ -1,4 +1,3 @@
-import chameleon
 import humanize
 
 from contextlib import suppress
@@ -6,6 +5,7 @@ from html import escape
 from markupsafe import Markup
 from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
+from onegov.core.templates import PageTemplate
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import _
 from wtforms.widgets import FileInput
@@ -194,7 +194,7 @@ class TextAreaWithTextModules(TextArea):
        you select and insert text modules. If no text modules have
        been defined this will be no different from textarea.
     """
-    template = chameleon.PageTemplate("""
+    template = PageTemplate("""
         <div class="textarea-widget">
             <div class="text-module-picker">
                 <span class="text-module-picker-label"
@@ -296,7 +296,7 @@ class IconWidget(TextInput):
 
     @property
     def template(self):
-        return chameleon.PageTemplate("""
+        return PageTemplate("""
         <div class="icon-widget">
             <ul style="font-family: ${iconfont}">
                 <li
@@ -352,7 +352,7 @@ class PreviewWidget(object):
 
     """
 
-    template = chameleon.PageTemplate("""
+    template = PageTemplate("""
         <div class="form-preview-widget"
              data-url="${url or ''}"
              data-fields="${','.join(fields)}"
@@ -375,7 +375,7 @@ class PreviewWidget(object):
 class PanelWidget(object):
     """ A widget that displays the field's text as panel (no input). """
 
-    template = chameleon.PageTemplate(
+    template = PageTemplate(
         """<div class="panel ${kind}">${text}</div>"""
     )
 

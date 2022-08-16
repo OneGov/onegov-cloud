@@ -2,6 +2,9 @@ from onegov.core.security import Secret
 from onegov.feriennet import _
 from onegov.feriennet.app import FeriennetApp
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
+from onegov.feriennet.qrbill import beneficiary_to_creditor
+from onegov.feriennet.qrbill import qr_iban
+from onegov.feriennet.qrbill import swiss_iban
 from onegov.feriennet.utils import format_donation_amounts
 from onegov.feriennet.utils import parse_donation_amounts
 from onegov.form import Form
@@ -10,12 +13,12 @@ from onegov.form.validators import Stdnum
 from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
-from onegov.feriennet.qrbill import qr_iban
-from onegov.feriennet.qrbill import swiss_iban
-from onegov.feriennet.qrbill import beneficiary_to_creditor
 from stdnum import iban
-from wtforms.fields import BooleanField, StringField, RadioField, TextAreaField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 
 

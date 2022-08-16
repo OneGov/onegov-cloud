@@ -3,10 +3,11 @@ from onegov.core.utils import ensure_scheme
 from onegov.form import Form
 from onegov.form.fields import HoneyPotField
 from onegov.form.fields import MultiCheckboxField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import validators
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
 
 
 class MutationForm(Form):
@@ -23,7 +24,7 @@ class MutationForm(Form):
         fieldset=_("Your contact details"),
         label=_("E-Mail"),
         description="max.muster@example.org",
-        validators=[validators.InputRequired(), validators.Email()],
+        validators=[InputRequired(), Email()],
     )
 
     submitter_message = TextAreaField(

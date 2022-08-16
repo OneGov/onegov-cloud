@@ -12,17 +12,17 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from re import findall
 from sqlalchemy import or_
-from wtforms import BooleanField
-from wtforms import IntegerField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import ValidationError
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 class ElectionForm(Form):

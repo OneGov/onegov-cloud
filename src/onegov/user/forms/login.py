@@ -1,6 +1,8 @@
 from onegov.form import Form
 from onegov.user import _
-from wtforms import StringField, PasswordField, validators
+from wtforms.fields import PasswordField
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
 
 
 class LoginForm(Form):
@@ -8,12 +10,12 @@ class LoginForm(Form):
 
     username = StringField(
         label=_("E-Mail Address"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         render_kw={'autofocus': True}
     )
     password = PasswordField(
         label=_("Password"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         render_kw={'autocomplete': 'current-password'}
     )
     yubikey = StringField(
@@ -32,7 +34,7 @@ class LoginForm(Form):
         # the yubikey field may be removed downstream - username and password
         # however *must* be there
         yubikey = getattr(self, 'yubikey', None)
-        yubikey = yubikey and yubikey.data.strip() or None
+        yubikey = yubikey and (yubikey.data or '').strip() or None
 
         return {
             'username': self.username.data,

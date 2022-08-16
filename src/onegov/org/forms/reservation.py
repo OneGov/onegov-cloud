@@ -4,8 +4,9 @@ from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField, TimeField
 from onegov.org import _
 from uuid import UUID
+from wtforms.fields import DateField
+from wtforms.fields import EmailField
 from wtforms.fields import RadioField
-from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired, Email, InputRequired
 
 from .allocation import WEEKDAYS

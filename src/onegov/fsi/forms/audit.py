@@ -1,11 +1,10 @@
 from cached_property import cached_property
-from wtforms import SelectField
-from wtforms.validators import InputRequired
-
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
 from onegov.fsi.models import CourseAttendee
+from wtforms.fields import SelectField
+from wtforms.validators import InputRequired
 
 
 class AuditForm(Form):
