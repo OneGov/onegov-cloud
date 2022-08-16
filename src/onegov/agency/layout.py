@@ -195,6 +195,11 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    text=_("Change URL"),
+                    url=self.request.link(self.model.proxy(), 'change-url'),
+                    attrs={'class': 'change-url'}
+                ),
+                Link(
                     text=_("Move"),
                     url=self.request.link(self.model.proxy(), 'move'),
                     attrs={'class': 'move'}
