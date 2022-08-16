@@ -74,7 +74,7 @@ class ExtendedAgencyForm(Form):
         exclude = {'csrf_token', 'organigram'}
         result = super(ExtendedAgencyForm, self).get_useful_data(exclude)
         if self.organigram.data:
-            result['organigram_file'] = self.organigram.raw_data[-1].file
+            result['organigram_file'] = self.organigram.file
         if self.portrait.data:
             result['portrait'] = linkify(self.portrait.data, escape=False)
         return result
@@ -89,7 +89,7 @@ class ExtendedAgencyForm(Form):
             del model.organigram
         if self.organigram.action == 'replace':
             if self.organigram.data:
-                model.organigram_file = self.organigram.raw_data[-1].file
+                model.organigram_file = self.organigram.file
         if hasattr(self, 'access'):
             model.access = self.access.data
         if hasattr(self, 'publication_start'):

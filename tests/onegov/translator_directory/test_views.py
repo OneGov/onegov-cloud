@@ -11,6 +11,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
 from onegov.user import UserCollection
 from openpyxl import load_workbook
+from pdftotext import PDF
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
@@ -37,6 +38,14 @@ def upload_pdf(filename):
     file.seek(0)
 
     return Upload(filename, file.read(), 'application/pdf')
+
+
+def check_pdf(page, filename, link):
+    response = page.click(link, index=0)
+    headers = dict(response.headers)
+    assert filename in headers['Content-Disposition']
+    assert headers['Content-Type'] == 'application/pdf'
+    assert filename in ''.join(PDF(BytesIO(response.body)))
 
 
 def test_view_translator(client):
@@ -1231,21 +1240,18 @@ def test_view_accreditation(client):
         assert '"admission-course-agreement">Ja' in page
         assert 'Some remarks' in page
 
-        def check_pdf(filename, link):
-            headers = dict(page.click(link, index=0).headers)
-            assert filename in headers['Content-Disposition']
-            assert headers['Content-Type'] == 'application/pdf'
-
-        check_pdf('1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
-        check_pdf('2.pdf', 'Kurzes Motivationsschreiben.pdf')
-        check_pdf('3.pdf', 'Lebenslauf.pdf')
-        check_pdf('4.pdf', 'Zertifikate.pdf')
-        check_pdf('5.pdf', 'AHV-Ausweis.pdf')
-        check_pdf('6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
-        check_pdf('7.pdf', 'Aktuelles Passfoto.pdf')
-        check_pdf('8.pdf', 'Aktueller Auszug aus dem Betreibungsregister.pdf')
-        check_pdf('9.pdf', 'Aktueller Auszug aus dem Zentralstrafregister.pdf')
-        check_pdf('A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+        check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+        check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
+        check_pdf(page, '3.pdf', 'Lebenslauf.pdf')
+        check_pdf(page, '4.pdf', 'Zertifikate.pdf')
+        check_pdf(page, '5.pdf', 'AHV-Ausweis.pdf')
+        check_pdf(page, '6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
+        check_pdf(page, '7.pdf', 'Aktuelles Passfoto.pdf')
+        check_pdf(page, '8.pdf',
+                  'Aktueller Auszug aus dem Betreibungsregister.pdf')
+        check_pdf(page, '9.pdf',
+                  'Aktueller Auszug aus dem Zentralstrafregister.pdf')
+        check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
 
         return page
 
@@ -1304,3 +1310,169 @@ def test_view_accreditation(client):
     page = page.maybe_follow()
     assert 'Benito, Hugo' in page
     assert '756.1234.4568.90' in page
+
+
+@mock.patch(
+    'onegov.gis.utils.MapboxRequests.directions',
+    return_value=FakeResponse({'code': 'Ok', 'routes': [{'distance': 2000}]})
+)
+def test_view_accreditation_errors(directions, client):
+    session = client.app.session()
+    language_ids = [str(lang.id) for lang in create_languages(session)]
+    transaction.commit()
+
+    client.login_admin()
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    settings.form.submit()
+    client.logout()
+
+    # first try
+    page = client.get('/request-accreditation')
+    page.form['last_name'] = 'Benito'
+    page.form['declaration_of_authorization'] = upload_pdf('1.pdf')
+    page = page.form.submit()
+    assert 'Das Formular enthält Fehler' in page
+    assert page.form['last_name'].value == 'Benito'
+    upload = page.form.fields['declaration_of_authorization']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '1.pdf'
+    assert upload[3].value
+
+    # second try
+    page.form['date_of_birth'] = '1970-01-01'
+    page.form['letter_of_motivation'] = upload_pdf('2.pdf')
+    page.form['resume'] = upload_pdf('3.pdf')
+    page = page.form.submit()
+    assert 'Das Formular enthält Fehler' in page
+    assert page.form['last_name'].value == 'Benito'
+    assert page.form['date_of_birth'].value == '1970-01-01'
+    upload = page.form.fields['declaration_of_authorization']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '1.pdf'
+    assert upload[3].value
+    upload = page.form.fields['letter_of_motivation']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '2.pdf'
+    assert upload[3].value
+    upload = page.form.fields['resume']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '3.pdf'
+    assert upload[3].value
+
+    # final try
+    page.form['first_name'] = 'Hugo'
+    page.form['gender'] = 'M'
+    page.form['hometown'] = 'Zug'
+    page.form['nationality'] = 'CH'
+    page.form['marital_status'] = 'verheiratet'
+    page.form['coordinates'] = encode_map_value({
+        'lat': 1, 'lon': 2, 'zoom': 12
+    })
+    page.form['address'] = 'Downing Street 5'
+    page.form['zip_code'] = '4000'
+    page.form['city'] = 'Luzern'
+    page.form['drive_distance'] = '1.1'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['social_sec_number'] = '756.1234.4568.90'
+    page.form['bank_name'] = 'R-BS'
+    page.form['bank_address'] = 'Bullstreet 5'
+    page.form['account_owner'] = 'Hugo Benito'
+    page.form['iban'] = 'CH9300762011623852957'
+    page.form['email'] = 'hugo.benito@translators.com'
+    page.form['tel_private'] = '041 444 44 45'
+    page.form['tel_office'] = '041 444 44 44'
+    page.form['tel_mobile'] = '079 000 00 00'
+    page.form['availability'] = '24h'
+    page.form['confirm_name_reveal'] = True
+    page.form['profession'] = 'Baker'
+    page.form['occupation'] = 'Reporter'
+    page.form['education_as_interpreter'] = False
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
+    page.form['expertise_interpreting_types'].select_multiple([
+        'consecutive', 'negotiation'
+    ])
+    page.form['expertise_professional_guilds'].select_multiple([
+        'economy', 'art_leisure'
+    ])
+    page.form['expertise_professional_guilds_other'] = ['Psychologie']
+    page.form['agency_references'] = 'Some ref'
+    page.form['admission_course_completed'] = False
+    page.form['admission_course_agreement'] = True
+    page.form.get('resume', 0).select('replace')
+    page.form.get('resume', 1).value = upload_pdf('3_new.pdf')
+    page.form['certificates'] = upload_pdf('4.pdf')
+    page.form['social_security_card'] = upload_pdf('5.pdf')
+    page.form['passport'] = upload_pdf('6.pdf')
+    page.form['passport_photo'] = upload_pdf('7.pdf')
+    page.form['debt_collection_register_extract'] = upload_pdf('8.pdf')
+    page.form['criminal_register_extract'] = upload_pdf('9.pdf')
+    page.form['certificate_of_capability'] = upload_pdf('A.pdf')
+    page.form['remarks'] = 'Some remarks'
+    page.form['confirm_submission'] = True
+
+    page = page.form.submit().follow()
+    assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Benito' in page
+    assert 'Hugo' in page
+    assert 'Männlich' in page
+    assert '01.01.1970' in page
+    assert 'Zug' in page
+    assert 'CH' in page
+    assert 'verheiratet' in page
+    assert '2.0 km' in page
+    assert 'Downing Street 5' in page
+    assert '4000' in page
+    assert 'Luzern' in page
+    assert '1.1' in page
+    assert '"withholding-tax">Nein' in page
+    assert '"self-employed">Nein' in page
+    assert '756.1234.4568.90' in page
+    assert 'R-BS' in page
+    assert 'Bullstreet 5' in page
+    assert 'Hugo Benito' in page
+    assert 'CH9300762011623852957' in page
+    assert 'hugo.benito@translators.com' in page
+    assert '041 444 44 45' in page
+    assert '041 444 44 44' in page
+    assert '079 000 00 00' in page
+    assert '24h' in page
+    assert '"confirm-name-reveal">Ja' in page
+    assert 'Baker' in page
+    assert 'Reporter' in page
+    assert '"education-as-interpreter">Nein' in page
+    assert 'German' in page
+    assert 'French' in page
+    assert 'Italian' in page
+    assert 'Arabic' in page
+    assert 'Wirtschaft' in page
+    assert 'Kunst und Freizeit' in page
+    assert 'Psychologie' in page
+    assert 'Konsektutivdolmetschen' in page
+    assert 'Verhandlungsdolmetschen' in page
+    assert 'Some ref' in page
+    assert '"admission-course-completed">Nein' in page
+    assert '"admission-course-agreement">Ja' in page
+    assert 'Some remarks' in page
+
+    check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+    check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
+    check_pdf(page, '3_new.pdf', 'Lebenslauf.pdf')
+    check_pdf(page, '4.pdf', 'Zertifikate.pdf')
+    check_pdf(page, '5.pdf', 'AHV-Ausweis.pdf')
+    check_pdf(page, '6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
+    check_pdf(page, '7.pdf', 'Aktuelles Passfoto.pdf')
+    check_pdf(page, '8.pdf',
+              'Aktueller Auszug aus dem Betreibungsregister.pdf')
+    check_pdf(page, '9.pdf',
+              'Aktueller Auszug aus dem Zentralstrafregister.pdf')
+    check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')

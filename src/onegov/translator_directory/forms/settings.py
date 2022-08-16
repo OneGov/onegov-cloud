@@ -38,7 +38,7 @@ class TranslatorDirectorySettingsForm(Form):
             self.request.session.flush()
         if self.voucher_excel.action == 'replace':
             if self.voucher_excel.data:
-                app.voucher_excel_file = self.voucher_excel.raw_data[-1].file
+                app.voucher_excel_file = self.voucher_excel.file
 
     def apply_model(self, app):
         self.coordinates.data = app.coordinates

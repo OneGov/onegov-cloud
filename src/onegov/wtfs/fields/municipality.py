@@ -23,10 +23,10 @@ class MunicipalityDataUploadField(UploadField):
         errors = []
         data = {}
 
-        if not self.raw_data:
+        if not self.data:
             raise ValidationError(_("No data"))
 
-        lines = self.raw_data[0].file.read().decode('cp1252').split('\r\n')
+        lines = self.file.read().decode('cp1252').split('\r\n')
         for line_number, line in enumerate(lines):
             if not line.strip():
                 continue

@@ -112,6 +112,7 @@ class UploadWidget(FileInput):
 
     def __call__(self, field, **kwargs):
         force_simple = kwargs.pop('force_simple', False)
+        resend_upload = kwargs.pop('resend_upload', False)
         input_html = super().__call__(field, **kwargs)
 
         if force_simple or field.errors or not field.data:
@@ -121,13 +122,20 @@ class UploadWidget(FileInput):
                 </div>
             """.format(input_html))
         else:
+            preview = ''
             src = self.image_source(field)
-
-            if not src:
-                preview = ''
-            else:
+            if src:
                 preview = f"""
                     <div class="uploaded-image"><img src="{src}"></div>
+                """
+
+            previous = ''
+            if field.data and resend_upload:
+                previous = f"""
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data.get('filename', '')}">
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data.get('data', '')}">
                 """
 
             return Markup("""
@@ -161,6 +169,8 @@ class UploadWidget(FileInput):
                             </div>
                         </li>
                     </ul>
+
+                    {previous}
                 </div>
             """.format(
                 # be careful, we do our own html generation here without any
@@ -175,6 +185,7 @@ class UploadWidget(FileInput):
                 delete_label=field.gettext(_('Delete file')),
                 replace_label=field.gettext(_('Replace file')),
                 preview=preview,
+                previous=previous
             ))
 
 

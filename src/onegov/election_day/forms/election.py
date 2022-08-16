@@ -344,8 +344,8 @@ class ElectionForm(Form):
             del model.explanations_pdf
         if action == 'replace' and self.explanations_pdf.data:
             model.explanations_pdf = (
-                self.explanations_pdf.raw_data[-1].file,
-                self.explanations_pdf.raw_data[-1].filename,
+                self.explanations_pdf.file,
+                self.explanations_pdf.filename,
             )
 
         model.colors = self.parse_colors(self.colors.data)

@@ -5,6 +5,7 @@ import sedate
 from cssutils.css import CSSStyleSheet
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
+from onegov.core.utils import dictionary_to_binary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import log
@@ -108,12 +109,21 @@ class UploadField(FileField):
             self.data.get('mimetype') in IMAGE_MIME_TYPES_AND_SVG
 
     def process_formdata(self, valuelist):
-        # the upload widget optionally includes an action with the request,
-        # indicating if the existing file should be replaced, kept or deleted
+
         if valuelist:
-            if len(valuelist) == 2:
+            if len(valuelist) == 4:
+                # resend_upload
+                self.action = valuelist[0]
+                fieldstorage = valuelist[1]
+                self.data = binary_to_dictionary(
+                    dictionary_to_binary({'data': valuelist[3]}),
+                    valuelist[2]
+                )
+            elif len(valuelist) == 2:
+                # force_simple
                 self.action, fieldstorage = valuelist
             else:
+                # default
                 self.action = 'replace'
                 fieldstorage = valuelist[0]
 

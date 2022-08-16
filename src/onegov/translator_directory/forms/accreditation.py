@@ -1,15 +1,16 @@
-from datetime import date
 from cached_property import cached_property
+from datetime import date
+from depot.io.utils import FileIntent
+from io import BytesIO
 from onegov.core.crypto import random_token
+from onegov.core.utils import dictionary_to_binary
 from onegov.file import File
-from onegov.file.utils import as_fileintent
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
 from onegov.form.fields import TagsField
 from onegov.form.fields import UploadField
-from wtforms.validators import DataRequired
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
@@ -32,6 +33,7 @@ from wtforms.fields import FloatField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -356,7 +358,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -367,7 +369,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -378,7 +380,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -393,7 +395,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -404,7 +406,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -415,7 +417,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -426,7 +428,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -438,7 +440,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -453,7 +455,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -465,20 +467,18 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
     submission_hint = PanelField(
         text=_('Your data will be treated with strict confidentiality.'),
         kind='',
-        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
     remarks = TextAreaField(
         label=_('Remarks'),
-        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
@@ -634,15 +634,17 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         def as_file(field, category):
             name = self.request.translate(field.label.text)
             name = name.replace(' (PDF)', '')
-            return File(
-                id=random_token(),
-                name=f'{name}.pdf',
-                note=category,
-                reference=as_fileintent(
-                    content=field.file,
-                    filename=field.filename
+            if field.data:
+                return File(
+                    id=random_token(),
+                    name=f'{name}.pdf',
+                    note=category,
+                    reference=FileIntent(
+                        BytesIO(dictionary_to_binary(field.data)),
+                        field.data['filename'],
+                        field.data['mimetype']
+                    )
                 )
-            )
 
         return [
             as_file(self.declaration_of_authorization, 'Antrag'),
