@@ -1,4 +1,3 @@
-import textwrap
 import morepath
 import os
 import os.path
@@ -7,8 +6,9 @@ import polib
 from onegov.core import utils
 from onegov.core.framework import Framework
 from onegov.core.layout import ChameleonLayout
-from onegov.core.templates import render_macro, PageTemplate
+from onegov.core.templates import render_macro, PageTemplate, PageTemplateFile
 from translationstring import TranslationStringFactory
+PageTemplateFile
 from webtest import TestApp as Client
 
 
@@ -183,23 +183,6 @@ def test_inject_default_vars(temporary_directory, redis_url):
     assert 'niño' in child_page
 
 
-def test_boolean_attrs_directly():
-    """
-    See https://github.com/malthe/chameleon/issues/318
-    """
-    ts = textwrap.dedent("""
-     <select>
-        <option value="1" tal:attributes="selected True">Selected</option>
-        <option value="2" tal:attributes="selected False">Not selected</option>
-        <option value="3" tal:attributes="selected None">OK</option>
-    </select>
-    """)
-    page = PageTemplate(ts)()
-    assert '<option value="1" selected="selected">Selected</option>' in page
-    assert '<option value="2">Not selected</option>' in page
-    assert '<option value="3">OK</option>' in page
-
-
 def test_macro_lookup(temporary_directory, redis_url):
 
     parent = os.path.join(temporary_directory, 'parent')
@@ -226,14 +209,8 @@ def test_macro_lookup(temporary_directory, redis_url):
             <html xmlns="http://www.w3.org/1999/xhtml"
                   xmlns:tal="http://xml.zope.org/namespaces/tal"
                   xmlns:metal="http://xml.zope.org/namespaces/metal">
-
-                <metal:block define-macro="foo">
-                    Foo
-                </metal:block>
-
-                <metal:block define-macro="id">
-                    Parent
-                </metal:block>
+                <metal:block define-macro="foo">Foo</metal:block>
+                <metal:block define-macro="id">Parent</metal:block>
             </html>
         """)
 
@@ -243,17 +220,8 @@ def test_macro_lookup(temporary_directory, redis_url):
             <html xmlns="http://www.w3.org/1999/xhtml"
                   xmlns:tal="http://xml.zope.org/namespaces/tal"
                   xmlns:metal="http://xml.zope.org/namespaces/metal">
-
-                <metal:block define-macro="bar">
-                    Bar
-                </metal:block>
-
-                <metal:block define-macro="id">
-                    Child
-                    <select>
-                    <option value="" tal:attributes="selected False"></option>
-                    </select>
-                </metal:block>
+                <metal:block define-macro="bar">Bar</metal:block>
+                <metal:block define-macro="id">Child</metal:block>
             </html>
         """)
 
@@ -295,4 +263,178 @@ def test_macro_lookup(temporary_directory, redis_url):
     assert 'Foo' in page
     assert 'Bar' in page
     assert 'Child' in page
-    assert 'selected="False"' not in page
+
+
+def test_boolean_attributes(temporary_directory, redis_url):
+    select = """
+    <select>
+        <option value="1" tal:attributes="selected True"></option>
+        <option value="2" tal:attributes="selected False"></option>
+        <option value="3" tal:attributes="selected None"></option>
+    </select>
+    """
+
+    radio_1 = """
+    <input type="radio" value="1" tal:attributes="checked True">
+    <input type="radio" value="2" tal:attributes="checked False">
+    <input type="radio" value="3" tal:attributes="checked None">
+    """
+
+    radio_2 = """
+    <input type="radio" value="4" tal:attributes="disabled True">
+    <input type="radio" value="5" tal:attributes="disabled False">
+    <input type="radio" value="6" tal:attributes="disabled None">
+    """
+
+    # PageTemplate
+    page = PageTemplate(select + radio_1 + radio_2)()
+    assert '<option value="1" selected="selected"></option>' in page
+    assert '<option value="2"></option>' in page
+    assert '<option value="3"></option>' in page
+    assert '<input type="radio" value="1" checked="checked">' in page
+    assert '<input type="radio" value="2">' in page
+    assert '<input type="radio" value="3">' in page
+    assert '<input type="radio" value="4" disabled="disabled">' in page
+    assert '<input type="radio" value="5">' in page
+    assert '<input type="radio" value="6">' in page
+
+    # PageTemplateFile
+    template = os.path.join(temporary_directory, 'template.pt')
+    with open(template, 'w') as f:
+        f.write(select + radio_1 + radio_2)
+    page = PageTemplateFile(template)()
+    assert '<option value="1" selected="selected"></option>' in page
+    assert '<option value="2"></option>' in page
+    assert '<option value="3"></option>' in page
+    assert '<input type="radio" value="1" checked="checked">' in page
+    assert '<input type="radio" value="2">' in page
+    assert '<input type="radio" value="3">' in page
+    assert '<input type="radio" value="4" disabled="disabled">' in page
+    assert '<input type="radio" value="5">' in page
+    assert '<input type="radio" value="6">' in page
+
+    # PageTemplateLoader
+    parent = os.path.join(temporary_directory, 'parent')
+    child = os.path.join(temporary_directory, 'child')
+
+    os.mkdir(parent)
+    os.mkdir(child)
+
+    with open(os.path.join(parent, 'index.pt'), 'w') as f:
+        f.write(f"""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal"
+                  xmlns:metal="http://xml.zope.org/namespaces/metal">
+                <metal:block use-macro="layout.macros.radio" />
+                {select}
+            </html>
+        """)
+
+    with open(os.path.join(parent, 'macros.pt'), 'w') as f:
+        f.write(f"""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal"
+                  xmlns:metal="http://xml.zope.org/namespaces/metal">
+                <metal:block define-macro="radio">{radio_1}</metal:block>
+            </html>
+        """)
+
+    with open(os.path.join(child, 'macros.pt'), 'w') as f:
+        f.write(f"""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal"
+                  xmlns:metal="http://xml.zope.org/namespaces/metal">
+                <metal:block define-macro="radio">
+                    <tal:block metal:define-slot="slot" />
+                    {radio_2}
+                </metal:block>
+            </html>
+        """)
+
+    with open(os.path.join(child, 'slot.pt'), 'w') as f:
+        f.write(f"""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal"
+                  xmlns:metal="http://xml.zope.org/namespaces/metal">
+                <metal:block use-macro="layout.macros.radio">
+                    <tal:block metal:fill-slot="slot">{radio_1}</tal:block>
+                </metal:block>
+                {select}
+            </html>
+        """)
+
+    class Parent(Framework):
+        pass
+
+    @Parent.template_directory()
+    def get_parent_template_directory():
+        return parent
+
+    @Parent.path(path='/')
+    class Root(object):
+        pass
+
+    @Parent.view(model=Root, template='index.pt')
+    def view_root(self, request):
+        return {
+            'layout': ChameleonLayout(self, request)
+        }
+
+    class Child(Parent):
+        pass
+
+    @Child.template_directory()
+    def get_child_template_directory():
+        return child
+
+    @Child.view(model=Root, name='slot', template='slot.pt')
+    def view_slot(self, request):
+        return {
+            'layout': ChameleonLayout(self, request)
+        }
+
+    utils.scan_morepath_modules(Parent)
+    utils.scan_morepath_modules(Child)
+
+    morepath.commit(Child, Parent)
+
+    parent = Parent()
+    parent.namespace = 'parent'
+    parent.configure_application(redis_url=redis_url)
+    parent.set_application_id('parent/parent')
+
+    page = Client(parent).get('/')
+    assert '<option value="1" selected="selected"></option>' in page
+    assert '<option value="2"></option>' in page
+    assert '<option value="3"></option>' in page
+    assert '<input type="radio" value="1" checked="checked">' in page
+    assert '<input type="radio" value="2">' in page
+    assert '<input type="radio" value="3">' in page
+
+    child = Child()
+    child.namespace = 'child'
+    child.configure_application(redis_url=redis_url)
+    child.set_application_id('child/child')
+
+    page = Client(child).get('/')
+    assert '<input type="radio" value="4" disabled="disabled">' in page
+    assert '<input type="radio" value="5">' in page
+    assert '<input type="radio" value="6">' in page
+    assert '<option value="1" selected="selected"></option>' in page
+    assert '<option value="2"></option>' in page
+    assert '<option value="3"></option>' in page
+
+    page = Client(child).get('/slot')
+    assert '<input type="radio" value="1" checked="checked">' in page
+    assert '<input type="radio" value="2">' in page
+    assert '<input type="radio" value="3">' in page
+    assert '<input type="radio" value="4" disabled="disabled">' in page
+    assert '<input type="radio" value="5">' in page
+    assert '<input type="radio" value="6">' in page
+    assert '<option value="1" selected="selected"></option>' in page
+    assert '<option value="2"></option>' in page
+    assert '<option value="3"></option>' in page
