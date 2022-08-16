@@ -1,5 +1,5 @@
-from chameleon import PageTemplate
 from markupsafe import Markup
+from onegov.core.templates import PageTemplate
 from wtforms.fields import Field
 from wtforms.widgets.core import html_params
 
