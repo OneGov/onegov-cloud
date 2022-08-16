@@ -754,8 +754,8 @@ msgstr ""
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
 
-msgid "Url path"
-msgstr "Url Pfad"
+msgid "URL path"
+msgstr "URL Pfad"
 
 msgid "Please fill out a new name"
 msgstr "Bitte geben sie einen neuen Namen an"
@@ -1706,8 +1706,8 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
-msgid "Change Url"
-msgstr "Url ändern"
+msgid "Change URL"
+msgstr "URL ändern"
 
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
@@ -4132,10 +4132,10 @@ msgstr ""
 "wiederholt werden."
 
 msgid ""
-"Stable urls are important. Here you can change the path to your site here "
-"independant of the title."
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
 msgstr ""
-"Stabile Url's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
 "angepasst werden."
 
 #, python-format
