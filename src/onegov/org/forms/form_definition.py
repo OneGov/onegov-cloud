@@ -49,7 +49,7 @@ class FormDefinitionForm(merge_forms(
 class FormDefinitionUrlForm(Form):
 
     name = StringField(
-        label=_('Url path'),
+        label=_('URL path'),
         validators=[InputRequired()]
     )
 

@@ -757,7 +757,7 @@ msgstr ""
 "Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
 "viene utilizzato nella pagina di stato del biglietto per informare l'utente"
 
-msgid "Url path"
+msgid "URL path"
 msgstr "Percorso URL"
 
 msgid "Please fill out a new name"
@@ -1719,7 +1719,7 @@ msgstr "Elimina modulo"
 msgid "Export"
 msgstr "Esporta"
 
-msgid "Change Url"
+msgid "Change URL"
 msgstr "Modifica URL"
 
 msgid "Registration Windows"
@@ -4140,8 +4140,8 @@ msgstr ""
 "volta. Per importare più elementi, ripeti l'importazione finché necessario."
 
 msgid ""
-"Stable urls are important. Here you can change the path to your site here "
-"independant of the title."
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
 msgstr ""
 "Gli URL stabili sono importanti. Qui puoi modificare il percorso del tuo "
 "sito indipendentemente dal titolo."

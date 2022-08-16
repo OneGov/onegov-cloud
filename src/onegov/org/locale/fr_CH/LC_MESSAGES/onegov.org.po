@@ -755,7 +755,7 @@ msgstr ""
 "Décrit la manière dont cette ressource peut être récupérée. Ce texte est "
 "utilisé sur la page de statut du ticket pour informer le client"
 
-msgid "Url path"
+msgid "URL path"
 msgstr "Chemin Url"
 
 msgid "Please fill out a new name"
@@ -1713,8 +1713,8 @@ msgstr "Supprimer le formulaire"
 msgid "Export"
 msgstr "Exporter"
 
-msgid "Change Url"
-msgstr "Changer Url"
+msgid "Change URL"
+msgstr "Changer URL"
 
 msgid "Registration Windows"
 msgstr "Fenêtres d'inscription"
@@ -4151,10 +4151,10 @@ msgstr ""
 "importations."
 
 msgid ""
-"Stable urls are important. Here you can change the path to your site here "
-"independant of the title."
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
 msgstr ""
-"Les urls stables sont importantes. Ici, vous pouvez modifier le chemin "
+"Les URLs stables sont importantes. Ici, vous pouvez modifier le chemin "
 "d'accès à votre site, indépendamment du titre."
 
 #, python-format

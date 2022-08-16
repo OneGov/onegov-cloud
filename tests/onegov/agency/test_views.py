@@ -16,7 +16,7 @@ from time import sleep
 from transaction import commit
 
 
-def test_views(client):
+def test_views_general(client):
     client.login_admin()
     settings = client.get('/module-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
@@ -126,6 +126,13 @@ def test_views(client):
     sr = edit_agency.form.submit().follow()
 
     assert 'Ständerat' in sr
+
+    # ... change URL
+    change_agency_url = sr.click('URL ändern')
+    change_agency_url.form['name'] = 'sr'
+    sr = change_agency_url.form.submit().follow()
+
+    assert sr.request.url.endswith('/sr')
 
     # ... sort agencies
     sort = client.get('/organizations').click('Sortieren')
