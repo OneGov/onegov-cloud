@@ -1,4 +1,3 @@
-import chameleon
 import textwrap
 import yaml
 
@@ -8,6 +7,7 @@ from collections import defaultdict
 from collections import OrderedDict
 from decimal import Decimal, localcontext
 from markupsafe import Markup
+from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryCollection
@@ -563,7 +563,7 @@ class DaycareSubsidyCalculator(object):
 
 class DaycareServicesWidget(object):
 
-    template = chameleon.PageTemplate("""
+    template = PageTemplate("""
         <table class="daycare-services">
             <thead>
                 <tr>
