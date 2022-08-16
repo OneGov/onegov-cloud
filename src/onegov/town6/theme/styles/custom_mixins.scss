@@ -84,6 +84,8 @@ $more-link-icon: "\f054";
     a:not(.edit-link)::after {
         @include icon-bold($more-link-icon);
         float: right;
+        padding-right: .5rem;
+        transition: all 200ms linear;
   }
 }
 

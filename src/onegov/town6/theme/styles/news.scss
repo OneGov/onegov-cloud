@@ -2,7 +2,6 @@
     news list
 */
 
-
 .newslist,
 .directories-list {
     i {
@@ -58,6 +57,38 @@
 
         + li::before {
             content: '/';
+        }
+    }
+}
+
+
+.more-news .card {
+    @include more-link-after;
+    border: 0;
+    position: relative;
+
+    a {
+        border-top: 1px solid #f5f5f5;
+        font-size: 1.1875rem;
+        font-weight: bold;
+        padding-bottom: .5rem;
+        padding-right: 2rem;
+        padding-top: .5rem;
+        transition: border 200ms linear;
+
+        &:hover {
+            border-top: 1px solid $primary-color;
+        }
+
+        &:not(.edit-link)::after {
+            position: absolute;
+            right: 0;
+            top: .5rem;
+            transition: all 200ms linear;
+        }
+
+        &:hover:not(.edit-link)::after {
+            padding-right: 0;
         }
     }
 }

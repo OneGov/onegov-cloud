@@ -85,6 +85,7 @@ def view_news(self, request, layout=None):
     children = []
     year_links = []
     tag_links = []
+    siblings = []
     if not self.parent:
         query = self.news_query(limit=None)
         if request.is_manager:
@@ -105,6 +106,11 @@ def view_news(self, request, layout=None):
             url=request.link(self.for_tag(tag)),
             rounded=True
         ) for tag in self.all_tags]
+    else:
+        siblings = self.siblings.order_by(
+            News.published_or_created).filter(News.published).all()
+        siblings.remove(self)
+        siblings = siblings[0:3]
 
     if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
@@ -117,5 +123,6 @@ def view_news(self, request, layout=None):
         'children': children,
         'year_links': year_links,
         'tag_links': tag_links,
-        'get_lead': get_lead
+        'get_lead': get_lead,
+        'siblings': siblings
     }

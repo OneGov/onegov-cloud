@@ -664,6 +664,15 @@
             </ul>
         </div>
         <div id="after-panels" metal:define-slot="after-panels"></div>
+        
+        <div class="more-news" tal:condition="siblings|False">
+            <h3>Weitere News</h3>
+            <div tal:repeat="sibling siblings" class="card">
+                <a href="${request.link(sibling)}">
+                    ${sibling.title}
+                </a>
+            </div>
+        </div>
     </div>
 </metal:page_content>
 
