@@ -24,7 +24,7 @@ class MunicipalityDataUploadField(UploadField):
         data = {}
 
         if not self.data:
-            raise ValueError(_("No data"))
+            raise ValidationError(_("No data"))
 
         lines = self.file.read().decode('cp1252').split('\r\n')
         for line_number, line in enumerate(lines):
