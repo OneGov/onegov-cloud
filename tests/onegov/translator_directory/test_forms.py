@@ -367,7 +367,8 @@ def test_accreditation_form(translator_app):
     # Test validation
     form = RequestAccreditationForm(DummyPostData({
         'email': 'hugo@benito.com',
-        'zip_code': '12'
+        'zip_code': '12',
+        'self_employed': False
     }))
     form.request = request
     form.on_request()
@@ -390,9 +391,19 @@ def test_accreditation_form(translator_app):
     assert form.errors['tel_private'] == [
         'Please provide at least one phone number.'
     ]
+    assert 'confirmation_compensation_office' not in form.errors
+
+    # ... extra document required if self employed
+    form = RequestAccreditationForm(DummyPostData({'self_employed': True}))
+    form.request = request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors['confirmation_compensation_office'] == [
+        'This field is required.'
+    ]
 
     # Test get data
-    form = RequestAccreditationForm(DummyPostData({
+    data = {
         'last_name': 'Benito',
         'first_name': 'Hugo',
         'gender': 'M',
@@ -443,7 +454,8 @@ def test_accreditation_form(translator_app):
         'certificate_of_capability': create_file('A.pdf'),
         'remarks': 'Some remarks',
         'confirm_submission': True
-    }))
+    }
+    form = RequestAccreditationForm(DummyPostData(data))
     form.request = request
     form.on_request()
     assert not form.validate()
@@ -525,4 +537,51 @@ def test_accreditation_form(translator_app):
         'admission_course_completed': False,
         'admission_course_agreement': True,
         'remarks': 'Some remarks',
+    }
+
+    # ... extra document required if self employed
+    data['self_employed'] = True
+    data['confirmation_compensation_office'] = create_file('B.pdf')
+    form = RequestAccreditationForm(DummyPostData(data))
+    form.request = request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors == {
+        'coordinates': [
+            'Home location is not configured. Please complete location '
+            'settings first'
+        ]
+    }
+
+    files = form.get_files()
+    files = {(file.note, file.name, file.reference.filename) for file in files}
+    assert files == {
+        ('Antrag', '_Signed declaration of authorization.pdf', '1.pdf'),
+        ('Antrag', '_Short letter of motivation.pdf', '2.pdf'),
+        ('Antrag', '_Resume.pdf', '3.pdf'),
+        ('Diplome und Zertifikate', '_Certificates.pdf', '4.pdf'),
+        ('Antrag', '_Social security card.pdf', '5.pdf'),
+        (
+            'Antrag',
+            '_Identity card, passport or foreigner identity card.pdf',
+            '6.pdf'
+        ),
+        ('Antrag', '_Current passport photo.pdf', '7.pdf'),
+        (
+            'Abklärungen',
+            '_Current extract from the debt collection register.pdf',
+            '8.pdf'
+        ),
+        (
+            'Abklärungen',
+            '_Current extract from the Central Criminal Register.pdf',
+            '9.pdf'
+        ),
+        ('Abklärungen', '_Certificate of Capability.pdf', 'A.pdf'),
+        (
+            'Abklärungen',
+            '_Confirmation from the compensation office regarding '
+            'self-employment.pdf',
+            'B.pdf'
+        )
     }

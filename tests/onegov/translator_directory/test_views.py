@@ -1140,7 +1140,7 @@ def test_view_accreditation(client):
         page.form['city'] = 'Luzern'
         page.form['drive_distance'] = '1.1'
         page.form['withholding_tax'] = False
-        page.form['self_employed'] = False
+        page.form['self_employed'] = True
         page.form['social_sec_number'] = '756.1234.4568.90'
         page.form['bank_name'] = 'R-BS'
         page.form['bank_address'] = 'Bullstreet 5'
@@ -1179,6 +1179,7 @@ def test_view_accreditation(client):
         page.form['debt_collection_register_extract'] = upload_pdf('8.pdf')
         page.form['criminal_register_extract'] = upload_pdf('9.pdf')
         page.form['certificate_of_capability'] = upload_pdf('A.pdf')
+        page.form['confirmation_compensation_office'] = upload_pdf('B.pdf')
         page.form['remarks'] = 'Some remarks'
         page.form['confirm_submission'] = True
 
@@ -1211,7 +1212,7 @@ def test_view_accreditation(client):
         assert 'Luzern' in page
         assert '1.1' in page
         assert '"withholding-tax">Nein' in page
-        assert '"self-employed">Nein' in page
+        assert '"self-employed">Ja' in page
         assert '756.1234.4568.90' in page
         assert 'R-BS' in page
         assert 'Bullstreet 5' in page
@@ -1252,6 +1253,9 @@ def test_view_accreditation(client):
         check_pdf(page, '9.pdf',
                   'Aktueller Auszug aus dem Zentralstrafregister.pdf')
         check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+        check_pdf(page, 'B.pdf',
+                  'Bestätigung der Ausgleichskasse betreffend '
+                  'Selbständigkeit.pdf')
 
         return page
 
