@@ -261,7 +261,7 @@
 </metal:footer_locales>
 
 <metal:partners define-macro="partner-card">
-    <div data-aos="fade" class="card" tal:condition="item.image_url">
+    <div data-aos="fade" data-aos-duration="800" class="card" tal:condition="item.image_url">
         <a tal:attributes="href item.url">
             <img src="${item.image_url}" alt="${item.lead or ''}">
           </a>
@@ -331,7 +331,7 @@
 </metal:panel>
 
 <metal:card define-macro="directory-card">
-    <div  data-aos="fade" class="card" data-equalizer-watch>
+    <div  data-aos="fade" data-aos-duration="800" class="card" data-equalizer-watch>
         <div class="card-section">
             <tal:b tal:content="structure link(layout)" />
             <small>${link.subtitle}</small>
@@ -417,7 +417,7 @@
 </metal:fields>
 
 <metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
-    <div class="card" data-aos="fade"  id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
+    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
         <div class="card-divider">
             <a tal:condition="item.page.url" href="${item.page.url}"><h5>${item.page.text}</h5></a>
             <h5 tal:condition="not item.page.url">${item.page.text}</h5>
@@ -493,7 +493,7 @@
 </metal:upload>
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
-    <div class="card" data-aos="fade" data-equalizer-watch tal:define="url request.link(item)">
+    <div class="card" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
         <div tal:condition="item.image_url|nothing" class="card-header">
             <img src="${item.image_url}">
         </div>
