@@ -68,7 +68,7 @@ def view_agencies(self, request):
 
 @AgencyApp.html(
     model=ExtendedAgencyCollection,
-    template='sort.pt',
+    template='custom_sort.pt',
     name='sort',
     permission=Private
 )
@@ -104,14 +104,14 @@ def view_agency(self, request):
 
 @AgencyApp.html(
     model=ExtendedAgency,
-    template='sort.pt',
+    template='custom_sort.pt',
     name='sort',
     permission=Private
 )
 def view_agency_sort(self, request):
     layout = AgencyLayout(self, request)
     return {
-        'title': self.title,
+        'title': _("Sort"),
         'layout': layout,
         'items': (
             (
