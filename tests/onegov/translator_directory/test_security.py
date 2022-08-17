@@ -25,7 +25,6 @@ from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.ticket import TranslatorMutationTicket
 from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.models.voucher import TranslatorVoucherFile
 from onegov.user.models import User
 
 
@@ -225,20 +224,11 @@ def test_security_permissions(translator_app):
     assert_no_access(users['anonymous'], model)  # restricted
     assert_no_access(None, model)
 
-    # TranslatorVoucherFile
-    model = TranslatorVoucherFile()
-    assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)  # restricted
-    assert_no_access(users['member'], model)  # restricted
-    assert_no_access(users['translator'], model)  # restricted
-    assert_no_access(users['anonymous'], model)  # restricted
-    assert_no_access(None, model)
-
     # GeneralFile
     model = GeneralFile()
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)  # restricted
-    assert_no_access(users['member'], model)  # restricted
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
     assert_no_access(None, model)
