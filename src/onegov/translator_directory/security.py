@@ -76,15 +76,24 @@ def restrict_general_file_coll_access_anon(app, identity, model, permission):
 
 
 @TranslatorDirectoryApp.permission_rule(
-    model=GeneralFile, permission=object)
-def restrict_general_file_access(app, identity, model, permission):
+    model=File, permission=object)
+def restrict_file_access(app, identity, model, permission):
     return identity.role == 'admin'
 
 
 @TranslatorDirectoryApp.permission_rule(
-    model=File, permission=object)
-def restrict_file_access(app, identity, model, permission):
-    return identity.role == 'admin'
+    model=GeneralFile, permission=object)
+def restrict_general_file_access(app, identity, model, permission):
+    if identity.role not in ('admin', 'editor', 'member'):
+        return False
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=GeneralFile, permission=object, identity=None)
+def restrict_general_file_access_anon(app, identity, model, permission):
+    return False
 
 
 @TranslatorDirectoryApp.permission_rule(

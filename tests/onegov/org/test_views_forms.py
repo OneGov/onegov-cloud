@@ -712,7 +712,7 @@ def test_registration_ticket_workflow(client):
 
     client.login_editor()
     # We rename the form and check if everything still works
-    rename_page = client.get('/form/meetup').click('Url ändern')
+    rename_page = client.get('/form/meetup').click('URL ändern')
     assert rename_page.form['name'].value == 'meetup'
 
     rename_page = rename_page.form.submit()

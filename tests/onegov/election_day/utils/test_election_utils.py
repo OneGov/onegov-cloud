@@ -24,7 +24,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         date_=date(2015, 10, 18),
         number_of_mandates=2,
         dataset_name='staenderatswahl-2015-parties',
-        expats=False
+        has_expats=False
     )
     assert not errors
 
@@ -305,7 +305,7 @@ def test_election_utils_proporz(import_test_datasets, session):
         date_=date(2015, 10, 18),
         number_of_mandates=3,
         dataset_name='nationalratswahlen-2015',
-        expats=False
+        has_expats=False
     )
     assert not errors
 
@@ -698,7 +698,7 @@ def test_election_utils_parties(import_test_datasets, session):
         date_=date(2015, 10, 18),
         number_of_mandates=3,
         dataset_name='nationalratswahlen-2015',
-        expats=False
+        has_expats=False
     )
     assert not errors
     errors = import_test_datasets(

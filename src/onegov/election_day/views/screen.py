@@ -1,5 +1,5 @@
-from chameleon import PageTemplate
 from onegov.core.security import Public
+from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day import ElectionDayApp

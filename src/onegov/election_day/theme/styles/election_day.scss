@@ -198,11 +198,14 @@ table {
 
     thead {
         background: none;
-
     }
 
     th {
         border-bottom: 1px solid $aluminum;
+
+        &:not(:first-of-type) {
+            hyphens: auto;
+        }
     }
 
     tbody {
@@ -336,6 +339,11 @@ table {
             td:nth-child(6) {
                 width: 10%;
             }
+
+            td.no-results {
+                text-align: right;
+                width: 50%;
+            }
         }
 
         &.election {
@@ -362,10 +370,20 @@ table {
 
         td,
         th {
+            padding-left: 0;
+            padding-right: 0;
             text-align: left;
         }
 
+        th {
+            border-bottom: 1px dashed #ddd;
+            border-top: 1px solid #ddd;
+            margin-top: 1rem;
+        }
+
         td {
+            border-bottom: 1px dashed #ddd;
+
             .tablesaw-cell-label {
                 color: $black;
                 font-weight: normal;
@@ -374,6 +392,10 @@ table {
             .tablesaw-cell-content {
                 float: right;
             }
+        }
+
+        td:last-child {
+            border-bottom: 0;
         }
 
         td:first-child {
@@ -390,6 +412,13 @@ table {
                 text-align: center;
                 width: 100%;
             }
+        }
+    }
+
+    th.right-aligned-small {
+        span, a {
+            float: right;
+            text-align: right;
         }
     }
 }

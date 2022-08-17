@@ -268,6 +268,7 @@ def test_election_compound(session):
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 0,
+            'expats': 0,
             'invalid_ballots': 0,
             'received_ballots': 0,
             'turnout': 0
@@ -282,6 +283,7 @@ def test_election_compound(session):
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 0,
+            'expats': 0,
             'invalid_ballots': 0,
             'received_ballots': 0,
             'turnout': 0
@@ -299,6 +301,7 @@ def test_election_compound(session):
                 entity_id=1,
                 counted=False,
                 eligible_voters=200,
+                expats=20,
                 received_ballots=150,
                 blank_ballots=6,
                 invalid_ballots=15,
@@ -312,6 +315,7 @@ def test_election_compound(session):
                 entity_id=2,
                 counted=False,
                 eligible_voters=200,
+                expats=20,
                 received_ballots=150,
                 blank_ballots=6,
                 invalid_ballots=15,
@@ -344,6 +348,7 @@ def test_election_compound(session):
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 400,
+            'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
             'turnout': 0
@@ -358,6 +363,7 @@ def test_election_compound(session):
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 400,
+            'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
             'turnout': 0
@@ -383,6 +389,7 @@ def test_election_compound(session):
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 400,
+            'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
             'turnout': 75.0
@@ -397,6 +404,7 @@ def test_election_compound(session):
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 400,
+            'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
             'turnout': 0

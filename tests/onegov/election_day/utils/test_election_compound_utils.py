@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from onegov.ballot import ElectionCompound
+from onegov.core.utils import Bunch
 from onegov.election_day.utils.election_compound import \
     get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_districts_data
@@ -69,13 +70,19 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
             'counted': False,
             'entities': [3231, 3232, 3233, 3234, 3235, 3236, 3238, 3251,
                          3252, 3253, 3254, 3255, 3256],
+            'link': '',
+            'mandates': '0 / 17',
             'percentage': 100.0,
+            'progress': '1 / 13',
             'votes': 0
         },
         'Rorschach': {
             'counted': True,
             'entities': [3211, 3213, 3214, 3215, 3216, 3217, 3218, 3219, 3237],
+            'link': '',
+            'mandates': '0 / 10',
             'percentage': 100.0,
+            'progress': '9 / 9',
             'votes': 0
         }
     }
@@ -131,18 +138,25 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     election_compound.manually_completed = True
     session.flush()
 
-    assert get_districts_data(election_compound, principal) == {
+    request = Bunch(link=lambda x: f'_{x.domain_segment}')
+    assert get_districts_data(election_compound, principal, request) == {
         'Rheintal': {
             'counted': True,
             'entities': [3231, 3232, 3233, 3234, 3235, 3236, 3238, 3251,
                          3252, 3253, 3254, 3255, 3256],
+            'link': '_Rheintal',
+            'mandates': '17 / 17',
             'percentage': 100.0,
+            'progress': '13 / 13',
             'votes': 0
         },
         'Rorschach': {
             'counted': True,
             'entities': [3211, 3213, 3214, 3215, 3216, 3217, 3218, 3219, 3237],
+            'link': '_Rorschach',
+            'mandates': '10 / 10',
             'percentage': 100.0,
+            'progress': '9 / 9',
             'votes': 0
         }
     }

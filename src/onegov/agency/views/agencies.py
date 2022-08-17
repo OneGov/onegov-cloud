@@ -21,6 +21,7 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org.elements import Link
+from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
@@ -284,6 +285,38 @@ def edit_agency(self, request, form):
         'title': self.title,
         'form': form,
         'button_text': _('Update')
+    }
+
+
+@AgencyApp.form(
+    model=ExtendedAgency,
+    name='change-url',
+    template='form.pt',
+    permission=Private,
+    form=ChangeAdjacencyListUrlForm
+)
+def change_agency_url(self, request, form):
+    layout = AgencyLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Change URL"), '#'))
+
+    form.delete_field('test')
+
+    if form.submitted(request):
+        self.name = form.name.data
+        request.success(_("Your changes were saved"))
+        return redirect(request.link(self))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'title': _('Change URL'),
+        'callout': _(
+            'Stable URLs are important. Here you can change the path to your '
+            'site independently from the title.'
+        ),
     }
 
 

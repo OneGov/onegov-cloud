@@ -1,4 +1,4 @@
-from chameleon import PageTemplate
+from onegov.core.templates import PageTemplate
 from onegov.core import cache
 from onegov.core.framework import Framework
 from onegov.core.utils import Bunch

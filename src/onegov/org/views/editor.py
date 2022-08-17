@@ -111,8 +111,8 @@ def handle_change_page_url(self, request, form, layout=None):
         count_page(child)
 
     messages = [
-        _('Stable urls are important. Here you can change the '
-          'path to your site here independant of the title.'),
+        _('Stable URLs are important. Here you can change the '
+          'path to your site independently from the title.'),
         _('A total of ${number} subpages are affected.',
           mapping={'number': subpage_count})
     ]
@@ -141,7 +141,7 @@ def handle_change_page_url(self, request, form, layout=None):
     elif not request.POST:
         form.process(obj=self.page)
 
-    site_title = _('Change Url')
+    site_title = _('Change URL')
 
     return {
         'layout': layout or EditorLayout(self, request, site_title),

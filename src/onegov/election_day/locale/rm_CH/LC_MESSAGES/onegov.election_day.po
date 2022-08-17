@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-08 14:50+0200\n"
+"POT-Creation-Date: 2022-08-10 16:20+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -97,7 +97,7 @@ msgstr "Betg alfanumeric: ${col}"
 
 #, python-format
 msgid "Invalid gender: ${value}"
-msgstr ""
+msgstr "Schlattaina nunvalaivla: ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -446,6 +446,8 @@ msgid ""
 "Shows a tab with the comparison of seat allocation as a bar chart. Requires "
 "party results."
 msgstr ""
+"Mussa ina carta da register cun la repartiziun dals sezs en furma d'in "
+"diagram a travs. Pretenda resultats da partidas."
 
 msgid "Views"
 msgstr "Vistas"
@@ -780,6 +782,9 @@ msgstr "Dumbrà ora"
 msgid "Updated"
 msgstr "Actualisà"
 
+msgid "No results yet"
+msgstr "Anc nagins resultats avant maun"
+
 msgid "Result"
 msgstr "Resultat"
 
@@ -893,13 +898,13 @@ msgid "Reset password"
 msgstr "Redefinir il pled-clav"
 
 msgid "female"
-msgstr ""
+msgstr "feminin"
 
 msgid "male"
-msgstr ""
+msgstr "masculin"
 
 msgid "undetermined"
-msgstr ""
+msgstr "nundeterminà"
 
 msgid "Actions"
 msgstr "Acziuns"
@@ -1052,9 +1057,6 @@ msgstr "Proxima pagina"
 msgid "You are here"
 msgstr "Pagina actuala"
 
-msgid "No results yet"
-msgstr "Anc nagins resultats avant maun"
-
 msgid "Alerts"
 msgstr "Communicaziuns"
 
@@ -1122,6 +1124,9 @@ msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
 "Las datas nunelavuradas da las candidatas e dals candidats èn disponiblas en "
 "ils suandants formats:"
+
+msgid "The raw data are available in the following formats:"
+msgstr "Las datas nunelavuradas èn disponiblas en ils suandants formats:"
 
 msgid "The raw data of the parties are available in the following formats:"
 msgstr ""
@@ -1197,10 +1202,10 @@ msgstr ""
 "proporziunala a las vuschs."
 
 msgid "Count"
-msgstr ""
+msgstr "Dumber"
 
 msgid "Average age"
-msgstr ""
+msgstr "Vegliadetgna media"
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"

@@ -11,10 +11,12 @@ from onegov.org import _
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
 from onegov.user import User
 from onegov.user import UserCollection
-from wtforms import BooleanField
-from wtforms import TextAreaField
-from wtforms import ValidationError
-from wtforms import validators
+from wtforms.fields import BooleanField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
+from wtforms.validators import Length
+from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 class TicketNoteForm(Form):
@@ -23,8 +25,8 @@ class TicketNoteForm(Form):
         label=_("Text"),
         description=_("Your note about this ticket"),
         validators=[
-            validators.InputRequired(),
-            validators.Length(max=TABLE_CELL_CHAR_LIMIT)
+            InputRequired(),
+            Length(max=TABLE_CELL_CHAR_LIMIT)
         ],
         filters=(strip_whitespace, ),
         render_kw={'rows': 10, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
@@ -33,7 +35,7 @@ class TicketNoteForm(Form):
         label=_("Attachment"),
         file_class=MessageFile,
         validators=[
-            validators.Optional(),
+            Optional(),
             FileSizeLimit(10 * 1000 * 1000)
         ])
 
@@ -44,8 +46,8 @@ class TicketChatMessageForm(Form):
         label=_("Message"),
         description=_("Your message"),
         validators=[
-            validators.InputRequired(),
-            validators.Length(max=TABLE_CELL_CHAR_LIMIT)
+            InputRequired(),
+            Length(max=TABLE_CELL_CHAR_LIMIT)
         ],
         filters=(strip_whitespace, ),
         render_kw={'rows': 5, 'data-max-length': TABLE_CELL_CHAR_LIMIT})
@@ -77,7 +79,7 @@ class TicketAssignmentForm(Form):
         _('User'),
         choices=[],
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ],
     )
 

@@ -1,10 +1,11 @@
-import chameleon
 import humanize
 
 from contextlib import suppress
 from html import escape
+from markupsafe import Markup
 from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
+from onegov.core.templates import PageTemplate
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import _
 from wtforms.widgets import FileInput
@@ -12,7 +13,7 @@ from wtforms.widgets import ListWidget
 from wtforms.widgets import Select
 from wtforms.widgets import TextArea
 from wtforms.widgets import TextInput
-from wtforms.widgets.core import HTMLString, html_params
+from wtforms.widgets.core import html_params
 
 
 class OrderedListWidget(ListWidget):
@@ -111,25 +112,33 @@ class UploadWidget(FileInput):
 
     def __call__(self, field, **kwargs):
         force_simple = kwargs.pop('force_simple', False)
+        resend_upload = kwargs.pop('resend_upload', False)
         input_html = super().__call__(field, **kwargs)
 
         if force_simple or field.errors or not field.data:
-            return HTMLString("""
+            return Markup("""
                 <div class="upload-widget without-data">
                     {}
                 </div>
             """.format(input_html))
         else:
+            preview = ''
             src = self.image_source(field)
-
-            if not src:
-                preview = ''
-            else:
+            if src:
                 preview = f"""
                     <div class="uploaded-image"><img src="{src}"></div>
                 """
 
-            return HTMLString("""
+            previous = ''
+            if field.data and resend_upload:
+                previous = f"""
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data.get('filename', '')}">
+                    <input type="hidden" name="{field.id}"
+                           value="{field.data.get('data', '')}">
+                """
+
+            return Markup("""
                 <div class="upload-widget with-data">
                     <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
 
@@ -160,6 +169,8 @@ class UploadWidget(FileInput):
                             </div>
                         </li>
                     </ul>
+
+                    {previous}
                 </div>
             """.format(
                 # be careful, we do our own html generation here without any
@@ -174,6 +185,7 @@ class UploadWidget(FileInput):
                 delete_label=field.gettext(_('Delete file')),
                 replace_label=field.gettext(_('Replace file')),
                 preview=preview,
+                previous=previous
             ))
 
 
@@ -182,7 +194,7 @@ class TextAreaWithTextModules(TextArea):
        you select and insert text modules. If no text modules have
        been defined this will be no different from textarea.
     """
-    template = chameleon.PageTemplate("""
+    template = PageTemplate("""
         <div class="textarea-widget">
             <div class="text-module-picker">
                 <span class="text-module-picker-label"
@@ -227,7 +239,7 @@ class TextAreaWithTextModules(TextArea):
             return input_html
 
         field.meta.request.include('text-module-picker')
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             id=field.id,
             label=field.gettext(_('Text modules')),
             text_modules=text_modules,
@@ -284,7 +296,7 @@ class IconWidget(TextInput):
 
     @property
     def template(self):
-        return chameleon.PageTemplate("""
+        return PageTemplate("""
         <div class="icon-widget">
             <ul style="font-family: ${iconfont}">
                 <li
@@ -309,7 +321,7 @@ class IconWidget(TextInput):
                 return '900'
             return 'regular'
 
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             iconfont=iconfont,
             icons=icons,
             id=field.id,
@@ -340,7 +352,7 @@ class PreviewWidget(object):
 
     """
 
-    template = chameleon.PageTemplate("""
+    template = PageTemplate("""
         <div class="form-preview-widget"
              data-url="${url or ''}"
              data-fields="${','.join(fields)}"
@@ -352,7 +364,7 @@ class PreviewWidget(object):
     def __call__(self, field, **kwargs):
         field.meta.request.include('preview-widget-handler')
 
-        return HTMLString(self.template.render(
+        return Markup(self.template.render(
             url=callable(field.url) and field.url(field.meta) or field.url,
             fields=field.fields,
             events=field.events,
@@ -363,7 +375,7 @@ class PreviewWidget(object):
 class PanelWidget(object):
     """ A widget that displays the field's text as panel (no input). """
 
-    template = chameleon.PageTemplate(
+    template = PageTemplate(
         """<div class="panel ${kind}">${text}</div>"""
     )
 
@@ -374,7 +386,7 @@ class PanelWidget(object):
         )
         text = text.replace('">', '" ' + html_params(**kwargs) + '>')
         text = text.replace('\n', '<br>')
-        return HTMLString(text)
+        return Markup(text)
 
 
 class HoneyPotWidget(TextInput):

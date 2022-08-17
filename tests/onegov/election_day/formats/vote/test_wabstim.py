@@ -230,8 +230,8 @@ def test_import_wabstim_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Municipality(municipality='3427')
 
-    for expats in (False, True):
-        vote.expats = expats
+    for has_expats in (False, True):
+        vote.has_expats = has_expats
         errors = import_vote_wabstim(
             vote, principal,
             BytesIO((
@@ -273,7 +273,7 @@ def test_import_wabstim_vote_expats(session):
             'text/plain',
         )
         errors = [e.error.interpolate() for e in errors]
-        if expats:
+        if has_expats:
             assert errors == []
         else:
             assert errors == ['No data found']

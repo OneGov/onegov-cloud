@@ -887,7 +887,7 @@ class FormSubmissionLayout(DefaultLayout):
         )
 
         change_url_link = Link(
-            text=_("Change Url"),
+            text=_("Change URL"),
             url=self.request.link(self.form, name='change-url'),
             attrs={'class': 'internal-url'}
         )

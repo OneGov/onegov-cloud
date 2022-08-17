@@ -1,7 +1,7 @@
-from chameleon import PageTemplate
+from markupsafe import Markup
+from onegov.core.templates import PageTemplate
 from wtforms.fields import Field
 from wtforms.widgets.core import html_params
-from wtforms.widgets.core import HTMLString
 
 
 class HintWidget(object):
@@ -21,7 +21,7 @@ class HintWidget(object):
         )
 
         translate = request.get_translate(for_chameleon=True)
-        return HTMLString(template.render(translate=translate))
+        return Markup(template.render(translate=translate))
 
 
 class HintField(Field):

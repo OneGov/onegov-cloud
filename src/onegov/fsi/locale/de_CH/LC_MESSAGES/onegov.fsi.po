@@ -86,7 +86,7 @@ msgid "Description"
 msgstr "Beschreibung"
 
 msgid "Refresh mandatory"
-msgstr "Wiederholdung obgligatorisch"
+msgstr "Wiederholdung obligatorisch"
 
 msgid "Refresh Interval (years)"
 msgstr "Wiederholungsintervall (in Jahren)"

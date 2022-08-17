@@ -154,12 +154,16 @@ class ElectionLayout(DetailLayout):
         return self.tab_visible(self.tab)
 
     @cached_property
+    def type(self):
+        return self.model.type
+
+    @cached_property
     def majorz(self):
-        return self.model.type == 'majorz'
+        return self.type == 'majorz'
 
     @cached_property
     def proporz(self):
-        return self.model.type == 'proporz'
+        return self.type == 'proporz'
 
     @cached_property
     def tacit(self):

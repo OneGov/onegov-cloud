@@ -99,7 +99,7 @@ Nome|Descrizione
 `entity_district`|Il distretto del comune.
 `entity_counted`|`True`, se lo spoglio è stato completato.
 `entity_eligible_voters`|Numero degli aventi diritto al voto di questo comune.
-`entity_expats`|Anzahl Auslandschweizer der Gemeinde.
+`entity_expats`|Numero di espatriati dell'unità.
 `entity_received_ballots`|Numero di schede ricevute per questo comune.
 `entity_blank_ballots`|Numero di schede bianche per questo comune.
 `entity_invalid_ballots`|Numero di schede nulle per questo comune.
@@ -119,8 +119,8 @@ Nome|Descrizione
 `candidate_id`|L'identificativo del candidato.
 `candidate_elected`|Vero se il candidato è stato eletto.
 `candidate_party`|Il nome del partito.
-`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
-`candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
+`candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
+`candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
 `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
@@ -198,4 +198,4 @@ Nome|Descrizione
 `invalid`|Numero di voti nulli
 `empty`|Numero di voti in bianco
 `eligible_voters`|Numero di aventi diritto di voto
-`expats`|Anzahl Auslandschweizer der Gemeinde.
+`expats`|Numero di espatriati dell'unità

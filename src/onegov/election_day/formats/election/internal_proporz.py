@@ -290,7 +290,7 @@ def import_election_internal_proporz(
         )
 
         # Skip expats if not enabled
-        if result and result['entity_id'] == 0 and not election.expats:
+        if result and result['entity_id'] == 0 and not election.has_expats:
             continue
 
         # Pass the errors and continue to next line
@@ -349,7 +349,7 @@ def import_election_internal_proporz(
 
     # Add the missing entities
     remaining = set(entities.keys())
-    if election.expats:
+    if election.has_expats:
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:

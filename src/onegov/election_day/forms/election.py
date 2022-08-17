@@ -12,17 +12,17 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from re import findall
 from sqlalchemy import or_
-from wtforms import BooleanField
-from wtforms import IntegerField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import ValidationError
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 class ElectionForm(Form):
@@ -97,7 +97,7 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
-    expats = BooleanField(
+    has_expats = BooleanField(
         label=_("Expats"),
         description=_("The election contains seperate results for expats."),
         render_kw=dict(force_simple=True)
@@ -315,7 +315,7 @@ class ElectionForm(Form):
         model.absolute_majority = self.absolute_majority.data or None
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
-        model.expats = self.expats.data
+        model.has_expats = self.has_expats.data
 
         titles = {}
         if self.election_de.data:
@@ -344,8 +344,8 @@ class ElectionForm(Form):
             del model.explanations_pdf
         if action == 'replace' and self.explanations_pdf.data:
             model.explanations_pdf = (
-                self.explanations_pdf.raw_data[-1].file,
-                self.explanations_pdf.raw_data[-1].filename,
+                self.explanations_pdf.file,
+                self.explanations_pdf.filename,
             )
 
         model.colors = self.parse_colors(self.colors.data)
@@ -404,7 +404,7 @@ class ElectionForm(Form):
         self.absolute_majority.data = model.absolute_majority
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit
-        self.expats.data = model.expats
+        self.has_expats.data = model.has_expats
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)

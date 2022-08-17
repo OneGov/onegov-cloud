@@ -1,15 +1,13 @@
 import sedate
 
-from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
-
-from wtforms import StringField, IntegerField, BooleanField
-from wtforms.validators import InputRequired
-
-from onegov.fsi import _
 from onegov.form import Form
+from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
+from onegov.fsi import _
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.models.course_event import course_status_choices, CourseEvent
+from wtforms.fields import StringField, IntegerField, BooleanField
+from wtforms.validators import InputRequired
 
 
 class CourseEventForm(Form):

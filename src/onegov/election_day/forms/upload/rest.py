@@ -5,8 +5,8 @@ from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
-from wtforms import RadioField
-from wtforms import StringField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 

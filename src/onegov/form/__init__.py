@@ -32,7 +32,7 @@ from onegov.form.parser import flatten_fieldsets
 from onegov.form.parser import parse_form
 from onegov.form.parser import parse_formcode
 from onegov.form.parser import WTFormsClassBuilder
-from onegov.form.utils import decimal_range, as_internal_id, with_options
+from onegov.form.utils import decimal_range, as_internal_id
 
 __all__ = [
     'as_internal_id',
@@ -58,6 +58,5 @@ __all__ = [
     'parse_formcode',
     'PendingFormSubmission',
     'render_field',
-    'with_options',
     'WTFormsClassBuilder',
 ]

@@ -84,7 +84,7 @@ def test_view_rest_validation(election_day_app_zg):
 
     # Invalid type
     result = client.post('/upload', status=400, params=(('type', 'xyz'),)).json
-    assert result['errors']['type'] == [{'message': 'Not a valid choice'}]
+    assert result['errors']['type'] == [{'message': 'Not a valid choice.'}]
 
     # No vote
     params = (

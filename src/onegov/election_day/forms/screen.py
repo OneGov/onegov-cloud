@@ -11,14 +11,14 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import CssField
 from onegov.form.fields import PanelField
 from onegov.form.validators import UniqueColumnValue
-from wtforms import IntegerField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import ValidationError
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 class ScreenForm(Form):

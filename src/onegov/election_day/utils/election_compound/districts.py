@@ -1,7 +1,7 @@
 from onegov.core.utils import groupbylist
 
 
-def get_districts_data(compound, principal):
+def get_districts_data(compound, principal, request=None):
     """ Returns the data used by elections compounds for rendering entities and
     districts maps. """
 
@@ -27,13 +27,17 @@ def get_districts_data(compound, principal):
         }
     if not lookup:
         return {}
-
     return {
         lookup[election.domain_segment]['id']: {
             'entities': lookup[election.domain_segment]['entities'],
             'votes': 0,
             'percentage': 100.0,
-            'counted': election.counted
+            'counted': election.counted,
+            'link': request.link(election) if request else '',
+            'progress': '{} / {}'.format(*election.progress),
+            'mandates': '{} / {}'.format(
+                election.allocated_mandates, election.number_of_mandates
+            )
         }
         for election in compound.elections
         if election.domain_segment in lookup
