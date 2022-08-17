@@ -2,13 +2,11 @@ import copy
 import re
 import transaction
 
-from datetime import datetime
 from io import BytesIO
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
 from onegov.user import UserCollection
 from openpyxl import load_workbook
 from pdftotext import PDF
@@ -17,7 +15,6 @@ from tests.onegov.translator_directory.shared import translator_data, \
 from tests.shared.utils import decode_map_value, encode_map_value
 from unittest import mock
 from webtest import Upload
-from xlsxwriter import Workbook
 
 
 class FakeResponse:
@@ -197,7 +194,6 @@ def test_view_translator(client):
     client.login_editor()
     page = client.get(translator_url)
     assert '978654' in page
-    assert 'Abrechnungsvorlage' in page
     page = page.click('Bearbeiten')
     page.form['pers_id'] = 123456
     page = page.form.submit().follow()
@@ -519,22 +515,52 @@ def test_file_security(client):
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 
-    forbidden = 403
-
+    # Add a general and a translator file
     client.login_admin()
-    page = client.get(f'/translator/{trs_id}')
-    assert 'Dokumente' in page
+    page = client.get('/files')
+    page.form['file'] = upload_pdf('g.pdf')
+    page = page.form.submit()
+    general_file = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    general_file = general_file.replace('/details', '')
+    assert 'g.pdf' in client.get(general_file).headers['Content-Disposition']
 
+    page = client.get(f'/translator/{trs_id}').click('Dokumente')
+    page.form['file'] = upload_pdf('t.pdf')
+    page = page.form.submit()
+    trs_file = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    trs_file = trs_file.replace('/details', '')
+    assert 't.pdf' in client.get(trs_file).headers['Content-Disposition']
+    client.logout()
+
+    # Editors can't manage and can see general files but not translator files
     client.login_editor()
     page = client.get(f'/translator/{trs_id}')
     assert 'Dokumente' not in page
-    client.get(f'/documents/{trs_id}', status=forbidden)
-    client.get('/files', status=forbidden)
+    client.get('/files', status=403)
+    assert 'g.pdf' in client.get(general_file).headers['Content-Disposition']
+    client.get(f'/documents/{trs_id}', status=403)
+    client.get(trs_file, status=403)
+    client.logout()
+
+    # Members can't manage and can see general files but not translator files
+    client.login_member()
+    page = client.get(f'/translator/{trs_id}')
+    assert 'Dokumente' not in page
+    client.get('/files', status=403)
+    assert 'g.pdf' in client.get(general_file).headers['Content-Disposition']
+    client.get(f'/documents/{trs_id}', status=403)
+    client.get(trs_file, status=403)
+    client.logout()
+
+    # Anonymous can't do anything
+    client.get('/files', status=403)
+    client.get(general_file, status=403)
+    client.get(f'/documents/{trs_id}', status=403)
+    client.get(trs_file, status=403)
 
 
 def test_translator_directory_settings(client):
     client.login_admin()
-    client.get('/voucher-template', status=404)
     settings = client.get('/').follow().click('Verzeichniseinstellungen')
 
     def map_value(page):
@@ -549,26 +575,10 @@ def test_translator_directory_settings(client):
         'lat': 46, 'lon': 7, 'zoom': 12
     })
 
-    file = BytesIO()
-    wb = Workbook(file)
-    wb.add_worksheet()
-    wb.close()
-    file.seek(0)
-
-    settings.form['voucher_excel'] = Upload(
-        'example.xlsx', file.read(), tuple(ALLOWED_MIME_TYPES)[0])
-
     page = settings.form.submit().follow()
     assert 'Ihre Änderungen wurden gespeichert' in page
     settings = client.get('/directory-settings')
     assert map_value(settings) == Coordinates(lat=46, lon=7, zoom=12)
-    year = datetime.now().year
-    filename = f'abrechnungsvorlage_{year}.xlsx'
-    assert filename in settings
-
-    # Get the file
-    file_page = client.get('/voucher')
-    assert filename in file_page.content_disposition
 
 
 def test_view_redirects(client):
