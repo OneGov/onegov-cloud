@@ -306,6 +306,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     agency_references = StringField(
         label=_('Authorities and courts'),
+        description=('z.B. ZG oder Bund'),
         fieldset=_('References'),
     )
 
@@ -468,6 +469,21 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             DataRequired(),
         ],
         render_kw={'resend_upload': True},
+        fieldset=_('Documents')
+    )
+
+    confirmation_compensation_office = UploadField(
+        label=_(
+            'Confirmation from the compensation office regarding '
+            'self-employment'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            DataRequired(),
+        ],
+        render_kw={'resend_upload': True},
+        depends_on=('self_employed', 'y'),
         fieldset=_('Documents')
     )
 
@@ -646,7 +662,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                     )
                 )
 
-        return [
+        result = [
             as_file(self.declaration_of_authorization, 'Antrag'),
             as_file(self.letter_of_motivation, 'Antrag'),
             as_file(self.resume, 'Antrag'),
@@ -657,7 +673,9 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             as_file(self.debt_collection_register_extract, 'Abklärungen'),
             as_file(self.criminal_register_extract, 'Abklärungen'),
             as_file(self.certificate_of_capability, 'Abklärungen'),
+            as_file(self.confirmation_compensation_office, 'Abklärungen'),
         ]
+        return [r for r in result if r is not None]
 
     def get_ticket_data(self):
         data = self.get_useful_data()
