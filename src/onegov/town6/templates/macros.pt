@@ -1314,7 +1314,7 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div class="homepage-video" style="max-height: ${max_height};">
+    <div tal:condition="link_mp4 or link_webm" class="homepage-video" style="max-height: ${max_height};">
         <video autoplay loop muted>
             <source tal:condition="link_mp4" src="${link_mp4}" type="video/mp4">
             <source tal:condition="link_webm" src="${link_webm}" type="video/webm">
