@@ -1314,9 +1314,10 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div class="homepage-video">
+    <div class="homepage-video" style="max-height: ${max_height};">
         <video autoplay loop muted>
-            <source src="${layout.org.homepage_video}" type="video/mp4">
+            <source tal:condition="link_mp4" src="${link_mp4}" type="video/mp4">
+            <source tal:condition="link_webm" src="${link_webm}" type="video/webm">
             Your browser does not support the video tag.
         </video> 
     </div>
