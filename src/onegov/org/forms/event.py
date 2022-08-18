@@ -112,7 +112,7 @@ class EventForm(Form):
                 'image/jpeg',
                 'image/png'
             }),
-            FileSizeLimit(1 * 1024 * 1024)
+            FileSizeLimit(5 * 1024 * 1024)
         ]
     )
 
@@ -124,7 +124,7 @@ class EventForm(Form):
             WhitelistedMimeType({
                 'application/pdf',
             }),
-            FileSizeLimit(1 * 1024 * 1024)
+            FileSizeLimit(5 * 1024 * 1024)
         ]
     )
 
