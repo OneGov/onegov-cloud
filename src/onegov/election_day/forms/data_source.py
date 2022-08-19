@@ -3,8 +3,8 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
-from wtforms import RadioField
-from wtforms import StringField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

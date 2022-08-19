@@ -215,6 +215,7 @@ def test_election_compound(session):
     assert election_compound.progress == (0, 0)
     assert election_compound.counted_entities == []
     assert election_compound.has_results is False
+    assert election_compound.results == []
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
@@ -256,6 +257,38 @@ def test_election_compound(session):
     assert election_compound.counted_entities == []
     assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == False
+    assert [r.__dict__ for r in election_compound.results] == [
+        {
+            'accounted_ballots': 0,
+            'accounted_votes': 0,
+            'blank_ballots': 0,
+            'counted': False,
+            'counted_eligible_voters': 0,
+            'counted_received_ballots': 0,
+            'domain_segment': 'First district',
+            'domain_supersegment': '',
+            'eligible_voters': 0,
+            'expats': 0,
+            'invalid_ballots': 0,
+            'received_ballots': 0,
+            'turnout': 0
+        },
+        {
+            'accounted_ballots': 0,
+            'accounted_votes': 0,
+            'blank_ballots': 0,
+            'counted': False,
+            'counted_eligible_voters': 0,
+            'counted_received_ballots': 0,
+            'domain_segment': 'Second district',
+            'domain_supersegment': '',
+            'eligible_voters': 0,
+            'expats': 0,
+            'invalid_ballots': 0,
+            'received_ballots': 0,
+            'turnout': 0
+        }
+    ]
     assert election_compound.completed == False
     assert election_compound.elected_candidates == []
 
@@ -268,6 +301,7 @@ def test_election_compound(session):
                 entity_id=1,
                 counted=False,
                 eligible_voters=200,
+                expats=20,
                 received_ballots=150,
                 blank_ballots=6,
                 invalid_ballots=15,
@@ -281,6 +315,7 @@ def test_election_compound(session):
                 entity_id=2,
                 counted=False,
                 eligible_voters=200,
+                expats=20,
                 received_ballots=150,
                 blank_ballots=6,
                 invalid_ballots=15,
@@ -302,6 +337,38 @@ def test_election_compound(session):
     assert election_compound.counted_entities == []
     assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == False
+    assert [r.__dict__ for r in election_compound.results] == [
+        {
+            'accounted_ballots': 258,
+            'accounted_votes': 216,
+            'blank_ballots': 12,
+            'counted': False,
+            'counted_eligible_voters': 0,
+            'counted_received_ballots': 0,
+            'domain_segment': 'First district',
+            'domain_supersegment': '',
+            'eligible_voters': 400,
+            'expats': 40,
+            'invalid_ballots': 30,
+            'received_ballots': 300,
+            'turnout': 0
+        },
+        {
+            'accounted_ballots': 258,
+            'accounted_votes': 474,
+            'blank_ballots': 12,
+            'counted': False,
+            'counted_eligible_voters': 0,
+            'counted_received_ballots': 0,
+            'domain_segment': 'Second district',
+            'domain_supersegment': '',
+            'eligible_voters': 400,
+            'expats': 40,
+            'invalid_ballots': 30,
+            'received_ballots': 300,
+            'turnout': 0
+        }
+    ]
     assert election_compound.completed == False
 
     # Set results as counted
@@ -311,6 +378,39 @@ def test_election_compound(session):
     assert election_compound.counted_entities == []
     assert election_compound.allocated_mandates == 0
     assert election_compound.has_results == True
+    assert [r.__dict__ for r in election_compound.results] == [
+        {
+            'accounted_ballots': 258,
+            'accounted_votes': 216,
+            'blank_ballots': 12,
+            'counted': False,
+            'counted_eligible_voters': 200,
+            'counted_received_ballots': 150,
+            'domain_segment': 'First district',
+            'domain_supersegment': '',
+            'eligible_voters': 400,
+            'expats': 40,
+            'invalid_ballots': 30,
+            'received_ballots': 300,
+            'turnout': 75.0
+        },
+        {
+            'accounted_ballots': 258,
+            'accounted_votes': 474,
+            'blank_ballots': 12,
+            'counted': False,
+            'counted_eligible_voters': 0,
+            'counted_received_ballots': 0,
+            'domain_segment': 'Second district',
+            'domain_supersegment': '',
+            'eligible_voters': 400,
+            'expats': 40,
+            'invalid_ballots': 30,
+            'received_ballots': 300,
+            'turnout': 0
+        }
+    ]
+
     assert election_compound.completed == False
 
     for result in session.query(ElectionResult):
@@ -1105,7 +1205,10 @@ def test_election_compound_supersegment_progress(session):
     assert election_compound.progress == (1, 3)
 
 
-def test_election_compound_attachments(test_app, explanations_pdf):
+def test_election_compound_attachments(
+    test_app, explanations_pdf, upper_apportionment_pdf,
+    lower_apportionment_pdf
+):
     model = ElectionCompound(
         title='Legislative Elections',
         domain='canton',
@@ -1113,10 +1216,35 @@ def test_election_compound_attachments(test_app, explanations_pdf):
     )
 
     assert model.explanations_pdf is None
+    assert model.upper_apportionment_pdf is None
+    assert model.lower_apportionment_pdf is None
+
     del model.explanations_pdf
-    model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
-    assert model.explanations_pdf.name == 'explanations_pdf'
-    assert model.explanations_pdf.reference.filename == 'explanations.pdf'
-    assert model.explanations_pdf.reference.content_type == 'application/pdf'
+    del model.upper_apportionment_pdf
+    del model.lower_apportionment_pdf
+
+    model.explanations_pdf = (explanations_pdf, 'e.pdf')
+    file = model.explanations_pdf
+    assert file.name == 'explanations_pdf'
+    assert file.reference.filename == 'e.pdf'
+    assert file.reference.content_type == 'application/pdf'
+
+    model.upper_apportionment_pdf = (upper_apportionment_pdf, 'u.pdf')
+    file = model.upper_apportionment_pdf
+    assert file.name == 'upper_apportionment_pdf'
+    assert file.reference.filename == 'u.pdf'
+    assert file.reference.content_type == 'application/pdf'
+
+    model.lower_apportionment_pdf = (lower_apportionment_pdf, 'l.pdf')
+    file = model.lower_apportionment_pdf
+    assert file.name == 'lower_apportionment_pdf'
+    assert file.reference.filename == 'l.pdf'
+    assert file.reference.content_type == 'application/pdf'
+
     del model.explanations_pdf
+    del model.upper_apportionment_pdf
+    del model.lower_apportionment_pdf
+
     assert model.explanations_pdf is None
+    assert model.upper_apportionment_pdf is None
+    assert model.lower_apportionment_pdf is None

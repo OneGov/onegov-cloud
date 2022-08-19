@@ -24,6 +24,7 @@ $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
 $new-daypass-icon: '\f3ff';
 $new-daily-item-icon: '\f518';
+$new-resource-link-icon: '\f0c1';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f07b';
 $new-recipient: '\f1fa';
@@ -278,6 +279,71 @@ $transition-duration: .1s;
     }
 }
 
+#offCanvas .side-navigation {
+    margin-top: 3rem;
+}
+
+.header-searchbox {
+    input {
+        border-bottom: 1px solid #ddd;
+        border-left: 0;
+        border-right: 0;
+        border-top: 0;
+        box-shadow: none;
+    }
+
+    .search-button {
+        background: transparent !important;
+        padding: 0 .5rem;
+    }
+
+    .typeahead {
+        position: absolute;
+        top: 50%;
+    }
+
+    .input-group-field:not(:focus) + .typeahead {
+        display: none;
+    }
+}
+
+.search-header-mobile {
+    i {
+        margin-right: 0 !important;
+    }
+
+    .is-active > .accordion-title::before {
+        content: "";
+    }
+
+    .accordion-title {
+        border: 0 !important;
+        font-size: inherit;
+        padding: 0;
+
+        &::before {
+            content: "";
+        }
+
+        &:hover,
+        &:focus {
+            background: transparent;
+        }
+    }
+
+    .accordion-content {
+        left: 0;
+        position: absolute;
+        top: 100%;
+        width: 100%;
+        z-index: 1;
+    }
+}
+
+body#page-search .search-header-mobile .accordion-title {
+    display: none !important;
+}
+
 
 $editbar-bg-color: $black;
 $editbar-bg-color-active: lighten($black, 15%);
@@ -381,6 +447,7 @@ $editbar-fg-color-active: $white;
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
+    .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
     .qr-code-link::before { @include icon-bold($qr-code-icon); }
 }

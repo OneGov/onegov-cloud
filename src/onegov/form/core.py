@@ -3,20 +3,20 @@ import weakref
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
-
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
+from onegov.form.display import render_field
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
 from onegov.form.validators import StrictOptional
 from onegov.pay import Price
-from onegov.form.display import render_field
 from operator import itemgetter
 from wtforms import Form as BaseForm
-from wtforms import StringField, TextAreaField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, DataRequired
 from wtforms_components import If, Chain
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired, DataRequired
 
 
 class Form(BaseForm):

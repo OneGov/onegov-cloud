@@ -38,7 +38,7 @@ def view_election_compound_by_district(self, request):
 
     """" View the districts/regions/municipalities as JSON for the map. """
 
-    return get_districts_data(self, request.app.principal)
+    return get_districts_data(self, request.app.principal, request)
 
 
 @ElectionDayApp.html(

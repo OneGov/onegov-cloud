@@ -888,6 +888,62 @@ def test_reserve_no_definition_pick_up_hint(client):
     assert len(os.listdir(client.app.maildir)) == 1
 
 
+@freeze_time("2022-10-30", tick=True)
+def test_reserve_allocation_dst_to_st_transition(client):
+
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2022, 10, 30, 0), datetime(2022, 10, 30, 10)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('02:00', '03:00').json == {'success': True}
+
+    # see if the reservation was created correctly
+    url = '/resource/tageskarte/reservations?start=2022-10-30&end=2022-10-30'
+    reservations = client.get(url).json
+
+    assert len(reservations['reservations']) == 1
+    reservation = reservations['reservations'][0]
+    assert reservation['time'] == '02:00 - 03:00'
+    # for this ambiguous time we should get ST and not DST
+    assert reservation['date'] == '2022-10-30T02:00:00+01:00'
+
+
+@freeze_time("2022-03-27", tick=True)
+def test_reserve_allocation_st_to_dst_transition(client):
+
+    # prepate the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2022, 3, 27, 0), datetime(2022, 3, 27, 10)),
+        whole_day=False,
+        partly_available=True
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve('02:00', '03:00').json == {
+        'message': "Die ausgewählte Zeit existiert nicht an diesem Datum "
+                   "aufgrund der Sommerzeitumstellung.",
+        'success': False
+    }
+
+
 def test_reserve_in_past(client):
 
     admin = client.spawn()

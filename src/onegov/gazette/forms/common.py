@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.gazette import _
-from wtforms import TextAreaField
+from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 
 

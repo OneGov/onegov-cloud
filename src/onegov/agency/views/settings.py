@@ -7,7 +7,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
-from wtforms import BooleanField, IntegerField, RadioField
+from wtforms.fields import BooleanField, IntegerField, RadioField
 from wtforms.validators import Optional, NumberRange
 
 

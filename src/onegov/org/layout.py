@@ -887,7 +887,7 @@ class FormSubmissionLayout(DefaultLayout):
         )
 
         change_url_link = Link(
-            text=_("Change Url"),
+            text=_("Change URL"),
             url=self.request.link(self.form, name='change-url'),
             attrs={'class': 'internal-url'}
         )
@@ -956,7 +956,8 @@ class FormCollectionLayout(DefaultLayout):
                                 self.external_forms,
                                 query_params={
                                     'title': self.request.translate(
-                                        _("New external form"))
+                                        _("New external form")),
+                                    'type': 'form'
                                 },
                                 name='new'
                             ),
@@ -1294,6 +1295,14 @@ class ResourcesLayout(DefaultLayout):
             Link(_("Reservations"), self.request.link(self.model))
         ]
 
+    @property
+    def external_resources(self):
+        return ExternalLinkCollection(self.request.session)
+
+    @property
+    def resources_url(self):
+        return self.request.class_link(ResourceCollection)
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
@@ -1329,6 +1338,20 @@ class ResourcesLayout(DefaultLayout):
                                 name='new-daily-item'
                             ),
                             attrs={'class': 'new-daily-item'}
+                        ),
+                        Link(
+                            text=_("External resource link"),
+                            url=self.request.link(
+                                self.external_resources,
+                                query_params={
+                                    'to': self.resources_url,
+                                    'title': self.request.translate(
+                                        _("New external resource")),
+                                    'type': 'resource'
+                                },
+                                name='new'
+                            ),
+                            attrs={'class': 'new-resource-link'}
                         )
                     ]
                 ),
@@ -2718,7 +2741,7 @@ class HomepageLayout(DefaultLayout):
     @property
     def editbar_links(self):
         if self.request.is_manager:
-            return[
+            return [
                 Link(
                     _("Edit"),
                     self.request.link(self.model, 'homepage-settings'),

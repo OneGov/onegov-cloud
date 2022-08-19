@@ -30,12 +30,12 @@ def test_pages_cache(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     root_page = client.get(root_url)
     links = edit_bar_links(root_page, 'text')
-    assert 'Url ändern' in links
+    assert 'URL ändern' in links
     assert len(links) == 6
 
     # Test changing the url of the root page organisation
-    assert 'Url ändern' not in editor.get(root_page.request.url)
-    url_page = root_page.click('Url ändern')
+    assert 'URL ändern' not in editor.get(root_page.request.url)
+    url_page = root_page.click('URL ändern')
 
     old_name = url_page.form['name'].value
     new_name = 'my-govikon'
@@ -192,7 +192,7 @@ def test_links(client):
     client.login_admin()
     root_page = client.get(root_url)
 
-    assert 'Url ändern' in edit_bar_links(root_page, 'text')
+    assert 'URL ändern' in edit_bar_links(root_page, 'text')
     new_link = root_page.click("Verknüpfung")
     assert "Neue Verknüpfung" in new_link
 
@@ -209,7 +209,7 @@ def test_links(client):
     internal_link = new_link.form.submit().follow()
 
     # Change the root url
-    change_url = root_page.click('Url ändern')
+    change_url = root_page.click('URL ändern')
     change_url.form['name'] = 'org'
     change_url.form['test'] = True
 

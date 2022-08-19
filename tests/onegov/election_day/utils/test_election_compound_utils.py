@@ -1,6 +1,9 @@
 from datetime import date
 from decimal import Decimal
 from onegov.ballot import ElectionCompound
+from onegov.core.utils import Bunch
+from onegov.election_day.utils.election_compound import \
+    get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_districts_data
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
@@ -28,6 +31,7 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
 
     assert get_districts_data(election_compound, principal) == {}
     assert get_elected_candidates(election_compound, session).all() == []
+    assert get_candidate_statistics(election_compound) == {}
 
     # Add intermediate results
     election_1, errors = import_test_datasets(
@@ -66,45 +70,54 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
             'counted': False,
             'entities': [3231, 3232, 3233, 3234, 3235, 3236, 3238, 3251,
                          3252, 3253, 3254, 3255, 3256],
+            'link': '',
+            'mandates': '0 / 17',
             'percentage': 100.0,
+            'progress': '1 / 13',
             'votes': 0
         },
         'Rorschach': {
             'counted': True,
             'entities': [3211, 3213, 3214, 3215, 3216, 3217, 3218, 3219, 3237],
+            'link': '',
+            'mandates': '0 / 10',
             'percentage': 100.0,
+            'progress': '9 / 9',
             'votes': 0
         }
     }
+    id_1 = election_1.id
+    id_2 = election_2.id
     assert get_elected_candidates(election_compound, session).all() == [
-        ('Bruss-Schmidheiny', 'Carmen', '', 'SVP', '01', election_1.id),
-        ('Eugster', 'Thomas', '', 'SVP', '01', election_1.id),
-        ('Freund', 'Walter', '', 'SVP', '01', election_1.id),
-        ('Götte', 'Michael', '', 'SVP', '01', election_2.id),
-        ('Kuster', 'Peter', '', 'SVP', '01', election_1.id),
-        ('Luterbacher', 'Mäge', '', 'SVP', '01', election_2.id),
-        ('Wasserfallen', 'Sandro', '', 'SVP', '01', election_2.id),
-        ('Willi', 'Christian', '', 'SVP', '01', election_1.id),
-        ('Wüst', 'Markus', '', 'SVP', '01', election_1.id),
-        ('Broger', 'Andreas', '', 'CVP', '02', election_1.id),
-        ('Dürr', 'Patrick', '', 'CVP', '02', election_1.id),
-        ('Hess', 'Sandro', '', 'CVP', '02', election_1.id),
-        ('Schöbi', 'Michael', '', 'CVP', '02', election_1.id),
-        ('Frei', 'Raphael', '', 'FDP', '02a', election_2.id),
-        ('Raths', 'Robert', '', 'FDP', '02a', election_2.id),
-        ('Britschgi', 'Stefan', '', 'FDP', '03', election_1.id),
-        ('Graf', 'Claudia', '', 'FDP', '03', election_1.id),
-        ('Huber', 'Rolf', '', 'FDP', '03', election_1.id),
-        ('Bucher', 'Laura', '', 'SP', '04', election_1.id),
-        ('Gemperli', 'Dominik', '', 'CVP', '04', election_2.id),
-        ('Krempl-Gnädinger', 'Luzia', '', 'CVP', '04', election_2.id),
-        ('Maurer', 'Remo', '', 'SP', '04', election_1.id),
-        ('Etterlin', 'Guido', '', 'SP', '05', election_2.id),
-        ('Gschwend', 'Meinrad', '', 'GRÜ', '05', election_1.id),
-        ('Schöb', 'Andrea', '', 'SP', '05', election_2.id),
-        ('Losa', 'Jeannette', '', 'GRÜ', '06', election_2.id),
-        ('Mattle', 'Ruedi', '', 'GLP', '06', election_1.id)
+        ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', id_1),
+        ('Eugster', 'Thomas', '', None, None, 'SVP', '01', id_1),
+        ('Freund', 'Walter', '', None, None, 'SVP', '01', id_1),
+        ('Götte', 'Michael', '', None, None, 'SVP', '01', id_2),
+        ('Kuster', 'Peter', '', None, None, 'SVP', '01', id_1),
+        ('Luterbacher', 'Mäge', '', None, None, 'SVP', '01', id_2),
+        ('Wasserfallen', 'Sandro', '', None, None, 'SVP', '01', id_2),
+        ('Willi', 'Christian', '', None, None, 'SVP', '01', id_1),
+        ('Wüst', 'Markus', '', None, None, 'SVP', '01', id_1),
+        ('Broger', 'Andreas', '', None, None, 'CVP', '02', id_1),
+        ('Dürr', 'Patrick', '', None, None, 'CVP', '02', id_1),
+        ('Hess', 'Sandro', '', None, None, 'CVP', '02', id_1),
+        ('Schöbi', 'Michael', '', None, None, 'CVP', '02', id_1),
+        ('Frei', 'Raphael', '', None, None, 'FDP', '02a', id_2),
+        ('Raths', 'Robert', '', None, None, 'FDP', '02a', id_2),
+        ('Britschgi', 'Stefan', '', None, None, 'FDP', '03', id_1),
+        ('Graf', 'Claudia', '', None, None, 'FDP', '03', id_1),
+        ('Huber', 'Rolf', '', None, None, 'FDP', '03', id_1),
+        ('Bucher', 'Laura', '', None, None, 'SP', '04', id_1),
+        ('Gemperli', 'Dominik', '', None, None, 'CVP', '04', id_2),
+        ('Krempl-Gnädinger', 'Luzia', '', None, None, 'CVP', '04', id_2),
+        ('Maurer', 'Remo', '', None, None, 'SP', '04', id_1),
+        ('Etterlin', 'Guido', '', None, None, 'SP', '05', id_2),
+        ('Gschwend', 'Meinrad', '', None, None, 'GRÜ', '05', id_1),
+        ('Schöb', 'Andrea', '', None, None, 'SP', '05', id_2),
+        ('Losa', 'Jeannette', '', None, None, 'GRÜ', '06', id_2),
+        ('Mattle', 'Ruedi', '', None, None, 'GLP', '06', id_1)
     ]
+    assert get_candidate_statistics(election_compound) == {}
 
     # Add final results
     election_1, errors = import_test_datasets(
@@ -125,18 +138,25 @@ def test_election_utils_compound(import_test_datasets, election_day_app_sg):
     election_compound.manually_completed = True
     session.flush()
 
-    assert get_districts_data(election_compound, principal) == {
+    request = Bunch(link=lambda x: f'_{x.domain_segment}')
+    assert get_districts_data(election_compound, principal, request) == {
         'Rheintal': {
             'counted': True,
             'entities': [3231, 3232, 3233, 3234, 3235, 3236, 3238, 3251,
                          3252, 3253, 3254, 3255, 3256],
+            'link': '_Rheintal',
+            'mandates': '17 / 17',
             'percentage': 100.0,
+            'progress': '13 / 13',
             'votes': 0
         },
         'Rorschach': {
             'counted': True,
             'entities': [3211, 3213, 3214, 3215, 3216, 3217, 3218, 3219, 3237],
+            'link': '_Rorschach',
+            'mandates': '10 / 10',
             'percentage': 100.0,
+            'progress': '9 / 9',
             'votes': 0
         }
     }
@@ -569,3 +589,49 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 
     data = get_party_results_data(election_compound)
     assert data['results'][0]['value']['back'] == 13.8
+
+
+def test_election_utils_candidate_statistics(
+    import_test_datasets, election_day_app_zg
+):
+    election_compound, errors = import_test_datasets(
+        api_format='internal',
+        model='election_compound',
+        principal='zg',
+        domain='municipality',
+        domain_segment=(
+            'Baar',
+            'Cham',
+            'Hünenberg',
+            'Menzingen',
+            'Neuheim',
+            'Oberägeri',
+            'Risch',
+            'Steinhausen',
+            'Unterägeri',
+            'Walchwil',
+            'Zug',
+        ),
+        number_of_mandates=(
+            15,
+            10,
+            6,
+            3,
+            2,
+            4,
+            7,
+            6,
+            6,
+            2,
+            19,
+        ),
+        date_=date(2022, 10, 2),
+        dataset_name='kantonsratswahl-2022'
+    )
+
+    assert not errors
+    assert get_candidate_statistics(election_compound) == {
+        'total': {'count': 74, 'age': 55},
+        'female': {'count': 23, 'age': 52},
+        'male': {'count': 51, 'age': 56}
+    }

@@ -103,7 +103,7 @@ def handle_form_change_name(form, session, new_name):
 def handle_change_form_name(self, request, form, layout=None):
     """Since the name used for the url is the primary key, we create a new
     FormDefinition to make our live easier """
-    site_title = _('Change Url')
+    site_title = _('Change URL')
     if form.submitted(request):
         new_form = handle_form_change_name(
             self, request.session, form.name.data

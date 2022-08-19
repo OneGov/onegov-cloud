@@ -57,6 +57,7 @@ $arrow-right: '\f061';
     .sort-alphabetically::before { @include icon('\f15d'); }
     .view-hidden::before { @include icon('\f070'); }
     .sort::before { @include icon($sort-icon); }
+    .change-url::before { @include icon('\f0c1'); }
 }
 
 

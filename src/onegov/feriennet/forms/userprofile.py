@@ -4,8 +4,10 @@ from onegov.feriennet import _
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.form.validators import Stdnum
-from wtforms import StringField, TextAreaField, RadioField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
 from wtforms.validators import Optional, URL, ValidationError, InputRequired
 
 

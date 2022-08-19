@@ -67,7 +67,7 @@ Num|Descripziun
 `entity_id`|Numer UST da la vischnanca. La valur `0` po vegnir duvrada per persunas che vivan a l'exteriur.
 `entity_counted`|`True`, sch'il resultat è vegnì eruì.
 `entity_eligible_voters`|Dumber da persunas cun dretg da votar da la vischnanca.
-`entity_expats`|Anzahl Auslandslebende der Einheit. Optional.
+`entity_expats`|Dumber da las persunas da l'unitad che vivan a l'exteriur. Opziunal.
 `entity_received_ballots`|Dumber da cedels da votar consegnads da la vischnanca.
 `entity_blank_ballots`|Dumber da cedels da votar vids da la vischnanca.
 `entity_invalid_ballots`|Dumber da cedels da votar nunvalaivels da la vischnanca.
@@ -84,8 +84,8 @@ Num|Descripziun
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
 `candidate_party`|Il num da la partida.
-`candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
-`candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
+`candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
+`candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
 
 #### Panachage results

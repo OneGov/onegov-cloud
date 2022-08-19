@@ -18,7 +18,7 @@ def test_import_wabstic_majorz(session, import_test_datasets):
         number_of_mandates=6,
         date_=date(2016, 2, 28),
         dataset_name='regierungsratswahlen-2016',
-        expats=True,
+        has_expats=True,
         election_number='9',
         election_district='1'
     )
@@ -276,8 +276,8 @@ def test_import_wabstic_majorz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for expats in (False, True):
-        election.expats = expats
+    for has_expats in (False, True):
+        election.has_expats = has_expats
         for entity_id in ('9170', '0'):
             errors = import_election_wabstic_majorz(
                 election, principal, '0', '0',
@@ -376,7 +376,7 @@ def test_import_wabstic_majorz_expats(session):
             )
             errors = [(e.line, e.error.interpolate()) for e in errors]
             result = election.results.filter_by(entity_id=0).first()
-            if expats:
+            if has_expats:
                 assert errors == []
                 assert result.invalid_votes == 1
             else:

@@ -65,7 +65,7 @@ def view_create_wabsti_proporz(self, request):
         self,
         request,
         data_source,
-        form.wp_wahl.raw_data[0].file,
+        form.wp_wahl.file,
         form.wp_wahl.data['mimetype'],
         create_compound=create_compound,
         pukelsheim=pukelsheim,

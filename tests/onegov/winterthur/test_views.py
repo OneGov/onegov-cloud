@@ -14,7 +14,7 @@ from webtest import Upload
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 1
 
 
 def test_view_addresses(winterthur_app, streets_csv, addresses_csv):

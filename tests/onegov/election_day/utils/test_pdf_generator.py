@@ -65,13 +65,14 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
     election = add_proporz_election(session)
     compound = add_election_compound(session, elections=[election])
     compound.pukelsheim = True
+    compound.show_seat_allocation = True
     compound.show_list_groups = True
     compound.show_party_strengths = True
     compound.show_party_panachage = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_bl.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 5
+            assert len(PdfReader(f, decompress=False).pages) == 8
 
     # with superregions
     compound.domain_elections = 'region'
@@ -79,7 +80,7 @@ def test_generate_pdf_election_compound(session, election_day_app_bl):
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app_bl.filestorage.open('election.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 6
+            assert len(PdfReader(f, decompress=False).pages) == 9
 
 
 def test_generate_pdf_vote(session, election_day_app_zg):
@@ -142,24 +143,6 @@ def test_generate_pdf_vote_districts(session, election_day_app_gr):
             assert len(PdfReader(f, decompress=False).pages) == 15
 
 
-def test_generate_pdf_vote_single(session, election_day_app_zg):
-    generator = PatchedPdfGenerator(election_day_app_zg)
-
-    # Simple vote, only one entity
-    vote = add_vote(session, 'simple')
-    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
-        generator.generate_pdf(vote, 'vote.pdf', locale)
-        with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 1
-
-    # Complex vote, only one entity
-    vote = add_vote(session, 'complex')
-    for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
-        generator.generate_pdf(vote, 'vote.pdf', locale)
-        with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
-            assert len(PdfReader(f, decompress=False).pages) == 3
-
-
 def test_generate_pdf_long_title(session, election_day_app_zg):
     title = """This is a very long title so that it breaks the header line to
     a second line which must also be ellipsed.
@@ -184,7 +167,7 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
     generator = PatchedPdfGenerator(election_day_app_zg)
     generator.generate_pdf(vote, 'vote.pdf', 'de_CH')
     with election_day_app_zg.filestorage.open('vote.pdf', 'rb') as f:
-        assert len(PdfReader(f, decompress=False).pages) == 1
+        assert len(PdfReader(f, decompress=False).pages) == 3
 
 
 def test_sign_pdf(session, election_day_app_zg):

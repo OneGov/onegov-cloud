@@ -12,7 +12,7 @@ EXTRACT_HREF = re.compile(
 
 
 class Client(TestApp):
-    skip_first_form = False
+    skip_n_forms = False
     use_intercooler = False
 
     def spawn(self):
@@ -89,8 +89,12 @@ class Client(TestApp):
         """
         bases = [GenericResponseExtension]
 
-        if self.skip_first_form:
-            bases.append(SkipFirstFormExtension)
+        if self.skip_n_forms:
+            bases.append(type(
+                "SkipNForms",
+                (SkipNFormsExtension, ),
+                dict(n=self.skip_n_forms)
+            ))
 
         if self.use_intercooler:
             bases.append(IntercoolerClickExtension)
@@ -167,16 +171,18 @@ class GenericResponseExtension(object):
         return '\n'.join([l for l in str(self).split('\n') if text in l])
 
 
-class SkipFirstFormExtension(object):
+class SkipNFormsExtension(object):
+    n = 0
 
     @property
     def form(self):
-        """ Ignore the first form, which is the general search form on
-        the top of the page.
+        """ Ignore the first n forms, which are the general search forms on
+        the top of the page. There are two different forms for mobile and
+        desktop in the town6 instances.
 
         """
-        if len(self.forms) > 1:
-            return self.forms[1]
+        if len(self.forms) > self.n:
+            return self.forms[self.n]
         else:
             return super().form
 

@@ -1,8 +1,9 @@
-from chameleon import PageTemplate
 from datetime import date
+from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import ElectionCompound
+from onegov.core.templates import PageTemplate
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionCompoundLayout
@@ -13,6 +14,8 @@ from onegov.election_day.screen_widgets import (
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
+    ElectionCompoundSeatAllocationChartWidget,
+    ElectionCompoundSeatAllocationTableWidget,
     LastResultChangeWidget,
     NumberOfCountedEntitiesWidget,
     ProgressWidget,
@@ -27,35 +30,49 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     structure = """
         <row>
             <column span="1">
-                <title class="my-class-1"/>
+                <title class="class-for-title"/>
             </column>
             <column span="1">
-                <progress class="my-class-2"/>
+                <progress class="class-for-progress"/>
             </column>
             <column span="1">
-                <counted-entities class="my-class-3"/>
+                <counted-entities class="class-for-counted-entities"/>
             </column>
             <column span="1">
-                <election-compound-candidates-table class="my-class-4"/>
+                <election-compound-candidates-table
+                 class="class-for-candidates-table"/>
             </column>
             <column span="1">
-                <election-compound-districts-table class="my-class-5"/>
+                <election-compound-districts-table
+                 class="class-for-districts-table"/>
             </column>
             <column span="1">
-                <election-compound-list-groups-table class="my-class-9"/>
+                <election-compound-list-groups-table
+                 class="class-for-list-groups-table"/>
             </column>
             <column span="1">
-                <election-compound-list-groups-chart class="my-class-a"/>
+                <election-compound-list-groups-chart
+                 class="class-for-list-groups-chart"/>
             </column>
             <column span="1">
-                <number-of-counted-entities class="my-class-b"/>
+                <number-of-counted-entities
+                 class="class-for-number-of-counted-entities"/>
             </column>
             <column span="1">
-                <total-entities class="my-class-c"/>
+                <total-entities class="class-for-total-entities"/>
             </column>
             <column span="1">
-                <last-result-change class="my-class-d"/>
+                <last-result-change class="class-for-last-result-change"/>
             </column>
+            <column span="1">
+                <election-compound-seat-allocation-table
+                 class="class-for-seat-allocation-table"/>
+            </column>
+            <column span="1">
+                <election-compound-seat-allocation-chart
+                 class="class-for-seat-allocation-chart"/>
+            </column>
+
         </row>
     """
     widgets = [
@@ -71,6 +88,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ElectionCompoundDistrictsTableWidget(),
         ElectionCompoundListGroupsChartWidget(),
         ElectionCompoundListGroupsTableWidget(),
+        ElectionCompoundSeatAllocationChartWidget(),
+        ElectionCompoundSeatAllocationTableWidget(),
     ]
 
     # Empty
@@ -98,7 +117,9 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'request': request
+        'parties': {},
+        'request': request,
+        'years': []
     }
 
     result = transform_structure(widgets, structure)
@@ -106,16 +127,18 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     etree.fromstring(result.encode('utf-8'))
 
     assert '>Compound</span>' in result
-    assert 'my-class-1' in result
-    assert 'my-class-2' in result
-    assert 'my-class-3' in result
-    assert 'my-class-4' in result
-    assert 'my-class-5' in result
-    assert 'my-class-9' in result
-    assert 'my-class-a' in result
-    assert 'my-class-b' in result
-    assert 'my-class-c' in result
-    assert 'my-class-d' in result
+    assert 'class-for-title' in result
+    assert 'class-for-progress' in result
+    assert 'class-for-counted-entities' in result
+    assert 'class-for-candidates-table' in result
+    assert 'class-for-districts-table' in result
+    assert 'class-for-list-groups-table' in result
+    assert 'class-for-list-groups-chart' in result
+    assert 'class-for-number-of-counted-entities' in result
+    assert 'class-for-total-entities' in result
+    assert 'class-for-last-result-change' in result
+    assert 'class-for-seat-allocation-table' in result
+    assert 'class-for-seat-allocation-chart' in result
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
@@ -164,33 +187,33 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             e_2: ('Rorschach', f'ProporzElection/{e_2}')
         },
         'elected_candidates': [
-            ('Bruss-Schmidheiny', 'Carmen', '', 'SVP', '01', e_1),
-            ('Eugster', 'Thomas', '', 'SVP', '01', e_1),
-            ('Freund', 'Walter', '', 'SVP', '01', e_1),
-            ('Götte', 'Michael', '', 'SVP', '01', e_2),
-            ('Kuster', 'Peter', '', 'SVP', '01', e_1),
-            ('Luterbacher', 'Mäge', '', 'SVP', '01', e_2),
-            ('Wasserfallen', 'Sandro', '', 'SVP', '01', e_2),
-            ('Willi', 'Christian', '', 'SVP', '01', e_1),
-            ('Wüst', 'Markus', '', 'SVP', '01', e_1),
-            ('Broger', 'Andreas', '', 'CVP', '02', e_1),
-            ('Dürr', 'Patrick', '', 'CVP', '02', e_1),
-            ('Hess', 'Sandro', '', 'CVP', '02', e_1),
-            ('Schöbi', 'Michael', '', 'CVP', '02', e_1),
-            ('Frei', 'Raphael', '', 'FDP', '02a', e_2),
-            ('Raths', 'Robert', '', 'FDP', '02a', e_2),
-            ('Britschgi', 'Stefan', '', 'FDP', '03', e_1),
-            ('Graf', 'Claudia', '', 'FDP', '03', e_1),
-            ('Huber', 'Rolf', '', 'FDP', '03', e_1),
-            ('Bucher', 'Laura', '', 'SP', '04', e_1),
-            ('Gemperli', 'Dominik', '', 'CVP', '04', e_2),
-            ('Krempl-Gnädinger', 'Luzia', '', 'CVP', '04', e_2),
-            ('Maurer', 'Remo', '', 'SP', '04', e_1),
-            ('Etterlin', 'Guido', '', 'SP', '05', e_2),
-            ('Gschwend', 'Meinrad', '', 'GRÜ', '05', e_1),
-            ('Schöb', 'Andrea', '', 'SP', '05', e_2),
-            ('Losa', 'Jeannette', '', 'GRÜ', '06', e_2),
-            ('Mattle', 'Ruedi', '', 'GLP', '06', e_1)
+            ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', e_1),
+            ('Eugster', 'Thomas', '', None, None, 'SVP', '01', e_1),
+            ('Freund', 'Walter', '', None, None, 'SVP', '01', e_1),
+            ('Götte', 'Michael', '', None, None, 'SVP', '01', e_2),
+            ('Kuster', 'Peter', '', None, None, 'SVP', '01', e_1),
+            ('Luterbacher', 'Mäge', '', None, None, 'SVP', '01', e_2),
+            ('Wasserfallen', 'Sandro', '', None, None, 'SVP', '01', e_2),
+            ('Willi', 'Christian', '', None, None, 'SVP', '01', e_1),
+            ('Wüst', 'Markus', '', None, None, 'SVP', '01', e_1),
+            ('Broger', 'Andreas', '', None, None, 'CVP', '02', e_1),
+            ('Dürr', 'Patrick', '', None, None, 'CVP', '02', e_1),
+            ('Hess', 'Sandro', '', None, None, 'CVP', '02', e_1),
+            ('Schöbi', 'Michael', '', None, None, 'CVP', '02', e_1),
+            ('Frei', 'Raphael', '', None, None, 'FDP', '02a', e_2),
+            ('Raths', 'Robert', '', None, None, 'FDP', '02a', e_2),
+            ('Britschgi', 'Stefan', '', None, None, 'FDP', '03', e_1),
+            ('Graf', 'Claudia', '', None, None, 'FDP', '03', e_1),
+            ('Huber', 'Rolf', '', None, None, 'FDP', '03', e_1),
+            ('Bucher', 'Laura', '', None, None, 'SP', '04', e_1),
+            ('Gemperli', 'Dominik', '', None, None, 'CVP', '04', e_2),
+            ('Krempl-Gnädinger', 'Luzia', '', None, None, 'CVP', '04', e_2),
+            ('Maurer', 'Remo', '', None, None, 'SP', '04', e_1),
+            ('Etterlin', 'Guido', '', None, None, 'SP', '05', e_2),
+            ('Gschwend', 'Meinrad', '', None, None, 'GRÜ', '05', e_1),
+            ('Schöb', 'Andrea', '', None, None, 'SP', '05', e_2),
+            ('Losa', 'Jeannette', '', None, None, 'GRÜ', '06', e_2),
+            ('Mattle', 'Ruedi', '', None, None, 'GLP', '06', e_1)
         ],
         'election': model,
         'election_compound': model,
@@ -199,7 +222,9 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'request': request
+        'parties': {},
+        'request': request,
+        'years': []
     }
 
     result = transform_structure(widgets, structure)
@@ -219,16 +244,18 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '0' in result
     assert '2' in result
     assert '01.01.2022' in result
-    assert 'my-class-1' in result
-    assert 'my-class-2' in result
-    assert 'my-class-3' in result
-    assert 'my-class-4' in result
-    assert 'my-class-5' in result
-    assert 'my-class-9' in result
-    assert 'my-class-a' in result
-    assert 'my-class-b' in result
-    assert 'my-class-c' in result
-    assert 'my-class-d' in result
+    assert 'class-for-title' in result
+    assert 'class-for-progress' in result
+    assert 'class-for-counted-entities' in result
+    assert 'class-for-candidates-table' in result
+    assert 'class-for-districts-table' in result
+    assert 'class-for-list-groups-table' in result
+    assert 'class-for-list-groups-chart' in result
+    assert 'class-for-number-of-counted-entities' in result
+    assert 'class-for-total-entities' in result
+    assert 'class-for-last-result-change' in result
+    assert 'class-for-seat-allocation-table' in result
+    assert 'class-for-seat-allocation-chart' in result
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
@@ -278,33 +305,33 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             e_2: ('Rorschach', f'ProporzElection/{e_2}')
         },
         'elected_candidates': [
-            ('Bruss-Schmidheiny', 'Carmen', '', 'SVP', '01', e_1),
-            ('Eugster', 'Thomas', '', 'SVP', '01', e_1),
-            ('Freund', 'Walter', '', 'SVP', '01', e_1),
-            ('Götte', 'Michael', '', 'SVP', '01', e_2),
-            ('Kuster', 'Peter', '', 'SVP', '01', e_1),
-            ('Luterbacher', 'Mäge', '', 'SVP', '01', e_2),
-            ('Wasserfallen', 'Sandro', '', 'SVP', '01', e_2),
-            ('Willi', 'Christian', '', 'SVP', '01', e_1),
-            ('Wüst', 'Markus', '', 'SVP', '01', e_1),
-            ('Broger', 'Andreas', '', 'CVP', '02', e_1),
-            ('Dürr', 'Patrick', '', 'CVP', '02', e_1),
-            ('Hess', 'Sandro', '', 'CVP', '02', e_1),
-            ('Schöbi', 'Michael', '', 'CVP', '02', e_1),
-            ('Frei', 'Raphael', '', 'FDP', '02a', e_2),
-            ('Raths', 'Robert', '', 'FDP', '02a', e_2),
-            ('Britschgi', 'Stefan', '', 'FDP', '03', e_1),
-            ('Graf', 'Claudia', '', 'FDP', '03', e_1),
-            ('Huber', 'Rolf', '', 'FDP', '03', e_1),
-            ('Bucher', 'Laura', '', 'SP', '04', e_1),
-            ('Gemperli', 'Dominik', '', 'CVP', '04', e_2),
-            ('Krempl-Gnädinger', 'Luzia', '', 'CVP', '04', e_2),
-            ('Maurer', 'Remo', '', 'SP', '04', e_1),
-            ('Etterlin', 'Guido', '', 'SP', '05', e_2),
-            ('Gschwend', 'Meinrad', '', 'GRÜ', '05', e_1),
-            ('Schöb', 'Andrea', '', 'SP', '05', e_2),
-            ('Losa', 'Jeannette', '', 'GRÜ', '06', e_2),
-            ('Mattle', 'Ruedi', '', 'GLP', '06', e_1)
+            ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', e_1),
+            ('Eugster', 'Thomas', '', None, None, 'SVP', '01', e_1),
+            ('Freund', 'Walter', '', None, None, 'SVP', '01', e_1),
+            ('Götte', 'Michael', '', None, None, 'SVP', '01', e_2),
+            ('Kuster', 'Peter', '', None, None, 'SVP', '01', e_1),
+            ('Luterbacher', 'Mäge', '', None, None, 'SVP', '01', e_2),
+            ('Wasserfallen', 'Sandro', '', None, None, 'SVP', '01', e_2),
+            ('Willi', 'Christian', '', None, None, 'SVP', '01', e_1),
+            ('Wüst', 'Markus', '', None, None, 'SVP', '01', e_1),
+            ('Broger', 'Andreas', '', None, None, 'CVP', '02', e_1),
+            ('Dürr', 'Patrick', '', None, None, 'CVP', '02', e_1),
+            ('Hess', 'Sandro', '', None, None, 'CVP', '02', e_1),
+            ('Schöbi', 'Michael', '', None, None, 'CVP', '02', e_1),
+            ('Frei', 'Raphael', '', None, None, 'FDP', '02a', e_2),
+            ('Raths', 'Robert', '', None, None, 'FDP', '02a', e_2),
+            ('Britschgi', 'Stefan', '', None, None, 'FDP', '03', e_1),
+            ('Graf', 'Claudia', '', None, None, 'FDP', '03', e_1),
+            ('Huber', 'Rolf', '', None, None, 'FDP', '03', e_1),
+            ('Bucher', 'Laura', '', None, None, 'SP', '04', e_1),
+            ('Gemperli', 'Dominik', '', None, None, 'CVP', '04', e_2),
+            ('Krempl-Gnädinger', 'Luzia', '', None, None, 'CVP', '04', e_2),
+            ('Maurer', 'Remo', '', None, None, 'SP', '04', e_1),
+            ('Etterlin', 'Guido', '', None, None, 'SP', '05', e_2),
+            ('Gschwend', 'Meinrad', '', None, None, 'GRÜ', '05', e_1),
+            ('Schöb', 'Andrea', '', None, None, 'SP', '05', e_2),
+            ('Losa', 'Jeannette', '', None, None, 'GRÜ', '06', e_2),
+            ('Mattle', 'Ruedi', '', None, None, 'GLP', '06', e_1)
         ],
         'election': model,
         'election_compound': model,
@@ -321,7 +348,94 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ],
         'layout': layout,
         'model': model,
-        'request': request
+        'parties': {
+            '0': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 27,
+                    'name': 'CVP',
+                    'voters_count': {
+                        'permille': Decimal('218.60'),
+                        'total': Decimal('3487.00')
+                    },
+                    'votes': {'permille': 219, 'total': 373080}
+                }
+            },
+            '1': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 2,
+                    'name': 'EVP',
+                    'voters_count': {
+                        'permille': Decimal('23.10'),
+                        'total': Decimal('369.00')
+                    },
+                    'votes': {'permille': 23, 'total': 39526}
+                }
+            },
+            '2': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 22,
+                    'name': 'FDP',
+                    'voters_count': {
+                        'permille': Decimal('181.50'),
+                        'total': Decimal('2894.00')
+                    },
+                    'votes': {'permille': 181, 'total': 309635}
+                }
+            },
+            '3': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 6,
+                    'name': 'GLP',
+                    'voters_count': {
+                        'permille': Decimal('73.00'),
+                        'total': Decimal('1165.00')
+                    },
+                    'votes': {'permille': 73, 'total': 124660}
+                }
+            },
+            '4': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 9,
+                    'name': 'GRÜ',
+                    'voters_count': {
+                        'permille': Decimal('89.30'),
+                        'total': Decimal('1424.00')
+                    },
+                    'votes': {'permille': 89, 'total': 152405}
+                }
+            },
+            '5': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 6,
+                    'name': 'SP',
+                    'voters_count': {
+                        'permille': Decimal('155.60'),
+                        'total': Decimal('2481.00')
+                    },
+                    'votes': {'permille': 156, 'total': 265457}
+                }
+            },
+            '6': {
+                '2020': {
+                    'color': '#0571b0',
+                    'mandates': 35,
+                    'name': 'SVP',
+                    'voters_count': {
+                        'permille': Decimal('258.80'),
+                        'total': Decimal('4128.00')
+                    },
+                    'votes': {'permille': 259, 'total': 441744}
+                }
+            }
+        },
+        'request': request,
+        'years': ['2020']
     }
 
     assert '>Compound</span>' in result
@@ -339,13 +453,15 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '2' in result
     assert '2' in result
     assert '02.01.2022' in result
-    assert 'my-class-1' in result
-    assert 'my-class-2' in result
-    assert 'my-class-3' in result
-    assert 'my-class-4' in result
-    assert 'my-class-5' in result
-    assert 'my-class-9' in result
-    assert 'my-class-a' in result
-    assert 'my-class-b' in result
-    assert 'my-class-c' in result
-    assert 'my-class-d' in result
+    assert 'class-for-title' in result
+    assert 'class-for-progress' in result
+    assert 'class-for-counted-entities' in result
+    assert 'class-for-candidates-table' in result
+    assert 'class-for-districts-table' in result
+    assert 'class-for-list-groups-table' in result
+    assert 'class-for-list-groups-chart' in result
+    assert 'class-for-number-of-counted-entities' in result
+    assert 'class-for-total-entities' in result
+    assert 'class-for-last-result-change' in result
+    assert 'class-for-seat-allocation-table' in result
+    assert 'class-for-seat-allocation-chart' in result

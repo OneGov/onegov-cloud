@@ -83,7 +83,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     assert form.related_link_label_rm.data == 'RM'
     assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
     assert form.vote_type.data == 'simple'
-    assert form.expats.data is False
+    assert form.has_expats.data is False
 
     fieldsets = [f.label for f in form.fieldsets if f.label]
     assert 'Title of the counter proposal' not in fieldsets
@@ -99,7 +99,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     form.related_link.data = 'http://ur.l'
     form.explanations_pdf.action = 'delete'
     form.vote_type.data = 'complex'
-    form.expats.data = True
+    form.has_expats.data = True
 
     form.update_model(model)
 
@@ -115,7 +115,7 @@ def test_vote_form_model(election_day_app_zg, related_link_labels,
     assert model.related_link == 'http://ur.l'
     assert model.explanations_pdf is None
     assert model.type == 'simple'
-    assert model.expats is True
+    assert model.has_expats is True
 
     form.explanations_pdf.action = 'upload'
 

@@ -1,24 +1,27 @@
 from onegov.form import Form, merge_forms, parse_formcode
-from onegov.form.validators import ValidFormDefinition
 from onegov.form.filters import as_float
+from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentMethodForm
 from onegov.org.forms.reservation import RESERVED_FIELDS
-from wtforms import BooleanField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import validators
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import Optional
 from wtforms.validators import ValidationError
-from wtforms.fields.html5 import DecimalField, IntegerField
 
 
 class ResourceBaseForm(Form):
     """ Defines the form for all resources. """
-    title = StringField(_("Title"), [validators.InputRequired()])
+    title = StringField(_("Title"), [InputRequired()])
 
     lead = TextAreaField(
         label=_("Lead"),
@@ -43,7 +46,7 @@ class ResourceBaseForm(Form):
     definition = TextAreaField(
         label=_("Extra Fields Definition"),
         validators=[
-            validators.Optional(),
+            Optional(),
             ValidFormDefinition(
                 require_email_field=False,
                 reserved_fields=RESERVED_FIELDS
@@ -56,7 +59,7 @@ class ResourceBaseForm(Form):
         label=_("Closing date for the public"),
         fieldset=_("Closing date"),
         default='n',
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         choices=(
             ('n', _(
                 "No closing date")),
@@ -73,8 +76,8 @@ class ResourceBaseForm(Form):
         depends_on=('deadline_unit', 'h'),
         default=1,
         validators=[
-            validators.InputRequired(),
-            validators.NumberRange(min=1)
+            InputRequired(),
+            NumberRange(min=1)
         ]
     )
 
@@ -84,8 +87,8 @@ class ResourceBaseForm(Form):
         depends_on=('deadline_unit', 'd'),
         default=1,
         validators=[
-            validators.InputRequired(),
-            validators.NumberRange(min=1)
+            InputRequired(),
+            NumberRange(min=1)
         ]
     )
 
@@ -99,7 +102,7 @@ class ResourceBaseForm(Form):
         label=_("Zip-code field"),
         fieldset=_("Zip-code limit"),
         depends_on=('zipcode_block_use', 'y'),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'text',
@@ -110,7 +113,7 @@ class ResourceBaseForm(Form):
         label=_("Allowed zip-codes (one per line)"),
         fieldset=_("Zip-code limit"),
         depends_on=('zipcode_block_use', 'y'),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         render_kw={
             'rows': 4
         }
@@ -121,8 +124,8 @@ class ResourceBaseForm(Form):
         fieldset=_("Zip-code limit"),
         depends_on=('zipcode_block_use', 'y'),
         validators=[
-            validators.InputRequired(),
-            validators.NumberRange(min=0)
+            InputRequired(),
+            NumberRange(min=0)
         ],
     )
 
@@ -130,7 +133,7 @@ class ResourceBaseForm(Form):
         label=_("Price"),
         fieldset=_("Payments"),
         default='free',
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         choices=(
             ('free', _("Free of charge")),
             ('per_item', _("Per item")),
@@ -142,7 +145,7 @@ class ResourceBaseForm(Form):
         label=_("Price per item"),
         filters=(as_float, ),
         fieldset=_("Payments"),
-        validators=[validators.Optional()],
+        validators=[Optional()],
         depends_on=('pricing_method', 'per_item')
     )
 
@@ -150,7 +153,7 @@ class ResourceBaseForm(Form):
         label=_("Price per hour"),
         filters=(as_float, ),
         fieldset=_("Payments"),
-        validators=[validators.Optional()],
+        validators=[Optional()],
         depends_on=('pricing_method', 'per_hour')
     )
 
@@ -159,7 +162,7 @@ class ResourceBaseForm(Form):
         default="CHF",
         fieldset=_("Payments"),
         depends_on=('pricing_method', '!free'),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
     )
 
     # only used for rooms, not day-passes
@@ -167,7 +170,7 @@ class ResourceBaseForm(Form):
         label=_("Default view"),
         fieldset=_("View"),
         default='agendaWeek',
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         choices=(
             ('agendaWeek', _("Week view")),
             ('month', _("Month view")),

@@ -9,11 +9,14 @@ from onegov.form.validators import WhitelistedMimeType
 from onegov.winterthur import _
 from onegov.winterthur.models import MissionReportFile
 from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import DecimalField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields.html5 import (
-    DateField, TimeField, DecimalField, IntegerField, URLField)
-from wtforms.fields import RadioField
+from wtforms.fields import TimeField
+from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional

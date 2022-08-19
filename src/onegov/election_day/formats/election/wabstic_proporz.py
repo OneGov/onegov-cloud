@@ -345,7 +345,7 @@ def import_election_wabstic_proporz(
             line_errors.append(e.args[0])
 
         # Skip expats if not enabled
-        if entity_id == 0 and not election.expats:
+        if entity_id == 0 and not election.has_expats:
             continue
 
         # Get and check the district/region
@@ -763,7 +763,7 @@ def import_election_wabstic_proporz(
     # Add the missing entities
     result_inserts = []
     remaining = set(entities.keys())
-    if election.expats:
+    if election.has_expats:
         remaining.add(0)
     remaining -= set(added_results.keys())
     for entity_id in remaining:

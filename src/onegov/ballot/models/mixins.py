@@ -167,25 +167,33 @@ class LastModifiedMixin(TimestampMixin):
         return func.greatest(cls.last_change, cls.last_result_change)
 
 
+class named_file(object):
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        if instance:
+            for file in instance.files:
+                if file.name == self.name:
+                    return file
+
+    def __set__(self, instance, value):
+        if instance:
+            content, filename = value
+            self.__delete__(instance)
+            file = File(id=random_token())
+            file.name = self.name
+            file.reference = as_fileintent(content, filename)
+            instance.files.append(file)
+
+    def __delete__(self, instance):
+        if instance:
+            for file in tuple(instance.files):
+                if file.name == self.name:
+                    instance.files.remove(file)
+
+
 class ExplanationsPdfMixin(AssociatedFiles):
 
-    @property
-    def explanations_pdf(self):
-        for file in self.files:
-            if file.name == 'explanations_pdf':
-                return file
-
-    @explanations_pdf.deleter
-    def explanations_pdf(self):
-        for file in tuple(self.files):
-            if file.name == 'explanations_pdf':
-                self.files.remove(file)
-
-    @explanations_pdf.setter
-    def explanations_pdf(self, value):
-        content, filename = value
-        del self.explanations_pdf
-        file = File(id=random_token())
-        file.name = 'explanations_pdf'
-        file.reference = as_fileintent(content, filename)
-        self.files.append(file)
+    explanations_pdf = named_file()

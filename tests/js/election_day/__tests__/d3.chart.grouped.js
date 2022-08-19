@@ -131,6 +131,26 @@ describe('Grouped bar chart', () => {
     expect(chart.width()).toBe(2000);
   });
 
+  it('renders a svg without back', () => {
+    var document = jsdom.jsdom();
+    var chart = groupedChart({
+      showBack: false,
+      width: 700,
+      data: {
+        "axis_units": {"front": "f", "back": "b"},
+        "maximum": {"front": 100, "back": 100},
+        "groups": ["A", "BB", "CCC", "DDDD", "EEEEE", "FFFFFF", "GGGGGGG"],
+        "labels": ["1000", "2000", "3000"],
+        "results": results
+      }
+    });
+    chart(document.body);
+    // require('fs').writeFile("grouped@nb.svg", document.svg(), function(err, result) {});
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.height()).toBe(400);
+    expect(chart.width()).toBe(700);
+  });
+
   it('renders a svg with more groups and labels as in the data', () => {
     var document = jsdom.jsdom();
     var chart = groupedChart({

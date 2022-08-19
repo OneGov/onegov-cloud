@@ -1,4 +1,5 @@
 import morepath
+import pytz
 import sedate
 import transaction
 
@@ -105,9 +106,19 @@ def reserve_allocation(self, request):
             start = sedate.parse_time(start)
             end = sedate.parse_time(end)
 
-        start, end = sedate.get_date_range(
-            sedate.to_timezone(self.start, self.timezone), start, end
-        )
+        try:
+            start, end = sedate.get_date_range(
+                self.display_start(),
+                start,
+                end,
+                raise_non_existent=True
+            )
+        except pytz.NonExistentTimeError:
+            err = request.translate(_(
+                "The selected time does not exist on this date due to "
+                "the switch from standard time to daylight saving time."
+            ))
+            return respond_with_error(request, err)
     else:
         start, end = self.start, self.end
 

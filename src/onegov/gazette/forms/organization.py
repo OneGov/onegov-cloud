@@ -7,8 +7,8 @@ from onegov.gazette.models import Organization
 from onegov.gazette.validators import UnusedColumnKeyValue
 from sqlalchemy import cast
 from sqlalchemy import String
-from wtforms import BooleanField
-from wtforms import StringField
+from wtforms.fields import BooleanField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

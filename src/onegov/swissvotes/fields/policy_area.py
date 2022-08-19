@@ -2,7 +2,7 @@ from copy import deepcopy
 from json import dumps
 from onegov.swissvotes import _
 from onegov.swissvotes.models import PolicyArea
-from wtforms import SelectMultipleField
+from wtforms.fields import SelectMultipleField
 from wtforms.widgets import Select
 
 

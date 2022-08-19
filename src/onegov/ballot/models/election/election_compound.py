@@ -4,6 +4,7 @@ from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
+from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -11,6 +12,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
+from onegov.core.utils import Bunch
 from onegov.core.utils import groupbylist
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
@@ -230,6 +232,27 @@ class ElectionCompound(
         return False
 
     @property
+    def results(self):
+        return [
+            Bunch(
+                domain_segment=election.domain_segment,
+                domain_supersegment=election.domain_supersegment,
+                counted=election.counted,
+                turnout=election.turnout,
+                eligible_voters=election.eligible_voters,
+                expats=election.expats,
+                counted_eligible_voters=election.counted_eligible_voters,
+                received_ballots=election.received_ballots,
+                counted_received_ballots=election.counted_received_ballots,
+                accounted_ballots=election.accounted_ballots,
+                blank_ballots=election.blank_ballots,
+                invalid_ballots=election.invalid_ballots,
+                accounted_votes=election.accounted_votes,
+            )
+            for election in self.elections
+        ]
+
+    @property
     def completed(self):
         """ Returns True, if all elections are completed. """
 
@@ -259,6 +282,15 @@ class ElectionCompound(
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
     related_link_label = meta_property('related_link_label')
+
+    #: additional file in case of Doppelter Pukelsheim
+    upper_apportionment_pdf = named_file()
+
+    #: additional file in case of Doppelter Pukelsheim
+    lower_apportionment_pdf = named_file()
+
+    #: may be used to enable/disable the visibility of the seat allocation
+    show_seat_allocation = meta_property('show_seat_allocation')
 
     #: may be used to enable/disable the visibility of the list groups
     show_list_groups = meta_property('show_list_groups')

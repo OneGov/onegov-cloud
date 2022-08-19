@@ -1,15 +1,18 @@
 from datetime import timedelta
-
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, ChosenSelectField, \
-    DateTimeLocalField
+from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import DateTimeLocalField
+from onegov.form.fields import MultiCheckboxField
 from onegov.newsletter import Recipient
 from onegov.org import _
 from sedate import replace_timezone, to_timezone, utcnow
-from wtforms import RadioField, StringField, TextAreaField, validators
-from wtforms import ValidationError
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 
 
 class NewsletterForm(Form):
@@ -17,7 +20,7 @@ class NewsletterForm(Form):
     title = StringField(
         label=_("Title"),
         description=_("Used in the overview and the e-mail subject"),
-        validators=[validators.InputRequired()])
+        validators=[InputRequired()])
 
     lead = TextAreaField(
         label=_("Editorial"),
@@ -166,7 +169,7 @@ class NewsletterSendForm(Form):
 
     time = DateTimeLocalField(
         label=_("Time"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         depends_on=('send', 'specify')
     )
 

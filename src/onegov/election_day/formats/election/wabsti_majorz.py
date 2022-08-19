@@ -202,7 +202,7 @@ def import_election_wabsti_majorz(
                     result.candidate_results.append(c_result)
 
             # Skip expats if not enabled
-            if result and result.entity_id == 0 and not election.expats:
+            if result and result.entity_id == 0 and not election.has_expats:
                 continue
 
             # Pass the errors and continue to next line
@@ -268,7 +268,7 @@ def import_election_wabsti_majorz(
 
     # Add the missing entities
     remaining = set(entities.keys())
-    if election.expats:
+    if election.has_expats:
         remaining.add(0)
     remaining -= set(results.keys())
     for entity_id in remaining:

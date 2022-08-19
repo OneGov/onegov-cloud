@@ -2,12 +2,14 @@ import pytest
 import transaction
 
 from datetime import date, timedelta
-from onegov.form import FormCollection, FormExtension, FormSubmission, \
-    FormRegistrationWindow
+from onegov.form import FormCollection
+from onegov.form import FormExtension
+from onegov.form import FormRegistrationWindow
+from onegov.form import FormSubmission
 from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from webob.multidict import MultiDict
-from wtforms import ValidationError
+from wtforms.validators import ValidationError
 
 
 def days(d):

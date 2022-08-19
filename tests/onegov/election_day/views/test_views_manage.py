@@ -241,6 +241,7 @@ def test_view_clear_results(election_day_app_zg):
         '/elections/elections/statistics',
         '/elections/elections/parties-panachage',
         '/elections/elections/party-strengths',
+        '/elections/elections/seat-allocation',
         '/vote/vote/entities'
     )
 

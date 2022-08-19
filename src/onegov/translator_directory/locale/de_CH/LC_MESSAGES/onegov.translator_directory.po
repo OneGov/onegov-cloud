@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-06 14:54+0200\n"
+"POT-Creation-Date: 2022-08-17 07:17+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -271,6 +271,9 @@ msgstr ""
 msgid "Written languages"
 msgstr "Arbeitssprache - Schrift"
 
+msgid "Monitoring languages"
+msgstr "Arbeitssprache - Kommunikationsüberwachung"
+
 msgid "Expertise by professional guild"
 msgstr "Fachkenntnisse nach Berufssparte"
 
@@ -376,6 +379,9 @@ msgstr "Handlungsfähigkeitszeugnis (PDF)"
 
 msgid "Available from the municipal or city administration."
 msgstr "Erhältlich bei der Gemeinde- oder Stadtverwaltung."
+
+msgid "Confirmation from the compensation office regarding self-employment"
+msgstr "Bestätigung der Ausgleichskasse betreffend Selbständigkeit"
 
 msgid "Your data will be treated with strict confidentiality."
 msgstr "Ihre Daten werden streng vertraulich behandelt."
@@ -513,9 +519,6 @@ msgstr "Bewerbung Datum"
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
-msgid "Monitoring languages"
-msgstr "Arbeitssprache - Kommunikationsüberwachung"
-
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
 
@@ -533,12 +536,6 @@ msgstr "Bemerkungen"
 
 msgid "Home Location"
 msgstr "Eigener Standort"
-
-msgid "Voucher template"
-msgstr "Abrechnungsvorlage"
-
-msgid "Templates"
-msgstr "Vorlagen"
 
 msgid "Address"
 msgstr "Anschrift"
@@ -648,11 +645,11 @@ msgstr "Sprache löschen"
 msgid "Accreditation"
 msgstr "Akkreditierung"
 
-msgid "Grant accreditation"
-msgstr "Akkreditierung erteilen"
+msgid "Grant admission"
+msgstr "Zulassung erteilen"
 
-msgid "Refuse accreditation"
-msgstr "Akkreditierung verweigern"
+msgid "Refuse admission"
+msgstr "Zulassung verweigern"
 
 msgid "Mutation"
 msgstr "Mutation"
@@ -729,17 +726,17 @@ msgstr "Koordinaten"
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
-msgid "Accreditation granted."
-msgstr "Akkreditierung erteilt."
+msgid "Admission granted."
+msgstr "Zulassung erteilt."
 
-msgid "Accreditation refused."
-msgstr "Akkreditierung verweigert."
+msgid "Admission refused."
+msgstr "Zulassung verweigert."
 
 msgid "Proposed changes applied"
 msgstr "Vorgeschlagene Änderungen übernommen"
 
-msgid "This translator is in the accreditation process!"
-msgstr "Dieser Übersetzer ist im Akkreditierungsverfahren!"
+msgid "This translator is in the admission process!"
+msgstr "Dieser Übersetzer ist im Zulassungsverfahren!"
 
 msgid "Certificates"
 msgstr "Zertifikate"

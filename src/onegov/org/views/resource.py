@@ -1,6 +1,7 @@
 import icalendar
 import morepath
 import sedate
+import collections
 
 from collections import OrderedDict, namedtuple
 from datetime import datetime, time, timedelta
@@ -24,6 +25,8 @@ from onegov.org.layout import (
 from onegov.org.models.resource import (
     DaypassResource, FindYourSpotCollection, RoomResource, ItemResource
 )
+from onegov.org.models.external_link import ExternalLinkCollection, \
+    ExternalLink
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.ticket import Ticket, TicketCollection
 from operator import attrgetter, itemgetter
@@ -53,6 +56,18 @@ RESOURCE_TYPES = {
 }
 
 
+def combine_grouped(items, external_links, sort=None):
+    for key, values in external_links.items():
+        if key not in items:
+            items[key] = values
+        else:
+            if sort:
+                items[key] = sorted(items[key] + values, key=sort)
+            else:
+                items[key] += values
+    return collections.OrderedDict(sorted(items.items()))
+
+
 def get_daypass_form(self, request):
     return get_resource_form(self, request, 'daypass')
 
@@ -78,36 +93,64 @@ def get_resource_form(self, request, type=None):
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request, layout=None):
-    default_group = request.translate(_("General"))
-    grouped = group_by_column(
+    resources = group_by_column(
         request=request,
         query=self.query(),
-        default_group=default_group,
         group_column=Resource.group,
         sort_column=Resource.title
     )
 
-    def contains_at_least_one_room(resources):
-        for resource in resources:
-            if resource.type == 'room':
-                return True
-        return False
+    ext_resources = group_by_column(
+        request,
+        query=ExternalLinkCollection.for_model(
+            request.session, ResourceCollection
+        ).query(),
+        group_column=ExternalLink.group,
+        sort_column=ExternalLink.order
+    )
 
-    for group, entries in grouped.items():
-        # don't include find-your-spot link for categories with
-        # no rooms
-        if not contains_at_least_one_room(entries):
-            continue
+    def link_func(model):
+        if isinstance(model, ExternalLink):
+            return model.url
+        return request.link(model)
 
-        entries.insert(0, FindYourSpotCollection(
-            request.app.libres_context,
-            group=None if group == default_group else group
-        ))
+    def edit_link(model):
+        if isinstance(model, ExternalLink) and request.is_manager:
+            title = request.translate(_("Edit resource"))
+            to = request.class_link(ResourceCollection)
+            return request.link(
+                model,
+                query_params={'title': title, 'to': to},
+                name='edit'
+            )
+
+    def external_link(model):
+        if isinstance(model, ExternalLink):
+            title = request.translate(_("Edit resource"))
+            to = request.class_link(ResourceCollection)
+            return request.link(
+                model,
+                query_params={'title': title, 'to': to},
+                name='edit'
+            )
+
+    def lead_func(model):
+        lead = model.meta.get('lead')
+        if not lead:
+            lead = ''
+        lead = layout.linkify(lead)
+        return lead
 
     return {
         'title': _("Reservations"),
-        'resources': grouped,
-        'layout': layout or ResourcesLayout(self, request)
+        'resources': combine_grouped(
+            resources, ext_resources, sort=lambda x: x.title
+        ),
+        'layout': layout or ResourcesLayout(self, request),
+        'link_func': link_func,
+        'edit_link': edit_link,
+        'external_link': external_link,
+        'lead_func': lead_func,
     }
 
 
@@ -166,6 +209,7 @@ def view_find_your_spot(self, request, form, layout=None):
                     start_time,
                     end_time
                 )
+
                 if not allocation.partly_available:
                     quota_left = allocation.quota_left
                     slots.append(utils.FindYourSpotEventInfo(
@@ -176,11 +220,17 @@ def view_find_your_spot(self, request, form, layout=None):
                         request
                     ))
                     continue
+                elif target_start >= target_end:
+                    # this can happen for non-existent times, we
+                    # just treat it as not available in this case
+                    continue
 
                 free = allocation.free_slots(target_start, target_end)
                 if not free:
                     continue
 
+                # FIXME: The availability calculation should probably be
+                #        normalized when a daylight savings shift occurs
                 target_range = (target_end - target_start)
                 slot_start, slot_end = free[0]
                 slot_end += time.resolution

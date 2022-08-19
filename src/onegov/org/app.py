@@ -1,6 +1,7 @@
 """ Contains the base application used by other applications. """
 
-from chameleon import PageTemplate
+import yaml
+
 from collections import defaultdict
 from dectate import directive
 from email.headerregistry import Address
@@ -9,6 +10,7 @@ from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
+from onegov.core.templates import PageTemplate
 from onegov.core.widgets import transform_structure
 from onegov.file import DepotApp
 from onegov.form import FormApp
@@ -27,7 +29,6 @@ from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from purl import URL
-import yaml
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -161,8 +162,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     def prepare_email(self, reply_to=None, **kwargs):
         """ Wraps :meth:`onegov.core.framework.Framework.prepare_email`,
-        setting the reply_to address by using the reply address from the
-        organisation settings.
+        setting  the reply_to address by using the reply address from
+        the organisation settings.
 
         """
         category = kwargs.get('category', 'marketing')

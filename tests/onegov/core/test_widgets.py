@@ -4,7 +4,7 @@ from lxml import etree
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import parse_structure
 from onegov.core.widgets import transform_structure
-from wtforms import ValidationError
+from wtforms.validators import ValidationError
 
 
 class TextWidget:

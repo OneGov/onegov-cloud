@@ -346,21 +346,21 @@ def test_person_mutation_form():
     assert form.get_useful_data() == {
         'submitter_email': 'info@hospital-springfield.org',
         'submitter_message': 'There is a typo in the name!',
-        'salutation': '',
+        'salutation': None,
         'academic_title': 'Dr.',
         'first_name': 'nick',
         'last_name': 'Rivera',
-        'function': '',
-        'email': '',
-        'phone': '',
-        'phone_direct': '',
-        'born': '',
-        'profession': '',
-        'political_party': '',
-        'parliamentary_group': '',
-        'website': '',
-        'address': '',
-        'notes': ''
+        'function': None,
+        'email': None,
+        'phone': None,
+        'phone_direct': None,
+        'born': None,
+        'profession': None,
+        'political_party': None,
+        'parliamentary_group': None,
+        'website': None,
+        'address': None,
+        'notes': None
     }
     assert form.validate()
 

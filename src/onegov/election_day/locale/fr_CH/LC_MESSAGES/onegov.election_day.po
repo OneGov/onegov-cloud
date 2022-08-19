@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"POT-Creation-Date: 2022-08-10 16:20+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -93,6 +93,10 @@ msgstr ""
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Pas un alphanumerique: ${col}"
+
+#, python-format
+msgid "Invalid gender: ${value}"
+msgstr "Sexe non valide : ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -403,6 +407,12 @@ msgstr "Achèvement"
 msgid "Completed"
 msgstr "Complété"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Répartition haute (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Répartition basse (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
@@ -426,6 +436,19 @@ msgstr "Nombres de votants exacts"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Affiche le nombre exact de votants au lieu des valeurs arrondies."
 
+msgid "Seat allocation"
+msgstr "Attribution des sièges"
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+"Affiche un onglet avec la comparaison de l'attribution des sièges sous forme "
+"de graphique à barres. Nécessite les résultats des partis."
+
+msgid "Views"
+msgstr "Vues"
+
 msgid "List groups"
 msgstr "Groupes de listes"
 
@@ -436,21 +459,6 @@ msgstr ""
 "Affiche un onglet avec les résultats du groupe de liste. Requiert les "
 "résultats des partis avec le nombre de votants. Uniquement pour Doppelter "
 "Pukelsheim."
-
-msgid "Views"
-msgstr "Vues"
-
-msgid "Lists"
-msgstr "Listes"
-
-msgid ""
-"Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-"Always rounded."
-msgstr ""
-"Affiche un onglet avec les résultats agrégés des listes pour toutes les "
-"élections. Seulement utile si les listes correspondent aux groupes de "
-"listes. Uniquement pour Doppelter Pukelsheim. Toujours arrondis."
 
 msgid "Party strengths"
 msgstr "Force des partis"
@@ -592,6 +600,9 @@ msgstr "Titre de le contre-projet"
 
 msgid "Title of the tie breaker"
 msgstr "Titre de le jeu décisif"
+
+msgid "Lists"
+msgstr "Listes"
 
 msgid "Candidates"
 msgstr "Candidats"
@@ -768,6 +779,9 @@ msgstr "Compté"
 msgid "Updated"
 msgstr "Actualisé"
 
+msgid "No results yet"
+msgstr "Pas de résultats à l'heure actuelle"
+
 msgid "Result"
 msgstr "Résultat"
 
@@ -840,9 +854,6 @@ msgstr ""
 "le nombre de sièges à pourvoir dans la circonscription électorale "
 "correspondante. Le résultat de cette opération est le nombre d'électeurs."
 
-msgid "Voters count"
-msgstr "Nombre de votants"
-
 msgid "The file is invalid."
 msgstr ""
 
@@ -881,6 +892,15 @@ msgstr "Mot de passe oublié?"
 
 msgid "Reset password"
 msgstr "Réinitialiser mot de passe"
+
+msgid "female"
+msgstr "femelle"
+
+msgid "male"
+msgstr "homme"
+
+msgid "undetermined"
+msgstr "indéterminé"
 
 msgid "Actions"
 msgstr "Actions"
@@ -958,6 +978,9 @@ msgstr "Connexion de sous-listes"
 msgid "Subtotal"
 msgstr "Sous-total"
 
+msgid "Party"
+msgstr "Parti"
+
 msgid "eligible Voters"
 msgstr "Electeurs"
 
@@ -982,9 +1005,6 @@ msgstr "Participation électorale"
 msgid "Candidate"
 msgstr "Candidat"
 
-msgid "Party"
-msgstr "Parti"
-
 msgid "List"
 msgstr "Liste"
 
@@ -1005,6 +1025,9 @@ msgstr "Candidats élus seulement"
 
 msgid "List group"
 msgstr "Groupe de listes"
+
+msgid "Voters count"
+msgstr "Nombre de votants"
 
 msgid "Embed diagram"
 msgstr "Intégrer un diagramme"
@@ -1029,9 +1052,6 @@ msgstr "Page suivante"
 
 msgid "You are here"
 msgstr "Vous êtes ici"
-
-msgid "No results yet"
-msgstr "Pas de résultats à l'heure actuelle"
 
 msgid "Alerts"
 msgstr "Alertes"
@@ -1100,6 +1120,9 @@ msgstr "Résultats des candidats"
 msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
 "Les données brutes des candidats sont disponibles dans les formats suivants :"
+
+msgid "The raw data are available in the following formats:"
+msgstr "Les données brutes sont disponibles dans les formats suivants :"
 
 msgid "The raw data of the parties are available in the following formats:"
 msgstr ""
@@ -1170,6 +1193,12 @@ msgstr ""
 "aux votes inchangés (y compris la liste vierge), les barres du côté droit "
 "aux résultats finale. La largeur des barres et des connexions est "
 "proportionnelle aux votes."
+
+msgid "Count"
+msgstr "Compter"
+
+msgid "Average age"
+msgstr "Âge moyen"
 
 msgid "View all details online"
 msgstr "Voir tous les détails en ligne"

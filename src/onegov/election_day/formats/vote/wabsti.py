@@ -87,7 +87,7 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
                 added_entity_ids.add(entity_id)
 
         # Skip expats if not enabled
-        if entity_id == 0 and not vote.expats:
+        if entity_id == 0 and not vote.has_expats:
             continue
 
         # the yeas
@@ -176,7 +176,7 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
 
     for ballot_type in used_ballot_types:
         remaining = set(entities.keys())
-        if vote.expats:
+        if vote.has_expats:
             remaining.add(0)
         remaining -= added_entity_ids
         for entity_id in remaining:

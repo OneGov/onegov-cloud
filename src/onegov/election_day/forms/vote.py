@@ -4,11 +4,11 @@ from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
-from wtforms import BooleanField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 
 
@@ -33,7 +33,7 @@ class VoteForm(Form):
         ]
     )
 
-    expats = BooleanField(
+    has_expats = BooleanField(
         label=_("Expats"),
         render_kw=dict(force_simple=True)
     )
@@ -178,7 +178,7 @@ class VoteForm(Form):
     def update_model(self, model):
         model.date = self.date.data
         model.domain = self.domain.data
-        model.expats = self.expats.data
+        model.has_expats = self.has_expats.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
 
@@ -209,8 +209,8 @@ class VoteForm(Form):
             del model.explanations_pdf
         if action == 'replace' and self.explanations_pdf.data:
             model.explanations_pdf = (
-                self.explanations_pdf.raw_data[-1].file,
-                self.explanations_pdf.raw_data[-1].filename,
+                self.explanations_pdf.file,
+                self.explanations_pdf.filename,
             )
 
         if model.type == 'complex':
@@ -251,7 +251,7 @@ class VoteForm(Form):
 
         self.date.data = model.date
         self.domain.data = model.domain
-        self.expats.data = model.expats
+        self.has_expats.data = model.has_expats
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
 
