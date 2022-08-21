@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-08-03 15:49+0200\n"
+"POT-Creation-Date: 2022-08-21 08:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -890,6 +890,9 @@ msgstr ""
 "Per abilitare i pagamenti con carta di credito è necessario impostare un "
 "provider di pagamento predefinito"
 
+msgid "Test run"
+msgstr "Esecuzione di prova"
+
 msgid "Describes what this photo album is about"
 msgstr "Descrive il contenuto di questo album fotografico"
 
@@ -950,9 +953,6 @@ msgstr "Mostra l'estratto se accedi alla pagina principale"
 
 msgid "(Redesign only)"
 msgstr "(Solo riprogettazione)"
-
-msgid "Test run"
-msgstr "Esecuzione di prova"
 
 msgid "Salutation"
 msgstr "Formula di saluto"
@@ -3476,10 +3476,10 @@ msgid ""
 "may return to the invidual request's page at any time. All information on "
 "this page has been sent to your e-mail address."
 msgstr ""
-"Sono state inviate le seguenti richieste. Per vedere lo stato dell'iter puoi"
-" tornare in qualsiasi momento alla pagina della singola richiesta. Tutte le "
-"informazioni presenti in questa pagina sono state inviate al tuo indirizzo "
-"e-mail."
+"Sono state inviate le seguenti richieste. Per vedere lo stato dell'iter puoi "
+"tornare in qualsiasi momento alla pagina della singola richiesta. Tutte le "
+"informazioni presenti in questa pagina sono state inviate al tuo indirizzo e-"
+"mail."
 
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"

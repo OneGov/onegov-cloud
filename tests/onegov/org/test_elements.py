@@ -20,7 +20,7 @@ def test_link(render_element):
         access='private'
     )))
 
-    assert result.pyquery('i').attr('title') == "Diese Seite ist Privat"
+    assert result.pyquery('i').attr('title') == "Diese Seite ist privat"
     assert result.pyquery('i').attr('class') == 'private-hint'
 
 

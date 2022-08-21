@@ -736,13 +736,13 @@ msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
 msgid "This site is private"
-msgstr "Diese Seite ist Privat"
+msgstr "Diese Seite ist privat"
 
 msgid "This site is private but can also be seen by members"
 msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
 
 msgid "This site is secret"
-msgstr "Diese Seite ist Geheim"
+msgstr "Diese Seite ist geheim"
 
 msgid "This site is not published."
 msgstr "Diese Seite ist nicht veröffentlicht."

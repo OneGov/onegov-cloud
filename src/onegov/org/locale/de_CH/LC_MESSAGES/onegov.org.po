@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-08-03 15:49+0200\n"
+"POT-Creation-Date: 2022-08-21 08:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -124,10 +124,10 @@ msgid "Ticket"
 msgstr "Ticket"
 
 msgid "This site is private"
-msgstr "Diese Seite ist Privat"
+msgstr "Diese Seite ist privat"
 
 msgid "This site is secret"
-msgstr "Diese Seite ist Geheim"
+msgstr "Diese Seite ist geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -887,6 +887,9 @@ msgstr ""
 "Um Kreditkartenzahlungen zu aktivieren benötigen Sie einen Standard-"
 "Zahlungsanbieter"
 
+msgid "Test run"
+msgstr "Testlauf"
+
 msgid "Describes what this photo album is about"
 msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
 
@@ -947,9 +950,6 @@ msgstr "Zeige Einleitung auf übergeordneter Seite"
 
 msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
-
-msgid "Test run"
-msgstr "Testlauf"
 
 msgid "Salutation"
 msgstr "Anrede"
