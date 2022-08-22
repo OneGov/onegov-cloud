@@ -515,21 +515,37 @@ def test_file_security(client):
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 
-    # Add a general and a translator file
+    def content_disposition(file, filename):
+        return filename in client.get(file).headers['Content-Disposition']
+
+    # Add a published general, an unpublished general and a translator file
     client.login_admin()
     page = client.get('/files')
-    page.form['file'] = upload_pdf('g.pdf')
+    page.form['file'] = upload_pdf('p.pdf')
     page = page.form.submit()
-    general_file = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
-    general_file = general_file.replace('/details', '')
-    assert 'g.pdf' in client.get(general_file).headers['Content-Disposition']
+    url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    published_file = url.replace('/details', '')
+    assert 'Öffentlich' in client.get(url)
+    assert 'Private' not in client.get(url)
+    assert content_disposition(published_file, 'p.pdf')
+
+    page = client.get('/files')
+    page.form['file'] = upload_pdf('u.pdf')
+    page = page.form.submit()
+    url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    unpublished_file = url.replace('/details', '')
+    assert content_disposition(unpublished_file, 'u.pdf')
+    page = client.get(url)
+    page = client.post(page.pyquery('a.is-published')[0].attrib['ic-post-to'])
+    assert 'Öffentlich' not in client.get(url)
+    assert 'Privat' in client.get(url)
 
     page = client.get(f'/translator/{trs_id}').click('Dokumente')
     page.form['file'] = upload_pdf('t.pdf')
     page = page.form.submit()
-    trs_file = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
-    trs_file = trs_file.replace('/details', '')
-    assert 't.pdf' in client.get(trs_file).headers['Content-Disposition']
+    translator_file = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    translator_file = translator_file.replace('/details', '')
+    assert content_disposition(translator_file, 't.pdf')
     client.logout()
 
     # Editors can't manage and can see general files but not translator files
@@ -537,9 +553,10 @@ def test_file_security(client):
     page = client.get(f'/translator/{trs_id}')
     assert 'Dokumente' not in page
     client.get('/files', status=403)
-    assert 'g.pdf' in client.get(general_file).headers['Content-Disposition']
+    assert content_disposition(published_file, 'p.pdf')
+    assert content_disposition(unpublished_file, 'u.pdf')
     client.get(f'/documents/{trs_id}', status=403)
-    client.get(trs_file, status=403)
+    client.get(translator_file, status=403)
     client.logout()
 
     # Members can't manage and can see general files but not translator files
@@ -547,16 +564,18 @@ def test_file_security(client):
     page = client.get(f'/translator/{trs_id}')
     assert 'Dokumente' not in page
     client.get('/files', status=403)
-    assert 'g.pdf' in client.get(general_file).headers['Content-Disposition']
+    assert content_disposition(published_file, 'p.pdf')
+    assert content_disposition(unpublished_file, 'u.pdf')
     client.get(f'/documents/{trs_id}', status=403)
-    client.get(trs_file, status=403)
+    client.get(translator_file, status=403)
     client.logout()
 
-    # Anonymous can't do anything
+    # Anonymous can only view published general files
     client.get('/files', status=403)
-    client.get(general_file, status=403)
+    assert content_disposition(published_file, 'p.pdf')
+    client.get(unpublished_file, status=403)
     client.get(f'/documents/{trs_id}', status=403)
-    client.get(trs_file, status=403)
+    client.get(translator_file, status=403)
 
 
 def test_translator_directory_settings(client):
