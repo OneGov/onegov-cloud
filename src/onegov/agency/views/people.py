@@ -189,7 +189,7 @@ def view_person(self, request):
 
 @AgencyApp.html(
     model=ExtendedPerson,
-    template='sort.pt',
+    template='custom_sort.pt',
     name='sort',
     permission=Private
 )

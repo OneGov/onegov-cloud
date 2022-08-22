@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.org import _
-from wtforms import RadioField
+from wtforms.fields import RadioField
 from wtforms.validators import InputRequired
 
 

@@ -378,7 +378,7 @@ class FocusWidget(object):
     template = """
     <xsl:template match="focus">
         <a href="{@focus-url}" class="focus-link">
-            <div class="focus-widget">
+            <div class="focus-widget" data-aos="fade">
                 <xsl:variable name="apos">'</xsl:variable>
                 <xsl:variable name="image_src">
                     <xsl:choose>

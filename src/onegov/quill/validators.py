@@ -8,7 +8,7 @@ class HtmlDataRequired(object):
 
     """
 
-    field_flags = ('required', )
+    field_flags = {'required': True}
 
     def __init__(self, message=None):
         self.message = message

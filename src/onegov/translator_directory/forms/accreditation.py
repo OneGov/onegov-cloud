@@ -1,15 +1,16 @@
-from datetime import date
 from cached_property import cached_property
+from datetime import date
+from depot.io.utils import FileIntent
+from io import BytesIO
 from onegov.core.crypto import random_token
+from onegov.core.utils import dictionary_to_binary
 from onegov.file import File
-from onegov.file.utils import as_fileintent
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import PanelField
 from onegov.form.fields import TagsField
 from onegov.form.fields import UploadField
-from wtforms.validators import DataRequired
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
@@ -25,13 +26,14 @@ from onegov.translator_directory.constants import PROFESSIONAL_GUILDS
 from onegov.translator_directory.forms.mixins import DrivingDistanceMixin
 from onegov.translator_directory.models.translator import Translator
 from re import match
-from wtforms import BooleanField
-from wtforms import FloatField
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import EmailField
+from wtforms.fields import FloatField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import DataRequired
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -82,9 +84,14 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         validators=[InputRequired()],
     )
 
-    marital_status = StringField(
+    marital_status = ChosenSelectField(
         label=_('Marital status'),
         fieldset=_('Personal Information'),
+        choices=(
+            ('ledig', 'ledig'),
+            ('verheiratet', 'verheiratet'),
+            ('geschieden', 'geschieden'),
+        ),
         validators=[InputRequired()],
     )
 
@@ -299,6 +306,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
 
     agency_references = StringField(
         label=_('Authorities and courts'),
+        description=('z.B. ZG oder Bund'),
         fieldset=_('References'),
     )
 
@@ -351,7 +359,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -362,7 +370,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -373,7 +381,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -388,7 +396,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -399,7 +407,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -410,7 +418,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -421,7 +429,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -433,7 +441,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -448,7 +456,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
         fieldset=_('Documents')
     )
 
@@ -460,20 +468,33 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             FileSizeLimit(100 * 1024 * 1024),
             DataRequired(),
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'resend_upload': True},
+        fieldset=_('Documents')
+    )
+
+    confirmation_compensation_office = UploadField(
+        label=_(
+            'Confirmation from the compensation office regarding '
+            'self-employment'
+        ),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024),
+            DataRequired(),
+        ],
+        render_kw={'resend_upload': True},
+        depends_on=('self_employed', 'y'),
         fieldset=_('Documents')
     )
 
     submission_hint = PanelField(
         text=_('Your data will be treated with strict confidentiality.'),
         kind='',
-        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
     remarks = TextAreaField(
         label=_('Remarks'),
-        render_kw=dict(force_simple=True),
         fieldset=_('Submission')
     )
 
@@ -629,17 +650,19 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         def as_file(field, category):
             name = self.request.translate(field.label.text)
             name = name.replace(' (PDF)', '')
-            return File(
-                id=random_token(),
-                name=f'{name}.pdf',
-                note=category,
-                reference=as_fileintent(
-                    content=field.file,
-                    filename=field.filename
+            if field.data:
+                return File(
+                    id=random_token(),
+                    name=f'{name}.pdf',
+                    note=category,
+                    reference=FileIntent(
+                        BytesIO(dictionary_to_binary(field.data)),
+                        field.data['filename'],
+                        field.data['mimetype']
+                    )
                 )
-            )
 
-        return [
+        result = [
             as_file(self.declaration_of_authorization, 'Antrag'),
             as_file(self.letter_of_motivation, 'Antrag'),
             as_file(self.resume, 'Antrag'),
@@ -650,7 +673,9 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             as_file(self.debt_collection_register_extract, 'Abklärungen'),
             as_file(self.criminal_register_extract, 'Abklärungen'),
             as_file(self.certificate_of_capability, 'Abklärungen'),
+            as_file(self.confirmation_compensation_office, 'Abklärungen'),
         ]
+        return [r for r in result if r is not None]
 
     def get_ticket_data(self):
         data = self.get_useful_data()

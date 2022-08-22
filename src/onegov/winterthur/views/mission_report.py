@@ -15,7 +15,7 @@ from onegov.winterthur.models import MissionReportVehicle
 from onegov.winterthur.models import MissionReportVehicleUse
 from uuid import UUID
 from wtforms.fields import BooleanField
-from wtforms.fields.html5 import IntegerField
+from wtforms.fields import IntegerField
 
 
 def mission_report_form(model, request):

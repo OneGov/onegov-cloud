@@ -2,9 +2,9 @@ from onegov.core.orm.func import unaccent
 from onegov.form import Form
 from onegov.wtfs import _
 from onegov.wtfs.models import Municipality
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

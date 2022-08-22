@@ -108,7 +108,7 @@ def view_upload_rest(self, request):
             )
 
     if not errors:
-        file = form.results.raw_data[0].file
+        file = form.results.file
         mimetype = form.results.data['mimetype']
 
         err = []

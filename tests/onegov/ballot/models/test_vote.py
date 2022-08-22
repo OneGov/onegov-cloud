@@ -543,6 +543,8 @@ def test_ballot_results_aggregation(session):
             district='ZG',
             name='Rotkreuz',
             counted=True,
+            eligible_voters=2877,
+            expats=17,
             yeas=507,
             nays=69,
             empty=14,
@@ -553,6 +555,8 @@ def test_ballot_results_aggregation(session):
             district='ZG',
             name='Menzingen',
             counted=True,
+            eligible_voters=1255,
+            expats=1,
             yeas=309,
             nays=28,
             empty=5,
@@ -564,31 +568,52 @@ def test_ballot_results_aggregation(session):
     session.add(ballot)
     session.flush()
 
-    assert ballot.yeas == 309 + 507
-    assert ballot.nays == 69 + 28
-    assert ballot.empty == 14 + 5
-    assert ballot.invalid == 5 + 0
-    assert ballot.cast_ballots == 309 + 507 + 69 + 28 + 14 + 5 + 5 + 0
+    assert ballot.yeas == 816
+    assert ballot.nays == 97
+    assert ballot.empty == 19
+    assert ballot.invalid == 5
+    assert ballot.eligible_voters == 4132
+    assert ballot.counted_eligible_voters == 4132
+    assert ballot.expats == 18
+    assert ballot.cast_ballots == 937
     assert ballot.accepted is True
     assert ballot.counted is True
     assert round(ballot.yeas_percentage, 2) == 89.38
     assert round(ballot.nays_percentage, 2) == 10.62
 
-    assert int(session.query(Vote.yeas).one()[0]) == 309 + 507
-    assert int(session.query(Vote.nays).one()[0]) == 69 + 28
-    assert int(session.query(Vote.empty).one()[0]) == 14 + 5
-    assert int(session.query(Vote.invalid).one()[0]) == 5 + 0
+    assert session.query(Ballot.yeas).scalar() == 816
+    assert session.query(Ballot.nays).scalar() == 97
+    assert session.query(Ballot.empty).scalar() == 19
+    assert session.query(Ballot.invalid).scalar() == 5
+    assert session.query(Ballot.eligible_voters).scalar() == 4132
+    assert session.query(Ballot.counted_eligible_voters).scalar() == 4132
+    assert session.query(Ballot.expats).scalar() == 18
+    assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert session.query(Ballot.accepted).scalar() is True
+    assert session.query(Ballot.counted).scalar() is True
+    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38 OGC-533
+    # assert session.query(Ballot.nays_percentage).scalar() == 10.62 OGC-533
 
-    session.query(Ballot.yeas).first() == (309 + 507, )
-    session.query(Ballot.nays).first() == (69 + 28, )
-    session.query(Ballot.empty).first() == (14 + 5, )
-    session.query(Ballot.invalid).first() == (5 + 0, )
-    session.query(Ballot.accepted).first() == (True, )
-    session.query(Ballot.counted).first() == (True, )
-    session.query(Ballot.cast_ballots).first() == (
-        309 + 507 + 69 + 28 + 14 + 5 + 5 + 0, )
-    round(session.query(Ballot.yeas_percentage).first()[0], 2) == 89.38
-    round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
+    assert vote.yeas == 816
+    assert vote.nays == 97
+    assert vote.empty == 19
+    assert vote.invalid == 5
+    assert vote.eligible_voters == 4132
+    assert vote.counted_eligible_voters == 4132
+    assert vote.expats == 18
+    assert vote.cast_ballots == 937
+    assert vote.counted is True
+    assert round(vote.yeas_percentage, 2) == 89.38
+    assert round(vote.nays_percentage, 2) == 10.62
+
+    assert session.query(Vote.yeas).scalar() == 816
+    assert session.query(Vote.nays).scalar() == 97
+    assert session.query(Vote.empty).scalar() == 19
+    assert session.query(Vote.invalid).scalar() == 5
+    assert session.query(Vote.eligible_voters).scalar() == 4132
+    assert session.query(Vote.counted_eligible_voters).scalar() == 4132
+    assert session.query(Vote.expats).scalar() == 18
+    assert session.query(Vote.cast_ballots).scalar() == 937
 
     ballot = session.query(Ballot).one()
     ballot.results.append(
@@ -597,55 +622,111 @@ def test_ballot_results_aggregation(session):
             name='Baar',
             counted=False,
             entity_id=1,
+            eligible_voters=420,
+            expats=10
         ),
     )
     session.flush()
 
-    assert ballot.yeas == 309 + 507
-    assert ballot.nays == 69 + 28
-    assert ballot.empty == 14 + 5
-    assert ballot.invalid == 5 + 0
-    assert ballot.cast_ballots == 309 + 507 + 69 + 28 + 14 + 5 + 5 + 0
+    assert ballot.yeas == 816
+    assert ballot.nays == 97
+    assert ballot.empty == 19
+    assert ballot.invalid == 5
+    assert ballot.eligible_voters == 4552
+    assert ballot.counted_eligible_voters == 4132
+    assert ballot.expats == 28
+    assert ballot.cast_ballots == 937
     assert ballot.accepted is None
     assert ballot.counted is False
     assert round(ballot.yeas_percentage, 2) == 89.38
     assert round(ballot.nays_percentage, 2) == 10.62
 
-    session.query(Ballot.yeas).first() == (309 + 507, )
-    session.query(Ballot.nays).first() == (69 + 28, )
-    session.query(Ballot.empty).first() == (14 + 5, )
-    session.query(Ballot.invalid).first() == (5 + 0, )
-    session.query(Ballot.accepted).first() == (None, )
-    session.query(Ballot.counted).first() == (False, )
-    session.query(Ballot.cast_ballots).first() == (
-        309 + 507 + 69 + 28 + 14 + 5 + 5 + 0, )
-    round(session.query(Ballot.yeas_percentage).first()[0], 2) == 89.38
-    round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
+    assert session.query(Ballot.yeas).scalar() == 816
+    assert session.query(Ballot.nays).scalar() == 97
+    assert session.query(Ballot.empty).scalar() == 19
+    assert session.query(Ballot.invalid).scalar() == 5
+    assert session.query(Ballot.eligible_voters).scalar() == 4552
+    # OGC-533
+    # assert session.query(Ballot.counted_eligible_voters).scalar() == 4132
+    assert session.query(Ballot.expats).scalar() == 28
+    assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert session.query(Ballot.accepted).scalar() is None
+    assert session.query(Ballot.counted).scalar() is False
+    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38  # OGC-533
+    # assert session.query(Ballot.nays_percentage).scalar() == 10.62  # OGC-533
+
+    assert vote.yeas == 816
+    assert vote.nays == 97
+    assert vote.empty == 19
+    assert vote.invalid == 5
+    assert vote.eligible_voters == 4552
+    assert vote.counted_eligible_voters == 4132
+    assert vote.expats == 28
+    assert vote.cast_ballots == 937
+    assert vote.counted is False
+    assert round(vote.yeas_percentage, 2) == 89.38
+    assert round(vote.nays_percentage, 2) == 10.62
+
+    assert session.query(Vote.yeas).scalar() == 816
+    assert session.query(Vote.nays).scalar() == 97
+    assert session.query(Vote.empty).scalar() == 19
+    assert session.query(Vote.invalid).scalar() == 5
+    assert session.query(Vote.eligible_voters).scalar() == 4552
+    # OGC-533
+    # assert session.query(Vote.counted_eligible_voters).scalar() == 4132
+    assert session.query(Vote.expats).scalar() == 28
+    assert session.query(Vote.cast_ballots).scalar() == 937
 
     # mark as counted, but don't change any results from 0
     ballot.results.filter_by(name='Baar').one().counted = True
     session.flush()
 
-    assert ballot.yeas == 309 + 507
-    assert ballot.nays == 69 + 28
-    assert ballot.empty == 14 + 5
-    assert ballot.invalid == 5 + 0
-    assert ballot.cast_ballots == 309 + 507 + 69 + 28 + 14 + 5 + 5 + 0
+    assert ballot.yeas == 816
+    assert ballot.nays == 97
+    assert ballot.empty == 19
+    assert ballot.invalid == 5
+    assert ballot.eligible_voters == 4552
+    assert ballot.counted_eligible_voters == 4552
+    assert ballot.expats == 28
+    assert ballot.cast_ballots == 937
     assert ballot.accepted is True
     assert ballot.counted is True
     assert round(ballot.yeas_percentage, 2) == 89.38
     assert round(ballot.nays_percentage, 2) == 10.62
 
-    session.query(Ballot.yeas).first() == (309 + 507, )
-    session.query(Ballot.nays).first() == (69 + 28, )
-    session.query(Ballot.empty).first() == (14 + 5, )
-    session.query(Ballot.invalid).first() == (5 + 0, )
-    session.query(Ballot.accepted).first() == (True, )
-    session.query(Ballot.counted).first() == (True, )
-    session.query(Ballot.cast_ballots).first() == (
-        309 + 507 + 69 + 28 + 14 + 5 + 5 + 0, )
-    round(session.query(Ballot.yeas_percentage).first()[0], 2) == 89.38
-    round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
+    assert session.query(Ballot.yeas).scalar() == 816
+    assert session.query(Ballot.nays).scalar() == 97
+    assert session.query(Ballot.empty).scalar() == 19
+    assert session.query(Ballot.invalid).scalar() == 5
+    assert session.query(Ballot.eligible_voters).scalar() == 4552
+    assert session.query(Ballot.counted_eligible_voters).scalar() == 4552
+    assert session.query(Ballot.expats).scalar() == 28
+    assert session.query(Ballot.cast_ballots).scalar() == 937
+    assert session.query(Ballot.accepted).scalar() is True
+    assert session.query(Ballot.counted).scalar() is True
+    # assert session.query(Ballot.yeas_percentage).scalar() == 89.38  # OGC-533
+    # assert session.query(Ballot.nays_percentage).scalar() == 10.62  # OGC-533
+
+    assert vote.yeas == 816
+    assert vote.nays == 97
+    assert vote.empty == 19
+    assert vote.invalid == 5
+    assert vote.eligible_voters == 4552
+    assert vote.counted_eligible_voters == 4552
+    assert vote.expats == 28
+    assert vote.cast_ballots == 937
+    assert vote.counted is True
+    assert round(vote.yeas_percentage, 2) == 89.38
+    assert round(vote.nays_percentage, 2) == 10.62
+
+    assert session.query(Vote.yeas).scalar() == 816
+    assert session.query(Vote.nays).scalar() == 97
+    assert session.query(Vote.empty).scalar() == 19
+    assert session.query(Vote.invalid).scalar() == 5
+    assert session.query(Vote.eligible_voters).scalar() == 4552
+    assert session.query(Vote.counted_eligible_voters).scalar() == 4552
+    assert session.query(Vote.expats).scalar() == 28
+    assert session.query(Vote.cast_ballots).scalar() == 937
 
 
 def test_vote_last_modified(session):

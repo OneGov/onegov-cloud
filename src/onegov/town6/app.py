@@ -191,6 +191,9 @@ def get_common_asset():
     yield 'internal_link_check.js'
     yield 'tickets.js'
     yield 'items_selectable.js'
+    yield 'aos.js'
+    yield 'aos-init.js'
+    yield 'aos.css'
 
 
 @TownApp.webasset('editor')

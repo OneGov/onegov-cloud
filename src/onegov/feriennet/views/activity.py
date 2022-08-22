@@ -431,18 +431,9 @@ def view_activities(self, request):
 )
 def view_activities_as_json(self, request):
 
-    period_ids = {
-        period.id for period in request.app.periods
-        if period.is_currently_prebooking
-        or period.is_currently_booking
-        or period.payment_phase
-    }
-    if not period_ids:
-        return []
-
-    self.filter.period_ids = period_ids
-    self.filter.timelines = {'now', 'future'}
     self.filter.states = {'accepted'}
+
+    active_period = request.app.active_period
 
     def image(activity):
         url = (activity.meta or {}).get('thumbnail')
@@ -464,7 +455,6 @@ def view_activities_as_json(self, request):
             'min': float(min_cost) if min_cost is not None else 0.0,
             'max': float(max_cost) if max_cost is not None else 0.0
         }
-        return
 
     def dates(activity):
         occasion_dates = []
@@ -495,26 +485,42 @@ def view_activities_as_json(self, request):
 
     provider = request.app.org.title
 
-    return [
-        {
-            'provider': provider,
-            'url': request.link(activity),
-            'title': activity.title,
-            'lead': (activity.meta or {}).get('lead', ''),
-            'image': image(activity),
-            'age': age(activity),
-            'cost': cost(activity),
-            'spots': activity_spots(activity, request),
-            'dates': dates(activity),
-            'location': activity.location,
-            'zip_code': zip_code(activity),
-            'coordinate': coordinates(activity),
-            'tags': tags(activity),
-        } for activity in self.query().options(
-            joinedload(Activity.occasions),
-            undefer(Activity.content)
-        )
-    ]
+    if active_period:
+        wish_start = None
+        wish_end = None
+        if active_period.confirmable:
+            wish_start = active_period.prebooking_start.isoformat()
+            wish_end = active_period.prebooking_end.isoformat()
+
+        return {
+            'period_name': active_period.title,
+            'wish_phase_start': wish_start,
+            'wish_phase_end': wish_end,
+            'booking_phase_start': active_period.booking_start.isoformat(),
+            'booking_phase_end': active_period.booking_end.isoformat(),
+            'deadline_days': active_period.deadline_days,
+            'activities': [
+                {
+                    'provider': provider,
+                    'url': request.link(activity),
+                    'title': activity.title,
+                    'lead': (activity.meta or {}).get('lead', ''),
+                    'image': image(activity),
+                    'age': age(activity),
+                    'cost': cost(activity),
+                    'spots': activity_spots(activity, request),
+                    'dates': dates(activity),
+                    'location': activity.location,
+                    'zip_code': zip_code(activity),
+                    'coordinate': coordinates(activity),
+                    'tags': tags(activity),
+                } for activity in self.query().options(
+                    joinedload(Activity.occasions),
+                    undefer(Activity.content))
+            ]
+        }
+    else:
+        return {}
 
 
 @FeriennetApp.html(

@@ -112,6 +112,7 @@ def test_agency_layout():
         'AgencyProxy/edit',
         'AgencyProxy/move',
         'AgencyProxy/sort',
+        'AgencyProxy/change-url',
         'ExtendedAgency/?csrf-token=x',
         'AgencyProxy/create-pdf',
         'AgencyProxy/new',

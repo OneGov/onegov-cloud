@@ -171,6 +171,9 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     # sum of eligible voters of only if ElectionResult.counted is true
     counted_eligible_voters = summarized_property('counted_eligible_voters')
 
+    #: The expats
+    expats = summarized_property('expats')
+
     #: The total received ballots
     received_ballots = summarized_property('received_ballots')
 
@@ -192,7 +195,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
-        return sum(getattr(result, attribute) for result in self.results)
+        return sum(getattr(result, attribute) or 0 for result in self.results)
 
     @staticmethod
     def aggregate_results_expression(cls, attribute):
@@ -234,7 +237,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     #: may be used to indicate that the vote contains expats as seperate
     #: results (typically with entity_id = 0)
-    expats = meta_property('expats', default=False)
+    has_expats = meta_property('expats', default=False)
 
     #: The segment of the domain. This might be the district, if this is a
     #: regional (district) election; the region, if it's a regional (region)

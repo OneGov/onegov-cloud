@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-08-03 15:49+0200\n"
+"POT-Creation-Date: 2022-08-21 08:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -124,10 +124,10 @@ msgid "Ticket"
 msgstr "Ticket"
 
 msgid "This site is private"
-msgstr "Diese Seite ist Privat"
+msgstr "Diese Seite ist privat"
 
 msgid "This site is secret"
-msgstr "Diese Seite ist Geheim"
+msgstr "Diese Seite ist geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -754,8 +754,8 @@ msgstr ""
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
 
-msgid "Url path"
-msgstr "Url Pfad"
+msgid "URL path"
+msgstr "URL Pfad"
 
 msgid "Please fill out a new name"
 msgstr "Bitte geben sie einen neuen Namen an"
@@ -887,6 +887,9 @@ msgstr ""
 "Um Kreditkartenzahlungen zu aktivieren benötigen Sie einen Standard-"
 "Zahlungsanbieter"
 
+msgid "Test run"
+msgstr "Testlauf"
+
 msgid "Describes what this photo album is about"
 msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
 
@@ -947,9 +950,6 @@ msgstr "Zeige Einleitung auf übergeordneter Seite"
 
 msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
-
-msgid "Test run"
-msgstr "Testlauf"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -1706,8 +1706,8 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
-msgid "Change Url"
-msgstr "Url ändern"
+msgid "Change URL"
+msgstr "URL ändern"
 
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
@@ -4132,10 +4132,10 @@ msgstr ""
 "wiederholt werden."
 
 msgid ""
-"Stable urls are important. Here you can change the path to your site here "
-"independant of the title."
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
 msgstr ""
-"Stabile Url's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
 "angepasst werden."
 
 #, python-format

@@ -189,7 +189,7 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
         if self.state is None:
             links.append(
                 Link(
-                    text=_('Grant accreditation'),
+                    text=_('Grant admission'),
                     url=request.return_here(
                         request.link(self.accreditation, 'grant')
                     ),
@@ -224,7 +224,7 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
             if self.state is None:
                 advanced_links.append(
                     Link(
-                        text=_('Refuse accreditation'),
+                        text=_('Refuse admission'),
                         url=request.return_here(
                             request.link(self.accreditation, 'refuse')
                         ),

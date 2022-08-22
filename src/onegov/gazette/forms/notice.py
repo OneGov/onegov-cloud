@@ -13,13 +13,13 @@ from onegov.quill.validators import HtmlDataRequired
 from sedate import as_datetime
 from sedate import standardize_date
 from sedate import utcnow
-from wtforms import BooleanField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.validators import InputRequired
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 from wtforms.validators import Length
 
 

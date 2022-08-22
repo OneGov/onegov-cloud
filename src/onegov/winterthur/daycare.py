@@ -1,4 +1,3 @@
-import chameleon
 import textwrap
 import yaml
 
@@ -7,6 +6,8 @@ from cached_property import cached_property
 from collections import defaultdict
 from collections import OrderedDict
 from decimal import Decimal, localcontext
+from markupsafe import Markup
+from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryCollection
@@ -15,10 +16,11 @@ from onegov.org.models import Organisation
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
-from wtforms.fields import Field, BooleanField, SelectField
-from wtforms.fields.html5 import DecimalField
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import Field
+from wtforms.fields import SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
-from wtforms.widgets.core import HTMLString
 
 
 SERVICE_DAYS = {
@@ -561,7 +563,7 @@ class DaycareSubsidyCalculator(object):
 
 class DaycareServicesWidget(object):
 
-    template = chameleon.PageTemplate("""
+    template = PageTemplate("""
         <table class="daycare-services">
             <thead>
                 <tr>
@@ -610,7 +612,7 @@ class DaycareServicesWidget(object):
         self.field = field
         self.services = field.services
 
-        return HTMLString(self.template.render(this=self))
+        return Markup(self.template.render(this=self))
 
     def is_selected(self, service, day):
         return self.services.is_selected(service.id, day)

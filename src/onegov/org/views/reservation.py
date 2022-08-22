@@ -3,7 +3,7 @@ import pytz
 import sedate
 import transaction
 
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
 from dill import pickles
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
@@ -106,42 +106,19 @@ def reserve_allocation(self, request):
             start = sedate.parse_time(start)
             end = sedate.parse_time(end)
 
-        # FIXME: We should change this back to sedate.get_date_range
-        #        once sedate has been patched to handle DST <-> ST
-        #        transitions correctly, although once we patch it
-        #        we probably need to catch NonExistentTimeError so
-        #        we can respond to it with the below new error message
-        # start, end = sedate.get_date_range(
-        #     sedate.to_timezone(self.start, self.timezone), start, end
-        # )
-
-        # first create tz naive datetimes for start and end
-        day = self.display_start().date()
-        start = datetime.combine(day, start, tzinfo=None)
-        end = datetime.combine(day, end, tzinfo=None)
-
-        # use pytz.localize to handle non-existent/ambiguous times
-        tzinfo = sedate.ensure_timezone(self.timezone)
         try:
-            start = tzinfo.localize(start, is_dst=None)
-            end = tzinfo.localize(end, is_dst=None)
+            start, end = sedate.get_date_range(
+                self.display_start(),
+                start,
+                end,
+                raise_non_existent=True
+            )
         except pytz.NonExistentTimeError:
-            # there's no graceful solution here, so we should return an
-            # error. Eventually we should probably mark non-existent time
-            # ranges in the calendar, so they can't be reserved
             err = request.translate(_(
                 "The selected time does not exist on this date due to "
                 "the switch from standard time to daylight saving time."
             ))
             return respond_with_error(request, err)
-        except pytz.AmbiguousTimeError:
-            # we treat ambiguous times as standard time always, to make
-            # our lifes easier. On the calendar you can't distinguish
-            # between DST and ST during that time interval anyways, so
-            # it should make no difference what we pick here, we just
-            # need to be consistent
-            start = tzinfo.localize(start, is_dst=False)
-            end = tzinfo.localize(end, is_dst=False)
     else:
         start, end = self.start, self.end
 

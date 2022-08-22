@@ -6,10 +6,10 @@ import numbers
 import sedate
 
 from cached_property import cached_property
-from chameleon import PageTemplate
 from datetime import datetime
 from functools import lru_cache
 from onegov.core import utils
+from onegov.core.templates import PageTemplate
 from pytz import timezone
 
 

@@ -4,13 +4,15 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentMethodForm
-from wtforms import StringField, TextAreaField, validators
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
 
 
 class FormDefinitionBaseForm(Form):
     """ Form to edit defined forms. """
 
-    title = StringField(_("Title"), [validators.InputRequired()])
+    title = StringField(_("Title"), [InputRequired()])
 
     lead = TextAreaField(
         label=_("Lead"),
@@ -26,7 +28,7 @@ class FormDefinitionBaseForm(Form):
 
     definition = TextAreaField(
         label=_("Definition"),
-        validators=[validators.InputRequired(), ValidFormDefinition()],
+        validators=[InputRequired(), ValidFormDefinition()],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
     pick_up = TextAreaField(
@@ -47,8 +49,8 @@ class FormDefinitionForm(merge_forms(
 class FormDefinitionUrlForm(Form):
 
     name = StringField(
-        label=_('Url path'),
-        validators=[validators.InputRequired()]
+        label=_('URL path'),
+        validators=[InputRequired()]
     )
 
     def ensure_correct_name(self):

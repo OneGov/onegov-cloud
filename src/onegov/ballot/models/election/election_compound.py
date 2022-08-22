@@ -240,6 +240,7 @@ class ElectionCompound(
                 counted=election.counted,
                 turnout=election.turnout,
                 eligible_voters=election.eligible_voters,
+                expats=election.expats,
                 counted_eligible_voters=election.counted_eligible_voters,
                 received_ballots=election.received_ballots,
                 counted_received_ballots=election.counted_received_ballots,

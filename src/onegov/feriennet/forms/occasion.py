@@ -10,11 +10,12 @@ from onegov.form import Form
 from sedate import to_timezone, standardize_date, overlaps
 from sqlalchemy import desc
 from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields.html5 import DecimalField, IntegerField
 from wtforms.validators import InputRequired, NumberRange, Optional
 
 

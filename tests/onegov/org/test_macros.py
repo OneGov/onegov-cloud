@@ -1,11 +1,10 @@
-from webob.multidict import MultiDict
-from wtforms import StringField
-
 from onegov.core.templates import render_macro
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.org.layout import DefaultLayout
 from pyquery import PyQuery as pq
+from webob.multidict import MultiDict
+from wtforms.fields import StringField
 
 
 class DummyRequest:

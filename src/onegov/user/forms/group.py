@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.user import _
-from wtforms import StringField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

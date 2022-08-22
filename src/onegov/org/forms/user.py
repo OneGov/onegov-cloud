@@ -10,12 +10,13 @@ from onegov.ticket import TicketPermission
 from onegov.user import User
 from onegov.user import UserCollection
 from re import match
-from wtforms import BooleanField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import validators
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import BooleanField
+from wtforms.fields import EmailField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.validators import Email
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 
 
 AVAILABLE_ROLES = [
@@ -92,14 +93,14 @@ class ManageUserForm(Form):
                 return
 
             if self.role.data in ('admin', 'editor'):
-                raise validators.ValidationError(_(
+                raise ValidationError(_(
                     "Administrators and editors must use a Yubikey"
                 ))
             else:
                 return
 
         if not is_valid_yubikey_format(field.data):
-            raise validators.ValidationError(_("Invalid Yubikey"))
+            raise ValidationError(_("Invalid Yubikey"))
 
         users = UserCollection(self.request.session)
         user = users.by_yubikey(field.data)
@@ -108,7 +109,7 @@ class ManageUserForm(Form):
             raise NotImplementedError()
 
         if user and user.username != self.current_username:
-            raise validators.ValidationError(
+            raise ValidationError(
                 _("This Yubikey is already used by ${username}", mapping={
                     'username': user.username
                 })
@@ -123,7 +124,7 @@ class PartialNewUserForm(Form):
     username = EmailField(
         label=_("E-Mail"),
         description=_("The users e-mail address (a.k.a. username)"),
-        validators=[validators.InputRequired(), validators.Email()]
+        validators=[InputRequired(), Email()]
     )
 
     send_activation_email = BooleanField(
@@ -139,7 +140,7 @@ class PartialNewUserForm(Form):
         users = UserCollection(self.request.session)
 
         if users.by_username(field.data):
-            raise validators.ValidationError(
+            raise ValidationError(
                 _("A user with this e-mail address exists already"))
 
 
