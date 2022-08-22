@@ -1,10 +1,10 @@
-from wtforms import StringField
-from wtforms.validators import InputRequired
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.fsi import _
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi import _
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
 
 
 class SubscriptionFormMixin:
@@ -86,7 +86,7 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
         if not events.first():
             return [self.none_choice]
-        return (self.event_choice(e) for e in events)
+        return tuple(self.event_choice(e) for e in events)
 
     def get_attendee_choices(self):
 

@@ -92,7 +92,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
                 added_entity_ids.add(entity_id)
 
         # Skip expats if not enabled
-        if entity_id == 0 and not vote.expats:
+        if entity_id == 0 and not vote.has_expats:
             continue
 
         # the yeas
@@ -170,7 +170,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
     if not errors:
         # Add the missing entities as uncounted results
         remaining = set(entities.keys())
-        if vote.expats:
+        if vote.has_expats:
             remaining.add(0)
         remaining -= added_entity_ids
         for entity_id in remaining:

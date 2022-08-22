@@ -1,8 +1,8 @@
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.swissvotes import _
-from wtforms import ValidationError
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 
 
 class UpdateExternalResourcesForm(Form):

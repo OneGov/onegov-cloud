@@ -208,8 +208,8 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
             start = replace_timezone(datetime(year, 1, 1), 'UTC')
             filter.append(
                 and_(
-                    News.created >= start,
-                    News.created < start.replace(year=year + 1)
+                    News.published_or_created >= start,
+                    News.published_or_created < start.replace(year=year + 1)
                 )
             )
         if filter:

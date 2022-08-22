@@ -1,13 +1,12 @@
-from wtforms import StringField
-from wtforms.validators import InputRequired, Email
-from wtforms.fields.html5 import EmailField
-
+from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
 from onegov.fsi import _
-from onegov.form import Form
 from onegov.fsi.models import CourseAttendee
 from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user import User
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired, Email
 
 
 class CourseAttendeeForm(Form):

@@ -1,19 +1,13 @@
-from datetime import datetime
 from onegov.core import utils
-from onegov.core.crypto import random_token
-from onegov.file.utils import as_fileintent, extension_for_content_type, \
-    content_type_from_fileobj
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.models import Organisation
-from onegov.translator_directory.models.voucher import TranslatorVoucherFile
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
 from purl import URL
-from sqlalchemy.orm import object_session
 
 
 class TranslatorDirectoryApp(OrgApp):
@@ -37,32 +31,6 @@ class TranslatorDirectoryApp(OrgApp):
     @coordinates.setter
     def coordinates(self, value):
         self.org.meta['translator_directory_home'] = value or {}
-
-    @property
-    def voucher_excel(self):
-        return object_session(self.org).query(TranslatorVoucherFile).first()
-
-    @property
-    def voucher_excel_file(self):
-        return self.voucher_excel and self.voucher_excel.reference.file
-
-    @voucher_excel_file.setter
-    def voucher_excel_file(self, value):
-        content_type = extension_for_content_type(
-            content_type_from_fileobj(value)
-        ) or 'xls'
-        year = datetime.now().year
-        filename = f'abrechnungsvorlage_{year}.{content_type}'
-        if self.voucher_excel:
-            self.voucher_excel.reference = as_fileintent(value, filename)
-            self.voucher_excel.name = filename
-        else:
-            file = TranslatorVoucherFile(id=random_token())
-            file.reference = as_fileintent(value, filename)
-            file.name = filename
-            session = object_session(self.org)
-            session.add(file)
-            session.flush()
 
     def redirect_after_login(self, identity, request, default):
         if default != '/' and '/auth/login' not in str(default):

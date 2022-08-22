@@ -33,7 +33,7 @@ def view_upload_election_compound(self, request, form):
                 errors = import_election_compound_internal(
                     self,
                     principal,
-                    form.results.raw_data[0].file,
+                    form.results.file,
                     form.results.data['mimetype']
                 )
             else:

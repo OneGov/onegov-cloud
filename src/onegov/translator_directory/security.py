@@ -31,6 +31,19 @@ def get_roles_setting():
     return result
 
 
+@TranslatorDirectoryApp.permission_rule(model=object, permission=object)
+def has_permission_logged_in(app, identity, model, permission):
+    if getattr(model, 'access', None) == 'private':
+        if identity.role not in ('admin', 'editor'):
+            return False
+
+    if getattr(model, 'access', None) == 'member':
+        if identity.role not in ('admin', 'editor', 'member', 'translator'):
+            return False
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
 @TranslatorDirectoryApp.permission_rule(model=Auth, permission=object)
 def restrict_auth_access(app, identity, model, permission):
     if permission == Personal and identity.role == 'translator':
@@ -76,15 +89,34 @@ def restrict_general_file_coll_access_anon(app, identity, model, permission):
 
 
 @TranslatorDirectoryApp.permission_rule(
-    model=GeneralFile, permission=object)
-def restrict_general_file_access(app, identity, model, permission):
+    model=File, permission=object)
+def restrict_file_access(app, identity, model, permission):
     return identity.role == 'admin'
 
 
 @TranslatorDirectoryApp.permission_rule(
-    model=File, permission=object)
-def restrict_file_access(app, identity, model, permission):
-    return identity.role == 'admin'
+    model=File, permission=object, identity=None)
+def restrict_file_access_anon(app, identity, model, permission):
+    return False
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=GeneralFile, permission=object)
+def restrict_general_file_access(app, identity, model, permission):
+    if not model.published:
+        if identity.role not in ('admin', 'editor', 'member', 'translator'):
+            return False
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@TranslatorDirectoryApp.permission_rule(
+    model=GeneralFile, permission=object, identity=None)
+def restrict_general_file_access_anon(app, identity, model, permission):
+    if not model.published:
+        return False
+
+    return permission == Public
 
 
 @TranslatorDirectoryApp.permission_rule(

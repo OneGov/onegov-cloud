@@ -9,6 +9,107 @@ from onegov.election_day.models import Canton
 from pytz import utc
 
 
+def test_import_internal_compound_regional_gr(session, import_test_datasets):
+    election_compound, errors = import_test_datasets(
+        api_format='internal',
+        model='election_compound',
+        principal='gr',
+        domain='region',
+        domain_segment=(
+            'Alvaschein',
+            'Avers',
+            'Belfort',
+            'Bergün',
+            'Bregaglia',
+            'Breil/Brigels',
+            'Brusio',
+            'Calanca',
+            'Chur',
+            'Churwalden',
+            'Davos',
+            'Disentis',
+            'Domleschg',
+            'Fünf Dörfer',
+            'Ilanz',
+            'Jenaz',
+            'Klosters',
+            'Küblis',
+            'Lumnezia/Lugnez',
+            'Luzein',
+            'Maienfeld',
+            'Mesocco',
+            'Oberengadin',
+            'Poschiavo',
+            'Ramosch',
+            'Rheinwald',
+            'Rhäzüns',
+            'Roveredo',
+            'Safien',
+            'Schams',
+            'Schanfigg',
+            'Schiers',
+            'Seewis',
+            'Suot Tasna',
+            'Sur Tasna',
+            'Surses',
+            'Thusis',
+            'Trins',
+            'Val Müstair'
+        ),
+        number_of_mandates=(
+            2,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            21,
+            1,
+            6,
+            4,
+            3,
+            11,
+            6,
+            1,
+            3,
+            1,
+            2,
+            1,
+            5,
+            1,
+            8,
+            2,
+            1,
+            1,
+            7,
+            3,
+            1,
+            1,
+            2,
+            3,
+            1,
+            3,
+            1,
+            1,
+            4,
+            5,
+            1,
+        ),
+        date_=date(2022, 5, 15),
+        dataset_name='grossratswahlen-2022'
+    )
+
+    assert not errors
+    assert election_compound.last_result_change
+    assert election_compound.completed
+    assert election_compound.progress == (39, 39)
+    assert election_compound.allocated_mandates == 120
+    assert election_compound.number_of_mandates == 120
+    assert len(election_compound.elected_candidates) == 120
+
+
 def test_import_internal_compound_missing_headers(session):
     election_1 = ProporzElection(
         title='election-1',
@@ -267,9 +368,9 @@ def test_import_internal_compound_expats(session):
 
     principal = Canton(canton='sg')
 
-    for expats in (False, True):
-        election_1.expats = expats
-        election_2.expats = expats
+    for has_expats in (False, True):
+        election_1.has_expats = has_expats
+        election_2.has_expats = has_expats
         for entity_id in (9170, 0):
             errors = import_election_compound_internal(
                 compound, principal,
@@ -326,7 +427,7 @@ def test_import_internal_compound_expats(session):
             )
             errors = [e.error.interpolate() for e in errors]
 
-            if expats:
+            if has_expats:
                 assert errors == [
                     'This format does not support separate results for expats'
                 ]

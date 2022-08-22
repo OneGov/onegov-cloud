@@ -1,8 +1,5 @@
 from cached_property import cached_property
 from chameleon.utils import Markup
-
-from sedate import utcnow
-
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.core.templates import render_macro
@@ -12,13 +9,15 @@ from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.user import UserCollection
 from purl import URL
+from sedate import utcnow
 from sqlalchemy import not_
 from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import HiddenField
+from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields import HiddenField
-from wtforms.fields.html5 import DateField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
 
 

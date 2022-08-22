@@ -573,6 +573,23 @@ def test_view_election_compound_parties_panachage(election_day_app_gr):
     )))
 
 
+def test_view_election_compound_statistics(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_election_compound(client)
+
+    statistics = client.get('/elections/elections/statistics')
+    assert "Alvaschein" in statistics
+    assert "Belfort" in statistics
+    assert "Noch nicht ausgezählt" in statistics
+
+    assert "Gewählte Kandidierende" in statistics
+    assert "weiblich"
+    assert ">37<" in statistics
+
+
 def test_view_election_compound_json(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -615,6 +632,12 @@ def test_view_election_compound_json(election_day_app_gr):
             'party': ''
         }
     ]
+    assert data['candidate_statistics'] == {
+        'female': {'age': 32, 'count': 1},
+        'male': {'age': 42, 'count': 1},
+        'total': {'age': 37, 'count': 2}
+    }
+
     assert data['elections']
     assert data['last_modified']
     assert data['mandates'] == {'allocated': 0, 'total': 15}

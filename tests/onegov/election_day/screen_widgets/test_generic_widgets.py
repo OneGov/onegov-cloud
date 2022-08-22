@@ -1,5 +1,5 @@
-from chameleon import PageTemplate
 from lxml import etree
+from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch
 from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure

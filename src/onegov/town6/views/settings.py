@@ -1,5 +1,5 @@
 """ The settings view, defining things like the logo or color of the org. """
-from wtforms import StringField, BooleanField, IntegerField
+from wtforms.fields import StringField, BooleanField, IntegerField
 
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields

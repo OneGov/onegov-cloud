@@ -1,10 +1,10 @@
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _
-from wtforms import StringField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, Email
 from onegov.reservation import Resource, ResourceCollection
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired, Email
 
 
 WEEKDAYS = (

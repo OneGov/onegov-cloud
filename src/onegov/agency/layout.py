@@ -205,6 +205,11 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     attrs={'class': 'sort'}
                 ),
                 Link(
+                    text=_("Change URL"),
+                    url=self.request.link(self.model.proxy(), 'change-url'),
+                    attrs={'class': 'change-url'}
+                ),
+                Link(
                     text=_("Delete"),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)

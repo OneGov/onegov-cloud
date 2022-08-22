@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-11 15:19+0200\n"
-"PO-Revision-Date: 2022-07-11 15:13+0200\n"
+"POT-Creation-Date: 2022-08-10 16:20+0200\n"
+"PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -97,7 +97,7 @@ msgstr "Nicht alphanumerisch: ${col}"
 
 #, python-format
 msgid "Invalid gender: ${value}"
-msgstr ""
+msgstr "Ungültiges Geschlecht: ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -408,6 +408,12 @@ msgstr "Abschluss"
 
 msgid "Completed"
 msgstr "Abgeschlossen"
+
+msgid "Upper apportionment (PDF)"
+msgstr "Oberzuteilung (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Unterzuteilung (PDF)"
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
@@ -773,6 +779,9 @@ msgstr "Ausgezählt"
 msgid "Updated"
 msgstr "Aktualisiert"
 
+msgid "No results yet"
+msgstr "Noch keine Resultate"
+
 msgid "Result"
 msgstr "Resultat"
 
@@ -883,6 +892,15 @@ msgstr "Passwort vergessen?"
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
+msgid "female"
+msgstr "weiblich"
+
+msgid "male"
+msgstr "männlich"
+
+msgid "undetermined"
+msgstr "unbestimmt"
+
 msgid "Actions"
 msgstr "Aktionen"
 
@@ -922,7 +940,7 @@ msgstr "Total"
 #.
 #. Default: eligible Voters
 msgid "eligible_voters_vote"
-msgstr "Stimm&shy;berechtigte"
+msgstr "Stimmberechtigte"
 
 msgid "Cast Ballots"
 msgstr "Eingegangene Stimmzettel"
@@ -959,6 +977,9 @@ msgstr "Unterlistenverbindung"
 msgid "Subtotal"
 msgstr "Zwischensumme"
 
+msgid "Party"
+msgstr "Partei"
+
 msgid "eligible Voters"
 msgstr "Wahlberechtigte"
 
@@ -982,9 +1003,6 @@ msgstr "Wahlbeteiligung"
 
 msgid "Candidate"
 msgstr "Kandidierende"
-
-msgid "Party"
-msgstr "Partei"
 
 msgid "List"
 msgstr "Liste"
@@ -1033,9 +1051,6 @@ msgstr "Nächste Seite"
 
 msgid "You are here"
 msgstr "Aktuelle Seite"
-
-msgid "No results yet"
-msgstr "Noch keine Resultate"
 
 msgid "Alerts"
 msgstr "Benachrichtigungen"
@@ -1104,6 +1119,9 @@ msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
 "Die Rohdaten der Kandidierenden sind in den folgenden Formaten verfügbar:"
 
+msgid "The raw data are available in the following formats:"
+msgstr "Die Rohdaten sind in den folgenden Formaten verfügbar:"
+
 msgid "The raw data of the parties are available in the following formats:"
 msgstr "Die Rohdaten der Parteien sind in den folgenden Formaten verfügbar:"
 
@@ -1171,6 +1189,12 @@ msgstr ""
 "Panaschieren. Auf der linken Seite sind die unveränderten Stimmen inklusive "
 "Blankoliste, auf der rechten Seite die panaschierten Stimmen. Die Breite der "
 "Balken und der Verbindungen ist proportional zu den Stimmen."
+
+msgid "Count"
+msgstr "Anzahl"
+
+msgid "Average age"
+msgstr "Durchschnittsalter"
 
 msgid "View all details online"
 msgstr "Alle Details online ansehen"
@@ -1692,12 +1716,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid ""
-#~ "Shows a tab with aggregated list results over all elections. Only useful "
-#~ "if the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-#~ "Always rounded."
-#~ msgstr ""
-#~ "Zeigt eine Registerkarte mit aggregierten Listenergebnissen für alle "
-#~ "Wahlen. Nur sinnvoll, wenn die Listen den Listengruppen entsprechen. Nur "
-#~ "falls Doppelter Pukelsheim. Immer gerundet."

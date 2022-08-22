@@ -3,6 +3,7 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.wtfs import _
+from wtforms.validators import ValidationError
 
 
 class MunicipalityDataUploadField(UploadField):
@@ -22,10 +23,10 @@ class MunicipalityDataUploadField(UploadField):
         errors = []
         data = {}
 
-        if not self.raw_data:
-            raise ValueError(_("No data"))
+        if not self.data:
+            raise ValidationError(_("No data"))
 
-        lines = self.raw_data[0].file.read().decode('cp1252').split('\r\n')
+        lines = self.file.read().decode('cp1252').split('\r\n')
         for line_number, line in enumerate(lines):
             if not line.strip():
                 continue
@@ -40,7 +41,7 @@ class MunicipalityDataUploadField(UploadField):
                 data[bfs_number] = {'dates': dates}
 
         if errors:
-            raise ValueError(_(
+            raise ValidationError(_(
                 "Some rows contain invalid values: ${errors}.",
                 mapping={'errors': ', '.join((str(e) for e in errors))}
             ))

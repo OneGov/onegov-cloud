@@ -1,10 +1,12 @@
 from onegov.activity import OccasionNeed
 from onegov.feriennet import _
 from onegov.form import Form
-from wtforms.fields import BooleanField, StringField, TextAreaField
-from wtforms.fields.html5 import IntegerField
-from wtforms.validators import InputRequired, NumberRange
 from psycopg2.extras import NumericRange
+from wtforms.fields import BooleanField
+from wtforms.fields import IntegerField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired, NumberRange
 
 
 class OccasionNeedForm(Form):

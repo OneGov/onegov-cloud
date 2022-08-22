@@ -1,9 +1,11 @@
-from onegov.org import _
 from onegov.form import Form
-from wtforms import StringField, TextAreaField, SelectField
-from wtforms.fields.html5 import URLField
-from wtforms.validators import InputRequired
+from onegov.org import _
 from onegov.org.models.external_link import ExternalLinkCollection
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
+from wtforms.validators import InputRequired
 
 
 class ExternalLinkForm(Form):

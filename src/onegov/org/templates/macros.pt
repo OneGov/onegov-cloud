@@ -286,12 +286,6 @@
 </metal:panel>
 
 <metal:form define-macro="form">
-    <div class="panel global-errors" tal:condition="form.errors.get('global-errors')">
-        <p tal:repeat="error form.errors['global-errors']">
-            ${error}
-        </p>
-    </div>
-
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
@@ -458,20 +452,6 @@
 </metal:publication_hint>
 
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.org">
-    <tal:b condition="item.access == 'private'|False">
-        <div class="row">
-            <div class="small-12 columns">
-                <div class="panel callout">
-                    <p i18n:translate>
-                        This site is not public.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </tal:b>
-</metal:access_hint_long>
-
-<metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
     <tal:b tal:switch="item.access|False">
         <tal:b tal:case="'private'">
             <div class="row">

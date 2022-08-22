@@ -1,10 +1,9 @@
-from wtforms import StringField, TextAreaField
-from wtforms.validators import InputRequired
-
+from cached_property import cached_property
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.fsi import _
-from cached_property import cached_property
+from wtforms.fields import StringField, TextAreaField
+from wtforms.validators import InputRequired
 
 
 class NotificationForm(Form):
