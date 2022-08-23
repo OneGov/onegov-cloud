@@ -32,9 +32,17 @@ def convert_agency_portrait_to_html(context):
                 linkify(agency.portrait).replace('\n', '<br>'))
 
 
-@upgrade_task('Add address column to agency')
-def add_address_column_to_agency(context):
-    if not context.has_column('agencies', 'address'):
+@upgrade_task('Add address columns to agency')
+def add_address_columns_to_agency(context):
+    if not context.has_column('agencies', 'street'):
         context.operations.add_column('agencies', Column(
-            'address', Text, nullable=True
+            'street', Text, nullable=True
+        ))
+    if not context.has_column('agencies', 'zip_code'):
+        context.operations.add_column('agencies', Column(
+            'zip_code', Text, nullable=True
+        ))
+    if not context.has_column('agencies', 'city'):
+        context.operations.add_column('agencies', Column(
+            'city', Text, nullable=True
         ))

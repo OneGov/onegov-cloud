@@ -9,9 +9,11 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import content_type_from_fileobj
 from onegov.file.utils import extension_for_content_type
+from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
+from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 
@@ -21,7 +23,7 @@ class AgencyOrganigram(File):
 
 
 class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
-             UTCPublicationMixin):
+             UTCPublicationMixin, CoordinatesMixin):
     """ An agency (organization) containing people through memberships. """
 
     __tablename__ = 'agencies'
@@ -50,7 +52,10 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: describes the agency
     portrait = Column(Text, nullable=True)
 
+    #: optional address
     address = Column(Text, nullable=True)
+    zip_code = Column(Integer, nullable=True)
+    city = Column(Text, nullable=True)
 
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')

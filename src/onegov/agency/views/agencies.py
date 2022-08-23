@@ -97,7 +97,7 @@ def view_agency(self, request):
 
     map = ""
     if self.address:
-        map = request.app.agency_map_class.map_html_string(self.address)
+        map = request.app.agency_map_class.map_html_string(self.coordinates)
 
     return {
         'title': self.title,
