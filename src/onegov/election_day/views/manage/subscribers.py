@@ -81,7 +81,7 @@ def handle_cleanup_subscribers(collection, request, form):
     errors = []
     if form.submitted(request):
         errors, count = collection.cleanup(
-            form.file.raw_data[0].file,
+            form.file.file,
             form.file.data['mimetype'],
             form.type.data == 'delete'
         )

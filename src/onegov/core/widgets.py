@@ -22,7 +22,7 @@ a get_variables method::
 XML using the widget tags can then be transformed to chameleon HTML/XML. The
 widget variables need to be injected before rendering::
 
-    from chameleon import PageTemplate
+    from onegov.core.templates import PageTemplate
     widgets = [MyWidget()]
     structure = '<my-widget>Hello world!</my-widget>'
     template = PageTemplate(transform_structure(widgets, structure))
@@ -32,7 +32,7 @@ widget variables need to be injected before rendering::
 """
 
 from lxml import etree
-from wtforms import ValidationError
+from wtforms.validators import ValidationError
 
 
 XSLT_BASE = """<?xml version="1.0" encoding="UTF-8"?>

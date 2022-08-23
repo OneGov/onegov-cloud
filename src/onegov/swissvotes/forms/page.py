@@ -4,7 +4,7 @@ from onegov.form import Form
 from onegov.quill import QuillField
 from onegov.swissvotes import _
 from onegov.swissvotes.models import TranslatablePage
-from wtforms import StringField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

@@ -160,8 +160,8 @@ msgstr "Supprimer le formulaire"
 msgid "Export"
 msgstr "Exporter"
 
-msgid "Change Url"
-msgstr "Changer Url"
+msgid "Change URL"
+msgstr "Changer URL"
 
 msgid "Registration Windows"
 msgstr "Fenêtres d'inscription"

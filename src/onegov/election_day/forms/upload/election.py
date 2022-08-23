@@ -5,9 +5,9 @@ from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
-from wtforms import BooleanField
-from wtforms import IntegerField
-from wtforms import RadioField
+from wtforms.fields import BooleanField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange

@@ -93,9 +93,9 @@ def view_upload_wabsti_vote(self, request):
 
         errors[vote.id] = import_vote_wabstic(
             vote, self, item.number, item.district,
-            form.sg_geschaefte.raw_data[0].file,
+            form.sg_geschaefte.file,
             form.sg_geschaefte.data['mimetype'],
-            form.sg_gemeinden.raw_data[0].file,
+            form.sg_gemeinden.file,
             form.sg_gemeinden.data['mimetype']
         )
         if not errors[vote.id]:
@@ -182,15 +182,15 @@ def view_upload_wabsti_majorz(self, request):
 
         errors[election.id] = import_election_wabstic_majorz(
             election, self, item.number, item.district,
-            form.wm_wahl.raw_data[0].file,
+            form.wm_wahl.file,
             form.wm_wahl.data['mimetype'],
-            form.wmstatic_gemeinden.raw_data[0].file,
+            form.wmstatic_gemeinden.file,
             form.wmstatic_gemeinden.data['mimetype'],
-            form.wm_gemeinden.raw_data[0].file,
+            form.wm_gemeinden.file,
             form.wm_gemeinden.data['mimetype'],
-            form.wm_kandidaten.raw_data[0].file,
+            form.wm_kandidaten.file,
             form.wm_kandidaten.data['mimetype'],
-            form.wm_kandidatengde.raw_data[0].file,
+            form.wm_kandidatengde.file,
             form.wm_kandidatengde.data['mimetype'],
         )
         if not errors[election.id]:
@@ -279,21 +279,21 @@ def view_upload_wabsti_proporz(self, request):
 
         errors[election.id] = import_election_wabstic_proporz(
             election, self, item.number, item.district,
-            form.wp_wahl.raw_data[0].file,
+            form.wp_wahl.file,
             form.wp_wahl.data['mimetype'],
-            form.wpstatic_gemeinden.raw_data[0].file,
+            form.wpstatic_gemeinden.file,
             form.wpstatic_gemeinden.data['mimetype'],
-            form.wp_gemeinden.raw_data[0].file,
+            form.wp_gemeinden.file,
             form.wp_gemeinden.data['mimetype'],
-            form.wp_listen.raw_data[0].file,
+            form.wp_listen.file,
             form.wp_listen.data['mimetype'],
-            form.wp_listengde.raw_data[0].file,
+            form.wp_listengde.file,
             form.wp_listengde.data['mimetype'],
-            form.wpstatic_kandidaten.raw_data[0].file,
+            form.wpstatic_kandidaten.file,
             form.wpstatic_kandidaten.data['mimetype'],
-            form.wp_kandidaten.raw_data[0].file,
+            form.wp_kandidaten.file,
             form.wp_kandidaten.data['mimetype'],
-            form.wp_kandidatengde.raw_data[0].file,
+            form.wp_kandidatengde.file,
             form.wp_kandidatengde.data['mimetype'],
         )
         if not errors[election.id]:

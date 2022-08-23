@@ -86,7 +86,7 @@ def test_browse_directory_uploads(browser, org_app, field):
 
     browser.find_by_css('.edit-link').click()
     browser.choose('photo', 'replace')
-    browser.find_by_name('photo').last.value = photo.name
+    browser.find_by_name('photo')[3].value = photo.name
     browser.find_by_value("Absenden").click()
 
     assert browser.is_element_present_by_css('.field-display img')

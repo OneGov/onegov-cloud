@@ -19,7 +19,6 @@ from onegov.translator_directory.models.language import \
     written_association_table, monitoring_association_table
 
 
-# todo: remove me!?
 class ESMixin(ORMSearchable):
 
     es_properties = {
@@ -39,7 +38,7 @@ class ESMixin(ORMSearchable):
 
 
 class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
-                 CoordinatesMixin):
+                 CoordinatesMixin, ESMixin):
 
     __tablename__ = 'translators'
 

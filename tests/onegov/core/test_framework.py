@@ -21,7 +21,8 @@ from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 from urllib.parse import parse_qsl
 from webtest import TestApp as Client
-from wtforms import Form, StringField
+from wtforms import Form
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

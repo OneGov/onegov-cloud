@@ -7,6 +7,7 @@ from onegov.core.security import Secret
 from onegov.file import File
 from onegov.org.models import GeneralFile
 from onegov.org.models import GeneralFileCollection
+from onegov.org.models import Topic
 from onegov.ticket import Ticket
 from onegov.ticket import TicketCollection
 from onegov.translator_directory.collections.certificate import \
@@ -25,7 +26,6 @@ from onegov.translator_directory.models.mutation import TranslatorMutation
 from onegov.translator_directory.models.ticket import AccreditationTicket
 from onegov.translator_directory.models.ticket import TranslatorMutationTicket
 from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.models.voucher import TranslatorVoucherFile
 from onegov.user.models import User
 
 
@@ -217,7 +217,7 @@ def test_security_permissions(translator_app):
     assert_anonymous(None, model)
 
     # File
-    model = File()
+    model = File(published=False)
     assert_admin(users['admin'], model)
     assert_no_access(users['editor'], model)  # restricted
     assert_no_access(users['member'], model)  # restricted
@@ -225,8 +225,7 @@ def test_security_permissions(translator_app):
     assert_no_access(users['anonymous'], model)  # restricted
     assert_no_access(None, model)
 
-    # TranslatorVoucherFile
-    model = TranslatorVoucherFile()
+    model = File(published=True)
     assert_admin(users['admin'], model)
     assert_no_access(users['editor'], model)  # restricted
     assert_no_access(users['member'], model)  # restricted
@@ -235,13 +234,21 @@ def test_security_permissions(translator_app):
     assert_no_access(None, model)
 
     # GeneralFile
-    model = GeneralFile()
+    model = GeneralFile(published=False)
     assert_admin(users['admin'], model)
-    assert_no_access(users['editor'], model)  # restricted
-    assert_no_access(users['member'], model)  # restricted
-    assert_no_access(users['translator'], model)  # restricted
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
     assert_no_access(users['anonymous'], model)  # restricted
     assert_no_access(None, model)
+
+    model = GeneralFile(published=True)
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
+    assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
 
     # GeneralFileCollection
     model = GeneralFileCollection(session)
@@ -250,6 +257,39 @@ def test_security_permissions(translator_app):
     assert_no_access(users['member'], model)  # restricted
     assert_no_access(users['translator'], model)  # restricted
     assert_no_access(users['anonymous'], model)  # restricted
+    assert_no_access(None, model)
+
+    # Topic
+    model = Topic('Topic', access='public')
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
+    assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
+
+    model = Topic('Topic', access='secret')
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
+    assert_anonymous(users['anonymous'], model)
+    assert_anonymous(None, model)
+
+    model = Topic('Topic', access='private')
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_no_access(users['member'], model)
+    assert_no_access(users['translator'], model)
+    assert_no_access(users['anonymous'], model)
+    assert_no_access(None, model)
+
+    model = Topic('Topic', access='member')
+    assert_admin(users['admin'], model)
+    assert_editor(users['editor'], model)
+    assert_member(users['member'], model)
+    assert_translator(users['translator'], model)
+    assert_no_access(users['anonymous'], model)
     assert_no_access(None, model)
 
     # Ticket

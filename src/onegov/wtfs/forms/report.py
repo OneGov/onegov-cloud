@@ -8,9 +8,9 @@ from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models import ReportFormsAllMunicipalities
 from onegov.wtfs.models import ReportFormsByMunicipality
-from wtforms import RadioField
-from wtforms import SelectField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import RadioField
+from wtforms.fields import SelectField
 from wtforms.validators import InputRequired
 
 

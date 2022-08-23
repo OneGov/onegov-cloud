@@ -9,8 +9,12 @@ from onegov.form.fields import PanelField
 from onegov.org.forms import ExportForm
 from sqlalchemy import distinct, func, or_, literal
 from wtforms.fields import BooleanField
-from wtforms.fields import StringField, RadioField, SelectField
-from wtforms.fields.html5 import DateField, IntegerField, DecimalField
+from wtforms.fields import DateField
+from wtforms.fields import DecimalField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired, Optional, NumberRange
 
 

@@ -18,7 +18,7 @@ def test_news(client):
 
     # Top page with path /news is fix, and all others are children
     links = edit_bar_links(page, 'text')
-    assert 'Url ändern' not in links
+    assert 'URL ändern' not in links
     assert len(links) == 3
 
     edit = page.click('Bearbeiten')

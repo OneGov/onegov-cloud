@@ -60,7 +60,7 @@ def view_upload_majorz_election(self, request, form):
                 errors = import_election_internal_majorz(
                     self,
                     principal,
-                    form.results.raw_data[0].file,
+                    form.results.file,
                     form.results.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
@@ -68,9 +68,9 @@ def view_upload_majorz_election(self, request, form):
                 errors = import_election_wabsti_majorz(
                     self,
                     principal,
-                    form.results.raw_data[0].file,
+                    form.results.file,
                     form.results.data['mimetype'],
-                    form.elected.raw_data[0].file if elected else None,
+                    form.elected.file if elected else None,
                     form.elected.data['mimetype'] if elected else None,
                 )
                 if form.majority.data:
@@ -80,7 +80,7 @@ def view_upload_majorz_election(self, request, form):
                 errors = import_election_wabsti_majorz(
                     self,
                     principal,
-                    form.results.raw_data[0].file,
+                    form.results.file,
                     form.results.data['mimetype'],
                 )
             elif form.file_format.data == 'wabsti_c':
@@ -91,15 +91,15 @@ def view_upload_majorz_election(self, request, form):
                             principal,
                             source.number,
                             source.district,
-                            form.wm_wahl.raw_data[0].file,
+                            form.wm_wahl.file,
                             form.wm_wahl.data['mimetype'],
-                            form.wmstatic_gemeinden.raw_data[0].file,
+                            form.wmstatic_gemeinden.file,
                             form.wmstatic_gemeinden.data['mimetype'],
-                            form.wm_gemeinden.raw_data[0].file,
+                            form.wm_gemeinden.file,
                             form.wm_gemeinden.data['mimetype'],
-                            form.wm_kandidaten.raw_data[0].file,
+                            form.wm_kandidaten.file,
                             form.wm_kandidaten.data['mimetype'],
-                            form.wm_kandidatengde.raw_data[0].file,
+                            form.wm_kandidatengde.file,
                             form.wm_kandidatengde.data['mimetype']
                         )
                     )
@@ -165,7 +165,7 @@ def view_upload_proporz_election(self, request, form):
                 errors = import_election_internal_proporz(
                     self,
                     principal,
-                    form.results.raw_data[0].file,
+                    form.results.file,
                     form.results.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
@@ -175,13 +175,13 @@ def view_upload_proporz_election(self, request, form):
                 errors = import_election_wabsti_proporz(
                     self,
                     principal,
-                    form.results.raw_data[0].file,
+                    form.results.file,
                     form.results.data['mimetype'],
-                    form.connections.raw_data[0].file if connections else None,
+                    form.connections.file if connections else None,
                     form.connections.data['mimetype'] if connections else None,
-                    form.elected.raw_data[0].file if elected else None,
+                    form.elected.file if elected else None,
                     form.elected.data['mimetype'] if elected else None,
-                    form.statistics.raw_data[0].file if stats else None,
+                    form.statistics.file if stats else None,
                     form.statistics.data['mimetype'] if stats else None
                 )
                 self.status = 'final' if form.complete.data else 'interim'
@@ -193,21 +193,21 @@ def view_upload_proporz_election(self, request, form):
                             principal,
                             source.number,
                             source.district,
-                            form.wp_wahl.raw_data[0].file,
+                            form.wp_wahl.file,
                             form.wp_wahl.data['mimetype'],
-                            form.wpstatic_gemeinden.raw_data[0].file,
+                            form.wpstatic_gemeinden.file,
                             form.wpstatic_gemeinden.data['mimetype'],
-                            form.wp_gemeinden.raw_data[0].file,
+                            form.wp_gemeinden.file,
                             form.wp_gemeinden.data['mimetype'],
-                            form.wp_listen.raw_data[0].file,
+                            form.wp_listen.file,
                             form.wp_listen.data['mimetype'],
-                            form.wp_listengde.raw_data[0].file,
+                            form.wp_listengde.file,
                             form.wp_listengde.data['mimetype'],
-                            form.wpstatic_kandidaten.raw_data[0].file,
+                            form.wpstatic_kandidaten.file,
                             form.wpstatic_kandidaten.data['mimetype'],
-                            form.wp_kandidaten.raw_data[0].file,
+                            form.wp_kandidaten.file,
                             form.wp_kandidaten.data['mimetype'],
-                            form.wp_kandidatengde.raw_data[0].file,
+                            form.wp_kandidatengde.file,
                             form.wp_kandidatengde.data['mimetype'],
                         )
                     )

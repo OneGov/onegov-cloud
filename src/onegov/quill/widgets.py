@@ -1,6 +1,6 @@
+from markupsafe import Markup
 from random import choice
 from wtforms.widgets import HiddenInput
-from wtforms.widgets.core import HTMLString
 
 
 HEADINGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
@@ -87,7 +87,7 @@ class QuillInput(HiddenInput):
         ]
         placeholders = ', '.join(placeholders)
 
-        return HTMLString(f"""
+        return Markup(f"""
             <div style="position:relative">
                 <div class="scrolling-container" id="{scroll_container_id}">
                   <div class="quill-container" id="{container_id}"></div>

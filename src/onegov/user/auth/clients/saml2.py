@@ -151,7 +151,7 @@ class SAML2Client():
         if conn is None:
             # create connection
             try:
-                base_url = request.application_url
+                base_url = request.application_url.rstrip('/')
                 provider_cls = type(provider)
                 acs_url = request.class_link(
                     provider_cls, {'name': provider.name}, name='redirect')

@@ -1,8 +1,10 @@
 from onegov.core.utils import ensure_scheme
 from onegov.form import Form
 from onegov.org import _
-from wtforms import StringField, TextAreaField, validators
-from wtforms.fields.html5 import EmailField
+from wtforms.validators import InputRequired
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 
 
 class PersonForm(Form):
@@ -11,8 +13,8 @@ class PersonForm(Form):
     salutation = StringField(_("Salutation"))
     academic_title = StringField(_("Academic Title"))
 
-    first_name = StringField(_("First name"), [validators.InputRequired()])
-    last_name = StringField(_("Last name"), [validators.InputRequired()])
+    first_name = StringField(_("First name"), [InputRequired()])
+    last_name = StringField(_("Last name"), [InputRequired()])
 
     function = StringField(_("Function"))
 

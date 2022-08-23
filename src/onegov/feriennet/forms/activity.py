@@ -4,7 +4,7 @@ from onegov.form import Form
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.org.forms.fields import HtmlField
 from onegov.user import User, UserCollection
-from wtforms import TextAreaField, SelectField, StringField
+from wtforms.fields import TextAreaField, SelectField, StringField
 from wtforms.validators import InputRequired
 
 

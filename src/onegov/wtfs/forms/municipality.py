@@ -7,11 +7,11 @@ from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PaymentType
 from onegov.wtfs.models import PickupDate
 from sqlalchemy import func
-from wtforms import IntegerField
-from wtforms import RadioField
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms.fields.html5 import DateField
+from wtforms.fields import DateField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional

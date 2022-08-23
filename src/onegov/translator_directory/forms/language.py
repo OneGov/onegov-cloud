@@ -1,10 +1,10 @@
-from wtforms import StringField, ValidationError
-from wtforms.validators import InputRequired
-
 from onegov.form import Form
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.models.language import Language
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 
 
 class LanguageForm(Form):
