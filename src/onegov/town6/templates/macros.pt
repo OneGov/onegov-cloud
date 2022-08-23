@@ -665,6 +665,9 @@
                 <a href="${request.link(sibling)}">
                     ${sibling.title}
                 </a>
+                <p class="list-lead">
+                    ${layout.format_date(sibling.published_or_created, 'date_long')}
+                </p>
             </div>
         </div>
     </div>

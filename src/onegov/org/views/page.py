@@ -107,8 +107,12 @@ def view_news(self, request, layout=None):
             rounded=True
         ) for tag in self.all_tags]
     else:
-        siblings = self.siblings.order_by(
-            News.published_or_created).filter(News.published).all()
+        query = self.parent.news_query(limit=None)
+        if request.is_manager:
+            siblings = query.all()
+        else:
+            siblings = request.exclude_invisible(query.all())
+
         siblings.remove(self)
         siblings = siblings[0:3]
 
