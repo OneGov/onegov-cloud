@@ -63,6 +63,19 @@ class TitleWidget(object):
     """
 
 
+@TownApp.homepage_widget(tag='autoplay_video')
+class AutoplayVideoWidget(object):
+    template = """
+        <xsl:template match="autoplay_video">
+            <div metal:use-macro="layout.macros.autoplay_video"
+             tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
+             link_webm '{link_webm}'
+             "
+            />
+        </xsl:template>
+    """
+
+
 @TownApp.homepage_widget(tag='text')
 class TextWidget(object):
     template = """

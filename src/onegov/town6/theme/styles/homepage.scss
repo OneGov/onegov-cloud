@@ -4,3 +4,12 @@
         color: $primary-fg-color;
     }
 }
+
+.homepage-video {
+    max-height: 60vh;
+    overflow: hidden;
+
+    video {
+        width: 100%;
+    }
+}
