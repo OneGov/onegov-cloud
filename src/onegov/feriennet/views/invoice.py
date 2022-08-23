@@ -103,15 +103,16 @@ def view_my_invoices(self, request):
         if not invoice.paid:
             self.schema.link(request.session, invoice)
 
-    if self.schema.name == 'feriennet-v1':
-        account = request.app.org.meta.get('bank_account')
+    meta = request.app.org.meta
+    if self.schema.name == 'feriennet-v1' or meta.get('bank_qr_bill'):
+        account = meta.get('bank_account')
         account = account and iban.format(account)
     else:
-        account = request.app.org.meta.get('bank_esr_participant_number')
+        account = meta.get('bank_esr_participant_number')
 
-    beneficiary = request.app.org.meta.get('bank_beneficiary')
+    beneficiary = meta.get('bank_beneficiary')
     payment_provider = request.app.default_payment_provider
-    qr_bill_enabled = request.app.org.meta.get('bank_qr_bill', False)
+    qr_bill_enabled = meta.get('bank_qr_bill', False)
     layout = InvoiceLayout(self, request, title)
 
     def payment_button(title, price):
