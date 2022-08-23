@@ -24,8 +24,13 @@ from wtforms.validators import InputRequired
 
 class FeriennetSettingsForm(Form):
 
+    bank_qr_bill = BooleanField(
+        label=_("QR-Bill"),
+        fieldset=_("Payment")
+    )
+
     bank_account = StringField(
-        label=_("Bank Account (IBAN)"),
+        label=_("Bank Account (IBAN / QR-IBAN)"),
         fieldset=_("Payment"),
         validators=[Stdnum(format='iban')]
     )
@@ -48,7 +53,7 @@ class FeriennetSettingsForm(Form):
     )
 
     bank_esr_participant_number = StringField(
-        label=_("ESR participant number"),
+        label=_("ESR participant number / QR-IBAN"),
         fieldset=_("Payment"),
         validators=[InputRequired()],
         depends_on=('bank_reference_schema', '!feriennet-v1')
@@ -59,11 +64,6 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Payment"),
         validators=[InputRequired()],
         depends_on=('bank_reference_schema', 'raiffeisen-v1')
-    )
-
-    bank_qr_bill = BooleanField(
-        label=_("QR-Bill (experimental)"),
-        fieldset=_("Payment")
     )
 
     require_full_age_for_registration = BooleanField(
