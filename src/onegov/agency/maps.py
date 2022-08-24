@@ -1,4 +1,5 @@
 from markupsafe import Markup
+import requests
 
 
 class AgencyMapDefault():
@@ -17,6 +18,12 @@ class AgencyMapDefault():
 class AgencyMapBs():
 
     def map_html_string(coordinates):
+        response = requests.get((
+            'http://geodesy.geo.admin.ch/reframe/wgs84tolv95?'
+            f'easting={coordinates.lon}&northing={coordinates.lat}&format=json'
+        ))
+        coordinates_ch = response.json()
+
         return Markup(f"""
             <link href="https://map.geo.bs.ch/api.css" rel="stylesheet">
             <script src="https://map.geo.bs.ch/api.js?version=2"></script>
@@ -24,10 +31,10 @@ class AgencyMapBs():
                 window.onload = function() {{
                     var map = new mapbs.Map({{
                         div: 'map', // id of the div element to put the map in
-                        zoom: {coordinates.zoom},
+                        zoom: 8,
                         backgroundLayers: ['Grundkarte farbig'],
-                        center: [{coordinates.lat},
-                        {coordinates.lon}]
+                        center: [{coordinates_ch['easting']},
+                        {coordinates_ch['northing']}]
                     }});
                     map.addMarker();
                 }};
