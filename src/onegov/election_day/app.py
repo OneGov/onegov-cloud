@@ -6,7 +6,6 @@ from datetime import datetime
 from dectate import directive
 from more.content_security import SELF
 from more.content_security.core import content_security_policy_tween_factory
-from onegov.api import ApiApp
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.datamanager import FileDataManager
@@ -14,7 +13,6 @@ from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import current_language_tween_factory
 from onegov.core.framework import transaction_tween_factory
 from onegov.core.utils import batched
-from onegov.election_day.api import VoteApiEndpoint
 from onegov.election_day.directives import CsvFileAction
 from onegov.election_day.directives import JsonFileAction
 from onegov.election_day.directives import ManageFormAction
@@ -29,7 +27,7 @@ from onegov.form import FormApp
 from onegov.user import UserApp
 
 
-class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, ApiApp):
+class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     """ The election day application. Include this in your onegov.yml to serve
     it with onegov-server.
 
@@ -394,8 +392,3 @@ def get_backend_common_asset():
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
     yield 'form_dependencies.js'
-
-
-@ElectionDayApp.setting(section='api', name='endpoints')
-def get_api_endpoints():
-    return [VoteApiEndpoint]
