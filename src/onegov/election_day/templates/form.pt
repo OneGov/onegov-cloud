@@ -11,16 +11,14 @@
         </div>
         <p tal:condition="message|nothing">${message}</p>
         <div tal:condition="file_import_errors|nothing" class="after-upload" >
-            <div class="alert-box alert" i18n:translate=""><p>The file is invalid.</p></div>
+            <div class="alert-box alert" i18n:translate="">The file is invalid.</div>
             <tal:block metal:use-macro="layout.macros['file_import_errors']" tal:define="errors file_import_errors"/>
         </div>
         <div tal:condition="show_form|True" class="row">
             <div class="small-12 columns">
                 <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
-                    <p>
-                        <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the marked fields.</tal:block>
-                        <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
-                    </p>
+                    <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the marked fields.</tal:block>
+                    <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
                 </div>
                 <div metal:use-macro="layout.macros['form']" />
             </div>

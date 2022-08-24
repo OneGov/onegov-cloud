@@ -1001,7 +1001,7 @@
                                 ${field(placeholder=request.translate(field.description))}
                             </tal:block>
                         </label>
-                        <p><small class="error" tal:repeat="error field.errors">${error}</small></p>
+                        <small class="error" tal:repeat="error field.errors">${error}</small>
                     </tal:block>
                </tal:block>
             </div>
@@ -1118,9 +1118,7 @@
          </p>
     </div>
     <div class="panel" tal:condition="layout.completed">
-        <p>
-            <span i18n:translate="">Last change</span>: ${layout.format_date(layout.last_result_change, 'datetime_long')}
-        </p>
+        <span i18n:translate="">Last change</span>: ${layout.format_date(layout.last_result_change, 'datetime_long')}
     </div>
 </metal:status_callout>
 
