@@ -1,4 +1,5 @@
 from onegov.agency.api import AgencyApiEndpoint
+from onegov.agency.api import MembershipApiEndpoint
 from onegov.agency.api import PersonApiEndpoint
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
@@ -166,5 +167,6 @@ def get_editor_assets():
 def get_api_endpoints():
     return [
         AgencyApiEndpoint,
-        PersonApiEndpoint
+        PersonApiEndpoint,
+        MembershipApiEndpoint
     ]

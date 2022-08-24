@@ -1,32 +1,45 @@
-from onegov.agency.collections import PaginatedAgencyCollection
+from cached_property import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.collections import PaginatedAgencyCollection
+from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.api import ApiEndpoint
 
 
-class PersonApiEndpoint(ApiEndpoint):
+class ApisMixin:
+
+    @cached_property
+    def agency_api(self):
+        return AgencyApiEndpoint(self.app)
+
+    @cached_property
+    def person_api(self):
+        return PersonApiEndpoint(self.app)
+
+    @cached_property
+    def membership_api(self):
+        return MembershipApiEndpoint(self.app)
+
+
+class PersonApiEndpoint(ApiEndpoint, ApisMixin):
 
     endpoint = 'people'
+    filters = []
 
-    @classmethod
-    def link(cls, person, request):
-        return request.link(
-            cls(request.app),
-            query_params={'id': person.id.hex}
+    @property
+    def collection(self):
+        result = ExtendedPersonCollection(
+            self.session,
+            page=self.page or 0
         )
+        result.exclude_hidden = True
+        result.batch_size = self.batch_size
+        return result
 
-    @classmethod
-    def json(cls, item, request, compact=True):
-        if not item:
-            return None
+    def by_id(self, id_):
+        return ExtendedPersonCollection(self.session).by_id(id_)
 
-        result = {
-            '@id': cls.link(item, request),
-            'title': item.title
-        }
-        if compact:
-            return result
-
-        result.update({
+    def item_data(self, item):
+        return {
             attribute: getattr(item, attribute, None)
             for attribute in (
                 'academic_title',
@@ -40,108 +53,99 @@ class PersonApiEndpoint(ApiEndpoint):
                 'parliamentary_group',
                 'phone_direct',
                 'phone',
-                'picture_url',
                 'political_party',
                 'profession',
                 'salutation',
                 'salutation',
                 'title',
+            )
+            if attribute not in self.app.org.hidden_people_fields
+        }
+
+    def item_links(self, item):
+        result = {
+            attribute: getattr(item, attribute, None)
+            for attribute in (
+                'picture_url',
                 'website',
             )
-            if attribute not in request.app.org.hidden_people_fields
-        })
-        result['memberships'] = [
-            {
-                'title': membership.title,
-                'organisation': AgencyApiEndpoint.json(
-                    membership.agency, request
-                )
-            }
-            for membership in item.memberships_by_agency
-            if (
-                membership.access == 'public'
-                and membership.published
-                and membership.agency
-            )
-        ]
-        return result
-
-    def by_id(self, id_):
-        return ExtendedPersonCollection(self.session).by_id(id_)
-
-    @property
-    def collection(self):
-        result = ExtendedPersonCollection(
-            self.session,
-            letter=self.get_filter('letter'),
-            agency=self.get_filter('agency'),
-            page=self.page or 0
-        )
-        result.batch_size = self.batch_size
-        return result
-
-
-class AgencyApiEndpoint(ApiEndpoint):
-
-    endpoint = 'organisations'
-
-    @classmethod
-    def link(cls, agency, request):
-        return request.link(
-            cls(request.app),
-            query_params={'id': str(agency.id)}
-        )
-
-    @classmethod
-    def json(cls, item, request, compact=True):
-        if not item:
-            return None
-
-        result = {
-            '@id': cls.link(item, request),
-            'title': item.title
+            if attribute not in self.app.org.hidden_people_fields
         }
-        if compact:
-            return result
-
-        result['portrait'] = item.portrait
-        result['organigram_file'] = (
-            request.link(item.organigram) if item.organigram_file
-            else None
+        result['memberships'] = self.membership_api.for_filter(
+            person=item.id.hex
         )
-        result['parent'] = cls.json(item.parent, request)
-        result['suborganizations'] = [
-            cls.json(child, request)
-            for child in item.children
-            if (child.access == 'public' and child.published)
-        ]
-        result['memberships'] = [
-            {
-                'title': membership.title,
-                'person': PersonApiEndpoint.json(
-                    membership.person,
-                    request
-                )
-            }
-            for membership in item.memberships
-            if (
-                membership.access == 'public'
-                and membership.published
-                and membership.person
-                and membership.person.access == 'public'
-                and membership.person.published
-            )
-        ]
         return result
 
-    def by_id(self, id_):
-        return PaginatedAgencyCollection(self.session).by_id(id_)
+
+class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
+
+    endpoint = 'agencies'
+    filters = ['parent']
 
     @property
     def collection(self):
         result = PaginatedAgencyCollection(
             self.session,
-            page=self.page or 0
+            page=self.page or 0,
+            parent=self.get_filter('parent'),
         )
+        result.exclude_hidden = True
         result.batch_size = self.batch_size
+        return result
+
+    def by_id(self, id_):
+        return PaginatedAgencyCollection(self.session).by_id(id_)
+
+    def item_data(self, item):
+        return {
+            'title': item.title,
+            'portrait': item.portrait
+        }
+
+    def item_links(self, item):
+        return {
+            'organigram': item.organigram,
+            'parent': self.for_item(item.parent),
+            'children': self.for_filter(parent=str(item.id)),
+            'memberships': self.membership_api.for_filter(
+                agency=str(item.id)
+            )
+        }
+
+
+class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
+
+    endpoint = 'memberships'
+    filters = ['agency', 'person']
+
+    @property
+    def collection(self):
+        result = PaginatedMembershipCollection(
+            self.session,
+            page=self.page or 0,
+            agency=self.get_filter('agency'),
+            person=self.get_filter('person')
+        )
+        result.exclude_hidden = True
+        result.batch_size = self.batch_size
+        return result
+
+    def by_id(self, id_):
+        return PaginatedMembershipCollection(self.session).by_id(id_)
+
+    def item_data(self, item):
+        return {
+            'title': item.title
+        }
+
+    def item_links(self, item):
+        result = {}
+        result['agency'] = None
+        if item.agency:
+            if item.agency.published and item.agency.access == 'public':
+                result['agency'] = self.agency_api.for_item(item.agency)
+        result['person'] = None
+        if item.person:
+            if item.person.published and item.person.access == 'public':
+                result['person'] = self.person_api.for_item(item.person)
         return result

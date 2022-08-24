@@ -3,16 +3,15 @@ from morepath import App
 
 class ApiApp(App):
 
-    def configure_api(self, **cfg):
-        # todo: allow global enabling/disabling for all applications?
-        pass
-
-    # todo: allow instance specific settings, probably using the filestorage?
-
     @property
     def rate_limit(self):
-        """ The number of requests per timedelta in seconds. """
-        return 10000, 15 * 60 * 60
+        """ The number of requests per timedelta in seconds.
+
+        Since providing an API is not our main focus, we keep the rate limit
+        rather low (<10 requests per minute) while still allowing small crawl
+        bursts.
+        """
+        return 100, 15 * 60
 
     @property
     def rate_limit_cache(self):
