@@ -41,7 +41,7 @@ def test_upload_vote_unknown_result(election_day_app_zg):
     )).encode('utf-8')
     upload.form['proposal'] = Upload('data.csv', proposal, 'text/plain')
     result = upload.form.submit().click("Hier klicken").maybe_follow()
-    result = ' '.join([td.text for td in result.pyquery('td')])
+    result = ' '.join([td.text for td in result.pyquery('.column-entity')])
 
     assert "Noch keine Resultate" not in result
     assert "Zug abgelehnt" in result
