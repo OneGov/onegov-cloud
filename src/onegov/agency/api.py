@@ -35,9 +35,6 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def by_id(self, id_):
-        return ExtendedPersonCollection(self.session).by_id(id_)
-
     def item_data(self, item):
         return {
             attribute: getattr(item, attribute, None)
@@ -93,9 +90,6 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
         result.batch_size = self.batch_size
         return result
 
-    def by_id(self, id_):
-        return PaginatedAgencyCollection(self.session).by_id(id_)
-
     def item_data(self, item):
         return {
             'title': item.title,
@@ -129,9 +123,6 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
         result.exclude_hidden = True
         result.batch_size = self.batch_size
         return result
-
-    def by_id(self, id_):
-        return PaginatedMembershipCollection(self.session).by_id(id_)
 
     def item_data(self, item):
         return {

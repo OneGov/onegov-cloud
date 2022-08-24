@@ -28,7 +28,10 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
         return ExtendedAgency
 
     def __eq__(self, other):
-        return other.page == self.page
+        return (
+            other.page == self.page
+            and other.parent == self.parent
+        )
 
     def subset(self):
         return self.query()

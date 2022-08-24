@@ -17,7 +17,11 @@ class PaginatedMembershipCollection(GenericCollection, Pagination):
         return ExtendedAgencyMembership
 
     def __eq__(self, other):
-        return other.page == self.page
+        return (
+            other.page == self.page
+            and other.agency == self.agency
+            and other.person == self.person
+        )
 
     def subset(self):
         return self.query()

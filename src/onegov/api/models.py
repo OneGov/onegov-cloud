@@ -80,15 +80,28 @@ class ApiEndpoint:
             getattr(item.id, 'hex', str(item.id))
         )
 
-    def item_title(self, item):
-        return item.title
+    def get_filter(self, name):
+        return (self.extra_parameters or {}).get(name, None)
+
+    @property
+    def collection(self):
+        raise NotImplementedError()
+
+    def by_id(self, id_):
+        return self.__class__(self.app).collection.by_id(id_)
 
     @property
     def session(self):
         return self.app.session()
 
-    def get_filter(self, name):
-        return self.extra_parameters.get(name, None)
+    def item_title(self, item):
+        return item.title
+
+    def item_data(self, item):
+        raise NotImplementedError()
+
+    def item_links(self, item):
+        raise NotImplementedError()
 
     @property
     def links(self):
@@ -102,19 +115,6 @@ class ApiEndpoint:
     @property
     def batch(self):
         return {
-            self.item_title(item): self.for_item(item)
+            self.for_item(item): self.item_title(item)
             for item in self.collection.batch
         }
-
-    @property
-    def collection(self):
-        raise NotImplementedError()
-
-    def by_id(self, id_):
-        raise NotImplementedError()
-
-    def item_data(self, item):
-        raise NotImplementedError()
-
-    def item_links(self, item):
-        raise NotImplementedError()

@@ -1,10 +1,9 @@
-from datetime import datetime
-from datetime import timedelta
 from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiExcpetion
+from onegov.api.utils import check_rate_limit
 from onegov.core.security import Public
 
 
@@ -61,41 +60,6 @@ def view_api_endpoints(self, request):
     }
 
 
-def check_rate_limit(request):
-    limit, expiration = request.app.rate_limit
-    requests, timestamp = request.app.rate_limit_cache.get_or_create(
-        request.client_addr,
-        creator=lambda: (0, datetime.utcnow()),
-    )
-    if (datetime.utcnow() - timestamp).seconds < expiration:
-        requests += 1
-    else:
-        timestamp = datetime.utcnow()
-        requests = 1
-    request.app.rate_limit_cache.set(
-        request.client_addr, (requests, timestamp)
-    )
-    reset = timestamp + timedelta(seconds=expiration)
-    headers = {
-        'X-RateLimit-Limit': str(limit),
-        'X-RateLimit-Remaining': str(max(limit - requests, 0)),
-        'X-RateLimit-Reset': reset.strftime("%a, %d %b %Y %H:%M:%S GMT")
-    }
-
-    @request.after
-    def add_headers(response):
-        for header in headers.items():
-            response.headers.add(*header)
-
-    if requests > limit:
-        headers['Retry-After'] = headers['X-RateLimit-Reset']
-        raise ApiExcpetion(
-            'Rate limit exceeded', status_code=429, headers=headers
-        )
-
-    return headers
-
-
 @ApiApp.json(
     model=ApiEndpoint,
     permission=Public
@@ -125,7 +89,7 @@ def view_api_endpoint(self, request):
                         'href': request.link(item),
                         'data': [{'title': title}]
                     }
-                    for title, item in self.batch.items()
+                    for item, title in self.batch.items()
                 ],
             }
         }
