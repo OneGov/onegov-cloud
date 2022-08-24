@@ -55,9 +55,9 @@
                             <tbody>
                                 <tal:b tal:repeat="vote results">
                                     <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
-                                        <td class="top-aligned" tal:define="prefix vote.title_prefix(request)">
+                                        <th class="top-aligned" tal:define="prefix vote.title_prefix(request)">
                                             <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
-                                        </td>
+                                        </th>
                                         <td class="top-aligned">
                                             <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
                                         </td>
@@ -98,9 +98,9 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="election results">
-                                    <td class="top-aligned" tal:define="prefix election.title_prefix(request)">
+                                    <th class="top-aligned" tal:define="prefix election.title_prefix(request)">
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
-                                    </td>
+                                    </th>
                                     <td class="top-aligned" >${layout.format_date(election.date, 'date')}</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'district'" i18n:translate>Regional</td>
