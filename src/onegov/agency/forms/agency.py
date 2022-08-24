@@ -98,7 +98,7 @@ class ExtendedAgencyForm(Form):
     def on_request(self):
         self.request.include('sortable-multi-checkbox')
         if self.request.app.agency_map_class != AgencyMapDefault:
-            self.coordinates.description = (
+            self.coordinates.description = _(
                 'Search for the exact address to set a marker. The address '
                 'fields beneath are filled out automatically.'
             )

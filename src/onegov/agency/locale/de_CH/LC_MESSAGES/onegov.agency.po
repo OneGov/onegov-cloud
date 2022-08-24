@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-08-17 09:40+0200\n"
+"POT-Creation-Date: 2022-08-24 15:44+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -30,6 +30,29 @@ msgstr "Portrait"
 
 msgid "Organigram"
 msgstr "Organigramm"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid ""
+"Search for the exact address to set a marker. The address fields beneath are "
+"filled out automatically. The zoom of the map will be saved as well."
+msgstr ""
+"Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. Die Address-"
+"Felder unterhalb werden automatisch ausgefüllt. Der Zoom der Karte wird "
+"ebenfalls gespeichert."
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Street and house number"
+msgstr "Strasse und Hausnummer"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
 
 msgid "Fields to include for each membership"
 msgstr "Zu berücksichtigende Felder der Mitgliedschaften"
@@ -81,6 +104,12 @@ msgstr "Person: Direktnummer"
 
 msgid "PDF Export"
 msgstr "PDF Export"
+
+msgid ""
+"Search for the exact address to set a marker. The address fields beneath are "
+"filled out automatically."
+msgstr "Suchen Sie nach der exakten Addresse, um einen Marker zu setzen. Die Address-"
+"Felder unterhalb werden automatisch ausgefüllt."
 
 msgid "Destination"
 msgstr "Ziel"
@@ -169,9 +198,6 @@ msgstr "Fraktion"
 
 msgid "Website"
 msgstr "Webseite"
-
-msgid "Address"
-msgstr "Adresse"
 
 msgid "Notes"
 msgstr "Bemerkungen"
@@ -425,14 +451,11 @@ msgstr "Eine neue Person wurde hinzugefügt"
 msgid "New person"
 msgstr "Neue Person"
 
-msgid "PDF Layout"
-msgstr "PDF Layout"
-
 msgid "PDF Design"
 msgstr "PDF Design"
 
-msgid "Layout"
-msgstr "Layout"
+msgid "PDF Layout"
+msgstr "PDF Layout"
 
 msgid "Default"
 msgstr "Standard"
@@ -457,6 +480,12 @@ msgstr "Farbe Hyperlinks im PDF"
 
 msgid "Underline pdf links"
 msgstr "Hyperlinks unterstreichen"
+
+msgid "Map for Agency Adresses"
+msgstr "Karte für die Adressen"
+
+msgid "Map"
+msgstr "Karte"
 
 msgid "Show additional agencies to search results"
 msgstr "Zusätzliche Organisation in den Suchresultaten anzeigen"
@@ -495,3 +524,6 @@ msgstr "Daten"
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+#~ msgid "Layout"
+#~ msgstr "Layout"
