@@ -35,6 +35,8 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     # The collection name this model should appear in
     member_of = Column(Text, nullable=True)
+    # TODO: Stop passing title (and maybe even to) as url parameters. 
+    # Figure out a way to use the member_of attribute instead.
     group = Column(Text, nullable=True)
 
     #: The normalized title for sorting
