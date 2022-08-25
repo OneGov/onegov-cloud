@@ -93,12 +93,30 @@ def get_resource_form(self, request, type=None):
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request, layout=None):
+    default_group = request.translate(_("General"))
     resources = group_by_column(
         request=request,
         query=self.query(),
+        default_group=default_group,
         group_column=Resource.group,
         sort_column=Resource.title
     )
+
+    def contains_at_least_one_room(resources):
+        for resource in resources:
+            if resource.type == 'room':
+                return True
+        return False
+
+    for group, entries in resources.items():
+        # don't include find-your-spot link for categories with
+        # no rooms
+        if not contains_at_least_one_room(entries):
+            continue
+        entries.insert(0, FindYourSpotCollection(
+            request.app.libres_context,
+            group=None if group == default_group else group
+        ))
 
     ext_resources = group_by_column(
         request,
@@ -124,16 +142,6 @@ def view_resources(self, request, layout=None):
                 name='edit'
             )
 
-    def external_link(model):
-        if isinstance(model, ExternalLink):
-            title = request.translate(_("Edit resource"))
-            to = request.class_link(ResourceCollection)
-            return request.link(
-                model,
-                query_params={'title': title, 'to': to},
-                name='edit'
-            )
-
     def lead_func(model):
         lead = model.meta.get('lead')
         if not lead:
@@ -149,7 +157,6 @@ def view_resources(self, request, layout=None):
         'layout': layout or ResourcesLayout(self, request),
         'link_func': link_func,
         'edit_link': edit_link,
-        'external_link': external_link,
         'lead_func': lead_func,
     }
 
