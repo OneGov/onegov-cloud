@@ -6,14 +6,14 @@ def test_views_user(client):
     client.login_admin()
 
     # Add a municipality
-    add = client.get('/municipalities').click(href='/add')
+    add = client.get('/municipalities').click('Hinzufügen')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '1'
     add.form['payment_type'] = 'normal'
     assert "Adlikon" in add.form.submit().follow()
 
     # Add a user
-    add = client.get('/users').click(href='/add')
+    add = client.get('/users').click('Hinzufügen')
     add.form['realname'] = "Hans Muster"
     add.form['username'] = "hans.muster@winterthur.ch"
     add.form['role'].select('editor')
@@ -25,7 +25,7 @@ def test_views_user(client):
     assert "Hans Muster" in client.get('/municipalities').click("Adlikon")
 
     # Add a user without a group
-    add = client.get('/users').click(href='/add')
+    add = client.get('/users').click('Hinzufügen')
     add.form['realname'] = "Optimo X"
     add.form['username'] = "info@optimo.info"
     add.form['role'].select('member')
@@ -82,7 +82,7 @@ def test_views_user_editor(client):
     client.login_editor()
 
     # Add a user
-    add = client.get('/users').click(href='/add')
+    add = client.get('/users').click('Hinzufügen')
     add.form['realname'] = "Hans Muster"
     add.form['username'] = "hans.muster@winterthur.ch"
     add.form['contact'] = True
@@ -131,7 +131,7 @@ def test_views_user_editor(client):
 def test_views_users_permissions(mock_method, client):
     client.login_admin()
 
-    add = client.get('/users').click(href='/add')
+    add = client.get('/users').click('Hinzufügen')
     add.form['realname'] = "Optimo X"
     add.form['username'] = "info@optimo.info"
     add.form['role'].select('member')
