@@ -38,11 +38,11 @@ def test_view_api(client):
             'items': [
                 {
                     'href': 'http://localhost/api/endpoint/1',
-                    'data': [{'title': 'First item'}],
+                    'data': [{'name': 'title', 'value': 'First item'}],
                 },
                 {
                     'href': 'http://localhost/api/endpoint/2',
-                    'data': [{'title': 'Second item'}],
+                    'data': [{'name': 'title', 'value': 'Second item'}],
                 }
             ]
         }
@@ -91,4 +91,5 @@ def test_view_api(client):
 
     client.app.rate_limit = (100, 900)
 
-# todo: text exceptions
+# todo: test exceptions
+# todo: test also with collection_json for compliance hints?

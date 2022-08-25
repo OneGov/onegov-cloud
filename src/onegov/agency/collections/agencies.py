@@ -17,11 +17,11 @@ class ExtendedAgencyCollection(AgencyCollection):
 
 class PaginatedAgencyCollection(GenericCollection, Pagination):
 
-    def __init__(self, session, page=0, parent=None):
+    def __init__(self, session, page=0, parent=None, exclude_hidden=True):
         super().__init__(session)
         self.page = page
         self.parent = parent
-        self.exclude_hidden = False
+        self.exclude_hidden = exclude_hidden
 
     @property
     def model_class(self):

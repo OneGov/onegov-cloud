@@ -5,12 +5,13 @@ from sqlalchemy import or_
 
 class PaginatedMembershipCollection(GenericCollection, Pagination):
 
-    def __init__(self, session, page=0, agency=None, person=None):
+    def __init__(self, session, page=0, agency=None, person=None,
+                 exclude_hidden=True):
         super().__init__(session)
         self.page = page
         self.agency = agency
         self.person = person
-        self.exclude_hidden = False
+        self.exclude_hidden = exclude_hidden
 
     @property
     def model_class(self):

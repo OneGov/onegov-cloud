@@ -135,7 +135,7 @@ def view_api_endpoint(self, request):
                 'items': [
                     {
                         'href': request.link(item),
-                        'data': [{'title': title}]
+                        'data': [{'name': 'title', 'value': title}]
                     }
                     for item, title in self.batch.items()
                 ],

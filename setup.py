@@ -182,6 +182,7 @@ setup(
         ],
         'test': [
             'Pillow',
+            'collection-json',
             'coverage',
             'findimports',
             'freezegun',

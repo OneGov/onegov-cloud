@@ -86,7 +86,6 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             page=self.page or 0,
             parent=self.get_filter('parent'),
         )
-        result.exclude_hidden = True
         result.batch_size = self.batch_size
         return result
 
@@ -120,7 +119,6 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
             agency=self.get_filter('agency'),
             person=self.get_filter('person')
         )
-        result.exclude_hidden = True
         result.batch_size = self.batch_size
         return result
 
