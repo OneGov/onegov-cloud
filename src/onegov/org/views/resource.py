@@ -104,19 +104,10 @@ def view_resources(self, request, layout=None):
 
     def contains_at_least_one_room(resources):
         for resource in resources:
-            if resource.type == 'room':
-                return True
+            if isinstance(resource, Resource):
+                if resource.type == 'room':
+                    return True
         return False
-
-    for group, entries in resources.items():
-        # don't include find-your-spot link for categories with
-        # no rooms
-        if not contains_at_least_one_room(entries):
-            continue
-        entries.insert(0, FindYourSpotCollection(
-            request.app.libres_context,
-            group=None if group == default_group else group
-        ))
 
     ext_resources = group_by_column(
         request,
@@ -126,6 +117,20 @@ def view_resources(self, request, layout=None):
         group_column=ExternalLink.group,
         sort_column=ExternalLink.order
     )
+
+    grouped = combine_grouped(
+        resources, ext_resources, sort=lambda x: x.title
+    )
+
+    for group, entries in grouped.items():
+        # don't include find-your-spot link for categories with
+        # no rooms
+        if not contains_at_least_one_room(entries):
+            continue
+        entries.insert(0, FindYourSpotCollection(
+            request.app.libres_context,
+            group=None if group == default_group else group
+        ))
 
     def link_func(model):
         if isinstance(model, ExternalLink):
@@ -151,9 +156,7 @@ def view_resources(self, request, layout=None):
 
     return {
         'title': _("Reservations"),
-        'resources': combine_grouped(
-            resources, ext_resources, sort=lambda x: x.title
-        ),
+        'resources': grouped,
         'layout': layout or ResourcesLayout(self, request),
         'link_func': link_func,
         'edit_link': edit_link,
