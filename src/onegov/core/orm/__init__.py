@@ -23,7 +23,7 @@ DB_CONNECTION_ERRORS = (
 
 
 #: The base for all OneGov Core ORM Models
-class ModelBase(object):
+class ModelBase:
 
     #: set by :class:`onegov.core.orm.cache.OrmCacheDescriptor`, this attribute
     #: indicates if the current model was loaded from cache

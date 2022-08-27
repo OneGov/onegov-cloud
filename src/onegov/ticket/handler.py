@@ -2,7 +2,7 @@ from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
 
 
-class Handler(object):
+class Handler:
     """ Defines a generic handler, responsible for a subset of the tickets.
 
     onegov.ticket is meant to be a rather generic bucket of tickets, to which
@@ -179,7 +179,7 @@ class Handler(object):
         raise NotImplementedError
 
 
-class HandlerRegistry(object):
+class HandlerRegistry:
 
     _reserved_handler_codes = {'ALL'}
 

@@ -37,7 +37,7 @@ class OrderedListWidget(ListWidget):
         ordered = [subfield for subfield in field]
         ordered.sort(key=lambda f: (f(), str(f.label.text))[1])
 
-        class FakeField(object):
+        class FakeField:
 
             id = field.id
 
@@ -346,7 +346,7 @@ class ChosenSelectWidget(Select):
         return super(ChosenSelectWidget, self).__call__(field, **kwargs)
 
 
-class PreviewWidget(object):
+class PreviewWidget:
     """ A widget that displays the html of a specific view whenver there's
     a change in other fields. JavaScript is used to facilitate this.
 
@@ -372,7 +372,7 @@ class PreviewWidget(object):
         ))
 
 
-class PanelWidget(object):
+class PanelWidget:
     """ A widget that displays the field's text as panel (no input). """
 
     template = PageTemplate(

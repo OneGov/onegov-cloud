@@ -4,7 +4,7 @@ from onegov.reservation.collection import ResourceCollection
 from uuid import UUID
 
 
-class LibresIntegration(object):
+class LibresIntegration:
     """ Provides libres integration for
     :class:`onegov.core.framework.Framework` based applications.
 

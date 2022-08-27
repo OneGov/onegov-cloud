@@ -11,7 +11,7 @@ from urllib.parse import urlsplit
 from yaml import safe_load
 
 
-class Principal(object):
+class Principal:
     """ The principal is the political entity running the election day app.
 
     There are currently two different types of principals supported: Cantons

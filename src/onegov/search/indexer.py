@@ -156,7 +156,7 @@ def parse_index_name(index_name):
     )
 
 
-class Indexer(object):
+class Indexer:
     """ Takes actions from a queue and executes them on the elasticsearch
     cluster. Depends on :class:`IndexManager` for index management and expects
     to have the same :class:`TypeRegistry` as :class:`ORMEventTranslator`.
@@ -306,7 +306,7 @@ class Indexer(object):
                     pass
 
 
-class TypeMapping(object):
+class TypeMapping:
 
     __slots__ = ['name', 'mapping', 'version', 'model']
 
@@ -380,7 +380,7 @@ class TypeMapping(object):
         return dictionary
 
 
-class TypeMappingRegistry(object):
+class TypeMappingRegistry:
 
     def __init__(self):
         self.mappings = {}
@@ -427,7 +427,7 @@ class TypeMappingRegistry(object):
         return {key for mapping in self for key in mapping.mapping.keys()}
 
 
-class IndexManager(object):
+class IndexManager:
     """ Manages the creation/destruction of indices. The indices it creates
     have an internal name and an external alias. To facilitate that, versions
     are used.
@@ -643,7 +643,7 @@ class ORMLanguageDetector(utils.LanguageDetector):
             return self.supported_languages[0]
 
 
-class ORMEventTranslator(object):
+class ORMEventTranslator:
     """ Handles the onegov.core orm events, translates them into indexing
     actions and puts the result into a queue for the indexer to consume.
 

@@ -8,12 +8,12 @@ from pytest import raises
 from sedate import standardize_date
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
     def __init__(self, publishing=True):
         self.publishing = publishing
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session, principal):
         self._session = session
         self.principal = principal
@@ -22,7 +22,7 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session, principal=None):
         self.app = DummyApp(session, principal)
         self.locale = 'de_CH'

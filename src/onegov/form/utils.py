@@ -49,7 +49,7 @@ def disable_required_attribute_in_html_inputs():
     wtforms.widgets.core.Input.html_params = staticmethod(patched_html_params)
 
 
-class decimal_range(object):
+class decimal_range:
     """ Implementation of Python's range builtin using decimal values instead
     of integers.
 

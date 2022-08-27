@@ -4,7 +4,7 @@ from wtforms.fields import Field
 from wtforms.widgets.core import html_params
 
 
-class HintWidget(object):
+class HintWidget:
 
     def __call__(self, field, **kwargs):
         params = html_params(name=field.name, **kwargs)

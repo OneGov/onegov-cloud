@@ -10,7 +10,7 @@ from onegov.user.errors import ExpiredSignupLinkError
 from onegov.user.auth.second_factor import SECOND_FACTORS
 
 
-class Auth(object):
+class Auth:
     """ Defines a model for authentication methods like login/logout.
     Applications should use this model to implement authentication views.
 

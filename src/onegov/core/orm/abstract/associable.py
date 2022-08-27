@@ -44,7 +44,7 @@ This all is probably best understood in an example:
         class Payment(Base, Associable):
             __tablename__ == 'payments'
 
-        class Payable(object):
+        class Payable:
             payment = associated(Payment, 'payment', 'one-to-one')
 
         class Product(Base, Payable):
@@ -107,7 +107,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
         class Adress(Base, Associable):
             pass
 
-        class Addressable(object):
+        class Addressable:
             address = associated(Address, 'address', 'one-to-one')
 
         class Company(Base, Addressable):
@@ -187,7 +187,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
     return declared_attr(descriptor)
 
 
-class Associable(object):
+class Associable:
     """ Mixin to enable associations on a model. Only models which are
     associable may be targeted by :func:`associated`.
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import object_session, joinedload, undefer
 from sqlalchemy.orm.attributes import get_history
 
 
-class DirectoryMigration(object):
+class DirectoryMigration:
     """ Takes a directory and the structure/configuration it should have in
     the future.
 
@@ -155,7 +155,7 @@ class DirectoryMigration(object):
             values[changed] = convert(values[changed])
 
 
-class FieldTypeMigrations(object):
+class FieldTypeMigrations:
     """ Contains methods to migrate fields from one type to another. """
 
     def possible(self, old_type, new_type):
@@ -209,7 +209,7 @@ class FieldTypeMigrations(object):
         return value
 
 
-class StructuralChanges(object):
+class StructuralChanges:
     """ Tries to detect structural changes between two formcode blocks.
 
     Can only be trusted if the ``detection_successful`` property is True. If it

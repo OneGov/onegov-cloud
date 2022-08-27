@@ -13,7 +13,7 @@ from sedate import standardize_date
 import transaction
 
 
-class DummyRequest(object):
+class DummyRequest:
 
     def link(self, item):
         return 'https://example.org/{}/{}'.format(

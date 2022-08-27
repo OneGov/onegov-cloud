@@ -22,7 +22,7 @@ from sqlalchemy import asc, desc, select
 DateInterval = namedtuple('DateInterval', ('name', 'start', 'end'))
 
 
-class GroupFilesByDateMixin(object):
+class GroupFilesByDateMixin:
 
     def get_date_intervals(self, today):
         today = standardize_date(today, 'UTC')

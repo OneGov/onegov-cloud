@@ -2,7 +2,7 @@ from cached_property import cached_property
 from onegov.swissvotes import _
 
 
-class Actor(object):
+class Actor:
     """ A helper class to translate political actors (parties, associations).
 
     Each actor consists of an abbreviation and a label, and might be rendered

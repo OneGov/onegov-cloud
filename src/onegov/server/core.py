@@ -34,7 +34,7 @@ class Request(BaseRequest):
                     yield hostname
 
 
-class Server(object):
+class Server:
     """ A WSGI application that hosts multiple WSGI applications in the
     same process.
 

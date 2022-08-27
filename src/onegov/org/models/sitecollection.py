@@ -6,7 +6,7 @@ from onegov.org.models.page import News, Topic
 from sqlalchemy.orm import defer
 
 
-class SiteCollection(object):
+class SiteCollection:
 
     def __init__(self, session):
         self.session = session

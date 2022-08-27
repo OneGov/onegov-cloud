@@ -18,7 +18,7 @@ from onegov.core import Framework
 from onegov.core.security import Public
 
 
-class Redirect(object):
+class Redirect:
     to = None
 
     def __init__(self, absorb=None):

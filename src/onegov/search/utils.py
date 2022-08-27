@@ -72,7 +72,7 @@ def extract_hashtags(text):
     return HASHTAG.findall(html.unescape(text))
 
 
-class classproperty(object):
+class classproperty:
     def __init__(self, f):
         self.f = f
 
@@ -119,7 +119,7 @@ def related_types(model):
     return result
 
 
-class LanguageDetector(object):
+class LanguageDetector:
     """ Detects languages with the help of langdetect.
 
     Unlike langdetect this detector may be limited to a subset of all

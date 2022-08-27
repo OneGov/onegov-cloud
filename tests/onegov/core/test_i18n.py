@@ -147,7 +147,7 @@ def test_default_locale_negotiator():
 
 def test_get_translation_bound_form():
 
-    class MockTranslation(object):
+    class MockTranslation:
 
         _fallback = None
 
@@ -160,7 +160,7 @@ def test_get_translation_bound_form():
     default = MockTranslation()
     translate = MockTranslation()
 
-    class MetaMeta(object):
+    class MetaMeta:
 
         def render_field(self, field, render_kw):
             return field.label.text
@@ -170,16 +170,16 @@ def test_get_translation_bound_form():
         def get_translations(self, form):
             return default
 
-    class MockForm(object):
+    class MockForm:
 
         Meta = MockMeta
 
-    class TranslatedMockField(object):
+    class TranslatedMockField:
 
         def __init__(self, label):
             self.label = Label('x', TranslationString(label))
 
-    class UntranslatedMockField(object):
+    class UntranslatedMockField:
 
         def __init__(self, label):
             self.label = Label('x', label)

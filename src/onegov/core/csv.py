@@ -27,7 +27,7 @@ VALID_CSV_DELIMITERS = {',', ';', '\t'}
 WHITESPACE = re.compile(r'\s+')
 
 
-class CSVFile(object):
+class CSVFile:
     """ Provides access to a csv file.
 
     :param csvfile:

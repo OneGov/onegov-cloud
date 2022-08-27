@@ -13,7 +13,7 @@ with open(module_path('tests.shared', 'drop_file.js')) as f:
     JS_DROP_FILE = f.read()
 
 
-class InjectedBrowserExtension(object):
+class InjectedBrowserExtension:
     """ Offers methods to inject an extended browser into the Splinter browser
     class hierarchy. All methods not related to spawning/cloning a new browser
     instance are provided by :class:`ExtendedBrowser`.

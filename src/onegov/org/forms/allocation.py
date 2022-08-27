@@ -34,7 +34,7 @@ def choices_as_integer(choices):
     return [int(c) for c in choices]
 
 
-class AllocationFormHelpers(object):
+class AllocationFormHelpers:
 
     def generate_dates(self, start, end,
                        start_time=None, end_time=None, weekdays=None):
@@ -376,7 +376,7 @@ class AllocationEditForm(Form, AllocationFormHelpers):
             self.access.data = data['access']
 
 
-class Daypasses(object):
+class Daypasses:
 
     daypasses = IntegerField(
         label=_("Daypasses"),
@@ -529,7 +529,7 @@ class RoomAllocationForm(AllocationForm):
         )
 
 
-class DailyItemFields(object):
+class DailyItemFields:
 
     items = IntegerField(
         label=_("Available items"),

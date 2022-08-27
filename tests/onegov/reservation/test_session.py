@@ -23,7 +23,7 @@ def test_setup_database(postgres_dsn, redis_url):
         id = Column(Integer, primary_key=True)
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.json(model=Root)
@@ -119,7 +119,7 @@ def test_transaction_integration(postgres_dsn, redis_url):
         id = Column(Integer, primary_key=True)
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.json(model=Root)

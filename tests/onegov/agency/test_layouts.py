@@ -10,16 +10,16 @@ from onegov.agency.models import ExtendedPerson
 from onegov.people import AgencyMembership
 
 
-class DummyOrg(object):
+class DummyOrg:
     geo_provider = None
     open_files_target_blank = True
 
 
-class DummyApp(object):
+class DummyApp:
     org = DummyOrg()
 
 
-class DummyRequest(object):
+class DummyRequest:
     locale = 'en'
     is_logged_in = False
     is_manager = False

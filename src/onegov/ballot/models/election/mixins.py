@@ -2,7 +2,7 @@ from collections import OrderedDict
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-class DerivedAttributesMixin(object):
+class DerivedAttributesMixin:
 
     """ A simple mixin to add commonly used functions to elections and their
     results. """
@@ -33,7 +33,7 @@ class DerivedAttributesMixin(object):
             self.counted_eligible_voters * 100
 
 
-class PartyResultExportMixin(object):
+class PartyResultExportMixin:
 
     """ A mixin allowing to export the party results optionally including the
     panachage data.

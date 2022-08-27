@@ -3,7 +3,7 @@ from collections import OrderedDict
 from onegov.swissvotes.models.vote import SwissVote
 
 
-class ColumnMapperDataset(object):
+class ColumnMapperDataset:
     """ Defines the columns used in the dataset and provides helper functions.
 
     Typically, you want to iterate over all attributes of a vote (``columns``,
@@ -694,7 +694,7 @@ class ColumnMapperDataset(object):
             yield attribute, column, type_, nullable, precision, scale
 
 
-class ColumnMapperMetadata(object):
+class ColumnMapperMetadata:
     """ Defines the columns used for the metadata and provides helper
     functions.
 

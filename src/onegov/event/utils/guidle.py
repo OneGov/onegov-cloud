@@ -6,7 +6,7 @@ from onegov.gis import Coordinates
 from sedate import replace_timezone
 
 
-class GuidleBase(object):
+class GuidleBase:
     """ Base class for parsing guidle exports containing general helpers. """
 
     def __init__(self, root):
