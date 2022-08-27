@@ -113,18 +113,19 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         else:
             order_within_person = 0
 
-        self.memberships.append(
-            ExtendedAgencyMembership(
-                person_id=person_id,
-                title=title,
-                order_within_agency=order_within_agency,
-                order_within_person=order_within_person,
-                **kwargs
-            )
+        membership = ExtendedAgencyMembership(
+            person_id=person_id,
+            title=title,
+            order_within_agency=order_within_agency,
+            order_within_person=order_within_person,
+            **kwargs
         )
+        self.memberships.append(membership)
 
         for order, membership in enumerate(self.memberships):
             membership.order_within_agency = order
+
+        return membership
 
     def deletable(self, request):
         if request.is_admin:

@@ -1,3 +1,6 @@
+from onegov.agency.api import AgencyApiEndpoint
+from onegov.agency.api import MembershipApiEndpoint
+from onegov.agency.api import PersonApiEndpoint
 from onegov.agency.custom import get_global_tools
 from onegov.agency.custom import get_top_navigation
 from onegov.agency.forms import UserGroupForm
@@ -7,6 +10,7 @@ from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
+from onegov.api import ApiApp
 from onegov.core import utils
 from onegov.form import FormApp
 from onegov.org import OrgApp
@@ -15,7 +19,7 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_redactor_asset as redactor_assets
 
 
-class AgencyApp(OrgApp, FormApp):
+class AgencyApp(OrgApp, FormApp, ApiApp):
 
     request_class = AgencyRequest
 
@@ -157,3 +161,12 @@ def get_redactor_asserts():
 @AgencyApp.webasset('editor')
 def get_editor_assets():
     yield from editor_assets()
+
+
+@AgencyApp.setting(section='api', name='endpoints')
+def get_api_endpoints():
+    return [
+        AgencyApiEndpoint,
+        PersonApiEndpoint,
+        MembershipApiEndpoint
+    ]
