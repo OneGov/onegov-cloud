@@ -33,13 +33,7 @@ from tests.shared.browser import ExtendedBrowser
 from tests.shared.postgresql import Postgresql
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
-
-
-try:
-    from elasticsearch import Elasticsearch
-except ImportError:
-    def Elasticsearch(*args, **kwargs):
-        assert False, "Elasticsearch is not installed"
+from elasticsearch import Elasticsearch
 
 
 redis_path = find_executable('redis-server')
