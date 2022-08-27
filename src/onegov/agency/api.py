@@ -84,7 +84,8 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
         result = PaginatedAgencyCollection(
             self.session,
             page=self.page or 0,
-            parent=self.get_filter('parent'),
+            parent=self.get_filter('parent', None, False),
+            joinedload=['organigram']
         )
         result.batch_size = self.batch_size
         return result
@@ -98,7 +99,7 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
     def item_links(self, item):
         return {
             'organigram': item.organigram,
-            'parent': self.for_item(item.parent),
+            'parent': self.for_item(item.parent_id),
             'children': self.for_filter(parent=str(item.id)),
             'memberships': self.membership_api.for_filter(
                 agency=str(item.id)
@@ -117,7 +118,7 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
             self.session,
             page=self.page or 0,
             agency=self.get_filter('agency'),
-            person=self.get_filter('person')
+            person=self.get_filter('person'),
         )
         result.batch_size = self.batch_size
         return result
@@ -128,13 +129,7 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
         }
 
     def item_links(self, item):
-        result = {}
-        result['agency'] = None
-        if item.agency:
-            if item.agency.published and item.agency.access == 'public':
-                result['agency'] = self.agency_api.for_item(item.agency)
-        result['person'] = None
-        if item.person:
-            if item.person.published and item.person.access == 'public':
-                result['person'] = self.person_api.for_item(item.person)
-        return result
+        return {
+            'agency': self.agency_api.for_item(item.agency),
+            'person': self.person_api.for_item(item.person)
+        }

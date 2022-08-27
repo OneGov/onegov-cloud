@@ -2,6 +2,7 @@ from onegov.agency.models import ExtendedAgency
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.people import AgencyCollection
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 
 class ExtendedAgencyCollection(AgencyCollection):
@@ -17,11 +18,13 @@ class ExtendedAgencyCollection(AgencyCollection):
 
 class PaginatedAgencyCollection(GenericCollection, Pagination):
 
-    def __init__(self, session, page=0, parent=None, exclude_hidden=True):
+    def __init__(self, session, page=0, parent=None, exclude_hidden=True,
+                 joinedload=None):
         super().__init__(session)
         self.page = page
         self.parent = parent
         self.exclude_hidden = exclude_hidden
+        self.joinedload = joinedload or []
 
     @property
     def model_class(self):
@@ -46,6 +49,11 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
     def query(self):
         query = super().query()
 
+        for attribute in self.joinedload:
+            query = query.options(
+                joinedload(getattr(ExtendedAgency, attribute))
+            )
+
         if self.exclude_hidden:
             query = query.filter(
                 or_(
@@ -55,7 +63,9 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
                 ExtendedAgency.published.is_(True)
             )
 
-        if self.parent:
+        if self.parent is False:
+            query = query.filter(ExtendedAgency.parent_id == None)
+        elif self.parent:
             query = query.filter(ExtendedAgency.parent_id == self.parent)
 
         return query

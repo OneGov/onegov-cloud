@@ -118,16 +118,18 @@ class ApiEndpoint:
         if not item:
             return
 
-        return ApiEndpointItem(
-            self.app,
-            self.endpoint,
-            getattr(item.id, 'hex', str(item.id))
-        )
+        target = str(item)
+        if hasattr(item, 'id'):
+            target = getattr(item.id, 'hex', str(item.id))
 
-    def get_filter(self, name):
+        return ApiEndpointItem(self.app, self.endpoint, target)
+
+    def get_filter(self, name, default=None, empty=None):
         """ Returns the filter value with the given name. """
 
-        return (self.extra_parameters or {}).get(name, None)
+        if name not in self.extra_parameters:
+            return default
+        return self.extra_parameters[name] or empty
 
     def by_id(self, id_):
         """ Return the item with the given ID from the collection. """
@@ -138,20 +140,17 @@ class ApiEndpoint:
     def session(self):
         return self.app.session()
 
-    def item_title(self, item):
-        """ Return the title of the collection item. """
-
-        return getattr(item, 'title', '')
-
     @property
     def links(self):
         """ Returns a dictionary with pagination instances. """
 
         result = {'prev': None, 'next': None}
-        if self.collection.previous:
-            result['prev'] = self.for_page(self.collection.previous.page)
-        if self.collection.next:
-            result['next'] = self.for_page(self.collection.next.page)
+        previous = self.collection.previous
+        if previous:
+            result['prev'] = self.for_page(previous.page)
+        next_ = self.collection.next
+        if next_:
+            result['next'] = self.for_page(next_.page)
         return result
 
     @property
@@ -162,7 +161,7 @@ class ApiEndpoint:
         """
 
         return {
-            self.for_item(item): self.item_title(item)
+            self.for_item(item): item
             for item in self.collection.batch
         }
 

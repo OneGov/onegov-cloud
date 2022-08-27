@@ -20,7 +20,7 @@ def test_api_endpoint_item(app, endpoint_class):
     item = ApiEndpointItem(app, 'endpoint', 1)
     assert item.api_endpoint.__class__ == endpoint_class
     assert item.item.id == 1
-    assert item.data == {'a': 1}
+    assert item.data == {'a': 1, 'title': 'First item'}
     assert item.links == {'b': '2'}
 
 
@@ -83,12 +83,11 @@ def test_api_endpoint(app, endpoint_class):
     assert endpoint_class(app).by_id(2).id == 2
     assert endpoint_class(app).by_id(3) is None
 
-    # ... item_title
-    assert ApiEndpoint(app).item_title(None) == ''
-    assert ApiEndpoint(app).item_title(Bunch(title='x')) == 'x'
-
     # .... item_data
-    assert endpoint_class(app).item_data(Bunch(a=1)) == {'a': 1}
+    assert endpoint_class(app).item_data(Bunch(title=1, a=2)) == {
+        'title': 1,
+        'a': 2
+    }
 
     # .... item_links
     assert endpoint_class(app).item_links(Bunch(b=2)) == {'b': 2}
@@ -103,5 +102,6 @@ def test_api_endpoint(app, endpoint_class):
 
     # ... batch
     batch = endpoint_class(app).batch
-    assert [item.id for item in batch] == ['1', '2']
-    assert list(batch.values()) == ['First item', 'Second item']
+    assert {endpoint.id: item.title for endpoint, item in batch.items()} == {
+        '1': 'First item', '2': 'Second item'
+    }

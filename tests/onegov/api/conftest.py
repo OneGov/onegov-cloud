@@ -38,7 +38,7 @@ class Endpoint(ApiEndpoint):
         return self._collection
 
     def item_data(self, item):
-        return {'a': item.a}
+        return {'title': item.title, 'a': item.a}
 
     def item_links(self, item):
         return {'b': item.b}

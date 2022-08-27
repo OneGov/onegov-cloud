@@ -1,9 +1,6 @@
 from collection_json import Collection
 
 
-# todo: test models?
-
-
 def test_view_api(client):
     client.login_admin()  # prevent rate limit
 
@@ -16,7 +13,7 @@ def test_view_api(client):
     def links(item):
         return {x.rel: x.href for x in item.links}
 
-    # Endpoints with query hitns
+    # Endpoints with query hints
     endpoints = collection('/api')
     assert endpoints.queries[0].rel == 'agencies'
     assert endpoints.queries[0].href == 'http://localhost/api/agencies'
@@ -103,7 +100,7 @@ def test_view_api(client):
 
     # People
     people = {
-        item.data[0].value: item.href
+        data(item)['title']: item.href
         for item in collection('/api/people').items
     }
     assert set(people) == {'Krabappel Edna', 'Rivera Nick'}

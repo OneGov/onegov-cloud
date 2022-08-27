@@ -124,20 +124,36 @@ def view_api_endpoint(self, request):
         return {
             'collection': {
                 'version': '1.0',
-                'href': request.link(self),
+                'href': request.link(self.for_filter()),
                 'links': [
                     {
-                        'rel': name,
+                        'rel': rel,
                         'href': request.link(item) if item else item
                     }
-                    for name, item in self.links.items()
+                    for rel, item in self.links.items()
                 ],
                 'items': [
                     {
-                        'href': request.link(item),
-                        'data': [{'name': 'title', 'value': title}]
+                        'href': request.link(target),
+                        'data': [
+                            {
+                                'name': name,
+                                'value': value
+                            }
+                            for name, value in self.item_data(item).items()
+                        ],
+                        'links': [
+                            {
+                                'rel': name,
+                                'href': (
+                                    link if not link or isinstance(link, str)
+                                    else request.link(link)
+                                ),
+                            }
+                            for name, link in self.item_links(item).items()
+                        ]
                     }
-                    for item, title in self.batch.items()
+                    for target, item in self.batch.items()
                 ],
             }
         }
@@ -175,13 +191,13 @@ def view_api_endpoint_item(self, request):
                         ],
                         'links': [
                             {
-                                'rel': name,
+                                'rel': rel,
                                 'href': (
-                                    item if not item or isinstance(item, str)
-                                    else request.link(item)
+                                    link if not link or isinstance(link, str)
+                                    else request.link(link)
                                 ),
                             }
-                            for name, item in self.links.items()
+                            for rel, link in self.links.items()
                         ]
                     }
                 ],

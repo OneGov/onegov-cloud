@@ -1,6 +1,10 @@
+from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
-from onegov.core.collection import GenericCollection, Pagination
+from onegov.agency.models import ExtendedPerson
+from onegov.core.collection import GenericCollection
+from onegov.core.collection import Pagination
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 
 class PaginatedMembershipCollection(GenericCollection, Pagination):
@@ -38,12 +42,39 @@ class PaginatedMembershipCollection(GenericCollection, Pagination):
         query = super().query()
 
         if self.exclude_hidden:
+            query = query.options(joinedload(ExtendedAgencyMembership.agency))
+            query = query.options(joinedload(ExtendedAgencyMembership.person))
+
             query = query.filter(
                 or_(
                     ExtendedAgencyMembership.meta['access'] == 'public',
                     ExtendedAgencyMembership.meta['access'] == None,
                 ),
                 ExtendedAgencyMembership.published.is_(True)
+            )
+
+            query = query.filter(
+                ExtendedAgencyMembership.agency_id.isnot(None)
+            )
+            query = query.filter(
+                ExtendedAgency.id == ExtendedAgencyMembership.agency_id,
+                or_(
+                    ExtendedAgency.meta['access'] == 'public',
+                    ExtendedAgency.meta['access'] == None,
+                ),
+                ExtendedAgency.published.is_(True)
+            )
+
+            query = query.filter(
+                ExtendedAgencyMembership.person_id.isnot(None)
+            )
+            query = query.filter(
+                ExtendedPerson.id == ExtendedAgencyMembership.person_id,
+                or_(
+                    ExtendedPerson.meta['access'] == 'public',
+                    ExtendedPerson.meta['access'] == None,
+                ),
+                ExtendedPerson.published.is_(True)
             )
 
         if self.agency:
