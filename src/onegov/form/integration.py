@@ -13,7 +13,7 @@ class FormApp(WebassetsApp):
         disable_required_attribute_in_html_inputs()
 
 
-class FormcodeParseFields(object):
+class FormcodeParseFields:
     pass
 
 

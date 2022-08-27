@@ -7,7 +7,7 @@ from sedate import overlaps
 from sqlalchemy import select
 
 
-class VolunteerCart(object):
+class VolunteerCart:
     """ Stores items of the volunteer cart view in the browser session.
 
     Items stored this way may not overlap with existing items. We want
@@ -99,7 +99,7 @@ class VolunteerCart(object):
             }
 
 
-class VolunteerCartAction(object):
+class VolunteerCartAction:
     """ Represents a single action for the VolunteerCart. """
 
     def __init__(self, action, target):

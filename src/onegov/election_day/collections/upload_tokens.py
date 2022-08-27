@@ -1,7 +1,7 @@
 from onegov.election_day.models import UploadToken
 
 
-class UploadTokenCollection(object):
+class UploadTokenCollection:
 
     def __init__(self, session):
         self.session = session

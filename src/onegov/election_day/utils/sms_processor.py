@@ -82,7 +82,7 @@ log = logging.getLogger('onegov.election_day')
 MAX_SEND_TIME = 60 * 60 * 3
 
 
-class SmsQueueProcessor(object):
+class SmsQueueProcessor:
 
     def __init__(self, path, username, password, originator=None):
         self.path = path

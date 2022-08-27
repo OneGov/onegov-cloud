@@ -31,7 +31,7 @@ def provider_by_name(providers, name):
     return next((p for p in providers if p.metadata.name == name), None)
 
 
-class Conclusion(object):
+class Conclusion:
     """ A final answer of :meth:`AuthenticationProvider`. """
 
 
@@ -66,7 +66,7 @@ class InvalidJWT(Failure):
 
 
 @attrs(slots=True, frozen=True)
-class ProviderMetadata(object):
+class ProviderMetadata:
     """ Holds provider-specific metadata. """
 
     name: str = attrib()
@@ -266,7 +266,7 @@ def ensure_user(source, source_id, session, username, role, force_role=True,
 
 
 @attrs(auto_attribs=True)
-class RolesMapping(object):
+class RolesMapping:
     """ Takes a role mapping and provides access to it.
 
     A role mapping maps a onegov-cloud role to an LDAP role. For example:
@@ -318,7 +318,7 @@ class RolesMapping(object):
 
 
 @attrs(auto_attribs=True)
-class LDAPAttributes(object):
+class LDAPAttributes:
     """ Holds the LDAP server-specific attributes. """
 
     # the name of the Distinguished Name (DN) attribute

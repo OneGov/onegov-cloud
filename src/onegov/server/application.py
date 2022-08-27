@@ -3,7 +3,7 @@ import re
 from onegov.server import errors
 
 
-class Application(object):
+class Application:
     """ WSGI applications inheriting from this class can be served by
     onegov.server.
 

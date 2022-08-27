@@ -14,31 +14,31 @@ from onegov.wtfs.models import ScanJob
 from onegov.wtfs.models import UserManual
 
 
-class AddModel(object):
+class AddModel:
     """ The permission to add a given model. """
 
 
-class AddModelUnrestricted(object):
+class AddModelUnrestricted:
     """ The permission to add given model without any restrictions. """
 
 
-class EditModel(object):
+class EditModel:
     """ The permission to edit a given model. """
 
 
-class EditModelUnrestricted(object):
+class EditModelUnrestricted:
     """ The permission to edit a given model without any restrictions. """
 
 
-class DeleteModel(object):
+class DeleteModel:
     """ The permission to delete a given model. """
 
 
-class ViewModel(object):
+class ViewModel:
     """ The permission to view a given model. """
 
 
-class ViewModelUnrestricted(object):
+class ViewModelUnrestricted:
     """ The permission to view a given model without any restrictions. """
 
 

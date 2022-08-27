@@ -3,7 +3,7 @@ from datetime import datetime
 from dateutil import relativedelta
 
 
-class AgeBarrier(object):
+class AgeBarrier:
     """ Holds various age barrier approaches available to the period. """
 
     registry = {}

@@ -39,7 +39,7 @@ def test_form_extensions(session):
 
     members = collection.definitions.add('Members', definition="E-Mail = @@@")
 
-    class CorporateOnly(object):
+    class CorporateOnly:
 
         def validate_e_mail(self, value):
             # note, you probably don't want to do this in a real world

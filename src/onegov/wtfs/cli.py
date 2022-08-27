@@ -134,7 +134,7 @@ def import_users(path):
 
     files = load_files(path)
 
-    class Context(object):
+    class Context:
 
         def __init__(self, session):
             self.session = session

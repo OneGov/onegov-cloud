@@ -56,7 +56,7 @@ class DirectoryConfigurationStorage(TypeDecorator, ScalarCoercible):
             return DirectoryConfiguration.from_json(value)
 
 
-class StoredConfiguration(object):
+class StoredConfiguration:
 
     fields = None
 

@@ -36,7 +36,7 @@ CANTONS = {
 }
 
 
-class SwissHolidays(object):
+class SwissHolidays:
     """ Provides the ability to check dates against Swiss holidays and to
     list the holidays for a given year. Builds on the code from
     python-holidays.

@@ -2,7 +2,7 @@ from wtforms.validators import ValidationError
 from onegov.gazette import _
 
 
-class UnusedColumnKeyValue(object):
+class UnusedColumnKeyValue:
     """ Test if the value is not used as a key in the given column.
 
     We assume that we can look up the old value of the field with the given

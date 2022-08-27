@@ -17,7 +17,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import ValidationError
 
 
-class ContentExtension(object):
+class ContentExtension:
     """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
     with custom data that is stored in either 'meta' or 'content'.
 

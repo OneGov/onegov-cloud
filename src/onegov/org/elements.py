@@ -11,7 +11,7 @@ from onegov.org import _
 from purl import URL
 
 
-class AccessMixin(object):
+class AccessMixin:
 
     @property
     def access(self):

@@ -2,7 +2,7 @@ from cached_property import cached_property
 from onegov.agency import _
 
 
-class Mutation(object):
+class Mutation:
 
     def __init__(self, session, target_id, ticket_id):
         self.session = session

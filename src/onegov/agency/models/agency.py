@@ -134,7 +134,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         return True
 
 
-class AgencyProxy(object):
+class AgencyProxy:
     """ A proxy/alias for an agency.
 
     The agencies are routed as adjacency lists and the path is fully absorbed

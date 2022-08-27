@@ -18,7 +18,7 @@ from tests.onegov.gazette.conftest import LOGO
 from unittest.mock import patch
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session, principal):
         self._session = session
         self.principal = principal
@@ -28,7 +28,7 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session, principal):
         self.app = DummyApp(session, principal)
         self.locale = 'de_CH'

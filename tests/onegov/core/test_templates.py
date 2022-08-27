@@ -70,7 +70,7 @@ def test_chameleon_with_translation(temporary_directory, redis_url):
         return 'de'
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.html(model=Root, template='index.pt')
@@ -129,7 +129,7 @@ def test_inject_default_vars(temporary_directory, redis_url):
         return templates
 
     @Parent.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @Parent.view(model=Root, template='index.pt')
@@ -233,7 +233,7 @@ def test_macro_lookup(temporary_directory, redis_url):
         return parent
 
     @Parent.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @Parent.view(model=Root, template='index.pt')
@@ -375,7 +375,7 @@ def test_boolean_attributes(temporary_directory, redis_url):
         return parent
 
     @Parent.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @Parent.view(model=Root, template='index.pt')
