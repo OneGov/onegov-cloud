@@ -8,12 +8,7 @@ from onegov.core import i18n, utils
 from webob import Request
 from wtforms import Label
 from translationstring import TranslationString
-
-# compatibility shim for webob 1.8 before its release
-try:
-    from webob.acceptparse import create_accept_language_header
-except ImportError:
-    from webob.acceptparse import Accept as create_accept_language_header
+from webob.acceptparse import create_accept_language_header
 
 
 def test_pofiles(temporary_directory):
