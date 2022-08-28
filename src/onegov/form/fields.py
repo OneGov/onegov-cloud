@@ -28,6 +28,7 @@ from wtforms.fields import FileField
 from wtforms.fields import SelectField
 from wtforms.fields import SelectMultipleField
 from wtforms.fields import StringField
+from wtforms.fields import TelField
 from wtforms.fields import TextAreaField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -262,7 +263,7 @@ class IconField(StringField):
     widget = IconWidget()
 
 
-class PhoneNumberField(StringField):
+class PhoneNumberField(TelField):
     """ A string field with support for phone numbers. """
 
     def __init__(self, *args, **kwargs):

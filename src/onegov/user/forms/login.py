@@ -1,6 +1,7 @@
 from onegov.form import Form
 from onegov.user import _
 from wtforms.fields import PasswordField
+from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
@@ -8,10 +9,13 @@ from wtforms.validators import InputRequired
 class LoginForm(Form):
     """ A generic login form for onegov.user """
 
-    username = StringField(
+    username = EmailField(
         label=_("E-Mail Address"),
         validators=[InputRequired()],
-        render_kw={'autofocus': True}
+        render_kw={
+            'autofocus': True,
+            'autocomplete': 'username'
+        },
     )
     password = PasswordField(
         label=_("Password"),
