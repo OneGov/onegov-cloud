@@ -4,7 +4,7 @@ from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 
 
-class Invoice(object):
+class Invoice:
 
     def __init__(self, session):
         self.session = session

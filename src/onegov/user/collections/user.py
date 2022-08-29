@@ -34,7 +34,7 @@ def as_dictionary_of_sets(d):
     }
 
 
-class UserCollection(object):
+class UserCollection:
     """ Manages a list of users.
 
     Use it like this::

@@ -34,7 +34,7 @@ from onegov.wtfs.models import UserManual
 from pytest import mark
 
 
-class App(object):
+class App:
     def __init__(self, session, principal):
         self._session = session
         self.principal = principal
@@ -43,13 +43,13 @@ class App(object):
         return self._session
 
 
-class Identity(object):
+class Identity:
     def __init__(self, groupid, userid=None, role=None):
         self.groupid = groupid
         self.userid = userid
 
 
-class Request(object):
+class Request:
     def __init__(self, session, principal=None, groupid=None, roles=[]):
         self.app = App(session, principal)
         self.session = session

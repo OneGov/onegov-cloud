@@ -136,7 +136,7 @@ class DummyPostData(dict):
         return v
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
 
     all_years = range(2000, 2030)
 
@@ -180,7 +180,7 @@ class DummyPrincipal(object):
         return ''
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session=None, application_id='application_id'):
         self._session = session
         self.application_id = application_id
@@ -195,7 +195,7 @@ class DummyApp(object):
         assert not list(prepared_emails)
 
 
-class DummyRequest(object):
+class DummyRequest:
 
     def __init__(self, session=None, app=None, locale='de',
                  is_logged_in=False, is_secret=False, url=''):

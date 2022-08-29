@@ -7,7 +7,7 @@ from onegov.core.utils import module_path
 from statistics import mean
 
 
-class MatchCollection(object):
+class MatchCollection:
 
     def __init__(self, session, period, states=None):
         self.session = session

@@ -36,17 +36,17 @@ from pytest import mark
 from unittest.mock import patch
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
     pass
 
 
-class DummyApp(object):
+class DummyApp:
     principal = DummyPrincipal()
     theme_options = {}
     static_content_pages = {'home'}
 
 
-class DummyRequest(object):
+class DummyRequest:
     app = DummyApp()
     is_logged_in = False
     locale = 'de_CH'

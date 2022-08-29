@@ -78,7 +78,7 @@ def longzip(a, b):
             yield None, item2
 
 
-class StreamDiffer(object):
+class StreamDiffer:
     """A class that can diff a stream of Genshi events. It will inject
 ``<ins>`` and ``<del>`` tags into the stream. It probably breaks
 in very ugly ways if you pass a random Genshi stream to it. I'm

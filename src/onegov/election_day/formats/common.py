@@ -27,7 +27,7 @@ STATI = (
 BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
 
 
-class FileImportError(object):
+class FileImportError:
     __slots__ = ['filename', 'line', 'error']
 
     def __init__(self, error, line=None, filename=None):

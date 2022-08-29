@@ -409,7 +409,7 @@ def create_parser_elements():
 
 
 # lazy loads the parser elements and stores them as attributes on itself
-class LazyElements(object):
+class LazyElements:
 
     def __init__(self):
         self.loaded = False
@@ -434,7 +434,7 @@ class CustomLoader(yaml.SafeLoader):
     """ Extends the default yaml loader with customized constructors. """
 
 
-class constructor(object):
+class constructor:
     """ Adds decorated functions to as constructors to the CustomLoader. """
 
     def __init__(self, tag):
@@ -552,7 +552,7 @@ def find_field(fieldsets, id):
                     return field
 
 
-class Fieldset(object):
+class Fieldset:
     """ Represents a parsed fieldset. """
 
     def __init__(self, label, fields=None):
@@ -571,7 +571,7 @@ class Fieldset(object):
         return find_field((self, ), *args, **kwargs)
 
 
-class Choice(object):
+class Choice:
     """ Represents a parsed choice.
 
     Note: Choices may have child-fields which are meant to be shown to the
@@ -585,7 +585,7 @@ class Choice(object):
         self.fields = fields
 
 
-class Field(object):
+class Field:
     """ Represents a parsed field. """
 
     def __init__(self, label, required, parent=None, fieldset=None,
@@ -740,7 +740,7 @@ class StdnumField(Field):
         )
 
 
-class RangeField(object):
+class RangeField:
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,
@@ -786,7 +786,7 @@ class FileinputField(Field):
         )
 
 
-class OptionsField(object):
+class OptionsField:
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,

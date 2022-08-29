@@ -28,7 +28,7 @@ STREET = re.compile(r"""
     """, re.UNICODE | re.VERBOSE)
 
 
-class Street(object):
+class Street:
 
     __slots__ = ('name', 'number')
 

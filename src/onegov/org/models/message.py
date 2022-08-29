@@ -13,7 +13,7 @@ from sqlalchemy.orm import object_session
 # setting
 
 
-class TicketMessageMixin(object):
+class TicketMessageMixin:
 
     def link(self, request):
         return request.class_link(Ticket, {

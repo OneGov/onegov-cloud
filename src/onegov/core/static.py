@@ -41,7 +41,7 @@ from more.webassets.tweens import (
 )
 
 
-class StaticFile(object):
+class StaticFile:
     """ Defines a static file served by the application. """
 
     def __init__(self, path, version=None):

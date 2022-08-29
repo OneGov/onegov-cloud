@@ -1,7 +1,7 @@
 from onegov.ballot.models import Ballot
 
 
-class BallotCollection(object):
+class BallotCollection:
 
     def __init__(self, session):
         self.session = session

@@ -1,7 +1,7 @@
 from onegov.form import _
 
 
-class Snippets(object):
+class Snippets:
 
     fragments = (
         (_("General"), None),

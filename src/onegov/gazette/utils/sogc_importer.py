@@ -19,7 +19,7 @@ from sedate import standardize_date
 from uuid import uuid4
 
 
-class SogcImporter(object):
+class SogcImporter:
 
     def __init__(self, session, config):
         self.session = session

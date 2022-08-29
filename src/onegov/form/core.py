@@ -587,7 +587,7 @@ class Form(BaseForm):
             return desc
 
 
-class Fieldset(object):
+class Fieldset:
     """ Defines a fieldset with a list of fields. """
 
     def __init__(self, label, fields):
@@ -619,7 +619,7 @@ class Fieldset(object):
             (id, field) for id, field in self.fields.items() if field.data)
 
 
-class FieldDependency(object):
+class FieldDependency:
     """ Defines a dependency to a field. The given field(s) must have the given
     choice for this dependency to be fulfilled.
 
@@ -678,7 +678,7 @@ class FieldDependency(object):
         return {'data-depends-on': value}
 
 
-class Pricing(object):
+class Pricing:
     """ Defines pricing on a field, returning the correct price for the field
     depending on its rule.
 

@@ -5,7 +5,7 @@ from tempfile import mkstemp
 from io import UnsupportedOperation
 
 
-class SigningService(object):
+class SigningService:
     """ A generic interface for various file signing services. """
 
     registry = {}

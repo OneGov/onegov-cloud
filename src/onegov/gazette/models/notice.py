@@ -22,7 +22,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class CachedUserNameMixin(object):
+class CachedUserNameMixin:
     """ Mixin providing a cached version of the user name. There needs to be:
     - a ``user`` relationship (which has no dynamic backref)
     - a meta column
@@ -62,7 +62,7 @@ class CachedUserNameMixin(object):
         self._user_name = user_name
 
 
-class CachedGroupNameMixin(object):
+class CachedGroupNameMixin:
     """ Mixin providing a cached version of the group name. There needs to be:
     - a ``group`` relationship (which has no dynamic backref)
     - a meta column

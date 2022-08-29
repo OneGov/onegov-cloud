@@ -56,7 +56,7 @@ def test_coordinates_field():
     assert field.data.zoom is None
 
     # on an object, coordinates are stored as is
-    class Test(object):
+    class Test:
         pass
 
     test = Test()

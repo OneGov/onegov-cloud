@@ -19,7 +19,7 @@ def random_filename():
     return random_token()
 
 
-class FilestorageFile(object):
+class FilestorageFile:
     """ Defines a static file served by the application. The difference
     between this and :class:`onegov.core.static.StaticFile` is the storage.
 

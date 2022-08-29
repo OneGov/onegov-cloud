@@ -48,7 +48,7 @@ from onegov.core import utils
 from onegov.core.filestorage import FilestorageFile
 
 
-class Theme(object):
+class Theme:
     """ Describres a onegov.core theme.
 
     A onegov theme is any kind of compiled or non-compiled css file. The core

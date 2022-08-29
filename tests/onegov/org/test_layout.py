@@ -17,11 +17,11 @@ from onegov.page import Page
 from webtest import TestApp as Client
 
 
-class MockModel(object):
+class MockModel:
     pass
 
 
-class MockRequest(object):
+class MockRequest:
     locale = 'en'
     is_logged_in = False
     is_manager = False
@@ -157,7 +157,7 @@ def test_page_layout_breadcrumbs(session):
 
 def test_template_layout(postgres_dsn, redis_url):
 
-    class Mock(object):
+    class Mock:
         pass
 
     class App(OrgApp):
@@ -181,7 +181,7 @@ def test_template_layout(postgres_dsn, redis_url):
         return False
 
     @App.path('/model')
-    class Model(object):
+    class Model:
         pass
 
     @App.html(model=Model, template='layout.pt')

@@ -7,7 +7,7 @@ import py
 import pytest
 
 
-class CaptureLogPlugin(object):
+class CaptureLogPlugin:
     """Attaches to the logging module and captures log messages for each test.
 
     """
@@ -96,7 +96,7 @@ class CaptureLogHandler(logging.StreamHandler):
         return super().emit(record)
 
 
-class CaptureLogFixture(object):
+class CaptureLogFixture:
     """Provides access and control of log capturing."""
 
     def __init__(self, handler):
@@ -137,7 +137,7 @@ class CaptureLogFixture(object):
         return CaptureLogLevel(obj, level)
 
 
-class CaptureLogLevel(object):
+class CaptureLogLevel:
     """Context manager that sets the logging level of a handler or logger."""
 
     def __init__(self, obj, level):

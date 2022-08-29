@@ -17,7 +17,7 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
-class Stdnum(object):
+class Stdnum:
     """ Validates a string using any python-stdnum format.
 
     See `<https://github.com/arthurdejong/python-stdnum>`_.
@@ -39,7 +39,7 @@ class Stdnum(object):
             raise ValidationError(field.gettext('Invalid input.'))
 
 
-class FileSizeLimit(object):
+class FileSizeLimit:
     """ Makes sure an uploaded file is not bigger than the given number of
     bytes.
 
@@ -63,7 +63,7 @@ class FileSizeLimit(object):
                 raise ValidationError(message)
 
 
-class WhitelistedMimeType(object):
+class WhitelistedMimeType:
     """ Makes sure an uploaded file is in a whitelist of allowed mimetypes.
 
     Expects an :class:`onegov.form.fields.UploadField` instance.
@@ -114,7 +114,7 @@ class ExpectedExtensions(WhitelistedMimeType):
         super().__init__(whitelist=mimetypes)
 
 
-class ValidFormDefinition(object):
+class ValidFormDefinition:
     """ Makes sure the given text is a valid onegov.form definition. """
 
     message = _("The form could not be parsed.")
@@ -207,7 +207,7 @@ class StrictOptional(Optional):
             raise StopValidation()
 
 
-class ValidPhoneNumber(object):
+class ValidPhoneNumber:
     """ Makes sure the given input is valid phone number.
 
     Expects an :class:`wtforms.StringField` instance.
@@ -237,7 +237,7 @@ class ValidPhoneNumber(object):
 swiss_ssn_rgxp = re.compile(r'756\.\d{4}\.\d{4}\.\d{2}$')
 
 
-class ValidSwissSocialSecurityNumber(object):
+class ValidSwissSocialSecurityNumber:
     """ Makes sure the given input is a valid swiss social security number.
 
     Expects an :class:`wtforms.StringField` instance.
@@ -252,7 +252,7 @@ class ValidSwissSocialSecurityNumber(object):
                 raise ValidationError(self.message)
 
 
-class UniqueColumnValue(object):
+class UniqueColumnValue:
     """ Test if the given table does not already have a value in the column
     (identified by the field name).
 

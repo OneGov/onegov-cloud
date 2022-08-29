@@ -18,7 +18,7 @@ def lines(value):
 
 
 @WinterthurApp.directory_search_widget('inline')
-class InlineSearch(object):
+class InlineSearch:
 
     def __init__(self, request, directory, search_query):
         self.app = request.app

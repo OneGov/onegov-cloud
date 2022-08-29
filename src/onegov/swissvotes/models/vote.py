@@ -28,14 +28,14 @@ from urllib.parse import urlparse
 from urllib.parse import urlunparse
 
 
-class encoded_property(object):
+class encoded_property:
     """ A shorthand property to return the label of an encoded value. Requires
     the instance the have a `codes`-lookup function. Creates the SqlAlchemy
     Column (with a prefixed underline).
 
     Example:
 
-        class MyClass(object):
+        class MyClass:
             value = encoded_property()
 
             def codes(self, attributes):
@@ -58,13 +58,13 @@ class encoded_property(object):
         return instance.codes(self.name).get(value)
 
 
-class localized_property(object):
+class localized_property:
     """ A shorthand property to return a localized attribute. Requires at least
     a `xxx_de` attribute and falls back to this.
 
     Example:
 
-        class MyClass(object):
+        class MyClass:
             value_de = Column(Text)
             value_fr = Column(Text)
             value = localized_property()

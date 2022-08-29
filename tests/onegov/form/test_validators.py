@@ -18,16 +18,16 @@ def test_unique_column_value_validator(postgres_dsn):
         __tablename__ = 'dummies'
         name = Column(Text, nullable=False, primary_key=True)
 
-    class Field(object):
+    class Field:
         def __init__(self, name, data):
             self.name = name
             self.data = data
 
-    class Request(object):
+    class Request:
         def __init__(self, session):
             self.session = session
 
-    class Form(object):
+    class Form:
         def __init__(self, session):
             self.request = Request(session)
 
@@ -52,7 +52,7 @@ def test_unique_column_value_validator(postgres_dsn):
 
 def test_phone_number_validator():
 
-    class Field(object):
+    class Field:
         def __init__(self, data):
             self.data = data
 
@@ -81,7 +81,7 @@ def test_phone_number_validator():
 
 
 def test_input_required_if_validator():
-    class Field(object):
+    class Field:
         def __init__(self, name, data):
             self.name = name
             self.data = data
@@ -91,7 +91,7 @@ def test_input_required_if_validator():
         def gettext(self, text):
             return text
 
-    class Form(object):
+    class Form:
         def __init__(self):
             self.true = Field('true', True)
             self.false = Field('false', False)
@@ -120,7 +120,7 @@ def test_input_required_if_validator():
 
 def test_swiss_ssn_validator():
 
-    class Field(object):
+    class Field:
         def __init__(self, data):
             self.data = data
 
