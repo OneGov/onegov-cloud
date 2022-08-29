@@ -105,6 +105,10 @@ def test_qrbill():
     assert 'Reference' in result
     assert '27 74091 52814 48879 80041 24782' in result
 
+    # silent fixes
+    address = ''.join(71 * ['x'])
+    assert f'>{address[:70]}<' in qr_bill(address=address)
+
     # fails
     assert qr_bill(enabled=False) is None
     assert qr_bill(iban=None) is None

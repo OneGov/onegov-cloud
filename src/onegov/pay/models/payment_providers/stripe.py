@@ -32,7 +32,7 @@ stripe.default_http_client = stripe.http_client.RequestsClient()
 STRIPE_NAMESPACE = UUID('aebb1a32-282b-4521-838d-92a1136624d1')
 
 
-class StripeCaptureManager(object):
+class StripeCaptureManager:
     """ Captures an open stripe charge when the transaction finishes.
 
     If there is an error during this step, it is logged, but the transaction
@@ -83,7 +83,7 @@ class StripeCaptureManager(object):
         pass
 
 
-class StripeFeePolicy(object):
+class StripeFeePolicy:
     """ All stripe fee calculations in one place (should they ever change). """
 
     percentage = 0.029

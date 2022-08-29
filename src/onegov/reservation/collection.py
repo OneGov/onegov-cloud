@@ -6,7 +6,7 @@ from uuid import uuid4
 any_type = object()
 
 
-class ResourceCollection(object):
+class ResourceCollection:
     """ Manages a list of resources.
 
     """

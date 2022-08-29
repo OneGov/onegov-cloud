@@ -10,7 +10,7 @@ from onegov.org.forms import DirectoryImportForm
 from onegov.org.layout import DirectoryEntryCollectionLayout
 
 
-class DummyApp(object):
+class DummyApp:
 
     def __init__(self, session, application_id='my-app'):
         self._session = session

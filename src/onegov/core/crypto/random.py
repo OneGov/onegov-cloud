@@ -93,7 +93,7 @@ tamaha su. Sono urami masite yara m kata nasi.
 '''
 
 
-class MarkovChain(object):
+class MarkovChain:
     """
     If a system transits from a state to another and the next state depends
     only on the current state and not the past, it is said to be a Markov

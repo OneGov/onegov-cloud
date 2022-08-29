@@ -1,4 +1,4 @@
-class ExportCollection(object):
+class ExportCollection:
 
     def __init__(self, app, registry='export_registry'):
         self.registry = getattr(app.config, registry)
@@ -14,7 +14,7 @@ class ExportCollection(object):
                 yield export
 
 
-class Export(object):
+class Export:
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():

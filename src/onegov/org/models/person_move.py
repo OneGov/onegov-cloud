@@ -3,7 +3,7 @@ from onegov.form import FormDefinition
 from onegov.reservation import Resource
 
 
-class PersonMove(object):
+class PersonMove:
     """ Represents a single move of a linked person. """
 
     def __init__(self, session, obj, subject, target, direction):
@@ -46,7 +46,7 @@ class PersonMove(object):
         # For example:
         #
         # @App.person_move_handler()
-        # class PagePersonMoveMapping(object):
+        # class PagePersonMoveMapping:
         #     def get_object(self, key):
         #        ...
         #     def get_key(self, obj):

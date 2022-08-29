@@ -165,7 +165,7 @@ class PageNameChange(ModelsWithLinksMixin):
         return cls(form.request, model, form.name.data)
 
 
-class LinkCheck(object):
+class LinkCheck:
     def __init__(self, name, link, url):
         self.name = name
         self.link = link

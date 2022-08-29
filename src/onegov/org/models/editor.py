@@ -1,7 +1,7 @@
 """ Contains the model describing the page editor. """
 
 
-class Editor(object):
+class Editor:
     """ Defines the model for the page editor. Required because pages need
     to be edited outside their url structure, since their urls are absorbed
     completely and turned into SQL queries.

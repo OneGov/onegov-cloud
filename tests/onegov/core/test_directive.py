@@ -11,7 +11,7 @@ def test_form_directive(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.form(model=Root, form=Form)
@@ -73,7 +73,7 @@ def test_query_form_class(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.form(model=Root, form=FormA)

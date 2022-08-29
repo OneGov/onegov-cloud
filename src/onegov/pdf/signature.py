@@ -4,7 +4,7 @@ from requests import get
 from requests import post
 
 
-class LexworkSigner(object):
+class LexworkSigner:
     """ Allows the sign PDFs using the lexwork PDF signing interface. """
 
     def __init__(self, host, login, password):

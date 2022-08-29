@@ -3,7 +3,7 @@ from datetime import date
 from onegov.activity import InvoiceItem
 
 
-class InvoiceAction(object):
+class InvoiceAction:
 
     def __init__(self, session, id, action, extend_to=None, text=None):
         self.session = session

@@ -300,7 +300,7 @@ def test_vote_upload(swissvotes_app, attachments):
 
 
 def test_view_vote_chart(session):
-    class Request(object):
+    class Request:
         def translate(self, text):
             if isinstance(text, TranslationString):
                 return text.interpolate()

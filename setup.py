@@ -10,6 +10,7 @@ setup(
     packages=[
         'onegov.activity',
         'onegov.agency',
+        'onegov.api',
         'onegov.async_http',
         'onegov.ballot',
         'onegov.chat',
@@ -181,6 +182,7 @@ setup(
         ],
         'test': [
             'Pillow',
+            'collection-json',
             'coverage',
             'findimports',
             'freezegun',

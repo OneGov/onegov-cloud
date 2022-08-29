@@ -29,7 +29,7 @@ class DirectoryFileNotFound(FileNotFoundError):
         self.filename = filename
 
 
-class FieldParser(object):
+class FieldParser:
     """ Parses records read by the directory archive reader. """
 
     def __init__(self, directory, archive_path):
@@ -95,7 +95,7 @@ class FieldParser(object):
         )
 
 
-class DirectoryArchiveReader(object):
+class DirectoryArchiveReader:
     """ Reading part of :class:`DirectoryArchive`. """
 
     def read(self, target=None, skip_existing=True, limit=0,
@@ -237,7 +237,7 @@ class DirectoryArchiveReader(object):
             ).lines)
 
 
-class DirectoryArchiveWriter(object):
+class DirectoryArchiveWriter:
     """ Writing part of :class:`DirectoryArchive`. """
 
     def write(self, directory, *args, **kwargs):
@@ -430,7 +430,7 @@ class DirectoryArchive(DirectoryArchiveReader, DirectoryArchiveWriter):
         self.transform = transform or (lambda key, value: (key, value))
 
 
-class DirectoryZipArchive(object):
+class DirectoryZipArchive:
     """ Offers the same interface as the DirectoryArchive, additionally
     zipping the folder on write and extracting the zip on read.
 

@@ -353,7 +353,7 @@ def clone(translation):
     return clone
 
 
-class SiteLocale(object):
+class SiteLocale:
     """ A model representing the locale of the site.
 
     Use this model to enable the user to change his locale through a path.

@@ -29,7 +29,7 @@ RomanshLocale.timeframes['week'] = "in'emna"
 RomanshLocale.timeframes['weeks'] = '{0} emnas'
 
 
-class Layout(object):
+class Layout:
     """ Contains useful methods related to rendering pages in html. Think of it
     as an API that you can rely on in your templates.
 

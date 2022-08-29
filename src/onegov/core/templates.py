@@ -19,7 +19,7 @@ For example::
         return 'templates'
 
     @App.path()
-    class Root(object):
+    class Root:
         pass
 
     @App.html(model=Root, template='index.pt')
@@ -119,7 +119,7 @@ class TemplateLoader(PageTemplateLoader):
         return MacrosLookup(self.search_path, name='mail_macros.pt')
 
 
-class MacrosLookup(object):
+class MacrosLookup:
     """ Takes a list of search paths and provides a lookup for macros.
 
     This means that when a macro is access through this lookup, it will travel

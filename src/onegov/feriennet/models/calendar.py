@@ -8,7 +8,7 @@ from sedate import standardize_date, utcnow
 from sqlalchemy import and_, select
 
 
-class Calendar(object):
+class Calendar:
     """ A base for all calendars that return icalendar renderings. """
 
     calendars = {}

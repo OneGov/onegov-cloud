@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import transaction
 
 
-class BaseScenario(object):
+class BaseScenario:
 
     def __init__(self, session, test_password):
         self.session = session

@@ -2,7 +2,7 @@ import inspect
 import time
 
 
-class Assistant(object):
+class Assistant:
     """ Describes an assistant guiding a user through onboarding. """
 
     def __init__(self, app, current_step_number=1):
@@ -63,7 +63,7 @@ class Assistant(object):
         return decorator
 
 
-class Step(object):
+class Step:
     """ Describes a step in an assistant. """
 
     def __init__(self, view_handler, order, form):
@@ -81,6 +81,6 @@ class Step(object):
             return self.view_handler(request, form)
 
 
-class DefaultAssistant(object):
+class DefaultAssistant:
     def __init__(self, assistant):
         self.assistant = assistant

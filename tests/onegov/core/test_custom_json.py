@@ -5,7 +5,7 @@ from decimal import Decimal
 from onegov.core.custom import json
 
 
-class Point(object):
+class Point:
 
     def __init__(self, x, y):
         self.x = x

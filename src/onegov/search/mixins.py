@@ -2,7 +2,7 @@ from onegov.search.utils import classproperty
 from onegov.search.utils import extract_hashtags
 
 
-class Searchable(object):
+class Searchable:
     """ Defines the interface required for an object to be searchable.
 
     Note that ``es_id ``, ``es_properties`` and ``es_type_name`` must be class

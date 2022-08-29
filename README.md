@@ -3,7 +3,7 @@
 OneGov Cloud is a Swiss initiative to provide municipalities with open-source
 web-applications.
 
-[![Screenshot](/docs/_static/govikon.png?raw=true)]()
+[![Screenshot](docs/_static/govikon.png?raw=true)]()
 
 ---
 
@@ -189,8 +189,8 @@ Onegov cloud uses one database for all applications and instances.
 
 Create a new organisation in the database together with a new admin (adjust the path according to your configuration):
 
-    onegov-org --select /onegov_org/govikon add "Gemeinde Govikon"
-    onegov-user --select /onegov_org/govikon add admin admin@example.org --password test
+    onegov-org --select /onegov_town6/govikon add "Gemeinde Govikon"
+    onegov-user --select /onegov_town6/govikon add admin admin@example.org --password test --no-prompt
 
 **Election Day and Swissvotes**
 
@@ -204,7 +204,7 @@ Run the server:
 
 And open the local url in your browser:
 
-    open http://localhost/onegov_town/govikon
+    http://localhost:8080/onegov_town6/govikon
 
 To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variable:
 

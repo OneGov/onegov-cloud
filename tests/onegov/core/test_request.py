@@ -91,7 +91,7 @@ def test_return_to(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root)
@@ -164,7 +164,7 @@ def test_has_permission(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         allowed_for = (Public, Personal, Private, Secret)
 
     @App.view(model=Root, permission=Public)
@@ -239,7 +239,7 @@ def test_permission_by_view(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root, name='public', permission=Public)

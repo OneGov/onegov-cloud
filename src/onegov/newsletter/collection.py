@@ -3,7 +3,7 @@ from onegov.newsletter import Newsletter, Recipient
 from onegov.newsletter.errors import AlreadyExistsError
 
 
-class NewsletterCollection(object):
+class NewsletterCollection:
 
     def __init__(self, session):
         self.session = session
@@ -42,7 +42,7 @@ class NewsletterCollection(object):
         self.session.flush()
 
 
-class RecipientCollection(object):
+class RecipientCollection:
 
     def __init__(self, session):
         self.session = session

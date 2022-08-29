@@ -19,12 +19,12 @@ class DummyPostData(dict):
         return v
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, POST):
         self.POST = DummyPostData(POST)
 
 
-class DummyField(object):
+class DummyField:
     def __init__(self, id, name, value):
         self.id = id
         self.name = name

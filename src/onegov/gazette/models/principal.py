@@ -1,7 +1,7 @@
 from yaml import safe_load
 
 
-class Principal(object):
+class Principal:
     """ The principal is the political entity running the gazette app. """
 
     CANTONS = {

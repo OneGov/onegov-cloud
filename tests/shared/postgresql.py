@@ -5,7 +5,7 @@ from testing.common.database import get_path_of
 from testing.postgresql import Postgresql as Base, SEARCH_PATHS
 
 
-class Snapshot(object):
+class Snapshot:
     def __init__(self, url):
         self.url = url
         self.dump = self.create_dump()

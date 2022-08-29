@@ -30,7 +30,7 @@ from uuid import UUID
 AVAILABILITY_VALUES = {'none', 'few', 'many'}
 
 
-class ActivityFilter(object):
+class ActivityFilter:
 
     # supported filters - should be named with a plural version that can
     # be turned into a singular with the removal of the last s

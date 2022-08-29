@@ -238,7 +238,7 @@ def touch(file_path):
         open(file_path, 'a').close()
 
 
-class Bunch(object):
+class Bunch:
     """ A simple but handy "collector of a bunch of named stuff" class.
 
     See `<http://code.activestate.com/recipes/\

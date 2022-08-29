@@ -3,7 +3,7 @@ from decimal import Decimal
 from onegov.swissvotes import _
 
 
-class PolicyArea(object):
+class PolicyArea:
     """ Helper class for handling of descriptors.
 
     There are three levels of descriptors, each new level refining the
@@ -108,7 +108,7 @@ class PolicyArea(object):
         return f'<span>{title}</span>'
 
 
-class PolicyAreaDefinition(object):
+class PolicyAreaDefinition:
     """ Helper class for all the policy areas and their translatable labels.
 
     Example: Get the label of the policy area "1.12.121":

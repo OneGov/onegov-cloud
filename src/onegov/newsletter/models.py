@@ -160,7 +160,7 @@ class Recipient(Base, TimestampMixin):
         return Subscription(self, self.token)
 
 
-class Subscription(object):
+class Subscription:
     """ Adds subscription management to a recipient. """
 
     def __init__(self, recipient, token):

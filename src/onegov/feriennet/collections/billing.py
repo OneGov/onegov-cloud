@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload
 from ulid import ulid
 
 
-class BillingCollection(object):
+class BillingCollection:
 
     def __init__(self, request, period,
                  username=None, expand=False, state=None):
@@ -235,7 +235,7 @@ class BillingCollection(object):
         bridge.complete(all_inclusive_booking_text)
 
 
-class BookingInvoiceBridge(object):
+class BookingInvoiceBridge:
     """ Creates invoices from bookings.
 
     Should be used in a two-phase process, with one exception:

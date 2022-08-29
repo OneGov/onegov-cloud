@@ -12,7 +12,7 @@ def spawn_basic_permissions_app(redis_url):
     class App(Framework):
         pass
 
-    class Root(object):
+    class Root:
         pass
 
     @App.path(path='', model=Root)
@@ -20,7 +20,7 @@ def spawn_basic_permissions_app(redis_url):
         return Root()
 
     @App.path(path='/hidden')
-    class HiddenFromPublic(object):
+    class HiddenFromPublic:
         access = 'private'
 
     @App.view(model=Root, name='public', permission=Public)

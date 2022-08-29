@@ -25,7 +25,7 @@ from wtforms.csrf.session import SessionCSRF
 Message = collections.namedtuple('Message', ['text', 'type'])
 
 
-class ReturnToMixin(object):
+class ReturnToMixin:
     """ Provides a safe and convenient way of using return-to links.
 
     Return-to links are links with an added 'return-to' query parameter

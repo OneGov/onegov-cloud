@@ -3,7 +3,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-class DerivedAttributesMixin(object):
+class DerivedAttributesMixin:
 
     """ A simple mixin to add commonly used functions to ballots and their
     results. """
@@ -42,7 +42,7 @@ class DerivedAttributesMixin(object):
         return case({True: cls.yeas > cls.nays}, cls.counted)
 
 
-class DerivedBallotsCountMixin(object):
+class DerivedBallotsCountMixin:
 
     """ A simple mixin to add commonly used functions to votes, ballots and
     their results. """

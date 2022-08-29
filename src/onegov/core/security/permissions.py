@@ -8,17 +8,17 @@ may of course introduce its own byzantine permission system.
 """
 
 
-class Public(object):
+class Public:
     """ The general public is allowed to do this. """
 
 
-class Private(object):
+class Private:
     """ Trusted people are allowed to do this. """
 
 
-class Personal(object):
+class Personal:
     """ Registered members are allowed to do this. """
 
 
-class Secret(object):
+class Secret:
     """ Only Demi-Gods are allowed to do this. """

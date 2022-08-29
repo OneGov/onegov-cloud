@@ -18,7 +18,7 @@ def test_view_form_alert(client):
 
 def test_render_form(client):
 
-    class Field(object):
+    class Field:
         def __init__(self, name, definition, comment=None):
             self.name = name
             self.id = as_internal_id(name)
