@@ -93,12 +93,21 @@ def get_resource_form(self, request, type=None):
 @OrgApp.html(model=ResourceCollection, template='resources.pt',
              permission=Public)
 def view_resources(self, request, layout=None):
+    default_group = request.translate(_("General"))
     resources = group_by_column(
         request=request,
         query=self.query(),
+        default_group=default_group,
         group_column=Resource.group,
         sort_column=Resource.title
     )
+
+    def contains_at_least_one_room(resources):
+        for resource in resources:
+            if isinstance(resource, Resource):
+                if resource.type == 'room':
+                    return True
+        return False
 
     ext_resources = group_by_column(
         request,
@@ -109,6 +118,20 @@ def view_resources(self, request, layout=None):
         sort_column=ExternalLink.order
     )
 
+    grouped = combine_grouped(
+        resources, ext_resources, sort=lambda x: x.title
+    )
+
+    for group, entries in grouped.items():
+        # don't include find-your-spot link for categories with
+        # no rooms
+        if not contains_at_least_one_room(entries):
+            continue
+        entries.insert(0, FindYourSpotCollection(
+            request.app.libres_context,
+            group=None if group == default_group else group
+        ))
+
     def link_func(model):
         if isinstance(model, ExternalLink):
             return model.url
@@ -116,16 +139,6 @@ def view_resources(self, request, layout=None):
 
     def edit_link(model):
         if isinstance(model, ExternalLink) and request.is_manager:
-            title = request.translate(_("Edit resource"))
-            to = request.class_link(ResourceCollection)
-            return request.link(
-                model,
-                query_params={'title': title, 'to': to},
-                name='edit'
-            )
-
-    def external_link(model):
-        if isinstance(model, ExternalLink):
             title = request.translate(_("Edit resource"))
             to = request.class_link(ResourceCollection)
             return request.link(
@@ -143,13 +156,10 @@ def view_resources(self, request, layout=None):
 
     return {
         'title': _("Reservations"),
-        'resources': combine_grouped(
-            resources, ext_resources, sort=lambda x: x.title
-        ),
+        'resources': grouped,
         'layout': layout or ResourcesLayout(self, request),
         'link_func': link_func,
         'edit_link': edit_link,
-        'external_link': external_link,
         'lead_func': lead_func,
     }
 

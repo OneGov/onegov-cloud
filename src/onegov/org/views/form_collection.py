@@ -59,16 +59,6 @@ def view_form_collection(self, request, layout=None):
                 name='edit'
             )
 
-    def external_link(model):
-        if isinstance(model, ExternalLink):
-            title = request.translate(_("Edit external form"))
-            to = request.class_link(FormCollection)
-            return request.link(
-                model,
-                query_params={'title': title, 'to': to},
-                name='edit'
-            )
-
     def lead_func(model):
         lead = model.meta.get('lead')
         if not lead:
@@ -106,7 +96,6 @@ def view_form_collection(self, request, layout=None):
         'forms': combine_grouped(forms, ext_forms, sort=lambda x: x.order),
         'link_func': link_func,
         'edit_link': edit_link,
-        'external_link': external_link,
         'lead_func': lead_func,
         'hint': hint
     }
