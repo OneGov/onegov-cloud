@@ -16,7 +16,7 @@ RELEASE_TAG = re.compile(r'release-[0-9]{4}\.[0-9]+')
 
 
 @attrs(auto_attribs=True)
-class ChangelogCommit(object):
+class ChangelogCommit:
 
     module: str
     title: str

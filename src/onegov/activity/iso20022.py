@@ -22,7 +22,7 @@ def normalize_xml(xml):
     return DOCUMENT_NS_EX.sub(r'<Document>\1', xml)
 
 
-class Transaction(object):
+class Transaction:
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():

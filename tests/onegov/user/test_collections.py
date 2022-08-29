@@ -121,7 +121,7 @@ def test_register_user(session):
 
     users = UserCollection(session)
 
-    class MockRequest(object):
+    class MockRequest:
         client_addr = '127.0.0.1'
 
     request = MockRequest()

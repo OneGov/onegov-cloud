@@ -20,9 +20,11 @@
                 </div>
 
                 <div class="panel">
-                    <i class="fa fa-info-circle"></i>
-                    <span i18n:translate="">A description of the WabstiCExport interface can be found here:</span>
-                    <a href="${layout.docs_base_url +'#wabsticexport'}">WabstiCExport</a>.
+                    <p>
+                        <i class="fa fa-info-circle"></i>
+                        <span i18n:translate="">A description of the WabstiCExport interface can be found here:</span>
+                        <a href="${layout.docs_base_url +'#wabsticexport'}">WabstiCExport</a>.
+                    </p>
                 </div>
 
                 <p tal:condition="not:data_sources" i18n:translate>

@@ -8,7 +8,7 @@ def test_views_municipality(client):
     client.login_admin()
 
     # Add a municipality
-    add = client.get('/municipalities').click(href='/add')
+    add = client.get('/municipalities').click('Hinzufügen')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '21'
     add.form['payment_type'] = 'normal'
@@ -71,7 +71,7 @@ def test_views_municipality(client):
 def test_views_municipality_permissions(mock_method, client):
     client.login_admin()
 
-    add = client.get('/municipalities').click(href='/add')
+    add = client.get('/municipalities').click('Hinzufügen')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '21'
     add.form['payment_type'] = 'normal'

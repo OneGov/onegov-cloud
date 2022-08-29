@@ -8,7 +8,7 @@ CALL_COUNT = 0
 
 
 # cannot be pickled by the builtin pickler
-class Point(object):
+class Point:
 
     __slots__ = ('x', 'y')
 

@@ -19,12 +19,12 @@ class DummyIdentity():
         self.userid = userid
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, principal):
         self.principal = principal
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, principal, identity=None):
         self.app = DummyApp(principal)
         self.identity = identity

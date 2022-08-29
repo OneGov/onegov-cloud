@@ -44,7 +44,7 @@ def get_thumbnail_size(image):
         return ('256', '256')
 
 
-class Img(object):
+class Img:
     """ Represents an img element. """
 
     __slots__ = ['src', 'alt', 'title', 'url', 'extra', 'width', 'height']

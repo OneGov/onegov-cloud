@@ -40,7 +40,7 @@ def overlaps(booking, other, minutes_between=0, alignment=None,
     )
 
 
-class LoopBudget(object):
+class LoopBudget:
     """ Helps ensure that a loop doesn't overreach its complexity budget.
 
     For example::
@@ -72,7 +72,7 @@ class LoopBudget(object):
 
 def hashable(attribute):
 
-    class Hashable(object):
+    class Hashable:
 
         def __hash__(self):
             return hash(getattr(self, attribute))

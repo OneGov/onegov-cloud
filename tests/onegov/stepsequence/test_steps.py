@@ -30,7 +30,7 @@ def test_step():
 
 def test_step_layout_extension(sequences):
 
-    class BaseLayout(object):
+    class BaseLayout:
 
         def __init__(self, model):
             self.model = model
@@ -101,7 +101,7 @@ def test_step_registry(sequences):
 def test_step_registry_edge_cases(sequences):
 
     @sequences.registered_step(1)
-    class MyClass(object):
+    class MyClass:
         pass
 
     step = sequences.get(cls_name='MyClass')
@@ -117,7 +117,7 @@ def test_step_registry_edge_cases(sequences):
 
     @sequences.registered_step(1, cls_after='MyClass')
     @sequences.registered_step(3, 'Return Start', cls_before='MyClass')
-    class OtherClass(object):
+    class OtherClass:
         pass
 
     with pytest.raises(ValueError):

@@ -13,7 +13,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-class DomainOfInfluenceMixin(object):
+class DomainOfInfluenceMixin:
     """ Defines the scope of a principal, an election, an election compound
     or a vote.
 
@@ -44,7 +44,7 @@ class DomainOfInfluenceMixin(object):
         )
 
 
-class StatusMixin(object):
+class StatusMixin:
     """ Mixin providing status indication for votes and elections. """
 
     #: Status of the election or vote
@@ -80,7 +80,7 @@ class StatusMixin(object):
         return self.counted
 
 
-class TitleTranslationsMixin(object):
+class TitleTranslationsMixin:
     """ Adds a helper to return the translation of the title without depending
     on the locale of the request.
 
@@ -167,7 +167,7 @@ class LastModifiedMixin(TimestampMixin):
         return func.greatest(cls.last_change, cls.last_result_change)
 
 
-class named_file(object):
+class named_file:
 
     def __set_name__(self, owner, name):
         self.name = name

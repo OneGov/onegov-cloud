@@ -256,7 +256,7 @@ def debug_wsgi_factory(config_file, pdb):
     return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
 
 
-class WSGIRequestMonitorMiddleware(object):
+class WSGIRequestMonitorMiddleware:
     """ Measures the time it takes to respond to a request and prints it
     at the end of the request.
 

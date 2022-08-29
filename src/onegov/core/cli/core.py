@@ -210,7 +210,7 @@ CONTEXT_SPECIFIC_SETTINGS = (
 )
 
 
-class GroupContextGuard(object):
+class GroupContextGuard:
     """ Contains methods which abort the commandline program if any condition
     is not met.
 
@@ -549,7 +549,7 @@ def command_group():
                     pass
 
             @CliApplication.path(path=view_path)
-            class Model(object):
+            class Model:
                 pass
 
             @CliApplication.view(model=Model, permission=Public)

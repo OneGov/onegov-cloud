@@ -438,7 +438,7 @@ def import_reservations(dsn, map, start_date):
     remote = Session(bind=engine)
 
     # define the mapping between old/new resources
-    class Mapping(object):
+    class Mapping:
 
         def __init__(self, libres_context, old_url, new_url, type):
             self.resources = ResourceCollection(libres_context)

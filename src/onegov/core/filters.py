@@ -1,5 +1,6 @@
 """ Extra webasset filters. """
 import os
+import rcssmin
 
 from webassets.filter import Filter, register_filter
 from webassets.filter.datauri import CSSDataUri, CSSUrlRewriter
@@ -76,12 +77,7 @@ class RCSSMinFilter(Filter):
     name = 'custom-rcssmin'
 
     def setup(self):
-        try:
-            import rcssmin
-        except ImportError:
-            raise EnvironmentError('The "rcssmin" package is not installed.')
-        else:
-            self.rcssmin = rcssmin
+        self.rcssmin = rcssmin
 
     def output(self, _in, out, **kw):
         out.write(self.rcssmin.cssmin(_in.read()))

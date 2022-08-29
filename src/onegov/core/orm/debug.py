@@ -7,7 +7,7 @@ from sqlalchemy.engine import Engine
 from sqlparse import format
 
 
-class Timer(object):
+class Timer:
     """ A timer that works just like a stopwatch. """
 
     def start(self):

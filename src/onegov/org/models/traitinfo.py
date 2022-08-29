@@ -39,7 +39,7 @@ TRAIT_MESSAGES = {
 }
 
 
-class TraitInfo(object):
+class TraitInfo:
     """" Typically used as a mixin for adjacency list based models,
     this class provides access to the trait related methods.
 

@@ -17,7 +17,7 @@ This module should eventually replace the elements.py module.
 from onegov.core.templates import render_macro
 
 
-class Element(object):
+class Element:
     """ Provides a way to define elements trough multiple variables. These
     elements may then be rendered by the elements.pt templates.
 
@@ -101,7 +101,7 @@ class Element(object):
         })
 
 
-class AccessMixin(object):
+class AccessMixin:
     """ Hidden links point to views which are not available to the public
     (usually through a publication mechanism).
 
@@ -163,7 +163,7 @@ class LinkGroup(AccessMixin):
         self.attributes = attributes
 
 
-class Trait(object):
+class Trait:
     """ Base class for all traits. """
 
     __slots__ = ('apply', )

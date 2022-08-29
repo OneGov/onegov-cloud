@@ -50,7 +50,7 @@ def form_app(request):
     class TestApp(Framework, FormApp):
         pass
 
-    class Content(object):
+    class Content:
         pass
 
     @TestApp.path(path='/snippets')

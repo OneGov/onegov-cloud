@@ -19,7 +19,7 @@ def test_run_cronjob(postgres_dsn, redis_url):
         pass
 
     @App.path(path='')
-    class Root(object):
+    class Root:
         pass
 
     @App.json(model=Root)
@@ -71,7 +71,7 @@ def test_disable_cronjobs(redis_url):
         pass
 
     @App.path(path='')
-    class Root(object):
+    class Root:
         pass
 
     @App.json(model=Root)

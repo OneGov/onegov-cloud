@@ -136,7 +136,7 @@ class DummyPostData(dict):
         return v
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
 
     all_years = range(2000, 2030)
 
@@ -180,7 +180,7 @@ class DummyPrincipal(object):
         return ''
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session=None, application_id='application_id'):
         self._session = session
         self.application_id = application_id
@@ -195,7 +195,7 @@ class DummyApp(object):
         assert not list(prepared_emails)
 
 
-class DummyRequest(object):
+class DummyRequest:
 
     def __init__(self, session=None, app=None, locale='de',
                  is_logged_in=False, is_secret=False, url=''):
@@ -210,6 +210,9 @@ class DummyRequest(object):
         self.default_locale = 'de_CH'
         self.is_secret = lambda x: is_secret
         self.url = url
+
+    def class_link(self, cls, name='', variables={}):
+        return f'{cls.__name__}/{name}/{variables}'
 
     def link(self, model, name='', query_params={}):
         class_name = model.__class__.__name__

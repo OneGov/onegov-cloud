@@ -3,7 +3,7 @@
 OneGov Cloud is a Swiss initiative to provide municipalities with open-source
 web-applications.
 
-[![Screenshot](/docs/_static/govikon.png?raw=true)]()
+[![Screenshot](docs/_static/govikon.png?raw=true)]()
 
 ---
 
@@ -105,11 +105,9 @@ name is valid (first character must be uppercase!).
 To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
-* Postgres 12+
+* Postgres 11-13
 * Python 3.8+
-* OpenJDK 11+
-* Elasticsearch 7.x
-* Redis 5.x
+* Redis 5+
 * NodeJS 9+
 
 ### Libraries
@@ -189,8 +187,8 @@ Onegov cloud uses one database for all applications and instances.
 
 Create a new organisation in the database together with a new admin (adjust the path according to your configuration):
 
-    onegov-org --select /onegov_org/govikon add "Gemeinde Govikon"
-    onegov-user --select /onegov_org/govikon add admin admin@example.org --password test
+    onegov-org --select /onegov_town6/govikon add "Gemeinde Govikon"
+    onegov-user --select /onegov_town6/govikon add admin admin@example.org --password test --no-prompt
 
 **Election Day and Swissvotes**
 
@@ -204,13 +202,13 @@ Run the server:
 
 And open the local url in your browser:
 
-    open http://localhost/onegov_town/govikon
+    http://localhost:8080/onegov_town6/govikon
 
 To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variable:
 
     export ONEGOV_DEVELOPMENT='1'
 
-Run the elastic search cluster and the SMTP server:
+Run the elastic search cluster, D3renderer and the SMTP server:
 
     docker-compose up -d
 

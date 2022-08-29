@@ -7,7 +7,7 @@ def html_converter(text):
     return '<br>'.join((line.strip() for line in text.split('\n')))
 
 
-class SogcConverter(object):
+class SogcConverter:
 
     """ The base class for all converters. """
 

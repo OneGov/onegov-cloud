@@ -63,7 +63,7 @@ class Organization(AdjacencyList, ContentMixin, TimestampMixin):
             notice.organization = title
 
 
-class OrganizationMove(object):
+class OrganizationMove:
     """ Represents a single move of an adjacency list item. """
 
     def __init__(self, session, subject_id, target_id, direction):

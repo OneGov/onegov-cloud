@@ -2,7 +2,7 @@ from attr import attrs
 from itertools import groupby
 
 
-class Dashboard(object):
+class Dashboard:
 
     def __init__(self, request):
         self.request = request
@@ -34,7 +34,7 @@ class Dashboard(object):
         return boardlets
 
 
-class Boardlet(object):
+class Boardlet:
     """ Base class used by all boardlets. Use as follows:
 
         from onegov.app import App
@@ -77,7 +77,7 @@ class Boardlet(object):
 
 
 @attrs(auto_attribs=True)
-class BoardletFact(object):
+class BoardletFact:
     """ A single boardlet fact. """
 
     # the text of the fact (includes the metric)

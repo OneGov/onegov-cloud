@@ -27,16 +27,11 @@ def view_archive(self, request):
     layout = DefaultLayout(self, request)
     results, last_modified = self.by_date()
     results = self.group_items(results, request)
-    archive_link = request.class_link(
-        SearchableArchivedResultCollection,
-        variables={'item_type': 'vote'}
-    )
 
     return {
         'layout': layout,
         'date': self.date,
         'archive_items': results,
-        'archive_link': archive_link
     }
 
 
@@ -87,16 +82,11 @@ def view_principal(self, request):
     archive = ArchivedResultCollection(request.session)
     latest, last_modified = archive.latest()
     latest = archive.group_items(latest, request)
-    archive_link = request.class_link(
-        SearchableArchivedResultCollection,
-        variables={'item_type': 'vote'}
-    )
 
     return {
         'layout': layout,
         'archive_items': latest,
         'date': None,
-        'archive_link': archive_link
     }
 
 

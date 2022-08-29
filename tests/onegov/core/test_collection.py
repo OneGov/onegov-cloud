@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 def test_pagination():
 
-    class Query(object):
+    class Query:
 
         def __init__(self, values):
             self.values = values

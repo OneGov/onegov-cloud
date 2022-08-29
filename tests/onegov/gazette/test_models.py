@@ -20,12 +20,12 @@ from sedate import standardize_date
 from textwrap import dedent
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
     name = 'Govikon'
     links = None
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session):
         self._session = session
         self.principal = DummyPrincipal()
@@ -35,7 +35,7 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session):
         self.app = DummyApp(session)
         self.identity = None

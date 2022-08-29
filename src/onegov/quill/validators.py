@@ -2,7 +2,7 @@ from onegov.core.html import html_to_text
 from wtforms.validators import ValidationError
 
 
-class HtmlDataRequired(object):
+class HtmlDataRequired:
     """ Checks the field's data contains text inside HTML otherwise stops the
     validation chain.
 

@@ -3,7 +3,7 @@ from dogpile.cache.api import NO_VALUE
 from hashlib import blake2b
 
 
-class Prefixed(object):
+class Prefixed:
 
     def __init__(self, prefix, cache):
         assert len(prefix) >= 24
@@ -41,7 +41,7 @@ class Prefixed(object):
         """, 0, f'*:{self.prefix}:*')
 
 
-class BrowserSession(object):
+class BrowserSession:
     """ A session bound to a token (session_id cookie). Used to store data
     about a client on the server.
 

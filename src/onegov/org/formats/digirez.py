@@ -6,7 +6,7 @@ import tempfile
 from onegov.core.csv import CSVFile
 
 
-class DigirezDB(object):
+class DigirezDB:
     """ Offers access to a Digirez Room Booking Software Database
     (see http://www.digiappz.com).
 
@@ -54,7 +54,7 @@ class DigirezDB(object):
         return RecordsAccessor(self.csv_path)
 
 
-class RecordsAccessor(object):
+class RecordsAccessor:
 
     def __init__(self, csv_path):
         self.csv_path = csv_path

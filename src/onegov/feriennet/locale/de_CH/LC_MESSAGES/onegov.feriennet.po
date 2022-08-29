@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-24 15:51+0200\n"
+"POT-Creation-Date: 2022-08-23 11:16+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,9 +12,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
-
-msgid "Partner of Pro Juventute"
-msgstr "Partner von Pro Juventute"
 
 msgid "No active period"
 msgstr "Kein aktiver Zeitraum"
@@ -625,8 +622,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "AGB"
 
@@ -2940,8 +2937,14 @@ msgstr "Der Zeitraum wurde erfolgreich deaktiviert"
 msgid "The period was archived successfully"
 msgstr "Der Zeitraum wurde erfolgreich archiviert"
 
+msgid "QR-Bill"
+msgstr "QR-Rechnung"
+
 msgid "Payment"
 msgstr "Bezahlung"
+
+msgid "Bank Account (IBAN / QR-IBAN)"
+msgstr "Bank Konto (IBAN / QR-IBAN)"
 
 msgid "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
 msgstr "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
@@ -2958,14 +2961,11 @@ msgstr "ESR (Generell)"
 msgid "ESR (Raiffeisen)"
 msgstr "ESR (Raiffeisen)"
 
-msgid "ESR participant number"
-msgstr "ESR Teilnehmernummer"
+msgid "ESR participant number / QR-IBAN"
+msgstr "ESR Teilnehmernummer / QR-IBAN"
 
 msgid "ESR identification number"
 msgstr "ESR Identifikationsnummer"
-
-msgid "QR-Bill (experimental)"
-msgstr "QR-Rechnung (experimentell)"
 
 msgid "Full age required for registration"
 msgstr "Volljährigkeit bei der Registrierung notwendig"
@@ -3058,6 +3058,3 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
-
-#~ msgid "Each child can register for up to ${count} activities."
-#~ msgstr "Jedes Kind kann sich für bis zu 12 Angebote anmelden."

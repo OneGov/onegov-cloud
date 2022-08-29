@@ -9,7 +9,7 @@ def hash_primary_key(text):
     return hashlib.sha1(text.encode('utf-8')).hexdigest()
 
 
-class PayableBase(object):
+class PayableBase:
 
     @property
     def payable_reference(self):
