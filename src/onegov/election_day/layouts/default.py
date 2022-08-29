@@ -7,6 +7,7 @@ from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.user import Auth
 
 
@@ -121,6 +122,13 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def archive(self):
         return ArchivedResultCollection(self.request.session)
+
+    @cached_property
+    def archive_search_link(self):
+        return self.request.class_link(
+            SearchableArchivedResultCollection,
+            variables={'item_type': 'vote'}
+        )
 
     @cached_property
     def locales(self):

@@ -106,11 +106,12 @@ metal:define-macro="layout">
             <p>
                 <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
                 <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a><br>
-                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
+                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a> |
+                <a class="sitemap-link" href="${request.link(layout.principal, 'sitemap')}" i18n:translate>Sitemap</a>
             </p>
             </div>
             <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                <p><a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a></p>
+                <p tal:condition="layout.login_link"><a href="${layout.login_link}" i18n:translate>Login</a></p>
                 <tal:block condition="layout.logout_link" >
                 <p>
                     <span i18n:translate>You are logged in: </span>
