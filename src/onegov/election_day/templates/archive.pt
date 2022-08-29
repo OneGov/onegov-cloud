@@ -1,10 +1,8 @@
 <div metal:use-macro="layout.base"
      i18n:domain="onegov.election_day"
      tal:define="communal_instance layout.principal.domain == 'municipality'">
-    <tal:block metal:fill-slot="title"  tal:define="years layout.archive.get_years()" tal:condition="years" tal:repeat="year years">
-        <tal:block condition="python: str(year) == date">
-            <tal:block i18n:translate="">Archive</tal:block> ${year} - ${request.app.principal.name}
-        </tal:block>
+    <tal:block metal:fill-slot="title">
+        <tal:block condition="date" i18n:translate="">Archive</tal:block> ${date} - ${request.app.principal.name}
     </tal:block>
     <tal:block metal:fill-slot="before-content">
         <h1>
