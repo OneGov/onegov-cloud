@@ -651,3 +651,7 @@ a > i.fa-external-link-alt {
 section#content h2 {
     margin-top: 2rem !important;
 }
+
+section#contetn h2:first-of-type {
+    margin-top: 0 !important;
+}
