@@ -193,7 +193,7 @@
                             <a tal:condition="python: str(year) != date" href="${request.link(layout.archive.for_date(year))}">${year}</a>
                         </li>
                     </ul><br>
-                    <p ><a i18n:translate href="${archive_link}">Archive Search</a></p>
+                    <p ><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
                 </div>
             </div>
         </div>

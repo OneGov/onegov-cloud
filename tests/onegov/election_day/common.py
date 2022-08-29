@@ -211,6 +211,9 @@ class DummyRequest:
         self.is_secret = lambda x: is_secret
         self.url = url
 
+    def class_link(self, cls, name='', variables={}):
+        return f'{cls.__name__}/{name}/{variables}'
+
     def link(self, model, name='', query_params={}):
         class_name = model.__class__.__name__
         if class_name == 'Canton' or class_name == 'Municipality':

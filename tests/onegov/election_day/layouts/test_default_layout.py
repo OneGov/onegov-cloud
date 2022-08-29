@@ -70,6 +70,9 @@ def test_default_layout():
 
     assert layout_de.login_link == 'Auth/login'
     assert layout_de.logout_link is None
+    assert layout_de.archive_search_link == (
+        "SearchableArchivedResultCollection//{'item_type': 'vote'}"
+    )
 
     layout_de = DefaultLayout(
         None, DummyRequest(locale='de', is_logged_in=True)
