@@ -41,7 +41,7 @@
                     </div>
 
                     <h2 i18n:translate>Search results</h2>
-                    <p tal:condition="results" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</p>
+                    <p role="alert" tal:condition="results" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</p>
                     <hr>
 
                     <tal:b tal:condition="item_type == 'vote'">
