@@ -105,11 +105,9 @@ name is valid (first character must be uppercase!).
 To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
-* Postgres 12+
+* Postgres 11-13
 * Python 3.8+
-* OpenJDK 11+
-* Elasticsearch 7.x
-* Redis 5.x
+* Redis 5+
 * NodeJS 9+
 
 ### Libraries
@@ -210,7 +208,7 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
 
     export ONEGOV_DEVELOPMENT='1'
 
-Run the elastic search cluster and the SMTP server:
+Run the elastic search cluster, D3renderer and the SMTP server:
 
     docker-compose up -d
 
