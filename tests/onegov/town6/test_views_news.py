@@ -175,3 +175,46 @@ def test_hide_news(client):
 
     response = anonymous.get(page.request.url)
     assert response.status_code == 200
+
+
+def test_news_detail(client):
+    client.login_admin()
+
+    news_list = client.get('/news')
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Foo"
+    page.form['lead'] = "Lorem"
+    page.form['publication_start'] = '2020-05-01T00:00'
+    page.form.submit().follow()
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Bar"
+    page.form['lead'] = "Lorem"
+    page.form['publication_start'] = '2020-04-01T00:00'
+    page.form.submit()
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Zap"
+    page.form['lead'] = "Lorem"
+    page.form['publication_start'] = '2020-03-01T00:00'
+    page.form.submit()
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "One"
+    page.form['lead'] = "Lorem"
+    page.form['publication_start'] = '2020-02-01T00:00'
+    page.form.submit()
+
+    news_list = client.get('/news')
+    news_detail = news_list.click('Foo')
+
+    more_news = news_detail.pyquery(".more-news a")
+    more_news = ' '.join([a.text for a in more_news])
+
+    assert "Foo" not in more_news
+    assert "One" not in more_news
+
+    assert "Wir haben" in more_news
+    assert "Bar" in more_news
+    assert "Zap" in more_news
