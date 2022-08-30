@@ -1,6 +1,9 @@
 <div metal:use-macro="layout.base"
      i18n:domain="onegov.election_day"
      tal:define="communal_instance layout.principal.domain == 'municipality'">
+    <tal:block metal:fill-slot="title">
+        <tal:block i18n:translate="">Archive Search</tal:block> - ${request.app.principal.name}
+    </tal:block>
     <tal:b metal:fill-slot="before-content">
         <h1>
             <small>${layout.principal.name}</small>
@@ -56,7 +59,10 @@
                                 <tal:b tal:repeat="vote results">
                                     <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
                                         <td class="top-aligned" tal:define="prefix vote.title_prefix(request)">
-                                            <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
+                                            <a href="${vote.url}">
+                                                <span tal:condition="prefix">${prefix}: </span>
+                                                <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
+                                            </a>
                                         </td>
                                         <td class="top-aligned">
                                             <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
@@ -99,7 +105,10 @@
                             <tbody>
                                 <tr tal:repeat="election results">
                                     <td class="top-aligned" tal:define="prefix election.title_prefix(request)">
-                                        <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
+                                        <a href="${election.url}">
+                                            <span tal:condition="prefix">${prefix}: </span>
+                                            <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
+                                        </a>
                                     </td>
                                     <td class="top-aligned" >${layout.format_date(election.date, 'date')}</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>

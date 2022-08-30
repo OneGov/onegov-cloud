@@ -3,7 +3,7 @@ from onegov.core.browser_session import BrowserSession
 from onegov.core.framework import Framework
 
 
-class IdentityPolicy(object):
+class IdentityPolicy:
     """ Stores the tokens associated with the identity on the browser session
 
     """

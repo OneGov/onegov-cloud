@@ -5,7 +5,7 @@ from onegov.user import User
 from sqlalchemy import func
 
 
-class Scoring(object):
+class Scoring:
     """ Provides scoring based on a number of criteria.
 
     A criteria is a callable which takes a booking and returns a score.
@@ -57,7 +57,7 @@ class Scoring(object):
         return settings
 
 
-class PreferMotivated(object):
+class PreferMotivated:
     """ Scores "motivated" bookings higher. A motivated booking is simply a
     booking with a higher priority (an attendee would favor a booking he's
     excited about.)
@@ -72,7 +72,7 @@ class PreferMotivated(object):
         return booking.priority
 
 
-class PreferInAgeBracket(object):
+class PreferInAgeBracket:
     """ Scores bookings whose attendees fall into the age-bracket of the
     occasion higher.
 
@@ -129,7 +129,7 @@ class PreferInAgeBracket(object):
             return 1.0 - min(1.0, difference / 10.0)
 
 
-class PreferOrganiserChildren(object):
+class PreferOrganiserChildren:
     """ Scores bookings of children higher if their parents are organisers.
 
     This is basically an incentive to become an organiser. A child whose parent
@@ -167,7 +167,7 @@ class PreferOrganiserChildren(object):
         return self.get_is_organiser_child(booking) and 1.0 or 0.0
 
 
-class PreferAdminChildren(object):
+class PreferAdminChildren:
     """ Scores bookings of children higher if their parents are admins. """
 
     def __init__(self, get_is_association_child):
@@ -195,7 +195,7 @@ class PreferAdminChildren(object):
         return self.get_is_association_child(booking) and 1.0 or 0.0
 
 
-class PreferGroups(object):
+class PreferGroups:
     """ Scores group bookings higher than other bookings. Groups get a boost
     by size:
 

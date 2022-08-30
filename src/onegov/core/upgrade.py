@@ -107,7 +107,7 @@ def get_upgrade_modules():
             yield entry.name, importlib.import_module(entry.module_name)
 
 
-class upgrade_task(object):
+class upgrade_task:
     """ Marks the decorated function as an upgrade task. Upgrade tasks should
     be defined outside classes (except for testing) - that is in the root of
     the module (directly in onegov/form/upgrades.py for example).
@@ -337,7 +337,7 @@ def register_all_modules_and_tasks(session):
     register_modules(session, get_upgrade_modules(), get_tasks())
 
 
-class UpgradeTransaction(object):
+class UpgradeTransaction:
     """ Holds the session and the alembic operations connection together and
     commits/aborts both at the same time.
 
@@ -362,7 +362,7 @@ class UpgradeTransaction(object):
         transaction.abort()
 
 
-class UpgradeContext(object):
+class UpgradeContext:
     """ Holdes the context of the upgrade. An instance of this is passed
     to each upgrade task.
 
@@ -494,7 +494,7 @@ class UpgradeContext(object):
             self.session.flush()
 
 
-class RawUpgradeRunner(object):
+class RawUpgradeRunner:
     """ Runs the given raw tasks. """
 
     def __init__(self, tasks, commit=True,
@@ -553,7 +553,7 @@ class RawUpgradeRunner(object):
         return executions
 
 
-class UpgradeRunner(object):
+class UpgradeRunner:
     """ Runs the given basic tasks. """
 
     def __init__(self, modules, tasks, commit=True,

@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 def test_upgrade_task_registration():
 
-    class MyUpgradeModule(object):
+    class MyUpgradeModule:
 
         @upgrade_task(name='Add new field')
         def add_new_field(request):
@@ -37,7 +37,7 @@ def test_upgrade_task_registration():
 
 def test_raw_task_requirement():
 
-    class MyUpgradeModule(object):
+    class MyUpgradeModule:
 
         @upgrade_task(name='Add new field', raw=True, always_run=True)
         def add_new_field(session_manager, schemas):
@@ -55,7 +55,7 @@ def test_raw_task_requirement():
 
 def test_upgrade_task_requirements():
 
-    class Two(object):
+    class Two:
 
         @upgrade_task(name='New Field', requires='one:Init Database')
         def new_field(request):
@@ -65,7 +65,7 @@ def test_upgrade_task_requirements():
         def destroy_database(request):
             pass
 
-    class One(object):
+    class One:
 
         @upgrade_task(name='Init Database')
         def init(request):
@@ -86,7 +86,7 @@ def test_upgrade_task_requirements():
 
 def test_upgrade_duplicate_tasks():
 
-    class MyUpgradeModule(object):
+    class MyUpgradeModule:
 
         @upgrade_task(name='Add new field')
         def add_new_field(request):
@@ -102,13 +102,13 @@ def test_upgrade_duplicate_tasks():
 
 def test_upgrade_duplicate_function_names():
 
-    class Foo(object):
+    class Foo:
 
         @upgrade_task(name='Foo')
         def task(request):
             pass
 
-    class Bar(object):
+    class Bar:
 
         @upgrade_task(name='Bar')
         def task(request):

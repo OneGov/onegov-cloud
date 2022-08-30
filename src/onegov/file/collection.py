@@ -6,7 +6,7 @@ from sedate import utcnow
 from sqlalchemy import and_, text, or_
 
 
-class FileCollection(object):
+class FileCollection:
     """ Manages files.
 
     :param session:
@@ -220,7 +220,7 @@ class FileCollection(object):
             return match.meta['action_metadata']
 
 
-class FileSetCollection(object):
+class FileSetCollection:
     """ Manages filesets. """
 
     def __init__(self, session, type='*'):

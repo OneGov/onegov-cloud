@@ -37,7 +37,7 @@ def test_wsgi_server():
     assert response.status_code == 200
     assert "Hello world!" in response.content.decode('utf-8')
 
-    class MockEvent(object):
+    class MockEvent:
         src_path = None
         is_directory = False
 

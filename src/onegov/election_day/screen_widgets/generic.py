@@ -65,7 +65,7 @@ class HRWidget:
 
 
 @ElectionDayApp.screen_widget(tag='row', category='generic')
-class RowWidget(object):
+class RowWidget:
     tag = 'row'
     template = """
         <xsl:template match="row">
@@ -78,7 +78,7 @@ class RowWidget(object):
 
 
 @ElectionDayApp.screen_widget(tag='column', category='generic')
-class ColumnWidget(object):
+class ColumnWidget:
     tag = 'column'
     template = """
         <xsl:template match="column">
@@ -92,7 +92,7 @@ class ColumnWidget(object):
 
 
 @ElectionDayApp.screen_widget(tag='logo', category='generic')
-class LogoWidget(object):
+class LogoWidget:
     tag = 'logo'
     template = """
         <xsl:template match="logo">

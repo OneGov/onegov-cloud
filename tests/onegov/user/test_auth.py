@@ -21,7 +21,7 @@ class DummyPostData(dict):
         return v
 
 
-class DummyApp(object):
+class DummyApp:
 
     def __init__(self, session, application_id='my-app'):
         self._session = session

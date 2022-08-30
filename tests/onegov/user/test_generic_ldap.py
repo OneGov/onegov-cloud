@@ -72,11 +72,11 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
         pass
 
     @App.path(path='/private')
-    class PrivateDocument(object):
+    class PrivateDocument:
         name = 'private'
 
     @App.path(path='/secret')
-    class SecretDocument(object):
+    class SecretDocument:
         name = 'secret'
 
     @App.path(path='/auth', model=Auth)

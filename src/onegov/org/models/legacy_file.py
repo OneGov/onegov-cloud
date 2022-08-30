@@ -9,7 +9,7 @@ from onegov.core.filestorage import FilestorageFile
 from onegov.core import utils
 
 
-class LegacyFileCollection(object):
+class LegacyFileCollection:
 
     def __init__(self, app):
         assert app.has_filestorage
@@ -22,7 +22,7 @@ class LegacyFileCollection(object):
             return LegacyFile(filename)
 
 
-class LegacyImageCollection(object):
+class LegacyImageCollection:
 
     def __init__(self, app):
         assert app.has_filestorage

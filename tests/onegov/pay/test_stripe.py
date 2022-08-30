@@ -71,7 +71,7 @@ def test_stripe_fee_policy():
 
 
 def test_stripe_capture_good_charge():
-    class GoodCharge(object):
+    class GoodCharge:
         captured = False
 
         def capture(self):
@@ -90,7 +90,7 @@ def test_stripe_capture_good_charge():
 def test_stripe_capture_evil_charge(capturelog):
     capturelog.setLevel(logging.ERROR, logger='onegov.pay')
 
-    class EvilCharge(object):
+    class EvilCharge:
         def capture(self):
             assert False
 

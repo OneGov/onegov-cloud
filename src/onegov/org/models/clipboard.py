@@ -1,7 +1,7 @@
 from cached_property import cached_property
 
 
-class Clipboard(object):
+class Clipboard:
     """ The clipboard holds a url that should be copied and then pasted.
     The url is expected to be stored in a token that has been created by
     :meth:`onegov.core.request.CoreRequest.new_url_safe_token`.

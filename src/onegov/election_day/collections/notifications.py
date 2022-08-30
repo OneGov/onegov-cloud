@@ -8,7 +8,7 @@ from onegov.election_day.models import SmsNotification
 from onegov.election_day.models import WebhookNotification
 
 
-class NotificationCollection(object):
+class NotificationCollection:
 
     def __init__(self, session):
         self.session = session

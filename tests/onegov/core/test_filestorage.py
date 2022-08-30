@@ -49,11 +49,11 @@ def test_filestorage(temporary_directory, redis_url):
         pass
 
     @App.path('/')
-    class Model(object):
+    class Model:
         pass
 
     @App.path('/login')
-    class Login(object):
+    class Login:
         pass
 
     @App.view(model=Model)

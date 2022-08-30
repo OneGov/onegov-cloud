@@ -2,7 +2,7 @@ from cached_property import cached_property
 from onegov.wtfs.models.report import Report
 
 
-class DailyList(object):
+class DailyList:
     pass
 
 

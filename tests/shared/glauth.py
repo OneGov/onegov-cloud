@@ -9,7 +9,7 @@ from textwrap import dedent
 
 
 @attrs(auto_attribs=True)
-class GLAuth(object):
+class GLAuth:
     """ Runs an LDAP sever using glauth.
 
     Requires the path to the glauth binary (can be retrieved through the

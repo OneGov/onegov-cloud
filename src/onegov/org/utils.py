@@ -249,7 +249,7 @@ def render_time_range(start, end):
     return ' - '.join((start, end))
 
 
-class ReservationInfo(object):
+class ReservationInfo:
 
     __slots__ = ['resource', 'reservation', 'request', 'translate']
 

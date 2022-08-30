@@ -244,7 +244,7 @@ class AdjacencyList(Base):
         )
 
 
-class AdjacencyListCollection(object):
+class AdjacencyListCollection:
     """ A base class for collections working with :class:`AdjacencyList`. """
 
     @property

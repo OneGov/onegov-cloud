@@ -10,7 +10,7 @@ from uuid import uuid4
 
 def test_template_variables():
 
-    class MockRequest(object):
+    class MockRequest:
 
         def __repr__(self):
             return 'MockRequest'
@@ -28,7 +28,7 @@ def test_template_variables():
         def app(self):
             return Bunch(org=self)
 
-    class MockPeriod(object):
+    class MockPeriod:
         id = uuid4()
         title = 'Foobar Pass'
 

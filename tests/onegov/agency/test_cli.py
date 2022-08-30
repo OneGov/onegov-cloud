@@ -8,7 +8,7 @@ from pathlib import Path
 def test_create_pdf(temporary_directory, cfg_path):
     runner = CliRunner()
 
-    class DummyResponse(object):
+    class DummyResponse:
         content = b'image'
 
         def raise_for_status(self):

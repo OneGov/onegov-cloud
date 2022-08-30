@@ -72,7 +72,7 @@ def finish_logout(request, user, to, local=True):
 
 
 @attrs(auto_attribs=True)
-class SAML2Attributes(object):
+class SAML2Attributes:
     """ Holds the required SAML2 Attributes """
 
     # the globally unique id

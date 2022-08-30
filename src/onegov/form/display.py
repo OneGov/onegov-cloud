@@ -11,7 +11,7 @@ from translationstring import TranslationString
 __all__ = ['render_field']
 
 
-class Registry(object):
+class Registry:
     """ Keeps track of all the renderers and the types they are registered for,
     making sure each renderer is only instantiated once.
 
@@ -51,7 +51,7 @@ registry = Registry()
 render_field = registry.render
 
 
-class BaseRenderer(object):
+class BaseRenderer:
     """ Provides utility functions for all renderers. """
 
     def escape(self, text):

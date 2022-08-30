@@ -4,7 +4,7 @@ from onegov.server import errors
 from onegov.server.utils import load_class
 
 
-class Config(object):
+class Config:
     """ Represents the configuration of the server. """
 
     def __init__(self, configuration):
@@ -46,7 +46,7 @@ class Config(object):
         return cls(yaml.safe_load(yaml_string))
 
 
-class ApplicationConfig(object):
+class ApplicationConfig:
     """ Represents an application config entry loaded from a dictionary like
     this::
 

@@ -3,7 +3,7 @@ from itertools import groupby
 from unidecode import unidecode
 
 
-class AtoZ(object):
+class AtoZ:
 
     def __init__(self, request):
         self.request = request

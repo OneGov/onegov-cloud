@@ -20,7 +20,7 @@ from itertools import chain
 from onegov.core.cache import lru_cache
 
 
-class Serializer(object):
+class Serializer:
     """ Provides a way to encode all objects of a given class or its
     subclasses to and from json.
 
@@ -75,7 +75,7 @@ class DictionarySerializer(Serializer):
 
     For example::
 
-        class Point(object):
+        class Point:
 
             def __init__(self, x, y):
                 self.x = x
@@ -92,7 +92,7 @@ class DictionarySerializer(Serializer):
     As the internal __dict__ represenation is of no concern, __slots__ may
     be used:
 
-        class Point(object):
+        class Point:
 
             __slots__ = ('x', 'y')
 
@@ -114,7 +114,7 @@ class DictionarySerializer(Serializer):
         return self.target(**dictionary)
 
 
-class Serializers(object):
+class Serializers:
     """ Organises the different serializer implementations under a unifiying
     interface. This allows the actual encoder/decoder to call a single class
     without having to worry how the various serializers need to be looked up
@@ -226,7 +226,7 @@ default_serializers.register(PrefixSerializer(
 ))
 
 
-class Serializable(object):
+class Serializable:
     """ Classes inheriting from this base are serialised using the
     :class:`DictionarySerializer` class.
 

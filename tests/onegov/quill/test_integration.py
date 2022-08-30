@@ -17,7 +17,7 @@ def test_integration(temporary_directory, redis_url):
         return temporary_directory
 
     @App.path(path='')
-    class Root(object):
+    class Root:
         pass
 
     @App.html(model=Root)

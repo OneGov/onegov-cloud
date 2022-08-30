@@ -3,7 +3,7 @@ from onegov.core.utils import Bunch
 from onegov.page import PageCollection
 
 
-class AdjacencyListMove(object):
+class AdjacencyListMove:
     """ Represents a single move of an adjacency list item. """
 
     def __init__(self, session, subject, target, direction):

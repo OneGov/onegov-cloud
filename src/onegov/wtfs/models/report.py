@@ -19,7 +19,7 @@ def zero(attribute):
     return literal_column('0').label(attribute)
 
 
-class Report(object):
+class Report:
     """ The base class for the reports.
 
     Aggregates the ``columns_dispatch`` on the dispatch date and
@@ -176,7 +176,7 @@ class ReportFormsAllMunicipalities(ReportFormsByMunicipality):
         return _("Report forms of all municipalities")
 
 
-class ReportBoxesAndFormsByDelivery(object):
+class ReportBoxesAndFormsByDelivery:
     """ A report containing all boxes, tax forms and single documents of a
     single municipality by delivery.
 

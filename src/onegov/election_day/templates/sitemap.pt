@@ -1,0 +1,71 @@
+<div metal:use-macro="layout.base"
+     i18n:domain="onegov.election_day"
+     tal:define="communal_instance layout.principal.domain == 'municipality'">
+
+    <tal:block metal:fill-slot="title"><tal:block i18n:translate="">Sitemap</tal:block> - ${request.app.principal.name}</tal:block>
+
+    <tal:block metal:fill-slot="before-content">
+        <h1>
+            <small>${layout.principal.name}</small>
+            <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
+        </h1>
+        <hr />
+    </tal:block>
+
+    <tal:block metal:fill-slot="content">
+        <div class="sitemap">
+            <h2 i18n:translate="">Sitemap</h2>
+            <nav>
+                <ul>
+                    <li>
+                        <tal:block i18n:translate="">Archive</tal:block>
+                        <ul>
+                            <li><a href="${layout.archive_search_link}" i18n:translate="">Archive Search</a></li>
+                            <li tal:repeat="year layout.archive.get_years()">
+                                <tal:block tal:define="archive layout.archive.for_date(year)">
+                                    <a href="${request.link(archive)}">${year}</a>
+                                    <ul tal:define="archive_items archive.group_items(archive.by_date()[0], request)">
+                                        <li tal:repeat="date archive_items">
+                                            <a i18n:translate="" href="${request.link(layout.archive.for_date(date))}">
+                                                Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date'/>
+                                            </a>
+                                            <ul>
+                                                <tal:block tal:repeat="domain archive_items[date]">
+                                                    <tal:block tal:repeat="type archive_items[date][domain]">
+                                                        <li tal:repeat="item archive_items[date][domain][type]">
+                                                            <tal:block tal:define="prefix item.title_prefix(request)">
+                                                                <a href="${item.url}">
+                                                                    <tal:block tal:condition="prefix">${prefix}: </tal:block>
+                                                                    <tal:block metal:use-macro="layout.macros['title-translation']" tal:define="item item"/>
+                                                                </a>
+                                                            </tal:block>
+                                                        </li>
+                                                    </tal:block>
+                                                </tal:block>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </tal:block>
+                            </li>
+                        </ul>
+                    </li>
+                    <li tal:condition="layout.principal.email_notification">
+                        <tal:block i18n:translate="">Email alerts</tal:block>
+                        <ul>
+                            <li><a href="${request.link(layout.model, 'subscribe-email')}" i18n:translate="">Get email alerts</a></li>
+                            <li><a href="${request.link(layout.model, 'unsubscribe-email')}" i18n:translate="">Stop email subscription</a></li>
+                        </ul>
+                    </li>
+                    <li tal:condition="layout.principal.sms_notification">
+                        <tal:block i18n:translate="">SMS alerts</tal:block>
+                        <ul>
+                            <li><a href="${request.link(layout.model, 'subscribe-sms')}" i18n:translate="">Get SMS alerts</a></li>
+                            <li><a href="${request.link(layout.model, 'unsubscribe-sms')}" i18n:translate="">Stop SMS subscription</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </tal:block>
+
+</div>
