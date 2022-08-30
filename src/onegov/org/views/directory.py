@@ -363,7 +363,15 @@ def view_geojson(self, request):
     name='new')
 def handle_new_directory_entry(self, request, form, layout=None):
     if form.submitted(request):
-        entry = self.directory.add_by_form(form, type='extended')
+        try:
+            entry = self.directory.add_by_form(form, type=(
+                'extended'))
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
+            transaction.abort()
+            return request.redirect(request.link(self))
 
         request.success(_("Added a new directory entry"))
         return request.redirect(request.link(entry))
