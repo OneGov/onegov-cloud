@@ -38,6 +38,10 @@ metal:define-macro="layout">
     <script metal:use-macro="layout.macros['tablesaw_translations']" />
 </head>
 <body>
+    <div class="row accessibility-links">
+        <a accesskey="0" class="show-only-on-tab" href="${layout.homepage_link}" i18n:translate="">Homepage</a>
+        <a accesskey="1" class="show-only-on-tab" href="#content" i18n:translate="">Content</a>
+    </div>
     <div tal:condition="not request.browser_session.get('headerless')" class="row header" tal:define="position request.app.principal.logo_position|'left'">
         <tal:block tal:condition="position == 'left'">
             <div class="small-12 medium-4 medium-push-8 columns text-right">
@@ -69,7 +73,7 @@ metal:define-macro="layout">
         </div>
     </div>
 
-    <div class="content">
+    <div class="content" id="content">
         <div class="row">
           <div class="small-12 columns" id="alert-boxes">
             <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
