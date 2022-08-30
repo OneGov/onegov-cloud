@@ -168,12 +168,12 @@
         <tbody>
             <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
-                    <td class="column-entity">${layout.format_name(result)}</td>
+                    <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="column-result answer" colspan="5" i18n:translate="">Not yet counted</td>
                 </tal:b>
                 <tal:b condition="result.counted">
-                    <td class="column-entity">${layout.format_name(result)}</td>
+                    <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="column-result answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
                     <td class="column-result answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
@@ -223,7 +223,7 @@
                     <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                 </tal:b>
                 <tal:b condition="result.counted">
-                    <td>${layout.format_name(result)}</td>
+                    <th>${layout.format_name(result)}</th>
                     <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
                     <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
                     <td class="right-aligned">${layout.format_number(result.yeas)}</td>
@@ -270,12 +270,12 @@
         <tbody>
             <tr tal:repeat="result ballot.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:b condition="not: result.counted">
-                    <td class="column-entity">${layout.format_name(result)}</td>
+                    <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="answer" colspan="5" i18n:translate="">Not yet counted</td>
                 </tal:b>
                 <tal:b condition="result.counted">
-                    <td class="column-entity">${layout.format_name(result)}</td>
+                    <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.eligible_voters)}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}" tal:condition="expats">${layout.format_number(result.expats)}</td>
@@ -425,7 +425,7 @@
         </thead>
         <tbody tal:condition="years">
             <tr tal:repeat="party parties" tal:define="current_year python: years[-1]">
-                <td>${parties[party][current_year]['name']}</td>
+                <th>${parties[party][current_year]['name']}</th>
                 <td tal:repeat="year years" class="right-aligned">${parties[party][year]['mandates']}</td>
             </tr>
         </tbody>
@@ -451,7 +451,7 @@
         </thead>
         <tbody>
             <tr tal:repeat="election election_compound.elections">
-                <td class="column-district left-aligned"><a href="${request.link(election)}">${election.domain_segment}</a></td>
+                <th class="column-district left-aligned"><a href="${request.link(election)}">${election.domain_segment}</a></th>
                 <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${election.domain_supersegment}</td>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></td>
@@ -477,7 +477,7 @@
         </thead>
         <tbody>
             <tr tal:repeat="superregion superregions">
-                <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${superregion}</td>
+                <th class="column-superregion left-aligned" tal:condition="layout.has_superregions">${superregion}</th>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['mandates']['allocated'], superregions[superregion]['mandates']['total'])" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['progress']['counted'], superregions[superregion]['progress']['total'])" /></td>
             </tr>
@@ -511,12 +511,12 @@
         <tbody>
             <tr tal:repeat="result layout.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:block condition="not: result.counted">
-                    <td>${layout.format_name(result)}</td>
+                    <th>${layout.format_name(result)}</th>
                     <td tal:condition="layout.has_districts">${result.district}</td>
                     <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                 </tal:block>
                 <tal:block condition="result.counted">
-                    <td>${layout.format_name(result)}</td>
+                    <th>${layout.format_name(result)}</th>
                     <td tal:condition="layout.has_districts">${result.district}</td>
                     <td tal:condition="layout.has_superregions">${result.superregion}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
@@ -572,12 +572,12 @@
         <tbody>
             <tr tal:repeat="result layout.results" tal:attributes="class python: 'counted' if result.counted else 'not-counted'">
                 <tal:block condition="not: result.counted">
-                    <td class="column-district left-aligned">${result.domain_segment}</td>
+                    <th class="column-district left-aligned">${result.domain_segment}</th>
                     <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${result.domain_supersegment}</td>
                     <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                 </tal:block>
                 <tal:block condition="result.counted">
-                    <td class="column-district left-aligned">${result.domain_segment}</td>
+                    <th class="column-district left-aligned">${result.domain_segment}</th>
                     <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${result.domain_supersegment}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}" tal:condition="expats">${layout.format_number(result.expats)}</td>
@@ -612,7 +612,7 @@
         <tbody>
             <tr tal:repeat="candidate elected_candidates">
                 <tal:block tal:define="district districts.get(candidate.election_id, None)">
-                    <td class="column-candidate">${candidate.family_name} ${candidate.first_name}</td>
+                    <th class="column-candidate">${candidate.family_name} ${candidate.first_name}</th>
                     <td class="column-party right-aligned" tal:condition="layout.majorz">${candidate.party}</td>
                     <td class="column-list right-aligned" tal:condition="layout.proporz">${candidate.list}</td>
                     <td class="column-list right-aligned" tal:condition="layout.has_superregions">
@@ -649,7 +649,7 @@
         <tbody>
             <tal:block tal:repeat="candidate candidates">
                 <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
-                    <td class="column-candidate">${candidate.family_name} ${candidate.first_name}</td>
+                    <th class="column-candidate">${candidate.family_name} ${candidate.first_name}</th>
                     <td tal:condition="not:layout.tacit" class="column-votes right-aligned" data-text="${candidate.votes}">${layout.format_number(candidate.votes)}</td>
                     <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>
                     <td tal:condition="layout.proporz" class="column-list right-aligned">${candidate.list_name}</td>
@@ -682,13 +682,13 @@
         >
         <thead>
             <tr>
-                <td data-tablesaw-priority="persist" class="column-entity" i18n:translate="">${layout.principal.label('entity')}</td>
-                <td data-tablesaw-priority="1" class="column-candidate right-aligned" tal:repeat="candidate candidates">${candidate.family_name} ${candidate.first_name}</td>
+                <th data-tablesaw-priority="persist" class="column-entity" i18n:translate="">${layout.principal.label('entity')}</th>
+                <th data-tablesaw-priority="1" class="column-candidate right-aligned" tal:repeat="candidate candidates">${candidate.family_name} ${candidate.first_name}</th>
             </tr>
         </thead>
         <tbody>
             <tr tal:repeat="result results">
-                <td class="column-entity" i18n:translate="">${result[0]}</td>
+                <th class="column-entity" i18n:translate="">${result[0]}</th>
                 <td class="column-candidate right-aligned" tal:repeat="candidate result[1]">${layout.format_number(candidate.votes)}</td>
             </tr>
         </tbody>
@@ -724,7 +724,7 @@
         <tbody>
             <tal:block tal:repeat="list lists">
                 <tr tal:condition="not names or list.name in names">
-                    <td class="column-list">${list.name}</td>
+                    <th class="column-list">${list.name}</th>
                     <td class="right-aligned column-votes" data-text="${list.votes or 0}">${layout.format_number(list.votes or 0)}</td>
                     <td class="column-mandates right-aligned">${list.number_of_mandates}</td>
                 </tr>
@@ -749,7 +749,7 @@
         </thead>
         <tbody>
             <tr tal:repeat="group groups">
-                <td class="column-list-group">${group.name}</td>
+                <th class="column-list-group">${group.name}</th>
                 <td class="column-voters-count right-aligned" data-text="${group.voters_count or 0}">${layout.format_number(group.voters_count or 0)}</td>
                 <td class="column-mandates right-aligned">${group.number_of_mandates}</td>
             </tr>
@@ -1467,7 +1467,7 @@
             <tbody>
                 <tal:block tal:repeat="gender sorted(candidate_statistics)">
                     <tr tal:condition="gender != 'total'">
-                        <td><metal:b use-macro="layout.macros['gender-singular']"/></td>
+                        <th><metal:b use-macro="layout.macros['gender-singular']"/></th>
                         <td class="right-aligned">${candidate_statistics[gender]['count']}</td>
                         <td class="right-aligned">${candidate_statistics[gender]['age']}</td>
                     </tr>
