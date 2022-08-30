@@ -128,7 +128,7 @@
                                     <div class="grid-x">
                                         <div class="large-2 small-2 cell">
                                             <button tal:condition="layout.root_pages" data-toggle="offCanvas">
-                                                <i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span>
+                                                <i class="fas fa-bars"></i><span class="hide-for-small-only navigation-button">Navigation</span>
                                             </button>
                                         </div>
                                         <div class="large-8 small-8 cell middle">
