@@ -11,7 +11,7 @@
         </div>
         <p tal:condition="message|nothing">${message}</p>
         <div tal:condition="file_import_errors|nothing" class="after-upload" >
-            <div class="alert-box alert" i18n:translate=""><p>The file is invalid.</p></div>
+            <div class="alert-box alert"><p i18n:translate="">The file is invalid.</p></div>
             <tal:block metal:use-macro="layout.macros['file_import_errors']" tal:define="errors file_import_errors"/>
         </div>
         <div tal:condition="show_form|True" class="row">
