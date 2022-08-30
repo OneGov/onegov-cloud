@@ -124,7 +124,7 @@ class ExtendedAgencyForm(Form):
             if self.organigram.data:
                 model.organigram_file = self.organigram.file
         model.address = self.address.data
-        model.zip_code = self.zip_code.data
+        model.zip_code = self.zip_code.data or None
         model.city = self.city.data
         model.coordinates = self.coordinates.data
         if hasattr(self, 'access'):
@@ -154,7 +154,7 @@ class ExtendedAgencyForm(Form):
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
         self.address.data = model.address
-        self.zip_code.data = model.zip_code
+        self.zip_code.data = model.zip_code or None
         self.city.data = model.city
         self.coordinates.data = model.coordinates
         if hasattr(self, 'access'):

@@ -96,7 +96,7 @@ def view_agencies_sort(self, request):
 def view_agency(self, request):
 
     map = ""
-    if self.address:
+    if self.coordinates:
         map = request.app.agency_map_class.map_html_string(self.coordinates)
 
     return {

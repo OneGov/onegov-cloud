@@ -37,7 +37,7 @@
                         <dd i18n:translate>Report a change</dd>
                     </dl>
                 </div>
-                <div tal:condition="agency.address" class="borderless-side-panel">
+                <div tal:condition="agency.coordinates" class="borderless-side-panel">
                     <h2>Karte</h2>
                     <tal:block content="structure map"></tal:block>
                 </div>

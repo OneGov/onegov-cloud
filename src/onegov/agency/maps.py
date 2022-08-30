@@ -30,7 +30,7 @@ class AgencyMapBs():
             <script>
                 window.onload = function() {{
                     var map = new mapbs.Map({{
-                        div: 'map', // id of the div element to put the map in
+                        div: 'map-bs', // id of the div element for the map
                         zoom: 8,
                         backgroundLayers: ['Grundkarte farbig'],
                         center: [{coordinates_ch['easting']},
@@ -39,5 +39,5 @@ class AgencyMapBs():
                     map.addMarker();
                 }};
             </script>
-            <div class="agency-map" id='map'></div>
+            <div class="agency-map" id='map-bs'></div>
         """)
