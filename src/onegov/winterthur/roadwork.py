@@ -18,7 +18,7 @@ class RoadworkConnectionError(RoadworkError):
     pass
 
 
-class RoadworkConfig(object):
+class RoadworkConfig:
     """ Looks at ~/.pdb.secret and /etc/pdb.secret (in this order), to extract
     the configuration used for the RoadworkClient class.
 
@@ -89,7 +89,7 @@ class RoadworkConfig(object):
         return result
 
 
-class RoadworkClient(object):
+class RoadworkClient:
     """ A proxy to Winterthur's internal roadworks service. Uses redis as
     a caching mechanism to ensure performance and reliability.
 
@@ -208,7 +208,7 @@ class RoadworkClient(object):
         return response[0] == 200
 
 
-class RoadworkCollection(object):
+class RoadworkCollection:
 
     def __init__(self, client, letter=None, query=None):
         self.client = client
@@ -297,7 +297,7 @@ class RoadworkCollection(object):
         return self.__class__(self.client, letter=letter, query=None)
 
 
-class Roadwork(object):
+class Roadwork:
 
     def __init__(self, data):
         self.data = data

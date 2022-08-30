@@ -24,7 +24,7 @@ from psycopg2.extras import NumericRange
 from tests.shared.scenario import BaseScenario
 
 
-class Collections(object):
+class Collections:
 
     def __init__(self, session, activity_type):
         self.session = session

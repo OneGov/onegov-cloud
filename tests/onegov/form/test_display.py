@@ -2,7 +2,7 @@ from datetime import datetime, time
 from onegov.form import render_field
 
 
-class MockField(object):
+class MockField:
 
     def __init__(self, type, data, choices=None):
         self.type = type

@@ -7,7 +7,7 @@ from sqlalchemy.inspection import inspect
 from onegov.core.orm import func
 
 
-class GenericCollection(object):
+class GenericCollection:
 
     def __init__(self, session):
         self.session = session
@@ -136,7 +136,7 @@ class SearcheableCollection(GenericCollection):
         return super().query().filter(or_(*self.term_filter))
 
 
-class Pagination(object):
+class Pagination:
     """ Provides collections with pagination, if they implement a few
     documented properties and methods.
 
@@ -234,7 +234,7 @@ class Pagination(object):
             return self.page_by_index(self.page + 1)
 
 
-class RangedPagination(object):
+class RangedPagination:
     """ Provides a pagination that supports loading multiple pages at once.
 
     This is useful in a context where a single button is used to 'load more'

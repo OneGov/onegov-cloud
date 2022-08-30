@@ -22,7 +22,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import object_session
 
 
-class DirectorySubmissionAction(object):
+class DirectorySubmissionAction:
 
     def __init__(self, session, directory_id, action, submission_id):
         self.session = session

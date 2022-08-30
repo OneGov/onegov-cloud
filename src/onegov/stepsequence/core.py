@@ -12,7 +12,7 @@ def as_step_registry_id(cls_name, position, cls_before=None, cls_after=None):
     ))
 
 
-class Step(object):
+class Step:
 
     def __init__(
             self, title, origin, position, cls_after=None, cls_before=None):
@@ -78,7 +78,7 @@ class StepCollection:
             'Multiple sequences match your class name specify position')
 
 
-class StepSequenceRegistry(object):
+class StepSequenceRegistry:
 
     def __init__(self):
         self.registry = {}

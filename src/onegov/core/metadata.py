@@ -27,7 +27,7 @@ def secret_property(fn):
     return property(fn)
 
 
-class Metadata(object):
+class Metadata:
 
     def __init__(self, app, absorb=None):
         self.app = app

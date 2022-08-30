@@ -267,7 +267,7 @@ def handle_field(builder, field, dependency=None):
                 handle_field(builder, choice_field, dependency)
 
 
-class WTFormsClassBuilder(object):
+class WTFormsClassBuilder:
     """ Helps dynamically build a wtforms class from parsed blocks.
 
     For example::

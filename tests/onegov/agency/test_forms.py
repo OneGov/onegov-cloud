@@ -18,7 +18,7 @@ from tempfile import TemporaryFile
 from unittest.mock import MagicMock
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session, principal):
         self._session = session
 
@@ -26,7 +26,7 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session, principal=None, private=False, secret=False,
                  permissions=None, current_user=None):
         self.app = DummyApp(session, principal)

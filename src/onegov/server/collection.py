@@ -3,7 +3,7 @@ import inspect
 from onegov.server import errors
 
 
-class CachedApplication(object):
+class CachedApplication:
     """ Wraps an application class with a configuration, returning a new
     instance the first time `get()` is called and the same instance very
     time after that.
@@ -24,7 +24,7 @@ class CachedApplication(object):
         return self.instance
 
 
-class ApplicationCollection(object):
+class ApplicationCollection:
     """ Keeps a list of applications and their roots.
 
     The applications are registered lazily and only instantiated/configured

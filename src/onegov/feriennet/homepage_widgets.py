@@ -2,7 +2,7 @@ from onegov.feriennet import FeriennetApp, _
 
 
 @FeriennetApp.homepage_widget(tag='registration')
-class RegistrationWidget(object):
+class RegistrationWidget:
     template = """
         <xsl:template match="registration">
             <div tal:condition="not:request.is_logged_in" class="register">

@@ -7,7 +7,7 @@ from onegov.town import TownApp, _
 
 
 @TownApp.homepage_widget(tag='services')
-class ServicesWidget(object):
+class ServicesWidget:
     template = """
         <xsl:template match="services">
             <h2 tal:content="services_panel.title"></h2>
@@ -85,7 +85,7 @@ class ServicesWidget(object):
 
 
 @TownApp.homepage_widget(tag='contacts_and_albums')
-class ContactsAndAlbumsWidget(object):
+class ContactsAndAlbumsWidget:
 
     template = """
         <xsl:template match="contacts_and_albums">

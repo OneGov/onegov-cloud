@@ -8,7 +8,7 @@ def current_memory_usage():
     return psutil.Process(os.getpid()).memory_info().rss
 
 
-class ResourceTracker(object):
+class ResourceTracker:
     """ An object to track memory and other resources during development. """
 
     tracking_tools = (

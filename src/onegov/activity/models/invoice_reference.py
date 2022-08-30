@@ -85,7 +85,7 @@ class InvoiceReference(Base, TimestampMixin):
         return KNOWN_SCHEMAS[self.schema]().format(self.reference)
 
 
-class Schema(object):
+class Schema:
     """ Defines the methods that need to be implemented by schemas. Schemas
     should generate numbers and be able to format them.
 

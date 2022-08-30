@@ -1,7 +1,7 @@
 form_extensions = {}
 
 
-class FormExtension(object):
+class FormExtension:
     """ Enables the extension of form definitions/submissions.
 
     When either of those models create a form class they will take the
@@ -54,7 +54,7 @@ class FormExtension(object):
         raise NotImplementedError
 
 
-class Extendable(object):
+class Extendable:
     """ Models extending their form classes use this mixin to create the
     extended forms. It also serves as a marker to possibly keep track of all
     classes that use extended forms.

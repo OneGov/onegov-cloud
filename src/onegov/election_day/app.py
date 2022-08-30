@@ -263,6 +263,8 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/elections/.*',
         '/screen/.*',
         '/catalog.rdf',
+        '/sitemap',
+        '/sitemap.xml',
     )
     cache_paths = re.compile(r'^({})$'.format('|'.join(cache_paths)))
 

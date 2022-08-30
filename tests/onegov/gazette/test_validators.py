@@ -6,7 +6,7 @@ from pytest import raises
 from wtforms.validators import ValidationError
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session):
         self._session = session
 
@@ -14,18 +14,18 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session):
         self.app = DummyApp(session)
         self.session = session
 
 
-class DummyForm(object):
+class DummyForm:
     def __init__(self, session):
         self.request = DummyRequest(session)
 
 
-class DummyField(object):
+class DummyField:
     def __init__(self, name, data):
         self.name = name
         self.data = data

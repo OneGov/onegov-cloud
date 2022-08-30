@@ -74,6 +74,8 @@ def generate_qr_bill(schema, request, user, invoice):
     if not debtor['name'] or not debtor['pcode'] or not debtor['city']:
         log.error('Not enough debtor information for qr bill: {user.realname}')
         return None
+    if debtor['street'] and len(debtor['street']) > 70:
+        debtor['street'] = debtor['street'][:70]
 
     # Language
     language = {'de_CH': 'de', 'fr_CH': 'fr', 'it_CH': 'it'}.get(

@@ -30,7 +30,7 @@ class TranslatablePageFile(File):
         return self.reference.filename
 
 
-class FileSubCollection(object):
+class FileSubCollection:
     """ """
 
     def __set_name__(self, owner, name):
@@ -44,7 +44,7 @@ class FileSubCollection(object):
             ], key=lambda file: file.name)
 
 
-class LocalizedFile(object):
+class LocalizedFile:
     """ A helper for localized files.
 
     Automatically choses the file according to the currently used locale. The

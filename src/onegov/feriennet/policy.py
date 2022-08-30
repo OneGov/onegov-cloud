@@ -4,7 +4,7 @@ from morepath.authentication import NO_IDENTITY
 from sqlalchemy import and_, or_
 
 
-class ActivityQueryPolicy(object):
+class ActivityQueryPolicy:
     """ Limits activity queries depending on the current user. """
 
     def __init__(self, username, role):

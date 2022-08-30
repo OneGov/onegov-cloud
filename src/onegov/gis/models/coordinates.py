@@ -29,7 +29,7 @@ class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
             self.zoom == other.zoom
 
 
-class CoordinatesMixin(object):
+class CoordinatesMixin:
     """ Extends any class that has a content dictionary field with a single
     coordinates pair.
 

@@ -5,7 +5,7 @@ from wtforms.validators import ValidationError
 
 def test_html_data_validator(session):
 
-    class Field(object):
+    class Field:
         def __init__(self, data):
             self.data = data
 

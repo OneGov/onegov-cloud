@@ -16,7 +16,7 @@ from onegov.town6 import _
 
 
 @TownApp.homepage_widget(tag='row')
-class RowWidget(object):
+class RowWidget:
     template = """
         <xsl:template match="row">
             <div class="grid-container">
@@ -29,7 +29,7 @@ class RowWidget(object):
 
 
 @TownApp.homepage_widget(tag='row-wide')
-class RowWidgetWide(object):
+class RowWidgetWide:
     template = """
         <xsl:template match="row-wide">
             <div class="grid-container full {@bgcolor}">
@@ -42,7 +42,7 @@ class RowWidgetWide(object):
 
 
 @TownApp.homepage_widget(tag='column')
-class ColumnWidget(object):
+class ColumnWidget:
     template = """
         <xsl:template match="column">
             <div class="small-12 medium-{@span} cell">
@@ -53,7 +53,7 @@ class ColumnWidget(object):
 
 
 @TownApp.homepage_widget(tag='title')
-class TitleWidget(object):
+class TitleWidget:
     template = """
         <xsl:template match="title">
             <h3 class="{@class}">
@@ -63,8 +63,21 @@ class TitleWidget(object):
     """
 
 
+@TownApp.homepage_widget(tag='autoplay_video')
+class AutoplayVideoWidget:
+    template = """
+        <xsl:template match="autoplay_video">
+            <div metal:use-macro="layout.macros.autoplay_video"
+             tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
+             link_webm '{link_webm}'
+             "
+            />
+        </xsl:template>
+    """
+
+
 @TownApp.homepage_widget(tag='text')
-class TextWidget(object):
+class TextWidget:
     template = """
         <xsl:template match="text">
             <p class="homepage-text">
@@ -75,7 +88,7 @@ class TextWidget(object):
 
 
 @TownApp.homepage_widget(tag='links')
-class LinksWidget(object):
+class LinksWidget:
     template = """
         <xsl:template match="links">
             <xsl:if test="@title">
@@ -120,7 +133,7 @@ class NewsWidget(OrgNewsWidget):
 
 
 @TownApp.homepage_widget(tag='homepage-cover')
-class CoverWidget(object):
+class CoverWidget:
     template = """
         <xsl:template match="homepage-cover">
             <div class="homepage-content page-text">
@@ -138,7 +151,7 @@ EventCard = namedtuple(
 
 
 @TownApp.homepage_widget(tag='events')
-class EventsWidget(object):
+class EventsWidget:
     template = """
         <xsl:template match="events">
             <metal:block use-macro="layout.macros['event-cards']"
@@ -181,7 +194,7 @@ class EventsWidget(object):
 
 
 @TownApp.homepage_widget(tag='partners')
-class PartnerWidget(object):
+class PartnerWidget:
 
     template = """
         <xsl:template match="partners">
@@ -219,7 +232,7 @@ class PartnerWidget(object):
 
 
 @TownApp.homepage_widget(tag='services')
-class ServicesWidget(object):
+class ServicesWidget:
     template = """
         <xsl:template match="services">
             <div class="services-panel">
@@ -318,7 +331,7 @@ class ServicesWidget(object):
 
 
 @TownApp.homepage_widget(tag='contacts_and_albums')
-class ContactsAndAlbumsWidget(object):
+class ContactsAndAlbumsWidget:
 
     template = """
            <xsl:template match="contacts_and_albums">
@@ -360,7 +373,7 @@ class DirectoriesWidget(OrgDirectoriesWidget):
 
 
 @TownApp.homepage_widget(tag='focus')
-class FocusWidget(object):
+class FocusWidget:
 
     template = """
     <xsl:template match="focus">

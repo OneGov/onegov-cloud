@@ -1,5 +1,5 @@
 
-class UserSource(object):
+class UserSource:
     """ Generalized UserSource to facilitate ldap sync """
 
     def __init__(self, name, bases, org=None, filters=None, user_type=None,

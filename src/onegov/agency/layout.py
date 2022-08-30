@@ -71,7 +71,7 @@ class PersonLayout(OrgPersonLayout):
             ]
 
 
-class MoveAgencyMixin(object):
+class MoveAgencyMixin:
 
     @cached_property
     def move_agency_url_template(self):
@@ -80,7 +80,7 @@ class MoveAgencyMixin(object):
         )
 
 
-class NavTreeMixin(object):
+class NavTreeMixin:
 
     def nav_item_url(self, agency):
         return self.request.link(agency.proxy(), 'as-nav-item')
@@ -312,7 +312,7 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
         )
 
 
-class AgencyPathMixin(object):
+class AgencyPathMixin:
 
     def get_ancestors(self, item, with_item=True, levels=None):
 

@@ -51,7 +51,7 @@ def query_schemas(connection, namespace=None):
             yield schema
 
 
-class SessionManager(object):
+class SessionManager:
     """ Holds sessions and creates schemas before binding sessions to schemas.
 
     Threadsafe in theory, but not tested or well thought out. No global state

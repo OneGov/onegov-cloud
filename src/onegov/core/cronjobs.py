@@ -118,7 +118,7 @@ def parse_cron(value, type):
     return (v for v in range(0, size) if v % remainder == 0)
 
 
-class Job(object):
+class Job:
     """ A single cron job. """
 
     __slots__ = (

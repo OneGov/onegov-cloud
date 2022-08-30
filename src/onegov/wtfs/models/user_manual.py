@@ -1,4 +1,4 @@
-class UserManual(object):
+class UserManual:
 
     def __init__(self, app):
         self.app = app

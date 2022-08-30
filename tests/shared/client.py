@@ -114,7 +114,7 @@ class Client(TestApp):
         return self.extend_response(super().do_request(*args, **kwargs))
 
 
-class GenericResponseExtension(object):
+class GenericResponseExtension:
 
     def select_checkbox(self, groupname, label, form=None, checked=True):
         """ Selects one of many checkboxes by fuzzy searching the label next to
@@ -171,7 +171,7 @@ class GenericResponseExtension(object):
         return '\n'.join([l for l in str(self).split('\n') if text in l])
 
 
-class SkipNFormsExtension(object):
+class SkipNFormsExtension:
     n = 0
 
     @property
@@ -187,7 +187,7 @@ class SkipNFormsExtension(object):
             return super().form
 
 
-class IntercoolerClickExtension(object):
+class IntercoolerClickExtension:
 
     def click(self, description=None, linkid=None, href=None,
               index=None, verbose=False,

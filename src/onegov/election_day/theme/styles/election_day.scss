@@ -170,6 +170,21 @@ html {
     }
 }
 
+
+/*
+    Sitemap
+*/
+.sitemap {
+    h2 {
+        font-size: $h3-font-size;
+    }
+
+    h3 {
+        font-size: $h4-font-size;
+    }
+}
+
+
 /*
     Voting states
 */
@@ -838,6 +853,10 @@ form {
 
 .alert-box {
     font-size: 1rem;
+
+    p {
+        margin-bottom: 0;
+    }
 }
 
 .embed-info {

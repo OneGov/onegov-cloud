@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-08-02 11:39+0200\n"
+"POT-Creation-Date: 2022-08-23 16:09+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -756,6 +756,9 @@ msgstr ""
 
 msgid "Map"
 msgstr "Mappa"
+
+msgid "More news"
+msgstr "Altre notizie"
 
 msgid "Total Amount"
 msgstr "Importo totale"

@@ -30,7 +30,7 @@ services:
 
     d3renderer:
         image: node
-        command: sh -c "git clone https://github.com/seantis/d3-renderer.git && cd d3-renderer && npm install && ./node_modules/.bin/phantomjs server.js"
+        command: sh -c "rm -rf d3-renderer && git clone https://github.com/seantis/d3-renderer.git && cd d3-renderer && npm install && ./node_modules/.bin/phantomjs server.js"
         environment:
             - OPENSSL_CONF=/etc/ssl
         working_dir: /app

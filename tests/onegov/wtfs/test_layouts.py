@@ -60,16 +60,16 @@ from onegov.wtfs.security import EditModelUnrestricted
 from onegov.wtfs.security import ViewModel
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
     pass
 
 
-class DummyApp(object):
+class DummyApp:
     principal = DummyPrincipal()
     theme_options = {}
 
 
-class DummyRequest(object):
+class DummyRequest:
     app = DummyApp()
     is_logged_in = False
     locale = 'de_CH'

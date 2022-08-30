@@ -8,7 +8,7 @@ from onegov.user import log
 
 
 @attrs(auto_attribs=True)
-class AzureADAttributes(object):
+class AzureADAttributes:
     """ Holds the expected AzureAD id_token_claims used to ensure the user """
 
     # the unique id in Azure per Application if sub is used

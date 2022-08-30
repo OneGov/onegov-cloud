@@ -1,7 +1,7 @@
 from onegov.swissvotes import _
 
 
-class Region(object):
+class Region:
     """ A helper class to translate geographical cantons.
 
     Each canton consists of an abbreviation and a label, and might be rendered

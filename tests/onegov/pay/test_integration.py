@@ -18,7 +18,7 @@ def test_process_manual_payment():
 
 def test_process_credit_card_payment_successfully():
 
-    class Provider(object):
+    class Provider:
         def charge(self, amount, currency, token):
             return 'success'
 
@@ -34,7 +34,7 @@ def test_process_credit_card_payment_successfully():
 
 def test_process_credit_card_payment_error(capturelog):
 
-    class Provider(object):
+    class Provider:
         title = 'Foobar'
 
         def charge(self, amount, currency, token):
