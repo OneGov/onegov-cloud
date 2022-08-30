@@ -41,6 +41,7 @@ metal:define-macro="layout">
     <div class="row accessibility-links">
         <a accesskey="0" class="show-only-on-tab" href="${layout.homepage_link}" i18n:translate="">Homepage</a>
         <a accesskey="1" class="show-only-on-tab" href="#content" i18n:translate="">Content</a>
+        <a accesskey="3" class="show-only-on-tab" href="${request.link(layout.principal, 'sitemap')}" i18n:translate="">Sitemap</a>
     </div>
     <div tal:condition="not request.browser_session.get('headerless')" class="row header" tal:define="position request.app.principal.logo_position|'left'">
         <tal:block tal:condition="position == 'left'">

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-10 16:20+0200\n"
+"POT-Creation-Date: 2022-08-30 14:40+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -733,6 +733,9 @@ msgstr "Quartiers"
 msgid "Last change"
 msgstr "Actualisé"
 
+msgid "Archive"
+msgstr "Archive"
+
 msgid "Elections &amp; Votes"
 msgstr "Elections et votations: données ouvertes"
 
@@ -742,9 +745,6 @@ msgstr "Il n'y a pas de élections ou votations définis actuellement."
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Elections et votes sur ${date}"
-
-msgid "Archive"
-msgstr "Archive"
 
 msgid "Federal Elections"
 msgstr "Elections fédéraux"
@@ -854,20 +854,29 @@ msgstr ""
 "le nombre de sièges à pourvoir dans la circonscription électorale "
 "correspondante. Le résultat de cette opération est le nombre d'électeurs."
 
-msgid "The file is invalid."
+msgid "<dynamic element>"
 msgstr ""
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés."
 
-#.
+msgid "Homepage"
+msgstr "Page d'accueil"
+
+msgid "Content"
+msgstr "Contenu"
+
+msgid "Sitemap"
+msgstr "Sitemap"
+
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Page d'accueil"
 
-msgid "Logo: Link to homepage"
-msgstr "Logo : Lien vers la page d'accueil"
+msgid "Logo ${layout.principal.name}: Link to homepage"
+msgstr ""
 
 msgid "Footer"
 msgstr "Pied de page"
@@ -1723,3 +1732,6 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Logo: Link to homepage"
+#~ msgstr "Logo : Lien vers la page d'accueil"
