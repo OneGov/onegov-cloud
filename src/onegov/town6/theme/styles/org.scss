@@ -649,9 +649,18 @@ a > i.fa-external-link-alt {
 }
 
 section#content h2 {
-    margin-top: 2rem !important;
+    margin-top: 2rem;
 }
 
-section#contetn h2:first-of-type {
+section#content h2:first-of-type {
     margin-top: 0 !important;
+}
+
+.find-your-spot-link {
+    border-bottom: 0 !important;
+    margin-left: 1rem;
+
+    i {
+        margin-bottom: 2px;
+    }
 }
