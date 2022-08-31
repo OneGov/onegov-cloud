@@ -1048,6 +1048,7 @@
 </metal:related_elections>
 
 <metal:pagination define-macro="pagination" i18n:domain="onegov.election_day">
+    <h3 class="visually-hidden">Pagination</h3>
     <ul class="pagination" role="menubar" aria-label="Pagination">
         <tal:block repeat="page collection.pages">
             <tal:block define="
@@ -1062,8 +1063,8 @@
                     </li>
                 </tal:block>
 
-                <li tal:condition="is_visible" class="${is_current and 'current' or ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
-                    <a href="${request.link(page)}">${page.page + 1}</a>
+                <li tal:condition="is_visible" class="${'current' if is_current else ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
+                    <a href="${request.link(page)}">${page.page + 1}<span tal:condition="is_current" i18n:translate="" class="visually-hidden"> (active)</span></a>
                 </li>
 
                 <tal:block condition="repeat.page.end and next">
