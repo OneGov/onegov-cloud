@@ -356,7 +356,7 @@ class ElasticsearchApp(morepath.App):
 
         # delete all existing indices for this town
         ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(self.schema)
-        self.es_client.indices.delete(ixs)
+        self.es_client.indices.delete(index=ixs)
 
         # have no queue limit for reindexing (that we're able to change
         # this here is a bit of a CPython implementation detail) - we can't
