@@ -84,7 +84,8 @@ def test_extended_agency_form(agency_app):
     }))
     data = form.get_useful_data()
     assert list(data.keys()) == [
-        'title', 'portrait', 'export_fields', 'organigram_file'
+        'title', 'portrait', 'coordinates', 'address', 'zip_code', 'city',
+        'export_fields', 'organigram_file'
     ]
     assert data['organigram_file'].read() == b'PNG'
     assert data['title'] == 'Springfield Hospital'

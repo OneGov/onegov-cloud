@@ -17,6 +17,7 @@ from onegov.gis import CoordinatesField
 from sqlalchemy import func
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
+from wtforms.validators import Length
 
 
 class ExtendedAgencyForm(Form):
@@ -64,6 +65,7 @@ class ExtendedAgencyForm(Form):
     zip_code = StringField(
         label=_('Zip Code'),
         fieldset=_("Address"),
+        validators=[Length(max=10)]
     )
 
     city = StringField(

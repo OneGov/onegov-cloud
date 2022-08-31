@@ -8,6 +8,7 @@ from onegov.org.models import Organisation
 from onegov.people import Agency
 from sqlalchemy import Column
 from sqlalchemy import Text
+from sqlalchemy import String
 
 
 @upgrade_task("Add default values for page breaks of PDFs")
@@ -40,7 +41,7 @@ def add_address_columns_to_agency(context):
         ))
     if not context.has_column('agencies', 'zip_code'):
         context.operations.add_column('agencies', Column(
-            'zip_code', Text, nullable=True
+            'zip_code', String, nullable=True
         ))
     if not context.has_column('agencies', 'city'):
         context.operations.add_column('agencies', Column(
