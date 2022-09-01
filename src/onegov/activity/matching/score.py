@@ -126,7 +126,7 @@ class PreferInAgeBracket:
                 abs(min_age - attendee_age),
                 abs(max_age - attendee_age)
             )
-            return 1.0 - min(1.0, difference / 10.0)
+            return 1.0 - min(1.0, float(difference) / 10.0)
 
 
 class PreferOrganiserChildren:
