@@ -149,3 +149,12 @@ class DefaultLayout(ChameleonLayout):
         if hasattr(item, 'entity_id'):
             return item.name if item.entity_id else _("Expats")
         return item.name or _("Expats")
+
+    @cached_property
+    def logo_alt_text(self):
+        alt_text = (
+            f'Logo: '
+            f'{self.principal.name} '
+            f'{self.request.translate(_("Link to homepage"))}'
+        )
+        return alt_text

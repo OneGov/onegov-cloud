@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-10 16:20+0200\n"
+"POT-Creation-Date: 2022-09-01 08:22+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -601,6 +601,9 @@ msgstr "Titel des Gegenentwurfs"
 msgid "Title of the tie breaker"
 msgstr "Titel der Stichfrage"
 
+msgid "Link to homepage"
+msgstr "Link zur Startseite"
+
 msgid "Lists"
 msgstr "Listen"
 
@@ -733,6 +736,9 @@ msgstr "Stadtteile"
 msgid "Last change"
 msgstr "Aktualisiert"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
 
@@ -742,9 +748,6 @@ msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Urnengang vom ${date}"
-
-msgid "Archive"
-msgstr "Archiv"
 
 msgid "Federal Elections"
 msgstr "Eidgenössische Wahlen"
@@ -796,6 +799,9 @@ msgstr "Archiv-Suche"
 
 msgid "Search in ${title}"
 msgstr "Suche in ${title}"
+
+msgid "Search results"
+msgstr "Suchergebnisse"
 
 msgid "Found ${item_count} items."
 msgstr "${item_count} Einträge gefunden."
@@ -860,13 +866,10 @@ msgstr "Die Datei ist ungültig."
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Startseite"
-
-msgid "Logo: Link to homepage"
-msgstr "Logo: Link zur Startseite"
 
 msgid "Footer"
 msgstr "Fusszeile"
@@ -876,6 +879,9 @@ msgstr "Sprache"
 
 msgid "Open Data"
 msgstr "Open Data"
+
+msgid "Sitemap"
+msgstr ""
 
 msgid "Login"
 msgstr "Anmelden"
@@ -1716,3 +1722,9 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
+
+#~ msgid "Logo ${principal_name}: Link to homepage"
+#~ msgstr "WHAT"
+
+#~ msgid "Logo: Link to homepage"
+#~ msgstr "Logo: Link zur Startseite"

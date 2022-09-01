@@ -36,11 +36,12 @@
                         </div>
                     </div>
                     <div class="columns small-12">
-                        <h3 i18n:translate>Search in <tal:b i18n:name="title">${layout.tab_menu_title}</tal:b></h3>
+                        <h2 i18n:translate>Search in <tal:b i18n:name="title">${layout.tab_menu_title}</tal:b></h2>
                         <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET';button_class 'right'"/>
                     </div>
 
-                    <strong tal:condition="results" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</strong>
+                    <h2 i18n:translate>Search results</h2>
+                    <p role="alert" tal:condition="results" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</p>
                     <hr>
 
                     <tal:b tal:condition="item_type == 'vote'">
