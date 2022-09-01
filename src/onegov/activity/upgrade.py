@@ -843,4 +843,6 @@ def make_activity_polymorphic_type_non_nullable(context):
 
 @upgrade_task('Cleanup activity aggregates')
 def cleanup_activity_aggregates(context):
-    context.operations.execute("DROP AGGREGATE IF EXISTS array_cat_agg;")
+    context.operations.execute(f"""
+        DROP AGGREGATE IF EXISTS "{context.schema}".array_cat_agg(anyarray);
+    """)
