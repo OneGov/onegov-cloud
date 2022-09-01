@@ -2,6 +2,8 @@ from datetime import timedelta, datetime
 from io import BytesIO
 
 import os
+
+import pytest
 import transaction
 from purl import URL
 from pytz import UTC
@@ -10,6 +12,7 @@ from webtest import Upload
 
 from onegov.directory import DirectoryEntry, DirectoryCollection, \
     DirectoryConfiguration, DirectoryZipArchive
+from onegov.directory.errors import DuplicateEntryError
 from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
@@ -227,9 +230,9 @@ def test_directory_publication_change_request(client):
     form_preview.form['publication_end'] = dt_for_form(new_end)
     changes = form_preview.form.submit()
     assert changes.pyquery('.diff ins')[0].text == \
-        dt_repr(replace_timezone(new_end, 'CET'))
+           dt_repr(replace_timezone(new_end, 'CET'))
     assert changes.pyquery('.diff del')[0].text == \
-        dt_repr(standardize_date(end, 'UTC'))
+           dt_repr(standardize_date(end, 'UTC'))
 
     page = changes.form.submit().follow()
     ticket_page = accecpt_latest_submission(client)
@@ -238,13 +241,12 @@ def test_directory_publication_change_request(client):
     annual_entry = dir_query(client).first()
     assert annual_entry.name == 'annual'
     assert annual_entry.publication_end == \
-        strip_s(new_end, timezone='Europe/Zurich')
+           strip_s(new_end, timezone='Europe/Zurich')
     assert annual_entry.publication_start == \
-        strip_s(now, timezone='Europe/Zurich')
+           strip_s(now, timezone='Europe/Zurich')
 
 
 def test_directory_change_requests(client):
-
     client.login_admin()
 
     # create a directory that accepts change requests
@@ -287,7 +289,7 @@ def test_directory_change_requests(client):
 
     # make sure it hasn't been applied yet
     assert 'Central Park' in \
-        client.get('/directories/playgrounds/central-park')
+           client.get('/directories/playgrounds/central-park')
 
     # apply the changes
     page.click("Übernehmen")
@@ -306,7 +308,6 @@ def test_directory_change_requests(client):
 
 
 def test_directory_submissions(client, postgres):
-
     client.login_admin()
 
     # create a directory does not accept submissions
@@ -413,7 +414,7 @@ def test_directory_submissions(client, postgres):
     assert formfile.reference == dirfile.reference
 
     # the description here is a multiline field
-    desc = client.app.session().query(DirectoryEntry)\
+    desc = client.app.session().query(DirectoryEntry) \
         .one().values['description']
 
     assert '\n' in desc
@@ -476,7 +477,7 @@ def test_directory_submissions(client, postgres):
     client.post(accept_url)
 
     # the description here is no longer a multiline field
-    desc = client.app.session().query(DirectoryEntry)\
+    desc = client.app.session().query(DirectoryEntry) \
         .one().values['description']
 
     assert '\n' not in desc
@@ -484,7 +485,6 @@ def test_directory_submissions(client, postgres):
 
 
 def test_directory_visibility(client):
-
     client.login_admin()
 
     page = client.get('/directories')
@@ -718,3 +718,30 @@ def test_directory_export(client):
     assert directory != events
     assert count == 1
     assert directory.meta == events.meta
+
+
+def test_add_directory_entries_with_duplicate_names(client):
+    client.login_admin()
+    duplicate_name = "duplicate"
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Playgrounds"
+    page.form['structure'] = """
+        Name *= ___
+    """
+    page.form['title_format'] = '[Name]'
+    page.form.submit()
+
+    page = client.get('/directories/playgrounds').click("^Eintrag$")
+    page.form['name'] = duplicate_name
+    page.form.submit()
+
+    client.get('/directories/playgrounds').click("^Eintrag$")
+    page.form['name'] = duplicate_name
+    try:
+        page = page.form.submit().follow()
+        assert f'Der Eintrag {duplicate_name} existiert zweimal' in page
+    except DuplicateEntryError:
+        pytest.fail(
+            "DuplicateEntryError not handled upon inserting duplicate "
+            "entries in /directories")
