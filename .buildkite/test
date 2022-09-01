@@ -55,6 +55,7 @@ source bin/activate
 
 # install testing dependencies
 echo "--- Installing dependencies :python:"
+echo "$(python --version)"
 cd /app/src
 pip install '.[test]' \
     pytest-test-groups \

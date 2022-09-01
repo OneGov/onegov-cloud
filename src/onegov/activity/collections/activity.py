@@ -428,7 +428,7 @@ class ActivityCollection(RangedPagination):
 
     def add(self, title, username, lead=None, text=None, tags=None, name=None):
 
-        type = self.type != '*' and self.type or None
+        type_ = self.type if self.type != '*' else 'generic'
 
         name = name or self.get_unique_name(title)
 
@@ -436,7 +436,7 @@ class ActivityCollection(RangedPagination):
             name=name,
             title=title,
             tags=tags,
-            type=type,
+            type=type_,
             username=username,
             lead=lead,
             text=text
