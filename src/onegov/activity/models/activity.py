@@ -12,7 +12,6 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey
-from sqlalchemy import event
 from sqlalchemy import exists, and_, desc
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
