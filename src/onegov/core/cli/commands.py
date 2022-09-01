@@ -134,10 +134,12 @@ def sendmail(group_context, queue, limit):
 @click.option('--no-database', default=False, is_flag=True,
               help="Do not transfer the database")
 @click.option('--transfer-schema', help="Only transfer this schema")
+@click.option('--to-14', default=False, is_flag=True,
+              help="Transfer from postgres <14 to >=14.")
 @pass_group_context
 def transfer(group_context,
              server, remote_config, confirm, no_filestorage, no_database,
-             transfer_schema):
+             transfer_schema, to_14):
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -250,6 +252,8 @@ def transfer(group_context,
 
         # Transfer
         print("Transfering database")
+        if to_14:
+            recv = f"sed 's/anyarray/anycompatiblearray/g' | {recv}"
         if shutil.which('pv'):
             recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
         subprocess.check_output(f'{send} | {recv}', shell=True)
