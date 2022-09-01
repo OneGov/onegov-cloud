@@ -300,12 +300,14 @@ def add_active_days(context):
         assert context.has_column('occasions', 'active_days')
         return
 
-    context.session.execute(
-        'CREATE AGGREGATE "{}".array_cat_agg(anyarray) '
-        '(SFUNC=array_cat, STYPE=anyarray)'.format(
-            context.schema
-        )
-    )
+    # This will be removed in an upgrade step further down again and is not
+    # compatible with postgres 13- and 14+.
+    # context.session.execute(
+    #     'CREATE AGGREGATE "{}".array_cat_agg(anyarray) '
+    #     '(SFUNC=array_cat, STYPE=anyarray)'.format(
+    #         context.schema
+    #     )
+    # )
 
     context.operations.add_column('activities', Column(
         'active_days', ARRAY(Integer), nullable=True
@@ -837,3 +839,8 @@ def make_activity_polymorphic_type_non_nullable(context):
         """)
 
         context.operations.alter_column('activities', 'type', nullable=False)
+
+
+@upgrade_task('Cleanup activity aggregates')
+def cleanup_activity_aggregates(context):
+    context.operations.execute("DROP AGGREGATE IF EXISTS array_cat_agg;")
