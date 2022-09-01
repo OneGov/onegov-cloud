@@ -15,6 +15,7 @@ from onegov.core.utils import Bunch
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from tempfile import TemporaryFile
+from tests.shared.utils import encode_map_value
 from unittest.mock import MagicMock
 
 
@@ -79,6 +80,10 @@ def test_extended_agency_form(agency_app):
     form = ExtendedAgencyForm(DummyPostData({
         'title': 'Springfield Hospital',
         'portrait': 'Springfield Hospital is hospital.',
+        'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
+        'address': 'Springstreet 12',
+        'zip_code': '6078',
+        'city': 'Springfield',
         'export_fields': ['person.first_name', 'person.last_name'],
         'organigram': create_file('image/png', 'org.png', b'PNG')
     }))
@@ -90,6 +95,13 @@ def test_extended_agency_form(agency_app):
     assert data['organigram_file'].read() == b'PNG'
     assert data['title'] == 'Springfield Hospital'
     assert data['portrait'] == 'Springfield Hospital is hospital.'
+    coordinates = data['coordinates']
+    assert coordinates.lat == 1
+    assert coordinates.lon == 2
+    assert coordinates.zoom == 12
+    assert data['address'] == 'Springstreet 12'
+    assert data['zip_code'] == '6078'
+    assert data['city'] == 'Springfield'
     assert data['export_fields'] == ['person.first_name', 'person.last_name']
 
     # update / apply / reorder
