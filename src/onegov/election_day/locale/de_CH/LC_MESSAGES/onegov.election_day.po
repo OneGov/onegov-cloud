@@ -228,7 +228,7 @@ msgid "Term"
 msgstr "Suchbegriff"
 
 msgid ""
-"Searches the title of the election/vote. Use Wilcards (*) to find more "
+"Searches the title of the election/vote. Use Wildcards (*) to find more "
 "results, e.g Nationalrat*."
 msgstr ""
 "Durchsucht den Titel der Wahl/Abstimmung. Benutzen Sie Wildcards (*), um "
