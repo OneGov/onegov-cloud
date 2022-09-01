@@ -56,7 +56,6 @@ async def fetch(
 
 
 async def fetch_many(
-        loop,
         urls: UrlsType,
         response_attr: str = 'json',
         fetch_func: Callable = fetch,
@@ -75,14 +74,12 @@ async def fetch_many(
             return handle_exceptions[ix]
 
         return await asyncio.gather(*(
-            loop.create_task(
-                fetch_func(
-                    url,
-                    session,
-                    response_attr,
-                    callback,
-                    exception_handler(ix)
-                )
+            fetch_func(
+                url,
+                session,
+                response_attr,
+                callback,
+                exception_handler(ix)
             )
             for ix, url in enumerate(urls)))
 
@@ -104,10 +101,9 @@ def async_aiohttp_get_all(
     If the callable of the exception handler function returns, it will be
     part of the returned results. """
 
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(
+    return asyncio.run(
         fetch_many(
-            loop, urls,
+            urls,
             response_attr=response_attr,
             callback=callback,
             handle_exceptions=handle_exceptions,
