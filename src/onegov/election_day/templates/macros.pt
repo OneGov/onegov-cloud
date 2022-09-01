@@ -996,12 +996,10 @@
                     <tal:block condition="input_type != 'hidden'">
                         <label tal:attributes="class field.errors and 'error' or None">
                             <tal:block condition="field.type == 'BooleanField'">
-                                ${field()}
-                                <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+                                ${field(placeholder=request.translate(field.description))}
+                                <span class="label-text">${field.label.text}</span>
+                                <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
                                 <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                                <div class="field-help" tal:condition="field.description">
-                                    <tal:b replace="structure request.translate(field.description)" />
-                                </div>
                             </tal:block>
                             <tal:block condition="field.type != 'BooleanField'">
 
