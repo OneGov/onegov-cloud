@@ -2174,12 +2174,12 @@ def test_find_your_spot_link(client):
     # A group with two rooms and a find-your-spot link
     new = resources.click('Raum')
     new.form['title'] = 'Meeting 1'
-    new.form['group'] = 'Meeting Rooms'
+    new.form['group'] = 'Rooms'
     new.form.submit().follow()
 
     new = resources.click('Raum')
     new.form['title'] = 'Meeting 2'
-    new.form['group'] = 'Meeting Rooms'
+    new.form['group'] = 'Rooms'
     new.form.submit().follow()
 
     # And a group with one room and therefore also a find-your-spot link
@@ -2195,14 +2195,7 @@ def test_find_your_spot_link(client):
 
     page = client.get('/resources')
 
-    resources = page.pyquery('.with-lead a')
-    resources = [t.text for t in resources]
-
-    # There are two standard entries without a group. One of these is a room
-    # therefore the first entry is a find-your-spot link
-    assert "Terminsuche" in resources[0]
-    # The two standard entries and the item we added ...
-    assert "Terminsuche" in resources[4]
-    # Our two rooms ...
-    assert "Terminsuche" in resources[7]
-    # The item 2 and the room
+    assert page.pyquery('#Allgemein .find-your-spot-link')
+    assert not page.pyquery('#Items .find-your-spot-link')
+    assert page.pyquery('#Rooms .find-your-spot-link')
+    assert page.pyquery('#Something .find-your-spot-link')
