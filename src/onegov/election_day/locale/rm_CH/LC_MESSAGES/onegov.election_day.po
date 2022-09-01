@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-31 11:46+0200\n"
+"POT-Creation-Date: 2022-09-01 08:22+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -604,6 +604,9 @@ msgstr "Titel da la cuntraproposta"
 msgid "Title of the tie breaker"
 msgstr "Titel da la dumonda decisiva"
 
+msgid "Link to homepage"
+msgstr "Link a la pagina iniziala"
+
 msgid "Lists"
 msgstr "Glistas"
 
@@ -872,9 +875,6 @@ msgstr ""
 #.
 msgid "homepage"
 msgstr "Pagina iniziala"
-
-msgid "Logo ${layout.principal.name}: Link to homepage"
-msgstr "Logo ${layout.principal.name}: Link a la pagina iniziala"
 
 msgid "Footer"
 msgstr "Pe-pagina"
@@ -1740,6 +1740,9 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Logo ${layout.principal.name}: Link to homepage"
+#~ msgstr "Logo ${layout.principal.name}: Link a la pagina iniziala"
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo: Link a la pagina iniziala"

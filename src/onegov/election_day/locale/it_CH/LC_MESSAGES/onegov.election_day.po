@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-31 11:46+0200\n"
+"POT-Creation-Date: 2022-09-01 08:22+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -596,6 +596,9 @@ msgstr "Titolo dello controprogetto"
 msgid "Title of the tie breaker"
 msgstr "Titolo dello spareggio"
 
+msgid "Link to homepage"
+msgstr "Link alla pagina iniziale"
+
 msgid "Lists"
 msgstr "Liste"
 
@@ -862,9 +865,6 @@ msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 #.
 msgid "homepage"
 msgstr "Pagina iniziale"
-
-msgid "Logo ${layout.principal.name}: Link to homepage"
-msgstr "Logo ${layout.principal.name}: Link alla pagina iniziale"
 
 msgid "Footer"
 msgstr "Piè di pagina"
@@ -1721,6 +1721,9 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
+
+#~ msgid "Logo ${layout.principal.name}: Link to homepage"
+#~ msgstr "Logo ${layout.principal.name}: Link alla pagina iniziale"
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo: Link alla pagina iniziale"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-31 11:46+0200\n"
+"POT-Creation-Date: 2022-09-01 08:22+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -601,6 +601,9 @@ msgstr "Titre de le contre-projet"
 msgid "Title of the tie breaker"
 msgstr "Titre de le jeu décisif"
 
+msgid "Link to homepage"
+msgstr "Lien vers la page d'accueil"
+
 msgid "Lists"
 msgstr "Listes"
 
@@ -868,9 +871,6 @@ msgstr ""
 #.
 msgid "homepage"
 msgstr "Page d'accueil"
-
-msgid "Logo ${layout.principal.name}: Link to homepage"
-msgstr "Logo ${layout.principal.name}: Lien vers la page d'accueil"
 
 msgid "Footer"
 msgstr "Pied de page"
@@ -1729,6 +1729,9 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Logo ${layout.principal.name}: Link to homepage"
+#~ msgstr "Logo ${layout.principal.name}: Lien vers la page d'accueil"
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo : Lien vers la page d'accueil"
