@@ -991,7 +991,7 @@
                 <tal:block define="input_type field.widget.input_type|None">
                     <tal:block condition="input_type == 'hidden'">
                         ${field()}
-                        <small class="error" tal:repeat="error field.errors">${error}</small>
+                        <p><small class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
                     <tal:block condition="input_type != 'hidden'">
                         <label tal:attributes="class field.errors and 'error' or None">
@@ -1024,7 +1024,7 @@
 
                             </tal:block>
                         </label>
-                        <p><small class="error" tal:repeat="error field.errors">${error}</small></p>
+                        <p><small id="${field.name}-error" class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
                </tal:block>
             </div>
