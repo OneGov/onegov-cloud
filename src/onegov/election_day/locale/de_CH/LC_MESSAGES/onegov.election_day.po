@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-30 14:40+0200\n"
+"POT-Creation-Date: 2022-09-01 08:22+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -228,7 +228,7 @@ msgid "Term"
 msgstr "Suchbegriff"
 
 msgid ""
-"Searches the title of the election/vote. Use Wilcards (*) to find more "
+"Searches the title of the election/vote. Use Wildcards (*) to find more "
 "results, e.g Nationalrat*."
 msgstr ""
 "Durchsucht den Titel der Wahl/Abstimmung. Benutzen Sie Wildcards (*), um "
@@ -601,6 +601,9 @@ msgstr "Titel des Gegenentwurfs"
 msgid "Title of the tie breaker"
 msgstr "Titel der Stichfrage"
 
+msgid "Link to homepage"
+msgstr "Link zur Startseite"
+
 msgid "Lists"
 msgstr "Listen"
 
@@ -797,6 +800,9 @@ msgstr "Archiv-Suche"
 msgid "Search in ${title}"
 msgstr "Suche in ${title}"
 
+msgid "Search results"
+msgstr "Suchergebnisse"
+
 msgid "Found ${item_count} items."
 msgstr "${item_count} Einträge gefunden."
 
@@ -874,9 +880,6 @@ msgstr "Sitemap"
 msgid "homepage"
 msgstr "Startseite"
 
-msgid "Logo ${layout.principal.name}: Link to homepage"
-msgstr ""
-
 msgid "Footer"
 msgstr "Fusszeile"
 
@@ -885,6 +888,9 @@ msgstr "Sprache"
 
 msgid "Open Data"
 msgstr "Open Data"
+
+msgid "Sitemap"
+msgstr ""
 
 msgid "Login"
 msgstr "Anmelden"
@@ -1725,9 +1731,6 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid "The file is invalid."
-#~ msgstr "Die Datei ist ungültig."
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo: Link zur Startseite"

@@ -50,7 +50,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="Logo ${layout.principal.name}: Link to homepage" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
             </div>
         </tal:block>
@@ -60,7 +60,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 columns text-right">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="Logo ${layout.principal.name}: Link to homepage" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
             </div>
         </tal:block>

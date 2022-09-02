@@ -36,10 +36,12 @@ def test_settings(client):
 
     settings.form['logo_url'] = 'https://seantis.ch/logo.img'
     settings.form['reply_to'] = 'info@govikon.ch'
+    settings.form['custom_css'] = 'h1 { text-decoration: underline; }'
     settings.form.submit()
 
     settings = client.get('/general-settings')
     assert '<img src="https://seantis.ch/logo.img"' in settings.text
+    assert '<style>h1 { text-decoration: underline; }</style>' in settings.text
 
     # homepage settings
     settings = client.get('/homepage-settings')

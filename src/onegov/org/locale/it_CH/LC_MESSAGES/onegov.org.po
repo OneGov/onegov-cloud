@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-08-21 08:02+0200\n"
+"POT-Creation-Date: 2022-09-02 07:16+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1125,6 +1125,9 @@ msgstr "Francese"
 
 msgid "Italian"
 msgstr "Italiano"
+
+msgid "Additional CSS"
+msgstr "CSS aggiuntivo"
 
 msgid "Column width left side"
 msgstr "Larghezza colonna lato sinistro"

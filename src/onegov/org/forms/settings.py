@@ -7,6 +7,7 @@ from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
@@ -75,6 +76,11 @@ class GeneralSettingsForm(Form):
         validators=[InputRequired()]
     )
 
+    custom_css = CssField(
+        label=_('Additional CSS'),
+        render_kw={'rows': 8},
+    )
+
     @property
     def theme_options(self):
         options = self.model.theme_options
@@ -113,10 +119,12 @@ class GeneralSettingsForm(Form):
     def populate_obj(self, model):
         super().populate_obj(model)
         model.theme_options = self.theme_options
+        model.custom_css = self.custom_css.data or ''
 
     def process_obj(self, model):
         super().process_obj(model)
         self.theme_options = model.theme_options or {}
+        self.custom_css.data = model.custom_css or ''
 
     def populate_font_families(self):
         self.font_family_sans_serif.choices = tuple(

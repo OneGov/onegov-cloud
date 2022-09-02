@@ -14,7 +14,7 @@ import urllib3
 
 from _pytest.monkeypatch import MonkeyPatch
 from contextlib import suppress
-from distutils.spawn import find_executable
+from shutil import which
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor, TCPExecutor
@@ -36,7 +36,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from elasticsearch import Elasticsearch
 
 
-redis_path = find_executable('redis-server')
+redis_path = which('redis-server')
 redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
 
 logging.getLogger('faker').setLevel(logging.INFO)
@@ -110,7 +110,7 @@ def cache_password_hashing(monkeysession):
 
 @pytest.fixture(scope="session")
 def pg_default_preferred_versions():
-    return ['13', '12', '11']
+    return ['14', '13', '12', '11', '10']
 
 
 @pytest.fixture(scope="session")
