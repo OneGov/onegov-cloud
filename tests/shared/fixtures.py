@@ -110,7 +110,7 @@ def cache_password_hashing(monkeysession):
 
 @pytest.fixture(scope="session")
 def pg_default_preferred_versions():
-    return ['13', '12', '11']
+    return ['14', '13', '12', '11', '10']
 
 
 @pytest.fixture(scope="session")
