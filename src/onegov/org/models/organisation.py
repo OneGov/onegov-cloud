@@ -36,6 +36,7 @@ class Organisation(Base, TimestampMixin):
     meta = Column(JSON, nullable=True, default=dict)
 
     # meta bound values
+    custom_css = meta_property()
     contact = meta_property()
     contact_url = meta_property()
     opening_hours = meta_property()
