@@ -41,4 +41,5 @@ class CoordinatesMixin:
 
     @coordinates.setter
     def coordinates(self, value):
+        self.content = self.content or {}
         self.content['coordinates'] = value or {}
