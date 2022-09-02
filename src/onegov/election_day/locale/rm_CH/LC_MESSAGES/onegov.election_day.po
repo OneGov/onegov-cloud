@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-01 08:22+0200\n"
+"POT-Creation-Date: 2022-09-02 11:11+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -864,8 +864,8 @@ msgstr ""
 "mintgamai divididas tras il dumber da sezs ch'èn d'occupar en il circul "
 "electoral respectiv. Il resultat da quai è il dumber d'electurs."
 
-msgid "<dynamic element>"
-msgstr ""
+msgid "The file is invalid."
+msgstr "La datoteca è nunvalaivla."
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
@@ -885,9 +885,6 @@ msgstr "Sitemap"
 msgid "homepage"
 msgstr "Pagina iniziala"
 
-msgid "Logo ${layout.principal.name}: Link to homepage"
-msgstr "Logo ${layout.principal.name}: Colliaziun a la homepage"
-
 msgid "Footer"
 msgstr "Pe-pagina"
 
@@ -896,9 +893,6 @@ msgstr "Lingua"
 
 msgid "Open Data"
 msgstr "Open Data"
-
-msgid "Sitemap"
-msgstr ""
 
 msgid "Login"
 msgstr "Annunziar"
@@ -1068,6 +1062,9 @@ msgstr "Trametter"
 
 msgid "Previous Page"
 msgstr "Pagina precedenta"
+
+msgid "(active)"
+msgstr "(activ)"
 
 msgid "Next Page"
 msgstr "Proxima pagina"
@@ -1752,6 +1749,9 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Logo ${layout.principal.name}: Link to homepage"
+#~ msgstr "Logo ${layout.principal.name}: Colliaziun a la homepage"
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo: Link a la pagina iniziala"

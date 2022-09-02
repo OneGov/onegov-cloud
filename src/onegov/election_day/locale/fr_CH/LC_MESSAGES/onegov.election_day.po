@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-01 08:22+0200\n"
+"POT-Creation-Date: 2022-09-02 11:11+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -860,8 +860,8 @@ msgstr ""
 "le nombre de sièges à pourvoir dans la circonscription électorale "
 "correspondante. Le résultat de cette opération est le nombre d'électeurs."
 
-msgid "<dynamic element>"
-msgstr ""
+msgid "The file is invalid."
+msgstr "Ce fichier n'est pas valide."
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
@@ -889,9 +889,6 @@ msgstr "Langue"
 
 msgid "Open Data"
 msgstr "Ouvrir les données"
-
-msgid "Sitemap"
-msgstr ""
 
 msgid "Login"
 msgstr "Se connecter"
@@ -1061,6 +1058,9 @@ msgstr "Soumettre"
 
 msgid "Previous Page"
 msgstr "Page précédente"
+
+msgid "(active)"
+msgstr "(actif)"
 
 msgid "Next Page"
 msgstr "Page suivante"
