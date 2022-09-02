@@ -5,15 +5,8 @@ set -euo pipefail
 trap 'echo "^^^ +++"' ERR
 
 echo "--- Installing prerequisites"
-pip install flake8 nodeenv
-node=$(nodeenv --list 2>&1 | tr '\t' '\n' | grep -E '^12' | tail -n 1)
+pip install flake8
 
-nodeenv --node="$node" /tmp/node
-/tmp/node/bin/npm install -g sass-lint
-
-echo "--- Linting :python:"
+echo "--- Linting"
 pip install flake8
 flake8 src/ tests/
-
-echo "--- Linting :sasslang:"
-sass-lint -c .sass-lint.yml 'src/**/*.scss' -v -q
