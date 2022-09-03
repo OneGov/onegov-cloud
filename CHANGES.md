@@ -1,8 +1,22 @@
 # Changes
 
+## 2022.44
+
+`2022-09-03` | [563b896390...63a6f19e9a](https://github.com/OneGov/onegov-cloud/compare/563b896390^...63a6f19e9a)
+
+### Core
+
+##### Add add-admins flag to transfer command.
+
+`Feature` | [89ed4bbbec](https://github.com/onegov/onegov-cloud/commit/89ed4bbbecffb119de3d7be51795fe24335f3863)
+
+##### Switch to python 3.10.
+
+`Feature` | [OGC-578](https://linear.app/onegovcloud/issue/OGC-578) | [63a6f19e9a](https://github.com/onegov/onegov-cloud/commit/63a6f19e9a8cf8d0d3914a553f6175e2aae835b2)
+
 ## 2022.43
 
-`2022-09-02` | [560eca5cfb...39021506df](https://github.com/OneGov/onegov-cloud/compare/560eca5cfb^...39021506df)
+`2022-09-02` | [560eca5cfb...9892b57ca2](https://github.com/OneGov/onegov-cloud/compare/560eca5cfb^...9892b57ca2)
 
 ### Activity
 
@@ -2149,14 +2163,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Fix problem with SVG without width not showing.
 
 `Bugfix` | [OGC-156](https://linear.app/onegovcloud/issue/OGC-156) | [01e1b2652d](https://github.com/onegov/onegov-cloud/commit/01e1b2652d6ba2ced1e8da4674de54a0a7665501)
-
-## 2021.95
-
-`2021-12-05` | [93aa02d789...0723514278](https://github.com/OneGov/onegov-cloud/compare/93aa02d789^...0723514278)
-
-### Swissvotes
-
-##### Add document full-text search to votes.
-
-`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [93aa02d789](https://github.com/onegov/onegov-cloud/commit/93aa02d7892396bb2975eccab9e78005ad92cb7a)
 
