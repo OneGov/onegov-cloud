@@ -12,4 +12,10 @@ def extract_pdf_info(content):
         pass
 
     pages = PDF(content)
-    return len(pages), '\n'.join(pages).strip(' \t\r\n').replace('\0', '')
+
+    return (
+        len(pages),
+        ' '.join(
+            ' '.join(page.replace('\0', '').split()) for page in pages
+        ).strip()
+    )
