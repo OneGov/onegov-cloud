@@ -8,5 +8,4 @@ echo "--- Installing prerequisites"
 pip install flake8
 
 echo "--- Linting"
-pip install flake8
 flake8 src/ tests/
