@@ -179,3 +179,13 @@ def add_address_columns_to_agency(context):
         context.operations.add_column('agencies', Column(
             'city', Text, nullable=True
         ))
+
+
+@upgrade_task('Fix agency address column')
+def fix_agency_address_column(context):
+    if context.has_column('agencies', 'street'):
+        context.operations.drop_column('agencies', 'street')
+    if not context.has_column('agencies', 'address'):
+        context.operations.add_column('agencies', Column(
+            'address', Text, nullable=True
+        ))
