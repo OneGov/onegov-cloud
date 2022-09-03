@@ -328,11 +328,11 @@ def test_view_notice_pdf_preview(gazette_app):
 
         assert extract_pdf_info(BytesIO(response.body)) == (
             1,
-            'xxx   Titel\n'
-            '      1. Oktober 2017\n'
-            '      Govikon, 1. Januar 2019\n'
-            '      State Chancellerist\n'
-            '© 2018 Govikon                1'
+            'xxx Titel '
+            '1. Oktober 2017 '
+            'Govikon, 1. Januar 2019 '
+            'State Chancellerist '
+            '© 2018 Govikon 1'
         )
 
 

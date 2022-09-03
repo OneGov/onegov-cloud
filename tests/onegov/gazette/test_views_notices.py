@@ -515,15 +515,15 @@ def test_view_notices_pdf_preview(gazette_app):
 
         assert extract_pdf_info(BytesIO(response.body)) == (
             1,
-            'xxx   Erneuerungswahlen\n'
-            '      1. Oktober 2017\n'
-            '      Govikon, 1. Januar 2019\n'
-            '      State Chancellerist\n'
-            'xxx   Kantonsratswahlen\n'
-            '      10. Oktober 2017\n'
-            '      Govikon, 1. Januar 2019\n'
-            '      State Chancellerist\n'
-            '© 2017 Govikon                1'
+            'xxx Erneuerungswahlen '
+            '1. Oktober 2017 '
+            'Govikon, 1. Januar 2019 '
+            'State Chancellerist '
+            'xxx Kantonsratswahlen '
+            '10. Oktober 2017 '
+            'Govikon, 1. Januar 2019 '
+            'State Chancellerist '
+            '© 2017 Govikon 1'
         )
 
 
@@ -571,22 +571,21 @@ def test_view_notices_index(gazette_app):
 
         assert extract_pdf_info(BytesIO(response.body)) == (
             2,
-            'Amtsblatt\n'
-            'Stichwortverzeichnis\n'
-            'Organisationen\n'
-            'C\n'
-            'Civic Community 2017-44-1, 2017-45-2\n'
-            'M\n'
-            'Municipality 2017-45-3, 2017-46-4\n'
-            '© 2017 Govikon                       1\n'
-            '\n'
-            'Amtsblatt\n'
-            'Rubriken\n'
-            'E\n'
-            'Education 2017-44-1, 2017-45-2\n'
-            'S\n'
-            'Submissions 2017-45-3, 2017-46-4\n'
-            '© 2017 Govikon                   2'
+            'Amtsblatt '
+            'Stichwortverzeichnis '
+            'Organisationen '
+            'C '
+            'Civic Community 2017-44-1, 2017-45-2 '
+            'M '
+            'Municipality 2017-45-3, 2017-46-4 '
+            '© 2017 Govikon 1 '
+            'Amtsblatt '
+            'Rubriken '
+            'E '
+            'Education 2017-44-1, 2017-45-2 '
+            'S '
+            'Submissions 2017-45-3, 2017-46-4 '
+            '© 2017 Govikon 2'
         )
 
 
