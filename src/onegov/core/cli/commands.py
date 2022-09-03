@@ -2,14 +2,15 @@ import click
 import os
 import platform
 import shutil
-import ssl
 import smtplib
+import ssl
 import subprocess
 import sys
 
 from fnmatch import fnmatch
 from onegov.core.cache import lru_cache
 from onegov.core.cli.core import command_group, pass_group_context, abort
+from onegov.core.crypto import hash_password
 from onegov.core.mail_processor import PostmarkMailQueueProcessor
 from onegov.core.mail_processor import SMTPMailQueueProcessor
 from onegov.core.orm import Base, SessionManager
@@ -20,6 +21,7 @@ from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
+from uuid import uuid4
 
 
 #: onegov.core's own command group
@@ -136,10 +138,12 @@ def sendmail(group_context, queue, limit):
 @click.option('--transfer-schema', help="Only transfer this schema")
 @click.option('--to-14', default=False, is_flag=True,
               help="Transfer from postgres <14 to >=14.")
+@click.option('--add-admins', default=False, is_flag=True,
+              help="Add local admins")
 @pass_group_context
 def transfer(group_context,
              server, remote_config, confirm, no_filestorage, no_database,
-             transfer_schema, to_14):
+             transfer_schema, to_14, add_admins):
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -164,11 +168,11 @@ def transfer(group_context,
         transfer_schema = transfer_schema.strip('/').replace('/', '-')
 
     if not shutil.which('pv'):
-        print("")
-        print("Core transfer requires 'pv', please install as follows:")
-        print("* brew install pv")
-        print("* apt-get install pv")
-        print("")
+        click.echo("")
+        click.echo("Core transfer requires 'pv', please install as follows:")
+        click.echo("* brew install pv")
+        click.echo("* apt-get install pv")
+        click.echo("")
         sys.exit(1)
 
     if confirm:
@@ -177,7 +181,7 @@ def transfer(group_context,
             default=False, abort=True
         )
 
-    print("Parsing the remote application configuration")
+    click.echo("Parsing the remote application configuration")
 
     remote_dir = os.path.dirname(remote_config)
 
@@ -211,7 +215,7 @@ def transfer(group_context,
         if shutil.which('pv'):
             recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
 
-        print(f"Copying {remote}/{glob}")
+        click.echo(f"Copying {remote}/{glob}")
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     def transfer_database(remote_db, local_db, schema_glob='*'):
@@ -240,7 +244,7 @@ def transfer(group_context,
 
         # Drop existing schemas
         for schema in schemas:
-            print(f"Drop local database schema {schema}")
+            click.echo(f"Drop local database schema {schema}")
             drop = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'
             drop = f"echo '{drop}' | {recv}"
 
@@ -251,12 +255,15 @@ def transfer(group_context,
             )
 
         # Transfer
-        print("Transfering database")
+        click.echo("Transfering database")
         if to_14:
+            # todo: remove me after 2022.43 has been deployed everywhere
             recv = f"sed 's/anyarray/anycompatiblearray/g' | {recv}"
         if shutil.which('pv'):
             recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
         subprocess.check_output(f'{send} | {recv}', shell=True)
+
+        return schemas
 
     def transfer_storage_of_app(local_cfg, remote_cfg):
         remote_storage = remote_cfg.configuration.get('filestorage')
@@ -304,9 +311,27 @@ def transfer(group_context,
         remote_db = remote_cfg.configuration['dsn'].split('/')[-1]
 
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
-        transfer_database(remote_db, local_db, schema_glob=schema_glob)
+        return transfer_database(remote_db, local_db, schema_glob=schema_glob)
+
+    def add_admins(local_cfg, schemas):
+        id_ = str(uuid4())
+        password_hash = hash_password('test').replace('$', '\\$')
+        query = (
+            f'INSERT INTO \\"{schema}\\".users '
+            f"(type, id, username, password_hash, role, active) "
+            f"VALUES ('generic', '{id_}', 'admin@example.org', "
+            f"'{password_hash}', 'admin', true);"
+        )
+        local_db = local_cfg.configuration['dsn'].split('/')[-1]
+        command = f'sudo -u postgres psql {local_db} -c "{query}"'
+        subprocess.check_call(
+            command, shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
 
     # transfer the data
+    schemas = set()
     for local_cfg in group_context.appcfgs:
 
         if transfer_schema and local_cfg.namespace not in transfer_schema:
@@ -316,19 +341,24 @@ def transfer(group_context,
             continue
 
         if local_cfg.configuration.get('disable_transfer'):
-            print(f"Skipping {local_cfg.namespace}, transfer disabled")
+            click.echo(f"Skipping {local_cfg.namespace}, transfer disabled")
             continue
 
         remote_cfg = remote_applications[local_cfg.namespace]
 
-        print(f"Fetching {remote_cfg.namespace}")
+        click.echo(f"Fetching {remote_cfg.namespace}")
 
         if not no_filestorage:
             transfer_storage_of_app(local_cfg, remote_cfg)
             transfer_depot_storage_of_app(local_cfg, remote_cfg)
 
         if not no_database:
-            transfer_database_of_app(local_cfg, remote_cfg)
+            schemas.update(transfer_database_of_app(local_cfg, remote_cfg))
+
+    if add_admins:
+        for schema in schemas:
+            click.echo(f"Adding admin@example:test to {schema}")
+            add_admins(local_cfg, schemas)
 
 
 @cli.command(context_settings={'default_selector': '*'})
