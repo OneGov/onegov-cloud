@@ -382,7 +382,7 @@ def test_pdf_mini_html():
 
     pdf.generate()
 
-    assert extract_pdf_info(file) == (
+    assert extract_pdf_info(file, remove='•\0') == (
         1,
         'Ipsum '
         'Pellentesque habitant morbi tristique senectus et netus et malesuada '
@@ -393,8 +393,8 @@ def test_pdf_mini_html():
         '1 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
         '2 Aliquam tincidunt mauris eu risus. '
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean '
-        '• Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
-        '• Aliquam tincidunt mauris eu risus.'
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
+        'Aliquam tincidunt mauris eu risus.'
     )
 
 
