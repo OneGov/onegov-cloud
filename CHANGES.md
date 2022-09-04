@@ -1,8 +1,28 @@
 # Changes
 
+## 2022.45
+
+`2022-09-04` | [bdb747639b...5cdddf291e](https://github.com/OneGov/onegov-cloud/compare/bdb747639b^...5cdddf291e)
+
+### Pdf
+
+##### Remove whitespaces from PDF extracts.
+
+`Feature` | [f523c8c174](https://github.com/onegov/onegov-cloud/commit/f523c8c1749e571c701fc1c7c0f80c1fef567544)
+
+##### Allow to remove additional characters from PDF extracts.
+
+`Feature` | [5cdddf291e](https://github.com/onegov/onegov-cloud/commit/5cdddf291e40f8463dcbb32e50d69f9ff5ac7c55)
+
+### People
+
+##### Fix agency upgrade step.
+
+`Bugfix` | [f09e155b1f](https://github.com/onegov/onegov-cloud/commit/f09e155b1fd0026f17cfd1732ba75a34e27a246a)
+
 ## 2022.44
 
-`2022-09-03` | [563b896390...63a6f19e9a](https://github.com/OneGov/onegov-cloud/compare/563b896390^...63a6f19e9a)
+`2022-09-03` | [563b896390...a3ae3af9e9](https://github.com/OneGov/onegov-cloud/compare/563b896390^...a3ae3af9e9)
 
 ### Core
 
@@ -2135,32 +2155,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Update full-text search.
 
 `Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [ea8856d556](https://github.com/onegov/onegov-cloud/commit/ea8856d556336482a50499cd8ee45067a4514c04)
-
-## 2021.96
-
-`2021-12-08` | [01e1b2652d...1a0a0c1d30](https://github.com/OneGov/onegov-cloud/compare/01e1b2652d^...1a0a0c1d30)
-
-### Election Day
-
-##### Add links to votes, elections, election compounds to breadcrumbs.
-
-`Feature` | [OGC_30](#OGC_30) | [0c19358eb8](https://github.com/onegov/onegov-cloud/commit/0c19358eb87b0abb85d8194bcc22eea1eda08c1d)
-
-### Org
-
-##### Fix setting bold problem with Chrome.
-
-`Feature` | [OGC-138](https://linear.app/onegovcloud/issue/OGC-138) | [81a267b69d](https://github.com/onegov/onegov-cloud/commit/81a267b69d0a3a57b784891e925d1e380a24da90)
-
-### Swissvotes
-
-##### Adds english fall back for full-text search and use less strict language handling.
-
-`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [d43b010753](https://github.com/onegov/onegov-cloud/commit/d43b0107539e7aaec7b6cff2df86c060a81c22bc)
-
-### Town6
-
-##### Fix problem with SVG without width not showing.
-
-`Bugfix` | [OGC-156](https://linear.app/onegovcloud/issue/OGC-156) | [01e1b2652d](https://github.com/onegov/onegov-cloud/commit/01e1b2652d6ba2ced1e8da4674de54a0a7665501)
 
