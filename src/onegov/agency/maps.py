@@ -18,7 +18,7 @@ class AgencyMapBs():
 
     def map_html_string(coordinates):
         request = (
-            'http://geodesy.geo.admin.ch/reframe/wgs84tolv95?'
+            'https://geodesy.geo.admin.ch/reframe/wgs84tolv95?'
             f'easting={coordinates.lon}&northing={coordinates.lat}&format=json'
         )
 

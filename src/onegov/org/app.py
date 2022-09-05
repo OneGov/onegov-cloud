@@ -330,7 +330,7 @@ def org_content_security_policy():
     policy.connect_src.add('https://maps.zg.ch')
     policy.connect_src.add('https://api.mapbox.com')
     policy.connect_src.add('https://stats.seantis.ch')
-    policy.connect_src.add('http://geodesy.geo.admin.ch')
+    policy.connect_src.add('https://geodesy.geo.admin.ch')
 
     return policy
 
