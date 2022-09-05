@@ -52,7 +52,7 @@ Try it!
 
 Have a look at OneGov Town, our flagship application:
 
-- `<https://govikon.onegovcloud.ch>`_.
+- `<https://neugovikon.onegovcloud.ch>`_.
 
 Start your own OneGov Town instance for free:
 
