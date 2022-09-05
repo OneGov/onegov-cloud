@@ -53,6 +53,8 @@ def handle_new_resource_recipient(self, request, form, layout=None):
             name=form.name.data,
             medium='email',
             address=form.address.data,
+            dayly_reservations=form.dayly_reservations.data,
+            new_reservations=form.new_reservations.data,
             send_on=form.send_on.data,
             resources=form.resources.data,
         )

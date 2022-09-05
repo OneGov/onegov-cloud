@@ -4,6 +4,7 @@ from onegov.org import _
 from onegov.reservation import Resource, ResourceCollection
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
+from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired, Email
 
 
@@ -21,18 +22,36 @@ WEEKDAYS = (
 class ResourceRecipientForm(Form):
     name = StringField(
         label=_("Name"),
+        fieldset="Empfänger",
         description="Peter Muster",
         validators=[InputRequired()]
     )
 
     address = EmailField(
         label=_("E-Mail"),
+        fieldset="Empfänger",
         description="peter.muster@example.org",
         validators=[InputRequired(), Email()]
     )
 
+    dayly_reservations = BooleanField(
+        label=_("Tägliche Belegung"),
+        fieldset="Benachrichtigung",
+        description=("Jeden Tag um 06:00 wird eine Benachrichtigung mit den "
+                     "Reservationen des Tages an die obenstehende Adresse "
+                     "gesendet."),
+    )
+
+    new_reservations = BooleanField(
+        label=_("Neue Reservationen"),
+        fieldset="Benachrichtigung",
+        description=("Bei jeder neuen Reservation wird eine Benachrichtigung "
+                     "an die obenstehende Adresse gesendet."),
+    )
+
     send_on = MultiCheckboxField(
         label=_("Send on"),
+        fieldset="Tage und Ressourcen",
         choices=WEEKDAYS,
         default=[key for key, value in WEEKDAYS],
         validators=[InputRequired()],
@@ -41,6 +60,7 @@ class ResourceRecipientForm(Form):
 
     resources = MultiCheckboxField(
         label=_("Resources"),
+        fieldset="Tage und Ressourcen",
         validators=[InputRequired()],
         choices=None
     )

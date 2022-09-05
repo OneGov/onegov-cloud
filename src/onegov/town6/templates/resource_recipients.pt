@@ -12,27 +12,31 @@
 
         <ul tal:condition="recipients" class="dense recipients">
             <li tal:repeat="recipient recipients" id="${recipient.id.hex}">
-                <h2>${recipient.name}</h2>
-                <div>
-                    <a href="mailto:${recipient.address}">${recipient.address}</a>
-                </div>
-                <div>
-                    <tal:b repeat="day recipient.send_on">
-                        <tal:b switch="day">
-                            <tal:b case="string:MO" i18n:translate>Mo</tal:b>
-                            <tal:b case="string:TU" i18n:translate>Tu</tal:b>
-                            <tal:b case="string:WE" i18n:translate>We</tal:b>
-                            <tal:b case="string:TH" i18n:translate>Th</tal:b>
-                            <tal:b case="string:FR" i18n:translate>Fr</tal:b>
-                            <tal:b case="string:SA" i18n:translate>Sa</tal:b>
-                            <tal:b case="string:SU" i18n:translate>Su</tal:b>
+                <h2>${recipient.name} - <a href="mailto:${recipient.address}">${recipient.address}</a></h2>
+                <ul class="fa-ul">
+                    <li tal:condition="recipient.dayly_reservations">
+                        <span class="fa-li"><i class="fas fa-check"></i></span> Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:<br/>
+                        <tal:b repeat="day recipient.send_on">
+                            <tal:b switch="day">
+                                <tal:b case="string:MO" i18n:translate>Mo</tal:b>
+                                <tal:b case="string:TU" i18n:translate>Tu</tal:b>
+                                <tal:b case="string:WE" i18n:translate>We</tal:b>
+                                <tal:b case="string:TH" i18n:translate>Th</tal:b>
+                                <tal:b case="string:FR" i18n:translate>Fr</tal:b>
+                                <tal:b case="string:SA" i18n:translate>Sa</tal:b>
+                                <tal:b case="string:SU" i18n:translate>Su</tal:b>
+                            </tal:b>
+                            <tal:b condition="not: repeat.day.end">, </tal:b>
                         </tal:b>
-                        <tal:b condition="not: repeat.day.end">, </tal:b>
-                    </tal:b>
-                </div>
-                <div class="text-links">
-                    <tal:b repeat="link recipient_links(recipient)" replace="structure link(layout)" />
-                </div>
+                    </li>
+
+                    <li tal:condition="recipient.new_reservations">
+                        <span class="fa-li"><i class="fas fa-check"></i></span> Erhält Benachtchtigungen für neue Reservationen.
+                    </li>
+                </ul>
+                    <p class="text-links">
+                        <tal:b repeat="link recipient_links(recipient)" replace="structure link(layout)" />
+                    </p>
             </li>
         </ul>
     </tal:b>
