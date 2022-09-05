@@ -30,11 +30,11 @@ def random_token(nbytes=512):
 
     More information:
 
-    `<http://wyattbaldwin.com/2014/01/09/generating-random-tokens-in-python>`_
+    `<https://wyattbaldwin.com/2014/01/09/generating-random-tokens-in-python>`_
 
-    `<http://www.2uo.de/myths-about-urandom/>`_
+    `<https://www.2uo.de/myths-about-urandom/>`_
 
-    `<http://crypto.stackexchange.com/q/1401>`_
+    `<https://crypto.stackexchange.com/q/1401>`_
 
     """
     assert nbytes >= 512

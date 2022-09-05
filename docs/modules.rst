@@ -207,7 +207,7 @@ OneGov Reservation
 
 Libres integration for OneGov Cloud. Libres is a python library to reserve stuff.
 
-`Libres Documentation <http://libres.readthedocs.org/en/latest/>`_
+`Libres Documentation <https://libres.readthedocs.org/en/latest/>`_
 
 .. toctree::
     onegov_reservation

@@ -4,7 +4,7 @@ It takes hints from the eCH-0110 & eCH-0155 Standards.
 See:
 
 `eCH-0155: Datenstandard politische Rechte \
-<http://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0155>`_
+<https://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0155>`_
 
 """
 from onegov.ballot.models.election import Candidate

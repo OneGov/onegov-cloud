@@ -247,7 +247,7 @@ class Framework(
 
         :file_storage:
             The file_storage module to use. See
-            `<http://docs.pyfilesystem.org/en/latest/filesystems.html>`_
+            `<https://docs.pyfilesystem.org/en/latest/filesystems.html>`_
 
         :file_storage_options:
             A dictionary of options passed to the ``__init__`` method of the
@@ -907,7 +907,7 @@ class Framework(
         """ Returns a filestorage object bound to the current application.
         Based on this nifty module:
 
-        `<http://docs.pyfilesystem.org/en/latest/>`_
+        `<https://docs.pyfilesystem.org/en/latest/>`_
 
         The file storage returned is guaranteed to be independent of other
         applications (the scope is the application_id, not just the class).
@@ -922,7 +922,7 @@ class Framework(
         The backend is configured through :meth:`configure_application`.
 
         For a list of methods available on the resulting object, consult this
-        list: `<http://docs.pyfilesystem.org/en/latest/interface.html>`_.
+        list: `<https://docs.pyfilesystem.org/en/latest/interface.html>`_.
 
         If no filestorage is available, this returns None.
         See :attr:`self.has_filestorage`.

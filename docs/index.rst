@@ -19,7 +19,7 @@ Introduction
 ------------
 
 OneGov Cloud is a RAD framework built with `Morepath, the web micro-framework
-with superpowers <http://morepath.readthedocs.io/en/latest/>`_. It enables us
+with superpowers <https://morepath.readthedocs.io/en/latest/>`_. It enables us
 to write web applications for government agencies in a secure, efficient,
 and modern manner.
 

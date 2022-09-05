@@ -40,7 +40,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     #: the name of the handler associated with this ticket, may be used to
     #: create custom polymorphic subclasses of this class. See
-    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
     handler_code = Column(Text, nullable=False, index=True)
 
