@@ -67,6 +67,8 @@ Design
 An introduction into the history and the design of OneGov Cloud.
 
 .. toctree::
+    :maxdepth: 2
+
     design
 
 Org
@@ -75,6 +77,8 @@ Org
 An introduction to the most fully-featured application of OneGov Cloud.
 
 .. toctree::
+    :maxdepth: 2
+
     org
 
 Feriennet
@@ -83,6 +87,8 @@ Feriennet
 An introduction to the most popular application of OneGov Cloud.
 
 .. toctree::
+    :maxdepth: 2
+
     feriennet
 
 
@@ -92,6 +98,8 @@ Formcode
 Describes our very own Formcode™ Syntax, a DSL to write forms with.
 
 .. toctree::
+    :maxdepth: 2
+
     formcode
 
 Source
@@ -107,4 +115,6 @@ Find out more about the inner workings of OneGov Cloud by having a look at
 the OneGov Cloud modules documentation.
 
 .. toctree::
+    :maxdepth: 2
+
     modules
