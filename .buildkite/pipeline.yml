@@ -1,16 +1,16 @@
 steps:
 
-  # build the container…
-  - command: "build-container"
-    label: "Building"
-
-    agents:
-      - queue=builder
-
-    env:
-      CONTAINER: "onegov-cloud:head"
-
-  - wait
+  # # build the container…
+  # - command: "build-container"
+  #   label: "Building"
+  #
+  #   agents:
+  #     - queue=builder
+  #
+  #   env:
+  #     CONTAINER: "onegov-cloud:head"
+  #
+  # - wait
 
   # check linting
   - command: "test-container"
@@ -21,7 +21,7 @@ steps:
       - ram=2048
 
     env:
-      CONTAINER: "onegov-cloud:head-$$BUILDKITE_COMMIT"
+      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT}"
       CONTAINER_TEST_SCRIPT: ".buildkite/lint"
 
   # run the javascript tests
@@ -34,7 +34,7 @@ steps:
     if: build.message =~ /jest/
 
     env:
-      CONTAINER: "onegov-cloud:head-$$BUILDKITE_COMMIT"
+      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT}"
       CONTAINER_TEST_SCRIPT: ".buildkite/jest"
 
   # run the python tests
@@ -49,7 +49,7 @@ steps:
       - ram=4096
 
     env:
-      CONTAINER: "onegov-cloud:head-$$BUILDKITE_COMMIT"
+      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT}"
       CONTAINER_TEST_SCRIPT: ".buildkite/test"
 
   # build the docs if possible (fails are ignored, only on master)
@@ -64,7 +64,7 @@ steps:
       - exit_status: 1
 
     env:
-      CONTAINER: "onegov-cloud:head-$$BUILDKITE_COMMIT"
+      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT}"
       CONTAINER_TEST_SCRIPT: ".buildkite/docs"
 
     branches: "master"
@@ -80,4 +80,4 @@ steps:
       - queue=builder
 
     env:
-      CONTAINER: "onegov-cloud:head-$$BUILDKITE_COMMIT"
+      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT}"
