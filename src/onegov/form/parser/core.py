@@ -254,7 +254,7 @@ in the future.
 Still, the library should be somewhat stable and the benefit is huge.
 
 To see the available format, have a look at the docs:
-`<http://arthurdejong.org/python-stdnum/doc/1.1/index.html#available-formats>`_
+`<https://arthurdejong.org/python-stdnum/doc/1.1/index.html#available-formats>`_
 
 Radio Buttons
 ~~~~~~~~~~~~~

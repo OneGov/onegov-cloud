@@ -23,7 +23,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
-    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
     type = Column(Text, nullable=False, default=lambda: 'generic')
 

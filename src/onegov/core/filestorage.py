@@ -1,7 +1,7 @@
 """ Filestorage is a way to store files locally or on a remote server, with the
 interface being the same, no matter where the files are stored.
 
-Based on `<http://docs.pyfilesystem.org/en/latest/>`_
+Based on `<https://docs.pyfilesystem.org/en/latest/>`_
 
 See :attr:`onegov.core.framework.Framework.filestorage` for more information.
 

@@ -36,7 +36,7 @@ SUPPORTED_STORAGE_BACKENDS = (
 
 
 class DepotApp(App):
-    """ Provides `Depot <depot.readthedocs.io>`_ integration for
+    """ Provides `Depot <https://depot.readthedocs.io>`_ integration for
     :class:`onegov.core.framework.Framework` based applications.
 
     """

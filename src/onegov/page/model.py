@@ -1,7 +1,7 @@
 """ A OneGov Page is an Adjacency List used to represent pages with any kind
 of content in a hierarchy.
 
-See also: `<http://docs.sqlalchemy.org/en/rel_0_9/orm/self_referential.html>`_
+See also: `<https://docs.sqlalchemy.org/en/rel_0_9/orm/self_referential.html>`_
 
 """
 from sqlalchemy import func

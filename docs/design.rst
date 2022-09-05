@@ -101,7 +101,7 @@ general framework component for requests/session handling and the like
 and applications tying it all together, like ``onegov.org``.
 
 An overview over the most important modules can be found here:
-:doc:`onegov_cloud_modules`.
+:doc:`modules`.
 
 Crucially, almost everything can be written in a way that allows for
 customization using the open/close principle (open for extension,

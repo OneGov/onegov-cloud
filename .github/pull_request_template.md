@@ -17,7 +17,9 @@ LINK: <Ticket-Number>
     - [ ] I have tested styling changes/features on different browsers
     - [ ] I have tested javascript changes/features on different browsers
     - [ ] I have tested database upgrades
+    - [ ] I have tested building the documentation
 - [ ] I have added tests for my changes/features
     - [ ] I considered using browser tests für javascript changes/features
     - [ ] I have added/updated jest tests for d3rendering (election_day, swissvotes)
 - [ ] I have updated the PO files
+- [ ] I have added new modules and files to the docs

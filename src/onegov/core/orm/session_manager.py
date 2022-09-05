@@ -86,7 +86,7 @@ class SessionManager:
             Database connection string including user, password, host, port
             and database name.
 
-            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
+            See: `<https://docs.sqlalchemy.org/en/latest/core/engines.html\
             #database-urls>`_
 
         :base:
@@ -102,13 +102,13 @@ class SessionManager:
         :engine_config:
             Additional configuration passed to SQLAlchemy's `create_engine`.
 
-            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
+            See: `<https://docs.sqlalchemy.org/en/latest/core/engines.html\
             #sqlalchemy.create_engine>`
 
         :session_config:
             Additional configuration passed to SQLAlchemy's sessionmaker.
 
-            See: `<http://docs.sqlalchemy.org/en/latest/orm/session_api.html\
+            See: `<https://docs.sqlalchemy.org/en/latest/orm/session_api.html\
             #sqlalchemy.orm.session.sessionmaker>`
 
         :pool_config:
