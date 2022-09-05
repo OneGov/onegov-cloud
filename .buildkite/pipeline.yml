@@ -1,16 +1,16 @@
 steps:
 
-  # # build the container…
-  # - command: "build-container"
-  #   label: "Building"
-  #
-  #   agents:
-  #     - queue=builder
-  #
-  #   env:
-  #     CONTAINER: "onegov-cloud:head"
-  #
-  # - wait
+  # build the container…
+  - command: "build-container"
+    label: "Building"
+
+    agents:
+      - queue=builder
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+
+  - wait
 
   # check linting
   - command: "test-container"
