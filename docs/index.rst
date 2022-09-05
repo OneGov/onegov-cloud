@@ -13,7 +13,7 @@ You reached the technical documentation of this initiative intended for
 administrators, developers and other technical personnel.
 
 To learn more about the product, please refer
-to `https://onegovcloud.ch/ <https://onegovcloud.ch/>`_
+to `https://www.admin.digital <https://www.admin.digital>`_.
 
 Introduction
 ------------
@@ -28,7 +28,7 @@ following consequences:
 
  * It only runs on POSIX platforms.
  * It uses PostgreSQL 10+ and won't support other databases.
- * It requires Python 3.6+. Python 2.x is *not* supported.
+ * It requires Python 3.6+.
  * It aims to provide concurrency through multiple processes and is not
    necessarily thread-safe.
 
@@ -61,25 +61,38 @@ Start your own OneGov Town instance for free:
 Documentation Highlights
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-:doc:`design`
-+++++++++++++
+Design
+++++++
 
 An introduction into the history and the design of OneGov Cloud.
 
-:doc:`org`
-++++++++++
+.. toctree::
+    design
+
+Org
++++
 
 An introduction to the most fully-featured application of OneGov Cloud.
 
-:doc:`feriennet`
-++++++++++++++++
+.. toctree::
+    org
+
+Feriennet
++++++++++
 
 An introduction to the most popular application of OneGov Cloud.
 
-:doc:`formcode`
-+++++++++++++++
+.. toctree::
+    feriennet
+
+
+Formcode
+++++++++
 
 Describes our very own Formcode™ Syntax, a DSL to write forms with.
+
+.. toctree::
+    formcode
 
 Source
 ^^^^^^
@@ -91,4 +104,7 @@ Further Reading
 ^^^^^^^^^^^^^^^
 
 Find out more about the inner workings of OneGov Cloud by having a look at
-the OneGov Cloud modules documentation at :doc:`onegov_cloud_modules`.
+the OneGov Cloud modules documentation.
+
+.. toctree::
+    modules

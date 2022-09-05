@@ -124,13 +124,15 @@ html_theme_path = [alabaster.get_path()]
 html_theme = 'alabaster'
 html_sidebars = {
     '**': [
-        'about.html', 'navigation.html', 'searchbox.html', 'donate.html',
+        'about.html',
+        'localtoc.html',
+        'searchbox.html',
     ]
 }
 html_theme_options = {
     'logo': 'logo.svg',
     'github_user': 'OneGov',
-    'github_repo': 'onegov-docs',
+    'github_repo': 'onegov-cloud',
 }
 html_style = 'custom.css'
 

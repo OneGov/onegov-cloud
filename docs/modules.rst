@@ -131,7 +131,7 @@ Provides a way to store and serve files tied to the database and bound to
 the transaction.
 
 .. toctree::
-onegov_file
+    onegov_file
 
 
 OneGov Form
@@ -207,7 +207,7 @@ OneGov Reservation
 
 Libres integration for OneGov Cloud. Libres is a python library to reserve stuff.
 
-* `Libres Documentation <http://libres.readthedocs.org/en/latest/>`
+`Libres Documentation <http://libres.readthedocs.org/en/latest/>`_
 
 .. toctree::
     onegov_reservation
