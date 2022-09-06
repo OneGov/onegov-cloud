@@ -17,7 +17,8 @@ from onegov.org.forms import ReservationForm, InternalTicketChatMessageForm
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
-    TicketMessage, TicketChatMessage, ReservationMessage)
+    TicketMessage, TicketChatMessage, ReservationMessage,
+    ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
@@ -637,6 +638,36 @@ def accept_reservation(self, request, text=None, notify=False):
                 'message': message
             }
         )
+
+        # get all recipients which require an e-mail for this resource
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(
+            ResourceRecipient.address,
+            ResourceRecipient.content
+        )
+        recipients = [
+            r.address
+            for r in q if self.resource.hex in r.content['resources']
+        ]
+
+        for r in recipients:
+            request.app.send_transactional_html_mail(
+                request=request,
+                template='mail_new_reservation_notification.pt',
+                subject=_("New reservations"),
+                receivers=(r),
+                ticket=ticket,
+                content={
+                    'model': self,
+                    'resource': resource,
+                    'reservations': reservations,
+                    'show_submission': show_submission,
+                    'form': form,
+                    'message': message
+                }
+            )
 
         request.success(_("The reservations were accepted"))
     else:

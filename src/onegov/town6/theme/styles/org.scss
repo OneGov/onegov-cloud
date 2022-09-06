@@ -671,6 +671,7 @@ section#content h2:first-of-type {
 
 ul.recipients {
     h2 {
+        color: #000;
         font-size: 1.25rem;
         margin-bottom: 0;
     }
@@ -689,11 +690,12 @@ ul.recipients {
     }
 
     &> li {
+        color: #707070;
         padding-bottom: 1rem;
     }
 
     .fa-ul {
-        color: #707070;
+        margin-bottom: .5rem;
         margin-left: 1.5rem;
     }
 }

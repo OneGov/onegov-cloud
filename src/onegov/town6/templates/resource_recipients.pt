@@ -4,10 +4,6 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-        <div class="panel" i18n:translate>
-            The following recipients receive a daily e-mail sent at 06:00 containing the reservation data for all reservations of the day.
-        </div>
-
         <p tal:condition="not:recipients" i18n:translate>No recipients defined yet.</p>
 
         <ul tal:condition="recipients" class="dense recipients">
@@ -15,7 +11,7 @@
                 <h2>${recipient.name} - <a href="mailto:${recipient.address}">${recipient.address}</a></h2>
                 <ul class="fa-ul">
                     <li tal:condition="recipient.daily_reservations">
-                        <span class="fa-li"><i class="fas fa-check"></i></span> Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:<br/>
+                        <span class="fa-li"><i class="fas fa-envelope"></i></span> Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:<br/>
                         <tal:b repeat="day recipient.send_on">
                             <tal:b switch="day">
                                 <tal:b case="string:MO" i18n:translate>Mo</tal:b>
@@ -31,12 +27,16 @@
                     </li>
 
                     <li tal:condition="recipient.new_reservations">
-                        <span class="fa-li"><i class="fas fa-check"></i></span> Erhält Benachtchtigungen für neue Reservationen.
+                        <span class="fa-li"><i class="fas fa-envelope"></i></span> Erhält Benachtchtigungen für neue Reservationen.
                     </li>
                 </ul>
-                    <p class="text-links">
-                        <tal:b repeat="link recipient_links(recipient)" replace="structure link(layout)" />
-                    </p>
+                <b style="margin-bottom: 0;">Resourcen</b>
+                <ul>
+                    <li tal:repeat="resource recipient.resources">${resources[resource]}</li>
+                </ul>
+                <p class="text-links">
+                    <tal:b repeat="link recipient_links(recipient)" replace="structure link(layout)" />
+                </p>
             </li>
         </ul>
     </tal:b>
