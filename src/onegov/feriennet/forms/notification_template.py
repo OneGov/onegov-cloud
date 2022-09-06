@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from markupsafe import Markup
 from onegov.activity import Activity
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
@@ -296,5 +297,4 @@ class NotificationTemplateSendForm(Form):
                     layout.format_datetime_range(*d) for d in record.dates
                 )
             }))
-
-            yield record.occasion_id.hex, label
+            yield record.occasion_id.hex, Markup(label)
