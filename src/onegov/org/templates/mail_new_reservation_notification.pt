@@ -27,7 +27,7 @@
     <tal:b metal:fill-slot="above-footer">
         <p>
             <span i18n:translate>
-                This is a notification for the new reservations for <tal:b i18n:name="organisation">${request.app.org.title}</tal:b>. If you no longer wish to receive these notifications, please contact an administrator so they can remove you from the recipients list.
+                This is the notification for reservations for ${request.app.org.title}. If you no longer want to receive this e-mail please contact an administrator so they can remove you from the recipients list.
             </span>
     </tal:b>
 

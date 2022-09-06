@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-09-02 07:16+0200\n"
+"POT-Creation-Date: 2022-09-06 12:58+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1087,11 +1087,20 @@ msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
 msgid "The price must be larger than zero"
 msgstr "Il prezzo deve essere maggiore di zero"
 
+msgid "New Reservations"
+msgstr ""
+
+msgid "Daily Reservations"
+msgstr ""
+
 msgid "Send on"
 msgstr "Invia il"
 
 msgid "Resources"
 msgstr "Risorse"
+
+msgid "Please add at least one notification."
+msgstr ""
 
 msgid "Logo"
 msgstr "Logo"
@@ -3148,6 +3157,18 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
+msgid "The following reservations have been accepted:"
+msgstr "Sono state accettate le seguenti prenotazioni:"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+msgid ""
+"This is the notification for reservations for ${request.app.org.title}. If "
+"you no longer want to receive this e-mail please contact an administrator so "
+"they can remove you from the recipients list."
+msgstr ""
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr "Un amministratore ha appena creato per te un nuovo account su ${org}."
 
@@ -3218,12 +3239,6 @@ msgstr "Registrazione"
 
 msgid "The ticket number is"
 msgstr "Il numero del biglietto è"
-
-msgid "The following reservations have been accepted:"
-msgstr "Sono state accettate le seguenti prenotazioni:"
-
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -4637,6 +4652,9 @@ msgstr ""
 
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
+
+msgid "New reservations"
+msgstr ""
 
 msgid "The reservations were accepted"
 msgstr "Le prenotazioni sono state accettate"

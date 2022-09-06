@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-02 07:16+0200\n"
+"POT-Creation-Date: 2022-09-06 12:58+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1086,11 +1086,20 @@ msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
 msgid "The price must be larger than zero"
 msgstr "Le prix doit être supérieur à zéro"
 
+msgid "New Reservations"
+msgstr ""
+
+msgid "Daily Reservations"
+msgstr ""
+
 msgid "Send on"
 msgstr "Envoyer sur"
 
 msgid "Resources"
 msgstr "Ressources"
+
+msgid "Please add at least one notification."
+msgstr ""
 
 msgid "Logo"
 msgstr "Logo"
@@ -3152,6 +3161,18 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
+msgid "The following reservations have been accepted:"
+msgstr "Les réservations suivantes ont été acceptées :"
+
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
+msgid ""
+"This is the notification for reservations for ${request.app.org.title}. If "
+"you no longer want to receive this e-mail please contact an administrator so "
+"they can remove you from the recipients list."
+msgstr ""
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
 "Un administrateur vient de créer un nouveau compte sur ${org} pour vous."
@@ -3226,12 +3247,6 @@ msgstr "Inscription "
 
 msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
-
-msgid "The following reservations have been accepted:"
-msgstr "Les réservations suivantes ont été acceptées :"
-
-msgid "${author} wrote"
-msgstr "${author} a écrit"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées :"
@@ -4643,6 +4658,9 @@ msgstr ""
 
 msgid "Your reservations were accepted"
 msgstr "Vos réservations ont été acceptées"
+
+msgid "New reservations"
+msgstr ""
 
 msgid "The reservations were accepted"
 msgstr "Les réservations ont été acceptées"

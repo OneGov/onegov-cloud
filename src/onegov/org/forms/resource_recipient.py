@@ -68,7 +68,7 @@ class ResourceRecipientForm(Form):
 
     def validate(self):
         result = super().validate()
-        if not (self.new_reservations or self.daily_reservations):
+        if not (self.new_reservations.data or self.daily_reservations.data):
             self.daily_reservations.errors.append(
                 _("Please add at least one notification.")
             )
