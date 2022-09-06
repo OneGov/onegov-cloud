@@ -14,7 +14,7 @@
             <li tal:repeat="recipient recipients" id="${recipient.id.hex}">
                 <h2>${recipient.name} - <a href="mailto:${recipient.address}">${recipient.address}</a></h2>
                 <ul class="fa-ul">
-                    <li tal:condition="recipient.dayly_reservations">
+                    <li tal:condition="recipient.daily_reservations">
                         <span class="fa-li"><i class="fas fa-check"></i></span> Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:<br/>
                         <tal:b repeat="day recipient.send_on">
                             <tal:b switch="day">

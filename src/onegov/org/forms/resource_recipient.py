@@ -34,19 +34,19 @@ class ResourceRecipientForm(Form):
         validators=[InputRequired(), Email()]
     )
 
-    dayly_reservations = BooleanField(
-        label=_("Tägliche Belegung"),
-        fieldset="Benachrichtigung",
-        description=("Jeden Tag um 06:00 wird eine Benachrichtigung mit den "
-                     "Reservationen des Tages an die obenstehende Adresse "
-                     "gesendet."),
+    new_reservations = BooleanField(
+        label=_("New Reservations"),
+        fieldset="Notifications *",
+        description=("Bei jeder neuen Reservation wird eine Benachrichtigung "
+                     "an den obenstehendes Empfänger gesendet."),
     )
 
-    new_reservations = BooleanField(
-        label=_("Neue Reservationen"),
-        fieldset="Benachrichtigung",
-        description=("Bei jeder neuen Reservation wird eine Benachrichtigung "
-                     "an die obenstehende Adresse gesendet."),
+    daily_reservations = BooleanField(
+        label=_("Daily Reservations"),
+        fieldset="Notifications *",
+        description=("An jedem unten ausgewählten Tag wird um 06:00 eine "
+                     "Benachrichtigung mit den Reservationen des Tages an den "
+                     "obenstehenden Empfänger gesendet."),
     )
 
     send_on = MultiCheckboxField(
@@ -55,6 +55,7 @@ class ResourceRecipientForm(Form):
         choices=WEEKDAYS,
         default=[key for key, value in WEEKDAYS],
         validators=[InputRequired()],
+        depends_on=('daily_reservations', 'y'),
         render_kw={'prefix_label': False, 'class_': 'oneline-checkboxes'}
     )
 
@@ -64,6 +65,15 @@ class ResourceRecipientForm(Form):
         validators=[InputRequired()],
         choices=None
     )
+
+    def validate(self):
+        result = super().validate()
+        if not (self.new_reservations or self.daily_reservations):
+            self.daily_reservations.errors.append(
+                _("Please add at least one notification.")
+            )
+            result = False
+        return result
 
     def on_request(self):
         self.populate_resources()
