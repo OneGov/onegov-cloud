@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-06 12:58+0200\n"
+"POT-Creation-Date: 2022-09-06 14:34+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4659,8 +4659,9 @@ msgstr ""
 msgid "Your reservations were accepted"
 msgstr "Vos réservations ont été acceptées"
 
-msgid "New reservations"
-msgstr ""
+#, python-format
+msgid "${org} New Reservation(s)"
+msgstr "${org} Nouvelle(s) réservation(s)"
 
 msgid "The reservations were accepted"
 msgstr "Les réservations ont été acceptées"

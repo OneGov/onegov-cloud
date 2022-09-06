@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-09-06 12:58+0200\n"
+"POT-Creation-Date: 2022-09-06 14:34+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4653,8 +4653,9 @@ msgstr ""
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
 
-msgid "New reservations"
-msgstr ""
+#, python-format
+msgid "${org} New Reservation(s)"
+msgstr "${org} Nuova/e prenotazione/i"
 
 msgid "The reservations were accepted"
 msgstr "Le prenotazioni sono state accettate"

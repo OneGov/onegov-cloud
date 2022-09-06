@@ -20,6 +20,7 @@
         <tal:b condition="show_submission|nothing">
             <hr class="large">
             <metal:b use-macro="layout.macros['display_form']"/>
+            <hr class="large">
         </tal:b>
         <p i18n:translate>Have a great day!</p>
         <tal:b metal:use-macro="layout.macros['sender']" />
