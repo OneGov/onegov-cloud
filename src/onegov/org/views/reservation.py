@@ -651,7 +651,10 @@ def accept_reservation(self, request, text=None, notify=False):
         )
         recipients = [
             r.address
-            for r in q if self.resource.hex in r.content['resources']
+            for r in q if (
+                self.resource.hex in r.content['resources']
+                and r.content['new_reservations']
+            )
         ]
 
         # E-mail for new reservations
