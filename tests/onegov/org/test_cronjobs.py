@@ -528,6 +528,7 @@ def test_daily_reservation_overview(org_app):
         name='Gym',
         medium='email',
         address='gym@example.org',
+        daily_reservations=True,
         send_on=['FR'],
         resources=[
             gymnasium.id.hex
@@ -537,6 +538,7 @@ def test_daily_reservation_overview(org_app):
         name='Day',
         medium='email',
         address='day@example.org',
+        daily_reservations=True,
         send_on=['FR'],
         resources=[
             dailypass.id.hex
@@ -546,6 +548,7 @@ def test_daily_reservation_overview(org_app):
         name='Both',
         medium='email',
         address='both@example.org',
+        daily_reservations=True,
         send_on=['SA'],
         resources=[
             dailypass.id.hex,
