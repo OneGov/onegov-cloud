@@ -713,6 +713,7 @@ def view_export(self, request, form, layout=None):
         'explanation': _("Exports the reservations of the given date range.")
     }
 
+
 @OrgApp.form(model=ResourceCollection, permission=Private, name='export-all',
              template='export.pt', form=AllResourcesExportForm)
 def view_export_all(self, request, form, layout=None):
@@ -793,6 +794,7 @@ def view_export_all(self, request, form, layout=None):
     return {'layout': layout, 'title': _("Export"), 'form': form,
             'explanation': _("Exports the reservations of all resources in"
                              " a given date range.")}
+
 
 def run_export(resource, start, end, nested, formatter):
     start = sedate.replace_timezone(

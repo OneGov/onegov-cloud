@@ -27,7 +27,7 @@ from pathlib import Path
 
 
 def test_parse_header():
-    assert parse_header("   Firtst name;  LastNAME; Designation") \
+    assert parse_header("   Firtst name;  LastNAME; Designation")\
            == ['firtst name', 'lastname', 'designation']
     assert parse_header("a") == ['a']
     assert parse_header("") == []
@@ -245,10 +245,10 @@ def test_match_headers_missing():
 
     assert match_headers(['a1', 'b2'], expected=('a1', 'c2')) == ['a1', 'c2']
 
-    assert match_headers(['first', 'second'], expected=('first', 'sekond')) \
+    assert match_headers(['first', 'second'], expected=('first', 'sekond'))\
            == ['first', 'sekond']
 
-    assert match_headers(['a', 'b', 'c'], expected=('a', 'c')) \
+    assert match_headers(['a', 'b', 'c'], expected=('a', 'c'))\
            == ['a', 'b', 'c']
 
 
@@ -418,18 +418,24 @@ def test_combine_xlsx_from_multiple_files():
     ]
 
     xlsx1 = convert_list_of_dicts_to_xlsx_names(data,
-                                                ('first_name', 'last_name'))
+                                                fields=('first_name',
+                                                        'last_name'),
+                                                title="test0")
     xlsx2 = convert_list_of_dicts_to_xlsx_names(data2,
-                                                ('first_name', 'last_name'))
+                                                fields=('first_name',
+                                                        'last_name'),
+                                                title="test1")
 
     input_workbooks = [xlsx1, xlsx2]
     absolute_path = merge_multiple_excel_files_into_one(input_workbooks)
 
     wb = load_workbook(absolute_path)
+    assert len(wb.worksheets) == 2
     first_sheet = wb[wb.sheetnames[0]]
     second_sheet = wb[wb.sheetnames[1]]
 
     tab_1 = tuple(first_sheet.rows)
+
     assert tab_1[0][0].value == 'first_name'
     assert tab_1[0][1].value == 'last_name'
     assert tab_1[1][0].value == 'Jean-Jacques'
