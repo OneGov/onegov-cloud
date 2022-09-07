@@ -1,14 +1,18 @@
 import json
+import tempfile
 import textwrap
 from datetime import datetime, date
 
 import os
 import pytest
+from pathlib import Path
+from openpyxl import load_workbook
 import transaction
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
 
+from onegov.core.utils import normalize_for_url
 from onegov.form import FormSubmission
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -1293,6 +1297,216 @@ def test_reservation_export_view(client):
     assert charlie['ticket'].startswith('RSV-')
     assert charlie['quota'] == 1
     assert charlie['form'] == {'vorname': 'Charlie', 'nachname': 'Carson'}
+
+
+@freeze_time("2023-08-28", tick=True)
+def test_reservation_export_all_view(client):
+    """ Create reservations with two different resources.
+        Then export everything to Excel.
+        It should create one Worksheet per resource.
+    """
+    resources = ResourceCollection(client.app.libres_context)
+    daypass_resource = resources.by_name('tageskarte')
+    daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
+    daypass_title = daypass_resource.title
+
+    scheduler = daypass_resource.get_scheduler(client.app.libres_context)
+    daypass_allocations = scheduler.allocate(
+        dates=(datetime(2023, 8, 28, 12, 0), datetime(2023, 8, 28, 13, 0)),
+        whole_day=False
+    )
+
+    reserve_daypass = client.bound_reserve(daypass_allocations[0])
+
+    resources.add(
+        "Conference room",
+        'Europe/Zurich',
+        type='room',
+        name='conference-room'
+    )
+
+    room_resource = resources.by_name('conference-room')
+    room_resource.definition = "title *= ___"
+    room_resource_title = room_resource.title
+
+    room_allocations = room_resource.scheduler.allocate(
+        dates=(datetime(2023, 8, 28), datetime(2023, 8, 28)),
+        whole_day=True
+    )
+
+    reserve_room = client.bound_reserve(room_allocations[0])
+    transaction.commit()
+    client.login_admin()
+
+    # create all reservations
+    assert reserve_daypass().json == {'success': True}
+    assert reserve_room().json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['vorname'] = 'Charlie'
+    formular.form['nachname'] = 'Carson'
+    formular.form.submit().follow().form.submit()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+
+    formular = client.get('/resource/conference-room/form')
+    formular.form['title'] = 'Room'
+    formular.form.submit().follow().form.submit()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+
+    export = client.get('/resources/export-all')
+    export.form['start'] = date(2023, 8, 28)
+    export.form['end'] = date(2023, 8, 28)
+
+    response = export.form.submit()
+    from onegov.core.framework import log
+    with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmp:
+        tmp.write(response.body)
+
+        log.info(tmp.name)
+        wb = load_workbook(Path(tmp.name))
+
+        daypass_sheet_name = wb.sheetnames[1]
+        # Tabs are named after the titles, without special characters.
+        assert daypass_sheet_name.lower() == normalize_for_url(
+            daypass_title.lower())
+        daypass_sheet = wb[daypass_sheet_name]
+
+        tab_2 = tuple(daypass_sheet.rows)
+        assert tab_2, "Sheet should not be empty"
+
+        assert tab_2[0][0].value == "start"
+        assert tab_2[0][1].value == "end"
+        assert tab_2[0][2].value == "quota"
+        assert tab_2[0][3].value == "email"
+        assert tab_2[0][4].value == "ticket"
+        assert tab_2[0][5].value == "title"
+        assert tab_2[0][6].value == "form_nachname"
+        assert tab_2[0][7].value == "form_vorname"
+
+        assert tab_2[1][0].value == "28.08.2023 12:00"
+        assert tab_2[1][1].value == "28.08.2023 13:00"
+        assert tab_2[1][2].value == int("1")
+        assert tab_2[1][3].value == "info@example.org"
+
+        room_sheet_name = wb.sheetnames[0]
+        assert room_sheet_name.lower() == normalize_for_url(
+            room_resource_title.lower())
+        room_sheet = wb[room_sheet_name]
+
+        tab_1 = tuple(room_sheet.rows)
+        assert tab_1, "Sheet should not be empty"
+
+        assert tab_1[0][0].value == "start"
+        assert tab_1[0][1].value == "end"
+        assert tab_1[0][2].value == "quota"
+        assert tab_1[0][3].value == "email"
+        assert tab_1[0][4].value == "ticket"
+        assert tab_1[0][5].value == "title"
+        assert tab_1[1][0].value == "28.08.2023 00:00"
+        assert tab_1[1][1].value == "29.08.2023 00:00"
+        assert tab_1[1][2].value == int("1")
+        assert "RSV-" in tab_1[1][4].value
+        assert "Room" in tab_1[1][5].value
+
+
+@freeze_time("2023-08-28", tick=True)
+def test_reservation_export_all_view_normalizes_sheet_names(client):
+    """ Names of Excel worksheets have to be valid.
+        Limited to 31 characters, no special characters.
+        Duplicate titles will be incremented numerically.
+    """
+
+    duplicate_title = normalize_for_url("Gemeindeverwaltung Sitzungszimmer "
+                                        "gross (2. OG)")
+
+    resources = ResourceCollection(client.app.libres_context)
+    daypass_resource = resources.by_name('tageskarte')
+    daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
+    daypass_resource.title = duplicate_title
+
+    scheduler = daypass_resource.get_scheduler(client.app.libres_context)
+    daypass_allocations = scheduler.allocate(
+        dates=(datetime(2023, 8, 28, 12, 0), datetime(2023, 8, 28, 13, 0)),
+        whole_day=False
+    )
+
+    reserve_daypass = client.bound_reserve(daypass_allocations[0])
+
+    resources.add(
+        "Conference room",
+        'Europe/Zurich',
+        type='room',
+        name='conference-room'
+    )
+
+    room_resource = resources.by_name('conference-room')
+    room_resource.definition = "Name *= ___"
+    room_resource.title = duplicate_title
+
+    room_allocations = room_resource.scheduler.allocate(
+        dates=(datetime(2023, 8, 28), datetime(2023, 8, 28)),
+        whole_day=True
+    )
+
+    reserve_room = client.bound_reserve(room_allocations[0])
+    transaction.commit()
+    client.login_admin()
+
+    # create all reservations
+    assert reserve_daypass().json == {'success': True}
+    assert reserve_room().json == {'success': True}
+
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['vorname'] = 'Charlie'
+    formular.form['nachname'] = 'Carson'
+
+    formular.form.submit().follow().form.submit()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+
+    formular = client.get('/resource/conference-room/form')
+    formular.form['name'] = 'Name'
+    formular.form.submit().follow().form.submit()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Alle Reservationen annehmen')
+
+    export = client.get('/resources/export-all')
+    export.form['start'] = date(2023, 8, 28)
+    export.form['end'] = date(2023, 8, 28)
+
+    response = export.form.submit()
+
+    with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmp:
+        tmp.write(response.body)
+        wb = load_workbook(Path(tmp.name))
+        actual_sheet_name_room = wb.sheetnames[0]
+        actual_sheet_name_daypass = wb.sheetnames[1]
+        assert duplicate_title[:31] == actual_sheet_name_room.lower()
+        from onegov.core.framework import log
+        log.info(duplicate_title)
+        assert duplicate_title[:31] + "1" == actual_sheet_name_daypass.lower()
+
+
+@freeze_time("2022-09-07", tick=True)
+def test_reservation_export_all_with_no_resources(client):
+    client.login_admin()
+
+    export = client.get('/resources/export-all')
+    export.form['start'] = date(2022, 9, 7)
+    export.form['end'] = date(2022, 9, 7)
+
+    # should not export anything, if there's nothing to export
+    response = export.form.submit().follow()
+    assert "Keine Reservierungen für den angegebenen Zeitraum gefunden"\
+           in response
 
 
 @freeze_time("2016-04-28", tick=True)

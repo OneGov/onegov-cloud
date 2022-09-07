@@ -1,5 +1,8 @@
+import tempfile
+
 from morepath.request import Response
-from onegov.core.csv import convert_list_of_dicts_to_csv
+from onegov.core.csv import convert_list_of_dicts_to_csv, \
+    merge_multiple_excel_files_into_one, convert_list_of_dicts_to_xlsx_names
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
@@ -94,8 +97,54 @@ class ExportForm(Form):
         raise NotImplementedError()
 
 
-class PaymentMethodForm(Form):
+class ExportToExcelWorksheets(Form):
+    """ A form providing the export of multiple reservations into Worksheets
+    """
 
+    file_format = RadioField(
+        label=_("Format"),
+        choices=[
+            ('xlsx', _("Excel File")),
+        ],
+        default='xlsx',
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    @property
+    def format(self):
+        return self.file_format.data
+
+    def as_multiple_export_response(self, keys, results, titles):
+        if self.format == 'xlsx':
+            xlsx_files = [convert_list_of_dicts_to_xlsx_names(result,
+                                                              key=key,
+                                                              title=title)
+                          for key, result, title in zip(keys, results, titles)]
+
+            with tempfile.TemporaryFile() as tmp:
+                absolute_path = merge_multiple_excel_files_into_one(xlsx_files)
+
+                with open(absolute_path, mode="rb") as f:
+                    tmp.write(f.read())
+
+                tmp.seek(0)
+                return Response(
+                    tmp.read(),
+                    content_type=(
+                        'application/vnd.openxmlformats'
+                        '-officedocument.spreadsheetml.sheet'
+                    ),
+                    content_disposition='inline; filename={}'.format(
+                        'all-resources-export'
+                    )
+                )
+
+        raise NotImplementedError()
+
+
+class PaymentMethodForm(Form):
     payment_method = RadioField(
         label=_("Payment Method"),
         fieldset=_("Payments"),
@@ -120,7 +169,6 @@ class PaymentMethodForm(Form):
 
 
 class ChangeAdjacencyListUrlForm(Form):
-
     name = StringField(
         label=_('URL path'),
         validators=[InputRequired()]

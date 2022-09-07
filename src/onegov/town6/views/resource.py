@@ -1,12 +1,13 @@
 from onegov.core.security import Public, Private, Personal
+from onegov.org.forms.resource import AllResourcesExportForm
 
 from onegov.org.views.resource import (
     view_resources, view_find_your_spot, get_room_form,
     get_daypass_form, handle_new_room, handle_new_daypass,
     get_resource_form, handle_edit_resource, view_resource,
     handle_cleanup_allocations, view_occupancy,
-    view_resource_subscribe, view_export, get_item_form,
-    handle_new_resource_item
+    view_resource_subscribe, view_export_all, get_item_form,
+    handle_new_resource_item, view_export
 )
 from onegov.reservation import ResourceCollection, Resource
 from onegov.town6 import TownApp
@@ -88,3 +89,9 @@ def town_view_resource_subscribe(self, request):
               template='export.pt', form=ResourceExportForm)
 def town_view_export(self, request, form):
     return view_export(self, request, form, ResourceLayout(self, request))
+
+
+@TownApp.form(model=ResourceCollection, permission=Private, name='export-all',
+              template='export.pt', form=AllResourcesExportForm)
+def town_view_export_all(self, request, form):
+    return view_export_all(self, request, form, ResourceLayout(self, request))

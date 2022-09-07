@@ -3,7 +3,7 @@ from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import DateRangeForm
+from onegov.org.forms.generic import DateRangeForm, ExportToExcelWorksheets
 from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentMethodForm
 from onegov.org.forms.reservation import RESERVED_FIELDS
@@ -143,7 +143,7 @@ class ResourceBaseForm(Form):
 
     price_per_item = DecimalField(
         label=_("Price per item"),
-        filters=(as_float, ),
+        filters=(as_float,),
         fieldset=_("Payments"),
         validators=[Optional()],
         depends_on=('pricing_method', 'per_item')
@@ -151,7 +151,7 @@ class ResourceBaseForm(Form):
 
     price_per_hour = DecimalField(
         label=_("Price per hour"),
-        filters=(as_float, ),
+        filters=(as_float,),
         fieldset=_("Payments"),
         validators=[Optional()],
         depends_on=('pricing_method', 'per_hour')
@@ -307,3 +307,8 @@ class ResourceCleanupForm(DateRangeForm):
 
 class ResourceExportForm(merge_forms(DateRangeForm, ExportForm)):
     """ Resource export form with start/end date. """
+
+
+class AllResourcesExportForm(merge_forms(DateRangeForm,
+                                         ExportToExcelWorksheets)):
+    """ Resource export all resources, with start/end date. """

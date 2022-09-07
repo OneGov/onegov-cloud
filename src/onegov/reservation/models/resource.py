@@ -258,3 +258,6 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
     def renew_access_token(self):
         self.access_token = secrets.token_hex(16)
+
+    def __repr__(self) -> str:
+        return f"{self.title}, {self.group}"
