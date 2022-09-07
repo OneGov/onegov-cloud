@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-08-21 08:02+0200\n"
+"POT-Creation-Date: 2022-09-01 14:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1799,6 +1799,9 @@ msgstr "Lien de ressource externe"
 
 msgid "New external resource"
 msgstr "Nouvelle ressource externe"
+
+msgid "Export All"
+msgstr "Exporter tout"
 
 msgid "Find Your Spot"
 msgstr "Rechercher les dates"
@@ -4989,3 +4992,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Exporte toutes les réservations dans une plage de dates donnée"
+
+msgid "No reservations found for the given date range."
+msgstr "Aucune réservation n'a été trouvée pour la période donnée."

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-08-21 08:02+0200\n"
+"POT-Creation-Date: 2022-09-01 14:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1807,6 +1807,9 @@ msgstr "Link a risorse esterne"
 
 msgid "New external resource"
 msgstr "Nuova risorsa esterna"
+
+msgid "Export All"
+msgstr "Esporta tutte"
 
 msgid "Find Your Spot"
 msgstr "Cerca le date"
@@ -4983,3 +4986,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Esporta tutte le prenotazioni in un intervallo di date specifico"
+
+msgid "No reservations found for the given date range."
+msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."

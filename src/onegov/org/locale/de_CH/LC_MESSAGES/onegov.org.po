@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-08-21 08:02+0200\n"
+"POT-Creation-Date: 2022-09-01 14:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1794,6 +1794,9 @@ msgstr "Externer Reservationslink"
 
 msgid "New external resource"
 msgstr "Neue externe Reservation"
+
+msgid "Export All"
+msgstr "Alle Exportieren"
 
 msgid "Find Your Spot"
 msgstr "Terminsuche"
@@ -4686,6 +4689,9 @@ msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 msgid "Exports the reservations of the given date range."
 msgstr "Exportiert alle Reservationen zwischen Start- und End-Datum."
 
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Exportiert alle Reservationen in einem bestimmten Datumsbereich"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\"?"
 msgstr "Möchten Sie \"${name}\" wirklich löschen?"
@@ -4969,3 +4975,7 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "No reservations found for the given date range."
+msgstr "Keine Reservierungen für den angegebenen Zeitraum gefunden."
+
