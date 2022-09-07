@@ -31,6 +31,11 @@ from copy import copy
 VALID_CSV_DELIMITERS = {',', ';', '\t'}
 WHITESPACE = re.compile(r'\s+')
 
+small_chars = set('fijlrt:,;.+i ')
+large_chars = set('GHMWQ_')
+
+max_width = 75
+
 
 class CSVFile:
     """ Provides access to a csv file.
@@ -377,6 +382,33 @@ def convert_excel_to_csv(file, sheet_name=None):
         return convert_xls_to_csv(file, sheet_name)
 
 
+def character_width(char):
+    # those numbers have been acquired by chasing unicorns
+    # and fairies in the magic forest of Excel
+    #
+    # tweak them as needed, but know that there's no correct answer,
+    # as each excel version on each platform or os-version will render
+    # the fonts used at different widths
+    if char in small_chars:
+        return 0.75
+    elif char in large_chars:
+        return 1.2
+    else:
+        return 1
+
+
+def estimate_width(text):
+    if not text:
+        return 0
+
+    width = max(
+        sum(character_width(c) for c in line)
+        for line in text.splitlines()
+    )
+
+    return min(width, max_width)
+
+
 def get_keys_from_list_of_dicts(rows, key=None, reverse=False):
     """ Returns all keys of a list of dicts in an ordered tuple.
 
@@ -445,36 +477,6 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
     """
 
-    small_chars = set('fijlrt:,;.+i ')
-    large_chars = set('GHMWQ_')
-
-    max_width = 75
-
-    def character_width(char):
-        # those numbers have been acquired by chasing unicorns
-        # and fairies in the magic forest of Excel
-        #
-        # tweak them as needed, but know that there's no correct answer,
-        # as each excel version on each platform or os-version will render
-        # the fonts used at different widths
-        if char in small_chars:
-            return 0.75
-        elif char in large_chars:
-            return 1.2
-        else:
-            return 1
-
-    def estimate_width(text):
-        if not text:
-            return 0
-
-        width = max(
-            sum(character_width(c) for c in line)
-            for line in text.splitlines()
-        )
-
-        return min(width, max_width)
-
     with tempfile.NamedTemporaryFile() as file:
         workbook = Workbook(file.name, options={'constant_memory': True})
         cellformat = workbook.add_format({'text_wrap': True})
@@ -518,36 +520,6 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
 def convert_list_of_dicts_to_xlsx_names(rows, fields=None, key=None,
                                         title=None, reverse=False):
-    small_chars = set('fijlrt:,;.+i ')
-    large_chars = set('GHMWQ_')
-
-    max_width = 75
-
-    def character_width(char):
-        # those numbers have been acquired by chasing unicorns
-        # and fairies in the magic forest of Excel
-        #
-        # tweak them as needed, but know that there's no correct answer,
-        # as each excel version on each platform or os-version will render
-        # the fonts used at different widths
-        if char in small_chars:
-            return 0.75
-        elif char in large_chars:
-            return 1.2
-        else:
-            return 1
-
-    def estimate_width(text):
-        if not text:
-            return 0
-
-        width = max(
-            sum(character_width(c) for c in line)
-            for line in text.splitlines()
-        )
-
-        return min(width, max_width)
-
     with tempfile.NamedTemporaryFile() as file:
 
         file.name = file.name.replace(basename(file.name), title)
