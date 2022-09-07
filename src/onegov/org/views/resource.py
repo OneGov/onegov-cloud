@@ -771,10 +771,24 @@ def view_export_all(self, request, form, layout=None):
                                                 keys=all_field_order)
 
     if request.method == 'GET':
-        from datetime import date
-        today = date.today()
-        tomorrow = date.today() + timedelta(days=1)
-        form.start.data, form.end.data = today, tomorrow
+
+        def get_week(date):
+            """Return the full week (Sunday first) of the week containing
+            the given date.
+            """
+            one_day = timedelta(days=1)
+            day_idx = (date.weekday() + 1) % 7  # turn sunday into 0, monday
+            # into 1, etc.
+            sunday = date - timedelta(days=day_idx)
+            date = sunday
+            for n in range(7):
+                yield date
+                date += one_day
+
+        # monday = list(get_week(datetime.now().date()))[1]
+        friday = list(get_week(datetime.now().date()))[5]
+
+        form.start.data, form.end.data = datetime.now().date(), friday
 
     return {'layout': layout, 'title': _("Export"), 'form': form,
             'explanation': _("Exports the reservations of all resources in"

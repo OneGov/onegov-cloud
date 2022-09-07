@@ -19,7 +19,6 @@ from onegov.ticket import TicketCollection
 
 
 def test_resource_slots(client):
-
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.add("Foo", 'Europe/Zurich')
 
@@ -200,15 +199,15 @@ def test_find_your_spot(client):
 
 
 def add_reservation(
-        resource,
-        client,
-        start,
-        end,
-        email=None,
-        partly_available=True,
-        reserve=True,
-        approve=True,
-        add_ticket=True
+    resource,
+    client,
+    start,
+    end,
+    email=None,
+    partly_available=True,
+    reserve=True,
+    approve=True,
+    add_ticket=True
 ):
     if not email:
         email = f'{resource.name}@example.org'
@@ -236,7 +235,6 @@ def add_reservation(
 
 
 def test_resource_room_deletion(client):
-
     # TicketMessage.create(ticket, request, 'opened')
     resources = ResourceCollection(client.app.libres_context)
     foyer = resources.add('Foyer', 'Europe/Zurich', type='room')
@@ -694,7 +692,6 @@ def test_auto_accept_reservations(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -809,7 +806,6 @@ def test_reserve_allocation(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reserve_allocation_partially(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -862,7 +858,6 @@ def test_reserve_allocation_partially(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reserve_no_definition_pick_up_hint(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -894,7 +889,6 @@ def test_reserve_no_definition_pick_up_hint(client):
 
 @freeze_time("2022-10-30", tick=True)
 def test_reserve_allocation_dst_to_st_transition(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -925,7 +919,6 @@ def test_reserve_allocation_dst_to_st_transition(client):
 
 @freeze_time("2022-03-27", tick=True)
 def test_reserve_allocation_st_to_dst_transition(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -949,7 +942,6 @@ def test_reserve_allocation_st_to_dst_transition(client):
 
 
 def test_reserve_in_past(client):
-
     admin = client.spawn()
     admin.login_admin()
 
@@ -987,7 +979,6 @@ def test_reserve_in_past(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reserve_confirmation_no_definition(client):
-
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(client.app.libres_context)
@@ -1029,7 +1020,6 @@ def test_reserve_confirmation_no_definition(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reserve_confirmation_with_definition(client):
-
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
     resource.definition = "Vorname *= ___\nNachname *= ___"
@@ -1073,7 +1063,6 @@ def test_reserve_confirmation_with_definition(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reserve_session_bound(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1107,7 +1096,6 @@ def test_reserve_session_bound(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_delete_reservation_anonymous(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1146,7 +1134,6 @@ def test_delete_reservation_anonymous(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reserve_in_parallel(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1179,12 +1166,11 @@ def test_reserve_in_parallel(client):
     # one will win, one will lose
     assert f1.form.submit().status_code == 302
     assert "Der gewünschte Zeitraum ist nicht mehr verfügbar."\
-        in f2.form.submit().follow()
+           in f2.form.submit().follow()
 
 
 @freeze_time("2015-08-28", tick=True)
 def test_occupancy_view(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1222,7 +1208,6 @@ def test_occupancy_view(client):
 
 
 def test_occupancy_view_member_access(client):
-
     # setup a resource that's visible to members
     client.login_admin()
 
@@ -1251,7 +1236,6 @@ def test_occupancy_view_member_access(client):
 
 @freeze_time("2015-08-28", tick=True)
 def test_reservation_export_view(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1297,6 +1281,50 @@ def test_reservation_export_view(client):
     assert charlie['ticket'].startswith('RSV-')
     assert charlie['quota'] == 1
     assert charlie['form'] == {'vorname': 'Charlie', 'nachname': 'Carson'}
+
+
+@freeze_time("2022-09-07", tick=True)
+def test_export_all_default_date_range(client):
+    """ Date range in the export  form is the current week. (from
+    monday to friday)
+    """
+    client.login_admin()
+
+    export = client.get('/resources/export-all')
+
+    start = export.form['start']
+    end = export.form['end']
+
+    actual_start_date = datetime.strptime(start.value__get(), '%Y-%m-%d')
+    assert actual_start_date == datetime(2022, 9, 7, 0, 0)
+    actual_end_date = datetime.strptime(end.value__get(), '%Y-%m-%d')
+    assert actual_end_date == datetime(2022, 9, 9, 0, 0)
+
+
+@freeze_time("2022-09-05", tick=True)
+def test_export_all_default_date_range_from_start_of_week(client):
+    client.login_admin()
+    export = client.get('/resources/export-all')
+    start = export.form['start']
+    end = export.form['end']
+
+    actual_start_date = datetime.strptime(start.value__get(), '%Y-%m-%d')
+    assert actual_start_date == datetime(2022, 9, 5, 0, 0)
+    actual_end_date = datetime.strptime(end.value__get(), '%Y-%m-%d')
+    assert actual_end_date == datetime(2022, 9, 9, 0, 0)
+
+
+@freeze_time("2022-09-09", tick=True)
+def test_export_all_default_date_range_from_end_of_week(client):
+    client.login_admin()
+    export = client.get('/resources/export-all')
+    start = export.form['start']
+    end = export.form['end']
+
+    actual_start_date = datetime.strptime(start.value__get(), '%Y-%m-%d')
+    assert actual_start_date == datetime(2022, 9, 9, 0, 0)
+    actual_end_date = datetime.strptime(end.value__get(), '%Y-%m-%d')
+    assert actual_end_date == datetime(2022, 9, 9, 0, 0)
 
 
 @freeze_time("2023-08-28", tick=True)
@@ -1872,7 +1900,6 @@ def test_reserve_failing_multiple(client):
 
 
 def test_cleanup_allocations(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1909,7 +1936,6 @@ def test_cleanup_allocations(client):
 
 @freeze_time("2017-07-09", tick=True)
 def test_manual_reservation_payment_with_extra(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -1976,7 +2002,6 @@ def test_manual_reservation_payment_with_extra(client):
 
 @freeze_time("2017-07-09", tick=True)
 def test_manual_reservation_payment_without_extra(client):
-
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
