@@ -799,7 +799,9 @@ def view_export_all(self, request, form, layout=None):
 
         form.start.data, form.end.data = datetime.now().date(), friday
 
-    return {'layout': layout, 'title': _("Export"), 'form': form,
+    return {'layout': layout,
+            'title': _("Export"),
+            'form': form,
             'explanation': _("Exports the reservations of all resources in"
                              " a given date range.")}
 
