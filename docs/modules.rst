@@ -52,7 +52,7 @@ This is how this hierarchy looks like:
                                │
                        ┌───────────────┐
                        │               │  ◇─┐
-                       │  onegov.town  │    │ an application
+                       │ onegov.town6  │    │ an application
                        │               │  ◇─┘
                        └───────────────┘
             ┌──────────────────┼──────────────────┐
@@ -342,4 +342,4 @@ layer.
 .. toctree::
     :maxdepth: 2
 
-    onegov_town
+    onegov_town6

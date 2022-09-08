@@ -33,7 +33,7 @@ For example:
 
     * ``/foo/bar``
     * ``/onegov_election_day/gr``
-    * ``/onegov_town/govikon``
+    * ``/onegov_town6/govikon``
 
 To select non-wildcard applications we can just omit the id:
 

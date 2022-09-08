@@ -157,8 +157,8 @@ def transfer(group_context,
     So if you have a 'cities' namespace locally and a 'towns' namespace on
     the remote, nothing will happen.
 
-    It's also possible to transfer only a given schema, e.g. '/town/govikon' or
-    '/town/*'. But beware, global files are copied in any case!
+    It's also possible to transfer only a given schema, e.g. '/town6/govikon'
+    or '/town6/*'. But beware, global files are copied in any case!
 
     WARNING: This may delete local content!
 

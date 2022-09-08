@@ -213,8 +213,9 @@ class ChameleonLayout(Layout):
 
     @cached_property
     def base(self):
-        """ Returns the layout, which defines the base layout of all town
-        pages. See ``templates/layout.pt``.
+        """ Returns the layout, which defines the base layout of all pages.
+
+        See ``templates/layout.pt``.
 
         """
         return self.template_loader['layout.pt']
