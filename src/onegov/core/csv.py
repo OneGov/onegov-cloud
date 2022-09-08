@@ -520,6 +520,14 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
 def convert_list_of_dicts_to_xlsx_names(rows, fields=None, key=None,
                                         title=None, reverse=False):
+    """ Takes a list of dictionaries and creates a xlsx. It then returns the
+    path to that xlsx file.
+
+    This behaves similar to :func:`convert_list_of_dicts_to_xlsx`, with two
+    differences: We are returning the path (rather than the file) and
+    the file extension .xlsx is added.
+
+    """
     with tempfile.NamedTemporaryFile() as file:
 
         file.name = file.name.replace(basename(file.name), title)
