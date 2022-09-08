@@ -570,7 +570,6 @@ def merge_multiple_excel_files_into_one(xlsx_files):
     :param xlsx_files: list of filenames
     :returns:
         - name - Name of the in-memory file
-        - file - The contents of the file
     """
 
     def copy_sheet(source_sheet: Worksheet, target_sheet: Worksheet):
@@ -719,10 +718,10 @@ def match_headers(headers, expected):
         raise errors.DuplicateColumnNamesError()
 
     # we calculate a 'sane' levenshtein distance by comparing the
-    # the distances between all headers, permutations, as well as the lengths
+    # distances between all headers, permutations, as well as the lengths
     # of all expected headers. This makes sure we don't end up with matches
     # that make no sense (like ['first', 'second'] matching ['first', 'third'])
-    sane_distance = getattr(sys, 'maxsize', 0) or sys.maxint
+    sane_distance = getattr(sys, 'maxsize', 0) or sys.maxsize
 
     if len(headers) > 1:
         sane_distance = min((
