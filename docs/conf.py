@@ -41,7 +41,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
-    'alabaster'
+    'alabaster',
+    'autoapi.extension'
 ]
 
 intersphinx_mapping = {
@@ -49,6 +50,9 @@ intersphinx_mapping = {
 }
 
 autodoc_member_order = 'bysource'
+
+autoapi_type = 'python'
+autoapi_dirs = ['../src/onegov']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

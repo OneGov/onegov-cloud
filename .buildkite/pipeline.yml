@@ -67,7 +67,8 @@ steps:
       CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
       CONTAINER_TEST_SCRIPT: ".buildkite/docs"
 
-    branches: "master"
+    # todo: uncomment before merging!
+    # branches: "master"
 
   - wait
 

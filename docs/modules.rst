@@ -79,24 +79,12 @@ web-applications this one should be proxied behind Nginx or Apache2.
 
 OneGov server does not depend on any other OneGov module.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_server
-
-
 OneGov Core
 ^^^^^^^^^^^
 
 Contains functionality shared between all the other OneGov modules, with the
 exception of OneGov Server, which may not depend on the core. In many ways
 this *is* the OneGov Cloud framework.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_core
-
 
 Supporting Modules
 ------------------
@@ -106,45 +94,21 @@ OneGov Activity
 
 Contains the model representing youth activites for Pro Juventute.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_activity
-
-
 OneGov Ballot
 ^^^^^^^^^^^^^
 
 Contains a model representing elections/votes in Switzerland.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_ballot
-
 
 OneGov Event
 ^^^^^^^^^^^^
 
 A simple event (concert, meetup, party) system for OneGov Cloud.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_event
-
-
 OneGov File
 ^^^^^^^^^^^
 
 Provides a way to store and serve files tied to the database and bound to
 the transaction.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_file
-
 
 OneGov Form
 ^^^^^^^^^^^
@@ -153,22 +117,10 @@ Integrates the form library WTForms with OneGov and provides useful
 functionality related to that. May generate HTML, but won't offer any
 UI as such.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_form
-
-
 OneGov Foundation
 ^^^^^^^^^^^^^^^^^
 
 Provides the Zurb Foundation theme for OneGov in an extendable fashion.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_foundation
-
 
 OneGov Gis
 ^^^^^^^^^^
@@ -176,23 +128,11 @@ OneGov Gis
 Contains models, methods and Javascript to use, work with and display maps and
 coordinates.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_gis
-
-
 OneGov Newsletter
 ^^^^^^^^^^^^^^^^^
 
 Contains models to handle the sending of newsletters and the managing of
 subscribers/recipients.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_newsletter
-
 
 OneGov Page
 ^^^^^^^^^^^
@@ -200,33 +140,15 @@ OneGov Page
 Provides functionality to manage custom pages used by OneGov Town. Does not
 provide a UI.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_page
-
-
 OneGov People
 ^^^^^^^^^^^^^
 
 Provides functionality to manage people. Does not provide a UI.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_people
-
-
 OneGov Recipient
 ^^^^^^^^^^^^^^^^
 
 A generic implementation of e-mail/sms/url recipients backed by the database.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_recipient
-
 
 OneGov Reservation
 ^^^^^^^^^^^^^^^^^^
@@ -235,56 +157,26 @@ Libres integration for OneGov Cloud. Libres is a python library to reserve stuff
 
 `Libres Documentation <https://libres.readthedocs.org/en/latest/>`_
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_reservation
-
-
 OneGov Search
 ^^^^^^^^^^^^^
 
 Elasticsearch integration for OneGov Cloud.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_search
-
 
 OneGov Shared
 ^^^^^^^^^^^^^
 
 Assets and other things shared between multiple OneGov applications.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_shared
-
-
 OneGov Ticket
 ^^^^^^^^^^^^^
 
 A simple ticketing system for OneGov.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_ticket
-
 
 
 OneGov User
 ^^^^^^^^^^^
 
 Providers user management without any UI.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_user
-
 
 Base Applications
 -----------------
@@ -296,12 +188,6 @@ Provides a base for applications written for organizations close to the
 government. For example, municipalities, youth organizations, elderly care,
 and so on.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_org
-
-
 Applications
 ------------
 
@@ -311,23 +197,11 @@ OneGov Election Day
 Shows Swiss election/voting results in an archive and as they come in during
 voting day.
 
-.. toctree::
-    :maxdepth: 2
-
-    onegov_election_day
-
-
 OneGov Feriennet
 ^^^^^^^^^^^^^^^^
 
 Developed for Pro Juventute, this specialised organisation website helps to
 organise summer activites for Switzerland's youth.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_feriennet
-
 
 OneGov Town
 ^^^^^^^^^^^
@@ -338,8 +212,3 @@ functionality of other OneGov modules and renders them.
 OneGov Town tries to implement features itself when necessary. It's main
 concern is rendering JSON/HTML. Therefore it should be considered the UI
 layer.
-
-.. toctree::
-    :maxdepth: 2
-
-    onegov_town
