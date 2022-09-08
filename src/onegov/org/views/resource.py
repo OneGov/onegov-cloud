@@ -767,9 +767,18 @@ def view_export_all(self, request, form, layout=None):
             request.alert(_("No reservations found for the given date range."))
             return request.redirect(request.url)
 
-        return form.as_multiple_export_response(results=all_results,
-                                                titles=all_titles,
-                                                keys=all_field_order)
+        return Response(
+            form.as_multiple_export_response(results=all_results,
+                                             titles=all_titles,
+                                             keys=all_field_order),
+            content_type=(
+                'application/vnd.openxmlformats'
+                '-officedocument.spreadsheetml.sheet'
+            ),
+            content_disposition='inline; filename={}'.format(
+                'all-resources-export'
+            )
+        )
 
     if request.method == 'GET':
 

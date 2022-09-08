@@ -1,4 +1,3 @@
-from morepath.request import Response
 from datetime import date, time, timedelta
 from functools import cached_property
 from onegov.form import Form
@@ -186,13 +185,4 @@ class ExportToExcelWorksheets(Form):
         absolute_path = merge_multiple_excel_files_into_one(xlsx_files)
 
         with open(absolute_path, mode="rb") as f:
-            return Response(
-                f.read(),
-                content_type=(
-                    'application/vnd.openxmlformats'
-                    '-officedocument.spreadsheetml.sheet'
-                ),
-                content_disposition='inline; filename={}'.format(
-                    'all-resources-export'
-                )
-            )
+            return f.read()
