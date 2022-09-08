@@ -3,10 +3,11 @@ from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import DateRangeForm, ExportToExcelWorksheets
+from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentMethodForm
-from onegov.org.forms.reservation import RESERVED_FIELDS
+from onegov.org.forms.reservation import RESERVED_FIELDS,\
+    ExportToExcelWorksheets
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField

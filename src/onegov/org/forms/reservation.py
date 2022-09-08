@@ -1,3 +1,4 @@
+from morepath.request import Response
 from datetime import date, time, timedelta
 from functools import cached_property
 from onegov.form import Form
@@ -10,7 +11,8 @@ from wtforms.fields import RadioField
 from wtforms.validators import DataRequired, Email, InputRequired
 
 from .allocation import WEEKDAYS
-
+from ...core.csv import convert_list_of_dicts_to_xlsx_names,\
+    merge_multiple_excel_files_into_one
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition
@@ -18,7 +20,6 @@ RESERVED_FIELDS = ['email']
 
 
 class ReservationForm(Form):
-
     reserved_fields = RESERVED_FIELDS
 
     email = EmailField(
@@ -28,7 +29,6 @@ class ReservationForm(Form):
 
 
 class FindYourSpotForm(Form):
-
     start = DateField(
         label=_("From"),
         validators=[InputRequired()])
@@ -167,3 +167,32 @@ class FindYourSpotForm(Form):
             if start <= date <= end:
                 return True
         return False
+
+
+class ExportToExcelWorksheets(Form):
+    """ A form providing the export of multiple reservations into Worksheets
+    """
+
+    @property
+    def format(self):
+        return 'xlsx'
+
+    def as_multiple_export_response(self, keys, results, titles):
+        xlsx_files = [convert_list_of_dicts_to_xlsx_names(result,
+                                                          key=key,
+                                                          title=title)
+                      for key, result, title in zip(keys, results, titles)]
+
+        absolute_path = merge_multiple_excel_files_into_one(xlsx_files)
+
+        with open(absolute_path, mode="rb") as f:
+            return Response(
+                f.read(),
+                content_type=(
+                    'application/vnd.openxmlformats'
+                    '-officedocument.spreadsheetml.sheet'
+                ),
+                content_disposition='inline; filename={}'.format(
+                    'all-resources-export'
+                )
+            )

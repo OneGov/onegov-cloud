@@ -786,7 +786,6 @@ def view_export_all(self, request, form, layout=None):
                 yield date
                 date += one_day
 
-        # monday = list(get_week(datetime.now().date()))[1]
         friday = list(get_week(datetime.now().date()))[5]
 
         form.start.data, form.end.data = datetime.now().date(), friday
