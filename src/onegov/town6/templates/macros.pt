@@ -2139,7 +2139,7 @@
               </tal:b>
           </td>
           <td class="ticket-date">
-              ${layout.format_date(ticket.created, 'relative')}
+              ${layout.format_date(ticket.created, 'datetime')}
           </td>
           <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
               <a class="ticket-accept ticket-button button small success" href="${request.link(ticket, 'accept')}" i18n:translate>
