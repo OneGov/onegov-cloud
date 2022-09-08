@@ -1354,6 +1354,10 @@ class ResourcesLayout(DefaultLayout):
                         )
                     ]
                 ),
+                Link(
+                    text=_("Export All"),
+                    url=self.request.link(self.model, name="export-all"),
+                ),
             ]
 
 
