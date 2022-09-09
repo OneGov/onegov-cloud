@@ -223,12 +223,6 @@ configuration: &global-config
 # All supported applications
 applications:
 
-  - path: /onegov_town/*
-    application: onegov.town.TownApp
-    namespace: onegov_town
-    configuration:
-      <<: *global-config
-
   - path: /onegov_town6/*
     application: onegov.town6.TownApp
     namespace: onegov_town6
@@ -316,7 +310,7 @@ applications:
 
       onboarding:
         onegov.town6:
-          namespace: onegov_town
+          namespace: onegov_town6
           domain: onegov.test
           configuration:
             depot_backend: depot.io.local.LocalFileStorage

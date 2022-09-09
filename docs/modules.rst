@@ -52,7 +52,7 @@ This is how this hierarchy looks like:
                                │
                        ┌───────────────┐
                        │               │  ◇─┐
-                       │  onegov.town  │    │ an application
+                       │ onegov.town6  │    │ an application
                        │               │  ◇─┘
                        └───────────────┘
             ┌──────────────────┼──────────────────┐

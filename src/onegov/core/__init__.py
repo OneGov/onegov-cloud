@@ -62,7 +62,6 @@ LEVELS = (
         'onegov.onboarding',
         'onegov.org',
         'onegov.swissvotes',
-        'onegov.town',
         'onegov.town6',
         'onegov.translator_directory',
         'onegov.winterthur',

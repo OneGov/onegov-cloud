@@ -21,7 +21,7 @@ def clear(dry_run):
 
     Example:
 
-        onegov-people --select '/town/govikon' clear
+        onegov-people --select '/org/govikon' clear
 
     """
 
@@ -75,7 +75,7 @@ def export_xlsx(filename):
 
     Example:
 
-        onegov-people --select '/town/govikon' export people.xlsx
+        onegov-people --select '/org/govikon' export people.xlsx
 
     """
 
@@ -111,7 +111,7 @@ def import_xlsx(file):
 
     Example:
 
-        onegov-people --select '/town/govikon' import people.xlsx
+        onegov-people --select '/org/govikon' import people.xlsx
 
     """
 

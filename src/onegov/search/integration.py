@@ -354,7 +354,7 @@ class ElasticsearchApp(morepath.App):
         self.es_configure_client(usage='reindex')
         self.es_indexer.ixmgr.created_indices = set()
 
-        # delete all existing indices for this town
+        # delete all existing indices
         ixs = self.es_indexer.ixmgr.get_managed_indices_wildcard(self.schema)
         self.es_client.indices.delete(index=ixs)
 
