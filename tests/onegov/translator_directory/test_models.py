@@ -183,6 +183,8 @@ def test_translator_mutation(session):
         'spoken_languages': [],
         'written_languages': [str(l.id) for l in languages[1:2]],
         'monitoring_languages': [str(l.id) for l in languages[0:1]],
+        'profession': 'salesman',
+        'occupation': 'lecturer',
         'expertise_professional_guilds': (
             'internation_relations',
             'law_insurance'
@@ -352,7 +354,11 @@ def test_translator_mutation(session):
             '_German',
             [str(l.id) for l in languages[0:1]]
         ),
-        'zip_code': ('_Zip Code', '8000', '8000')
+        'zip_code': ('_Zip Code', '8000', '8000'),
+        'profession': ('_Learned profession', 'salesman', 'salesman'),
+        'occupation': (
+            '_Current professional activity', 'lecturer', 'lecturer'
+        )
     }
 
     changes = set(mutation.changes)
@@ -394,6 +400,8 @@ def test_translator_mutation(session):
     assert translator.spoken_languages == []
     assert translator.written_languages == languages[1:2]
     assert translator.monitoring_languages == languages[0:1]
+    assert translator.profession == 'salesman'
+    assert translator.occupation == 'lecturer'
     assert translator.expertise_professional_guilds == [
         'internation_relations',
         'law_insurance'
