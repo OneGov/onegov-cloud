@@ -17,6 +17,7 @@ LINK: <Ticket-Number>
     - [ ] I have tested styling changes/features on different browsers
     - [ ] I have tested javascript changes/features on different browsers
     - [ ] I have tested database upgrades
+    - [ ] I have tested sending mails
     - [ ] I have tested building the documentation
 - [ ] I have added tests for my changes/features
     - [ ] I considered using browser tests für javascript changes/features
