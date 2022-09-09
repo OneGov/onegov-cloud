@@ -35,7 +35,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     title = Column(Text, nullable=False)
 
     #: the type of the fileset, this can be used to create custom polymorphic
-    #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
+    #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
     #:
     #: this is independent from the :attr:`onegov.file.models.File.type`

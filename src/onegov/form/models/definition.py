@@ -40,7 +40,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     checksum = Column(Text, nullable=False)
 
     #: the type of the form, this can be used to create custom polymorphic
-    #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
+    #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
     type = Column(Text, nullable=False, default=lambda: 'generic')
 

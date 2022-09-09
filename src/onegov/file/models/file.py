@@ -74,7 +74,7 @@ class SearchableFile(ORMSearchable):
 class File(Base, Associable, TimestampMixin):
     """ A general file (image, document, pdf, etc), referenced in the database.
 
-    Thanks to the use of `Depot <http://depot.readthedocs.io>`_ files
+    Thanks to the use of `Depot <https://depot.readthedocs.io>`_ files
     can be seemingly stored in the database (with transaction guarantees),
     without actually storing it in the database.
 
@@ -128,7 +128,7 @@ class File(Base, Associable, TimestampMixin):
     signature_metadata = deferred(Column(JSON, nullable=True))
 
     #: the type of the file, this can be used to create custom polymorphic
-    #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
+    #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
     #:
     #: not to be confused with the the actual filetype which is stored

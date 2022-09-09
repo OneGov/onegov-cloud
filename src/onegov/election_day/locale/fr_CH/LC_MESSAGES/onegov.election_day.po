@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-10 16:20+0200\n"
+"POT-Creation-Date: 2022-09-02 11:11+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -227,7 +227,7 @@ msgid "Term"
 msgstr "Terme de recherche"
 
 msgid ""
-"Searches the title of the election/vote. Use Wilcards (*) to find more "
+"Searches the title of the election/vote. Use Wildcards (*) to find more "
 "results, e.g Nationalrat*."
 msgstr ""
 "Recherche le titre de l'élection ou de la votation. Utilisez des caractères "
@@ -601,6 +601,9 @@ msgstr "Titre de le contre-projet"
 msgid "Title of the tie breaker"
 msgstr "Titre de le jeu décisif"
 
+msgid "Link to homepage"
+msgstr "Lien vers la page d'accueil"
+
 msgid "Lists"
 msgstr "Listes"
 
@@ -733,6 +736,9 @@ msgstr "Quartiers"
 msgid "Last change"
 msgstr "Actualisé"
 
+msgid "Archive"
+msgstr "Archive"
+
 msgid "Elections &amp; Votes"
 msgstr "Elections et votations: données ouvertes"
 
@@ -742,9 +748,6 @@ msgstr "Il n'y a pas de élections ou votations définis actuellement."
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Elections et votes sur ${date}"
-
-msgid "Archive"
-msgstr "Archive"
 
 msgid "Federal Elections"
 msgstr "Elections fédéraux"
@@ -796,6 +799,9 @@ msgstr "Recherche dans les archives"
 
 msgid "Search in ${title}"
 msgstr "Recherche dans ${title}"
+
+msgid "Search results"
+msgstr "Résultats de la recherche"
 
 msgid "Found ${item_count} items."
 msgstr "${item_count} entrées trouvés."
@@ -855,19 +861,25 @@ msgstr ""
 "correspondante. Le résultat de cette opération est le nombre d'électeurs."
 
 msgid "The file is invalid."
-msgstr ""
+msgstr "Ce fichier n'est pas valide."
 
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés."
 
-#.
-#. Default: Start
-msgid "homepage"
+msgid "Homepage"
 msgstr "Page d'accueil"
 
-msgid "Logo: Link to homepage"
-msgstr "Logo : Lien vers la page d'accueil"
+msgid "Content"
+msgstr "Contenu"
+
+msgid "Sitemap"
+msgstr "Sitemap"
+
+#. Default: Start
+#.
+msgid "homepage"
+msgstr "Page d'accueil"
 
 msgid "Footer"
 msgstr "Pied de page"
@@ -1046,6 +1058,9 @@ msgstr "Soumettre"
 
 msgid "Previous Page"
 msgstr "Page précédente"
+
+msgid "(active)"
+msgstr "(actif)"
 
 msgid "Next Page"
 msgstr "Page suivante"
@@ -1723,3 +1738,9 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Logo ${layout.principal.name}: Link to homepage"
+#~ msgstr "Logo ${layout.principal.name}: Lien vers la page d'accueil"
+
+#~ msgid "Logo: Link to homepage"
+#~ msgstr "Logo : Lien vers la page d'accueil"

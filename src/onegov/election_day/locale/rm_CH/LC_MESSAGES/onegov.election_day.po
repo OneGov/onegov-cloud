@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-10 16:20+0200\n"
+"POT-Creation-Date: 2022-09-02 11:11+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -228,10 +228,10 @@ msgid "Term"
 msgstr "Noziun tschertgada"
 
 msgid ""
-"Searches the title of the election/vote. Use Wilcards (*) to find more "
+"Searches the title of the election/vote. Use Wildcards (*) to find more "
 "results, e.g Nationalrat*."
 msgstr ""
-"Tschertga en il titel da l'elecziun u da la votaziun. Utilisai wildcards (*) "
+"Tschertga en il titel da l'elecziun u da la votaziun. Utilisai Wildcards (*) "
 "per survegnir dapli resultats, p.ex. scola*."
 
 msgid "From date"
@@ -604,6 +604,9 @@ msgstr "Titel da la cuntraproposta"
 msgid "Title of the tie breaker"
 msgstr "Titel da la dumonda decisiva"
 
+msgid "Link to homepage"
+msgstr "Link a la pagina iniziala"
+
 msgid "Lists"
 msgstr "Glistas"
 
@@ -736,6 +739,9 @@ msgstr "Quartiers"
 msgid "Last change"
 msgstr "Actualisà"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
 
@@ -745,9 +751,6 @@ msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Votaziun dals ${date}"
-
-msgid "Archive"
-msgstr "Archiv"
 
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
@@ -800,6 +803,9 @@ msgstr "Tschertga en l'archiv"
 msgid "Search in ${title}"
 msgstr "­Tschertgar en ${title}"
 
+msgid "Search results"
+msgstr "Resultats da tschertga"
+
 msgid "Found ${item_count} items."
 msgstr "${item_count} resultats."
 
@@ -810,7 +816,7 @@ msgid "No candidacies."
 msgstr "Naginas candidaturas."
 
 msgid "Download diagram"
-msgstr ""
+msgstr "Telechargiar il diagram"
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -865,13 +871,19 @@ msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
-#.
-#. Default: Start
-msgid "homepage"
+msgid "Homepage"
 msgstr "Pagina iniziala"
 
-msgid "Logo: Link to homepage"
-msgstr "Logo: Link a la pagina iniziala"
+msgid "Content"
+msgstr "Cuntegn"
+
+msgid "Sitemap"
+msgstr "Sitemap"
+
+#. Default: Start
+#.
+msgid "homepage"
+msgstr "Pagina iniziala"
 
 msgid "Footer"
 msgstr "Pe-pagina"
@@ -1050,6 +1062,9 @@ msgstr "Trametter"
 
 msgid "Previous Page"
 msgstr "Pagina precedenta"
+
+msgid "(active)"
+msgstr "(activ)"
 
 msgid "Next Page"
 msgstr "Proxima pagina"
@@ -1734,3 +1749,9 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Logo ${layout.principal.name}: Link to homepage"
+#~ msgstr "Logo ${layout.principal.name}: Colliaziun a la homepage"
+
+#~ msgid "Logo: Link to homepage"
+#~ msgstr "Logo: Link a la pagina iniziala"

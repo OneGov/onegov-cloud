@@ -31,10 +31,6 @@ install-packages \
     libxss1 \
     xdg-utils
 
-echo "$(redis-server --version)"
-echo "$(psql --version)"
-echo "$(java --version)"
-
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 dpkg -i google-chrome-stable_current_amd64.deb
 
@@ -46,6 +42,12 @@ redis-server --daemonize yes
 
 # this needs to be set on Google Cloud for unknown reasons
 echo '127.0.0.1 localhost' >> /etc/hosts
+
+echo "$(redis-server --version)"
+echo "$(psql --version)"
+echo "$(java --version)"
+
+echo "--- Creating virtual environment"
 
 # switch to virtual environment
 cd /app

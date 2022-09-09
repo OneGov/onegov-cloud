@@ -113,7 +113,8 @@ def view_news(self, request, layout=None):
         else:
             siblings = request.exclude_invisible(query.all())
 
-        siblings.remove(self)
+        if self in siblings:
+            siblings.remove(self)
         siblings = siblings[0:3]
 
     if request.is_manager:

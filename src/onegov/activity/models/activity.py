@@ -12,7 +12,6 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey
-from sqlalchemy import event
 from sqlalchemy import exists, and_, desc
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
@@ -184,17 +183,3 @@ class Activity(Base, ContentMixin, TimestampMixin):
         )
 
         return q.scalar()
-
-
-@event.listens_for(Activity.__table__, 'after_create')
-def receive_after_create(target, connection, **kw):
-    # we need as specialised aggregate function for the active_days column
-    # usually we wouldn't create our query using format, but sqlalchemy is
-    # not able to correctly create this statement and the schema is not
-    # user defined (and if it is, it's ensured to only have safe characters)
-    connection.execute(
-        'CREATE AGGREGATE "{}".array_cat_agg(anyarray) '
-        '(SFUNC=array_cat, STYPE=anyarray)'.format(
-            connection._execution_options['schema']
-        )
-    )

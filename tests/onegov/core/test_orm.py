@@ -1793,7 +1793,7 @@ def test_selectable_sql_query(session):
                 stmt.c.table_name == 'pg_group',
                 stmt.c.is_updatable == True
             )
-        )
+        ).order_by(stmt.c.column_name)
     ).fetchall()
 
     assert columns == [('groname', ), ('grosysid', )]

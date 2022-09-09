@@ -33,7 +33,7 @@ For example:
 
     * ``/foo/bar``
     * ``/onegov_election_day/gr``
-    * ``/onegov_town/govikon``
+    * ``/onegov_town6/govikon``
 
 To select non-wildcard applications we can just omit the id:
 
@@ -477,7 +477,7 @@ def command_group():
     """ Generates a click command group for individual modules.
 
     Each individual module may have its own command group from which to run
-    commands to. Read `<http://click.pocoo.org/6/commands/>`_ to learn more
+    commands to. Read `<https://click.pocoo.org/6/commands/>`_ to learn more
     about command groups.
 
     The returned command group will provide the individual commands with

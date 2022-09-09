@@ -386,6 +386,9 @@ def get_custom_asset():
     # Embedded tables as widgets
     yield 'embedded_widgets.js'
 
+    # Form
+    yield 'error-focus.js'
+
 
 @ElectionDayApp.webasset('backend_common')
 def get_backend_common_asset():

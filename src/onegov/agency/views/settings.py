@@ -16,8 +16,8 @@ class AgencySettingsForm(Form):
     topmost_levels = 1, 2, 3
 
     pdf_layout = RadioField(
-        label=_("PDF Layout"),
-        fieldset=_("Layout"),
+        label=_("PDF Design"),
+        fieldset=_("PDF Layout"),
         default='default',
         choices=[
             ('default', _("Default")),
@@ -29,7 +29,7 @@ class AgencySettingsForm(Form):
 
     root_pdf_page_break = RadioField(
         label=_('For root PDF, page after every:'),
-        fieldset=_("Layout"),
+        fieldset=_("PDF Layout"),
         choices=[
             ('1', _("1 Heading")),
             ('2', _("1.1 Heading")),
@@ -40,7 +40,7 @@ class AgencySettingsForm(Form):
 
     orga_pdf_page_break = RadioField(
         label=_("For organisation PDF's, page after every:"),
-        fieldset=_("Layout"),
+        fieldset=_("PDF Layout"),
         choices=[
             ('1', _("1 Heading")),
             ('2', _("1.1 Heading")),
@@ -51,12 +51,22 @@ class AgencySettingsForm(Form):
 
     link_color = ColorField(
         label=_('PDF link color'),
-        fieldset=_("Layout")
+        fieldset=_("PDF Layout")
     )
 
     underline_links = BooleanField(
         label=_("Underline pdf links"),
-        fieldset=_("Layout")
+        fieldset=_("PDF Layout")
+    )
+
+    agency_map = RadioField(
+        label=_("Map for Agency Adresses"),
+        fieldset=_("Map"),
+        default='default',
+        choices=[
+            ('default', _("Default")),
+            ('bs', "Kanton Basel-Stadt"),
+        ],
     )
 
     agency_display = ChosenSelectMultipleField(
@@ -113,6 +123,7 @@ class AgencySettingsForm(Form):
     def process_obj(self, obj):
         super().process_obj(obj)
         self.pdf_layout.data = obj.pdf_layout or 'default'
+        self.agency_map.data = obj.agency_map or 'default'
         self.root_pdf_page_break.data = str(
             obj.page_break_on_level_root_pdf or 1)
         self.orga_pdf_page_break.data = str(
@@ -136,6 +147,7 @@ class AgencySettingsForm(Form):
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
         obj.pdf_layout = self.pdf_layout.data
+        obj.agency_map = self.agency_map.data
         obj.report_changes = self.report_changes.data
         obj.page_break_on_level_root_pdf = int(self.root_pdf_page_break.data)
         obj.page_break_on_level_org_pdf = int(self.orga_pdf_page_break.data)

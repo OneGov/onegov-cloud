@@ -77,7 +77,7 @@ def sanitize_html(html):
 
     """
 
-    return cleaner.clean(html)
+    return cleaner.clean(html or '')
 
 
 def sanitize_svg(svg):

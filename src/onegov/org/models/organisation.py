@@ -36,6 +36,7 @@ class Organisation(Base, TimestampMixin):
     meta = Column(JSON, nullable=True, default=dict)
 
     # meta bound values
+    custom_css = meta_property()
     contact = meta_property()
     contact_url = meta_property()
     opening_hours = meta_property()
@@ -120,6 +121,9 @@ class Organisation(Base, TimestampMixin):
     pdf_layout = meta_property()
     pdf_link_color = meta_property()
     pdf_underline_links = meta_property(default=False)
+
+    # Map for agency adresses
+    agency_map = meta_property()
 
     # break points of pages after title of level x, type integer
     page_break_on_level_root_pdf = meta_property()

@@ -23,7 +23,10 @@ class EmailSubscriptionForm(Form):
             InputRequired(),
             Email()
         ],
-        render_kw={'autocomplete': 'email'}
+        render_kw={
+            'autocomplete': 'email',
+            'aria-describedby': 'email-error',
+        }
     )
 
     name = HoneyPotField()
@@ -37,7 +40,10 @@ class SmsSubscriptionForm(Form):
         validators=[
             InputRequired(),
         ],
-        render_kw={'autocomplete': 'tel'}
+        render_kw={
+            'autocomplete': 'tel',
+            'aria-describedby': 'phone_number-error',
+        }
     )
 
     name = HoneyPotField()

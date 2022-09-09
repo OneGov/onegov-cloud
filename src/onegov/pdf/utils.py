@@ -1,7 +1,7 @@
 from pdftotext import PDF
 
 
-def extract_pdf_info(content):
+def extract_pdf_info(content, remove='\0'):
     """ Extracts the number of pages and text from a PDF.
 
     Requires poppler.
@@ -12,4 +12,10 @@ def extract_pdf_info(content):
         pass
 
     pages = PDF(content)
-    return len(pages), '\n'.join(pages).strip(' \t\r\n').replace('\0', '')
+
+    def clean(text):
+        for character in remove:
+            text = text.replace(character, '')
+        return ' '.join(text.split())
+
+    return (len(pages), ' '.join(clean(page) for page in pages).strip())
