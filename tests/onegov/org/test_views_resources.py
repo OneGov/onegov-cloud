@@ -1285,7 +1285,7 @@ def test_reservation_export_view(client):
 
 @freeze_time("2022-09-07", tick=True)
 def test_export_all_default_date_range(client):
-    """ Date range in the export  form is the current week. (from
+    """ Date range in the export form is the current week. (from
     monday to friday)
     """
     client.login_admin()
@@ -1391,11 +1391,9 @@ def test_reservation_export_all_view(client):
     export.form['end'] = date(2023, 8, 28)
 
     response = export.form.submit()
-    from onegov.core.framework import log
     with tempfile.NamedTemporaryFile(suffix='.xlsx') as tmp:
         tmp.write(response.body)
 
-        log.info(tmp.name)
         wb = load_workbook(Path(tmp.name))
 
         daypass_sheet_name = wb.sheetnames[1]
@@ -1518,8 +1516,6 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
         actual_sheet_name_room = wb.sheetnames[0]
         actual_sheet_name_daypass = wb.sheetnames[1]
         assert duplicate_title[:31] == actual_sheet_name_room.lower()
-        from onegov.core.framework import log
-        log.info(duplicate_title)
         assert duplicate_title[:31] + "1" == actual_sheet_name_daypass.lower()
 
 

@@ -1,7 +1,6 @@
 """ Offers tools to deal with csv (and xls, xlsx) files. """
 
 import codecs
-from os.path import basename
 
 import openpyxl
 import re
@@ -20,7 +19,6 @@ from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors
 from onegov.core.cache import lru_cache
-from pathlib import Path
 from ordered_set import OrderedSet
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
@@ -518,64 +516,13 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
         return file.read()
 
 
-def convert_list_of_dicts_to_xlsx_names(rows, fields=None, key=None,
-                                        title=None, reverse=False):
-    """ Takes a list of dictionaries and creates a xlsx. It then returns the
-    path to that xlsx file.
-
-    This behaves similar to :func:`convert_list_of_dicts_to_xlsx`, with two
-    differences: We are returning the path (rather than the file) and
-    the file extension .xlsx is added.
-
-    """
-    with tempfile.NamedTemporaryFile() as file:
-
-        file.name = file.name.replace(basename(file.name), title)
-        file.name = f"{file.name}.xlsx"
-        workbook = Workbook(file.name, options={'constant_memory': True})
-        cellformat = workbook.add_format({'text_wrap': True})
-
-        worksheet = workbook.add_worksheet()
-
-        fields = fields or get_keys_from_list_of_dicts(rows, key, reverse)
-
-        # write the header
-        worksheet.write_row(0, 0, fields, cellformat)
-
-        # keep track of the maximum character width
-        column_widths = [estimate_width(field) for field in fields]
-
-        def values(row):
-            for ix, field in enumerate(fields):
-                value = row.get(field, '')
-                column_widths[ix] = max(
-                    column_widths[ix],
-                    estimate_width(str(value))
-                )
-
-                if isinstance(value, str):
-                    value = value.replace('\r', '')
-
-                yield value
-
-        # write the rows
-        for r, row in enumerate(rows, start=1):
-            worksheet.write_row(r, 0, values(row), cellformat)
-
-        # set the column widths
-        for col, width in enumerate(column_widths):
-            worksheet.set_column(col, col, width)
-
-        workbook.close()
-        return file.name
-
-
-def merge_multiple_excel_files_into_one(xlsx_files):
+def merge_multiple_excel_files_into_one(xlsx_files, titles):
     """
     Combines multiple xlsx files into a single file, where each Worksheet
     corresponds to a file.
 
-    :param xlsx_files: list of filenames
+    :param xlsx_files: List of file-like objects open in binary mode
+    :param titles: List of the names for each Worksheet.
     :returns:
         - name - Name of the in-memory file
     """
@@ -627,16 +574,13 @@ def merge_multiple_excel_files_into_one(xlsx_files):
             if source_cell.comment:
                 target_cell.comment = copy(source_cell.comment)
 
-    def extract_basename(file_name):
-        return Path(file_name).stem
-
     wb_target = openpyxl.Workbook()
     with tempfile.NamedTemporaryFile() as tmp:
 
-        target_sheets = (wb_target.create_sheet(extract_basename(file_name))
-                         for file_name in xlsx_files)
+        target_sheets = (wb_target.create_sheet(title) for title in titles)
 
-        wb_sources = (openpyxl.load_workbook(file, data_only=True)
+        wb_sources = (openpyxl.load_workbook(filename=BytesIO(file),
+                                             data_only=True)
                       for file in xlsx_files)
 
         source_sheets = (workbook.worksheets[0] for workbook in wb_sources)
@@ -649,14 +593,10 @@ def merge_multiple_excel_files_into_one(xlsx_files):
             wb_target.remove(wb_target['Sheet'])
 
         wb_target.active = 0
-
-        # the suffix is significant:
-        # if ".xlsx" is not added, openpyxl refuses to open the file.
-        tmp.name = f"{tmp.name}.xlsx"
-
         wb_target.save(tmp.name)
 
-        return tmp.name
+        tmp.seek(0)
+        return tmp.read()
 
 
 def parse_header(csv, dialect=None, rename_duplicate_column_names=False):

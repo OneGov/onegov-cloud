@@ -14,7 +14,7 @@ from onegov.core.csv import (
     match_headers,
     merge_multiple_excel_files_into_one,
     normalize_header,
-    parse_header, convert_list_of_dicts_to_xlsx_names,
+    parse_header,
 )
 from onegov.core.errors import (
     AmbiguousColumnsError,
@@ -417,19 +417,16 @@ def test_combine_xlsx_from_multiple_files():
         }
     ]
 
-    xlsx1 = convert_list_of_dicts_to_xlsx_names(data,
-                                                fields=('first_name',
-                                                        'last_name'),
-                                                title="test0")
-    xlsx2 = convert_list_of_dicts_to_xlsx_names(data2,
-                                                fields=('first_name',
-                                                        'last_name'),
-                                                title="test1")
+    xlsx1 = convert_list_of_dicts_to_xlsx(data, fields=('first_name',
+                                                        'last_name'))
+    xlsx2 = convert_list_of_dicts_to_xlsx(data2, fields=('first_name',
+                                                         'last_name'))
 
     input_workbooks = [xlsx1, xlsx2]
-    absolute_path = merge_multiple_excel_files_into_one(input_workbooks)
+    titles = ["test1", "test2"]
+    merged_file = merge_multiple_excel_files_into_one(input_workbooks, titles)
 
-    wb = load_workbook(absolute_path)
+    wb = load_workbook(BytesIO(merged_file), data_only=True)
     assert len(wb.worksheets) == 2
     first_sheet = wb[wb.sheetnames[0]]
     second_sheet = wb[wb.sheetnames[1]]
@@ -459,14 +456,19 @@ def test_merge_multiple_excel_files_into_one():
                                  'fixtures/reservations/')
         return [p for p in filter(Path.is_file, Path(path).iterdir())]
 
-    input_workbooks = xlxs_files_names()
-    absolute_path = merge_multiple_excel_files_into_one(input_workbooks)
+    input_workbooks = []
+    titles = ["data", "data2"]
 
-    wb = load_workbook(absolute_path)
+    for file in xlxs_files_names():
+        with open(file, mode="rb") as f:
+            input_workbooks.append(f.read())
+
+    merged_file = merge_multiple_excel_files_into_one(input_workbooks, titles)
+
+    wb = load_workbook(filename=BytesIO(merged_file), data_only=True)
+
     sheetnames = wb.sheetnames
-
     assert len(sheetnames) == 2
-
     first_sheet = wb[sheetnames[0]]
     second_sheet = wb[sheetnames[1]]
 

@@ -10,8 +10,8 @@ from wtforms.fields import RadioField
 from wtforms.validators import DataRequired, Email, InputRequired
 
 from .allocation import WEEKDAYS
-from ...core.csv import convert_list_of_dicts_to_xlsx_names,\
-    merge_multiple_excel_files_into_one
+from onegov.core.csv import (merge_multiple_excel_files_into_one,
+                             convert_list_of_dicts_to_xlsx)
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition
@@ -177,12 +177,8 @@ class ExportToExcelWorksheets(Form):
         return 'xlsx'
 
     def as_multiple_export_response(self, keys, results, titles):
-        xlsx_files = [convert_list_of_dicts_to_xlsx_names(result,
-                                                          key=key,
-                                                          title=title)
-                      for key, result, title in zip(keys, results, titles)]
 
-        absolute_path = merge_multiple_excel_files_into_one(xlsx_files)
+        xlsx_files = [convert_list_of_dicts_to_xlsx(result, key=key)
+                      for key, result in zip(keys, results)]
 
-        with open(absolute_path, mode="rb") as f:
-            return f.read()
+        return merge_multiple_excel_files_into_one(xlsx_files, titles)

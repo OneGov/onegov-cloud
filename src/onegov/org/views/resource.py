@@ -775,7 +775,7 @@ def view_export_all(self, request, form, layout=None):
                 'application/vnd.openxmlformats'
                 '-officedocument.spreadsheetml.sheet'
             ),
-            content_disposition='inline; filename={}'.format(
+            content_disposition='inline; filename={}.xlsx'.format(
                 'all-resources-export'
             )
         )
