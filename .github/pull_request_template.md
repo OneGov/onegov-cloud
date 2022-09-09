@@ -11,6 +11,7 @@ LINK: <Ticket-Number>
 
 ## Checklist
 
+- [ ] I made changes/features for both org and town6
 - [ ] I have performed a self-review of my code
 - [ ] I considered adding a reviewer
 - [ ] I have tested my code thoroughly by hand
