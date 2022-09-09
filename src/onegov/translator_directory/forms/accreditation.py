@@ -628,6 +628,7 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
                 'availability',
                 'confirm_name_reveal',
                 'education_as_interpreter',
+                'profession',
                 'occupation',
                 'expertise_professional_guilds',
                 'expertise_professional_guilds_other',
@@ -683,7 +684,6 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
             key: data.get(key) for key in (
                 'hometown',
                 'marital_status',
-                'profession',
                 'admission_course_completed',
                 'admission_course_agreement',
                 'remarks',

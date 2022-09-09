@@ -152,6 +152,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     for_admins_only = Column(Boolean, default=False, nullable=False)
 
     # the below might never be used, but we import it if customer wants them
+    profession = Column(Text)
     occupation = Column(Text)
     other_certificates = Column(Text)
 

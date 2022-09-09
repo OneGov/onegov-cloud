@@ -301,6 +301,10 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         choices=[]
     )
 
+    profession = StringField(
+        label=_('Learned profession')
+    )
+
     occupation = StringField(
         label=_('Current professional activity')
     )
@@ -474,6 +478,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.education_as_interpreter = self.education_as_interpreter.data
         model.comments = self.comments.data or None
         model.for_admins_only = self.for_admins_only.data
+        model.profession = self.profession.data
         model.occupation = self.occupation.data
         model.operation_comments = self.operation_comments.data or None
         model.coordinates = self.coordinates.data

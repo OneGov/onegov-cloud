@@ -33,6 +33,7 @@ translator_data = dict(
     tel_office='041 444 44 44',
     tel_private=None,
     availability='always',
+    profession='craftsman',
     occupation='baker',
     operation_comments='',
     confirm_name_reveal=None,
