@@ -1474,14 +1474,15 @@ def test_import_account_statement(client, scenario):
     settings.form.submit()
 
     # Prepare two payments
-    bookings = scenario.session.query(InvoiceItem).all()
+    bookings = scenario.session.query(InvoiceItem)
+    bookings = bookings.order_by(InvoiceItem.group).all()
     assert not all([booking.payment_date for booking in bookings])
     assert not all([booking.tid for booking in bookings])
 
     code_1 = 'Zahlungszweck {}'.format(
-        bookings[1].invoice.references[0].readable)
-    code_2 = 'Zahlungszweck {}'.format(
         bookings[3].invoice.references[0].readable)
+    code_2 = 'Zahlungszweck {}'.format(
+        bookings[0].invoice.references[0].readable)
     xml = generate_xml([
         dict(amount='200.00 CHF', note='no match', valdat='2020-04-23'),
         dict(amount='100.00 CHF', note=code_1, valdat='2020-03-22', tid='TX1'),
