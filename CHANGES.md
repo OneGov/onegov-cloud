@@ -1,8 +1,12 @@
 # Changes
 
+## 2022.47
+
+`2022-09-11` | [73cba7eba1...73cba7eba1](https://github.com/OneGov/onegov-cloud/compare/73cba7eba1^...73cba7eba1)
+
 ## 2022.46
 
-`2022-09-11` | [e6857e75b0...0489204323](https://github.com/OneGov/onegov-cloud/compare/e6857e75b0^...0489204323)
+`2022-09-11` | [e6857e75b0...c697cabe7a](https://github.com/OneGov/onegov-cloud/compare/e6857e75b0^...c697cabe7a)
 
 ### Agency
 
@@ -2173,30 +2177,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ## 2021.99
 
 `2021-12-22` | [6cebe417d2...579dbd0974](https://github.com/OneGov/onegov-cloud/compare/6cebe417d2^...579dbd0974)
-
-## 2021.98
-
-`2021-12-22` | [35e78c3645...34dc2ac0a5](https://github.com/OneGov/onegov-cloud/compare/35e78c3645^...34dc2ac0a5)
-
-### Election Day
-
-##### Add date to screen dropdown menus.
-
-`Feature` | [OGC-173](https://linear.app/onegovcloud/issue/OGC-173) | [663f2c1adc](https://github.com/onegov/onegov-cloud/commit/663f2c1adc83ab30fd6ff6a8666fa7d6c541f4aa)
-
-##### Add screens export.
-
-`Feature` | [OGC-181](https://linear.app/onegovcloud/issue/OGC-181) | [a14f57fb02](https://github.com/onegov/onegov-cloud/commit/a14f57fb021f5dfc66d5235dc3c5a1e2bb786f06)
-
-### Feriennet
-
-##### Update translations.
-
-`Other` | [PRO-946](https://linear.app/projuventute/issue/PRO-946) | [e6efa3e617](https://github.com/onegov/onegov-cloud/commit/e6efa3e61772f1ffea75651d3e8f1e2899f05232)
-
-### Swissvotes
-
-##### Fixes language of attachments not being translate in the search.
-
-`Bugfix` | [92f96dc9bd](https://github.com/onegov/onegov-cloud/commit/92f96dc9bdb112b76caacec81d353cf2a4bda18b)
 
