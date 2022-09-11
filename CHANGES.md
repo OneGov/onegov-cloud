@@ -1,8 +1,76 @@
 # Changes
 
+## 2022.46
+
+`2022-09-11` | [e6857e75b0...0489204323](https://github.com/OneGov/onegov-cloud/compare/e6857e75b0^...0489204323)
+
+### Agency
+
+##### Use secure requests for map integration.
+
+`Bugfix` | [OGC-241](https://linear.app/onegovcloud/issue/OGC-241) | [0ca196bb00](https://github.com/onegov/onegov-cloud/commit/0ca196bb0058b21c481ab51fec2e000e17151cd4)
+
+### Core
+
+##### Fixes documentation not being built.
+
+Also cleanup the documentation.
+
+`Bugfix` | [OGC-481](https://linear.app/onegovcloud/issue/OGC-481) | [46007815bd](https://github.com/onegov/onegov-cloud/commit/46007815bdfebf778546cae8be659374aa75f204)
+
+##### Removes obsolete package from documentation.
+
+`Bugfix` | [OGC-589](https://linear.app/onegovcloud/issue/OGC-589) | [fb904c42d3](https://github.com/onegov/onegov-cloud/commit/fb904c42d33f08f8212215819a666912523f4260)
+
+### Core 
+
+##### Use autoapi for documentation.
+
+`Feature` | [OGC-589](https://linear.app/onegovcloud/issue/OGC-589) | [1a886c594a](https://github.com/onegov/onegov-cloud/commit/1a886c594af0d61883e3316704cb6302d1552b15)
+
+### Feriennet
+
+##### Clarify labels and error messages for QR bill settings.
+
+`Feature` | [PRO-1003](https://linear.app/projuventute/issue/PRO-1003) | [3ec3340d35](https://github.com/onegov/onegov-cloud/commit/3ec3340d3551c0af88ee697c8898b60ba3f9b233)
+
+##### Check if news item is in siblings list
+
+`Bugfix` | [e67d91c886](https://github.com/onegov/onegov-cloud/commit/e67d91c886ed3e25f2d601b0d8269d41e4ec2068)
+
+##### Fixes occasion choices in notification template not being rendered as HTML.
+
+`Bugfix` | [PRO-1079](https://linear.app/projuventute/issue/PRO-1079) | [87ec196dbe](https://github.com/onegov/onegov-cloud/commit/87ec196dbe841c4e70f85bedd24dc200f03ca74e)
+
+##### Make test less flaky.
+
+`Bugfix` | [OGC-587](https://linear.app/onegovcloud/issue/OGC-587) | [72fb109fcd](https://github.com/onegov/onegov-cloud/commit/72fb109fcd5522df35b68f99d5cfc57eddd87e76)
+
+### Pay
+
+##### Allow disabling payment providers.
+
+`Feature` | [PRO-1026](https://linear.app/projuventute/issue/PRO-1026) | [0489204323](https://github.com/onegov/onegov-cloud/commit/0489204323ee2f1759c7ad75d09ae986cfb18108)
+
+### Town
+
+##### Display absolute date instead of relative.
+
+`Feature` | [OGC-576](https://linear.app/onegovcloud/issue/OGC-576) | [baf5c7696c](https://github.com/onegov/onegov-cloud/commit/baf5c7696ce4c7162c0230e39880e2f68ef6d7ef)
+
+##### Remove town package.
+
+`Other` | [OGC-594](https://linear.app/onegovcloud/issue/OGC-594) | [625c802b6a](https://github.com/onegov/onegov-cloud/commit/625c802b6a81051876624f7bad25058c4cd4b348)
+
+### User
+
+##### Revert back to using a string field instead of an email field for logins.
+
+`Bugfix` | [OGC-591](https://linear.app/onegovcloud/issue/OGC-591) | [b4dd0109aa](https://github.com/onegov/onegov-cloud/commit/b4dd0109aa48154f3290e22cf66e7640b023ea57)
+
 ## 2022.45
 
-`2022-09-04` | [bdb747639b...5cdddf291e](https://github.com/OneGov/onegov-cloud/compare/bdb747639b^...5cdddf291e)
+`2022-09-04` | [bdb747639b...711063ad8c](https://github.com/OneGov/onegov-cloud/compare/bdb747639b^...711063ad8c)
 
 ### Pdf
 
@@ -2131,28 +2199,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Fixes language of attachments not being translate in the search.
 
 `Bugfix` | [92f96dc9bd](https://github.com/onegov/onegov-cloud/commit/92f96dc9bdb112b76caacec81d353cf2a4bda18b)
-
-## 2021.97
-
-`2021-12-08` | [b14a8d105b...182ae78670](https://github.com/OneGov/onegov-cloud/compare/b14a8d105b^...182ae78670)
-
-### Election Day
-
-##### Make party panachage view on compounds configurable.
-
-`Feature` | [OGC-165](https://linear.app/onegovcloud/issue/OGC-165) | [09b7462f11](https://github.com/onegov/onegov-cloud/commit/09b7462f1186e49c775b7c4581c49731016a3cd9)
-
-##### Don't show districts for regional elections.
-
-`Other` | [OGC-30](https://linear.app/onegovcloud/issue/OGC-30) | [b14a8d105b](https://github.com/onegov/onegov-cloud/commit/b14a8d105b01e7a5c8845cba31cae26a92d0dbbf)
-
-##### Make aggretaed lists view of election compounds optional. Also add a warning because this view is not meaningful.
-
-`Bugfix` | [OGC-40](https://linear.app/onegovcloud/issue/OGC-40) | [65ec908289](https://github.com/onegov/onegov-cloud/commit/65ec9082899f67bb127063f0f35db67b03ec699f)
-
-### Swissvotes
-
-##### Update full-text search.
-
-`Feature` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [ea8856d556](https://github.com/onegov/onegov-cloud/commit/ea8856d556336482a50499cd8ee45067a4514c04)
 
