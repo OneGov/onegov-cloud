@@ -24,7 +24,7 @@ def view_payment_providers(self, request, layout=None):
     layout = layout or PaymentProviderLayout(self, request)
 
     def links(provider):
-        if not provider.default:
+        if not provider.default and provider.enabled:
             yield Link(
                 _("As default"),
                 request.link(provider, 'default'),
@@ -47,23 +47,59 @@ def view_payment_providers(self, request, layout=None):
             request.link(provider, 'settings'),
         )
 
-        yield Link(
-            _("Delete"),
-            layout.csrf_protected_url(request.link(provider)),
-            traits=(
-                Confirm(
-                    _("Do you really want to delete this provider?"),
-                    _("This cannot be undone."),
-                    _("Delete"),
-                    _("Cancel")
-                ),
-                Intercooler(
-                    request_method='DELETE',
-                    target='#' + provider.id.hex,
-                    redirect_after=request.link(self)
+        if not provider.enabled:
+            yield Link(
+                _("Enable"),
+                request.link(provider, 'enable'),
+                traits=(
+                    Confirm(
+                        _("Should this provider really be enabled?"),
+                        None,
+                        _("Enable"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.link(self)
+                    )
                 )
             )
-        )
+        else:
+            yield Link(
+                _("Disable"),
+                request.link(provider, 'disable'),
+                traits=(
+                    Confirm(
+                        _("Should this provider really be disabled?"),
+                        None,
+                        _("Disable"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=request.link(self)
+                    )
+                )
+            )
+
+        if not provider.payments:
+            yield Link(
+                _("Delete"),
+                layout.csrf_protected_url(request.link(provider)),
+                traits=(
+                    Confirm(
+                        _("Do you really want to delete this provider?"),
+                        _("This cannot be undone."),
+                        _("Delete"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        target='#' + provider.id.hex,
+                        redirect_after=request.link(self)
+                    )
+                )
+            )
 
     return {
         'layout': layout,
@@ -157,6 +193,28 @@ def handle_default_provider(self, request):
     providers.as_default(self)
 
     request.success(_("Changed the default payment provider."))
+
+
+@OrgApp.view(
+    model=PaymentProvider,
+    name='enable',
+    permission=Secret,
+    request_method='POST')
+def enable_provider(self, request):
+    self.enabled = True
+
+    request.success(_("Provider enabled."))
+
+
+@OrgApp.view(
+    model=PaymentProvider,
+    name='disable',
+    permission=Secret,
+    request_method='POST')
+def disable_provider(self, request):
+    self.enabled = False
+
+    request.success(_("Provider disabled."))
 
 
 @OrgApp.view(

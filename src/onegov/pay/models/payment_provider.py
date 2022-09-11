@@ -26,6 +26,9 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
     #: true if this is the default provider (can only ever be one)
     default = Column(Boolean, nullable=False, default=False)
 
+    #: true if this provider is enabled
+    enabled = Column(Boolean, nullable=False, default=True)
+
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'generic'
