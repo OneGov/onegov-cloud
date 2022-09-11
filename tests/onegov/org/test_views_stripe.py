@@ -41,6 +41,16 @@ def test_setup_stripe(client):
     assert provider.refresh_token == 'refresh_token'
     assert provider.access_token == 'access_token'
 
+    with requests_mock.Mocker() as m:
+        m.get('https://api.stripe.com/v1/accounts/stripe_user_id', json={
+            'business_name': 'Govikon',
+            'email': 'info@example.org'
+        })
+
+        client.get('/payment-provider').click("Deaktivieren")
+
+    assert client.app.default_payment_provider is None
+
 
 def test_stripe_form_payment(client):
     collection = FormCollection(client.app.session())
