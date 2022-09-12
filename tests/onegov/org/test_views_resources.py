@@ -1,10 +1,11 @@
 import json
 import textwrap
+import transaction
+
 from datetime import datetime, date
 
 import os
 import pytest
-import transaction
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
@@ -12,6 +13,7 @@ from libres.modules.errors import AffectedReservationError
 from onegov.form import FormSubmission
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.org.models import ResourceRecipientCollection
 
 
 def test_resource_slots(client):
@@ -2199,3 +2201,37 @@ def test_find_your_spot_link(client):
     assert not page.pyquery('#Items .find-your-spot-link')
     assert page.pyquery('#Rooms .find-your-spot-link')
     assert page.pyquery('#Something .find-your-spot-link')
+
+
+def test_resource_recipient_overview(client):
+    resources = ResourceCollection(client.app.libres_context)
+    gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
+    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+    resources.add('Meeting', 'Europe/Zurich', type='room')
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        new_reservations=True,
+        daily_reservations=True,
+        send_on=['FR', 'SU'],
+        resources=[
+            gymnasium.id.hex,
+            dailypass.id.hex
+        ]
+    )
+
+    transaction.commit()
+    client.login_admin()
+
+    page = client.get('/resource-recipients')
+    assert "John" in page
+    assert "john@example.org" in page
+    assert "Erhält Benachtchtigungen für neue Reservationen." in page
+    assert "für Reservationen des Tages an folgenden Tagen:" in page
+    assert "Fr , So" in page
+    assert "Gymnasium" in page
+    assert "Dailypass" in page
+    assert "Meeting" not in page
