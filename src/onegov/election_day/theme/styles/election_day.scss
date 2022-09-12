@@ -1198,6 +1198,11 @@ a:focus {
 }
 
 .accessibility-links a {
+    left: 0;
+    margin: auto;
     padding: 1rem;
     position: absolute;
-}
+    right: 0;
+    text-align: center;
+    width: 200px;
+    }
