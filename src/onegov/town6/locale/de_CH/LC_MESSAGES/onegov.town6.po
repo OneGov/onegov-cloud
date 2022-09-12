@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-09-06 14:34+0200\n"
+"POT-Creation-Date: 2022-09-11 08:59+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1588,6 +1588,12 @@ msgstr "Keine Zahlungsanbieter definiert."
 
 msgid "Connected:"
 msgstr "Verbunden:"
+
+msgid "Default:"
+msgstr "Standard:"
+
+msgid "Enabled:"
+msgstr "Aktiviert:"
 
 msgid "Fee:"
 msgstr "Gebühr:"

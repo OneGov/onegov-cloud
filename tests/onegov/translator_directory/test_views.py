@@ -125,6 +125,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
+    assert len(values) == 22
     assert values['Personal Nr.'] == '978654'
     assert values['Zulassung'] == 'nicht akkreditiert / Einsatz Dringlichkeit'
     assert values['Quellensteuer'] == 'Nein'
@@ -241,6 +242,8 @@ def test_view_translator(client):
     page.form['education_as_interpreter'] = True
     page.form['comments'] = 'My Comments'
     page.form['operation_comments'] = 'operational'
+    page.form['profession'] = 'Baker'
+    page.form['occupation'] = 'Salesman'
     page.form['for_admins_only'] = True
     page.form.get('expertise_professional_guilds', index=0).checked = False
     page.form.get('expertise_professional_guilds', index=1).checked = True
@@ -274,6 +277,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
+    assert len(values) == 39
     assert values['AHV-Nr.'] == '756.1111.1111.11'
     assert values['Anschrift'] == 'Somestreet'
     assert values['Ausbildung Dolmetscher'] == 'Ja'
@@ -304,6 +308,8 @@ def test_view_translator(client):
     assert values['Telefon Geschäft'] == '044 123 50 52'
     assert values['Telefon Mobile'] == '044 123 50 50'
     assert values['Telefon Privat'] == '044 123 50 51'
+    assert values['Erlernter Beruf'] == 'Baker'
+    assert values['Aktuelle berufliche Tatigkeit'] == 'Salesman'
     assert values['Versteckt'] == 'Ja'
     assert values['Wegberechnung'] == f'{round(new_drive_distance, 1)} km'
     assert values['Zulassung'] == 'im Zulassungsverfahren'
@@ -481,33 +487,34 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 11).value == 'Downing Street 5'
     assert sheet.cell(2, 12).value == '4000'
     assert sheet.cell(2, 13).value == 'Luzern'
-    assert sheet.cell(2, 14).value == None
+    assert sheet.cell(2, 14).value is None
     assert sheet.cell(2, 15).value == '756.1234.4568.90'
     assert sheet.cell(2, 16).value == 'R-BS'
     assert sheet.cell(2, 17).value == 'Bullstreet 5'
     assert sheet.cell(2, 18).value == 'Hugo Benito'
-    assert sheet.cell(2, 19).value == None
+    assert sheet.cell(2, 19).value is None
     assert sheet.cell(2, 20).value == 'hugo@benito.com'
-    assert sheet.cell(2, 21).value == None
+    assert sheet.cell(2, 21).value is None
     assert sheet.cell(2, 22).value == '079 000 00 00'
     assert sheet.cell(2, 23).value == '041 444 44 44'
     assert sheet.cell(2, 24).value == 'always'
-    assert sheet.cell(2, 25).value == None
+    assert sheet.cell(2, 25).value is None
     assert sheet.cell(2, 26).value == 0
     assert sheet.cell(2, 27).value == data['date_of_application'].isoformat()
     assert sheet.cell(2, 28).value == data['date_of_decision'].isoformat()
-    assert sheet.cell(2, 29).value == None
+    assert sheet.cell(2, 29).value is None
     assert sheet.cell(2, 30).value == 'German'
     assert sheet.cell(2, 31).value == 'French'
     assert sheet.cell(2, 32).value == 'Italian'
-    assert sheet.cell(2, 33).value == 'baker'
-    assert sheet.cell(2, 34).value == 'Wirtschaft|Psychologie|Religion'
-    assert sheet.cell(2, 35).value == 'Simultandolmetschen|Flüsterdolmetschen'
-    assert sheet.cell(2, 36).value == 'all okay'
-    assert sheet.cell(2, 37).value == 'Some ref'
-    assert sheet.cell(2, 38).value == 0
-    assert sheet.cell(2, 39).value == None
-    assert sheet.cell(2, 40).value == None
+    assert sheet.cell(2, 33).value == 'craftsman'
+    assert sheet.cell(2, 34).value == 'baker'
+    assert sheet.cell(2, 35).value == 'Wirtschaft|Psychologie|Religion'
+    assert sheet.cell(2, 36).value == 'Simultandolmetschen|Flüsterdolmetschen'
+    assert sheet.cell(2, 37).value == 'all okay'
+    assert sheet.cell(2, 38).value == 'Some ref'
+    assert sheet.cell(2, 39).value == 0
+    assert sheet.cell(2, 40).value is None
+    assert sheet.cell(2, 41).value is None
 
 
 def test_file_security(client):
@@ -718,6 +725,7 @@ def test_view_translator_mutation(client):
     page.form['operation_comments'] = 'No operation comments'
     page.form['confirm_name_reveal'] = False
     page.form['date_of_application'] = '2020-01-01'
+    page.form['profession'] = 'Handwerker'
     page.form['occupation'] = 'Bäcker'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
@@ -985,6 +993,7 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = True
     page.form['date_of_application'] = '2021-01-01'
     page.form['date_of_decision'] = '2021-02-02'
+    page.form['profession'] = 'Hochbauzeichner'
     page.form['occupation'] = 'Bauarbeiter'
     page.form['proof_of_preconditions'] = 'Keine'
     page.form['agency_references'] = 'Kanton LU'
@@ -1053,6 +1062,7 @@ def test_view_translator_mutation(client):
     assert 'Zustimmung Namensbekanntgabe: Ja' in page
     assert 'Bewerbung Datum: 2021-01-01' in page
     assert 'Entscheid Datum: 2021-02-02' in page
+    assert 'Erlernter Beruf: Hochbauzeichner' in page
     assert 'Aktuelle berufliche Tatigkeit: Bauarbeiter' in page
     assert 'Nachweis der Voraussetzung: Keine' in page
     assert 'Referenzen Behörden: Kanton LU' in page
@@ -1061,7 +1071,7 @@ def test_view_translator_mutation(client):
     assert 'Bemerkungen: Kein Kommentar' in page
 
     page = page.click('Vorgeschlagene Änderungen übernehmen')
-    page.form.get('changes', index=39).checked = False
+    page.form.get('changes', index=40).checked = False
     page = page.form.submit().follow()
     assert (
         'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
@@ -1078,10 +1088,12 @@ def test_view_translator_mutation(client):
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
         'Muttersprachen, Arbeitssprache - Wort, Arbeitssprache - Schrift, '
         'Arbeitssprache - Kommunikations\\u00fcberwachung, '
+        'Erlernter Beruf, '
         'Aktuelle berufliche Tatigkeit, '
         'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page
+
     page.click('Ticket abschliessen')
 
     mail = client.get_email(0, flush_queue=True)
@@ -1128,6 +1140,7 @@ def test_view_translator_mutation(client):
     assert 'German' in page
     assert 'Arabic' in page
     assert 'Italian' in page
+    assert 'Hochbauzeichner' in page
     assert 'Bauarbeiter' in page
     assert 'Keine' in page
     assert 'Kanton LU' in page

@@ -1196,3 +1196,8 @@ a:focus {
 .show-only-on-tab:not(:focus) {
     @include element-invisible;
 }
+
+.accessibility-links a {
+    padding: 1rem;
+    position: absolute;
+}

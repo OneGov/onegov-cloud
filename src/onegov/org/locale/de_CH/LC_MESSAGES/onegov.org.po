@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-06 14:34+0200\n"
+"POT-Creation-Date: 2022-09-11 08:59+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3485,6 +3485,12 @@ msgstr "Keine Zahlungsanbieter definiert."
 msgid "Connected:"
 msgstr "Verbunden:"
 
+msgid "Default:"
+msgstr "Standard:"
+
+msgid "Enabled:"
+msgstr "Aktiviert:"
+
 msgid "Fee:"
 msgstr "Gebühr:"
 
@@ -4524,6 +4530,18 @@ msgstr "Alle zukünftigen Zahlungen werden umgeleitet."
 msgid "Make Default"
 msgstr "Als Standard"
 
+msgid "Enable"
+msgstr "Aktivieren"
+
+msgid "Should this provider really be enabled?"
+msgstr "Sollte dieser Anbieter wirklich aktiviert werden?"
+
+msgid "Disable"
+msgstr "Deaktivieren"
+
+msgid "Should this provider really be disabled?"
+msgstr "Sollte dieser Anbieter wirklich deaktiviert werden?"
+
 msgid "Do you really want to delete this provider?"
 msgstr "Möchten Sie diesen Zahlungsanbieter wirklich löschen?"
 
@@ -4535,6 +4553,12 @@ msgstr "Ihr Stripe Konto konnte nicht verbunden werden."
 
 msgid "Changed the default payment provider."
 msgstr "Der Standard Zahlungsanbieter wurde verändert."
+
+msgid "Provider enabled."
+msgstr "Anbieter aktiviert."
+
+msgid "Provider disabled."
+msgstr "Anbieter deaktiviert."
 
 msgid "The payment provider was deleted."
 msgstr "Der Zahlungsanbieter wurde gelöscht."

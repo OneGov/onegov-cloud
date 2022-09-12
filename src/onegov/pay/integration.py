@@ -46,8 +46,10 @@ class PayApp(WebassetsApp):
 
     @orm_cached(policy='on-table-change:payment_providers')
     def default_payment_provider(self):
-        return self.session().query(PaymentProvider)\
-            .filter_by(default=True).first()
+        return self.session().query(PaymentProvider).filter(
+            PaymentProvider.default.is_(True),
+            PaymentProvider.enabled.is_(True),
+        ).first()
 
     def adjust_price(self, price):
         """ Takes the given price object and adjusts it depending on the

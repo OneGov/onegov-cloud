@@ -7980,11 +7980,11 @@ ReactDOMComponent.Mixin = {
       // a newline specifically to get eaten by the parser. (Alternately for
       // textareas, replacing "^\n" with "\r\n" doesn't get eaten, and the first
       // \r is normalized out by HTMLTextAreaElement#value.)
-      // See: <http://www.w3.org/TR/html-polyglot/#newlines-in-textarea-and-pre>
-      // See: <http://www.w3.org/TR/html5/syntax.html#element-restrictions>
-      // See: <http://www.w3.org/TR/html5/syntax.html#newlines>
+      // See: <https://www.w3.org/TR/html-polyglot/#newlines-in-textarea-and-pre>
+      // See: <https://www.w3.org/TR/html5/syntax.html#element-restrictions>
+      // See: <https://www.w3.org/TR/html5/syntax.html#newlines>
       // See: Parsing of "textarea" "listing" and "pre" elements
-      //  from <http://www.w3.org/TR/html5/syntax.html#parsing-main-inbody>
+      //  from <https://www.w3.org/TR/html5/syntax.html#parsing-main-inbody>
       return '\n' + ret;
     } else {
       return ret;

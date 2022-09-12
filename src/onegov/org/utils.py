@@ -214,7 +214,7 @@ def parse_fullcalendar_request(request, timezone):
     """ Parses start and end from the given fullcalendar request. It is
     expected that no timezone is passed (the default).
 
-    See `<http://fullcalendar.io/docs/timezone/timezone/>`_
+    See `<https://fullcalendar.io/docs/timezone/timezone/>`_
 
     :returns: A tuple of timezone-aware datetime objects or (None, None).
 

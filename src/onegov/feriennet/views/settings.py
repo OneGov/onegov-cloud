@@ -46,7 +46,7 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Payment"),
         choices=[
             ('feriennet-v1', _("Basic")),
-            ('esr-v1', _("ESR (General)")),
+            ('esr-v1', _("ESR (General) / QR-Reference")),
             ('raiffeisen-v1', _("ESR (Raiffeisen)"))
         ],
         default='feriennet-v1'
@@ -164,15 +164,16 @@ class FeriennetSettingsForm(Form):
                 return False
 
             if qr_iban(self.bank_account.data):
-                if self.bank_reference_schema.data == 'feriennet-v1':
-                    self.bank_account.errors.append(_(
-                        "This IBAN cannot be used for QR-Bills without ESR"
+                if self.bank_reference_schema.data != 'esr-v1':
+                    self.bank_reference_schema.errors.append(_(
+                        "Select ESR (General) / QR-Reference when using the "
+                        "given QR-IBAN"
                     ))
                     return False
             else:
                 if self.bank_reference_schema.data != 'feriennet-v1':
-                    self.bank_account.errors.append(_(
-                        "This IBAN cannot be used for QR-Bills with ESR"
+                    self.bank_reference_schema.errors.append(_(
+                        "Select Basic when using the given IBAN"
                     ))
                     return False
 

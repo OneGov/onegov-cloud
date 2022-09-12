@@ -155,6 +155,10 @@
                                     </span>
                                 </dd>
                             </dl>
+                            <dl class="field-display" tal:condition="model.profession and layout.show('profession')">
+                                <dt i18n:translate>Learned profession</dt>
+                                <dd >${model.profession}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.occupation and layout.show('occupation')">
                                 <dt i18n:translate>Current professional activity</dt>
                                 <dd >${model.occupation}</dd>

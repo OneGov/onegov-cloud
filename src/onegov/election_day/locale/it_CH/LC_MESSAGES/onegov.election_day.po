@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-01 08:22+0200\n"
+"POT-Creation-Date: 2022-09-02 11:11+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -861,6 +861,15 @@ msgstr "Il file non è valido."
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
+msgid "Homepage"
+msgstr "Pagina iniziale"
+
+msgid "Content"
+msgstr "Contenuto"
+
+msgid "Sitemap"
+msgstr "Sitemap"
+
 #. Default: Start
 #.
 msgid "homepage"
@@ -874,9 +883,6 @@ msgstr "Lingua"
 
 msgid "Open Data"
 msgstr "Open Data"
-
-msgid "Sitemap"
-msgstr ""
 
 msgid "Login"
 msgstr "Login"
@@ -1046,6 +1052,9 @@ msgstr "Invia"
 
 msgid "Previous Page"
 msgstr "Pagina precedente"
+
+msgid "(active)"
+msgstr "(attivo)"
 
 msgid "Next Page"
 msgstr "Pagina successiva"

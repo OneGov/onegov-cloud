@@ -3,6 +3,7 @@ from io import BytesIO
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import ExtendedAgency
+from onegov.agency.maps import AgencyMapDefault
 from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.security import Private
 from onegov.core.utils import linkify
@@ -12,9 +13,11 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
+from onegov.gis import CoordinatesField
 from sqlalchemy import func
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
+from wtforms.validators import Length
 
 
 class ExtendedAgencyForm(Form):
@@ -43,6 +46,33 @@ class ExtendedAgencyForm(Form):
         ]
     )
 
+    coordinates = CoordinatesField(
+        label=_('Location'),
+        description=_(
+            'Search for the exact address to set a marker. The address '
+            'fields beneath are filled out automatically. The zoom of '
+            'the map will be saved as well.'
+        ),
+        fieldset=_("Address"),
+        render_kw={'data-map-type': 'marker'},
+    )
+
+    address = StringField(
+        label=_('Street and house number'),
+        fieldset=_("Address"),
+    )
+
+    zip_code = StringField(
+        label=_('Zip Code'),
+        fieldset=_("Address"),
+        validators=[Length(max=10)]
+    )
+
+    city = StringField(
+        label=_('City'),
+        fieldset=_("Address"),
+    )
+
     export_fields = MultiCheckboxField(
         label=_("Fields to include for each membership"),
         choices=[
@@ -69,6 +99,11 @@ class ExtendedAgencyForm(Form):
 
     def on_request(self):
         self.request.include('sortable-multi-checkbox')
+        if self.request.app.agency_map_class != AgencyMapDefault:
+            self.coordinates.description = _(
+                'Search for the exact address to set a marker. The address '
+                'fields beneath are filled out automatically.'
+            )
 
     def get_useful_data(self):
         exclude = {'csrf_token', 'organigram'}
@@ -90,6 +125,10 @@ class ExtendedAgencyForm(Form):
         if self.organigram.action == 'replace':
             if self.organigram.data:
                 model.organigram_file = self.organigram.file
+        model.address = self.address.data
+        model.zip_code = self.zip_code.data or None
+        model.city = self.city.data
+        model.coordinates = self.coordinates.data
         if hasattr(self, 'access'):
             model.access = self.access.data
         if hasattr(self, 'publication_start'):
@@ -116,6 +155,10 @@ class ExtendedAgencyForm(Form):
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
+        self.address.data = model.address
+        self.zip_code.data = model.zip_code or None
+        self.city.data = model.city
+        self.coordinates.data = model.coordinates
         if hasattr(self, 'access'):
             self.access.data = model.access
         if hasattr(self, 'publication_start'):

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-09-06 14:34+0200\n"
+"POT-Creation-Date: 2022-09-11 08:59+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3483,6 +3483,12 @@ msgstr "Nessun fornitore di servizi di pagamento definito."
 msgid "Connected:"
 msgstr "Connesso:"
 
+msgid "Default:"
+msgstr "Predefinito:"
+
+msgid "Enabled:"
+msgstr "Abilitato:"
+
 msgid "Fee:"
 msgstr "Imposta:"
 
@@ -4540,6 +4546,18 @@ msgstr "Tutti i pagamenti futuri verranno reindirizzati."
 msgid "Make Default"
 msgstr "Imposta come predefinito"
 
+msgid "Enable"
+msgstr "Attivare"
+
+msgid "Should this provider really be enabled?"
+msgstr "Questo fornitore deve essere abilitato?"
+
+msgid "Disable"
+msgstr "Disattivare"
+
+msgid "Should this provider really be disabled?"
+msgstr "Questo fornitore dovrebbe davvero essere disabilitato?"
+
 msgid "Do you really want to delete this provider?"
 msgstr "Vuoi davvero eliminare questo fornitore?"
 
@@ -4551,6 +4569,12 @@ msgstr "Impossibile connettere il tuo account Stripe."
 
 msgid "Changed the default payment provider."
 msgstr "Provider di pagamento predefinito modificato."
+
+msgid "Provider enabled."
+msgstr "Fornitore abilitato."
+
+msgid "Provider disabled."
+msgstr "Fornitore disabilitato."
 
 msgid "The payment provider was deleted."
 msgstr "Il fornitore di servizi di pagamento è stato eliminato."

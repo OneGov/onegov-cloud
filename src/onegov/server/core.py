@@ -39,7 +39,7 @@ class Server:
     mounted applications.
 
     See `Morepath's way of nesting applications
-    <http://morepath.readthedocs.org/en/latest/app_reuse.html
+    <https://morepath.readthedocs.org/en/latest/app_reuse.html
     #nesting-applications>`_
 
     Applications are hosted in two ways:

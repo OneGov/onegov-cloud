@@ -8,14 +8,22 @@
         </div>
 
         <ul class="payment-providers" tal:condition="providers">
-            <li tal:repeat="provider providers" class="payment-provider-${provider.type} ${provider.default and 'payment-provider-default' or ''}" id="${provider.id.hex}">
+            <li tal:repeat="provider providers" class="payment-provider-${provider.type} ${'payment-provider-default' if provider.default and provider.enabled else ''}" id="${provider.id.hex}">
                 <h2><a href="${provider.url}">${provider.title}</a></h2>
                 <div>
                     <span>${provider.public_identity}</span>
                 </div>
                 <div>
                     <span i18n:translate>Connected:</span>
-                    ${provider.connected and '✔︎' or '✘'}
+                    ${'✔︎' if provider.connected else'✘'}
+                </div>
+                <div>
+                    <span i18n:translate>Default:</span>
+                    ${'✔︎' if provider.default else'✘'}
+                </div>
+                <div>
+                    <span i18n:translate>Enabled:</span>
+                    ${'✔︎' if provider.enabled else'✘'}
                 </div>
                 <div>
                     <tal:b switch="provider.type">
