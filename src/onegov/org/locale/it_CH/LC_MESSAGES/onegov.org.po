@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-09-11 08:59+0200\n"
+"POT-Creation-Date: 2022-09-12 12:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3611,15 +3611,19 @@ msgstr "(${num_pending} in attesa di approvazione)"
 msgid "Utilised"
 msgstr "Utilizzato"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"I seguenti destinatari ricevono una e-mail giornaliera inviata alle ore 6:00 "
-"contenente i dati di prenotazione per tutte le prenotazioni del giorno."
-
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Riceve le notifiche per le nuove prenotazioni."
+
+msgid "Notifications for following Resources"
+msgstr "Notifiche per le seguenti risorse"
 
 msgid "No reservation resources defined yet."
 msgstr "Nessuna risorsa di prenotazione ancora definita."
@@ -5029,3 +5033,11 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid ""
+#~ "The following recipients receive a daily e-mail sent at 06:00 containing "
+#~ "the reservation data for all reservations of the day."
+#~ msgstr ""
+#~ "I seguenti destinatari ricevono una e-mail giornaliera inviata alle ore "
+#~ "6:00 contenente i dati di prenotazione per tutte le prenotazioni del "
+#~ "giorno."

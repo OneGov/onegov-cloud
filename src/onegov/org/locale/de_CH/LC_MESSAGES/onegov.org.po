@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-11 08:59+0200\n"
+"POT-Creation-Date: 2022-09-12 12:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3607,15 +3607,19 @@ msgstr "(${num_pending} noch nicht akzeptiert)"
 msgid "Utilised"
 msgstr "Ausgelastet"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
-"Reservationen des Tages."
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Erhält Benachtchtigungen für neue Reservationen."
+
+msgid "Notifications for following Resources"
+msgstr "Benachrichtigungen für die folgenden Reservationen"
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
@@ -5015,3 +5019,10 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid ""
+#~ "The following recipients receive a daily e-mail sent at 06:00 containing "
+#~ "the reservation data for all reservations of the day."
+#~ msgstr ""
+#~ "Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
+#~ "Reservationen des Tages."
