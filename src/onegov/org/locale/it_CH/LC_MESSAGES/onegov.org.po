@@ -1088,10 +1088,10 @@ msgid "The price must be larger than zero"
 msgstr "Il prezzo deve essere maggiore di zero"
 
 msgid "New Reservations"
-msgstr ""
+msgstr "Nuove prenotazioni"
 
 msgid "Daily Reservations"
-msgstr ""
+msgstr "Prenotazioni giornaliere"
 
 msgid "Send on"
 msgstr "Invia il"
@@ -1100,7 +1100,7 @@ msgid "Resources"
 msgstr "Risorse"
 
 msgid "Please add at least one notification."
-msgstr ""
+msgstr "Aggiungere almeno una notifica."
 
 msgid "Logo"
 msgstr "Logo"
