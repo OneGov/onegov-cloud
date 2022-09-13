@@ -1329,6 +1329,18 @@
     </div>
 </metal:autoplay_video>
 
+<metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
+        <div tal:condition="title and icon" class="cell icon-link">
+            <a href="${link}">
+                <div class="icon" style="background-color:${color}">
+                    <i class="fa ${icon}"></i>
+                </div>
+                <h4>${title}</h4>
+            </a>
+            <p tal:condition="text" >${text}</p>
+        </div>
+</metal:icon_links>
+
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
         <div class="orbit-wrapper">
