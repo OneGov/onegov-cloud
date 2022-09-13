@@ -482,3 +482,16 @@ class FocusWidget:
 
     def get_variables(self, layout):
         return {}
+
+
+@TownApp.homepage_widget(tag='testimonial')
+class TestimonialsWidget:
+    template = """
+        <xsl:template match="testimonial">
+            <div metal:use-macro="layout.macros.testimonial"
+             tal:define="description '{@description}'; quote '{@quote}';
+             image '{@image}';
+             "
+            />
+        </xsl:template>
+    """

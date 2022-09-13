@@ -1329,6 +1329,28 @@
     </div>
 </metal:autoplay_video>
 
+<metal:testimonial define-macro="testimonial" i18n:domain="onegov.town6">
+    <div class="testimonial grid-x grid-padding-x" data-aos="fade" condition="description and image and quote">
+        <div class="small-4 medium-2 cell">
+            <div class="square-container">
+                <img src="${image}"/>
+            </div>
+        </div>
+        <div class="small-8 medium-10 cell">
+            <div class="text">
+                <p class="description">
+                    ${description}
+                </p>
+                <p class="quote">
+                    <i class="fas fa-angle-double-left"></i>
+                    ${quote}
+                    <i class="fas fa-angle-double-right"></i>
+                </p>
+            </div>
+        </div>
+    </div>
+</metal:testimonial>
+
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
         <div class="orbit-wrapper">
