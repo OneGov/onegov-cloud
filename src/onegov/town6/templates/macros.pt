@@ -1330,7 +1330,7 @@
 </metal:autoplay_video>
 
 <metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
-        <div tal:condition="title and icon" class="cell icon-link">
+        <div tal:condition="title and icon" class="cell icon-link" data-aos="fade">
             <a href="${link}">
                 <div class="icon" style="background-color:${color}">
                     <i class="fa ${icon}"></i>
