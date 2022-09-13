@@ -114,3 +114,25 @@ def test_video_widget(town_app):
     assert "link_mp4 \'/video.mp4\'" in result
     assert "max_height \'40vh\'" in result
     assert "link_webm \'\'" in result
+
+
+def test_testimonial_widget(town_app):
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+
+    structure = """
+        <testimonial image='/files/image.jpg' description='Doctor'
+        quote='very good hospital'
+    />
+    """
+
+    result = transform_structure(widgets, structure)
+    assert 'use-macro="layout.macros.testimonial"' in result
+    assert "image \'/files/image.jpg\'" in result
+    assert "description \'Doctor\'" in result
+    assert "quote \'very good hospital\'" in result
