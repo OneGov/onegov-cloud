@@ -115,22 +115,22 @@ def handle_links_settings(self, request, form, layout=None):
 @OrgApp.form(
     model=Organisation, name='newsletter-settings', template='form.pt',
     permission=Secret, form=NewsletterSettingsForm,
-    setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
+    setting=_("Newsletter"), order=-951, icon='far fa-paper-plane'
 )
 def handle_newsletter_settings(self, request, form, layout=None):
     return handle_generic_settings(
-        self, request, form, _("Newsletter Settings"), layout
+        self, request, form, _("Newsletter"), layout
     )
 
 
 @OrgApp.form(
     model=Organisation, name='ticket-settings', template='form.pt',
     permission=Secret, form=OrgTicketSettingsForm,
-    setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
+    setting=_("Tickets"), order=-950, icon='fa-ticket'
 )
 def handle_ticket_settings(self, request, form, layout=None):
     resp = handle_generic_settings(
-        self, request, form, _("Ticket Settings"), layout)
+        self, request, form, _("Tickets"), layout)
     return resp
 
 

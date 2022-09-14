@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-11 08:59+0200\n"
+"POT-Creation-Date: 2022-09-12 13:03+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4768,12 +4768,6 @@ msgstr "Favicon"
 msgid "Links"
 msgstr "Liens"
 
-msgid "Newsletter Settings"
-msgstr "Paramètres de la newsletter"
-
-msgid "Ticket Settings"
-msgstr "Paramètres tickets"
-
 msgid "Header"
 msgstr "En-tête"
 
@@ -5016,3 +5010,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Newsletter Settings"
+#~ msgstr "Paramètres de la newsletter"
+
+#~ msgid "Ticket Settings"
+#~ msgstr "Paramètres tickets"
