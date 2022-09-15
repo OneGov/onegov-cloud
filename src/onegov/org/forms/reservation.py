@@ -9,7 +9,7 @@ from wtforms.fields import EmailField
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired, Email, InputRequired
 
-from .allocation import WEEKDAYS
+from onegov.org.forms.allocation import WEEKDAYS
 from onegov.core.csv import (merge_multiple_excel_files_into_one,
                              convert_list_of_dicts_to_xlsx)
 
