@@ -100,7 +100,7 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             'event_limit_homepage',
             'news_limit_homepage',
         ),
-        after='homepage_image_6'
+        after='homepage_cover'
     )
 
 

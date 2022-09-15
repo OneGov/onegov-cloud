@@ -384,19 +384,10 @@ class SliderWidget:
                 'src': layout.request.link(image)
             }
 
-    def get_images_from_theme(self, layout):
-        for key, value in layout.org.theme_options.items():
-            if key.startswith('tile-image'):
-                yield {
-                    'note': None,
-                    'src': value.strip('"\'')
-                }
-
     def get_variables(self, layout):
         # if we don't have an album used for images, we use the images
         # shown on the homepage anyway to avoid having to show nothing
-        images = tuple(self.get_images_from_sets(layout)) \
-            or tuple(self.get_images_from_theme(layout))
+        images = tuple(self.get_images_from_sets(layout))
 
         return {
             'images': images

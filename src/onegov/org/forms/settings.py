@@ -477,30 +477,6 @@ class HeaderSettingsForm(Form):
 
 class HomepageSettingsForm(Form):
 
-    homepage_image_1 = StringField(
-        label=_("Homepage Image #1"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_2 = StringField(
-        label=_("Homepage Image #2"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_3 = StringField(
-        label=_("Homepage Image #3"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_4 = StringField(
-        label=_("Homepage Image #4"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_5 = StringField(
-        label=_("Homepage Image #5"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_6 = StringField(
-        label=_("Homepage Image #6"),
-        render_kw={'class_': 'image-url'})
-
     homepage_cover = HtmlField(
         label=_("Homepage Cover"),
         render_kw={'rows': 10})
@@ -556,43 +532,6 @@ class HomepageSettingsForm(Form):
                 field.render_kw['data-highlight-line'] = correct_line
 
                 raise ValidationError(correct_msg)
-
-    @property
-    def theme_options(self):
-        options = self.model.theme_options
-
-        # set the images only if provided
-        for i in range(1, 7):
-            image = getattr(self, 'homepage_image_{}'.format(i)).data
-
-            if not image:
-                options.pop(f'tile-image-{i}', None)
-            else:
-                options[f'tile-image-{i}'] = '"{}"'.format(image)
-
-        # override the options using the default values if no value was given
-        for key in options:
-            if not options[key]:
-                options[key] = user_options[key]
-
-        return options
-
-    @theme_options.setter
-    def theme_options(self, options):
-        self.homepage_image_1.data = options.get('tile-image-1', '').strip('"')
-        self.homepage_image_2.data = options.get('tile-image-2', '').strip('"')
-        self.homepage_image_3.data = options.get('tile-image-3', '').strip('"')
-        self.homepage_image_4.data = options.get('tile-image-4', '').strip('"')
-        self.homepage_image_5.data = options.get('tile-image-5', '').strip('"')
-        self.homepage_image_6.data = options.get('tile-image-6', '').strip('"')
-
-    def populate_obj(self, model):
-        super().populate_obj(model)
-        model.theme_options = self.theme_options
-
-    def process_obj(self, model):
-        super().process_obj(model)
-        self.theme_options = model.theme_options
 
 
 class ModuleSettingsForm(Form):
