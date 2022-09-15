@@ -488,9 +488,7 @@
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
     <div class="card news-card" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
-        <div tal:condition="item.image_url|nothing" class="card-header">
-            <img src="${item.image_url}">
-        </div>
+        <div tal:condition="item.page_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></div>
         <div class="card-section">
             <div>
                 <a class="heading" href="${url}"><tal:b tal:switch="heading|'h5'">
