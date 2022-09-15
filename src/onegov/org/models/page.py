@@ -5,7 +5,7 @@ from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import (
-    ContactExtension, ContactHiddenOnPageExtension,
+    ContactExtension, ContactHiddenOnPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension
 )
 from onegov.org.models.extensions import CoordinatesExtension
@@ -94,7 +94,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
            ContactExtension, ContactHiddenOnPageExtension, PersonLinkExtension,
-           CoordinatesExtension):
+           CoordinatesExtension, ImageExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     es_type_name = 'news'
