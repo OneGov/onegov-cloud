@@ -55,7 +55,6 @@ from onegov.user.utils import password_reset_url
 from sedate import to_timezone
 from translationstring import TranslationString
 
-
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
 
@@ -1355,6 +1354,10 @@ class ResourcesLayout(DefaultLayout):
                         )
                     ]
                 ),
+                Link(
+                    text=_("Export All"),
+                    url=self.request.link(self.model, name="export-all"),
+                ),
             ]
 
 
@@ -2406,11 +2409,11 @@ class DirectoryEntryBaseLayout(DefaultLayout):
         super().__init__(*args, **kwargs)
         self.request.include('photoswipe')
         if self.directory.marker_color:
-            self.custom_body_attributes['data-default-marker-color']\
+            self.custom_body_attributes['data-default-marker-color'] \
                 = self.directory.marker_color
 
         if self.directory.marker_icon:
-            self.custom_body_attributes['data-default-marker-icon']\
+            self.custom_body_attributes['data-default-marker-icon'] \
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
     @property

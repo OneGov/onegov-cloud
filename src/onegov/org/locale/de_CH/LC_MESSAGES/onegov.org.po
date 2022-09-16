@@ -1798,6 +1798,9 @@ msgstr "Externer Reservationslink"
 msgid "New external resource"
 msgstr "Neue externe Reservation"
 
+msgid "Export All"
+msgstr "Alle Exportieren"
+
 msgid "Find Your Spot"
 msgstr "Terminsuche"
 
@@ -4713,6 +4716,9 @@ msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 msgid "Exports the reservations of the given date range."
 msgstr "Exportiert alle Reservationen zwischen Start- und End-Datum."
 
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Exportiert alle Reservationen in einem bestimmten Datumsbereich"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\"?"
 msgstr "Möchten Sie \"${name}\" wirklich löschen?"
@@ -4991,8 +4997,5 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-#~ msgid "Newsletter Settings"
-#~ msgstr "Newsletter-Einstellungen"
-
-#~ msgid "Ticket Settings"
-#~ msgstr "Ticket-Einstellungen"
+msgid "No reservations found for the given date range."
+msgstr "Keine Reservierungen für den angegebenen Zeitraum gefunden."
