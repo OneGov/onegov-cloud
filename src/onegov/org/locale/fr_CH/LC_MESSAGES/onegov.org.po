@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-02 07:16+0200\n"
+"POT-Creation-Date: 2022-09-12 13:03+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3479,6 +3479,12 @@ msgstr "Aucun fournisseur de paiement n'a été défini."
 msgid "Connected:"
 msgstr "Connecté :"
 
+msgid "Default:"
+msgstr "Défaut :"
+
+msgid "Enabled:"
+msgstr "Activé :"
+
 msgid "Fee:"
 msgstr "Tarif :"
 
@@ -4534,6 +4540,18 @@ msgstr "Tous les futurs paiement seront redirigés."
 msgid "Make Default"
 msgstr "Définir par défaut"
 
+msgid "Enable"
+msgstr "Activer"
+
+msgid "Should this provider really be enabled?"
+msgstr "Ce prestataire doit-il vraiment être activé ?"
+
+msgid "Disable"
+msgstr "Désactiver"
+
+msgid "Should this provider really be disabled?"
+msgstr "Ce prestataire doit-il vraiment être désactivé ?"
+
 msgid "Do you really want to delete this provider?"
 msgstr "Voulez-vous vraiment supprimer ce prestataire ?"
 
@@ -4545,6 +4563,12 @@ msgstr "Votre compte Stripe n'a pas pu être connecté."
 
 msgid "Changed the default payment provider."
 msgstr "Le prestataire de paiement par défaut a été modifié."
+
+msgid "Provider enabled."
+msgstr "Prestataire activé."
+
+msgid "Provider disabled."
+msgstr "Prestataire désactivé."
 
 msgid "The payment provider was deleted."
 msgstr "Le prestataire de paiement a été supprimé."
@@ -4746,12 +4770,6 @@ msgstr "Favicon"
 
 msgid "Links"
 msgstr "Liens"
-
-msgid "Newsletter Settings"
-msgstr "Paramètres de la newsletter"
-
-msgid "Ticket Settings"
-msgstr "Paramètres tickets"
 
 msgid "Header"
 msgstr "En-tête"
