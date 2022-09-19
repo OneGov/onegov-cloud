@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-09-11 08:59+0200\n"
+"POT-Creation-Date: 2022-09-12 13:05+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2050,11 +2050,11 @@ msgstr "Analytics"
 msgid "Holidays"
 msgstr "Jours fériés"
 
-msgid "Ticket Settings"
-msgstr "Paramètres tickets"
-
-msgid "Newsletter Settings"
-msgstr "Paramètres de la newsletter"
-
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+#~ msgid "Ticket Settings"
+#~ msgstr "Paramètres tickets"
+
+#~ msgid "Newsletter Settings"
+#~ msgstr "Paramètres de la newsletter"

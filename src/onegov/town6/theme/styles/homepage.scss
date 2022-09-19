@@ -13,3 +13,41 @@
         width: 100%;
     }
 }
+
+.icon-link {
+
+    .fa-external-link-alt {
+        display: none;
+    }
+
+    a:hover .icon i {
+        font-size: 4.6rem;
+        padding-top: calc(50% - 2.3rem);
+    }
+
+    a:hover h4 {
+        filter: brightness(.7);
+        transition: all 200ms linear;
+    }
+
+    .icon {
+        background-color: $primary-color;
+        border-radius: 50%;
+        color: $white;
+        height: 0;
+        margin-bottom: 1rem;
+        padding-bottom: 90%;
+        text-align: center;
+        width: 90%;
+    }
+
+    i {
+        font-size: 4rem;
+        padding-top: calc(50% - 2rem);
+        transition: all 200ms linear;
+    }
+
+    h4 {
+        color: $primary-color;
+    }
+}

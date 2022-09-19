@@ -1820,6 +1820,9 @@ msgstr "Link a risorse esterne"
 msgid "New external resource"
 msgstr "Nuova risorsa esterna"
 
+msgid "Export All"
+msgstr "Esporta tutte"
+
 msgid "Find Your Spot"
 msgstr "Cerca le date"
 
@@ -4785,12 +4788,6 @@ msgstr "Favicon"
 msgid "Links"
 msgstr "Collegamenti"
 
-msgid "Newsletter Settings"
-msgstr "Impostazioni della newsletter"
-
-msgid "Ticket Settings"
-msgstr "Impostazioni del biglietto"
-
 msgid "Header"
 msgstr "Intestazione"
 
@@ -5034,10 +5031,8 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid ""
-#~ "The following recipients receive a daily e-mail sent at 06:00 containing "
-#~ "the reservation data for all reservations of the day."
-#~ msgstr ""
-#~ "I seguenti destinatari ricevono una e-mail giornaliera inviata alle ore "
-#~ "6:00 contenente i dati di prenotazione per tutte le prenotazioni del "
-#~ "giorno."
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Esporta tutte le prenotazioni in un intervallo di date specifico"
+
+msgid "No reservations found for the given date range."
+msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."

@@ -12,6 +12,7 @@ from onegov.core.csv import (
     convert_xlsx_to_csv,
     detect_encoding,
     match_headers,
+    merge_multiple_excel_files_into_one,
     normalize_header,
     parse_header,
 )
@@ -22,11 +23,12 @@ from onegov.core.errors import (
     MissingColumnsError,
 )
 from openpyxl import load_workbook
+from pathlib import Path
 
 
 def test_parse_header():
     assert parse_header("   Firtst name;  LastNAME; Designation")\
-        == ['firtst name', 'lastname', 'designation']
+           == ['firtst name', 'lastname', 'designation']
     assert parse_header("a") == ['a']
     assert parse_header("") == []
     assert parse_header("a,b,c;d") == ['a', 'b', 'c;d']
@@ -243,16 +245,16 @@ def test_match_headers_missing():
 
     assert match_headers(['a1', 'b2'], expected=('a1', 'c2')) == ['a1', 'c2']
 
-    assert match_headers(['first', 'second'], expected=('first', 'sekond')) \
-        == ['first', 'sekond']
+    assert match_headers(['first', 'second'], expected=('first', 'sekond'))\
+           == ['first', 'sekond']
 
-    assert match_headers(['a', 'b', 'c'], expected=('a', 'c')) \
-        == ['a', 'b', 'c']
+    assert match_headers(['a', 'b', 'c'], expected=('a', 'c'))\
+           == ['a', 'b', 'c']
 
 
 def test_match_headers_ambiguous():
     with pytest.raises(AmbiguousColumnsError) as e:
-        match_headers(['abcd', 'bcde'], expected=('bcd', ))
+        match_headers(['abcd', 'bcde'], expected=('bcd',))
 
     assert list(e.value.columns.keys()) == ['bcd']
     assert set(e.value.columns['bcd']) == {'abcd', 'bcde'}
@@ -391,3 +393,87 @@ def test_convert_irregular_list_of_dicts_to_csv():
     assert header == 'name,role,identity,gang'
     assert batman == 'Batman,Superhero,Bruce Wayne,'
     assert joker == 'Joker,Supervillain,,Injustice League'
+
+
+def test_combine_xlsx_from_multiple_files():
+    data = [
+        {
+            'first_name': 'Jean-Jacques',
+            'last_name': 'Rousseau'
+        },
+        {
+            'first_name': 'Edgar',
+            'last_name': 'Poe'
+        }
+    ]
+    data2 = [
+        {
+            'first_name': 'Charles',
+            'last_name': 'Darwin'
+        },
+        {
+            'first_name': 'James',
+            'last_name': 'Maxwell'
+        }
+    ]
+
+    xlsx1 = convert_list_of_dicts_to_xlsx(data, fields=('first_name',
+                                                        'last_name'))
+    xlsx2 = convert_list_of_dicts_to_xlsx(data2, fields=('first_name',
+                                                         'last_name'))
+
+    input_workbooks = [xlsx1, xlsx2]
+    titles = ["test1", "test2"]
+    merged_file = merge_multiple_excel_files_into_one(input_workbooks, titles)
+
+    wb = load_workbook(BytesIO(merged_file), data_only=True)
+    assert len(wb.worksheets) == 2
+    first_sheet = wb[wb.sheetnames[0]]
+    second_sheet = wb[wb.sheetnames[1]]
+
+    tab_1 = tuple(first_sheet.rows)
+
+    assert tab_1[0][0].value == 'first_name'
+    assert tab_1[0][1].value == 'last_name'
+    assert tab_1[1][0].value == 'Jean-Jacques'
+    assert tab_1[1][1].value == 'Rousseau'
+    assert tab_1[2][0].value == 'Edgar'
+    assert tab_1[2][1].value == 'Poe'
+
+    tab_2 = tuple(second_sheet.rows)
+    assert tab_2[0][0].value == 'first_name'
+    assert tab_2[0][1].value == 'last_name'
+    assert tab_2[1][0].value == 'Charles'
+    assert tab_2[1][1].value == 'Darwin'
+    assert tab_2[2][0].value == 'James'
+    assert tab_2[2][1].value == 'Maxwell'
+
+
+@pytest.mark.filterwarnings('ignore::UserWarning')
+def test_merge_multiple_excel_files_into_one():
+    def xlxs_files_names():
+        path = utils.module_path('tests.onegov.core',
+                                 'fixtures/reservations/')
+        return [p for p in filter(Path.is_file, Path(path).iterdir())]
+
+    input_workbooks = []
+    titles = ["data", "data2"]
+
+    for file in xlxs_files_names():
+        with open(file, mode="rb") as f:
+            input_workbooks.append(f.read())
+
+    merged_file = merge_multiple_excel_files_into_one(input_workbooks, titles)
+
+    wb = load_workbook(filename=BytesIO(merged_file), data_only=True)
+
+    sheetnames = wb.sheetnames
+    assert len(sheetnames) == 2
+    first_sheet = wb[sheetnames[0]]
+    second_sheet = wb[sheetnames[1]]
+
+    assert tuple(first_sheet.rows)[0][1].value == 'Name'
+    assert tuple(second_sheet.rows)[0][1].value == 'Name'
+
+    assert tuple(first_sheet.rows)[0][3].value == 'Case Number'
+    assert tuple(second_sheet.rows)[0][3].value == 'Case Number'

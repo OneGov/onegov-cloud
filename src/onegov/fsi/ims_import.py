@@ -18,7 +18,7 @@ Personen.txt:
 
 (Daten sind sortiert nach Nachname/Vorname)
 
-- Es gibt Email-Addressen wie user@sg.ch.local, und dann in den Anmeldungen
+- Es gibt Email-Adressen wie user@sg.ch.local, und dann in den Anmeldungen
   ohne .local.
 - Was bedeutet das Feld P_VALID_TILL? Relevant?
 - es gibt viele Einträge ohne email und/oder Kürzel (P_USERID), z.B. Zeilen
@@ -80,7 +80,7 @@ Es werden nicht importiert:
 
 Vervollständigungen
 
-- .local in Email-Addressen wird herausgenommen
+- .local in Email-Adressen wird herausgenommen
 - Fehlender Wert für ANWESEND bei alten Anmeldungen wird mit JA gefüllt.
 - Referent Kurs: Standard-Wert einfügen "Unbekannter Referent" sofern fehlend
 

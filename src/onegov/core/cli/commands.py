@@ -136,14 +136,12 @@ def sendmail(group_context, queue, limit):
 @click.option('--no-database', default=False, is_flag=True,
               help="Do not transfer the database")
 @click.option('--transfer-schema', help="Only transfer this schema")
-@click.option('--to-14', default=False, is_flag=True,
-              help="Transfer from postgres <14 to >=14.")
 @click.option('--add-admins', default=False, is_flag=True,
               help="Add local admins")
 @pass_group_context
 def transfer(group_context,
              server, remote_config, confirm, no_filestorage, no_database,
-             transfer_schema, to_14, add_admins):
+             transfer_schema, add_admins):
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -256,9 +254,6 @@ def transfer(group_context,
 
         # Transfer
         click.echo("Transfering database")
-        if to_14:
-            # todo: remove me after 2022.43 has been deployed everywhere
-            recv = f"sed 's/anyarray/anycompatiblearray/g' | {recv}"
         if shutil.which('pv'):
             recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
         subprocess.check_output(f'{send} | {recv}', shell=True)
