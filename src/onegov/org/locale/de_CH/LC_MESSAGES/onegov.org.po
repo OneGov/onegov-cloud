@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-12 13:03+0200\n"
+"POT-Creation-Date: 2022-09-12 12:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1084,11 +1084,20 @@ msgstr ""
 msgid "The price must be larger than zero"
 msgstr "Der Preis muss grösser als Null sein"
 
+msgid "New Reservations"
+msgstr "Neue Reservationen"
+
+msgid "Daily Reservations"
+msgstr "Tägliche Reservationen"
+
 msgid "Send on"
 msgstr "Senden am"
 
 msgid "Resources"
 msgstr "Reservationen"
+
+msgid "Please add at least one notification."
+msgstr "Bitte wählen sie mindestens eine Benachrichtigung."
 
 msgid "Logo"
 msgstr "Logo"
@@ -3151,6 +3160,18 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
+msgid "The following reservations have been accepted:"
+msgstr "Die folgenden Reservationen wurden angenommen:"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+msgid ""
+"This is the notification for reservations for ${request.app.org.title}. If "
+"you no longer want to receive this e-mail please contact an administrator so "
+"they can remove you from the recipients list."
+msgstr ""
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
 "Ein Administrator hat soeben ein neues Konto auf ${org} für Sie eingerichtet."
@@ -3224,12 +3245,6 @@ msgstr "Anmeldung"
 
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
-
-msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -3595,15 +3610,19 @@ msgstr "(${num_pending} noch nicht akzeptiert)"
 msgid "Utilised"
 msgstr "Ausgelastet"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
-"Reservationen des Tages."
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Erhält Benachtchtigungen für neue Reservationen."
+
+msgid "Notifications for following Resources"
+msgstr "Benachrichtigungen für die folgenden Reservationen"
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
@@ -4648,6 +4667,10 @@ msgstr ""
 
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"
+
+#, python-format
+msgid "${org} New Reservation(s)"
+msgstr "${org} Neue Reservation(en)"
 
 msgid "The reservations were accepted"
 msgstr "Die Reservationen wurden angenommen"
