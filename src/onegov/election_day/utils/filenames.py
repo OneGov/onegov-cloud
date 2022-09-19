@@ -47,3 +47,11 @@ def svg_filename(item, type_, locale, last_modified=None):
         ts = int((last_modified or item.last_modified).timestamp())
 
     return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale)
+
+
+def archive_filename():
+    """
+        Get the filename of the archive. This is mainly used to avoid
+        duplication of knowledge.
+    """
+    return 'archive.zip'
