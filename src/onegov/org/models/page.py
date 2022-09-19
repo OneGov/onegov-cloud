@@ -1,6 +1,6 @@
 from datetime import datetime
 from onegov.core.orm.mixins import content_property, meta_property
-from onegov.form import Form
+from onegov.form import Form, move_fields
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
@@ -167,6 +167,14 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 # homepage anyway)
                 form_class.is_visible_on_homepage.kwargs['label'] = _(
                     "Always visible on homepage")
+
+            form_class = move_fields(
+                form_class=form_class,
+                fields=(
+                    'page_image',
+                ),
+                after='title'
+            )
 
             return form_class
 
