@@ -9,8 +9,9 @@ from wtforms.fields import EmailField
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired, Email, InputRequired
 
-from .allocation import WEEKDAYS
-
+from onegov.org.forms.allocation import WEEKDAYS
+from onegov.core.csv import (merge_multiple_excel_files_into_one,
+                             convert_list_of_dicts_to_xlsx)
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition
@@ -18,7 +19,6 @@ RESERVED_FIELDS = ['email']
 
 
 class ReservationForm(Form):
-
     reserved_fields = RESERVED_FIELDS
 
     email = EmailField(
@@ -28,7 +28,6 @@ class ReservationForm(Form):
 
 
 class FindYourSpotForm(Form):
-
     start = DateField(
         label=_("From"),
         validators=[InputRequired()])
@@ -167,3 +166,19 @@ class FindYourSpotForm(Form):
             if start <= date <= end:
                 return True
         return False
+
+
+class ExportToExcelWorksheets(Form):
+    """ A form providing the export of multiple reservations into Worksheets
+    """
+
+    @property
+    def format(self):
+        return 'xlsx'
+
+    def as_multiple_export_response(self, keys, results, titles):
+
+        xlsx_files = [convert_list_of_dicts_to_xlsx(result, key=key)
+                      for key, result in zip(keys, results)]
+
+        return merge_multiple_excel_files_into_one(xlsx_files, titles)

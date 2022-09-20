@@ -122,9 +122,6 @@ class Organisation(Base, TimestampMixin):
     pdf_link_color = meta_property()
     pdf_underline_links = meta_property(default=False)
 
-    # Map for agency adresses
-    agency_map = meta_property()
-
     # break points of pages after title of level x, type integer
     page_break_on_level_root_pdf = meta_property()
     page_break_on_level_org_pdf = meta_property()

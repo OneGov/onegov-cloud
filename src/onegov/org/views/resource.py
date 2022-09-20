@@ -9,10 +9,11 @@ from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
-from onegov.core.utils import module_path
+from onegov.core.utils import module_path, normalize_for_url
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
 from onegov.org.cli import close_ticket
+from onegov.org.forms.resource import AllResourcesExportForm
 from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.org import _, OrgApp, utils
 from onegov.org.elements import Link
@@ -711,6 +712,98 @@ def view_export(self, request, form, layout=None):
         'form': form,
         'explanation': _("Exports the reservations of the given date range.")
     }
+
+
+@OrgApp.form(model=ResourceCollection, permission=Private, name='export-all',
+             template='export.pt', form=AllResourcesExportForm)
+def view_export_all(self, request, form, layout=None):
+    self.title = _("Export All")
+    layout = layout or ResourceLayout(self, request)
+    layout.editbar_links = None
+
+    def no_reservations_for_date(reservations):
+        return not reservations
+
+    if form.submitted(request):
+
+        default_group = request.translate(_("General"))
+        resources = group_by_column(request=request, query=self.query(),
+                                    default_group=default_group,
+                                    group_column=Resource.group,
+                                    sort_column=Resource.title)
+
+        ext_resources = group_by_column(request,
+                                        query=ExternalLinkCollection.for_model(
+                                            request.session,
+                                            ResourceCollection).query(),
+                                        group_column=ExternalLink.group,
+                                        sort_column=ExternalLink.order)
+
+        grouped = combine_grouped(resources, ext_resources,
+                                  sort=lambda x: x.title)
+
+        all_results = []
+        all_titles = []
+        all_field_order = []
+
+        for entries in grouped.values():
+            for resource in entries:
+                resource.bind_to_libres_context(request.app.libres_context)
+
+                field_order, results = run_export(resource=resource,
+                                                  start=form.data['start'],
+                                                  end=form.data['end'],
+                                                  nested=form.format == 'json',
+                                                  formatter=layout.
+                                                  export_formatter(
+                                                      form.format))
+
+                if results:
+                    all_results.append(results)
+                    all_titles.append(normalize_for_url(resource.title)[:31])
+                    all_field_order.append(field_order)
+
+        if no_reservations_for_date(all_results):
+            request.alert(_("No reservations found for the given date range."))
+            return request.redirect(request.url)
+
+        return Response(
+            form.as_multiple_export_response(results=all_results,
+                                             titles=all_titles,
+                                             keys=all_field_order),
+            content_type=(
+                'application/vnd.openxmlformats'
+                '-officedocument.spreadsheetml.sheet'
+            ),
+            content_disposition='inline; filename={}.xlsx'.format(
+                'all-resources-export'
+            )
+        )
+
+    if request.method == 'GET':
+
+        def get_week(date):
+            """Return the full week (Sunday first) of the week containing
+            the given date.
+            """
+            one_day = timedelta(days=1)
+            day_idx = (date.weekday() + 1) % 7  # turn sunday into 0, monday
+            # into 1, etc.
+            sunday = date - timedelta(days=day_idx)
+            date = sunday
+            for n in range(7):
+                yield date
+                date += one_day
+
+        friday = list(get_week(datetime.now().date()))[5]
+
+        form.start.data, form.end.data = datetime.now().date(), friday
+
+    return {'layout': layout,
+            'title': _("Export"),
+            'form': form,
+            'explanation': _("Exports the reservations of all resources in"
+                             " a given date range.")}
 
 
 def run_export(resource, start, end, nested, formatter):

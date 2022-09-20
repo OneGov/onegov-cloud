@@ -4,14 +4,14 @@
 Core Commands
 -------------
 
-Provides a framework for cli commands run against one ore more onegov
+Provides a framework for cli commands run against one or more onegov
 cloud applications.
 
-OneGov cli commands are usually ran against a onegov.yml config file, which
+OneGov cli commands are usually ran against an onegov.yml config file, which
 may contain definitions for multiple applications. It may define multiple
-application with different applicaiton classes and it may contain wildcard
+application with different application classes, and it may contain wildcard
 applications which run the same application class, but contain multiple
-tennants for each application.
+tenants for each application.
 
 To have a command run against one or many applications we use a selector to
 help select the applications we want to target in a command.
@@ -27,7 +27,7 @@ Selector
 
 A selector has the form <namespace>/<id>.
 
-That is, it consists of the namespace of the application and it's id.
+That is, it consists of the namespace of the application, and it's id.
 
 For example:
 
@@ -87,7 +87,7 @@ a command which creates the path that matches the selector we can use::
 
     @cli.command(context_settings={'creates_path': True})
 
-By default we expect that a selector is passed. For commands which usually run
+By default, we expect that a selector is passed. For commands which usually run
 against all applications we can provide a default selector::
 
     @cli.command(context_settings={'default_selector': '*'})

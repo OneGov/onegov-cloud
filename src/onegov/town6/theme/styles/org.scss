@@ -665,6 +665,41 @@ section#content h2:first-of-type {
     }
 }
 
+/*
+    Resource recipients
+*/
+
+ul.recipients {
+    h2 {
+        color: #000;
+        font-size: 1.25rem;
+        margin-bottom: 0;
+    }
+
+    div {
+        font-size: .875rem;
+
+        &:nth-child(2) {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        &:last-child {
+            margin-top: .25rem;
+        }
+    }
+
+    &> li {
+        color: #707070;
+        padding-bottom: 1rem;
+    }
+
+    .fa-ul {
+        margin-bottom: .5rem;
+        margin-left: 1.5rem;
+    }
+}
+
 .page-image {
     padding-bottom: 2rem;
 }

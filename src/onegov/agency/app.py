@@ -8,7 +8,6 @@ from onegov.agency.initial_content import create_new_organisation
 from onegov.agency.pdf import AgencyPdfAr, AgencyPdfBs
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
-from onegov.agency.maps import AgencyMapDefault, AgencyMapBs
 from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
 from onegov.api import ApiApp
@@ -78,13 +77,6 @@ class AgencyApp(OrgApp, FormApp, ApiApp):
         if pdf_layout == 'bs':
             return AgencyPdfBs
         return AgencyPdfDefault
-
-    @property
-    def agency_map_class(self):
-        agency_map = self.org.meta.get('agency_map')
-        if agency_map == 'bs':
-            return AgencyMapBs
-        return AgencyMapDefault
 
     @property
     def enable_yubikey(self):

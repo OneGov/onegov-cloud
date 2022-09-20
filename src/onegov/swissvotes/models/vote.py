@@ -842,8 +842,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         """
 
         def cleanup(text):
+            wildcard = text.endswith('*')
             result = ''.join((c for c in text if c.isalnum() or c in ',.'))
-            return f'{result}:*' if text.endswith('*') else result
+            if not result:
+                return result
+            if wildcard:
+                return f'{result}:*'
+            return result
 
         parts = [cleanup(part) for part in (term or '').strip().split()]
         return ' <-> '.join([part for part in parts if part])
