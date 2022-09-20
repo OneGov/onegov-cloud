@@ -806,6 +806,8 @@ def test_model_vote_search_term_expression(swissvotes_app):
     assert expression('') == ''
     assert expression('*') == ''
     assert expression('* *') == ''
+    assert expression('* a *') == 'a'
+    assert expression('*   a *  b *') == 'a <-> b'
     assert expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
     assert expression('AHV Mehrwertsteuer') == 'AHV <-> Mehrwertsteuer'
     assert expression('AHV Mehrwert*') == 'AHV <-> Mehrwert:*'
