@@ -3,7 +3,6 @@ from io import BytesIO
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import ExtendedAgency
-from onegov.agency.maps import AgencyMapDefault
 from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.security import Private
 from onegov.core.utils import linkify
@@ -99,11 +98,6 @@ class ExtendedAgencyForm(Form):
 
     def on_request(self):
         self.request.include('sortable-multi-checkbox')
-        if self.request.app.agency_map_class != AgencyMapDefault:
-            self.coordinates.description = _(
-                'Search for the exact address to set a marker. The address '
-                'fields beneath are filled out automatically.'
-            )
 
     def get_useful_data(self):
         exclude = {'csrf_token', 'organigram'}
