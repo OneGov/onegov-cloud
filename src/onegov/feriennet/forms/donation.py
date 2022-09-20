@@ -16,7 +16,8 @@ class DonationForm(Form):
 
     def on_request(self):
         amounts = self.request.app.org.meta.get(
-            'donation_amounts', DEFAULT_DONATION_AMOUNTS)
+            'donation_amounts', DEFAULT_DONATION_AMOUNTS
+        ) or DEFAULT_DONATION_AMOUNTS
 
         readable = format_donation_amounts(amounts).split('\n')
         parsable = (f'{a:.2f}' for a in amounts)

@@ -135,9 +135,10 @@ def sendmail(group_context, queue, limit):
               help="Do not transfer the files")
 @click.option('--no-database', default=False, is_flag=True,
               help="Do not transfer the database")
-@click.option('--transfer-schema', help="Only transfer this schema")
+@click.option('--transfer-schema',
+              help="Only transfer this schema, e.g. /town6/govikon")
 @click.option('--add-admins', default=False, is_flag=True,
-              help="Add local admins")
+              help="Add local admins (admin@example.org:test)")
 @pass_group_context
 def transfer(group_context,
              server, remote_config, confirm, no_filestorage, no_database,
@@ -228,6 +229,10 @@ def transfer(group_context,
         schemas = (s for s in schemas if s)
         schemas = (s for s in schemas if fnmatch(s, schema_glob))
         schemas = tuple(schemas)
+
+        if not schemas:
+            click.echo("No matching schema(s) found!")
+            return schemas
 
         # Prepare send command
         send = f"ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}"
@@ -343,12 +348,12 @@ def transfer(group_context,
 
         click.echo(f"Fetching {remote_cfg.namespace}")
 
+        if not no_database:
+            schemas.update(transfer_database_of_app(local_cfg, remote_cfg))
+
         if not no_filestorage:
             transfer_storage_of_app(local_cfg, remote_cfg)
             transfer_depot_storage_of_app(local_cfg, remote_cfg)
-
-        if not no_database:
-            schemas.update(transfer_database_of_app(local_cfg, remote_cfg))
 
     if add_admins:
         for schema in schemas:
