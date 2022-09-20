@@ -59,16 +59,6 @@ class AgencySettingsForm(Form):
         fieldset=_("PDF Layout")
     )
 
-    agency_map = RadioField(
-        label=_("Map for Agency Adresses"),
-        fieldset=_("Map"),
-        default='default',
-        choices=[
-            ('default', _("Default")),
-            ('bs', "Kanton Basel-Stadt"),
-        ],
-    )
-
     agency_display = ChosenSelectMultipleField(
         label=_('Show additional agencies to search results'),
         fieldset=_('Customize search results'),
@@ -123,7 +113,6 @@ class AgencySettingsForm(Form):
     def process_obj(self, obj):
         super().process_obj(obj)
         self.pdf_layout.data = obj.pdf_layout or 'default'
-        self.agency_map.data = obj.agency_map or 'default'
         self.root_pdf_page_break.data = str(
             obj.page_break_on_level_root_pdf or 1)
         self.orga_pdf_page_break.data = str(
@@ -147,7 +136,6 @@ class AgencySettingsForm(Form):
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
         obj.pdf_layout = self.pdf_layout.data
-        obj.agency_map = self.agency_map.data
         obj.report_changes = self.report_changes.data
         obj.page_break_on_level_root_pdf = int(self.root_pdf_page_break.data)
         obj.page_break_on_level_org_pdf = int(self.orga_pdf_page_break.data)
