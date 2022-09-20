@@ -116,6 +116,32 @@ def test_video_widget(town_app):
     assert "link_webm \'\'" in result
 
 
+def test_link_icon_widget(town_app):
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+
+    structure = "<icon_link title='Services'/>"
+    result = transform_structure(widgets, structure)
+    assert 'use-macro="layout.macros.icon_link"' in result
+    assert 'icon-link' not in result
+
+    structure = """
+        <icon_link title='Services' icon='fa-user' color='#000'
+        link='https://www.test.ch' text='Whenever you want'
+        />
+    """
+    result = transform_structure(widgets, structure)
+    assert "icon \'fa-user\'" in result
+    assert "color \'#000\'" in result
+    assert "link \'https://www.test.ch\'" in result
+    assert "text \'Whenever you want\'" in result
+
+
 def test_testimonial_widget(town_app):
     class App(TownApp):
         pass

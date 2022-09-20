@@ -353,10 +353,13 @@ def send_daily_resource_usage_overview(request):
         ResourceRecipient.content
     )
 
-    recipients = tuple(
+    recipients = [
         (r.address, r.content['resources'])
-        for r in q if weekday in r.content['send_on']
-    )
+        for r in q if (
+            r.content['daily_reservations']
+            and weekday in r.content['send_on']
+        )
+    ]
 
     if not recipients:
         return

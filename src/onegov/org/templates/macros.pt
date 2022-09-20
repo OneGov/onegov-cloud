@@ -351,7 +351,6 @@
         <div class="homepage-tiles">
             <div tal:repeat="tile tiles" class="homepage-tile" id="homepage-tile-${tile.number}">
                 <a href="${tile.page.url}" class="tile-link">
-                    <div class="tile-image"></div>
                     <h3>${tile.page.text}</h3>
                 </a>
                 <div class="child-links">
