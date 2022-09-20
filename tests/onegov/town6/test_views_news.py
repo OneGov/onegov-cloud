@@ -177,13 +177,14 @@ def test_hide_news(client):
     assert response.status_code == 200
 
 
-def test_news_detail(client):
+def test_news_overview_detail(client):
     client.login_admin()
 
     news_list = client.get('/news')
 
     page = news_list.click('Nachricht')
     page.form['title'] = "Foo"
+    page.form['page_image'] = "/image.png"
     page.form['lead'] = "Lorem"
     page.form['publication_start'] = '2020-05-01T00:00'
     page.form.submit().follow()
@@ -211,6 +212,10 @@ def test_news_detail(client):
 
     more_news = news_detail.pyquery(".more-news a")
     more_news = ' '.join([a.text for a in more_news])
+
+    assert "/image.png" in news_detail
+
+    assert "/image.png" in news_list
 
     assert "Foo" not in more_news
     assert "One" not in more_news
