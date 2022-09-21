@@ -59,10 +59,10 @@ def test_settings(client):
 
     # test default not giving the color
     assert settings.form['left_header_color'].value == '#000000'
-    assert settings.form['left_header_announcement_bg_color'].value == (
+    assert settings.form['announcement_bg_color'].value == (
         '#FBBC05'
     )
-    assert settings.form['left_header_announcement_font_color'].value == (
+    assert settings.form['announcement_font_color'].value == (
         '#000000'
     )
 
@@ -70,9 +70,9 @@ def test_settings(client):
     settings.form['left_header_url'] = 'https://govikon.ch'
     settings.form['left_header_rem'] = 2.5
     settings.form['left_header_color'] = color
-    settings.form['left_header_announcement'] = text
-    settings.form['left_header_announcement_bg_color'] = bg_color
-    settings.form['left_header_announcement_font_color'] = color
+    settings.form['announcement'] = text
+    settings.form['announcement_bg_color'] = bg_color
+    settings.form['announcement_font_color'] = color
     page = settings.form.submit().follow()
     assert (
         f'<a href="https://govikon.ch" '
