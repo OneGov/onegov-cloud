@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-09-12 12:36+0200\n"
+"POT-Creation-Date: 2022-09-21 09:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1305,29 +1305,17 @@ msgstr "Dimensione relativa del carattere"
 msgid "Announcement"
 msgstr "Annuncio"
 
+msgid "Announcement URL"
+msgstr "URL per l'annuncio"
+
 msgid "Announcement bg color"
 msgstr "Colore di sfondo dell'annuncio"
 
 msgid "Announcement font color"
 msgstr "Colore del carattere dell'annuncio"
 
-msgid "Homepage Image #1"
-msgstr "Immagine n. 1 della pagina principale"
-
-msgid "Homepage Image #2"
-msgstr "Immagine n. 2 della pagina principale"
-
-msgid "Homepage Image #3"
-msgstr "Immagine n. 3 della pagina principale"
-
-msgid "Homepage Image #4"
-msgstr "Immagine n. 4 della pagina principale"
-
-msgid "Homepage Image #5"
-msgstr "Immagine n. 5 della pagina principale"
-
-msgid "Homepage Image #6"
-msgstr "Immagine n. 6 della pagina principale"
+msgid "Only show Announcement for logged-in users"
+msgstr "Mostra solo gli annunci per gli utenti connessi"
 
 msgid "Homepage Cover"
 msgstr "Copertina della pagina principale"
@@ -4755,6 +4743,12 @@ msgstr "Rimosse correttamente ${count} allocazioni inutilizzate"
 msgid "Exports the reservations of the given date range."
 msgstr "Esporta le prenotazioni dell'intervallo di date specificato."
 
+msgid "No reservations found for the given date range."
+msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."
+
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Esporta tutte le prenotazioni in un intervallo di date specifico"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\"?"
 msgstr "Vuoi davvero cancellare \"${name}\"?"
@@ -5031,8 +5025,20 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-msgid "Exports the reservations of all resources in a given date range."
-msgstr "Esporta tutte le prenotazioni in un intervallo di date specifico"
+#~ msgid "Homepage Image #1"
+#~ msgstr "Immagine n. 1 della pagina principale"
 
-msgid "No reservations found for the given date range."
-msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."
+#~ msgid "Homepage Image #2"
+#~ msgstr "Immagine n. 2 della pagina principale"
+
+#~ msgid "Homepage Image #3"
+#~ msgstr "Immagine n. 3 della pagina principale"
+
+#~ msgid "Homepage Image #4"
+#~ msgstr "Immagine n. 4 della pagina principale"
+
+#~ msgid "Homepage Image #5"
+#~ msgstr "Immagine n. 5 della pagina principale"
+
+#~ msgid "Homepage Image #6"
+#~ msgstr "Immagine n. 6 della pagina principale"
