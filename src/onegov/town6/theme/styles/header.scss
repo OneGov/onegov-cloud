@@ -203,6 +203,10 @@ $qr-code-icon: '\f029';
 #announcement_header {
     padding: 1rem;
     text-align: center;
+
+    p {
+        margin-bottom: 0;
+    }
 }
 
 $navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);

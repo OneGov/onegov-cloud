@@ -417,6 +417,10 @@ $globals-height: 2.5rem;
 #announcement_header {
     padding: 1rem;
     text-align: center;
+
+    p {
+        margin-bottom: 0;
+    }
 }
 
 #redactor-modal-box footer {
