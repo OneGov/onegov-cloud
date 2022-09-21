@@ -71,6 +71,7 @@ def test_settings(client):
     settings.form['left_header_rem'] = 2.5
     settings.form['left_header_color'] = color
     settings.form['announcement'] = text
+    settings.form['announcement_url'] = 'https://other-town.ch'
     settings.form['announcement_bg_color'] = bg_color
     settings.form['announcement_font_color'] = color
     page = settings.form.submit().follow()
@@ -79,9 +80,13 @@ def test_settings(client):
         f'style="color:{color}; font-size: 2.5rem">'
     ) in page
     assert text in page
+    assert '' in page
     assert (
-        f'<div id="announcement" style="color: {color}; '
-        f'background-color: {bg_color};">'
+        f'<div id="announcement_header" '
+        f'style="background-color: {bg_color};">'
+    ) in page
+    assert (
+        f'<a style="color: {color}" href="https://other-town.ch"'
     ) in page
 
 
