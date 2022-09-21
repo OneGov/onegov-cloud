@@ -424,6 +424,11 @@ class HeaderSettingsForm(Form):
         fieldset=_("Announcement"),
     )
 
+    left_header_announcement_url = StringField(
+        label=_("Announcement URL"),
+        fieldset=_("Announcement"),
+    )
+
     left_header_announcement_bg_color = ColorField(
         label=_("Announcement bg color"),
         fieldset=_("Announcement")
@@ -442,6 +447,8 @@ class HeaderSettingsForm(Form):
             'left_header_color': self.left_header_color.data.get_hex(),
             'left_header_rem': self.left_header_rem.data,
             'left_header_announcement': self.left_header_announcement.data,
+            'left_header_announcement_url':
+                self.left_header_announcement_url.data,
             'left_header_announcement_bg_color':
                 self.left_header_announcement_bg_color.data.get_hex(),
             'left_header_announcement_font_color':
@@ -458,6 +465,9 @@ class HeaderSettingsForm(Form):
         self.left_header_rem.data = options.get('left_header_rem', 1)
         self.left_header_announcement.data = options.get(
             'left_header_announcement', ""
+        )
+        self.left_header_announcement_url.data = options.get(
+            'left_header_announcement_url', ""
         )
         self.left_header_announcement_bg_color.data = options.get(
             'left_header_announcement_bg_color', '#FBBC05'

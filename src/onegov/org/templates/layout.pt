@@ -85,12 +85,15 @@
 
         <header tal:define="header_options request.app.org.header_options or {}" >
           <div tal:condition="header_options.get('left_header_announcement', '')"
-               id="announcement"
-               style="color: ${header_options.get('left_header_announcement_font_color', '#000000')};
-                      background-color: ${header_options.get('left_header_announcement_bg_color', '#FBBC05')};">
-              <div class="grid-container">
-                ${header_options['left_header_announcement']}
-              </div>
+                id="announcement"
+                style="background-color: ${header_options.get('left_header_announcement_bg_color', '#FBBC05')};">
+                    <div class="grid-container" tal:define="url header_options.get('left_header_announcement_url');">
+                          <a style="color: ${header_options.get('left_header_announcement_font_color', '#000000')}"
+                              tal:condition="url" href="${url}">
+                              <i class="fa fa-link"></i> ${header_options['left_header_announcement']}</a>
+                          <p style="color: ${header_options.get('left_header_announcement_font_color', '#000000')}"
+                              tal:condition="not url">${header_options['left_header_announcement']}</p>
+                    </div>
           </div>
           <div class="globals">
             <div class="row">
