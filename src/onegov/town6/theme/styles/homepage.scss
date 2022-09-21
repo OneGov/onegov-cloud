@@ -14,6 +14,45 @@
     }
 }
 
+.testimonial {
+    padding-bottom: 1rem;
+
+    &:last-of-type {
+        padding-bottom: 0;
+    }
+
+    > div {
+        align-items: center;
+        display: flex;
+    }
+
+    .description {
+        color: $primary-color;
+        margin-bottom: 0;
+    }
+
+    .quote {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+    }
+
+    .square-container {
+        padding-bottom: 100%;
+        position: relative;
+        width: 100%;
+    }
+
+    img {
+        border-radius: 50%;
+        bottom: 0;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+}
+
 .icon-link {
 
     .fa-external-link-alt {

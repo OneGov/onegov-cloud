@@ -1,8 +1,84 @@
 # Changes
 
+## 2022.48
+
+`2022-09-21` | [31de20c003...e4dc9ed6ab](https://github.com/OneGov/onegov-cloud/compare/31de20c003^...e4dc9ed6ab)
+
+### Core
+
+##### Catch no matching schemas in transfer command.
+
+Also improve help texts.
+
+`Feature` | [OGC-614](https://linear.app/onegovcloud/issue/OGC-614) | [53a304ad9b](https://github.com/onegov/onegov-cloud/commit/53a304ad9b52967dda8e3414a28473e9517c0f39)
+
+### Election Day
+
+##### Center skip links
+
+`Feature` | [OGC-558](https://linear.app/onegovcloud/issue/OGC-558) | [31de20c003](https://github.com/onegov/onegov-cloud/commit/31de20c0037bef6a0b07a8aa66b8e45aeb5b94d2)
+
+##### Avoid using an empty selector
+
+`Bugfix` | [OGC-561](https://linear.app/onegovcloud/issue/OGC-561) | [30ea5adfbe](https://github.com/onegov/onegov-cloud/commit/30ea5adfbe0e154bd79cf7817ba32773cddc6a58)
+
+### Feriennet
+
+##### Replace concordia banners.
+
+`Other` | [PRO-1082](https://linear.app/projuventute/issue/PRO-1082) | [25ebc75d2c](https://github.com/onegov/onegov-cloud/commit/25ebc75d2c021dc1f5077799943da5a2a469a5bb)
+
+##### Fix donation form providing invalid selection when custom donation amounts configuration is empty.
+
+`Bugfix` | [OGC-608](https://linear.app/onegovcloud/issue/OGC-608) | [1aba0a9b11](https://github.com/onegov/onegov-cloud/commit/1aba0a9b11ac92a3fbab5d844296fccb495ff97e)
+
+### Org
+
+##### Ability to export several reservations at once
+
+`Feature` | [OGC-574](https://linear.app/onegovcloud/issue/OGC-574) | [b7e9efcc5b](https://github.com/onegov/onegov-cloud/commit/b7e9efcc5b7b0fb3fe573d96ff1964e169d37c9a)
+
+##### Fully integrate Geo-BS
+
+`Feature` | [OGC-241](https://linear.app/onegovcloud/issue/OGC-241) | [ba82b41bfa](https://github.com/onegov/onegov-cloud/commit/ba82b41bfa95f166071f3a60e34bd2dd2756d3b3)
+
+### Swissvotes
+
+##### Fixes wildcard search.
+
+`Bugfix` | [OGC-609](https://linear.app/onegovcloud/issue/OGC-609) | [eba3224818](https://github.com/onegov/onegov-cloud/commit/eba32248189fd1393e7851bcd108112cfa56f50f)
+
+### Town6
+
+##### Add icon widget
+
+`Feature` | [OGC-579](https://linear.app/onegovcloud/issue/OGC-579) | [938e99fb75](https://github.com/onegov/onegov-cloud/commit/938e99fb7598a9070f670a5cd9679165bff7b6d5)
+
+##### Add option to receive a notification for new reservations
+
+`Feature` | [OGC-575](https://linear.app/onegovcloud/issue/OGC-575) | [c08e159593](https://github.com/onegov/onegov-cloud/commit/c08e1595937731c91ef904c4ab3d6eaa86c0df59)
+
+##### Add testimonial widget
+
+`Feature` | [OGC-580](https://linear.app/onegovcloud/issue/OGC-580) | [e4dc9ed6ab](https://github.com/onegov/onegov-cloud/commit/e4dc9ed6ab1fb9fd15367f418e41e1e5ebc7a492)
+
+##### Fix inconsistencies in setting option names
+
+`Bugfix` | [OGC-504](https://linear.app/onegovcloud/issue/OGC-504) | [a6f818ae1d](https://github.com/onegov/onegov-cloud/commit/a6f818ae1dbe72edf311fe2d4b123ea32c9cc43e)
+
+##### Remove unused tile image option in settings
+
+`Bugfix` | [OGC-592](https://linear.app/onegovcloud/issue/OGC-592) | [9c4de71ac3](https://github.com/onegov/onegov-cloud/commit/9c4de71ac3aac6efcbe4cda6e9c020aef63d3a95)
+
+### Winterthur
+
+##### Fixes flaky test.
+
+`Bugfix` | [ba468fc43d](https://github.com/onegov/onegov-cloud/commit/ba468fc43d98f668dbca7a6bb0e7b6b5a3e623fa)
+
 ## 2022.47
 
-`2022-09-11` | [73cba7eba1...73cba7eba1](https://github.com/OneGov/onegov-cloud/compare/73cba7eba1^...73cba7eba1)
+`2022-09-11` | [73cba7eba1...655cc2fe97](https://github.com/OneGov/onegov-cloud/compare/73cba7eba1^...655cc2fe97)
 
 ## 2022.46
 
@@ -2173,8 +2249,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ## 2021.100
 
 `2021-12-29` | [14d227380f...212583fb9d](https://github.com/OneGov/onegov-cloud/compare/14d227380f^...212583fb9d)
-
-## 2021.99
-
-`2021-12-22` | [6cebe417d2...579dbd0974](https://github.com/OneGov/onegov-cloud/compare/6cebe417d2^...579dbd0974)
 
