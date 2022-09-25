@@ -31,7 +31,7 @@ def groupbydict(items, keyfunc, sortfunc=None):
     )
 
 
-class ArchivedResultCollection(object):
+class ArchivedResultCollection:
 
     def __init__(self, session, date_=None):
         self.session = session

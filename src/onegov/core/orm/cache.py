@@ -27,7 +27,7 @@ import sqlalchemy
 from sqlalchemy.orm.query import Query
 
 
-class OrmCacheApp(object):
+class OrmCacheApp:
     """ Integrates the orm cache handling into the application
     (i.e. :class:`onegov.core.framework.Framework').
 
@@ -107,7 +107,7 @@ class OrmCacheApp(object):
                 yield member
 
 
-class OrmCacheDescriptor(object):
+class OrmCacheDescriptor:
     """ The descriptor implements the protocol for fetching the objects
     either from cache or from the database (through the handler).
 

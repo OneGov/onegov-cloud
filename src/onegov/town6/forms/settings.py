@@ -6,8 +6,10 @@ from onegov.org.forms.settings import GeneralSettingsForm as \
 from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
 from onegov.town6 import _
 from onegov.town6.theme import user_options
-from wtforms import validators, StringField, RadioField, \
-    BooleanField
+from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
 
 
 class GeneralSettingsForm(OrgGeneralSettingsForm):
@@ -17,14 +19,14 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
         label=_('Font family serif'),
         description=_('Used for text in html body'),
         choices=[],
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     header_font_family_ui = ChosenSelectField(
         label=_('Font family sans-serif'),
         description=_('Used for all the headings'),
         choices=[],
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     @property

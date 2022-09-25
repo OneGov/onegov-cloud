@@ -1,4 +1,3 @@
-import inspect
 import re
 import wtforms.widgets.core
 
@@ -38,26 +37,19 @@ def extract_text_from_html(html):
     return _html_tags.sub('', html)
 
 
-def use_required_attribute_in_html_inputs(use):
-    used = wtforms.widgets.core.html_params is original_html_params
+def disable_required_attribute_in_html_inputs():
+    """ Replaces the required attribute with aria-required. """
 
-    if use == used:
-        return
+    def patched_html_params(**kwargs):
+        if kwargs.pop('required', None):
+            kwargs['aria_required'] = True
+        return original_html_params(**kwargs)
 
-    if use:
-        function = original_html_params
-    else:
-        def patched_html_params(**kwargs):
-            kwargs.pop('required', None)
-            return original_html_params(**kwargs)
-
-        function = patched_html_params
-
-    wtforms.widgets.core.html_params = function
-    wtforms.widgets.core.Input.html_params = staticmethod(function)
+    wtforms.widgets.core.html_params = patched_html_params
+    wtforms.widgets.core.Input.html_params = staticmethod(patched_html_params)
 
 
-class decimal_range(object):
+class decimal_range:
     """ Implementation of Python's range builtin using decimal values instead
     of integers.
 
@@ -109,42 +101,6 @@ class decimal_range(object):
 
 def hash_definition(definition):
     return md5(definition.encode('utf-8')).hexdigest()
-
-
-def with_options(widget, **render_options):
-    """ Takes a widget class or instance and returns a child-instance of the
-    widget class, with the given options set on the render call.
-
-    This makes it easy to use existing WTForms widgets with custom render
-    options:
-
-    field = StringField(widget=with_options(TextArea, class_="markdown"))
-
-    Note: With wtforms 2.1 this is no longer necssary. Instead use the
-    render_kw parameter of the field class. This function will be deprecated
-    in a future release.
-
-    """
-
-    if inspect.isclass(widget):
-        class Widget(widget):
-
-            def __call__(self, *args, **kwargs):
-                render_options.update(kwargs)
-                return super().__call__(*args, **render_options)
-
-        return Widget()
-    else:
-        class Widget(widget.__class__):
-
-            def __init__(self):
-                self.__dict__.update(widget.__dict__)
-
-            def __call__(self, *args, **kwargs):
-                render_options.update(kwargs)
-                return widget.__call__(*args, **render_options)
-
-        return Widget()
 
 
 def path_to_filename(path):

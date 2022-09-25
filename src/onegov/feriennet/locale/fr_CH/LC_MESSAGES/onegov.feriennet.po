@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-24 15:51+0200\n"
+"POT-Creation-Date: 2022-09-05 10:29+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -13,9 +13,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 3.0\n"
-
-msgid "Partner of Pro Juventute"
-msgstr "Partenaires Pro Juventute"
 
 msgid "No active period"
 msgstr "Pas de période active"
@@ -627,8 +624,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "Conditions de participation"
 
@@ -2953,8 +2950,14 @@ msgstr "La période a été désactivée avec succès"
 msgid "The period was archived successfully"
 msgstr "La période a été archivée avec succès"
 
+msgid "QR-Bill"
+msgstr "QR-facture"
+
 msgid "Payment"
 msgstr "Paiement"
+
+msgid "Bank Account (IBAN / QR-IBAN)"
+msgstr "Compte bancaire (IBAN / QR-IBAN)"
 
 msgid "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
 msgstr "Passeport Vacances, Rue de la Gare 2, 1234 Exemple"
@@ -2965,20 +2968,17 @@ msgstr "Bulletin de versement"
 msgid "Basic"
 msgstr "Simple"
 
-msgid "ESR (General)"
-msgstr "BVR (Général)"
+msgid "ESR (General) / QR-Reference"
+msgstr "BVR (Général) / Référence QR"
 
 msgid "ESR (Raiffeisen)"
 msgstr "BVR (Raiffeisen)"
 
-msgid "ESR participant number"
-msgstr "Numéro de participant·e BVR"
+msgid "ESR participant number / QR-IBAN"
+msgstr "Numéro de participant·e BVR / QR-IBAN"
 
 msgid "ESR identification number"
 msgstr "Numéro de référence BVR"
-
-msgid "QR-Bill (experimental)"
-msgstr "QR-facture (expérimental)"
 
 msgid "Full age required for registration"
 msgstr "La majorité civile (18 ans) doit être atteinte pour l'inscription"
@@ -3046,11 +3046,13 @@ msgstr "N° IBAN non valide"
 msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
 msgstr "Les QR-factures nécessitent un n° IBAN en Suisse ou au Liechteinstein"
 
-msgid "This IBAN cannot be used for QR-Bills without ESR"
-msgstr "Ce n° IBAN ne peut pas être utilisé pour les QR-factures sans BVR"
+msgid "Select ESR (General) / QR-Reference when using the given QR-IBAN"
+msgstr ""
+"Sélectionnez BVR (Général) / Référence QR lorsque vous utilisez le QR-IBAN "
+"donné."
 
-msgid "This IBAN cannot be used for QR-Bills with ESR"
-msgstr "Ce n° IBAN ne peut pas être utilisé pour les QR-factures avec BVR"
+msgid "Select Basic when using the given IBAN"
+msgstr "Sélectionnez Simple lorsque vous utilisez l'IBAN donné"
 
 msgid "QR-Bills require a beneficiary"
 msgstr "Les QR-factures nécessitent un·e bénéficiaire"

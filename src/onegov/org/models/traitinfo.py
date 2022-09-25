@@ -39,7 +39,7 @@ TRAIT_MESSAGES = {
 }
 
 
-class TraitInfo(object):
+class TraitInfo:
     """" Typically used as a mixin for adjacency list based models,
     this class provides access to the trait related methods.
 
@@ -184,7 +184,7 @@ class TraitInfo(object):
 
         if request.is_admin and self.url_changeable:
             yield Link(
-                _('Change Url'),
+                _('Change URL'),
                 request.link(Editor('change-url', self)),
                 classes=('internal-url',)
             )

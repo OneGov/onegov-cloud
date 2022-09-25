@@ -1,6 +1,7 @@
 """ Offers tools to deal with csv (and xls, xlsx) files. """
 
 import codecs
+
 import openpyxl
 import re
 import sys
@@ -22,12 +23,19 @@ from ordered_set import OrderedSet
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
 
+from openpyxl.worksheet.worksheet import Worksheet
+from copy import copy
 
 VALID_CSV_DELIMITERS = {',', ';', '\t'}
 WHITESPACE = re.compile(r'\s+')
 
+small_chars = set('fijlrt:,;.+i ')
+large_chars = set('GHMWQ_')
 
-class CSVFile(object):
+max_width = 75
+
+
+class CSVFile:
     """ Provides access to a csv file.
 
     :param csvfile:
@@ -372,6 +380,33 @@ def convert_excel_to_csv(file, sheet_name=None):
         return convert_xls_to_csv(file, sheet_name)
 
 
+def character_width(char):
+    # those numbers have been acquired by chasing unicorns
+    # and fairies in the magic forest of Excel
+    #
+    # tweak them as needed, but know that there's no correct answer,
+    # as each excel version on each platform or os-version will render
+    # the fonts used at different widths
+    if char in small_chars:
+        return 0.75
+    elif char in large_chars:
+        return 1.2
+    else:
+        return 1
+
+
+def estimate_width(text):
+    if not text:
+        return 0
+
+    width = max(
+        sum(character_width(c) for c in line)
+        for line in text.splitlines()
+    )
+
+    return min(width, max_width)
+
+
 def get_keys_from_list_of_dicts(rows, key=None, reverse=False):
     """ Returns all keys of a list of dicts in an ordered tuple.
 
@@ -440,36 +475,6 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
     """
 
-    small_chars = set('fijlrt:,;.+i ')
-    large_chars = set('GHMWQ_')
-
-    max_width = 75
-
-    def character_width(char):
-        # those numbers have been acquired by chasing unicorns
-        # and fairies in the magic forest of Excel
-        #
-        # tweak them as needed, but know that there's no correct answer,
-        # as each excel version on each platform or os-version will render
-        # the fonts used at different widths
-        if char in small_chars:
-            return 0.75
-        elif char in large_chars:
-            return 1.2
-        else:
-            return 1
-
-    def estimate_width(text):
-        if not text:
-            return 0
-
-        width = max(
-            sum(character_width(c) for c in line)
-            for line in text.splitlines()
-        )
-
-        return min(width, max_width)
-
     with tempfile.NamedTemporaryFile() as file:
         workbook = Workbook(file.name, options={'constant_memory': True})
         cellformat = workbook.add_format({'text_wrap': True})
@@ -509,6 +514,89 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
         file.seek(0)
         return file.read()
+
+
+def merge_multiple_excel_files_into_one(xlsx_files, titles):
+    """
+    Combines multiple xlsx files into a single file, where each Worksheet
+    corresponds to a file.
+
+    :param xlsx_files: List of file-like objects open in binary mode
+    :param titles: List of the names for each Worksheet.
+    :returns:
+        - name - Name of the in-memory file
+    """
+
+    def copy_sheet(source_sheet: Worksheet, target_sheet: Worksheet):
+        copy_cells(source_sheet,
+                   target_sheet)  # copy all the cel values and styles
+        copy_sheet_attributes(source_sheet, target_sheet)
+
+    def copy_sheet_attributes(source_sheet: Worksheet,
+                              target_sheet: Worksheet):
+        target_sheet.sheet_format = copy(source_sheet.sheet_format)
+        target_sheet.sheet_properties = copy(source_sheet.sheet_properties)
+        target_sheet.merged_cells = copy(source_sheet.merged_cells)
+        target_sheet.page_margins = copy(source_sheet.page_margins)
+        target_sheet.freeze_panes = copy(source_sheet.freeze_panes)
+
+        for rn in range(len(source_sheet.row_dimensions)):
+            target_sheet.row_dimensions[rn] = copy(
+                source_sheet.row_dimensions[rn])
+
+        if source_sheet.sheet_format.defaultColWidth is not None:
+            target_sheet.sheet_format.defaultColWidth = copy(
+                source_sheet.sheet_format.defaultColWidth)
+
+        for key, value in source_sheet.column_dimensions.items():
+            target_sheet.column_dimensions[key].min = copy(
+                source_sheet.column_dimensions[
+                    key].min)
+            target_sheet.column_dimensions[key].max = copy(
+                source_sheet.column_dimensions[
+                    key].max)
+            target_sheet.column_dimensions[key].width = copy(
+                source_sheet.column_dimensions[
+                    key].width)  # set width for every column
+            target_sheet.column_dimensions[key].hidden = copy(
+                source_sheet.column_dimensions[key].hidden)
+
+    def copy_cells(source_sheet: Worksheet, target_sheet: Worksheet):
+        for (row, col), source_cell in source_sheet._cells.items():
+            target_cell = target_sheet.cell(column=col, row=row)
+
+            target_cell._value = source_cell._value
+            target_cell.data_type = source_cell.data_type
+
+            if source_cell.hyperlink:
+                target_cell._hyperlink = copy(source_cell.hyperlink)
+
+            if source_cell.comment:
+                target_cell.comment = copy(source_cell.comment)
+
+    wb_target = openpyxl.Workbook()
+    with tempfile.NamedTemporaryFile() as tmp:
+
+        target_sheets = (wb_target.create_sheet(title) for title in titles)
+
+        wb_sources = (openpyxl.load_workbook(filename=BytesIO(file),
+                                             data_only=True)
+                      for file in xlsx_files)
+
+        source_sheets = (workbook.worksheets[0] for workbook in wb_sources)
+
+        for source_sheet, target_sheets in zip(source_sheets, target_sheets):
+            copy_sheet(source_sheet, target_sheets)
+
+        if 'Sheet' in wb_target.sheetnames and len(wb_target.sheetnames) > 1:
+            # remove default sheet
+            wb_target.remove(wb_target['Sheet'])
+
+        wb_target.active = 0
+        wb_target.save(tmp.name)
+
+        tmp.seek(0)
+        return tmp.read()
 
 
 def parse_header(csv, dialect=None, rename_duplicate_column_names=False):
@@ -578,10 +666,10 @@ def match_headers(headers, expected):
         raise errors.DuplicateColumnNamesError()
 
     # we calculate a 'sane' levenshtein distance by comparing the
-    # the distances between all headers, permutations, as well as the lengths
+    # distances between all headers, permutations, as well as the lengths
     # of all expected headers. This makes sure we don't end up with matches
     # that make no sense (like ['first', 'second'] matching ['first', 'third'])
-    sane_distance = getattr(sys, 'maxsize', 0) or sys.maxint
+    sane_distance = getattr(sys, 'maxsize', 0) or sys.maxsize
 
     if len(headers) > 1:
         sane_distance = min((

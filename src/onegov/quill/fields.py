@@ -1,7 +1,7 @@
 from bleach.sanitizer import Cleaner
 from onegov.quill.widgets import QuillInput
 from onegov.quill.widgets import TAGS
-from wtforms import TextAreaField
+from wtforms.fields import TextAreaField
 
 
 class QuillField(TextAreaField):

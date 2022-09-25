@@ -5,17 +5,19 @@ from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
-from onegov.org.forms.extensions import (
-    CoordinatesFormExtension, PublicationFormExtension)
+from onegov.org.forms.extensions import CoordinatesFormExtension
+from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.people import Person, PersonCollection
-from sqlalchemy.orm import object_session
-from wtforms import (
-    BooleanField, RadioField, StringField, TextAreaField, ValidationError)
-
 from onegov.reservation import Resource
+from sqlalchemy.orm import object_session
+from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import ValidationError
 
 
-class ContentExtension(object):
+class ContentExtension:
     """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
     with custom data that is stored in either 'meta' or 'content'.
 

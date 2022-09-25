@@ -7,7 +7,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
-from wtforms import BooleanField, IntegerField, RadioField
+from wtforms.fields import BooleanField, IntegerField, RadioField
 from wtforms.validators import Optional, NumberRange
 
 
@@ -16,8 +16,8 @@ class AgencySettingsForm(Form):
     topmost_levels = 1, 2, 3
 
     pdf_layout = RadioField(
-        label=_("PDF Layout"),
-        fieldset=_("Layout"),
+        label=_("PDF Design"),
+        fieldset=_("PDF Layout"),
         default='default',
         choices=[
             ('default', _("Default")),
@@ -29,7 +29,7 @@ class AgencySettingsForm(Form):
 
     root_pdf_page_break = RadioField(
         label=_('For root PDF, page after every:'),
-        fieldset=_("Layout"),
+        fieldset=_("PDF Layout"),
         choices=[
             ('1', _("1 Heading")),
             ('2', _("1.1 Heading")),
@@ -40,7 +40,7 @@ class AgencySettingsForm(Form):
 
     orga_pdf_page_break = RadioField(
         label=_("For organisation PDF's, page after every:"),
-        fieldset=_("Layout"),
+        fieldset=_("PDF Layout"),
         choices=[
             ('1', _("1 Heading")),
             ('2', _("1.1 Heading")),
@@ -51,12 +51,12 @@ class AgencySettingsForm(Form):
 
     link_color = ColorField(
         label=_('PDF link color'),
-        fieldset=_("Layout")
+        fieldset=_("PDF Layout")
     )
 
     underline_links = BooleanField(
         label=_("Underline pdf links"),
-        fieldset=_("Layout")
+        fieldset=_("PDF Layout")
     )
 
     agency_display = ChosenSelectMultipleField(

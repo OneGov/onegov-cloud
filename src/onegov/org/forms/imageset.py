@@ -1,11 +1,14 @@
 from onegov.form import Form
 from onegov.org import _
-from wtforms import BooleanField, RadioField, StringField, TextAreaField
-from wtforms import validators
+from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
 
 
 class ImageSetForm(Form):
-    title = StringField(_("Title"), [validators.InputRequired()])
+    title = StringField(_("Title"), [InputRequired()])
 
     lead = TextAreaField(
         label=_("Lead"),

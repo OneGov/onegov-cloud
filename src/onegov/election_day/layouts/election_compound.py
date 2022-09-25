@@ -13,12 +13,17 @@ class ElectionCompoundLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'list-groups', 'superregions', 'districts', 'candidates',
+        'seat-allocation',
+        'list-groups',
+        'superregions',
+        'districts',
+        'candidates',
         'statistics'
     )
 
     majorz = False
     proporz = True
+    type = 'compound'
 
     @cached_property
     def table_link(self):
@@ -32,6 +37,7 @@ class ElectionCompoundLayout(DetailLayout):
     def all_tabs(self):
         """ Return the tabs in order of their appearance. """
         return (
+            'seat-allocation',
             'list-groups',
             'superregions',
             'districts',
@@ -42,11 +48,9 @@ class ElectionCompoundLayout(DetailLayout):
             'data'
         )
 
-    @property
+    @cached_property
     def results(self):
-        for e in self.model.elections:
-            for result in e.results:
-                yield result
+        return self.model.results
 
     @cached_property
     def has_districts(self):
@@ -79,6 +83,8 @@ class ElectionCompoundLayout(DetailLayout):
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
 
+        if tab == 'seat-allocation':
+            return _("Seat allocation")
         if tab == 'list-groups':
             return _("List groups")
         if tab == 'superregions':
@@ -106,6 +112,11 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         if tab == 'superregions':
             return self.has_superregions
+        if tab == 'seat-allocation':
+            return (
+                self.model.show_seat_allocation is True
+                and self.has_party_results
+            )
         if tab == 'list-groups':
             return (
                 self.model.show_list_groups is True

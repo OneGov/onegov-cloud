@@ -5,7 +5,7 @@ from onegov.core.theme import get_filename
 from webtest import TestApp as Client
 
 
-class MockTheme(object):
+class MockTheme:
 
     def __init__(self, name, version, result=''):
         self.name = name
@@ -37,7 +37,7 @@ def test_theme_application(temporary_directory, redis_url):
         }
 
     @App.path('/')
-    class Model(object):
+    class Model:
         pass
 
     @App.setting(section='core', name='theme')

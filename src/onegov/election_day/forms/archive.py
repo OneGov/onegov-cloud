@@ -1,8 +1,8 @@
+from onegov.election_day import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
-from wtforms.fields.html5 import DateField
-from wtforms import StringField
-from onegov.election_day import _
+from wtforms.fields import DateField
+from wtforms.fields import StringField
 
 
 class ArchiveSearchForm(Form):
@@ -12,7 +12,7 @@ class ArchiveSearchForm(Form):
         render_kw={'size': 4, 'clear': False},
         description=_(
             "Searches the title of the election/vote. "
-            "Use Wilcards (*) to find more results, e.g Nationalrat*."
+            "Use Wildcards (*) to find more results, e.g Nationalrat*."
         ),
     )
 
@@ -66,7 +66,7 @@ class ArchiveSearchFormVote(ArchiveSearchForm):
     def on_request(self):
         super().on_request()
         principal = self.request.app.principal
-        self.domains.choices = principal.domains_vote.items()
+        self.domains.choices = list(principal.domains_vote.items())
 
     def apply_model(self, model):
         super().apply_model(model)

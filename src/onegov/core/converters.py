@@ -1,4 +1,4 @@
-""" Contains custom converters used by onegov.town. """
+""" Contains custom converters. """
 
 import isodate
 import morepath

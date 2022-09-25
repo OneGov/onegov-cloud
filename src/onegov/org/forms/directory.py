@@ -21,14 +21,16 @@ from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentMethodForm
 from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
-from wtforms import BooleanField
-from wtforms import DecimalField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import ValidationError
-from wtforms import validators
 from wtforms_components import ColorField
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import ValidationError
 
 
 class DirectoryBaseForm(Form):
@@ -37,7 +39,7 @@ class DirectoryBaseForm(Form):
     title = StringField(
         label=_("Title"),
         fieldset=_("General"),
-        validators=[validators.InputRequired()])
+        validators=[InputRequired()])
 
     lead = TextAreaField(
         label=_("Lead"),
@@ -53,7 +55,7 @@ class DirectoryBaseForm(Form):
         label=_("Definition"),
         fieldset=_("General"),
         validators=[
-            validators.InputRequired(),
+            InputRequired(),
             ValidFormDefinition(
                 require_email_field=False,
                 require_title_fields=True
@@ -83,7 +85,7 @@ class DirectoryBaseForm(Form):
     title_format = StringField(
         label=_("Title-Format"),
         fieldset=_("Display"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         render_kw={'class_': 'formcode-format'})
 
     lead_format = StringField(
@@ -180,7 +182,7 @@ class DirectoryBaseForm(Form):
         label=_("Order-Format"),
         fieldset=_("Order"),
         render_kw={'class_': 'formcode-format'},
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         depends_on=('order', 'by-format'))
 
     order_direction = RadioField(
@@ -230,7 +232,7 @@ class DirectoryBaseForm(Form):
         label=_("Price per submission"),
         fieldset=_("New entries"),
         filters=(as_float, ),
-        validators=[validators.Optional()],
+        validators=[Optional()],
         depends_on=('enable_submissions', 'y', 'price', 'paid'))
 
     currency = StringField(
@@ -238,7 +240,7 @@ class DirectoryBaseForm(Form):
         fieldset=_("New entries"),
         default="CHF",
         depends_on=('enable_submissions', 'y', 'price', 'paid'),
-        validators=[validators.InputRequired()])
+        validators=[InputRequired()])
 
     enable_change_requests = BooleanField(
         label=_("Users may send change requests"),
@@ -536,7 +538,7 @@ class DirectoryImportForm(Form):
             ('no', _("No, only import entries"))
         ),
         default='no',
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     mode = RadioField(
@@ -546,13 +548,13 @@ class DirectoryImportForm(Form):
             ('replace', _("Replace all entries")),
         ),
         default='new',
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     zip_file = UploadField(
         label=_("Import"),
         validators=[
-            validators.DataRequired(),
+            DataRequired(),
             WhitelistedMimeType({
                 'application/zip',
                 'application/octet-stream'

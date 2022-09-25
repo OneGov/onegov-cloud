@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-20 06:34+0200\n"
+"POT-Creation-Date: 2022-09-02 11:11+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -94,6 +94,10 @@ msgstr ""
 #, python-format
 msgid "Not an alphanumeric: ${col}"
 msgstr "Betg alfanumeric: ${col}"
+
+#, python-format
+msgid "Invalid gender: ${value}"
+msgstr "Schlattaina nunvalaivla: ${value}"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -224,10 +228,10 @@ msgid "Term"
 msgstr "Noziun tschertgada"
 
 msgid ""
-"Searches the title of the election/vote. Use Wilcards (*) to find more "
+"Searches the title of the election/vote. Use Wildcards (*) to find more "
 "results, e.g Nationalrat*."
 msgstr ""
-"Tschertga en il titel da l'elecziun u da la votaziun. Utilisai wildcards (*) "
+"Tschertga en il titel da l'elecziun u da la votaziun. Utilisai Wildcards (*) "
 "per survegnir dapli resultats, p.ex. scola*."
 
 msgid "From date"
@@ -405,6 +409,12 @@ msgstr "Terminaziun"
 msgid "Completed"
 msgstr "Terminà"
 
+msgid "Upper apportionment (PDF)"
+msgstr "Attribuziun superiura (PDF)"
+
+msgid "Lower apportionment (PDF)"
+msgstr "Sutattribuziun (PDF)"
+
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
@@ -429,6 +439,19 @@ msgstr "Dumber d'electurs exact"
 msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
 
+msgid "Seat allocation"
+msgstr "Repartiziun dals sezs"
+
+msgid ""
+"Shows a tab with the comparison of seat allocation as a bar chart. Requires "
+"party results."
+msgstr ""
+"Mussa ina carta da register cun la repartiziun dals sezs en furma d'in "
+"diagram a travs. Pretenda resultats da partidas."
+
+msgid "Views"
+msgstr "Vistas"
+
 msgid "List groups"
 msgstr "Gruppas da glistas"
 
@@ -438,21 +461,6 @@ msgid ""
 msgstr ""
 "Mussa ina carta da register cun resultats da gruppas da glistas. Pretenda "
 "resultats da partidas cun cifras electoralas. Mo en cas dal Pukelsheim dubel."
-
-msgid "Views"
-msgstr "Vistas"
-
-msgid "Lists"
-msgstr "Glistas"
-
-msgid ""
-"Shows a tab with aggregated list results over all elections. Only useful if "
-"the lists correspond to the list groups. Only if Doppelter Pukelsheim. "
-"Always rounded."
-msgstr ""
-"Mussa ina carta da register cun resultats da glistas agregads per tut las "
-"elecziuns. Mo raschunaivel, sche las glistas correspundan a las gruppas da "
-"glistas. Mo en cas dal Pukelsheim dubel."
 
 msgid "Party strengths"
 msgstr "Forza da las partidas"
@@ -596,6 +604,12 @@ msgstr "Titel da la cuntraproposta"
 msgid "Title of the tie breaker"
 msgstr "Titel da la dumonda decisiva"
 
+msgid "Link to homepage"
+msgstr "Link a la pagina iniziala"
+
+msgid "Lists"
+msgstr "Glistas"
+
 msgid "Candidates"
 msgstr "Candidatas e candidats"
 
@@ -725,6 +739,9 @@ msgstr "Quartiers"
 msgid "Last change"
 msgstr "Actualisà"
 
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
 
@@ -734,9 +751,6 @@ msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 #, python-format
 msgid "Elections and votes on ${date}"
 msgstr "Votaziun dals ${date}"
-
-msgid "Archive"
-msgstr "Archiv"
 
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
@@ -771,6 +785,9 @@ msgstr "Dumbrà ora"
 msgid "Updated"
 msgstr "Actualisà"
 
+msgid "No results yet"
+msgstr "Anc nagins resultats avant maun"
+
 msgid "Result"
 msgstr "Resultat"
 
@@ -786,6 +803,9 @@ msgstr "Tschertga en l'archiv"
 msgid "Search in ${title}"
 msgstr "­Tschertgar en ${title}"
 
+msgid "Search results"
+msgstr "Resultats da tschertga"
+
 msgid "Found ${item_count} items."
 msgstr "${item_count} resultats."
 
@@ -796,7 +816,7 @@ msgid "No candidacies."
 msgstr "Naginas candidaturas."
 
 msgid "Download diagram"
-msgstr ""
+msgstr "Telechargiar il diagram"
 
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -844,9 +864,6 @@ msgstr ""
 "mintgamai divididas tras il dumber da sezs ch'èn d'occupar en il circul "
 "electoral respectiv. Il resultat da quai è il dumber d'electurs."
 
-msgid "Voters count"
-msgstr "Cifra electorala"
-
 msgid "The file is invalid."
 msgstr "La datoteca è nunvalaivla."
 
@@ -854,13 +871,19 @@ msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads."
 
-#.
-#. Default: Start
-msgid "homepage"
+msgid "Homepage"
 msgstr "Pagina iniziala"
 
-msgid "Logo: Link to homepage"
-msgstr "Logo: Link a la pagina iniziala"
+msgid "Content"
+msgstr "Cuntegn"
+
+msgid "Sitemap"
+msgstr "Sitemap"
+
+#. Default: Start
+#.
+msgid "homepage"
+msgstr "Pagina iniziala"
 
 msgid "Footer"
 msgstr "Pe-pagina"
@@ -885,6 +908,15 @@ msgstr "Emblidà il pled-clav?"
 
 msgid "Reset password"
 msgstr "Redefinir il pled-clav"
+
+msgid "female"
+msgstr "feminin"
+
+msgid "male"
+msgstr "masculin"
+
+msgid "undetermined"
+msgstr "nundeterminà"
 
 msgid "Actions"
 msgstr "Acziuns"
@@ -962,6 +994,9 @@ msgstr "Sutcolliaziun da glistas"
 msgid "Subtotal"
 msgstr "Summa intermediara"
 
+msgid "Party"
+msgstr "Partida"
+
 msgid "eligible Voters"
 msgstr "Persunas cun dretg d’eleger"
 
@@ -986,9 +1021,6 @@ msgstr "Participaziun a las elecziuns"
 msgid "Candidate"
 msgstr "Persuna che candidescha"
 
-msgid "Party"
-msgstr "Partida"
-
 msgid "List"
 msgstr "Glista"
 
@@ -1010,6 +1042,9 @@ msgstr "Mo candidat(a)s elegid(a)s"
 msgid "List group"
 msgstr "Gruppa da glista"
 
+msgid "Voters count"
+msgstr "Cifra electorala"
+
 msgid "Embed diagram"
 msgstr "Integrar diagram"
 
@@ -1028,14 +1063,14 @@ msgstr "Trametter"
 msgid "Previous Page"
 msgstr "Pagina precedenta"
 
+msgid "(active)"
+msgstr "(activ)"
+
 msgid "Next Page"
 msgstr "Proxima pagina"
 
 msgid "You are here"
 msgstr "Pagina actuala"
-
-msgid "No results yet"
-msgstr "Anc nagins resultats avant maun"
 
 msgid "Alerts"
 msgstr "Communicaziuns"
@@ -1104,6 +1139,9 @@ msgid "The raw data of the candidates are available in the following formats:"
 msgstr ""
 "Las datas nunelavuradas da las candidatas e dals candidats èn disponiblas en "
 "ils suandants formats:"
+
+msgid "The raw data are available in the following formats:"
+msgstr "Las datas nunelavuradas èn disponiblas en ils suandants formats:"
 
 msgid "The raw data of the parties are available in the following formats:"
 msgstr ""
@@ -1177,6 +1215,12 @@ msgstr ""
 "midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
 "vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
 "proporziunala a las vuschs."
+
+msgid "Count"
+msgstr "Dumber"
+
+msgid "Average age"
+msgstr "Vegliadetgna media"
 
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
@@ -1705,3 +1749,9 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Logo ${layout.principal.name}: Link to homepage"
+#~ msgstr "Logo ${layout.principal.name}: Colliaziun a la homepage"
+
+#~ msgid "Logo: Link to homepage"
+#~ msgstr "Logo: Link a la pagina iniziala"

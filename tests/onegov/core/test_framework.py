@@ -21,7 +21,8 @@ from tempfile import NamedTemporaryFile
 from unittest.mock import patch
 from urllib.parse import parse_qsl
 from webtest import TestApp as Client
-from wtforms import Form, StringField
+from wtforms import Form
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 
@@ -60,11 +61,11 @@ def test_virtual_host_request(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.path(path='/blog')
-    class Blog(object):
+    class Blog:
         pass
 
     @App.view(model=Root)
@@ -138,7 +139,7 @@ def test_browser_session_request(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root)
@@ -195,7 +196,7 @@ def test_browser_session_dirty(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root, name='undirty')
@@ -238,10 +239,10 @@ def test_request_messages(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
-    class Message(object):
+    class Message:
         def __init__(self, text, type):
             self.text = text
             self.type = type
@@ -304,7 +305,7 @@ def test_fix_webassets_url(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.html(model=Root)
@@ -407,7 +408,7 @@ def test_csrf(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root, request_method='GET')
@@ -453,7 +454,7 @@ def test_get_form(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.form(model=Root, form=PlainForm, name='plain')
@@ -493,7 +494,7 @@ def test_get_localized_form(redis_url):
         default_locale = None
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.form(model=Root, form=LocalizedForm, name='form')
@@ -541,7 +542,7 @@ def test_fixed_translation_chain_length(redis_url):
             return {'de': NullTranslations()}
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.form(model=Root, form=LocalizedForm, name='form')
@@ -702,11 +703,11 @@ def test_object_by_path():
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.path(path='/pages', absorb=True)
-    class Page(object):
+    class Page:
         def __init__(self, absorb):
             self.absorb = absorb
 
@@ -741,7 +742,7 @@ def test_send_email_transaction(tmpdir, redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root, name='send-fail')

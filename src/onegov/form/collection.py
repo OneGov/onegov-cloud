@@ -18,7 +18,7 @@ from sqlalchemy import func, exc, inspect
 from uuid import uuid4
 
 
-class FormCollection(object):
+class FormCollection:
     """ Manages a collection of forms and form-submissions. """
 
     def __init__(self, session):
@@ -68,7 +68,7 @@ class FormCollection(object):
             yield form
 
 
-class FormDefinitionCollection(object):
+class FormDefinitionCollection:
     """ Manages a collection of forms. """
 
     def __init__(self, session):
@@ -158,7 +158,7 @@ class FormDefinitionCollection(object):
         return self.query().filter(FormDefinition.name == name).first()
 
 
-class FormSubmissionCollection(object):
+class FormSubmissionCollection:
     """ Manages a collection of submissions. """
 
     def __init__(self, session, name=None):

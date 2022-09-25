@@ -1,23 +1,23 @@
-import importlib
-import re
-
 import humanize
+import importlib
 import phonenumbers
+import re
 
 from cgi import FieldStorage
 from mimetypes import types_map
 from onegov.form import _
-from onegov.form.utils import with_options
-from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError, \
-    FieldCompileError
+from onegov.form.errors import DuplicateLabelError
+from onegov.form.errors import FieldCompileError
+from onegov.form.errors import InvalidFormSyntax
 from stdnum.exceptions import ValidationError as StdnumValidationError
-from wtforms import ValidationError
 from wtforms.fields import SelectField
-from wtforms.validators import InputRequired, Optional, StopValidation
-from wtforms.compat import string_types
+from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import StopValidation
+from wtforms.validators import ValidationError
 
 
-class Stdnum(object):
+class Stdnum:
     """ Validates a string using any python-stdnum format.
 
     See `<https://github.com/arthurdejong/python-stdnum>`_.
@@ -39,7 +39,7 @@ class Stdnum(object):
             raise ValidationError(field.gettext('Invalid input.'))
 
 
-class FileSizeLimit(object):
+class FileSizeLimit:
     """ Makes sure an uploaded file is not bigger than the given number of
     bytes.
 
@@ -63,7 +63,7 @@ class FileSizeLimit(object):
                 raise ValidationError(message)
 
 
-class WhitelistedMimeType(object):
+class WhitelistedMimeType:
     """ Makes sure an uploaded file is in a whitelist of allowed mimetypes.
 
     Expects an :class:`onegov.form.fields.UploadField` instance.
@@ -114,7 +114,7 @@ class ExpectedExtensions(WhitelistedMimeType):
         super().__init__(whitelist=mimetypes)
 
 
-class ValidFormDefinition(object):
+class ValidFormDefinition:
     """ Makes sure the given text is a valid onegov.form definition. """
 
     message = _("The form could not be parsed.")
@@ -140,9 +140,8 @@ class ValidFormDefinition(object):
             try:
                 form = parse_form(field.data)()
             except InvalidFormSyntax as e:
-                field.widget = with_options(
-                    field.widget, **{'data-highlight-line': e.line}
-                )
+                field.render_kw = field.render_kw or {}
+                field.render_kw['data-highlight-line'] = e.line
                 raise ValidationError(
                     field.gettext(self.syntax).format(line=e.line)
                 )
@@ -188,7 +187,7 @@ class StrictOptional(Optional):
         if not value:
             return True
 
-        if isinstance(value, string_types):
+        if isinstance(value, str):
             return not self.string_check(value)
 
         return False
@@ -208,7 +207,7 @@ class StrictOptional(Optional):
             raise StopValidation()
 
 
-class ValidPhoneNumber(object):
+class ValidPhoneNumber:
     """ Makes sure the given input is valid phone number.
 
     Expects an :class:`wtforms.StringField` instance.
@@ -238,7 +237,7 @@ class ValidPhoneNumber(object):
 swiss_ssn_rgxp = re.compile(r'756\.\d{4}\.\d{4}\.\d{2}$')
 
 
-class ValidSwissSocialSecurityNumber(object):
+class ValidSwissSocialSecurityNumber:
     """ Makes sure the given input is a valid swiss social security number.
 
     Expects an :class:`wtforms.StringField` instance.
@@ -253,7 +252,7 @@ class ValidSwissSocialSecurityNumber(object):
                 raise ValidationError(self.message)
 
 
-class UniqueColumnValue(object):
+class UniqueColumnValue:
     """ Test if the given table does not already have a value in the column
     (identified by the field name).
 

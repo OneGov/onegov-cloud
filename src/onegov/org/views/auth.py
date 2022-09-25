@@ -202,13 +202,12 @@ def do_logout_with_external_provider(self, request):
     if isinstance(self.app, UserApp) and user.source:
         for provider in self.app.providers:
             if isinstance(provider, OauthProvider):
-                # skip provider if there is no active session with the
-                # external provider
-                if not provider.applies_to(request, user):
-                    continue
-
-                request.browser_session['logout_to'] = self.to
-                return morepath.redirect(provider.logout_url(request, user))
+                response = provider.do_logout(request, user, self.to)
+                # some providers may not need to redirect, in which
+                # case we just fall through to regular do_logout or
+                # the next provider
+                if response is not None:
+                    return response
 
     return do_logout(self, request)
 

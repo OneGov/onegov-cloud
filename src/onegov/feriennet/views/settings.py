@@ -2,6 +2,9 @@ from onegov.core.security import Secret
 from onegov.feriennet import _
 from onegov.feriennet.app import FeriennetApp
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
+from onegov.feriennet.qrbill import beneficiary_to_creditor
+from onegov.feriennet.qrbill import qr_iban
+from onegov.feriennet.qrbill import swiss_iban
 from onegov.feriennet.utils import format_donation_amounts
 from onegov.feriennet.utils import parse_donation_amounts
 from onegov.form import Form
@@ -10,19 +13,24 @@ from onegov.form.validators import Stdnum
 from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
-from onegov.feriennet.qrbill import qr_iban
-from onegov.feriennet.qrbill import swiss_iban
-from onegov.feriennet.qrbill import beneficiary_to_creditor
 from stdnum import iban
-from wtforms.fields import BooleanField, StringField, RadioField, TextAreaField
-from wtforms.fields.html5 import URLField
+from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 
 
 class FeriennetSettingsForm(Form):
 
+    bank_qr_bill = BooleanField(
+        label=_("QR-Bill"),
+        fieldset=_("Payment")
+    )
+
     bank_account = StringField(
-        label=_("Bank Account (IBAN)"),
+        label=_("Bank Account (IBAN / QR-IBAN)"),
         fieldset=_("Payment"),
         validators=[Stdnum(format='iban')]
     )
@@ -38,14 +46,14 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Payment"),
         choices=[
             ('feriennet-v1', _("Basic")),
-            ('esr-v1', _("ESR (General)")),
+            ('esr-v1', _("ESR (General) / QR-Reference")),
             ('raiffeisen-v1', _("ESR (Raiffeisen)"))
         ],
         default='feriennet-v1'
     )
 
     bank_esr_participant_number = StringField(
-        label=_("ESR participant number"),
+        label=_("ESR participant number / QR-IBAN"),
         fieldset=_("Payment"),
         validators=[InputRequired()],
         depends_on=('bank_reference_schema', '!feriennet-v1')
@@ -56,11 +64,6 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Payment"),
         validators=[InputRequired()],
         depends_on=('bank_reference_schema', 'raiffeisen-v1')
-    )
-
-    bank_qr_bill = BooleanField(
-        label=_("QR-Bill (experimental)"),
-        fieldset=_("Payment")
     )
 
     require_full_age_for_registration = BooleanField(
@@ -161,15 +164,16 @@ class FeriennetSettingsForm(Form):
                 return False
 
             if qr_iban(self.bank_account.data):
-                if self.bank_reference_schema.data == 'feriennet-v1':
-                    self.bank_account.errors.append(_(
-                        "This IBAN cannot be used for QR-Bills without ESR"
+                if self.bank_reference_schema.data != 'esr-v1':
+                    self.bank_reference_schema.errors.append(_(
+                        "Select ESR (General) / QR-Reference when using the "
+                        "given QR-IBAN"
                     ))
                     return False
             else:
                 if self.bank_reference_schema.data != 'feriennet-v1':
-                    self.bank_account.errors.append(_(
-                        "This IBAN cannot be used for QR-Bills with ESR"
+                    self.bank_reference_schema.errors.append(_(
+                        "Select Basic when using the given IBAN"
                     ))
                     return False
 

@@ -7,7 +7,7 @@ from sqlalchemy.schema import Column
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
-class TimestampMixin(object):
+class TimestampMixin:
     """ Mixin providing created/modified timestamps for all records.
 
     The columns are deferred loaded as this is primarily for logging and future

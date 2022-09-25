@@ -45,7 +45,7 @@ def view_upload(self, request, form):
                 errors = import_vote_internal(
                     self,
                     principal,
-                    form.proposal.raw_data[0].file,
+                    form.proposal.file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
@@ -53,7 +53,7 @@ def view_upload(self, request, form):
                     self,
                     principal,
                     form.vote_number.data,
-                    form.proposal.raw_data[0].file,
+                    form.proposal.file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti_c':
@@ -64,9 +64,9 @@ def view_upload(self, request, form):
                             principal,
                             source.number,
                             source.district,
-                            form.sg_geschaefte.raw_data[0].file,
+                            form.sg_geschaefte.file,
                             form.sg_geschaefte.data['mimetype'],
-                            form.sg_gemeinden.raw_data[0].file,
+                            form.sg_gemeinden.file,
                             form.sg_gemeinden.data['mimetype']
                         )
                     )
@@ -74,7 +74,7 @@ def view_upload(self, request, form):
                 errors = import_vote_wabstim(
                     self,
                     principal,
-                    form.proposal.raw_data[0].file,
+                    form.proposal.file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'default':
@@ -89,7 +89,7 @@ def view_upload(self, request, form):
                             self,
                             principal,
                             ballot_type,
-                            field.raw_data[0].file,
+                            field.file,
                             field.data['mimetype']
                         )
                     )

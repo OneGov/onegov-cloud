@@ -9,7 +9,8 @@ import transaction
 from collections import OrderedDict
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, Vote, ProporzElection, ComplexVote
+from onegov.ballot import Election, Vote, ProporzElection, ComplexVote, \
+    ElectionCompound
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.hidden_by_principal import \
@@ -20,7 +21,7 @@ from onegov.election_day.formats import import_election_internal_majorz, \
     import_election_internal_proporz, import_election_wabstic_proporz, \
     import_election_wabstic_majorz, import_election_wabsti_proporz, \
     import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti, \
-    import_party_results
+    import_party_results, import_election_compound_internal
 from tests.onegov.election_day.common import print_errors, \
     get_tar_file_path, create_principal
 from onegov.pdf import Pdf
@@ -184,7 +185,7 @@ def import_elections_internal(
         date_,
         domain_segment,
         dataset_name,
-        expats,
+        has_expats,
         election,
         municipality
 ):
@@ -239,7 +240,7 @@ def import_elections_internal(
                     domain=domain,
                     domain_segment=domain_segment,
                     type=election_type,
-                    expats=expats,
+                    has_expats=has_expats,
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(election)
@@ -249,6 +250,95 @@ def import_elections_internal(
             )
             loaded_elections[election.title] = (election, errors)
     print(tar_fp)
+    assert loaded_elections, 'No election was loaded'
+    return loaded_elections
+
+
+def import_election_compounds_internal(
+        principal,
+        domain,
+        session,
+        number_of_mandates,
+        date_,
+        domain_segment,
+        dataset_name,
+        has_expats,
+        election,
+        municipality
+):
+    """
+    Import test datasets in internal formats. For one election, there is
+    a single file to load, so subfolders are not necessary.
+
+    :param dataset_name: use the filename without ending
+    :return:
+    """
+    assert isinstance(principal, str)
+    assert isinstance(domain_segment, (tuple, list))
+    assert isinstance(number_of_mandates, (tuple, list))
+    assert len(domain_segment) == len(number_of_mandates)
+    if dataset_name:
+        assert '.' not in dataset_name, 'Remove the file ending' \
+                                        ' from dataset_name'
+
+    api = 'internal'
+    mimetype = 'text/plain'
+
+    loaded_elections = OrderedDict()
+
+    tar_fp = get_tar_file_path(domain, principal, api, 'election', 'proporz')
+    with tarfile.open(tar_fp, 'r:gz') as f:
+        # According to docs, both methods return the same ordering
+        members = f.getmembers()
+        names = [fn.split('.')[0] for fn in f.getnames()]
+
+        for name, member in zip(names, members):
+            if dataset_name and dataset_name != name:
+                continue
+            print(f'reading {name}.csv ...')
+
+            if not date_:
+                year = re.search(r'(\d){4}', name).group(0)
+                assert year, 'Put the a year into the filename'
+                election_date = date(int(year), 1, 1)
+            else:
+                election_date = date_
+
+            elections = []
+            if not election:
+                election = ElectionCompound(
+                    title=f'compound_{api}_{name}',
+                    date=election_date,
+                    domain='canton',
+                )
+                for index in range(len(domain_segment)):
+                    proporz_election = ProporzElection(
+                        title=f'proporz_{api}_{domain_segment[index]}',
+                        date=election_date,
+                        shortcode=f'{index}',
+                        number_of_mandates=number_of_mandates[index],
+                        domain=domain,
+                        domain_segment=domain_segment[index],
+                        has_expats=has_expats,
+                    )
+                    elections.append(proporz_election)
+                    session.add(proporz_election)
+
+            session.add(election)
+            session.flush()
+
+            election.elections = elections if elections else election.elections
+            assert election.number_of_mandates == sum(number_of_mandates)
+
+            principal_obj = create_principal(principal, municipality)
+            csv_file = f.extractfile(member).read()
+            errors = import_election_compound_internal(
+                election, principal_obj, BytesIO(csv_file), mimetype,
+            )
+            loaded_elections[election.title] = (election, errors)
+
+    print(tar_fp)
+
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
 
@@ -302,10 +392,9 @@ def import_elections_wabstic(
         number,
         district,
         dataset_name,
-        expats,
+        has_expats,
         election,
         municipality
-
 ):
     """
     :param principal: canton as string, e.g. zg
@@ -348,7 +437,7 @@ def import_elections_wabstic(
                     domain=domain,
                     domain_segment=domain_segment,
                     # type=election_type,
-                    expats=expats
+                    has_expats=has_expats
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(election)
@@ -400,7 +489,7 @@ def import_elections_wabsti(
         number,
         district,
         dataset_name,
-        expats,
+        has_expats,
         election,
         municipality
 
@@ -441,7 +530,7 @@ def import_elections_wabsti(
                     domain=domain,
                     domain_segment=domain_segment,
                     # type=election_type,
-                    expats=expats
+                    has_expats=has_expats
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(election)
@@ -518,7 +607,7 @@ def import_votes_internal(
         session,
         date_,
         dataset_name,
-        expats,
+        has_expats,
         vote,
         municipality
 ):
@@ -564,7 +653,7 @@ def import_votes_internal(
                     title=f'{vote_type}_{api}_{name}',
                     date=vote_date,
                     domain=domain,
-                    expats=expats,
+                    has_expats=has_expats,
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(vote)
@@ -585,7 +674,7 @@ def import_votes_wabsti(
         session,
         date_,
         dataset_name,
-        expats,
+        has_expats,
         vote,
         vote_number,
         municipality
@@ -623,7 +712,7 @@ def import_votes_wabsti(
                     title=f'{vote_type}_{api}_{name}',
                     date=election_date,
                     domain=domain,
-                    expats=expats,
+                    has_expats=has_expats,
                 )
             principal_obj = create_principal(principal, municipality)
             session.add(vote)
@@ -640,7 +729,7 @@ def import_votes_wabsti(
 @pytest.fixture(scope="function")
 def import_test_datasets(session):
 
-    models = ('election', 'vote', 'parties')
+    models = ('election', 'vote', 'parties', 'election_compound')
     election_types = ('majorz', 'proporz')
     apis = ('internal', 'wabstic', 'wabsti')
     domains = (
@@ -658,7 +747,7 @@ def import_test_datasets(session):
             date_=None,
             domain_segment='',
             dataset_name=None,
-            expats=False,
+            has_expats=False,
             election=None,
             election_number='1',
             election_district=None,
@@ -697,7 +786,7 @@ def import_test_datasets(session):
                     date_=date_,
                     domain_segment=domain_segment,
                     dataset_name=dataset_name,
-                    expats=expats,
+                    has_expats=has_expats,
                     election=election,
                     municipality=municipality
                 )
@@ -712,7 +801,7 @@ def import_test_datasets(session):
                     date_=date_,
                     domain_segment=domain_segment,
                     dataset_name=dataset_name,
-                    expats=expats,
+                    has_expats=has_expats,
                     election=election,
                     number=election_number,
                     district=election_district,
@@ -729,7 +818,7 @@ def import_test_datasets(session):
                     date_=date_,
                     domain_segment=domain_segment,
                     dataset_name=dataset_name,
-                    expats=expats,
+                    has_expats=has_expats,
                     election=election,
                     number=election_number,
                     district=election_district,
@@ -753,11 +842,12 @@ def import_test_datasets(session):
                 app_session,
                 date_,
                 dataset_name,
-                expats,
+                has_expats,
                 vote,
                 municipality
             )
             all_loaded.update(votes)
+
         elif model == 'vote' and api_format == 'wabsti':
             # This function is used for simple and complex votes
             votes = import_votes_wabsti(
@@ -767,16 +857,34 @@ def import_test_datasets(session):
                 app_session,
                 date_,
                 dataset_name,
-                expats,
+                has_expats,
                 vote,
                 int(vote_number),
                 municipality
             )
             all_loaded.update(votes)
+
+        elif model == 'election_compound' and api_format == 'internal':
+            compounds = import_election_compounds_internal(
+                principal=principal,
+                domain=domain,
+                session=app_session,
+                number_of_mandates=number_of_mandates,
+                date_=date_,
+                domain_segment=domain_segment,
+                dataset_name=dataset_name,
+                has_expats=has_expats,
+                election=election,
+                municipality=municipality
+            )
+            all_loaded.update(compounds)
+
         else:
             raise NotImplementedError
+
         if len(all_loaded) == 1:
             return list(all_loaded.values())[0]
+
         return all_loaded
 
     return _import_test_datasets
@@ -794,7 +902,7 @@ def majorz_election(import_test_datasets):
             number_of_mandates=2,
             date_=date(2015, 1, 1),
             dataset_name='majorz-election-gr',
-            expats=False,
+            has_expats=False,
             app_session=session
         )
     return _majorz_election
@@ -806,6 +914,28 @@ def explanations_pdf():
     pdf = Pdf(result)
     pdf.init_report()
     pdf.p("Erläuterungen")
+    pdf.generate()
+    result.seek(0)
+    return result
+
+
+@pytest.fixture(scope="function")
+def upper_apportionment_pdf():
+    result = BytesIO()
+    pdf = Pdf(result)
+    pdf.init_report()
+    pdf.p("Oberzuteilung")
+    pdf.generate()
+    result.seek(0)
+    return result
+
+
+@pytest.fixture(scope="function")
+def lower_apportionment_pdf():
+    result = BytesIO()
+    pdf = Pdf(result)
+    pdf.init_report()
+    pdf.p("Unterzuteilung")
     pdf.generate()
     result.seek(0)
     return result

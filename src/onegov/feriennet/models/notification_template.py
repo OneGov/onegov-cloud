@@ -59,7 +59,7 @@ def as_paragraphs(text):
         yield '<p>{}</p>'.format('<br>'.join(paragraph))
 
 
-class TemplateVariables(object):
+class TemplateVariables:
 
     def __init__(self, request, period):
         self.request = request

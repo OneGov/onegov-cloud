@@ -115,6 +115,7 @@ def test_translator_mutation_form(translator_app):
     assert form.spoken_languages.long_description == '_French, _Italian'
     assert form.written_languages.long_description == '_Italian, _Arabic'
     assert form.monitoring_languages.long_description == '_Arabic'
+    assert form.profession.long_description == 'craftsman'
     assert form.occupation.long_description == 'baker'
     assert form.expertise_professional_guilds.long_description == \
         '_Economy, _Military'
@@ -167,8 +168,8 @@ def test_translator_mutation_form(translator_app):
     form.request.is_admin = False
     form.request.is_translator = True
     form.on_request()
-    assert len(form._fields) == 41
-    assert len(form.proposal_fields) == 40
+    assert len(form._fields) == 42
+    assert len(form.proposal_fields) == 41
 
     form = TranslatorMutationForm()
     form.model = translator
@@ -260,6 +261,7 @@ def test_translator_mutation_form(translator_app):
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
         'monitoring_languages': [str(x.id) for x in languages[3:4]],
+        'profession': 'craftsman',
         'occupation': 'baker',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
@@ -325,6 +327,7 @@ def test_translator_mutation_form(translator_app):
         'spoken_languages': [str(x.id) for x in languages[1:3]],
         'written_languages': [str(x.id) for x in languages[2:4]],
         'monitoring_languages': [str(x.id) for x in languages[3:4]],
+        'profession': 'craftsman',
         'occupation': 'baker',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
@@ -367,7 +370,8 @@ def test_accreditation_form(translator_app):
     # Test validation
     form = RequestAccreditationForm(DummyPostData({
         'email': 'hugo@benito.com',
-        'zip_code': '12'
+        'zip_code': '12',
+        'self_employed': False
     }))
     form.request = request
     form.on_request()
@@ -390,16 +394,26 @@ def test_accreditation_form(translator_app):
     assert form.errors['tel_private'] == [
         'Please provide at least one phone number.'
     ]
+    assert 'confirmation_compensation_office' not in form.errors
+
+    # ... extra document required if self employed
+    form = RequestAccreditationForm(DummyPostData({'self_employed': True}))
+    form.request = request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors['confirmation_compensation_office'] == [
+        'This field is required.'
+    ]
 
     # Test get data
-    form = RequestAccreditationForm(DummyPostData({
+    data = {
         'last_name': 'Benito',
         'first_name': 'Hugo',
         'gender': 'M',
         'date_of_birth': '1970-01-01',
         'hometown': 'Zug',
         'nationality': 'CH',
-        'marital_status': 'married',
+        'marital_status': 'verheiratet',
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'address': 'Downing Street 5',
         'zip_code': '4000',
@@ -443,7 +457,8 @@ def test_accreditation_form(translator_app):
         'certificate_of_capability': create_file('A.pdf'),
         'remarks': 'Some remarks',
         'confirm_submission': True
-    }))
+    }
+    form = RequestAccreditationForm(DummyPostData(data))
     form.request = request
     form.on_request()
     assert not form.validate()
@@ -484,6 +499,7 @@ def test_accreditation_form(translator_app):
         'spoken_languages': [languages[1]],
         'written_languages': [languages[2]],
         'monitoring_languages': [languages[3]],
+        'profession': 'Baker',
         'occupation': 'Reporter',
         'expertise_professional_guilds': ['economy', 'military'],
         'expertise_professional_guilds_other': ['Psychology'],
@@ -520,9 +536,55 @@ def test_accreditation_form(translator_app):
     }
     assert form.get_ticket_data() == {
         'hometown': 'Zug',
-        'marital_status': 'married',
-        'profession': 'Baker',
+        'marital_status': 'verheiratet',
         'admission_course_completed': False,
         'admission_course_agreement': True,
         'remarks': 'Some remarks',
+    }
+
+    # ... extra document required if self employed
+    data['self_employed'] = True
+    data['confirmation_compensation_office'] = create_file('B.pdf')
+    form = RequestAccreditationForm(DummyPostData(data))
+    form.request = request
+    form.on_request()
+    assert not form.validate()
+    assert form.errors == {
+        'coordinates': [
+            'Home location is not configured. Please complete location '
+            'settings first'
+        ]
+    }
+
+    files = form.get_files()
+    files = {(file.note, file.name, file.reference.filename) for file in files}
+    assert files == {
+        ('Antrag', '_Signed declaration of authorization.pdf', '1.pdf'),
+        ('Antrag', '_Short letter of motivation.pdf', '2.pdf'),
+        ('Antrag', '_Resume.pdf', '3.pdf'),
+        ('Diplome und Zertifikate', '_Certificates.pdf', '4.pdf'),
+        ('Antrag', '_Social security card.pdf', '5.pdf'),
+        (
+            'Antrag',
+            '_Identity card, passport or foreigner identity card.pdf',
+            '6.pdf'
+        ),
+        ('Antrag', '_Current passport photo.pdf', '7.pdf'),
+        (
+            'Abklärungen',
+            '_Current extract from the debt collection register.pdf',
+            '8.pdf'
+        ),
+        (
+            'Abklärungen',
+            '_Current extract from the Central Criminal Register.pdf',
+            '9.pdf'
+        ),
+        ('Abklärungen', '_Certificate of Capability.pdf', 'A.pdf'),
+        (
+            'Abklärungen',
+            '_Confirmation from the compensation office regarding '
+            'self-employment.pdf',
+            'B.pdf'
+        )
     }

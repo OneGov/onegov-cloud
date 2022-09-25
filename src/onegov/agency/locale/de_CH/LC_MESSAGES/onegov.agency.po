@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-07-14 16:35+0200\n"
+"POT-Creation-Date: 2022-09-19 06:59+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -30,6 +30,29 @@ msgstr "Portrait"
 
 msgid "Organigram"
 msgstr "Organigramm"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid ""
+"Search for the exact address to set a marker. The address fields beneath are "
+"filled out automatically. The zoom of the map will be saved as well."
+msgstr ""
+"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Die "
+"Adressfelder unterhalb werden automatisch ausgefüllt. Der Zoom der Karte "
+"wird ebenfalls gespeichert."
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Street and house number"
+msgstr "Strasse und Hausnummer"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
 
 msgid "Fields to include for each membership"
 msgstr "Zu berücksichtigende Felder der Mitgliedschaften"
@@ -81,6 +104,13 @@ msgstr "Person: Direktnummer"
 
 msgid "PDF Export"
 msgstr "PDF Export"
+
+msgid ""
+"Search for the exact address to set a marker. The address fields beneath are "
+"filled out automatically."
+msgstr ""
+"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Die "
+"Adressfelder unterhalb werden automatisch ausgefüllt."
 
 msgid "Destination"
 msgstr "Ziel"
@@ -170,9 +200,6 @@ msgstr "Fraktion"
 msgid "Website"
 msgstr "Webseite"
 
-msgid "Address"
-msgstr "Adresse"
-
 msgid "Notes"
 msgstr "Bemerkungen"
 
@@ -232,6 +259,9 @@ msgstr "Organisationen mit Mitgliedschaften können nicht gelöscht werden"
 
 msgid "Move"
 msgstr "Verschieben"
+
+msgid "Change URL"
+msgstr "URL ändern"
 
 msgid "Membership"
 msgstr "Mitgliedschaft"
@@ -301,6 +331,16 @@ msgstr "Mutation melden"
 msgid "Report a change"
 msgstr "Eine Mutation melden"
 
+msgid ""
+"Sort the items using drag and drop. The new positions are automatically "
+"saved directly after moving."
+msgstr ""
+"Sortieren Sie die Elemente mittels Drag & Drop. Die neuen Positionen werden "
+"direkt nach dem Verschieben automatisch gespeichert."
+
+msgid "Back"
+msgstr "Zurück"
+
 msgid "No people found."
 msgstr "Keine Personen gefunden."
 
@@ -337,9 +377,6 @@ msgstr "Elektronische Visitenkarte (vCard)"
 msgid "Proposed changes applied."
 msgstr "Vorgeschlagene Änderungen übernommen."
 
-msgid "Sort the items using drag and drop."
-msgstr "Sortieren sie die Elemente mittels Drag & Drop."
-
 msgid "Added a new agency"
 msgstr "Eine neue Organisation wurde hinzufügt"
 
@@ -360,6 +397,13 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Update"
 msgstr "Aktualisieren"
+
+msgid ""
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
+msgstr ""
+"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"angepasst werden."
 
 msgid "Agency moved"
 msgstr "Organisation verschoben"
@@ -385,7 +429,7 @@ msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
 
 msgid "New ticket"
-msgstr ""
+msgstr "Neues Ticket"
 
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
@@ -408,11 +452,11 @@ msgstr "Eine neue Person wurde hinzugefügt"
 msgid "New person"
 msgstr "Neue Person"
 
+msgid "PDF Design"
+msgstr "PDF Design"
+
 msgid "PDF Layout"
 msgstr "PDF Layout"
-
-msgid "Layout"
-msgstr "Layout"
 
 msgid "Default"
 msgstr "Standard"
@@ -437,6 +481,12 @@ msgstr "Farbe Hyperlinks im PDF"
 
 msgid "Underline pdf links"
 msgstr "Hyperlinks unterstreichen"
+
+msgid "Map for Agency Adresses"
+msgstr "Karte für die Adressen"
+
+msgid "Map"
+msgstr "Karte"
 
 msgid "Show additional agencies to search results"
 msgstr "Zusätzliche Organisation in den Suchresultaten anzeigen"
@@ -475,3 +525,6 @@ msgstr "Daten"
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+#~ msgid "Layout"
+#~ msgstr "Layout"

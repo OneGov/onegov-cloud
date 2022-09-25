@@ -758,17 +758,6 @@ table {
 /*
     form style customizations
 */
-.panel.global-errors {
-    background: $alert-color;
-    border: 0;
-    padding: .5rem .75rem;
-
-    p {
-        color: $white;
-        font-size: .875rem;
-    }
-}
-
 form {
     label {
         min-width: 75%;
@@ -1052,17 +1041,6 @@ form {
 }
 
 /*
-    homepage tiles images
-*/
-
-#homepage-tile-1 .tile-image { background-image: url(#{$tile-image-1});}
-#homepage-tile-2 .tile-image { background-image: url(#{$tile-image-2});}
-#homepage-tile-3 .tile-image { background-image: url(#{$tile-image-3});}
-#homepage-tile-4 .tile-image { background-image: url(#{$tile-image-4});}
-#homepage-tile-5 .tile-image { background-image: url(#{$tile-image-5});}
-#homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
-
-/*
     Hide the spam bot honeypot field
 */
 .field-roboter_falle {
@@ -1320,21 +1298,10 @@ input[type='color'] {
         content: '';
     }
 
-    .tile-image {
-        background-position: center center;
-        background-size: cover;
-        display: block;
-        height: 7rem;
-        width: 100%;
-    }
-
     .tile-link:hover h3 {
         color: $anchor-font-color-hover;
     }
 
-    .tile-link:hover .tile-image {
-        @include grayscale;
-    }
 }
 
 /*
@@ -6489,5 +6456,14 @@ a#results {
             cursor: pointer;
             background-color: $green;
         }
+    }
+}
+
+.find-your-spot-link {
+    border-bottom: 0 !important;
+    margin-left: 1rem;
+
+    i.fa-calendar {
+        font-size: 1.8rem;
     }
 }

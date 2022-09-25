@@ -261,7 +261,7 @@
 </metal:footer_locales>
 
 <metal:partners define-macro="partner-card">
-    <div class="card" tal:condition="item.image_url">
+    <div data-aos="fade" data-aos-duration="800" class="card" tal:condition="item.image_url">
         <a tal:attributes="href item.url">
             <img src="${item.image_url}" alt="${item.lead or ''}">
           </a>
@@ -283,7 +283,7 @@
 
 <metal:events define-macro="event-item-card">
     <a href="${item.url}">
-        <div class="card">
+        <div class="card" data-aos="fade">
                 <div class="date-place" data-equalizer-watch>
                     <div class="grid-x">
                         <div class="cell small-1 medium-2">
@@ -305,7 +305,7 @@
                 <div class="card-section" style="display:none;" >
                     ${item.location}
                 </div>
-                <img class="contained" tal:condition="item.image_url" src="${item.image_url}">  
+                <img class="contained" tal:condition="item.image_url" src="${item.image_url}">
                 <div class="image-placeholder card-section contained" tal:condition="not: item.image_url">
                     <i class="far fa-calendar-alt" aria-hidden="true"></i>
                 </div>
@@ -313,7 +313,7 @@
                     <h5>${item.lead}</h5>
                 </div>
         </div>
-    </a>    
+    </a>
 </metal:events>
 
 <metal:panel define-macro="event-cards">
@@ -331,7 +331,7 @@
 </metal:panel>
 
 <metal:card define-macro="directory-card">
-    <div class="card" data-equalizer-watch>
+    <div  data-aos="fade" data-aos-duration="800" class="card" data-equalizer-watch>
         <div class="card-section">
             <tal:b tal:content="structure link(layout)" />
             <small>${link.subtitle}</small>
@@ -353,12 +353,6 @@
 </metal:directory>
 
 <metal:form define-macro="form">
-    <div class="panel global-errors" tal:condition="form.errors.get('global-errors')">
-        <p tal:repeat="error form.errors['global-errors']">
-            ${error}
-        </p>
-    </div>
-
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
@@ -417,7 +411,7 @@
 </metal:fields>
 
 <metal:homepage-tiles define-macro="homepage-tile-card" i18n:domain="onegov.town6">
-    <div class="card" id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
+    <div class="card" data-aos="fade" data-aos-duration="800"  id="homepage-tile-${item.number}" data-equalizer-watch tal:condition="item.links">
         <div class="card-divider">
             <a tal:condition="item.page.url" href="${item.page.url}"><h5>${item.page.text}</h5></a>
             <h5 tal:condition="not item.page.url">${item.page.text}</h5>
@@ -493,21 +487,21 @@
 </metal:upload>
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
-    <div class="card" data-equalizer-watch tal:define="url request.link(item)">
+    <div class="card news-card" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
         <div tal:condition="item.image_url|nothing" class="card-header">
             <img src="${item.image_url}">
         </div>
         <div class="card-section">
             <div>
-                <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.published_or_created, 'date_long')}</small></h5>
                 <a class="heading" href="${url}"><tal:b tal:switch="heading|'h5'">
                     <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
                     <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h4>
                     <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /> <metal:hint use-macro="layout.macros['publication_hint']" /></h5>
                 </tal:b></a>
+                <h5 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.published_or_created, 'date_long')}</small></h5>
                 <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
             </div>
-            <a href="${url}" class="more-link" i18n:translate="">read more</a>
+            <a href="${url}" class="news-more-link" i18n:translate="">read more</a>
         </div>
     </div>
 </metal:newslist>
@@ -524,7 +518,7 @@
                     <tal:b condition="layout.org.show_newsletter">
                         <span> / </span>
                         <a href="${layout.newsletter_url}"><span i18n:translate>Newsletter</span></a>
-                    </tal:b>    
+                    </tal:b>
                 </small>
             </h3>
         </div>
@@ -648,7 +642,7 @@
                 <div class="contact-panel-content">
                     <tal:b content="structure contact" />
                 </div>
-            </div>   
+            </div>
             <br tal:condition="coordinates and contact" />
             <h3 i18n:translate tal:condition="not contact">Map</h3>
             <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
@@ -664,6 +658,18 @@
             </ul>
         </div>
         <div id="after-panels" metal:define-slot="after-panels"></div>
+        
+        <div class="more-news side-panel" tal:condition="siblings|False">
+            <h3 i18n:translate="">More news</h3>
+            <div tal:repeat="sibling siblings" class="card">
+                <a href="${request.link(sibling)}">
+                    ${sibling.title}
+                </a>
+                <p class="list-lead">
+                    ${layout.format_date(sibling.published_or_created, 'date_long')}
+                </p>
+            </div>
+        </div>
     </div>
 </metal:page_content>
 
@@ -930,7 +936,7 @@
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town6">
     <div tal:condition="ticket">
         <h3 i18n:translate>Ticket</h3>
-            <div class="ticket-number side-panel-with-bg"><a href="${request.link(ticket)}">${ticket.number}</a></div>    
+            <div class="ticket-number side-panel-with-bg"><a href="${request.link(ticket)}">${ticket.number}</a></div>
     </div>
 </metal:ticket_callout>
 
@@ -1313,6 +1319,49 @@
     </div>
 </metal:photoswipe>
 
+<metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
+    <div tal:condition="link_mp4 or link_webm" class="homepage-video" style="max-height: ${max_height};">
+        <video autoplay loop muted>
+            <source tal:condition="link_mp4" src="${link_mp4}" type="video/mp4">
+            <source tal:condition="link_webm" src="${link_webm}" type="video/webm">
+            Your browser does not support the video tag.
+        </video> 
+    </div>
+</metal:autoplay_video>
+
+<metal:testimonial define-macro="testimonial" i18n:domain="onegov.town6">
+    <div class="testimonial grid-x grid-padding-x" data-aos="fade" condition="description and image and quote">
+        <div class="small-4 medium-2 cell">
+            <div class="square-container">
+                <img src="${image}"/>
+            </div>
+        </div>
+        <div class="small-8 medium-10 cell">
+            <div class="text">
+                <p class="description">
+                    ${description}
+                </p>
+                <p class="quote">
+                    <i class="fas fa-angle-double-left"></i>
+                    ${quote}
+                    <i class="fas fa-angle-double-right"></i>
+                </p>
+            </div>
+        </div>
+    </div>
+</metal:testimonial>
+
+<metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
+        <div tal:condition="title and icon" class="cell icon-link" data-aos="fade">
+            <a href="${link}">
+                <div class="icon" style="background-color:${color}">
+                    <i class="fa ${icon}"></i>
+                </div>
+                <h4>${title}</h4>
+            </a>
+            <p tal:condition="text" >${text}</p>
+        </div>
+</metal:icon_links>
 
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
@@ -1697,32 +1746,36 @@
 </metal:directory_error>
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.town6">
-    <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False">
-        <a class="category-anchor" id="${group}"></a>
-        <h2 tal:condition="len(grouped) > 1">
-            ${group}
-            <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
-        </h2>
-
-        <ul class="forms-list more-list">
-            <li tal:repeat="record grouped[group]">
-            <tal:b tal:define="link edit_link(record)|nothing">
-               
-                <a class="list-title" tal:attributes="href link_func(record); target link">
-                        ${record.title} 
-                        <tal:block condition="external_link(record)|nothing"> 
-                        </tal:block><metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-                </a>
-                <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                     tal:content="structure lead">
-                </div>
-                <div class="list-hint hints" tal:define="hint hint(record)|False"
-                     tal:content="structure hint" tal:condition="hint">
-                </div>
-                 <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
-            </tal:b>
-            </li>
-        </ul>
+    <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False;">
+        <tal:b tal:define="find_your_spot grouped[group][0] if grouped[group][0].title == 'Find Your Spot' else None">
+            <a class="category-anchor" id="${group}"></a>
+            <h2 tal:condition="len(grouped) > 1">
+                ${group}
+                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
+            <span tal:condition="find_your_spot" i18n:attributes="title" class="find-your-spot-link" data-tooltip tabindex="1" title="Find Your Spot">
+            <a tal:attributes="href link_func(find_your_spot)"><i class="fa fa-xs fa-calendar"></i></a>
+            </span>
+            </h2>
+            <ul class="forms-list more-list">
+                <tal:b tal:repeat="record grouped[group]">
+                    <li tal:condition="record != find_your_spot">
+                    <tal:b tal:define="link edit_link(record)|nothing">
+                        <a class="list-title" tal:attributes="href link_func(record); target link">
+                                ${record.title}
+                                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+                        </a>
+                        <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                            tal:content="structure lead">
+                        </div>
+                        <div class="list-hint hints" tal:define="hint hint(record)|False"
+                            tal:content="structure hint" tal:condition="hint">
+                        </div>
+                        <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
+                    </tal:b>
+                    </li>
+                </tal:b>
+            </ul>
+        </tal:b>
     </tal:b>
 </metal:group_by_column>
 
@@ -2125,7 +2178,7 @@
               </tal:b>
           </td>
           <td class="ticket-date">
-              ${layout.format_date(ticket.created, 'relative')}
+              ${layout.format_date(ticket.created, 'datetime')}
           </td>
           <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
               <a class="ticket-accept ticket-button button small success" href="${request.link(ticket, 'accept')}" i18n:translate>

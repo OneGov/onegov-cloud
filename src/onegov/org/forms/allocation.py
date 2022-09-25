@@ -6,12 +6,14 @@ from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TimeField
 from onegov.org import _
 from uuid import uuid4
-from wtforms.fields import StringField, RadioField
-from wtforms.fields.html5 import DateField, IntegerField
+from wtforms.fields import DateField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
-from onegov.form.fields import TimeField
 
 
 WEEKDAYS = (
@@ -32,7 +34,7 @@ def choices_as_integer(choices):
     return [int(c) for c in choices]
 
 
-class AllocationFormHelpers(object):
+class AllocationFormHelpers:
 
     def generate_dates(self, start, end,
                        start_time=None, end_time=None, weekdays=None):
@@ -374,7 +376,7 @@ class AllocationEditForm(Form, AllocationFormHelpers):
             self.access.data = data['access']
 
 
-class Daypasses(object):
+class Daypasses:
 
     daypasses = IntegerField(
         label=_("Daypasses"),
@@ -527,7 +529,7 @@ class RoomAllocationForm(AllocationForm):
         )
 
 
-class DailyItemFields(object):
+class DailyItemFields:
 
     items = IntegerField(
         label=_("Available items"),

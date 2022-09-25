@@ -184,7 +184,7 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         }
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.json(model=Root)

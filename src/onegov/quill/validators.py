@@ -2,13 +2,13 @@ from onegov.core.html import html_to_text
 from wtforms.validators import ValidationError
 
 
-class HtmlDataRequired(object):
+class HtmlDataRequired:
     """ Checks the field's data contains text inside HTML otherwise stops the
     validation chain.
 
     """
 
-    field_flags = ('required', )
+    field_flags = {'required': True}
 
     def __init__(self, message=None):
         self.message = message

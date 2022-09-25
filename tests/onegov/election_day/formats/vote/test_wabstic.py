@@ -38,7 +38,7 @@ def test_import_wabstic_vote(session):
 
     # Test federal results
     principal = Canton(name='sg', canton='sg')
-    vote.expats = True
+    vote.has_expats = True
     for number, yeas, completed, status in (
         ('1', 70821, True, 'final'),     # final and progress (78, 78)
         ('2', 84247, True, 'unknown'),    # unknown and progress (78, 78)
@@ -58,7 +58,7 @@ def test_import_wabstic_vote(session):
 
     # Test cantonal results
     vote.domain = 'canton'
-    vote.expats = True
+    vote.has_expats = True
     errors = import_vote_wabstic(
         vote, principal, '3', '1',
         BytesIO(sg_geschaefte), 'text/plain',
@@ -72,7 +72,7 @@ def test_import_wabstic_vote(session):
 
     # Test communal results
     vote.domain = 'municipality'
-    vote.expats = False
+    vote.has_expats = False
     for district, number, entity_id, yeas in (
         ('3', '1', 3204, 1871),
         ('43', '1', 3292, 743),
@@ -307,9 +307,9 @@ def test_import_wabstic_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
 
-    for expats in (False, True):
+    for has_expats in (False, True):
         for entity_id in ('9170', '0'):
-            vote.expats = expats
+            vote.has_expats = has_expats
             errors = import_vote_wabstic(
                 vote, principal, '0', '0',
                 BytesIO((
@@ -379,7 +379,7 @@ def test_import_wabstic_vote_expats(session):
             assert not errors
 
             result = vote.proposal.results.filter_by(entity_id=0).first()
-            if expats:
+            if has_expats:
                 assert result.empty == 1
             else:
                 assert result is None

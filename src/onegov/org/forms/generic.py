@@ -1,11 +1,14 @@
 from morepath.request import Response
-from onegov.form import Form
-from onegov.org import _
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
-from wtforms import RadioField, validators
-from wtforms.fields.html5 import DateField
+from onegov.form import Form
+from onegov.org import _
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
 
 
 class DateRangeForm(Form):
@@ -13,12 +16,12 @@ class DateRangeForm(Form):
 
     start = DateField(
         label=_("Start"),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     end = DateField(
         label=_("End"),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     def validate(self):
@@ -45,7 +48,7 @@ class ExportForm(Form):
         ],
         default='csv',
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ]
     )
 
@@ -92,12 +95,11 @@ class ExportForm(Form):
 
 
 class PaymentMethodForm(Form):
-
     payment_method = RadioField(
         label=_("Payment Method"),
         fieldset=_("Payments"),
         default='manual',
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         choices=[
             ('manual', _("No credit card payments")),
             ('free', _("Credit card payments optional")),
@@ -114,3 +116,61 @@ class PaymentMethodForm(Form):
                 "credit card payments"
             ))
             return False
+
+
+class ChangeAdjacencyListUrlForm(Form):
+    name = StringField(
+        label=_('URL path'),
+        validators=[InputRequired()]
+    )
+
+    test = BooleanField(
+        label=_('Test run'),
+        default=True
+    )
+
+    def get_model(self):
+        return self.model
+
+    def ensure_correct_name(self):
+        if not self.name.data:
+            return
+
+        model = self.get_model()
+
+        if model.name == self.name.data:
+            self.name.errors.append(
+                _('Please fill out a new name')
+            )
+            return False
+
+        normalized_name = normalize_for_url(self.name.data)
+        if not self.name.data == normalized_name:
+            self.name.errors.append(
+                _('Invalid name. A valid suggestion is: ${name}',
+                  mapping={'name': normalized_name})
+            )
+            return False
+
+        if not model.parent_id:
+            cls = model.__class__
+            query = self.request.session.query(cls)
+            query = query.filter(
+                cls.parent_id.is_(None),
+                cls.name == normalized_name
+            )
+            if query.first():
+                self.name.errors.append(
+                    _("An entry with the same name exists")
+                )
+                return False
+            return
+
+        for child in model.parent.children:
+            if child == self.model:
+                continue
+            if child.name == self.name.data:
+                self.name.errors.append(
+                    _("An entry with the same name exists")
+                )
+                return False

@@ -1,3 +1,4 @@
+import pytest
 import transaction
 
 from datetime import timedelta
@@ -14,7 +15,7 @@ from webtest import Upload
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 1
 
 
 def test_view_addresses(winterthur_app, streets_csv, addresses_csv):
@@ -39,6 +40,7 @@ def test_view_addresses(winterthur_app, streets_csv, addresses_csv):
     assert "Töss" in page
 
 
+@pytest.mark.xfail(reason="the remote host providing the csv might be down")
 def test_view_addresses_update_info(
     winterthur_app, streets_csv, addresses_csv
 ):

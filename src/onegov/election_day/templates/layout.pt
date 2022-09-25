@@ -38,6 +38,11 @@ metal:define-macro="layout">
     <script metal:use-macro="layout.macros['tablesaw_translations']" />
 </head>
 <body>
+    <div class="row accessibility-links">
+        <a accesskey="0" class="show-only-on-tab" href="${layout.homepage_link}" i18n:translate="">Homepage</a>
+        <a accesskey="1" class="show-only-on-tab" href="#content" i18n:translate="">Content</a>
+        <a accesskey="3" class="show-only-on-tab" href="${request.link(layout.principal, 'sitemap')}" i18n:translate="">Sitemap</a>
+    </div>
     <div tal:condition="not request.browser_session.get('headerless')" class="row header" tal:define="position request.app.principal.logo_position|'left'">
         <tal:block tal:condition="position == 'left'">
             <div class="small-12 medium-4 medium-push-8 columns text-right">
@@ -45,7 +50,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="Logo: Link to homepage" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
             </div>
         </tal:block>
@@ -55,7 +60,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 columns text-right">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="Logo: Link to homepage" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
                 </a>
             </div>
         </tal:block>
@@ -69,7 +74,7 @@ metal:define-macro="layout">
         </div>
     </div>
 
-    <div class="content">
+    <div class="content" id="content">
         <div class="row">
           <div class="small-12 columns" id="alert-boxes">
             <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
@@ -92,9 +97,9 @@ metal:define-macro="layout">
         </h2>
         <div class="row">
             <div class="small-12 medium-4 medium-push-4 columns text-center">
-                <h2 class="visually-hidden" i18n:translate>
+                <h3 class="visually-hidden" i18n:translate>
                     Language
-                </h2>
+                </h3>
                 <ul class="locales">
                     <li tal:repeat="(name, url) layout.locales">
                         <a tal:condition="request.locale not in url" href="${url}">${name}</a>
@@ -106,11 +111,12 @@ metal:define-macro="layout">
             <p>
                 <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
                 <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a><br>
-                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
+                <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a> |
+                <a class="sitemap-link" href="${request.link(layout.principal, 'sitemap')}" i18n:translate>Sitemap</a>
             </p>
             </div>
             <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                <p><a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a></p>
+                <p tal:condition="layout.login_link"><a href="${layout.login_link}" i18n:translate>Login</a></p>
                 <tal:block condition="layout.logout_link" >
                 <p>
                     <span i18n:translate>You are logged in: </span>

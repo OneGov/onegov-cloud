@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-08-03 15:49+0200\n"
+"POT-Creation-Date: 2022-09-12 12:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -757,7 +757,7 @@ msgstr ""
 "Descrive il modo in cui questa risorsa può essere prelevata. Questo testo "
 "viene utilizzato nella pagina di stato del biglietto per informare l'utente"
 
-msgid "Url path"
+msgid "URL path"
 msgstr "Percorso URL"
 
 msgid "Please fill out a new name"
@@ -890,6 +890,9 @@ msgstr ""
 "Per abilitare i pagamenti con carta di credito è necessario impostare un "
 "provider di pagamento predefinito"
 
+msgid "Test run"
+msgstr "Esecuzione di prova"
+
 msgid "Describes what this photo album is about"
 msgstr "Descrive il contenuto di questo album fotografico"
 
@@ -950,9 +953,6 @@ msgstr "Mostra l'estratto se accedi alla pagina principale"
 
 msgid "(Redesign only)"
 msgstr "(Solo riprogettazione)"
-
-msgid "Test run"
-msgstr "Esecuzione di prova"
 
 msgid "Salutation"
 msgstr "Formula di saluto"
@@ -1087,11 +1087,20 @@ msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
 msgid "The price must be larger than zero"
 msgstr "Il prezzo deve essere maggiore di zero"
 
+msgid "New Reservations"
+msgstr "Nuove prenotazioni"
+
+msgid "Daily Reservations"
+msgstr "Prenotazioni giornaliere"
+
 msgid "Send on"
 msgstr "Invia il"
 
 msgid "Resources"
 msgstr "Risorse"
+
+msgid "Please add at least one notification."
+msgstr "Aggiungere almeno una notifica."
 
 msgid "Logo"
 msgstr "Logo"
@@ -1125,6 +1134,9 @@ msgstr "Francese"
 
 msgid "Italian"
 msgstr "Italiano"
+
+msgid "Additional CSS"
+msgstr "CSS aggiuntivo"
 
 msgid "Column width left side"
 msgstr "Larghezza colonna lato sinistro"
@@ -1719,7 +1731,7 @@ msgstr "Elimina modulo"
 msgid "Export"
 msgstr "Esporta"
 
-msgid "Change Url"
+msgid "Change URL"
 msgstr "Modifica URL"
 
 msgid "Registration Windows"
@@ -1807,6 +1819,9 @@ msgstr "Link a risorse esterne"
 
 msgid "New external resource"
 msgstr "Nuova risorsa esterna"
+
+msgid "Export All"
+msgstr "Esporta tutte"
 
 msgid "Find Your Spot"
 msgstr "Cerca le date"
@@ -3145,6 +3160,18 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
+msgid "The following reservations have been accepted:"
+msgstr "Sono state accettate le seguenti prenotazioni:"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+msgid ""
+"This is the notification for reservations for ${request.app.org.title}. If "
+"you no longer want to receive this e-mail please contact an administrator so "
+"they can remove you from the recipients list."
+msgstr ""
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr "Un amministratore ha appena creato per te un nuovo account su ${org}."
 
@@ -3215,12 +3242,6 @@ msgstr "Registrazione"
 
 msgid "The ticket number is"
 msgstr "Il numero del biglietto è"
-
-msgid "The following reservations have been accepted:"
-msgstr "Sono state accettate le seguenti prenotazioni:"
-
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -3465,6 +3486,12 @@ msgstr "Nessun fornitore di servizi di pagamento definito."
 msgid "Connected:"
 msgstr "Connesso:"
 
+msgid "Default:"
+msgstr "Predefinito:"
+
+msgid "Enabled:"
+msgstr "Abilitato:"
+
 msgid "Fee:"
 msgstr "Imposta:"
 
@@ -3476,10 +3503,10 @@ msgid ""
 "may return to the invidual request's page at any time. All information on "
 "this page has been sent to your e-mail address."
 msgstr ""
-"Sono state inviate le seguenti richieste. Per vedere lo stato dell'iter puoi"
-" tornare in qualsiasi momento alla pagina della singola richiesta. Tutte le "
-"informazioni presenti in questa pagina sono state inviate al tuo indirizzo "
-"e-mail."
+"Sono state inviate le seguenti richieste. Per vedere lo stato dell'iter puoi "
+"tornare in qualsiasi momento alla pagina della singola richiesta. Tutte le "
+"informazioni presenti in questa pagina sono state inviate al tuo indirizzo e-"
+"mail."
 
 msgid "Request Reference"
 msgstr "Riferimento della richiesta"
@@ -3587,15 +3614,19 @@ msgstr "(${num_pending} in attesa di approvazione)"
 msgid "Utilised"
 msgstr "Utilizzato"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"I seguenti destinatari ricevono una e-mail giornaliera inviata alle ore 6:00 "
-"contenente i dati di prenotazione per tutte le prenotazioni del giorno."
-
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Riceve le notifiche per le nuove prenotazioni."
+
+msgid "Notifications for following Resources"
+msgstr "Notifiche per le seguenti risorse"
 
 msgid "No reservation resources defined yet."
 msgstr "Nessuna risorsa di prenotazione ancora definita."
@@ -4140,8 +4171,8 @@ msgstr ""
 "volta. Per importare più elementi, ripeti l'importazione finché necessario."
 
 msgid ""
-"Stable urls are important. Here you can change the path to your site here "
-"independant of the title."
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
 msgstr ""
 "Gli URL stabili sono importanti. Qui puoi modificare il percorso del tuo "
 "sito indipendentemente dal titolo."
@@ -4522,6 +4553,18 @@ msgstr "Tutti i pagamenti futuri verranno reindirizzati."
 msgid "Make Default"
 msgstr "Imposta come predefinito"
 
+msgid "Enable"
+msgstr "Attivare"
+
+msgid "Should this provider really be enabled?"
+msgstr "Questo fornitore deve essere abilitato?"
+
+msgid "Disable"
+msgstr "Disattivare"
+
+msgid "Should this provider really be disabled?"
+msgstr "Questo fornitore dovrebbe davvero essere disabilitato?"
+
 msgid "Do you really want to delete this provider?"
 msgstr "Vuoi davvero eliminare questo fornitore?"
 
@@ -4533,6 +4576,12 @@ msgstr "Impossibile connettere il tuo account Stripe."
 
 msgid "Changed the default payment provider."
 msgstr "Provider di pagamento predefinito modificato."
+
+msgid "Provider enabled."
+msgstr "Fornitore abilitato."
+
+msgid "Provider disabled."
+msgstr "Fornitore disabilitato."
 
 msgid "The payment provider was deleted."
 msgstr "Il fornitore di servizi di pagamento è stato eliminato."
@@ -4635,6 +4684,10 @@ msgstr ""
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
 
+#, python-format
+msgid "${org} New Reservation(s)"
+msgstr "${org} Nuova/e prenotazione/i"
+
 msgid "The reservations were accepted"
 msgstr "Le prenotazioni sono state accettate"
 
@@ -4734,12 +4787,6 @@ msgstr "Favicon"
 
 msgid "Links"
 msgstr "Collegamenti"
-
-msgid "Newsletter Settings"
-msgstr "Impostazioni della newsletter"
-
-msgid "Ticket Settings"
-msgstr "Impostazioni del biglietto"
 
 msgid "Header"
 msgstr "Intestazione"
@@ -4983,3 +5030,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Esporta tutte le prenotazioni in un intervallo di date specifico"
+
+msgid "No reservations found for the given date range."
+msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."

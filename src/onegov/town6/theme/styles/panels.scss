@@ -87,7 +87,7 @@ $publications-icon: '\f1ea';
 
     @include clean-ul;
     @include breakpoint(medium up) {
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
     }
 
     ul.bulleted {
@@ -141,12 +141,12 @@ $publications-icon: '\f1ea';
 
             a {
                 line-height: 1.2;
+                padding: 1rem 0;
             }
         }
 
         li {
             border-bottom: 1px solid rgba(255, 255, 255, .3);
-            padding: 1rem 0;
         }
 
         li:last-of-type {
@@ -262,14 +262,9 @@ $checklist-icon: "\f0ae";
         margin-top: .3rem;
     }
 
-    ul {
-        border-top: $morelist-border;
-        padding-top: .5rem;
-
-        div {
-            color: #444;
-            margin-top: -10px !important;
-        }
+    ul div {
+        color: #444;
+        margin-top: -10px !important;
     }
 
     .person-link {

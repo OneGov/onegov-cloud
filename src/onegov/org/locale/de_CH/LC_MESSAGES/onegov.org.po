@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-08-03 15:49+0200\n"
+"POT-Creation-Date: 2022-09-12 12:36+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -124,10 +124,10 @@ msgid "Ticket"
 msgstr "Ticket"
 
 msgid "This site is private"
-msgstr "Diese Seite ist Privat"
+msgstr "Diese Seite ist privat"
 
 msgid "This site is secret"
-msgstr "Diese Seite ist Geheim"
+msgstr "Diese Seite ist geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -754,8 +754,8 @@ msgstr ""
 "Dieser Text wird auf Ticket-Status-Seite genutzt, um den Nutzer zu "
 "informieren"
 
-msgid "Url path"
-msgstr "Url Pfad"
+msgid "URL path"
+msgstr "URL Pfad"
 
 msgid "Please fill out a new name"
 msgstr "Bitte geben sie einen neuen Namen an"
@@ -887,6 +887,9 @@ msgstr ""
 "Um Kreditkartenzahlungen zu aktivieren benötigen Sie einen Standard-"
 "Zahlungsanbieter"
 
+msgid "Test run"
+msgstr "Testlauf"
+
 msgid "Describes what this photo album is about"
 msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
 
@@ -947,9 +950,6 @@ msgstr "Zeige Einleitung auf übergeordneter Seite"
 
 msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
-
-msgid "Test run"
-msgstr "Testlauf"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -1084,11 +1084,20 @@ msgstr ""
 msgid "The price must be larger than zero"
 msgstr "Der Preis muss grösser als Null sein"
 
+msgid "New Reservations"
+msgstr "Neue Reservationen"
+
+msgid "Daily Reservations"
+msgstr "Tägliche Reservationen"
+
 msgid "Send on"
 msgstr "Senden am"
 
 msgid "Resources"
 msgstr "Reservationen"
+
+msgid "Please add at least one notification."
+msgstr "Bitte wählen sie mindestens eine Benachrichtigung."
 
 msgid "Logo"
 msgstr "Logo"
@@ -1122,6 +1131,9 @@ msgstr "Französisch"
 
 msgid "Italian"
 msgstr "Italienisch"
+
+msgid "Additional CSS"
+msgstr "Zusätzliches CSS"
 
 msgid "Column width left side"
 msgstr "Breite linke Seite"
@@ -1706,8 +1718,8 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
-msgid "Change Url"
-msgstr "Url ändern"
+msgid "Change URL"
+msgstr "URL ändern"
 
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
@@ -1794,6 +1806,9 @@ msgstr "Externer Reservationslink"
 
 msgid "New external resource"
 msgstr "Neue externe Reservation"
+
+msgid "Export All"
+msgstr "Alle Exportieren"
 
 msgid "Find Your Spot"
 msgstr "Terminsuche"
@@ -3145,6 +3160,18 @@ msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
 
+msgid "The following reservations have been accepted:"
+msgstr "Die folgenden Reservationen wurden angenommen:"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+msgid ""
+"This is the notification for reservations for ${request.app.org.title}. If "
+"you no longer want to receive this e-mail please contact an administrator so "
+"they can remove you from the recipients list."
+msgstr ""
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
 "Ein Administrator hat soeben ein neues Konto auf ${org} für Sie eingerichtet."
@@ -3218,12 +3245,6 @@ msgstr "Anmeldung"
 
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
-
-msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -3467,6 +3488,12 @@ msgstr "Keine Zahlungsanbieter definiert."
 msgid "Connected:"
 msgstr "Verbunden:"
 
+msgid "Default:"
+msgstr "Standard:"
+
+msgid "Enabled:"
+msgstr "Aktiviert:"
+
 msgid "Fee:"
 msgstr "Gebühr:"
 
@@ -3583,15 +3610,19 @@ msgstr "(${num_pending} noch nicht akzeptiert)"
 msgid "Utilised"
 msgstr "Ausgelastet"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
-"Reservationen des Tages."
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Erhält Benachtchtigungen für neue Reservationen."
+
+msgid "Notifications for following Resources"
+msgstr "Benachrichtigungen für die folgenden Reservationen"
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
@@ -4132,10 +4163,10 @@ msgstr ""
 "wiederholt werden."
 
 msgid ""
-"Stable urls are important. Here you can change the path to your site here "
-"independant of the title."
+"Stable URLs are important. Here you can change the path to your site "
+"independently from the title."
 msgstr ""
-"Stabile Url's sind wichtig. Hier kann der Pfad unabhängig von Titel "
+"Beständige URL's sind wichtig. Hier kann der Pfad unabhängig von Titel "
 "angepasst werden."
 
 #, python-format
@@ -4506,6 +4537,18 @@ msgstr "Alle zukünftigen Zahlungen werden umgeleitet."
 msgid "Make Default"
 msgstr "Als Standard"
 
+msgid "Enable"
+msgstr "Aktivieren"
+
+msgid "Should this provider really be enabled?"
+msgstr "Sollte dieser Anbieter wirklich aktiviert werden?"
+
+msgid "Disable"
+msgstr "Deaktivieren"
+
+msgid "Should this provider really be disabled?"
+msgstr "Sollte dieser Anbieter wirklich deaktiviert werden?"
+
 msgid "Do you really want to delete this provider?"
 msgstr "Möchten Sie diesen Zahlungsanbieter wirklich löschen?"
 
@@ -4517,6 +4560,12 @@ msgstr "Ihr Stripe Konto konnte nicht verbunden werden."
 
 msgid "Changed the default payment provider."
 msgstr "Der Standard Zahlungsanbieter wurde verändert."
+
+msgid "Provider enabled."
+msgstr "Anbieter aktiviert."
+
+msgid "Provider disabled."
+msgstr "Anbieter deaktiviert."
 
 msgid "The payment provider was deleted."
 msgstr "Der Zahlungsanbieter wurde gelöscht."
@@ -4619,6 +4668,10 @@ msgstr ""
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"
 
+#, python-format
+msgid "${org} New Reservation(s)"
+msgstr "${org} Neue Reservation(en)"
+
 msgid "The reservations were accepted"
 msgstr "Die Reservationen wurden angenommen"
 
@@ -4686,6 +4739,9 @@ msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 msgid "Exports the reservations of the given date range."
 msgstr "Exportiert alle Reservationen zwischen Start- und End-Datum."
 
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Exportiert alle Reservationen in einem bestimmten Datumsbereich"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\"?"
 msgstr "Möchten Sie \"${name}\" wirklich löschen?"
@@ -4718,12 +4774,6 @@ msgstr "Favicon"
 
 msgid "Links"
 msgstr "Links"
-
-msgid "Newsletter Settings"
-msgstr "Newsletter-Einstellungen"
-
-msgid "Ticket Settings"
-msgstr "Ticket-Einstellungen"
 
 msgid "Header"
 msgstr "Kopfzeile"
@@ -4969,3 +5019,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "No reservations found for the given date range."
+msgstr "Keine Reservierungen für den angegebenen Zeitraum gefunden."

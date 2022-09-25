@@ -263,6 +263,8 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/elections/.*',
         '/screen/.*',
         '/catalog.rdf',
+        '/sitemap',
+        '/sitemap.xml',
     )
     cache_paths = re.compile(r'^({})$'.format('|'.join(cache_paths)))
 
@@ -383,6 +385,9 @@ def get_custom_asset():
 
     # Embedded tables as widgets
     yield 'embedded_widgets.js'
+
+    # Form
+    yield 'error-focus.js'
 
 
 @ElectionDayApp.webasset('backend_common')

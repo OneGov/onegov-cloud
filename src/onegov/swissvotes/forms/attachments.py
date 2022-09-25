@@ -223,7 +223,7 @@ class AttachmentsForm(Form):
                 if field.data:
                     file = SwissVoteFile(id=random_token())
                     file.reference = as_fileintent(
-                        field.raw_data[-1].file,
+                        field.file,
                         f'{name}-{locale}'
                     )
                     setattr(model, name, file)

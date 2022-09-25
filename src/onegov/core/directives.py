@@ -177,7 +177,7 @@ class StaticDirectoryAction(Action):
         staticdirectory_registry.paths.append(path)
 
 
-class TemplateVariablesRegistry(object):
+class TemplateVariablesRegistry:
 
     __slots__ = ['callbacks']
 

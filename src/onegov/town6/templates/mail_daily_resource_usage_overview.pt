@@ -79,5 +79,6 @@
             <span i18n:translate>
                 This is the daily reservation overview for <tal:b i18n:name="organisation">${organisation}</tal:b>. If you no longer want to receive this e-mail please contact an administrator so they can remove you from the recipients list.
             </span>
+        </p>
     </tal:b>
 </div>

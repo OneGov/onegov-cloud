@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-07-19 16:31+0200\n"
+"POT-Creation-Date: 2022-09-12 13:05+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -160,8 +160,8 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
-msgid "Change Url"
-msgstr "Url ändern"
+msgid "Change URL"
+msgstr "URL ändern"
 
 msgid "Registration Windows"
 msgstr "Anmeldezeitraum"
@@ -656,9 +656,6 @@ msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 
-msgid "Search"
-msgstr "Suche"
-
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
 
@@ -667,6 +664,12 @@ msgstr "Zurück zur Startseite"
 
 msgid "Logo"
 msgstr "Logo"
+
+msgid "Search term"
+msgstr "Suchbegriff"
+
+msgid "Perform Search"
+msgstr "Suchen"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -733,13 +736,13 @@ msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
 msgid "This site is private"
-msgstr "Diese Seite ist Privat"
+msgstr "Diese Seite ist privat"
 
 msgid "This site is private but can also be seen by members"
 msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
 
 msgid "This site is secret"
-msgstr "Diese Seite ist Geheim"
+msgstr "Diese Seite ist geheim"
 
 msgid "This site is not published."
 msgstr "Diese Seite ist nicht veröffentlicht."
@@ -760,6 +763,9 @@ msgstr ""
 
 msgid "Map"
 msgstr "Karte"
+
+msgid "More news"
+msgstr "Weitere News"
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
@@ -1249,6 +1255,22 @@ msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 msgid "The OneGov Cloud Team"
 msgstr "Das OneGov Cloud Team"
 
+msgid "The following reservations have been accepted:"
+msgstr "Die folgenden Reservationen wurden angenommen:"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+msgid ""
+"This is a notification for the new reservations for ${organisation}. If you "
+"no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies it eine Benachrichtigung zu den neuen Reservationenen von "
+"${organisation}. Falls Sie diese E-Mails nicht mehr bekommen möchten, melden "
+"Sie sich bitte bei einem Administrator damit dieser Sie von der "
+"Empfängerliste streichen kann."
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
 "Ein Administrator hat soeben ein neues Konto auf ${org} für Sie eingerichtet."
@@ -1325,12 +1347,6 @@ msgstr "Anmeldezeitraum"
 
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
-
-msgid "The following reservations have been accepted:"
-msgstr "Die folgenden Reservationen wurden angenommen:"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
@@ -1573,6 +1589,12 @@ msgstr "Keine Zahlungsanbieter definiert."
 msgid "Connected:"
 msgstr "Verbunden:"
 
+msgid "Default:"
+msgstr "Standard:"
+
+msgid "Enabled:"
+msgstr "Aktiviert:"
+
 msgid "Fee:"
 msgstr "Gebühr:"
 
@@ -1677,15 +1699,19 @@ msgstr "(${num_pending} noch nicht akzeptiert)"
 msgid "Utilised"
 msgstr "Ausgelastet"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
-"Reservationen des Tages."
-
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Erhält Benachtchtigungen für neue Reservationen."
+
+msgid "Notifications for following Resources"
+msgstr "Benachrichtigungen für die folgenden Reservationen"
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
@@ -1697,6 +1723,9 @@ msgstr ""
 "Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
 "Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später "
 "wieder."
+
+msgid "Search"
+msgstr "Suche"
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
@@ -2017,11 +2046,11 @@ msgstr "Web-Statistik"
 msgid "Holidays"
 msgstr "Feiertage"
 
-msgid "Ticket Settings"
-msgstr "Ticket-Einstellungen"
-
-msgid "Newsletter Settings"
-msgstr "Newsletter Einstellungen"
-
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Ticket Settings"
+#~ msgstr "Ticket-Einstellungen"
+
+#~ msgid "Newsletter Settings"
+#~ msgstr "Newsletter Einstellungen"

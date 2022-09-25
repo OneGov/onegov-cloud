@@ -7,7 +7,7 @@ from sqlalchemy.schema import Column
 IMMUTABLE_TYPES = (int, float, complex, str, tuple, frozenset, bytes)
 
 
-class ContentMixin(object):
+class ContentMixin:
     """ Mixin providing a meta/content JSON pair. Meta is a JSON column loaded
     with each request, content is a JSON column loaded deferred (to be shown
     only in the detail view).
@@ -38,7 +38,7 @@ def is_valid_default(default):
     return False
 
 
-class dict_property(object):
+class dict_property:
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -76,7 +76,7 @@ class dict_property(object):
 
         foo_property = dict_property_factory('foo')
 
-        class Model(object):
+        class Model:
 
             foo = {}
 

@@ -10,7 +10,6 @@ from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
-from pytest import skip
 from pytz import utc
 
 
@@ -486,9 +485,6 @@ def test_votes_query(swissvotes_app):
 
 def test_votes_query_attachments(swissvotes_app, attachments,
                                  postgres_version, campaign_material):
-    if int(postgres_version.split('.')[0]) < 10:
-        skip("PostgreSQL 10+")
-
     votes = SwissVoteCollection(swissvotes_app)
     votes.add(
         id=1,

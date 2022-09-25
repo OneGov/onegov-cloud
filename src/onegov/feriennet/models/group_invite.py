@@ -6,7 +6,7 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 
 
-class GroupInvite(object):
+class GroupInvite:
 
     def __init__(self, session, group_code, username):
         self.session = session

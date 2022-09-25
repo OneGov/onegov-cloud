@@ -3,11 +3,7 @@ import logging.config
 from onegov.server.collection import ApplicationCollection
 from webob import BaseRequest
 from webob.exc import HTTPNotFound, HTTPForbidden
-
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
+from urllib.parse import urlparse
 
 
 local_hostnames = {
@@ -34,7 +30,7 @@ class Request(BaseRequest):
                     yield hostname
 
 
-class Server(object):
+class Server:
     """ A WSGI application that hosts multiple WSGI applications in the
     same process.
 
@@ -43,7 +39,7 @@ class Server(object):
     mounted applications.
 
     See `Morepath's way of nesting applications
-    <http://morepath.readthedocs.org/en/latest/app_reuse.html
+    <https://morepath.readthedocs.org/en/latest/app_reuse.html
     #nesting-applications>`_
 
     Applications are hosted in two ways:

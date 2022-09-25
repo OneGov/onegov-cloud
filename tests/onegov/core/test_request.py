@@ -68,13 +68,30 @@ def test_return_to_mixin():
     assert r.redirect('http://safe').location == 'http://safe'
 
 
+def test_vhm_root_application_url():
+
+    request = CoreRequest(environ={
+        'wsgi.url_scheme': 'https',
+        'PATH_INFO': '/',
+        'SCRIPT_NAME': '/town/example',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https',
+        'HTTP_HOST': 'example.com',
+        'HTTP_X_VHM_ROOT': '/town/example/',
+    }, app=Bunch())
+
+    assert request.x_vhm_root == '/town/example'
+    assert request.application_url == 'https://example.com/'
+
+
 def test_return_to(redis_url):
 
     class App(Framework):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root)
@@ -147,7 +164,7 @@ def test_has_permission(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         allowed_for = (Public, Personal, Private, Secret)
 
     @App.view(model=Root, permission=Public)
@@ -222,7 +239,7 @@ def test_permission_by_view(redis_url):
         pass
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     @App.view(model=Root, name='public', permission=Public)

@@ -27,7 +27,7 @@ def get_lead(text, max_chars=180, consider_sentences=True):
 
 
 @OrgApp.homepage_widget(tag='row')
-class RowWidget(object):
+class RowWidget:
     template = """
         <xsl:template match="row">
             <div class="row">
@@ -38,7 +38,7 @@ class RowWidget(object):
 
 
 @OrgApp.homepage_widget(tag='column')
-class ColumnWidget(object):
+class ColumnWidget:
     template = """
         <xsl:template match="column">
             <div class="small-12 medium-{@span} columns">
@@ -49,7 +49,7 @@ class ColumnWidget(object):
 
 
 @OrgApp.homepage_widget(tag='text')
-class TextWidget(object):
+class TextWidget:
     template = """
         <xsl:template match="text">
             <p class="homepage-text">
@@ -60,7 +60,7 @@ class TextWidget(object):
 
 
 @OrgApp.homepage_widget(tag='panel')
-class PanelWidget(object):
+class PanelWidget:
     # panels with less than one link (not counting the more-link) are
     # hidden unless the user is logged-in
     template = """
@@ -83,7 +83,7 @@ class PanelWidget(object):
 
 
 @OrgApp.homepage_widget(tag='links')
-class LinksWidget(object):
+class LinksWidget:
     template = """
         <xsl:template match="links">
             <xsl:if test="@title">
@@ -115,7 +115,7 @@ class LinksWidget(object):
 
 
 @OrgApp.homepage_widget(tag='directories')
-class DirectoriesWidget(object):
+class DirectoriesWidget:
     template = """
         <xsl:template match="directories">
             <metal:block use-macro="layout.macros['directories-panel']" />
@@ -158,7 +158,7 @@ class DirectoriesWidget(object):
 
 
 @OrgApp.homepage_widget(tag='news')
-class NewsWidget(object):
+class NewsWidget:
 
     template = """
         <xsl:template match="news">
@@ -211,7 +211,7 @@ class NewsWidget(object):
 
 
 @OrgApp.homepage_widget(tag='homepage-cover')
-class CoverWidget(object):
+class CoverWidget:
     template = """
         <xsl:template match="homepage-cover">
             <div class="homepage-content page-text">
@@ -224,7 +224,7 @@ class CoverWidget(object):
 
 
 @OrgApp.homepage_widget(tag='events')
-class EventsWidget(object):
+class EventsWidget:
     template = """
         <xsl:template match="events">
             <metal:block use-macro="layout.macros['events-panel']" />
@@ -264,7 +264,7 @@ class EventsWidget(object):
 
 
 @OrgApp.homepage_widget(tag='homepage-tiles')
-class TilesWidget(object):
+class TilesWidget:
     template = """
         <xsl:template match="homepage-tiles">
             <xsl:choose>
@@ -337,7 +337,7 @@ class TilesWidget(object):
 
 
 @OrgApp.homepage_widget(tag='line')
-class HrWidget(object):
+class HrWidget:
     template = """
         <xsl:template match="line">
             <hr />
@@ -346,7 +346,7 @@ class HrWidget(object):
 
 
 @OrgApp.homepage_widget(tag='slider')
-class SliderWidget(object):
+class SliderWidget:
     template = """
         <xsl:template match="slider">
             <div metal:use-macro="layout.macros.slider" />
@@ -384,19 +384,10 @@ class SliderWidget(object):
                 'src': layout.request.link(image)
             }
 
-    def get_images_from_theme(self, layout):
-        for key, value in layout.org.theme_options.items():
-            if key.startswith('tile-image'):
-                yield {
-                    'note': None,
-                    'src': value.strip('"\'')
-                }
-
     def get_variables(self, layout):
         # if we don't have an album used for images, we use the images
         # shown on the homepage anyway to avoid having to show nothing
-        images = tuple(self.get_images_from_sets(layout)) \
-            or tuple(self.get_images_from_theme(layout))
+        images = tuple(self.get_images_from_sets(layout))
 
         return {
             'images': images

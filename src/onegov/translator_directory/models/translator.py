@@ -19,7 +19,6 @@ from onegov.translator_directory.models.language import \
     written_association_table, monitoring_association_table
 
 
-# todo: remove me!?
 class ESMixin(ORMSearchable):
 
     es_properties = {
@@ -39,7 +38,7 @@ class ESMixin(ORMSearchable):
 
 
 class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
-                 CoordinatesMixin):
+                 CoordinatesMixin, ESMixin):
 
     __tablename__ = 'translators'
 
@@ -153,6 +152,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     for_admins_only = Column(Boolean, default=False, nullable=False)
 
     # the below might never be used, but we import it if customer wants them
+    profession = Column(Text)
     occupation = Column(Text)
     other_certificates = Column(Text)
 

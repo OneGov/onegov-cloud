@@ -74,6 +74,7 @@ eggs/
 
 # Sphinx
 docs/_build
+docs/autoapi
 
 # node
 node_modules/

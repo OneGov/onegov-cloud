@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2021-09-26 12:29+0200\n"
+"POT-Creation-Date: 2022-09-19 06:59+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -86,7 +86,7 @@ msgid "Description"
 msgstr "Beschreibung"
 
 msgid "Refresh mandatory"
-msgstr "Wiederholdung obgligatorisch"
+msgstr "Wiederholdung obligatorisch"
 
 msgid "Refresh Interval (years)"
 msgstr "Wiederholungsintervall (in Jahren)"
@@ -97,8 +97,11 @@ msgstr "Anzahl Jahre"
 msgid "Hidden"
 msgstr "Versteckt"
 
+msgid "Not a valid integer value"
+msgstr "Keine gültige Ganzzahl"
+
 msgid "Paste a list of email addresses."
-msgstr "Fügen Sie eine Liste von Email-Addressen ein."
+msgstr "Fügen Sie eine Liste von Email-Adressen ein."
 
 msgid "First Name"
 msgstr "Vorname(n)"
@@ -143,7 +146,7 @@ msgid "Location"
 msgstr "Kurslokal"
 
 msgid "Address and Room"
-msgstr "Addresse und Kursraum"
+msgstr "Adresse und Kursraum"
 
 msgid "Attendees min"
 msgstr "Teilnehmer min"

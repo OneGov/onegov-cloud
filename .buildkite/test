@@ -43,6 +43,12 @@ redis-server --daemonize yes
 # this needs to be set on Google Cloud for unknown reasons
 echo '127.0.0.1 localhost' >> /etc/hosts
 
+echo "$(redis-server --version)"
+echo "$(psql --version)"
+echo "$(java --version)"
+
+echo "--- Creating virtual environment"
+
 # switch to virtual environment
 cd /app
 
@@ -51,6 +57,7 @@ source bin/activate
 
 # install testing dependencies
 echo "--- Installing dependencies :python:"
+echo "$(python --version)"
 cd /app/src
 pip install '.[test]' \
     pytest-test-groups \

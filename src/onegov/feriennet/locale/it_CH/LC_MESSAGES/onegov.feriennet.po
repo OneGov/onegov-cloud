@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-05-24 15:51+0200\n"
+"POT-Creation-Date: 2022-09-05 10:29+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -12,9 +12,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 3.0\n"
-
-msgid "Partner of Pro Juventute"
-msgstr "Partner di Pro Juventute"
 
 msgid "No active period"
 msgstr "Nessun periodo attivo"
@@ -626,8 +623,8 @@ msgstr "Ignorare restrizioni di età"
 msgid "Accept TOS"
 msgstr "Accettare CG"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "CG"
 
@@ -2938,8 +2935,14 @@ msgstr "Il periodo è stato disattivato con successo"
 msgid "The period was archived successfully"
 msgstr "Il periodo è stato archiviato con successo"
 
+msgid "QR-Bill"
+msgstr "Fattura QR"
+
 msgid "Payment"
 msgstr "Pagamento"
+
+msgid "Bank Account (IBAN / QR-IBAN)"
+msgstr "Conto bancario (IBAN / QR-IBAN)"
 
 msgid "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
 msgstr "Lasciapassare vacanze Musterlingen, Bahnhofstr. 2, 1234 Esempio"
@@ -2950,20 +2953,17 @@ msgstr "Bollettino di pagamento"
 msgid "Basic"
 msgstr "Semplice"
 
-msgid "ESR (General)"
-msgstr "PVR (generale)"
+msgid "ESR (General) / QR-Reference"
+msgstr "PVR (generale) / Riferimento QR"
 
 msgid "ESR (Raiffeisen)"
 msgstr "PVR (Raiffeisen)"
 
-msgid "ESR participant number"
-msgstr "Numero cliente PVR"
+msgid "ESR participant number / QR-IBAN"
+msgstr "Numero cliente PVR / QR-IBAN"
 
 msgid "ESR identification number"
 msgstr "Numero di identificazione PVR"
-
-msgid "QR-Bill (experimental)"
-msgstr "Fattura QR (sperimentale)"
 
 msgid "Full age required for registration"
 msgstr "Età completa richiesta per la registrazione"
@@ -3030,11 +3030,13 @@ msgstr "IBAN non valido"
 msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
 msgstr "Le fatture QR richiedono un IBAN svizzero o del Lichteinstein"
 
-msgid "This IBAN cannot be used for QR-Bills without ESR"
-msgstr "Questo IBAN non può essere utilizzato per le fatture QR senza PVR"
+msgid "Select ESR (General) / QR-Reference when using the given QR-IBAN"
+msgstr ""
+"Selezionare PVR (generale) / Riferimento QR quando si utilizza il QR-IBAN "
+"indicato."
 
-msgid "This IBAN cannot be used for QR-Bills with ESR"
-msgstr "Questo IBAN non può essere utilizzato per le fatture QR con PVR"
+msgid "Select Basic when using the given IBAN"
+msgstr "Selezionare Semplice quando si utilizza l'IBAN indicato"
 
 msgid "QR-Bills require a beneficiary"
 msgstr "Le fatture QR richiedono un beneficiario"

@@ -56,7 +56,7 @@ class TranslatablePage(Base, TimestampMixin, AssociatedFiles):
     slider_images = FileSubCollection()
 
 
-class TranslatablePageMove(object):
+class TranslatablePageMove:
     """ Represents a single move of a page. """
 
     def __init__(self, session, subject_id, target_id, direction):

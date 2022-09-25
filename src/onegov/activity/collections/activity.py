@@ -30,7 +30,7 @@ from uuid import UUID
 AVAILABILITY_VALUES = {'none', 'few', 'many'}
 
 
-class ActivityFilter(object):
+class ActivityFilter:
 
     # supported filters - should be named with a plural version that can
     # be turned into a singular with the removal of the last s
@@ -428,7 +428,7 @@ class ActivityCollection(RangedPagination):
 
     def add(self, title, username, lead=None, text=None, tags=None, name=None):
 
-        type = self.type != '*' and self.type or None
+        type_ = self.type if self.type != '*' else 'generic'
 
         name = name or self.get_unique_name(title)
 
@@ -436,7 +436,7 @@ class ActivityCollection(RangedPagination):
             name=name,
             title=title,
             tags=tags,
-            type=type,
+            type=type_,
             username=username,
             lead=lead,
             text=text

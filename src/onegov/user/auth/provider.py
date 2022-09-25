@@ -15,6 +15,7 @@ from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.clients.msal import MSALConnections
 from onegov.user.auth.clients.saml2 import SAML2Connections
+from onegov.user.auth.clients.saml2 import finish_logout
 from onegov.user.models.user import User
 from saml2.ident import code
 from translationstring import TranslationString
@@ -31,7 +32,7 @@ def provider_by_name(providers, name):
     return next((p for p in providers if p.metadata.name == name), None)
 
 
-class Conclusion(object):
+class Conclusion:
     """ A final answer of :meth:`AuthenticationProvider`. """
 
 
@@ -66,7 +67,7 @@ class InvalidJWT(Failure):
 
 
 @attrs(slots=True, frozen=True)
-class ProviderMetadata(object):
+class ProviderMetadata:
     """ Holds provider-specific metadata. """
 
     name: str = attrib()
@@ -266,7 +267,7 @@ def ensure_user(source, source_id, session, username, role, force_role=True,
 
 
 @attrs(auto_attribs=True)
-class RolesMapping(object):
+class RolesMapping:
     """ Takes a role mapping and provides access to it.
 
     A role mapping maps a onegov-cloud role to an LDAP role. For example:
@@ -318,7 +319,7 @@ class RolesMapping(object):
 
 
 @attrs(auto_attribs=True)
-class LDAPAttributes(object):
+class LDAPAttributes:
     """ Holds the LDAP server-specific attributes. """
 
     # the name of the Distinguished Name (DN) attribute
@@ -649,18 +650,14 @@ class OauthProvider(SeparateAuthenticationProvider):
     """
 
     @abstractmethod
-    def logout_url(self, request, user):
-        """ Returns the tenant or app specific logout url to the authentication
-        endpoint in a consistent manner.
-        """
+    def do_logout(self, request, user, to):
+        """ May return a webob response that gets used instead of the default
+        logout response, to perform e.g. a redirect to the external provider.
 
-    @abstractmethod
-    def applies_to(self, request, user):
-        """ Returns whether or not this provider applies to this user, i.e.
-        whether the active session was created by this provider previously
-        and thus should also be in charge of further interactions with the
-        provider, such as a global logout. The global session may expire
-        before ours, so this would be one place to check for that.
+        If no special response is necessary because the external logout is
+        skipped/unecessary or performed through a back-channel, this will
+        just return None and fall through to the default logout response
+        which will terminate the local user session.
         """
 
     @abstractmethod
@@ -755,9 +752,9 @@ class AzureADProvider(
     def button_text(self, request):
         return _("Login with Microsoft")
 
-    def applies_to(self, request, user):
+    def do_logout(self, request, user, to):
         # global logout is deactivated for AzureAD currently
-        return False
+        return None
 
     def logout_url(self, request, user):
         client = self.tenants.client(request.app)
@@ -976,39 +973,50 @@ class SAML2Provider(
         client = self.tenants.client(request.app)
         return client.button_text
 
-    def applies_to(self, request, user):
+    def do_logout(self, request, user, to):
 
         data = user.data or {}
         if 'saml2_transient_id' not in data:
-            return False
+            return None
 
         # if the source isn't what we expect then it doesn't apply
         client = self.tenants.client(request.app)
         if client.treat_as_ldap:
             if user.source != 'ldap':
-                return False
+                return None
         elif user.source != 'saml2':
-            return False
+            return None
 
         nooa = data.get('saml2_not_on_or_after', -1)
         if nooa < 0:
             # this means no session was created
-            return False
+            return None
         elif nooa == 0:
             # no expiration was defined on the session
-            return True
-
+            pass
         # this is a bit suspect, but it's what PySAML2 does
         # technically int(time.time()) should do the exact same
-        return nooa > calendar.timegm(time.gmtime())
+        elif nooa <= calendar.timegm(time.gmtime()):
+            return None
 
-    def logout_url(self, request, user):
-        client = self.tenants.client(request.app)
-        logout_url = client.logout_url(self, request, user)
-        if not logout_url:
-            # in this case we bail to the redirect url to finish logout
-            return self.logout_redirect_uri(request)
-        return logout_url
+        session_id, request_info = client.create_logout_request(
+            self, request, user)
+
+        if not session_id or not request_info:
+            return None
+
+        # remember where we need to redirect to
+        redirects = client.get_redirects(request.app)
+        redirects[session_id] = to
+
+        headers = {k.lower(): v for k, v in request_info['headers']}
+        logout_url = headers['location']
+
+        # now we terminate the local session before we redirect
+        # to the authentication provider, so our local logout
+        # will complete, even if an error occurs on the IdP's
+        # end and we never receive a logout response
+        return finish_logout(request, user, logout_url)
 
     def authenticate_request(self, request):
         """

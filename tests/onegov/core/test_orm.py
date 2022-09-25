@@ -224,7 +224,7 @@ def test_orm_scenario(postgres_dsn, redis_url):
         id = Column(Integer, primary_key=True)
         title = Column(Text, nullable=False)
 
-    class DocumentCollection(object):
+    class DocumentCollection:
 
         def __init__(self, session):
             self.session = session
@@ -753,13 +753,13 @@ def test_application_retries(postgres_dsn, number_of_retries, redis_url):
         pass
 
     @App.path(path='/foo/{id}/{uid}')
-    class Document(object):
+    class Document:
         def __init__(self, id, uid):
             self.id = id
             self.uid = uid
 
     @App.path(path='/')
-    class Root(object):
+    class Root:
         pass
 
     class Record(Base):
@@ -1150,7 +1150,7 @@ def test_get_polymorphic_class():
 
 def test_dict_properties():
 
-    class Site(object):
+    class Site:
         users = {}
         names = dict_property('users')
 
@@ -1162,7 +1162,7 @@ def test_dict_properties():
 
 def test_content_properties():
 
-    class Content(object):
+    class Content:
         meta = {}
         content = {}
 
@@ -1223,7 +1223,7 @@ def test_find_models():
 
     Base = declarative_base(cls=ModelBase)
 
-    class Mixin(object):
+    class Mixin:
         pass
 
     class A(Base):
@@ -1494,7 +1494,7 @@ def test_associable_one_to_one(postgres_dsn):
         id = Column(Integer, primary_key=True)
         town = Column(Text, nullable=False)
 
-    class Addressable(object):
+    class Addressable:
         address = associated(Address, 'address', 'one-to-one')
 
     class Company(Base, Addressable):
@@ -1561,7 +1561,7 @@ def test_associable_one_to_many(postgres_dsn):
         id = Column(Integer, primary_key=True)
         town = Column(Text, nullable=False)
 
-    class Addressable(object):
+    class Addressable:
         addresses = associated(Address, 'addresses', 'one-to-many')
 
     class Company(Base, Addressable):
@@ -1624,7 +1624,7 @@ def test_associable_many_to_many(postgres_dsn):
         id = Column(Integer, primary_key=True)
         town = Column(Text, nullable=False)
 
-    class Addressable(object):
+    class Addressable:
         addresses = associated(Address, 'addresses', 'many-to-many')
 
     class Company(Base, Addressable):
@@ -1774,7 +1774,7 @@ def test_selectable_sql_query(session):
                 stmt.c.table_name == 'pg_group',
                 stmt.c.is_updatable == True
             )
-        )
+        ).order_by(stmt.c.column_name)
     ).fetchall()
 
     assert columns == [('groname', ), ('grosysid', )]

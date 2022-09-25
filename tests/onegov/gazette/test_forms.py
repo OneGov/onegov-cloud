@@ -17,12 +17,12 @@ from onegov.user import UserGroupCollection
 from sedate import standardize_date
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
     def __init__(self, time_zone='Europe/Zurich'):
         self.time_zone = time_zone
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session, principal):
         self._session = session
         self.principal = principal
@@ -31,7 +31,7 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session, principal=None, private=False, secret=False):
         self.app = DummyApp(session, principal)
         self.session = session

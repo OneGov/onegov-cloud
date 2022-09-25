@@ -2,7 +2,7 @@ from cached_property import cached_property
 from onegov.core.orm.abstract import MoveDirection
 
 
-class Move(object):
+class Move:
     """ Base class for moving things. """
 
     def __init__(self, session, subject_id, target_id, direction):

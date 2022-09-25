@@ -18,7 +18,7 @@ def test_view_form_alert(client):
 
 def test_render_form(client):
 
-    class Field(object):
+    class Field:
         def __init__(self, name, definition, comment=None):
             self.name = name
             self.id = as_internal_id(name)
@@ -712,7 +712,7 @@ def test_registration_ticket_workflow(client):
 
     client.login_editor()
     # We rename the form and check if everything still works
-    rename_page = client.get('/form/meetup').click('Url ändern')
+    rename_page = client.get('/form/meetup').click('URL ändern')
     assert rename_page.form['name'].value == 'meetup'
 
     rename_page = rename_page.form.submit()

@@ -192,7 +192,7 @@ def test_pdf_headers():
     pdf.generate()
     assert extract_pdf_info(file) == (
         1,
-        'h1\nh1\nh2\nh2\nh3\nh3\nh4\nh4\nh5\nh5\nh6\nh6\nh7'
+        'h1 h1 h2 h2 h3 h3 h4 h4 h5 h5 h6 h6 h7'
     )
 
 
@@ -226,40 +226,37 @@ def test_pdf_toc():
 
     assert extract_pdf_info(file) == (
         4,
-        '1a                      2\n'
-        '1.1 a.a                 2\n'
-        '1.2 a.b                 3\n'
-        '1.2.1 a.b.a             3\n'
-        '1.2.2 a.b.b             3\n'
-        '1.2.2.1 a.b.b.a         3\n'
-        '1.2.2.2 a.b.b.b         3\n'
-        '1.2.2.3 a.b.b.c         3\n'
-        '1.2.3 a.b.c             3\n'
-        '1.3 a.c                 4\n'
-        '1.3.1 a.c.a             4\n'
-        '1.3.1.1 a.c.a.a         4\n'
-        '1.3.1.1.1 a.c.a.a.a     4\n'
-        '1.3.1.1.2 a.c.a.a.b     4\n'
-        '1.3.1.1.2.1 a.c.a.a.b.a 4\n'
-        '1.3.1.1.2.2 a.c.a.a.b.b 4\n'
-        '\n'
-        '1a\n'
-        '1.1 a.a\n'
-        '\n'
-        '1.2 a.b\n'
-        '1.2.1 a.b.a\n'
-        '1.2.2 a.b.b\n'
-        '1.2.2.1 a.b.b.a\n'
-        '1.2.2.2 a.b.b.b\n'
-        '1.2.2.3 a.b.b.c\n'
-        '1.2.3 a.b.c\n'
-        '\n'
-        '1.3 a.c\n'
-        '1.3.1 a.c.a\n'
-        '1.3.1.1 a.c.a.a\n'
-        '1.3.1.1.1 a.c.a.a.a\n'
-        '1.3.1.1.2 a.c.a.a.b\n'
-        '1.3.1.1.2.1 a.c.a.a.b.a\n'
+        '1a 2 '
+        '1.1 a.a 2 '
+        '1.2 a.b 3 '
+        '1.2.1 a.b.a 3 '
+        '1.2.2 a.b.b 3 '
+        '1.2.2.1 a.b.b.a 3 '
+        '1.2.2.2 a.b.b.b 3 '
+        '1.2.2.3 a.b.b.c 3 '
+        '1.2.3 a.b.c 3 '
+        '1.3 a.c 4 '
+        '1.3.1 a.c.a 4 '
+        '1.3.1.1 a.c.a.a 4 '
+        '1.3.1.1.1 a.c.a.a.a 4 '
+        '1.3.1.1.2 a.c.a.a.b 4 '
+        '1.3.1.1.2.1 a.c.a.a.b.a 4 '
+        '1.3.1.1.2.2 a.c.a.a.b.b 4 '
+        '1a '
+        '1.1 a.a '
+        '1.2 a.b '
+        '1.2.1 a.b.a '
+        '1.2.2 a.b.b '
+        '1.2.2.1 a.b.b.a '
+        '1.2.2.2 a.b.b.b '
+        '1.2.2.3 a.b.b.c '
+        '1.2.3 a.b.c '
+        '1.3 a.c '
+        '1.3.1 a.c.a '
+        '1.3.1.1 a.c.a.a '
+        '1.3.1.1.1 a.c.a.a.a '
+        '1.3.1.1.2 a.c.a.a.b '
+        '1.3.1.1.2.1 a.c.a.a.b.a '
         '1.3.1.1.2.2 a.c.a.a.b.b'
     )
 
@@ -280,13 +277,13 @@ def test_pdf_toc_levels():
     pdf.generate()
     assert extract_pdf_info(file) == (
         1,
-        '1a                      1\n'
-        '1.1 a.a                 1\n'
-        '1a\n'
-        '1.1 a.a\n'
-        '1.1.1 a.a.a\n'
-        '1.1.1.1 a.a.a.a\n'
-        '1.1.1.1.1 a.a.a.a.a\n'
+        '1a 1 '
+        '1.1 a.a 1 '
+        '1a '
+        '1.1 a.a '
+        '1.1.1 a.a.a '
+        '1.1.1.1 a.a.a.a '
+        '1.1.1.1.1 a.a.a.a.a '
         '1.1.1.1.1.1 a.a.a.a.a.a'
     )
 
@@ -385,19 +382,19 @@ def test_pdf_mini_html():
 
     pdf.generate()
 
-    assert extract_pdf_info(file) == (
+    assert extract_pdf_info(file, remove='•\0') == (
         1,
-        'Ipsum\n'
+        'Ipsum '
         'Pellentesque habitant morbi tristique senectus et netus et malesuada '
-        'fames ac turpis.\n'
+        'fames ac turpis. '
         'Donec eu libero sit amet quam egestas semper. Aenean ultricies mi '
-        'vitae est. Mauris commodo vitae.\n'
-        'Donec non enim in turpis pulvinar facilisis. Ut felis. Aliquam\n'
-        '1 Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
-        '2 Aliquam tincidunt mauris eu risus.\n'
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean\n'
-        '•   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n'
-        '•   Aliquam tincidunt mauris eu risus.'
+        'vitae est. Mauris commodo vitae. '
+        'Donec non enim in turpis pulvinar facilisis. Ut felis. Aliquam '
+        '1 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
+        '2 Aliquam tincidunt mauris eu risus. '
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean '
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. '
+        'Aliquam tincidunt mauris eu risus.'
     )
 
 
@@ -555,7 +552,7 @@ def test_page_fn_header():
     assert extract_pdf_info(file) == (
         1,
         'This is a very long title so that it breaks the header line to a '
-        'second line which must also be ellipsed.It is\n'
+        'second line which must also be ellipsed.It is '
         'really, really, really, really, really, really, really, really, '
         'really, really, really, [...]'
     )
@@ -588,7 +585,7 @@ def test_page_fn_footer():
     pdf.pagebreak()
     pdf.generate()
 
-    assert extract_pdf_info(file) == (2, '1\n2')
+    assert extract_pdf_info(file) == (2, '1 2')
 
     # author
     file = BytesIO()
@@ -611,8 +608,8 @@ def test_page_fn_header_and_footer():
 
     assert extract_pdf_info(file) == (
         2,
-        f'title\n© {year} author 1\n\n'
-        f'title\n© {year} author 2'
+        f'title © {year} author 1 '
+        f'title © {year} author 2'
     )
 
 
@@ -654,4 +651,4 @@ def test_page_fn_header_logo_and_footer(path):
     pdf.init_a4_portrait(page_fn_header_logo_and_footer)
     pdf.generate()
 
-    assert extract_pdf_info(file) == (1, f'onegov.ch\n© {year} author 1')
+    assert extract_pdf_info(file) == (1, f'onegov.ch © {year} author 1')

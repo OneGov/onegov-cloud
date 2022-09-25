@@ -12,7 +12,7 @@ import transaction
 
 
 class Client(BaseClient):
-    skip_first_form = True
+    skip_n_forms = 1
 
 
 def test_export(request):

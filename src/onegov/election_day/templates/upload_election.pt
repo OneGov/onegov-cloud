@@ -8,7 +8,7 @@
         <h2 class="subheader" i18n:translate="">Upload results</h2>
 
         <div class="panel">
-            <span i18n:translate="">Last change</span>: ${layout.format_date(last_change, 'datetime_long')}
+            <p><span i18n:translate="">Last change</span>: ${layout.format_date(last_change, 'datetime_long')}</p>
         </div>
 
         <div class="after-upload" tal:condition="status == 'success'">
@@ -36,9 +36,11 @@
 
         <div tal:condition="status != 'success'">
             <div class="panel">
-                <i class="fa fa-info-circle"></i>
-                <span i18n:translate="">Please use the following format:</span>
-                <a href="${layout.format_description_link}" i18n:translate="">Format Description</a>
+                <p>
+                    <i class="fa fa-info-circle"></i>
+                    <span i18n:translate="">Please use the following format:</span>
+                    <a href="${layout.format_description_link}" i18n:translate="">Format Description</a>
+                </p>
             </div>
 
             <div metal:use-macro="layout.macros['form']" />

@@ -25,7 +25,7 @@ from wtforms.csrf.session import SessionCSRF
 Message = collections.namedtuple('Message', ['text', 'type'])
 
 
-class ReturnToMixin(object):
+class ReturnToMixin:
     """ Provides a safe and convenient way of using return-to links.
 
     Return-to links are links with an added 'return-to' query parameter
@@ -159,6 +159,15 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             url += '?' + self.query_string
 
         return url
+
+    @cached_property
+    def application_url(self):
+        """ Extends the default application_url with virtual host suport. """
+        # FIXME: Technically this is not guaranteed to be URL safe, but the
+        #        same is already true for X_VHM_ROOT and X_VHM_HOST, if we
+        #        want to be able to deal with this properly we should add
+        #        a function that does the same thing webob does internally
+        return self.transform(self.script_name)
 
     def transform(self, url):
         """ Applies X_VHM_HOST and X_VHM_ROOT to the given url (which is

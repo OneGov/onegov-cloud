@@ -36,7 +36,7 @@ SUPPORTED_STORAGE_BACKENDS = (
 
 
 class DepotApp(App):
-    """ Provides `Depot <depot.readthedocs.io>`_ integration for
+    """ Provides `Depot <https://depot.readthedocs.io>`_ integration for
     :class:`onegov.core.framework.Framework` based applications.
 
     """
@@ -111,9 +111,9 @@ class DepotApp(App):
             By default we use the '__default__.yml' config. Alternatively
             we can create separate configs for various application ids.
 
-            For example, we might create a `onegov_town-govikon.yml`, which
+            For example, we might create a `onegov_town6-govikon.yml`, which
             would take precedence over the default config, if the application
-            with the id `onegov_town-govikon` would use the signing service.
+            with the id `onegov_town6-govikon` would use the signing service.
 
         """
 

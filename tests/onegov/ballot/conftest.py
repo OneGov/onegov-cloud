@@ -27,3 +27,25 @@ def explanations_pdf():
     pdf.generate()
     result.seek(0)
     return result
+
+
+@fixture(scope="function")
+def upper_apportionment_pdf():
+    result = BytesIO()
+    pdf = Pdf(result)
+    pdf.init_report()
+    pdf.p("Oberzuteilung")
+    pdf.generate()
+    result.seek(0)
+    return result
+
+
+@fixture(scope="function")
+def lower_apportionment_pdf():
+    result = BytesIO()
+    pdf = Pdf(result)
+    pdf.init_report()
+    pdf.p("Unterzuteilung")
+    pdf.generate()
+    result.seek(0)
+    return result

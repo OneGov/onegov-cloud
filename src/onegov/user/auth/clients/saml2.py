@@ -10,9 +10,9 @@ from onegov.user.auth import Auth
 from saml2 import BINDING_HTTP_POST, BINDING_HTTP_REDIRECT
 from saml2.cache import Cache
 from saml2.client import Saml2Client as Connection
-from saml2.client_base import LogoutError
 from saml2.config import Config
-from saml2.ident import code
+from saml2.ident import code, decode
+from saml2.mdstore import locations
 from saml2.saml import NAMEID_FORMAT_TRANSIENT
 from saml2.s_utils import status_message_factory
 from saml2.s_utils import success_status_factory
@@ -72,7 +72,7 @@ def finish_logout(request, user, to, local=True):
 
 
 @attrs(auto_attribs=True)
-class SAML2Attributes(object):
+class SAML2Attributes:
     """ Holds the required SAML2 Attributes """
 
     # the globally unique id
@@ -151,7 +151,7 @@ class SAML2Client():
         if conn is None:
             # create connection
             try:
-                base_url = request.application_url
+                base_url = request.application_url.rstrip('/')
                 provider_cls = type(provider)
                 acs_url = request.class_link(
                     provider_cls, {'name': provider.name}, name='redirect')
@@ -209,36 +209,80 @@ class SAML2Client():
         if user and user.data:
             return user.data.get('saml2_transient_id')
 
-    def logout_url(self, provider, request, user):
+    def create_logout_request(self, provider, request, user):
         transient_id = self.get_name_id(user)
         if not transient_id:
-            return None
+            return None, None
 
+        # FIXME: Unfortunately the convenience method `global_logout`
+        #        does not return the request_id for the responses it
+        #        generates, so theres no way to store any locale state
+        #        that should belong to that request, like e.g. the
+        #        `to` clause from the logout, so we have to re-implement
+        #        global logout. This is not a full implementation, as it
+        #        always attempts a redirect, regardless of what may be
+        #        configured. It also assumes that there is only one IdP
         conn = self.connection(provider, request)
+        name_id = decode(transient_id)
+        entity_ids = conn.users.issuers_of_info(name_id)
+        if not entity_ids:
+            # nothing to do
+            return None, None
+
+        # disregard any IdP beyond the first one
+        entity_id = entity_ids[0]
+        bindings = conn.metadata.single_logout_service(
+            entity_id=entity_id, typ='idpsso')
+
+        # we only support redirects for now
+        if BINDING_HTTP_REDIRECT not in bindings:
+            return None, None
+
+        service_info = bindings[BINDING_HTTP_REDIRECT]
+        service_location = next(locations(service_info), None)
+        if not service_location:
+            # we can't redirect without a location
+            log.warning('SAML2: No location configured for IdP SSO')
+            return None, None
+
         try:
-            data = conn.global_logout(transient_id)
-        except LogoutError:
-            return None
+            session_info = conn.users.get_info_from(name_id, entity_id, False)
+            session_index = session_info.get('session_index')
+            session_indexes = [session_index] if session_index else None
+        except KeyError:
+            session_indexes = None
 
-        for entity_id, logout_info in data.items():
-            if not isinstance(logout_info, tuple):
-                # safe to ignore
-                continue
+        # FIXME: This would need to change to support signed requests
+        session_id, logout_req = conn.create_logout_request(
+            service_location,
+            entity_id,
+            name_id=name_id,
+            session_indexes=session_indexes)
+        relay_state = conn._relay_state(session_id)
+        request_info = conn.apply_binding(
+            BINDING_HTTP_REDIRECT,
+            str(logout_req),
+            service_location,
+            relay_state)
 
-            binding, request_info = logout_info
-            if binding != BINDING_HTTP_REDIRECT:
-                # we only support redirect bindings for now
-                continue
-
-            # all we care about is the location header
-            headers = {k.lower(): v for k, v in request_info['headers']}
-            return headers.get('location', None)
+        # remember this logout request
+        conn.state[session_id] = {
+            'entity_id': entity_id,
+            'operation': 'SLO',
+            'entity_ids': entity_ids,
+            'name_id': code(name_id),
+            'reason': '',
+            'not_on_or_after': None,
+            'sign': False,
+        }
+        return session_id, request_info
 
     def handle_slo(self, provider, request):
         # this could be either a request or a response
         saml_request = request.params.get('SAMLRequest')
         saml_response = request.params.get('SAMLResponse')
         user = request.current_user
+        to = request.browser_session.pop('logout_to', provider.to or '/')
         if saml_request:
             # this should be a LogoutRequest
             conn = self.connection(provider, request)
@@ -265,6 +309,12 @@ class SAML2Client():
             try:
                 logout_res = conn.parse_logout_request_response(
                     saml_response, binding)
+
+                # recover redirect target
+                session_id = logout_res.in_response_to
+                redirects = self.get_redirects(request.app)
+                to = redirects.get(session_id, to)
+
                 # TODO: If we want to support multiple IdP's this may
                 #       result in further redirects to the next IdP
                 #       for now we assume this doesn't happen, if we
@@ -282,8 +332,6 @@ class SAML2Client():
         # the same way we would if we got a response, i.e. we terminate
         # the SAML2 session and redirect back to the logout view to
         # finish local logout
-        to = request.browser_session.pop('logout_to', provider.to or '/')
-
         if user:
             # first we terminate the SAML2 session and then we redirect
             # to the normal logout view to finish the local logout

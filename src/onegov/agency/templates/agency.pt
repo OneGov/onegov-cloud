@@ -20,7 +20,7 @@
                     <h2 i18n:translate>Exports</h2>
                     <ul class="agency-export-list">
                         <li>
-                            <a href="${request.link(agency.pdf)}" target="_blank"  i18n:translate>
+                            <a href="${request.link(agency.pdf)}" target="_blank" i18n:translate>
                                 Export this agency and its children as a PDF
                             </a>
                         </li>
@@ -36,6 +36,14 @@
                         </dt>
                         <dd i18n:translate>Report a change</dd>
                     </dl>
+                </div>
+                <div tal:condition="agency.coordinates" class="borderless-side-panel">
+                    <h2>Karte</h2>
+                    <div class="marker-map agency-map"
+                        data-lat="${agency.coordinates.lat}"
+                        data-lon="${agency.coordinates.lon}"
+                        data-zoom="${agency.coordinates.zoom}">
+                    </div>
                 </div>
 
             </div>

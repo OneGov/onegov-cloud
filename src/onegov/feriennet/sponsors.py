@@ -12,7 +12,7 @@ def load_sponsors(sponsors_path):
         return [Sponsor(**sponsor) for sponsor in yaml.safe_load(f)]
 
 
-class Sponsor(object):
+class Sponsor:
 
     __slots__ = (
         'name', 'logo', 'logo_url', 'mail_url', 'background', 'height',

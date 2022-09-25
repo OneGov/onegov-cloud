@@ -3,20 +3,20 @@ import weakref
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
-
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
+from onegov.form.display import render_field
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
 from onegov.form.validators import StrictOptional
 from onegov.pay import Price
-from onegov.form.display import render_field
 from operator import itemgetter
 from wtforms import Form as BaseForm
-from wtforms import StringField, TextAreaField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, DataRequired
 from wtforms_components import If, Chain
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired, DataRequired
 
 
 class Form(BaseForm):
@@ -587,7 +587,7 @@ class Form(BaseForm):
             return desc
 
 
-class Fieldset(object):
+class Fieldset:
     """ Defines a fieldset with a list of fields. """
 
     def __init__(self, label, fields):
@@ -619,7 +619,7 @@ class Fieldset(object):
             (id, field) for id, field in self.fields.items() if field.data)
 
 
-class FieldDependency(object):
+class FieldDependency:
     """ Defines a dependency to a field. The given field(s) must have the given
     choice for this dependency to be fulfilled.
 
@@ -678,7 +678,7 @@ class FieldDependency(object):
         return {'data-depends-on': value}
 
 
-class Pricing(object):
+class Pricing:
     """ Defines pricing on a field, returning the correct price for the field
     depending on its rule.
 

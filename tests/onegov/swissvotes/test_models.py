@@ -20,7 +20,7 @@ from onegov.swissvotes.models.file import LocalizedFile
 from translationstring import TranslationString
 
 
-class DummyRequest(object):
+class DummyRequest:
     def translate(self, text):
         if isinstance(text, TranslationString):
             return text.interpolate()
@@ -79,18 +79,18 @@ def test_model_canton():
 
 
 def test_model_localized_file():
-    class SessionManager(object):
+    class SessionManager:
         def __init__(self):
             self.current_locale = 'de_CH'
 
-    class MyClass(object):
+    class MyClass:
         file = LocalizedFile('pdf', 'title', {})
 
         def __init__(self):
             self.session_manager = SessionManager()
             self.files = []
 
-    class File(object):
+    class File:
         def __init__(self, name):
             self.name = name
 
@@ -801,9 +801,16 @@ def test_model_vote_codes():
 
 
 def test_model_vote_search_term_expression(swissvotes_app):
-    assert SwissVote.search_term_expression(None) == ''
-    assert SwissVote.search_term_expression('') == ''
-    assert SwissVote.search_term_expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
+    expression = SwissVote.search_term_expression
+    assert expression(None) == ''
+    assert expression('') == ''
+    assert expression('*') == ''
+    assert expression('* *') == ''
+    assert expression('* a *') == 'a'
+    assert expression('*   a *  b *') == 'a <-> b'
+    assert expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
+    assert expression('AHV Mehrwertsteuer') == 'AHV <-> Mehrwertsteuer'
+    assert expression('AHV Mehrwert*') == 'AHV <-> Mehrwert:*'
 
 
 def test_model_vote_attachments(swissvotes_app, attachments,

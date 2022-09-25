@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-05-24 15:51+0200\n"
+"POT-Creation-Date: 2022-09-05 10:29+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,9 +12,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
-
-msgid "Partner of Pro Juventute"
-msgstr "Partner von Pro Juventute"
 
 msgid "No active period"
 msgstr "Kein aktiver Zeitraum"
@@ -625,8 +622,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#. Used in sentence: "I have read the ${tos} and accept them."
 #.
+#. Used in sentence: "I have read the ${tos} and accept them."
 msgid "TOS"
 msgstr "AGB"
 
@@ -2940,8 +2937,14 @@ msgstr "Der Zeitraum wurde erfolgreich deaktiviert"
 msgid "The period was archived successfully"
 msgstr "Der Zeitraum wurde erfolgreich archiviert"
 
+msgid "QR-Bill"
+msgstr "QR-Rechnung"
+
 msgid "Payment"
 msgstr "Bezahlung"
+
+msgid "Bank Account (IBAN / QR-IBAN)"
+msgstr "Bank Konto (IBAN / QR-IBAN)"
 
 msgid "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
 msgstr "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
@@ -2952,20 +2955,17 @@ msgstr "Einzahlungsschein"
 msgid "Basic"
 msgstr "Einfach"
 
-msgid "ESR (General)"
-msgstr "ESR (Generell)"
+msgid "ESR (General) / QR-Reference"
+msgstr "ESR (Generell) / QR-Referenz"
 
 msgid "ESR (Raiffeisen)"
 msgstr "ESR (Raiffeisen)"
 
-msgid "ESR participant number"
-msgstr "ESR Teilnehmernummer"
+msgid "ESR participant number / QR-IBAN"
+msgstr "ESR Teilnehmernummer / QR-IBAN"
 
 msgid "ESR identification number"
 msgstr "ESR Identifikationsnummer"
-
-msgid "QR-Bill (experimental)"
-msgstr "QR-Rechnung (experimentell)"
 
 msgid "Full age required for registration"
 msgstr "Volljährigkeit bei der Registrierung notwendig"
@@ -3032,11 +3032,13 @@ msgstr "Ungültige IBAN"
 msgid "QR-Bills require a Swiss or Lichteinstein IBAN"
 msgstr "QR-Rechnungen benötigen eine Schweizer oder Lichteinstein-IBAN"
 
-msgid "This IBAN cannot be used for QR-Bills without ESR"
-msgstr "Diese IBAN kann nicht für QR-Rechnungen ohne ESR verwendet werden"
+msgid "Select ESR (General) / QR-Reference when using the given QR-IBAN"
+msgstr ""
+"Wählen Sie ESR (Generell) / QR-Referenz, wenn Sie die angegebene QR-IBAN "
+"verwenden."
 
-msgid "This IBAN cannot be used for QR-Bills with ESR"
-msgstr "Diese IBAN kann nicht für QR-Rechnungen mit ESR verwendet werden"
+msgid "Select Basic when using the given IBAN"
+msgstr "Wählen Sie Einfach, wenn Sie die angegebene IBAN verwenden."
 
 msgid "QR-Bills require a beneficiary"
 msgstr "QR-Rechnungen erfordern einen Begünstigten"
@@ -3058,6 +3060,3 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
-
-#~ msgid "Each child can register for up to ${count} activities."
-#~ msgstr "Jedes Kind kann sich für bis zu 12 Angebote anmelden."

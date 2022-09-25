@@ -136,6 +136,9 @@
                         })
                         .html(function(d) {
                             var name = '<strong>' + d.properties.name + '</strong>';
+                            if (d.properties.result && d.properties.result.mandates && d.properties.result.progress) {
+                                return name + '<br><i class="fa fa fa-user"></i> ' + d.properties.result.mandates + '<br><i class="fa fa-check"></i> ' + d.properties.result.progress;
+                            }
                             if (!isUndefined(d.properties.result) && !isUndefined(d.properties.result.percentage) && d.properties.result.counted) {
                                 var percentage = Math.round(d.properties.result.percentage * 100) / 100;
 
@@ -179,6 +182,11 @@
                         })
                         .on('mouseout.highlight', function() {
                             d3.select(this).classed('selected', false);
+                        })
+                        .on('click.highlight', function(d) {
+                            if (d.properties.result && d.properties.result.link && d.properties.result.counted) {
+                                window.location = d.properties.result.link;
+                            }
                         })
                         .on('click', tooltip.show);
                 }

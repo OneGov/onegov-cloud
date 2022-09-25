@@ -144,7 +144,7 @@
         <h3 i18n:translate>Training</h3>
         <dl class="accreditation">
             <dt i18n:translate>Learned profession</dt>
-            <dd>${ticket_data.get('profession')}</dd>
+            <dd>${translator.profession}</dd>
 
             <dt i18n:translate>Current professional activity</dt>
             <dd>${translator.occupation}</dd>
@@ -207,7 +207,7 @@
         <dl class="accreditation">
             <dt i18n:translate>Admission</dt>
 
-            <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
+            <dt i18n:translate>Admission course of the high court of the Canton of Zurich available</dt>
             <dd class="admission-course-completed">${layout.format_boolean(ticket_data.get('admission_course_completed'))}</dd>
 
             <dt i18n:translate>I agree to attend the admission course of the high court of the Canton of Zürich at my own expense CHF 1'100.00.</dt>
@@ -233,5 +233,45 @@
         </dl>
     </metal:display_accreditation>
 
+    <metal:access_hint define-macro="access_hint" i18n:domain="onegov.translator_directory">
+        <tal:b tal:condition="request.is_manager|nothing">
+            <tal:b condition="item.access == 'private'|False">
+                <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
+            </tal:b>
+            <tal:b condition="item.access == 'member'|False">
+                <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
+            </tal:b>
+            <tal:b condition="item.access == 'secret'|False">
+                <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
+            </tal:b>
+        </tal:b>
+    </metal:access_hint>
+
+    <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.translator_directory">
+        <tal:b tal:switch="item.access|False" tal:condition="request.is_manager|nothing">
+            <tal:b tal:case="'private'">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div class="panel callout">
+                            <p i18n:translate>
+                                This site is not public.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </tal:b>
+            <tal:b tal:case="'member'">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div class="panel callout">
+                            <p i18n:translate>
+                                This site is not public but it can be seen by members.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </tal:b>
+        </tal:b>
+    </metal:access_hint_long>
 
 </body>

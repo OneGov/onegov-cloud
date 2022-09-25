@@ -1,38 +1,4 @@
-""" Provides commands used to manage users.
-
-Examples:
-
-To add a user called ``admin@example.org`` to the ``towns-govikon`` schema,
-with the role 'admin'::
-
-    dsn=postgres://user:password@localhost:5432/database
-    schema=towns-govikon
-    onegov-user --dsn $dsn --schema $schema add admin admin@example.org
-
-This command will ask for a password if none was provided with ``--password``.
-
-To delete a user::
-
-    dsn=postgres://user:password@localhost:5432/database
-    schema=towns-govikon
-    onegov-user --dsn $dsn --schema $schema delete admin@example.org
-
-To check if a user exists::
-
-    dsn=postgres://user:password@localhost:5432/database
-    schema=towns-govikon
-    onegov-user --dsn $dsn --schema $schema exists admin@example.org
-
-To change a users password::
-
-    dsn=postgres://user:password@localhost:5432/database
-    schema=towns-govikon
-    onegov-user --dsn $dsn --schema $schema change-password admin@example.org
-
-This command will also ask for a password if none was provided with
-``--password``.
-
-"""
+""" Provides commands used to manage users. """
 
 import click
 

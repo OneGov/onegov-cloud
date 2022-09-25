@@ -34,15 +34,15 @@ from onegov.translator_directory.models.translator import \
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.models.translator import \
     written_association_table
-from wtforms import BooleanField
-from wtforms import FloatField
-from wtforms import RadioField
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.fields.html5 import EmailField
-from wtforms.fields.html5 import IntegerField
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import EmailField
+from wtforms.fields import FloatField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import Email
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
@@ -301,6 +301,10 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         choices=[]
     )
 
+    profession = StringField(
+        label=_('Learned profession')
+    )
+
     occupation = StringField(
         label=_('Current professional activity')
     )
@@ -474,6 +478,7 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.education_as_interpreter = self.education_as_interpreter.data
         model.comments = self.comments.data or None
         model.for_admins_only = self.for_admins_only.data
+        model.profession = self.profession.data
         model.occupation = self.occupation.data
         model.operation_comments = self.operation_comments.data or None
         model.coordinates = self.coordinates.data

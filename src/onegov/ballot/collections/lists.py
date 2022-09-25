@@ -1,7 +1,7 @@
 from onegov.ballot.models import List
 
 
-class ListCollection(object):
+class ListCollection:
 
     def __init__(self, session):
         self.session = session

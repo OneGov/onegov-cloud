@@ -52,7 +52,7 @@ def query_schemas(connection, namespace=None):
             yield schema
 
 
-class SessionManager(object):
+class SessionManager:
     """ Holds sessions and creates schemas before binding sessions to schemas.
 
     Threadsafe in theory, but not tested or well thought out. No global state
@@ -87,7 +87,7 @@ class SessionManager(object):
             Database connection string including user, password, host, port
             and database name.
 
-            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
+            See: `<https://docs.sqlalchemy.org/en/latest/core/engines.html\
             #database-urls>`_
 
         :base:
@@ -103,13 +103,13 @@ class SessionManager(object):
         :engine_config:
             Additional configuration passed to SQLAlchemy's `create_engine`.
 
-            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
+            See: `<https://docs.sqlalchemy.org/en/latest/core/engines.html\
             #sqlalchemy.create_engine>`
 
         :session_config:
             Additional configuration passed to SQLAlchemy's sessionmaker.
 
-            See: `<http://docs.sqlalchemy.org/en/latest/orm/session_api.html\
+            See: `<https://docs.sqlalchemy.org/en/latest/orm/session_api.html\
             #sqlalchemy.orm.session.sessionmaker>`
 
         :pool_config:

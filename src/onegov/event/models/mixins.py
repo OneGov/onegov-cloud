@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 
 
-class OccurrenceMixin(object):
+class OccurrenceMixin:
     """ Contains all attributes events and ocurrences share.
 
     The ``start`` and ``end`` date and times are stored in UTC - that is, they

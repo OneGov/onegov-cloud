@@ -38,7 +38,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
-    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
     type = Column(Text, nullable=True)
 
@@ -200,6 +200,9 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     counted_eligible_voters = summarized_property('counted_eligible_voters')
 
+    #: the total expats
+    expats = summarized_property('expats')
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
@@ -259,7 +262,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     #: may be used to indicate that the vote contains expats as seperate
     #: resultas (typically with entity_id = 0)
-    expats = meta_property('expats', default=False)
+    has_expats = meta_property('expats', default=False)
 
     def clear_results(self):
         """ Clear all the results. """

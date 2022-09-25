@@ -1,7 +1,7 @@
 from onegov.form import Form
 from onegov.wtfs import _
-from wtforms import StringField
-from wtforms import TextAreaField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 
 

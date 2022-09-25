@@ -43,7 +43,7 @@ class FindYourSpotCollection(ResourceCollection):
         return query
 
 
-class SharedMethods(object):
+class SharedMethods:
 
     lead = meta_property()
     text = content_property()

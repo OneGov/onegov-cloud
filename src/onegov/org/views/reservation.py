@@ -3,11 +3,12 @@ import pytz
 import sedate
 import transaction
 
-from datetime import datetime, time, timedelta
+from datetime import time, timedelta
 from dill import pickles
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.security import Public, Private
+from onegov.core.templates import render_template
 from onegov.form import FormCollection, merge_forms, as_internal_id
 from onegov.org import _, OrgApp
 from onegov.org import utils
@@ -15,9 +16,11 @@ from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm, InternalTicketChatMessageForm
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
+from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
-    TicketMessage, TicketChatMessage, ReservationMessage)
+    TicketMessage, TicketChatMessage, ReservationMessage,
+    ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
@@ -106,42 +109,19 @@ def reserve_allocation(self, request):
             start = sedate.parse_time(start)
             end = sedate.parse_time(end)
 
-        # FIXME: We should change this back to sedate.get_date_range
-        #        once sedate has been patched to handle DST <-> ST
-        #        transitions correctly, although once we patch it
-        #        we probably need to catch NonExistentTimeError so
-        #        we can respond to it with the below new error message
-        # start, end = sedate.get_date_range(
-        #     sedate.to_timezone(self.start, self.timezone), start, end
-        # )
-
-        # first create tz naive datetimes for start and end
-        day = self.display_start().date()
-        start = datetime.combine(day, start, tzinfo=None)
-        end = datetime.combine(day, end, tzinfo=None)
-
-        # use pytz.localize to handle non-existent/ambiguous times
-        tzinfo = sedate.ensure_timezone(self.timezone)
         try:
-            start = tzinfo.localize(start, is_dst=None)
-            end = tzinfo.localize(end, is_dst=None)
+            start, end = sedate.get_date_range(
+                self.display_start(),
+                start,
+                end,
+                raise_non_existent=True
+            )
         except pytz.NonExistentTimeError:
-            # there's no graceful solution here, so we should return an
-            # error. Eventually we should probably mark non-existent time
-            # ranges in the calendar, so they can't be reserved
             err = request.translate(_(
                 "The selected time does not exist on this date due to "
                 "the switch from standard time to daylight saving time."
             ))
             return respond_with_error(request, err)
-        except pytz.AmbiguousTimeError:
-            # we treat ambiguous times as standard time always, to make
-            # our lifes easier. On the calendar you can't distinguish
-            # between DST and ST during that time interval anyways, so
-            # it should make no difference what we pick here, we just
-            # need to be consistent
-            start = tzinfo.localize(start, is_dst=False)
-            end = tzinfo.localize(end, is_dst=False)
     else:
         start, end = self.start, self.end
 
@@ -660,6 +640,49 @@ def accept_reservation(self, request, text=None, notify=False):
                 'message': message
             }
         )
+
+        # get all recipients which require an e-mail for this resource
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(
+            ResourceRecipient.address,
+            ResourceRecipient.content
+        )
+        recipients = [
+            r.address
+            for r in q if (
+                self.resource.hex in r.content['resources']
+                and r.content['new_reservations']
+            )
+        ]
+
+        # E-mail for new reservations
+        args = {
+            'layout': DefaultMailLayout(object(), request),
+            'title': request.translate(
+                _("${org} New Reservation(s)", mapping={
+                    'org': request.app.org.title
+                })
+            ),
+            'form': form,
+            'model': self,
+            'resource': resource,
+            'reservations': reservations,
+            'show_submission': show_submission,
+            'message': message
+        }
+
+        content = render_template(
+            'mail_new_reservation_notification.pt', request, args
+        )
+
+        for r in recipients:
+            request.app.send_transactional_email(
+                subject=args['title'],
+                receivers=(r),
+                content=content,
+            )
 
         request.success(_("The reservations were accepted"))
     else:

@@ -1,6 +1,9 @@
 <div metal:use-macro="layout.base"
      i18n:domain="onegov.election_day"
      tal:define="communal_instance layout.principal.domain == 'municipality'">
+    <tal:block metal:fill-slot="title">
+        <tal:block i18n:translate="">Archive Search</tal:block> - ${request.app.principal.name}
+    </tal:block>
     <tal:b metal:fill-slot="before-content">
         <h1>
             <small>${layout.principal.name}</small>
@@ -33,11 +36,12 @@
                         </div>
                     </div>
                     <div class="columns small-12">
-                        <h3 i18n:translate>Search in <tal:b i18n:name="title">${layout.tab_menu_title}</tal:b></h3>
+                        <h2 i18n:translate>Search in <tal:b i18n:name="title">${layout.tab_menu_title}</tal:b></h2>
                         <div metal:use-macro="layout.macros['form']" tal:define="form_method 'GET';button_class 'right'"/>
                     </div>
 
-                    <strong tal:condition="results" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</strong>
+                    <h2 i18n:translate>Search results</h2>
+                    <p role="alert" tal:condition="results" i18n:translate="">Found <tal:b i18n:name="item_count">${item_count}</tal:b> items.</p>
                     <hr>
 
                     <tal:b tal:condition="item_type == 'vote'">
@@ -55,9 +59,12 @@
                             <tbody>
                                 <tal:b tal:repeat="vote results">
                                     <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
-                                        <td class="top-aligned" tal:define="prefix vote.title_prefix(request)">
-                                            <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
-                                        </td>
+                                        <th class="top-aligned" tal:define="prefix vote.title_prefix(request)">
+                                            <a href="${vote.url}">
+                                                <span tal:condition="prefix">${prefix}: </span>
+                                                <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
+                                            </a>
+                                        </th>
                                         <td class="top-aligned">
                                             <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
                                         </td>
@@ -98,9 +105,12 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="election results">
-                                    <td class="top-aligned" tal:define="prefix election.title_prefix(request)">
-                                        <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
-                                    </td>
+                                    <th class="top-aligned" tal:define="prefix election.title_prefix(request)">
+                                        <a href="${election.url}">
+                                            <span tal:condition="prefix">${prefix}: </span>
+                                            <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
+                                        </a>
+                                    </th>
                                     <td class="top-aligned" >${layout.format_date(election.date, 'date')}</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
                                     <td class="top-aligned" tal:condition="election.domain == 'district'" i18n:translate>Regional</td>

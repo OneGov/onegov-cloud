@@ -124,7 +124,7 @@ html {
         display: flex;
         flex-direction: row-reverse;
         height: 1.7rem;
-
+        margin-bottom: 0;
     }
 }
 
@@ -170,6 +170,21 @@ html {
     }
 }
 
+
+/*
+    Sitemap
+*/
+.sitemap {
+    h2 {
+        font-size: $h3-font-size;
+    }
+
+    h3 {
+        font-size: $h4-font-size;
+    }
+}
+
+
 /*
     Voting states
 */
@@ -198,11 +213,14 @@ table {
 
     thead {
         background: none;
-
     }
 
     th {
         border-bottom: 1px solid $aluminum;
+
+        &:not(:first-of-type) {
+            hyphens: auto;
+        }
     }
 
     tbody {
@@ -336,6 +354,11 @@ table {
             td:nth-child(6) {
                 width: 10%;
             }
+
+            td.no-results {
+                text-align: right;
+                width: 50%;
+            }
         }
 
         &.election {
@@ -362,10 +385,20 @@ table {
 
         td,
         th {
+            padding-left: 0;
+            padding-right: 0;
             text-align: left;
         }
 
+        th {
+            border-bottom: 1px dashed #ddd;
+            border-top: 1px solid #ddd;
+            margin-top: 1rem;
+        }
+
         td {
+            border-bottom: 1px dashed #ddd;
+
             .tablesaw-cell-label {
                 color: $black;
                 font-weight: normal;
@@ -374,6 +407,10 @@ table {
             .tablesaw-cell-content {
                 float: right;
             }
+        }
+
+        td:last-child {
+            border-bottom: 0;
         }
 
         td:first-child {
@@ -390,6 +427,13 @@ table {
                 text-align: center;
                 width: 100%;
             }
+        }
+    }
+
+    th.right-aligned-small {
+        span, a {
+            float: right;
+            text-align: right;
         }
     }
 }
@@ -809,6 +853,10 @@ form {
 
 .alert-box {
     font-size: 1rem;
+
+    p {
+        margin-bottom: 0;
+    }
 }
 
 .embed-info {
@@ -859,6 +907,10 @@ ul.pagination li.first,
 ul.pagination li.last {
     background-color: $smoke;
     border-radius: 3px;
+}
+
+ul.pagination li.current a {
+    font-size: 1.2rem;
 }
 
 
@@ -912,7 +964,6 @@ ul.pagination li.last {
     }
 }
 
-
 /*
     Related Links
 */
@@ -921,6 +972,7 @@ ul.pagination li.last {
 }
 
 .related-link {
+    display: block;
     word-break: break-all;
 }
 
@@ -941,6 +993,15 @@ ul.pagination li.last {
         margin: 0 0 1.5rem;
     }
 }
+
+
+/*
+    Embedd Widget
+*/
+.embedded-widget {
+    margin-bottom: 2rem;
+}
+
 
 /*
     Open Data
@@ -1135,3 +1196,13 @@ a:focus {
 .show-only-on-tab:not(:focus) {
     @include element-invisible;
 }
+
+.accessibility-links a {
+    left: 0;
+    margin: auto;
+    padding: 1rem;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    width: 200px;
+    }

@@ -22,7 +22,7 @@ For example::
     @TownApp.setting(section='i18n', name='localedirs')
     def get_i18n_localedirs():
         return [
-            utils.module_path('onegov.town', 'locale')
+            utils.module_path('onegov.town6', 'locale')
             utils.module_path('onegov.form', 'locale')
         ]
 
@@ -353,7 +353,7 @@ def clone(translation):
     return clone
 
 
-class SiteLocale(object):
+class SiteLocale:
     """ A model representing the locale of the site.
 
     Use this model to enable the user to change his locale through a path.

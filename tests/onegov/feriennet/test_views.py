@@ -1474,14 +1474,15 @@ def test_import_account_statement(client, scenario):
     settings.form.submit()
 
     # Prepare two payments
-    bookings = scenario.session.query(InvoiceItem).all()
+    bookings = scenario.session.query(InvoiceItem)
+    bookings = bookings.order_by(InvoiceItem.group).all()
     assert not all([booking.payment_date for booking in bookings])
     assert not all([booking.tid for booking in bookings])
 
     code_1 = 'Zahlungszweck {}'.format(
-        bookings[1].invoice.references[0].readable)
-    code_2 = 'Zahlungszweck {}'.format(
         bookings[3].invoice.references[0].readable)
+    code_2 = 'Zahlungszweck {}'.format(
+        bookings[0].invoice.references[0].readable)
     xml = generate_xml([
         dict(amount='200.00 CHF', note='no match', valdat='2020-04-23'),
         dict(amount='100.00 CHF', note=code_1, valdat='2020-03-22', tid='TX1'),
@@ -2929,7 +2930,7 @@ def test_view_qrbill(client, scenario):
 
 
 def test_activities_json(client, scenario):
-    scenario.add_period(confirmed=True)
+    scenario.add_period(title="Ferienpass 2022", confirmed=True)
     activity = scenario.add_activity(
         title='Backen',
         lead='Backen mit Johann.',
@@ -2952,31 +2953,39 @@ def test_activities_json(client, scenario):
     )
     scenario.commit()
 
-    assert client.get('/activities/json').json == [{
-        'age': {'min': 1, 'max': 15},
-        'coordinate': {'lat': 1.1, 'lon': 2.2},
-        'cost': {'min': 0.0, 'max': 100.0},
-        'dates': [
-            {
-                'start_date': start_date,
-                'start_time': '00:00:00',
-                'end_date': start_date,
-                'end_time': '01:00:00'
-            },
-            {
-                'start_date': start_date,
-                'start_time': '01:00:00',
-                'end_date': start_date,
-                'end_time': '02:00:00'
-            },
-        ],
-        'image': {'thumbnail': None, 'full': None},
-        'lead': 'Backen mit Johann.',
-        'location': 'Bäckerei Govikon, Rathausplatz, 4001 Govikon',
-        'provider': 'Govikon',
-        'spots': 15,
-        'tags': ['Abenteuer', 'Bauernhof', 'Halbtägig'],
-        'title': 'Backen',
-        'url': 'http://localhost/activity/backen',
-        'zip_code': 4001
-    }]
+    assert client.get('/activities/json').json == {
+        'period_name': 'Ferienpass 2022',
+        'wish_phase_start': scenario.date_offset(-1).isoformat(),
+        'wish_phase_end': date.today().isoformat(),
+        'booking_phase_start': date.today().isoformat(),
+        'booking_phase_end': scenario.date_offset(+10).isoformat(),
+        'deadline_days': None,
+        'activities': [{
+            'age': {'min': 1, 'max': 15},
+            'coordinate': {'lat': 1.1, 'lon': 2.2},
+            'cost': {'min': 0.0, 'max': 100.0},
+            'dates': [
+                {
+                    'start_date': start_date,
+                    'start_time': '00:00:00',
+                    'end_date': start_date,
+                    'end_time': '01:00:00'
+                },
+                {
+                    'start_date': start_date,
+                    'start_time': '01:00:00',
+                    'end_date': start_date,
+                    'end_time': '02:00:00'
+                },
+            ],
+            'image': {'thumbnail': None, 'full': None},
+            'lead': 'Backen mit Johann.',
+            'location': 'Bäckerei Govikon, Rathausplatz, 4001 Govikon',
+            'provider': 'Govikon',
+            'spots': 15,
+            'tags': ['Abenteuer', 'Bauernhof', 'Halbtägig'],
+            'title': 'Backen',
+            'url': 'http://localhost/activity/backen',
+            'zip_code': 4001
+        }]
+    }

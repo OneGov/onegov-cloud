@@ -120,10 +120,15 @@ configuration: &global-config
   # To test mapbox integration, a mapbox token has to be provided
   # mapbox_token:
 
-  # Install https://github.com/seantis/d3-renderer
-#  d3_renderer: 'http://localhost:1337'
+  # API rate limit, default is 100 requests per 15 Minutes
+  # api_rate_limit:
+  # requests: 100
+  # expiration: 900
 
-   # For Swissvotes, the Museum für Gestatlung has an api
+  # Install https://github.com/seantis/d3-renderer
+  # d3_renderer: 'http://localhost:1337'
+
+  # For Swissvotes, the Museum für Gestatlung has an api
   # mfg_api_token:
 
   # for org app, disable the password reset view (case the users have their own auth providers)
@@ -218,12 +223,6 @@ configuration: &global-config
 # All supported applications
 applications:
 
-  - path: /onegov_town/*
-    application: onegov.town.TownApp
-    namespace: onegov_town
-    configuration:
-      <<: *global-config
-
   - path: /onegov_town6/*
     application: onegov.town6.TownApp
     namespace: onegov_town6
@@ -311,7 +310,7 @@ applications:
 
       onboarding:
         onegov.town6:
-          namespace: onegov_town
+          namespace: onegov_town6
           domain: onegov.test
           configuration:
             depot_backend: depot.io.local.LocalFileStorage

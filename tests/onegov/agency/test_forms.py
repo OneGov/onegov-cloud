@@ -15,10 +15,11 @@ from onegov.core.utils import Bunch
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from tempfile import TemporaryFile
+from tests.shared.utils import encode_map_value
 from unittest.mock import MagicMock
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session, principal):
         self._session = session
 
@@ -26,7 +27,7 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session, principal=None, private=False, secret=False,
                  permissions=None, current_user=None):
         self.app = DummyApp(session, principal)
@@ -79,16 +80,28 @@ def test_extended_agency_form(agency_app):
     form = ExtendedAgencyForm(DummyPostData({
         'title': 'Springfield Hospital',
         'portrait': 'Springfield Hospital is hospital.',
+        'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
+        'address': 'Springstreet 12',
+        'zip_code': '6078',
+        'city': 'Springfield',
         'export_fields': ['person.first_name', 'person.last_name'],
         'organigram': create_file('image/png', 'org.png', b'PNG')
     }))
     data = form.get_useful_data()
     assert list(data.keys()) == [
-        'title', 'portrait', 'export_fields', 'organigram_file'
+        'title', 'portrait', 'coordinates', 'address', 'zip_code', 'city',
+        'export_fields', 'organigram_file'
     ]
     assert data['organigram_file'].read() == b'PNG'
     assert data['title'] == 'Springfield Hospital'
     assert data['portrait'] == 'Springfield Hospital is hospital.'
+    coordinates = data['coordinates']
+    assert coordinates.lat == 1
+    assert coordinates.lon == 2
+    assert coordinates.zoom == 12
+    assert data['address'] == 'Springstreet 12'
+    assert data['zip_code'] == '6078'
+    assert data['city'] == 'Springfield'
     assert data['export_fields'] == ['person.first_name', 'person.last_name']
 
     # update / apply / reorder
@@ -346,21 +359,21 @@ def test_person_mutation_form():
     assert form.get_useful_data() == {
         'submitter_email': 'info@hospital-springfield.org',
         'submitter_message': 'There is a typo in the name!',
-        'salutation': '',
+        'salutation': None,
         'academic_title': 'Dr.',
         'first_name': 'nick',
         'last_name': 'Rivera',
-        'function': '',
-        'email': '',
-        'phone': '',
-        'phone_direct': '',
-        'born': '',
-        'profession': '',
-        'political_party': '',
-        'parliamentary_group': '',
-        'website': '',
-        'address': '',
-        'notes': ''
+        'function': None,
+        'email': None,
+        'phone': None,
+        'phone_direct': None,
+        'born': None,
+        'profession': None,
+        'political_party': None,
+        'parliamentary_group': None,
+        'website': None,
+        'address': None,
+        'notes': None
     }
     assert form.validate()
 

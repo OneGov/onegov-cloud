@@ -2,9 +2,12 @@ import re
 
 from onegov.form import Form
 from onegov.onboarding import _
-from wtforms import StringField, validators
-from wtforms.fields.html5 import EmailField
 from wtforms_components import ColorField
+from wtforms.fields import EmailField
+from wtforms.fields import StringField
+from wtforms.validators import Email
+from wtforms.validators import InputRequired
+from wtforms.validators import Length
 
 
 class TownForm(Form):
@@ -15,7 +18,7 @@ class TownForm(Form):
     name = StringField(
         label=_("Town Name"),
         description=_("The name of your town (real or fictitious)"),
-        validators=[validators.InputRequired(), validators.Length(max=63)],
+        validators=[InputRequired(), Length(max=63)],
         render_kw={
             'autofocus': '',
             'class_': 'autocomplete',
@@ -26,12 +29,12 @@ class TownForm(Form):
     user = EmailField(
         label=_("E-Mail"),
         description=_("Your e-mail address"),
-        validators=[validators.InputRequired(), validators.Email()]
+        validators=[InputRequired(), Email()]
     )
 
     color = ColorField(
         label=_("Primary Color"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         default='#005ba1'
     )
 

@@ -7,6 +7,7 @@ from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.user import Auth
 
 
@@ -123,6 +124,13 @@ class DefaultLayout(ChameleonLayout):
         return ArchivedResultCollection(self.request.session)
 
     @cached_property
+    def archive_search_link(self):
+        return self.request.class_link(
+            SearchableArchivedResultCollection,
+            variables={'item_type': 'vote'}
+        )
+
+    @cached_property
     def locales(self):
         to = self.request.url
 
@@ -141,3 +149,12 @@ class DefaultLayout(ChameleonLayout):
         if hasattr(item, 'entity_id'):
             return item.name if item.entity_id else _("Expats")
         return item.name or _("Expats")
+
+    @cached_property
+    def logo_alt_text(self):
+        alt_text = (
+            f'Logo: '
+            f'{self.principal.name} '
+            f'{self.request.translate(_("Link to homepage"))}'
+        )
+        return alt_text

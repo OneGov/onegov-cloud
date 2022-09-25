@@ -76,7 +76,7 @@ def import_vote_wabstim(vote, principal, file, mimetype):
             line_errors.append(_("Invalid values"))
 
         # Skip expats if not enabled
-        if entity_id == 0 and not vote.expats:
+        if entity_id == 0 and not vote.has_expats:
             continue
 
         # the yeas
@@ -162,7 +162,7 @@ def import_vote_wabstim(vote, principal, file, mimetype):
 
     for ballot_type in used_ballot_types:
         remaining = set(entities.keys())
-        if vote.expats:
+        if vote.has_expats:
             remaining.add(0)
         remaining -= added_entity_ids
         for id in remaining:

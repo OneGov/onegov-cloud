@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="panel callout" tal:condition="model.state == 'proposed'">
-            <p i18n:translate>This translator is in the accreditation process!</p>
+            <p i18n:translate>This translator is in the admission process!</p>
         </div>
         <div class="row">
             <div class="columns small-12">
@@ -154,6 +154,10 @@
                                         ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
                                     </span>
                                 </dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.profession and layout.show('profession')">
+                                <dt i18n:translate>Learned profession</dt>
+                                <dd >${model.profession}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.occupation and layout.show('occupation')">
                                 <dt i18n:translate>Current professional activity</dt>

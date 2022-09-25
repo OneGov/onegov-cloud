@@ -3,8 +3,11 @@ from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
 from sqlalchemy import func
-from wtforms.fields import BooleanField, RadioField, SelectField, StringField
-from wtforms.fields.html5 import DecimalField
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import RadioField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 

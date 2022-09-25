@@ -2,10 +2,14 @@ from cached_property import cached_property
 from onegov.form import Form, FormDefinition
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _
-from wtforms.fields import BooleanField, RadioField, TextAreaField
-from wtforms.fields.html5 import DateField, IntegerField
-from wtforms.validators import NumberRange, InputRequired, ValidationError
-from wtforms import validators
+from wtforms.fields import BooleanField
+from wtforms.fields import DateField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import TextAreaField
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import ValidationError
 
 
 class FormRegistrationMessageForm(Form):
@@ -13,7 +17,7 @@ class FormRegistrationMessageForm(Form):
     message = TextAreaField(
         label=_("Your message"),
         render_kw={'rows': 12},
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     registration_state = MultiCheckboxField(
@@ -24,7 +28,7 @@ class FormRegistrationMessageForm(Form):
             ('cancelled', _("Cancelled")),
         ],
         default=['confirmed'],
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     def ensure_receivers(self):

@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 
 from onegov.core.upgrade import upgrade_task
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Text
 
@@ -32,3 +33,13 @@ def make_payment_models_polymorphic_type_non_nullable(context):
 
         context.operations.alter_column('payment_providers', 'type',
                                         nullable=False)
+
+
+@upgrade_task('Add enabled to payment providers')
+def add_enabled_to_payment_providers(context):
+    if not context.has_column('payment_providers', 'enabled'):
+        context.add_column_with_defaults(
+            table='payment_providers',
+            column=Column('enabled', Boolean, nullable=False),
+            default=True
+        )

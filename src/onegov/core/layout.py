@@ -6,10 +6,10 @@ import numbers
 import sedate
 
 from cached_property import cached_property
-from chameleon import PageTemplate
 from datetime import datetime
 from functools import lru_cache
 from onegov.core import utils
+from onegov.core.templates import PageTemplate
 from pytz import timezone
 
 
@@ -29,7 +29,7 @@ RomanshLocale.timeframes['week'] = "in'emna"
 RomanshLocale.timeframes['weeks'] = '{0} emnas'
 
 
-class Layout(object):
+class Layout:
     """ Contains useful methods related to rendering pages in html. Think of it
     as an API that you can rely on in your templates.
 
@@ -213,8 +213,9 @@ class ChameleonLayout(Layout):
 
     @cached_property
     def base(self):
-        """ Returns the layout, which defines the base layout of all town
-        pages. See ``templates/layout.pt``.
+        """ Returns the layout, which defines the base layout of all pages.
+
+        See ``templates/layout.pt``.
 
         """
         return self.template_loader['layout.pt']

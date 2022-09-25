@@ -16,11 +16,11 @@ from onegov.swissvotes.models import TranslatablePage
 from xlsxwriter.workbook import Workbook
 
 
-class DummyPrincipal(object):
+class DummyPrincipal:
     pass
 
 
-class DummyApp(object):
+class DummyApp:
     def __init__(self, session, principal, mfg_api_token=None):
         self._session = session
         self.principal = principal
@@ -30,7 +30,7 @@ class DummyApp(object):
         return self._session
 
 
-class DummyRequest(object):
+class DummyRequest:
     def __init__(self, session, principal=None, private=False, secret=False):
         self.app = DummyApp(session, principal)
         self.session = session
@@ -532,10 +532,10 @@ def test_update_external_resources_form(session):
     form = UpdateExternalResourcesForm()
     form.request = DummyRequest(session, DummyPrincipal())
 
-    assert form.resources.choices == (
+    assert form.resources.choices == [
         ('mfg', 'eMuseum.ch'),
         ('sa', 'Social Archives')
-    )
+    ]
 
     # Validate
     assert not form.validate()

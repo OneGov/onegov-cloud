@@ -67,7 +67,7 @@ class AdjacencyList(Base):
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
-    #: `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: `<https://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
     type = Column(Text, nullable=False, default=lambda: 'generic')
 
@@ -229,7 +229,7 @@ class AdjacencyList(Base):
         """ Alias for :attr:`path`. This is a convenience feature for Morepath
         if a path is absorbed.
 
-        See `<http://morepath.readthedocs.org/en/latest/\
+        See `<https://morepath.readthedocs.org/en/latest/\
         paths_and_linking.html?highlight=absorb#absorbing>`_
 
         """
@@ -244,7 +244,7 @@ class AdjacencyList(Base):
         )
 
 
-class AdjacencyListCollection(object):
+class AdjacencyListCollection:
     """ A base class for collections working with :class:`AdjacencyList`. """
 
     @property
@@ -324,10 +324,10 @@ class AdjacencyListCollection(object):
 
         See:
 
-        `<http://schinckel.net/2014/11/22/\
+        `<https://schinckel.net/2014/11/22/\
         postgres-tree-shootout-part-1%3A-introduction./>`
 
-        `<http://schinckel.net/2014/11/27/\
+        `<https://schinckel.net/2014/11/27/\
         postgres-tree-shootout-part-2%3A-adjacency-list-using-ctes/>`
 
         """
@@ -373,28 +373,31 @@ class AdjacencyListCollection(object):
 
         return name
 
-    def add(self, parent, title, name=None, type='generic', **kwargs):
-        """ Adds a page to the given parent. """
+    def add(self, parent, title, name=None, type=None, **kwargs):
+        """ Adds a child to the given parent. """
 
         name = name or self.get_unique_child_name(title, parent)
 
-        page_class = self.__listclass__.get_polymorphic_class(type)
+        if type is not None:
+            child_class = self.__listclass__.get_polymorphic_class(type)
+        else:
+            child_class = self.__listclass__
 
-        page = page_class(parent=parent, title=title, name=name, **kwargs)
+        child = child_class(parent=parent, title=title, name=name, **kwargs)
 
-        self.session.add(page)
+        self.session.add(child)
         self.session.flush()
 
         # impose an order, unless one is given
         if kwargs.get('order') is not None:
-            return page
+            return child
 
-        siblings = page.siblings.all()
+        siblings = child.siblings.all()
 
-        if is_sorted((s for s in siblings if s != page), key=self.sort_key):
+        if is_sorted((s for s in siblings if s != child), key=self.sort_key):
             sort_siblings(siblings, key=self.sort_key)
 
-        return page
+        return child
 
     def add_root(self, title, name=None, **kwargs):
         return self.add(None, title, name, **kwargs)

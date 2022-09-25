@@ -34,7 +34,7 @@ from webob import exc
 def view_allocations_json(self, request):
     """ Returns the allocations in a fullcalendar compatible events feed.
 
-    See `<http://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
+    See `<https://fullcalendar.io/docs/event_data/events_json_feed/>`_ for
     more information.
 
     """

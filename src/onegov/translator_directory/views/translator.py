@@ -7,7 +7,6 @@ from onegov.core.security import Secret, Personal, Private
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import Organisation
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
@@ -24,7 +23,6 @@ from onegov.translator_directory.layout import AddTranslatorLayout, \
     ReportTranslatorChangesLayout
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
-from webob.exc import HTTPNotFound
 from xlsxwriter import Workbook
 
 
@@ -179,6 +177,7 @@ def export_translator_directory(self, request):
         request.translate(_("Spoken languages")),
         request.translate(_("Written languages")),
         request.translate(_("Monitoring languages")),
+        request.translate(_("Learned profession")),
         request.translate(_("Current professional activity")),
         request.translate(_("Expertise by professional guild")),
         request.translate(_("Expertise by interpreting type")),
@@ -224,6 +223,7 @@ def export_translator_directory(self, request):
             format_languages(trs.spoken_languages),
             format_languages(trs.written_languages),
             format_languages(trs.monitoring_languages),
+            trs.profession or '',
             trs.occupation or '',
             format_guilds(trs.expertise_professional_guilds_all),
             format_interpreting_types(trs.expertise_interpreting_types),
@@ -336,25 +336,6 @@ def delete_translator(self, request):
     request.assert_valid_csrf_token()
     TranslatorCollection(request.app).delete(self)
     request.success(_('Translator successfully deleted'))
-
-
-@TranslatorDirectoryApp.view(
-    model=Organisation,
-    permission=Personal,
-    name='voucher'
-)
-def get_static_excel_file(self, request):
-    file = request.app.voucher_excel_file
-    if not file:
-        return HTTPNotFound()
-
-    return Response(
-        file.read(),
-        content_type=(
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        ),
-        content_disposition=f'inline; filename={file.filename}'
-    )
 
 
 @TranslatorDirectoryApp.form(

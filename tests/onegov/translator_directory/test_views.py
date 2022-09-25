@@ -2,21 +2,19 @@ import copy
 import re
 import transaction
 
-from datetime import datetime
 from io import BytesIO
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.forms.settings import ALLOWED_MIME_TYPES
 from onegov.user import UserCollection
 from openpyxl import load_workbook
+from pdftotext import PDF
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
 from unittest import mock
 from webtest import Upload
-from xlsxwriter import Workbook
 
 
 class FakeResponse:
@@ -37,6 +35,14 @@ def upload_pdf(filename):
     file.seek(0)
 
     return Upload(filename, file.read(), 'application/pdf')
+
+
+def check_pdf(page, filename, link):
+    response = page.click(link, index=0)
+    headers = dict(response.headers)
+    assert filename in headers['Content-Disposition']
+    assert headers['Content-Type'] == 'application/pdf'
+    assert filename in ''.join(PDF(BytesIO(response.body)))
 
 
 def test_view_translator(client):
@@ -119,6 +125,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
+    assert len(values) == 22
     assert values['Personal Nr.'] == '978654'
     assert values['Zulassung'] == 'nicht akkreditiert / Einsatz Dringlichkeit'
     assert values['Quellensteuer'] == 'Nein'
@@ -188,7 +195,6 @@ def test_view_translator(client):
     client.login_editor()
     page = client.get(translator_url)
     assert '978654' in page
-    assert 'Abrechnungsvorlage' in page
     page = page.click('Bearbeiten')
     page.form['pers_id'] = 123456
     page = page.form.submit().follow()
@@ -236,6 +242,8 @@ def test_view_translator(client):
     page.form['education_as_interpreter'] = True
     page.form['comments'] = 'My Comments'
     page.form['operation_comments'] = 'operational'
+    page.form['profession'] = 'Baker'
+    page.form['occupation'] = 'Salesman'
     page.form['for_admins_only'] = True
     page.form.get('expertise_professional_guilds', index=0).checked = False
     page.form.get('expertise_professional_guilds', index=1).checked = True
@@ -269,6 +277,7 @@ def test_view_translator(client):
         dl.find('dd').text_content().strip()
         for dl in page.pyquery('dl')
     }
+    assert len(values) == 39
     assert values['AHV-Nr.'] == '756.1111.1111.11'
     assert values['Anschrift'] == 'Somestreet'
     assert values['Ausbildung Dolmetscher'] == 'Ja'
@@ -299,6 +308,8 @@ def test_view_translator(client):
     assert values['Telefon Geschäft'] == '044 123 50 52'
     assert values['Telefon Mobile'] == '044 123 50 50'
     assert values['Telefon Privat'] == '044 123 50 51'
+    assert values['Erlernter Beruf'] == 'Baker'
+    assert values['Aktuelle berufliche Tatigkeit'] == 'Salesman'
     assert values['Versteckt'] == 'Ja'
     assert values['Wegberechnung'] == f'{round(new_drive_distance, 1)} km'
     assert values['Zulassung'] == 'im Zulassungsverfahren'
@@ -476,33 +487,34 @@ def test_view_export_translators(client):
     assert sheet.cell(2, 11).value == 'Downing Street 5'
     assert sheet.cell(2, 12).value == '4000'
     assert sheet.cell(2, 13).value == 'Luzern'
-    assert sheet.cell(2, 14).value == None
+    assert sheet.cell(2, 14).value is None
     assert sheet.cell(2, 15).value == '756.1234.4568.90'
     assert sheet.cell(2, 16).value == 'R-BS'
     assert sheet.cell(2, 17).value == 'Bullstreet 5'
     assert sheet.cell(2, 18).value == 'Hugo Benito'
-    assert sheet.cell(2, 19).value == None
+    assert sheet.cell(2, 19).value is None
     assert sheet.cell(2, 20).value == 'hugo@benito.com'
-    assert sheet.cell(2, 21).value == None
+    assert sheet.cell(2, 21).value is None
     assert sheet.cell(2, 22).value == '079 000 00 00'
     assert sheet.cell(2, 23).value == '041 444 44 44'
     assert sheet.cell(2, 24).value == 'always'
-    assert sheet.cell(2, 25).value == None
+    assert sheet.cell(2, 25).value is None
     assert sheet.cell(2, 26).value == 0
     assert sheet.cell(2, 27).value == data['date_of_application'].isoformat()
     assert sheet.cell(2, 28).value == data['date_of_decision'].isoformat()
-    assert sheet.cell(2, 29).value == None
+    assert sheet.cell(2, 29).value is None
     assert sheet.cell(2, 30).value == 'German'
     assert sheet.cell(2, 31).value == 'French'
     assert sheet.cell(2, 32).value == 'Italian'
-    assert sheet.cell(2, 33).value == 'baker'
-    assert sheet.cell(2, 34).value == 'Wirtschaft|Psychologie|Religion'
-    assert sheet.cell(2, 35).value == 'Simultandolmetschen|Flüsterdolmetschen'
-    assert sheet.cell(2, 36).value == 'all okay'
-    assert sheet.cell(2, 37).value == 'Some ref'
-    assert sheet.cell(2, 38).value == 0
-    assert sheet.cell(2, 39).value == None
-    assert sheet.cell(2, 40).value == None
+    assert sheet.cell(2, 33).value == 'craftsman'
+    assert sheet.cell(2, 34).value == 'baker'
+    assert sheet.cell(2, 35).value == 'Wirtschaft|Psychologie|Religion'
+    assert sheet.cell(2, 36).value == 'Simultandolmetschen|Flüsterdolmetschen'
+    assert sheet.cell(2, 37).value == 'all okay'
+    assert sheet.cell(2, 38).value == 'Some ref'
+    assert sheet.cell(2, 39).value == 0
+    assert sheet.cell(2, 40).value is None
+    assert sheet.cell(2, 41).value is None
 
 
 def test_file_security(client):
@@ -510,22 +522,71 @@ def test_file_security(client):
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 
-    forbidden = 403
+    def content_disposition(file, filename):
+        return filename in client.get(file).headers['Content-Disposition']
 
+    # Add a published general, an unpublished general and a translator file
     client.login_admin()
-    page = client.get(f'/translator/{trs_id}')
-    assert 'Dokumente' in page
+    page = client.get('/files')
+    page.form['file'] = upload_pdf('p.pdf')
+    page = page.form.submit()
+    url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    published_file = url.replace('/details', '')
+    assert 'Öffentlich' in client.get(url)
+    assert 'Private' not in client.get(url)
+    assert content_disposition(published_file, 'p.pdf')
 
+    page = client.get('/files')
+    page.form['file'] = upload_pdf('u.pdf')
+    page = page.form.submit()
+    url = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    unpublished_file = url.replace('/details', '')
+    assert content_disposition(unpublished_file, 'u.pdf')
+    page = client.get(url)
+    page = client.post(page.pyquery('a.is-published')[0].attrib['ic-post-to'])
+    assert 'Öffentlich' not in client.get(url)
+    assert 'Privat' in client.get(url)
+
+    page = client.get(f'/translator/{trs_id}').click('Dokumente')
+    page.form['file'] = upload_pdf('t.pdf')
+    page = page.form.submit()
+    translator_file = page.pyquery('div[ic-get-from]')[0].attrib['ic-get-from']
+    translator_file = translator_file.replace('/details', '')
+    assert content_disposition(translator_file, 't.pdf')
+    client.logout()
+
+    # Editors can't manage and can see general files but not translator files
     client.login_editor()
     page = client.get(f'/translator/{trs_id}')
     assert 'Dokumente' not in page
-    client.get(f'/documents/{trs_id}', status=forbidden)
-    client.get('/files', status=forbidden)
+    client.get('/files', status=403)
+    assert content_disposition(published_file, 'p.pdf')
+    assert content_disposition(unpublished_file, 'u.pdf')
+    client.get(f'/documents/{trs_id}', status=403)
+    client.get(translator_file, status=403)
+    client.logout()
+
+    # Members can't manage and can see general files but not translator files
+    client.login_member()
+    page = client.get(f'/translator/{trs_id}')
+    assert 'Dokumente' not in page
+    client.get('/files', status=403)
+    assert content_disposition(published_file, 'p.pdf')
+    assert content_disposition(unpublished_file, 'u.pdf')
+    client.get(f'/documents/{trs_id}', status=403)
+    client.get(translator_file, status=403)
+    client.logout()
+
+    # Anonymous can only view published general files
+    client.get('/files', status=403)
+    assert content_disposition(published_file, 'p.pdf')
+    client.get(unpublished_file, status=403)
+    client.get(f'/documents/{trs_id}', status=403)
+    client.get(translator_file, status=403)
 
 
 def test_translator_directory_settings(client):
     client.login_admin()
-    client.get('/voucher-template', status=404)
     settings = client.get('/').follow().click('Verzeichniseinstellungen')
 
     def map_value(page):
@@ -540,26 +601,10 @@ def test_translator_directory_settings(client):
         'lat': 46, 'lon': 7, 'zoom': 12
     })
 
-    file = BytesIO()
-    wb = Workbook(file)
-    wb.add_worksheet()
-    wb.close()
-    file.seek(0)
-
-    settings.form['voucher_excel'] = Upload(
-        'example.xlsx', file.read(), tuple(ALLOWED_MIME_TYPES)[0])
-
     page = settings.form.submit().follow()
     assert 'Ihre Änderungen wurden gespeichert' in page
     settings = client.get('/directory-settings')
     assert map_value(settings) == Coordinates(lat=46, lon=7, zoom=12)
-    year = datetime.now().year
-    filename = f'abrechnungsvorlage_{year}.xlsx'
-    assert filename in settings
-
-    # Get the file
-    file_page = client.get('/voucher')
-    assert filename in file_page.content_disposition
 
 
 def test_view_redirects(client):
@@ -680,6 +725,7 @@ def test_view_translator_mutation(client):
     page.form['operation_comments'] = 'No operation comments'
     page.form['confirm_name_reveal'] = False
     page.form['date_of_application'] = '2020-01-01'
+    page.form['profession'] = 'Handwerker'
     page.form['occupation'] = 'Bäcker'
     page.form['agency_references'] = 'All okay'
     page.form['education_as_interpreter'] = False
@@ -947,6 +993,7 @@ def test_view_translator_mutation(client):
     page.form['confirm_name_reveal'] = True
     page.form['date_of_application'] = '2021-01-01'
     page.form['date_of_decision'] = '2021-02-02'
+    page.form['profession'] = 'Hochbauzeichner'
     page.form['occupation'] = 'Bauarbeiter'
     page.form['proof_of_preconditions'] = 'Keine'
     page.form['agency_references'] = 'Kanton LU'
@@ -1015,6 +1062,7 @@ def test_view_translator_mutation(client):
     assert 'Zustimmung Namensbekanntgabe: Ja' in page
     assert 'Bewerbung Datum: 2021-01-01' in page
     assert 'Entscheid Datum: 2021-02-02' in page
+    assert 'Erlernter Beruf: Hochbauzeichner' in page
     assert 'Aktuelle berufliche Tatigkeit: Bauarbeiter' in page
     assert 'Nachweis der Voraussetzung: Keine' in page
     assert 'Referenzen Behörden: Kanton LU' in page
@@ -1023,7 +1071,7 @@ def test_view_translator_mutation(client):
     assert 'Bemerkungen: Kein Kommentar' in page
 
     page = page.click('Vorgeschlagene Änderungen übernehmen')
-    page.form.get('changes', index=39).checked = False
+    page.form.get('changes', index=40).checked = False
     page = page.form.submit().follow()
     assert (
         'Vorgeschlagene \\u00c4nderungen \\u00fcbernommen: '
@@ -1040,10 +1088,12 @@ def test_view_translator_mutation(client):
         'Zustimmung Namensbekanntgabe, Bewerbung Datum, Entscheid Datum, '
         'Muttersprachen, Arbeitssprache - Wort, Arbeitssprache - Schrift, '
         'Arbeitssprache - Kommunikations\\u00fcberwachung, '
+        'Erlernter Beruf, '
         'Aktuelle berufliche Tatigkeit, '
         'Nachweis der Voraussetzung, Referenzen Beh\\u00f6rden, '
         'Ausbildung Dolmetscher, Zertifikate.'
     ) in page
+
     page.click('Ticket abschliessen')
 
     mail = client.get_email(0, flush_queue=True)
@@ -1090,6 +1140,7 @@ def test_view_translator_mutation(client):
     assert 'German' in page
     assert 'Arabic' in page
     assert 'Italian' in page
+    assert 'Hochbauzeichner' in page
     assert 'Bauarbeiter' in page
     assert 'Keine' in page
     assert 'Kanton LU' in page
@@ -1122,7 +1173,7 @@ def test_view_accreditation(client):
         page.form['date_of_birth'] = '1970-01-01'
         page.form['hometown'] = 'Zug'
         page.form['nationality'] = 'CH'
-        page.form['marital_status'] = 'married'
+        page.form['marital_status'] = 'verheiratet'
         page.form['coordinates'] = encode_map_value({
             'lat': 1, 'lon': 2, 'zoom': 12
         })
@@ -1131,7 +1182,7 @@ def test_view_accreditation(client):
         page.form['city'] = 'Luzern'
         page.form['drive_distance'] = '1.1'
         page.form['withholding_tax'] = False
-        page.form['self_employed'] = False
+        page.form['self_employed'] = True
         page.form['social_sec_number'] = '756.1234.4568.90'
         page.form['bank_name'] = 'R-BS'
         page.form['bank_address'] = 'Bullstreet 5'
@@ -1170,6 +1221,7 @@ def test_view_accreditation(client):
         page.form['debt_collection_register_extract'] = upload_pdf('8.pdf')
         page.form['criminal_register_extract'] = upload_pdf('9.pdf')
         page.form['certificate_of_capability'] = upload_pdf('A.pdf')
+        page.form['confirmation_compensation_office'] = upload_pdf('B.pdf')
         page.form['remarks'] = 'Some remarks'
         page.form['confirm_submission'] = True
 
@@ -1195,14 +1247,14 @@ def test_view_accreditation(client):
         assert '01.01.1970' in page
         assert 'Zug' in page
         assert 'CH' in page
-        assert 'married' in page
+        assert 'verheiratet' in page
         assert '2.0 km' in page
         assert 'Downing Street 5' in page
         assert '4000' in page
         assert 'Luzern' in page
         assert '1.1' in page
         assert '"withholding-tax">Nein' in page
-        assert '"self-employed">Nein' in page
+        assert '"self-employed">Ja' in page
         assert '756.1234.4568.90' in page
         assert 'R-BS' in page
         assert 'Bullstreet 5' in page
@@ -1231,29 +1283,29 @@ def test_view_accreditation(client):
         assert '"admission-course-agreement">Ja' in page
         assert 'Some remarks' in page
 
-        def check_pdf(filename, link):
-            headers = dict(page.click(link, index=0).headers)
-            assert filename in headers['Content-Disposition']
-            assert headers['Content-Type'] == 'application/pdf'
-
-        check_pdf('1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
-        check_pdf('2.pdf', 'Kurzes Motivationsschreiben.pdf')
-        check_pdf('3.pdf', 'Lebenslauf.pdf')
-        check_pdf('4.pdf', 'Zertifikate.pdf')
-        check_pdf('5.pdf', 'AHV-Ausweis.pdf')
-        check_pdf('6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
-        check_pdf('7.pdf', 'Aktuelles Passfoto.pdf')
-        check_pdf('8.pdf', 'Aktueller Auszug aus dem Betreibungsregister.pdf')
-        check_pdf('9.pdf', 'Aktueller Auszug aus dem Zentralstrafregister.pdf')
-        check_pdf('A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+        check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+        check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
+        check_pdf(page, '3.pdf', 'Lebenslauf.pdf')
+        check_pdf(page, '4.pdf', 'Zertifikate.pdf')
+        check_pdf(page, '5.pdf', 'AHV-Ausweis.pdf')
+        check_pdf(page, '6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
+        check_pdf(page, '7.pdf', 'Aktuelles Passfoto.pdf')
+        check_pdf(page, '8.pdf',
+                  'Aktueller Auszug aus dem Betreibungsregister.pdf')
+        check_pdf(page, '9.pdf',
+                  'Aktueller Auszug aus dem Zentralstrafregister.pdf')
+        check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+        check_pdf(page, 'B.pdf',
+                  'Bestätigung der Ausgleichskasse betreffend '
+                  'Selbständigkeit.pdf')
 
         return page
 
     # Request accredtitation
     page = request_accreditation()
 
-    # Refuse accreditation
-    page = page.click('Akkreditierung verweigern').form.submit().follow()
+    # Refuse admission
+    page = page.click('Zulassung verweigern').form.submit().follow()
     assert 'Der hinterlegte Datensatz wurde entfernt' in page
 
     page.click('Ticket abschliessen')
@@ -1265,9 +1317,9 @@ def test_view_accreditation(client):
     # Request accredtitation
     page = request_accreditation()
 
-    # Grant accreditation
-    page = page.click('Akkreditierung erteilen').form.submit().follow()
-    assert 'Akkreditierung erteilt' in page
+    # Grant admission
+    page = page.click('Zulassung erteilen').form.submit().follow()
+    assert 'Zulassung erteilt' in page
     assert 'Aktivierungs-Email verschickt' in page
 
     mail = client.get_email(0, flush_queue=True)
@@ -1304,3 +1356,169 @@ def test_view_accreditation(client):
     page = page.maybe_follow()
     assert 'Benito, Hugo' in page
     assert '756.1234.4568.90' in page
+
+
+@mock.patch(
+    'onegov.gis.utils.MapboxRequests.directions',
+    return_value=FakeResponse({'code': 'Ok', 'routes': [{'distance': 2000}]})
+)
+def test_view_accreditation_errors(directions, client):
+    session = client.app.session()
+    language_ids = [str(lang.id) for lang in create_languages(session)]
+    transaction.commit()
+
+    client.login_admin()
+    settings = client.get('/directory-settings')
+    settings.form['coordinates'] = encode_map_value({
+        'lat': 46, 'lon': 7, 'zoom': 12
+    })
+    settings.form.submit()
+    client.logout()
+
+    # first try
+    page = client.get('/request-accreditation')
+    page.form['last_name'] = 'Benito'
+    page.form['declaration_of_authorization'] = upload_pdf('1.pdf')
+    page = page.form.submit()
+    assert 'Das Formular enthält Fehler' in page
+    assert page.form['last_name'].value == 'Benito'
+    upload = page.form.fields['declaration_of_authorization']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '1.pdf'
+    assert upload[3].value
+
+    # second try
+    page.form['date_of_birth'] = '1970-01-01'
+    page.form['letter_of_motivation'] = upload_pdf('2.pdf')
+    page.form['resume'] = upload_pdf('3.pdf')
+    page = page.form.submit()
+    assert 'Das Formular enthält Fehler' in page
+    assert page.form['last_name'].value == 'Benito'
+    assert page.form['date_of_birth'].value == '1970-01-01'
+    upload = page.form.fields['declaration_of_authorization']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '1.pdf'
+    assert upload[3].value
+    upload = page.form.fields['letter_of_motivation']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '2.pdf'
+    assert upload[3].value
+    upload = page.form.fields['resume']
+    assert upload[0].value == 'keep'
+    assert upload[2].value == '3.pdf'
+    assert upload[3].value
+
+    # final try
+    page.form['first_name'] = 'Hugo'
+    page.form['gender'] = 'M'
+    page.form['hometown'] = 'Zug'
+    page.form['nationality'] = 'CH'
+    page.form['marital_status'] = 'verheiratet'
+    page.form['coordinates'] = encode_map_value({
+        'lat': 1, 'lon': 2, 'zoom': 12
+    })
+    page.form['address'] = 'Downing Street 5'
+    page.form['zip_code'] = '4000'
+    page.form['city'] = 'Luzern'
+    page.form['drive_distance'] = '1.1'
+    page.form['withholding_tax'] = False
+    page.form['self_employed'] = False
+    page.form['social_sec_number'] = '756.1234.4568.90'
+    page.form['bank_name'] = 'R-BS'
+    page.form['bank_address'] = 'Bullstreet 5'
+    page.form['account_owner'] = 'Hugo Benito'
+    page.form['iban'] = 'CH9300762011623852957'
+    page.form['email'] = 'hugo.benito@translators.com'
+    page.form['tel_private'] = '041 444 44 45'
+    page.form['tel_office'] = '041 444 44 44'
+    page.form['tel_mobile'] = '079 000 00 00'
+    page.form['availability'] = '24h'
+    page.form['confirm_name_reveal'] = True
+    page.form['profession'] = 'Baker'
+    page.form['occupation'] = 'Reporter'
+    page.form['education_as_interpreter'] = False
+    page.form['mother_tongues_ids'] = language_ids[0:1]
+    page.form['spoken_languages_ids'] = language_ids[1:2]
+    page.form['written_languages_ids'] = language_ids[2:3]
+    page.form['monitoring_languages_ids'] = language_ids[3:4]
+    page.form['expertise_interpreting_types'].select_multiple([
+        'consecutive', 'negotiation'
+    ])
+    page.form['expertise_professional_guilds'].select_multiple([
+        'economy', 'art_leisure'
+    ])
+    page.form['expertise_professional_guilds_other'] = ['Psychologie']
+    page.form['agency_references'] = 'Some ref'
+    page.form['admission_course_completed'] = False
+    page.form['admission_course_agreement'] = True
+    page.form.get('resume', 0).select('replace')
+    page.form.get('resume', 1).value = upload_pdf('3_new.pdf')
+    page.form['certificates'] = upload_pdf('4.pdf')
+    page.form['social_security_card'] = upload_pdf('5.pdf')
+    page.form['passport'] = upload_pdf('6.pdf')
+    page.form['passport_photo'] = upload_pdf('7.pdf')
+    page.form['debt_collection_register_extract'] = upload_pdf('8.pdf')
+    page.form['criminal_register_extract'] = upload_pdf('9.pdf')
+    page.form['certificate_of_capability'] = upload_pdf('A.pdf')
+    page.form['remarks'] = 'Some remarks'
+    page.form['confirm_submission'] = True
+
+    page = page.form.submit().follow()
+    assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
+
+    client.login_admin()
+    page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+    assert 'Benito' in page
+    assert 'Hugo' in page
+    assert 'Männlich' in page
+    assert '01.01.1970' in page
+    assert 'Zug' in page
+    assert 'CH' in page
+    assert 'verheiratet' in page
+    assert '2.0 km' in page
+    assert 'Downing Street 5' in page
+    assert '4000' in page
+    assert 'Luzern' in page
+    assert '1.1' in page
+    assert '"withholding-tax">Nein' in page
+    assert '"self-employed">Nein' in page
+    assert '756.1234.4568.90' in page
+    assert 'R-BS' in page
+    assert 'Bullstreet 5' in page
+    assert 'Hugo Benito' in page
+    assert 'CH9300762011623852957' in page
+    assert 'hugo.benito@translators.com' in page
+    assert '041 444 44 45' in page
+    assert '041 444 44 44' in page
+    assert '079 000 00 00' in page
+    assert '24h' in page
+    assert '"confirm-name-reveal">Ja' in page
+    assert 'Baker' in page
+    assert 'Reporter' in page
+    assert '"education-as-interpreter">Nein' in page
+    assert 'German' in page
+    assert 'French' in page
+    assert 'Italian' in page
+    assert 'Arabic' in page
+    assert 'Wirtschaft' in page
+    assert 'Kunst und Freizeit' in page
+    assert 'Psychologie' in page
+    assert 'Konsektutivdolmetschen' in page
+    assert 'Verhandlungsdolmetschen' in page
+    assert 'Some ref' in page
+    assert '"admission-course-completed">Nein' in page
+    assert '"admission-course-agreement">Ja' in page
+    assert 'Some remarks' in page
+
+    check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+    check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
+    check_pdf(page, '3_new.pdf', 'Lebenslauf.pdf')
+    check_pdf(page, '4.pdf', 'Zertifikate.pdf')
+    check_pdf(page, '5.pdf', 'AHV-Ausweis.pdf')
+    check_pdf(page, '6.pdf', 'ID, Pass oder Ausländerausweis.pdf')
+    check_pdf(page, '7.pdf', 'Aktuelles Passfoto.pdf')
+    check_pdf(page, '8.pdf',
+              'Aktueller Auszug aus dem Betreibungsregister.pdf')
+    check_pdf(page, '9.pdf',
+              'Aktueller Auszug aus dem Zentralstrafregister.pdf')
+    check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')

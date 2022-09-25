@@ -36,7 +36,7 @@ def ticket_submitter(ticket):
     return mail
 
 
-class OrgTicketMixin(object):
+class OrgTicketMixin:
     """ Adds additional methods to the ticket, needed by the organisations
     implementation of it. Strictly limited to things that
     do not belong into onegov.ticket.

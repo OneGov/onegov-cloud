@@ -1,4 +1,4 @@
-from chameleon import PageTemplate
+from onegov.core.templates import PageTemplate
 from onegov.core import cache
 from onegov.core.framework import Framework
 from onegov.core.utils import Bunch
@@ -8,7 +8,7 @@ CALL_COUNT = 0
 
 
 # cannot be pickled by the builtin pickler
-class Point(object):
+class Point:
 
     __slots__ = ('x', 'y')
 

@@ -1,4 +1,3 @@
-import chameleon
 import textwrap
 import yaml
 
@@ -7,6 +6,8 @@ from cached_property import cached_property
 from collections import defaultdict
 from collections import OrderedDict
 from decimal import Decimal, localcontext
+from markupsafe import Markup
+from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryCollection
@@ -15,10 +16,11 @@ from onegov.org.models import Organisation
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.winterthur import _
 from ordered_set import OrderedSet
-from wtforms.fields import Field, BooleanField, SelectField
-from wtforms.fields.html5 import DecimalField
+from wtforms.fields import BooleanField
+from wtforms.fields import DecimalField
+from wtforms.fields import Field
+from wtforms.fields import SelectField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
-from wtforms.widgets.core import HTMLString
 
 
 SERVICE_DAYS = {
@@ -72,7 +74,7 @@ def format_5_cents(amount):
     return format_precise(round_to(amount, '0.05'))
 
 
-class Daycare(object):
+class Daycare:
 
     def __init__(self, id, title, rate, weeks):
         self.id = id
@@ -85,7 +87,7 @@ class Daycare(object):
         return Decimal(self.weeks) / Decimal('12')
 
 
-class Services(object):
+class Services:
 
     def __init__(self, definition):
         if definition:
@@ -143,7 +145,7 @@ class Services(object):
         )
 
 
-class Result(object):
+class Result:
 
     def __init__(self, title, amount=None, note=None, operation=None,
                  important=False, currency='CHF', output_format=None):
@@ -164,7 +166,7 @@ class Result(object):
         return self.output_format(self.amount)
 
 
-class Block(object):
+class Block:
 
     def __init__(self, id, title):
         self.id = id
@@ -226,7 +228,7 @@ class Block(object):
         return self.total
 
 
-class DirectoryDaycareAdapter(object):
+class DirectoryDaycareAdapter:
 
     def __init__(self, directory):
         self.directory = directory
@@ -264,7 +266,7 @@ class DirectoryDaycareAdapter(object):
         )
 
 
-class Settings(object):
+class Settings:
 
     def __init__(self, organisation):
         settings = organisation.meta.get('daycare_settings', {})
@@ -302,7 +304,7 @@ class Settings(object):
         return factor
 
 
-class DaycareSubsidyCalculator(object):
+class DaycareSubsidyCalculator:
 
     def __init__(self, session):
         self.session = session
@@ -559,9 +561,9 @@ class DaycareSubsidyCalculator(object):
         )
 
 
-class DaycareServicesWidget(object):
+class DaycareServicesWidget:
 
-    template = chameleon.PageTemplate("""
+    template = PageTemplate("""
         <table class="daycare-services">
             <thead>
                 <tr>
@@ -610,7 +612,7 @@ class DaycareServicesWidget(object):
         self.field = field
         self.services = field.services
 
-        return HTMLString(self.template.render(this=self))
+        return Markup(self.template.render(this=self))
 
     def is_selected(self, service, day):
         return self.services.is_selected(service.id, day)

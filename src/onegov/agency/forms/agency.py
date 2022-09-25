@@ -12,9 +12,11 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
+from onegov.gis import CoordinatesField
 from sqlalchemy import func
-from wtforms import StringField
-from wtforms import validators
+from wtforms.fields import StringField
+from wtforms.validators import InputRequired
+from wtforms.validators import Length
 
 
 class ExtendedAgencyForm(Form):
@@ -23,7 +25,7 @@ class ExtendedAgencyForm(Form):
     title = StringField(
         label=_("Title"),
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ],
     )
 
@@ -41,6 +43,33 @@ class ExtendedAgencyForm(Form):
             }),
             FileSizeLimit(1 * 1024 * 1024)
         ]
+    )
+
+    coordinates = CoordinatesField(
+        label=_('Location'),
+        description=_(
+            'Search for the exact address to set a marker. The address '
+            'fields beneath are filled out automatically. The zoom of '
+            'the map will be saved as well.'
+        ),
+        fieldset=_("Address"),
+        render_kw={'data-map-type': 'marker'},
+    )
+
+    address = StringField(
+        label=_('Street and house number'),
+        fieldset=_("Address"),
+    )
+
+    zip_code = StringField(
+        label=_('Zip Code'),
+        fieldset=_("Address"),
+        validators=[Length(max=10)]
+    )
+
+    city = StringField(
+        label=_('City'),
+        fieldset=_("Address"),
     )
 
     export_fields = MultiCheckboxField(
@@ -74,7 +103,7 @@ class ExtendedAgencyForm(Form):
         exclude = {'csrf_token', 'organigram'}
         result = super(ExtendedAgencyForm, self).get_useful_data(exclude)
         if self.organigram.data:
-            result['organigram_file'] = self.organigram.raw_data[-1].file
+            result['organigram_file'] = self.organigram.file
         if self.portrait.data:
             result['portrait'] = linkify(self.portrait.data, escape=False)
         return result
@@ -89,7 +118,11 @@ class ExtendedAgencyForm(Form):
             del model.organigram
         if self.organigram.action == 'replace':
             if self.organigram.data:
-                model.organigram_file = self.organigram.raw_data[-1].file
+                model.organigram_file = self.organigram.file
+        model.address = self.address.data
+        model.zip_code = self.zip_code.data or None
+        model.city = self.city.data
+        model.coordinates = self.coordinates.data
         if hasattr(self, 'access'):
             model.access = self.access.data
         if hasattr(self, 'publication_start'):
@@ -116,6 +149,10 @@ class ExtendedAgencyForm(Form):
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
+        self.address.data = model.address
+        self.zip_code.data = model.zip_code or None
+        self.city.data = model.city
+        self.coordinates.data = model.coordinates
         if hasattr(self, 'access'):
             self.access.data = model.access
         if hasattr(self, 'publication_start'):
@@ -133,7 +170,7 @@ class MoveAgencyForm(Form):
         label=_("Destination"),
         choices=[],
         validators=[
-            validators.InputRequired()
+            InputRequired()
         ]
     )
 
@@ -160,7 +197,7 @@ class MoveAgencyForm(Form):
 
         parent_id = None
         parent = None
-        if self.parent_id.data.isdigit():
+        if self.parent_id.data and self.parent_id.data.isdigit():
             parent_id = int(self.parent_id.data)
             parent = agencies.by_id(parent_id)
         model.name = agencies.get_unique_child_name(model.title, parent)

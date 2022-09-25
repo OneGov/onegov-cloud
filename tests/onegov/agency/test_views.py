@@ -12,11 +12,12 @@ from sedate import utcnow
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 from tests.onegov.org.common import get_cronjob_by_name
 from tests.onegov.org.common import get_cronjob_url
+from tests.shared.utils import encode_map_value
 from time import sleep
 from transaction import commit
 
 
-def test_views(client):
+def test_views_general(client):
     client.login_admin()
     settings = client.get('/module-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
@@ -126,6 +127,13 @@ def test_views(client):
     sr = edit_agency.form.submit().follow()
 
     assert 'Ständerat' in sr
+
+    # ... change URL
+    change_agency_url = sr.click('URL ändern')
+    change_agency_url.form['name'] = 'sr'
+    sr = change_agency_url.form.submit().follow()
+
+    assert sr.request.url.endswith('/sr')
 
     # ... sort agencies
     sort = client.get('/organizations').click('Sortieren')
@@ -867,3 +875,23 @@ def test_view_user_groups(client):
     # delete
     client.get('/usergroups').click('Ansicht').click('Löschen')
     assert 'Alle (0)' in client.get('/usergroups')
+
+
+def test_agency_map(client):
+    client.login_admin()
+
+    manage = client.get('/organizations').click('Organisation', href='new')
+    manage.form['title'] = 'Finanzkontrolle'
+    manage = manage.form.submit().follow()
+
+    page = client.get('/organization/finanzkontrolle')
+    assert 'marker-map' not in page
+
+    manage = page.click('Bearbeiten')
+    manage.form['coordinates'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 12
+    })
+    manage = manage.form.submit().follow()
+
+    page = client.get('/organization/finanzkontrolle')
+    assert 'marker-map' in page

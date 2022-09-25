@@ -286,12 +286,6 @@
 </metal:panel>
 
 <metal:form define-macro="form">
-    <div class="panel global-errors" tal:condition="form.errors.get('global-errors')">
-        <p tal:repeat="error form.errors['global-errors']">
-            ${error}
-        </p>
-    </div>
-
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
@@ -357,7 +351,6 @@
         <div class="homepage-tiles">
             <div tal:repeat="tile tiles" class="homepage-tile" id="homepage-tile-${tile.number}">
                 <a href="${tile.page.url}" class="tile-link">
-                    <div class="tile-image"></div>
                     <h3>${tile.page.text}</h3>
                 </a>
                 <div class="child-links">
@@ -458,20 +451,6 @@
 </metal:publication_hint>
 
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.org">
-    <tal:b condition="item.access == 'private'|False">
-        <div class="row">
-            <div class="small-12 columns">
-                <div class="panel callout">
-                    <p i18n:translate>
-                        This site is not public.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </tal:b>
-</metal:access_hint_long>
-
-<metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.town6">
     <tal:b tal:switch="item.access|False">
         <tal:b tal:case="'private'">
             <div class="row">
@@ -1551,30 +1530,36 @@
 
 <metal:group_by_column define-macro="group_by_column" i18n:domain="onegov.org">
     <tal:b repeat="group grouped" tal:define="link_func link_func|request.link; add_pagerefs add_pagerefs|False">
-        <h2 tal:condition="len(grouped) > 1" id="${group}">
-            ${group}
-            <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
-        </h2>
+        <tal:b tal:define="find_your_spot grouped[group][0] if grouped[group][0].title == 'Find Your Spot' else None">
+            <h2 tal:condition="len(grouped) > 1" id="${group}">
+                ${group}
+                <metal:b tal:condition="add_pagerefs" use-macro="layout.macros['pageref']" tal:define="pageref_id group" />
+                <span tal:condition="find_your_spot" i18n:attributes="title" class="find-your-spot-link" data-tooltip aria-haspopup="true" class="has-tip" title="Find Your Spot">
+                    <a tal:attributes="href link_func(find_your_spot)"><i class="fa fa-calendar"></i></a>
+                </span>
+            </h2>
 
-        <ul class="with-lead">
-            <li tal:repeat="record grouped[group]">
+            <ul class="with-lead">
+                <tal:block tal:repeat="record grouped[group]">
+                    <li tal:condition="record != find_your_spot">
+                        <a class="list-title" tal:attributes="href link_func(record)">
+                            ${record.title}
+                        </a>
+                        <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
+                        <tal:b tal:define="link edit_link(record)|nothing">
+                            <a class="edit-link" href="${link}" tal:condition="link"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                        </tal:b>
 
-                <a class="list-title" tal:attributes="href link_func(record)">
-                    ${record.title}
-                </a>
-                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
-                <tal:b tal:define="link edit_link(record)|nothing">
-                    <a class="edit-link" href="${link}" tal:condition="link"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                </tal:b>
-
-                <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                     tal:content="structure lead">
-                </div>
-                <div class="list-hint hints" tal:define="hint hint(record)|False"
-                     tal:content="structure hint" tal:condition="hint">
-                </div>
-            </li>
-        </ul>
+                        <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                            tal:content="structure lead">
+                        </div>
+                        <div class="list-hint hints" tal:define="hint hint(record)|False"
+                            tal:content="structure hint" tal:condition="hint">
+                        </div>
+                    </li>
+                </tal:block>
+            </ul>
+        </tal:b>
     </tal:b>
 </metal:group_by_column>
 

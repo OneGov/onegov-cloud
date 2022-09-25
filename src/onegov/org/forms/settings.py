@@ -3,32 +3,35 @@ import re
 
 from cached_property import cached_property
 from lxml import etree
-from wtforms.validators import NumberRange, InputRequired
-
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
-from onegov.form import with_options
-from onegov.form.fields import MultiCheckboxField, TagsField, \
-    ChosenSelectField
+from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import CssField
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
+from onegov.form.fields import TagsField
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.user import AVAILABLE_ROLES
 from onegov.org.theme import user_options
-from onegov.ticket import TicketPermission
-from purl import URL
-from wtforms import BooleanField, StringField, TextAreaField, RadioField, \
-    FloatField
-from wtforms import ValidationError
-from wtforms import validators
-from wtforms.fields.html5 import EmailField, URLField, IntegerField
-from wtforms_components import ColorField
-
 from onegov.ticket import handlers
+from onegov.ticket import TicketPermission
 from onegov.user import User
-
-from .user import AVAILABLE_ROLES
+from purl import URL
+from wtforms_components import ColorField
+from wtforms.fields import BooleanField
+from wtforms.fields import EmailField
+from wtforms.fields import FloatField
+from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
+from wtforms.fields import URLField
+from wtforms.validators import InputRequired
+from wtforms.validators import NumberRange
+from wtforms.validators import ValidationError
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
@@ -38,7 +41,7 @@ class GeneralSettingsForm(Form):
 
     name = StringField(
         label=_("Name"),
-        validators=[validators.InputRequired()])
+        validators=[InputRequired()])
 
     logo_url = StringField(
         label=_("Logo"),
@@ -51,7 +54,7 @@ class GeneralSettingsForm(Form):
         render_kw={'class_': 'image-url'})
 
     reply_to = EmailField(
-        _("E-Mail Reply Address (Reply-To)"), [validators.InputRequired()],
+        _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
         description=_("Replies to automated e-mails go to this address."))
 
     primary_color = ColorField(
@@ -60,7 +63,7 @@ class GeneralSettingsForm(Form):
     font_family_sans_serif = ChosenSelectField(
         label=_('Default Font Family'),
         choices=[],
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     locales = RadioField(
@@ -70,7 +73,12 @@ class GeneralSettingsForm(Form):
             ('fr_CH', _("French")),
             ('it_CH', _("Italian"))
         ),
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
+    )
+
+    custom_css = CssField(
+        label=_('Additional CSS'),
+        render_kw={'rows': 8},
     )
 
     @property
@@ -111,10 +119,12 @@ class GeneralSettingsForm(Form):
     def populate_obj(self, model):
         super().populate_obj(model)
         model.theme_options = self.theme_options
+        model.custom_css = self.custom_css.data or ''
 
     def process_obj(self, model):
         super().process_obj(model)
         self.theme_options = model.theme_options or {}
+        self.custom_css.data = model.custom_css or ''
 
     def populate_font_families(self):
         self.font_family_sans_serif.choices = tuple(
@@ -135,21 +145,21 @@ class FooterSettingsForm(Form):
         label=_("Column width left side"),
         fieldset=_("Footer Division"),
         default=3,
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     footer_center_width = IntegerField(
         label=_("Column width for the center"),
         fieldset=_("Footer Division"),
         default=5,
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     footer_right_width = IntegerField(
         label=_("Column width right side"),
         fieldset=_("Footer Division"),
         default=4,
-        validators=[validators.InputRequired()]
+        validators=[InputRequired()]
     )
 
     contact = TextAreaField(
@@ -322,9 +332,11 @@ class FooterSettingsForm(Form):
         ])
 
         if summed_cols != 12:
-            self.errors['global-errors'] = [(
-                _("The sum of all the footer columns must be equal to 12")
-            )]
+            for col in ('left', 'center', 'right'):
+                field = getattr(self, f'footer_{col}_width')
+                field.errors.append(
+                    _("The sum of all the footer columns must be equal to 12")
+                )
             return False
 
 
@@ -465,30 +477,6 @@ class HeaderSettingsForm(Form):
 
 class HomepageSettingsForm(Form):
 
-    homepage_image_1 = StringField(
-        label=_("Homepage Image #1"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_2 = StringField(
-        label=_("Homepage Image #2"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_3 = StringField(
-        label=_("Homepage Image #3"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_4 = StringField(
-        label=_("Homepage Image #4"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_5 = StringField(
-        label=_("Homepage Image #5"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_6 = StringField(
-        label=_("Homepage Image #6"),
-        render_kw={'class_': 'image-url'})
-
     homepage_cover = HtmlField(
         label=_("Homepage Cover"),
         render_kw={'rows': 10})
@@ -515,7 +503,7 @@ class HomepageSettingsForm(Form):
 
     redirect_path = StringField(
         label=_("Path"),
-        validators=[validators.InputRequired()],
+        validators=[InputRequired()],
         depends_on=('redirect_homepage_to', 'path'))
 
     def validate_redirect_path(self, field):
@@ -540,48 +528,10 @@ class HomepageSettingsForm(Form):
                 correct_msg = 'line {}'.format(correct_line)
                 correct_msg = ERROR_LINE_RE.sub(correct_msg, e.msg)
 
-                field.widget = with_options(
-                    field.widget, **{'data-highlight-line': correct_line}
-                )
+                field.render_kw = field.render_kw or {}
+                field.render_kw['data-highlight-line'] = correct_line
 
                 raise ValidationError(correct_msg)
-
-    @property
-    def theme_options(self):
-        options = self.model.theme_options
-
-        # set the images only if provided
-        for i in range(1, 7):
-            image = getattr(self, 'homepage_image_{}'.format(i)).data
-
-            if not image:
-                options.pop(f'tile-image-{i}', None)
-            else:
-                options[f'tile-image-{i}'] = '"{}"'.format(image)
-
-        # override the options using the default values if no value was given
-        for key in options:
-            if not options[key]:
-                options[key] = user_options[key]
-
-        return options
-
-    @theme_options.setter
-    def theme_options(self, options):
-        self.homepage_image_1.data = options.get('tile-image-1', '').strip('"')
-        self.homepage_image_2.data = options.get('tile-image-2', '').strip('"')
-        self.homepage_image_3.data = options.get('tile-image-3', '').strip('"')
-        self.homepage_image_4.data = options.get('tile-image-4', '').strip('"')
-        self.homepage_image_5.data = options.get('tile-image-5', '').strip('"')
-        self.homepage_image_6.data = options.get('tile-image-6', '').strip('"')
-
-    def populate_obj(self, model):
-        super().populate_obj(model)
-        model.theme_options = self.theme_options
-
-    def process_obj(self, model):
-        super().process_obj(model)
-        self.theme_options = model.theme_options
 
 
 class ModuleSettingsForm(Form):
@@ -624,6 +574,7 @@ class MapSettingsForm(Form):
             ('geo-mapbox', _("Mapbox (Default)")),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
             ('geo-zugmap-luftbild', "ZugMap Luftbild"),
+            ('geo-bs', "Geoportal Basel-Stadt"),
         ])
 
 

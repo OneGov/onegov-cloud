@@ -184,44 +184,6 @@ def fill_event_form(form_page, start_date, end_date, add_image=False):
     return form_page
 
 
-@pytest.mark.skip('Re-enable if adding EVN to choices in ticket settings form')
-@pytest.mark.parametrize('mute,mail_count', [(False, 1), (True, 0)])
-def test_submit_event_auto_accept_no_emails(client, mute, mail_count):
-    client.login_admin()
-    settings = client.get('/ticket-settings')
-    settings.form['ticket_auto_accepts'] = ['EVN']
-    if mute:
-        # this should even mute the accept confirmation email
-        settings.form['mute_all_tickets'] = 'yes'
-    settings.form.submit()
-    anon = client.spawn()
-
-    start_date = date.today() + timedelta(days=1)
-    end_date = start_date + timedelta(days=4)
-
-    form_page = anon.get('/events').click("Veranstaltung melden")
-
-    # Fill out event
-    form_page = fill_event_form(form_page, start_date, end_date)
-    preview_page = form_page.form.submit().follow()
-    # Submit event
-    confirmation_page = preview_page.form.submit().follow()
-
-    assert 'Ihr Anliegen wurde abgeschlossen' in confirmation_page
-    client.login_editor()
-    page = client.get('/events')
-
-    assert len(os.listdir(client.app.maildir)) == mail_count
-    if not mute:
-        message = client.get_email(0)
-        assert 'Ihre Veranstaltung wurde angenommen' in message['Subject']
-
-    assert page.pyquery('.open-tickets').attr('data-count') == '0'
-    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
-    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
-    assert "My Ewent" in page
-
-
 @pytest.mark.parametrize('skip_opening_email', [True, False])
 def test_submit_event(client, skip_opening_email):
 

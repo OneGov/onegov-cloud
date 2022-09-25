@@ -4,14 +4,14 @@
 Core Commands
 -------------
 
-Provides a framework for cli commands run against one ore more onegov
+Provides a framework for cli commands run against one or more onegov
 cloud applications.
 
-OneGov cli commands are usually ran against a onegov.yml config file, which
+OneGov cli commands are usually ran against an onegov.yml config file, which
 may contain definitions for multiple applications. It may define multiple
-application with different applicaiton classes and it may contain wildcard
+application with different application classes, and it may contain wildcard
 applications which run the same application class, but contain multiple
-tennants for each application.
+tenants for each application.
 
 To have a command run against one or many applications we use a selector to
 help select the applications we want to target in a command.
@@ -27,13 +27,13 @@ Selector
 
 A selector has the form <namespace>/<id>.
 
-That is, it consists of the namespace of the application and it's id.
+That is, it consists of the namespace of the application, and it's id.
 
 For example:
 
     * ``/foo/bar``
     * ``/onegov_election_day/gr``
-    * ``/onegov_town/govikon``
+    * ``/onegov_town6/govikon``
 
 To select non-wildcard applications we can just omit the id:
 
@@ -87,7 +87,7 @@ a command which creates the path that matches the selector we can use::
 
     @cli.command(context_settings={'creates_path': True})
 
-By default we expect that a selector is passed. For commands which usually run
+By default, we expect that a selector is passed. For commands which usually run
 against all applications we can provide a default selector::
 
     @cli.command(context_settings={'default_selector': '*'})
@@ -210,7 +210,7 @@ CONTEXT_SPECIFIC_SETTINGS = (
 )
 
 
-class GroupContextGuard(object):
+class GroupContextGuard:
     """ Contains methods which abort the commandline program if any condition
     is not met.
 
@@ -477,7 +477,7 @@ def command_group():
     """ Generates a click command group for individual modules.
 
     Each individual module may have its own command group from which to run
-    commands to. Read `<http://click.pocoo.org/6/commands/>`_ to learn more
+    commands to. Read `<https://click.pocoo.org/6/commands/>`_ to learn more
     about command groups.
 
     The returned command group will provide the individual commands with
@@ -549,7 +549,7 @@ def command_group():
                     pass
 
             @CliApplication.path(path=view_path)
-            class Model(object):
+            class Model:
                 pass
 
             @CliApplication.view(model=Model, permission=Public)

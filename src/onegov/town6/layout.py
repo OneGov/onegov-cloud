@@ -168,6 +168,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
                 page, Link(page.title, self.request.link(page)),
                 children
             )
+
         return tuple(yield_children(page) for page in self.root_pages)
 
     @cached_property
@@ -443,7 +444,7 @@ class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
         )
 
         change_url_link = Link(
-            text=_("Change Url"),
+            text=_("Change URL"),
             url=self.request.link(self.form, name='change-url'),
             attrs={'class': 'internal-url'}
         )
@@ -929,6 +930,10 @@ class ResourcesLayout(DefaultLayout):
                         )
                     ]
                 ),
+                Link(
+                    text=_("Export All"),
+                    url=self.request.link(self.model, name="export-all"),
+                ),
             ]
 
 
@@ -1118,7 +1123,6 @@ class ResourceLayout(DefaultLayout):
     2, _("Check"),
     cls_before='ReservationLayout', cls_after='TicketChatMessageLayout')
 class ReservationLayout(ResourceLayout, StepsLayoutExtension):
-
     editbar_links = None
 
     @property

@@ -22,7 +22,7 @@ from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import observes
 from uuid import uuid4
-from wtforms.fields.html5 import EmailField
+from wtforms.fields import EmailField
 
 
 class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,

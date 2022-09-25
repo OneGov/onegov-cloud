@@ -8,6 +8,7 @@ from onegov.swissvotes.models import ColumnMapperDataset
 from onegov.swissvotes.models import SwissVote
 from openpyxl import load_workbook
 from openpyxl.utils.datetime import from_excel
+from wtforms.validators import ValidationError
 
 
 class SwissvoteDatasetField(UploadField):
@@ -53,25 +54,25 @@ class SwissvoteDatasetField(UploadField):
         mapper = ColumnMapperDataset()
 
         try:
-            workbook = load_workbook(self.raw_data[0].file, data_only=True)
+            workbook = load_workbook(self.file, data_only=True)
         except Exception:
-            raise ValueError(_("Not a valid XLSX file."))
+            raise ValidationError(_("Not a valid XLSX file."))
 
         if len(workbook.worksheets) < 1:
-            raise ValueError(_("No data."))
+            raise ValidationError(_("No data."))
 
         if 'DATA' not in workbook.sheetnames:
-            raise ValueError(_('Sheet DATA is missing.'))
+            raise ValidationError(_('Sheet DATA is missing.'))
 
         sheet = workbook['DATA']
 
         if sheet.max_row <= 1:
-            raise ValueError(_("No data."))
+            raise ValidationError(_("No data."))
 
         headers = [column.value for column in next(sheet.rows)]
         missing = set(mapper.columns.values()) - set(headers)
         if missing:
-            raise ValueError(_(
+            raise ValidationError(_(
                 "Some columns are missing: ${columns}.",
                 mapping={'columns': ', '.join(missing)}
             ))
@@ -104,7 +105,7 @@ class SwissvoteDatasetField(UploadField):
                         elif cell.data_type == 'd':
                             value = cell.value.date()
                         else:
-                            raise ValueError('Not a valid date format')
+                            raise ValidationError('Not a valid date format')
                     elif type_ == 'INTEGER':
                         if cell.data_type == 's':
                             value = cell.value
@@ -141,7 +142,7 @@ class SwissvoteDatasetField(UploadField):
                 data.append(vote)
 
         if errors:
-            raise ValueError(_(
+            raise ValidationError(_(
                 "Some cells contain invalid values: ${errors}.",
                 mapping={
                     'errors': '; '.join([
