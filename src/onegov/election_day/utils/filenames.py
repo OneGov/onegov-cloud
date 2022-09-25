@@ -51,7 +51,8 @@ def svg_filename(item, type_, locale, last_modified=None):
 
 def archive_filename():
     """
-        Get the filename of the archive. This is mainly used to avoid
-        duplication of knowledge.
+        Get the filename of the archive.zip. This is meant to be the single
+        source of truth for the filename. Avoids duplication of
+        knowledge.
     """
     return 'archive.zip'

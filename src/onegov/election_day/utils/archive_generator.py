@@ -5,7 +5,7 @@ from collections import defaultdict
 from fs import path
 from fs.subfs import SubFS
 from fs.copy import copy_dir
-from fs.zipfs import ZipFS
+from fs.zipfs import WriteZipFS
 from onegov.election_day.utils.filenames import archive_filename
 
 
@@ -13,7 +13,8 @@ class ArchiveGenerator:
     def __init__(self, app):
         self.app = app
         self.session = self.app.session()
-        self.archive_dir = self.app.filestorage.makedir("archive")
+        self.archive_dir: SubFS = self.app.filestorage.makedir("archive",
+                                                               recreate=True)
         self.MAX_FILENAME_LENGTH = 240
 
     def generate_csv(self, subset=None):
@@ -101,25 +102,28 @@ class ArchiveGenerator:
 
         return list(groups.values())
 
-    def zip_dir(self, base_dir: SubFS):
-        """Zips all votes and elections in a base_dir.
+    def zip_dir(self, base_dir: SubFS) -> tuple[str, WriteZipFS]:
+        """Recursively zips a directory (base_dir).
 
-        :param base_dir: Directory, whose subdirectories contain
-        "votes" and "elections".
+        :param base_dir: This is a directory in app.filestorage. Per default
+        named "archive". Contains subdirectories 'votes' and 'elections'.
 
-        :returns the ZipFS of the archive.zip
+        :returns the temporary path to the zipfs and the zip_filesystem itself
         """
-
-        zip_filesystem = ZipFS(archive_filename(), write=True)
-        for entity in ["votes", "elections"]:
-            if base_dir.isdir(entity):
-                copy_dir(
-                    src_fs=base_dir,
-                    src_path=entity,
-                    dst_fs=zip_filesystem,
-                    dst_path=entity,
-                )
-        return zip_filesystem
+        base_dir.makedir("zipfs")
+        temp_path = f"zipfs/{archive_filename()}"
+        base_dir.create(temp_path)
+        with base_dir.open(temp_path, mode="wb") as file:
+            with WriteZipFS(file) as zip_filesystem:
+                for entity in ["votes", "elections"]:
+                    if base_dir.isdir(entity):
+                        copy_dir(
+                            src_fs=base_dir,
+                            src_path=entity,
+                            dst_fs=zip_filesystem,
+                            dst_path=entity,
+                        )
+                return temp_path, zip_filesystem
 
     def generate_votes_csv(self):
         return self.generate_csv(subset=["votes"])
@@ -140,13 +144,19 @@ class ArchiveGenerator:
             .all()
         )
 
+    @property
+    def archive_system_path(self):
+        name = archive_filename()
+        return self.archive_dir.getsyspath(name)
+
     def generate_archive(self):
         archive_dir = self.generate_csv()
-        zip_fs = self.zip_dir(archive_dir)
-        return zip_fs
+        path, writable_zip_filesystem = self.zip_dir(archive_dir)
+        self.write_zipfs_to_fs(writable_zip_filesystem, archive_dir)
+        return archive_dir
 
-
-class InvalidZipDirectory(Exception):
-    """Raised if attempted to zip directories which don't contain
-    directories of votes or elections, or don't contain any csv files"""
-    pass
+    def write_zipfs_to_fs(self, writable_zip_filesystem, base_dir):
+        base_dir.create(archive_filename())
+        with base_dir.open(archive_filename(), mode="wb") as zipfile:
+            with writable_zip_filesystem as wzf:
+                wzf.write_zip(zipfile)
