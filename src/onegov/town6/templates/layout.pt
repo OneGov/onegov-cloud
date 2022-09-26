@@ -80,6 +80,23 @@
             <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
             <main>
                 <header id="header" tal:define="header_options request.app.org.header_options or {}">
+                    <div id="header-links" class="text-center">
+                        <div class="grid-container">
+                            <div class="title-bar align-center" data-responsive-toggle="example-animated-menu" data-hide-for="medium">
+                                <button type="button" data-toggle><i class="fa fa-bars"></i> Quicklinks</button>
+                                </div>
+
+                                <div class="top-bar" id="example-animated-menu">
+                                <div class="top-bar-left">
+                                    <ul class="dropdown menu align-center" data-dropdown-menu>
+                                        <li><a href="#">One</a></li>
+                                        <li><a href="#">Two</a></li>
+                                        <li><a href="#">Three</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div tal:condition="header_options.get('left_header_announcement', '')"
                          id="announcement"
                          style="color: ${header_options.get('left_header_announcement_font_color', '#000000')};
