@@ -293,29 +293,30 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
     assert get_session('thun').query(ArchivedResult).count() == 4
 
 
+def add_vote(number, session_manager):
+    vote = Vote(
+        id='vote-{}'.format(number),
+        title='vote-{}'.format(number),
+        domain='canton',
+        date=date(2015, 6, number)
+    )
+    session_manager.set_current_schema('onegov_election_day-govikon')
+    session = session_manager.session()
+    session.add(vote)
+    session.flush()
+
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.proposal.results.append(
+        BallotResult(
+            name='x', entity_id=1, counted=True, yeas=30, nays=10
+        )
+    )
+    transaction.commit()
+
+
 def test_generate_media(postgres_dsn, temporary_directory, session_manager,
                         redis_url):
     session_manager.set_locale('de_CH', 'de_CH')
-
-    def add_vote(number):
-        vote = Vote(
-            id='vote-{}'.format(number),
-            title='vote-{}'.format(number),
-            domain='canton',
-            date=date(2015, 6, number)
-        )
-        session_manager.set_current_schema('onegov_election_day-govikon')
-        session = session_manager.session()
-        session.add(vote)
-        session.flush()
-
-        vote.ballots.append(Ballot(type='proposal'))
-        vote.proposal.results.append(
-            BallotResult(
-                name='x', entity_id=1, counted=True, yeas=30, nays=10
-            )
-        )
-        transaction.commit()
 
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
@@ -335,12 +336,38 @@ def test_generate_media(postgres_dsn, temporary_directory, session_manager,
     assert os.listdir(pdf_path) == []
     assert os.listdir(svg_path) == []
 
-    add_vote(1)
+    add_vote(1, session_manager)
     assert run_command(cfg_path, 'govikon', ['generate-media']).exit_code == 0
     assert len(os.listdir(pdf_path)) == 4
     assert os.listdir(svg_path) == []
 
-    add_vote(2)
+    add_vote(2, session_manager)
     assert run_command(cfg_path, 'govikon', ['generate-media']).exit_code == 0
     assert len(os.listdir(pdf_path)) == 8
     assert os.listdir(svg_path) == []
+
+
+def test_generate_archive_total_package(postgres_dsn, temporary_directory,
+                                        session_manager, redis_url):
+    session_manager.set_locale('de_CH', 'de_CH')
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
+    write_principal(temporary_directory, 'Govikon', entity='1200')
+    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
+
+    archive_path = os.path.join(
+        temporary_directory,
+        'file-storage/onegov_election_day-govikon/archive'
+    )
+
+    assert run_command(
+        cfg_path, 'govikon', ['generate-archive']).exit_code == 0
+    assert os.path.exists(archive_path)
+    assert "archive.zip" in os.listdir(archive_path)
+
+    add_vote(1, session_manager)
+
+    assert run_command(
+        cfg_path, 'govikon', ['generate-archive']).exit_code == 0
+    assert "archive.zip" in os.listdir(archive_path)

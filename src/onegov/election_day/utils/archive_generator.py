@@ -108,8 +108,10 @@ class ArchiveGenerator:
         :param base_dir: This is a directory in app.filestorage. Per default
         named "archive". Contains subdirectories 'votes' and 'elections'.
 
-        :returns the temporary path to the zipfs and the zip_filesystem itself
+        :returns the temporary path to the zipfs and the zip filesystem itself
         """
+        if base_dir.isdir("zipfs"):
+            base_dir.removetree("zipfs")
         base_dir.makedir("zipfs")
         temp_path = f"zipfs/{archive_filename()}"
         base_dir.create(temp_path)
@@ -156,6 +158,8 @@ class ArchiveGenerator:
         return archive_dir
 
     def write_zipfs_to_fs(self, writable_zip_filesystem, base_dir):
+        if base_dir.exists(archive_filename()):
+            base_dir.remove(archive_filename())
         base_dir.create(archive_filename())
         with base_dir.open(archive_filename(), mode="wb") as zipfile:
             with writable_zip_filesystem as wzf:
