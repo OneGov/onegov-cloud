@@ -1736,3 +1736,6 @@ msgstr "L'origine dati non è configurata correttamente"
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo: Link alla pagina iniziale"
+
+msgid "Download Archive"
+msgstr "Scarica l'archivio"

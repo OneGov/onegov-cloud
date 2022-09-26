@@ -101,3 +101,31 @@ def test_view_filter_archive(url, election_day_app_zg):
     assert new.form.method == 'GET'
     resp = new.form.submit()
     assert resp.status_code == 200
+
+
+def test_download_archive_link_click(election_day_app_zg, session):
+    client = Client(election_day_app_zg)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'Abstimmung 1. Januar 2022'
+    new.form['date'] = '2022-01-01'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = "Wahl 1. Januar 2022"
+    new.form['date'] = '2022-01-01'
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    page = client.get('/')
+    assert 'Archiv Herunterladen' in page
+
+    with pytest.raises(Exception):
+        # Expecting HTTP 404 because archive has not been generated
+        page.click('Archiv Herunterladen')

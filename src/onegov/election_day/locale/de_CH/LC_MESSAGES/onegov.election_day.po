@@ -1734,3 +1734,6 @@ msgstr "Die Datenquellekonfiguration ist ungültig"
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo: Link zur Startseite"
+
+msgid "Download Archive"
+msgstr "Archiv Herunterladen"

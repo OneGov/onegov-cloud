@@ -158,3 +158,7 @@ class DefaultLayout(ChameleonLayout):
             f'{self.request.translate(_("Link to homepage"))}'
         )
         return alt_text
+
+    @cached_property
+    def archive_download(self):
+        return self.request.link(self.principal, name="archive-download")

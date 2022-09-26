@@ -1744,3 +1744,6 @@ msgstr "La source de données n'est pas configurée correctement"
 
 #~ msgid "Logo: Link to homepage"
 #~ msgstr "Logo : Lien vers la page d'accueil"
+
+msgid "Download Archive"
+msgstr "Télécharger l'archive"

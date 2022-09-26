@@ -195,6 +195,7 @@
                         </li>
                     </ul><br>
                     <p ><a i18n:translate href="${layout.archive_search_link}">Archive Search</a></p>
+                    <p ><a i18n:translate href="${layout.archive_download}">Download Archive</a></p>
                 </div>
             </div>
         </div>

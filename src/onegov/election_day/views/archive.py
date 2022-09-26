@@ -10,6 +10,7 @@ from onegov.election_day.models import Principal
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_summaries
+from onegov.election_day.utils.filenames import archive_filename
 
 
 @ElectionDayApp.html(
@@ -153,4 +154,16 @@ def view_archive_search(self, request, form):
         'form_method': 'GET',
         'item_count': self.subset_count,
         'results': self.batch
+    }
+
+
+@ElectionDayApp.archive_zip(
+    model=Principal,
+    name='archive-download',
+    permission=Public)
+def view_archive_download(self, request):
+
+    return {
+        'path': f"/zip/{archive_filename()}",
+        'name': 'archive'
     }
