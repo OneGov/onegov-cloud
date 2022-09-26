@@ -653,7 +653,9 @@ def accept_reservation(self, request, text=None, notify=False):
             r.address
             for r in q if (
                 self.resource.hex in r.content['resources']
-                and r.content['new_reservations']
+                and r.content['new_reservations'] if (
+                    'new_reservations' in r.content.keys()
+                ) else False
             )
         ]
 
