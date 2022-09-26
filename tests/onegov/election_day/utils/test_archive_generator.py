@@ -183,4 +183,8 @@ def test_generate_archive_total_package(election_day_app_zg_with_votes):
     app = election_day_app_zg_with_votes
 
     generator = ArchiveGenerator(app)
-    generator.generate_archive()
+    base_dir, archive_zip = generator.generate_archive()
+
+    assert base_dir.exists(archive_zip)
+    file_size = base_dir.getinfo(archive_zip, namespaces=['details']).size
+    assert file_size > 10  # ensure file is not 0 bytes

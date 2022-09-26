@@ -146,11 +146,14 @@ def generate_archive():
         start_time = time.time()
 
         archive_generator = ArchiveGenerator(app)
-        archive_generator.generate_archive()
-
-        diff = (time.time() - start_time)
-        click.secho(f"Completed in {diff:.0f} seconds.")
-        click.secho("Archive generated successfully:", fg='green')
+        base_dir, archive_zip = archive_generator.generate_archive()
+        file_size = base_dir.getinfo(archive_zip, namespaces=['details']).size
+        if file_size == 0:
+            click.secho("Generated archive is empty", fg='red')
+        else:
+            diff = (time.time() - start_time)
+            click.secho(f"Completed in {diff:.0f} seconds.")
+            click.secho("Archive generated successfully:", fg='green')
         absolute_path = archive_generator.archive_system_path
         click.secho(f"file://{absolute_path}")
 

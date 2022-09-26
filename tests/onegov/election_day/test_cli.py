@@ -358,7 +358,7 @@ def test_generate_archive_total_package(postgres_dsn, temporary_directory,
 
     archive_path = os.path.join(
         temporary_directory,
-        'file-storage/onegov_election_day-govikon/archive'
+        'file-storage/onegov_election_day-govikon/archive/zip'
     )
 
     assert run_command(
@@ -371,3 +371,4 @@ def test_generate_archive_total_package(postgres_dsn, temporary_directory,
     assert run_command(
         cfg_path, 'govikon', ['generate-archive']).exit_code == 0
     assert "archive.zip" in os.listdir(archive_path)
+    assert not os.path.getsize(archive_path) == 0

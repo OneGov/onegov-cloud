@@ -15,6 +15,7 @@ class ArchiveGenerator:
         self.session = self.app.session()
         self.archive_dir: SubFS = self.app.filestorage.makedir("archive",
                                                                recreate=True)
+        self.archive_parent_dir = "zip"
         self.MAX_FILENAME_LENGTH = 240
 
     def generate_csv(self, subset=None):
@@ -94,7 +95,6 @@ class ArchiveGenerator:
             groups = [[vote_1, vote_2], [vote_3], ...]
 
             where vote_1.date.year == vote_2.date.year
-
         """
         groups = defaultdict(list)
         for entity in entities:
@@ -108,12 +108,10 @@ class ArchiveGenerator:
         :param base_dir: This is a directory in app.filestorage. Per default
         named "archive". Contains subdirectories 'votes' and 'elections'.
 
-        :returns the temporary path to the zipfs and the zip filesystem itself
+        :returns path to the zipfile and the zip filesystem itself
         """
-        if base_dir.isdir("zipfs"):
-            base_dir.removetree("zipfs")
-        base_dir.makedir("zipfs")
-        temp_path = f"zipfs/{archive_filename()}"
+        base_dir.makedir(self.archive_parent_dir)
+        temp_path = f"{self.archive_parent_dir}/{archive_filename()}"
         base_dir.create(temp_path)
         with base_dir.open(temp_path, mode="wb") as file:
             with WriteZipFS(file) as zip_filesystem:
@@ -148,19 +146,11 @@ class ArchiveGenerator:
 
     @property
     def archive_system_path(self):
-        name = archive_filename()
-        return self.archive_dir.getsyspath(name)
+        zip_path = f"{self.archive_parent_dir}/{archive_filename()}"
+        return self.archive_dir.getsyspath(zip_path)
 
     def generate_archive(self):
+        self.archive_dir.removetree("/")  # clean up files from previous export
         archive_dir = self.generate_csv()
-        path, writable_zip_filesystem = self.zip_dir(archive_dir)
-        self.write_zipfs_to_fs(writable_zip_filesystem, archive_dir)
-        return archive_dir
-
-    def write_zipfs_to_fs(self, writable_zip_filesystem, base_dir):
-        if base_dir.exists(archive_filename()):
-            base_dir.remove(archive_filename())
-        base_dir.create(archive_filename())
-        with base_dir.open(archive_filename(), mode="wb") as zipfile:
-            with writable_zip_filesystem as wzf:
-                wzf.write_zip(zipfile)
+        temp_path, writable_zip_filesystem = self.zip_dir(archive_dir)
+        return archive_dir, temp_path
