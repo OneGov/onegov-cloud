@@ -32,7 +32,11 @@
                 </ul>
                 <b i18n:translate="" style="margin-bottom: 0;">Notifications for following Resources</b>
                 <ul>
-                    <li tal:repeat="resource recipient.resources">${resources[resource]}</li>
+                    <tal:b tal:repeat="resource recipient.resources">
+                        <li tal:condition="resource in resources">
+                            ${resources[resource]}
+                        </li>
+                    </tal:b>
                 </ul>
                 <p class="text-links">
                     <tal:b repeat="link recipient_links(recipient)" replace="structure link(layout)" />
