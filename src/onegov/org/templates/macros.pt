@@ -414,8 +414,13 @@
     <div class="newslist" tal:condition="news">
         <h2 i18n:translate tal:condition="not:hide_title|False">Latest news</h2>
 
-        <div class="row news-list-item" tal:repeat="item news">
-            <div class="small-12 columns">
+        <div class="row">
+            <div class="small-12 columns news-list-item" tal:repeat="item news">
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <div tal:condition="item.page_image" style="width: 100%; padding-bottom: 50%; background-image: url(${item.page_image}); background-size: cover;"></div>
+                    </div>
+                </div>
                 <a tal:attributes="href request.link(item)">
                     <h2 tal:condition="heading == 'h2'|True">${item.title} <metal:hint use-macro="layout.macros['access_hint']" />  <metal:hint use-macro="layout.macros['publication_hint']" /></h2>
                     <h3 tal:condition="heading == 'h3'|nothing">${item.title} <metal:hint use-macro="layout.macros['access_hint']" />  <metal:hint use-macro="layout.macros['publication_hint']" /></h3>
@@ -507,6 +512,11 @@
     <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False">
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 columns page-content-main">
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <img class="page-image" tal:condition="page.page_image | None" src="${page.page_image}">
+                    </div>
+                </div>
                 <div metal:define-slot="before-lead"></div>
                 <span class="page-lead" tal:condition="lead" tal:content="structure lead" />
                 <div metal:define-slot="after-lead"></div>
