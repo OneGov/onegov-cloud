@@ -152,5 +152,5 @@ class ArchiveGenerator:
     def generate_archive(self):
         self.archive_dir.removetree("/")  # clean up files from previous export
         archive_dir = self.generate_csv()
-        temp_path, writable_zip_filesystem = self.zip_dir(archive_dir)
+        temp_path, _ = self.zip_dir(archive_dir)
         return archive_dir, temp_path
