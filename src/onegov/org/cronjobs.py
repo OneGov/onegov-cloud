@@ -358,9 +358,8 @@ def send_daily_resource_usage_overview(request):
     recipients = [
         (r.address, r.content['resources'])
         for r in q if (
-            (r.content['daily_reservations'] if (
-                'daily_reservations' in r.content.keys()
-            ) else True) and weekday in r.content['send_on']
+            r.content.get('daily_reservations', True)
+            and weekday in r.content['send_on']
         )
     ]
 
