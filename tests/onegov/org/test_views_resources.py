@@ -1336,7 +1336,6 @@ def test_reservation_export_all_view(client):
     resources = ResourceCollection(client.app.libres_context)
     daypass_resource = resources.by_name('tageskarte')
     daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
-    daypass_title = daypass_resource.title
 
     scheduler = daypass_resource.get_scheduler(client.app.libres_context)
     daypass_allocations = scheduler.allocate(
@@ -1355,7 +1354,6 @@ def test_reservation_export_all_view(client):
 
     room_resource = resources.by_name('conference-room')
     room_resource.definition = "title *= ___"
-    room_resource_title = room_resource.title
 
     room_allocations = room_resource.scheduler.allocate(
         dates=(datetime(2023, 8, 28), datetime(2023, 8, 28)),
@@ -1397,9 +1395,6 @@ def test_reservation_export_all_view(client):
         wb = load_workbook(Path(tmp.name))
 
         daypass_sheet_name = wb.sheetnames[1]
-        # Tabs are named after the titles, without special characters.
-        assert daypass_sheet_name.lower() == normalize_for_url(
-            daypass_title.lower())
         daypass_sheet = wb[daypass_sheet_name]
 
         tab_2 = tuple(daypass_sheet.rows)
@@ -1420,8 +1415,6 @@ def test_reservation_export_all_view(client):
         assert tab_2[1][3].value == "info@example.org"
 
         room_sheet_name = wb.sheetnames[0]
-        assert room_sheet_name.lower() == normalize_for_url(
-            room_resource_title.lower())
         room_sheet = wb[room_sheet_name]
 
         tab_1 = tuple(room_sheet.rows)
@@ -1515,8 +1508,8 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
         wb = load_workbook(Path(tmp.name))
         actual_sheet_name_room = wb.sheetnames[0]
         actual_sheet_name_daypass = wb.sheetnames[1]
-        assert duplicate_title[:31] == actual_sheet_name_room.lower()
-        assert duplicate_title[:31] + "1" == actual_sheet_name_daypass.lower()
+        assert "sitzungszimmer-gross-2-og" == actual_sheet_name_room
+        assert "sitzungszimmer-gross-2-og_1" == actual_sheet_name_daypass
 
 
 @freeze_time("2022-09-07", tick=True)

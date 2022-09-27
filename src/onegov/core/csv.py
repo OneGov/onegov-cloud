@@ -26,6 +26,8 @@ from xlsxwriter.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from copy import copy
 
+from onegov.core.utils import normalize_for_url
+
 VALID_CSV_DELIMITERS = {',', ';', '\t'}
 WHITESPACE = re.compile(r'\s+')
 
@@ -516,15 +518,141 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
         return file.read()
 
 
+def convert_list_of_list_of_dicts_to_xlsx(row_list, titles_list,
+                                          key_list=None,
+                                          reverse=False):
+    """
+    Like to :func:`convert_list_of_dicts_to_xlsx`, but operates on a list
+    instead of in a single item.
+
+    """
+    titles_list = normalize_sheet_titles(titles_list)
+
+    with tempfile.NamedTemporaryFile() as file:
+        workbook = Workbook(file.name, options={'constant_memory': True})
+        if key_list is None:
+            key_list = [None] * len(titles_list)
+        for rows, title, key in zip(row_list, titles_list, key_list):
+
+            cellformat = workbook.add_format({'text_wrap': True})
+            worksheet = workbook.add_worksheet(title)
+            fields = get_keys_from_list_of_dicts(rows, key, reverse)
+
+            # write the header
+            worksheet.write_row(0, 0, fields, cellformat)
+
+            # keep track of the maximum character width
+            column_widths = [estimate_width(field) for field in fields]
+
+            def values(row):
+                for ix, field in enumerate(fields):
+                    value = row.get(field, '')
+                    column_widths[ix] = max(
+                        column_widths[ix],
+                        estimate_width(str(value))
+                    )
+
+                    if isinstance(value, str):
+                        value = value.replace('\r', '')
+
+                    yield value
+
+            # write the list_of_rows
+            for r, row in enumerate(rows, start=1):
+                worksheet.write_row(r, 0, values(row), cellformat)
+
+            # set the column widths
+            for col, width in enumerate(column_widths):
+                worksheet.set_column(col, col, width)
+
+        workbook.close()
+        file.seek(0)
+        return file.read()
+
+
+def normalize_sheet_titles(titles):
+    """
+        Ensuring the title of the xlsx is valid.
+    """
+
+    def valid_characters_or_raise(title):
+        INVALID_TITLE_REGEX = re.compile(r'[\\*?:/\[\]]')
+        m = INVALID_TITLE_REGEX.search(title)
+        if m:
+            msg = f"Invalid character {m.group(0)} found in xlsx sheet title"
+            raise ValueError(msg)
+
+    titles = [normalize_for_url(title) for title in titles]
+    duplicate_idxs = list_duplicates_index(titles)
+
+    # change name of the duplicate sheet names
+    for index in duplicate_idxs:
+        current_title = titles[index]
+        valid_characters_or_raise(current_title)
+        titles[index] = avoid_duplicate_name(titles, current_title)
+
+    # change name of the duplicate sheet names
+    for index, item in enumerate(titles):
+        if len(item) > 31:
+            while len(titles[index]) > 31:
+                titles[index] = remove_first_word(titles[index])
+
+    return titles
+
+
+def avoid_duplicate_name(titles, title):
+    """
+    Naive check to see whether name already exists.
+    If name does exist suggest a name using an incrementer
+    Duplicates are case-insensitive
+    """
+    # Check for an absolute match in which case we need to find an alternative
+    match = [n for n in titles if n.lower() == title.lower()]
+    if match:
+        titles = u",".join(titles)
+        sheet_title_regex = re.compile(
+            f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.I
+        )
+        matches = sheet_title_regex.findall(titles)
+        if matches:
+            # use name, but append with the next highest integer
+            counts = [int(idx) for (t, idx) in matches if idx.isdigit()]
+            highest = 0
+            if counts:
+                highest = max(counts)
+            title = u"{0}_{1}".format(title, highest + 1)
+    return title
+
+
+def remove_first_word(title):
+    """
+        Removes all chars from beginning up until and including the first "-".
+    """
+    title = re.sub(r'^.*?-', '-', title)
+    return title[1:]
+
+
+def has_duplicates(a_list):
+    return len(a_list) != len(set(a_list))
+
+
+def list_duplicates_index(a):
+    """
+        returns a list of indexes of duplicates in a list.
+        for example:
+            a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
+            list_duplicates_index(a) == [3, 4, 7, 8, 9]
+    """
+    return [idx for idx, item in enumerate(a) if item in a[:idx]]
+
+
 def merge_multiple_excel_files_into_one(xlsx_files, titles):
     """
     Combines multiple xlsx files into a single file, where each Worksheet
     corresponds to a file.
-
     :param xlsx_files: List of file-like objects open in binary mode
     :param titles: List of the names for each Worksheet.
-    :returns:
-        - name - Name of the in-memory file
+    :returns: the merged xlsx file
     """
 
     def copy_sheet(source_sheet: Worksheet, target_sheet: Worksheet):
