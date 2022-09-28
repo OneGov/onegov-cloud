@@ -9,7 +9,7 @@ from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
-from onegov.core.utils import module_path, normalize_for_url
+from onegov.core.utils import module_path
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
 from onegov.org.cli import close_ticket

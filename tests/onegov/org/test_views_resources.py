@@ -1,7 +1,6 @@
 import json
 import tempfile
 import textwrap
-import transaction
 
 from datetime import datetime, date
 import os
@@ -1511,6 +1510,7 @@ def test_reservation_export_all_view_normalizes_sheet_names(client):
         actual_sheet_name_daypass = wb.sheetnames[1]
         assert "sitzungszimmer-gross-2-og" == actual_sheet_name_room
         assert "sitzungszimmer-gross-2-og_1" == actual_sheet_name_daypass
+
 
 @freeze_time("2022-09-07", tick=True)
 def test_reservation_export_all_with_no_resources(client):
