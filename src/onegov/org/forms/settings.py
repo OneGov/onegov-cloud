@@ -1,4 +1,5 @@
 import datetime
+import json
 import re
 
 from cached_property import cached_property
@@ -419,6 +420,12 @@ class HeaderSettingsForm(Form):
         default=1
     )
 
+    header_links = StringField(
+        label=_("Header links"),
+        fieldset=_("Header links"),
+        render_kw={'class_': 'many many-links'}
+    )
+
     left_header_announcement = StringField(
         label=_("Announcement"),
         fieldset=_("Announcement"),
@@ -437,6 +444,7 @@ class HeaderSettingsForm(Form):
     @property
     def header_options(self):
         return {
+            'header_links': self.header_links.data or None,
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
             'left_header_color': self.left_header_color.data.get_hex(),
@@ -450,6 +458,11 @@ class HeaderSettingsForm(Form):
 
     @header_options.setter
     def header_options(self, options):
+        if not options.get('header_links'):
+            self.header_links.data = self.links_to_json(None)
+        else:
+            self.header_links.data = options.get('header_links')
+
         self.left_header_name.data = options.get('left_header_name')
         self.left_header_url.data = options.get('left_header_url')
         self.left_header_color.data = options.get(
@@ -466,6 +479,9 @@ class HeaderSettingsForm(Form):
             'left_header_announcement_font_color', '#000000'
         )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def populate_obj(self, model):
         super().populate_obj(model)
         model.header_options = self.header_options
@@ -473,6 +489,43 @@ class HeaderSettingsForm(Form):
     def process_obj(self, model):
         super().process_obj(model)
         self.header_options = model.header_options or {}
+
+    def validate(self):
+        result = super().validate()
+        for text, link in self.json_to_links(self.header_links.data):
+            if text and not link:
+                self.header_links.errors.append(
+                    _('Please add an url to each link')
+                )
+                result = False
+        return result
+
+    def json_to_links(self, text=None):
+        result = []
+
+        for value in json.loads(text or '{}').get('values', []):
+            result.append((value['text'], value['link']))
+
+        return result
+
+    def links_to_json(self, header_links=None):
+        header_links = header_links or []
+
+        return json.dumps({
+            'labels': {
+                'text': self.request.translate(_("Text")),
+                'link': self.request.translate(_("URL")),
+                'add': self.request.translate(_("Add")),
+                'remove': self.request.translate(_("Remove")),
+            },
+            'values': [
+                {
+                    'text': t,
+                    'link': l,
+                    'error': self.link_errors.get(ix, "")
+                } for ix, t, l in enumerate(header_links)
+            ]
+        })
 
 
 class HomepageSettingsForm(Form):

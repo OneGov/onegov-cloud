@@ -31,3 +31,10 @@
     list-style: none;
     margin: 0 0 1rem;
 }
+
+#fieldset-header-links {
+    small.error {
+        display: block !important;
+        margin-top: .5rem;
+    }
+}
