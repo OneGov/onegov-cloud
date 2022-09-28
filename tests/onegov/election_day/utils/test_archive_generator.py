@@ -188,3 +188,15 @@ def test_generate_archive_total_package(election_day_app_zg_with_votes):
     assert base_dir.exists(archive_zip)
     file_size = base_dir.getinfo(archive_zip, namespaces=['details']).size
     assert file_size > 10  # ensure file is not 0 bytes
+
+
+def test_get_docs_files_at_runtime():
+    docs = module_path("onegov.election_day", "static/docs/")
+
+    docs_dir = OSFS(docs)
+    assert docs_dir.isdir("api")
+    assert not docs_dir.isempty("api")
+    languages = ["de", "en", "it", "fr", "rm"]
+    api = docs_dir.opendir("api")
+    assert all(api.isfile(f"open_data_{l}.md") for l in languages)
+
