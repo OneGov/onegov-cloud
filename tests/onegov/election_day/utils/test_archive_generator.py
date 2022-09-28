@@ -108,6 +108,13 @@ def test_zipping_multiple_directories(election_day_app_zg):
             flattened = reduce(lambda x, y: x + y, election_csv_files)
             assert len(flattened) == 2
 
+            additional_files = (match for match in zip_fs.glob(
+                "*.md", namespaces=["details"]))
+
+            assert len(list(additional_files)) >= 5
+            for f in additional_files:
+                assert f.info.size > 100
+
 
 def test_long_filenames_are_truncated(election_day_app_zg):
     long_title = "Bundesbeschluss vom 28. September 2018 über die "\
@@ -200,3 +207,15 @@ def test_get_docs_files_at_runtime():
     api = docs_dir.opendir("api")
     assert all(api.isfile(f"open_data_{l}.md") for l in languages)
 
+
+def test_open_data_markdown_files_are_included(election_day_app_zg_with_votes):
+    app = election_day_app_zg_with_votes
+
+    generator = ArchiveGenerator(app)
+    archive_dir, zip_dir = generator.generate_archive()
+    doc_files = generator.additional_files_to_include
+
+    with archive_dir.open(zip_dir, mode="rb") as fi:
+        with ReadZipFS(fi) as zip_fs:
+            top_level_dir = zip_fs.listdir(".")
+            assert all(file in top_level_dir for file in doc_files)

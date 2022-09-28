@@ -1,3 +1,4 @@
+from onegov.core.utils import module_path
 from onegov.ballot import Vote, Election, ElectionCompound
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from sqlalchemy import desc
@@ -5,7 +6,9 @@ from collections import defaultdict
 from fs import path
 from fs.subfs import SubFS
 from fs.copy import copy_dir
+from fs.copy import copy_file
 from fs.zipfs import WriteZipFS
+from fs.osfs import OSFS
 from onegov.election_day.utils.filenames import archive_filename
 
 
@@ -106,7 +109,8 @@ class ArchiveGenerator:
         """Recursively zips a directory (base_dir).
 
         :param base_dir: This is a directory in app.filestorage. Per default
-        named "archive". Contains subdirectories 'votes' and 'elections'.
+        named "archive". Contains subdirectories 'votes' and 'elections',
+        as well as the files describing the download format.
 
         :returns path to the zipfile and the zip filesystem itself
         """
@@ -123,6 +127,15 @@ class ArchiveGenerator:
                             dst_fs=zip_filesystem,
                             dst_path=entity,
                         )
+                for f in self.additional_files_to_include:
+                    if base_dir.isfile(f):
+                        copy_file(
+                            src_fs=base_dir,
+                            src_path=f,
+                            dst_fs=zip_filesystem,
+                            dst_path=f,
+                        )
+
                 return temp_path, zip_filesystem
 
     def generate_votes_csv(self):
@@ -149,8 +162,29 @@ class ArchiveGenerator:
         zip_path = f"{self.archive_parent_dir}/{archive_filename()}"
         return self.archive_dir.getsyspath(zip_path)
 
+    @property
+    def additional_files_to_include(self):
+        languages = ["de", "en", "it", "fr", "rm"]
+        files = [f"open_data_{lang}.md" for lang in languages]
+        return files
+
+    def include_docs(self):
+        api = module_path("onegov.election_day", "static/docs/api")
+        native_docs_dir = OSFS(api)
+        assert len(native_docs_dir.listdir('.')) == 22
+
+        for file in self.additional_files_to_include:
+            copy_file(
+                src_fs=native_docs_dir,
+                src_path=file,
+                dst_fs=self.archive_dir,
+                dst_path=file,
+            )
+        return self.archive_dir
+
     def generate_archive(self):
         self.archive_dir.removetree("/")  # clean up files from previous export
-        archive_dir = self.generate_csv()
+        self.generate_csv()
+        archive_dir = self.include_docs()
         temp_path, _ = self.zip_dir(archive_dir)
         return archive_dir, temp_path
