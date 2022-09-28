@@ -8,8 +8,8 @@ from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired, Email, InputRequired
-from onegov.org.forms.allocation import WEEKDAYS
 from onegov.core.csv import convert_list_of_list_of_dicts_to_xlsx
+from onegov.org.forms.allocation import WEEKDAYS
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition

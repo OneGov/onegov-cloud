@@ -1248,6 +1248,22 @@ msgstr "Votre événement a malheureusement été rejeté:"
 msgid "The OneGov Cloud Team"
 msgstr "L'équipe de OneGov Cloud"
 
+msgid "The following reservations have been accepted:"
+msgstr "Les réservations suivantes ont été acceptées:"
+
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
+msgid ""
+"This is a notification for the new reservations for ${organisation}. If you "
+"no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Ceci est une notification pour les nouvelles réservations de "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"veuillez contacter un administrateur afin qu'il vous retire de la liste des "
+"destinataires."
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
 "Un administrateur vient de créer un nouveau compte sur ${org} pour vous."
@@ -1325,12 +1341,6 @@ msgstr "Fenêtre d'inscription"
 
 msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
-
-msgid "The following reservations have been accepted:"
-msgstr "Les réservations suivantes ont été acceptées:"
-
-msgid "${author} wrote"
-msgstr "${author} a écrit"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
@@ -1692,15 +1702,19 @@ msgstr "(${num_pending} en attente d'approbation)"
 msgid "Utilised"
 msgstr "Utilisé"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"Les destinataires suivants reçoivent un e-mail quotidien envoyé à 6 h "
-"contenant les données de réservation pour toutes les réservations du jour."
-
 msgid "No recipients defined yet."
 msgstr "Aucun destinataire défini pour le moment."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Reçoit des notifications pour les réservations du jour les jours suivants:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Recevoir des notifications pour les nouvelles réservations."
+
+msgid "Notifications for following Resources"
+msgstr "Notifications pour les ressources suivantes"
 
 msgid "No reservation resources defined yet."
 msgstr "Aucune ressource de réservation n'est encore définie."

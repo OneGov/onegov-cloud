@@ -39,7 +39,11 @@
                 </div>
                 <div tal:condition="agency.coordinates" class="borderless-side-panel">
                     <h2>Karte</h2>
-                    <tal:block content="structure map"></tal:block>
+                    <div class="marker-map agency-map"
+                        data-lat="${agency.coordinates.lat}"
+                        data-lon="${agency.coordinates.lon}"
+                        data-zoom="${agency.coordinates.zoom}">
+                    </div>
                 </div>
 
             </div>

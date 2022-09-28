@@ -82,6 +82,13 @@ def get_geo_zugmap_luftbild():
     yield 'geo-zugmap-luftbild.js'
 
 
+@MapboxApp.webasset('geo-bs')
+def get_geo_bs():
+    yield 'leaflet'
+    yield 'proj4js'
+    yield 'geo-bs.js'
+
+
 @MapboxApp.tween_factory()
 def inject_mapbox_api_token_tween_factory(app, handler):
 

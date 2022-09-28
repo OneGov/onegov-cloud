@@ -23,6 +23,7 @@ from onegov.core.errors import (
     MissingColumnsError,
 )
 from openpyxl import load_workbook
+from pathlib import Path
 
 
 def test_parse_header():
@@ -392,7 +393,6 @@ def test_convert_irregular_list_of_dicts_to_csv():
     assert header == 'name,role,identity,gang'
     assert batman == 'Batman,Superhero,Bruce Wayne,'
     assert joker == 'Joker,Supervillain,,Injustice League'
-
 
 def test_convert_multiple_list_of_dicts_to_xlsx():
     data = [

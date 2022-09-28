@@ -1,10 +1,11 @@
 from more.webassets import WebassetsApp
 from onegov.core.security import Public
 from onegov.form import _
+from onegov.form.errors import FormError
 from onegov.form.parser.core import flatten_fieldsets, parse_formcode
 from onegov.form.parser.snippets import Snippets
-from onegov.form.errors import FormError
 from onegov.form.utils import disable_required_attribute_in_html_inputs
+from yaml.parser import ParserError
 
 
 class FormApp(WebassetsApp):
@@ -60,7 +61,7 @@ def view_parse_formcode(self, request):
             }
             for field in flatten_fieldsets(parse_formcode(formcode))
         ]
-    except (FormError, AttributeError, TypeError):
+    except (FormError, AttributeError, TypeError, ParserError):
         return {'error': True}
 
 
