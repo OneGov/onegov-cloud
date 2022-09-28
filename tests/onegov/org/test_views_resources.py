@@ -2,7 +2,6 @@ import json
 import tempfile
 import textwrap
 from datetime import datetime, date
-
 import os
 import pytest
 from pathlib import Path
@@ -11,7 +10,6 @@ import transaction
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
-
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormSubmission
 from onegov.reservation import ResourceCollection
