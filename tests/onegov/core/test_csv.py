@@ -23,7 +23,6 @@ from onegov.core.errors import (
     MissingColumnsError,
 )
 from openpyxl import load_workbook
-from pathlib import Path
 
 
 def test_parse_header():

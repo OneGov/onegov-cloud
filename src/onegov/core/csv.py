@@ -23,9 +23,6 @@ from ordered_set import OrderedSet
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
 
-from openpyxl.worksheet.worksheet import Worksheet
-from copy import copy
-
 from onegov.core.utils import normalize_for_url
 
 VALID_CSV_DELIMITERS = {',', ';', '\t'}
