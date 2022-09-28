@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-02 11:11+0200\n"
+"POT-Creation-Date: 2022-09-27 10:53+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -669,14 +669,6 @@ msgid "Statistics"
 msgstr "Statistiche"
 
 #, python-format
-msgid "Final results are available on ${url}"
-msgstr "Risultati finali disponibili su ${url}"
-
-#, python-format
-msgid "New intermediate results are available on ${url}"
-msgstr "Nuovi risultati provvisori sono disponibili su ${url}"
-
-#, python-format
 msgid "Regional (${on})"
 msgstr "Regionale (${on})"
 
@@ -870,8 +862,8 @@ msgstr "Contenuto"
 msgid "Sitemap"
 msgstr "Sitemap"
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziale"
 
@@ -1316,8 +1308,32 @@ msgstr "Attivo"
 msgid "Activate"
 msgstr "Attivare"
 
+msgid "This will trigger the following notifications:"
+msgstr ""
+
+msgid ""
+"If email is selected, one email with all the results. The subject will be:"
+msgstr ""
+
+msgid "If all selected votes and elections are completed:"
+msgstr ""
+
+msgid "If any of the selected elections and votes is not yet completed:"
+msgstr ""
+
+msgid "If SMS is selected, one SMS with the generic message:"
+msgstr ""
+
 msgid "Last notifications:"
 msgstr "Ultime notifiche:"
+
+msgid "No notifications yet."
+msgstr ""
+
+msgid ""
+"If email is selected, one email with all the results from the selected "
+"elections and votes. The subject will be:"
+msgstr ""
 
 msgid "Create token"
 msgstr "Crea token"
@@ -1730,9 +1746,3 @@ msgstr "Nessuna elezione secondo il sistema proporzionale"
 
 msgid "The data source is not configured properly"
 msgstr "L'origine dati non è configurata correttamente"
-
-#~ msgid "Logo ${layout.principal.name}: Link to homepage"
-#~ msgstr "Logo ${layout.principal.name}: Link alla pagina iniziale"
-
-#~ msgid "Logo: Link to homepage"
-#~ msgstr "Logo: Link alla pagina iniziale"
