@@ -59,7 +59,7 @@ class ApiEndpointItem:
     @property
     def api_endpoint(self):
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
-        return cls(self.app)
+        return cls(self.app) if cls else None
 
     @property
     def item(self):
