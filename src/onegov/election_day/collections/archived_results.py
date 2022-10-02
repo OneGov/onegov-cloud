@@ -7,7 +7,9 @@ from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundCollection
 from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
+from onegov.core.collection import Pagination
 from onegov.election_day.models import ArchivedResult
+from sedate import as_datetime
 from sqlalchemy import cast
 from sqlalchemy import desc
 from sqlalchemy import distinct
@@ -18,7 +20,6 @@ from sqlalchemy import or_
 from sqlalchemy.sql.expression import case
 from time import mktime
 from time import strptime
-from onegov.core.collection import Pagination
 
 
 def groupbydict(items, keyfunc, sortfunc=None):
@@ -68,7 +69,11 @@ class ArchivedResultCollection:
             id_ for item in items for id_ in getattr(item, 'elections', [])
         }
 
-        dates = groupbydict(items, lambda i: i.date)
+        dates = groupbydict(
+            items,
+            lambda i: i.date,
+            lambda i: -(as_datetime(i.date).timestamp() or 0)
+        )
 
         order = {
             'federation': 1,
