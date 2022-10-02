@@ -76,6 +76,8 @@ def generate_qr_bill(schema, request, user, invoice):
         return None
     if debtor['street'] and len(debtor['street']) > 70:
         debtor['street'] = debtor['street'][:70]
+    if debtor['pcode'] and len(debtor['pcode']) > 16:
+        debtor['pcode'] = debtor['pcode'][:16]
 
     # Language
     language = {'de_CH': 'de', 'fr_CH': 'fr', 'it_CH': 'it'}.get(
