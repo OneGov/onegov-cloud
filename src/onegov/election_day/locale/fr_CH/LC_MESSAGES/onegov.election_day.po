@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-27 10:53+0200\n"
+"POT-Creation-Date: 2022-10-02 15:36+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1319,31 +1319,35 @@ msgid "Activate"
 msgstr "Activez"
 
 msgid "This will trigger the following notifications:"
-msgstr ""
+msgstr "Cela déclenchera les notifications suivantes :"
+
+msgid "Email: One email containing all the results. The subject will be"
+msgstr "Courriel : Un courriel contenant tous les résultats. L'objet sera"
+
+msgid "SMS: One SMS with the generic message"
+msgstr "SMS : Un SMS avec le message générique"
 
 msgid ""
-"If email is selected, one email with all the results. The subject will be:"
+"There is also the possibility to trigger bundled notifications for the "
+"current election day:"
 msgstr ""
-
-msgid "If all selected votes and elections are completed:"
-msgstr ""
-
-msgid "If any of the selected elections and votes is not yet completed:"
-msgstr ""
-
-msgid "If SMS is selected, one SMS with the generic message:"
-msgstr ""
+"Il est également possible de déclencher des notifications groupées pour le "
+"jour d'élection en cours :"
 
 msgid "Last notifications:"
 msgstr "Les dernières notifications :"
 
 msgid "No notifications yet."
-msgstr ""
+msgstr "Pas encore de notification."
 
 msgid ""
-"If email is selected, one email with all the results from the selected "
-"elections and votes. The subject will be:"
+"Email: One email containing all the results of the selected elections and "
+"votes. The subject depends on whether all selected elections and votes are "
+"completed:"
 msgstr ""
+"Courriel : Un email contenant tous les résultats des élections et votes "
+"sélectionnés. Le sujet dépend de l'achèvement ou non de toutes les élections "
+"et votes sélectionnés :"
 
 msgid "Create token"
 msgstr "Créer un token"

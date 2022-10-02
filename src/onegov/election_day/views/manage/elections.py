@@ -10,6 +10,7 @@ from onegov.election_day.forms import ChangeIdForm
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.forms import TriggerNotificationForm
 from onegov.election_day.layouts import ManageElectionsLayout
+from onegov.election_day.layouts import MailLayout
 
 
 @ElectionDayApp.manage_html(
@@ -250,6 +251,7 @@ def trigger_election(self, request, form):
     message = ''
     title = _("Trigger notifications")
     button_class = 'primary'
+    subject = MailLayout(None, request).subject(self)
 
     if notifications.by_model(self):
         callout = _(
@@ -267,6 +269,7 @@ def trigger_election(self, request, form):
         'form': form,
         'title': self.title,
         'shortcode': self.shortcode,
+        'subject': subject,
         'subtitle': title,
         'callout': callout,
         'button_text': title,

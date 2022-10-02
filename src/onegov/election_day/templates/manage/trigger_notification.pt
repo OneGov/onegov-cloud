@@ -13,26 +13,16 @@
              <p i18n:translate>This will trigger the following notifications:</p>
              <ul>
                  <li tal:condition="request.app.principal.email_notification">
-                     <tal:block i18n:translate>If email is selected, one email containing all the results of the selected elections and votes. The subject will be:</tal:block>
-                     <ul>
-                         <li>
-                             <tal:block i18n:translate>If all selected votes and elections are completed:</tal:block>
-                             <q i18n:translate>The final results are available</q>
-                         </li>
-                         <li>
-                             <tal:block i18n:translate>If any of the selected elections and votes is not yet completed:</tal:block>
-                             <q i18n:translate>New results are available</q>
-                         </li>
-                     </ul>
+                     <tal:block i18n:translate>Email: One email containing all the results. The subject will be </tal:block> <q>${subject}</q>.
                  </li>
                  <li tal:condition="request.app.principal.sms_notification">
-                     <tal:block i18n:translate>If SMS is selected, one SMS with the generic message:</tal:block>
-                     <q i18n:translate>New results are available on <tal:block tal:replace="request.app.principal.sms_notification" i18n:name="url" /></q>
+                     <tal:block i18n:translate>SMS: One SMS with the generic message</tal:block>
+                     <q i18n:translate>New results are available on <tal:block tal:replace="request.app.principal.sms_notification" i18n:name="url"/></q>.
                  </li>
              </ul>
              <p>
                  <tal:block i18n:translate>There is also the possibility to trigger bundled notifications for the current election day:</tal:block>
-                 <a href="${request.link(request.app.principal, 'trigger-notifications')}" i18n:translate>Trigger notifications</a>
+                 <a href="${request.link(request.app.principal, 'trigger-notifications')}" i18n:translate>Trigger notifications</a>.
             </p>
         </div>
         <div class="panel">
