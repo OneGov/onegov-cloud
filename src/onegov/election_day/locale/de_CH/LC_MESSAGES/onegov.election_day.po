@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-02 11:11+0200\n"
+"POT-Creation-Date: 2022-10-02 15:36+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -674,14 +674,6 @@ msgid "Statistics"
 msgstr "Statistik"
 
 #, python-format
-msgid "Final results are available on ${url}"
-msgstr "Schlussresultate verfügbar auf ${url}"
-
-#, python-format
-msgid "New intermediate results are available on ${url}"
-msgstr "Neue Zwischenresultate verfügbar auf ${url}"
-
-#, python-format
 msgid "Regional (${on})"
 msgstr "Regional (${on})"
 
@@ -875,8 +867,8 @@ msgstr "Inhalt"
 msgid "Sitemap"
 msgstr "Sitemap"
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Startseite"
 
@@ -1322,8 +1314,36 @@ msgstr "Aktiv"
 msgid "Activate"
 msgstr "Aktivieren"
 
+msgid "This will trigger the following notifications:"
+msgstr "Die folgenden Benachrichtigungen werden ausgelöst:"
+
+msgid "Email: One email containing all the results. The subject will be"
+msgstr "E-Mail: Eine E-Mail mit allen Ergebnissen. Der Betreff lautet"
+
+msgid "SMS: One SMS with the generic message"
+msgstr "SMS: Eine SMS mit der allgemeinen Nachricht"
+
+msgid ""
+"There is also the possibility to trigger bundled notifications for the "
+"current election day:"
+msgstr ""
+"Es besteht auch die Möglichkeit, gebündelte Benachrichtigungen für den "
+"aktuellen Urnengang auszulösen:"
+
 msgid "Last notifications:"
 msgstr "Letzte Benachrichtigungen:"
+
+msgid "No notifications yet."
+msgstr "Noch keine Beanchrichtigungen."
+
+msgid ""
+"Email: One email containing all the results of the selected elections and "
+"votes. The subject depends on whether all selected elections and votes are "
+"completed:"
+msgstr ""
+"E-Mail: Eine E-Mail mit allen Ergebnissen der ausgewählten Wahlen und "
+"Abstimmungen. Der Betreff hängt davon ab, ob alle ausgewählten Wahlen und "
+"Abstimmungen abgeschlossen sind:"
 
 msgid "Create token"
 msgstr "Token erzeugen"
@@ -1731,6 +1751,3 @@ msgstr "Keine Proporzwahl"
 
 msgid "The data source is not configured properly"
 msgstr "Die Datenquellekonfiguration ist ungültig"
-
-#~ msgid "Logo: Link to homepage"
-#~ msgstr "Logo: Link zur Startseite"
