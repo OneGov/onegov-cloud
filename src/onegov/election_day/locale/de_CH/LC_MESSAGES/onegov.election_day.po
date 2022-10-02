@@ -1328,7 +1328,7 @@ msgid ""
 "current election day:"
 msgstr ""
 "Es besteht auch die Möglichkeit, gebündelte Benachrichtigungen für den "
-"aktuellen Wahltag auszulösen:"
+"aktuellen Urnengang auszulösen:"
 
 msgid "Last notifications:"
 msgstr "Letzte Benachrichtigungen:"
