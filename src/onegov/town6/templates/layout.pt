@@ -80,7 +80,7 @@
             <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
             <main>
                 <header id="header" tal:define="header_options request.app.org.header_options or {}">
-                    <div tal:condition="header_options.get('announcement', '') and (request.is_manager or not header_options.get('announcement_is_private'))"
+                    <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
                          id="announcement_header"
                          style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
                              <div class="grid-container" tal:define="url header_options.get('announcement_url');">
