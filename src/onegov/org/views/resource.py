@@ -9,7 +9,7 @@ from isodate import parse_date, ISO8601Error
 from itertools import groupby, islice
 from morepath.request import Response
 from onegov.core.security import Public, Private, Personal
-from onegov.core.utils import module_path, normalize_for_url
+from onegov.core.utils import module_path
 from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
 from onegov.org.cli import close_ticket
@@ -760,7 +760,7 @@ def view_export_all(self, request, form, layout=None):
 
                 if results:
                     all_results.append(results)
-                    all_titles.append(normalize_for_url(resource.title)[:31])
+                    all_titles.append(resource.title)
                     all_field_order.append(field_order)
 
         if no_reservations_for_date(all_results):
@@ -776,7 +776,7 @@ def view_export_all(self, request, form, layout=None):
                 '-officedocument.spreadsheetml.sheet'
             ),
             content_disposition='inline; filename={}.xlsx'.format(
-                'all-resources-export'
+                'All-Reservations-Export'
             )
         )
 
