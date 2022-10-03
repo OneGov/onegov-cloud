@@ -21,6 +21,13 @@ var ManyFields = React.createClass({
                             onChange={this.props.onChange}
                         />
                 }
+                {
+                    this.props.type === "links" &&
+                        <ManyLinks
+                            data={this.props.data}
+                            onChange={this.props.onChange}
+                        />
+                }
             </div>
         );
     }
@@ -282,6 +289,156 @@ var DateTimePickerField = React.createClass({
                     className={this.props.size}
                     defaultValue={this.props.defaultValue}
                     onChange={this.props.onChange}
+                />
+            </label>
+        );
+    }
+});
+
+var ManyLinks = React.createClass({
+    getInitialState: function() {
+        var state = {
+            values: _.clone(this.props.data.values)
+        };
+
+        if (state.values.length === 0) {
+            state.values = [
+                {'text': '', 'link': ''}
+            ];
+        }
+
+        return state;
+    },
+    handleAdd: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index + 1, 0, {
+            text: '',
+            link: ''
+        });
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleRemove: function(index, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+        state.values.splice(index, 1);
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    handleInputChange: function(index, name, e) {
+        var state = JSON.parse(JSON.stringify(this.state));
+
+        state.values[index][name] = e.target.value;
+
+        this.setState(state);
+
+        e.preventDefault();
+    },
+    componentWillUpdate: function(props, state) {
+        props.onChange(state);
+    },
+    render: function() {
+        var data = this.props.data;
+        var values = this.state.values;
+        var self = this;
+        return (
+            <div> {
+                _.map(values, function(value, index) {
+                    var onTextChange = self.handleInputChange.bind(self, index, 'text');
+                    var onLinkChange = self.handleInputChange.bind(self, index, 'link');
+                    var onRemove = self.handleRemove.bind(self, index);
+                    var onAdd = self.handleAdd.bind(self, index);
+
+                    return (
+                        <div key={index}>
+                            <div className={"row " + (value.error && 'error' || '')}>
+                                <div className="small-6 columns">
+                                    <StringField
+                                        type="text"
+                                        label={data.labels.text}
+                                        defaultValue={value.text}
+                                        onChange={onTextChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder="Linktext"
+                                    />
+                                </div>
+                                <div className="small-6 columns">
+                                    <StringField required
+                                        type="text"
+                                        label={data.labels.link}
+                                        defaultValue={value.link}
+                                        onChange={onLinkChange}
+                                        extra={data.extra}
+                                        size="small"
+                                        placeholder="https://www.example.ch"
+                                    />
+                                </div>
+                                <div className="small-12 columns">
+                                    {
+                                        index === (values.length - 1) &&
+                                            <a href="#" className="button round field-button" onClick={onAdd}>
+                                                <i className="fa fa-plus" aria-hidden="true" />
+                                                <span className="show-for-sr">{data.labels.add}</span>
+                                            </a>
+                                    }
+                                    {
+                                        index > 0 && index === (values.length - 1) &&
+                                            <a href="#" className="button round secondary field-button" onClick={onRemove}>
+                                                <i className="fa fa-minus" aria-hidden="true" />
+                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                            </a>
+                                    }
+                                </div>
+                            </div>
+                            {
+                                value.error &&
+                                    <div className="row link-error">
+                                        <div className="small-12 columns end">
+                                            <small className="error">{value.error}</small>
+                                        </div>
+                                    </div>
+                            }
+                        </div>
+                    );
+                })
+            } </div>
+        );
+    }
+});
+
+var StringField = React.createClass({
+    componentWillMount: function() {
+        this.id = _.uniqueId(this.props.type + '-');
+    },
+    componentDidMount: function() {
+        this.renderStringInput();
+    },
+    componentDidUpdate: function() {
+        this.renderStringInput();
+    },
+    renderStringInput: function() {
+        var onChange = this.props.onChange;
+
+    },
+    render: function() {
+        return (
+            <label>
+                <span className="label-text">{this.props.label}</span>
+
+                {
+                    this.props.required &&
+                        <span className="label-required">*</span>
+                }
+
+                <input
+                    id={this.id}
+                    type={this.props.type}
+                    className={this.props.size}
+                    defaultValue={this.props.defaultValue}
+                    onChange={this.props.onChange}
+                    placeholder={this.props.placeholder}
                 />
             </label>
         );

@@ -507,7 +507,7 @@ class HeaderSettingsForm(Form):
         result = []
 
         for value in json.loads(text or '{}').get('values', []):
-            if value['link']:
+            if value['link'] or value['text']:
                 result.append([value['text'], value['link']])
 
         return result

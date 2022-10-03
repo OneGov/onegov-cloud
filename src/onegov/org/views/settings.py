@@ -139,6 +139,7 @@ def handle_ticket_settings(self, request, form, layout=None):
     permission=Secret, form=HeaderSettingsForm, setting=_("Header"),
     icon='fa-window-maximize', order=-810)
 def handle_header_settings(self, request, form, layout=None):
+    layout = layout or SettingsLayout(self, request, _("Header"))
     request.include('many')
     return handle_generic_settings(self, request, form, _("Header"), layout)
 
