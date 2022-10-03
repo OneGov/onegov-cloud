@@ -170,7 +170,6 @@ class ArchiveGenerator:
     def include_docs(self):
         api = module_path("onegov.election_day", "static/docs/api")
         native_docs_dir = OSFS(api)
-        assert len(native_docs_dir.listdir('.')) == 22
 
         for file in self.additional_files_to_include:
             copy_file(
