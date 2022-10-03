@@ -273,15 +273,10 @@ class SmsNotification(Notification):
         """
         self.update_from_model(model)
 
-        if model.completed:
-            content = _(
-                "Final results are available on ${url}",
+        self.send_sms(
+            request,
+            _(
+                "New results are available on ${url}",
                 mapping={'url': request.app.principal.sms_notification}
             )
-        else:
-            content = _(
-                "New intermediate results are available on ${url}",
-                mapping={'url': request.app.principal.sms_notification}
-            )
-
-        self.send_sms(request, content)
+        )

@@ -397,3 +397,4 @@ def get_backend_common_asset():
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
     yield 'form_dependencies.js'
+    yield 'doubleclick.js'

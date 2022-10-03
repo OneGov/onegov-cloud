@@ -27,12 +27,16 @@
                     </li>
 
                     <li tal:condition="recipient.new_reservations">
-                        <span class="fa-li"><i class="fas fa-envelope"></i></span> <tal:b i18n:translate="">Receives notifications for new reservations.</tal:b
+                        <span class="fa-li"><i class="fas fa-envelope"></i></span> <tal:b i18n:translate="">Receives notifications for new reservations.</tal:b>
                     </li>
                 </ul>
                 <b i18n:translate="" style="margin-bottom: 0;">Notifications for following Resources</b>
                 <ul>
-                    <li tal:repeat="resource recipient.resources">${resources[resource]}</li>
+                    <tal:b tal:repeat="resource recipient.resources">
+                        <li tal:condition="resource in resources">
+                            ${resources[resource]}
+                        </li>
+                    </tal:b>
                 </ul>
                 <p class="text-links">
                     <tal:b repeat="link recipient_links(recipient)" replace="structure link(layout)" />
