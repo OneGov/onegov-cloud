@@ -82,11 +82,11 @@
                 <header id="header" tal:define="header_options request.app.org.header_options or {}">
                     <div id="header-links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
                         <div class="grid-container">
-                            <div class="title-bar align-center" data-responsive-toggle="example-animated-menu" data-hide-for="medium">
+                            <div class="title-bar align-center" data-responsive-toggle="animated-menu" data-hide-for="medium">
                                 <button type="button" data-toggle><i class="fa fa-bars"></i> Quicklinks</button>
                                 </div>
 
-                                <div class="top-bar" id="example-animated-menu">
+                                <div class="top-bar" id="animated-menu">
                                 <div class="top-bar-left">
                                     <ul class="dropdown menu align-center" data-dropdown-menu>
                                         <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>

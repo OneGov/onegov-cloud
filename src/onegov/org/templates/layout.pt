@@ -94,7 +94,7 @@
                       </li>
                   </ul>
                   
-                  <section class="top-bar-section" style="left: 0%;">
+                  <section class="top-bar-section" id="quicklinks" style="left: 0%;">
                     <ul id="quicklinks-submenu">
                       <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
                     </ul>
