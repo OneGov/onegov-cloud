@@ -11,6 +11,7 @@ from onegov.people import Agency
 from onegov.people import AgencyMembership
 from sqlalchemy import Column
 from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy import Text
 
 
@@ -164,7 +165,26 @@ def make_people_models_polymorphic_type_non_nullable(context):
             context.operations.alter_column(table, 'type', nullable=False)
 
 
-@upgrade_task('Remove address columns to agency')
+@upgrade_task('Add address columns to agency')
+def add_address_columns_to_agency(context):
+    if not context.has_column('agencies', 'street'):
+        context.operations.add_column('agencies', Column(
+            'street', Text, nullable=True
+        ))
+    if not context.has_column('agencies', 'zip_code'):
+        context.operations.add_column('agencies', Column(
+            'zip_code', String(length=10), nullable=True
+        ))
+    if not context.has_column('agencies', 'city'):
+        context.operations.add_column('agencies', Column(
+            'city', Text, nullable=True
+        ))
+
+
+@upgrade_task(
+    'Remove address columns from agency',
+    requires='onegov.people:Add address columns to agency'
+)
 def remove_address_columns_to_agency(context):
     if context.has_column('agencies', 'street'):
         context.operations.drop_column('agencies', 'street')
