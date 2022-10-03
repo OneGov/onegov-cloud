@@ -1036,11 +1036,11 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert election_day_app_zg.send_sms.call_count == 2
         assert election_day_app_zg.send_sms.call_args_list[0][0] == (
             ['+41791112233'],
-            'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
+            'Neue Resultate verfügbar auf https://wab.ch.ch'
         )
         assert election_day_app_zg.send_sms.call_args_list[1][0] == (
             ['+41791112233', '+41791112244'],
-            'New intermediate results are available on https://wab.ch.ch'
+            'New results are available on https://wab.ch.ch'
         )
 
         # Intermediate election compound results
@@ -1053,11 +1053,11 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert election_day_app_zg.send_sms.call_count == 4
         assert election_day_app_zg.send_sms.call_args_list[2][0] == (
             ['+41791112233'],
-            'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
+            'Neue Resultate verfügbar auf https://wab.ch.ch'
         )
         assert election_day_app_zg.send_sms.call_args_list[3][0] == (
             ['+41791112233', '+41791112244'],
-            'New intermediate results are available on https://wab.ch.ch'
+            'New results are available on https://wab.ch.ch'
         )
 
         # Intermediate vote results
@@ -1070,11 +1070,11 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert election_day_app_zg.send_sms.call_count == 6
         assert election_day_app_zg.send_sms.call_args_list[4][0] == (
             ['+41791112233'],
-            'Neue Zwischenresultate verfügbar auf https://wab.ch.ch'
+            'Neue Resultate verfügbar auf https://wab.ch.ch'
         )
         assert election_day_app_zg.send_sms.call_args_list[5][0] == (
             ['+41791112233', '+41791112244'],
-            'New intermediate results are available on https://wab.ch.ch'
+            'New results are available on https://wab.ch.ch'
         )
 
         # Final election results
@@ -1088,11 +1088,11 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert election_day_app_zg.send_sms.call_count == 8
         assert election_day_app_zg.send_sms.call_args_list[6][0] == (
             ['+41791112233'],
-            'Schlussresultate verfügbar auf https://wab.ch.ch'
+            'Neue Resultate verfügbar auf https://wab.ch.ch'
         )
         assert election_day_app_zg.send_sms.call_args_list[7][0] == (
             ['+41791112233', '+41791112244'],
-            'Final results are available on https://wab.ch.ch'
+            'New results are available on https://wab.ch.ch'
         )
 
         # Final election compound results
@@ -1108,11 +1108,11 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert election_day_app_zg.send_sms.call_count == 10
         assert election_day_app_zg.send_sms.call_args_list[8][0] == (
             ['+41791112233'],
-            'Schlussresultate verfügbar auf https://wab.ch.ch'
+            'Neue Resultate verfügbar auf https://wab.ch.ch'
         )
         assert election_day_app_zg.send_sms.call_args_list[9][0] == (
             ['+41791112233', '+41791112244'],
-            'Final results are available on https://wab.ch.ch'
+            'New results are available on https://wab.ch.ch'
         )
 
         # Final vote results
@@ -1126,9 +1126,9 @@ def test_sms_notification(request, election_day_app_zg, session):
         assert election_day_app_zg.send_sms.call_count == 12
         assert election_day_app_zg.send_sms.call_args_list[10][0] == (
             ['+41791112233'],
-            'Schlussresultate verfügbar auf https://wab.ch.ch'
+            'Neue Resultate verfügbar auf https://wab.ch.ch'
         )
         assert election_day_app_zg.send_sms.call_args_list[11][0] == (
             ['+41791112233', '+41791112244'],
-            'Final results are available on https://wab.ch.ch'
+            'New results are available on https://wab.ch.ch'
         )
