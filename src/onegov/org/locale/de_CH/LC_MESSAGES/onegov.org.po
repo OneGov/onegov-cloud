@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-12 12:36+0200\n"
+"POT-Creation-Date: 2022-10-03 15:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1299,6 +1299,9 @@ msgstr "Schriftfarbe"
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
 
+msgid "Header links"
+msgstr "Kopfzeilenlinks"
+
 msgid "Announcement"
 msgstr "Ankündigung"
 
@@ -1308,23 +1311,8 @@ msgstr "Hintergrundfarbe der Ankündigung"
 msgid "Announcement font color"
 msgstr "Schriftfarbe der Ankündigung"
 
-msgid "Homepage Image #1"
-msgstr "Startseiten Bild #1"
-
-msgid "Homepage Image #2"
-msgstr "Startseiten Bild #2"
-
-msgid "Homepage Image #3"
-msgstr "Startseiten Bild #3"
-
-msgid "Homepage Image #4"
-msgstr "Startseiten Bild #4"
-
-msgid "Homepage Image #5"
-msgstr "Startseiten Bild #5"
-
-msgid "Homepage Image #6"
-msgstr "Startseiten Bild #6"
+msgid "Please add an url to each link"
+msgstr "Bitte geben Sie für jeden Link eine URL ein"
 
 msgid "Homepage Cover"
 msgstr "Startseiten Cover"
@@ -4739,6 +4727,9 @@ msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 msgid "Exports the reservations of the given date range."
 msgstr "Exportiert alle Reservationen zwischen Start- und End-Datum."
 
+msgid "No reservations found for the given date range."
+msgstr "Keine Reservierungen für den angegebenen Zeitraum gefunden."
+
 msgid "Exports the reservations of all resources in a given date range."
 msgstr "Exportiert alle Reservationen in einem bestimmten Datumsbereich"
 
@@ -5020,5 +5011,20 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-msgid "No reservations found for the given date range."
-msgstr "Keine Reservierungen für den angegebenen Zeitraum gefunden."
+#~ msgid "Homepage Image #1"
+#~ msgstr "Startseiten Bild #1"
+
+#~ msgid "Homepage Image #2"
+#~ msgstr "Startseiten Bild #2"
+
+#~ msgid "Homepage Image #3"
+#~ msgstr "Startseiten Bild #3"
+
+#~ msgid "Homepage Image #4"
+#~ msgstr "Startseiten Bild #4"
+
+#~ msgid "Homepage Image #5"
+#~ msgstr "Startseiten Bild #5"
+
+#~ msgid "Homepage Image #6"
+#~ msgstr "Startseiten Bild #6"
