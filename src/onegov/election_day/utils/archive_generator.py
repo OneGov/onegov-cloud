@@ -9,7 +9,6 @@ from fs.copy import copy_dir
 from fs.copy import copy_file
 from fs.zipfs import WriteZipFS
 from fs.osfs import OSFS
-from onegov.election_day.utils.filenames import archive_filename
 
 
 class ArchiveGenerator:
@@ -115,7 +114,7 @@ class ArchiveGenerator:
         :returns path to the zipfile and the zip filesystem itself
         """
         base_dir.makedir(self.archive_parent_dir)
-        temp_path = f"{self.archive_parent_dir}/{archive_filename()}"
+        temp_path = f"{self.archive_parent_dir}/archive.zip"
         base_dir.create(temp_path)
         with base_dir.open(temp_path, mode="wb") as file:
             with WriteZipFS(file) as zip_filesystem:
@@ -159,7 +158,7 @@ class ArchiveGenerator:
 
     @property
     def archive_system_path(self):
-        zip_path = f"{self.archive_parent_dir}/{archive_filename()}"
+        zip_path = f"{self.archive_parent_dir}/archive.zip"
         return self.archive_dir.getsyspath(zip_path)
 
     @property
