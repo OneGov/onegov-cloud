@@ -33,6 +33,10 @@
 }
 
 #fieldset-header-links {
+    .field-button {
+        margin-top: 0 !important;
+    }
+
     small.error {
         display: block !important;
         margin-top: .5rem;

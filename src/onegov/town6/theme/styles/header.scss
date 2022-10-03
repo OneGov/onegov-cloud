@@ -206,9 +206,17 @@ $qr-code-icon: '\f029';
 }
 
 #header-links {
+    .fa-external-link-alt {
+        display: none;
+    }
+
     .title-bar,
     button {
         color: $primary-color;
+    }
+
+    ul.menu {
+        display: flex;
     }
 
     li {
@@ -221,6 +229,16 @@ $qr-code-icon: '\f029';
 
     & * {
         background: transparent;
+    }
+    @media #{$small-only} {
+        ul.menu {
+            display: block;
+        }
+
+        li {
+            border-left: 0;
+            border-top: 1px dashed $primary-color;
+        }
     }
 }
 

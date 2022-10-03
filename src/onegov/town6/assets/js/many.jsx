@@ -353,7 +353,7 @@ var ManyLinks = React.createClass({
                     return (
                         <div key={index}>
                             <div className={"grid-x grid-padding-x" + (value.error && 'error' || '')}>
-                                <div className="small-5 cell">
+                                <div className="small-6 cell">
                                     <StringField
                                         type="text"
                                         label={data.labels.text}
@@ -364,7 +364,7 @@ var ManyLinks = React.createClass({
                                         placeholder="Linktext"
                                     />
                                 </div>
-                                <div className="small-5 cell">
+                                <div className="small-6 cell">
                                     <StringField required
                                         type="text"
                                         label={data.labels.link}
@@ -375,14 +375,9 @@ var ManyLinks = React.createClass({
                                         placeholder="https://www.example.ch"
                                     />
                                 </div>
-                                <div className="small-2 cell">
-                                    {
-                                        index === (values.length - 1) &&
-                                            <a href="#" className="button round field-button" onClick={onAdd}>
-                                                <i className="fa fa-plus" aria-hidden="true" />
-                                                <span className="show-for-sr">{data.labels.add}</span>
-                                            </a>
-                                    }
+                            </div>
+                            <div className="grid-x grid-padding-x align-center">
+                                <div>
                                     {
                                         index > 0 && index === (values.length - 1) &&
                                             <a href="#" className="button round secondary field-button" onClick={onRemove}>
@@ -390,12 +385,19 @@ var ManyLinks = React.createClass({
                                                 <span className="show-for-sr">{data.labels.remove}</span>
                                             </a>
                                     }
+                                    {
+                                        index === (values.length - 1) &&
+                                            <a href="#" className="button round field-button" onClick={onAdd}>
+                                                <i className="fa fa-plus" aria-hidden="true" />
+                                                <span className="show-for-sr">{data.labels.add}</span>
+                                            </a>
+                                    }
                                 </div>
                             </div>
                             {
                                 value.error &&
                                     <div className="row error link-error">
-                                        <div className="small-10 columns end">
+                                        <div className="small-12 columns end">
                                             <small className="error link-error">{value.error}</small>
                                         </div>
                                     </div>

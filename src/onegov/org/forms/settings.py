@@ -444,7 +444,7 @@ class HeaderSettingsForm(Form):
     @property
     def header_options(self):
         return {
-            'header_links': self.header_links.data or None,
+            'header_links': self.json_to_links(self.header_links.data) or None,
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
             'left_header_color': self.left_header_color.data.get_hex(),
@@ -461,7 +461,9 @@ class HeaderSettingsForm(Form):
         if not options.get('header_links'):
             self.header_links.data = self.links_to_json(None)
         else:
-            self.header_links.data = options.get('header_links')
+            self.header_links.data = self.links_to_json(
+                options.get('header_links')
+            )
 
         self.left_header_name.data = options.get('left_header_name')
         self.left_header_url.data = options.get('left_header_url')
@@ -481,6 +483,7 @@ class HeaderSettingsForm(Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.link_errors = {}
 
     def populate_obj(self, model):
         super().populate_obj(model)
@@ -504,7 +507,8 @@ class HeaderSettingsForm(Form):
         result = []
 
         for value in json.loads(text or '{}').get('values', []):
-            result.append((value['text'], value['link']))
+            if value['link']:
+                result.append([value['text'], value['link']])
 
         return result
 
@@ -520,10 +524,10 @@ class HeaderSettingsForm(Form):
             },
             'values': [
                 {
-                    'text': t,
-                    'link': l,
+                    'text': l[0],
+                    'link': l[1],
                     'error': self.link_errors.get(ix, "")
-                } for ix, t, l in enumerate(header_links)
+                } for ix, l in enumerate(header_links)
             ]
         })
 
