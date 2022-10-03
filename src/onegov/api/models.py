@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from logging import getLogger
 from logging import NullHandler
+from sqlalchemy.exc import SQLAlchemyError
 
 
 log = getLogger('onegov.api')
@@ -134,7 +135,10 @@ class ApiEndpoint:
     def by_id(self, id_):
         """ Return the item with the given ID from the collection. """
 
-        return self.__class__(self.app).collection.by_id(id_)
+        try:
+            return self.__class__(self.app).collection.by_id(id_)
+        except SQLAlchemyError:
+            return None
 
     @property
     def session(self):
