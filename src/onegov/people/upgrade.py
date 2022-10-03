@@ -181,19 +181,6 @@ def add_address_columns_to_agency(context):
         ))
 
 
-@upgrade_task(
-    'Remove address columns from agency',
-    requires='onegov.people:Add address columns to agency'
-)
-def remove_address_columns_to_agency(context):
-    if context.has_column('agencies', 'street'):
-        context.operations.drop_column('agencies', 'street')
-    if context.has_column('agencies', 'zip_code'):
-        context.operations.drop_column('agencies', 'zip_code')
-    if context.has_column('agencies', 'city'):
-        context.operations.drop_column('agencies', 'city')
-
-
 @upgrade_task('Fix agency address column')
 def fix_agency_address_column(context):
     if context.has_column('agencies', 'street'):
@@ -202,3 +189,23 @@ def fix_agency_address_column(context):
         context.operations.add_column('agencies', Column(
             'address', Text, nullable=True
         ))
+
+
+@upgrade_task(
+    'Remove address columns from agency',
+    requires='onegov.people:Add address columns to agency'
+)
+def remove_address_columns_from_agency(context):
+    if context.has_column('agencies', 'zip_code'):
+        context.operations.drop_column('agencies', 'zip_code')
+    if context.has_column('agencies', 'city'):
+        context.operations.drop_column('agencies', 'city')
+
+
+@upgrade_task(
+    'Remove agency address column',
+    requires='onegov.people:Fix agency address column'
+)
+def remove_agency_address_column(context):
+    if context.has_column('agencies', 'address'):
+        context.operations.drop_column('agencies', 'address')
