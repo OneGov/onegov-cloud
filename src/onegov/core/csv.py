@@ -523,8 +523,8 @@ def merge_multiple_excel_files_into_one(xlsx_files, titles):
 
     :param xlsx_files: List of file-like objects open in binary mode
     :param titles: List of the names for each Worksheet.
-    :returns:
-        - name - Name of the in-memory file
+
+    :returns: the merged xlsx file
     """
 
     def copy_sheet(source_sheet: Worksheet, target_sheet: Worksheet):

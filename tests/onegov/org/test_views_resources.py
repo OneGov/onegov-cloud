@@ -2442,7 +2442,7 @@ def test_resource_recipient_overview(client):
     resources = ResourceCollection(client.app.libres_context)
     gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
     dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
-    resources.add('Meeting', 'Europe/Zurich', type='room')
+    meeting = resources.add('Meeting', 'Europe/Zurich', type='room')
 
     recipients = ResourceRecipientCollection(client.app.session())
     recipients.add(
@@ -2454,9 +2454,14 @@ def test_resource_recipient_overview(client):
         send_on=['FR', 'SU'],
         resources=[
             gymnasium.id.hex,
-            dailypass.id.hex
+            dailypass.id.hex,
+            meeting.id.hex
         ]
     )
+
+    # John will still have the meeting room id as his resource, but this should
+    # not make any problems
+    resources.delete(meeting)
 
     transaction.commit()
     client.login_admin()
