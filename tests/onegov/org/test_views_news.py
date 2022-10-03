@@ -31,13 +31,21 @@ def test_news(client):
 
     page = page.click('Nachricht')
     page.form['title'] = "We have a new homepage"
+    page.form['page_image'] = "/image.png"
     page.form['lead'] = "It is very good"
     page.form['text'] = "It is lots of fun \n #fun"
     page = page.form.submit().follow()
 
     assert "We have a new homepage" in page.text
+    assert "image.png" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" in page.text
+
+    overview = client.get('/news')
+    assert "We have a new homepage" in overview.text
+    assert "image.png" in overview.text
+    assert "It is very good" in overview.text
+    assert "It is lots of fun" not in overview.text
 
     # Test OpenGraph Meta
     assert get_meta(page, 'og:title') == 'We have a new homepage'

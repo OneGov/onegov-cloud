@@ -5028,17 +5028,5 @@ msgstr "Utente creato correttamente"
 #~ msgid "Homepage Image #1"
 #~ msgstr "Immagine n. 1 della pagina principale"
 
-#~ msgid "Homepage Image #2"
-#~ msgstr "Immagine n. 2 della pagina principale"
-
-#~ msgid "Homepage Image #3"
-#~ msgstr "Immagine n. 3 della pagina principale"
-
-#~ msgid "Homepage Image #4"
-#~ msgstr "Immagine n. 4 della pagina principale"
-
-#~ msgid "Homepage Image #5"
-#~ msgstr "Immagine n. 5 della pagina principale"
-
-#~ msgid "Homepage Image #6"
-#~ msgstr "Immagine n. 6 della pagina principale"
+msgid "No reservations found for the given date range."
+msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."

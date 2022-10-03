@@ -29,7 +29,11 @@ class EmailSubscriptionForm(Form):
         }
     )
 
-    name = HoneyPotField()
+    name = HoneyPotField(
+        render_kw={
+            'autocomplete': 'off'
+        }
+    )
 
 
 class SmsSubscriptionForm(Form):
@@ -46,7 +50,11 @@ class SmsSubscriptionForm(Form):
         }
     )
 
-    name = HoneyPotField()
+    name = HoneyPotField(
+        render_kw={
+            'autocomplete': 'off'
+        }
+    )
 
 
 class SubscribersCleanupForm(Form):

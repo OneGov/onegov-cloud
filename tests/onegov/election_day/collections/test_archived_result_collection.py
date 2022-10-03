@@ -174,19 +174,19 @@ def test_archived_result_collection_grouping(session):
     request.app.principal.domain = 'canton'
     expected = ['federation', 'canton', 'region', 'municipality']
     grouped = archive.group_items(items, request)
-    assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
+    assert list(grouped) == [date(2017, 5, 21), date(2017, 2, 12)]
     assert all([list(group) == expected for group in grouped.values()])
-    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
     assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
 
     # Test grouping of a communal instance
     request.app.principal.domain = 'municipality'
     expected = ['municipality', 'federation', 'canton', 'region']
     grouped = archive.group_items(items, request)
-    assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
+    assert list(grouped) == [date(2017, 5, 21), date(2017, 2, 12)]
     assert all([list(group) == expected for group in grouped.values()])
-    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
     assert len(grouped[date(2017, 5, 21)]['region']['election']) == 3
+    assert len(grouped[date(2017, 2, 12)]['region']['vote']) == 3
 
     # Test grouping with compounds
     assert 'election' not in grouped[date(2017, 2, 12)]['municipality']
