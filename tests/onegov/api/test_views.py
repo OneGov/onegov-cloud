@@ -113,6 +113,19 @@ def test_view_api(client):
     client.app.rate_limit = (100, 900)
 
     # Exceptions
+    for url in ('/api/entpoind', '/api/entpoind/one', '/api/endpoint/one'):
+        response = client.get(url, status=404)
+        headers = response.headers
+        assert headers['Content-Type'] == 'application/vnd.collection+json'
+        assert response.json == {
+            'collection': {
+                'version': '1.0',
+                'href': f'http://localhost{url}',
+                'error': {'message': 'Not found'}
+            }
+        }
+        assert Collection.from_json(response.body).version == '1.0'
+
     with patch('onegov.api.models.ApiEndpointCollection'):
         for url in ('/api', '/api/endpoint', '/api/endpoint/1'):
             response = client.get('/api/endpoint/1', status=500)
