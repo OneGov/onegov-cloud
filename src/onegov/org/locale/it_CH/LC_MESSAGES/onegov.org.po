@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-10-03 15:10+0200\n"
+"POT-Creation-Date: 2022-10-04 13:14+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1290,6 +1290,24 @@ msgstr ""
 msgid "Open files in separate window"
 msgstr "Apri i file in una finestra separata"
 
+msgid "Announcement"
+msgstr "Annuncio"
+
+msgid "Announcement URL"
+msgstr "URL per l'annuncio"
+
+msgid "Announcement bg color"
+msgstr "Colore di sfondo dell'annuncio"
+
+msgid "Announcement font color"
+msgstr "Colore del carattere dell'annuncio"
+
+msgid "Only show Announcement for logged-in users"
+msgstr "Mostra solo gli annunci per gli utenti connessi"
+
+msgid "Header links"
+msgstr "Collegamenti di intestazione"
+
 msgid "Title header left side"
 msgstr "Lato sinistro dell'intestazione del titolo"
 
@@ -1301,18 +1319,6 @@ msgstr "Colore del carattere"
 
 msgid "Relative font size"
 msgstr "Dimensione relativa del carattere"
-
-msgid "Header links"
-msgstr "Collegamenti di intestazione"
-
-msgid "Announcement"
-msgstr "Annuncio"
-
-msgid "Announcement bg color"
-msgstr "Colore di sfondo dell'annuncio"
-
-msgid "Announcement font color"
-msgstr "Colore del carattere dell'annuncio"
 
 msgid "Please add an url to each link"
 msgstr "Aggiungere un url a ciascun link"
@@ -5027,6 +5033,3 @@ msgstr "Utente creato correttamente"
 
 #~ msgid "Homepage Image #1"
 #~ msgstr "Immagine n. 1 della pagina principale"
-
-msgid "No reservations found for the given date range."
-msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."

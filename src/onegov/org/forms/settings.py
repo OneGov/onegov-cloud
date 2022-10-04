@@ -394,18 +394,28 @@ class LinksSettingsForm(Form):
 
 class HeaderSettingsForm(Form):
 
-    left_header_announcement = StringField(
+    announcement = StringField(
         label=_("Announcement"),
         fieldset=_("Announcement"),
     )
 
-    left_header_announcement_bg_color = ColorField(
+    announcement_url = StringField(
+        label=_("Announcement URL"),
+        fieldset=_("Announcement"),
+    )
+
+    announcement_bg_color = ColorField(
         label=_("Announcement bg color"),
         fieldset=_("Announcement")
     )
 
-    left_header_announcement_font_color = ColorField(
+    announcement_font_color = ColorField(
         label=_("Announcement font color"),
+        fieldset=_("Announcement")
+    )
+
+    announcement_is_private = BooleanField(
+        label=_("Only show Announcement for logged-in users"),
         fieldset=_("Announcement")
     )
 
@@ -449,11 +459,12 @@ class HeaderSettingsForm(Form):
             'left_header_url': self.left_header_url.data or None,
             'left_header_color': self.left_header_color.data.get_hex(),
             'left_header_rem': self.left_header_rem.data,
-            'left_header_announcement': self.left_header_announcement.data,
-            'left_header_announcement_bg_color':
-                self.left_header_announcement_bg_color.data.get_hex(),
-            'left_header_announcement_font_color':
-                self.left_header_announcement_font_color.data.get_hex()
+            'announcement': self.announcement.data,
+            'announcement_url': self.announcement_url.data,
+            'announcement_bg_color': self.announcement_bg_color.data.get_hex(),
+            'announcement_font_color':
+            self.announcement_font_color.data.get_hex(),
+            'announcement_is_private': self.announcement_is_private.data
         }
 
     @header_options.setter
@@ -471,15 +482,14 @@ class HeaderSettingsForm(Form):
             'left_header_color', '#000000'
         )
         self.left_header_rem.data = options.get('left_header_rem', 1)
-        self.left_header_announcement.data = options.get(
-            'left_header_announcement', ""
-        )
-        self.left_header_announcement_bg_color.data = options.get(
-            'left_header_announcement_bg_color', '#FBBC05'
-        )
-        self.left_header_announcement_font_color.data = options.get(
-            'left_header_announcement_font_color', '#000000'
-        )
+        self.announcement.data = options.get('announcement', "")
+        self.announcement_url.data = options.get('announcement_url', "")
+        self.announcement_bg_color.data = options.get(
+            'announcement_bg_color', '#FBBC05')
+        self.announcement_font_color.data = options.get(
+            'announcement_font_color', '#000000')
+        self.announcement_is_private.data = options.get(
+            'announcement_is_private', "")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
