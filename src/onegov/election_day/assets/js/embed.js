@@ -23,14 +23,27 @@ var appendEmbedCode = function(target, width, height, source, title) {
         .append(
             $('<a>')
             .attr('href', '#')
+            .attr('aria-expanded', false)
+            .attr('id', 'embed-link')
             .on('click', function() {
-               $('#'+id).toggle();
+                embed_link = document.getElementById("embed-link")
+                if (embed_link.getAttribute('aria-expanded') == 'false') {
+                    embed_link.setAttribute("aria-expanded", true);
+                } else {
+                    embed_link.setAttribute("aria-expanded", false);
+                }
+                $('#'+id).toggle();
                return false;
             })
             .text(title)
             .prepend(
                 $('<i>')
                 .attr('class', 'fa fa-share-square-o')
+            )
+            .append(
+                $('<i>')
+                .attr('class', 'fa fa-caret-down')
+                .attr('style', 'padding-left: .5rem;')
             )
         )
         .append(
