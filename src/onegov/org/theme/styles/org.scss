@@ -6468,6 +6468,57 @@ a#results {
     }
 }
 
+#fieldset-header-links {
+    .field-button {
+        margin-top: 0 !important;
+    }
+
+    small.error {
+        display: block !important;
+        margin-top: .5rem;
+    }
+}
+
+#header-links {
+    .toggle-topbar {
+        left: 0;
+        right: 0;
+        span {
+            color: #666 !important;
+        }
+    }
+
+    .title-bar,
+    button {
+        color: $editbar-bg-color;
+    }
+
+    #quicklinks-submenu {
+        li {
+            border-left: 1px solid $editbar-bg-color;
+            a {
+                padding: .5rem;
+                color: #666;
+                text-transform: none;
+            }
+        }
+    }
+
+    & * {
+        background: transparent;
+    }
+    @media #{$small-only} {
+        ul.menu {
+            display: block;
+        }
+
+        #quicklinks-submenu li {
+            border-left: 0;
+            border-top: 1px dashed $editbar-bg-color;
+        }
+    }
+}
+
 .page-image {
     padding-bottom: 1rem;
 }

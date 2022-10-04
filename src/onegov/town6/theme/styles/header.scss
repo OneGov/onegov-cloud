@@ -205,6 +205,43 @@ $qr-code-icon: '\f029';
     text-align: center;
 }
 
+#header-links {
+    .fa-external-link-alt {
+        display: none;
+    }
+
+    .title-bar,
+    button {
+        color: $primary-color;
+    }
+
+    ul.menu {
+        display: flex;
+    }
+
+    li {
+        border-left: 1px solid $primary-color;
+    }
+
+    li:first-child {
+        border-left: 0;
+    }
+
+    & * {
+        background: transparent;
+    }
+    @media #{$small-only} {
+        ul.menu {
+            display: block;
+        }
+
+        li {
+            border-left: 0;
+            border-top: 1px dashed $primary-color;
+        }
+    }
+}
+
 $navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);
 $transition-duration: .1s;
 

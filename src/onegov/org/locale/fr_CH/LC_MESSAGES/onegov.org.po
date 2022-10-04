@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-12 12:36+0200\n"
+"POT-Creation-Date: 2022-10-03 15:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1301,6 +1301,9 @@ msgstr "Couleur de la police"
 msgid "Relative font size"
 msgstr "Taille de police relative"
 
+msgid "Header links"
+msgstr "Liens d'en-tête"
+
 msgid "Announcement"
 msgstr "Annonce"
 
@@ -1310,23 +1313,8 @@ msgstr "Couleur de fond de l'annonce"
 msgid "Announcement font color"
 msgstr "Couleur de la police de l'annonce"
 
-msgid "Homepage Image #1"
-msgstr "Image n°1 de page d'accueil"
-
-msgid "Homepage Image #2"
-msgstr "Image n°2 de page d'accueil"
-
-msgid "Homepage Image #3"
-msgstr "Image n°3 de page d'accueil"
-
-msgid "Homepage Image #4"
-msgstr "Image n°4 de page d'accueil"
-
-msgid "Homepage Image #5"
-msgstr "Image n°5 de page d'accueil"
-
-msgid "Homepage Image #6"
-msgstr "Image n°6 de page d'accueil"
+msgid "Please add an url to each link"
+msgstr "Veuillez ajouter une url à chaque lien"
 
 msgid "Homepage Cover"
 msgstr "Couverture de la page d'accueil"
@@ -4761,6 +4749,12 @@ msgstr "${count} affectations inutilisées ont été supprimées avec succès"
 msgid "Exports the reservations of the given date range."
 msgstr "Exporte les réservations de la période donnée."
 
+msgid "No reservations found for the given date range."
+msgstr "Aucune réservation n'a été trouvée pour la période donnée."
+
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Exporte toutes les réservations dans une plage de dates donnée"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\"?"
 msgstr "Voulez-vous vraiment supprimer « ${name} » ?"
@@ -5037,8 +5031,20 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "Exports the reservations of all resources in a given date range."
-msgstr "Exporte toutes les réservations dans une plage de dates donnée"
+#~ msgid "Homepage Image #1"
+#~ msgstr "Image n°1 de page d'accueil"
 
-msgid "No reservations found for the given date range."
-msgstr "Aucune réservation n'a été trouvée pour la période donnée."
+#~ msgid "Homepage Image #2"
+#~ msgstr "Image n°2 de page d'accueil"
+
+#~ msgid "Homepage Image #3"
+#~ msgstr "Image n°3 de page d'accueil"
+
+#~ msgid "Homepage Image #4"
+#~ msgstr "Image n°4 de page d'accueil"
+
+#~ msgid "Homepage Image #5"
+#~ msgstr "Image n°5 de page d'accueil"
+
+#~ msgid "Homepage Image #6"
+#~ msgstr "Image n°6 de page d'accueil"
