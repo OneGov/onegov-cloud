@@ -20,7 +20,7 @@ class ArchiveGenerator:
         self.archive_parent_dir = "zip"
         self.MAX_FILENAME_LENGTH = 240
 
-    def generate_csv(self, subset=None):
+    def generate_csv(self):
         """
         Creates csv files with a directory structure like this:
 
@@ -47,19 +47,9 @@ class ArchiveGenerator:
         names = ["votes", "elections", "elections"]
         entities = [
             self.all_votes(),
-            self.all_elections()
+            self.all_elections(),
+            self.all_election_compounds()
         ]
-        if subset:
-            names = subset
-            if set(subset) == {"votes"}:
-                entities = [self.all_votes()]
-            elif set(subset) == {"elections"}:
-                entities = [self.all_elections()]
-            else:
-                raise ValueError(
-                    f"Invalid argument: {subset}, "
-                    f"Must be list ['votes', 'elections] or subset."
-                )
 
         for entity_name, entity in zip(names, entities):
 
@@ -100,7 +90,6 @@ class ArchiveGenerator:
         groups = defaultdict(list)
         for entity in entities:
             groups[entity.date.year].append(entity)
-
         return list(groups.values())
 
     def zip_dir(self, base_dir: SubFS) -> tuple[str, WriteZipFS]:
@@ -117,7 +106,7 @@ class ArchiveGenerator:
         base_dir.create(temp_path)
         with base_dir.open(temp_path, mode="wb") as file:
             with WriteZipFS(file) as zip_filesystem:
-                for entity in ["votes", "elections"]:
+                for entity in base_dir.listdir('/'):
                     if base_dir.isdir(entity):
                         copy_dir(
                             src_fs=base_dir,
@@ -125,13 +114,12 @@ class ArchiveGenerator:
                             dst_fs=zip_filesystem,
                             dst_path=entity,
                         )
-                for f in self.additional_files_to_include:
-                    if base_dir.isfile(f):
+                    if base_dir.isfile(entity):
                         copy_file(
                             src_fs=base_dir,
-                            src_path=f,
+                            src_path=entity,
                             dst_fs=zip_filesystem,
-                            dst_path=f,
+                            dst_path=entity,
                         )
 
                 return temp_path, zip_filesystem
@@ -142,27 +130,28 @@ class ArchiveGenerator:
     def all_elections(self):
         return self.session.query(Election).order_by(desc(Election.date)).all()
 
+    def all_election_compounds(self):
+        return (
+            self.session.query(ElectionCompound)
+            .order_by(desc(ElectionCompound.date))
+            .all()
+        )
+
     @property
     def archive_system_path(self):
         zip_path = f"{self.archive_parent_dir}/archive.zip"
         return self.archive_dir.getsyspath(zip_path)
 
-    @property
-    def additional_files_to_include(self):
-        languages = ["de", "en", "it", "fr", "rm"]
-        files = [f"open_data_{lang}.md" for lang in languages]
-        return files
-
     def include_docs(self):
         api = module_path("onegov.election_day", "static/docs/api")
-        native_docs_dir = OSFS(api)
+        native_fs = OSFS(api)
 
-        for file in self.additional_files_to_include:
+        for match in native_fs.glob("**/open_data*.md"):
             copy_file(
-                src_fs=native_docs_dir,
-                src_path=file,
+                src_fs=native_fs,
+                src_path=match.path,
                 dst_fs=self.archive_dir,
-                dst_path=file,
+                dst_path=match.path,
             )
         return self.archive_dir
 

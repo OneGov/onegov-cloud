@@ -10,6 +10,7 @@ from collections import Counter
 from fs.zipfs import ReadZipFS
 from fs.tempfs import TempFS
 from fs.copy import copy_dir
+from fs.copy import copy_file
 from fs.osfs import OSFS
 
 
@@ -222,11 +223,25 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
 
 def test_get_docs_files_at_runtime():
     docs = module_path("onegov.election_day", "static/docs/")
-
     docs_dir = OSFS(docs)
     assert docs_dir.isdir("api")
     assert not docs_dir.isempty("api")
-    languages = ["de", "en", "it", "fr", "rm"]
-    api = docs_dir.opendir("api")
-    assert all(api.isfile(f"open_data_{l}.md") for l in languages)
+    api = module_path("onegov.election_day", "static/docs/api")
+    native_fs = OSFS(api)
+    tmp_fs = TempFS()
+
+    matches = []
+    for match in native_fs.glob("**/open_data*.md"):
+        matches.append(match)
+        copy_file(
+            src_fs=native_fs,
+            src_path=match.path,
+            dst_fs=tmp_fs,
+            dst_path=match.path,
+        )
+
+
+    assert len(matches) >= 5
+
+
 
