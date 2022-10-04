@@ -47,8 +47,7 @@ class ArchiveGenerator:
         names = ["votes", "elections", "elections"]
         entities = [
             self.all_votes(),
-            self.all_elections(),
-            self.all_election_compounds(),
+            self.all_elections()
         ]
         if subset:
             names = subset
@@ -148,13 +147,6 @@ class ArchiveGenerator:
 
     def all_elections(self):
         return self.session.query(Election).order_by(desc(Election.date)).all()
-
-    def all_election_compounds(self):
-        return (
-            self.session.query(ElectionCompound)
-            .order_by(desc(ElectionCompound.date))
-            .all()
-        )
 
     @property
     def archive_system_path(self):
