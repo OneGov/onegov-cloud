@@ -1,7 +1,6 @@
 """ Provides commands used to initialize election day websites. """
 import click
 import os
-import time
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
@@ -143,7 +142,6 @@ def generate_archive():
     def generate(request, app):
 
         click.secho('Starting archive.zip generation.')
-        start_time = time.time()
 
         archive_generator = ArchiveGenerator(app)
         archive_zip = archive_generator.generate_archive()
@@ -153,8 +151,6 @@ def generate_archive():
         if archive_filesize == 0:
             click.secho("Generated archive is empty", fg='red')
         else:
-            diff = (time.time() - start_time)
-            click.secho(f"Completed in {diff:.0f} seconds.")
             click.secho("Archive generated successfully:", fg='green')
         absolute_path = archive_generator.archive_system_path
         click.secho(f"file://{absolute_path}")
