@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-03 15:10+0200\n"
+"POT-Creation-Date: 2022-10-04 13:14+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1287,21 +1287,6 @@ msgstr ""
 msgid "Open files in separate window"
 msgstr "Dateien in separatem Fenster öffnen"
 
-msgid "Title header left side"
-msgstr "Titel Kopfzeile links"
-
-msgid "Optional"
-msgstr "Optional"
-
-msgid "Font color"
-msgstr "Schriftfarbe"
-
-msgid "Relative font size"
-msgstr "Relative Schriftgrösse"
-
-msgid "Header links"
-msgstr "Kopfzeilenlinks"
-
 msgid "Announcement"
 msgstr "Ankündigung"
 
@@ -1313,6 +1298,24 @@ msgstr "Hintergrundfarbe der Ankündigung"
 
 msgid "Announcement font color"
 msgstr "Schriftfarbe der Ankündigung"
+
+msgid "Only show Announcement for logged-in users"
+msgstr "Ankündigung nur für eingeloggte Benutzer anzeigen"
+
+msgid "Header links"
+msgstr "Kopfzeilenlinks"
+
+msgid "Title header left side"
+msgstr "Titel Kopfzeile links"
+
+msgid "Optional"
+msgstr "Optional"
+
+msgid "Font color"
+msgstr "Schriftfarbe"
+
+msgid "Relative font size"
+msgstr "Relative Schriftgrösse"
 
 msgid "Please add an url to each link"
 msgstr "Bitte geben Sie für jeden Link eine URL ein"
@@ -5013,6 +5016,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-msgid "No reservations found for the given date range."
-msgstr "Keine Reservierungen für den angegebenen Zeitraum gefunden."
