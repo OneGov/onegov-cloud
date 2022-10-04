@@ -146,9 +146,11 @@ def generate_archive():
         start_time = time.time()
 
         archive_generator = ArchiveGenerator(app)
-        base_dir, archive_zip = archive_generator.generate_archive()
-        file_size = base_dir.getinfo(archive_zip, namespaces=['details']).size
-        if file_size == 0:
+        archive_zip = archive_generator.generate_archive()
+
+        archive_filesize = archive_generator.archive_dir.getinfo(
+            archive_zip, namespaces=['details']).size
+        if archive_filesize == 0:
             click.secho("Generated archive is empty", fg='red')
         else:
             diff = (time.time() - start_time)

@@ -14,7 +14,7 @@ from fs.copy import copy_file
 from fs.osfs import OSFS
 
 
-def test_votes_generation_group_by_year(election_day_app_zg):
+def test_archive_generation_from_scratch(election_day_app_zg):
     archive_generator = ArchiveGenerator(election_day_app_zg)
     session = election_day_app_zg.session()
 
@@ -53,7 +53,6 @@ def test_votes_generation_group_by_year(election_day_app_zg):
     add_local_results(source, target, bern, session)
     session.flush()
 
-
     votes = archive_generator.all_votes()
 
     assert votes[0].date == date(2022, 1, 1)
@@ -72,24 +71,29 @@ def test_votes_generation_group_by_year(election_day_app_zg):
     for item in grouped_by_year[0]:
         assert str(item.date.year) == "2022"
 
-    base_dir, _ = archive_generator.generate_archive()
-    votes_dir = base_dir.listdir('votes')
-    years = [str(year) for year in votes_dir]
+    zip_path = archive_generator.generate_archive()
 
-    assert len(base_dir.listdir('votes')) == 2
-    assert {"2022", "2013"} == set(years)
+    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
+        with ReadZipFS(fi) as zip_fs:
+            votes_dir = zip_fs.listdir("votes")
+            years = [str(year) for year in votes_dir]
 
-    votes = base_dir.opendir('votes')
-    counter = Counter()
-    total_bytes_csv = 0
-    walker = Walker()
-    for _, _, files in walker.walk(votes, namespaces=["basic", "details"]):
-        for file in files:
-            counter[file.name] += 1
+            assert len(zip_fs.listdir("votes")) == 2
+            assert {"2022", "2013"} == set(years)
 
-        total_bytes_csv = sum(info.size for info in files)
-    assert sum(counter.values()) == 3
-    assert total_bytes_csv > 10  # check to ensure files are not empty
+            votes = zip_fs.opendir("votes")
+            counter = Counter()
+            total_bytes_csv = 0
+            walker = Walker()
+            for _, _, files in walker.walk(
+                votes, namespaces=["basic", "details"]
+            ):
+                for file in files:
+                    counter[file.name] += 1
+
+                total_bytes_csv = sum(info.size for info in files)
+            assert sum(counter.values()) == 3
+            assert total_bytes_csv > 10  # check to ensure files are not empty
 
 
 def test_zipping_multiple_directories(election_day_app_zg):
@@ -108,9 +112,9 @@ def test_zipping_multiple_directories(election_day_app_zg):
     )
 
     test_data_dir = tmp_fs.opendir("/test_data")
-    f, _ = archive_generator.zip_dir(test_data_dir)
+    zip_path = archive_generator.zip_dir(test_data_dir)
 
-    with test_data_dir.open(f, mode="rb") as fi:
+    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
         with ReadZipFS(fi) as zip_fs:
             # roundtrip: extract zipfile again and validate it's internal
             # structure
@@ -147,8 +151,8 @@ def test_zipping_multiple_directories(election_day_app_zg):
                 "*.md", namespaces=["details"]))
 
             assert len(list(additional_files)) >= 5
-            for f in additional_files:
-                assert f.info.size > 100
+            for zip_path in additional_files:
+                assert zip_path.info.size > 100
 
 
 def test_long_filenames_are_truncated(election_day_app_zg):
@@ -176,14 +180,16 @@ def test_long_filenames_are_truncated(election_day_app_zg):
     source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)
 
-    generator = ArchiveGenerator(election_day_app_zg)
+    archive_generator = ArchiveGenerator(election_day_app_zg)
 
-    base_dir, _ = generator.generate_archive()
+    zip_path = archive_generator.generate_archive()
+    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
+        with ReadZipFS(fi) as zip_fs:
 
-    csv = [csv for csv in base_dir.scandir("votes/2022", namespaces=["basic"])]
-    first_file = csv[0]
-
-    assert "bundesbeschluss-vom-28-september" in first_file.name
+            csv = [csv for csv in zip_fs.scandir("votes/2022",
+                                                 namespaces=["basic"])]
+            first_file = csv[0]
+            assert "bundesbeschluss-vom-28-september" in first_file.name
 
 
 def test_election_generation(election_day_app_zg, import_test_datasets):
@@ -200,10 +206,8 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
     )
 
     archive_generator = ArchiveGenerator(election_day_app_zg)
-    archive_dir, _ = archive_generator.generate_archive()
-    temp_path, _ = archive_generator.zip_dir(archive_dir)
-
-    with archive_dir.open(temp_path, mode="rb") as fi:
+    zip_path = archive_generator.generate_archive()
+    with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
         with ReadZipFS(fi) as zip_fs:
             top_level_dir = zip_fs.listdir(".")
             assert "elections" in top_level_dir
@@ -240,8 +244,4 @@ def test_get_docs_files_at_runtime():
             dst_path=match.path,
         )
 
-
     assert len(matches) >= 5
-
-
-

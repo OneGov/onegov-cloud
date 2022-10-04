@@ -8,6 +8,7 @@ from fs.subfs import SubFS
 from fs.copy import copy_dir
 from fs.copy import copy_file
 from fs.zipfs import WriteZipFS
+from fs.tempfs import TempFS
 from fs.osfs import OSFS
 
 
@@ -17,6 +18,7 @@ class ArchiveGenerator:
         self.session = self.app.session()
         self.archive_dir: SubFS = self.app.filestorage.makedir("archive",
                                                                recreate=True)
+        self.temp_fs = TempFS()
         self.archive_parent_dir = "zip"
         self.MAX_FILENAME_LENGTH = 240
 
@@ -50,7 +52,6 @@ class ArchiveGenerator:
             self.all_elections(),
             self.all_election_compounds()
         ]
-
         for entity_name, entity in zip(names, entities):
 
             grouped_by_year = self.group_by_year(entity)
@@ -58,16 +59,14 @@ class ArchiveGenerator:
             for yearly_package in grouped_by_year:
                 year = str(yearly_package[0].date.year)
                 year_dir = f"{entity_name}/{year}"
-                self.archive_dir.makedirs(year_dir, recreate=True)
+                self.temp_fs.makedirs(year_dir, recreate=True)
                 for item in yearly_package:
                     # item may be of type Vote, Election or ElectionCompound
                     filename = item.id[: self.MAX_FILENAME_LENGTH] + ".csv"
                     combined_path = path.combine(year_dir, filename)
-                    with self.archive_dir.open(combined_path, "w") as f:
+                    with self.temp_fs.open(combined_path, "w") as f:
                         rows = item.export(sorted(self.app.locales))
                         f.write(convert_list_of_dicts_to_csv(rows))
-
-        return self.archive_dir
 
     def group_by_year(self, entities):
         """Creates a list of lists, grouped by year.
@@ -92,8 +91,10 @@ class ArchiveGenerator:
             groups[entity.date.year].append(entity)
         return list(groups.values())
 
-    def zip_dir(self, base_dir: SubFS) -> tuple[str, WriteZipFS]:
+    def zip_dir(self, base_dir: SubFS) -> str:
         """Recursively zips a directory (base_dir).
+            base_dir: is the temporary file system which will get deleted
+            automatically
 
         :param base_dir: This is a directory in app.filestorage. Per default
         named "archive". Contains subdirectories 'votes' and 'elections',
@@ -101,10 +102,11 @@ class ArchiveGenerator:
 
         :returns path to the zipfile and the zip filesystem itself
         """
-        base_dir.makedir(self.archive_parent_dir, recreate=True)
-        temp_path = f"{self.archive_parent_dir}/archive.zip"
-        base_dir.create(temp_path)
-        with base_dir.open(temp_path, mode="wb") as file:
+        self.archive_dir.makedir(self.archive_parent_dir, recreate=True)
+        zip_path = f"{self.archive_parent_dir}/archive.zip"
+        self.archive_dir.create(zip_path)
+
+        with self.archive_dir.open(zip_path, mode="wb") as file:
             with WriteZipFS(file) as zip_filesystem:
                 for entity in base_dir.listdir('/'):
                     if base_dir.isdir(entity):
@@ -122,7 +124,7 @@ class ArchiveGenerator:
                             dst_path=entity,
                         )
 
-                return temp_path, zip_filesystem
+                return zip_path
 
     def all_votes(self):
         return self.session.query(Vote).order_by(desc(Vote.date)).all()
@@ -150,14 +152,12 @@ class ArchiveGenerator:
             copy_file(
                 src_fs=native_fs,
                 src_path=match.path,
-                dst_fs=self.archive_dir,
+                dst_fs=self.temp_fs,
                 dst_path=match.path,
             )
-        return self.archive_dir
 
     def generate_archive(self):
-        self.archive_dir.removetree("/")  # clean up files from previous export
         self.generate_csv()
-        archive_dir = self.include_docs()
-        temp_path, _ = self.zip_dir(archive_dir)
-        return archive_dir, temp_path
+        self.include_docs()
+        root = self.temp_fs.opendir('/')
+        return self.zip_dir(root)

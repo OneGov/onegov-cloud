@@ -8,11 +8,9 @@ from collections import OrderedDict
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election, Vote, ProporzElection, ComplexVote,\
-    ElectionCompound, BallotResult
-from onegov.election_day.models import Municipality, ArchivedResult
+    ElectionCompound
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.utils import add_local_results
 from onegov.election_day.hidden_by_principal import\
     always_hide_candidate_by_entity_chart_percentages as hide_chart_perc,\
     hide_connections_chart_intermediate_results as hide_conn_chart,\
