@@ -112,7 +112,7 @@ class ArchiveGenerator:
 
         :returns path to the zipfile and the zip filesystem itself
         """
-        base_dir.makedir(self.archive_parent_dir)
+        base_dir.makedir(self.archive_parent_dir, recreate=True)
         temp_path = f"{self.archive_parent_dir}/archive.zip"
         base_dir.create(temp_path)
         with base_dir.open(temp_path, mode="wb") as file:
@@ -135,12 +135,6 @@ class ArchiveGenerator:
                         )
 
                 return temp_path, zip_filesystem
-
-    def generate_votes_csv(self):
-        return self.generate_csv(subset=["votes"])
-
-    def generate_elections_csv(self):
-        return self.generate_csv(subset=["elections"])
 
     def all_votes(self):
         return self.session.query(Vote).order_by(desc(Vote.date)).all()

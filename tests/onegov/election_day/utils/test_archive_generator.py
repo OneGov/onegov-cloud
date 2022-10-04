@@ -13,8 +13,45 @@ from fs.copy import copy_dir
 from fs.osfs import OSFS
 
 
-def test_votes_generation_group_by_year(election_day_app_zg_with_votes):
-    archive_generator = ArchiveGenerator(election_day_app_zg_with_votes)
+def test_votes_generation_group_by_year(election_day_app_zg):
+    archive_generator = ArchiveGenerator(election_day_app_zg)
+    session = election_day_app_zg.session()
+
+    sample_votes = [
+        Vote(title="Abstimmung 1. Januar 2022", domain='federation',
+             date=date(2022, 1, 1)),
+        Vote(title="Abstimmung 1. Januar 2013", domain='federation',
+             date=date(2013, 1, 1)),
+        Vote(title="Abstimmung 2. Januar 2013", domain='federation',
+             date=date(2013, 1, 2))
+    ]
+
+    ballot_results = [
+        BallotResult(
+            name='Bern', entity_id=351,
+            counted=True, yeas=7000, nays=3000, empty=0, invalid=0
+        ),
+        BallotResult(
+            name='Bern', entity_id=351,
+            counted=True, yeas=3000, nays=7000, empty=0, invalid=0
+        ),
+        BallotResult(
+            name='Bern', entity_id=351,
+            counted=True, yeas=2000, nays=5000, empty=0, invalid=0
+        )
+    ]
+    # 3 Votes with 1 BallotResult each
+    for sample_vote, ballot_result in zip(sample_votes, ballot_results):
+        session.add(sample_vote)
+        vote = session.query(Vote).filter_by(date=sample_vote.date).first()
+        vote.proposal.results.append(ballot_result)
+
+    bern = Municipality(name='Bern', municipality='351')
+    target = ArchivedResult()
+    source = ArchivedResult(type='vote')
+    add_local_results(source, target, bern, session)
+    session.flush()
+
 
     votes = archive_generator.all_votes()
 
@@ -34,10 +71,7 @@ def test_votes_generation_group_by_year(election_day_app_zg_with_votes):
     for item in grouped_by_year[0]:
         assert str(item.date.year) == "2022"
 
-
-def test_votes_generation_csv(election_day_app_zg_with_votes):
-    archive_generator = ArchiveGenerator(election_day_app_zg_with_votes)
-    base_dir = archive_generator.generate_votes_csv()
+    base_dir, _ = archive_generator.generate_archive()
     votes_dir = base_dir.listdir('votes')
     years = [str(year) for year in votes_dir]
 
@@ -143,7 +177,7 @@ def test_long_filenames_are_truncated(election_day_app_zg):
 
     generator = ArchiveGenerator(election_day_app_zg)
 
-    base_dir = generator.generate_votes_csv()
+    base_dir, _ = generator.generate_archive()
 
     csv = [csv for csv in base_dir.scandir("votes/2022", namespaces=["basic"])]
     first_file = csv[0]
@@ -165,7 +199,7 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
     )
 
     archive_generator = ArchiveGenerator(election_day_app_zg)
-    archive_dir = archive_generator.generate_elections_csv()
+    archive_dir, _ = archive_generator.generate_archive()
     temp_path, _ = archive_generator.zip_dir(archive_dir)
 
     with archive_dir.open(temp_path, mode="rb") as fi:
@@ -186,17 +220,6 @@ def test_election_generation(election_day_app_zg, import_test_datasets):
                    first_file.name
 
 
-def test_generate_archive_total_package(election_day_app_zg_with_votes):
-    app = election_day_app_zg_with_votes
-
-    generator = ArchiveGenerator(app)
-    base_dir, archive_zip = generator.generate_archive()
-
-    assert base_dir.exists(archive_zip)
-    file_size = base_dir.getinfo(archive_zip, namespaces=['details']).size
-    assert file_size > 10  # ensure file is not 0 bytes
-
-
 def test_get_docs_files_at_runtime():
     docs = module_path("onegov.election_day", "static/docs/")
 
@@ -207,15 +230,3 @@ def test_get_docs_files_at_runtime():
     api = docs_dir.opendir("api")
     assert all(api.isfile(f"open_data_{l}.md") for l in languages)
 
-
-def test_open_data_markdown_files_are_included(election_day_app_zg_with_votes):
-    app = election_day_app_zg_with_votes
-
-    generator = ArchiveGenerator(app)
-    archive_dir, zip_dir = generator.generate_archive()
-    doc_files = generator.additional_files_to_include
-
-    with archive_dir.open(zip_dir, mode="rb") as fi:
-        with ReadZipFS(fi) as zip_fs:
-            top_level_dir = zip_fs.listdir(".")
-            assert all(file in top_level_dir for file in doc_files)
