@@ -394,6 +394,27 @@ class LinksSettingsForm(Form):
 
 class HeaderSettingsForm(Form):
 
+    left_header_announcement = StringField(
+        label=_("Announcement"),
+        fieldset=_("Announcement"),
+    )
+
+    left_header_announcement_bg_color = ColorField(
+        label=_("Announcement bg color"),
+        fieldset=_("Announcement")
+    )
+
+    left_header_announcement_font_color = ColorField(
+        label=_("Announcement font color"),
+        fieldset=_("Announcement")
+    )
+
+    header_links = StringField(
+        label=_("Header links"),
+        fieldset=_("Header links"),
+        render_kw={'class_': 'many many-links'}
+    )
+
     left_header_name = StringField(
         label=_("Name"),
         description=_(""),
@@ -418,27 +439,6 @@ class HeaderSettingsForm(Form):
             NumberRange(0.5, 7)
         ],
         default=1
-    )
-
-    header_links = StringField(
-        label=_("Header links"),
-        fieldset=_("Header links"),
-        render_kw={'class_': 'many many-links'}
-    )
-
-    left_header_announcement = StringField(
-        label=_("Announcement"),
-        fieldset=_("Announcement"),
-    )
-
-    left_header_announcement_bg_color = ColorField(
-        label=_("Announcement bg color"),
-        fieldset=_("Announcement")
-    )
-
-    left_header_announcement_font_color = ColorField(
-        label=_("Announcement font color"),
-        fieldset=_("Announcement")
     )
 
     @property
