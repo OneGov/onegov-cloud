@@ -97,6 +97,24 @@
                       </div>
                     </div>
           </div>
+          <div id="header-links" class="text-center row" tal:define="links header_options.get('header_links')" tal:condition="links">
+              <div class="columns small-12">
+                <nav class="top-bar" data-topbar="" role="navigation">
+                  <ul class="title-area">
+                      <li class="name" style="width: 0;"></li>
+                      <li class="toggle-topbar">
+                          <a href="#"><span><i class="fa fa-bars"></i> Quicklinks</span></a>
+                      </li>
+                  </ul>
+                  
+                  <section class="top-bar-section" id="quicklinks" style="left: 0%;">
+                    <ul id="quicklinks-submenu">
+                      <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
+                    </ul>
+                  </section>
+              </nav>
+              </div>
+          </div>
           <div class="globals">
             <div class="row">
               <div class="columns small-12">

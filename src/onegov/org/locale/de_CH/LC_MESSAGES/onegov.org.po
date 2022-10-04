@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-21 09:28+0200\n"
+"POT-Creation-Date: 2022-10-03 15:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1299,6 +1299,9 @@ msgstr "Schriftfarbe"
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
 
+msgid "Header links"
+msgstr "Kopfzeilenlinks"
+
 msgid "Announcement"
 msgstr "Ankündigung"
 
@@ -1311,8 +1314,8 @@ msgstr "Hintergrundfarbe der Ankündigung"
 msgid "Announcement font color"
 msgstr "Schriftfarbe der Ankündigung"
 
-msgid "Only show Announcement for logged-in users"
-msgstr "Ankündigung nur für eingeloggte User anzeigen"
+msgid "Please add an url to each link"
+msgstr "Bitte geben Sie für jeden Link eine URL ein"
 
 msgid "Homepage Cover"
 msgstr "Startseiten Cover"

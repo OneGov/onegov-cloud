@@ -11,8 +11,8 @@ from onegov.people import Agency
 from onegov.people import AgencyMembership
 from sqlalchemy import Column
 from sqlalchemy import Integer
-from sqlalchemy import Text
 from sqlalchemy import String
+from sqlalchemy import Text
 
 
 @upgrade_task('Rename academic_title to salutation')
@@ -181,7 +181,10 @@ def add_address_columns_to_agency(context):
         ))
 
 
-@upgrade_task('Fix agency address column')
+@upgrade_task(
+    'Fix agency address column',
+    requires='onegov.people:Add address columns to agency'
+)
 def fix_agency_address_column(context):
     if context.has_column('agencies', 'street'):
         context.operations.drop_column('agencies', 'street')
@@ -189,3 +192,16 @@ def fix_agency_address_column(context):
         context.operations.add_column('agencies', Column(
             'address', Text, nullable=True
         ))
+
+
+@upgrade_task(
+    'Remove address columns from agency',
+    requires='onegov.people:Fix agency address column'
+)
+def remove_address_columns_from_agency(context):
+    if context.has_column('agencies', 'zip_code'):
+        context.operations.drop_column('agencies', 'zip_code')
+    if context.has_column('agencies', 'city'):
+        context.operations.drop_column('agencies', 'city')
+    if context.has_column('agencies', 'address'):
+        context.operations.drop_column('agencies', 'address')
