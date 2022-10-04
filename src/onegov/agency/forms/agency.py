@@ -16,7 +16,6 @@ from onegov.gis import CoordinatesField
 from sqlalchemy import func
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
-from wtforms.validators import Length
 
 
 class ExtendedAgencyForm(Form):
@@ -48,28 +47,11 @@ class ExtendedAgencyForm(Form):
     coordinates = CoordinatesField(
         label=_('Location'),
         description=_(
-            'Search for the exact address to set a marker. The address '
-            'fields beneath are filled out automatically. The zoom of '
+            'Search for the exact address to set a marker. The zoom of '
             'the map will be saved as well.'
         ),
-        fieldset=_("Address"),
+        fieldset=_("Map"),
         render_kw={'data-map-type': 'marker'},
-    )
-
-    address = StringField(
-        label=_('Street and house number'),
-        fieldset=_("Address"),
-    )
-
-    zip_code = StringField(
-        label=_('Zip Code'),
-        fieldset=_("Address"),
-        validators=[Length(max=10)]
-    )
-
-    city = StringField(
-        label=_('City'),
-        fieldset=_("Address"),
     )
 
     export_fields = MultiCheckboxField(
@@ -119,9 +101,6 @@ class ExtendedAgencyForm(Form):
         if self.organigram.action == 'replace':
             if self.organigram.data:
                 model.organigram_file = self.organigram.file
-        model.address = self.address.data
-        model.zip_code = self.zip_code.data or None
-        model.city = self.city.data
         model.coordinates = self.coordinates.data
         if hasattr(self, 'access'):
             model.access = self.access.data
@@ -149,9 +128,6 @@ class ExtendedAgencyForm(Form):
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
-        self.address.data = model.address
-        self.zip_code.data = model.zip_code or None
-        self.city.data = model.city
         self.coordinates.data = model.coordinates
         if hasattr(self, 'access'):
             self.access.data = model.access
