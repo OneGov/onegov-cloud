@@ -39,11 +39,6 @@ class ArchiveGenerator:
             └── 2022
                 └── vote1.csv
 
-        :param subset: Generate only votes or elections (Optional)
-        :type subset: list of str
-
-        :returns: The base directory
-        :rtype: :class:`fs.subfs.SubFS`
         """
 
         names = ["votes", "elections", "elections"]
@@ -93,14 +88,12 @@ class ArchiveGenerator:
 
     def zip_dir(self, base_dir: SubFS) -> str:
         """Recursively zips a directory (base_dir).
-            base_dir: is the temporary file system which will get deleted
-            automatically
 
-        :param base_dir: This is a directory in app.filestorage. Per default
-        named "archive". Contains subdirectories 'votes' and 'elections',
-        as well as the files describing the download format.
+        :param base_dir: is a directory in a temporary file system.
+        Contains subdirectories 'votes' and 'elections', as well as various
+        other files to include.
 
-        :returns path to the zipfile and the zip filesystem itself
+        :returns path to the zipfile
         """
         self.archive_dir.makedir(self.archive_parent_dir, recreate=True)
         zip_path = f"{self.archive_parent_dir}/archive.zip"
@@ -123,7 +116,6 @@ class ArchiveGenerator:
                             dst_fs=zip_filesystem,
                             dst_path=entity,
                         )
-
                 return zip_path
 
     def all_votes(self):
