@@ -20,7 +20,6 @@ from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.directives import PdfFileViewAction
 from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
-from onegov.election_day.directives import ArchiveDownloadFileAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.file import DepotApp
@@ -42,7 +41,6 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
     pdf_file = directive(PdfFileViewAction)
     svg_file = directive(SvgFileViewAction)
     screen_widget = directive(ScreenWidgetAction)
-    archive_zip = directive(ArchiveDownloadFileAction)
 
     @property
     def principal(self):

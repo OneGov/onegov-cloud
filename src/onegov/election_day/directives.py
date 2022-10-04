@@ -98,40 +98,6 @@ class PdfFileViewAction(ViewAction):
         )
 
 
-class ArchiveDownloadFileAction(ViewAction):
-
-    """ View directive for viewing the zipped archive from filestorage. The
-    zipfile is created using a cronjob and might not be available. """
-
-    def __init__(self, model, **kwargs):
-        kwargs['permission'] = kwargs.get('permission', Public)
-        kwargs['render'] = self.render
-        super().__init__(model, **kwargs)
-
-    @staticmethod
-    def render(content, request):
-        path = content.get('path')
-        name = content.get('name')
-        if not path:
-            raise HTTPAccepted()
-
-        if not request.app.filestorage.isdir("archive"):
-            raise HTTPNotFound()
-        try:
-            zip_dir = request.app.filestorage.opendir("archive/zip")
-            content = None
-            with zip_dir.open("archive.zip", mode="rb") as zipfile:
-                content = zipfile.read()
-
-            return Response(
-                content,
-                content_type='application/zip',
-                content_disposition=f'inline; filename={name}.zip'
-            )
-        except (FileNotFoundError, ResourceNotFound):
-            raise HTTPNotFound()
-
-
 class JsonFileAction(ViewAction):
 
     """ View directive for viewing JSON data as file. """
