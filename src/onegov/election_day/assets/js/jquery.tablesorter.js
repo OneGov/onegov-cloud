@@ -639,7 +639,7 @@
 			}
 			c.$table.find( c.selectorHeaders ).attr({
 				scope: 'col',
-				role : 'columnheader'
+				role : 'switch columnheader'
 			});
 			// enable/disable sorting
 			ts.updateHeader( c );
