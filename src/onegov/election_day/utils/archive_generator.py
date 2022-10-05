@@ -101,22 +101,25 @@ class ArchiveGenerator:
 
         with self.archive_dir.open(zip_path, mode="wb") as file:
             with WriteZipFS(file) as zip_filesystem:
-                for entity in base_dir.listdir('/'):
-                    if base_dir.isdir(entity):
-                        copy_dir(
-                            src_fs=base_dir,
-                            src_path=entity,
-                            dst_fs=zip_filesystem,
-                            dst_path=entity,
-                        )
-                    if base_dir.isfile(entity):
-                        copy_file(
-                            src_fs=base_dir,
-                            src_path=entity,
-                            dst_fs=zip_filesystem,
-                            dst_path=entity,
-                        )
-                return zip_path
+                counts = base_dir.glob("**/*.csv").count()
+                if counts.files != 0:
+                    if len(base_dir.listdir('/')) != 0:
+                        for entity in base_dir.listdir('/'):
+                            if base_dir.isdir(entity):
+                                copy_dir(
+                                    src_fs=base_dir,
+                                    src_path=entity,
+                                    dst_fs=zip_filesystem,
+                                    dst_path=entity,
+                                )
+                            if base_dir.isfile(entity):
+                                copy_file(
+                                    src_fs=base_dir,
+                                    src_path=entity,
+                                    dst_fs=zip_filesystem,
+                                    dst_path=entity,
+                                )
+                        return zip_path
 
     def all_votes(self):
         return self.session.query(Vote).order_by(desc(Vote.date)).all()

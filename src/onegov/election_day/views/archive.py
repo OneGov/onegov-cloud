@@ -176,8 +176,7 @@ def view_archive_download(self, request):
         return Response(
             content,
             content_type='application/zip',
-            content_disposition=f'inline; filename=archive.zip'
+            content_disposition='inline; filename=Archive.zip'
         )
     except (FileNotFoundError, ResourceNotFound):
         raise HTTPNotFound()
-

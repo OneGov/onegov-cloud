@@ -9,9 +9,7 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
 from onegov.election_day.forms import EmptyForm
-from fs.errors import ResourceNotFound
 from webob.exc import HTTPAccepted
-from webob.exc import HTTPNotFound
 
 
 class ManageHtmlAction(HtmlAction):
