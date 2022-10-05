@@ -1,1 +1,1 @@
-These files have been moved to [/onegov-cloud/src/onegov/election_day/static/docs/api](/onegov-cloud/src/onegov/election_day/static/docs/api)
+These files have been moved to [src/onegov/election_day/static/docs/api](/onegov-cloud/src/onegov/election_day/static/docs/api)
