@@ -153,7 +153,8 @@ def generate_archive():
         else:
             click.secho("Archive generated successfully:", fg='green')
         absolute_path = archive_generator.archive_system_path
-        click.secho(f"file://{absolute_path}")
+        if absolute_path:
+            click.secho(f"file://{absolute_path}")
 
     return generate
 

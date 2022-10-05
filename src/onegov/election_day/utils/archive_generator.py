@@ -10,6 +10,7 @@ from fs.copy import copy_file
 from fs.zipfs import WriteZipFS
 from fs.tempfs import TempFS
 from fs.osfs import OSFS
+from fs.errors import NoSysPath
 
 
 class ArchiveGenerator:
@@ -137,7 +138,12 @@ class ArchiveGenerator:
     @property
     def archive_system_path(self):
         zip_path = f"{self.archive_parent_dir}/archive.zip"
-        return self.archive_dir.getsyspath(zip_path)
+        # syspath may not be available, depending on the actual filestorage
+        try:
+            sys_path = self.archive_dir.getsyspath(zip_path)
+            return sys_path
+        except NoSysPath:
+            return None
 
     def include_docs(self):
         api = module_path("onegov.election_day", "static/docs/api")

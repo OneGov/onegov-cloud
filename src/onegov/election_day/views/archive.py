@@ -172,7 +172,8 @@ def view_archive_download(self, request):
         content = None
         with zip_dir.open("archive.zip", mode="rb") as zipfile:
             content = zipfile.read()
-
+        if not content:
+            raise HTTPNotFound()
         return Response(
             content,
             content_type='application/zip',
