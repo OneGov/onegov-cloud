@@ -661,11 +661,17 @@
             </tal:block>
         </tbody>
         <tfoot>
-            <tr class="more" tal:condition="not: election.tacit" aria-haspopup="true" role="switch" aria-expanded="false">
-                <td colspan="4" i18n:translate="">All candidates</td>
+            <tr class="more" tal:condition="not: election.tacit" aria-haspopup="true" aria-expanded="false">
+                <td colspan="4">
+                    <span i18n:translate="" aria-hidden="true">All candidates</span>
+                    <button class="visually-hidden" i18n:translate="">All candidates</button>
+                </td>
             </tr>
-            <tr class="less" tal:condition="not: election.tacit" aria-haspopup="true" role="switch" aria-expanded="true">
-                <td colspan="4" i18n:translate="">Elected candidates only</td>
+            <tr class="less" tal:condition="not: election.tacit" aria-haspopup="true" aria-expanded="true">
+                <td colspan="4" i18n:translate="">
+                    <span i18n:translate="" aria-hidden="true">Elected candidates only</span>
+                    <button class="visually-hidden" i18n:translate="">Elected candidates only</button>
+                </td>
             </tr>
         </tfoot>
     </table>
