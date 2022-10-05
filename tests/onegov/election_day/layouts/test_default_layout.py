@@ -33,8 +33,8 @@ def test_default_layout():
     assert layout_it.terms_link == 'https://opendata.swiss/it/terms-of-use'
     assert layout_rm.terms_link == 'https://opendata.swiss/rm/terms-of-use'
 
-    base_url = 'https://github.com/OneGov/onegov-cloud' \
-               '/tree/master/docs/api/election_day/'
+    base_url = 'https://github.com/OneGov/onegov-cloud/blob/master/src' \
+                    '/onegov/election_day/static/docs/api/'
 
     assert layout_de.opendata_link == (
         base_url + 'open_data_de.md'

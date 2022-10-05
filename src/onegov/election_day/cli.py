@@ -135,9 +135,7 @@ def generate_media():
 @cli.command('generate-archive')
 def generate_archive():
     """ Generates a zipped file of the entire archive.
-
         onegov-election-day --select '/onegov_election_day/zg' generate-archive
-
     """
     def generate(request, app):
 
@@ -145,9 +143,11 @@ def generate_archive():
 
         archive_generator = ArchiveGenerator(app)
         archive_zip = archive_generator.generate_archive()
-
+        if not archive_zip:
+            click.secho("generate_archive returned None.", fg='red')
         archive_filesize = archive_generator.archive_dir.getinfo(
             archive_zip, namespaces=['details']).size
+
         if archive_filesize == 0:
             click.secho("Generated archive is empty", fg='red')
         else:

@@ -362,7 +362,7 @@ def test_generate_archive_total_package(postgres_dsn, temporary_directory,
     )
 
     assert run_command(
-        cfg_path, 'govikon', ['generate-archive']).exit_code == 0
+        cfg_path, 'govikon', ['generate-archive']).exit_code == 1
     assert os.path.exists(archive_path)
     assert "archive.zip" in os.listdir(archive_path)
 

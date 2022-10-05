@@ -18,7 +18,7 @@ class DefaultLayout(ChameleonLayout):
     datetime_long_format = 'medium'
 
     docs_base_url = 'https://github.com/OneGov/onegov-cloud/blob/master/src' \
-                    '/onegov/election_day/static/docs/api/'
+                    '/onegov/election_day/static/docs/api'
 
     def __init__(self, model, request):
         super().__init__(model, request)
