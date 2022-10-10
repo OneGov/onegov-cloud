@@ -353,10 +353,15 @@ def send_daily_resource_usage_overview(request):
         ResourceRecipient.content
     )
 
-    recipients = tuple(
+    # If the key 'daily_reservations' doesn't exist, the recipient was
+    # created before anything else was an option, therefore it must be true
+    recipients = [
         (r.address, r.content['resources'])
-        for r in q if weekday in r.content['send_on']
-    )
+        for r in q if (
+            r.content.get('daily_reservations', True)
+            and weekday in r.content['send_on']
+        )
+    ]
 
     if not recipients:
         return

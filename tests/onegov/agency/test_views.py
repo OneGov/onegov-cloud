@@ -886,23 +886,12 @@ def test_agency_map(client):
 
     page = client.get('/organization/finanzkontrolle')
     assert 'marker-map' not in page
-    assert 'map-bs' not in page
 
-    manage = client.get('/organizations').click('Organisation', href='new')
-    manage.form['title'] = 'Parlament'
+    manage = page.click('Bearbeiten')
     manage.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 12
     })
     manage = manage.form.submit().follow()
 
-    page = client.get('/organization/parlament')
+    page = client.get('/organization/finanzkontrolle')
     assert 'marker-map' in page
-    assert 'map-bs' not in page
-
-    settings = client.get('/agency-settings')
-    settings.form['agency_map'] = 'bs'
-    settings.form.submit().follow()
-
-    page = client.get('/organization/parlament')
-    assert 'map-bs' in page
-    assert 'marker-map' not in page

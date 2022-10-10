@@ -20,7 +20,7 @@ column_mapper = OrderedDict(
     political_party='Partei',
     parliamentary_group='Parlamentarische Gruppe',
     website='Website',
-    address='Addresse',
+    address='Adresse',
     notes='Notizen',
     memberships='Mitgliedschaften'
 )

@@ -95,7 +95,6 @@ class ExportForm(Form):
 
 
 class PaymentMethodForm(Form):
-
     payment_method = RadioField(
         label=_("Payment Method"),
         fieldset=_("Payments"),
@@ -120,7 +119,6 @@ class PaymentMethodForm(Form):
 
 
 class ChangeAdjacencyListUrlForm(Form):
-
     name = StringField(
         label=_('URL path'),
         validators=[InputRequired()]

@@ -1,7 +1,7 @@
 /*
     hide the news in the topbar
 */
-.top-bar-section {
+.top-bar-section:not(#quicklinks) {
     ul {
         width: 100%;
     }

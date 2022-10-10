@@ -1,19 +1,20 @@
 import pytest
 import tempfile
-
 from io import BytesIO
 from onegov.core import utils
 from onegov.core.csv import (
     CSVFile,
     convert_excel_to_csv,
     convert_list_of_dicts_to_csv,
+    convert_list_of_list_of_dicts_to_xlsx,
     convert_list_of_dicts_to_xlsx,
     convert_xls_to_csv,
     convert_xlsx_to_csv,
     detect_encoding,
     match_headers,
     normalize_header,
-    parse_header,
+    parse_header, normalize_sheet_titles, remove_first_word,
+    avoid_duplicate_name, list_duplicates_index,
 )
 from onegov.core.errors import (
     AmbiguousColumnsError,
@@ -26,7 +27,7 @@ from openpyxl import load_workbook
 
 def test_parse_header():
     assert parse_header("   Firtst name;  LastNAME; Designation")\
-        == ['firtst name', 'lastname', 'designation']
+           == ['firtst name', 'lastname', 'designation']
     assert parse_header("a") == ['a']
     assert parse_header("") == []
     assert parse_header("a,b,c;d") == ['a', 'b', 'c;d']
@@ -243,16 +244,16 @@ def test_match_headers_missing():
 
     assert match_headers(['a1', 'b2'], expected=('a1', 'c2')) == ['a1', 'c2']
 
-    assert match_headers(['first', 'second'], expected=('first', 'sekond')) \
-        == ['first', 'sekond']
+    assert match_headers(['first', 'second'], expected=('first', 'sekond'))\
+           == ['first', 'sekond']
 
-    assert match_headers(['a', 'b', 'c'], expected=('a', 'c')) \
-        == ['a', 'b', 'c']
+    assert match_headers(['a', 'b', 'c'], expected=('a', 'c'))\
+           == ['a', 'b', 'c']
 
 
 def test_match_headers_ambiguous():
     with pytest.raises(AmbiguousColumnsError) as e:
-        match_headers(['abcd', 'bcde'], expected=('bcd', ))
+        match_headers(['abcd', 'bcde'], expected=('bcd',))
 
     assert list(e.value.columns.keys()) == ['bcd']
     assert set(e.value.columns['bcd']) == {'abcd', 'bcde'}
@@ -391,3 +392,134 @@ def test_convert_irregular_list_of_dicts_to_csv():
     assert header == 'name,role,identity,gang'
     assert batman == 'Batman,Superhero,Bruce Wayne,'
     assert joker == 'Joker,Supervillain,,Injustice League'
+
+
+def test_convert_multiple_list_of_dicts_to_xlsx():
+    data = [
+        {
+            'first_name': 'Dick',
+            'last_name': 'Cheney',
+            'plz': '3434',
+        },
+        {
+            'first_name': 'Donald',
+            'last_name': 'Rumsfeld',
+            'plz': '3434',
+        }
+    ]
+    data2 = [
+        {
+            'first_name': 'Dick',
+            'last_name': 'Cheney',
+            'plz': '3434',
+        },
+        {
+            'first_name': 'Donald',
+            'last_name': 'Rumsfeld',
+            'plz': '3434',
+        }
+    ]
+    xlsx = convert_list_of_list_of_dicts_to_xlsx([data, data2],
+                                                 titles_list=["first",
+                                                              "second",
+                                                              "third"])
+
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(xlsx)
+        for i in range(2):  # Loop over each tab
+            rows = tuple(load_workbook(f).worksheets[i].rows)
+            assert rows[0][0].value == 'first_name'
+            assert rows[0][1].value == 'last_name'
+            assert rows[0][2].value == 'plz'
+            assert rows[1][0].value == 'Dick'
+            assert rows[1][1].value == 'Cheney'
+            assert rows[1][2].value == '3434'
+            assert rows[2][0].value == 'Donald'
+            assert rows[2][1].value == 'Rumsfeld'
+            assert rows[2][2].value == '3434'
+
+
+def test_xlsx_title_validation():
+    # this is 36 chars, excel cannot load more than 31 chars
+    title1 = "Schulhaus Schönwetter Gruppenraum 01"
+    title2 = "Schulhaus Schönwetter Gruppenraum 02"
+    titles = [title1, title2]
+    norm = normalize_sheet_titles(titles)
+
+    assert norm == ["schoenwetter-gruppenraum-01",
+                    "schoenwetter-gruppenraum-02"]
+
+    # if there are duplicates in the titles
+    title1 = "Schulhaus Schönwetter Gruppenraum 01"
+    title2 = "Schulhaus Schönwetter Gruppenraum 02"
+    title3 = "Schulhaus Schönwetter Gruppenraum 02"
+    titles = [title1, title2, title3]
+
+    norm = normalize_sheet_titles(titles)
+
+    # duplicates should be handled appropriately
+    assert norm == ["schoenwetter-gruppenraum-01",
+                    "schoenwetter-gruppenraum-02",
+                    "schoenwetter-gruppenraum-02_1"]
+
+    # even with very long names
+    title1 = "Schulhaus Schönwetter Gruppenraum 01"
+    title2 = "Schulhaus Schönwetter Gruppenraum 02"
+    title3 = "Schulhaus Schönwetter Gruppenraum 02"
+    titles = [title1, title2, title3]
+
+
+def test_remove_first_word():
+    titles = ["raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-02"]
+
+    trimmed_titles = [remove_first_word(t) for t in titles]
+
+    assert trimmed_titles[0] == "zweiter-stock-mit-langem-namen-01"
+    assert trimmed_titles[1] == "zweiter-stock-mit-langem-namen-02"
+
+
+def test_check_duplicates():
+    titles = ["raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-011",
+              "raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-02",
+              "raum-zweiter-stock-mit-langem-namen-02"]
+
+    duplicate_index = list_duplicates_index(titles)
+    assert len(duplicate_index) == 2
+    assert duplicate_index == [2, 4]
+
+
+def test_avoid_duplicates():
+    titles = ["Schulhaus-Schönwetter-Gruppenraum",
+              "raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-01"]
+
+    duplicate_index = list_duplicates_index(titles)
+
+    for index in duplicate_index:
+        item = titles[index]
+        titles[index] = avoid_duplicate_name(titles, item)
+
+    assert titles == ["Schulhaus-Schönwetter-Gruppenraum",
+                      "raum-zweiter-stock-mit-langem-namen-01",
+                      "raum-zweiter-stock-mit-langem-namen-01_1"]
+
+    titles = ["raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-011",
+              "raum-zweiter-stock-mit-langem-namen-01",
+              "raum-zweiter-stock-mit-langem-namen-02",
+              "raum-zweiter-stock-mit-langem-namen-02"]
+
+    duplicate_index = list_duplicates_index(titles)  # [2, 4]
+
+    for index in duplicate_index:
+        item = titles[index]
+        titles[index] = avoid_duplicate_name(titles, item)
+
+    assert titles == ["raum-zweiter-stock-mit-langem-namen-01",
+                      "raum-zweiter-stock-mit-langem-namen-011",
+                      "raum-zweiter-stock-mit-langem-namen-01_2",
+                      "raum-zweiter-stock-mit-langem-namen-02",
+                      "raum-zweiter-stock-mit-langem-namen-02_1"]

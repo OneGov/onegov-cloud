@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-09-11 08:59+0200\n"
+"POT-Creation-Date: 2022-10-04 13:14+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1087,11 +1087,20 @@ msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
 msgid "The price must be larger than zero"
 msgstr "Il prezzo deve essere maggiore di zero"
 
+msgid "New Reservations"
+msgstr "Nuove prenotazioni"
+
+msgid "Daily Reservations"
+msgstr "Prenotazioni giornaliere"
+
 msgid "Send on"
 msgstr "Invia il"
 
 msgid "Resources"
 msgstr "Risorse"
+
+msgid "Please add at least one notification."
+msgstr "Aggiungere almeno una notifica."
 
 msgid "Logo"
 msgstr "Logo"
@@ -1281,6 +1290,24 @@ msgstr ""
 msgid "Open files in separate window"
 msgstr "Apri i file in una finestra separata"
 
+msgid "Announcement"
+msgstr "Annuncio"
+
+msgid "Announcement URL"
+msgstr "URL per l'annuncio"
+
+msgid "Announcement bg color"
+msgstr "Colore di sfondo dell'annuncio"
+
+msgid "Announcement font color"
+msgstr "Colore del carattere dell'annuncio"
+
+msgid "Only show Announcement for logged-in users"
+msgstr "Mostra solo gli annunci per gli utenti connessi"
+
+msgid "Header links"
+msgstr "Collegamenti di intestazione"
+
 msgid "Title header left side"
 msgstr "Lato sinistro dell'intestazione del titolo"
 
@@ -1293,32 +1320,8 @@ msgstr "Colore del carattere"
 msgid "Relative font size"
 msgstr "Dimensione relativa del carattere"
 
-msgid "Announcement"
-msgstr "Annuncio"
-
-msgid "Announcement bg color"
-msgstr "Colore di sfondo dell'annuncio"
-
-msgid "Announcement font color"
-msgstr "Colore del carattere dell'annuncio"
-
-msgid "Homepage Image #1"
-msgstr "Immagine n. 1 della pagina principale"
-
-msgid "Homepage Image #2"
-msgstr "Immagine n. 2 della pagina principale"
-
-msgid "Homepage Image #3"
-msgstr "Immagine n. 3 della pagina principale"
-
-msgid "Homepage Image #4"
-msgstr "Immagine n. 4 della pagina principale"
-
-msgid "Homepage Image #5"
-msgstr "Immagine n. 5 della pagina principale"
-
-msgid "Homepage Image #6"
-msgstr "Immagine n. 6 della pagina principale"
+msgid "Please add an url to each link"
+msgstr "Aggiungere un url a ciascun link"
 
 msgid "Homepage Cover"
 msgstr "Copertina della pagina principale"
@@ -1810,6 +1813,9 @@ msgstr "Link a risorse esterne"
 
 msgid "New external resource"
 msgstr "Nuova risorsa esterna"
+
+msgid "Export All"
+msgstr "Esporta tutte"
 
 msgid "Find Your Spot"
 msgstr "Cerca le date"
@@ -3148,6 +3154,18 @@ msgstr ""
 msgid "Or by changing the settings in your user profile."
 msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
+msgid "The following reservations have been accepted:"
+msgstr "Sono state accettate le seguenti prenotazioni:"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+msgid ""
+"This is the notification for reservations for ${request.app.org.title}. If "
+"you no longer want to receive this e-mail please contact an administrator so "
+"they can remove you from the recipients list."
+msgstr ""
+
 msgid "An administrator just created a new account on ${org} for you."
 msgstr "Un amministratore ha appena creato per te un nuovo account su ${org}."
 
@@ -3218,12 +3236,6 @@ msgstr "Registrazione"
 
 msgid "The ticket number is"
 msgstr "Il numero del biglietto è"
-
-msgid "The following reservations have been accepted:"
-msgstr "Sono state accettate le seguenti prenotazioni:"
-
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -3596,15 +3608,19 @@ msgstr "(${num_pending} in attesa di approvazione)"
 msgid "Utilised"
 msgstr "Utilizzato"
 
-msgid ""
-"The following recipients receive a daily e-mail sent at 06:00 containing the "
-"reservation data for all reservations of the day."
-msgstr ""
-"I seguenti destinatari ricevono una e-mail giornaliera inviata alle ore 6:00 "
-"contenente i dati di prenotazione per tutte le prenotazioni del giorno."
-
 msgid "No recipients defined yet."
 msgstr "Nessun destinatario ancora definito."
+
+msgid ""
+"Receives notifications for reservations of the day on the following days:"
+msgstr ""
+"Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for new reservations."
+msgstr "Riceve le notifiche per le nuove prenotazioni."
+
+msgid "Notifications for following Resources"
+msgstr "Notifiche per le seguenti risorse"
 
 msgid "No reservation resources defined yet."
 msgstr "Nessuna risorsa di prenotazione ancora definita."
@@ -4662,6 +4678,10 @@ msgstr ""
 msgid "Your reservations were accepted"
 msgstr "Le tue prenotazioni sono state accettate"
 
+#, python-format
+msgid "${org} New Reservation(s)"
+msgstr "${org} Nuova/e prenotazione/i"
+
 msgid "The reservations were accepted"
 msgstr "Le prenotazioni sono state accettate"
 
@@ -4729,6 +4749,12 @@ msgstr "Rimosse correttamente ${count} allocazioni inutilizzate"
 msgid "Exports the reservations of the given date range."
 msgstr "Esporta le prenotazioni dell'intervallo di date specificato."
 
+msgid "No reservations found for the given date range."
+msgstr "Non sono state trovate prenotazioni per l'intervallo di date indicato."
+
+msgid "Exports the reservations of all resources in a given date range."
+msgstr "Esporta tutte le prenotazioni in un intervallo di date specifico"
+
 #, python-format
 msgid "Do you really want to delete \"${name}\"?"
 msgstr "Vuoi davvero cancellare \"${name}\"?"
@@ -4761,12 +4787,6 @@ msgstr "Favicon"
 
 msgid "Links"
 msgstr "Collegamenti"
-
-msgid "Newsletter Settings"
-msgstr "Impostazioni della newsletter"
-
-msgid "Ticket Settings"
-msgstr "Impostazioni del biglietto"
 
 msgid "Header"
 msgstr "Intestazione"
@@ -5010,3 +5030,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Homepage Image #1"
+#~ msgstr "Immagine n. 1 della pagina principale"

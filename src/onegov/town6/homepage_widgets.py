@@ -20,7 +20,7 @@ class RowWidget:
     template = """
         <xsl:template match="row">
             <div class="grid-container">
-                <div class="grid-x grid-padding-x">
+                <div class="grid-x grid-padding-x {@class}">
                     <xsl:apply-templates select="node()"/>
                 </div>
             </div>
@@ -71,6 +71,20 @@ class AutoplayVideoWidget:
              tal:define="max_height '{@max-height}'; link_mp4 '{@link_mp4}';
              link_webm '{link_webm}'
              "
+            />
+        </xsl:template>
+    """
+
+
+@TownApp.homepage_widget(tag='icon_link')
+class IconLinksWidget:
+    template = """
+        <xsl:template match="icon_link">
+            <div metal:use-macro="layout.macros.icon_link"
+            tal:define="
+                title '{@title}'; color '{@color}'; icon '{@icon}';
+                text '{@text}'; link '{@link}';
+            "
             />
         </xsl:template>
     """
@@ -482,3 +496,16 @@ class FocusWidget:
 
     def get_variables(self, layout):
         return {}
+
+
+@TownApp.homepage_widget(tag='testimonial')
+class TestimonialsWidget:
+    template = """
+        <xsl:template match="testimonial">
+            <div metal:use-macro="layout.macros.testimonial"
+             tal:define="description '{@description}'; quote '{@quote}';
+             image '{@image}';
+             "
+            />
+        </xsl:template>
+    """

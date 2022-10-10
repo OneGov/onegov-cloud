@@ -118,22 +118,26 @@ def test_announcement(client):
     settings = client.get('/header-settings')
 
     # test default not giving the color
-    assert settings.form['left_header_announcement_bg_color'].value == (
+    assert settings.form['announcement_bg_color'].value == (
         '#FBBC05'
     )
-    assert settings.form['left_header_announcement_font_color'].value == (
+    assert settings.form['announcement_font_color'].value == (
         '#000000'
     )
 
-    settings.form['left_header_announcement'] = text
-    settings.form['left_header_announcement_bg_color'] = bg_color
-    settings.form['left_header_announcement_font_color'] = color
+    settings.form['announcement'] = text
+    settings.form['announcement_url'] = 'https://other-town.ch'
+    settings.form['announcement_bg_color'] = bg_color
+    settings.form['announcement_font_color'] = color
     page = settings.form.submit().follow()
 
     assert text in page
     assert (
-        f'<div id="announcement" style="color: {color}; '
-        f'background-color: {bg_color};">'
+        f'<div id="announcement_header" '
+        f'style="background-color: {bg_color};">'
+    ) in page
+    assert (
+        f'<a style="color: {color}" href="https://other-town.ch"'
     ) in page
 
 
@@ -172,3 +176,44 @@ def test_create_external_link(client):
 
     assert 'Birth certificate request' in forms
     assert 'Birth certificate request' not in resources
+
+
+def test_header_links(client):
+    client.login_admin()
+
+    page = client.get('/')
+    assert 'id="header-links"' not in page
+
+    settings = client.get('/header-settings')
+    settings.form['header_links'] = '''
+        {"labels":
+            {"text": "Text",
+             "link": "URL",
+             "add": "Hinzuf\\u00fcgen",
+             "remove": "Entfernen"},
+         "values": []
+        }
+    '''
+    page = settings.form.submit().follow()
+
+    assert 'id="header-links"' not in page
+
+    settings = client.get('/header-settings')
+    settings.form['header_links'] = '''
+        {"labels":
+            {"text": "Text",
+             "link": "URL",
+             "add": "Hinzuf\\u00fcgen",
+             "remove": "Entfernen"},
+         "values": [
+            {"text": "Govikon School",
+             "link": "https://www.govikon-school.ch", "error": ""},
+            {"text": "Castle Govikon",
+             "link": "https://www.govikon-castle.ch", "error": ""}
+         ]
+        }
+    '''
+    page = settings.form.submit().follow()
+
+    assert '<a href="https://www.govikon-castle.ch">Castle Govikon</a>' in page
+    assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page

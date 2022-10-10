@@ -27,7 +27,7 @@ $new-daily-item-icon: '\f518';
 $new-resource-link-icon: '\f0c1';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f07b';
-$new-recipient: '\f1fa';
+$new-recipient: '\f0e0';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
 $new-news-icon: '\f1ea';
@@ -200,9 +200,50 @@ $qr-code-icon: '\f029';
     }
 }
 
-#announcement {
+#announcement_header {
     padding: 1rem;
     text-align: center;
+
+    p {
+        margin-bottom: 0;
+    }
+}
+
+#header-links {
+    .fa-external-link-alt {
+        display: none;
+    }
+
+    .title-bar,
+    button {
+        color: $primary-color;
+    }
+
+    ul.menu {
+        display: flex;
+    }
+
+    li {
+        border-left: 1px solid $primary-color;
+    }
+
+    li:first-child {
+        border-left: 0;
+    }
+
+    & * {
+        background: transparent;
+    }
+    @media #{$small-only} {
+        ul.menu {
+            display: block;
+        }
+
+        li {
+            border-left: 0;
+            border-top: 1px dashed $primary-color;
+        }
+    }
 }
 
 $navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);

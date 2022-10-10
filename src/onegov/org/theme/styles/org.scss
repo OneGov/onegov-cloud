@@ -414,9 +414,13 @@ $globals-height: 2.5rem;
     }
 }
 
-#announcement {
+#announcement_header {
     padding: 1rem;
     text-align: center;
+
+    p {
+        margin-bottom: 0;
+    }
 }
 
 #redactor-modal-box footer {
@@ -1041,17 +1045,6 @@ form {
 }
 
 /*
-    homepage tiles images
-*/
-
-#homepage-tile-1 .tile-image { background-image: url(#{$tile-image-1});}
-#homepage-tile-2 .tile-image { background-image: url(#{$tile-image-2});}
-#homepage-tile-3 .tile-image { background-image: url(#{$tile-image-3});}
-#homepage-tile-4 .tile-image { background-image: url(#{$tile-image-4});}
-#homepage-tile-5 .tile-image { background-image: url(#{$tile-image-5});}
-#homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
-
-/*
     Hide the spam bot honeypot field
 */
 .field-roboter_falle {
@@ -1309,21 +1302,10 @@ input[type='color'] {
         content: '';
     }
 
-    .tile-image {
-        background-position: center center;
-        background-size: cover;
-        display: block;
-        height: 7rem;
-        width: 100%;
-    }
-
     .tile-link:hover h3 {
         color: $anchor-font-color-hover;
     }
 
-    .tile-link:hover .tile-image {
-        @include grayscale;
-    }
 }
 
 /*
@@ -6488,4 +6470,59 @@ a#results {
     i.fa-calendar {
         font-size: 1.8rem;
     }
+}
+
+#fieldset-header-links {
+    .field-button {
+        margin-top: 0 !important;
+    }
+
+    small.error {
+        display: block !important;
+        margin-top: .5rem;
+    }
+}
+
+#header-links {
+    .toggle-topbar {
+        left: 0;
+        right: 0;
+        span {
+            color: #666 !important;
+        }
+    }
+
+    .title-bar,
+    button {
+        color: $editbar-bg-color;
+    }
+
+    #quicklinks-submenu {
+        li {
+            border-left: 1px solid $editbar-bg-color;
+            a {
+                padding: .5rem;
+                color: #666;
+                text-transform: none;
+            }
+        }
+    }
+
+    & * {
+        background: transparent;
+    }
+    @media #{$small-only} {
+        ul.menu {
+            display: block;
+        }
+
+        #quicklinks-submenu li {
+            border-left: 0;
+            border-top: 1px dashed $editbar-bg-color;
+        }
+    }
+}
+
+.page-image {
+    padding-bottom: 1rem;
 }

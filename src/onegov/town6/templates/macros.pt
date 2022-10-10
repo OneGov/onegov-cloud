@@ -488,9 +488,7 @@
 
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
     <div class="card news-card" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
-        <div tal:condition="item.image_url|nothing" class="card-header">
-            <img src="${item.image_url}">
-        </div>
+        <div tal:condition="item.page_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></div>
         <div class="card-section">
             <div>
                 <a class="heading" href="${url}"><tal:b tal:switch="heading|'h5'">
@@ -677,6 +675,7 @@
     <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False">
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 cell page-content-main">
+                <img class="page-image" tal:condition="page.page_image | None" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
@@ -689,6 +688,7 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or show_side_panel">
             <div class="small-12 medium-8 cell page-content-main">
+                <img class="page-image" tal:condition="page.page_image | None" src="${page.page_image}">
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
                 </div>
@@ -1328,6 +1328,40 @@
         </video> 
     </div>
 </metal:autoplay_video>
+
+<metal:testimonial define-macro="testimonial" i18n:domain="onegov.town6">
+    <div class="testimonial grid-x grid-padding-x" data-aos="fade" condition="description and image and quote">
+        <div class="small-4 medium-2 cell">
+            <div class="square-container">
+                <img src="${image}"/>
+            </div>
+        </div>
+        <div class="small-8 medium-10 cell">
+            <div class="text">
+                <p class="description">
+                    ${description}
+                </p>
+                <p class="quote">
+                    <i class="fas fa-angle-double-left"></i>
+                    ${quote}
+                    <i class="fas fa-angle-double-right"></i>
+                </p>
+            </div>
+        </div>
+    </div>
+</metal:testimonial>
+
+<metal:icon_links define-macro="icon_link" i18n:domain="onegov.town6">
+        <div tal:condition="title and icon" class="cell icon-link" data-aos="fade">
+            <a href="${link}">
+                <div class="icon" style="background-color:${color}">
+                    <i class="fa ${icon}"></i>
+                </div>
+                <h4>${title}</h4>
+            </a>
+            <p tal:condition="text" >${text}</p>
+        </div>
+</metal:icon_links>
 
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">

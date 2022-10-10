@@ -100,7 +100,7 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
             'event_limit_homepage',
             'news_limit_homepage',
         ),
-        after='homepage_image_6'
+        after='homepage_cover'
     )
 
 
@@ -235,7 +235,7 @@ def town_handle_holiday_settings(self, request, form):
 @TownApp.form(
     model=Organisation, name='ticket-settings', template='form.pt',
     permission=Secret, form=OrgTicketSettingsForm,
-    setting=_("Ticket Settings"), order=-950, icon='fa-ticket-alt'
+    setting=_("Tickets"), order=-950, icon='fa-ticket-alt'
 )
 def town_handle_ticket_settings(self, request, form):
     return handle_ticket_settings(
@@ -245,7 +245,7 @@ def town_handle_ticket_settings(self, request, form):
 @TownApp.form(
     model=Organisation, name='newsletter-settings', template='form.pt',
     permission=Secret, form=NewsletterSettingsForm,
-    setting=_("Newsletter Settings"), order=-951, icon='far fa-paper-plane'
+    setting=_("Newsletter"), order=-951, icon='far fa-paper-plane'
 )
 def town_handle_newsletter_settings(self, request, form):
     return handle_newsletter_settings(

@@ -456,3 +456,19 @@ class HoneyPotExtension(ContentExtension):
             )
 
         return HoneyPotForm
+
+
+class ImageExtension(ContentExtension):
+
+    page_image = meta_property()
+
+    def extend_form(self, form_class, request):
+
+        class PageImageForm(form_class):
+            # pass label by keyword to give the News model access
+            page_image = StringField(
+                label=_("Image"),
+                render_kw={'class_': 'image-url'}
+            )
+
+        return PageImageForm

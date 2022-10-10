@@ -1,6 +1,7 @@
 """ Offers tools to deal with csv (and xls, xlsx) files. """
 
 import codecs
+
 import openpyxl
 import re
 import sys
@@ -21,10 +22,16 @@ from onegov.core.cache import lru_cache
 from ordered_set import OrderedSet
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
+from onegov.core.utils import normalize_for_url
 
 
 VALID_CSV_DELIMITERS = {',', ';', '\t'}
 WHITESPACE = re.compile(r'\s+')
+
+small_chars = set('fijlrt:,;.+i ')
+large_chars = set('GHMWQ_')
+
+max_width = 75
 
 
 class CSVFile:
@@ -372,6 +379,33 @@ def convert_excel_to_csv(file, sheet_name=None):
         return convert_xls_to_csv(file, sheet_name)
 
 
+def character_width(char):
+    # those numbers have been acquired by chasing unicorns
+    # and fairies in the magic forest of Excel
+    #
+    # tweak them as needed, but know that there's no correct answer,
+    # as each excel version on each platform or os-version will render
+    # the fonts used at different widths
+    if char in small_chars:
+        return 0.75
+    elif char in large_chars:
+        return 1.2
+    else:
+        return 1
+
+
+def estimate_width(text):
+    if not text:
+        return 0
+
+    width = max(
+        sum(character_width(c) for c in line)
+        for line in text.splitlines()
+    )
+
+    return min(width, max_width)
+
+
 def get_keys_from_list_of_dicts(rows, key=None, reverse=False):
     """ Returns all keys of a list of dicts in an ordered tuple.
 
@@ -440,36 +474,6 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
     """
 
-    small_chars = set('fijlrt:,;.+i ')
-    large_chars = set('GHMWQ_')
-
-    max_width = 75
-
-    def character_width(char):
-        # those numbers have been acquired by chasing unicorns
-        # and fairies in the magic forest of Excel
-        #
-        # tweak them as needed, but know that there's no correct answer,
-        # as each excel version on each platform or os-version will render
-        # the fonts used at different widths
-        if char in small_chars:
-            return 0.75
-        elif char in large_chars:
-            return 1.2
-        else:
-            return 1
-
-    def estimate_width(text):
-        if not text:
-            return 0
-
-        width = max(
-            sum(character_width(c) for c in line)
-            for line in text.splitlines()
-        )
-
-        return min(width, max_width)
-
     with tempfile.NamedTemporaryFile() as file:
         workbook = Workbook(file.name, options={'constant_memory': True})
         cellformat = workbook.add_format({'text_wrap': True})
@@ -509,6 +513,134 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
         file.seek(0)
         return file.read()
+
+
+def convert_list_of_list_of_dicts_to_xlsx(row_list, titles_list,
+                                          key_list=None,
+                                          reverse=False):
+    """
+    Like to :func:`convert_list_of_dicts_to_xlsx`, but operates on a list
+    instead of in a single item.
+
+    """
+    titles_list = normalize_sheet_titles(titles_list)
+
+    with tempfile.NamedTemporaryFile() as file:
+        workbook = Workbook(file.name, options={'constant_memory': True})
+        if key_list is None:
+            key_list = [None] * len(titles_list)
+        for rows, title, key in zip(row_list, titles_list, key_list):
+
+            cellformat = workbook.add_format({'text_wrap': True})
+            worksheet = workbook.add_worksheet(title)
+            fields = get_keys_from_list_of_dicts(rows, key, reverse)
+
+            # write the header
+            worksheet.write_row(0, 0, fields, cellformat)
+
+            # keep track of the maximum character width
+            column_widths = [estimate_width(field) for field in fields]
+
+            def values(row):
+                for ix, field in enumerate(fields):
+                    value = row.get(field, '')
+                    column_widths[ix] = max(
+                        column_widths[ix],
+                        estimate_width(str(value))
+                    )
+
+                    if isinstance(value, str):
+                        value = value.replace('\r', '')
+
+                    yield value
+
+            # write the list_of_rows
+            for r, row in enumerate(rows, start=1):
+                worksheet.write_row(r, 0, values(row), cellformat)
+
+            # set the column widths
+            for col, width in enumerate(column_widths):
+                worksheet.set_column(col, col, width)
+
+        workbook.close()
+        file.seek(0)
+        return file.read()
+
+
+def normalize_sheet_titles(titles):
+    """
+        Ensuring the title of the xlsx is valid.
+    """
+
+    def valid_characters_or_raise(title):
+        INVALID_TITLE_REGEX = re.compile(r'[\\*?:/\[\]]')
+        m = INVALID_TITLE_REGEX.search(title)
+        if m:
+            msg = f"Invalid character {m.group(0)} found in xlsx sheet title"
+            raise ValueError(msg)
+
+    titles = [normalize_for_url(title) for title in titles]
+    duplicate_idxs = list_duplicates_index(titles)
+
+    # change name of the duplicate sheet names
+    for index in duplicate_idxs:
+        current_title = titles[index]
+        valid_characters_or_raise(current_title)
+        titles[index] = avoid_duplicate_name(titles, current_title)
+
+    # change name of the duplicate sheet names
+    for index, item in enumerate(titles):
+        if len(item) > 31:
+            while len(titles[index]) > 31:
+                titles[index] = remove_first_word(titles[index])
+
+    return titles
+
+
+def avoid_duplicate_name(titles, title):
+    """
+    Naive check to see whether name already exists.
+    If name does exist suggest a name using an incrementer
+    Duplicates are case-insensitive
+    """
+    # Check for an absolute match in which case we need to find an alternative
+    match = [n for n in titles if n.lower() == title.lower()]
+    if match:
+        titles = u",".join(titles)
+        sheet_title_regex = re.compile(
+            f'(?P<title>{re.escape(title)})(?P<count>\\d*),?', re.I
+        )
+        matches = sheet_title_regex.findall(titles)
+        if matches:
+            # use name, but append with the next highest integer
+            counts = [int(idx) for (t, idx) in matches if idx.isdigit()]
+            highest = 0
+            if counts:
+                highest = max(counts)
+            title = u"{0}_{1}".format(title, highest + 1)
+    return title
+
+
+def remove_first_word(title):
+    """
+        Removes all chars from beginning up until and including the first "-".
+    """
+    title = re.sub(r'^.*?-', '-', title)
+    return title[1:]
+
+
+def has_duplicates(a_list):
+    return len(a_list) != len(set(a_list))
+
+
+def list_duplicates_index(a):
+    """
+        returns a list of indexes of duplicates in a list.
+        for example:
+            a = [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
+            list_duplicates_index(a) == [3, 4, 7, 8, 9]
+    """
+    return [idx for idx, item in enumerate(a) if item in a[:idx]]
 
 
 def parse_header(csv, dialect=None, rename_duplicate_column_names=False):
@@ -578,10 +710,10 @@ def match_headers(headers, expected):
         raise errors.DuplicateColumnNamesError()
 
     # we calculate a 'sane' levenshtein distance by comparing the
-    # the distances between all headers, permutations, as well as the lengths
+    # distances between all headers, permutations, as well as the lengths
     # of all expected headers. This makes sure we don't end up with matches
     # that make no sense (like ['first', 'second'] matching ['first', 'third'])
-    sane_distance = getattr(sys, 'maxsize', 0) or sys.maxint
+    sane_distance = getattr(sys, 'maxsize', 0) or sys.maxsize
 
     if len(headers) > 1:
         sane_distance = min((

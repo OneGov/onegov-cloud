@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-02 11:11+0200\n"
+"POT-Creation-Date: 2022-10-02 15:36+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -677,14 +677,6 @@ msgid "Statistics"
 msgstr "Statistica"
 
 #, python-format
-msgid "Final results are available on ${url}"
-msgstr "Resultats finals disponibels sin ${url}"
-
-#, python-format
-msgid "New intermediate results are available on ${url}"
-msgstr "Novs resultats intermediars disponibels sin ${url}"
-
-#, python-format
 msgid "Regional (${on})"
 msgstr "Plaun regiunal (${on})"
 
@@ -880,8 +872,8 @@ msgstr "Cuntegn"
 msgid "Sitemap"
 msgstr "Sitemap"
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziala"
 
@@ -1332,8 +1324,31 @@ msgstr "Activ"
 msgid "Activate"
 msgstr "Activar"
 
+msgid "This will trigger the following notifications:"
+msgstr ""
+
+msgid "Email: One email containing all the results. The subject will be"
+msgstr ""
+
+msgid "SMS: One SMS with the generic message"
+msgstr ""
+
+msgid ""
+"There is also the possibility to trigger bundled notifications for the "
+"current election day:"
+msgstr ""
+
 msgid "Last notifications:"
 msgstr "Ultimas infurmaziuns:"
+
+msgid "No notifications yet."
+msgstr ""
+
+msgid ""
+"Email: One email containing all the results of the selected elections and "
+"votes. The subject depends on whether all selected elections and votes are "
+"completed:"
+msgstr ""
 
 msgid "Create token"
 msgstr "Crear in token"
@@ -1752,9 +1767,3 @@ msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
 
 msgid "Download Archive"
 msgstr "Telechargiar l’archiv"
-
-#~ msgid "Logo ${layout.principal.name}: Link to homepage"
-#~ msgstr "Logo ${layout.principal.name}: Colliaziun a la homepage"
-
-#~ msgid "Logo: Link to homepage"
-#~ msgstr "Logo: Link a la pagina iniziala"

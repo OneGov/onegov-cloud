@@ -1,4 +1,5 @@
 import datetime
+import json
 import re
 
 from cached_property import cached_property
@@ -393,6 +394,37 @@ class LinksSettingsForm(Form):
 
 class HeaderSettingsForm(Form):
 
+    announcement = StringField(
+        label=_("Announcement"),
+        fieldset=_("Announcement"),
+    )
+
+    announcement_url = StringField(
+        label=_("Announcement URL"),
+        fieldset=_("Announcement"),
+    )
+
+    announcement_bg_color = ColorField(
+        label=_("Announcement bg color"),
+        fieldset=_("Announcement")
+    )
+
+    announcement_font_color = ColorField(
+        label=_("Announcement font color"),
+        fieldset=_("Announcement")
+    )
+
+    announcement_is_private = BooleanField(
+        label=_("Only show Announcement for logged-in users"),
+        fieldset=_("Announcement")
+    )
+
+    header_links = StringField(
+        label=_("Header links"),
+        fieldset=_("Header links"),
+        render_kw={'class_': 'many many-links'}
+    )
+
     left_header_name = StringField(
         label=_("Name"),
         description=_(""),
@@ -419,52 +451,49 @@ class HeaderSettingsForm(Form):
         default=1
     )
 
-    left_header_announcement = StringField(
-        label=_("Announcement"),
-        fieldset=_("Announcement"),
-    )
-
-    left_header_announcement_bg_color = ColorField(
-        label=_("Announcement bg color"),
-        fieldset=_("Announcement")
-    )
-
-    left_header_announcement_font_color = ColorField(
-        label=_("Announcement font color"),
-        fieldset=_("Announcement")
-    )
-
     @property
     def header_options(self):
         return {
+            'header_links': self.json_to_links(self.header_links.data) or None,
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
             'left_header_color': self.left_header_color.data.get_hex(),
             'left_header_rem': self.left_header_rem.data,
-            'left_header_announcement': self.left_header_announcement.data,
-            'left_header_announcement_bg_color':
-                self.left_header_announcement_bg_color.data.get_hex(),
-            'left_header_announcement_font_color':
-                self.left_header_announcement_font_color.data.get_hex()
+            'announcement': self.announcement.data,
+            'announcement_url': self.announcement_url.data,
+            'announcement_bg_color': self.announcement_bg_color.data.get_hex(),
+            'announcement_font_color':
+            self.announcement_font_color.data.get_hex(),
+            'announcement_is_private': self.announcement_is_private.data
         }
 
     @header_options.setter
     def header_options(self, options):
+        if not options.get('header_links'):
+            self.header_links.data = self.links_to_json(None)
+        else:
+            self.header_links.data = self.links_to_json(
+                options.get('header_links')
+            )
+
         self.left_header_name.data = options.get('left_header_name')
         self.left_header_url.data = options.get('left_header_url')
         self.left_header_color.data = options.get(
             'left_header_color', '#000000'
         )
         self.left_header_rem.data = options.get('left_header_rem', 1)
-        self.left_header_announcement.data = options.get(
-            'left_header_announcement', ""
-        )
-        self.left_header_announcement_bg_color.data = options.get(
-            'left_header_announcement_bg_color', '#FBBC05'
-        )
-        self.left_header_announcement_font_color.data = options.get(
-            'left_header_announcement_font_color', '#000000'
-        )
+        self.announcement.data = options.get('announcement', "")
+        self.announcement_url.data = options.get('announcement_url', "")
+        self.announcement_bg_color.data = options.get(
+            'announcement_bg_color', '#FBBC05')
+        self.announcement_font_color.data = options.get(
+            'announcement_font_color', '#000000')
+        self.announcement_is_private.data = options.get(
+            'announcement_is_private', "")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.link_errors = {}
 
     def populate_obj(self, model):
         super().populate_obj(model)
@@ -474,32 +503,46 @@ class HeaderSettingsForm(Form):
         super().process_obj(model)
         self.header_options = model.header_options or {}
 
+    def validate(self):
+        result = super().validate()
+        for text, link in self.json_to_links(self.header_links.data):
+            if text and not link:
+                self.header_links.errors.append(
+                    _('Please add an url to each link')
+                )
+                result = False
+        return result
+
+    def json_to_links(self, text=None):
+        result = []
+
+        for value in json.loads(text or '{}').get('values', []):
+            if value['link'] or value['text']:
+                result.append([value['text'], value['link']])
+
+        return result
+
+    def links_to_json(self, header_links=None):
+        header_links = header_links or []
+
+        return json.dumps({
+            'labels': {
+                'text': self.request.translate(_("Text")),
+                'link': self.request.translate(_("URL")),
+                'add': self.request.translate(_("Add")),
+                'remove': self.request.translate(_("Remove")),
+            },
+            'values': [
+                {
+                    'text': l[0],
+                    'link': l[1],
+                    'error': self.link_errors.get(ix, "")
+                } for ix, l in enumerate(header_links)
+            ]
+        })
+
 
 class HomepageSettingsForm(Form):
-
-    homepage_image_1 = StringField(
-        label=_("Homepage Image #1"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_2 = StringField(
-        label=_("Homepage Image #2"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_3 = StringField(
-        label=_("Homepage Image #3"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_4 = StringField(
-        label=_("Homepage Image #4"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_5 = StringField(
-        label=_("Homepage Image #5"),
-        render_kw={'class_': 'image-url'})
-
-    homepage_image_6 = StringField(
-        label=_("Homepage Image #6"),
-        render_kw={'class_': 'image-url'})
 
     homepage_cover = HtmlField(
         label=_("Homepage Cover"),
@@ -557,43 +600,6 @@ class HomepageSettingsForm(Form):
 
                 raise ValidationError(correct_msg)
 
-    @property
-    def theme_options(self):
-        options = self.model.theme_options
-
-        # set the images only if provided
-        for i in range(1, 7):
-            image = getattr(self, 'homepage_image_{}'.format(i)).data
-
-            if not image:
-                options.pop(f'tile-image-{i}', None)
-            else:
-                options[f'tile-image-{i}'] = '"{}"'.format(image)
-
-        # override the options using the default values if no value was given
-        for key in options:
-            if not options[key]:
-                options[key] = user_options[key]
-
-        return options
-
-    @theme_options.setter
-    def theme_options(self, options):
-        self.homepage_image_1.data = options.get('tile-image-1', '').strip('"')
-        self.homepage_image_2.data = options.get('tile-image-2', '').strip('"')
-        self.homepage_image_3.data = options.get('tile-image-3', '').strip('"')
-        self.homepage_image_4.data = options.get('tile-image-4', '').strip('"')
-        self.homepage_image_5.data = options.get('tile-image-5', '').strip('"')
-        self.homepage_image_6.data = options.get('tile-image-6', '').strip('"')
-
-    def populate_obj(self, model):
-        super().populate_obj(model)
-        model.theme_options = self.theme_options
-
-    def process_obj(self, model):
-        super().process_obj(model)
-        self.theme_options = model.theme_options
-
 
 class ModuleSettingsForm(Form):
 
@@ -635,6 +641,7 @@ class MapSettingsForm(Form):
             ('geo-mapbox', _("Mapbox (Default)")),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
             ('geo-zugmap-luftbild', "ZugMap Luftbild"),
+            ('geo-bs', "Geoportal Basel-Stadt"),
         ])
 
 
