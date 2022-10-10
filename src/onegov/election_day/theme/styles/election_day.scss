@@ -56,7 +56,7 @@ html {
     Ballot Result Bar
 */
 .ballot-result-bar {
-    color: $aluminum;
+    color: #575757;
     margin-bottom: 2em;
 
     dl dt {
@@ -216,7 +216,7 @@ table {
     }
 
     th {
-        border-bottom: 1px solid $aluminum;
+        border-bottom: 1px solid #575757;
 
         &:not(:first-of-type) {
             hyphens: auto;
@@ -556,7 +556,7 @@ figcaption {
     SVG Downloads
 */
 .svg-download {
-    color: $aluminum;
+    color: #575757;
     display: block;
     font-size: .8rem;
     text-align: right;
@@ -573,7 +573,7 @@ figcaption {
     font-size: .8rem;
 
     a {
-        color: $aluminum;
+        color: #575757;
         display: block;
         text-align: right;
     }
@@ -603,7 +603,7 @@ figcaption {
     }
 
     span {
-        color: $aluminum;
+        color: #575757;
         font-weight: bold;
     }
 }
@@ -643,7 +643,7 @@ footer {
     margin-top: 1em;
 
     .title-area {
-        border-bottom: 1px solid $aluminum;
+        border-bottom: 1px solid #575757;
 
         .name {
             background: $white-smoke;
@@ -656,11 +656,11 @@ footer {
 
     .top-bar {
         &:not(.expanded) {
-            border-bottom: 1px solid $aluminum;
+            border-bottom: 1px solid #575757;
         }
 
         .title-area .name span {
-            color: $aluminum;
+            color: #575757;
         }
 
         .left {
@@ -671,7 +671,7 @@ footer {
 
         .has-dropdown>a::after {
             border-color: transparent;
-            border-left-color: $aluminum;
+            border-left-color: #575757;
         }
     }
 }
@@ -689,13 +689,18 @@ footer {
             }
 
             .left {
-                border-bottom: 1px solid $aluminum;
+                border-bottom: 1px solid #575757;
                 width: 100%;
 
                 li {
                     border-bottom: 2px solid $white;
                     position: relative;
                     z-index: 10;
+
+                    a,
+                    a:hover {
+                        color: #575757;
+                    }
 
                     &.active {
                         border-bottom: 2px solid $primary-color;
@@ -708,7 +713,7 @@ footer {
 
             .has-dropdown>a::after {
                 border-color: transparent;
-                border-top-color: $aluminum;
+                border-top-color: #575757;
             }
 
             .top-bar-section .dropdown {
@@ -719,6 +724,7 @@ footer {
 
                     > a {
                         background-color: $white-smoke;
+                        color: #575757;
                     }
 
                     &:not(.has-form):not(.active)>a:not(.button) {
@@ -854,6 +860,11 @@ form {
 .alert-box {
     font-size: 1rem;
 
+    &.alert {
+        background-color: #D72D0F;
+        border-color: #D72D0F;
+    }
+
     p {
         margin-bottom: 0;
     }
@@ -864,6 +875,19 @@ form {
     margin-right: auto;
     margin-top: 1%;
     width: 85%;
+}
+
+/*
+    Errors
+*/
+
+label.error {
+    color: #A2220B;
+}
+
+small.error,
+span.error {
+    background-color: #D72D0F;
 }
 
 /*
