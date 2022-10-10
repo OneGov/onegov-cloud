@@ -10,7 +10,7 @@
             <tal:b i18n:translate="">Elections &amp; Votes</tal:b>
         </h1>
 
-        <hr />
+        <hr>
     </tal:b>
 
     <tal:b metal:fill-slot="content">
@@ -21,7 +21,7 @@
                     <div class="columns small-12 small-centered">
                         <div class="tab-navigation clearfix" tal:condition="layout.menu">
                             <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
-                                <section class="top-bar-section">
+                                <div class="top-bar-section">
                                     <ul class="left">
 
                                         <tal:b repeat="(title, link, active) layout.menu">
@@ -31,7 +31,7 @@
                                         </tal:b>
 
                                     </ul>
-                                </section>
+                                </div>
                             </nav>
                         </div>
                     </div>
