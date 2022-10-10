@@ -60,7 +60,7 @@ Sche la vischnanca n'è betg cuntegnida en ils resultats, vala ella sco anc betg
 
 #### Project
 
-- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_standard.csv)
+- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_standard.csv)
 
 ### OneGov
 
@@ -97,7 +97,7 @@ Sch'il status
 
 #### Project
 
-- [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_onegov.csv)
+- [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_onegov.csv)
 
 
 ### Wabsti
@@ -129,7 +129,7 @@ Vischnancas valan sco anc betg dumbradas ora, sch'ina da las duas suandantas cun
 
 #### Project
 
-- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_wabsti.csv)
+- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_wabsti.csv)
 
 
 ### WabstiCExport

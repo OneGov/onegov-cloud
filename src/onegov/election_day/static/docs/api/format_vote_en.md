@@ -60,7 +60,7 @@ Municipalities are deemed not to have been counted yet if the municipality is no
 
 #### Template
 
-- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_standard.csv)
+- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_standard.csv)
 
 
 ### OneGov
@@ -97,7 +97,7 @@ If the status is
 
 #### Template
 
-- [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_onegov.csv)
+- [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_onegov.csv)
 
 
 ### Wabsti
@@ -129,7 +129,7 @@ Municipalities are deemed not to have been counted yet if one of the following t
 
 #### Template
 
-- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_wabsti.csv)
+- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_wabsti.csv)
 
 
 ### WabstiCExport

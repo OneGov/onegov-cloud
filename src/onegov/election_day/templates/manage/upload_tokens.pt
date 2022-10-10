@@ -23,7 +23,7 @@
                     <p>
                         <i class="fa fa-info-circle"></i>
                         <span i18n:translate="">A description of the REST interface can be found here:</span>
-                        <a href="https://github.com/OneGov/onegov-cloud/tree/master/docs/api/election_day#rest-interface" target="_blank">REST Interface</a>.
+                        <a href="https://github.com/OneGov/onegov-cloud/tree/master/src/onegov/election_day/static/docs/api/#rest-interface" target="_blank">REST Interface</a>.
                     </p>
                 </div>
 
