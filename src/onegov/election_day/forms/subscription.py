@@ -25,7 +25,6 @@ class EmailSubscriptionForm(Form):
         ],
         render_kw={
             'autocomplete': 'email',
-            'aria-describedby': 'email-error',
         }
     )
 
@@ -46,7 +45,6 @@ class SmsSubscriptionForm(Form):
         ],
         render_kw={
             'autocomplete': 'tel',
-            'aria-describedby': 'phone_number-error',
         }
     )
 
