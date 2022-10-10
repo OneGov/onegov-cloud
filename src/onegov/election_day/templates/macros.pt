@@ -1014,7 +1014,7 @@
                                     <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
                                     <tal:b tal:condition="long_description">
                                         <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
-                                        <p class="visually-hidden">${field.description}</p>
+                                        <span class="visually-hidden">${field.description}</span>
                                     </tal:b>
                                     <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
 
