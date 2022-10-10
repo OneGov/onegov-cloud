@@ -825,7 +825,8 @@ ul.actions {
 */
 
 form {
-    label ul {
+    label ul,
+    .group-label > ul {
         list-style: none;
 
         margin: 0;
@@ -840,6 +841,12 @@ form {
     p {
         font-size: inherit;
     }
+
+    .group-label {
+        color: $form-label-font-color;
+        font-size: $form-label-font-size;
+    }
+
 }
 
 .cancel-button {

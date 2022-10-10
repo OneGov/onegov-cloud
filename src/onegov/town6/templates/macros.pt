@@ -395,12 +395,12 @@
                 ${field()}
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:b>
-            <tal:b condition="input_type != 'hidden'">
-                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not:field.contains_labels|nothing">
+            <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
+                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </label>
 
-                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
+                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </div>
                 <small class="error" tal:repeat="error field.errors">${error}</small>
