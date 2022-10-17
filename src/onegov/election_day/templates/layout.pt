@@ -7,8 +7,8 @@ xmlns:tal="http://xml.zope.org/namespaces/tal"
 i18n:domain="onegov.election_day"
 metal:define-macro="layout">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         <tal:block metal:define-slot="title">
             <tal:block content="layout.principal.name" />:
@@ -50,7 +50,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 medium-8 medium-pull-4 small-only-text-center columns">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" >
                 </a>
             </div>
         </tal:block>
@@ -60,7 +60,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 columns text-right">
                 <a href="${layout.homepage_link}" title="homepage" i18n:attributes="title">
-                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
+                    <img aria-hidden="true" alt="${layout.logo_alt_text}" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing">
                 </a>
             </div>
         </tal:block>

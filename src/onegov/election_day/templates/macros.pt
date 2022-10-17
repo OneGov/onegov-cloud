@@ -993,14 +993,15 @@
                         ${field()}
                         <p><small class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
-                    <tal:block condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
-                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
-                    <metal:b use-macro="layout.macros['field']" />
-                </label>
 
-                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
-                    <metal:b use-macro="layout.macros['field']" />
-                </div>
+                    <tal:block condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
+                        <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
+                        </label>
+
+                        <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
+                        </div>
 
                         <p><small id="${field.name}-error" class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>

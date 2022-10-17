@@ -10,6 +10,9 @@ from onegov.election_day.models import Principal
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_summaries
+from webob.exc import HTTPNotFound
+from fs.errors import ResourceNotFound
+from morepath.request import Response
 
 
 @ElectionDayApp.html(
@@ -154,3 +157,27 @@ def view_archive_search(self, request, form):
         'item_count': self.subset_count,
         'results': self.batch
     }
+
+
+@ElectionDayApp.view(
+    model=Principal,
+    name='archive-download',
+    permission=Public)
+def view_archive_download(self, request):
+
+    if not request.app.filestorage.isdir("archive"):
+        raise HTTPNotFound()
+    try:
+        zip_dir = request.app.filestorage.opendir("archive/zip")
+        content = None
+        with zip_dir.open("archive.zip", mode="rb") as zipfile:
+            content = zipfile.read()
+        if not content:
+            raise HTTPNotFound()
+        return Response(
+            content,
+            content_type='application/zip',
+            content_disposition='inline; filename=Archive.zip'
+        )
+    except (FileNotFoundError, ResourceNotFound):
+        raise HTTPNotFound()

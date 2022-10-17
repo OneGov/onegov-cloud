@@ -17,8 +17,8 @@ class DefaultLayout(ChameleonLayout):
     date_long_format = 'long'
     datetime_long_format = 'medium'
 
-    docs_base_url = 'https://github.com/OneGov/onegov-cloud' \
-                    '/tree/master/docs/api/election_day'
+    docs_base_url = 'https://github.com/OneGov/onegov-cloud/blob/master/src' \
+                    '/onegov/election_day/static/docs/api'
 
     def __init__(self, model, request):
         super().__init__(model, request)
@@ -158,3 +158,7 @@ class DefaultLayout(ChameleonLayout):
             f'{self.request.translate(_("Link to homepage"))}'
         )
         return alt_text
+
+    @cached_property
+    def archive_download(self):
+        return self.request.link(self.principal, name="archive-download")
