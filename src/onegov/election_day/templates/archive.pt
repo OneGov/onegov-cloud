@@ -13,7 +13,7 @@
             <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
         </h1>
 
-        <hr />
+        <hr>
     </tal:block>
 
     <tal:block metal:fill-slot="content">
@@ -24,12 +24,10 @@
             </tal:block>
 
             <nav class="skip-links">
-                <ul>
-                    <a tal:repeat="date archive_items" class="show-only-on-tab" i18n:translate="" href="#date-${date}">
-                        Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                    </a>
-                    <a class="show-only-on-tab" href="#archive" i18n:translate="">Archive</a>
-                </ul>
+                <a tal:repeat="date archive_items" class="show-only-on-tab" i18n:translate="" href="#date-${date}">
+                    Elections and votes on <tal:block tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
+                </a>
+                <a class="show-only-on-tab" href="#archive" i18n:translate="">Archive</a>
             </nav>
 
             <div tal:repeat="date archive_items" class="date-${date}">
