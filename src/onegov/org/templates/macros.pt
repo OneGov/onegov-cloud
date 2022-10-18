@@ -1844,7 +1844,7 @@
         file_number file.number|file.id;
         file_upload file.upload_date|file.created
     ">
-        <tr class="file-info ${file.signed and 'signed'}">
+        <tr class="file-info ${'signed' if file.signed else ''}">
             <td>
                 ${file.name}
             </td>
