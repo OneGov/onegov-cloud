@@ -25,7 +25,7 @@ class TranslatorDocumentCollection(FileCollection):
     supported_content_types = 'all'
 
     def __init__(self, session, translator_id, category):
-        super().__init__(session, type="*", allow_duplicates=False)
+        super().__init__(session, type="*", allow_duplicates=True)
 
         self.translator_id = translator_id
         self.category = category or DEFAULT_DOCUMENT_CATEGORIES[0]
