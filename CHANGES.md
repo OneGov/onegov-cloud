@@ -1,8 +1,76 @@
 # Changes
 
+## 2022.50
+
+`2022-10-18` | [882bf8e010...443e117f90](https://github.com/OneGov/onegov-cloud/compare/882bf8e010^...443e117f90)
+
+### Agency
+
+##### Add information for changes form
+
+`Feature` | [OGC-650](https://linear.app/onegovcloud/issue/OGC-650) | [c0a04a906d](https://github.com/onegov/onegov-cloud/commit/c0a04a906d0dd7af513f92f85648f954a4cc5fff)
+
+##### Delete reference on non-existant address fields
+
+`Bugfix` | [OGC-645](https://linear.app/onegovcloud/issue/OGC-645) | [f4d2fd08c2](https://github.com/onegov/onegov-cloud/commit/f4d2fd08c20bac393533e55ab0837d1a98940364)
+
+### Election Day
+
+##### Export all votes and elections of all time.
+
+`Feature` | [OGC-483](https://linear.app/onegovcloud/issue/OGC-483) | [882bf8e010](https://github.com/onegov/onegov-cloud/commit/882bf8e0100dcd7bcf1e13386ab8531c48677033)
+
+##### Allow alternative expats column name.
+
+`Feature` | [404e98a5e5](https://github.com/onegov/onegov-cloud/commit/404e98a5e5c3b236636ea920f3c60a434bb73055)
+
+##### Color contrasts
+
+`Feature` | [OGC-556](https://linear.app/onegovcloud/issue/OGC-556) | [77ce7da75c](https://github.com/onegov/onegov-cloud/commit/77ce7da75c90a4cc5c0557a4c046389a84d6fbc1)
+
+##### Add white background to terms of usage image
+
+`Feature` | [OGC-538](https://linear.app/onegovcloud/issue/OGC-538) | [23a89290b4](https://github.com/onegov/onegov-cloud/commit/23a89290b47e6fb19ec6e489d66b4aa7fd9cdf14)
+
+##### Fix HTML Errors
+
+`Bugfix` | [OGC-562](https://linear.app/onegovcloud/issue/OGC-562) | [aa9ca0ca1b](https://github.com/onegov/onegov-cloud/commit/aa9ca0ca1bcaaafbce8fff7f174998566f65ad86)
+
+##### Fix broken up definition list
+
+`Bugfix` | [OGC-552](https://linear.app/onegovcloud/issue/OGC-552) | [05705527e2](https://github.com/onegov/onegov-cloud/commit/05705527e2e89bad6a25c7c44524ba2340a306f7)
+
+### Feriennet
+
+##### Fix age check options being escaped.
+
+`Bugfix` | [PRO-1094](https://linear.app/projuventute/issue/PRO-1094) | [0e58e5755c](https://github.com/onegov/onegov-cloud/commit/0e58e5755c79b2280d3712c02f08db1967b455e3)
+
+### Org
+
+##### Fix signed class rendering.
+
+`Bugfix` | [94ea74c201](https://github.com/onegov/onegov-cloud/commit/94ea74c20182cd0693cae7a097c635156aa9aea5)
+
+##### Fix label nesting problem
+
+Fixed problem with nested labels on multiple choice fields in forms
+
+`Bugfix` | [OGC-554](https://linear.app/onegovcloud/issue/OGC-554) | [e4a799e5c0](https://github.com/onegov/onegov-cloud/commit/e4a799e5c0b3eab6be8c1b5766c996987e00e0fe)
+
+### Town6
+
+##### Display contact information correctly
+
+`Bugfix` | [OGC-648](https://linear.app/onegovcloud/issue/OGC-648) | [9fe7bd211a](https://github.com/onegov/onegov-cloud/commit/9fe7bd211add87148fd0ea88965d2cf487121c5e)
+
+##### Homepage widget adjustments
+
+`Bugfix` | [cc30098a80](https://github.com/onegov/onegov-cloud/commit/cc30098a80f5ba810f143b8c78db825d3c0d95fb)
+
 ## 2022.49
 
-`2022-10-04` | [c6b209efef...2996c3f2a7](https://github.com/OneGov/onegov-cloud/compare/c6b209efef^...2996c3f2a7)
+`2022-10-04` | [c6b209efef...173144825b](https://github.com/OneGov/onegov-cloud/compare/c6b209efef^...173144825b)
 
 ### Agency
 
@@ -2319,8 +2387,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Update translations.
 
 `Bugfix` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [62416c3a0f](https://github.com/onegov/onegov-cloud/commit/62416c3a0f631d0eed77e392598a99b6fa67b14f)
-
-## 2021.101
-
-`2021-12-29` | [d7e8950d11...d7e8950d11](https://github.com/OneGov/onegov-cloud/compare/d7e8950d11^...d7e8950d11)
 
