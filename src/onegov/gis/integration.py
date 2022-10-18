@@ -89,6 +89,20 @@ def get_geo_bs():
     yield 'geo-bs.js'
 
 
+@MapboxApp.webasset('geo-admin')
+def get_geo_admin():
+    yield 'leaflet'
+    yield 'proj4js'
+    yield 'geo-admin.js'
+
+
+@MapboxApp.webasset('geo-admin-aerial')
+def get_geo_admin_aerial():
+    yield 'leaflet'
+    yield 'proj4js'
+    yield 'geo-admin-aerial.js'
+
+
 @MapboxApp.tween_factory()
 def inject_mapbox_api_token_tween_factory(app, handler):
 
