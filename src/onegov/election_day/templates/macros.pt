@@ -991,6 +991,7 @@
                     </tal:block>
 
                     <tal:block condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
+                        <p class="visually-hidden" tal:condition="field.type == 'LazyWolvesField'" i18n:translate>The next field is a spam protection, please do not fill it out.</p>
                         <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
                             <metal:b use-macro="layout.macros['field']" />
                         </label>
