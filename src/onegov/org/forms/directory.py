@@ -280,6 +280,16 @@ class DirectoryBaseForm(Form):
             return None
 
     @cached_property
+    def known_fields(self):
+        try:
+            return [
+                field for field in
+                flatten_fieldsets(parse_formcode(self.structure.data))
+            ]
+        except FormError:
+            return None
+
+    @cached_property
     def missing_fields(self):
         try:
             return self.configuration.missing_fields(self.structure.data)
@@ -422,6 +432,14 @@ class DirectoryBaseForm(Form):
     @property
     def configuration(self):
         content_fields = list(self.extract_field_ids(self.content_fields))
+
+        # Remove file and url fields from search
+        file_fields = [f.human_id for f in self.known_fields if (
+            f.type == 'fileinput' or f.type == 'url'
+        )]
+        searchable_content_fields = [
+            f for f in content_fields if f not in file_fields
+        ]
         content_hide_labels = list(
             self.extract_field_ids(self.content_hide_labels))
         contact_fields = list(self.extract_field_ids(self.contact_fields))
@@ -437,7 +455,7 @@ class DirectoryBaseForm(Form):
             lead=self.lead_format.data,
             order=safe_format_keys(order_format),
             keywords=keyword_fields,
-            searchable=content_fields + contact_fields,
+            searchable=searchable_content_fields + contact_fields,
             display={
                 'content': content_fields,
                 'contact': contact_fields,
