@@ -295,11 +295,11 @@ class PeriodForm(Form):
         fieldset=_("Age check"),
         choices=[
             ('exact', _(
-                "<b>Exact</b> - the attendees need to be of the expected age "
+                "Exact - the attendees need to be of the expected age "
                 "at the beginning of the occasion"
             )),
             ('year', _(
-                "<b>Age group</b> - The attendees need to be of the expected "
+                "Age group - The attendees need to be of the expected "
                 "age sometime during the year of the occasion"
             )),
         ],
