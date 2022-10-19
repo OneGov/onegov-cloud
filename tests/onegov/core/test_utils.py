@@ -443,6 +443,7 @@ def test_to_html_ul():
     assert to_html_ul(text) == f'<ul>{li("A")}</ul>' \
                                f'<ul class="bulleted">{li("B")}</ul>'
 
+
 def test_batched():
     iterable = utils.batched(range(12), 5)
     assert next(iterable) == (0, 1, 2, 3, 4)
