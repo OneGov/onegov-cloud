@@ -3,6 +3,7 @@ import click
 import os
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -219,3 +220,29 @@ def update_last_result_change():
         click.secho(f'Updated {count} items', fg='green')
 
     return update
+
+
+@cli.command('migrate-colors')
+def migrate_colors():
+    def migrate(request, app):
+        click.secho(f'Updating {app.schema}', fg='yellow')
+
+        count = 0
+
+        session = request.app.session()
+        items = session.query(ProporzElection).all()
+        items.extend(session.query(ElectionCompound))
+        for item in items:
+            colors = {
+                name: result.color
+                for result in item.party_results
+                for name in result.name_translations.values()
+            }
+            colors.update(item.colors)
+            if item.colors != colors:
+                item.colors = colors
+                count += 1
+
+        click.secho(f'Updated {count} items', fg='green')
+
+    return migrate
