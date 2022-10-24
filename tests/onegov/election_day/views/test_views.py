@@ -150,9 +150,6 @@ def test_content_security_policy(election_day_app_zg):
     assert "connect-src 'self' https://data.onegov.cloud" in csp
 
 
-
-
-
 def test_pages_cache(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH')
