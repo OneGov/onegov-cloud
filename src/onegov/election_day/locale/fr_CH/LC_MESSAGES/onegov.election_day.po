@@ -789,8 +789,8 @@ msgstr "Non %"
 msgid "Archive Search"
 msgstr "Recherche dans les archives"
 
-msgid "Download Archive"
-msgstr "Télécharger l'archive"
+msgid "Download the entire archive"
+msgstr "Télécharger l'archive complète"
 
 msgid "Search in ${title}"
 msgstr "Recherche dans ${title}"
