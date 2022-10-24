@@ -332,7 +332,7 @@ msgid "Documents"
 msgstr "Dokumente"
 
 msgid "Signed declaration of authorization (PDF)"
-msgstr "Unterschriebene Ermächtigunserklärung (PDF)"
+msgstr "Unterschriebene Einverständniserklärung (PDF)"
 
 msgid "Short letter of motivation (PDF)"
 msgstr "Kurzes Motivationsschreiben (PDF)"
