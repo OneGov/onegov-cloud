@@ -2649,6 +2649,9 @@ msgstr "Nessun album fotografico ancora definito."
 msgid "Skip navigation"
 msgstr "Ignora navigazione"
 
+msgid "Straight to ..."
+msgstr "Direttamente a ..."
+
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
 

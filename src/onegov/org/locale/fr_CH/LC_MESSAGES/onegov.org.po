@@ -2647,6 +2647,9 @@ msgstr "Aucun album photo défini pour le moment."
 msgid "Skip navigation"
 msgstr "Ignorez la navigation"
 
+msgid "Straight to ..."
+msgstr "Directement à ..."
+
 msgid "Back to the homepage"
 msgstr "Retour à la page d'accueil"
 

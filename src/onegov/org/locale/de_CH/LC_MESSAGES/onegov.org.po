@@ -2641,6 +2641,9 @@ msgstr "Noch keine Fotoalben erstellt."
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
 
+msgid "Straight to ..."
+msgstr "Direkt zu ..."
+
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
 
