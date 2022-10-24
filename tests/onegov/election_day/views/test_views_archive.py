@@ -124,8 +124,8 @@ def test_download_archive_link_click(election_day_app_zg, session):
     new.form.submit()
 
     page = client.get('/')
-    assert 'Archiv Herunterladen' in page
+    assert 'Gesamtes Archiv herunterladen' in page
 
     with pytest.raises(Exception):
         # Expecting HTTP 404 because archive has not been generated
-        page.click('Archiv Herunterladen')
+        page.click('Gesamtes Archiv herunterladen')

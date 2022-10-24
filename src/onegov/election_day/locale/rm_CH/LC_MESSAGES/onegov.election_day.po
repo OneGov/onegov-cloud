@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-02 15:36+0200\n"
+"POT-Creation-Date: 2022-10-24 07:47+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -792,6 +792,9 @@ msgstr "% NA"
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"
 
+msgid "Download the entire archive"
+msgstr "Chargiar giu l'entir archiv"
+
 msgid "Search in ${title}"
 msgstr "­Tschertgar en ${title}"
 
@@ -1325,30 +1328,34 @@ msgid "Activate"
 msgstr "Activar"
 
 msgid "This will trigger the following notifications:"
-msgstr ""
+msgstr "Las suandantas communicaziuns vegnan activadas:"
 
 msgid "Email: One email containing all the results. The subject will be"
-msgstr ""
+msgstr "E-mail: in e-mail cun tut ils resultats. L'object sa cloma"
 
 msgid "SMS: One SMS with the generic message"
-msgstr ""
+msgstr "SMS: in SMS cun il messadi general"
 
 msgid ""
 "There is also the possibility to trigger bundled notifications for the "
 "current election day:"
 msgstr ""
+"Igl è er pussaivel d'activar pliras communicaziuns per la votaziun actuala:"
 
 msgid "Last notifications:"
 msgstr "Ultimas infurmaziuns:"
 
 msgid "No notifications yet."
-msgstr ""
+msgstr "Anc naginas communicaziuns."
 
 msgid ""
 "Email: One email containing all the results of the selected elections and "
 "votes. The subject depends on whether all selected elections and votes are "
 "completed:"
 msgstr ""
+"E-mail: in e-mail cun tut ils resultats da las elecziuns e da las votaziuns "
+"tschernidas. L'object dependa dal fatg, sche tut las elecziuns e tut las "
+"votaziuns tschernidas èn terminadas:"
 
 msgid "Create token"
 msgstr "Crear in token"
@@ -1764,6 +1771,3 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
-
-msgid "Download Archive"
-msgstr "Telechargiar l’archiv"
