@@ -598,6 +598,10 @@ class RequestAccreditationForm(Form, DrivingDistanceMixin):
         self.expertise_interpreting_types.choices = \
             self.expertise_interpreting_types_choices
 
+        declaration_link = self.request.app.org.meta.get('declaration_link')
+        if declaration_link:
+            self.declaration_of_authorization.description = declaration_link
+
         self.hide(self.drive_distance)
 
     def get_translator_data(self):

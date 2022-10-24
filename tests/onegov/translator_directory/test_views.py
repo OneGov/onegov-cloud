@@ -596,15 +596,20 @@ def test_translator_directory_settings(client):
 
     settings = client.get('/directory-settings')
     assert map_value(settings) == Coordinates()
+    assert not settings.form['declaration_link'].value
 
     settings.form['coordinates'] = encode_map_value({
         'lat': 46, 'lon': 7, 'zoom': 12
     })
+    settings.form['declaration_link'].value = 'https://t.ch/file.pdf'
 
     page = settings.form.submit().follow()
     assert 'Ihre Änderungen wurden gespeichert' in page
     settings = client.get('/directory-settings')
     assert map_value(settings) == Coordinates(lat=46, lon=7, zoom=12)
+    assert settings.form['declaration_link'].value == 'https://t.ch/file.pdf'
+
+    assert 'https://t.ch/file.pdf' in client.get('/request-accreditation')
 
 
 def test_view_redirects(client):
