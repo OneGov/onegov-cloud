@@ -226,7 +226,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             return Locale.parse(locale).get_language_name().capitalize()
 
         def get_link(locale):
-            return self.request.link(SiteLocale(locale, to))
+            return SiteLocale(locale).link(self.request, to)
 
         return [
             (get_name(locale), get_link(locale))

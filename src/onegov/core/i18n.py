@@ -34,7 +34,6 @@ For example::
 
 import gettext
 import glob
-import morepath
 import os
 import os.path
 import polib
@@ -361,16 +360,18 @@ class SiteLocale:
     """
 
     @classmethod
-    def for_path(cls, app, locale, to):
+    def for_path(cls, app, locale):
         if locale in app.locales:
-            return cls(locale, to)
+            return cls(locale)
 
-    def __init__(self, locale, to):
+    def __init__(self, locale):
         self.locale = locale
-        self.to = to
+
+    def link(self, request, to):
+        return request.return_to(request.link(self), to)
 
     def redirect(self, request):
-        response = morepath.redirect(self.to)
+        response = request.redirect('')  # use return-to
         response.set_cookie(
             'locale',
             self.locale,

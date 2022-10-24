@@ -29,8 +29,8 @@ class MailLayout(DefaultLayout):
     def model_url(self, model):
         """ Returns the localized link to the given election of vote. """
 
-        return self.request.link(
-            SiteLocale(self.request.locale, self.request.link(model))
+        return SiteLocale(self.request.locale).link(
+            self.request, self.request.link(model)
         )
 
     def subject(self, model):
