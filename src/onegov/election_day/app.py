@@ -4,6 +4,7 @@ import re
 
 from datetime import datetime
 from dectate import directive
+from more.content_security import NONE
 from more.content_security import SELF
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework
@@ -189,13 +190,19 @@ def get_i18n_default_locale():
     under=content_security_policy_tween_factory
 )
 def enable_iframes_and_analytics_tween_factory(app, handler):
+    no_iframe_paths = (
+        r'/auth/.*',
+        r'/manage/.*'
+    )
+    no_iframe_paths = re.compile(rf"({'|'.join(no_iframe_paths)})")
+
     iframe_paths = (
         r'/ballot/.*',
         r'/vote/.*',
         r'/election/.*',
         r'/elections/.*',
+        r'/screen/.*',
     )
-
     iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
 
     def enable_iframes_and_analytics_tween(request):
@@ -203,7 +210,9 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
 
         result = handler(request)
 
-        if iframe_paths.match(request.path_info):
+        if no_iframe_paths.match(request.path_info):
+            request.content_security_policy.frame_ancestors = {NONE}
+        elif iframe_paths.match(request.path_info):
             request.content_security_policy.frame_ancestors.add('http://*')
             request.content_security_policy.frame_ancestors.add('https://*')
 
