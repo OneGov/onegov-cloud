@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-10-18 11:54+0200\n"
+"POT-Creation-Date: 2022-10-18 15:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1379,8 +1379,11 @@ msgstr ""
 msgid "Geo provider"
 msgstr "Fornitore di dati geografici"
 
-msgid "Mapbox (Default)"
-msgstr "Riquadro della mappa (predefinito)"
+msgid "Swisstopo (Default)"
+msgstr "Swisstopo (predefinito)"
+
+msgid "Swisstopo Aerial"
+msgstr "Swisstopo fotografia aerea"
 
 msgid "Analytics Code"
 msgstr "Codice Analytics"
@@ -5033,6 +5036,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Mapbox (Default)"
+#~ msgstr "Riquadro della mappa (predefinito)"
 
 #~ msgid "Homepage Image #1"
 #~ msgstr "Immagine n. 1 della pagina principale"

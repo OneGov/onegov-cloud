@@ -1283,7 +1283,7 @@ def test_view_accreditation(client):
         assert '"admission-course-agreement">Ja' in page
         assert 'Some remarks' in page
 
-        check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+        check_pdf(page, '1.pdf', 'Unterschriebene Einverständniserklärung.pdf')
         check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
         check_pdf(page, '3.pdf', 'Lebenslauf.pdf')
         check_pdf(page, '4.pdf', 'Zertifikate.pdf')
@@ -1510,7 +1510,7 @@ def test_view_accreditation_errors(directions, client):
     assert '"admission-course-agreement">Ja' in page
     assert 'Some remarks' in page
 
-    check_pdf(page, '1.pdf', 'Unterschriebene Ermächtigunserklärung.pdf')
+    check_pdf(page, '1.pdf', 'Unterschriebene Einverständniserklärung.pdf')
     check_pdf(page, '2.pdf', 'Kurzes Motivationsschreiben.pdf')
     check_pdf(page, '3_new.pdf', 'Lebenslauf.pdf')
     check_pdf(page, '4.pdf', 'Zertifikate.pdf')
