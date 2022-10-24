@@ -101,6 +101,58 @@ def test_cache_control(election_day_app_zg):
     assert 'no_cache' not in client.cookies
 
 
+def test_content_security_policy(election_day_app_zg):
+    principal = election_day_app_zg.principal
+    principal.csp_script_src = ('https://scripts.onegov.cloud', )
+    principal.csp_connect_src = ('https://data.onegov.cloud', )
+    election_day_app_zg.cache.set('principal', principal)
+
+    client = Client(election_day_app_zg)
+
+    # create vote
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = '2015-01-01'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # check content security policy
+    response = client.get('/')
+    csp = response.headers['Content-Security-Policy']
+    assert "frame-ancestors" not in csp
+    assert "connect-src 'self'" in csp
+    assert (
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
+        "https: https://scripts.onegov.cloud;"
+    ) in csp
+    assert "connect-src 'self' https://data.onegov.cloud" in csp
+
+    response = client.get('/auth/login')
+    csp = response.headers['Content-Security-Policy']
+    assert "frame-ancestors 'none'" in csp
+    assert "connect-src 'self'" in csp
+    assert (
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
+        "https: https://scripts.onegov.cloud;"
+    ) in csp
+    assert "connect-src 'self' https://data.onegov.cloud" in csp
+
+    response = client.get('/vote/vote')
+    csp = response.headers['Content-Security-Policy']
+    assert "frame-ancestors http://* https://*" in csp
+    assert "connect-src 'self'" in csp
+    assert (
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
+        "https: https://scripts.onegov.cloud;"
+    ) in csp
+    assert "connect-src 'self' https://data.onegov.cloud" in csp
+
+
+
+
+
 def test_pages_cache(election_day_app_zg):
     client = Client(election_day_app_zg)
     client.get('/locale/de_CH')
