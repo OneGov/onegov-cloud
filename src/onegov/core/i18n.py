@@ -34,7 +34,6 @@ For example::
 
 import gettext
 import glob
-import morepath
 import os
 import os.path
 import polib
