@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-24 07:47+0200\n"
+"POT-Creation-Date: 2022-10-24 10:20+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -792,6 +792,9 @@ msgstr "Archivsuche"
 msgid "Download the entire archive"
 msgstr "Gesamtes Archiv herunterladen"
 
+msgid "Download Archive"
+msgstr "Archiv Herunterladen"
+
 msgid "Search in ${title}"
 msgstr "Suche in ${title}"
 
@@ -870,8 +873,8 @@ msgstr "Inhalt"
 msgid "Sitemap"
 msgstr "Sitemap"
 
-#.
 #. Default: Start
+#.
 msgid "homepage"
 msgstr "Startseite"
 
@@ -1049,6 +1052,9 @@ msgstr "Abbrechen"
 
 msgid "Submit"
 msgstr "Absenden"
+
+msgid "The next field is a spam protection, please do not fill it out."
+msgstr "Das nächste Feld ist ein Spamschutz, bitte füllen Sie es nicht aus."
 
 msgid "Previous Page"
 msgstr "Vorherige Seite"
