@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-04 13:14+0200\n"
+"POT-Creation-Date: 2022-10-18 15:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1377,8 +1377,11 @@ msgstr "La vue par défaut de la carte. Cela devrait montrer la ville entière"
 msgid "Geo provider"
 msgstr "Fournisseur de geo"
 
-msgid "Mapbox (Default)"
-msgstr "Mapbox (défaut)"
+msgid "Swisstopo (Default)"
+msgstr "Swisstopo (défaut)"
+
+msgid "Swisstopo Aerial"
+msgstr "Swisstopo photo aérienne"
 
 msgid "Analytics Code"
 msgstr "Code Analytics"
@@ -2643,6 +2646,9 @@ msgstr "Aucun album photo défini pour le moment."
 
 msgid "Skip navigation"
 msgstr "Ignorez la navigation"
+
+msgid "Straight to ..."
+msgstr "Directement à ..."
 
 msgid "Back to the homepage"
 msgstr "Retour à la page d'accueil"
@@ -5036,6 +5042,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Mapbox (Default)"
+#~ msgstr "Mapbox (défaut)"
 
 #~ msgid "Homepage Image #1"
 #~ msgstr "Image n°1 de page d'accueil"

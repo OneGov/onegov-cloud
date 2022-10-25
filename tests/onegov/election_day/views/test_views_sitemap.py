@@ -40,7 +40,7 @@ def test_view_sitemap(election_day_app_zg):
 
     # HTML
     sitemap = client.get('/sitemap')
-    assert 'Archiv-Suche' in sitemap
+    assert 'Archivsuche' in sitemap
     assert '>2013<' in sitemap
     assert 'Urnengang vom 1. Januar 2013' in sitemap
     assert 'Abstimmung 1. Januar 2013' in sitemap

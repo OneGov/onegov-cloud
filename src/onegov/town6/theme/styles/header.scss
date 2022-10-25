@@ -224,7 +224,7 @@ $qr-code-icon: '\f029';
     }
 
     li {
-        border-left: 1px solid $primary-color;
+        border-left: 1px solid scale-color($primary-color, $lightness: 80%, $saturation: -12.5%);
     }
 
     li:first-child {
@@ -241,7 +241,7 @@ $qr-code-icon: '\f029';
 
         li {
             border-left: 0;
-            border-top: 1px dashed $primary-color;
+            border-top: 1px dashed scale-color($primary-color, $lightness: 50%, $saturation: -12.5%);
         }
     }
 }

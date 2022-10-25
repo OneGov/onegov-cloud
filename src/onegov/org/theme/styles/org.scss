@@ -5059,7 +5059,7 @@ h2 + div.timeline {
     @include panel;
     @include smooth-edges;
 
-    padding: 1rem 1rem .5rem;
+    padding: 1rem 1rem;
 
     i.unpublished-hint::before {
         width: 2ex;

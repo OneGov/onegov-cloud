@@ -1,8 +1,6 @@
 """ Provides commands used to initialize election day websites. """
-
 import click
 import os
-
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
@@ -11,11 +9,11 @@ from onegov.core.cli import pass_group_context
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import DataSource
 from onegov.election_day.utils import add_local_results
+from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
-
 
 cli = command_group()
 
@@ -134,11 +132,37 @@ def generate_media():
     return generate
 
 
+@cli.command('generate-archive')
+def generate_archive():
+    """ Generates a zipped file of the entire archive.
+        onegov-election-day --select '/onegov_election_day/zg' generate-archive
+    """
+    def generate(request, app):
+
+        click.secho('Starting archive.zip generation.')
+
+        archive_generator = ArchiveGenerator(app)
+        archive_zip = archive_generator.generate_archive()
+        if not archive_zip:
+            click.secho("generate_archive returned None.", fg='red')
+        archive_filesize = archive_generator.archive_dir.getinfo(
+            archive_zip, namespaces=['details']).size
+
+        if archive_filesize == 0:
+            click.secho("Generated archive is empty", fg='red')
+        else:
+            click.secho("Archive generated successfully:", fg='green')
+        absolute_path = archive_generator.archive_system_path
+        if absolute_path:
+            click.secho(f"file://{absolute_path}")
+
+    return generate
+
+
 @cli.command('delete-associated')
 @click.option('--wabsti-token')
 @click.option('--delete-compound', help='Delete the compound if it exists')
 def delete_associated(wabsti_token, delete_compound):
-
     def delete(request, app):
         query = request.session.query(DataSource)
         query = query.filter(DataSource.token == wabsti_token)
@@ -165,7 +189,6 @@ def delete_associated(wabsti_token, delete_compound):
 
 @cli.command('update-last-result-change')
 def update_last_result_change():
-
     def update(request, app):
         click.secho(f'Updating {app.schema}', fg='yellow')
 

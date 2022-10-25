@@ -250,6 +250,9 @@ class DummyRequest:
             return self.app.chameleon_translations.get(self.locale)
         return self.app.translations.get(self.locale)
 
+    def return_to(self, url, redirect):
+        return f'{url}{redirect}'
+
 
 def login(client, to=''):
     login = client.get(f'/auth/login?to={to}')

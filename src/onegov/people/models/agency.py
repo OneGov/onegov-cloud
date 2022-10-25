@@ -13,7 +13,7 @@ from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
-from sqlalchemy import Text, String
+from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 
 
@@ -50,11 +50,6 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: describes the agency
     portrait = Column(Text, nullable=True)
-
-    #: optional address
-    address = Column(Text, nullable=True)
-    zip_code = Column(String(length=10), nullable=True)
-    city = Column(Text, nullable=True)
 
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')

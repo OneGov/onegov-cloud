@@ -103,7 +103,7 @@
                   <ul class="title-area">
                       <li class="name" style="width: 0;"></li>
                       <li class="toggle-topbar">
-                          <a href="#"><span><i class="fa fa-bars"></i> Quicklinks</span></a>
+                          <a href="#"><i class="fa fa-bars"></i> <span i18n:translate="">Straight to ...</span></a>
                       </li>
                   </ul>
                   

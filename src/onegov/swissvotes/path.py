@@ -32,9 +32,8 @@ def get_auth(request, to='/'):
     model=SiteLocale,
     path='/locale/{locale}'
 )
-def get_locale(request, app, locale, to=None):
-    to = to or request.link(app.principal)
-    return SiteLocale.for_path(app, locale, to)
+def get_locale(request, app, locale):
+    return SiteLocale.for_path(app, locale)
 
 
 @SwissvotesApp.path(

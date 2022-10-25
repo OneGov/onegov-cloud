@@ -4,25 +4,23 @@ import re
 import tarfile
 import textwrap
 import transaction
-
-
 from collections import OrderedDict
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, Vote, ProporzElection, ComplexVote, \
+from onegov.ballot import Election, Vote, ProporzElection, ComplexVote,\
     ElectionCompound
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.hidden_by_principal import \
-    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc, \
-    hide_connections_chart_intermediate_results as hide_conn_chart, \
+from onegov.election_day.hidden_by_principal import\
+    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc,\
+    hide_connections_chart_intermediate_results as hide_conn_chart,\
     hide_candidates_chart_intermediate_results as hide_cand_chart
-from onegov.election_day.formats import import_election_internal_majorz, \
-    import_election_internal_proporz, import_election_wabstic_proporz, \
-    import_election_wabstic_majorz, import_election_wabsti_proporz, \
-    import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti, \
+from onegov.election_day.formats import import_election_internal_majorz,\
+    import_election_internal_proporz, import_election_wabstic_proporz,\
+    import_election_wabstic_majorz, import_election_wabsti_proporz,\
+    import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti,\
     import_party_results, import_election_compound_internal
-from tests.onegov.election_day.common import print_errors, \
+from tests.onegov.election_day.common import print_errors,\
     get_tar_file_path, create_principal
 from onegov.pdf import Pdf
 from onegov.user import User
@@ -41,13 +39,13 @@ def election_day_password():
 
 
 def create_election_day(
-        request,
-        canton='',
-        municipality='',
-        use_maps='false',
-        hide_candidate_chart_percentages=hide_chart_perc,
-        hide_connections_chart=hide_conn_chart,
-        hide_candidates_chart=hide_cand_chart
+    request,
+    canton='',
+    municipality='',
+    use_maps='false',
+    hide_candidate_chart_percentages=hide_chart_perc,
+    hide_connections_chart=hide_conn_chart,
+    hide_candidates_chart=hide_cand_chart
 ):
     """
 
@@ -104,7 +102,6 @@ def create_election_day(
 
 @pytest.fixture(scope="function")
 def election_day_app_bl(request):
-
     app = create_election_day(request, "bl")
     yield app
     app.session_manager.dispose()
@@ -112,7 +109,6 @@ def election_day_app_bl(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_zg(request):
-
     app = create_election_day(
         request,
         "zg",
@@ -123,7 +119,6 @@ def election_day_app_zg(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_gr(request):
-
     app = create_election_day(request, "gr")
     yield app
     app.session_manager.dispose()
@@ -131,7 +126,6 @@ def election_day_app_gr(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_sg(request):
-
     app = create_election_day(
         request,
         "sg",
@@ -144,7 +138,6 @@ def election_day_app_sg(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_sz(request):
-
     app = create_election_day(
         request,
         "sz",
@@ -157,7 +150,6 @@ def election_day_app_sz(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_bern(request):
-
     app = create_election_day(request, "", "'351'", "true")
     yield app
     app.session_manager.dispose()
@@ -165,7 +157,6 @@ def election_day_app_bern(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_kriens(request):
-
     app = create_election_day(request, "", "'1059'", "false")
     yield app
     app.session_manager.dispose()
@@ -177,17 +168,17 @@ def related_link_labels():
 
 
 def import_elections_internal(
-        election_type,
-        principal,
-        domain,
-        session,
-        number_of_mandates,
-        date_,
-        domain_segment,
-        dataset_name,
-        has_expats,
-        election,
-        municipality
+    election_type,
+    principal,
+    domain,
+    session,
+    number_of_mandates,
+    date_,
+    domain_segment,
+    dataset_name,
+    has_expats,
+    election,
+    municipality
 ):
     """
     Import test datasets in internal formats. For one election, there is
@@ -198,7 +189,7 @@ def import_elections_internal(
     """
     assert isinstance(principal, str)
     if dataset_name:
-        assert '.' not in dataset_name, 'Remove the file ending' \
+        assert '.' not in dataset_name, 'Remove the file ending'\
                                         ' from dataset_name'
 
     model_mapping = dict(proporz=ProporzElection, majorz=Election)
@@ -255,16 +246,16 @@ def import_elections_internal(
 
 
 def import_election_compounds_internal(
-        principal,
-        domain,
-        session,
-        number_of_mandates,
-        date_,
-        domain_segment,
-        dataset_name,
-        has_expats,
-        election,
-        municipality
+    principal,
+    domain,
+    session,
+    number_of_mandates,
+    date_,
+    domain_segment,
+    dataset_name,
+    has_expats,
+    election,
+    municipality
 ):
     """
     Import test datasets in internal formats. For one election, there is
@@ -278,7 +269,7 @@ def import_election_compounds_internal(
     assert isinstance(number_of_mandates, (tuple, list))
     assert len(domain_segment) == len(number_of_mandates)
     if dataset_name:
-        assert '.' not in dataset_name, 'Remove the file ending' \
+        assert '.' not in dataset_name, 'Remove the file ending'\
                                         ' from dataset_name'
 
     api = 'internal'
@@ -344,10 +335,10 @@ def import_election_compounds_internal(
 
 
 def import_parties_internal(
-        principal,
-        domain,
-        dataset_name,
-        election,
+    principal,
+    domain,
+    dataset_name,
+    election,
 ):
     """
     Import test datasets with party results in internal formats. For one
@@ -358,7 +349,7 @@ def import_parties_internal(
     """
     assert isinstance(principal, str)
     if dataset_name:
-        assert '.' not in dataset_name, 'Remove the file ending' \
+        assert '.' not in dataset_name, 'Remove the file ending'\
                                         ' from dataset_name'
 
     tar_fp = get_tar_file_path(
@@ -382,19 +373,19 @@ def import_parties_internal(
 
 
 def import_elections_wabstic(
-        election_type,
-        principal,
-        domain,
-        session,
-        number_of_mandates,
-        date_,
-        domain_segment,
-        number,
-        district,
-        dataset_name,
-        has_expats,
-        election,
-        municipality
+    election_type,
+    principal,
+    domain,
+    session,
+    number_of_mandates,
+    date_,
+    domain_segment,
+    number,
+    district,
+    dataset_name,
+    has_expats,
+    election,
+    municipality
 ):
     """
     :param principal: canton as string, e.g. zg
@@ -472,26 +463,26 @@ def get_mimetype(archive_filename):
     fname = archive_filename.split('/')[-1]
     ending = fname.split('.')[-1]
     if ending.lower() in ('xlsx', 'xls'):
-        return 'application/vnd.openxmlformats-' \
+        return 'application/vnd.openxmlformats-'\
                'officedocument.spreadsheetml.sheet'
     else:
         return 'text/plain'
 
 
 def import_elections_wabsti(
-        election_type,
-        principal,
-        domain,
-        session,
-        number_of_mandates,
-        date_,
-        domain_segment,
-        number,
-        district,
-        dataset_name,
-        has_expats,
-        election,
-        municipality
+    election_type,
+    principal,
+    domain,
+    session,
+    number_of_mandates,
+    date_,
+    domain_segment,
+    number,
+    district,
+    dataset_name,
+    has_expats,
+    election,
+    municipality
 
 ):
     """
@@ -601,17 +592,16 @@ def import_elections_wabsti(
 
 
 def import_votes_internal(
-        vote_type,
-        principal,
-        domain,
-        session,
-        date_,
-        dataset_name,
-        has_expats,
-        vote,
-        municipality
+    vote_type,
+    principal,
+    domain,
+    session,
+    date_,
+    dataset_name,
+    has_expats,
+    vote,
+    municipality
 ):
-
     """
     Import test datasets in internal formats. For one vote, there is
     a single file to load, so subfolders are not necessary.
@@ -668,16 +658,16 @@ def import_votes_internal(
 
 
 def import_votes_wabsti(
-        vote_type,
-        principal,
-        domain,
-        session,
-        date_,
-        dataset_name,
-        has_expats,
-        vote,
-        vote_number,
-        municipality
+    vote_type,
+    principal,
+    domain,
+    session,
+    date_,
+    dataset_name,
+    has_expats,
+    vote,
+    vote_number,
+    municipality
 ):
     assert isinstance(principal, str)
 
@@ -738,24 +728,24 @@ def import_test_datasets(session):
     vote_types = ('simple', 'complex')
 
     def _import_test_datasets(
-            api_format,
-            model,
-            principal,
-            domain,
-            election_type=None,
-            number_of_mandates=None,
-            date_=None,
-            domain_segment='',
-            dataset_name=None,
-            has_expats=False,
-            election=None,
-            election_number='1',
-            election_district=None,
-            municipality=None,
-            vote_type='simple',
-            vote=None,
-            vote_number=1,
-            app_session=None
+        api_format,
+        model,
+        principal,
+        domain,
+        election_type=None,
+        number_of_mandates=None,
+        date_=None,
+        domain_segment='',
+        dataset_name=None,
+        has_expats=False,
+        election=None,
+        election_number='1',
+        election_district=None,
+        municipality=None,
+        vote_type='simple',
+        vote=None,
+        vote_number=1,
+        app_session=None
     ):
         if not app_session:
             app_session = session
