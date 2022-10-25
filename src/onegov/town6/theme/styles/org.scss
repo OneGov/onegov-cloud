@@ -536,6 +536,37 @@ $pageref-color-hover: $iron;
     font-size: 1.1875rem !important;
 }
 
+.page-links {
+    > li {
+
+        a:not(.edit-link) {
+            line-height: 1.3rem;
+            padding-bottom: .5rem;
+            padding-top: .8rem;
+        }
+
+        .page-image {
+            margin-bottom: .5rem;
+        }
+
+        p {
+            margin-bottom: 0;
+        }
+    }
+
+    > li.medium-6 {
+        padding-bottom: 2rem;
+
+        .list-lead {
+            max-width: 100%;
+        }
+
+        a:not(.edit-link) {
+            border-top: 1px solid $primary-color !important;
+        }
+    }
+}
+
 .directory-list {
     margin-top: .5rem;
 }
