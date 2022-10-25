@@ -1590,7 +1590,7 @@
         </tal:b>
 
         <tal:b condition="not price">
-            <input type="submit" value="Complete" class="button" i18n:attributes="value">
+            <input type="submit" value="Complete" class="button expanded" i18n:attributes="value">
             <metal:b define-slot="after-submit" />
         </tal:b>
     </form>
