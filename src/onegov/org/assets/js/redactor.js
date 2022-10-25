@@ -347,6 +347,11 @@
 		codemirror: false
 	};
 
+	// Offset for toolbar for town6
+	if (document.body.classList.contains('town-6')) {
+		$.Redactor.opts.toolbarFixedTopOffset = 96;
+	}
+
 	// Functionality
 	Redactor.fn = $.Redactor.prototype = {
 
