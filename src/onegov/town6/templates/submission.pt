@@ -27,7 +27,7 @@
                     tal:define="payment_method model.payment_method; show_privacy_settings True">
 
                     <tal:b metal:fill-slot="after-submit">
-                        <a href="${edit_link}"><i class="fa fa-edit"></i> <span i18n:translate>Edit</span></a>
+                        <a href="${edit_link}" i18n:translate="">Edit</a>
                     </tal:b>
                 </tal:b>
             </div>
