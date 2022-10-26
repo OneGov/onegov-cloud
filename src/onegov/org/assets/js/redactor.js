@@ -349,7 +349,7 @@
 
 	// Offset for toolbar for town6
 	if (document.body.classList.contains('town-6')) {
-		$.Redactor.opts.toolbarFixedTopOffset = 96;
+		$.Redactor.opts.toolbarFixedTopOffset = 100;
 	}
 
 	// Functionality
