@@ -11,6 +11,7 @@ from pytz import UTC
 from sedate import utcnow
 from tempfile import NamedTemporaryFile
 from time import sleep
+from tests.shared.utils import encode_map_value
 
 
 def test_browse_activities(browser):
@@ -419,3 +420,22 @@ def test_signature_workflow(browser, temporary_path, org_app):
 
     assert browser.is_text_present('foo@example.org')
     assert browser.is_text_present('Digitales Siegel angewendet')
+
+
+def test_external_map_link(browser, client):
+    client.login_admin()
+    settings = client.get('/map-settings')
+    settings.form['geo_provider'] = 'geo-bs'
+    settings.form.submit()
+
+    topic = client.get('/topics/themen')
+    topic = topic.click('Bearbeiten')
+
+    topic.form['coordinates'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 12
+    })
+    topic.form.submit()
+
+    browser.visit('/topics/themen')
+    browser.find_by_css(".button-state").click()
+    assert browser.is_text_present("Karte Geo-BS")
