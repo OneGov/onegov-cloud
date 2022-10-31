@@ -266,6 +266,10 @@ function addExternalLinkButton(map) {
 
                 $('<li><a href="http://maps.google.com/?q=' + [point.lat, point.lng].join(',') + '" target="_blank">Google Maps</a></li>').appendTo(menu);
                 $('<li><a href="http://maps.apple.com/?q=' + [point.lat, point.lng].join(',') + '" target="_blank">Apple Maps</a></li>').appendTo(menu);
+                if (map.options.custom_map == 'map-bs') {
+                    var point_ch = map.options.crs.project(point);
+                    $('<li><a  id="map-bs-button" href="https://map.geo.bs.ch/?lang=de&baselayer_ref=Grundkarte%20farbig&map_crosshair=true&map_x=' + point_ch.x + '&map_y=' + point_ch.y + '&map_zoom=8' + '" target="_blank">Karte Geo-BS</a></li>').appendTo(menu);
+                }
 
                 menu.insertAfter($(btn.button));
                 btn.state('open');
