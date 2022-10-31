@@ -322,7 +322,7 @@ class PanelField(Field):
     def __init__(self, *args, **kwargs):
         self.text = kwargs.pop('text')
         self.kind = kwargs.pop('kind')
-        self.hide_label = True
+        self.hide_label = kwargs.pop('hide_label', True)
         super().__init__(*args, **kwargs)
 
     def populate_obj(self, obj, name):
