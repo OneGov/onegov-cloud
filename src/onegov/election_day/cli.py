@@ -227,8 +227,6 @@ def migrate_colors():
     def migrate(request, app):
         click.secho(f'Updating {app.schema}', fg='yellow')
 
-        count = 0
-
         session = request.app.session()
         items = session.query(ProporzElection).all()
         items.extend(session.query(ElectionCompound))
@@ -237,12 +235,11 @@ def migrate_colors():
                 name: result.color
                 for result in item.party_results
                 for name in result.name_translations.values()
+                if result.color not in ('#0571b0', '#999999')
             }
             colors.update(item.colors)
             if item.colors != colors:
                 item.colors = colors
-                count += 1
-
-        click.secho(f'Updated {count} items', fg='green')
+                click.secho(f'Updated {item.id}', fg='green')
 
     return migrate

@@ -82,10 +82,10 @@ def test_import_party_results(session):
                     'mandates',
                     'votes',
                 )),
-                '2015,10000,1,P1,#123456,1,5000',
-                '2011,10000,1,P1,#123456,0,3000',
+                '2015,10000,1,P1,,1,5000',
+                '2011,10000,1,P1,,0,3000',
                 '2015,10000,2,P2,#aabbcc,0,5000',
-                '2011,10000,2,P2,#aabbcc,1,7000',
+                '2011,10000,2,P2,#aabbdd,1,7000',
             ))
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
@@ -94,16 +94,19 @@ def test_import_party_results(session):
     assert not errors
     assert sorted([
         (
-            r.year, r.party_id, r.name_translations, r.color, r.votes,
+            r.year, r.party_id, r.name_translations, r.votes,
             r.total_votes, r.number_of_mandates
         )
         for r in election.party_results
     ]) == [
-        (2011, '1', {'de_CH': 'P1'}, '#123456', 3000, 10000, 0),
-        (2011, '2', {'de_CH': 'P2'}, '#aabbcc', 7000, 10000, 1),
-        (2015, '1', {'de_CH': 'P1'}, '#123456', 5000, 10000, 1),
-        (2015, '2', {'de_CH': 'P2'}, '#aabbcc', 5000, 10000, 0)
+        (2011, '1', {'de_CH': 'P1'}, 3000, 10000, 0),
+        (2011, '2', {'de_CH': 'P2'}, 7000, 10000, 1),
+        (2015, '1', {'de_CH': 'P1'}, 5000, 10000, 1),
+        (2015, '2', {'de_CH': 'P2'}, 5000, 10000, 0)
     ]
+    assert election.colors == {
+        'P2': '#aabbdd',
+    }
 
     # with panachage results
     errors = import_party_results(
@@ -125,7 +128,7 @@ def test_import_party_results(session):
                 '2015,10000,1,P1,#123456,1,5000,10,11,12',
                 '2011,10000,1,P1,#123456,0,3000,13,14,15',
                 '2015,10000,2,P2,#aabbcc,0,5000,20,21,22',
-                '2011,10000,2,P2,#aabbcc,1,7000,23,24,25',
+                '2011,10000,2,P2,#aabbee,1,7000,23,24,25',
             ))
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
@@ -134,17 +137,20 @@ def test_import_party_results(session):
     assert not errors
     assert sorted([
         (
-            r.year, r.party_id, r.name_translations, r.color, r.votes,
+            r.year, r.party_id, r.name_translations, r.votes,
             r.total_votes, r.number_of_mandates
         )
         for r in election.party_results
     ]) == [
-        (2011, '1', {'de_CH': 'P1'}, '#123456', 3000, 10000, 0),
-        (2011, '2', {'de_CH': 'P2'}, '#aabbcc', 7000, 10000, 1),
-        (2015, '1', {'de_CH': 'P1'}, '#123456', 5000, 10000, 1),
-        (2015, '2', {'de_CH': 'P2'}, '#aabbcc', 5000, 10000, 0)
+        (2011, '1', {'de_CH': 'P1'}, 3000, 10000, 0),
+        (2011, '2', {'de_CH': 'P2'}, 7000, 10000, 1),
+        (2015, '1', {'de_CH': 'P1'}, 5000, 10000, 1),
+        (2015, '2', {'de_CH': 'P2'}, 5000, 10000, 0)
     ]
-
+    assert election.colors == {
+        'P1': '#123456',
+        'P2': '#aabbee',
+    }
     results = sorted([
         (r.target, r.source, r.votes) for r in election.panachage_results
     ])
@@ -183,29 +189,33 @@ def test_import_party_results(session):
     assert not errors
     assert sorted([
         (
-            r.year, r.party_id, r.name_translations, r.color, r.votes,
+            r.year, r.party_id, r.name_translations, r.votes,
             r.voters_count, r.voters_count_percentage,
             r.total_votes, r.number_of_mandates
         )
         for r in election.party_results
     ]) == [
         (
-            2011, '1', {'de_CH': 'P1'}, '#123456', 3000, Decimal('3000.00'),
+            2011, '1', {'de_CH': 'P1'}, 3000, Decimal('3000.00'),
             Decimal('37.50'), 10000, 0
         ),
         (
-            2011, '2', {'de_CH': 'P2'}, '#aabbcc', 7000, Decimal('1000.01'),
+            2011, '2', {'de_CH': 'P2'}, 7000, Decimal('1000.01'),
             Decimal('12.50'), 10000, 1
         ),
         (
-            2015, '1', {'de_CH': 'P1'}, '#123456', 5000, Decimal('4000.00'),
+            2015, '1', {'de_CH': 'P1'}, 5000, Decimal('4000.00'),
             Decimal('50.00'), 10000, 1
         ),
         (
-            2015, '2', {'de_CH': 'P2'}, '#aabbcc', 5000, Decimal('2000.00'),
+            2015, '2', {'de_CH': 'P2'}, 5000, Decimal('2000.00'),
             Decimal('25.00'), 10000, 0
         )
     ]
+    assert election.colors == {
+        'P1': '#123456',
+        'P2': '#aabbcc',
+    }
 
     # with name translations
     errors = import_party_results(
@@ -225,15 +235,16 @@ def test_import_party_results(session):
                     'name_it_ch',
                     'name_rm_ch',
                 )),
-                '2022,1,1,,1,0,Die Mitte,Die Mitte,Le Centre,'
+                '2022,1,1,#111111,1,0,Die Mitte,Die Mitte,Le Centre,'
                 'Alleanza del Centro,Allianza dal Center',
-                '2015,1,1,,0,0,CVP,CVP,PDC,PPD,PCD',
+                '2015,1,1,#222222,0,0,CVP,CVP,PDC,PPD,PCD',
                 '2022,1,2,,0,0,,SP,PS,PS,',
                 '2015,1,2,,1,0,SP,,,,',
             ))
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
     )
+
     assert not errors
     assert sorted([
         (r.year, r.party_id, r.name_translations)
@@ -245,6 +256,16 @@ def test_import_party_results(session):
                      'it_CH': 'Alleanza del Centro'}),
         (2022, '2', {'de_CH': 'SP', 'fr_CH': 'PS', 'it_CH': 'PS'})
     ]
+    assert election.colors == {
+        'P1': '#123456',
+        'P2': '#aabbcc',
+        'Die Mitte': '#111111',
+        'Le Centre': '#111111',
+        'Alleanza del Centro': '#111111',
+        'CVP': '#222222',
+        'PDC': '#222222',
+        'PPD': '#222222',
+    }
 
 
 def test_import_party_results_missing_headers(session):

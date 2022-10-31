@@ -146,7 +146,6 @@ def test_proporz_election_create_all_models(session):
         total_votes=100,
         name_translations={'en_US': 'Libertarian'},
         party_id='1',
-        color='black'
     )
 
     session.add(party_result)
@@ -376,7 +375,6 @@ def test_proporz_election_results(session):
             number_of_mandates=1,
             votes=10,
             total_votes=100,
-            color='red',
             party_id='1',
         )
     )
@@ -386,7 +384,6 @@ def test_proporz_election_results(session):
             number_of_mandates=1,
             votes=20,
             total_votes=100,
-            color='blue',
             party_id='2',
         )
     )
@@ -860,6 +857,10 @@ def test_proporz_election_export_parties(session):
     )
     session.flush()
     election = session.query(ProporzElection).one()
+    election.colors = {
+        'Conservative': 'red',
+        'Libertarian': 'black'
+    }
 
     assert election.export_parties(['en_US'], 'en_US') == []
 
@@ -873,7 +874,6 @@ def test_proporz_election_export_parties(session):
             total_votes=100,
             name_translations={'en_US': 'Libertarian'},
             party_id='2',
-            color='black',
             year=2012
         )
     )
@@ -886,7 +886,6 @@ def test_proporz_election_export_parties(session):
             total_votes=50,
             name_translations={'en_US': 'Libertarian'},
             party_id='2',
-            color='black',
             year=2016
         )
     )
@@ -899,7 +898,6 @@ def test_proporz_election_export_parties(session):
             total_votes=100,
             name_translations={'en_US': 'Conservative'},
             party_id='1',
-            color='red',
             year=2012
         )
     )
@@ -912,7 +910,6 @@ def test_proporz_election_export_parties(session):
             total_votes=50,
             name_translations={'en_US': 'Conservative'},
             party_id='1',
-            color='red',
             year=2016
         )
     )

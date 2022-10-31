@@ -197,7 +197,7 @@ def proporz_election(
     return election
 
 
-def test_election_compound(session):
+def test_election_compound_model(session):
     session.add(
         ElectionCompound(
             title='Legislative Elections',
@@ -440,8 +440,7 @@ def test_election_compound(session):
         votes=0,
         total_votes=100,
         name_translations={'en_US': 'Libertarian'},
-        party_id='1',
-        color='black'
+        party_id='1'
     )
     session.add(party_result)
     session.flush()
@@ -475,8 +474,7 @@ def test_election_compound(session):
         votes=0,
         total_votes=100,
         name_translations={'en_US': 'Libertarian'},
-        party_id='1',
-        color='black'
+        party_id='1'
     )
     session.add(party_result)
     session.flush()
@@ -845,6 +843,10 @@ def test_election_compound_export_parties(session):
     )
     session.flush()
     election_compound = session.query(ElectionCompound).one()
+    election_compound.colors = {
+        'Conservative': 'red',
+        'Libertarian': 'black'
+    }
 
     assert election_compound.export_parties(['de_CH'], 'de_CH') == []
 
@@ -858,7 +860,6 @@ def test_election_compound_export_parties(session):
             total_votes=100,
             name_translations={'en_US': 'Libertarian'},
             party_id='3',
-            color='black',
             year=2012
         )
     )
@@ -871,7 +872,6 @@ def test_election_compound_export_parties(session):
             voters_count_percentage=Decimal('50.02'),
             name_translations={'en_US': 'Libertarian'},
             party_id='3',
-            color='black',
             year=2016
         )
     )
@@ -884,7 +884,6 @@ def test_election_compound_export_parties(session):
             voters_count_percentage=Decimal('100.02'),
             name_translations={'en_US': 'Conservative'},
             party_id='5',
-            color='red',
             year=2012
         )
     )
@@ -897,7 +896,6 @@ def test_election_compound_export_parties(session):
             voters_count_percentage=Decimal('50.02'),
             name_translations={'en_US': 'Conservative'},
             party_id='5',
-            color='red',
             year=2016
         )
     )
