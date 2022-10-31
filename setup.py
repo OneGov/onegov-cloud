@@ -123,6 +123,7 @@ setup(
         'pyquery',
         'qrbill',
         'qrcode',
+        'py==1.10.0',
         'pysaml2',
         'python-dateutil',
         'python-magic',
