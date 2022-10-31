@@ -36,6 +36,6 @@ def test_directory_roundtrip(browser, client_with_es):
     # directories_page.form['search_term'] = '201-B'
     # search_page = directories_page.form.submit().follow()
     client.get('/directories/clubs')
-    search_page = client.post('/directories/clubs?search=inline&search_term=201-B&search_query={"term"%3A"201-B"}')
+    search_page = client.get('/directories/clubs?search=inline&search_term=201-B&search_query={"term"%3A"201-B"}')
 
     assert "Pilatus" in search_page
