@@ -1,8 +1,86 @@
 # Changes
 
+## 2022.51
+
+`2022-11-02` | [27e4250d99...f9dbb3a226](https://github.com/OneGov/onegov-cloud/compare/27e4250d99^...f9dbb3a226)
+
+### Core
+
+##### Use signed redirects for locales.
+
+`Feature` | [OGC-671](https://linear.app/onegovcloud/issue/OGC-671) | [38f3fd0438](https://github.com/onegov/onegov-cloud/commit/38f3fd04385790408872fc2bb32c40fd87aa7526)
+
+##### Fixes missing dependency.
+
+`Bugfix` | [OGC-681](https://linear.app/onegovcloud/issue/OGC-681) | [9d9f17ab6a](https://github.com/onegov/onegov-cloud/commit/9d9f17ab6a2351582fbbb173a2ee48f448c517f6)
+
+### Election Day
+
+##### Update translations.
+
+`Feature` | [27e4250d99](https://github.com/onegov/onegov-cloud/commit/27e4250d99124c905286d76c4a709e05f8b08616)
+
+##### Disable iframes in authentication and manage views.
+
+Also fixes connect source setting.
+
+LING: OGC-669
+
+`Feature` | [895ab08f36](https://github.com/onegov/onegov-cloud/commit/895ab08f36e24f27757d1f84f029c84ddba41d74)
+
+##### Honeypot info for screen readers
+
+`Feature` | [OGC-560](https://linear.app/onegovcloud/issue/OGC-560) | [d1bd564748](https://github.com/onegov/onegov-cloud/commit/d1bd564748e928977774e2a0d704c6a972df4290)
+
+##### Fix typo.
+
+`Bugfix.` | [45e0759e8d](https://github.com/onegov/onegov-cloud/commit/45e0759e8de8759864aa288d75c4131c3bdc4214)
+
+##### Make dropdown function visible for screen reader
+
+`Bugfix` | [OGC-548](https://linear.app/onegovcloud/issue/OGC-548) | [4e870c9a10](https://github.com/onegov/onegov-cloud/commit/4e870c9a1087969cadeb32216497e860f162b14d)
+
+### Org
+
+##### Add Swisstopo and aerial Map
+
+`Feature` | [OGC-632](https://linear.app/onegovcloud/issue/OGC-632) | [d68b4024a8](https://github.com/onegov/onegov-cloud/commit/d68b4024a8086eb23af193cf7c55f17250a3b0c2)
+
+##### Link for map-bs if map-bs is selected in settings
+
+`Feature` | [OGC-634](https://linear.app/onegovcloud/issue/OGC-634) | [f82e1fd75c](https://github.com/onegov/onegov-cloud/commit/f82e1fd75c71a891567c2d0c7fa9fd75f98b3003)
+
+### Town 6
+
+##### Rename quicklinks
+
+`Feature` | [OGC-581](https://linear.app/onegovcloud/issue/OGC-581) | [8d469c99b3](https://github.com/onegov/onegov-cloud/commit/8d469c99b3f7738855cc7da5c90a9d7245111aba)
+
+##### Display Contact Info correctly
+
+`Bugfix` | [OGC-648](https://linear.app/onegovcloud/issue/OGC-648) | [11dbe043ea](https://github.com/onegov/onegov-cloud/commit/11dbe043ea61f15df58c86cdb8f12354e26e2175)
+
+### Town6
+
+##### Add a cancel link on forms
+
+`Feature` | [OGC-582](https://linear.app/onegovcloud/issue/OGC-582) | [1dc1d164e4](https://github.com/onegov/onegov-cloud/commit/1dc1d164e4923336ca82d7bbf3d3a9f6ede73b72)
+
+##### Remove button class from edit link
+
+`Feature` | [OGC-673](https://linear.app/onegovcloud/issue/OGC-673) | [44ad387a63](https://github.com/onegov/onegov-cloud/commit/44ad387a6309363f5ee2e0bcf155b14df976d7a7)
+
+##### Add an offset for the toolbar
+
+`Bugfix` | [OGC-672](https://linear.app/onegovcloud/issue/OGC-672) | [5b1e9b347e](https://github.com/onegov/onegov-cloud/commit/5b1e9b347e64d37e298f4139413f5e73ee360ab4)
+
+##### Fixed Typo
+
+`Bugfix` | [OGC-679](https://linear.app/onegovcloud/issue/OGC-679) | [f9dbb3a226](https://github.com/onegov/onegov-cloud/commit/f9dbb3a226bc67226371dc59291775f86b69e92e)
+
 ## 2022.50
 
-`2022-10-18` | [882bf8e010...443e117f90](https://github.com/OneGov/onegov-cloud/compare/882bf8e010^...443e117f90)
+`2022-10-18` | [882bf8e010...f016c97cc8](https://github.com/OneGov/onegov-cloud/compare/882bf8e010^...f016c97cc8)
 
 ### Agency
 
@@ -2359,32 +2437,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Add options to hide the online counter and reserverations link on the homepage.
 
 `Feature` | [OGC-212](https://linear.app/onegovcloud/issue/OGC-212) | [f7e892211d](https://github.com/onegov/onegov-cloud/commit/f7e892211dda171317462ddc2545d5f6ed8dad1b)
-
-## 2022.1
-
-`2022-01-04` | [62416c3a0f...9fabebc6ee](https://github.com/OneGov/onegov-cloud/compare/62416c3a0f^...9fabebc6ee)
-
-### Election Day
-
-##### Add year 2022.
-
-`Feature` | [OGC-225](https://linear.app/onegovcloud/issue/OGC-225) | [4bd51d99dd](https://github.com/onegov/onegov-cloud/commit/4bd51d99dd037b5be07c17bf019393fd0810d8dd)
-
-##### Add static data for regions and superregions.
-
-`Feature` | [OGC-164](https://linear.app/onegovcloud/issue/OGC-164) | [c0be59074d](https://github.com/onegov/onegov-cloud/commit/c0be59074d3c0a43f39503c37bac9b98d9ea84fc)
-
-##### Remove Bodensee from mapdata.
-
-`Bugfix` | [OGC-148](https://linear.app/onegovcloud/issue/OGC-148) | [ed069923c3](https://github.com/onegov/onegov-cloud/commit/ed069923c31fa0e8ba5cb201a928919130aa53eb)
-
-### Swissvotes
-
-##### Don't allow to download press article for copyright reasons.
-
-`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [6fbab571af](https://github.com/onegov/onegov-cloud/commit/6fbab571afff266fc83732780bb4b1922eb4ea9d)
-
-##### Update translations.
-
-`Bugfix` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [62416c3a0f](https://github.com/onegov/onegov-cloud/commit/62416c3a0f631d0eed77e392598a99b6fa67b14f)
 
