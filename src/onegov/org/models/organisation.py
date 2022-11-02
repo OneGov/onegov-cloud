@@ -29,6 +29,10 @@ class Organisation(Base, TimestampMixin):
     #: the logo of the organisation
     logo_url = Column(Text, nullable=True)
 
+    # #: the standard image which will be used wherever an image is needed
+    # # but none has been provided
+    standard_image = Column(Text, nullable=True)
+
     #: the theme options of the organisation
     theme_options = Column(JSON, nullable=True, default=user_options.copy)
 

@@ -15,6 +15,8 @@ from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
 from onegov.reservation import Resource
 from onegov.user import User
+from sqlalchemy import Column
+from sqlalchemy import Text
 from sqlalchemy.orm import undefer
 
 
@@ -206,3 +208,11 @@ def change_daily_ticket_statistics_data_format(context):
             'ticket_statistics',
             'daily' if daily else 'never'
         )
+
+
+@upgrade_task('Add standard image to organisation')
+def add_standard_image_column_to_organisation(context):
+    if not context.has_column('organisations', 'standard_image'):
+        context.operations.add_column('organisations', Column(
+            'standard_image', Text, nullable=True
+        ))
