@@ -15,6 +15,7 @@ function spawnDefaultMap(target, options, cb) {
         var map = L.map(target, $.extend(options, {
             crs: crs,
             maxZoom: crs.options.resolutions.length,
+            custom_map: 'map-bs'
         }));
         
         L.tileLayer('https://wmts.geo.bs.ch/wmts/1.0.0/BaseMap_farbig/default/swissgrid/{z}/{y}/{x}.png', {

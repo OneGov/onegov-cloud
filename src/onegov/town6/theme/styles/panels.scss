@@ -183,7 +183,7 @@ $publications-icon: '\f1ea';
 $checklist-icon: "\f0ae";
 
 @mixin contact-content-base {
-    min-height: .5rem;
+    min-height: 1rem;
 
     + li {
         margin-top: .25rem;

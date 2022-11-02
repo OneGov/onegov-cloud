@@ -433,6 +433,7 @@ def to_html_ul(value, convert_dashes=True):
         return ''
 
     value = value.replace('\r', '').strip('\n')
+    value = value.replace('\n\n', '\n \n')
 
     if not convert_dashes:
         return '<ul><li>{}</li></ul>'.format(
