@@ -1714,7 +1714,7 @@ msgstr ""
 "Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
 
 msgid "Receives notifications for new reservations."
-msgstr "Erhält Benachtchtigungen für neue Reservationen."
+msgstr "Erhält Benachrichtigungen für neue Reservationen."
 
 msgid "Notifications for following Resources"
 msgstr "Benachrichtigungen für die folgenden Reservationen"
