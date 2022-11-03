@@ -1,8 +1,18 @@
 # Changes
 
+## 2022.52
+
+`2022-11-03` | [8e75e5483a...69e2daf81e](https://github.com/OneGov/onegov-cloud/compare/8e75e5483a^...69e2daf81e)
+
+### Election Day
+
+##### Add provisional data for 2023.
+
+`Feature` | [OGC-237](https://linear.app/onegovcloud/issue/OGC-237) | [69e2daf81e](https://github.com/onegov/onegov-cloud/commit/69e2daf81e8ea41da62863b8038e0d1a95324025)
+
 ## 2022.51
 
-`2022-11-02` | [27e4250d99...f9dbb3a226](https://github.com/OneGov/onegov-cloud/compare/27e4250d99^...f9dbb3a226)
+`2022-11-02` | [27e4250d99...2a7b5c742b](https://github.com/OneGov/onegov-cloud/compare/27e4250d99^...2a7b5c742b)
 
 ### Core
 
@@ -2427,14 +2437,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Update translations.
 
 `Other` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [642818ca15](https://github.com/onegov/onegov-cloud/commit/642818ca15ca76f4534b916d6cf6271ab436907c)
-
-## 2022.2
-
-`2022-01-07` | [f7e892211d...22a8a3665a](https://github.com/OneGov/onegov-cloud/compare/f7e892211d^...22a8a3665a)
-
-### Org
-
-##### Add options to hide the online counter and reserverations link on the homepage.
-
-`Feature` | [OGC-212](https://linear.app/onegovcloud/issue/OGC-212) | [f7e892211d](https://github.com/onegov/onegov-cloud/commit/f7e892211dda171317462ddc2545d5f6ed8dad1b)
 
