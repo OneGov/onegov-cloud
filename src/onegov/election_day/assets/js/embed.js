@@ -16,15 +16,25 @@ var appendSvgDownloadLink = function(target, data, title, text) {
 };
 
 var appendEmbedCode = function(target, width, height, source, title) {
-    var id = 'embed_code_' + Math.floor(Math.random() * 100) + 1;
+    var id = Math.floor(Math.random() * 100) + 1;
+    var embed_code_id = 'embed_code_' + id;
+    var embed_link_id = 'embed_link_' + id;
     $(target).append(
         $('<div>')
         .attr('class', 'embed')
         .append(
             $('<a>')
             .attr('href', '#')
+            .attr('aria-expanded', false)
+            .attr('id', embed_link_id)
             .on('click', function() {
-               $('#'+id).toggle();
+                embed_link = document.getElementById(embed_link_id)
+                if (embed_link.getAttribute('aria-expanded') == 'false') {
+                    embed_link.setAttribute("aria-expanded", true);
+                } else {
+                    embed_link.setAttribute("aria-expanded", false);
+                }
+                $('#'+embed_code_id).toggle();
                return false;
             })
             .text(title)
@@ -32,10 +42,15 @@ var appendEmbedCode = function(target, width, height, source, title) {
                 $('<i>')
                 .attr('class', 'fa fa-share-square-o')
             )
+            .append(
+                $('<i>')
+                .attr('class', 'fa fa-caret-down')
+                .attr('style', 'padding-left: .5rem;')
+            )
         )
         .append(
             $('<code>')
-            .attr('id', id)
+            .attr('id', embed_code_id)
             .css('display', 'none')
             .text(
                 '<iframe src="' + source + '" ' +
