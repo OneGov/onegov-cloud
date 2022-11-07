@@ -21,7 +21,7 @@ class ArchiveGenerator:
                                                                recreate=True)
         self.temp_fs = TempFS()
         self.archive_parent_dir = "zip"
-        self.MAX_FILENAME_LENGTH = 240
+        self.MAX_FILENAME_LENGTH = 60
 
     def generate_csv(self):
         """
@@ -44,7 +44,7 @@ class ArchiveGenerator:
 
         names = ["votes", "elections", "elections"]
         entities = [
-            self.all_votes(),
+            self.all_counted_votes_with_results(),
             self.all_elections(),
             self.all_election_compounds()
         ]
@@ -122,8 +122,16 @@ class ArchiveGenerator:
                                 )
                         return zip_path
 
-    def all_votes(self):
-        return self.session.query(Vote).order_by(desc(Vote.date)).all()
+    def all_counted_votes_with_results(self):
+        all_votes = self.session.query(Vote)\
+            .order_by(desc(Vote.date))\
+            .all()
+
+        closed_votes = []
+        for vote in all_votes:
+            if vote.counted and vote.has_results:
+                closed_votes.append(vote)
+        return closed_votes
 
     def all_elections(self):
         return self.session.query(Election).order_by(desc(Election.date)).all()
