@@ -14,6 +14,12 @@ from fs.errors import NoSysPath
 
 
 class ArchiveGenerator:
+    """
+        Iterates over all Votes, Election and ElectionCompounds and runs the
+        csv export function on each of them.
+        This creates a bunch of csv files, which are zipped and the path to
+        the zip is returned.
+    """
     def __init__(self, app):
         self.app = app
         self.session = self.app.session()
@@ -21,7 +27,7 @@ class ArchiveGenerator:
                                                                recreate=True)
         self.temp_fs = TempFS()
         self.archive_parent_dir = "zip"
-        self.MAX_FILENAME_LENGTH = 240
+        self.MAX_FILENAME_LENGTH = 60
 
     def generate_csv(self):
         """
