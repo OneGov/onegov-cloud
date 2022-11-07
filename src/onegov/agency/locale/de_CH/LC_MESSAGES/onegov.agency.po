@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-19 06:59+0200\n"
+"POT-Creation-Date: 2022-10-18 09:32+0200\n"
 "PO-Revision-Date: 2021-01-27 13:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -38,20 +38,11 @@ msgid ""
 "Search for the exact address to set a marker. The zoom of the map will be "
 "saved as well."
 msgstr ""
-"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. "
-"Der Zoom der Karte wird ebenfalls gespeichert."
+"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Der Zoom der "
+"Karte wird ebenfalls gespeichert."
 
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Street and house number"
-msgstr "Strasse und Hausnummer"
-
-msgid "Zip Code"
-msgstr "PLZ"
-
-msgid "City"
-msgstr "Ort"
+msgid "Map"
+msgstr "Karte"
 
 msgid "Fields to include for each membership"
 msgstr "Zu berücksichtigende Felder der Mitgliedschaften"
@@ -103,13 +94,6 @@ msgstr "Person: Direktnummer"
 
 msgid "PDF Export"
 msgstr "PDF Export"
-
-msgid ""
-"Search for the exact address to set a marker. The address fields beneath are "
-"filled out automatically."
-msgstr ""
-"Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Die "
-"Adressfelder unterhalb werden automatisch ausgefüllt."
 
 msgid "Destination"
 msgstr "Ziel"
@@ -198,6 +182,9 @@ msgstr "Fraktion"
 
 msgid "Website"
 msgstr "Webseite"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Notes"
 msgstr "Bemerkungen"
@@ -328,7 +315,7 @@ msgid "Report change"
 msgstr "Mutation melden"
 
 msgid "Report a change"
-msgstr "Eine Mutation melden"
+msgstr ""
 
 msgid ""
 "Sort the items using drag and drop. The new positions are automatically "
@@ -375,6 +362,20 @@ msgstr "Elektronische Visitenkarte (vCard)"
 
 msgid "Proposed changes applied."
 msgstr "Vorgeschlagene Änderungen übernommen."
+
+msgid "Changes"
+msgstr "Änderungen"
+
+msgid ""
+"The contact form can be used to report changes to incorrect information of "
+"the persons or organizations listed. The form is not intended "
+"for contacting or sending messages to the respective persons and "
+"organizations."
+msgstr ""
+"Über das Kontaktformular können Änderungen zu inkorrekten Angaben der "
+"verzeichneten Personen oder Organisationen gemeldet werden. Das Formular "
+"dient nicht zur Kontaktaufnahme mit den jeweiligen Personen und "
+"Organisationen oder zur Übermittlung von Nachrichten an diese."
 
 msgid "Added a new agency"
 msgstr "Eine neue Organisation wurde hinzufügt"
@@ -481,12 +482,6 @@ msgstr "Farbe Hyperlinks im PDF"
 msgid "Underline pdf links"
 msgstr "Hyperlinks unterstreichen"
 
-msgid "Map for Agency Adresses"
-msgstr "Karte für die Adressen"
-
-msgid "Map"
-msgstr "Karte"
-
 msgid "Show additional agencies to search results"
 msgstr "Zusätzliche Organisation in den Suchresultaten anzeigen"
 
@@ -524,6 +519,36 @@ msgstr "Daten"
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+#~ msgid "Street and house number"
+#~ msgstr "Strasse und Hausnummer"
+
+#~ msgid "Zip Code"
+#~ msgstr "PLZ"
+
+#~ msgid "City"
+#~ msgstr "Ort"
+
+#~ msgid ""
+#~ "Search for the exact address to set a marker. The address fields beneath "
+#~ "are filled out automatically."
+#~ msgstr ""
+#~ "Suchen Sie nach der exakten Adresse, um einen Marker zu setzen. Die "
+#~ "Adressfelder unterhalb werden automatisch ausgefüllt."
+
+#~ msgid ""
+#~ "The contact form can be used to report changes to incorrect information "
+#~ "of the persons or organizations listed. The form is <i>not</i> intended "
+#~ "for contacting or sending messages to the respective persons and "
+#~ "organizations."
+#~ msgstr ""
+#~ "Über das Kontaktformular können Änderungen zu inkorrekten Angaben der "
+#~ "verzeichneten Personen oder Organisationen gemeldet werden. Das Formular "
+#~ "dient <i>nicht</i> zur Kontaktaufnahme mit den jeweiligen Personen und "
+#~ "Organisationen oder zur Übermittlung von Nachrichten an diese."
+
+#~ msgid "Map for Agency Adresses"
+#~ msgstr "Karte für die Adressen"
 
 #~ msgid "Layout"
 #~ msgstr "Layout"

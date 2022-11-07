@@ -638,7 +638,9 @@ class MapSettingsForm(Form):
         label=_("Geo provider"),
         default='geo-mapbox',
         choices=[
-            ('geo-mapbox', _("Mapbox (Default)")),
+            ('geo-admin', _("Swisstopo (Default)")),
+            ('geo-admin-aerial', _("Swisstopo Aerial")),
+            ('geo-mapbox', "Mapbox"),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
             ('geo-zugmap-luftbild', "ZugMap Luftbild"),
             ('geo-bs', "Geoportal Basel-Stadt"),
