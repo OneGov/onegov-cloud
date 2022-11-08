@@ -34,7 +34,7 @@ var Tablesaw = {
 		modeToggle: "Toggle",
 		modeSwitchColumnsAbbreviated: "Cols",
 		modeSwitchColumns: "Columns",
-		columnToggleButton: "Columns",
+		columnToggleButton: "Show or hide columns",
 		columnToggleError: "No eligible columns.",
 		sort: "Sort",
 		swipePreviousColumn: "Previous column",
@@ -1890,9 +1890,9 @@ if (Tablesaw.mustard) {
 			var $switcher = $("<div>").addClass(S.classes.main + " " + S.classes.toolbar);
 
 			var html = [
-					'<label><span class="abbreviated">' +
+					'<label><span aria-label="Toggle column presentation" class="abbreviated">' +
 						Tablesaw.i18n.modeSwitchColumnsAbbreviated +
-						'</span><span class="longform">' +
+						'</span><span aria-label="Toggle column presentation"  class="longform">' +
 						Tablesaw.i18n.modeSwitchColumns +
 						"</span>:"
 				],
