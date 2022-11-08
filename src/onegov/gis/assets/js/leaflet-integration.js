@@ -8,12 +8,10 @@ var entry_counter = 0
 function VectorMarkerSVG(markerColor, borderColor, iconColor, icon) {
     if (icon === 'numbers') {
         entry_counter += 1
-        console.log('Es sind nummere')
         font_family = 'inherit'
         icon = entry_counter
     } else {
         icon = '&#x' + (icon || 'f111').replace('\\', '');
-        console.log('nei, es esch:', icon)
         font_family = fa_version === 5 && "'Font Awesome 5 Free'" || 'FontAwesome'
     }
     return vectorMarkerSVGTemplate
