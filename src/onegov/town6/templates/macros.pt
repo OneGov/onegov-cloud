@@ -384,7 +384,7 @@
         <tal:b condition="button_text|nothing">
             <input type="submit" value="${button_text}" class="button expanded" role="button">
         </tal:b>
-        <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"><i class="fa fa-times"></i> <span i18n:translate="">Cancel</span><a/>
+        <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span><a/>
     </form>
 </metal:form>
 
