@@ -562,7 +562,10 @@ def test_election_compound_export(session):
     election.colors = {'Democratic Party': '#112233'}
     session.add(election)
     election = proporz_election()
-    election.colors = {'Democratic Party': '#112233', 'Kwik-E-Major': '#223344'}
+    election.colors = {
+        'Democratic Party': '#112233',
+        'Kwik-E-Major': '#223344'
+    }
     session.add(election)
     session.flush()
     election_compound = session.query(ElectionCompound).one()
