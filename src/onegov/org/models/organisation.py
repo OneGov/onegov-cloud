@@ -167,6 +167,11 @@ class Organisation(Base, TimestampMixin):
     hide_chat_for_roles = meta_property(default=tuple)
     disable_chat = meta_property(default=False)
 
+    # Required information to upload documents to a Gever instance
+    gever_username = meta_property()
+    gever_password = meta_property()
+    gever_endpoint = meta_property()
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

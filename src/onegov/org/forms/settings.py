@@ -12,6 +12,7 @@ from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.parser.core import PasswordField
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -638,7 +639,9 @@ class MapSettingsForm(Form):
         label=_("Geo provider"),
         default='geo-mapbox',
         choices=[
-            ('geo-mapbox', _("Mapbox (Default)")),
+            ('geo-admin', _("Swisstopo (Default)")),
+            ('geo-admin-aerial', _("Swisstopo Aerial")),
+            ('geo-mapbox', "Mapbox"),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
             ('geo-zugmap-luftbild', "ZugMap Luftbild"),
             ('geo-bs', "Geoportal Basel-Stadt"),
@@ -1010,3 +1013,33 @@ class LinkHealthCheckForm(Form):
         ),
         default='external'
     )
+
+
+class GeverSettingsForm(Form):
+    gever_username = StringField(
+        "Username Gever Account",
+        [InputRequired()],
+        description="Username for the associated " "Gever account",
+    )
+
+    gever_password = PasswordField(
+        "Password Gever Account",
+        [InputRequired()],
+        description="Password for the associated Gever account",
+    )
+
+    gever_endpoint = URLField(
+        "Gever API Endpoint where the documents are " "uploaded",
+        [InputRequired()],
+        description="For Example: https://example.org/eingangskorb_fa",
+    )
+
+    def populate_obj(self, model):
+        super().populate_obj(model)  # model refers to the Organization
+        model.gever_username = self.gever_username.data or ""
+        model.gever_password = self.gever_password.data or ""
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.gever_username.data = model.gever_username or ""
+        self.gever_password.data = model.gever_password or ""
