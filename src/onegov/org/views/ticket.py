@@ -21,7 +21,8 @@ from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
+from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
+    Organisation
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
@@ -30,6 +31,7 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.ticket.errors import InvalidStateChange
+from onegov.town6.gever.GeverClient import GeverClient
 from onegov.user import User, UserCollection
 from sqlalchemy import select
 from webob import exc
@@ -724,6 +726,47 @@ def view_ticket_status(self, request, form, layout=None):
         'form': form,
         'pick_up_hint': pick_up_hint
     }
+
+
+@OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)
+def view_send_to_gever(self, request):
+
+    query = request.session.query(Organisation)
+    org: Organisation = query.first()
+
+    # do we have credentials?
+    if not (org.gever_username and org.gever_password):
+        request.alert("Could not find valid credentials. You can set them in "
+                      "Gever Settings.")
+        return morepath.redirect(request.link(self))
+
+    endpoint = org.gever_endpoint
+
+    if not endpoint:
+        request.alert("The Gever API Endpoint has not been found. The url has "
+                      "to be set in Settings -> Gever API")
+        return morepath.redirect(request.link(self))
+
+    pdf = TicketPdf.from_ticket(request, self)
+    filename = '{}_{}.pdf'.format(
+        normalize_for_url(self.number),
+        date.today().strftime('%Y%m%d')
+    )
+
+    # upload the pdf
+    client = GeverClient(org.gever_username, org.gever_password)
+    response = client.upload_file(pdf.read(), filename, endpoint)
+
+    # server will respond with status 204 after a successful upload.
+    if not response.status_code == 204 and "Location" in \
+            response.headers.keys():
+        request.alert(f"Failed to upload to Gever. Response status code is "
+                      f"{response.status_code}")
+        return morepath.redirect(request.link(self))
+
+    request.success(f"Successfully uploaded the pdf of this ticket "
+                    f"({filename}) to Gever")
+    return morepath.redirect(request.link(self))
 
 
 def get_filters(self, request):

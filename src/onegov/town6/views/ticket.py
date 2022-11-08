@@ -2,7 +2,7 @@ from onegov.core.security import Public, Private
 from onegov.org.views.ticket import (
     view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
     view_ticket_status, view_tickets, view_archived_tickets,
-    view_pending_tickets, assign_ticket)
+    view_pending_tickets, assign_ticket, view_send_to_gever)
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import TicketNoteForm, TicketAssignmentForm
@@ -83,3 +83,9 @@ def town_view_archived_tickets(self, request):
 def town_view_pending_tickets(self, request):
     return view_pending_tickets(
         self, request, FindYourSpotLayout(self, request))
+
+
+@TownApp.html(model=Ticket, name='send-to-gever',
+              permission=Private)
+def town_send_to_gever(self, request):
+    return view_send_to_gever(self, request)
