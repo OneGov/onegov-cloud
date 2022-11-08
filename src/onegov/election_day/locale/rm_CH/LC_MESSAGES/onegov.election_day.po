@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-24 10:20+0200\n"
+"POT-Creation-Date: 2022-11-08 13:09+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -98,6 +98,10 @@ msgstr "Betg alfanumeric: ${col}"
 #, python-format
 msgid "Invalid gender: ${value}"
 msgstr "Schlattaina nunvalaivla: ${value}"
+
+#, python-format
+msgid "Invalid color: ${col}"
+msgstr "Colur nunvalaivla: : ${col"
 
 msgid "This format does not support separate results for expats"
 msgstr ""
@@ -875,8 +879,8 @@ msgstr "Cuntegn"
 msgid "Sitemap"
 msgstr "Sitemap"
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziala"
 
@@ -1056,7 +1060,8 @@ msgid "Submit"
 msgstr "Trametter"
 
 msgid "The next field is a spam protection, please do not fill it out."
-msgstr "Il proxim champ è ina protecziun da spam, per plaschair betg emplenir ora."
+msgstr ""
+"Il proxim champ è ina protecziun da spam, per plaschair betg emplenir ora."
 
 msgid "Previous Page"
 msgstr "Pagina precedenta"

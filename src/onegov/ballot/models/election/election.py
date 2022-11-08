@@ -379,6 +379,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
             row['candidate_id'] = result.candidate_id
             row['candidate_elected'] = result.elected
             row['candidate_party'] = result.party
+            row['candidate_party_color'] = self.colors.get(result.party, '')
             row['candidate_gender'] = result.gender or ''
             row['candidate_year_of_birth'] = result.year_of_birth or ''
             row['candidate_votes'] = result.votes

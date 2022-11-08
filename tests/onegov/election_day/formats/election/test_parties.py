@@ -404,7 +404,7 @@ def test_import_party_results_invalid_values(session):
         (2, 'Invalid integer: year'),
         (2, 'Not an alphanumeric: id'),
         (3, 'Invalid values'),
-        (4, 'Invalid values'),
+        (4, 'Invalid color: color'),
         (6, '1/2015 was found twice'),
         (7, 'Invalid decimal number: voters_count'),
         (7, 'Invalid integer: panachage_votes_from_1')

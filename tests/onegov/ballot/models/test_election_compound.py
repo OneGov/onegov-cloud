@@ -558,8 +558,12 @@ def test_election_compound_export(session):
             date=date(2015, 6, 14),
         )
     )
-    session.add(majorz_election())
-    session.add(proporz_election())
+    election = majorz_election()
+    election.colors = {'Democratic Party': '#112233'}
+    session.add(election)
+    election = proporz_election()
+    election.colors = {'Democratic Party': '#112233', 'Kwik-E-Major': '#223344'}
+    session.add(election)
     session.flush()
     election_compound = session.query(ElectionCompound).one()
     election_compound.title_translations['it_CH'] = 'Elezioni'
@@ -606,6 +610,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_party_color': '#112233',
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
@@ -645,6 +650,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_party_color': '',
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520
@@ -686,6 +692,7 @@ def test_election_compound_export(session):
         'entity_accounted_votes': 285,
         'list_name': 'Kwik-E-Major',
         'list_id': '2',
+        'list_color': '#223344',
         'list_number_of_mandates': 0,
         'list_votes': 111,
         'list_connection': 'A.1',
@@ -695,6 +702,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_party_color': '#112233',
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111,
@@ -735,6 +743,7 @@ def test_election_compound_export(session):
         'entity_accounted_votes': 285,
         'list_name': 'Quimby Again!',
         'list_id': '1',
+        'list_color': '',
         'list_number_of_mandates': 1,
         'list_votes': 520,
         'list_connection': None,
@@ -744,6 +753,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_party_color': '',
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
@@ -787,6 +797,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_party_color': '#112233',
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
@@ -827,6 +838,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_party_color': '',
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520

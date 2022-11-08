@@ -3,11 +3,11 @@ from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.common import validate_color
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.common import validate_list_id
 from onegov.election_day.formats.common import validate_numeric
 from onegov.election_day.formats.mappings import ELECTION_PARTY_HEADERS
-from re import match
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -32,7 +32,7 @@ def parse_party_result(
                 name_translations[default_locale] = line.name or ''
 
         party_id = validate_list_id(line, 'id')
-        color = line.color
+        color = validate_color(line, 'color')
         mandates = validate_integer(
             line, 'mandates', optional=True, default=None
         )
@@ -52,7 +52,6 @@ def parse_party_result(
         )
         assert all((year, name_translations.get(default_locale)))
         assert totals.get(year, total_votes) == total_votes
-        assert not color or match(r'^#[0-9A-Fa-f]{6}$', color)
     except ValueError as e:
         errors.append(e.args[0])
     except AssertionError:
