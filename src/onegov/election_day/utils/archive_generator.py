@@ -45,8 +45,8 @@ class ArchiveGenerator:
         names = ["votes", "elections", "elections"]
         entities = [
             self.all_counted_votes_with_results(),
-            self.all_elections(),
-            self.all_election_compounds()
+            self.all_counted_election_with_results(),
+            self.all_counted_election_compounds_with_results()
         ]
         for entity_name, entity in zip(names, entities):
 
@@ -123,9 +123,7 @@ class ArchiveGenerator:
                         return zip_path
 
     def all_counted_votes_with_results(self):
-        all_votes = self.session.query(Vote)\
-            .order_by(desc(Vote.date))\
-            .all()
+        all_votes = self.session.query(Vote).order_by(desc(Vote.date)).all()
 
         closed_votes = []
         for vote in all_votes:
@@ -133,15 +131,29 @@ class ArchiveGenerator:
                 closed_votes.append(vote)
         return closed_votes
 
-    def all_elections(self):
-        return self.session.query(Election).order_by(desc(Election.date)).all()
+    def all_counted_election_with_results(self):
+        all_elections = (
+            self.session.query(Election).order_by(desc(Election.date)).all()
+        )
 
-    def all_election_compounds(self):
-        return (
+        closed_elections = []
+        for election in all_elections:
+            if election.counted and election.has_results:
+                closed_elections.append(election)
+        return closed_elections
+
+    def all_counted_election_compounds_with_results(self):
+        all_election_compounds = (
             self.session.query(ElectionCompound)
             .order_by(desc(ElectionCompound.date))
             .all()
         )
+
+        closed_election_compounds = []
+        for election_compound in all_election_compounds:
+            if election_compound.counted and election_compound.has_results:
+                closed_election_compounds.append(election_compound)
+        return closed_election_compounds
 
     @property
     def archive_system_path(self):

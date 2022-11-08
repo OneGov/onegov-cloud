@@ -49,7 +49,6 @@ def test_query_only_counted_votes_that_have_results(election_day_app_zg):
     assert len(votes) == 1
 
 
-
 def test_archive_generation_from_scratch(election_day_app_zg):
     archive_generator = ArchiveGenerator(election_day_app_zg)
     session = election_day_app_zg.session()
