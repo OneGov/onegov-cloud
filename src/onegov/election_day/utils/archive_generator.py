@@ -124,23 +124,15 @@ class ArchiveGenerator:
 
     def all_counted_votes_with_results(self):
         all_votes = self.session.query(Vote).order_by(desc(Vote.date)).all()
-
-        closed_votes = []
-        for vote in all_votes:
-            if vote.counted and vote.has_results:
-                closed_votes.append(vote)
+        closed_votes = self.filter_by_final_results(all_votes)
         return closed_votes
 
     def all_counted_election_with_results(self):
         all_elections = (
             self.session.query(Election).order_by(desc(Election.date)).all()
         )
-
-        closed_elections = []
-        for election in all_elections:
-            if election.counted and election.has_results:
-                closed_elections.append(election)
-        return closed_elections
+        final_elections = self.filter_by_final_results(all_elections)
+        return final_elections
 
     def all_counted_election_compounds_with_results(self):
         all_election_compounds = (
@@ -148,12 +140,17 @@ class ArchiveGenerator:
             .order_by(desc(ElectionCompound.date))
             .all()
         )
+        final_election_compounds = self.filter_by_final_results(
+            all_election_compounds
+        )
+        return final_election_compounds
 
-        closed_election_compounds = []
-        for election_compound in all_election_compounds:
-            if election_compound.counted and election_compound.has_results:
-                closed_election_compounds.append(election_compound)
-        return closed_election_compounds
+    def filter_by_final_results(self, all_entities):
+        finalized = []
+        for entity in all_entities:
+            if entity.counted and entity.has_results:
+                finalized.append(entity)
+        return finalized
 
     @property
     def archive_system_path(self):
