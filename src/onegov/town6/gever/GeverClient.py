@@ -1,6 +1,5 @@
 from base64 import b64encode
 import requests
-from onegov.core.utils import log
 
 
 class GeverClient:
@@ -43,7 +42,6 @@ class GeverClient:
         }
         last_char = endpoint[-1]
         endpoint += "@tus-upload" if last_char == "/" else "/@tus-upload"
-        log.info(f"Post request to {endpoint}")
         resp = self.request_with_basic_auth(
             "POST", endpoint, headers=headers
         )

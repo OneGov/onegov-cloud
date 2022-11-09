@@ -5033,3 +5033,22 @@ msgstr "Utente creato correttamente"
 
 #~ msgid "Homepage Image #1"
 #~ msgstr "Immagine n. 1 della pagina principale"
+
+msgid "Could not find valid credentials. You can set them in Gever API Settings."
+msgstr "Impossibile trovare credenziali valide. "
+"È possibile impostarle nelle Impostazioni API di Gever"
+
+
+msgid "The Gever API Endpoint has not been found. The url has to "
+"be set in Settings -> Gever API"
+msgstr "L'endpoint API di Gever non è stato trovato. "
+"L'url deve essere impostato in Impostazioni -> API di Gever."
+
+
+msgid "Successfully uploaded the PDF of this ticket to Gever"
+msgstr "Il PDF di questo biglietto è stato caricato con successo su Gever."
+
+msgid "Encountered an error while uploading to Gever."
+"Response status code is ${status}."
+msgstr "Si è verificato un errore durante il caricamento su Gever."
+"Il codice di stato della risposta è ${status}."

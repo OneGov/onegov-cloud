@@ -730,14 +730,13 @@ def view_ticket_status(self, request, form, layout=None):
 
 @OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)
 def view_send_to_gever(self, request):
-
     query = request.session.query(Organisation)
     org: Organisation = query.first()
 
     # do we have credentials?
     if not (org.gever_username and org.gever_password):
         request.alert("Could not find valid credentials. You can set them in "
-                      "Gever Settings.")
+                      "Gever API Settings.")
         return morepath.redirect(request.link(self))
 
     endpoint = org.gever_endpoint
@@ -755,17 +754,17 @@ def view_send_to_gever(self, request):
 
     # upload the pdf
     client = GeverClient(org.gever_username, org.gever_password)
-    response = client.upload_file(pdf.read(), filename, endpoint)
+    resp = client.upload_file(pdf.read(), filename, endpoint)
 
     # server will respond with status 204 after a successful upload.
-    if not response.status_code == 204 and "Location" in \
-            response.headers.keys():
-        request.alert(f"Failed to upload to Gever. Response status code is "
-                      f"{response.status_code}")
+    if not (resp.status_code == 204 and "Location" in resp.headers.keys()):
+        msg = _("Encountered an error while uploading to Gever. Response "
+                "status code is ${status}.", mapping={
+                "status": resp.status_code})
+        request.alert(msg)
         return morepath.redirect(request.link(self))
 
-    request.success(f"Successfully uploaded the pdf of this ticket "
-                    f"({filename}) to Gever")
+    request.success(_("Successfully uploaded the PDF of this ticket to Gever"))
     return morepath.redirect(request.link(self))
 
 

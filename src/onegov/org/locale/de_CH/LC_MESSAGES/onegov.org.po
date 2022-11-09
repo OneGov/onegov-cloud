@@ -5016,3 +5016,20 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Could not find valid credentials. You can set them in Gever API Settings."
+msgstr "Es konnten keine gültigen Anmeldedaten gefunden werden."
+"Sie können sie in den Gever API-Einstellungen festlegen."
+
+msgid "The Gever API Endpoint has not been found. The url has to "
+"be set in Settings -> Gever API"
+msgstr "Der Gever API Endpunkt wurde nicht gefunden. "
+"Die Url kann unter Einstellungen -> Gever API eingestellt werden."
+
+msgid "Successfully uploaded the PDF of this ticket to Gever"
+msgstr "Das PDF dieses Tickets wurde erfolgreich hochgeladen zu Gever."
+
+msgid "Encountered an error while uploading to Gever."
+"Response status code is ${status}."
+msgstr "Beim Hochladen auf Gever ist ein Fehler aufgetreten."
+"Der Statuscode der Antwort lautet ${status}."
