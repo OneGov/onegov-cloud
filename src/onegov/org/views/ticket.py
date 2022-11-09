@@ -754,7 +754,12 @@ def view_send_to_gever(self, request):
 
     # upload the pdf
     client = GeverClient(org.gever_username, org.gever_password)
-    resp = client.upload_file(pdf.read(), filename, endpoint)
+    try:
+        resp = client.upload_file(pdf.read(), filename, endpoint)
+    except ValueError:
+        msg = _("Encountered an error while uploading to Gever.")
+        request.alert(msg)
+        return morepath.redirect(request.link(self))
 
     # server will respond with status 204 after a successful upload.
     if not (resp.status_code == 204 and "Location" in resp.headers.keys()):

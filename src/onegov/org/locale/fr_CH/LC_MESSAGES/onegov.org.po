@@ -5080,3 +5080,6 @@ msgid "Encountered an error while uploading to Gever."
 "Response status code is ${status}."
 msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
 "Le code d'état de la réponse est ${status}."
+
+msgid "Encountered an error while uploading to Gever."
+msgstr "Une erreur s'est produite lors du téléchargement sur Gever."

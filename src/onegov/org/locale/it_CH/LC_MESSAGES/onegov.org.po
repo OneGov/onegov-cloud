@@ -5061,3 +5061,7 @@ msgid "Encountered an error while uploading to Gever."
 "Response status code is ${status}."
 msgstr "Si è verificato un errore durante il caricamento su Gever."
 "Il codice di stato della risposta è ${status}."
+
+
+msgid "Encountered an error while uploading to Gever."
+msgstr "Si è verificato un errore durante il caricamento su Gever."
