@@ -760,7 +760,7 @@ def view_send_to_gever(self, request):
     if not (resp.status_code == 204 and "Location" in resp.headers.keys()):
         msg = _("Encountered an error while uploading to Gever. Response "
                 "status code is ${status}.", mapping={
-                "status": resp.status_code})
+                    "status": resp.status_code})
         request.alert(msg)
         return morepath.redirect(request.link(self))
 
