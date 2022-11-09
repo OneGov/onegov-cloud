@@ -2016,7 +2016,7 @@ class DirectoryEntryBaseLayout(DefaultLayout):
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
         if self.directory.marker_type == 'numbers':
-            self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
+            self.custom_body_attributes['data-default-marker-icon'] = 'f111'
 
     @property
     def directory(self):
@@ -2053,6 +2053,12 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 )
 class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
                                      StepsLayoutExtension):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
+
     @property
     def step_position(self):
         return 1
