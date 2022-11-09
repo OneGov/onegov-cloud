@@ -112,7 +112,7 @@ class DefaultLayout(ChameleonLayout):
                 locale_code,
                 locale.language,
                 locale.get_language_name().capitalize(),
-                self.request.link(SiteLocale(locale_code, self.request.url))
+                SiteLocale(locale_code).link(self.request, self.request.url)
             ))
         return result
 

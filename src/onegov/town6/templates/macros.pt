@@ -384,6 +384,7 @@
         <tal:b condition="button_text|nothing">
             <input type="submit" value="${button_text}" class="button expanded" role="button">
         </tal:b>
+        <a href="" class="cancel-link" onclick="history.back()"><i class="fa fa-times"></i> <span i18n:translate="">Cancel</span><a/>
     </form>
 </metal:form>
 
@@ -395,12 +396,12 @@
                 ${field()}
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:b>
-            <tal:b condition="input_type != 'hidden'">
-                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not:field.contains_labels|nothing">
+            <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
+                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </label>
 
-                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
+                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </div>
                 <small class="error" tal:repeat="error field.errors">${error}</small>
@@ -1321,11 +1322,20 @@
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
     <div tal:condition="link_mp4 or link_webm" class="homepage-video" style="max-height: ${max_height};">
-        <video autoplay loop muted>
+        <video id="autoplay-video" autoplay playsinline loop muted>
             <source tal:condition="link_mp4" src="${link_mp4}" type="video/mp4">
             <source tal:condition="link_webm" src="${link_webm}" type="video/webm">
             Your browser does not support the video tag.
         </video> 
+        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer"></div>
+        <script>
+            var vid = document.querySelector('#autoplay-video');
+            vid.addEventListener('loadeddata', (event) => {
+                var ratio = vid.videoHeight / vid.videoWidth * 100;
+                var spacer = document.getElementById("spacer");
+                spacer.style.paddingBottom = ratio + "%"
+            });
+        </script>
     </div>
 </metal:autoplay_video>
 
@@ -1575,13 +1585,13 @@
                 <metal:b define-slot="after-submit" />
             </div>
             <div data-depends-on="payment_method/manual">
-                <input type="submit" value="Complete" class="button" i18n:attributes="value">
+                <input type="submit" value="Send" class="button expanded" i18n:attributes="value">
                 <metal:b define-slot="after-submit" />
             </div>
         </tal:b>
 
         <tal:b condition="not price">
-            <input type="submit" value="Complete" class="button" i18n:attributes="value">
+            <input type="submit" value="Send" class="button expanded" i18n:attributes="value">
             <metal:b define-slot="after-submit" />
         </tal:b>
     </form>
@@ -2050,7 +2060,7 @@
         file_number file.number|file.id;
         file_upload file.upload_date|file.created
     ">
-        <tr class="file-info ${file.signed and 'signed' or ''}">
+        <tr class="file-info ${'signed' if file.signed else ''}">
             <td>
                 ${file.name}
             </td>

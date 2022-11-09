@@ -113,8 +113,8 @@ Die Resultate von verbundenen Wahlen können gebündelt hochgeladen werden, inde
 
 #### Vorlage
 
-- [election_onegov_majorz.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_onegov_majorz.csv)
-- [election_onegov_proporz.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_onegov_proporz.csv)
+- [election_onegov_majorz.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_onegov_majorz.csv)
+- [election_onegov_proporz.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_onegov_proporz.csv)
 
 ### Wabsti Majorz
 
@@ -157,8 +157,8 @@ Das Datenformat enthält auch keine Information dazu, ob eine einzelne Einheit f
 
 #### Vorlagen
 
-- [election_wabsti_majorz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_majorz_results.csv)
-- [election_wabsti_majorz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_majorz_candidates.csv)
+- [election_wabsti_majorz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_majorz_results.csv)
+- [election_wabsti_majorz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_majorz_candidates.csv)
 
 ### Wabsti Proporz
 
@@ -214,10 +214,10 @@ Das Datenformat enthält auch keine Information dazu, ob eine einzelne Einheit f
 
 #### Vorlagen
 
-- [election_wabsti_proporz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_results.csv)
-- [electionwabsti_proporz_statistics.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_statistics.csv)
-- [electionwabsti_proporz_list_connections.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_list_connections.csv)
-- [electionwabsti_proporz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_wabsti_proporz_candidates.csv)
+- [election_wabsti_proporz_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_results.csv)
+- [electionwabsti_proporz_statistics.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_statistics.csv)
+- [electionwabsti_proporz_list_connections.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_list_connections.csv)
+- [electionwabsti_proporz_candidates.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_wabsti_proporz_candidates.csv)
 
 ### WabstiCExport Majorz
 
@@ -261,7 +261,7 @@ Panaschierdaten werden nur hinzugefügt, falls:
 
 #### Vorlagen
 
-- [election_party_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/election_party_results.csv)
+- [election_party_results.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/election_party_results.csv)
 
 ### Automatische Erstellung verbundene Wahl und Wahlen mit REST-API
 

@@ -79,6 +79,9 @@ class DummyRequest:
     def new_csrf_token(self):
         return 'x'
 
+    def return_to(self, url, redirect):
+        return f'{url}{redirect}'
+
 
 def path(links):
     return '/'.join([link.attrs['href'].strip('/') for link in links])

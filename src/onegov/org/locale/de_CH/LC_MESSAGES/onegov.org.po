@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-04 13:14+0200\n"
+"POT-Creation-Date: 2022-10-18 15:09+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1374,8 +1374,11 @@ msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
 msgid "Geo provider"
 msgstr "Geo Anbieter"
 
-msgid "Mapbox (Default)"
-msgstr "Mapbox (Standard)"
+msgid "Swisstopo (Default)"
+msgstr "Swisstopo (Standard)"
+
+msgid "Swisstopo Aerial"
+msgstr "Swisstopo Luftbild"
 
 msgid "Analytics Code"
 msgstr "Analytics Code"
@@ -2637,6 +2640,9 @@ msgstr "Noch keine Fotoalben erstellt."
 
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
+
+msgid "Straight to ..."
+msgstr "Direkt zu ..."
 
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
@@ -5016,6 +5022,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Mapbox (Default)"
+#~ msgstr "Mapbox (Standard)"
 
 msgid "Could not find valid credentials. You can set them in Gever API Settings."
 msgstr "Es konnten keine gültigen Anmeldedaten gefunden werden."

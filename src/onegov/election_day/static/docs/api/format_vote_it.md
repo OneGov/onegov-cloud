@@ -58,7 +58,7 @@ Si ritiene che i comuni non siano stati conteggiati se il comune non è incluso 
 
 #### Modello
 
-- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_standard.csv)
+- [vote_standard.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_standard.csv)
 
 ### OneGov
 
@@ -95,7 +95,7 @@ Se lo stato è
 
 #### Modello
 
-- [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_onegov.csv)
+- [vote_onegov.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_onegov.csv)
 
 ### Wabsti
 
@@ -126,7 +126,7 @@ Si ritiene che i comuni non siano stati conteggiati se si verifica una delle due
 
 #### Modello
 
-- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/docs/api/election_day/templates/vote_wabsti.csv)
+- [vote_wabsti.csv](https://github.com/OneGov/onegov-cloud/blob/master/src/onegov/election_day/static/docs/api/templates/vote_wabsti.csv)
 
 
 ### WabstiCExport

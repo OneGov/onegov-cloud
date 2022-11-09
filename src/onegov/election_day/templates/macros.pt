@@ -759,20 +759,16 @@
 
 <metal:ballot-result-bar define-macro="ballot-result-bar">
     <div class="ballot-result-bar" tal:condition="layout.has_results and ballot">
-        <div class="percentages flex-container justify-between align-center">
-            <div class="">
-                <dl>
-                    <dt i18n:translate="">Yeas</dt>
-                    <dd class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</dd>
-                </dl>
-            </div>
-            <div class="">
-                <dl style="text-align: right;">
-                    <dt i18n:translate="">Nays</dt>
-                    <dd class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</dd>
-                </dl>
-            </div>
-        </div>
+        <ul class="percentages flex-container justify-between align-center">
+            <li>
+                <span i18n:translate="">Yeas</span><br/>
+                <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span>
+            </li>
+            <li>
+                <span i18n:translate="">Nays</span><br/>
+                <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span>
+            </li>
+        </ul>
         <div class="percentage">
             <div class="yeas"></div>
             <div class="nays right" style="width:${'{0:.2f}'.format(ballot.nays_percentage)}%"></div>
@@ -993,37 +989,17 @@
                         ${field()}
                         <p><small class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
-                    <tal:block condition="input_type != 'hidden'">
-                        <label tal:attributes="class field.errors and 'error' or None">
-                            <tal:block condition="field.type == 'BooleanField'">
-                                ${field(placeholder=request.translate(field.description))}
-                                <span class="label-text">${field.label.text}</span>
-                                <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
-                                <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                            </tal:block>
-                            <tal:block condition="field.type != 'BooleanField'">
 
-                                <!--!
-                                    Note how the field is rendered *first* in the 'define' step,
-                                    before the label is accessed. This is due to the field call
-                                    setting up translatable labels as a side-effect.
-
-                                    See onegov.core.i18n.get_translation_bound_meta.render_field
-                                -->
-                                <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '')">
-                                    <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
-                                    <tal:b tal:condition="long_description">
-                                        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
-                                        <p class="visually-hidden">${field.description}</p>
-                                    </tal:b>
-                                    <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-
-                                    <!--! The field is placed here -->
-                                    <tal:b replace="structure content" />
-                                </tal:b>
-
-                            </tal:block>
+                    <tal:block condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
+                        <p class="visually-hidden" tal:condition="field.type == 'LazyWolvesField'" i18n:translate>The next field is a spam protection, please do not fill it out.</p>
+                        <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
                         </label>
+
+                        <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
+                            <metal:b use-macro="layout.macros['field']" />
+                        </div>
+
                         <p><small id="${field.name}-error" class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
                </tal:block>
@@ -1032,6 +1008,37 @@
         </tal:block>
   </div>
 </metal:fields>
+
+<metal:field define-macro="field" i18n:domain="onegov.election_day">
+    <tal:block condition="field.type == 'BooleanField'">
+        ${field(placeholder=request.translate(field.description))}
+        <span class="label-text">${field.label.text}</span>
+        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
+        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+    </tal:block>
+    <tal:block condition="field.type != 'BooleanField'">
+
+        <!--!
+            Note how the field is rendered *first* in the 'define' step,
+            before the label is accessed. This is due to the field call
+            setting up translatable labels as a side-effect.
+
+            See onegov.core.i18n.get_translation_bound_meta.render_field
+        -->
+        <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '')">
+            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+            <tal:b tal:condition="long_description">
+                <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
+                <span class="visually-hidden">${field.description}</span>
+            </tal:b>
+            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+
+            <!--! The field is placed here -->
+            <tal:b replace="structure content" />
+        </tal:b>
+
+    </tal:block>
+</metal:field>
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
     <tal:block tal:define="explanations_pdf layout.explanations_pdf;
@@ -1110,7 +1117,7 @@
                 <li class="name menu-icon"><span>${layout.title()}</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
             </ul>
-            <section class="top-bar-section">
+            <div class="top-bar-section">
                 <ul class="left">
                     <tal:block repeat="(title, link, active, submenu) layout.menu">
                         <li tal:condition="not submenu" tal:attributes="class 'active' if active else '';aria-current 'true' if active else 'false'">
@@ -1128,7 +1135,7 @@
                         </li>
                     </tal:block>
                 </ul>
-            </section>
+            </div>
         </nav>
     </div>
 </metal:tab_menu>
@@ -1180,7 +1187,7 @@
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
             <li tal:condition="item.compound|None"><a href="${request.link(item.compound)}"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item.compound"/></a></li>
-            <li><a href="${request.link(item)}" aria-current="You are here" i18n:attributes="aria-current"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item"/></a></li>
+            <li><a href="${request.link(item)}" aria-current="page"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item"/></a></li>
         </ul>
     </nav>
 </metal:election_day_link>
@@ -1188,15 +1195,16 @@
 <metal:election_header define-macro="election_header" i18n:domain="onegov.election_day">
     <div metal:use-macro="layout.macros['election_day_link']" tal:define="item election"/>
     <h1><span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/></h1>
-    <hr />
+    <hr>
 </metal:election_header>
 
 <metal:vote_header define-macro="vote_header" i18n:domain="onegov.election_day">
     <h1>
         <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
-        <div tal:condition="layout.answer">
-            <div tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer"/>
-            <div tal:condition="layout.type == 'complex'">
+        <tal:b tal:condition="layout.answer">
+            <br>
+            <tal:b tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer"/>
+            <tal:b tal:condition="layout.type == 'complex'">
                 <tal:block tal:define="proposal vote.proposal.accepted;
                                        counter_proposal vote.counter_proposal.accepted;
                                        tie_breaker vote.tie_breaker.accepted">
@@ -1218,14 +1226,14 @@
                         </span>
                     </tal:block>
                 </tal:block>
-            </div>
-        </div>
+            </tal:b>
+        </tal:b>
     </h1>
 
     <div class="clearfix"></div>
     <metal metal:use-macro="layout.macros['ballot-result-bar']" />
     <tal:block tal:condition="not: layout.has_results and ballot">
-        <hr />
+        <hr>
     </tal:block>
 </metal:vote_header>
 
@@ -1406,13 +1414,13 @@
                 <li class="name menu-icon"><span i18n:translate="">Year</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
             </ul>
-            <section class="top-bar-section">
+            <div class="top-bar-section">
                 <ul class="left tabs" data-tab>
                     <tal:block tal:repeat="year sorted(years, reverse=True)">
                         <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
                     </tal:block>
                 </ul>
-            </section>
+            </div>
         </nav>
     </div>
     <div class="tabs-content">

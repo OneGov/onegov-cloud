@@ -9,7 +9,7 @@
             <small>${layout.principal.name}</small>
             <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
         </h1>
-        <hr />
+        <hr>
     </tal:block>
 
     <tal:block metal:fill-slot="content">
