@@ -17,6 +17,8 @@ function epsg_2056_projection() {
         {
             // all zoomed out -> all zoomed in
             scales: [
+                0.015625,
+                0.03125,
                 0.0625,
                 0.125,
                 0.25,
