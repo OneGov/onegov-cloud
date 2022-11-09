@@ -31,10 +31,11 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.ticket.errors import InvalidStateChange
-from onegov.town6.gever.GeverClient import GeverClient
+from onegov.town6.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
 from sqlalchemy import select
 from webob import exc
+from urllib.parse import urlsplit
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -733,7 +734,6 @@ def view_send_to_gever(self, request):
     query = request.session.query(Organisation)
     org: Organisation = query.first()
 
-    # do we have credentials?
     if not (org.gever_username and org.gever_password):
         request.alert("Could not find valid credentials. You can set them in "
                       "Gever API Settings.")
@@ -752,8 +752,9 @@ def view_send_to_gever(self, request):
         date.today().strftime('%Y%m%d')
     )
 
-    # upload the pdf
-    client = GeverClient(org.gever_username, org.gever_password)
+    base_url = "{0.scheme}://{0.netloc}/".format(urlsplit(endpoint))
+    client = GeverClientCAS(org.gever_username, org.gever_password,
+                            service_url=base_url)
     try:
         resp = client.upload_file(pdf.read(), filename, endpoint)
     except ValueError:
