@@ -720,7 +720,7 @@ class TicketLayout(DefaultLayout):
                 Link(
                     text="Send to Gever",
                     url=self.request.link(self.model, 'send-to-gever'),
-                    attrs={'class': 'send-to-gever'}
+                    attrs={'class': 'upload'}
                 )
             )
 
