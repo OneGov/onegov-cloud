@@ -2416,6 +2416,9 @@ class DirectoryEntryBaseLayout(DefaultLayout):
             self.custom_body_attributes['data-default-marker-icon'] \
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
+
     @property
     def directory(self):
         return self.model.directory
