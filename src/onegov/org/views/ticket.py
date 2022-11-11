@@ -770,6 +770,12 @@ def view_send_to_gever(self, request):
         request.alert(msg)
         return morepath.redirect(request.link(self))
 
+    # if we land here, there was a successful upload.
+    TicketMessage.create(
+        self,
+        request,
+        "uploaded"
+    )
     request.success(_("Successfully uploaded the PDF of this ticket to Gever"))
     return morepath.redirect(request.link(self))
 

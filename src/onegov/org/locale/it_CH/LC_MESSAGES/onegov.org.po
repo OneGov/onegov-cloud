@@ -5065,3 +5065,6 @@ msgstr "Si è verificato un errore durante il caricamento su Gever."
 
 msgid "Encountered an error while uploading to Gever."
 msgstr "Si è verificato un errore durante il caricamento su Gever."
+
+msgid "Ticket uploaded to Gever."
+msgstr "Biglietto caricato su Gever."

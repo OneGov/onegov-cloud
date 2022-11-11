@@ -3401,6 +3401,9 @@ msgstr "Ticket archiviert."
 msgid "Ticket recovered from archive."
 msgstr "Ticket aus dem Archiv geholt."
 
+msgid "Ticket uploaded to Gever."
+msgstr "Ticket zu Gever hochgeladen."
+
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "
 "logged in."
