@@ -5086,3 +5086,6 @@ msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
 
 msgid "Ticket uploaded to Gever."
 msgstr "Ticket téléchargé à Gever."
+
+msgid "Upload to Gever"
+msgstr "Télécharger à Gever"

@@ -718,7 +718,7 @@ class TicketLayout(DefaultLayout):
             )
             links.append(
                 Link(
-                    text="Send to Gever",
+                    text=_("Upload to Gever"),
                     url=self.request.link(self.model, 'send-to-gever'),
                     attrs={'class': 'upload'}
                 )

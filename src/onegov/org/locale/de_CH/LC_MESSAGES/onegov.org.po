@@ -5048,3 +5048,6 @@ msgstr "Beim Hochladen auf Gever ist ein Fehler aufgetreten."
 
 msgid "Encountered an error while uploading to Gever."
 msgstr "Beim Hochladen auf Gever ist ein Fehler aufgetreten."
+
+msgid "Upload to Gever"
+msgstr "Hochladen auf Gever"
