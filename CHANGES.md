@@ -1,8 +1,24 @@
 # Changes
 
+## 2022.53
+
+`2022-11-16` | [c4b89f4698...eefba89962](https://github.com/OneGov/onegov-cloud/compare/c4b89f4698^...eefba89962)
+
+### Event
+
+##### Fix icalendar tests
+
+`Bugfix` | [ff15e573d8](https://github.com/onegov/onegov-cloud/commit/ff15e573d8bb67a59f8120dd9836af8a12c21f19)
+
+### Gis
+
+##### Add zoom levels for swiss admin map
+
+`Feature` | [OGC-694](https://linear.app/onegovcloud/issue/OGC-694) | [eefba89962](https://github.com/onegov/onegov-cloud/commit/eefba89962a70b098ad91ac6bebb74e7dd4ac7ca)
+
 ## 2022.52
 
-`2022-11-03` | [8e75e5483a...69e2daf81e](https://github.com/OneGov/onegov-cloud/compare/8e75e5483a^...69e2daf81e)
+`2022-11-03` | [8e75e5483a...f55f16d53e](https://github.com/OneGov/onegov-cloud/compare/8e75e5483a^...f55f16d53e)
 
 ### Election Day
 
@@ -2423,18 +2439,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Hide campaign material with no metadata in full-text search results. Always show them when logged-in.
 
 `Bugfix` | [SWI-16](https://linear.app/swissvotes/issue/SWI-16) | [2fbeb92b02](https://github.com/onegov/onegov-cloud/commit/2fbeb92b020e0cc9689966c06f0eee67edb937ec)
-
-## 2022.3
-
-`2022-01-09` | [642818ca15...82ad29c86f](https://github.com/OneGov/onegov-cloud/compare/642818ca15^...82ad29c86f)
-
-### Swissvotes
-
-##### Split importing campaign material in multiple transactions.
-
-`Feature` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [c1e5f4ef0e](https://github.com/onegov/onegov-cloud/commit/c1e5f4ef0ee43bb50a1969c12c1ff6a3d61363d0)
-
-##### Update translations.
-
-`Other` | [SWI-15](https://linear.app/swissvotes/issue/SWI-15) | [642818ca15](https://github.com/onegov/onegov-cloud/commit/642818ca15ca76f4534b916d6cf6271ab436907c)
 
