@@ -1,3 +1,4 @@
+from onegov.ballot import ElectionCompound
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
@@ -12,9 +13,37 @@ from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
+def parse_domain(line, election):
+    """ Parse domain and domain segment. Also indicate, if line should be
+    skipped.
+
+    """
+
+    domain = getattr(line, 'domain', None) or None
+    domain_segment = getattr(line, 'domain_segment', None) or None
+
+    if isinstance(election, ElectionCompound):
+        # Compound (including results for superregions)
+        if not domain or domain == election.domain:
+            return False, election.domain, None
+        if domain == "superregion" and domain_segment:
+            return False, domain, domain_segment
+
+    else:
+        # Election
+        if not domain or domain == election.domain:
+            if (
+                not domain_segment
+                or domain_segment == election.domain_segment
+            ):
+                return False, election.domain, election.domain_segment
+
+    return True, None, None
+
+
 def parse_party_result(
     line, errors, party_results, totals, parties, election_year,
-    locales, default_locale, colors
+    locales, default_locale, colors, domain, domain_segment
 ):
     try:
         year = validate_integer(line, 'year', default=election_year)
@@ -67,6 +96,8 @@ def parse_party_result(
         else:
             party_results[key] = PartyResult(
                 id=uuid4(),
+                domain=domain,
+                domain_segment=domain_segment,
                 party_id=party_id,
                 year=year,
                 total_votes=total_votes,
@@ -136,13 +167,20 @@ def import_party_results(election, file, mimetype, locales, default_locale):
         else:
             panachage_headers = parse_panachage_headers(csv)
             for line in csv.lines:
+                skip, domain, domain_segment = parse_domain(
+                    line, election
+                )
+                if skip:
+                    continue
+
                 line_errors = []
                 parse_party_result(
                     line, line_errors,
                     party_results, party_totals, parties,
                     election.date.year,
                     locales, default_locale,
-                    colors
+                    colors,
+                    domain, domain_segment
                 )
                 parse_panachage_results(
                     line, line_errors,

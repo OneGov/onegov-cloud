@@ -6,26 +6,29 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 ## Inhalt
 
-<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
-- [Format Spezifikation Abstimmungen](#format-spezifikation-abstimmungen)
-    - [Inhalt](#inhalt)
-    - [Vorbemerkungen](#vorbemerkungen)
-        - [Einheiten](#einheiten)
-    - [Formate](#formate)
-        - [Standardformat](#standardformat)
-            - [Spalten](#spalten)
-            - [Temporäre Resultate](#temporäre-resultate)
-            - [Vorlage](#vorlage)
-        - [OneGov](#onegov)
-            - [Spalten](#spalten-1)
-            - [Temporäre Resultate](#temporäre-resultate-1)
-            - [Vorlage](#vorlage-1)
-        - [Wabsti](#wabsti)
-            - [Spalten](#spalten-2)
-            - [Temporäre Resultate](#temporäre-resultate-2)
-            - [Vorlage](#vorlage-2)
-        - [WabstiCExport](#wabsticexport)
-<!-- TOC END -->
+<!-- https://atom.io/packages/atom-mdtoc -->
+<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+
+- 1. [Inhalt](#Inhalt)   
+- 2. [Vorbemerkungen](#Vorbemerkungen)   
+   - 2.1. [Einheiten](#Einheiten)   
+- 3. [Formate](#Formate)   
+   - 3.1. [Standardformat](#Standardformat)   
+      - 3.1.1. [Spalten](#Spalten)   
+      - 3.1.2. [Temporäre Resultate](#Temporare-Resultate)   
+      - 3.1.3. [Vorlage](#Vorlage)   
+   - 3.2. [OneGov](#OneGov)   
+      - 3.2.1. [Spalten](#Spalten-1)   
+      - 3.2.2. [Temporäre Resultate](#Temporare-Resultate-1)   
+      - 3.2.3. [Vorlage](#Vorlage-1)   
+   - 3.3. [Wabsti](#Wabsti)   
+      - 3.3.1. [Spalten](#Spalten-2)   
+      - 3.3.2. [Temporäre Resultate](#Temporare-Resultate-2)   
+      - 3.3.3. [Vorlage](#Vorlage-2)   
+   - 3.4. [WabstiCExport](#WabstiCExport)   
+      - 3.4.1. [Ermittlung des Status einer Wahl](#Ermittlung-des-Status-einer-Wahl)   
+
+<!-- /MDTOC -->
 
 
 

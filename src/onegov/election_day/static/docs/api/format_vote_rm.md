@@ -6,27 +6,28 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 
 ## Cuntegn
 
-<!-- TOC START min:1 max:4 link:true update:true -->
-- [Format Specification Votes](#format-specification-votes)
-  - [Cuntegn](#cuntegn)
-  - [Remartgas preliminaras](#remartgas-preliminaras)
-    - [Unitads](#unitads)
-  - [Formats](#formats)
-    - [Format da standard](#format-da-standard)
-      - [Colonnas](#colonnas)
-      - [Resultats temporars](#resultats-temporars)
-      - [Project](#project)
-    - [OneGov](#onegov)
-    - [Colonnas](#colonnas-1)
-      - [Resultats temporars](#resultats-temporars-1)
-      - [Project](#project-1)
-    - [Wabsti](#wabsti)
-      - [Colonnas](#colonnas-2)
-      - [Resultats temporars](#resultats-temporars-2)
-      - [Project](#project-2)
-    - [WabstiCExport](#wabsticexport)
+<!-- https://atom.io/packages/atom-mdtoc -->
+<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-<!-- TOC END -->
+- 1. [Cuntegn](#Cuntegn)   
+- 2. [Remartgas preliminaras](#Remartgas-preliminaras)   
+   - 2.1. [Unitads](#Unitads)   
+- 3. [Formats](#Formats)   
+   - 3.1. [Format da standard](#Format-da-standard)   
+      - 3.1.1. [Colonnas](#Colonnas)   
+      - 3.1.2. [Resultats temporars](#Resultats-temporars)   
+      - 3.1.3. [Project](#Project)   
+   - 3.2. [OneGov](#OneGov)   
+   - 3.3. [Colonnas](#Colonnas-1)   
+      - 3.3.1. [Resultats temporars](#Resultats-temporars-1)   
+      - 3.3.2. [Project](#Project-1)   
+   - 3.4. [Wabsti](#Wabsti)   
+      - 3.4.1. [Colonnas](#Colonnas-2)   
+      - 3.4.2. [Resultats temporars](#Resultats-temporars-2)   
+      - 3.4.3. [Project](#Project-2)   
+   - 3.5. [WabstiCExport](#WabstiCExport)   
+
+<!-- /MDTOC -->
 
 
 ## Remartgas preliminaras

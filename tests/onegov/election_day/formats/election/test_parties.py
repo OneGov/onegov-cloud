@@ -4,6 +4,7 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_party_results
 from tests.onegov.election_day.common import get_tar_file_path
@@ -439,3 +440,109 @@ def test_import_party_results_invalid_values(session):
     assert errors[0].error.interpolate() == (
         'Panachage results ids and id not consistent'
     )
+
+
+def test_import_party_results_domains(session):
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='region',
+            domain_segment='Allschwil',
+            date=date(2022, 11, 21),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+
+    session.add(
+        ElectionCompound(
+            title='elections',
+            domain='canton',
+            date=date(2022, 11, 21)
+        )
+    )
+    session.flush()
+    compound = session.query(ElectionCompound).one()
+    compound.elections = [election]
+
+    # Election
+    for domain, domain_segment, result in (
+        ('', '', {'region': 'Allschwil'}),
+        ('region', '', {'region': 'Allschwil'}),
+        ('region', 'Allschwil', {'region': 'Allschwil'}),
+        ('region', 'ABC', False),
+        ('district', '', False),
+        ('district', 'Allschwil', False),
+        ('district', 'ABC', False),
+    ):
+        election.party_results.delete()
+        errors = import_party_results(
+            election,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'domain',
+                        'domain_segment',
+                        'year',
+                        'total_votes',
+                        'id',
+                        'name',
+                        'color',
+                        'mandates',
+                        'votes',
+                    )),
+                    f'{domain},{domain_segment},2022,1000,1,P1,,1,5000',
+                    f'{domain},{domain_segment},2022,1000,2,P2,#aabbcc,0,5000',
+                ))
+            ).encode('utf-8')), 'text/plain',
+            ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
+        )
+        if result is False:
+            assert errors
+        else:
+            assert not errors
+            assert result == {
+                pr.domain: pr.domain_segment for pr in election.party_results
+            }
+
+    # Compound
+    for domain, domain_segment, result in (
+        ('', '', {'canton': None}),
+        ('canton', '', {'canton': None}),
+        ('canton', 'ABC', {'canton': None}),
+        ('region', '', False),
+        ('region', 'ABC', False),
+        ('superregion', 'Region 1', {'superregion': 'Region 1'}),
+        ('superregion', '', False),
+        ('superregion', 'ABC', {'superregion': 'ABC'}),
+    ):
+        compound.party_results.delete()
+        errors = import_party_results(
+            compound,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'domain',
+                        'domain_segment',
+                        'year',
+                        'total_votes',
+                        'id',
+                        'name',
+                        'color',
+                        'mandates',
+                        'votes',
+                    )),
+                    f'{domain},{domain_segment},2022,1000,1,P1,,1,5000',
+                    f'{domain},{domain_segment},2022,1000,2,P2,#aabbcc,0,5000',
+                ))
+            ).encode('utf-8')), 'text/plain',
+            ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
+        )
+        if result is False:
+            assert errors
+        else:
+            assert not errors
+            assert result == {
+                pr.domain: pr.domain_segment for pr in compound.party_results
+            }

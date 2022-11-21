@@ -71,6 +71,8 @@ class PartyResultExportMixin:
         for result in self.party_results:
             year = results.setdefault(result.year, {})
             year[result.party_id] = {
+                'domain': result.domain,
+                'domain_segment': result.domain_segment,
                 'name_translations': result.name_translations,
                 'total_votes': result.total_votes,
                 'mandates': result.number_of_mandates,
@@ -96,6 +98,12 @@ class PartyResultExportMixin:
 
                 # add the party results
                 row = OrderedDict()
+                row['domain'] = result['domain'] or self.domain
+                row['domain_segment'] = (
+                    result['domain_segment']
+                    or getattr(self, 'domain_segment', None)
+                    or None
+                )
                 row['year'] = year
                 row['id'] = party_id
                 row['name'] = default_name

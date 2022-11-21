@@ -4,37 +4,43 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezion
 
 ## Contenuto
 
-<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
-- [Specifica Formato Elezioni](#specifica-formato-elezioni)
-    - [Contenuto](#contenuto)
-    - [Prefazione](#prefazione)
-        - [Enti](#enti)
-        - [Elezioni tacite](#elezioni-tacite)
-        - [Elezioni regionali](#elezioni-regionali)
-    - [Formati](#formati)
-        - [Onegov](#onegov)
-            - [Colonne](#colonne)
-            - [Risultati panachage](#risultati-panachage)
-            - [Risultati temporanei](#risultati-temporanei)
-            - [Modello](#modello)
-        - [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
-            - [Esportazione delle colonne dati](#esportazione-delle-colonne-dati)
-            - [Colonne risultati candidati](#colonne-risultati-candidati)
-            - [Risultati temporanei](#risultati-temporanei-1)
-            - [Modelli](#modelli)
-        - [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
-            - [Colonne esportazione dei dati dei risultati](#colonne-esportazione-dei-dati-dei-risultati)
-            - [Risultati panachage](#risultati-panachage-1)
-            - [Colonne esportazione di dati di statistica](#colonne-esportazione-di-dati-di-statistica)
-            - [Colonne apparentamenti delle liste](#colonne-apparentamenti-delle-liste)
-            - [Colonne risultati candidati](#colonne-risultati-candidati-1)
-            - [Risultati temporanei](#risultati-temporanei-2)
-            - [Modelli](#modelli-1)
-        - [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
-        - [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
-        - [Risultati dei partiti](#risultati-dei-partiti)
-            - [Modelli](#modelli-2)
-<!-- TOC END -->
+<!-- https://atom.io/packages/atom-mdtoc -->
+<!-- MDTOC maxdepth:6 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
+
+- [Specifica Formato Elezioni](#Specifica-Formato-Elezioni)   
+   - [Contenuto](#Contenuto)   
+   - [Prefazione](#Prefazione)   
+      - [Enti](#Enti)   
+      - [Elezioni tacite](#Elezioni-tacite)   
+      - [Elezioni regionali](#Elezioni-regionali)   
+   - [Formati](#Formati)   
+      - [Onegov](#Onegov)   
+         - [Colonne](#Colonne)   
+         - [Risultati panachage](#Risultati-panachage)   
+         - [Risultati temporanei](#Risultati-temporanei)   
+         - [Componenti delle elezioni](#Componenti-delle-elezioni)   
+         - [Modello](#Modello)   
+      - [Wabsti Sistema Maggioritario](#Wabsti-Sistema-Maggioritario)   
+         - [Esportazione delle colonne dati](#Esportazione-delle-colonne-dati)   
+         - [Colonne risultati candidati](#Colonne-risultati-candidati)   
+         - [Risultati temporanei](#Risultati-temporanei-1)   
+         - [Modelli](#Modelli)   
+      - [Wabsti Sistema Proporzionale](#Wabsti-Sistema-Proporzionale)   
+         - [Colonne esportazione dei dati dei risultati](#Colonne-esportazione-dei-dati-dei-risultati)   
+         - [Risultati panachage](#Risultati-panachage-1)   
+         - [Colonne esportazione di dati di statistica](#Colonne-esportazione-di-dati-di-statistica)   
+         - [Colonne apparentamenti delle liste](#Colonne-apparentamenti-delle-liste)   
+         - [Colonne risultati candidati](#Colonne-risultati-candidati-1)   
+         - [Risultati temporanei](#Risultati-temporanei-2)   
+         - [Modelli](#Modelli-1)   
+      - [WabstiCExport Sistema Maggioritario](#WabstiCExport-Sistema-Maggioritario)   
+      - [WabstiCExport Sistema Proporzionale](#WabstiCExport-Sistema-Proporzionale)   
+      - [Risultati dei partiti](#Risultati-dei-partiti)   
+         - [Einflussbereich](#Einflussbereich)   
+         - [Risultati panachage](#Risultati-panachage-2)   
+         - [Modelli](#Modelli-2)   
+
+<!-- /MDTOC -->
 
 ## Prefazione
 
@@ -240,10 +246,12 @@ Le seguenti colonne verranno valutate e devono esistere:
 
 Nome|Descrizione
 ---|---
+`domain`|Der Einflussbereich, für den die Zeile gilt. Optional.
+`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt. Optional.
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito nella lingua definita come standard. Quale opzione*.
-`name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco. Quale opzione*.
+`name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco. Quale opzione. Si assicuri di aver indicato nella colonna name oppure nella colonna name_{default_locale} il nome del partito nella lingua definita come standard.
 `name`|Il nome del partito.
 `id`|ID del partito (qualsiasi numero).
 `color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
@@ -252,7 +260,11 @@ Nome|Descrizione
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 `voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
 
-*Si assicuri di aver indicato nella colonna name oppure nella colonna name_{default_locale} il nome del partito nella lingua definita come standard.
+#### Einflussbereich
+
+`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden.
+
+#### Risultati panachage
 
 I risultati potrebbero contenere risultati misti aggiungendo una colonna per partito:
 
