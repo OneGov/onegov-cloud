@@ -7,6 +7,7 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from onegov.election_day.formats.common import validate_color
 from onegov.election_day.formats.common import validate_gender
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.mappings import INTERNAL_MAJORZ_HEADERS
@@ -87,23 +88,25 @@ def parse_election_result(line, errors, entities, election, principal):
                 )
 
 
-def parse_candidate(line, errors, election_id):
+def parse_candidate(line, errors, election_id, colors):
     try:
         id = validate_integer(line, 'candidate_id')
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
         party = line.candidate_party
+        color = validate_color(line, 'candidate_party_color')
         gender = validate_gender(line)
         year_of_birth = validate_integer(
             line, 'candidate_year_of_birth', optional=True, default=None
         )
-
     except ValueError as e:
         errors.append(e.args[0])
     except Exception:
         errors.append(_("Invalid candidate values"))
     else:
+        if party and color:
+            colors[party] = color
         return dict(
             id=uuid4(),
             candidate_id=id,
@@ -156,6 +159,7 @@ def import_election_internal_majorz(election, principal, file, mimetype):
     results = {}
     entities = principal.entities[election.date.year]
     election_id = election.id
+    colors = election.colors.copy()
 
     # This format has one candiate per entity per line
     absolute_majority = None
@@ -168,7 +172,7 @@ def import_election_internal_majorz(election, principal, file, mimetype):
         result = parse_election_result(
             line, line_errors, entities, election, principal
         )
-        candidate = parse_candidate(line, line_errors, election_id)
+        candidate = parse_candidate(line, line_errors, election_id, colors)
         candidate_result = parse_candidate_result(line, line_errors)
 
         # Skip expats if not enabled
@@ -232,6 +236,7 @@ def import_election_internal_majorz(election, principal, file, mimetype):
     election.last_result_change = election.timestamp()
     election.absolute_majority = absolute_majority
     election.status = status
+    election.colors = colors
 
     session = object_session(election)
     session.bulk_insert_mappings(Candidate, candidates.values())

@@ -73,7 +73,6 @@ class PartyResultExportMixin:
             year[result.party_id] = {
                 'name_translations': result.name_translations,
                 'total_votes': result.total_votes,
-                'color': result.color,
                 'mandates': result.number_of_mandates,
                 'votes': result.votes,
                 'voters_count': result.voters_count,
@@ -91,20 +90,21 @@ class PartyResultExportMixin:
         for year in sorted(results.keys(), reverse=True):
             for party_id in parties:
                 result = results[year].get(party_id, {})
+                default_name = result['name_translations'].get(default_locale)
+                default_color = self.colors.get(default_name)
+                fallback_color = None
 
                 # add the party results
                 row = OrderedDict()
                 row['year'] = year
                 row['id'] = party_id
-                row['name'] = result['name_translations'].get(
-                    default_locale, None
-                )
+                row['name'] = default_name
                 for locale in locales:
-                    row[f'name_{locale}'] = result['name_translations'].get(
-                        locale, None
-                    )
+                    name = result['name_translations'].get(locale)
+                    fallback_color = fallback_color or self.colors.get(name)
+                    row[f'name_{locale}'] = name
                 row['total_votes'] = result['total_votes']
-                row['color'] = result['color']
+                row['color'] = default_color or fallback_color
                 row['mandates'] = result['mandates']
                 row['votes'] = result['votes']
                 row['voters_count'] = convert_decimal(result['voters_count'])

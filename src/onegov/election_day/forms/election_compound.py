@@ -238,6 +238,7 @@ class ElectionCompoundForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        hide_label=False,
         fieldset=_('Colors'),
         text=(
             'AL #a74c97\n'

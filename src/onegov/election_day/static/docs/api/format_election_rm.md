@@ -75,6 +75,7 @@ Num|Descripziun
 `entity_invalid_votes`|Dumber da vuschs nunvalaivlas da la vischnanca. Nulla en cas d'ina elecziun da proporz.
 `list_name`|Num da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
 `list_id`|ID da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
+`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
 `list_number_of_mandates`|Dumber total da mandats da la glista. Mo tar elecziuns da proporz.
 `list_votes`|Dumber a vuschs da la glista. Mo tar elecziuns da proporz.
 `list_connection`|ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
@@ -84,6 +85,7 @@ Num|Descripziun
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
 `candidate_party`|Il num da la partida.
+`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
@@ -243,7 +245,7 @@ Num|Descripziun
 `name`|Il num da la partida en la lingua da standard. Opziunal*.
 `name_{locale}`|Translaziun dal num da la partida, p.ex. `name_de_CH` per il num tudestg. Opziunal*.
 `id`|ID da la partida (cifra casuala).
-`color`|La colur da la partida.
+`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `mandates`|Il dumber da sezs da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.

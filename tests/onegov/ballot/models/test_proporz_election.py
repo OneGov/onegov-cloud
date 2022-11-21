@@ -146,7 +146,6 @@ def test_proporz_election_create_all_models(session):
         total_votes=100,
         name_translations={'en_US': 'Libertarian'},
         party_id='1',
-        color='black'
     )
 
     session.add(party_result)
@@ -376,7 +375,6 @@ def test_proporz_election_results(session):
             number_of_mandates=1,
             votes=10,
             total_votes=100,
-            color='red',
             party_id='1',
         )
     )
@@ -386,7 +384,6 @@ def test_proporz_election_results(session):
             number_of_mandates=1,
             votes=20,
             total_votes=100,
-            color='blue',
             party_id='2',
         )
     )
@@ -654,6 +651,10 @@ def test_proporz_election_export(session):
         absolute_majority=144
     )
     election.title_translations['it_CH'] = 'Elezione'
+    election.colors = {
+        'Kwik-E-Major': '#112233',
+        'Democratic Party': '#223344'
+    }
 
     connection = ListConnection(
         connection_id='A'
@@ -787,6 +788,7 @@ def test_proporz_election_export(session):
             'entity_accounted_votes': 285,
             'list_name': 'Kwik-E-Major',
             'list_id': '2',
+            'list_color': '#112233',
             'list_number_of_mandates': 0,
             'list_votes': 111,
             'list_connection': 'A.1',
@@ -796,6 +798,7 @@ def test_proporz_election_export(session):
             'candidate_id': '2',
             'candidate_elected': False,
             'candidate_party': 'Democratic Party',
+            'candidate_party_color': '#223344',
             'candidate_gender': '',
             'candidate_year_of_birth': '',
             'candidate_votes': 111,
@@ -829,6 +832,7 @@ def test_proporz_election_export(session):
             'entity_accounted_votes': 285,
             'list_name': 'Quimby Again!',
             'list_id': '1',
+            'list_color': '',
             'list_number_of_mandates': 1,
             'list_votes': 520,
             'list_connection': None,
@@ -838,6 +842,7 @@ def test_proporz_election_export(session):
             'candidate_id': '1',
             'candidate_elected': True,
             'candidate_party': 'Republican Party',
+            'candidate_party_color': '',
             'candidate_gender': 'male',
             'candidate_year_of_birth': 1970,
             'candidate_votes': 520,
@@ -860,6 +865,10 @@ def test_proporz_election_export_parties(session):
     )
     session.flush()
     election = session.query(ProporzElection).one()
+    election.colors = {
+        'Conservative': 'red',
+        'Libertarian': 'black'
+    }
 
     assert election.export_parties(['en_US'], 'en_US') == []
 
@@ -873,7 +882,6 @@ def test_proporz_election_export_parties(session):
             total_votes=100,
             name_translations={'en_US': 'Libertarian'},
             party_id='2',
-            color='black',
             year=2012
         )
     )
@@ -886,7 +894,6 @@ def test_proporz_election_export_parties(session):
             total_votes=50,
             name_translations={'en_US': 'Libertarian'},
             party_id='2',
-            color='black',
             year=2016
         )
     )
@@ -899,7 +906,6 @@ def test_proporz_election_export_parties(session):
             total_votes=100,
             name_translations={'en_US': 'Conservative'},
             party_id='1',
-            color='red',
             year=2012
         )
     )
@@ -912,7 +918,6 @@ def test_proporz_election_export_parties(session):
             total_votes=50,
             name_translations={'en_US': 'Conservative'},
             party_id='1',
-            color='red',
             year=2016
         )
     )

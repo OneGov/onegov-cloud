@@ -208,13 +208,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     election_compound.completes_manually = True
     election_compound.manually_completed = False
     assert get_list_groups(election_compound) == [
-        ('CVP', 931, 22, '#EE7F00'),
-        ('SVP', 899, 19, '#019040'),
-        ('FDP', 863, 18, '#0E52A0'),
-        ('AL', 538, 10, '#99C040'),
-        ('SP', 418, 7, '#E53136'),
-        ('GLP', 236, 4, '#acc700'),
-        ('Piraten', 19, 0, '#F9B200')
+        ('CVP', 931, 22),
+        ('SVP', 899, 19),
+        ('FDP', 863, 18),
+        ('AL', 538, 10),
+        ('SP', 418, 7),
+        ('GLP', 236, 4),
+        ('Piraten', 19, 0)
     ]
     assert get_list_groups_data(election_compound) == {
         'results': [
@@ -273,13 +273,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     # Pukelsheim, final
     election_compound.manually_completed = True
     assert get_list_groups(election_compound) == [
-        ('CVP', 931, 22, '#EE7F00'),
-        ('SVP', 899, 19, '#019040'),
-        ('FDP', 863, 18, '#0E52A0'),
-        ('AL', 538, 10, '#99C040'),
-        ('SP', 418, 7, '#E53136'),
-        ('GLP', 236, 4, '#acc700'),
-        ('Piraten', 19, 0, '#F9B200')
+        ('CVP', 931, 22),
+        ('SVP', 899, 19),
+        ('FDP', 863, 18),
+        ('AL', 538, 10),
+        ('SP', 418, 7),
+        ('GLP', 236, 4),
+        ('Piraten', 19, 0)
     ]
     assert get_list_groups_data(election_compound) == {
         'results': [
