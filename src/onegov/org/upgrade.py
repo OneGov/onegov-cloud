@@ -208,11 +208,3 @@ def change_daily_ticket_statistics_data_format(context):
             'ticket_statistics',
             'daily' if daily else 'never'
         )
-
-
-@upgrade_task('Add standard image to organisation')
-def add_standard_image_column_to_organisation(context):
-    if not context.has_column('organisations', 'standard_image'):
-        context.operations.add_column('organisations', Column(
-            'standard_image', Text, nullable=True
-        ))
