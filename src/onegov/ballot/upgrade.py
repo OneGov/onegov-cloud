@@ -667,3 +667,12 @@ def add_exapts_columns(context):
                 table,
                 Column('expats', Integer(), nullable=True)
             )
+
+
+@upgrade_task(
+    'Drop party color column',
+    requires='onegov.ballot:Add party resuts columns',
+)
+def drop_party_color_column(context):
+    if context.has_column('party_results', 'color'):
+        context.operations.drop_column('party_results', 'color')
