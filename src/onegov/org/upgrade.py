@@ -15,8 +15,6 @@ from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
 from onegov.reservation import Resource
 from onegov.user import User
-from sqlalchemy import Column
-from sqlalchemy import Text
 from sqlalchemy.orm import undefer
 
 
