@@ -100,7 +100,6 @@ function isBrightColor(color) {
 
 function getMarkerOptions(input, overrides) {
     var body = $('body');
-    console.log('what', input)
     var icon = input.data('marker-icon') || body.data('default-marker-icon') || 'f111';
     var markerColor = input.data('marker-color') || body.data('default-marker-color') || '#006fba';
     var iconColor = isBrightColor(markerColor) && '#000' || '#fff';
