@@ -2416,6 +2416,9 @@ class DirectoryEntryBaseLayout(DefaultLayout):
             self.custom_body_attributes['data-default-marker-icon'] \
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'f111'
+
     @property
     def directory(self):
         return self.model.directory
@@ -2447,6 +2450,11 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 
 
 class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
 
     @cached_property
     def breadcrumbs(self):
