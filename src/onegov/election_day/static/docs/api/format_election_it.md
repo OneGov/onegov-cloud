@@ -75,6 +75,7 @@ Nome|Descrizione
 `entity_invalid_votes`|Numero di voti nulli nel Comune. Zero nel caso di elezione con sistema proporzionale.
 `list_name`|Nome della lista di candidati. Solo con elezioni con sistema proporzionale.
 `list_id`|ID della lista del candidato. Solo con elezioni con sistema proporzionale. Può essere numerico o alfanumerico.
+`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
 `list_number_of_mandates`|Numero totale di mandati della lista. Solo con elezioni con sistema proporzionale.
 `list_votes`|Numero di voti di lista per comune. Solo con elezioni con sistema proporzionale.
 `list_connection`|ID dell'apparentamento della lista. Solo con elezioni con sistema proporzionale.
@@ -84,6 +85,7 @@ Nome|Descrizione
 `candidate_first_name`|Nome del candidato.
 `candidate_elected`|Vero, se il candidato è stato eletto.
 `candidate_party`|Il nome del partito.
+`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti per il candidato nel Comune.
@@ -244,7 +246,7 @@ Nome|Descrizione
 `name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco. Quale opzione*.
 `name`|Il nome del partito.
 `id`|ID del partito (qualsiasi numero).
-`color`|Il colore del partito.
+`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.

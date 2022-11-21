@@ -77,6 +77,7 @@ Name|Description
 `entity_invalid_votes`|Number invalid votes in municipality. Zero if Proporz election.
 `list_name`|Name of list of candidate. Only with Proporz elections.
 `list_id`|ID of the list of the candidate. Only with Proporz elections. Can be numeric or alphanumeric.
+`list_color`|The color of the list as a hexadecimal value, e.g. '#a6b784'.
 `list_number_of_mandates`|Total number of mandates of the list. Only with Proporz elections.
 `list_votes`|Number of list votes per municipality. Only with Proporz elections.
 `list_connection`|ID of the list connection or superordinate list connection (in case list_connection_parent is present). Only with Proporz elections.
@@ -86,6 +87,7 @@ Name|Description
 `candidate_first_name`|First name of the candidate.
 `candidate_elected`|True, if the candidate was elected.
 `candidate_party`|The name of the party.
+`candidate_party_color`|The color of the party as a hexadecimal value, e.g. '#a6b784'.
 `candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`. Optional.
 `candidate_year_of_birth`|The year of the candidate. Optional.
 `candidate_votes`|Number of candidate votes in municipality.
@@ -245,7 +247,7 @@ Name|Description
 `name`|The name of the party in the default language. Optional*.
 `name_{locale}`|Translated name of the party, e.g. `name_de_ch` for the German name. Optional*.
 `id`|ID of the party (any number).
-`color`|The color of the party.
+`color`|The color of the party as a hexadecimal value, e.g. '#a6b784'.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
