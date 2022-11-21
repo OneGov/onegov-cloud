@@ -197,7 +197,7 @@ def proporz_election(
     return election
 
 
-def test_election_compound(session):
+def test_election_compound_model(session):
     session.add(
         ElectionCompound(
             title='Legislative Elections',
@@ -440,8 +440,7 @@ def test_election_compound(session):
         votes=0,
         total_votes=100,
         name_translations={'en_US': 'Libertarian'},
-        party_id='1',
-        color='black'
+        party_id='1'
     )
     session.add(party_result)
     session.flush()
@@ -475,8 +474,7 @@ def test_election_compound(session):
         votes=0,
         total_votes=100,
         name_translations={'en_US': 'Libertarian'},
-        party_id='1',
-        color='black'
+        party_id='1'
     )
     session.add(party_result)
     session.flush()
@@ -560,8 +558,15 @@ def test_election_compound_export(session):
             date=date(2015, 6, 14),
         )
     )
-    session.add(majorz_election())
-    session.add(proporz_election())
+    election = majorz_election()
+    election.colors = {'Democratic Party': '#112233'}
+    session.add(election)
+    election = proporz_election()
+    election.colors = {
+        'Democratic Party': '#112233',
+        'Kwik-E-Major': '#223344'
+    }
+    session.add(election)
     session.flush()
     election_compound = session.query(ElectionCompound).one()
     election_compound.title_translations['it_CH'] = 'Elezioni'
@@ -608,6 +613,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_party_color': '#112233',
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
@@ -647,6 +653,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_party_color': '',
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520
@@ -688,6 +695,7 @@ def test_election_compound_export(session):
         'entity_accounted_votes': 285,
         'list_name': 'Kwik-E-Major',
         'list_id': '2',
+        'list_color': '#223344',
         'list_number_of_mandates': 0,
         'list_votes': 111,
         'list_connection': 'A.1',
@@ -697,6 +705,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_party_color': '#112233',
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111,
@@ -737,6 +746,7 @@ def test_election_compound_export(session):
         'entity_accounted_votes': 285,
         'list_name': 'Quimby Again!',
         'list_id': '1',
+        'list_color': '',
         'list_number_of_mandates': 1,
         'list_votes': 520,
         'list_connection': None,
@@ -746,6 +756,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_party_color': '',
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
@@ -789,6 +800,7 @@ def test_election_compound_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_party_color': '#112233',
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
@@ -829,6 +841,7 @@ def test_election_compound_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_party_color': '',
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520
@@ -845,6 +858,10 @@ def test_election_compound_export_parties(session):
     )
     session.flush()
     election_compound = session.query(ElectionCompound).one()
+    election_compound.colors = {
+        'Conservative': 'red',
+        'Libertarian': 'black'
+    }
 
     assert election_compound.export_parties(['de_CH'], 'de_CH') == []
 
@@ -858,7 +875,6 @@ def test_election_compound_export_parties(session):
             total_votes=100,
             name_translations={'en_US': 'Libertarian'},
             party_id='3',
-            color='black',
             year=2012
         )
     )
@@ -871,7 +887,6 @@ def test_election_compound_export_parties(session):
             voters_count_percentage=Decimal('50.02'),
             name_translations={'en_US': 'Libertarian'},
             party_id='3',
-            color='black',
             year=2016
         )
     )
@@ -884,7 +899,6 @@ def test_election_compound_export_parties(session):
             voters_count_percentage=Decimal('100.02'),
             name_translations={'en_US': 'Conservative'},
             party_id='5',
-            color='red',
             year=2012
         )
     )
@@ -897,7 +911,6 @@ def test_election_compound_export_parties(session):
             voters_count_percentage=Decimal('50.02'),
             name_translations={'en_US': 'Conservative'},
             party_id='5',
-            color='red',
             year=2016
         )
     )

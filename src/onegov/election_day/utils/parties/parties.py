@@ -39,7 +39,7 @@ def get_party_results(item, json_serializable=False):
     for result in item.party_results:
         party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
-        year['color'] = result.color
+        year['color'] = item.colors.get(result.name)
         year['mandates'] = result.number_of_mandates
         year['name'] = result.name
 
@@ -193,7 +193,11 @@ def get_parties_panachage_data(item, request=None):
     def right_node(party):
         return parties.index(party) + len(parties)
 
-    colors = dict(set((r.party_id, r.color) for r in party_results))
+    colors = {
+        r.party_id: item.colors[r.name]
+        for r in party_results
+        if r.name in item.colors
+    }
     intra_party_votes = dict(set((r.party_id, r.votes) for r in party_results))
 
     # Create the links

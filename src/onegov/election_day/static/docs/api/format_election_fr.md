@@ -75,6 +75,7 @@ Nom|Description
 `entity_invalid_votes`|Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
 `list_name`|Nom de la liste de candidats. Uniquement avec les élections Proporz.
 `list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz. Peut-être numeric ou alpha-numeric.
+`list_color`|La couleur de la liste en valeur hexadécimale, par exemple `#a6b784'.
 `list_number_of_mandates`|Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
 `list_votes`Nombre de votes de liste par municipalité. Uniquement avec les élections Proporz.
 `list_connection`|Identifiant de la connexion de liste ou sous-list (en cas list_connection_parent est présent). Uniquement avec les élections Proporz.
@@ -84,6 +85,7 @@ Nom|Description
 `candidate_first_name`|Prénom du candidat.
 `candidate_elected`|Vrai, si le candidat a été élu.
 `candidate_party`|Nom de le parti.
+`candidate_party_color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784'.
 `candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé). Facultatif.
 `candidate_year_of_birth`|L'année de naissance du candidat. Facultatif.
 `candidate_votes`|Nombre de votes de candidats dans la municipalité.
@@ -243,7 +245,7 @@ Nom|Description
 `name`|Le dénomination du parti dans la langue par défaut. Optionnel*.
 `name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand. Optionnel*.
 `id`|Identifiant du parti (n'importe quel numéro).
-`color`|La couleur du parti.
+`color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784'.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.

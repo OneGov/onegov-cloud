@@ -348,7 +348,7 @@ def test_view_election_party_strengths(election_day_app_gr):
         'panachage_votes_from_999',
         '2022,1,BDP,BDP,,,,11270,#efb52c,1,60387,603.01,41.73,,11,12,100',
         '2022,2,CVP,CVP,,,,11270,#ff6300,1,49117,491.02,33.98,21,,22,200',
-        '2022,3,FDP,FDP,,,,11270,#0571b0,0,35134,351.04,24.29,31,32,,300',
+        '2022,3,FDP,FDP,,,,11270,,0,35134,351.04,24.29,31,32,,300',
     ]
 
     export = client.get('/election/proporz-election/data-parties-json').json
@@ -392,7 +392,7 @@ def test_view_election_party_strengths(election_day_app_gr):
             'year': 2022
         },
         {
-            'color': '#0571b0',
+            'color': None,
             'id': '3',
             'mandates': 0,
             'name': 'FDP',

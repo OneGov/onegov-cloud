@@ -1,5 +1,3 @@
-import re
-
 from decimal import Decimal
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
@@ -10,6 +8,7 @@ from onegov.core.errors import EmptyLineInFileError
 from onegov.core.errors import InvalidFormatError
 from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
+from re import match
 
 
 EXPATS = (
@@ -302,7 +301,7 @@ def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
      """
     result = getattr(line, col)
     if result:
-        if re.match(r'^[0-9]+[A-Za-z0-9\.]*$', result):
+        if match(r'^[0-9]+[A-Za-z0-9\.]*$', result):
             return result
         raise ValueError(
             _('Not an alphanumeric: ${col}', mapping={'col': col}))
@@ -316,5 +315,14 @@ def validate_gender(line):
     if result not in (None, 'male', 'female', 'undetermined'):
         raise ValueError(
             _('Invalid gender: ${value}', mapping={'value': result})
+        )
+    return result
+
+
+def validate_color(line, col):
+    result = getattr(line, col, '') or ''
+    if result and not match(r'^#[0-9A-Fa-f]{6}$', result):
+        raise ValueError(
+            _('Invalid color: ${col}', mapping={'col': col})
         )
     return result

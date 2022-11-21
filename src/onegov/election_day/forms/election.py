@@ -185,6 +185,7 @@ class ElectionForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        hide_label=False,
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'

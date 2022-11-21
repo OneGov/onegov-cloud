@@ -151,9 +151,19 @@ class DirectoryBaseForm(Form):
         depends_on=('address_block_title_type', 'fixed'),
     )
 
+    marker_type = RadioField(
+        label=_("Marker Type"),
+        fieldset=_("Marker"),
+        choices=[
+            ('icon', _("Icon")),
+            ('numbers', _("Numbers"))
+        ],
+        default='icon')
+
     marker_icon = IconField(
         label=_("Icon"),
-        fieldset=_("Marker"))
+        fieldset=_("Marker"),
+        depends_on=('marker_type', 'icon'))
 
     marker_color_type = RadioField(
         label=_("Marker Color"),

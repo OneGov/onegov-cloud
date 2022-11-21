@@ -310,6 +310,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             row['entity_accounted_votes'] = result.accounted_votes
             row['list_name'] = result.list_name
             row['list_id'] = result.list_id
+            row['list_color'] = self.colors.get(result.list_name, '')
             row['list_number_of_mandates'] = result.list_number_of_mandates
             row['list_votes'] = list_results_grouped.get(
                 result.entity_id, {}
@@ -321,6 +322,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             row['candidate_id'] = result.candidate_id
             row['candidate_elected'] = result.elected
             row['candidate_party'] = result.party
+            row['candidate_party_color'] = self.colors.get(result.party, '')
             row['candidate_gender'] = result.gender or ''
             row['candidate_year_of_birth'] = result.year_of_birth or ''
             row['candidate_votes'] = result.votes
