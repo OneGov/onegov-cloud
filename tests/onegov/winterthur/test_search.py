@@ -1,10 +1,8 @@
-import pytest
 from webtest import Upload
 from tests.shared.utils import create_image
 
 
-@pytest.mark.skip('Passes locally, but not in CI, skip for now')
-def test_directory_roundtrip(client_with_es):
+def test_search_excluding_image(client_with_es):
 
     client = client_with_es
     client.login_admin()
@@ -31,10 +29,14 @@ def test_directory_roundtrip(client_with_es):
     page.form['pic'] = Upload('pretty-room.jpg', create_image().read())
     clubs = page.form.submit().follow()
 
+    client.app.es_indexer.process()
     client.app.es_client.indices.refresh(index='_all')
 
-    client.get('/directories/clubs')
     search_page = client.get(
         '/directories/clubs?search=inline&search_query={"term"%3A"201-B"}')
-
     assert "Pilatus" in search_page
+
+    search_page = client.get(
+        '/directories/clubs?search=inline&search_query={"term"%3A"pretty"}')
+
+    assert "Keine Eintr\xc3\xa4ge gefunden." not in search_page
