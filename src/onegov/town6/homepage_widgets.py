@@ -472,7 +472,7 @@ class FocusWidget:
                 <xsl:choose>
                     <xsl:when test="@hide-title"></xsl:when>
                     <xsl:otherwise>
-                    <h3>
+                    <h5>
                         <xsl:choose>
                             <xsl:when test="@title">
                                 <xsl:value-of select="@title" />
@@ -482,7 +482,7 @@ class FocusWidget:
                                 use-macro="layout.macros['focus-title']" />
                             </xsl:otherwise>
                         </xsl:choose>
-                    </h3>
+                    </h5>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:for-each select="text">

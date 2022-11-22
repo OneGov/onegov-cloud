@@ -37,8 +37,9 @@ article.content .side-panel {
 .homepage {
 
     .focus-widget {
-        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .15);
-        color: $black;
+        border-radius: .5rem;
+        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .15);
+        color: $oil;
         height: calc(100% - 2rem);
         margin-bottom: 2rem;
         transition: all 200ms linear;
@@ -54,6 +55,10 @@ article.content .side-panel {
         .focus-image {
             padding: 0;
             padding-bottom: 1rem;
+
+            img {
+                border-radius: .5rem .5rem 0 0;
+            }
         }
 
         p {
@@ -67,8 +72,7 @@ article.content .side-panel {
     }
 
     &> .grid-container {
-        padding-bottom: 2rem;
-        padding-top: 2rem;
+        padding: 5rem 0;
     }
 
     .grid-container.full {
