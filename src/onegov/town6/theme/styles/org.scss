@@ -93,6 +93,7 @@ a[href^="mailto:"] {
 
 html,
 body {
+    color: $oil !important;
     height: 100%;
     width: 100%;
 }
@@ -373,6 +374,10 @@ footer {
 
 
 /* Card component tuning */
+.card {
+    @include smooth-edges;
+}
+
 .card-section {
     @include clean-ul;
 
@@ -380,6 +385,18 @@ footer {
     h5,
     h6 {
         margin-bottom: 0;
+    }
+}
+
+/* Button */
+.button {
+    border-radius: 10rem !important;
+    padding: 1rem 1.5rem !important;
+
+    &.hollow-white {
+        background: transparent;
+        border: 1px solid $white;
+        color: $white;
     }
 }
 

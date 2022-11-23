@@ -58,14 +58,12 @@
     }
 
     .icon-link {
-        // text-align: center;
+        background: $white;
+        border: 2px solid transparent !important;
+        border-radius: 1rem;
         display: flex;
         flex: 0 0 auto;
-        background: $white;
-        border-radius: 1rem;
         height: calc(100% - 2rem);
-        box-shadow: 0 0 17px 0 rgba(0, 0, 0, 0.07);
-        border: 2px solid transparent !important;
         transition: all 200ms linear;
 
         &:hover {
@@ -74,10 +72,10 @@
         }
 
         p {
+            color: $charcoal;
             hyphens: none;
-            color: $oil;
-            padding: 1.5rem;
             margin-bottom: 0;
+            padding: 1.5rem;
         }
 
         .fa-external-link-alt {
@@ -85,50 +83,51 @@
         }
 
         .icon {
+            background: $primary-color;
             color: #FFF;
+            height: 3rem;
+            margin-right: 1rem;
+            padding: .9rem;
             text-align: center;
             width: 3rem;
-            height: 3rem;
-            background: $primary-color;
-            padding: .9rem;
-            margin-right: 1rem;
         }
 
         i {
+            background: #0068a5;
+            border-radius: 1rem;
             color: #FFF;
+            height: 3rem;
+            margin-right: 1rem;
+            padding: .9rem;
             text-align: center;
             width: 3rem;
-            height: 3rem;
-            background: #0068a5;
-            padding: .9rem;
-            margin-right: 1rem;
-            border-radius: 1rem;
         }
 
         .title {
             color: #363636;
             font-weight: bold;
-            padding: 0;
             padding: 1.5rem;
-            padding-bottom: 1.5rem;
-            padding-bottom: 0;
+            padding-bottom: 0;  
         }
     }
 
     .card {
-        border: transparent;
-        border-radius: .7rem;
+        border: 1px solid #eee;
         margin-bottom: 2rem;
+        box-shadow: 0 0 17px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .gray .card {
+        border: 1px solid #eee;;
+        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07);
+    }
+
+    .primary .card {
+        border: none;
+        box-shadow: none;
     }
 
     .card-section {
         padding: 1.5rem;
     }
-
-    // h3,
-    // .h3 {
-    //     color: $primary-color;
-    //     font-size: 2.2rem;
-    // }
-
 }
