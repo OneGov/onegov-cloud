@@ -9,6 +9,7 @@ from onegov.winterthur.initial_content import create_new_organisation
 from pathlib import Path
 from sqlalchemy.orm.session import close_all_sessions
 from tests.shared.utils import create_app
+from tests.shared import Client
 
 
 @pytest.fixture()
@@ -71,3 +72,11 @@ def create_winterthur_app(request, use_elasticsearch):
     close_all_sessions()
 
     return app
+
+
+@pytest.fixture(scope='function')
+def client_with_es(es_winterthur_app):
+    client = Client(es_winterthur_app)
+    client.skip_n_forms = 1
+    client.use_intercooler = True
+    return client
