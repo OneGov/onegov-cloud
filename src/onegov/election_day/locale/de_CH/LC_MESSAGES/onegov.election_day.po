@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-08 13:09+0100\n"
+"POT-Creation-Date: 2022-11-27 13:03+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -138,6 +138,10 @@ msgstr "Ungültige Listenverbindungsdaten"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} nicht in list_id's"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment ungültig: ${domain_segment}"
 
 msgid "Invalid values"
 msgstr "Ungültige Werte"

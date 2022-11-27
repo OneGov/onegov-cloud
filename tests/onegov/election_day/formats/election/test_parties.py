@@ -7,10 +7,13 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_party_results
+from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import get_tar_file_path
 
 
 def test_import_party_results_fixtures(session):
+    principal = Canton('gr')
+
     # Test data from R.Semlic
     session.add(
         ProporzElection(
@@ -30,7 +33,7 @@ def test_import_party_results_fixtures(session):
             'Nationalratswahlen_2019_sesam-test_Parteien.csv').read()
 
     errors = import_party_results(
-        election, BytesIO(csv), 'text/plain',
+        election, principal, BytesIO(csv), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
     )
     assert not errors
@@ -58,6 +61,8 @@ def test_import_party_results_fixtures(session):
 
 
 def test_import_party_results(session):
+    principal = Canton('gr')
+
     session.add(
         ProporzElection(
             title='election',
@@ -72,6 +77,7 @@ def test_import_party_results(session):
     # minimal
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -112,6 +118,7 @@ def test_import_party_results(session):
     # with panachage results
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -165,6 +172,7 @@ def test_import_party_results(session):
     # with voters count
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -221,6 +229,7 @@ def test_import_party_results(session):
     # with name translations
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -270,6 +279,8 @@ def test_import_party_results(session):
 
 
 def test_import_party_results_missing_headers(session):
+    principal = Canton('gr')
+
     session.add(
         ProporzElection(
             title='election',
@@ -283,6 +294,7 @@ def test_import_party_results_missing_headers(session):
 
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -304,6 +316,8 @@ def test_import_party_results_missing_headers(session):
 
 
 def test_import_party_results_invalid_values(session):
+    principal = Canton('gr')
+
     session.add(
         ProporzElection(
             title='election',
@@ -317,6 +331,7 @@ def test_import_party_results_invalid_values(session):
 
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -406,7 +421,7 @@ def test_import_party_results_invalid_values(session):
         (2, 'Not an alphanumeric: id'),
         (3, 'Invalid values'),
         (4, 'Invalid color: color'),
-        (6, '1/2015 was found twice'),
+        (6, 'canton//2015/1 was found twice'),
         (7, 'Invalid decimal number: voters_count'),
         (7, 'Invalid integer: panachage_votes_from_1')
     ]
@@ -414,6 +429,7 @@ def test_import_party_results_invalid_values(session):
     # IDs don't match the IDs in the panache results
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -443,6 +459,8 @@ def test_import_party_results_invalid_values(session):
 
 
 def test_import_party_results_domains(session):
+    principal = Canton('bl')
+
     session.add(
         ProporzElection(
             title='election',
@@ -467,18 +485,20 @@ def test_import_party_results_domains(session):
     compound.elections = [election]
 
     # Election
-    for domain, domain_segment, result in (
-        ('', '', {'region': 'Allschwil'}),
-        ('region', '', {'region': 'Allschwil'}),
-        ('region', 'Allschwil', {'region': 'Allschwil'}),
-        ('region', 'ABC', False),
-        ('district', '', False),
-        ('district', 'Allschwil', False),
-        ('district', 'ABC', False),
+    for domain, segment, result, parties, panachage in (
+        ('', '', set(), {'region': 'Allschwil'}, 4),
+        ('region', '', set(), {'region': 'Allschwil'}, 4),
+        ('region', 'Allschwil', set(), {'region': 'Allschwil'}, 4),
+        ('region', 'ABC', {'No party results for year 2022'}, {}, 0),
+        ('district', '', {'No party results for year 2022'}, {}, 0),
+        ('district', 'Allschwil', {'No party results for year 2022'}, {}, 0),
+        ('district', 'ABC', {'No party results for year 2022'}, {}, 0),
     ):
         election.party_results.delete()
+        election.panachage_results.delete()
         errors = import_party_results(
             election,
+            principal,
             BytesIO((
                 '\n'.join((
                     ','.join((
@@ -491,35 +511,38 @@ def test_import_party_results_domains(session):
                         'color',
                         'mandates',
                         'votes',
+                        'panachage_votes_from_1',
+                        'panachage_votes_from_2',
+                        'panachage_votes_from_999'
                     )),
-                    f'{domain},{domain_segment},2022,1000,1,P1,,1,5000',
-                    f'{domain},{domain_segment},2022,1000,2,P2,#aabbcc,0,5000',
+                    f'{domain},{segment},2022,1000,1,P1,,1,5000,1,2,3',
+                    f'{domain},{segment},2022,1000,2,P2,#aabbcc,0,5000,4,5,6',
                 ))
             ).encode('utf-8')), 'text/plain',
             ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
         )
-        if result is False:
-            assert errors
-        else:
-            assert not errors
-            assert result == {
-                pr.domain: pr.domain_segment for pr in election.party_results
-            }
+        assert result == {e.error.interpolate() for e in errors or []}
+        assert parties == {
+            pr.domain: pr.domain_segment for pr in election.party_results
+        }
+        assert election.panachage_results.count() == panachage
 
     # Compound
-    for domain, domain_segment, result in (
-        ('', '', {'canton': None}),
-        ('canton', '', {'canton': None}),
-        ('canton', 'ABC', {'canton': None}),
-        ('region', '', False),
-        ('region', 'ABC', False),
-        ('superregion', 'Region 1', {'superregion': 'Region 1'}),
-        ('superregion', '', False),
-        ('superregion', 'ABC', {'superregion': 'ABC'}),
+    for domain, segment, result, parties, panachage in (
+        ('', '', set(), {'canton': None}, 4),
+        ('canton', '', set(), {'canton': None}, 4),
+        ('canton', 'ABC', set(), {'canton': None}, 4),
+        ('region', '', {'No party results for year 2022'}, {}, 0),
+        ('region', 'ABC', {'No party results for year 2022'}, {}, 0),
+        ('superregion', 'Region 1', set(), {'superregion': 'Region 1'}, 0),
+        ('superregion', '', {'Invalid domain_segment: None'}, {}, 0),
+        ('superregion', 'ABC', {'Invalid domain_segment: ABC'}, {}, 0),
     ):
         compound.party_results.delete()
+        compound.panachage_results.delete()
         errors = import_party_results(
             compound,
+            principal,
             BytesIO((
                 '\n'.join((
                     ','.join((
@@ -532,17 +555,18 @@ def test_import_party_results_domains(session):
                         'color',
                         'mandates',
                         'votes',
+                        'panachage_votes_from_1',
+                        'panachage_votes_from_2',
+                        'panachage_votes_from_999'
                     )),
-                    f'{domain},{domain_segment},2022,1000,1,P1,,1,5000',
-                    f'{domain},{domain_segment},2022,1000,2,P2,#aabbcc,0,5000',
+                    f'{domain},{segment},2022,1000,1,P1,,1,5000,1,2,3',
+                    f'{domain},{segment},2022,1000,2,P2,#aabbcc,0,5000,4,5,6',
                 ))
             ).encode('utf-8')), 'text/plain',
             ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
         )
-        if result is False:
-            assert errors
-        else:
-            assert not errors
-            assert result == {
-                pr.domain: pr.domain_segment for pr in compound.party_results
-            }
+        assert result == {e.error.interpolate() for e in errors or []}
+        assert parties == {
+            pr.domain: pr.domain_segment for pr in compound.party_results
+        }
+        assert compound.panachage_results.count() == panachage

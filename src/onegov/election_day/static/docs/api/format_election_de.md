@@ -7,38 +7,38 @@ Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von "Wabst
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Inhalt](#Inhalt)   
-- 2. [Vorbemerkungen](#Vorbemerkungen)   
-   - 2.1. [Einheiten](#Einheiten)   
-   - 2.2. [Stille Wahlen](#Stille-Wahlen)   
-   - 2.3. [Regionale Wahlen](#Regionale-Wahlen)   
-- 3. [Formate](#Formate)   
-   - 3.1. [OneGov](#OneGov)   
-      - 3.1.1. [Spalten](#Spalten)   
-      - 3.1.2. [Panaschierdaten](#Panaschierdaten)   
-      - 3.1.3. [Temporäre Resultate](#Temporare-Resultate)   
-      - 3.1.4. [Verbundene Wahlen](#Verbundene-Wahlen)   
-      - 3.1.5. [Vorlage](#Vorlage)   
-   - 3.2. [Wabsti Majorz](#Wabsti-Majorz)   
-      - 3.2.1. [Spalten Datenexport](#Spalten-Datenexport)   
-      - 3.2.2. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate)   
-      - 3.2.3. [Temporäre Resultate](#Temporare-Resultate-1)   
-      - 3.2.4. [Vorlagen](#Vorlagen)   
-   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)   
-      - 3.3.1. [Spalten Datenexport der Resultate](#Spalten-Datenexport-der-Resultate)   
-      - 3.3.2. [Panaschierdaten](#Panaschierdaten-1)   
-      - 3.3.3. [Spalten Datenexport der Statistik](#Spalten-Datenexport-der-Statistik)   
-      - 3.3.4. [Spalten Listenverbindungen](#Spalten-Listenverbindungen)   
-      - 3.3.5. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate-1)   
-      - 3.3.6. [Temporäre Resultate](#Temporare-Resultate-2)   
-      - 3.3.7. [Vorlagen](#Vorlagen-1)   
-   - 3.4. [WabstiCExport Majorz](#WabstiCExport-Majorz)   
-   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)   
-   - 3.6. [Parteiresultate](#Parteiresultate)   
-      - 3.6.1. [Einflussbereich](#Einflussbereich)   
-      - 3.6.2. [Panaschierdaten](#Panaschierdaten-2)   
-      - 3.6.3. [Vorlagen](#Vorlagen-2)   
-   - 3.7. [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#Automatische-Erstellung-verbundene-Wahl-und-Wahlen-mit-REST-API)   
+- 1. [Inhalt](#Inhalt)
+- 2. [Vorbemerkungen](#Vorbemerkungen)
+   - 2.1. [Einheiten](#Einheiten)
+   - 2.2. [Stille Wahlen](#Stille-Wahlen)
+   - 2.3. [Regionale Wahlen](#Regionale-Wahlen)
+- 3. [Formate](#Formate)
+   - 3.1. [OneGov](#OneGov)
+      - 3.1.1. [Spalten](#Spalten)
+      - 3.1.2. [Panaschierdaten](#Panaschierdaten)
+      - 3.1.3. [Temporäre Resultate](#Temporare-Resultate)
+      - 3.1.4. [Verbundene Wahlen](#Verbundene-Wahlen)
+      - 3.1.5. [Vorlage](#Vorlage)
+   - 3.2. [Wabsti Majorz](#Wabsti-Majorz)
+      - 3.2.1. [Spalten Datenexport](#Spalten-Datenexport)
+      - 3.2.2. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate)
+      - 3.2.3. [Temporäre Resultate](#Temporare-Resultate-1)
+      - 3.2.4. [Vorlagen](#Vorlagen)
+   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)
+      - 3.3.1. [Spalten Datenexport der Resultate](#Spalten-Datenexport-der-Resultate)
+      - 3.3.2. [Panaschierdaten](#Panaschierdaten-1)
+      - 3.3.3. [Spalten Datenexport der Statistik](#Spalten-Datenexport-der-Statistik)
+      - 3.3.4. [Spalten Listenverbindungen](#Spalten-Listenverbindungen)
+      - 3.3.5. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate-1)
+      - 3.3.6. [Temporäre Resultate](#Temporare-Resultate-2)
+      - 3.3.7. [Vorlagen](#Vorlagen-1)
+   - 3.4. [WabstiCExport Majorz](#WabstiCExport-Majorz)
+   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)
+   - 3.6. [Parteiresultate](#Parteiresultate)
+      - 3.6.1. [Einflussbereich](#Einflussbereich)
+      - 3.6.2. [Panaschierdaten](#Panaschierdaten-2)
+      - 3.6.3. [Vorlagen](#Vorlagen-2)
+   - 3.7. [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#Automatische-Erstellung-verbundene-Wahl-und-Wahlen-mit-REST-API)
 
 <!-- /MDTOC -->
 
@@ -260,7 +260,7 @@ Name|Beschreibung
 
 #### Einflussbereich
 
-`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden.
+`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden, `domain` wird in diesem Fall implizit auf den `domain` der Wahl oder des Verbundes gesetzt. Aktuell wird nur der `domain` der Wahl oder des Verbundes sowie `domain = 'superregion'` bei verbundenen Wahlen unterstützt.
 
 #### Panaschierdaten
 

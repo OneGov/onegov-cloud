@@ -7,37 +7,37 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Cuntegn](#Cuntegn)   
-- 2. [Remartgas preliminaras](#Remartgas-preliminaras)   
-   - 2.1. [Unitads](#Unitads)   
-   - 2.2. [Elecziun taciturnas](#Elecziun-taciturnas)   
-   - 2.3. [Elecziuns regiunalas](#Elecziuns-regiunalas)   
-- 3. [Formats](#Formats)   
-   - 3.1. [Onegov](#Onegov)   
-      - 3.1.1. [Colonnas](#Colonnas)   
-      - 3.1.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas)   
-      - 3.1.3. [Resultats temporars](#Resultats-temporars)   
-      - 3.1.4. [Elecziuns colliadas](#Elecziuns-colliadas)   
-      - 3.1.5. [Project](#Project)   
-   - 3.2. [Wabsti Maiorz](#Wabsti-Maiorz)   
-      - 3.2.1. [Colonnas "Export da datas"](#Colonnas-Export-da-datas)   
-      - 3.2.2. [Colonnas "Resultats da las candidatas e dals candidats"](#Colonnas-Resultats-da-las-candidatas-e-dals-candidats)   
-      - 3.2.3. [Resultats temporars](#Resultats-temporars-1)   
-      - 3.2.4. [Projects](#Projects)   
-   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)   
-      - 3.3.1. [Colonnas "Export da datas dals resultats"](#Colonnas-Export-da-datas-dals-resultats)   
-      - 3.3.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas-1)   
-      - 3.3.3. [Colonnas "Export da datas da la statistica"](#Colonnas-Export-da-datas-da-la-statistica)   
-      - 3.3.4. [Colonnas "Colliaziuns da glistas"](#Colonnas-Colliaziuns-da-glistas)   
-      - 3.3.5. [Colonnas "Resultats da las candidatas e dals candidats"](#Colonnas-Resultats-da-las-candidatas-e-dals-candidats-1)   
-      - 3.3.6. [Resultats temporars](#Resultats-temporars-2)   
-      - 3.3.7. [Projects](#Projects-1)   
-   - 3.4. [WabstiCExport Maiorz](#WabstiCExport-Maiorz)   
-   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)   
-   - 3.6. [Resultats da la(s) partida(s)](#Resultats-da-las-partidas)   
-      - 3.6.1. [Einflussbereich](#Einflussbereich)   
-      - 3.6.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas-2)   
-      - 3.6.3. [Projects](#Projects-2)   
+- 1. [Cuntegn](#Cuntegn)
+- 2. [Remartgas preliminaras](#Remartgas-preliminaras)
+   - 2.1. [Unitads](#Unitads)
+   - 2.2. [Elecziun taciturnas](#Elecziun-taciturnas)
+   - 2.3. [Elecziuns regiunalas](#Elecziuns-regiunalas)
+- 3. [Formats](#Formats)
+   - 3.1. [Onegov](#Onegov)
+      - 3.1.1. [Colonnas](#Colonnas)
+      - 3.1.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas)
+      - 3.1.3. [Resultats temporars](#Resultats-temporars)
+      - 3.1.4. [Elecziuns colliadas](#Elecziuns-colliadas)
+      - 3.1.5. [Project](#Project)
+   - 3.2. [Wabsti Maiorz](#Wabsti-Maiorz)
+      - 3.2.1. [Colonnas "Export da datas"](#Colonnas-Export-da-datas)
+      - 3.2.2. [Colonnas "Resultats da las candidatas e dals candidats"](#Colonnas-Resultats-da-las-candidatas-e-dals-candidats)
+      - 3.2.3. [Resultats temporars](#Resultats-temporars-1)
+      - 3.2.4. [Projects](#Projects)
+   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)
+      - 3.3.1. [Colonnas "Export da datas dals resultats"](#Colonnas-Export-da-datas-dals-resultats)
+      - 3.3.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas-1)
+      - 3.3.3. [Colonnas "Export da datas da la statistica"](#Colonnas-Export-da-datas-da-la-statistica)
+      - 3.3.4. [Colonnas "Colliaziuns da glistas"](#Colonnas-Colliaziuns-da-glistas)
+      - 3.3.5. [Colonnas "Resultats da las candidatas e dals candidats"](#Colonnas-Resultats-da-las-candidatas-e-dals-candidats-1)
+      - 3.3.6. [Resultats temporars](#Resultats-temporars-2)
+      - 3.3.7. [Projects](#Projects-1)
+   - 3.4. [WabstiCExport Maiorz](#WabstiCExport-Maiorz)
+   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)
+   - 3.6. [Resultats da la(s) partida(s)](#Resultats-da-las-partidas)
+      - 3.6.1. [Einflussbereich](#Einflussbereich)
+      - 3.6.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas-2)
+      - 3.6.3. [Projects](#Projects-2)
 
 <!-- /MDTOC -->
 
@@ -260,7 +260,7 @@ Num|Descripziun
 
 #### Einflussbereich
 
-`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden.
+`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden, `domain` wird in diesem Fall implizit auf den `domain` der Wahl oder des Verbundes gesetzt. Aktuell wird nur der `domain` der Wahl oder des Verbundes sowie `domain = 'superregion'` bei verbundenen Wahlen unterstützt.
 
 #### Resultats pon cuntegnair datas panaschadas
 

@@ -868,6 +868,7 @@ def test_election_compound_export_parties(session):
     # Add party results
     election_compound.party_results.append(
         PartyResult(
+            domain='canton',
             number_of_mandates=0,
             votes=0,
             voters_count=Decimal('1.01'),
@@ -880,6 +881,7 @@ def test_election_compound_export_parties(session):
     )
     election_compound.party_results.append(
         PartyResult(
+            domain='canton',
             number_of_mandates=2,
             votes=2,
             voters_count=Decimal('3.01'),
@@ -892,6 +894,7 @@ def test_election_compound_export_parties(session):
     )
     election_compound.party_results.append(
         PartyResult(
+            domain='canton',
             number_of_mandates=1,
             votes=1,
             voters_count=Decimal('2.01'),
@@ -904,6 +907,7 @@ def test_election_compound_export_parties(session):
     )
     election_compound.party_results.append(
         PartyResult(
+            domain='canton',
             number_of_mandates=3,
             votes=3,
             voters_count=Decimal('4.01'),
@@ -914,9 +918,39 @@ def test_election_compound_export_parties(session):
             year=2016
         )
     )
+    election_compound.party_results.append(
+        PartyResult(
+            domain='superregion',
+            domain_segment='Superregion 1',
+            number_of_mandates=1,
+            votes=1,
+            voters_count=Decimal('1.01'),
+            total_votes=10,
+            voters_count_percentage=Decimal('10.02'),
+            name_translations={'en_US': 'Conservative'},
+            party_id='5',
+            year=2016
+        )
+    )
+    election_compound.party_results.append(
+        PartyResult(
+            domain='region',
+            domain_segment='Region 1',
+            number_of_mandates=10,
+            votes=10,
+            voters_count=Decimal('1.01'),
+            total_votes=10,
+            voters_count_percentage=Decimal('10.02'),
+            name_translations={'en_US': 'Conservative'},
+            party_id='5',
+            year=2016
+        )
+    )
 
     assert election_compound.export_parties(['en_US', 'de_CH'], 'en_US') == [
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2016,
             'name': 'Libertarian',
             'name_en_US': 'Libertarian',
@@ -930,6 +964,8 @@ def test_election_compound_export_parties(session):
             'voters_count_percentage': '50.02',
         },
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2016,
             'name': 'Conservative',
             'name_en_US': 'Conservative',
@@ -943,6 +979,8 @@ def test_election_compound_export_parties(session):
             'voters_count_percentage': '50.02',
         },
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2012,
             'name': 'Libertarian',
             'name_en_US': 'Libertarian',
@@ -956,6 +994,8 @@ def test_election_compound_export_parties(session):
             'voters_count_percentage': '100.02',
         },
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2012,
             'name': 'Conservative',
             'name_en_US': 'Conservative',
@@ -967,7 +1007,37 @@ def test_election_compound_export_parties(session):
             'votes': 1,
             'voters_count': '2.01',
             'voters_count_percentage': '100.02',
-        }
+        },
+        {
+            'domain': 'region',
+            'domain_segment': 'Region 1',
+            'year': 2016,
+            'name': 'Conservative',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '5',
+            'color': 'red',
+            'mandates': 10,
+            'total_votes': 10,
+            'votes': 10,
+            'voters_count': '1.01',
+            'voters_count_percentage': '10.02',
+        },
+        {
+            'domain': 'superregion',
+            'domain_segment': 'Superregion 1',
+            'year': 2016,
+            'name': 'Conservative',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '5',
+            'color': 'red',
+            'mandates': 1,
+            'total_votes': 10,
+            'votes': 1,
+            'voters_count': '1.01',
+            'voters_count_percentage': '10.02',
+        },
     ]
 
     # Add panachage results
@@ -988,6 +1058,8 @@ def test_election_compound_export_parties(session):
     )
     assert election_compound.export_parties(['de_CH', 'en_US'], 'de_CH') == [
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2016,
             'name': None,
             'name_de_CH': None,
@@ -1004,6 +1076,8 @@ def test_election_compound_export_parties(session):
             'panachage_votes_from_999': None,
         },
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2016,
             'name': None,
             'name_de_CH': None,
@@ -1020,6 +1094,8 @@ def test_election_compound_export_parties(session):
             'panachage_votes_from_999': 4,
         },
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2012,
             'name': None,
             'name_de_CH': None,
@@ -1036,6 +1112,8 @@ def test_election_compound_export_parties(session):
             'panachage_votes_from_999': None,
         },
         {
+            'domain': 'canton',
+            'domain_segment': None,
             'year': 2012,
             'name': None,
             'name_de_CH': None,
@@ -1048,6 +1126,40 @@ def test_election_compound_export_parties(session):
             'voters_count': '2.01',
             'voters_count_percentage': '100.02',
             'panachage_votes_from_3': None,
+            'panachage_votes_from_5': None,
+            'panachage_votes_from_999': None,
+        },
+        {
+            'domain': 'region',
+            'domain_segment': 'Region 1',
+            'year': 2016,
+            'name': None,
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '5',
+            'color': 'red',
+            'mandates': 10,
+            'total_votes': 10,
+            'votes': 10,
+            'voters_count': '1.01',
+            'voters_count_percentage': '10.02',
+            'panachage_votes_from_5': None,
+            'panachage_votes_from_999': None,
+        },
+        {
+            'domain': 'superregion',
+            'domain_segment': 'Superregion 1',
+            'year': 2016,
+            'name': None,
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '5',
+            'color': 'red',
+            'mandates': 1,
+            'total_votes': 10,
+            'votes': 1,
+            'voters_count': '1.01',
+            'voters_count_percentage': '10.02',
             'panachage_votes_from_5': None,
             'panachage_votes_from_999': None,
         },

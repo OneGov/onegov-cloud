@@ -13,22 +13,33 @@ from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
-def parse_domain(line, election):
+def parse_domain(line, errors, election, principal, election_year):
     """ Parse domain and domain segment. Also indicate, if line should be
     skipped.
 
     """
 
     domain = getattr(line, 'domain', None) or None
-    domain_segment = getattr(line, 'domain_segment', None) or None
+    domain_segment = (
+        getattr(line, 'domain_segment', None)
+        or getattr(line, 'domain_id', None)
+        or None
+    )
 
     if isinstance(election, ElectionCompound):
         # Compound (including results for superregions)
         if not domain or domain == election.domain:
             return False, election.domain, None
-        if domain == "superregion" and domain_segment:
+        if domain == 'superregion':
+            if domain_segment not in principal.get_superregions(election_year):
+                errors.append(
+                    _(
+                        "Invalid domain_segment: ${domain_segment}",
+                        mapping={'domain_segment': domain_segment}
+                    )
+                )
+                return False, None, None
             return False, domain, domain_segment
-
     else:
         # Election
         if not domain or domain == election.domain:
@@ -86,7 +97,7 @@ def parse_party_result(
     except AssertionError:
         errors.append(_("Invalid values"))
     else:
-        key = '{}/{}'.format(party_id, year)
+        key = f'{domain}/{domain_segment}/{year}/{party_id}'
         totals[year] = total_votes
         if year == election_year:
             parties.add(party_id)
@@ -138,7 +149,9 @@ def parse_panachage_results(line, errors, results, headers, election_year):
         errors.append(e.args[0])
 
 
-def import_party_results(election, file, mimetype, locales, default_locale):
+def import_party_results(
+    election, principal, file, mimetype, locales, default_locale
+):
     """ Tries to import the given file.
 
     This is our own format used for party results. Supports per party panachage
@@ -167,13 +180,14 @@ def import_party_results(election, file, mimetype, locales, default_locale):
         else:
             panachage_headers = parse_panachage_headers(csv)
             for line in csv.lines:
+                line_errors = []
                 skip, domain, domain_segment = parse_domain(
-                    line, election
+                    line, line_errors,
+                    election, principal, election.date.year
                 )
                 if skip:
                     continue
 
-                line_errors = []
                 parse_party_result(
                     line, line_errors,
                     party_results, party_totals, parties,
@@ -182,11 +196,12 @@ def import_party_results(election, file, mimetype, locales, default_locale):
                     colors,
                     domain, domain_segment
                 )
-                parse_panachage_results(
-                    line, line_errors,
-                    panachage_results, panachage_headers,
-                    election.date.year
-                )
+                if domain == election.domain:
+                    parse_panachage_results(
+                        line, line_errors,
+                        panachage_results, panachage_headers,
+                        election.date.year
+                    )
                 if line_errors:
                     errors.extend(
                         FileImportError(error=err, line=line.rownumber)

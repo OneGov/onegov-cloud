@@ -260,7 +260,7 @@ Nom|Description
 
 #### Domaine d'influence
 
-`domain` et `domain_segment` permettent de fournir les résultats des partis pour un domaine d'influence différent de celui de l'élection ou du composé. `domain` correspond à un sous-domaine d'influence de l'élection ou du composé, par exemple pour les élections législatives cantonales `superregion`, `region`, `district` ou `municipality` selon le canton. `domain_segment` correspond à une unité dans ce sous-domaine d'influence, par exemple `Region 1`, `Bergün`, `Toggenburg` ou `Zug`. Normalement, `domain` et `domain_segment` peuvent tous deux être vides ou omis.
+`domain` et `domain_segment` permettent de fournir les résultats des partis pour un domaine d'influence différent de celui de l'élection ou du composé. `domain` correspond à un sous-domaine d'influence de l'élection ou du composé, par exemple pour les élections législatives cantonales `superregion`, `region`, `district` ou `municipality` selon le canton. `domain_segment` correspond à une unité dans ce sous-domaine d'influence, par exemple `Region 1`, `Bergün`, `Toggenburg` ou `Zug`. Normalement, `domain` et `domain_segment` peuvent être laissés vides ou omis ; dans ce cas, `domain` est implicitement défini comme le `domain` de l'élection ou de l'association. Actuellement, seul le `domain` de l'élection ou de l'association est supporté, ainsi que `domain = 'superregion'` pour les associations d'élections.
 
 #### Résultats du panachage
 

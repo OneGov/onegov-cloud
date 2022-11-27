@@ -146,6 +146,8 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Description
 ---|---
+`domain`|Der Einflussbereich, für den die Zeile gilt.
+`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
 `name`|Der Name der Partei in der Standardsprache.

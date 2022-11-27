@@ -875,6 +875,7 @@ def test_proporz_election_export_parties(session):
     # Add party results
     election.party_results.append(
         PartyResult(
+            domain='federation',
             number_of_mandates=0,
             votes=0,
             voters_count=Decimal('1.01'),
@@ -887,6 +888,7 @@ def test_proporz_election_export_parties(session):
     )
     election.party_results.append(
         PartyResult(
+            domain='federation',
             number_of_mandates=2,
             votes=2,
             voters_count=Decimal('3.01'),
@@ -899,6 +901,7 @@ def test_proporz_election_export_parties(session):
     )
     election.party_results.append(
         PartyResult(
+            domain='federation',
             number_of_mandates=1,
             votes=1,
             voters_count=Decimal('2.01'),
@@ -911,6 +914,7 @@ def test_proporz_election_export_parties(session):
     )
     election.party_results.append(
         PartyResult(
+            domain='federation',
             number_of_mandates=3,
             votes=3,
             voters_count=Decimal('4.01'),
@@ -921,8 +925,24 @@ def test_proporz_election_export_parties(session):
             year=2016
         )
     )
+    election.party_results.append(
+        PartyResult(
+            domain='quarter',
+            domain_segment='Quarter 1',
+            number_of_mandates=1,
+            votes=1,
+            voters_count=Decimal('4.01'),
+            voters_count_percentage=Decimal('50.02'),
+            total_votes=50,
+            name_translations={'en_US': 'Conservative'},
+            party_id='1',
+            year=2016
+        )
+    )
     assert election.export_parties(['en_US', 'de_CH'], 'en_US') == [
         {
+            'domain': 'federation',
+            'domain_segment': None,
             'color': 'red',
             'mandates': 3,
             'name': 'Conservative',
@@ -935,6 +955,8 @@ def test_proporz_election_export_parties(session):
             'voters_count_percentage': '50.02',
             'year': 2016,
         }, {
+            'domain': 'federation',
+            'domain_segment': None,
             'color': 'black',
             'mandates': 2,
             'name': 'Libertarian',
@@ -947,6 +969,8 @@ def test_proporz_election_export_parties(session):
             'voters_count_percentage': '50.02',
             'year': 2016,
         }, {
+            'domain': 'federation',
+            'domain_segment': None,
             'color': 'red',
             'mandates': 1,
             'name': 'Conservative',
@@ -959,6 +983,8 @@ def test_proporz_election_export_parties(session):
             'voters_count_percentage': '100.02',
             'year': 2012,
         }, {
+            'domain': 'federation',
+            'domain_segment': None,
             'color': 'black',
             'mandates': 0,
             'name': 'Libertarian',
@@ -970,6 +996,20 @@ def test_proporz_election_export_parties(session):
             'voters_count': '1.01',
             'voters_count_percentage': '100.02',
             'year': 2012,
+        }, {
+            'domain': 'quarter',
+            'domain_segment': 'Quarter 1',
+            'color': 'red',
+            'mandates': 1,
+            'name': 'Conservative',
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '1',
+            'total_votes': 50,
+            'votes': 1,
+            'voters_count': '4.01',
+            'voters_count_percentage': '50.02',
+            'year': 2016,
         }
     ]
 
@@ -990,6 +1030,8 @@ def test_proporz_election_export_parties(session):
     )
     assert election.export_parties(['de_CH', 'en_US'], 'de_CH') == [
         {
+            'domain': 'federation',
+            'domain_segment': None,
             'year': 2016,
             'name': None,
             'name_de_CH': None,
@@ -1006,6 +1048,8 @@ def test_proporz_election_export_parties(session):
             'panachage_votes_from_999': 4,
         },
         {
+            'domain': 'federation',
+            'domain_segment': None,
             'year': 2016,
             'name': None,
             'name_de_CH': None,
@@ -1022,6 +1066,8 @@ def test_proporz_election_export_parties(session):
             'panachage_votes_from_999': None,
         },
         {
+            'domain': 'federation',
+            'domain_segment': None,
             'year': 2012,
             'name': None,
             'name_de_CH': None,
@@ -1038,6 +1084,8 @@ def test_proporz_election_export_parties(session):
             'panachage_votes_from_999': None,
         },
         {
+            'domain': 'federation',
+            'domain_segment': None,
             'year': 2012,
             'name': None,
             'name_de_CH': None,
@@ -1051,6 +1099,23 @@ def test_proporz_election_export_parties(session):
             'voters_count_percentage': '100.02',
             'panachage_votes_from_1': None,
             'panachage_votes_from_2': None,
+            'panachage_votes_from_999': None,
+        },
+        {
+            'domain': 'quarter',
+            'domain_segment': 'Quarter 1',
+            'color': 'red',
+            'mandates': 1,
+            'name': None,
+            'name_en_US': 'Conservative',
+            'name_de_CH': None,
+            'id': '1',
+            'total_votes': 50,
+            'votes': 1,
+            'voters_count': '4.01',
+            'voters_count_percentage': '50.02',
+            'year': 2016,
+            'panachage_votes_from_1': None,
             'panachage_votes_from_999': None,
         }
     ]

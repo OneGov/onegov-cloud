@@ -362,7 +362,7 @@ def import_parties_internal(
             if name == dataset_name:
                 file = f.extractfile(member).read()
                 errors = import_party_results(
-                    election, BytesIO(file), 'text/plain',
+                    election, principal, BytesIO(file), 'text/plain',
                     ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
                 )
                 break

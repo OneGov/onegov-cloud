@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-08 13:09+0100\n"
+"POT-Creation-Date: 2022-11-27 13:03+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -136,6 +136,10 @@ msgstr "Valori della lista delle connessioni non validi"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} no e list_id's"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment non valido: ${domain_segment}"
 
 msgid "Invalid values"
 msgstr "Valori non validi"

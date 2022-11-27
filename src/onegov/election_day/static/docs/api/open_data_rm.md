@@ -147,6 +147,8 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 Num|Descripziun
 ---|---
+`domain`|Der Einflussbereich, für den die Zeile gilt.
+`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
 `year`|L'onn da l'elecziun.
 `total_votes`|Il dumber total da las vuschs da l'elecziun.
 `name`|Il num da la partida en la lingua da standard.
