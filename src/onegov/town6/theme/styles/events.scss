@@ -32,12 +32,13 @@ $event-image-max-height: 150px;
     }
 
     .date-place {
-        color:  $primary-color;
-        flex: none;
-        font-size: 97%;
-        font-weight: bold;
-        padding: 1rem;
+        color:  $charcoal;
         i { width: $events-icon-width; }
+    }
+
+    hr {
+        border-bottom: 1px dashed #cacaca;
+        margin: .5rem 0;
     }
 
     .image-placeholder {

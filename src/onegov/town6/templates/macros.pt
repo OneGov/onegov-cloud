@@ -284,40 +284,35 @@
 <metal:events define-macro="event-item-card">
     <a href="${item.url}">
         <div class="card" data-aos="fade">
-                <div class="date-place" data-equalizer-watch>
-                    <div class="grid-x">
-                        <div class="cell small-1 medium-2">
-                            <i class="far fa-calendar-alt"></i>
-                        </div>
-                        <div class="cell small-11 medium-10">
-                            ${item.subtitle}
-                        </div>
-                    </div>
-                    <div class="grid-x">
-                        <div class="cell small-1 medium-2">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="cell small-11 medium-10">
-                            ${item.location}
-                        </div>
-                    </div>
-                </div>
-                <div class="card-section" style="display:none;" >
-                    ${item.location}
-                </div>
-                <img class="contained" tal:condition="item.image_url" src="${item.image_url}">
-                <div class="image-placeholder card-section contained" tal:condition="not: item.image_url">
-                    <i class="far fa-calendar-alt" aria-hidden="true"></i>
-                </div>
+                <div style="width: 100%; padding-bottom: 55%; background-image: url(${item.image_url}); background-size: cover;"></div>
                 <div class="card-section" tal:condition="with_lead|False">
-                    <h5>${item.lead}</h5>
+                    <h5 data-equalizer-watch="events">${item.lead}</h5>
+                    <div class="date-place">
+                        <div class="grid-x">
+                            <div class="cell small-1 medium-2">
+                                <i class="far fa-calendar-alt"></i>
+                            </div>
+                            <div class="cell small-11 medium-10">
+                                ${item.subtitle}
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="grid-x">
+                            <div class="cell small-1 medium-2">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="cell small-11 medium-10">
+                                ${item.location}
+                            </div>
+                        </div>
+                    </div>
                 </div>
         </div>
     </a>
 </metal:events>
 
 <metal:panel define-macro="event-cards">
-    <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center" data-equalizer data-equalize-on="medium">
+    <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center" data-equalizer="events" data-equalize-on="medium">
         <div class="cell small-12 large-3 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
@@ -2219,7 +2214,7 @@
 
 <metal:focus define-macro="focus-panel" i18n:domain="onegov.town6">
         <div class="focus-image" tal:condition="image_src">
-            <img src="${image_src}" alt="Focus Image">
+            <div style="width: 100%; padding-bottom: 55%; background-image: url(${image_src}); background-size: cover;"></div>
         </div>
         <div class="panel" tal:condition="python: not image_src">
             <p i18n:translate="">Available options for the focus widget:</p>

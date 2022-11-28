@@ -122,6 +122,7 @@
     .card {
         border: 2px solid rgba(0, 0, 0, .04);
         box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07);
+        height: calc(100% - 2rem);
         margin-bottom: 2rem;
         transition: all 200ms linear !important;
 
@@ -147,6 +148,12 @@
         .card {
             border: 2px solid $primary-color;
             box-shadow: none;
+            transition: all 200ms linear !important;
+
+            &:hover {
+                border: 2px solid $white !important;
+                transition: all 200ms linear;
+            }
         }
 
         .button.hollow {
