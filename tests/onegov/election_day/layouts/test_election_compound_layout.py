@@ -19,7 +19,7 @@ def test_election_compound_layout_general(session):
     compound = session.query(ElectionCompound).one()
     request = DummyRequest()
     layout = ElectionCompoundLayout(compound, request)
-    assert layout.all_tabs == (
+    assert layout.all_tabs == [
         'seat-allocation',
         'list-groups',
         'superregions',
@@ -29,7 +29,7 @@ def test_election_compound_layout_general(session):
         'parties-panachage',
         'statistics',
         'data'
-    )
+    ]
     assert layout.title() == ''
     assert layout.title('undefined') == ''
     assert layout.title('seat-allocation') == 'Seat allocation'

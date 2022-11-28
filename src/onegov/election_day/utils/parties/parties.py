@@ -127,6 +127,57 @@ def get_party_results_deltas(item, years, parties):
 
 
 def get_party_results_data(item, domain=None, domain_segment=None):
+    """ Retuns the data used for the diagrams showing the party results. """
+
+    if item.horizontal_party_strengths:
+        return get_party_results_horizontal_data(item, domain, domain_segment)
+    return get_party_results_vertical_data(item, domain, domain_segment)
+
+
+def get_party_results_horizontal_data(item, domain=None, domain_segment=None):
+
+    """ Retuns the data used for the horitzonal bar diagram showing the party
+    results.
+
+    """
+
+    if not has_party_results(item):
+        return {
+            'results': [],
+        }
+
+    voters_counts = getattr(item, 'voters_counts', False) == True
+    attribute = 'voters_count' if voters_counts else 'votes'
+    years, parties = get_party_results(item, domain, domain_segment)
+    results = []
+    if years:
+        year = years[-1]
+        party_ids = {
+            values.get(year, {}).get(attribute).get('total', 0): party_id
+            for party_id, values in parties.items()
+        }
+        party_ids = [party_ids[key] for key in sorted(party_ids)]
+        for party_id in reversed(party_ids):
+            for year in reversed(years):
+                active = year == years[-1]
+                party = parties.get(party_id, {}).get(year, {})
+                name = party.get('name')
+                value = round(party.get(attribute, {}).get('total', 0) or 0)
+                results.append({
+                    'text': f'{name} {year}' if active else year,
+                    'value': value,
+                    'value2': party.get('mandates'),
+                    'class': (
+                        'active' if active and party.get('mandates')
+                        else 'inactive'
+                    ),
+                    'color': party.get('color')
+                })
+
+    return {'results': results}
+
+
+def get_party_results_vertical_data(item, domain=None, domain_segment=None):
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.

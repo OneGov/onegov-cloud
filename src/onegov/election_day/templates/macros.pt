@@ -847,20 +847,37 @@
 </metal:seat-allocation-chart i18n:domain="onegov.election_day">
 
 <metal:party-strengths-chart define-macro="party-strengths-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="embed">
-        <div class="grouped-bar-chart"
-            i18n:attributes="data-embed-link"
-            data-dataurl="${request.link(model, name='party-strengths-data')}"
-            data-show-back="true"
-            data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='party-strengths-chart')}">
-        </div>
+    <tal:block tal:condition="not: model.horizontal_party_strengths|False">
+        <tal:block tal:condition="embed">
+            <div class="grouped-bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='party-strengths-data')}"
+                data-show-back="true"
+                data-embed-link="Embed diagram"
+                data-embed-source="${request.link(model, name='party-strengths-chart')}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="grouped-bar-chart"
+                data-dataurl="${request.link(model, name='party-strengths-data')}"
+                data-show-back="true">
+            </div>
+        </tal:block>
     </tal:block>
-    <tal:block tal:condition="not: embed">
-        <div class="grouped-bar-chart"
-            data-dataurl="${request.link(model, name='party-strengths-data')}"
-            data-show-back="true">
-        </div>
+    <tal:block tal:condition="model.horizontal_party_strengths|False">
+        <tal:block tal:condition="embed">
+            <div class="bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='party-strengths-data')}"
+                data-embed-link="Embed diagram"
+                data-embed-source="${request.link(model, name='party-strengths-chart')}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="bar-chart"
+                data-dataurl="${request.link(model, name='party-strengths-data')}">
+            </div>
+        </tal:block>
     </tal:block>
 </metal:party-strengths-chart i18n:domain="onegov.election_day">
 
@@ -1399,7 +1416,7 @@
         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
         </a>
-        <figcaption i18n:translate="figcaption_party_strengths">
+            <figcaption i18n:translate="figcaption_party_strengths" tal:condition="not: model.horizontal_party_strengths|False">
             The diagram shows the votes and mandates of the parties. The rimmed bars
             (left scale) correspond to the number of mandates, the colored bars (right scale)
             to the voices (percentages).
