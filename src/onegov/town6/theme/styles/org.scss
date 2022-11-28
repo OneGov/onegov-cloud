@@ -388,16 +388,30 @@ footer {
     }
 }
 
+/* Input */
+
+select, textarea, input[type="text"], input[type="password"],
+    input[type="datetime"], input[type="datetime-local"],
+    input[type="date"], input[type="month"], input[type="time"],
+    input[type="week"], input[type="number"], input[type="email"],
+    input[type="tel"], input[type="url"] {
+        height: auto;
+    }
+
 /* Button */
 .button {
     border-radius: 10rem !important;
     padding: 1rem 1.5rem !important;
+    transition: all 200ms linear !important;
 
-    &.hollow-white {
-        background: transparent;
-        border: 1px solid $white;
-        color: $white;
+    &:hover {
+        padding: 1rem 2rem !important;
+        transition: all 200ms linear;
     }
+}
+
+form .button {
+    margin-top: 2rem;
 }
 
 /*

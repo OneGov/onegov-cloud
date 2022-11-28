@@ -64,7 +64,7 @@
         display: flex;
         flex: 0 0 auto;
         height: calc(100% - 2rem);
-        transition: all 200ms linear;
+        transition: all 200ms linear !important;
 
         &:hover {
             border: 2px solid #0068a5 !important;
@@ -122,9 +122,17 @@
         box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07);
     }
 
-    .primary .card {
-        border: none;
-        box-shadow: none;
+    .primary {
+        .card {
+            border: none;
+            box-shadow: none;
+        }
+
+        .button.hollow{
+            background: transparent;
+            border: 1px solid $white;
+            color: $white;
+        }
     }
 
     .card-section {
