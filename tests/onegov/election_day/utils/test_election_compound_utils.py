@@ -338,7 +338,6 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     # Party results
     data = get_parties_panachage_data(election_compound)
     assert data['title'] == 'Compound'
-    l = data['links']
 
     def assert_link(active, color, source, target, value):
         assert {
