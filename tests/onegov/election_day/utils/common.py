@@ -113,6 +113,7 @@ def add_proporz_election(session, year=2015):
 
     election.party_results.append(
         PartyResult(
+            domain='federation',
             name_translations={'de_CH': 'Party 1'},
             party_id='0',
             number_of_mandates=1,
@@ -121,6 +122,7 @@ def add_proporz_election(session, year=2015):
     )
     election.party_results.append(
         PartyResult(
+            domain='federation',
             name_translations={'de_CH': 'Party 2'},
             party_id='1',
             number_of_mandates=1,
@@ -248,6 +250,7 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
 
     compound.party_results.append(
         PartyResult(
+            domain='canton',
             name_translations={'de_CH': 'Party 1'},
             year=year,
             party_id='0',
@@ -257,6 +260,7 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
     )
     compound.party_results.append(
         PartyResult(
+            domain='canton',
             name_translations={'de_CH': 'Party 2'},
             year=year,
             party_id='1',

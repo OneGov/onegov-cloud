@@ -13,7 +13,9 @@ def has_party_results(item):
     return False
 
 
-def get_party_results(item, json_serializable=False):
+def get_party_results(
+    item, json_serializable=False, domain=None, domain_segment=None
+):
 
     """ Returns the aggregated party results as list.
 
@@ -31,12 +33,23 @@ def get_party_results(item, json_serializable=False):
 
     # Get the totals votes per year
     query = session.query(PartyResult.year, PartyResult.total_votes)
-    query = query.filter(PartyResult.owner == item.id).distinct()
+    query = query.filter(
+        PartyResult.owner == item.id,
+        PartyResult.domain == (domain or item.domain)
+    )
+    if domain_segment:
+        query = query.filter(PartyResult.domain_segment == domain_segment)
+    query = query.distinct()
     totals_votes = dict(query)
     years = sorted((str(key) for key in totals_votes.keys()))
 
     parties = {}
     for result in item.party_results:
+        if result.domain != (domain or item.domain):
+            continue
+        if domain_segment and result.domain_segment != domain_segment:
+            continue
+
         party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
         year['color'] = item.colors.get(result.name)
@@ -113,7 +126,7 @@ def get_party_results_deltas(item, years, parties):
     return deltas, results
 
 
-def get_party_results_data(item):
+def get_party_results_data(item, domain=None, domain_segment=None):
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
@@ -128,7 +141,7 @@ def get_party_results_data(item):
 
     voters_counts = getattr(item, 'voters_counts', False) == True
     attribute = 'voters_count' if voters_counts else 'votes'
-    years, parties = get_party_results(item)
+    years, parties = get_party_results(item, domain, domain_segment)
     groups = {}
     results = []
     for party_id in parties:

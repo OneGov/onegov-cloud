@@ -145,6 +145,8 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
+`domain`|Der Einflussbereich, für den die Zeile gilt.
+`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito nella lingua definita come standard.
