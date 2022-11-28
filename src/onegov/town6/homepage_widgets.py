@@ -393,7 +393,7 @@ class FocusWidget:
     template = """
     <xsl:template match="focus">
         <a href="{@focus-url}" class="focus-link">
-            <div class="focus-widget" data-aos="fade">
+            <div class="focus-widget card" data-aos="fade">
                 <xsl:variable name="apos">'</xsl:variable>
                 <xsl:variable name="image_src">
                     <xsl:choose>
@@ -469,6 +469,7 @@ class FocusWidget:
                         )"/>
                     </xsl:attribute>
                 </metal:block>
+                <div class="card-section">
                 <xsl:choose>
                     <xsl:when test="@hide-title"></xsl:when>
                     <xsl:otherwise>
@@ -490,6 +491,7 @@ class FocusWidget:
                         <xsl:apply-templates select="node()"/>
                     </p>
                 </xsl:for-each>
+                </div>
             </div>
         </a>
     </xsl:template>

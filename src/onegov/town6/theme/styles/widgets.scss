@@ -16,12 +16,12 @@
 
 .grid-container.full.gray {
     background: $white-smoke;
-    box-shadow: 0 0 17px 0 rgba(0,0,0,0.07) inset;
+    box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07) inset;
 }
 
 .grid-container.full.darkgray {
     background: $light-gray;
-    box-shadow: 0 0 17px 0 rgba(0,0,0,0.07) inset;
+    box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07) inset;
 }
 
 article.content .side-panel {
@@ -39,16 +39,10 @@ article.content .side-panel {
 .homepage {
 
     .focus-widget {
-        border-radius: .5rem;
-        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .15);
         color: $oil;
         height: calc(100% - 2rem);
         margin-bottom: 2rem;
         transition: all 200ms linear;
-
-        &:hover {
-            box-shadow: 0 8px 17px 0 rgba(0, 0, 0, .3);
-        }
 
         &> * {
             padding: 0 1rem;
@@ -56,7 +50,6 @@ article.content .side-panel {
 
         .focus-image {
             padding: 0;
-            padding-bottom: 1rem;
 
             img {
                 border-radius: .5rem .5rem 0 0;
@@ -65,7 +58,7 @@ article.content .side-panel {
 
         p {
             margin: 0;
-            padding-bottom: 3rem;
+            padding-bottom: 2rem;
         }
     }
 
@@ -84,8 +77,8 @@ article.content .side-panel {
     }
 
     .focus-link > i.fa-external-link-alt {
-        margin-left: 1rem;
-        margin-top: -4rem;
+        margin-left: 1.5rem;
+        margin-top: -4.2rem;
         position: absolute;
     }
 }

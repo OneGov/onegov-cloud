@@ -1,4 +1,9 @@
 .homepage {
+    h5 {
+        color: $primary-color;
+        padding-bottom: 1rem;
+    }
+
     .full.primary {
         small a:first-of-type {
             color: $primary-fg-color;
@@ -64,11 +69,10 @@
         display: flex;
         flex: 0 0 auto;
         height: calc(100% - 2rem);
-        transition: all 200ms linear !important;
 
-        &:hover {
-            border: 2px solid #0068a5 !important;
-            transition: all 200ms linear;
+        a {
+            display: block;
+            height: 100%;
         }
 
         p {
@@ -84,7 +88,7 @@
 
         .icon {
             background: $primary-color;
-            color: #FFF;
+            color: #fff;
             height: 3rem;
             margin-right: 1rem;
             padding: .9rem;
@@ -93,9 +97,9 @@
         }
 
         i {
-            background: #0068a5;
+            background: $primary-color;
             border-radius: 1rem;
-            color: #FFF;
+            color: $white;
             height: 3rem;
             margin-right: 1rem;
             padding: .9rem;
@@ -103,32 +107,49 @@
             width: 3rem;
         }
 
-        .title {
-            color: #363636;
+        h5 {
+            color: $body-font-color;
             font-weight: bold;
             padding: 1.5rem;
-            padding-bottom: 0;  
+            padding-bottom: 0;
         }
+    }
+
+    a .card p {
+        color: $body-font-color;
     }
 
     .card {
-        border: 1px solid #eee;
+        border: 2px solid rgba(0, 0, 0, .04);
+        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07);
         margin-bottom: 2rem;
-        box-shadow: 0 0 17px 0 rgba(0, 0, 0, 0.08);
+        transition: all 200ms linear !important;
+
+
+        &:hover {
+            border: 2px solid $primary-color !important;
+            transition: all 200ms linear;
+        }
     }
 
     .gray .card {
-        border: 1px solid #eee;;
-        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07);
+        border: 2px solid rgba(0, 0, 0, .07);
+        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .05);
     }
+
+    .darkgray .card {
+        border: 2px solid $light-gray;
+        box-shadow: none;
+    }
+
 
     .primary {
         .card {
-            border: none;
+            border: 2px solid $primary-color;
             box-shadow: none;
         }
 
-        .button.hollow{
+        .button.hollow {
             background: transparent;
             border: 1px solid $white;
             color: $white;
