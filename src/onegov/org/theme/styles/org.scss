@@ -6526,3 +6526,8 @@ a#results {
 .page-image {
     padding-bottom: 1rem;
 }
+
+/* Hide page-image form field on topic-forms */
+[id^="page-editor-edit-page"] .field-page_image {
+    display: none;
+}
