@@ -64,6 +64,22 @@ class ArchiveGenerator:
                         rows = item.export(sorted(self.app.locales))
                         f.write(convert_list_of_dicts_to_csv(rows))
 
+        # Additionally, create 'flat csv' containing all votes in a single file
+        votes = entities[0]
+        if votes:
+            filename = "all_votes.csv"
+            combined_path = path.combine("votes", filename)
+            with self.temp_fs.open(combined_path, "w") as f:
+                votes_exports = self.get_all_rows_for_votes(votes)
+                f.write(convert_list_of_dicts_to_csv(votes_exports))
+
+    def get_all_rows_for_votes(self, votes):
+        all_votes = []
+        for v in votes:
+            vote_row = v.export(sorted(self.app.locales))
+            all_votes.extend(vote_row)
+        return all_votes
+
     def group_by_year(self, entities):
         """Creates a list of lists, grouped by year.
 

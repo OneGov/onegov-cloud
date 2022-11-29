@@ -75,9 +75,8 @@ def test_archive_generation_from_scratch(election_day_app_zg):
         with ReadZipFS(fi) as zip_fs:
             votes_dir = zip_fs.listdir("votes")
             years = [str(year) for year in votes_dir]
-
-            assert len(zip_fs.listdir("votes")) == 2
-            assert {"2022", "2013"} == set(years)
+            assert len(zip_fs.listdir("votes")) == 3
+            assert {"all_votes.csv", "2022", "2013"} == set(years)
 
             votes = zip_fs.opendir("votes")
             counter = Counter()
@@ -90,7 +89,9 @@ def test_archive_generation_from_scratch(election_day_app_zg):
                     counter[file.name] += 1
 
                 total_bytes_csv = sum(info.size for info in files)
-            assert sum(counter.values()) == 3
+            # We expect 3 csv because we have 3 votes,
+            # Plus a csv that contains everything = 4
+            assert sum(counter.values()) == 4
             assert total_bytes_csv > 10  # check to ensure files are not empty
 
 
