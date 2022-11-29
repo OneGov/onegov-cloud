@@ -61,8 +61,10 @@ def parse_form(text, base_class=Form):
 def normalize_label_for_dependency(label):
     """ Removes all between '(' and ')' Parentheses (inclusive) """
     if '(' in label and ')' in label:
-        label = re.sub("([\(]).*?([\)])", "", label)
+        label = re.sub("([(]).*?([)])", "", label)
         return label[:-1] if label[-1] == " " else label
+    else:
+        return label
 
 
 def handle_field(builder, field, dependency=None):
