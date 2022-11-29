@@ -129,7 +129,6 @@ def get_lists_data(
 
     completed = election.completed
     colors = election.colors
-    default_color = '#999' if election.colors else ''
 
     if election.type == 'majorz':
         return {
@@ -148,7 +147,7 @@ def get_lists_data(
                     'active' if completed and list_.number_of_mandates
                     else 'inactive'
                 ),
-                'color': colors.get(list_.name) or default_color
+                'color': colors.get(list_.name)
             }
             for list_ in get_list_results(
                 election, limit=limit, names=names, sort_by_names=sort_by_names
@@ -175,26 +174,37 @@ def get_lists_panachage_data(election, request):
     nodes = OrderedDict()
     nodes['left.999'] = {'name': blank}
     for list_ in election.lists.order_by(List.name):
-        nodes[f'left.{list_.list_id}'] = {'name': list_.name}
+        nodes[f'left.{list_.list_id}'] = {
+            'name': list_.name,
+            'color': election.colors.get(list_.name),
+            'active': list_.number_of_mandates > 0
+        }
     for list_ in election.lists:
-        nodes[f'right.{list_.list_id}'] = {'name': list_.name}
+        nodes[f'right.{list_.list_id}'] = {
+            'name': list_.name,
+            'color': election.colors.get(list_.name),
+            'active': list_.number_of_mandates > 0
+        }
     node_keys = list(nodes.keys())
 
     links = []
     for list_target in election.lists:
-        target = node_keys.index(f'right.{list_target.list_id}')
+        target_index = node_keys.index(f'right.{list_target.list_id}')
         remaining = list_target.votes - sum(
             [r.votes for r in list_target.panachage_results]
         )
         for result in list_target.panachage_results:
-            source = node_keys.index(f'left.{result.source}')
+            source_item = nodes.get(f'left.{result.source}', {})
+            source_index = node_keys.index(f'left.{result.source}')
             votes = result.votes
             if list_target.list_id == result.source:
                 votes += remaining
             links.append({
-                'source': source,
-                'target': target,
-                'value': votes
+                'source': source_index,
+                'target': target_index,
+                'value': votes,
+                'color': source_item.get('color'),
+                'active': source_item.get('active')
             })
 
     count = 0

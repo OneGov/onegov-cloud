@@ -4,37 +4,42 @@ En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont accept
 
 ## Contenu
 
-<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
-- [Spécifications de format des élections](#spécifications-de-format-des-élections)
-    - [Contenu](#contenu)
-    - [Avant-propos](#avant-propos)
-        - [Entités](#entités)
-        - [Élections tacites](#élections-tacites)
-        - [Élections régionales](#élections-régionales)
-    - [Formats](#formats)
-        - [Onegov](#onegov)
-            - [Colonnes](#colonnes)
-            - [Résultats du panachage](#résultats-du-panachage)
-            - [Résultats temporaires](#résultats-temporaires)
-            - [Modèle](#modèle)
-        - [Wabsti Majorz](#wabsti-majorz)
-            - [Exportation des données de colonnes](#exportation-des-données-de-colonnes)
-            - [Résultats des candidats de colonnes](#résultats-des-candidats-de-colonnes)
-            - [Résultats temporaires](#résultats-temporaires-1)
-            - [Modèles](#modèles)
-        - [Wabsti Proporz](#wabsti-proporz)
-            - [Exportation des données de résultats pour les colonnes](#exportation-des-données-de-résultats-pour-les-colonnes)
-            - [Résultats du panachage](#résultats-du-panachage-1)
-            - [Exportation des données de statistiques pour les colonnes](#exportation-des-données-de-statistiques-pour-les-colonnes)
-            - [Connexions de liste des colonnes](#connexions-de-liste-des-colonnes)
-            - [Résultats de candidats des colonnes](#résultats-de-candidats-des-colonnes)
-            - [Résultats temporaires](#résultats-temporaires-2)
-            - [Modèles](#modèles-1)
-        - [WabstiCExport Majorz](#wabsticexport-majorz)
-        - [WabstiCExport Proporz](#wabsticexport-proporz)
-        - [Résultats du parti](#résultats-du-parti)
-            - [Modèles](#modèles-2)
-<!-- TOC END -->
+<!-- https://atom.io/packages/atom-mdtoc -->
+<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+
+- 1. [Contenu](#Contenu)
+- 2. [Avant-propos](#Avant-propos)
+   - 2.1. [Entités](#Entites)
+   - 2.2. [Élections tacites](#Elections-tacites)
+   - 2.3. [Élections régionales](#Elections-regionales)
+- 3. [Formats](#Formats)
+   - 3.1. [Onegov](#Onegov)
+      - 3.1.1. [Colonnes](#Colonnes)
+      - 3.1.2. [Résultats du panachage](#Resultats-du-panachage)
+      - 3.1.3. [Résultats temporaires](#Resultats-temporaires)
+      - 3.1.4. [Composantes des élections](#Composantes-des-elections)
+      - 3.1.5. [Modèle](#Modele)
+   - 3.2. [Wabsti Majorz](#Wabsti-Majorz)
+      - 3.2.1. [Exportation des données de colonnes](#Exportation-des-donnees-de-colonnes)
+      - 3.2.2. [Résultats des candidats de colonnes](#Resultats-des-candidats-de-colonnes)
+      - 3.2.3. [Résultats temporaires](#Resultats-temporaires-1)
+      - 3.2.4. [Modèles](#Modeles)
+   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)
+      - 3.3.1. [Exportation des données de résultats pour les colonnes](#Exportation-des-donnees-de-resultats-pour-les-colonnes)
+      - 3.3.2. [Résultats du panachage](#Resultats-du-panachage-1)
+      - 3.3.3. [Exportation des données de statistiques pour les colonnes](#Exportation-des-donnees-de-statistiques-pour-les-colonnes)
+      - 3.3.4. [Connexions de liste des colonnes](#Connexions-de-liste-des-colonnes)
+      - 3.3.5. [Résultats de candidats des colonnes](#Resultats-de-candidats-des-colonnes)
+      - 3.3.6. [Résultats temporaires](#Resultats-temporaires-2)
+      - 3.3.7. [Modèles](#Modeles-1)
+   - 3.4. [WabstiCExport Majorz](#WabstiCExport-Majorz)
+   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)
+   - 3.6. [Résultats du parti](#Resultats-du-parti)
+      - 3.6.1. [Résultats du panachage](#Resultats-du-panachage-2)
+      - 3.6.2. [Modèles](#Modeles-2)
+   - 3.7. [Création automatique des composantes des élections](#Creation-automatique-des-composantes-des-elections)
+
+<!-- /MDTOC -->
 
 ## Avant-propos
 
@@ -75,6 +80,7 @@ Nom|Description
 `entity_invalid_votes`|Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
 `list_name`|Nom de la liste de candidats. Uniquement avec les élections Proporz.
 `list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz. Peut-être numeric ou alpha-numeric.
+`list_color`|La couleur de la liste en valeur hexadécimale, par exemple `#a6b784'.
 `list_number_of_mandates`|Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
 `list_votes`Nombre de votes de liste par municipalité. Uniquement avec les élections Proporz.
 `list_connection`|Identifiant de la connexion de liste ou sous-list (en cas list_connection_parent est présent). Uniquement avec les élections Proporz.
@@ -84,6 +90,7 @@ Nom|Description
 `candidate_first_name`|Prénom du candidat.
 `candidate_elected`|Vrai, si le candidat a été élu.
 `candidate_party`|Nom de le parti.
+`candidate_party_color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784'.
 `candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé). Facultatif.
 `candidate_year_of_birth`|L'année de naissance du candidat. Facultatif.
 `candidate_votes`|Nombre de votes de candidats dans la municipalité.
@@ -238,18 +245,24 @@ Les colonnes suivantes seront évaluées et devraient avoir été créées :
 
 Nom|Description
 ---|---
+`domain`|Le domaine d'influence auquel la ligne s'applique. Facultatif.
+`domain_segment`|L'unité du domaine d'influence à laquelle s'applique la ligne. Facultatif.
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
 `name`|Le dénomination du parti dans la langue par défaut. Optionnel*.
-`name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand. Optionnel*.
+`name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand. Optionnel. Assurez-vous de fournir le nom de la partie dans la langue par défaut soit avec la colonne `name` ou `name_{default_locale}`.
 `id`|Identifiant du parti (n'importe quel numéro).
-`color`|La couleur du parti.
+`color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784'.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 `voters_count_percentage`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
 
-*Assurez-vous de fournir le nom de la partie dans la langue par défaut soit avec la colonne `name` ou `name_{default_locale}`.
+#### Domaine d'influence
+
+`domain` et `domain_segment` permettent de fournir les résultats des partis pour un domaine d'influence différent de celui de l'élection ou du composé. `domain` correspond à un sous-domaine d'influence de l'élection ou du composé, par exemple pour les élections législatives cantonales `superregion`, `region`, `district` ou `municipality` selon le canton. `domain_segment` correspond à une unité dans ce sous-domaine d'influence, par exemple `Region 1`, `Bergün`, `Toggenburg` ou `Zug`. Normalement, `domain` et `domain_segment` peuvent être laissés vides ou omis ; dans ce cas, `domain` est implicitement défini comme le `domain` de l'élection ou de l'association. Actuellement, seul le `domain` de l'élection ou de l'association est supporté, ainsi que `domain = 'superregion'` pour les associations d'élections.
+
+#### Résultats du panachage
 
 Les résultats peuvent inclure des résultats avec panachage en ajoutant une colonne par parti :
 

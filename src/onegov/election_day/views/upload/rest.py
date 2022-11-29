@@ -130,6 +130,7 @@ def view_upload_rest(self, request):
         if form.type.data == 'parties':
             err = import_party_results(
                 item,
+                request.app.principal,
                 file,
                 mimetype,
                 request.app.locales,

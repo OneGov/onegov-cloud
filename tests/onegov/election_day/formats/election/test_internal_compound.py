@@ -218,6 +218,7 @@ def test_import_internal_compound_invalid_values(session):
                         'entity_invalid_votes',
                         'list_name',
                         'list_id',
+                        'list_color',
                         'list_number_of_mandates',
                         'list_votes',
                         'list_connection',
@@ -228,6 +229,7 @@ def test_import_internal_compound_invalid_values(session):
                         'candidate_elected',
                         'candidate_votes',
                         'candidate_party',
+                        'candidate_party_color',
                     )),
                     ','.join((
                         'xxx',  # election_status
@@ -241,6 +243,7 @@ def test_import_internal_compound_invalid_values(session):
                         'xxx',  # entity_invalid_votes
                         'xxx',  # list_name
                         'xxx',  # list_id
+                        '',  # list_color
                         'xxx',  # list_number_of_mandates
                         'xxx',  # list_votes
                         'xxx',  # list_connection
@@ -251,6 +254,7 @@ def test_import_internal_compound_invalid_values(session):
                         'xxx',  # candidate_elected
                         'xxx',  # candidate_votes
                         'xxx',  # candidate_party
+                        '',  # candidate_party_color
                     )),
                     # St. Gallen
                     ','.join((
@@ -265,6 +269,7 @@ def test_import_internal_compound_invalid_values(session):
                         '0',  # entity_invalid_votes
                         '',  # list_name
                         '',  # list_id
+                        '',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -275,6 +280,7 @@ def test_import_internal_compound_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        '',  # candidate_party_color
                     )),
                     # Rorschach
                     ','.join((
@@ -288,7 +294,8 @@ def test_import_internal_compound_invalid_values(session):
                         '0',  # entity_blank_votes
                         '0',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '1',  # list_id
+                        'xxx',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -299,6 +306,7 @@ def test_import_internal_compound_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        'xxx',  # candidate_party_color
                     )),
                     # Rheintal
                     ','.join((
@@ -313,6 +321,7 @@ def test_import_internal_compound_invalid_values(session):
                         '0',  # entity_invalid_votes
                         '',  # list_name
                         '',  # list_id
+                        '',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -323,6 +332,7 @@ def test_import_internal_compound_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        '',  # candidate_party_color
                     )),
                 ))
                 ).encode('utf-8')), 'text/plain',
@@ -335,7 +345,8 @@ def test_import_internal_compound_invalid_values(session):
         (2, 'Invalid status'),
         (2, 'Not an alphanumeric: list_id'),
         (3, 'Empty value: list_id'),
-        (4, 'Empty value: list_id'),
+        (4, 'Invalid color: candidate_party_color'),
+        (4, 'Invalid color: list_color'),
     ]
 
 

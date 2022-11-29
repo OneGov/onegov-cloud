@@ -1868,8 +1868,8 @@ def test_icalendar_subscription(client, scenario):
 
     assert 'SUMMARY:Fishing' in calendar
     assert 'DESCRIPTION:Children might get wet' in calendar
-    assert 'DTSTART;VALUE=DATE-TIME:20161125T070000Z' in calendar
-    assert 'DTEND;VALUE=DATE-TIME:20161125T150000Z' in calendar
+    assert 'DTSTART:20161125T070000Z' in calendar
+    assert 'DTEND:20161125T150000Z' in calendar
 
 
 def test_fill_out_contact_form(client):

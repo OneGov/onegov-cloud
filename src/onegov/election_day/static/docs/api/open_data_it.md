@@ -110,6 +110,7 @@ Nome|Descrizione
 `entity_accounted_votes`|Numero di voti validi in questo comune.
 `list_name`|Nome della lista alla quale appartiene questo candidato. Valido solo per elezioni basate sul sistema proporzionale.
 `list_id`|L'identificativo della lista su cui questo candidato compare. Rilevante solo per le elezioni basate sul metodo proporzionale.
+`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
 `list_number_of_mandates`|Il numero di mandati ottenuti da questa lista. Rilevante solo per le elezioni basate sul metodo proporzionale.
 `list_votes`|Numero di voti ricevuti da questa lista. Valido solo per elezioni basate sul sistema proporzionale.
 `list_connection`|L'identificato del collegamento della lista a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
@@ -119,6 +120,7 @@ Nome|Descrizione
 `candidate_id`|L'identificativo del candidato.
 `candidate_elected`|Vero se il candidato è stato eletto.
 `candidate_party`|Il nome del partito.
+`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
@@ -143,12 +145,14 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
+`domain`|Der Einflussbereich, für den die Zeile gilt.
+`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
 `year`|L’anno dell’elezione.
 `total_votes`|Il totale dei voti dell’elezione.
 `name`|Il nome del partito nella lingua definita come standard.
 `name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco.
 `id`|ID del partito.
-`color`|Il colore del partito.
+`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.

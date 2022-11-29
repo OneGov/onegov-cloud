@@ -109,6 +109,7 @@ Name|Description
 `entity_accounted_votes`|The number of accounted votes for this municipality.
 `list_name`|The name of the list this candidate appears on. Only relevant for elections based on proportional representation.
 `list_id`|The id of the list this candidate appears on. Only relevant for elections based on proportional representation.
+`list_color`|The color of the list as a hexadecimal value, e.g. '#a6b784'.
 `list_number_of_mandates`|The number of mandates this list has got. Only relevant for elections based on proportional representation.
 `list_votes`|The number of votes this list has got. Only relevant for elections based on proportional representation.
 `list_connection`|The ID of the list connection this list is connected to. Only relevant for elections based on proportional representation.
@@ -118,6 +119,7 @@ Name|Description
 `candidate_id`|The ID of the candidate.
 `candidate_elected`|True if the candidate has been elected.
 `candidate_party`|The name of the party.
+`candidate_party_color`|The color of the party as a hexadecimal value, e.g. '#a6b784'.
 `candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
 `candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
@@ -142,12 +144,14 @@ The following fields are included in all formats:
 
 Name|Description
 ---|---
+`domain`|The domain of influence to which the line applies. Optional.
+`domain_segment`|The unit of the domain of influence to which the line applies. Optional.
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
 `name`|The name of the party in the default language.
 `name_{locale}`|Translated name of the party, e.g. `name_de_ch` for the German name.
 `id`|ID of the party.
-`color`|The color of the party.
+`color`|The color of the party as a hexadecimal value, e.g. '#a6b784'.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
 `voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.

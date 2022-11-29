@@ -18,8 +18,14 @@ class PartyResult(Base, TimestampMixin):
     #: identifies the party result
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the election or election  compound this result belongs to
+    #: the election or election compound this result belongs to
     owner = Column(Text, nullable=False)
+
+    #: the domain of this result
+    domain = Column(Text, nullable=True)
+
+    #: the domain segment of this result
+    domain_segment = Column(Text, nullable=True)
 
     #: the number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)

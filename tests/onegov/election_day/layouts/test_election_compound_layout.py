@@ -30,6 +30,19 @@ def test_election_compound_layout_general(session):
         'statistics',
         'data'
     )
+    compound.horizontal_party_strengths = True
+    layout = ElectionCompoundLayout(compound, request)
+    assert layout.all_tabs == (
+        'seat-allocation',
+        'party-strengths',
+        'list-groups',
+        'superregions',
+        'districts',
+        'candidates',
+        'parties-panachage',
+        'statistics',
+        'data'
+    )
     assert layout.title() == ''
     assert layout.title('undefined') == ''
     assert layout.title('seat-allocation') == 'Seat allocation'

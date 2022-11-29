@@ -58,6 +58,34 @@ class PartyResultExportMixin:
 
         """
 
+        result = []
+        parts = {r.domain: r.domain_segment for r in self.party_results}
+        for domain, domain_segment in sorted(parts.items()):
+            result.extend(
+                self._export_parties(
+                    locales, default_locale,
+                    json_serializable,
+                    domain, domain_segment
+                )
+            )
+        return result
+
+    def _export_parties(self, locales, default_locale, json_serializable=False,
+                        domain=None, domain_segment=None):
+        """ Returns all party results with the panachage as list with dicts.
+
+        This is meant as a base for json/csv/excel exports. The result is
+        therefore a flat list of dictionaries with repeating values to avoid
+        the nesting of values. Each record in the resulting list is a single
+        candidate result for each political entity. Party results are not
+        included in the export (since they are not really connected with the
+        lists).
+
+        If `json_serializable` is True, decimals are converted to floats. This
+        might be a lossy conversation!
+
+        """
+
         def convert_decimal(value):
             if value is None:
                 return value
@@ -69,11 +97,16 @@ class PartyResultExportMixin:
 
         # get the party results
         for result in self.party_results:
+            if result.domain != (domain or self.domain):
+                continue
+            if domain_segment and result.domain_segment != domain_segment:
+                continue
             year = results.setdefault(result.year, {})
             year[result.party_id] = {
+                'domain': result.domain,
+                'domain_segment': result.domain_segment,
                 'name_translations': result.name_translations,
                 'total_votes': result.total_votes,
-                'color': result.color,
                 'mandates': result.number_of_mandates,
                 'votes': result.votes,
                 'voters_count': result.voters_count,
@@ -81,30 +114,38 @@ class PartyResultExportMixin:
             }
 
         # get the panachage results
-        for result in self.panachage_results:
-            year = results.setdefault(self.date.year, {})
-            target = year.setdefault(result.target, {})
-            target[result.source] = result.votes
+        if domain == self.domain:
+            for result in self.panachage_results:
+                year = results.setdefault(self.date.year, {})
+                target = year.setdefault(result.target, {})
+                target[result.source] = result.votes
 
         rows = []
         parties = sorted({key for r in results.values() for key in r.keys()})
         for year in sorted(results.keys(), reverse=True):
             for party_id in parties:
                 result = results[year].get(party_id, {})
+                default_name = result['name_translations'].get(default_locale)
+                default_color = self.colors.get(default_name)
+                fallback_color = None
 
                 # add the party results
                 row = OrderedDict()
+                row['domain'] = result['domain'] or self.domain
+                row['domain_segment'] = (
+                    result['domain_segment']
+                    or getattr(self, 'domain_segment', None)
+                    or None
+                )
                 row['year'] = year
                 row['id'] = party_id
-                row['name'] = result['name_translations'].get(
-                    default_locale, None
-                )
+                row['name'] = default_name
                 for locale in locales:
-                    row[f'name_{locale}'] = result['name_translations'].get(
-                        locale, None
-                    )
+                    name = result['name_translations'].get(locale)
+                    fallback_color = fallback_color or self.colors.get(name)
+                    row[f'name_{locale}'] = name
                 row['total_votes'] = result['total_votes']
-                row['color'] = result['color']
+                row['color'] = default_color or fallback_color
                 row['mandates'] = result['mandates']
                 row['votes'] = result['votes']
                 row['voters_count'] = convert_decimal(result['voters_count'])

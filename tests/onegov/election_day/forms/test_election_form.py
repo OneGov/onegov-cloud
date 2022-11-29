@@ -99,6 +99,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
     model.tacit = False
     model.has_expats = False
+    model.horizontal_party_strengths = False
     model.colors = {
         'FDP': '#3a8bc1',
         'CVP': '#ff9100',
@@ -126,6 +127,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
     assert form.tacit.data is False
     assert form.has_expats.data is False
+    assert form.horizontal_party_strengths.data is False
     assert form.colors.data == (
         'CVP #ff9100\n'
         'FDP #3a8bc1'
@@ -147,6 +149,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     form.explanations_pdf.action = 'delete'
     form.tacit.data = True
     form.has_expats.data = True
+    form.horizontal_party_strengths.data = True
     form.colors.data = (
         'CVP #ff9100\r\n'
         'SP Juso #dd0e0e\n'
@@ -173,6 +176,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert model.explanations_pdf is None
     assert model.tacit is True
     assert model.has_expats is True
+    assert model.horizontal_party_strengths is True
     assert model.colors == {
         'CVP': '#ff9100',
         'FDP': '#3a8bc1',
