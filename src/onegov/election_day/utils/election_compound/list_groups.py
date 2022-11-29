@@ -3,7 +3,7 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 
 
-def get_list_groups(election_compound):
+def get_list_groups(election_compound, domain=None, domain_segment=None):
     """" Get list groups data. """
 
     if not election_compound.pukelsheim:
@@ -15,7 +15,6 @@ def get_list_groups(election_compound):
             PartyResult.name.label('name'),
             PartyResult.voters_count,
             PartyResult.number_of_mandates,
-            PartyResult.color
         )
     else:
         query = query.with_entities(
@@ -25,11 +24,13 @@ def get_list_groups(election_compound):
                 Integer
             ).label('voters_count'),
             PartyResult.number_of_mandates,
-            PartyResult.color
         )
     query = query.filter(
-        PartyResult.year == election_compound.date.year
+        PartyResult.year == election_compound.date.year,
+        PartyResult.domain == (domain or election_compound.domain)
     )
+    if domain_segment:
+        query = query.filter(PartyResult.domain_segment == domain_segment)
     query = query.order_by(
         PartyResult.voters_count.desc(),
         PartyResult.name,
@@ -56,7 +57,7 @@ def get_list_groups_data(election_compound):
                     'active' if completed and result.number_of_mandates
                     else 'inactive'
                 ),
-                'color': result.color
+                'color': election_compound.colors.get(result.name)
             } for result in results
         ],
     }

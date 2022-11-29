@@ -11,6 +11,7 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from onegov.election_day.formats.common import validate_color
 from onegov.election_day.formats.common import validate_gender
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.common import validate_list_id
@@ -88,14 +89,17 @@ def parse_election_result(line, errors, entities, election, principal,
     return False
 
 
-def parse_list(line, errors, election_id):
+def parse_list(line, errors, election_id, colors):
     try:
         id = validate_list_id(line, 'list_id', treat_empty_as_default=False)
         name = line.list_name
+        color = validate_color(line, 'list_color')
         mandates = validate_integer(line, 'list_number_of_mandates')
     except ValueError as e:
         errors.append(e.args[0])
     else:
+        if name and color:
+            colors[name] = color
         return dict(
             id=uuid4(),
             election_id=election_id,
@@ -151,13 +155,14 @@ def parse_panachage_results(line, errors, panachage, panachage_headers):
         errors.append(_("Invalid list results"))
 
 
-def parse_candidate(line, errors, election_id):
+def parse_candidate(line, errors, election_id, colors):
     try:
         id = line.candidate_id
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
         party = line.candidate_party
+        color = validate_color(line, 'candidate_party_color')
         gender = validate_gender(line)
         year_of_birth = validate_integer(
             line, 'candidate_year_of_birth', optional=True, default=None
@@ -168,6 +173,8 @@ def parse_candidate(line, errors, election_id):
     except Exception:
         errors.append(_("Invalid candidate values"))
     else:
+        if party and color:
+            colors[party] = color
         return dict(
             id=uuid4(),
             election_id=election_id,
@@ -265,6 +272,7 @@ def import_election_internal_proporz(
     panachage_headers = parse_panachage_headers(csv)
     entities = principal.entities[election.date.year]
     election_id = election.id
+    colors = election.colors.copy()
 
     # This format has one candiate per entity per line
     status = None
@@ -278,9 +286,9 @@ def import_election_internal_proporz(
         if result is True:
             continue
         status = parse_election(line, line_errors)
-        candidate = parse_candidate(line, line_errors, election_id)
+        candidate = parse_candidate(line, line_errors, election_id, colors)
         candidate_result = parse_candidate_result(line, line_errors)
-        list_ = parse_list(line, line_errors, election_id)
+        list_ = parse_list(line, line_errors, election_id, colors)
         list_result = parse_list_result(line, line_errors)
         connection, subconnection = parse_connection(
             line, line_errors, election_id
@@ -379,6 +387,7 @@ def import_election_internal_proporz(
     election.clear_results()
     election.last_result_change = election.timestamp()
     election.status = status
+    election.colors = colors
     for association in election.associations:
         association.election_compound.last_result_change = (
             election.last_result_change

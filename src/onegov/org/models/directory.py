@@ -235,6 +235,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
 
     searchwidget_config = content_property()
 
+    marker_type = content_property()
     marker_icon = content_property()
     marker_color = content_property()
 

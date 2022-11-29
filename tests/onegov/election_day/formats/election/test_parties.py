@@ -4,12 +4,16 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_party_results
+from onegov.election_day.models import Canton
 from tests.onegov.election_day.common import get_tar_file_path
 
 
 def test_import_party_results_fixtures(session):
+    principal = Canton('gr')
+
     # Test data from R.Semlic
     session.add(
         ProporzElection(
@@ -29,7 +33,7 @@ def test_import_party_results_fixtures(session):
             'Nationalratswahlen_2019_sesam-test_Parteien.csv').read()
 
     errors = import_party_results(
-        election, BytesIO(csv), 'text/plain',
+        election, principal, BytesIO(csv), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
     )
     assert not errors
@@ -57,6 +61,8 @@ def test_import_party_results_fixtures(session):
 
 
 def test_import_party_results(session):
+    principal = Canton('gr')
+
     session.add(
         ProporzElection(
             title='election',
@@ -71,6 +77,7 @@ def test_import_party_results(session):
     # minimal
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -82,10 +89,10 @@ def test_import_party_results(session):
                     'mandates',
                     'votes',
                 )),
-                '2015,10000,1,P1,#123456,1,5000',
-                '2011,10000,1,P1,#123456,0,3000',
+                '2015,10000,1,P1,,1,5000',
+                '2011,10000,1,P1,,0,3000',
                 '2015,10000,2,P2,#aabbcc,0,5000',
-                '2011,10000,2,P2,#aabbcc,1,7000',
+                '2011,10000,2,P2,#aabbdd,1,7000',
             ))
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
@@ -94,20 +101,24 @@ def test_import_party_results(session):
     assert not errors
     assert sorted([
         (
-            r.year, r.party_id, r.name_translations, r.color, r.votes,
+            r.year, r.party_id, r.name_translations, r.votes,
             r.total_votes, r.number_of_mandates
         )
         for r in election.party_results
     ]) == [
-        (2011, '1', {'de_CH': 'P1'}, '#123456', 3000, 10000, 0),
-        (2011, '2', {'de_CH': 'P2'}, '#aabbcc', 7000, 10000, 1),
-        (2015, '1', {'de_CH': 'P1'}, '#123456', 5000, 10000, 1),
-        (2015, '2', {'de_CH': 'P2'}, '#aabbcc', 5000, 10000, 0)
+        (2011, '1', {'de_CH': 'P1'}, 3000, 10000, 0),
+        (2011, '2', {'de_CH': 'P2'}, 7000, 10000, 1),
+        (2015, '1', {'de_CH': 'P1'}, 5000, 10000, 1),
+        (2015, '2', {'de_CH': 'P2'}, 5000, 10000, 0)
     ]
+    assert election.colors == {
+        'P2': '#aabbdd',
+    }
 
     # with panachage results
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -125,7 +136,7 @@ def test_import_party_results(session):
                 '2015,10000,1,P1,#123456,1,5000,10,11,12',
                 '2011,10000,1,P1,#123456,0,3000,13,14,15',
                 '2015,10000,2,P2,#aabbcc,0,5000,20,21,22',
-                '2011,10000,2,P2,#aabbcc,1,7000,23,24,25',
+                '2011,10000,2,P2,#aabbee,1,7000,23,24,25',
             ))
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
@@ -134,17 +145,20 @@ def test_import_party_results(session):
     assert not errors
     assert sorted([
         (
-            r.year, r.party_id, r.name_translations, r.color, r.votes,
+            r.year, r.party_id, r.name_translations, r.votes,
             r.total_votes, r.number_of_mandates
         )
         for r in election.party_results
     ]) == [
-        (2011, '1', {'de_CH': 'P1'}, '#123456', 3000, 10000, 0),
-        (2011, '2', {'de_CH': 'P2'}, '#aabbcc', 7000, 10000, 1),
-        (2015, '1', {'de_CH': 'P1'}, '#123456', 5000, 10000, 1),
-        (2015, '2', {'de_CH': 'P2'}, '#aabbcc', 5000, 10000, 0)
+        (2011, '1', {'de_CH': 'P1'}, 3000, 10000, 0),
+        (2011, '2', {'de_CH': 'P2'}, 7000, 10000, 1),
+        (2015, '1', {'de_CH': 'P1'}, 5000, 10000, 1),
+        (2015, '2', {'de_CH': 'P2'}, 5000, 10000, 0)
     ]
-
+    assert election.colors == {
+        'P1': '#123456',
+        'P2': '#aabbee',
+    }
     results = sorted([
         (r.target, r.source, r.votes) for r in election.panachage_results
     ])
@@ -158,6 +172,7 @@ def test_import_party_results(session):
     # with voters count
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -183,33 +198,38 @@ def test_import_party_results(session):
     assert not errors
     assert sorted([
         (
-            r.year, r.party_id, r.name_translations, r.color, r.votes,
+            r.year, r.party_id, r.name_translations, r.votes,
             r.voters_count, r.voters_count_percentage,
             r.total_votes, r.number_of_mandates
         )
         for r in election.party_results
     ]) == [
         (
-            2011, '1', {'de_CH': 'P1'}, '#123456', 3000, Decimal('3000.00'),
+            2011, '1', {'de_CH': 'P1'}, 3000, Decimal('3000.00'),
             Decimal('37.50'), 10000, 0
         ),
         (
-            2011, '2', {'de_CH': 'P2'}, '#aabbcc', 7000, Decimal('1000.01'),
+            2011, '2', {'de_CH': 'P2'}, 7000, Decimal('1000.01'),
             Decimal('12.50'), 10000, 1
         ),
         (
-            2015, '1', {'de_CH': 'P1'}, '#123456', 5000, Decimal('4000.00'),
+            2015, '1', {'de_CH': 'P1'}, 5000, Decimal('4000.00'),
             Decimal('50.00'), 10000, 1
         ),
         (
-            2015, '2', {'de_CH': 'P2'}, '#aabbcc', 5000, Decimal('2000.00'),
+            2015, '2', {'de_CH': 'P2'}, 5000, Decimal('2000.00'),
             Decimal('25.00'), 10000, 0
         )
     ]
+    assert election.colors == {
+        'P1': '#123456',
+        'P2': '#aabbcc',
+    }
 
     # with name translations
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -225,15 +245,16 @@ def test_import_party_results(session):
                     'name_it_ch',
                     'name_rm_ch',
                 )),
-                '2022,1,1,,1,0,Die Mitte,Die Mitte,Le Centre,'
+                '2022,1,1,#111111,1,0,Die Mitte,Die Mitte,Le Centre,'
                 'Alleanza del Centro,Allianza dal Center',
-                '2015,1,1,,0,0,CVP,CVP,PDC,PPD,PCD',
+                '2015,1,1,#222222,0,0,CVP,CVP,PDC,PPD,PCD',
                 '2022,1,2,,0,0,,SP,PS,PS,',
                 '2015,1,2,,1,0,SP,,,,',
             ))
         ).encode('utf-8')), 'text/plain',
         ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
     )
+
     assert not errors
     assert sorted([
         (r.year, r.party_id, r.name_translations)
@@ -245,9 +266,21 @@ def test_import_party_results(session):
                      'it_CH': 'Alleanza del Centro'}),
         (2022, '2', {'de_CH': 'SP', 'fr_CH': 'PS', 'it_CH': 'PS'})
     ]
+    assert election.colors == {
+        'P1': '#123456',
+        'P2': '#aabbcc',
+        'Die Mitte': '#111111',
+        'Le Centre': '#111111',
+        'Alleanza del Centro': '#111111',
+        'CVP': '#222222',
+        'PDC': '#222222',
+        'PPD': '#222222',
+    }
 
 
 def test_import_party_results_missing_headers(session):
+    principal = Canton('gr')
+
     session.add(
         ProporzElection(
             title='election',
@@ -261,6 +294,7 @@ def test_import_party_results_missing_headers(session):
 
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -282,6 +316,8 @@ def test_import_party_results_missing_headers(session):
 
 
 def test_import_party_results_invalid_values(session):
+    principal = Canton('gr')
+
     session.add(
         ProporzElection(
             title='election',
@@ -295,6 +331,7 @@ def test_import_party_results_invalid_values(session):
 
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -383,8 +420,8 @@ def test_import_party_results_invalid_values(session):
         (2, 'Invalid integer: year'),
         (2, 'Not an alphanumeric: id'),
         (3, 'Invalid values'),
-        (4, 'Invalid values'),
-        (6, '1/2015 was found twice'),
+        (4, 'Invalid color: color'),
+        (6, 'canton//2015/1 was found twice'),
         (7, 'Invalid decimal number: voters_count'),
         (7, 'Invalid integer: panachage_votes_from_1')
     ]
@@ -392,6 +429,7 @@ def test_import_party_results_invalid_values(session):
     # IDs don't match the IDs in the panache results
     errors = import_party_results(
         election,
+        principal,
         BytesIO((
             '\n'.join((
                 ','.join((
@@ -418,3 +456,117 @@ def test_import_party_results_invalid_values(session):
     assert errors[0].error.interpolate() == (
         'Panachage results ids and id not consistent'
     )
+
+
+def test_import_party_results_domains(session):
+    principal = Canton('bl')
+
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='region',
+            domain_segment='Allschwil',
+            date=date(2022, 11, 21),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+
+    session.add(
+        ElectionCompound(
+            title='elections',
+            domain='canton',
+            date=date(2022, 11, 21)
+        )
+    )
+    session.flush()
+    compound = session.query(ElectionCompound).one()
+    compound.elections = [election]
+
+    # Election
+    for domain, segment, result, parties, panachage in (
+        ('', '', set(), {'region': 'Allschwil'}, 4),
+        ('region', '', set(), {'region': 'Allschwil'}, 4),
+        ('region', 'Allschwil', set(), {'region': 'Allschwil'}, 4),
+        ('region', 'ABC', {'No party results for year 2022'}, {}, 0),
+        ('district', '', {'No party results for year 2022'}, {}, 0),
+        ('district', 'Allschwil', {'No party results for year 2022'}, {}, 0),
+        ('district', 'ABC', {'No party results for year 2022'}, {}, 0),
+    ):
+        election.party_results.delete()
+        election.panachage_results.delete()
+        errors = import_party_results(
+            election,
+            principal,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'domain',
+                        'domain_segment',
+                        'year',
+                        'total_votes',
+                        'id',
+                        'name',
+                        'color',
+                        'mandates',
+                        'votes',
+                        'panachage_votes_from_1',
+                        'panachage_votes_from_2',
+                        'panachage_votes_from_999'
+                    )),
+                    f'{domain},{segment},2022,1000,1,P1,,1,5000,1,2,3',
+                    f'{domain},{segment},2022,1000,2,P2,#aabbcc,0,5000,4,5,6',
+                ))
+            ).encode('utf-8')), 'text/plain',
+            ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
+        )
+        assert result == {e.error.interpolate() for e in errors or []}
+        assert parties == {
+            pr.domain: pr.domain_segment for pr in election.party_results
+        }
+        assert election.panachage_results.count() == panachage
+
+    # Compound
+    for domain, segment, result, parties, panachage in (
+        ('', '', set(), {'canton': None}, 4),
+        ('canton', '', set(), {'canton': None}, 4),
+        ('canton', 'ABC', set(), {'canton': None}, 4),
+        ('region', '', {'No party results for year 2022'}, {}, 0),
+        ('region', 'ABC', {'No party results for year 2022'}, {}, 0),
+        ('superregion', 'Region 1', set(), {'superregion': 'Region 1'}, 0),
+        ('superregion', '', {'Invalid domain_segment: None'}, {}, 0),
+        ('superregion', 'ABC', {'Invalid domain_segment: ABC'}, {}, 0),
+    ):
+        compound.party_results.delete()
+        compound.panachage_results.delete()
+        errors = import_party_results(
+            compound,
+            principal,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'domain',
+                        'domain_segment',
+                        'year',
+                        'total_votes',
+                        'id',
+                        'name',
+                        'color',
+                        'mandates',
+                        'votes',
+                        'panachage_votes_from_1',
+                        'panachage_votes_from_2',
+                        'panachage_votes_from_999'
+                    )),
+                    f'{domain},{segment},2022,1000,1,P1,,1,5000,1,2,3',
+                    f'{domain},{segment},2022,1000,2,P2,#aabbcc,0,5000,4,5,6',
+                ))
+            ).encode('utf-8')), 'text/plain',
+            ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
+        )
+        assert result == {e.error.interpolate() for e in errors or []}
+        assert parties == {
+            pr.domain: pr.domain_segment for pr in compound.party_results
+        }
+        assert compound.panachage_results.count() == panachage

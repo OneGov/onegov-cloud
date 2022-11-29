@@ -14,6 +14,7 @@ from onegov.election_day.utils.election import get_lists_panachage_data
 from onegov.election_day.utils.election_compound import get_list_groups_data
 from onegov.election_day.utils.parties import get_parties_panachage_data
 from onegov.election_day.utils.parties import get_party_results_data
+from onegov.election_day.utils.parties import get_party_results_vertical_data
 from onegov.election_day.utils.vote import get_ballot_data_by_district
 from onegov.election_day.utils.vote import get_ballot_data_by_entity
 from requests import post
@@ -164,7 +165,7 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, (Election, ElectionCompound)):
-            data = get_party_results_data(item)
+            data = get_party_results_vertical_data(item)
             if data and data.get('results'):
                 chart = self.get_chart(
                     'grouped', fmt, data, params={'showBack': False}
@@ -177,9 +178,12 @@ class D3Renderer():
         if isinstance(item, (Election, ElectionCompound)):
             data = get_party_results_data(item)
             if data and data.get('results'):
-                chart = self.get_chart(
-                    'grouped', fmt, data, params={'showBack': False}
-                )
+                if item.horizontal_party_strengths:
+                    chart = self.get_chart('bar', fmt, data)
+                else:
+                    chart = self.get_chart(
+                        'grouped', fmt, data, params={'showBack': False}
+                    )
         return (chart, data) if return_data else chart
 
     def get_lists_panachage_chart(self, item, fmt, return_data=False):

@@ -208,13 +208,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     election_compound.completes_manually = True
     election_compound.manually_completed = False
     assert get_list_groups(election_compound) == [
-        ('CVP', 931, 22, '#EE7F00'),
-        ('SVP', 899, 19, '#019040'),
-        ('FDP', 863, 18, '#0E52A0'),
-        ('AL', 538, 10, '#99C040'),
-        ('SP', 418, 7, '#E53136'),
-        ('GLP', 236, 4, '#acc700'),
-        ('Piraten', 19, 0, '#F9B200')
+        ('CVP', 931, 22),
+        ('SVP', 899, 19),
+        ('FDP', 863, 18),
+        ('AL', 538, 10),
+        ('SP', 418, 7),
+        ('GLP', 236, 4),
+        ('Piraten', 19, 0)
     ]
     assert get_list_groups_data(election_compound) == {
         'results': [
@@ -273,13 +273,13 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     # Pukelsheim, final
     election_compound.manually_completed = True
     assert get_list_groups(election_compound) == [
-        ('CVP', 931, 22, '#EE7F00'),
-        ('SVP', 899, 19, '#019040'),
-        ('FDP', 863, 18, '#0E52A0'),
-        ('AL', 538, 10, '#99C040'),
-        ('SP', 418, 7, '#E53136'),
-        ('GLP', 236, 4, '#acc700'),
-        ('Piraten', 19, 0, '#F9B200')
+        ('CVP', 931, 22),
+        ('SVP', 899, 19),
+        ('FDP', 863, 18),
+        ('AL', 538, 10),
+        ('SP', 418, 7),
+        ('GLP', 236, 4),
+        ('Piraten', 19, 0)
     ]
     assert get_list_groups_data(election_compound) == {
         'results': [
@@ -338,80 +338,91 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     # Party results
     data = get_parties_panachage_data(election_compound)
     assert data['title'] == 'Compound'
-    l = data['links']
-    assert {'color': '#EE7F00', 'source': 2, 'target': 9, 'value': 1797} in l
-    assert {'color': '#0E52A0', 'source': 3, 'target': 9, 'value': 876} in l
-    assert {'color': '#acc700', 'source': 4, 'target': 9, 'value': 1336} in l
-    assert {'color': '#F9B200', 'source': 5, 'target': 9, 'value': 274} in l
-    assert {'color': '#E53136', 'source': 6, 'target': 9, 'value': 2450} in l
-    assert {'color': '#019040', 'source': 7, 'target': 9, 'value': 414} in l
-    assert {'color': '#999', 'source': 0, 'target': 9, 'value': 5981} in l
-    assert {'color': '#99C040', 'source': 1, 'target': 10, 'value': 1271} in l
-    assert {'color': '#0E52A0', 'source': 3, 'target': 10, 'value': 4281} in l
-    assert {'color': '#acc700', 'source': 4, 'target': 10, 'value': 1128} in l
-    assert {'color': '#F9B200', 'source': 5, 'target': 10, 'value': 93} in l
-    assert {'color': '#E53136', 'source': 6, 'target': 10, 'value': 1342} in l
-    assert {'color': '#019040', 'source': 7, 'target': 10, 'value': 3467} in l
-    assert {'color': '#999', 'source': 0, 'target': 10, 'value': 11593} in l
-    assert {'color': '#99C040', 'source': 1, 'target': 11, 'value': 531} in l
-    assert {'color': '#EE7F00', 'source': 2, 'target': 11, 'value': 3339} in l
-    assert {'color': '#acc700', 'source': 4, 'target': 11, 'value': 817} in l
-    assert {'color': '#F9B200', 'source': 5, 'target': 11, 'value': 129} in l
-    assert {'color': '#E53136', 'source': 6, 'target': 11, 'value': 678} in l
-    assert {'color': '#019040', 'source': 7, 'target': 11, 'value': 2979} in l
-    assert {'color': '#999', 'source': 0, 'target': 11, 'value': 8289} in l
-    assert {'color': '#99C040', 'source': 1, 'target': 12, 'value': 570} in l
-    assert {'color': '#EE7F00', 'source': 2, 'target': 12, 'value': 721} in l
-    assert {'color': '#0E52A0', 'source': 3, 'target': 12, 'value': 667} in l
-    assert {'color': '#F9B200', 'source': 5, 'target': 12, 'value': 84} in l
-    assert {'color': '#E53136', 'source': 6, 'target': 12, 'value': 573} in l
-    assert {'color': '#019040', 'source': 7, 'target': 12, 'value': 249} in l
-    assert {'color': '#999', 'source': 0, 'target': 12, 'value': 2739} in l
-    assert {'color': '#99C040', 'source': 1, 'target': 13, 'value': 58} in l
-    assert {'color': '#EE7F00', 'source': 2, 'target': 13, 'value': 32} in l
-    assert {'color': '#0E52A0', 'source': 3, 'target': 13, 'value': 21} in l
-    assert {'color': '#acc700', 'source': 4, 'target': 13, 'value': 60} in l
-    assert {'color': '#E53136', 'source': 6, 'target': 13, 'value': 50} in l
-    assert {'color': '#019040', 'source': 7, 'target': 13, 'value': 25} in l
-    assert {'color': '#999', 'source': 0, 'target': 13, 'value': 227} in l
-    assert {'color': '#99C040', 'source': 1, 'target': 14, 'value': 1789} in l
-    assert {'color': '#EE7F00', 'source': 2, 'target': 14, 'value': 1299} in l
-    assert {'color': '#0E52A0', 'source': 3, 'target': 14, 'value': 581} in l
-    assert {'color': '#acc700', 'source': 4, 'target': 14, 'value': 840} in l
-    assert {'color': '#F9B200', 'source': 5, 'target': 14, 'value': 112} in l
-    assert {'color': '#019040', 'source': 7, 'target': 14, 'value': 342} in l
-    assert {'color': '#999', 'source': 0, 'target': 14, 'value': 4623} in l
-    assert {'color': '#99C040', 'source': 1, 'target': 15, 'value': 160} in l
-    assert {'color': '#EE7F00', 'source': 2, 'target': 15, 'value': 1724} in l
-    assert {'color': '#0E52A0', 'source': 3, 'target': 15, 'value': 1990} in l
-    assert {'color': '#acc700', 'source': 4, 'target': 15, 'value': 256} in l
-    assert {'color': '#F9B200', 'source': 5, 'target': 15, 'value': 101} in l
-    assert {'color': '#E53136', 'source': 6, 'target': 15, 'value': 196} in l
-    assert {'color': '#999', 'source': 0, 'target': 15, 'value': 7035} in l
-    assert {'color': '#0E52A0', 'source': 3, 'target': 11, 'value': 52266} in l
-    assert {'color': '#E53136', 'source': 6, 'target': 14, 'value': 23873} in l
-    assert {'color': '#019040', 'source': 7, 'target': 15, 'value': 60468} in l
-    assert {'color': '#F9B200', 'source': 5, 'target': 13, 'value': 1014} in l
-    assert {'color': '#99C040', 'source': 1, 'target': 9, 'value': 29934} in l
-    assert {'color': '#EE7F00', 'source': 2, 'target': 10, 'value': 51273} in l
-    assert {'color': '#acc700', 'source': 4, 'target': 12, 'value': 13261} in l
-    n = data['nodes']
-    assert {'color': '#999', 'id': 1, 'name': '-'} in n
-    assert {'color': '#99C040', 'id': 2, 'name': 'AL'} in n
-    assert {'color': '#EE7F00', 'id': 3, 'name': 'CVP'} in n
-    assert {'color': '#0E52A0', 'id': 4, 'name': 'FDP'} in n
-    assert {'color': '#acc700', 'id': 5, 'name': 'GLP'} in n
-    assert {'color': '#F9B200', 'id': 6, 'name': 'Piraten'} in n
-    assert {'color': '#E53136', 'id': 7, 'name': 'SP'} in n
-    assert {'color': '#019040', 'id': 8, 'name': 'SVP'} in n
-    assert {'color': '#999', 'id': 9, 'name': '-'} in n
-    assert {'color': '#99C040', 'id': 10, 'name': 'AL'} in n
-    assert {'color': '#EE7F00', 'id': 11, 'name': 'CVP'} in n
-    assert {'color': '#0E52A0', 'id': 12, 'name': 'FDP'} in n
-    assert {'color': '#acc700', 'id': 13, 'name': 'GLP'} in n
-    assert {'color': '#F9B200', 'id': 14, 'name': 'Piraten'} in n
-    assert {'color': '#E53136', 'id': 15, 'name': 'SP'} in n
-    assert {'color': '#019040', 'id': 16, 'name': 'SVP'} in n
+
+    def assert_link(active, color, source, target, value):
+        assert {
+            'active': active, 'color': color,
+            'source': source, 'target': target, 'value': value
+        } in data['links']
+
+    assert_link(True, '#EE7F00', 2, 9, 1797)
+    assert_link(True, '#0E52A0', 3, 9, 876)
+    assert_link(True, '#acc700', 4, 9, 1336)
+    assert_link(False, '#F9B200', 5, 9, 274)
+    assert_link(True, '#E53136', 6, 9, 2450)
+    assert_link(True, '#019040', 7, 9, 414)
+    assert_link(False, None, 0, 9, 5981)
+    assert_link(True, '#99C040', 1, 10, 1271)
+    assert_link(True, '#0E52A0', 3, 10, 4281)
+    assert_link(True, '#acc700', 4, 10, 1128)
+    assert_link(False, '#F9B200', 5, 10, 93)
+    assert_link(True, '#E53136', 6, 10, 1342)
+    assert_link(True, '#019040', 7, 10, 3467)
+    assert_link(False, None, 0, 10, 11593)
+    assert_link(True, '#99C040', 1, 11, 531)
+    assert_link(True, '#EE7F00', 2, 11, 3339)
+    assert_link(True, '#acc700', 4, 11, 817)
+    assert_link(False, '#F9B200', 5, 11, 129)
+    assert_link(True, '#E53136', 6, 11, 678)
+    assert_link(True, '#019040', 7, 11, 2979)
+    assert_link(False, None, 0, 11, 8289)
+    assert_link(True, '#99C040', 1, 12, 570)
+    assert_link(True, '#EE7F00', 2, 12, 721)
+    assert_link(True, '#0E52A0', 3, 12, 667)
+    assert_link(False, '#F9B200', 5, 12, 84)
+    assert_link(True, '#E53136', 6, 12, 573)
+    assert_link(True, '#019040', 7, 12, 249)
+    assert_link(False, None, 0, 12, 2739)
+    assert_link(True, '#99C040', 1, 13, 58)
+    assert_link(True, '#EE7F00', 2, 13, 32)
+    assert_link(True, '#0E52A0', 3, 13, 21)
+    assert_link(True, '#acc700', 4, 13, 60)
+    assert_link(True, '#E53136', 6, 13, 50)
+    assert_link(True, '#019040', 7, 13, 25)
+    assert_link(False, None, 0, 13, 227)
+    assert_link(True, '#99C040', 1, 14, 1789)
+    assert_link(True, '#EE7F00', 2, 14, 1299)
+    assert_link(True, '#0E52A0', 3, 14, 581)
+    assert_link(True, '#acc700', 4, 14, 840)
+    assert_link(False, '#F9B200', 5, 14, 112)
+    assert_link(True, '#019040', 7, 14, 342)
+    assert_link(False, None, 0, 14, 4623)
+    assert_link(True, '#99C040', 1, 15, 160)
+    assert_link(True, '#EE7F00', 2, 15, 1724)
+    assert_link(True, '#0E52A0', 3, 15, 1990)
+    assert_link(True, '#acc700', 4, 15, 256)
+    assert_link(False, '#F9B200', 5, 15, 101)
+    assert_link(True, '#E53136', 6, 15, 196)
+    assert_link(False, None, 0, 15, 7035)
+    assert_link(True, '#0E52A0', 3, 11, 52266)
+    assert_link(True, '#E53136', 6, 14, 23873)
+    assert_link(True, '#019040', 7, 15, 60468)
+    assert_link(False, '#F9B200', 5, 13, 1014)
+    assert_link(True, '#99C040', 1, 9, 29934)
+    assert_link(True, '#EE7F00', 2, 10, 51273)
+    assert_link(True, '#acc700', 4, 12, 13261)
+
+    def assert_node(active, color, id_, name):
+        assert {
+            'active': active, 'color': color, 'id': id_, 'name': name
+        } in data['nodes']
+
+    assert_node(False, None, 1, '-')
+    assert_node(True, '#99C040', 2, 'AL')
+    assert_node(True, '#EE7F00', 3, 'CVP')
+    assert_node(True, '#0E52A0', 4, 'FDP')
+    assert_node(True, '#acc700', 5, 'GLP')
+    assert_node(False, '#F9B200', 6, 'Piraten')
+    assert_node(True, '#E53136', 7, 'SP')
+    assert_node(True, '#019040', 8, 'SVP')
+    assert_node(False, None, 9, '-')
+    assert_node(True, '#99C040', 10, 'AL')
+    assert_node(True, '#EE7F00', 11, 'CVP')
+    assert_node(True, '#0E52A0', 12, 'FDP')
+    assert_node(True, '#acc700', 13, 'GLP')
+    assert_node(False, '#F9B200', 14, 'Piraten')
+    assert_node(True, '#E53136', 15, 'SP')
+    assert_node(True, '#019040', 16, 'SVP')
 
     years, parties = get_party_results(election_compound)
     assert years == ['2014']
@@ -554,7 +565,63 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         'title': 'Compound'
     }
 
+    election_compound.horizontal_party_strengths = True
+    assert get_party_results_data(election_compound) == {
+        'results': [
+            {
+                'class': 'active',
+                'color': '#EE7F00',
+                'text': 'CVP 2014',
+                'value': 931,
+                'value2': 22
+            },
+            {
+                'class': 'active',
+                'color': '#019040',
+                'text': 'SVP 2014',
+                'value': 899,
+                'value2': 19
+            },
+            {
+                'class': 'active',
+                'color': '#0E52A0',
+                'text': 'FDP 2014',
+                'value': 863,
+                'value2': 18
+            },
+            {
+                'class': 'active',
+                'color': '#99C040',
+                'text': 'AL 2014',
+                'value': 538,
+                'value2': 10
+            },
+            {
+                'class': 'active',
+                'color': '#E53136',
+                'text': 'SP 2014',
+                'value': 418,
+                'value2': 7
+            },
+            {
+                'class': 'active',
+                'color': '#acc700',
+                'text': 'GLP 2014',
+                'value': 236,
+                'value2': 4
+            },
+            {
+                'class': 'inactive',
+                'color': '#F9B200',
+                'text': 'Piraten 2014',
+                'value': 19,
+                'value2': 0
+            }
+        ]
+    }
+
     # ... with exact voters counts
+    election_compound.horizontal_party_strengths = False
     election_compound.exact_voters_counts = True
 
     groups = get_list_groups(election_compound)
@@ -573,6 +640,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert data['results'][0]['value']['back'] == 13.78
 
     # ... with votes
+    election_compound.horizontal_party_strengths = False
     election_compound.voters_counts = False
 
     groups = get_list_groups(election_compound)
@@ -589,6 +657,10 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 
     data = get_party_results_data(election_compound)
     assert data['results'][0]['value']['back'] == 13.8
+
+    election_compound.horizontal_party_strengths = True
+    data = get_party_results_data(election_compound)
+    assert data['results'][0]['value'] == 74448
 
 
 def test_election_utils_candidate_statistics(

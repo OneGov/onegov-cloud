@@ -84,7 +84,7 @@ def test_election_utils_majorz(import_test_datasets, session):
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'Thöni Stefan',
             'value': 1709
         }
@@ -384,7 +384,7 @@ def test_election_utils_proporz(import_test_datasets, session):
         },
         {
             'class': 'active',
-            'color': '#999',
+            'color': None,
             'text': 'Pezzatti Bruno',
             'value': 10174
         }
@@ -459,19 +459,19 @@ def test_election_utils_proporz(import_test_datasets, session):
         'results': [
             {
                 'class': 'active',
-                'color': '#999',
+                'color': None,
                 'text': 'Pezzatti Bruno',
                 'value': 10174
             },
             {
                 'class': 'inactive',
-                'color': '#999',
+                'color': None,
                 'text': 'Ingold Gabriela',
                 'value': 3637
             },
             {
                 'class': 'inactive',
-                'color': '#999',
+                'color': None,
                 'text': 'Mollet Patrick',
                 'value': 2190
             },
@@ -539,105 +539,105 @@ def test_election_utils_proporz(import_test_datasets, session):
         },
         {
             'class': 'active',
-            'color': '#999',
+            'color': None,
             'text': 'FDP Ost',
             'value': 16285,
             'value2': 1
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP',
             'value': 8868,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'CVP Junge',
             'value': 6521,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'ALG',
             'value': 5844,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SVP WuG',
             'value': 4436,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'FDP West',
             'value': 4299,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'glp',
             'value': 4178,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Männer',
             'value': 3314,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Frauen',
             'value': 2186,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'ALG Bildung',
             'value': 1701,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Juso',
             'value': 1333,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'Piraten',
             'value': 1128,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'ALG Junge',
             'value': 807,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SVP Int.',
             'value': 575,
             'value2': 0
         },
         {
             'class': 'inactive',
-            'color': '#999',
+            'color': None,
             'text': 'SP Migrant.',
             'value': 347,
             'value2': 0
@@ -927,68 +927,167 @@ def test_election_utils_parties(import_test_datasets, session):
         ],
         'title': 'proporz_internal_nationalratswahlen-2015'
     }
+    election.horizontal_party_strengths = True
+    assert get_party_results_data(election) == {
+        'results': [
+            {
+                'class': 'active',
+                'color': '#3f841a',
+                'text': 'SVP 2015',
+                'value': 35543,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#3f841a',
+                'text': '2011',
+                'value': 33116,
+                'value2': 1
+            },
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'text': 'CVP 2015',
+                'value': 30856,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#ff6300',
+                'text': '2011',
+                'value': 28413,
+                'value2': 1
+            },
+            {
+                'class': 'active',
+                'color': '#4068c8',
+                'text': 'FDP 2015',
+                'value': 20584,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#4068c8',
+                'text': '2011',
+                'value': 22494,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#db3c27',
+                'text': 'SP 2015',
+                'value': 16048,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#db3c27',
+                'text': '2011',
+                'value': 6167,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#a74c97',
+                'text': 'AL 2015',
+                'value': 8352,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#a74c97',
+                'text': '2011',
+                'value': 17972,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#aeca00',
+                'text': 'GLP 2015',
+                'value': 4178,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#aeca00',
+                'text': '2011',
+                'value': 7943,
+                'value2': 0
+            }
+        ]
+    }
 
     data = get_parties_panachage_data(election)
     assert data['title'] == 'proporz_internal_nationalratswahlen-2015'
-    l = data['links']
-    assert {'color': '#ff6300', 'source': 2, 'target': 8, 'value': 20} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 8, 'value': 30} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 8, 'value': 40} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 8, 'value': 50} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 8, 'value': 60} in l
-    assert {'color': '#999', 'source': 0, 'target': 8, 'value': 70} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 9, 'value': 10} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 9, 'value': 31} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 9, 'value': 41} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 9, 'value': 51} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 9, 'value': 61} in l
-    assert {'color': '#999', 'source': 0, 'target': 9, 'value': 71} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 10, 'value': 11} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 10, 'value': 21} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 10, 'value': 42} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 10, 'value': 52} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 10, 'value': 62} in l
-    assert {'color': '#999', 'source': 0, 'target': 10, 'value': 72} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 11, 'value': 12} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 11, 'value': 22} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 11, 'value': 32} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 11, 'value': 53} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 11, 'value': 63} in l
-    assert {'color': '#999', 'source': 0, 'target': 11, 'value': 73} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 12, 'value': 13} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 12, 'value': 23} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 12, 'value': 33} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 12, 'value': 43} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 12, 'value': 64} in l
-    assert {'color': '#999', 'source': 0, 'target': 12, 'value': 74} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 13, 'value': 14} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 13, 'value': 24} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 13, 'value': 34} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 13, 'value': 44} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 13, 'value': 54} in l
-    assert {'color': '#999', 'source': 0, 'target': 13, 'value': 75} in l
-    assert {'color': '#3f841a', 'source': 6, 'target': 13, 'value': 35298} in l
-    assert {'color': '#ff6300', 'source': 2, 'target': 9, 'value': 30591} in l
-    assert {'color': '#a74c97', 'source': 1, 'target': 8, 'value': 8082} in l
-    assert {'color': '#aeca00', 'source': 4, 'target': 11, 'value': 3923} in l
-    assert {'color': '#db3c27', 'source': 5, 'target': 12, 'value': 15798} in l
-    assert {'color': '#4068c8', 'source': 3, 'target': 10, 'value': 20324} in l
 
-    n = data['nodes']
-    assert {'color': '#999', 'id': 1, 'name': '-'} in n
-    assert {'color': '#a74c97', 'id': 2, 'name': 'AL'} in n
-    assert {'color': '#ff6300', 'id': 3, 'name': 'CVP'} in n
-    assert {'color': '#4068c8', 'id': 4, 'name': 'FDP'} in n
-    assert {'color': '#aeca00', 'id': 5, 'name': 'GLP'} in n
-    assert {'color': '#db3c27', 'id': 6, 'name': 'SP'} in n
-    assert {'color': '#3f841a', 'id': 7, 'name': 'SVP'} in n
-    assert {'color': '#999', 'id': 8, 'name': '-'} in n
-    assert {'color': '#a74c97', 'id': 9, 'name': 'AL'} in n
-    assert {'color': '#ff6300', 'id': 10, 'name': 'CVP'} in n
-    assert {'color': '#4068c8', 'id': 11, 'name': 'FDP'} in n
-    assert {'color': '#aeca00', 'id': 12, 'name': 'GLP'} in n
-    assert {'color': '#db3c27', 'id': 13, 'name': 'SP'} in n
-    assert {'color': '#3f841a', 'id': 14, 'name': 'SVP'} in n
+    def assert_link(active, color, source, target, value):
+        assert {
+            'active': active, 'color': color,
+            'source': source, 'target': target, 'value': value
+        } in data['links']
+
+    assert_link(True, '#ff6300', 2, 8, 20)
+    assert_link(True, '#4068c8', 3, 8, 30)
+    assert_link(False, '#aeca00', 4, 8, 40)
+    assert_link(False, '#db3c27', 5, 8, 50)
+    assert_link(True, '#3f841a', 6, 8, 60)
+    assert_link(False, None, 0, 8, 70)
+    assert_link(False, '#a74c97', 1, 9, 10)
+    assert_link(True, '#4068c8', 3, 9, 31)
+    assert_link(False, '#aeca00', 4, 9, 41)
+    assert_link(False, '#db3c27', 5, 9, 51)
+    assert_link(True, '#3f841a', 6, 9, 61)
+    assert_link(False, None, 0, 9, 71)
+    assert_link(False, '#a74c97', 1, 10, 11)
+    assert_link(True, '#ff6300', 2, 10, 21)
+    assert_link(False, '#aeca00', 4, 10, 42)
+    assert_link(False, '#db3c27', 5, 10, 52)
+    assert_link(True, '#3f841a', 6, 10, 62)
+    assert_link(False, None, 0, 10, 72)
+    assert_link(False, '#a74c97', 1, 11, 12)
+    assert_link(True, '#ff6300', 2, 11, 22)
+    assert_link(True, '#4068c8', 3, 11, 32)
+    assert_link(False, '#db3c27', 5, 11, 53)
+    assert_link(True, '#3f841a', 6, 11, 63)
+    assert_link(False, None, 0, 11, 73)
+    assert_link(False, '#a74c97', 1, 12, 13)
+    assert_link(True, '#ff6300', 2, 12, 23)
+    assert_link(True, '#4068c8', 3, 12, 33)
+    assert_link(False, '#aeca00', 4, 12, 43)
+    assert_link(True, '#3f841a', 6, 12, 64)
+    assert_link(False, None, 0, 12, 74)
+    assert_link(False, '#a74c97', 1, 13, 14)
+    assert_link(True, '#ff6300', 2, 13, 24)
+    assert_link(True, '#4068c8', 3, 13, 34)
+    assert_link(False, '#aeca00', 4, 13, 44)
+    assert_link(False, '#db3c27', 5, 13, 54)
+    assert_link(False, None, 0, 13, 75)
+    assert_link(True, '#3f841a', 6, 13, 35298)
+    assert_link(True, '#ff6300', 2, 9, 30591)
+    assert_link(False, '#a74c97', 1, 8, 8082)
+    assert_link(False, '#aeca00', 4, 11, 3923)
+    assert_link(False, '#db3c27', 5, 12, 15798)
+    assert_link(True, '#4068c8', 3, 10, 20324)
+
+    def assert_node(active, color, id_, name):
+        assert {
+            'active': active, 'color': color, 'id': id_, 'name': name
+        } in data['nodes']
+
+    assert_node(False, None, 1, '-')
+    assert_node(False, '#a74c97', 2, 'AL')
+    assert_node(True, '#ff6300', 3, 'CVP')
+    assert_node(True, '#4068c8', 4, 'FDP')
+    assert_node(False, '#aeca00', 5, 'GLP')
+    assert_node(False, '#db3c27', 6, 'SP')
+    assert_node(True, '#3f841a', 7, 'SVP')
+    assert_node(False, None, 8, '-')
+    assert_node(False, '#a74c97', 9, 'AL')
+    assert_node(True, '#ff6300', 10, 'CVP')
+    assert_node(True, '#4068c8', 11, 'FDP')
+    assert_node(False, '#aeca00', 12, 'GLP')
+    assert_node(False, '#db3c27', 13, 'SP')
+    assert_node(True, '#3f841a', 14, 'SVP')
 
 
 def test_get_connection_results_internal(import_test_datasets, session):

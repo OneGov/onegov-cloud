@@ -24,4 +24,5 @@ LINK: <Ticket-Number>
     - [ ] I considered using browser tests für javascript changes/features
     - [ ] I have added/updated jest tests for d3rendering (election_day, swissvotes)
 - [ ] I have updated the PO files
+- [ ] I have updated the election_day API docs
 - [ ] I have added new modules to the docs

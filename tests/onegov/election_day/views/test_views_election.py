@@ -341,20 +341,26 @@ def test_view_election_party_strengths(election_day_app_gr):
     export = client.get('/election/proporz-election/data-parties-csv').text
     lines = [l for l in export.split('\r\n') if l]
     assert lines == [
-        'year,id,name,name_de_CH,name_fr_CH,name_it_CH,name_rm_CH,'
+        'domain,domain_segment,year,id,'
+        'name,name_de_CH,name_fr_CH,name_it_CH,name_rm_CH,'
         'total_votes,color,mandates,votes,'
         'voters_count,voters_count_percentage,panachage_votes_from_1,'
         'panachage_votes_from_2,panachage_votes_from_3,'
         'panachage_votes_from_999',
-        '2022,1,BDP,BDP,,,,11270,#efb52c,1,60387,603.01,41.73,,11,12,100',
-        '2022,2,CVP,CVP,,,,11270,#ff6300,1,49117,491.02,33.98,21,,22,200',
-        '2022,3,FDP,FDP,,,,11270,#0571b0,0,35134,351.04,24.29,31,32,,300',
+        'federation,,2022,1,BDP,BDP,,,,11270,#efb52c,'
+        '1,60387,603.01,41.73,,11,12,100',
+        'federation,,2022,2,CVP,CVP,,,,11270,#ff6300,'
+        '1,49117,491.02,33.98,21,,22,200',
+        'federation,,2022,3,FDP,FDP,,,,11270,,'
+        '0,35134,351.04,24.29,31,32,,300',
     ]
 
     export = client.get('/election/proporz-election/data-parties-json').json
     assert export == [
         {
             'color': '#efb52c',
+            'domain': 'federation',
+            'domain_segment': None,
             'id': '1',
             'mandates': 1,
             'name': 'BDP',
@@ -374,6 +380,8 @@ def test_view_election_party_strengths(election_day_app_gr):
         },
         {
             'color': '#ff6300',
+            'domain': 'federation',
+            'domain_segment': None,
             'id': '2',
             'mandates': 1,
             'name': 'CVP',
@@ -392,7 +400,9 @@ def test_view_election_party_strengths(election_day_app_gr):
             'year': 2022
         },
         {
-            'color': '#0571b0',
+            'color': None,
+            'domain': 'federation',
+            'domain_segment': None,
             'id': '3',
             'mandates': 0,
             'name': 'FDP',
