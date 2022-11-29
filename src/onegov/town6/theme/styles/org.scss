@@ -287,7 +287,7 @@ footer {
     @include label;
     background: none;
     border: 1px solid $gray;
-    color: $black;
+    color: $body-font-color;
     font-size: .8rem;
     margin: 0 4px 7px 0;
 
@@ -366,7 +366,7 @@ footer {
 
         // color last element
         &:last-child a {
-            color: $black;
+            color: $body-font-color;
        }
     }
 
