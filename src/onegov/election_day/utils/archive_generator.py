@@ -21,7 +21,7 @@ class ArchiveGenerator:
                                                                recreate=True)
         self.temp_fs = TempFS()
         self.archive_parent_dir = "zip"
-        self.MAX_FILENAME_LENGTH = 240
+        self.MAX_FILENAME_LENGTH = 60
 
     def generate_csv(self):
         """
@@ -44,9 +44,9 @@ class ArchiveGenerator:
 
         names = ["votes", "elections", "elections"]
         entities = [
-            self.all_votes(),
-            self.all_elections(),
-            self.all_election_compounds()
+            self.all_counted_votes_with_results(),
+            self.all_counted_election_with_results(),
+            self.all_counted_election_compounds_with_results()
         ]
         for entity_name, entity in zip(names, entities):
 
@@ -138,18 +138,35 @@ class ArchiveGenerator:
                                 )
                         return zip_path
 
-    def all_votes(self):
-        return self.session.query(Vote).order_by(desc(Vote.date)).all()
+    def all_counted_votes_with_results(self):
+        all_votes = self.session.query(Vote).order_by(desc(Vote.date)).all()
+        closed_votes = self.filter_by_final_results(all_votes)
+        return closed_votes
 
-    def all_elections(self):
-        return self.session.query(Election).order_by(desc(Election.date)).all()
+    def all_counted_election_with_results(self):
+        all_elections = (
+            self.session.query(Election).order_by(desc(Election.date)).all()
+        )
+        final_elections = self.filter_by_final_results(all_elections)
+        return final_elections
 
-    def all_election_compounds(self):
-        return (
+    def all_counted_election_compounds_with_results(self):
+        all_election_compounds = (
             self.session.query(ElectionCompound)
             .order_by(desc(ElectionCompound.date))
             .all()
         )
+        final_election_compounds = self.filter_by_final_results(
+            all_election_compounds
+        )
+        return final_election_compounds
+
+    def filter_by_final_results(self, all_entities):
+        finalized = []
+        for entity in all_entities:
+            if entity.counted and entity.has_results:
+                finalized.append(entity)
+        return finalized
 
     @property
     def archive_system_path(self):
