@@ -50,7 +50,7 @@ class ElectionCompoundLayout(DetailLayout):
         if self.model.horizontal_party_strengths:
             result.remove('party-strengths')
             result.insert(1, 'party-strengths')
-        return result
+        return tuple(result)
 
     @cached_property
     def results(self):

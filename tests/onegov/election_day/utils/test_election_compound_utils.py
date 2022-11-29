@@ -565,7 +565,63 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         'title': 'Compound'
     }
 
+    election_compound.horizontal_party_strengths = True
+    assert get_party_results_data(election_compound) == {
+        'results': [
+            {
+                'class': 'active',
+                'color': '#EE7F00',
+                'text': 'CVP 2014',
+                'value': 931,
+                'value2': 22
+            },
+            {
+                'class': 'active',
+                'color': '#019040',
+                'text': 'SVP 2014',
+                'value': 899,
+                'value2': 19
+            },
+            {
+                'class': 'active',
+                'color': '#0E52A0',
+                'text': 'FDP 2014',
+                'value': 863,
+                'value2': 18
+            },
+            {
+                'class': 'active',
+                'color': '#99C040',
+                'text': 'AL 2014',
+                'value': 538,
+                'value2': 10
+            },
+            {
+                'class': 'active',
+                'color': '#E53136',
+                'text': 'SP 2014',
+                'value': 418,
+                'value2': 7
+            },
+            {
+                'class': 'active',
+                'color': '#acc700',
+                'text': 'GLP 2014',
+                'value': 236,
+                'value2': 4
+            },
+            {
+                'class': 'inactive',
+                'color': '#F9B200',
+                'text': 'Piraten 2014',
+                'value': 19,
+                'value2': 0
+            }
+        ]
+    }
+
     # ... with exact voters counts
+    election_compound.horizontal_party_strengths = False
     election_compound.exact_voters_counts = True
 
     groups = get_list_groups(election_compound)
@@ -584,6 +640,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert data['results'][0]['value']['back'] == 13.78
 
     # ... with votes
+    election_compound.horizontal_party_strengths = False
     election_compound.voters_counts = False
 
     groups = get_list_groups(election_compound)
@@ -600,6 +657,10 @@ def test_election_compound_utils_parties(import_test_datasets, session):
 
     data = get_party_results_data(election_compound)
     assert data['results'][0]['value']['back'] == 13.8
+
+    election_compound.horizontal_party_strengths = True
+    data = get_party_results_data(election_compound)
+    assert data['results'][0]['value'] == 74448
 
 
 def test_election_utils_candidate_statistics(

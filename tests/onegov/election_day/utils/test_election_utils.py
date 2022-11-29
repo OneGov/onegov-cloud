@@ -927,6 +927,95 @@ def test_election_utils_parties(import_test_datasets, session):
         ],
         'title': 'proporz_internal_nationalratswahlen-2015'
     }
+    election.horizontal_party_strengths = True
+    assert get_party_results_data(election) == {
+        'results': [
+            {
+                'class': 'active',
+                'color': '#3f841a',
+                'text': 'SVP 2015',
+                'value': 35543,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#3f841a',
+                'text': '2011',
+                'value': 33116,
+                'value2': 1
+            },
+            {
+                'class': 'active',
+                'color': '#ff6300',
+                'text': 'CVP 2015',
+                'value': 30856,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#ff6300',
+                'text': '2011',
+                'value': 28413,
+                'value2': 1
+            },
+            {
+                'class': 'active',
+                'color': '#4068c8',
+                'text': 'FDP 2015',
+                'value': 20584,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#4068c8',
+                'text': '2011',
+                'value': 22494,
+                'value2': 1
+            },
+            {
+                'class': 'inactive',
+                'color': '#db3c27',
+                'text': 'SP 2015',
+                'value': 16048,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#db3c27',
+                'text': '2011',
+                'value': 6167,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#a74c97',
+                'text': 'AL 2015',
+                'value': 8352,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#a74c97',
+                'text': '2011',
+                'value': 17972,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#aeca00',
+                'text': 'GLP 2015',
+                'value': 4178,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': '#aeca00',
+                'text': '2011',
+                'value': 7943,
+                'value2': 0
+            }
+        ]
+    }
 
     data = get_parties_panachage_data(election)
     assert data['title'] == 'proporz_internal_nationalratswahlen-2015'
