@@ -2,7 +2,7 @@
     Events
 */
 $events-icon-width: 3ex;
-$placeholder-icon-size: 6rem;
+$placeholder-icon-size: 5rem;
 $event-image-max-height: 150px;
 
 .events {
@@ -45,13 +45,14 @@ $event-image-max-height: 150px;
         display: flex;
         justify-content: center;
         max-height: $event-image-max-height;
-        padding: 30px 15px;
+        position: absolute;
 
         .far {
             color: $iron;
             font-size: $placeholder-icon-size;
             height: $placeholder-icon-size;
             margin: auto;
+            padding: 1.5rem;
             width: $placeholder-icon-size;
         }
     }

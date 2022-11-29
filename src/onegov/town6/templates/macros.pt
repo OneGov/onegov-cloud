@@ -284,7 +284,10 @@
 <metal:events define-macro="event-item-card">
     <a href="${item.url}">
         <div class="card" data-aos="fade">
-                <div style="width: 100%; padding-bottom: 55%; background-image: url(${item.image_url}); background-size: cover;"></div>
+                <div style="width: 100%; padding-bottom: 55%; background-image: url(${item.image_url}); background-color: #a4a4a4; background-size: cover;"></div>
+                <div class="image-placeholder" tal:condition="not: item.image_url">
+                    <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                </div>
                 <div class="card-section" tal:condition="with_lead|False">
                     <h5 data-equalizer-watch="events">${item.lead}</h5>
                     <div class="date-place">
@@ -1144,7 +1147,7 @@
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
-
+event
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
 </metal:occurrences>
 
