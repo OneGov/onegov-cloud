@@ -251,7 +251,6 @@ class ServicesWidget:
     template = """
         <xsl:template match="services">
             <div class="services-panel">
-                <h3 tal:content="services_panel.title"></h3>
                 <ul class="panel-links callout">
                     <li tal:repeat="link services_panel.links">
                         <tal:b content="structure link(layout)" />
@@ -351,7 +350,6 @@ class ContactsAndAlbumsWidget:
     template = """
            <xsl:template match="contacts_and_albums">
               <div class="contacts-albums-panel">
-                <h3 tal:content="contacts_and_albums_panel.title"></h3>
                 <metal:block use-macro="layout.macros['panel-links']"
                    tal:define="panel contacts_and_albums_panel;
                    classes ['more-list']"
