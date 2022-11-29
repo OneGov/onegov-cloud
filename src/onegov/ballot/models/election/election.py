@@ -92,6 +92,9 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     #: Absolute majority
     absolute_majority = Column(Integer, nullable=True)
 
+    #: show a horizontal party strengths bar chart instead of a vertical
+    horizontal_party_strengths = meta_property('horizontal_party_strengths')
+
     @hybrid_property
     def counted(self):
         """ True if all results have been counted. """

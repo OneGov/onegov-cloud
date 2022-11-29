@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-27 13:03+0100\n"
+"POT-Creation-Date: 2022-11-29 08:14+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -328,11 +328,20 @@ msgstr "Comune"
 msgid "Tacit election"
 msgstr "Elezione tacita"
 
+msgid "View options"
+msgstr "Opzioni di visualizzazione"
+
 msgid "Expats"
 msgstr "Svizzeri all'estero"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'elezione contiene risultati separati per gli espatriati."
+
+msgid "Horizonal party strengths chart"
+msgstr ""
+
+msgid "Shows a horizontal bar chart instead of a vertical bar chart."
+msgstr ""
 
 msgid "Date"
 msgstr "Data"
@@ -422,9 +431,6 @@ msgstr "Sottoripartizione (PDF)"
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
-
-msgid "View options"
-msgstr "Opzioni di visualizzazione"
 
 msgid "Allows to show the list groups and lists views."
 msgstr "Permette di visualizzare i gruppi di liste e le liste."
@@ -846,6 +852,7 @@ msgstr "Indicazione riguardo al numero di elettori"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
+#.
 msgid "figcaption_list_groups"
 msgstr ""
 "In una prima fase, la cosiddetta sovraripartizione, tutti i voti espressi "
