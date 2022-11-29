@@ -35,7 +35,7 @@ def view_vote_data_as_json(self, request):
 
     return {
         'data': self.export(sorted(request.app.locales)),
-        'name': normalize_for_url(self.title)
+        'name': normalize_for_url(self.title[:60])
     }
 
 
@@ -48,9 +48,7 @@ def view_vote_data_as_csv(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    max_filename_len = 60
-    filename = self.title[:max_filename_len]
     return {
         'data': self.export(sorted(request.app.locales)),
-        'name': normalize_for_url(filename)
+        'name': normalize_for_url(self.title[:60])
     }
