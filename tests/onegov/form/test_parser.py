@@ -4,6 +4,7 @@ from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.fields import DateTimeLocalField
+from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.pay import Price
 from textwrap import dedent
@@ -846,3 +847,36 @@ def test_dependency_validation_chain(field, invalid):
         inv = invalid
         assert not form(data={'select': 'no', 'select_value': inv}).validate()
         assert not form(data={'select': 'ya', 'select_value': inv}).validate()
+
+
+def test_parse_dependency_with_price():
+    text = dedent(
+        """
+    Versand *=
+        ( ) Ich möchte die Bestellung am Schalter abholen
+        (x) Ich möchte die Bestellung mittels Post erhalten (5 CHF)
+            Strasse (inkl. Hausnummer) *= ___
+            PLZ / Ort *= ___
+    """
+    )
+
+    fieldsets = parse_formcode(text)
+    assert len(fieldsets) == 1
+    assert fieldsets[0].fields[0].type == "radio"
+    assert len(fieldsets[0].fields) == 1
+
+    from onegov.form.parser.core import RadioField
+
+    assert isinstance(fieldsets[0].fields[0], RadioField)
+    choices = fieldsets[0].fields[0].choices
+    assert len(choices) == 2
+
+
+def test_normalization():
+    label = "Ich möchte die Bestellung mittels Post erhalten (5.00 CHF)"
+    norm = normalize_label_for_dependency(label)
+    assert norm == "Ich möchte die Bestellung mittels Post erhalten"
+
+    label = "Ich möchte die Bestellung mittels Post erhalten (200.00 CHF)"
+    norm = normalize_label_for_dependency(label)
+    assert norm == "Ich möchte die Bestellung mittels Post erhalten"
