@@ -54,6 +54,11 @@ class GeneralSettingsForm(Form):
         description=_("URL pointing to the logo"),
         render_kw={'class_': 'image-url'})
 
+    standard_image = StringField(
+        label=_("Standard Image"),
+        render_kw={'class_': 'image-url'}
+    )
+
     reply_to = EmailField(
         _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
         description=_("Replies to automated e-mails go to this address."))
