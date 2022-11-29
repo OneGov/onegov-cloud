@@ -222,6 +222,12 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         return order
 
     def extract_searchable(self, data):
+        # Remove non-searchable fields from data
+        searchable_ids = [
+            s.replace('/', '_').lower() for s in self.searchable
+        ]
+        data = {id: data[id] for id in searchable_ids}
+
         if self.searchable:
             return self.join(data, 'searchable')
 

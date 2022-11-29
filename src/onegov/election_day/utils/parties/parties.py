@@ -13,7 +13,9 @@ def has_party_results(item):
     return False
 
 
-def get_party_results(item, json_serializable=False):
+def get_party_results(
+    item, json_serializable=False, domain=None, domain_segment=None
+):
 
     """ Returns the aggregated party results as list.
 
@@ -31,12 +33,23 @@ def get_party_results(item, json_serializable=False):
 
     # Get the totals votes per year
     query = session.query(PartyResult.year, PartyResult.total_votes)
-    query = query.filter(PartyResult.owner == item.id).distinct()
+    query = query.filter(
+        PartyResult.owner == item.id,
+        PartyResult.domain == (domain or item.domain)
+    )
+    if domain_segment:
+        query = query.filter(PartyResult.domain_segment == domain_segment)
+    query = query.distinct()
     totals_votes = dict(query)
     years = sorted((str(key) for key in totals_votes.keys()))
 
     parties = {}
     for result in item.party_results:
+        if result.domain != (domain or item.domain):
+            continue
+        if domain_segment and result.domain_segment != domain_segment:
+            continue
+
         party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
         year['color'] = item.colors.get(result.name)
@@ -113,7 +126,58 @@ def get_party_results_deltas(item, years, parties):
     return deltas, results
 
 
-def get_party_results_data(item):
+def get_party_results_data(item, domain=None, domain_segment=None):
+    """ Retuns the data used for the diagrams showing the party results. """
+
+    if item.horizontal_party_strengths:
+        return get_party_results_horizontal_data(item, domain, domain_segment)
+    return get_party_results_vertical_data(item, domain, domain_segment)
+
+
+def get_party_results_horizontal_data(item, domain=None, domain_segment=None):
+
+    """ Retuns the data used for the horitzonal bar diagram showing the party
+    results.
+
+    """
+
+    if not has_party_results(item):
+        return {
+            'results': [],
+        }
+
+    voters_counts = getattr(item, 'voters_counts', False) == True
+    attribute = 'voters_count' if voters_counts else 'votes'
+    years, parties = get_party_results(item, domain, domain_segment)
+    results = []
+    if years:
+        year = years[-1]
+        party_ids = {
+            values.get(year, {}).get(attribute).get('total', 0): party_id
+            for party_id, values in parties.items()
+        }
+        party_ids = [party_ids[key] for key in sorted(party_ids)]
+        for party_id in reversed(party_ids):
+            for year in reversed(years):
+                active = year == years[-1]
+                party = parties.get(party_id, {}).get(year, {})
+                name = party.get('name')
+                value = round(party.get(attribute, {}).get('total', 0) or 0)
+                results.append({
+                    'text': f'{name} {year}' if active else year,
+                    'value': value,
+                    'value2': party.get('mandates'),
+                    'class': (
+                        'active' if active and party.get('mandates')
+                        else 'inactive'
+                    ),
+                    'color': party.get('color')
+                })
+
+    return {'results': results}
+
+
+def get_party_results_vertical_data(item, domain=None, domain_segment=None):
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
@@ -128,7 +192,7 @@ def get_party_results_data(item):
 
     voters_counts = getattr(item, 'voters_counts', False) == True
     attribute = 'voters_count' if voters_counts else 'votes'
-    years, parties = get_party_results(item)
+    years, parties = get_party_results(item, domain, domain_segment)
     groups = {}
     results = []
     for party_id in parties:
@@ -193,6 +257,7 @@ def get_parties_panachage_data(item, request=None):
     def right_node(party):
         return parties.index(party) + len(parties)
 
+    active = {r.party_id: r.number_of_mandates > 0 for r in party_results}
     colors = {
         r.party_id: item.colors[r.name]
         for r in party_results
@@ -211,14 +276,16 @@ def get_parties_panachage_data(item, request=None):
             'source': left_node(result.source),
             'target': right_node(result.target),
             'value': result.votes,
-            'color': colors.get(result.source, '#999')
+            'color': colors.get(result.source),
+            'active': active.get(result.source, False)
         })
     for party, votes in intra_party_votes.items():
         links.append({
             'source': left_node(party),
             'target': right_node(party),
             'value': votes,
-            'color': colors.get(party, '#999')
+            'color': colors.get(party),
+            'active': active.get(party, False)
         })
 
     # Create the nodes
@@ -228,7 +295,8 @@ def get_parties_panachage_data(item, request=None):
         {
             'name': names.get(party_id, '') or blank,
             'id': count + 1,
-            'color': colors.get(party_id, '#999')
+            'color': colors.get(party_id),
+            'active': active.get(party_id, False)
         }
         for count, party_id in enumerate(2 * parties)
     ]

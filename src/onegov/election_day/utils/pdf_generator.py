@@ -303,7 +303,8 @@ class PdfGenerator():
         if chart:
             pdf.h2(_('Party strengths'))
             pdf.pdf(chart)
-            pdf.figcaption(_('figcaption_party_strengths'))
+            if not election.horizontal_party_strengths:
+                pdf.figcaption(_('figcaption_party_strengths'))
             pdf.spacer()
             years, parties = get_party_results(election)
             deltas, results = get_party_results_deltas(
@@ -593,7 +594,7 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.figcaption('<b>{}</b>: {}'.format(
                 pdf.translate(_('Voters count')),
-                pdf.translate(_('figcaption_party_strengths'))
+                pdf.translate(_('figcaption_list_groups'))
             ))
             pdf.spacer()
             pdf.results(
@@ -618,7 +619,8 @@ class PdfGenerator():
         if compound.show_party_strengths and chart:
             pdf.h2(_('Party strengths'))
             pdf.pdf(chart)
-            pdf.figcaption(_('figcaption_party_strengths'))
+            if not compound.horizontal_party_strengths:
+                pdf.figcaption(_('figcaption_party_strengths'))
             pdf.spacer()
             years, parties = get_party_results(compound)
             deltas, results = get_party_results_deltas(

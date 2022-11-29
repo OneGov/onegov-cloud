@@ -4,7 +4,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.parties import get_party_results
-from onegov.election_day.utils.parties import get_party_results_data
+from onegov.election_day.utils.parties import get_party_results_vertical_data
 
 
 @ElectionDayApp.json(
@@ -19,7 +19,7 @@ def view_election_compound_seat_allocation_data(self, request):
 
     """
 
-    return get_party_results_data(self)
+    return get_party_results_vertical_data(self)
 
 
 @ElectionDayApp.html(

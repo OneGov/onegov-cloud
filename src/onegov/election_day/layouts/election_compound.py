@@ -36,7 +36,7 @@ class ElectionCompoundLayout(DetailLayout):
     @cached_property
     def all_tabs(self):
         """ Return the tabs in order of their appearance. """
-        return (
+        result = [
             'seat-allocation',
             'list-groups',
             'superregions',
@@ -46,7 +46,11 @@ class ElectionCompoundLayout(DetailLayout):
             'parties-panachage',
             'statistics',
             'data'
-        )
+        ]
+        if self.model.horizontal_party_strengths:
+            result.remove('party-strengths')
+            result.insert(1, 'party-strengths')
+        return tuple(result)
 
     @cached_property
     def results(self):

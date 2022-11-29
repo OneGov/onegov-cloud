@@ -28,6 +28,7 @@ def view_upload_election_party_results(self, request, form):
     if form.submitted(request):
         errors = import_party_results(
             self,
+            request.app.principal,
             form.parties.file,
             form.parties.data['mimetype'],
             request.app.locales,
@@ -83,6 +84,7 @@ def view_upload_election_compound_party_results(self, request, form):
     if form.submitted(request):
         errors = import_party_results(
             self,
+            request.app.principal,
             form.parties.file,
             form.parties.data['mimetype'],
             request.app.locales,

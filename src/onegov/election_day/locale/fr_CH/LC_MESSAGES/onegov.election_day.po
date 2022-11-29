@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-08 13:09+0100\n"
+"POT-Creation-Date: 2022-11-29 08:14+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -137,6 +137,10 @@ msgstr "Valeurs de connexion de liste non valides"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} pas dans list_id's"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment non valide: ${domain_segment}"
 
 msgid "Invalid values"
 msgstr "Valeurs non valides"
@@ -325,11 +329,22 @@ msgstr "Commune"
 msgid "Tacit election"
 msgstr "Élection tacite"
 
+msgid "View options"
+msgstr "Options d'affichage"
+
 msgid "Expats"
 msgstr "Suisses de l'étranger"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'élection contient des résultats distincts pour les expatriés."
+
+msgid "Horizonal party strengths chart"
+msgstr "Graphique horizontal des forces du parti"
+
+msgid "Shows a horizontal bar chart instead of a vertical bar chart."
+msgstr ""
+"Affiche un graphique à barres horizontales au lieu d'un graphique à barres "
+"verticales."
 
 msgid "Date"
 msgstr "Date"
@@ -419,9 +434,6 @@ msgstr "Répartition basse (PDF)"
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
-
-msgid "View options"
-msgstr "Options d'affichage"
 
 msgid "Allows to show the list groups and lists views."
 msgstr "Permet d'afficher les vues des groupes de listes et des listes."
@@ -847,6 +859,7 @@ msgstr "Note sur le nombre d'électeurs"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
+#.
 msgid "figcaption_list_groups"
 msgstr ""
 "Dans une première étape - appelée répartition supérieure - on considère "

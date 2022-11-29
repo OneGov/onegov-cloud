@@ -298,6 +298,9 @@ class ElectionCompound(
     #: may be used to enable/disable the visibility of party strengths
     show_party_strengths = meta_property('show_party_strengths')
 
+    #: show a horizontal party strengths bar chart instead of a vertical
+    horizontal_party_strengths = meta_property('horizontal_party_strengths')
+
     #: may be used to enable/disable the visibility of party panachage
     show_party_panachage = meta_property('show_party_panachage')
 
