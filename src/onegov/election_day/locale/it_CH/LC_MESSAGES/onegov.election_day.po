@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-24 10:20+0200\n"
+"POT-Creation-Date: 2022-11-29 08:14+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -98,6 +98,10 @@ msgstr "Non alfanumerico: ${col}"
 msgid "Invalid gender: ${value}"
 msgstr "Genere non valido: ${value}"
 
+#, python-format
+msgid "Invalid color: ${col}"
+msgstr "Colore non valido: ${col}"
+
 msgid "This format does not support separate results for expats"
 msgstr "Questo formato non supporta risultati separati per gli espatriati"
 
@@ -132,6 +136,10 @@ msgstr "Valori della lista delle connessioni non validi"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} no e list_id's"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment non valido: ${domain_segment}"
 
 msgid "Invalid values"
 msgstr "Valori non validi"
@@ -320,11 +328,20 @@ msgstr "Comune"
 msgid "Tacit election"
 msgstr "Elezione tacita"
 
+msgid "View options"
+msgstr "Opzioni di visualizzazione"
+
 msgid "Expats"
 msgstr "Svizzeri all'estero"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'elezione contiene risultati separati per gli espatriati."
+
+msgid "Horizonal party strengths chart"
+msgstr ""
+
+msgid "Shows a horizontal bar chart instead of a vertical bar chart."
+msgstr ""
 
 msgid "Date"
 msgstr "Data"
@@ -414,9 +431,6 @@ msgstr "Sottoripartizione (PDF)"
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
-
-msgid "View options"
-msgstr "Opzioni di visualizzazione"
 
 msgid "Allows to show the list groups and lists views."
 msgstr "Permette di visualizzare i gruppi di liste e le liste."
@@ -838,6 +852,7 @@ msgstr "Indicazione riguardo al numero di elettori"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
+#.
 msgid "figcaption_list_groups"
 msgstr ""
 "In una prima fase, la cosiddetta sovraripartizione, tutti i voti espressi "
@@ -865,8 +880,8 @@ msgstr "Contenuto"
 msgid "Sitemap"
 msgstr "Sitemap"
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziale"
 

@@ -6,26 +6,28 @@ I formati di file accettabili sono file generati manualmente, dal software elett
 
 ## Contenuto
 
-<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
-- [Specifica Formato Voti](#specifica-formato-voti)
-    - [Contenuto](#contenuto)
-    - [Prefazione](#prefazione)
-        - [Enti](#enti)
-    - [Formati](#formati)
-        - [Formato standard](#formato-standard)
-            - [Colonne](#colonne)
-            - [Risultati temporanei](#risultati-temporanei)
-            - [Modello](#modello)
-        - [OneGov](#onegov)
-            - [Colonne](#colonne-1)
-            - [Risultati temporanei](#risultati-temporanei-1)
-            - [Modello](#modello-1)
-        - [Wabsti](#wabsti)
-            - [Colonne](#colonne-2)
-            - [Risultati temporanei](#risultati-temporanei-2)
-            - [Modello](#modello-2)
-        - [WabstiCExport](#wabsticexport)
-<!-- TOC END -->
+<!-- https://atom.io/packages/atom-mdtoc -->
+<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+
+- 1. [Contenuto](#Contenuto)   
+- 2. [Prefazione](#Prefazione)   
+   - 2.1. [Enti](#Enti)   
+- 3. [Formati](#Formati)   
+   - 3.1. [Formato standard](#Formato-standard)   
+      - 3.1.1. [Colonne](#Colonne)   
+      - 3.1.2. [Risultati temporanei](#Risultati-temporanei)   
+      - 3.1.3. [Modello](#Modello)   
+   - 3.2. [OneGov](#OneGov)   
+      - 3.2.1. [Colonne](#Colonne-1)   
+      - 3.2.2. [Risultati temporanei](#Risultati-temporanei-1)   
+      - 3.2.3. [Modello](#Modello-1)   
+   - 3.3. [Wabsti](#Wabsti)   
+      - 3.3.1. [Colonne](#Colonne-2)   
+      - 3.3.2. [Risultati temporanei](#Risultati-temporanei-2)   
+      - 3.3.3. [Modello](#Modello-2)   
+   - 3.4. [WabstiCExport](#WabstiCExport)   
+
+<!-- /MDTOC -->
 
 ## Prefazione
 

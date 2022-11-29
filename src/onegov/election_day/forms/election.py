@@ -94,12 +94,24 @@ class ElectionForm(Form):
 
     tacit = BooleanField(
         label=_("Tacit election"),
+        fieldset=_("View options"),
         render_kw=dict(force_simple=True)
     )
 
     has_expats = BooleanField(
         label=_("Expats"),
+        fieldset=_("View options"),
         description=_("The election contains seperate results for expats."),
+        render_kw=dict(force_simple=True)
+    )
+
+    horizontal_party_strengths = BooleanField(
+        label=_("Horizonal party strengths chart"),
+        fieldset=_("View options"),
+        description=_(
+            "Shows a horizontal bar chart instead of a vertical bar chart."
+        ),
+        depends_on=('election_type', 'proporz'),
         render_kw=dict(force_simple=True)
     )
 
@@ -185,6 +197,7 @@ class ElectionForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        hide_label=False,
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
@@ -316,6 +329,7 @@ class ElectionForm(Form):
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
         model.has_expats = self.has_expats.data
+        model.horizontal_party_strengths = self.horizontal_party_strengths.data
 
         titles = {}
         if self.election_de.data:
@@ -405,6 +419,7 @@ class ElectionForm(Form):
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit
         self.has_expats.data = model.has_expats
+        self.horizontal_party_strengths.data = model.horizontal_party_strengths
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)

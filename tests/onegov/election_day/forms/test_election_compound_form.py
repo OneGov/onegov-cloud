@@ -156,6 +156,7 @@ def test_election_compound_form_model(
     model.manually_completed = True
     model.voters_counts = True
     model.exact_voters_counts = True
+    model.horizontal_party_strengths = True
     model.colors = {
         'FDP': '#3a8bc1',
         'CVP': '#ff9100',
@@ -192,6 +193,7 @@ def test_election_compound_form_model(
     assert form.manually_completed.data is True
     assert form.voters_counts.data is True
     assert form.exact_voters_counts.data is True
+    assert form.horizontal_party_strengths.data is True
     assert form.colors.data == (
         'CVP #ff9100\n'
         'FDP #3a8bc1'
@@ -221,6 +223,7 @@ def test_election_compound_form_model(
     form.manually_completed.data = False
     form.voters_counts.data = False
     form.exact_voters_counts.data = False
+    form.horizontal_party_strengths.data = False
     form.colors.data = (
         'CVP #ff9100\r\n'
         'SP Juso #dd0e0e\n'
@@ -250,6 +253,7 @@ def test_election_compound_form_model(
     assert model.manually_completed is False
     assert model.voters_counts is False
     assert model.exact_voters_counts is False
+    assert model.horizontal_party_strengths is False
     assert form.show_seat_allocation.data is False
     assert form.show_list_groups.data is False
     assert form.show_party_strengths.data is False

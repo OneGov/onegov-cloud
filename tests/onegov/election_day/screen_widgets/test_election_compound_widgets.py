@@ -351,7 +351,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'parties': {
             '0': {
                 '2020': {
-                    'color': '#0571b0',
+                    'color': None,
                     'mandates': 27,
                     'name': 'CVP',
                     'voters_count': {
@@ -363,7 +363,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             },
             '1': {
                 '2020': {
-                    'color': '#0571b0',
+                    'color': None,
                     'mandates': 2,
                     'name': 'EVP',
                     'voters_count': {
@@ -375,7 +375,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             },
             '2': {
                 '2020': {
-                    'color': '#0571b0',
+                    'color': None,
                     'mandates': 22,
                     'name': 'FDP',
                     'voters_count': {
@@ -387,7 +387,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             },
             '3': {
                 '2020': {
-                    'color': '#0571b0',
+                    'color': None,
                     'mandates': 6,
                     'name': 'GLP',
                     'voters_count': {
@@ -399,7 +399,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             },
             '4': {
                 '2020': {
-                    'color': '#0571b0',
+                    'color': None,
                     'mandates': 9,
                     'name': 'GRÜ',
                     'voters_count': {
@@ -411,7 +411,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             },
             '5': {
                 '2020': {
-                    'color': '#0571b0',
+                    'color': None,
                     'mandates': 6,
                     'name': 'SP',
                     'voters_count': {
@@ -423,7 +423,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             },
             '6': {
                 '2020': {
-                    'color': '#0571b0',
+                    'color': None,
                     'mandates': 35,
                     'name': 'SVP',
                     'voters_count': {

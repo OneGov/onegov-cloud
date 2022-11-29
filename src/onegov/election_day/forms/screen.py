@@ -132,6 +132,7 @@ class ScreenForm(Form):
 
     tags_simple_vote = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'simple_vote'),
@@ -139,6 +140,7 @@ class ScreenForm(Form):
 
     tags_complex_vote = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'complex_vote'),
@@ -146,6 +148,7 @@ class ScreenForm(Form):
 
     tags_majorz_election = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'majorz_election'),
@@ -153,6 +156,7 @@ class ScreenForm(Form):
 
     tags_proporz_election = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'proporz_election'),
@@ -160,6 +164,7 @@ class ScreenForm(Form):
 
     tags_election_compound = PanelField(
         label=_('Available tags'),
+        hide_label=False,
         text='',
         kind='',
         depends_on=('type', 'election_compound'),

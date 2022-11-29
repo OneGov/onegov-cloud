@@ -110,6 +110,7 @@ Name|Beschreibung
 `entity_accounted_votes`|Die Anzahl gültiger Stimmen der Gemeinde.
 `list_name`|Der Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
 `list_id`|Die ID der Liste, für welche der Kandidierende kandidiert. Nur bei Proporzwahlen.
+`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
 `list_number_of_mandates`|Die Anzahl Mandate der Liste. Nur bei Proporzwahlen.
 `list_votes`|Die Anzahl der Listenstimmen. Nur bei Proporzwahlen.
 `list_connection`|Die ID der Listenverbindung. Nur bei Proporzwahlen.
@@ -119,6 +120,7 @@ Name|Beschreibung
 `candidate_id`|Die ID des Kandidierenden.
 `candidate_elected`|Wahr, falls der Kandidierenden gewählt wurde.
 `candidate_party`|Der Name der Partei.
+`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
 `candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
@@ -144,12 +146,14 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 Name|Description
 ---|---
+`domain`|Der Einflussbereich, für den die Zeile gilt.
+`domain_segment`|Die Einheit des Einflussbereichs, für die die Zeile gilt.
 `year`|Das Jahr der Wahl.
 `total_votes`|Die Gesamtanzahl der Stimmen der Wahl.
 `name`|Der Name der Partei in der Standardsprache.
 `name_{locale}`|Übersetzter Name der Partei, z. B. `name_de_ch` für den deutschen Namen.
 `id`|ID der Partei (beliebige Zahl).
-`color`|Die Farbe der Partei.
+`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 `voters_count`|Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl, nur für verbundene Wahlen.

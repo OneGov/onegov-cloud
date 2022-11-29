@@ -105,20 +105,26 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     export = client.get('/elections/elections/data-parties-csv').text
     lines = [l for l in export.split('\r\n') if l]
     assert lines == [
-        'year,id,name,name_de_CH,name_fr_CH,name_it_CH,name_rm_CH,'
+        'domain,domain_segment,year,id,'
+        'name,name_de_CH,name_fr_CH,name_it_CH,name_rm_CH,'
         'total_votes,color,mandates,votes,'
         'voters_count,voters_count_percentage,panachage_votes_from_1,'
         'panachage_votes_from_2,panachage_votes_from_3,'
         'panachage_votes_from_999',
-        '2022,1,BDP,BDP,,,,11270,#efb52c,1,60387,603.01,41.73,,11,12,100',
-        '2022,2,CVP,CVP,,,,11270,#ff6300,1,49117,491.02,33.98,21,,22,200',
-        '2022,3,FDP,FDP,,,,11270,#0571b0,0,35134,351.04,24.29,31,32,,300',
+        'canton,,2022,1,BDP,BDP,,,,11270,#efb52c,'
+        '1,60387,603.01,41.73,,11,12,100',
+        'canton,,2022,2,CVP,CVP,,,,11270,#ff6300,'
+        '1,49117,491.02,33.98,21,,22,200',
+        'canton,,2022,3,FDP,FDP,,,,11270,,'
+        '0,35134,351.04,24.29,31,32,,300',
     ]
 
     export = client.get('/elections/elections/data-parties-json').json
     assert export == [
         {
             'color': '#efb52c',
+            'domain': 'canton',
+            'domain_segment': None,
             'id': '1',
             'mandates': 1,
             'name': 'BDP',
@@ -138,6 +144,8 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
         },
         {
             'color': '#ff6300',
+            'domain': 'canton',
+            'domain_segment': None,
             'id': '2',
             'mandates': 1,
             'name': 'CVP',
@@ -156,7 +164,9 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
             'year': 2022
         },
         {
-            'color': '#0571b0',
+            'color': None,
+            'domain': 'canton',
+            'domain_segment': None,
             'id': '3',
             'mandates': 0,
             'name': 'FDP',
@@ -198,7 +208,7 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
         '3': {
             '2022': {
                 'name': 'FDP',
-                'color': '#0571b0',
+                'color': None,
                 'mandates': 0,
                 'voters_count': {'permille': 242.9, 'total': 351.04},
                 'votes': {'permille': 3117, 'total': 35134}
@@ -485,7 +495,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
             },
             {
                 'class': 'inactive',
-                'color': '#0571b0',
+                'color': None,
                 'text': 'FDP',
                 'value': 351,
                 'value2': 0
@@ -526,7 +536,7 @@ def test_view_election_compound_list_groups(election_day_app_gr):
             },
             {
                 'class': 'inactive',
-                'color': '#0571b0',
+                'color': None,
                 'text': 'FDP',
                 'value': 351,
                 'value2': 0

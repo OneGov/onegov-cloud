@@ -75,7 +75,6 @@ def test_archive_generation_from_scratch(election_day_app_zg):
         with ReadZipFS(fi) as zip_fs:
             votes_dir = zip_fs.listdir("votes")
             years = [str(year) for year in votes_dir]
-            # 2 years directory created and the flattened file
             assert len(zip_fs.listdir("votes")) == 3
             assert {"all_votes.csv", "2022", "2013"} == set(years)
 

@@ -384,7 +384,7 @@
         <tal:b condition="button_text|nothing">
             <input type="submit" value="${button_text}" class="button expanded" role="button">
         </tal:b>
-        <a href="" class="cancel-link" onclick="history.back()"><i class="fa fa-times"></i> <span i18n:translate="">Cancel</span><a/>
+        <a class="cancel-link" href="#" onclick="if(document.referrer) {window.open(document.referrer,'_self');} else {history.go(-1);} return false;"> <span i18n:translate="">Cancel</span><a/>
     </form>
 </metal:form>
 
@@ -673,10 +673,10 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False">
+    <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.trait == 'news' and page.page_image | None;">
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 cell page-content-main">
-                <img class="page-image" tal:condition="page.page_image | None" src="${page.page_image}">
+                <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
@@ -689,7 +689,7 @@
         </tal:b>
         <tal:b condition="people or contact or coordinates or show_side_panel">
             <div class="small-12 medium-8 cell page-content-main">
-                <img class="page-image" tal:condition="page.page_image | None" src="${page.page_image}">
+                <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
                 </div>
@@ -1323,8 +1323,6 @@
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
     <div tal:condition="link_mp4 or link_webm" class="homepage-video" style="max-height: ${max_height};">
         <video id="autoplay-video" autoplay playsinline loop muted>
-            <source tal:condition="link_mp4" src="${link_mp4}" type="video/mp4">
-            <source tal:condition="link_webm" src="${link_webm}" type="video/webm">
             Your browser does not support the video tag.
         </video> 
         <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer"></div>
@@ -1333,8 +1331,29 @@
             vid.addEventListener('loadeddata', (event) => {
                 var ratio = vid.videoHeight / vid.videoWidth * 100;
                 var spacer = document.getElementById("spacer");
-                spacer.style.paddingBottom = ratio + "%"
+                spacer.style.paddingBottom = ratio + "%";
             });
+
+            var w = window.matchMedia("(max-width: 700px)");
+            var source = document.createElement("source");
+            source.id = "hvid";
+            vid.appendChild(source);
+            
+            if (w.matches && "${link_mp4_low_res or link_webm_low_res}") {
+                vid.pause();
+                source.removeAttribute("src");
+                source.setAttribute("src", "${link_mp4_low_res or link_webm_low_res}");
+                source.setAttribute("type", "video/${'mp4' if link_mp4_low_res else 'webm'}");
+                vid.load();
+                vid.play();
+            } else {
+                vid.pause();
+                source.removeAttribute("src");
+                source.setAttribute("src", "${link_mp4 or link_webm}");
+                source.setAttribute("type", "video/${'mp4' if link_mp4 else 'webm'}");
+                vid.load();
+                vid.play();
+            }
         </script>
     </div>
 </metal:autoplay_video>

@@ -196,6 +196,16 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    horizontal_party_strengths = BooleanField(
+        label=_("Horizonal party strengths chart"),
+        fieldset=_("View options"),
+        description=_(
+            "Shows a horizontal bar chart instead of a vertical bar chart."
+        ),
+        depends_on=('show_party_strengths', 'y'),
+        render_kw=dict(force_simple=True)
+    )
+
     show_seat_allocation = BooleanField(
         label=_("Seat allocation"),
         description=_(
@@ -238,6 +248,7 @@ class ElectionCompoundForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        hide_label=False,
         fieldset=_('Colors'),
         text=(
             'AL #a74c97\n'
@@ -354,6 +365,7 @@ class ElectionCompoundForm(Form):
         model.manually_completed = self.manually_completed.data
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
+        model.horizontal_party_strengths = self.horizontal_party_strengths.data
 
         model.elections = []
         query = self.request.session.query(Election)
@@ -446,6 +458,7 @@ class ElectionCompoundForm(Form):
         self.manually_completed.data = model.manually_completed
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
+        self.horizontal_party_strengths.data = model.horizontal_party_strengths
         self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
         self.show_party_strengths.data = model.show_party_strengths

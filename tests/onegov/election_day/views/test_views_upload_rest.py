@@ -300,8 +300,9 @@ def test_view_rest_parties(election_day_app_zg):
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], Election)
-        assert isinstance(import_.call_args[0][1], BytesIO)
-        assert import_.call_args[0][2] == 'application/octet-stream'
+        assert isinstance(import_.call_args[0][1], Canton)
+        assert isinstance(import_.call_args[0][2], BytesIO)
+        assert import_.call_args[0][3] == 'application/octet-stream'
 
     # compound
     with patch(
@@ -318,5 +319,6 @@ def test_view_rest_parties(election_day_app_zg):
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], ElectionCompound)
-        assert isinstance(import_.call_args[0][1], BytesIO)
-        assert import_.call_args[0][2] == 'application/octet-stream'
+        assert isinstance(import_.call_args[0][1], Canton)
+        assert isinstance(import_.call_args[0][2], BytesIO)
+        assert import_.call_args[0][3] == 'application/octet-stream'
