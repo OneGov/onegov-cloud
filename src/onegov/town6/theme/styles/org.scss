@@ -414,6 +414,15 @@ input[type="tel"], input[type="url"] {
 
 form .button {
     margin-top: 1rem;
+
+    &.secondary {
+        margin: 0;
+        padding: 0 !important;
+
+        &:hover {
+            padding: 0 !important;
+        }
+    }
 }
 
 /*

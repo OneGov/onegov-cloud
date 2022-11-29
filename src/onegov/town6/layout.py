@@ -80,6 +80,9 @@ class Layout(OrgLayout):
                 image_url=getattr(self.org, f'partner_{ix}_img'),
                 lead=getattr(self.org, f'partner_{ix}_name'),
             ) for ix in range(1, partner_count + 1)
+            if (getattr(self.org, f'partner_{ix}_url')
+                or getattr(self.org, f'partner_{ix}_img')
+                or getattr(self.org, f'partner_{ix}_name'))
         ]
 
     @property
