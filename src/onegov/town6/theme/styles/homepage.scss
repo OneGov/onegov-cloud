@@ -113,6 +113,18 @@
             padding: 1.5rem;
             padding-bottom: 0;
         }
+
+        @media #{$small-only} {
+            h5 {
+                margin-bottom: 0;
+                padding-bottom: 1.5rem;
+            }
+
+            p {
+                display: none;
+            }
+        }
+
     }
 
     a .card p {
