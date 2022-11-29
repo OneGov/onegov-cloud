@@ -19,6 +19,7 @@ from onegov.ballot.models.election import ListResult
 from onegov.ballot.models.election import PanachageResult
 from onegov.ballot.models.election import PartyResult
 from onegov.ballot.models.election import ProporzElection
+from onegov.ballot.models.election import Superregion
 from onegov.ballot.models.vote import Ballot
 from onegov.ballot.models.vote import BallotResult
 from onegov.ballot.models.vote import ComplexVote
@@ -40,5 +41,6 @@ __all__ = [
     'PanachageResult',
     'PartyResult',
     'ProporzElection',
+    'Superregion',
     'Vote',
 ]

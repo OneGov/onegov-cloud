@@ -10,7 +10,7 @@ from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.election.proporz_election import ProporzElection
-
+from onegov.ballot.models.election.superregion import Superregion
 
 __all__ = [
     'Candidate',
@@ -25,4 +25,5 @@ __all__ = [
     'PanachageResult',
     'PartyResult',
     'ProporzElection',
+    'Superregion',
 ]

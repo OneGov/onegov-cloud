@@ -1,3 +1,4 @@
+from onegov.ballot import Superregion
 from onegov.core.utils import groupbylist
 
 
@@ -7,10 +8,14 @@ def get_superregions(compound, principal):
     if compound.domain_elections != 'region':
         return {}
 
+    # todo: add dummies from principal
+    # todo: move this to model?
+
     entities = principal.entities.get(compound.date.year, {})
     result = {entity.get('superregion') for entity in entities.values()}
     result = {
         superregion: {
+            'superregion': Superregion(compound, superregion),
             'mandates': {'allocated': 0, 'total': 0},
             'progress': {'counted': 0, 'total': 0}
         }

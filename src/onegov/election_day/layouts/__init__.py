@@ -12,6 +12,7 @@ from onegov.election_day.layouts.manage import ManageScreensLayout
 from onegov.election_day.layouts.manage import ManageSubscribersLayout
 from onegov.election_day.layouts.manage import ManageUploadTokensLayout
 from onegov.election_day.layouts.manage import ManageVotesLayout
+from onegov.election_day.layouts.superregion import SuperregionLayout
 from onegov.election_day.layouts.vote import VoteLayout
 
 
@@ -29,5 +30,6 @@ __all__ = [
     'ManageSubscribersLayout',
     'ManageUploadTokensLayout',
     'ManageVotesLayout',
+    'SuperregionLayout',
     'VoteLayout',
 ]
