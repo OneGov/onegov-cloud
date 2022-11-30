@@ -93,6 +93,7 @@ a[href^="mailto:"] {
 
 html,
 body {
+    color: $oil !important;
     height: 100%;
     width: 100%;
 }
@@ -286,7 +287,7 @@ footer {
     @include label;
     background: none;
     border: 1px solid $gray;
-    color: $black;
+    color: $body-font-color;
     font-size: .8rem;
     margin: 0 4px 7px 0;
 
@@ -365,7 +366,7 @@ footer {
 
         // color last element
         &:last-child a {
-            color: $black;
+            color: $body-font-color;
        }
     }
 
@@ -373,13 +374,54 @@ footer {
 
 
 /* Card component tuning */
+.card {
+    @include smooth-edges;
+}
+
 .card-section {
     @include clean-ul;
+    padding: 1.5rem !important;
 
     h4,
     h5,
     h6 {
         margin-bottom: 0;
+    }
+}
+
+
+/* Input */
+
+select, textarea, input[type="text"], input[type="password"],
+input[type="datetime"], input[type="datetime-local"],
+input[type="date"], input[type="month"], input[type="time"],
+input[type="week"], input[type="number"], input[type="email"],
+input[type="tel"], input[type="url"] {
+    height: auto;
+}
+
+/* Button */
+.button {
+    border-radius: 10rem !important;
+    padding: 1rem 1.5rem !important;
+    transition: all 200ms linear !important;
+
+    &:hover {
+        padding: 1rem 2rem !important;
+        transition: all 200ms linear;
+    }
+}
+
+form .button {
+    margin-top: 1rem;
+
+    &.secondary {
+        margin: 0;
+        padding: 0 !important;
+
+        &:hover {
+            padding: 0 !important;
+        }
     }
 }
 
@@ -776,6 +818,16 @@ ul.recipients {
     margin-bottom: 1rem;
 }
 
-#page-auth-login .cancel-link {
-    display: none;
+#page-auth-login {
+    p {
+        margin-top: 2rem;
+    }
+
+    #text {
+        color: $black-light;
+    }
+
+    .cancel-link {
+        display: none;
+    }
 }

@@ -28,7 +28,7 @@
 }
 
 @mixin smooth-edges {
-    border-radius: 2px;
+    border-radius: .7rem !important;
 }
 
 @mixin circle {

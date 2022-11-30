@@ -22,7 +22,7 @@ def test_focus_widget():
         <focus title="My Fokus"/>
     """)
 
-    assert '<h3>My Fokus</h3>' in result
+    assert '<h5>My Fokus</h5>' in result
 
     result = transform_structure(widgets, """
         <focus title="My Fokus" hide-title="any value" />
