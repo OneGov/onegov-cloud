@@ -2,7 +2,7 @@
     Events
 */
 $events-icon-width: 3ex;
-$placeholder-icon-size: 6rem;
+$placeholder-icon-size: 5rem;
 $event-image-max-height: 150px;
 
 .events {
@@ -31,26 +31,37 @@ $event-image-max-height: 150px;
         border-top: 1px solid $iron;
     }
 
+    h5 {
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        padding-bottom: 0 !important;
+        margin-bottom: 1rem;
+    }
+
     .date-place {
-        color:  $primary-color;
-        flex: none;
-        font-size: 97%;
-        font-weight: bold;
-        padding: 1rem;
+        color:  $charcoal;
         i { width: $events-icon-width; }
+    }
+
+    hr {
+        border-bottom: 1px dashed #cacaca;
+        margin: .5rem 0;
     }
 
     .image-placeholder {
         display: flex;
         justify-content: center;
         max-height: $event-image-max-height;
-        padding: 30px 15px;
+        position: absolute;
 
         .far {
             color: $iron;
             font-size: $placeholder-icon-size;
             height: $placeholder-icon-size;
             margin: auto;
+            padding: 1.5rem;
             width: $placeholder-icon-size;
         }
     }

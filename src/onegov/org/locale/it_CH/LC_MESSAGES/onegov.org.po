@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-10-18 15:09+0200\n"
+"POT-Creation-Date: 2022-11-22 08:21+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -377,11 +377,17 @@ msgstr "La prima riga dell'indirizzo"
 msgid "Static title"
 msgstr "Titolo statico"
 
-msgid "Icon"
-msgstr "Icona"
+msgid "Marker Type"
+msgstr "Tipo di indicatore"
 
 msgid "Marker"
 msgstr "Indicatore"
+
+msgid "Icon"
+msgstr "Icona"
+
+msgid "Numbers"
+msgstr ""
 
 msgid "Marker Color"
 msgstr "Colore indicatore"
@@ -1110,6 +1116,9 @@ msgstr "URL che punta al logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (quadrato)"
+
+msgid "Standard Image"
+msgstr "Immagine standard"
 
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "Indirizzo di risposta dell'e-mail (Rispondi a)"

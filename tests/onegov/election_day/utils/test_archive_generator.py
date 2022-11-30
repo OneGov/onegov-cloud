@@ -12,6 +12,43 @@ from fs.copy import copy_file
 from fs.osfs import OSFS
 
 
+def test_query_only_counted_votes_that_have_results(election_day_app_zg):
+    archive_generator = ArchiveGenerator(election_day_app_zg)
+    session = election_day_app_zg.session()
+
+    sample_votes = [
+        Vote(title="Abstimmung 1. Januar 2022", domain='federation',
+             date=date(2022, 1, 1)),
+        Vote(title="Abstimmung 2. Januar 2013", domain='federation',
+             date=date(2013, 1, 2))
+    ]
+
+    ballot_results = [
+        BallotResult(
+            name='Bern', entity_id=351,
+            counted=True, yeas=7000, nays=3000, empty=0, invalid=0
+        ),
+        BallotResult(
+            name='Bern', entity_id=351,
+            counted=False, yeas=2000, nays=5000, empty=0, invalid=0
+        )
+    ]
+    # 2 Votes with 1 BallotResult each
+    for sample_vote, ballot_result in zip(sample_votes, ballot_results):
+        session.add(sample_vote)
+        vote = session.query(Vote).filter_by(date=sample_vote.date).first()
+        vote.proposal.results.append(ballot_result)
+
+    bern = Municipality(name='Bern', municipality='351')
+    target = ArchivedResult()
+    source = ArchivedResult(type='vote')
+    add_local_results(source, target, bern, session)
+    session.flush()
+
+    votes = archive_generator.all_counted_votes_with_results()
+    assert len(votes) == 1
+
+
 def test_archive_generation_from_scratch(election_day_app_zg):
     archive_generator = ArchiveGenerator(election_day_app_zg)
     session = election_day_app_zg.session()
@@ -51,7 +88,7 @@ def test_archive_generation_from_scratch(election_day_app_zg):
     add_local_results(source, target, bern, session)
     session.flush()
 
-    votes = archive_generator.all_votes()
+    votes = archive_generator.all_counted_votes_with_results()
 
     assert votes[0].date == date(2022, 1, 1)
     assert votes[1].date == date(2013, 1, 2)
@@ -75,26 +112,27 @@ def test_archive_generation_from_scratch(election_day_app_zg):
         with ReadZipFS(fi) as zip_fs:
             votes_dir = zip_fs.listdir("votes")
             years = [str(year) for year in votes_dir]
-
-            assert len(zip_fs.listdir("votes")) == 2
-            assert {"2022", "2013"} == set(years)
+            assert len(zip_fs.listdir("votes")) == 3
+            assert {"all_votes.csv", "2022", "2013"} == set(years)
 
             votes = zip_fs.opendir("votes")
             counter = Counter()
             total_bytes_csv = 0
             walker = Walker()
             for _, _, files in walker.walk(
-                votes, namespaces=["basic", "details"]
+                    votes, namespaces=["basic", "details"]
             ):
                 for file in files:
                     counter[file.name] += 1
 
                 total_bytes_csv = sum(info.size for info in files)
-            assert sum(counter.values()) == 3
+            # We expect 3 csv because we have 3 votes,
+            # Plus a csv that contains everything = 4
+            assert sum(counter.values()) == 4
             assert total_bytes_csv > 10  # check to ensure files are not empty
 
 
-def test_zipping_multiple_directories2(election_day_app_zg):
+def test_zipping_multiple_directories(election_day_app_zg):
     archive_generator = ArchiveGenerator(election_day_app_zg)
     tmp_fs = TempFS()
     empty_dir = tmp_fs.opendir("/")
@@ -171,11 +209,12 @@ def test_long_filenames_are_truncated(election_day_app_zg):
     zip_path = archive_generator.generate_archive()
     with archive_generator.archive_dir.open(zip_path, mode="rb") as fi:
         with ReadZipFS(fi) as zip_fs:
-
             csv = [csv for csv in zip_fs.scandir("votes/2022",
                                                  namespaces=["basic"])]
             first_file = csv[0]
-            assert "bundesbeschluss-vom-28-september" in first_file.name
+            filename = first_file.name
+            assert "bundesbeschluss-vom-28-september" in filename
+            assert len(filename) <= archive_generator.MAX_FILENAME_LENGTH + 4
 
 
 def test_election_generation(election_day_app_zg, import_test_datasets):
