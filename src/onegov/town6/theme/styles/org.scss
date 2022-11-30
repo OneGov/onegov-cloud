@@ -605,6 +605,7 @@ $pageref-color-hover: $iron;
 
         .page-image {
             background-color: #000 ;
+            border-radius: .7rem;
             padding-bottom: 60%;
             transition: all 200ms linear;
             width: 100%;
@@ -626,11 +627,11 @@ $pageref-color-hover: $iron;
 
             span {
                 background: rgba(0, 0, 0, .6);
+                border-radius: 0 0 .7rem .7rem;
                 display: block;
                 margin-bottom: 0;
-                padding: .8rem;
-                padding-bottom: .5rem;
-                padding-top: .5rem;
+                padding: 1.5rem;
+                padding-top: 1rem;
                 text-shadow: #000 0 0 10px;
 
                 &::after {
