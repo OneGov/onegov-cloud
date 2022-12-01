@@ -184,10 +184,10 @@ def get_election_compound(app, id):
 
 @ElectionDayApp.path(
     model=ElectionCompoundPart,
-    path='/elections-part/{election_compound_id}/{id}'
+    path='/elections-part/{election_compound_id}/{domain}/{id}'
 )
-def get_superregion(app, election_compound_id, id):
-    return ElectionCompoundPart.by_id(app, election_compound_id, id)
+def get_superregion(app, election_compound_id, domain, id):
+    return ElectionCompoundPart.by_id(app, election_compound_id, domain, id)
 
 
 @ElectionDayApp.path(

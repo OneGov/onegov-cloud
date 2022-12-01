@@ -15,7 +15,9 @@ def get_superregions(compound, principal):
     result = {entity.get('superregion') for entity in entities.values()}
     result = {
         superregion: {
-            'superregion': ElectionCompoundPart(compound, superregion),
+            'superregion': ElectionCompoundPart(
+                compound, 'superregion', superregion
+            ),
             'mandates': {'allocated': 0, 'total': 0},
             'progress': {'counted': 0, 'total': 0}
         }

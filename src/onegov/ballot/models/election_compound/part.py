@@ -25,14 +25,15 @@ class ElectionCompoundPart(DerivedAttributesMixin):
 
     """
 
-    def __init__(self, election_compound, segment):
+    def __init__(self, election_compound, domain, segment):
         self.election_compound = election_compound
         self.election_compound_id = election_compound.id
+        self.domain = domain
         self.segment = segment
         self.id = segment.replace(' ', '-').lower()
 
     @classmethod
-    def by_id(cls, app, election_compound_id, id):
+    def by_id(cls, app, election_compound_id, domain, id):
         from onegov.ballot.collections import ElectionCompoundCollection
 
         compound = ElectionCompoundCollection(app.session()).by_id(
@@ -40,16 +41,35 @@ class ElectionCompoundPart(DerivedAttributesMixin):
         )
         if compound:
             segment = id.title().replace('-', ' ')
-            if segment in app.principal.get_superregions(compound.date.year):
-                return cls(compound, segment)
+            segments = []
+            if domain == 'district':
+                segments = app.principal.get_districts(compound.date.year)
+            if domain == 'region':
+                segments = app.principal.get_regions(compound.date.year)
+            if domain == 'superregion':
+                segments = app.principal.get_superregions(compound.date.year)
+            if segment in segments:
+                return cls(compound, domain, segment)
 
     date = inherited_attribute()
     completed = inherited_attribute()
     last_result_change = inherited_attribute()
+    last_modified = inherited_attribute()
+    colors = inherited_attribute()
+    voters_counts = inherited_attribute()
+    show_party_strengths = inherited_attribute()
 
     @property
     def title(self):
         return f'{self.election_compound.title} {self.segment}'
+
+    @property
+    def title_translations(self):
+        return {
+            locale: f'{title} {self.segment}'
+            for locale, title
+            in self.election_compound.title_translations.items()
+        }
 
     @property
     def elections(self):

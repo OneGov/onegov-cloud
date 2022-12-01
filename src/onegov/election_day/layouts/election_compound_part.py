@@ -13,63 +13,38 @@ class ElectionCompoundPartLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
-    # todo: ?
-    # tabs_with_embedded_tables = (
-    #     'seat-allocation',
-    #     'list-groups',
-    #     'superregions',
-    #     'districts',
-    #     'candidates',
-    #     'statistics'
-    # )
+    tabs_with_embedded_tables = (
+        'districts',
+        'candidates',
+        'statistics'
+    )
 
     majorz = False
     proporz = True
     # todo: ?
     # type = 'compound'
 
-    # todo: ?
-    # @cached_property
-    # def table_link(self):
-    #     if self.tab not in self.tabs_with_embedded_tables:
-    #         return None
-    #     return self.request.link(
-    #         self.model, f'{self.tab}-table'
-    #     )
+    @cached_property
+    def table_link(self):
+        if self.tab not in self.tabs_with_embedded_tables:
+            return None
+        return self.request.link(
+            self.model, f'{self.tab}-table'
+        )
 
     @cached_property
     def all_tabs(self):
         """ Return the tabs in order of their appearance. """
         return (
             'districts',
-            # todo: ?
-            # 'candidates',
-            # 'party-strengths',
-            # 'statistics',
-            # 'data'
+            'candidates',
+            'party-strengths',
+            'statistics',
         )
 
-    # todo: ?
-    # @cached_property
-    # def results(self):
-    #     return self.model.results
-
-    # todo: ?
-    # @cached_property
-    # def has_districts(self):
-    #     if not self.principal.has_districts:
-    #         return False
-    #     if self.model.domain_elections == 'municipality':
-    #         return False
-    #     return True
-
-    # todo: ?
-    # @cached_property
-    # def has_superregions(self):
-    #     return (
-    #         self.principal.has_superregions
-    #         and self.model.domain_elections == 'region'
-    #     )
+    @cached_property
+    def results(self):
+        return self.model.results
 
     def label(self, value):
         if value == 'district':
@@ -89,15 +64,12 @@ class ElectionCompoundPartLayout(DetailLayout):
 
         if tab == 'districts':
             return self.label('districts')
-        # todo: ?
-        # if tab == 'candidates':
-        #     return _("Elected candidates")
-        # if tab == 'party-strengths':
-        #     return _("Party strengths")
-        # if tab == 'data':
-        #     return _("Downloads")
-        # if tab == 'statistics':
-        #     return _("Election statistics")
+        if tab == 'candidates':
+            return _("Elected candidates")
+        if tab == 'party-strengths':
+            return _("Party strengths")
+        if tab == 'statistics':
+            return _("Election statistics")
 
         return ''
 
@@ -105,18 +77,16 @@ class ElectionCompoundPartLayout(DetailLayout):
 
         if not self.has_results:
             return False
-        # todo: ?
-        # if tab == 'party-strengths':
-        #     return (
-        #         self.model.show_party_strengths is True
-        #         and self.has_party_results
-        #     )
+        if tab == 'party-strengths':
+            return (
+                self.model.show_party_strengths is True
+                and self.has_party_results
+            )
         return True
 
-    # todo: ?
-    # @cached_property
-    # def has_party_results(self):
-    #     return self.model.party_results.first() is not None
+    @cached_property
+    def has_party_results(self):
+        return self.model.party_results.first() is not None
 
     @cached_property
     def visible(self):

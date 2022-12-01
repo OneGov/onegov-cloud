@@ -485,31 +485,6 @@
     </table>
 </metal:election-compound-superregions-table>
 
-<metal:superregion-districts-table define-macro="superregion-districts-table" i18n:domain="onegov.election_day">
-    <table
-        class="superregion-districts-table results tablesaw sortable"
-        data-tablesaw-mode="columntoggle"
-        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-        data-tablesaw-minimap=""
-        >
-        <thead>
-            <tr>
-                <th data-tablesaw-priority="persist" i18n:translate="" class="column-district left-aligned">${layout.label('district')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.proporz" data-sorter="false">${layout.label('mandates')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="column-mandates right-aligned" tal:condition="layout.majorz" data-sorter="false">Seats</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-counted right-aligned" data-sorter="false">Counted</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr tal:repeat="election superregion.elections">
-                <th class="column-district left-aligned"><a href="${request.link(election)}">${election.domain_segment}</a></th>
-                <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></td>
-                <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></td>
-            </tr>
-        </tbody>
-    </table>
-</metal:superregion-districts-table>
-
 
 <metal:election-statistics-table define-macro="election-statistics-table" i18n:domain="onegov.election_day">
     <table
