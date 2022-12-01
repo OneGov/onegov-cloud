@@ -34,6 +34,23 @@ class DerivedAttributesMixin:
         return mandates[0] if mandates else 0
 
     @property
+    def counted(self):
+        """ True if all elections have been counted. """
+
+        for election in self.elections:
+            if not election.counted:
+                return False
+
+        return True
+
+    @property
+    def counted_entities(self):
+        return [
+            election.domain_segment for election in self.elections
+            if election.completed
+        ]
+
+    @property
     def results(self):
         return [
             Bunch(

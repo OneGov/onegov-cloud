@@ -55,8 +55,10 @@ class ElectionCompoundPart(DerivedAttributesMixin):
     completed = inherited_attribute()
     last_result_change = inherited_attribute()
     last_modified = inherited_attribute()
+    domain_elections = inherited_attribute()
     colors = inherited_attribute()
     voters_counts = inherited_attribute()
+    horizontal_party_strengths = inherited_attribute()
     show_party_strengths = inherited_attribute()
 
     @property
@@ -83,29 +85,10 @@ class ElectionCompoundPart(DerivedAttributesMixin):
     def session(self):
         return object_session(self.election_compound)
 
-    # todo: ?
-    # @property
-    # def counted(self):
-    #     """ True if all elections have been counted. """
-    #
-    #     for election in self.elections:
-    #         if not election.counted:
-    #             return False
-    #
-    #     return True
-
     @property
     def progress(self):
         result = [e.completed for e in self.elections]
         return sum(1 for r in result if r), len(result)
-
-    # todo: ?
-    # @property
-    # def counted_entities(self):
-    #     return [
-    #         election.domain_segment for election in self.elections
-    #         if election.completed
-    #     ]
 
     @property
     def party_results(self):

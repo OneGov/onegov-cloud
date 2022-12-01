@@ -119,16 +119,6 @@ class ElectionCompound(
         return object_session(self)
 
     @property
-    def counted(self):
-        """ True if all elections have been counted. """
-
-        for election in self.elections:
-            if not election.counted:
-                return False
-
-        return True
-
-    @property
     def progress(self):
         """ Returns a tuple with the current progress.
 
@@ -151,13 +141,6 @@ class ElectionCompound(
             result = [all(v) for k, v in result.items()]
 
         return sum(1 for r in result if r), len(result)
-
-    @property
-    def counted_entities(self):
-        return [
-            election.domain_segment for election in self.elections
-            if election.completed
-        ]
 
     @property
     def has_results(self):

@@ -1,10 +1,6 @@
 from cached_property import cached_property
-# todo: ?
-# from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout
-# todo: ?
-# from onegov.election_day.utils import svg_filename
 
 
 class ElectionCompoundPartLayout(DetailLayout):
@@ -21,8 +17,7 @@ class ElectionCompoundPartLayout(DetailLayout):
 
     majorz = False
     proporz = True
-    # todo: ?
-    # type = 'compound'
+    type = 'compound_part'
 
     @cached_property
     def table_link(self):
@@ -110,46 +105,10 @@ class ElectionCompoundPartLayout(DetailLayout):
             ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
 
-    # todo: ?
-    # @cached_property
-    # def svg_path(self):
-    #     """ Returns the path to the SVG or None, if it is not available. """
-    #
-    #     path = 'svg/{}'.format(
-    #         svg_filename(
-    #             self.model,
-    #             self.tab,
-    #             self.request.locale,
-    #             last_modified=self.last_modified
-    #         )
-    #     )
-    #     if self.request.app.filestorage.exists(path):
-    #         return path
-    #
-    #     return None
+    @property
+    def svg_path(self):
+        return None
 
-    # todo: ?
-    # @cached_property
-    # def svg_link(self):
-    #     """ Returns a link to the SVG download view. """
-    #
-    #     return self.request.link(self.model, name='{}-svg'.format(self.tab))
-
-    # todo: ?
-    # @cached_property
-    # def svg_name(self):
-    #     """ Returns a nice to read SVG filename. """
-    #
-    #     return '{}.svg'.format(
-    #         normalize_for_url(
-    #             '{}-{}'.format(
-    #                 self.model.id,
-    #                 self.request.translate(self.title() or '')
-    #             )
-    #         )
-    #     )
-
-    # todo: ?
-    # @property
-    # def summarize(self):
-    #     return False
+    @property
+    def summarize(self):
+        return False

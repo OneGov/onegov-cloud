@@ -55,20 +55,18 @@ def view_election_compound_part_json(self, request):
         add_last_modified_header(response, last_modified)
 
     session = request.app.session()
-    # todo:
-    # embed = {'districts-map': request.link(self, 'districts-map')}
+    embed = {'districts-map': request.link(self, 'districts-map')}
     embed = {}
     media = {'charts': {}}
     layout = ElectionCompoundPartLayout(self, request)
     layout.last_modified = last_modified
-    # todo:
-    # for tab in ('party-strengths', ):
-    #     layout = ElectionCompoundPartLayout(self, request, tab=tab)
-    #     layout.last_modified = last_modified
-    #     if layout.visible:
-    #         embed[tab] = request.link(self, '{}-chart'.format(tab))
-    #     if layout.svg_path:
-    #         media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
+    for tab in ('party-strengths', ):
+        layout = ElectionCompoundPartLayout(self, request, tab=tab)
+        layout.last_modified = last_modified
+        if layout.visible:
+            embed[tab] = request.link(self, '{}-chart'.format(tab))
+        if layout.svg_path:
+            media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 
     elected_candidates = get_elected_candidates(self, session).all()
     candidate_statistics = get_candidate_statistics(self, elected_candidates)

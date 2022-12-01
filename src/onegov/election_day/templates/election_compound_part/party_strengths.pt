@@ -18,7 +18,11 @@
 
             <h3 tal:content="layout.title()" />
 
-            <!-- todo: figure -->
+            <div class="row">
+                <div class="small-12 small-centered large-10 columns">
+                    <figure metal:use-macro="layout.macros['party_strengths_figure']" tal:define="model election_compound_part"/>
+                </div>
+            </div>
 
             <div metal:use-macro="layout.macros['party_strengths']" tal:define="voters_counts election_compound_part.voters_counts"/>
 
