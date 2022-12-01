@@ -1,66 +1,27 @@
 from collections import OrderedDict
+from onegov.ballot.models.election_compound.association import \
+    ElectionCompoundAssociation
 from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.mixins import PartyResultExportMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
+from onegov.ballot.models.party_result.mixins import PartyResultExportMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
-from onegov.core.orm.types import UUID
 from onegov.core.utils import Bunch
 from onegov.core.utils import groupbylist
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
-from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
-from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
-from uuid import uuid4
-
-
-class ElectionCompoundAssociation(Base):
-
-    __tablename__ = 'election_compound_associations'
-
-    #: identifies the candidate result
-    id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: The election compound ID
-    election_compound_id = Column(
-        Text,
-        ForeignKey('election_compounds.id', onupdate='CASCADE')
-    )
-
-    #: The election ID
-    election_id = Column(
-        Text,
-        ForeignKey('elections.id', onupdate='CASCADE'),
-        primary_key=True
-    )
-
-    election_compound = relationship(
-        'ElectionCompound', backref=backref(
-            'associations',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
-    )
-
-    election = relationship(
-        'Election', backref=backref(
-            'associations',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
-    )
 
 
 class ElectionCompound(
