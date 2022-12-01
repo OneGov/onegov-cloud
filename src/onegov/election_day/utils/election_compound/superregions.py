@@ -8,9 +8,6 @@ def get_superregions(compound, principal):
     if compound.domain_elections != 'region':
         return {}
 
-    # todo: add dummies from principal
-    # todo: move this to model?
-
     entities = principal.entities.get(compound.date.year, {})
     result = {entity.get('superregion') for entity in entities.values()}
     result = {
