@@ -496,10 +496,11 @@
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
     <div class="newslist grid-x grid-padding-x align-center" tal:condition="news" data-equalizer data-equalize-on="medium">
-
         <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
+    </div>
+    <div class="newslist grid-x align-center">
         <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All articles</span></a>
     </div>
 </metal:newslist>
