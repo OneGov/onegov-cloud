@@ -55,8 +55,5 @@ class PartyResult(Base, TimestampMixin):
     #: the year
     year = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: the color code
-    color = Column(Text, nullable=True)
-
     #: the id of the party
     party_id = Column(Text, nullable=False)
