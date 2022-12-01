@@ -33,14 +33,12 @@
         </div>
         <div class="grid-x">
             <div class="small-12 cell" tal:condition="not: request.app.disable_password_reset">
-                <span i18n:translate>
-                    Forgot your password?
-                </span>
-                <span>
+                <p>
+                    <span id="text" i18n:translate>Forgot your password?</span><br/>
                     <a href="${password_reset_link}" i18n:translate>
                         Reset password
-                    </a>.
-                </span>
+                    </a>
+                </p>
             </div>
         </div>
         <div class="grid-x" tal:condition="providers">

@@ -251,7 +251,6 @@ class ServicesWidget:
     template = """
         <xsl:template match="services">
             <div class="services-panel">
-                <h3 tal:content="services_panel.title"></h3>
                 <ul class="panel-links callout">
                     <li tal:repeat="link services_panel.links">
                         <tal:b content="structure link(layout)" />
@@ -351,7 +350,6 @@ class ContactsAndAlbumsWidget:
     template = """
            <xsl:template match="contacts_and_albums">
               <div class="contacts-albums-panel">
-                <h3 tal:content="contacts_and_albums_panel.title"></h3>
                 <metal:block use-macro="layout.macros['panel-links']"
                    tal:define="panel contacts_and_albums_panel;
                    classes ['more-list']"
@@ -393,7 +391,7 @@ class FocusWidget:
     template = """
     <xsl:template match="focus">
         <a href="{@focus-url}" class="focus-link">
-            <div class="focus-widget" data-aos="fade">
+            <div class="focus-widget card" data-aos="fade">
                 <xsl:variable name="apos">'</xsl:variable>
                 <xsl:variable name="image_src">
                     <xsl:choose>
@@ -469,10 +467,11 @@ class FocusWidget:
                         )"/>
                     </xsl:attribute>
                 </metal:block>
+                <div class="card-section">
                 <xsl:choose>
                     <xsl:when test="@hide-title"></xsl:when>
                     <xsl:otherwise>
-                    <h3>
+                    <h5>
                         <xsl:choose>
                             <xsl:when test="@title">
                                 <xsl:value-of select="@title" />
@@ -482,7 +481,7 @@ class FocusWidget:
                                 use-macro="layout.macros['focus-title']" />
                             </xsl:otherwise>
                         </xsl:choose>
-                    </h3>
+                    </h5>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:for-each select="text">
@@ -490,6 +489,7 @@ class FocusWidget:
                         <xsl:apply-templates select="node()"/>
                     </p>
                 </xsl:for-each>
+                </div>
             </div>
         </a>
     </xsl:template>

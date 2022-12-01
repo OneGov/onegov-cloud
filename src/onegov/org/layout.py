@@ -298,6 +298,12 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @cached_property
+    def directories_url(self):
+        return self.request.link(
+            DirectoryCollection(self.request.session)
+        )
+
+    @cached_property
     def news_url(self):
         return self.request.class_link(News, {'absorb': ''})
 
