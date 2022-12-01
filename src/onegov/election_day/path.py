@@ -8,7 +8,7 @@ from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundCollection
 from onegov.ballot import List
 from onegov.ballot import ListCollection
-from onegov.ballot import Superregion
+from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.core.converters import extended_date_converter
@@ -183,11 +183,11 @@ def get_election_compound(app, id):
 
 
 @ElectionDayApp.path(
-    model=Superregion,
-    path='/superregion/{election_compound_id}/{id}'
+    model=ElectionCompoundPart,
+    path='/elections-part/{election_compound_id}/{id}'
 )
 def get_superregion(app, election_compound_id, id):
-    return Superregion.by_id(app, election_compound_id, id)
+    return ElectionCompoundPart.by_id(app, election_compound_id, id)
 
 
 @ElectionDayApp.path(

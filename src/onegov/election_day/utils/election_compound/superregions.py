@@ -1,4 +1,4 @@
-from onegov.ballot import Superregion
+from onegov.ballot import ElectionCompoundPart
 from onegov.core.utils import groupbylist
 
 
@@ -15,7 +15,7 @@ def get_superregions(compound, principal):
     result = {entity.get('superregion') for entity in entities.values()}
     result = {
         superregion: {
-            'superregion': Superregion(compound, superregion),
+            'superregion': ElectionCompoundPart(compound, superregion),
             'mandates': {'allocated': 0, 'total': 0},
             'progress': {'counted': 0, 'total': 0}
         }

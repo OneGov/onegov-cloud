@@ -2,10 +2,22 @@ from onegov.ballot.models.election.candidate import Candidate
 from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
+# todo: InheritedAttribute
+# todo: Mixin
 
-class Superregion:
 
-    """ A superregion of an election compound. """
+class ElectionCompoundPart:
+
+    """ A part of an election compound.
+
+    Covers a part of an election compound between the domain of the compound
+    and the domain of the elections.
+
+    There is no database object behind a part of an election compound, all
+    the results are either taken from the compound (parties) or elections
+    (candidates)-
+
+    """
 
     def __init__(self, election_compound, segment):
         self.election_compound = election_compound

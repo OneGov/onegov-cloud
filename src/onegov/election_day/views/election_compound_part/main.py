@@ -1,10 +1,10 @@
 from morepath import redirect
-from onegov.ballot import Superregion
+from onegov.ballot import ElectionCompoundPart
 from onegov.core.security import Public
 # todo: ?
 # from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import SuperregionLayout
+from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 # todo: ?
@@ -18,7 +18,7 @@ from onegov.election_day.utils import add_last_modified_header
 
 
 @ElectionDayApp.view(
-    model=Superregion,
+    model=ElectionCompoundPart,
     request_method='HEAD',
     permission=Public
 )
@@ -33,18 +33,18 @@ def view_superregion_head(self, request):
 
 
 @ElectionDayApp.html(
-    model=Superregion,
+    model=ElectionCompoundPart,
     permission=Public
 )
 def view_superregion(self, request):
 
     """" The main view. """
 
-    return redirect(SuperregionLayout(self, request).main_view)
+    return redirect(ElectionCompoundPartLayout(self, request).main_view)
 
 # todo: ?
 # @ElectionDayApp.json(
-#     model=Superregion,
+#     model=ElectionCompoundPart,
 #     name='json',
 #     permission=Public
 # )
@@ -61,12 +61,12 @@ def view_superregion(self, request):
 #     session = request.app.session()
 #     embed = {'districts-map': request.link(self, 'districts-map')}
 #     media = {'charts': {}}
-#     layout = SuperregionLayout(self, request)
+#     layout = ElectionCompoundPartLayout(self, request)
 #     layout.last_modified = last_modified
 #     if layout.pdf_path:
 #         media['pdf'] = request.link(self, 'pdf')
 #     for tab in ('party-strengths', 'parties-panachage'):
-#         layout = SuperregionLayout(self, request, tab=tab)
+#         layout = ElectionCompoundPartLayout(self, request, tab=tab)
 #         layout.last_modified = last_modified
 #         if layout.visible:
 #             embed[tab] = request.link(self, '{}-chart'.format(tab))
@@ -135,7 +135,7 @@ def view_superregion(self, request):
 
 # todo: ?
 # @ElectionDayApp.json(
-#     model=Superregion,
+#     model=ElectionCompoundPart,
 #     name='summary',
 #     permission=Public
 # )

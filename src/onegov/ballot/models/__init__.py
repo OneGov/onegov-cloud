@@ -19,7 +19,7 @@ from onegov.ballot.models.election import PanachageResult
 from onegov.ballot.models.election import ProporzElection
 from onegov.ballot.models.election_compound import ElectionCompound
 from onegov.ballot.models.election_compound import ElectionCompoundAssociation
-from onegov.ballot.models.election_compound import Superregion
+from onegov.ballot.models.election_compound import ElectionCompoundPart
 from onegov.ballot.models.party_result import PartyResult
 from onegov.ballot.models.vote import Ballot
 from onegov.ballot.models.vote import BallotResult
@@ -36,6 +36,7 @@ __all__ = [
     'ElectionAssociation',
     'ElectionCompound',
     'ElectionCompoundAssociation',
+    'ElectionCompoundPart',
     'ElectionResult',
     'List',
     'ListConnection',
@@ -43,6 +44,5 @@ __all__ = [
     'PanachageResult',
     'PartyResult',
     'ProporzElection',
-    'Superregion',
     'Vote',
 ]

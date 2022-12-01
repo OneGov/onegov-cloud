@@ -1,7 +1,8 @@
 from collections import OrderedDict
 from onegov.ballot.models.election_compound.association import \
     ElectionCompoundAssociation
-from onegov.ballot.models.election.candidate import Candidate
+from onegov.ballot.models.election_compound.mixins import \
+    DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
@@ -17,7 +18,6 @@ from onegov.core.utils import Bunch
 from onegov.core.utils import groupbylist
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
-from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import object_session
@@ -27,7 +27,7 @@ from sqlalchemy.orm import relationship
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultExportMixin, ExplanationsPdfMixin
+    PartyResultExportMixin, ExplanationsPdfMixin, DerivedAttributesMixin
 ):
 
     __tablename__ = 'election_compounds'
@@ -116,26 +116,8 @@ class ElectionCompound(
                 self.last_result_change = new
 
     @property
-    def number_of_mandates(self):
-        """ The (total) number of mandates. """
-        return sum([
-            election.number_of_mandates for election in self.elections
-        ])
-
-    @property
-    def allocated_mandates(self):
-        """ Number of already allocated mandates/elected candidates. """
-
-        election_ids = [e.id for e in self.elections if e.completed]
-        if not election_ids:
-            return 0
-        session = object_session(self)
-        mandates = session.query(
-            func.count(func.nullif(Candidate.elected, False))
-        )
-        mandates = mandates.filter(Candidate.election_id.in_(election_ids))
-        mandates = mandates.first()
-        return mandates[0] if mandates else 0
+    def session(self):
+        return object_session(self)
 
     @property
     def counted(self):

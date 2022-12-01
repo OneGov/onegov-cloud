@@ -1,14 +1,14 @@
-from onegov.ballot import Superregion
+from onegov.ballot import ElectionCompoundPart
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import SuperregionLayout
+from onegov.election_day.layouts import ElectionCompoundPartLayout
 # todo: ?
 # from onegov.election_day.utils import add_last_modified_header
 # from onegov.election_day.utils.election_compound import get_districts_data
 
 
 @ElectionDayApp.html(
-    model=Superregion,
+    model=ElectionCompoundPart,
     name='districts',
     template='superregion/districts.pt',
     permission=Public
@@ -24,7 +24,7 @@ def view_superregion_districts(self, request):
 
     return {
         'superregion': self,
-        'layout': SuperregionLayout(self, request, 'districts'),
+        'layout': ElectionCompoundPartLayout(self, request, 'districts'),
         # todo: ?
         # 'map_type': map_type,
         # 'data_url': request.link(self, name='by-district'),
@@ -34,7 +34,7 @@ def view_superregion_districts(self, request):
 
 # todo: ?
 # @ElectionDayApp.json(
-#     model=Superregion,
+#     model=ElectionCompoundPart,
 #     name='by-district',
 #     permission=Public
 # )
@@ -47,7 +47,7 @@ def view_superregion_districts(self, request):
 
 # todo: ?
 # @ElectionDayApp.html(
-#     model=Superregion,
+#     model=ElectionCompoundPart,
 #     name='districts-map',
 #     template='embed.pt',
 #     permission=Public
@@ -66,7 +66,7 @@ def view_superregion_districts(self, request):
 #
 #     return {
 #         'model': self,
-#         'layout': SuperregionLayout(self, request, 'districts'),
+#         'layout': ElectionCompoundPartLayout(self, request, 'districts'),
 #         'type': 'map',
 #         'scope': scope,
 #         'year': self.date.year,
@@ -81,7 +81,7 @@ def view_superregion_districts(self, request):
 
 # todo: ?
 # @ElectionDayApp.html(
-#     model=Superregion,
+#     model=ElectionCompoundPart,
 #     name='districts-table',
 #     template='embed.pt',
 #     permission=Public
@@ -96,7 +96,7 @@ def view_superregion_districts(self, request):
 #
 #     return {
 #         'election_compound': self,
-#         'layout': SuperregionLayout(self, request, 'districts'),
+#         'layout': ElectionCompoundPartLayout(self, request, 'districts'),
 #         'type': 'election-compound-table',
 #         'scope': 'districts'
 #     }

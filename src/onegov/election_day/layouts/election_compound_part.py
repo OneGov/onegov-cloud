@@ -7,7 +7,7 @@ from onegov.election_day.layouts.detail import DetailLayout
 # from onegov.election_day.utils import svg_filename
 
 
-class SuperregionLayout(DetailLayout):
+class ElectionCompoundPartLayout(DetailLayout):
 
     def __init__(self, model, request, tab=None):
         super().__init__(model, request)
