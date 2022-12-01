@@ -3,8 +3,6 @@ import click
 import os
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
-from onegov.ballot import PartyResult
-from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -209,23 +207,3 @@ def update_last_result_change():
         click.secho(f'Updated {count} items', fg='green')
 
     return update
-
-
-@cli.command('migrate-party-result-domains')
-def migrate_party_resultdomains():
-    def migrate(request, app):
-        click.secho(f'Updating {app.schema}', fg='yellow')
-
-        session = request.app.session()
-        items = session.query(ProporzElection).all()
-        items.extend(session.query(ElectionCompound))
-        for item in items:
-            results = item.party_results.filter(
-                PartyResult.domain.is_(None)
-            ).all()
-            if results:
-                for result in results:
-                    result.domain = item.domain
-                click.secho(f'Updated {item.id}', fg='green')
-
-    return migrate
