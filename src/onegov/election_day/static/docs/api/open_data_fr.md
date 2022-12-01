@@ -145,6 +145,8 @@ Les champs suivants sont inclus dans tous les formats:
 
 Nom|Description
 ---|---
+`domain`|Le domaine d'influence auquel la ligne s'applique.
+`domain_segment`|L'unité du domaine d'influence à laquelle s'applique la ligne.
 `year`|Année de l'élection.
 `total_votes`|Le total des votes de l'élection.
 `name`|Le dénomination du parti dans la langue par défaut.

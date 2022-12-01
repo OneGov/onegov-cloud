@@ -297,7 +297,7 @@ class IconWidget(TextInput):
     @property
     def template(self):
         return PageTemplate("""
-        <div class="icon-widget">
+        <div class="icon-widget" tal:attributes="depends_on">
             <ul style="font-family: ${iconfont}">
                 <li
                     tal:repeat="icon icons"
@@ -321,10 +321,15 @@ class IconWidget(TextInput):
                 return '900'
             return 'regular'
 
+        depends_on = field.render_kw.get(
+            'data-depends-on', False) if field.render_kw else False
+        depends_on = {'data-depends-on': depends_on} if depends_on else {}
+
         return Markup(self.template.render(
             iconfont=iconfont,
             icons=icons,
             id=field.id,
+            depends_on=depends_on,
             value=field.data or icons[0][0],
             font_weight=font_weight
         ))

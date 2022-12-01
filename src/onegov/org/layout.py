@@ -298,6 +298,12 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         )
 
     @cached_property
+    def directories_url(self):
+        return self.request.link(
+            DirectoryCollection(self.request.session)
+        )
+
+    @cached_property
     def news_url(self):
         return self.request.class_link(News, {'absorb': ''})
 
@@ -2416,6 +2422,9 @@ class DirectoryEntryBaseLayout(DefaultLayout):
             self.custom_body_attributes['data-default-marker-icon'] \
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'f111'
+
     @property
     def directory(self):
         return self.model.directory
@@ -2447,6 +2456,11 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 
 
 class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
 
     @cached_property
     def breadcrumbs(self):

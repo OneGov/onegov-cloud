@@ -144,6 +144,8 @@ The following fields are included in all formats:
 
 Name|Description
 ---|---
+`domain`|The domain of influence to which the line applies. Optional.
+`domain_segment`|The unit of the domain of influence to which the line applies. Optional.
 `year`|The year of the election.
 `total_votes`|The total votes of the election.
 `name`|The name of the party in the default language.

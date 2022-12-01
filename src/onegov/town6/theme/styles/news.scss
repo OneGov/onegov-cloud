@@ -26,8 +26,8 @@
         justify-content: space-between;
     }
 
-    .subheader small {
-        color: $dark-gray;
+    .subheader {
+        margin-top: 0;
     }
 
     .heading {
@@ -44,8 +44,14 @@
     }
 
     p.news-lead {
+        color: $body-font-color;
         line-height: 1.5;
     }
+}
+
+.news-card .card-section a:first-child {
+    display: block;
+    height: 100%;
 }
 
 .news-years {
@@ -62,18 +68,26 @@
     }
 }
 
-.news-more-link {
-
-    &::after {
-        @include icon-bold($more-link-icon);
-        float: right;
-        padding-right: .5rem;
-        transition: all 200ms linear;
+body:not(.homepage-layout)
+{
+    .newslist {
+        justify-content: left;
     }
 
-    &:hover::after {
-        padding-right: 0;
-    }
+    .news-all-entries {
+        display: none;
+}
+}
+
+.news-more-link::after {
+    @include icon-bold($more-link-icon);
+    float: right;
+    padding-right: .5rem;
+    transition: all 200ms linear;
+}
+
+.card:hover .news-more-link::after {
+    padding-right: 0;
 }
 
 .more-news .card {

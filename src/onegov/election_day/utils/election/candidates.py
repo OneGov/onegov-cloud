@@ -75,7 +75,6 @@ def get_candidates_data(
     session = object_session(election)
 
     colors = election.colors
-    default_color = '#999' if election.colors else ''
     column = Candidate.party
     if election.type == 'proporz':
         column = Candidate.list_id
@@ -145,7 +144,6 @@ def get_candidates_data(
                 'color': (
                     colors.get(candidate.party)
                     or colors.get(candidate.list_id)
-                    or default_color
                 )
             } for candidate in candidates
         ],

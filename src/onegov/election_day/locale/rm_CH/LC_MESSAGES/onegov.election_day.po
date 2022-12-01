@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-08 13:09+0100\n"
+"POT-Creation-Date: 2022-11-29 08:14+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -137,6 +137,10 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} betg en list_id's"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment nunvalaivels: ${domain_segment}"
 
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
@@ -327,11 +331,20 @@ msgstr "Vischnanca"
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
 
+msgid "View options"
+msgstr "Opziuns da visualisaziun"
+
 msgid "Expats"
 msgstr "Svizzers a l'exteriur"
 
 msgid "The election contains seperate results for expats."
 msgstr "L'elecziun cuntegna resultats separads per Svizzers a l'exteriur."
+
+msgid "Horizonal party strengths chart"
+msgstr ""
+
+msgid "Shows a horizontal bar chart instead of a vertical bar chart."
+msgstr ""
 
 msgid "Date"
 msgstr "Data"
@@ -421,9 +434,6 @@ msgstr "Sutattribuziun (PDF)"
 
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
-
-msgid "View options"
-msgstr "Opziuns da visualisaziun"
 
 msgid "Allows to show the list groups and lists views."
 msgstr ""
@@ -851,6 +861,7 @@ msgstr "Infurmaziun concernent il dumber d'electurs"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
+#.
 msgid "figcaption_list_groups"
 msgstr ""
 "En in emprim pass – tar l'uschenumnada attribuziun superiura – vegnan "

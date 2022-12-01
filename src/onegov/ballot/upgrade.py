@@ -669,6 +669,16 @@ def add_exapts_columns(context):
             )
 
 
+@upgrade_task('Add domain columns to party results')
+def add_domain_columns_to_party_results(context):
+    for column in ('domain', 'domain_segment'):
+        if not context.has_column('party_results', column):
+            context.operations.add_column(
+                'party_results',
+                Column(column, Text(), nullable=True)
+            )
+
+
 @upgrade_task(
     'Drop party color column',
     requires='onegov.ballot:Add party resuts columns',
