@@ -1,12 +1,18 @@
-from onegov.ballot.models.election.candidate import Candidate
-from sqlalchemy import func
+from onegov.ballot.models.election_compound.mixins import \
+    DerivedAttributesMixin
 from sqlalchemy.orm import object_session
 
-# todo: InheritedAttribute
-# todo: Mixin
+
+class inherited_attribute:
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        return getattr(instance.election_compound, self.name)
 
 
-class ElectionCompoundPart:
+class ElectionCompoundPart(DerivedAttributesMixin):
 
     """ A part of an election compound.
 
@@ -37,21 +43,13 @@ class ElectionCompoundPart:
             if segment in app.principal.get_superregions(compound.date.year):
                 return cls(compound, segment)
 
-    @property
-    def date(self):
-        return self.election_compound.date
+    date = inherited_attribute()
+    completed = inherited_attribute()
+    last_result_change = inherited_attribute()
 
     @property
     def title(self):
         return f'{self.election_compound.title} {self.segment}'
-
-    @property
-    def completed(self):
-        return self.election_compound.completed
-
-    @property
-    def last_result_change(self):
-        return self.election_compound.last_result_change
 
     @property
     def elections(self):
@@ -62,27 +60,8 @@ class ElectionCompoundPart:
         ]
 
     @property
-    def number_of_mandates(self):
-        """ The (total) number of mandates. """
-
-        return sum([
-            election.number_of_mandates for election in self.elections
-        ])
-
-    @property
-    def allocated_mandates(self):
-        """ Number of already allocated mandates/elected candidates. """
-
-        election_ids = [e.id for e in self.elections if e.completed]
-        if not election_ids:
-            return 0
-        session = object_session(self.election_compound)
-        mandates = session.query(
-            func.count(func.nullif(Candidate.elected, False))
-        )
-        mandates = mandates.filter(Candidate.election_id.in_(election_ids))
-        mandates = mandates.first()
-        return mandates[0] if mandates else 0
+    def session(self):
+        return object_session(self.election_compound)
 
     # todo: ?
     # @property
