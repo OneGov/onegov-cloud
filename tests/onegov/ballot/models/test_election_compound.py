@@ -434,7 +434,7 @@ def test_election_compound_model(session):
 
     # Add party results
     party_result = PartyResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         number_of_mandates=0,
         votes=0,
         total_votes=100,
@@ -447,7 +447,7 @@ def test_election_compound_model(session):
 
     # Add panachage results
     panachage_result = PanachageResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         source='A',
         target='B',
         votes=0,
@@ -468,7 +468,7 @@ def test_election_compound_model(session):
 
     # Add results again and delete compound
     party_result = PartyResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         number_of_mandates=0,
         votes=0,
         total_votes=100,
@@ -480,7 +480,7 @@ def test_election_compound_model(session):
     assert election_compound.party_results.one() == party_result
 
     panachage_result = PanachageResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         source='A',
         target='B',
         votes=0,
@@ -1166,32 +1166,66 @@ def test_election_compound_export_parties(session):
 
 
 def test_election_compound_rename(session):
+    # Add data
     session.add(majorz_election())
     session.add(proporz_election())
     session.flush()
 
     election_compound = ElectionCompound(
         title='Elections',
-        id='elerctions',
+        id='x',
         domain='canton',
         date=date(2015, 6, 14),
     )
     election_compound.elections = session.query(Election).all()
     session.add(election_compound)
     session.flush()
-
-    query = session.query(
-        ElectionCompoundAssociation.election_compound_id.distinct()
+    session.add(
+        PartyResult(
+            election_compound_id=election_compound.id,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name_translations={'en_US': 'Libertarian'},
+            party_id='1'
+        )
     )
-    assert query.one()[0] == 'elerctions'
-
-    election_compound.id = 'elections'
-    assert query.one()[0] == 'elections'
-    assert len(election_compound.elections) == 2
-
+    session.add(
+        PanachageResult(
+            election_compound_id=election_compound.id,
+            source='A',
+            target='B',
+            votes=0,
+        )
+    )
     session.flush()
-    assert query.one()[0] == 'elections'
+
+    # Check IDs
+    assert session.query(
+        ElectionCompoundAssociation.election_compound_id
+    ).distinct().scalar() == 'x'
+    assert ('x',) in session.query(
+        PartyResult.election_compound_id
+    ).distinct().all()
+    assert ('x',) in session.query(
+        PanachageResult.election_compound_id
+    ).distinct().all()
+
+    # Change
+    election_compound.id = 'y'
+    session.flush()
+
+    # Check IDs
+    assert session.query(
+        ElectionCompoundAssociation.election_compound_id
+    ).distinct().scalar() == 'y'
     assert len(election_compound.elections) == 2
+    assert ('y',) in session.query(
+        PartyResult.election_compound_id
+    ).distinct().all()
+    assert ('y',) in session.query(
+        PanachageResult.election_compound_id
+    ).distinct().all()
 
 
 def test_election_compound_manual_completion(session):

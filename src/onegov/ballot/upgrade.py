@@ -686,3 +686,8 @@ def add_domain_columns_to_party_results(context):
 def drop_party_color_column(context):
     if context.has_column('party_results', 'color'):
         context.operations.drop_column('party_results', 'color')
+
+
+# todo: make owner nullable, add foreign keys
+# todo: add migration step
+# todo: drop owner
