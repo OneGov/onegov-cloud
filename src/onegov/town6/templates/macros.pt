@@ -516,15 +516,13 @@
             <form class="signup" action="${form.action}" method="POST">
                 <div>${form.csrf_token}</div>
                 <div class="grid-x">
-                    <div class="cell small-8">
+                    <div class="cell small-12">
                         <label class="${'error' if form.address.errors else ''}">
                             <input data-typeahead-subject type="email"
                                name="address"
                                placeholder="E-Mail Address" i18n:attributes="placeholder"/>
                             <small class="error" tal:repeat="error form.address.errors">${error}</small>
                         </label>
-                    </div>
-                    <div class="cell small-4 ${'error' if form.address.errors else ''}">
                         <button type="submit"
                                 class="button" i18n:translate>
                             Signup

@@ -261,6 +261,10 @@ $transition-duration: .1s;
             padding-top: 0;
         }
 
+        button {
+            border-radius: 0;
+        }
+
         .cell {
 
             @include breakpoint(small only) {
