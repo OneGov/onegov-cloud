@@ -270,7 +270,7 @@
 </metal:partners>
 
 <metal:partners define-macro="partner-cards" i18n:domain="onegov.town6" tal:define="subpage subpage|False">
-    <div class="partners grid-x grid-padding-x columns small-up-1 medium-up-3 large-up-4 align-center">
+    <div class="partners grid-x grid-padding-x columns small-up-2 medium-up-3 large-up-4 align-center">
         <div class="cell" tal:repeat="item partners">
             <metal:b use-macro="layout.macros['partner-card']" />
         </div>
