@@ -677,3 +677,12 @@ def add_domain_columns_to_party_results(context):
                 'party_results',
                 Column(column, Text(), nullable=True)
             )
+
+
+@upgrade_task(
+    'Drop party color column',
+    requires='onegov.ballot:Add party resuts columns',
+)
+def drop_party_color_column(context):
+    if context.has_column('party_results', 'color'):
+        context.operations.drop_column('party_results', 'color')
