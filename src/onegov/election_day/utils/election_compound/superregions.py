@@ -1,5 +1,4 @@
 from onegov.ballot import ElectionCompoundPart
-from onegov.core.utils import groupbylist
 
 
 def get_superregions(compound, principal):
@@ -35,40 +34,35 @@ def get_superregions(compound, principal):
     return {k: v for k, v in result.items() if k in keys}
 
 
-def get_superregions_data(compound, principal):
+def get_superregions_data(compound, principal, request=None):
     """ Returns the data used by elections compounds for rendering entities and
     districts maps. """
 
     if compound.domain_elections != 'region':
         return {}
 
-    entities = principal.entities.get(compound.date.year, {})
-    lookup = sorted([
-        (value.get('superregion'), key)
-        for key, value in entities.items()
-    ])
-    lookup = groupbylist(lookup, lambda x: x[0])
-    lookup = {
-        key: {
-            'id': key,
-            'entities': [v[1] for v in value]
-        } for key, value in lookup
-    }
+    result = get_superregions(compound, principal)
 
-    result = {}
-    for election in compound.elections:
-        if election.domain_supersegment in lookup:
-            key = election.domain_supersegment
-            id_ = lookup[key]['id']
-            if id_ not in result:
-                result[id_] = {
-                    'entities': lookup[key]['entities'],
-                    'votes': 0,
-                    'percentage': 100.0,
-                    'counted': election.counted
-                }
-            result[id_]['counted'] = (
-                result[id_]['counted'] and election.counted
-            )
+    for values in result.values():
+        values['votes'] = 0
+        values['percentage'] = 100.0
+        values['counted'] = values['superregion'].counted
+        values['progress'] = '{} / {}'.format(
+            values['progress']['counted'],
+            values['progress']['total']
+        )
+        values['mandates'] = '{} / {}'.format(
+            values['mandates']['allocated'],
+            values['mandates']['total']
+        )
+        values['link'] = request.link(values['superregion']) if request else ''
+        del values['superregion']
+
+    entities = principal.entities.get(compound.date.year, {})
+    for entity_id, values in entities.items():
+        superregion = values.get('superregion')
+        if superregion and superregion in result:
+            result[superregion].setdefault('entities', [])
+            result[superregion]['entities'].append(entity_id)
 
     return result

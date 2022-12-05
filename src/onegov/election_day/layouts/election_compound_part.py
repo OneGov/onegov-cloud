@@ -30,12 +30,16 @@ class ElectionCompoundPartLayout(DetailLayout):
     @cached_property
     def all_tabs(self):
         """ Return the tabs in order of their appearance. """
-        return (
+        result = [
             'districts',
             'candidates',
             'party-strengths',
             'statistics',
-        )
+        ]
+        if self.model.horizontal_party_strengths:
+            result.remove('party-strengths')
+            result.insert(0, 'party-strengths')
+        return tuple(result)
 
     @cached_property
     def results(self):
@@ -71,6 +75,8 @@ class ElectionCompoundPartLayout(DetailLayout):
     def tab_visible(self, tab):
 
         if not self.has_results:
+            return False
+        if self.hide_tab(tab):
             return False
         if tab == 'party-strengths':
             return (

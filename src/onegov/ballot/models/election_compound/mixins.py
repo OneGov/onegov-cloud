@@ -34,6 +34,23 @@ class DerivedAttributesMixin:
         return mandates[0] if mandates else 0
 
     @property
+    def completed(self):
+        """ Returns True, if all elections are completed. """
+
+        elections = self.elections
+        if not elections:
+            return False
+
+        for election in elections:
+            if not election.completed:
+                return False
+
+        if self.completes_manually and not self.manually_completed:
+            return False
+
+        return True
+
+    @property
     def counted(self):
         """ True if all elections have been counted. """
 

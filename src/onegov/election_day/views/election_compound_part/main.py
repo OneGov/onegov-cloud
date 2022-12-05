@@ -136,4 +136,6 @@ def view_election_compound_part_summary(self, request):
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
-    return get_election_compound_summary(self, request)
+    return get_election_compound_summary(
+        self, request, type_='election_compound_part'
+    )

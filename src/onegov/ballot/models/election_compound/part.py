@@ -32,32 +32,15 @@ class ElectionCompoundPart(DerivedAttributesMixin):
         self.segment = segment
         self.id = segment.replace(' ', '-').lower()
 
-    @classmethod
-    def by_id(cls, app, election_compound_id, domain, id):
-        from onegov.ballot.collections import ElectionCompoundCollection
-
-        compound = ElectionCompoundCollection(app.session()).by_id(
-            election_compound_id
-        )
-        if compound:
-            segment = id.title().replace('-', ' ')
-            segments = []
-            if domain == 'district':
-                segments = app.principal.get_districts(compound.date.year)
-            if domain == 'region':
-                segments = app.principal.get_regions(compound.date.year)
-            if domain == 'superregion':
-                segments = app.principal.get_superregions(compound.date.year)
-            if segment in segments:
-                return cls(compound, domain, segment)
-
     date = inherited_attribute()
-    completed = inherited_attribute()
+    completes_manually = inherited_attribute()
+    manually_completed = inherited_attribute()
     last_result_change = inherited_attribute()
     last_modified = inherited_attribute()
     domain_elections = inherited_attribute()
     colors = inherited_attribute()
     voters_counts = inherited_attribute()
+    exact_voters_counts = inherited_attribute()
     horizontal_party_strengths = inherited_attribute()
     show_party_strengths = inherited_attribute()
 
@@ -93,7 +76,7 @@ class ElectionCompoundPart(DerivedAttributesMixin):
     @property
     def party_results(self):
         return self.election_compound.party_results.filter_by(
-            domain='superregion', domain_segment=self.segment
+            domain=self.domain, domain_segment=self.segment
         )
 
     @property
