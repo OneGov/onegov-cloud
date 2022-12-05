@@ -9,6 +9,7 @@ from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
@@ -688,6 +689,80 @@ def drop_party_color_column(context):
         context.operations.drop_column('party_results', 'color')
 
 
-# todo: make owner nullable, add foreign keys
-# todo: add migration step
+@upgrade_task(
+    'Add foreign keys to party results',
+    requires='onegov.ballot:Add party results to compounds'
+)
+def add_foreign_keys_to_party_results(context):
+    if context.has_column('party_results', 'owner'):
+        context.operations.alter_column(
+            'party_results', 'owner', nullable=True
+        )
+
+    if not context.has_column('party_results', 'election_id'):
+        context.operations.add_column(
+            'party_results',
+            Column(
+                'election_id',
+                Text,
+                ForeignKey(
+                    'elections.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+
+    if not context.has_column('party_results', 'election_compound_id'):
+        context.operations.add_column(
+            'party_results',
+            Column(
+                'election_compound_id',
+                Text,
+                ForeignKey(
+                    'election_compounds.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task(
+    'Add foreign keys to panachage results',
+    requires='onegov.ballot:Add panachage results to compounds'
+)
+def add_foreign_keys_to_panahcage_results(context):
+    if not context.has_column('panachage_results', 'election_id'):
+        context.operations.add_column(
+            'panachage_results',
+            Column(
+                'election_id',
+                Text,
+                ForeignKey(
+                    'elections.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+    if not context.has_column('panachage_results', 'election_compound_id'):
+        context.operations.add_column(
+            'panachage_results',
+            Column(
+                'election_compound_id',
+                Text,
+                ForeignKey(
+                    'election_compounds.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+
+
 # todo: drop owner
