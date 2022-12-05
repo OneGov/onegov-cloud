@@ -212,9 +212,9 @@ def test_pages_cache(election_day_app_zg):
     assert '0xd3adc0d3' in client.get('/vote/0xdeadbeef/entities')
 
 
-def test_view_last_modified(election_day_app_zg):
+def test_view_last_modified(election_day_app_sg):
     with freeze_time("2014-01-01 12:00"):
-        client = Client(election_day_app_zg)
+        client = Client(election_day_app_sg)
         client.get('/locale/de_CH').follow()
 
         login(client)
@@ -242,10 +242,11 @@ def test_view_last_modified(election_day_app_zg):
         new.form['domain_elections'] = 'municipality'
         new.form.submit()
 
-        client = Client(election_day_app_zg)
+        client = Client(election_day_app_sg)
         client.get('/locale/de_CH').follow()
 
         modified = 'Wed, 01 Jan 2014 12:00:00 GMT'
+
         for path in (
             '/json',
             '/election/election/summary',
@@ -256,6 +257,8 @@ def test_view_last_modified(election_day_app_zg):
             '/elections/elections/json',
             '/elections/elections/data-json',
             '/elections/elections/data-csv',
+            '/elections-part/elections/district/Wil/summary',
+            '/elections-part/elections/district/Wil/json',
             '/vote/vote/summary',
             '/vote/vote/json',
             '/vote/vote/data-json',
@@ -265,6 +268,7 @@ def test_view_last_modified(election_day_app_zg):
         for path in (
             '/election/election',
             '/elections/elections',
+            '/elections-part/elections/district/Wil',
             '/vote/vote',
         ):
             assert client.head(path).headers.get('Last-Modified') == modified
@@ -282,6 +286,8 @@ def test_view_last_modified(election_day_app_zg):
             '/elections/elections',
             '/elections/elections/districts',
             '/elections/elections/data',
+            '/elections-part/elections/district/Wil',
+            '/elections-part/elections/district/Wil/districts',
             '/vote/vote/',
             '/vote/vote/counter-proposal-entities',
             '/vote/vote/tie-breaker-entities',

@@ -157,23 +157,6 @@ class ElectionCompound(
         return False
 
     @property
-    def completed(self):
-        """ Returns True, if all elections are completed. """
-
-        elections = self.elections
-        if not elections:
-            return False
-
-        for election in elections:
-            if not election.completed:
-                return False
-
-        if self.completes_manually and not self.manually_completed:
-            return False
-
-        return True
-
-    @property
     def elected_candidates(self):
         """ Returns the first and last names of the elected candidates. """
 

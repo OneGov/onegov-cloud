@@ -1,0 +1,173 @@
+from datetime import date
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
+from onegov.ballot import ElectionResult
+from onegov.ballot import PartyResult
+from onegov.ballot import ProporzElection
+from onegov.election_day.layouts import ElectionCompoundPartLayout
+from tests.onegov.election_day.common import DummyRequest
+
+
+def test_election_compound_part_layout_general(session):
+    date_ = date(2011, 1, 1)
+    election = ProporzElection(
+        title="election",
+        domain='region',
+        domain_segment='Allschwil',
+        domain_supersegment='Region 1',
+        date=date_
+    )
+    session.add(election)
+    session.add(ElectionCompound(title="e", domain='canton', date=date_))
+    session.flush()
+    compound = session.query(ElectionCompound).one()
+    part = ElectionCompoundPart(compound, 'superregion', 'Region 1')
+    request = DummyRequest()
+    layout = ElectionCompoundPartLayout(part, request)
+    assert layout.all_tabs == (
+        'districts',
+        'candidates',
+        'party-strengths',
+        'statistics',
+    )
+    assert layout.title() == ''
+    assert layout.title('undefined') == ''
+    assert layout.title('districts') == '__districts'
+    assert layout.title('candidates') == 'Elected candidates'
+    assert layout.title('party-strengths') == 'Party strengths'
+    assert layout.title('statistics') == 'Election statistics'
+    assert layout.main_view == 'ElectionCompoundPart/districts'
+    assert layout.majorz is False
+    assert layout.proporz is True
+    assert layout.has_party_results is False
+    assert layout.tab_visible('statistics') is False
+
+    # test results
+    compound.elections = [election]
+    election.results.append(
+        ElectionResult(
+            name='1',
+            entity_id=1,
+            counted=True,
+            eligible_voters=500,
+        )
+    )
+    layout = ElectionCompoundPartLayout(part, DummyRequest())
+    assert layout.has_results
+
+    # test party results
+    compound.party_results.append(
+        PartyResult(
+            domain='superregion',
+            domain_segment='Region 1',
+            year=2017,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name_translations={'de_CH': 'A'},
+            party_id='1'
+        )
+    )
+    layout = ElectionCompoundPartLayout(part, DummyRequest())
+    assert layout.has_party_results is True
+
+    # test main view
+    layout = ElectionCompoundPartLayout(part, request)
+    assert layout.main_view == 'ElectionCompoundPart/districts'
+
+    compound.show_party_strengths = True
+    layout = ElectionCompoundPartLayout(part, request)
+    assert layout.main_view == 'ElectionCompoundPart/districts'
+
+    compound.horizontal_party_strengths = True
+    layout = ElectionCompoundPartLayout(part, request)
+    assert layout.main_view == 'ElectionCompoundPart/party-strengths'
+
+    request.app.principal.hidden_tabs = {'elections-part': ['party-strengths']}
+    layout = ElectionCompoundPartLayout(part, request)
+    assert layout.hide_tab('party-strengths') is True
+    assert layout.main_view == 'ElectionCompoundPart/districts'
+
+    # test table links
+    for tab, expected in (
+        ('districts', 'ElectionCompoundPart/districts-table'),
+        ('candidates', 'ElectionCompoundPart/candidates-table'),
+        ('party-strengths', None),
+        ('statistics', 'ElectionCompoundPart/statistics-table')
+    ):
+        layout = ElectionCompoundPartLayout(part, DummyRequest(), tab=tab)
+        assert expected == layout.table_link
+
+
+def test_election_compound_part_layout_menu(session):
+    election = ProporzElection(
+        title="Election",
+        domain='region',
+        domain_segment='Allschwil',
+        domain_supersegment='Region 1',
+        date=date(2011, 1, 1)
+    )
+    compound = ElectionCompound(
+        title="Elections",
+        domain='canton',
+        date=date(2011, 1, 1)
+    )
+    session.add(election)
+    session.add(compound)
+    session.flush()
+    compound.elections = [election]
+    part = ElectionCompoundPart(compound, 'superregion', 'Region 1')
+
+    # No results yet
+    request = DummyRequest()
+    assert ElectionCompoundPartLayout(part, request).menu == []
+    assert ElectionCompoundPartLayout(part, request, 'data').menu == []
+
+    # Results available
+    election.results.append(
+        ElectionResult(
+            name='1',
+            entity_id=1,
+            counted=True,
+            eligible_voters=500,
+        )
+    )
+    assert ElectionCompoundPartLayout(part, request).menu == [
+        ('__districts', 'ElectionCompoundPart/districts', False, []),
+        ('Elected candidates', 'ElectionCompoundPart/candidates', False, []),
+        ('Election statistics', 'ElectionCompoundPart/statistics', False, []),
+    ]
+    assert ElectionCompoundPartLayout(part, request, 'statistics').menu == [
+        ('__districts', 'ElectionCompoundPart/districts', False, []),
+        ('Elected candidates', 'ElectionCompoundPart/candidates', False, []),
+        ('Election statistics', 'ElectionCompoundPart/statistics', True, []),
+    ]
+
+    # Party results available, but no views enabled
+    compound.party_results.append(
+        PartyResult(
+            domain='superregion',
+            domain_segment='Region 1',
+            year=2017,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name_translations={'de_CH': 'A'},
+            party_id='1'
+        )
+    )
+    assert ElectionCompoundPartLayout(part, request).menu == [
+        ('__districts', 'ElectionCompoundPart/districts', False, []),
+        ('Elected candidates', 'ElectionCompoundPart/candidates', False, []),
+        ('Election statistics', 'ElectionCompoundPart/statistics', False, []),
+    ]
+
+    # All views enabled
+    compound.show_party_strengths = True
+    compound.horizontal_party_strengths = True
+    assert ElectionCompoundPartLayout(part, request).menu == [
+        ('Party strengths', 'ElectionCompoundPart/party-strengths', False, []),
+        ('__districts', 'ElectionCompoundPart/districts', False, []),
+        ('Elected candidates', 'ElectionCompoundPart/candidates', False, []),
+        ('Election statistics', 'ElectionCompoundPart/statistics', False, []),
+    ]

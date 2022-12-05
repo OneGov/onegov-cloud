@@ -6,9 +6,9 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCollection
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundCollection
+from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import List
 from onegov.ballot import ListCollection
-from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.core.converters import extended_date_converter
@@ -187,7 +187,20 @@ def get_election_compound(app, id):
     path='/elections-part/{election_compound_id}/{domain}/{id}'
 )
 def get_superregion(app, election_compound_id, domain, id):
-    return ElectionCompoundPart.by_id(app, election_compound_id, domain, id)
+    compound = ElectionCompoundCollection(app.session()).by_id(
+        election_compound_id
+    )
+    if compound:
+        segment = id.title().replace('-', ' ')
+        segments = []
+        if domain == 'district':
+            segments = app.principal.get_districts(compound.date.year)
+        if domain == 'region':
+            segments = app.principal.get_regions(compound.date.year)
+        if domain == 'superregion':
+            segments = app.principal.get_superregions(compound.date.year)
+        if segment in segments:
+            return ElectionCompoundPart(compound, domain, segment)
 
 
 @ElectionDayApp.path(
