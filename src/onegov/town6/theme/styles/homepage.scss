@@ -4,6 +4,13 @@
         padding-bottom: 1rem;
     }
 
+    @media #{$small-only} {
+        h5 {
+            font-size: 1.2rem;
+        }
+
+    }
+
     .full.primary {
         small a:first-of-type {
             color: $primary-fg-color;
