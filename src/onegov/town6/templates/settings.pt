@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="org-settings">
-            <div class="grid-x grid-margin-x small-up-1 medium-up-2 large-up-3">
+            <div class="grid-x grid-margin-x small-up-1 medium-up-2 large-up-4">
                 <div tal:repeat="setting settings" class="${setting.name} cell">
                     <a href="${setting.link}">
                         <div class="card">

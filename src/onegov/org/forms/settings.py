@@ -1017,3 +1017,12 @@ class LinkHealthCheckForm(Form):
         ),
         default='external'
     )
+
+
+class EventSettingsForm(Form):
+
+    submit_own_events = BooleanField(
+        label=_('Submit own event'),
+        description=_('Enables website visitors to submit their own events'),
+        default=True
+    )

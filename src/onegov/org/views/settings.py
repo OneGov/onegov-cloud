@@ -16,7 +16,7 @@ from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
     NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm, \
-    SocialMediaSettingsForm
+    SocialMediaSettingsForm, EventSettingsForm
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -286,3 +286,11 @@ def handle_link_health_check(self, request, form, layout=None):
         'stats': stats,
         'healthcheck': healthcheck
     }
+
+
+@OrgApp.form(
+    model=Organisation, name='event-settings', template='form.pt',
+    permission=Secret, form=EventSettingsForm, setting=_("Events"),
+    icon='fa-calendar-alt', order=-700)
+def handle_event_settings(self, request, form, layout=None):
+    return handle_generic_settings(self, request, form, _("Events"), layout)
