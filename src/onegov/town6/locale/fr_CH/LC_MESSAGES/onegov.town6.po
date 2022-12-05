@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-10-18 12:00+0200\n"
+"POT-Creation-Date: 2022-12-05 15:00+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -719,9 +719,6 @@ msgstr "plus"
 msgid "Opening Hours"
 msgstr "Horaires d'ouverture"
 
-msgid "Partner"
-msgstr "Partenaire"
-
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -730,9 +727,6 @@ msgstr "Déposez des fichiers pour télécharger"
 
 msgid "read more"
 msgstr "en savoir plus"
-
-msgid "Latest news"
-msgstr "Dernières nouvelles"
 
 msgid "All articles"
 msgstr "Toutes les contributions"
@@ -1294,6 +1288,9 @@ msgid "To use your account you need the Yubikey with the serial ${number}"
 msgstr ""
 "Pour utiliser votre compte, vous aurez besoin de la Yubikey avec le numéro "
 "de série ${number}"
+
+msgid "Latest news"
+msgstr "Dernières nouvelles"
 
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
@@ -2058,6 +2055,9 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+#~ msgid "Partner"
+#~ msgstr "Partenaire"
 
 #~ msgid "Ticket Settings"
 #~ msgstr "Paramètres tickets"
