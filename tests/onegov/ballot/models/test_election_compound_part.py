@@ -223,9 +223,8 @@ def test_election_compound_part_model(session):
     ]
 
     # Add party results
-    session.add(
+    compound.party_results.append(
         PartyResult(
-            owner=compound.id,
             domain='canton',
             domain_segment='',
             number_of_mandates=0,
@@ -235,9 +234,8 @@ def test_election_compound_part_model(session):
             party_id='1'
         )
     )
-    session.add(
+    compound.party_results.append(
         PartyResult(
-            owner=compound.id,
             domain='superregion',
             domain_segment='First Superregion',
             number_of_mandates=0,
@@ -247,9 +245,8 @@ def test_election_compound_part_model(session):
             party_id='1'
         )
     )
-    session.add(
+    compound.party_results.append(
         PartyResult(
-            owner=compound.id,
             domain='superregion',
             domain_segment='Second Superregion',
             number_of_mandates=0,
