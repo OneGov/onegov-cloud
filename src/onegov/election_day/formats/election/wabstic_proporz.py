@@ -7,8 +7,7 @@ from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import ProporzElection
-from onegov.ballot.models.election.election_compound import \
-    ElectionCompoundAssociation
+from onegov.ballot import ElectionCompoundAssociation
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS

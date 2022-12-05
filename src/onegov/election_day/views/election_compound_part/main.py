@@ -1,49 +1,50 @@
 from morepath import redirect
-from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.core.security import Public
-from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
 from onegov.election_day.utils.election_compound import \
     get_candidate_statistics
-from onegov.election_day.utils.election_compound import get_elected_candidates
-from onegov.election_day.utils.election_compound import get_superregions
+from onegov.election_day.utils.election_compound import \
+    get_elected_candidates
 from onegov.election_day.utils.parties import get_party_results
 
 
 @ElectionDayApp.view(
-    model=ElectionCompound,
+    model=ElectionCompoundPart,
     request_method='HEAD',
     permission=Public
 )
-def view_election_compound_head(self, request):
+def view_election_compound_part_head(self, request):
 
     @request.after
     def add_headers(response):
         add_cors_header(response)
-        add_last_modified_header(response, self.last_modified)
+        add_last_modified_header(
+            response, self.election_compound.last_modified
+        )
 
 
 @ElectionDayApp.html(
-    model=ElectionCompound,
+    model=ElectionCompoundPart,
     permission=Public
 )
-def view_election_compound(self, request):
+def view_election_compound_part(self, request):
 
     """" The main view. """
 
-    return redirect(ElectionCompoundLayout(self, request).main_view)
+    return redirect(ElectionCompoundPartLayout(self, request).main_view)
 
 
 @ElectionDayApp.json(
-    model=ElectionCompound,
+    model=ElectionCompoundPart,
     name='json',
     permission=Public
 )
-def view_election_compound_json(self, request):
+def view_election_compound_part_json(self, request):
     """" The main view as JSON. """
 
     last_modified = self.last_modified
@@ -55,13 +56,12 @@ def view_election_compound_json(self, request):
 
     session = request.app.session()
     embed = {'districts-map': request.link(self, 'districts-map')}
+    embed = {}
     media = {'charts': {}}
-    layout = ElectionCompoundLayout(self, request)
+    layout = ElectionCompoundPartLayout(self, request)
     layout.last_modified = last_modified
-    if layout.pdf_path:
-        media['pdf'] = request.link(self, 'pdf')
-    for tab in ('party-strengths', 'parties-panachage'):
-        layout = ElectionCompoundLayout(self, request, tab=tab)
+    for tab in ('party-strengths', ):
+        layout = ElectionCompoundPartLayout(self, request, tab=tab)
         layout.last_modified = last_modified
         if layout.visible:
             embed[tab] = request.link(self, '{}-chart'.format(tab))
@@ -84,9 +84,6 @@ def view_election_compound_json(self, request):
         }
         for election in self.elections
     }
-    superregions = get_superregions(self, request.app.principal)
-    for superregion in superregions.values():
-        superregion['superregion'] = request.link(superregion['superregion'])
 
     years, parties = get_party_results(self, json_serializable=True)
 
@@ -103,7 +100,6 @@ def view_election_compound_json(self, request):
             'total': self.progress[1] or 0
         },
         'districts': list(districts.values()),
-        'superregions': superregions,
         'elections': [
             request.link(election) for election in self.elections
         ],
@@ -118,43 +114,28 @@ def view_election_compound_json(self, request):
         ],
         'candidate_statistics': candidate_statistics,
         'parties': parties,
-        'related_link': self.related_link,
         'title': self.title_translations,
-        'type': 'election_compound',
+        'type': 'election_compound_part',
         'url': request.link(self),
         'embed': embed,
         'media': media,
-        'data': {
-            'json': request.link(self, 'data-json'),
-            'csv': request.link(self, 'data-csv'),
-        }
     }
 
 
 @ElectionDayApp.json(
-    model=ElectionCompound,
+    model=ElectionCompoundPart,
     name='summary',
     permission=Public
 )
-def view_election_compound_summary(self, request):
+def view_election_compound_part_summary(self, request):
 
-    """ View the summary of the election compound as JSON. """
+    """ View the summary of the election compound part as JSON. """
 
     @request.after
     def add_headers(response):
         add_cors_header(response)
         add_last_modified_header(response, self.last_modified)
 
-    return get_election_compound_summary(self, request)
-
-
-@ElectionDayApp.pdf_file(model=ElectionCompound, name='pdf')
-def view_election_compound_pdf(self, request):
-
-    """ View the generated PDF. """
-
-    layout = ElectionCompoundLayout(self, request)
-    return {
-        'path': layout.pdf_path,
-        'name': normalize_for_url(self.title)
-    }
+    return get_election_compound_summary(
+        self, request, type_='election_compound_part'
+    )

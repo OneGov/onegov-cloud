@@ -13,8 +13,7 @@ from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
-from onegov.ballot.models.election.election_compound import \
-    ElectionCompoundAssociation
+from onegov.ballot import ElectionCompoundAssociation
 from pytz import UTC
 from uuid import uuid4
 

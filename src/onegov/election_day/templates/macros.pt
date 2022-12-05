@@ -14,7 +14,7 @@
 </metal:gender-singular>
 
 <metal:title-translation define-macro="title-translation" i18n:domain="onegov.election_day">
-    <tal:b switch="item.title == item.title_translations.get(request.locale)">
+    <tal:b switch="item.title == item.title_translations.get(request.locale)|True">
         <tal:b case="True">${item.title}</tal:b>
         <tal:b case="False"><span lang="${request.default_locale.replace('_', '-')}">${item.title}</span></tal:b>
     </tal:b>
@@ -477,13 +477,14 @@
         </thead>
         <tbody>
             <tr tal:repeat="superregion superregions">
-                <th class="column-superregion left-aligned" tal:condition="layout.has_superregions">${superregion}</th>
+                <th class="column-superregion left-aligned" tal:condition="layout.has_superregions"><a href="${request.link(superregions[superregion]['superregion'])}">${superregion}</a></th>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['mandates']['allocated'], superregions[superregion]['mandates']['total'])" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['progress']['counted'], superregions[superregion]['progress']['total'])" /></td>
             </tr>
         </tbody>
     </table>
 </metal:election-compound-superregions-table>
+
 
 <metal:election-statistics-table define-macro="election-statistics-table" i18n:domain="onegov.election_day">
     <table
@@ -1199,11 +1200,11 @@
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
     <nav role="navigation" aria-label="Breadcrumb Navigation">
-        <ul class="breadcrumbs back-links">
+        <ul class="breadcrumbs back-links" tal:define="compound item.compound|item.election_compound|None">
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
-            <li tal:condition="item.compound|None"><a href="${request.link(item.compound)}"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item.compound"/></a></li>
+            <li tal:condition="compound"><a href="${request.link(compound)}"><span metal:use-macro="layout.macros['title-translation']" tal:define="item compound"/></a></li>
             <li><a href="${request.link(item)}" aria-current="page"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item"/></a></li>
         </ul>
     </nav>

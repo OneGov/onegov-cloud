@@ -11,14 +11,16 @@ from onegov.ballot.models.election import Candidate
 from onegov.ballot.models.election import CandidateResult
 from onegov.ballot.models.election import Election
 from onegov.ballot.models.election import ElectionAssociation
-from onegov.ballot.models.election import ElectionCompound
 from onegov.ballot.models.election import ElectionResult
 from onegov.ballot.models.election import List
 from onegov.ballot.models.election import ListConnection
 from onegov.ballot.models.election import ListResult
 from onegov.ballot.models.election import PanachageResult
-from onegov.ballot.models.election import PartyResult
 from onegov.ballot.models.election import ProporzElection
+from onegov.ballot.models.election_compound import ElectionCompound
+from onegov.ballot.models.election_compound import ElectionCompoundAssociation
+from onegov.ballot.models.election_compound import ElectionCompoundPart
+from onegov.ballot.models.party_result import PartyResult
 from onegov.ballot.models.vote import Ballot
 from onegov.ballot.models.vote import BallotResult
 from onegov.ballot.models.vote import ComplexVote
@@ -33,6 +35,8 @@ __all__ = [
     'Election',
     'ElectionAssociation',
     'ElectionCompound',
+    'ElectionCompoundAssociation',
+    'ElectionCompoundPart',
     'ElectionResult',
     'List',
     'ListConnection',

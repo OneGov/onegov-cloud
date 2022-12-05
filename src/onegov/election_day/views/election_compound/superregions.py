@@ -36,7 +36,7 @@ def view_election_compound_by_superregion(self, request):
 
     """" View the superregions/regions/municipalities as JSON for the map. """
 
-    return get_superregions_data(self, request.app.principal)
+    return get_superregions_data(self, request.app.principal, request)
 
 
 @ElectionDayApp.html(
