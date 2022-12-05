@@ -294,8 +294,7 @@ def test_view_election_compound_part_party_strengths(election_day_app_bl):
     client.get('/locale/fr_CH')
     parties = client.get(
         '/elections-part/elections/superregion/region-1/party-strengths-data'
-    )
-    parties = parties.json
+    ).json
     assert parties['groups'] == ['BDP', 'Le Centre', 'FDP']
     results = client.get(
         '/elections-part/elections/superregion/region-1/party-strengths'
@@ -304,7 +303,15 @@ def test_view_election_compound_part_party_strengths(election_day_app_bl):
     assert 'PDC' in results
     assert 'BDP' in results
 
-    # with horizontal_party_strengths?
+    # with horizontal_party_strengths
+    edit = client.get('/elections/elections/edit')
+    edit.form['horizontal_party_strengths'] = True
+    edit.form.submit()
+    data = client.get(
+        '/elections-part/elections/superregion/region-1/party-strengths-data'
+    ).json
+    assert data['results'][0]['text'] == 'Le Centre 2022'
+    assert data['results'][0]['value'] == 300
 
 
 def test_view_election_compound_part_statistics(election_day_app_bl):
