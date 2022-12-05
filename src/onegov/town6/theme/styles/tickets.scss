@@ -690,3 +690,11 @@ button {
         width: 50%;
     }
 }
+
+.tickets-layout {
+    .button,
+    .button:hover {
+        margin-right: 0;
+        padding: .5rem !important;
+    }
+}

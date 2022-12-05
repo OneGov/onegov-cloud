@@ -407,6 +407,8 @@ input[type="tel"], input[type="url"] {
     transition: all 200ms linear !important;
 
     &:hover {
+        margin-left: -.5rem;
+        margin-right: -.5rem;
         padding: 1rem 2rem !important;
         transition: all 200ms linear;
     }
