@@ -223,10 +223,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def extract_searchable(self, data):
         # Remove non-searchable fields from data
-        searchable_ids = [
-            as_internal_id(s) for s in self.searchable
-        ]
-        data = {id: data.get(id) for id in searchable_ids}
+        data = {id: data.get(as_internal_id(id)) for id in self.searchable}
 
         return self.join(data, 'searchable')
 
