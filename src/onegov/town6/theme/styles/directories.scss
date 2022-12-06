@@ -71,6 +71,7 @@
         li:hover {
             @include primary-color-background;
             a { color: $white; }
+            border-radius: .7rem;
         }
 
         a {
