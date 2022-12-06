@@ -224,12 +224,11 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
     def extract_searchable(self, data):
         # Remove non-searchable fields from data
         searchable_ids = [
-            s.replace('/', '_').lower() for s in self.searchable
+            s.replace('-', '_').replace(' ', '_').lower() for s in self.searchable
         ]
         data = {id: data[id] for id in searchable_ids}
 
-        if self.searchable:
-            return self.join(data, 'searchable')
+        return self.join(data, 'searchable')
 
     def extract_keywords(self, data):
         if self.keywords:
