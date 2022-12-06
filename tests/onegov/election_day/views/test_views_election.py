@@ -205,38 +205,74 @@ def test_view_election_lists(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
+
+    # Majorz election
     upload_majorz_election(client)
 
+    # ... main
     main = client.get('/election/majorz-election/lists')
     assert '<h3>Listen</h3>' not in main
 
-    lists = client.get('/election/majorz-election/lists-data')
-    assert lists.json['results'] == []
+    # ... bar chart data
+    data = client.get('/election/majorz-election/lists-data')
+    assert data.json['results'] == []
 
+    # ... embedded chart
     chart = client.get('/election/majorz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/majorz-election/lists' in chart
 
+    # .... embedded table
+    table = client.get('/election/majorz-election/lists-table')
+    assert 'data-text=' not in table
+
+    # Proporz election
     upload_proporz_election(client)
 
+    # ... main
     main = client.get('/election/proporz-election/lists')
     assert '<h3>Listen</h3>' in main
 
+    # ... bar chart data (with filters)
     for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
-        lists = client.get(f'/election/proporz-election/lists-data{suffix}')
-        assert {r['text']: r['value'] for r in lists.json['results']} == {
+        data = client.get(f'/election/proporz-election/lists-data{suffix}')
+        assert {r['text']: r['value'] for r in data.json['results']} == {
             'FDP': 8,
             'CVP': 6
         }
 
-    lists = client.get('/election/proporz-election/lists-data?limit=1')
-    assert {r['text']: r['value'] for r in lists.json['results']} == {
+    data = client.get('/election/proporz-election/lists-data?limit=1')
+    assert {r['text']: r['value'] for r in data.json['results']} == {
         'FDP': 8,
     }
 
+    data = client.get(
+        '/election/proporz-election/lists-data?entity=Vaz/Obervaz'
+    )
+    assert data.json['results']
+
+    data = client.get('/election/proporz-election/lists-data?entity=Filisur')
+    assert not data.json['results']
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/proporz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/proporz-election/lists-data' in chart
+
+    chart = client.get('/election/proporz-election/lists-chart?entity=Filisur')
+    assert 'entity=Filisur' in chart
+
+    # ... embedded table
+    table = client.get('/election/proporz-election/lists-table')
+    assert 'data-text="8"' in table
+
+    table = client.get(
+        '/election/proporz-election/lists-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="8"' in table
+
+    table = client.get('/election/proporz-election/lists-table?entity=Filisur')
+    assert 'data-text=' not in table
 
 
 def test_view_election_list_by_entity(election_day_app_gr):

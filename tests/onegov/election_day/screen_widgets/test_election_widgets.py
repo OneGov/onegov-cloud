@@ -662,23 +662,23 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         'entities': 'Baar, Cham, Hünenberg, Menzingen',
         'layout': layout,
         'lists': [
-            ('SVP', 13532, '15', 1),
-            ('CVP', 10247, '4', 1),
-            ('FDP Ost', 6219, '6', 1),
-            ('SP', 3866, '10', 0),
-            ('CVP Junge', 3549, '5', 0),
-            ('ALG', 2459, '1', 0),
-            ('FDP West', 2143, '7', 0),
-            ('SVP WuG', 1933, '17', 0),
-            ('SP Männer', 1814, '13', 0),
-            ('glp', 1718, '8', 0),
-            ('SP Frauen', 998, '11', 0),
-            ('ALG Bildung', 735, '3', 0),
-            ('SP Juso', 567, '12', 0),
-            ('Piraten', 475, '9', 0),
-            ('ALG Junge', 245, '2', 0),
-            ('SVP Int.', 223, '16', 0),
-            ('SP Migrant.', 146, '14', 0)
+            (13532, 'SVP', 1),
+            (10247, 'CVP', 1),
+            (6219, 'FDP Ost', 1),
+            (3866, 'SP', 0),
+            (3549, 'CVP Junge', 0),
+            (2459, 'ALG', 0),
+            (2143, 'FDP West', 0),
+            (1933, 'SVP WuG', 0),
+            (1814, 'SP Männer', 0),
+            (1718, 'glp', 0),
+            (998, 'SP Frauen', 0),
+            (735, 'ALG Bildung', 0),
+            (567, 'SP Juso', 0),
+            (475, 'Piraten', 0),
+            (245, 'ALG Junge', 0),
+            (223, 'SVP Int.', 0),
+            (146, 'SP Migrant.', 0)
         ],
         'model': model,
         'request': request
@@ -712,11 +712,11 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="245"' in result
     assert (
         'data-dataurl="ProporzElection/lists-data'
-        '?limit=0&amp;names=&amp;sort_by_names="'
+        '?limit=0&amp;names=&amp;sort_by_names=&amp;entity="'
     ) in result
     assert (
         'data-dataurl="ProporzElection/lists-data'
-        '?limit=03&amp;names=a,b&amp;sort_by_names=True"'
+        '?limit=03&amp;names=a,b&amp;sort_by_names=True&amp;entity="'
     ) in result
     assert '4' in result
     assert '11' in result
@@ -825,23 +825,23 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         ),
         'layout': layout,
         'lists': [
-            ('SVP', 30532, '15', 1),
-            ('CVP', 24335, '4', 1),
-            ('FDP Ost', 16285, '6', 1),
-            ('SP', 8868, '10', 0),
-            ('CVP Junge', 6521, '5', 0),
-            ('ALG', 5844, '1', 0),
-            ('SVP WuG', 4436, '17', 0),
-            ('FDP West', 4299, '7', 0),
-            ('glp', 4178, '8', 0),
-            ('SP Männer', 3314, '13', 0),
-            ('SP Frauen', 2186, '11', 0),
-            ('ALG Bildung', 1701, '3', 0),
-            ('SP Juso', 1333, '12', 0),
-            ('Piraten', 1128, '9', 0),
-            ('ALG Junge', 807, '2', 0),
-            ('SVP Int.', 575, '16', 0),
-            ('SP Migrant.', 347, '14', 0)
+            (30532, 'SVP', 1),
+            (24335, 'CVP', 1),
+            (16285, 'FDP Ost', 1),
+            (8868, 'SP', 0),
+            (6521, 'CVP Junge', 0),
+            (5844, 'ALG', 0),
+            (4436, 'SVP WuG', 0),
+            (4299, 'FDP West', 0),
+            (4178, 'glp', 0),
+            (3314, 'SP Männer', 0),
+            (2186, 'SP Frauen', 0),
+            (1701, 'ALG Bildung', 0),
+            (1333, 'SP Juso', 0),
+            (1128, 'Piraten', 0),
+            (807, 'ALG Junge', 0),
+            (575, 'SVP Int.', 0),
+            (347, 'SP Migrant.', 0)
         ],
         'model': model,
         'request': request
@@ -878,11 +878,11 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-text="807"' in result
     assert (
         'data-dataurl="ProporzElection/lists-data'
-        '?limit=0&amp;names=&amp;sort_by_names="'
+        '?limit=0&amp;names=&amp;sort_by_names=&amp;entity="'
     ) in result
     assert (
         'data-dataurl="ProporzElection/lists-data'
-        '?limit=03&amp;names=a,b&amp;sort_by_names=True"'
+        '?limit=03&amp;names=a,b&amp;sort_by_names=True&amp;entity="'
     ) in result
     assert '11' in result
     assert '11' in result
