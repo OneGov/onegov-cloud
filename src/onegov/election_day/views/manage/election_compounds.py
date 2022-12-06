@@ -21,7 +21,11 @@ def view_election_compounds(self, request):
     """ View a list of all election compoundss. """
 
     years = [
-        (year, year == self.year, request.link(self.for_year(year)))
+        (
+            year if year else _('All'),
+            year == self.year,
+            request.link(self.for_year(year))
+        )
         for year in [None] + self.get_years()
     ]
 
@@ -30,7 +34,7 @@ def view_election_compounds(self, request):
         'title': _("Compounds of elections"),
         'groups': groupbylist(self.batch, key=lambda items: items.date),
         'new_election_compound': request.link(self, 'new-election-compound'),
-        'years': years,
+        'redirect_filters': {_('Year'): years},
     }
 
 

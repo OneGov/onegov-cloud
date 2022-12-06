@@ -166,7 +166,7 @@ def test_election_compound_layout_general(session):
         ('data', None)
     ):
         layout = ElectionCompoundLayout(compound, DummyRequest(), tab=tab)
-        assert expected == layout.table_link
+        assert expected == layout.table_link()
 
 
 def test_election_compound_layout_menu(session):

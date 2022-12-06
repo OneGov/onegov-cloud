@@ -4,6 +4,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_parameter
+from onegov.election_day.utils import get_entity_filter
 from onegov.election_day.utils.election import get_list_results
 from onegov.election_day.utils.election import get_lists_data
 
@@ -20,9 +21,14 @@ def view_election_lists_data(self, request):
     limit = get_parameter(request, 'limit', int, None)
     names = get_parameter(request, 'names', list, None)
     sort_by_names = get_parameter(request, 'sort_by_names', list, None)
+    entity = request.params.get('entity', '')
 
     return get_lists_data(
-        self, limit=limit, names=names, sort_by_names=sort_by_names
+        self,
+        limit=limit,
+        names=names,
+        sort_by_names=sort_by_names,
+        entities=[entity] if entity else None
     )
 
 
@@ -40,10 +46,13 @@ def view_election_lists_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    entity = request.params.get('entity', '')
+
     return {
         'model': self,
         'layout': ElectionLayout(self, request),
         'type': 'lists-chart',
+        'entity': entity
     }
 
 
@@ -61,9 +70,12 @@ def view_election_lists_table(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    entity = request.params.get('entity', '')
+    lists = get_list_results(self, entities=[entity] if entity else None)
+
     return {
         'election': self,
-        'lists': get_list_results(self),
+        'lists': lists,
         'layout': ElectionLayout(self, request),
         'type': 'election-table',
         'scope': 'lists',
@@ -81,11 +93,16 @@ def view_election_lists(self, request):
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'lists')
+    entity = request.params.get('entity', '')
+    entities = get_entity_filter(request, self, 'lists', entity)
+    lists = get_list_results(self, entities=[entity] if entity else None)
 
     return {
         'election': self,
         'layout': layout,
-        'lists': get_list_results(self),
+        'lists': lists,
+        'entity': entity,
+        'redirect_filters': {request.app.principal.label('entity'): entities}
     }
 
 

@@ -486,23 +486,23 @@ def test_election_utils_proporz(import_test_datasets, session):
 
     # get_list_results
     expected = (
-        ('SVP', 30532, '15', 1),
-        ('CVP', 24335, '4', 1),
-        ('FDP Ost', 16285, '6', 1),
-        ('SP', 8868, '10', 0),
-        ('CVP Junge', 6521, '5', 0),
-        ('ALG', 5844, '1', 0),
-        ('SVP WuG', 4436, '17', 0),
-        ('FDP West', 4299, '7', 0),
-        ('glp', 4178, '8', 0),
-        ('SP Männer', 3314, '13', 0),
-        ('SP Frauen', 2186, '11', 0),
-        ('ALG Bildung', 1701, '3', 0),
-        ('SP Juso', 1333, '12', 0),
-        ('Piraten', 1128, '9', 0),
-        ('ALG Junge', 807, '2', 0),
-        ('SVP Int.', 575, '16', 0),
-        ('SP Migrant.', 347, '14', 0)
+        (30532, 'SVP', 1),
+        (24335, 'CVP', 1),
+        (16285, 'FDP Ost', 1),
+        (8868, 'SP', 0),
+        (6521, 'CVP Junge', 0),
+        (5844, 'ALG', 0),
+        (4436, 'SVP WuG', 0),
+        (4299, 'FDP West', 0),
+        (4178, 'glp', 0),
+        (3314, 'SP Männer', 0),
+        (2186, 'SP Frauen', 0),
+        (1701, 'ALG Bildung', 0),
+        (1333, 'SP Juso', 0),
+        (1128, 'Piraten', 0),
+        (807, 'ALG Junge', 0),
+        (575, 'SVP Int.', 0),
+        (347, 'SP Migrant.', 0)
     )
     assert tuple(get_list_results(election)) == expected
 
@@ -511,16 +511,22 @@ def test_election_utils_proporz(import_test_datasets, session):
         assert tuple(get_list_results(election, limit=limit)) == expected
     for names in ([], None):
         assert tuple(get_list_results(election, names=names)) == expected
+    for entities in ([], None):
+        assert tuple(get_list_results(election, entities=entities)) == expected
 
     # ... valid filters
     assert tuple(get_list_results(election, limit=3)) == expected[:3]
     names = ['SP Juso', 'SP Alle', 'SP Männer', 'SP Frauen']
     assert tuple(get_list_results(election, names=names)) == tuple(
-        (e for e in expected if e[0] in names)
+        (e for e in expected if e[1] in names)
     )
     assert tuple(get_list_results(election, limit=2, names=names)) == tuple(
-        (e for e in expected if e[0] in names)
+        (e for e in expected if e[1] in names)
     )[:2]
+    entities = ['Baar', 'Zug']
+    assert tuple(
+        get_list_results(election, limit=2, names=names, entities=entities)
+    ) == ((1133 + 724, 'SP Männer', 0), (579 + 570, 'SP Frauen', 0))
 
     # get_lists_data
     expected = [
@@ -662,6 +668,12 @@ def test_election_utils_proporz(import_test_datasets, session):
             'title': 'proporz_internal_nationalratswahlen-2015',
             'results': expected,
         }
+    for entities in ([], None):
+        assert get_lists_data(election, entities=entities) == {
+            'majority': None,
+            'title': 'proporz_internal_nationalratswahlen-2015',
+            'results': expected,
+        }
 
     # ... valid filters
     assert get_lists_data(election, limit=3) == {
@@ -685,6 +697,29 @@ def test_election_utils_proporz(import_test_datasets, session):
         'majority': None,
         'title': 'proporz_internal_nationalratswahlen-2015',
         'results': list(reversed([e for e in expected if e['text'] in names])),
+    }
+    entities = ['Baar', 'Zug']
+    assert get_lists_data(
+        election, limit=2, names=names, entities=entities
+    ) == {
+        'majority': None,
+        'title': 'proporz_internal_nationalratswahlen-2015',
+        'results': [
+            {
+                'class': 'inactive',
+                'color': None,
+                'text': 'SP Männer',
+                'value': 1133 + 724,
+                'value2': 0
+            },
+            {
+                'class': 'inactive',
+                'color': None,
+                'text': 'SP Frauen',
+                'value': 579 + 570,
+                'value2': 0
+            }
+        ],
     }
 
 

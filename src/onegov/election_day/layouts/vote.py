@@ -149,23 +149,28 @@ class VoteLayout(DetailLayout):
                 self.model, f'{self.ballot.type}-by-districts-map'
             )
 
-    @cached_property
-    def table_link(self):
+    def table_link(self, query_params={}):
         if self.tab not in self.tabs_with_embedded_tables:
             return None
 
         if self.scope == 'entities':
             return self.request.link(
-                self.model, f'{self.ballot.type}-by-entities-table'
+                self.model,
+                f'{self.ballot.type}-by-entities-table',
+                query_params=query_params
             )
 
         if self.scope == 'districts':
             return self.request.link(
-                self.model, f'{self.ballot.type}-by-districts-table'
+                self.model,
+                f'{self.ballot.type}-by-districts-table',
+                query_params=query_params
             )
 
         return self.request.link(
-            self.model, f'{self.ballot.type}-statistics-table'
+            self.model,
+            f'{self.ballot.type}-statistics-table',
+            query_params=query_params
         )
 
     @cached_property
