@@ -652,24 +652,7 @@ $pageref-color-hover: $iron;
     margin-top: .5rem;
 }
 
-.contact-panel-content>ul li+li {
-    margin-top: 0 !important;
-}
 
-.side-panel-with-bg {
-    background-color: #f8f9f9;
-    margin-bottom: 3rem !important;
-    padding: 1rem;
-
-    .calendar-export-list {
-        list-style: none;
-        margin: 0;
-    }
-
-    &> *:last-child {
-        margin-bottom: 0 !important;
-    }
-}
 
 .occurrence-dates {
     h3 {

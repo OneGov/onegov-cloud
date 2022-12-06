@@ -84,11 +84,11 @@ $publications-icon: '\f1ea';
 
 
 .side-panel {
-
     @include clean-ul;
     @include breakpoint(medium up) {
-        margin-bottom: 2rem;
+        margin-bottom: 4rem;
     }
+    padding-left: 1.5rem;
 
     ul.bulleted {
         list-style-type: disc;
@@ -188,6 +188,26 @@ $checklist-icon: "\f0ae";
     + li {
         margin-top: .25rem;
     }
+}
+
+.contact-panel-content>ul li+li {
+    margin-top: 0 !important;
+}
+
+.side-panel-with-bg {
+
+    .calendar-export-list {
+        list-style: none;
+        margin: 0;
+    }
+
+    &> *:last-child {
+        margin-bottom: 0 !important;
+    }
+}
+
+.marker-map {
+    border-radius: .7rem;
 }
 
 .homepage .side-panel:first-child,
