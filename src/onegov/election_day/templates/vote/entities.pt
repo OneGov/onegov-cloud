@@ -37,7 +37,7 @@
             </div>
 
             <tal:b metal:use-macro="layout.macros['ballot-entities-table']"/>
-            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link"/>
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link()"/>
 
         </tal:block>
 

@@ -15,11 +15,12 @@ class ElectionLayout(DetailLayout):
     tabs_with_embedded_tables = (
         'lists', 'candidates', 'statistics', 'connections')
 
-    @cached_property
-    def table_link(self):
+    def table_link(self, query_params={}):
         if self.tab not in self.tabs_with_embedded_tables:
             return None
-        return self.request.link(self.model, f'{self.tab}-table')
+        return self.request.link(
+            self.model, f'{self.tab}-table', query_params=query_params
+        )
 
     @cached_property
     def all_tabs(self):

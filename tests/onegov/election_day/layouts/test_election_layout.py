@@ -415,4 +415,4 @@ def test_election_layout_table_links(tab, expected):
     # Test link depending on tab
     election = Election(date=date(2100, 1, 1), domain='federation')
     layout = ElectionLayout(election, DummyRequest(), tab=tab)
-    assert expected == layout.table_link
+    assert expected == layout.table_link()

@@ -21,7 +21,11 @@ def view_elections(self, request):
     """ View a list of all elections. """
 
     years = [
-        (year, year == self.year, request.link(self.for_year(year)))
+        (
+            year if year else _('All'),
+            year == self.year,
+            request.link(self.for_year(year))
+        )
         for year in [None] + self.get_years()
     ]
 
@@ -30,7 +34,7 @@ def view_elections(self, request):
         'title': _("Elections"),
         'groups': groupbylist(self.batch, key=lambda election: election.date),
         'new_election': request.link(self, 'new-election'),
-        'years': years
+        'redirect_filters': {_('Year'): years},
     }
 
 

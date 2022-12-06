@@ -140,7 +140,7 @@ def test_proporz_election_create_all_models(session):
     session.flush()
 
     party_result = PartyResult(
-        owner=election.id,
+        election_id=election.id,
         number_of_mandates=0,
         votes=0,
         total_votes=100,
@@ -218,7 +218,7 @@ def test_proporz_election_create_all_models(session):
     assert candidate.election == election
     assert candidate.list == list
 
-    assert party_result.owner == election.id
+    assert party_result.election_id == election.id
 
     assert election_result.list_results.one() == list_result
     assert election_result.candidate_results.one() == candidate_result
@@ -1150,21 +1150,30 @@ def test_proporz_election_clear_results(session):
 
 def test_proporz_election_rename(session):
     election = proporz_election()
+    election.id = 'x'
     session.add(election)
     session.flush()
 
-    session.query(Candidate).one().election_id == 'election'
-    session.query(ElectionResult).one().election_id == 'election'
-    session.query(List).one().election_id == 'election'
-    session.query(ListConnection).first().election_id == 'election'
+    assert session.query(Candidate.election_id).distinct().scalar() == 'x'
+    assert session.query(ElectionResult.election_id).distinct().scalar() == 'x'
+    assert session.query(List.election_id).distinct().scalar() == 'x'
+    assert session.query(ListConnection.election_id).distinct().scalar() == 'x'
+    assert session.query(PartyResult.election_id).distinct().scalar() == 'x'
+    assert session.query(
+        PanachageResult.election_id
+    ).distinct().scalar() == 'x'
 
-    election.id = 'elerction'
+    election.id = 'y'
     session.flush()
 
-    session.query(Candidate).one().election_id == 'elerction'
-    session.query(ElectionResult).one().election_id == 'elerction'
-    session.query(List).one().election_id == 'elerction'
-    session.query(ListConnection).first().election_id == 'elerction'
+    assert session.query(Candidate.election_id).distinct().scalar() == 'y'
+    assert session.query(ElectionResult.election_id).distinct().scalar() == 'y'
+    assert session.query(List.election_id).distinct().scalar() == 'y'
+    assert session.query(ListConnection.election_id).distinct().scalar() == 'y'
+    assert session.query(PartyResult.election_id).distinct().scalar() == 'y'
+    assert session.query(
+        PanachageResult.election_id
+    ).distinct().scalar() == 'y'
 
 
 def test_proporz_election_attachments(test_app, explanations_pdf):

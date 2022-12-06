@@ -2,6 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from uuid import uuid4
@@ -30,7 +31,23 @@ class PanachageResult(Base, TimestampMixin):
 
     #: the owner of this result, maps to election.id
     # where electon.id is derived from the title
-    owner = Column(Text, nullable=True)
+    owner = Column(Text, nullable=True)  # todo: delete me after migration!
+
+    #: the election this result belongs to
+    election_id = Column(
+        Text,
+        ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
+    )
+
+    #: the election compound this result belongs to
+    election_compound_id = Column(
+        Text,
+        ForeignKey(
+            'election_compounds.id', onupdate='CASCADE', ondelete='CASCADE'
+        ),
+        nullable=True
+    )
 
     #: the target this result belongs to, maps to list.id
     target = Column(Text, nullable=False)

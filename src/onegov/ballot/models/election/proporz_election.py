@@ -43,20 +43,16 @@ class ProporzElection(Election, PartyResultExportMixin):
     #: An election may contains n party results
     party_results = relationship(
         'PartyResult',
-        primaryjoin=(
-            'foreign(PartyResult.owner) == ProporzElection.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election'),
         lazy='dynamic',
     )
 
     #: An election may contains n (party) panachage results
     panachage_results = relationship(
         'PanachageResult',
-        primaryjoin=(
-            'foreign(PanachageResult.owner) == Election.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election'),
         lazy='dynamic',
     )
 
@@ -151,10 +147,10 @@ class ProporzElection(Election, PartyResultExportMixin):
             ListConnection.election_id == self.id
         ).delete()
         session.query(PartyResult).filter(
-            PartyResult.owner == self.id
+            PartyResult.election_id == self.id
         ).delete()
         session.query(PanachageResult).filter(
-            PanachageResult.owner == self.id
+            PanachageResult.election_id == self.id
         ).delete()
 
     def export(self, locales):

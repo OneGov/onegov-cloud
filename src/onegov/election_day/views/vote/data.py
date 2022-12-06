@@ -35,7 +35,7 @@ def view_vote_data_as_json(self, request):
 
     return {
         'data': self.export(sorted(request.app.locales)),
-        'name': normalize_for_url(self.title)
+        'name': normalize_for_url(self.title[:60])
     }
 
 
@@ -50,5 +50,5 @@ def view_vote_data_as_csv(self, request):
 
     return {
         'data': self.export(sorted(request.app.locales)),
-        'name': normalize_for_url(self.title)
+        'name': normalize_for_url(self.title[:60])
     }

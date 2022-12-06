@@ -19,6 +19,7 @@ from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
+from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
@@ -70,20 +71,16 @@ class ElectionCompound(
     #: An election compound may contains n party results
     party_results = relationship(
         'PartyResult',
-        primaryjoin=(
-            'foreign(PartyResult.owner) == ElectionCompound.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election_compound'),
         lazy='dynamic',
     )
 
     #: An election compound may contains n panachage results
     panachage_results = relationship(
         'PanachageResult',
-        primaryjoin=(
-            'foreign(PanachageResult.owner) == ElectionCompound.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election_compound'),
         lazy='dynamic',
     )
 
