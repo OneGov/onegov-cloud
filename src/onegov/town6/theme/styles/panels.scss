@@ -260,23 +260,6 @@ $checklist-icon: "\f0ae";
     }
 }
 
-/*
-    Custom record submission
-*/
-.submit-yours {
-    @include callout($gray-dark-medium);
-    @include smooth-edges;
-
-    padding: 1rem 1rem .5rem;
-
-    h2 {
-        color: $primary-color;
-        display: inline;
-        font-size: 1rem;
-        font-weight: bold;
-    }
-}
-
 .people-panel {
     li div:first-of-type {
         margin-top: .3rem;
