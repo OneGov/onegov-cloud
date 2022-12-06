@@ -158,7 +158,8 @@ def test_vote_layout(session):
         assert layout.svg_path == f'svg/ballot-{ht}.{ts}.entities-map.de.svg'
         assert layout.svg_link == 'Ballot/entities-map-svg'
         assert layout.svg_name == 'vote-tie-breaker-__entities.svg'
-        assert layout.table_link() == 'ComplexVote/tie-breaker-by-entities-table'
+        assert layout.table_link() == \
+            'ComplexVote/tie-breaker-by-entities-table'
 
         layout = VoteLayout(vote, request, 'tie-breaker-districts')
         layout.has_districts = True
