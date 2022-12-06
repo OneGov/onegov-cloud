@@ -38,14 +38,17 @@ def test_view_election_candidates(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client, status='final')
-    upload_proporz_election(client, status='final')
 
+    # Majorz election
+    upload_majorz_election(client, status='final')
+
+    # ... main
     candidates = client.get('/election/majorz-election/candidates')
     assert all((expected in candidates for expected in (
         "Engler Stefan", "20", "Schmid Martin", "18"
     )))
 
+    # ... bar chart data (with filters)
     for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
         candidates = client.get(
             f'/election/majorz-election/candidates-data{suffix}'
@@ -53,6 +56,7 @@ def test_view_election_candidates(election_day_app_gr):
         assert {r['text']: r['value'] for r in candidates.json['results']} == {
             'Engler Stefan': 20, 'Schmid Martin': 18
         }
+
     candidates = client.get(
         '/election/majorz-election/candidates-data?limit=1'
     )
@@ -60,22 +64,89 @@ def test_view_election_candidates(election_day_app_gr):
         'Engler Stefan': 20
     }
 
+    candidates = client.get(
+        '/election/majorz-election/candidates-data?entity=Vaz/Obervaz'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Engler Stefan': 20, 'Schmid Martin': 18
+    }
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/majorz-election/candidates-chart')
     assert '/election/majorz-election/candidates' in chart
 
+    chart = client.get(
+        '/election/majorz-election/candidates-chart?entity=Filisur'
+    )
+    assert 'entity=Filisur' in chart
+
+    # ... ebmedded table (with filters)
+    table = client.get('/election/majorz-election/candidates-table')
+    assert 'data-text="20"' in table
+
+    table = client.get(
+        '/election/majorz-election/candidates-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="20"' in table
+
+    table = client.get(
+        '/election/majorz-election/candidates-table?entity=Filisur'
+    )
+    assert 'data-text=' not in table
+
+    # Proporz election
+    upload_proporz_election(client, status='final')
+
+    # ....main
     candidates = client.get('/election/proporz-election/candidates')
     assert all((expected in candidates for expected in (
         "Caluori Corina", "1", "Casanova Angela", "0"
     )))
 
-    for suffix in ('', '?limit=', '?limit=a', '?limit=0', '?limit=1'):
+    # ... bar chart data (with filters)
+    for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
         candidates = client.get(
             f'/election/proporz-election/candidates-data{suffix}'
         )
         assert candidates.json['results'] == []
 
+    candidates = client.get(
+        '/election/proporz-election/candidates-data?elected=False&limit=1'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Caluori Corina': 2
+    }
+
+    candidates = client.get(
+        '/election/majorz-election/candidates-data?elected=False&'
+        'entity=Vaz/Obervaz'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Engler Stefan': 20, 'Schmid Martin': 18
+    }
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/proporz-election/candidates-chart')
     assert '/election/proporz-election/candidates' in chart
+
+    chart = client.get(
+        '/election/proporz-election/candidates-chart?entity=Filisur'
+    )
+    assert 'entity=Filisur' in chart
+
+    # ... ebmedded table (with filters)
+    table = client.get('/election/proporz-election/candidates-table')
+    assert 'data-text="2"' in table
+
+    table = client.get(
+        '/election/proporz-election/candidates-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="2"' in table
+
+    table = client.get(
+        '/election/proporz-election/candidates-table?entity=Filisur'
+    )
+    assert 'data-text=' not in table
 
 
 def test_view_election_candidate_by_entity(election_day_app_gr):
@@ -262,7 +333,7 @@ def test_view_election_lists(election_day_app_gr):
     chart = client.get('/election/proporz-election/lists-chart?entity=Filisur')
     assert 'entity=Filisur' in chart
 
-    # ... embedded table
+    # ... embedded table (with filters)
     table = client.get('/election/proporz-election/lists-table')
     assert 'data-text="8"' in table
 
