@@ -224,7 +224,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
     def extract_searchable(self, data):
         # Remove non-searchable fields from data
         searchable_ids = [
-            s.replace('-', '_').replace(' ', '_').lower() for s in self.searchable
+            s.replace('-', '_').replace(' ', '_').lower()
+            for s in self.searchable
         ]
         data = {id: data[id] for id in searchable_ids}
 
