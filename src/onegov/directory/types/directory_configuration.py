@@ -226,7 +226,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         searchable_ids = [
             as_internal_id(s) for s in self.searchable
         ]
-        data = {id: data[id] for id in searchable_ids}
+        data = {id: data.get(id) for id in searchable_ids}
 
         return self.join(data, 'searchable')
 
