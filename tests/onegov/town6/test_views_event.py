@@ -203,13 +203,13 @@ def test_hide_event_submission_option(client):
 
     client.login_admin()
     settings = client.get('/event-settings')
-    settings.form['submit_own_events'] = False
+    settings.form['submit_events_visible'] = False
     settings.form.submit()
 
     events_page = client.get('/events')
     assert "Veranstaltung vorschlagen" not in events_page
 
-    settings.form['submit_own_events'] = True
+    settings.form['submit_events_visible'] = True
     settings.form.submit()
 
     events_page = client.get('/events')
