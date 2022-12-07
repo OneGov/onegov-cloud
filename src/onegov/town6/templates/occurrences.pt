@@ -86,9 +86,10 @@
 
                 <div class="submit-yours side-panel">
                     <h3 i18n:translate="">Submit your event</h3>
-                    <a href="${add_link}" i18n:translate="">
-                        Submit your own event
-                    </a>
+                    <p>
+                        <span i18n:translate="">Submit your own event</span>
+                        <a href="${add_link}" i18n:translate="">Submit your event</a>
+                    </p>
                 </div>
           </div>
 
