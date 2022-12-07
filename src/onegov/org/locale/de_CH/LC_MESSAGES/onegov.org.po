@@ -4204,7 +4204,7 @@ msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
 msgid "Submit an event"
-msgstr "Veranstaltung melden"
+msgstr "Veranstaltung vorschlagen"
 
 msgid ""
 "Only events taking place inside the town or events related to town societies "

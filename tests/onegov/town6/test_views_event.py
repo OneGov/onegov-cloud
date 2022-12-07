@@ -9,7 +9,7 @@ from tests.onegov.town6.common import step_class
 
 def test_event_steps(client):
 
-    form_page = client.get('/events').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung vorschlagen")
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=4)
 
