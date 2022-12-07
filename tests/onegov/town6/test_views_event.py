@@ -9,7 +9,7 @@ from tests.onegov.town6.common import step_class
 
 def test_event_steps(client):
 
-    form_page = client.get('/events').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung vorschlagen")
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=4)
 
@@ -195,3 +195,22 @@ def test_event_steps(client):
     assert "Bearbeiten Sie diese Veranstaltung." not in confirmation_page
     assert client.get(form_page.request.url, expect_errors=True).status_code \
         == 403
+
+
+def test_hide_event_submission_option(client):
+    events_page = client.get('/events')
+    assert "Veranstaltung vorschlagen" in events_page
+
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['submit_events_visible'] = False
+    settings.form.submit()
+
+    events_page = client.get('/events')
+    assert "Veranstaltung vorschlagen" not in events_page
+
+    settings.form['submit_events_visible'] = True
+    settings.form.submit()
+
+    events_page = client.get('/events')
+    assert "Veranstaltung vorschlagen" in events_page

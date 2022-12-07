@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-10-18 12:00+0200\n"
+"POT-Creation-Date: 2022-12-05 15:00+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -720,9 +720,6 @@ msgstr "mehr"
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
-msgid "Partner"
-msgstr "Partner"
-
 msgid "Submit"
 msgstr "Absenden"
 
@@ -731,9 +728,6 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
 msgid "read more"
 msgstr "weiterlesen"
-
-msgid "Latest news"
-msgstr "Aktuelles"
 
 msgid "All articles"
 msgstr "Alle Beiträge"
@@ -1301,6 +1295,9 @@ msgstr ""
 "Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
 "${number}"
 
+msgid "Latest news"
+msgstr "Aktuelles"
+
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."
@@ -1584,7 +1581,7 @@ msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
-msgstr "Veranstaltung melden"
+msgstr "Veranstaltung vorschlagen"
 
 msgid "Submit your own event"
 msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
@@ -2054,6 +2051,9 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Partner"
+#~ msgstr "Partner"
 
 #~ msgid "Ticket Settings"
 #~ msgstr "Ticket-Einstellungen"

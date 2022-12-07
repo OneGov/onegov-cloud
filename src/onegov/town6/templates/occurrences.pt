@@ -84,7 +84,7 @@
                     </div>
                 </div>
 
-                <div class="submit-yours side-panel">
+                <div class="submit-yours side-panel" tal:condition="layout.org.meta.get('submit_events_visible', True)">
                     <h3 i18n:translate="">Submit your event</h3>
                     <p>
                         <span i18n:translate="">Submit your own event</span>
