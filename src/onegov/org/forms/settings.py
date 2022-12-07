@@ -1021,7 +1021,7 @@ class LinkHealthCheckForm(Form):
 
 class EventSettingsForm(Form):
 
-    submit_own_events = BooleanField(
+    submit_events_visible = BooleanField(
         label=_('Submit your event'),
         description=_('Enables website visitors to submit their own events'),
         default=True
