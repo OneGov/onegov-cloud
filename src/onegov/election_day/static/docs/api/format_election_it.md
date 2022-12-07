@@ -257,8 +257,8 @@ Nome|Descrizione
 `color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
-`voters_count`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
-`voters_count_percentage`|Il numero cumulativo di voti per il numero totale di mandati per elezione, solo per i composti elettorali.
+`voters_count`|Numero di elettori. Il numero cumulativo di voti per il numero totale di mandati per elezione. Solo per i composti elettorali.
+`voters_count_percentage`|Numero di elettori (percentuali). Il numero cumulativo di voti per il numero totale di mandati per elezione (percentuali). Solo per i composti elettorali.
 
 #### Einflussbereich
 

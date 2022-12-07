@@ -255,8 +255,8 @@ Nom|Description
 `color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784'.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
-`voters_count`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
-`voters_count_percentage`|Le nombre cumulé de voix par rapport au nombre total de mandats par élection, uniquement pour les composantes des élections.
+`voters_count`|Nombre de votants. Le nombre cumulé de voix par rapport au nombre total de mandats par élection. Uniquement pour les composantes des élections.
+`voters_count_percentage`|Nombre de votants (pourcentages). Le nombre cumulé de voix par rapport au nombre total de mandats par élection (pourcentages). Uniquement pour les composantes des élections.
 
 #### Domaine d'influence
 
