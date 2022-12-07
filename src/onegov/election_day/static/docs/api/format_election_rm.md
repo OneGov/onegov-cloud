@@ -101,7 +101,7 @@ Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada in
 
 Num|Descripziun
 ---|---
-`panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+`list_panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 #### Resultats temporars
 

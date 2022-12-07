@@ -102,7 +102,7 @@ I risultati possono contenere dei risultati di panachage aggiungendo una colonna
 
 Nome|Descrizione
 ---|---
-`panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 #### Risultati temporanei
 

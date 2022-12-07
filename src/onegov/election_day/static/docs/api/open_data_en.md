@@ -123,7 +123,7 @@ Name|Description
 `candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
 `candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
-`panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`list_panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 Not yet counted municipalities are not included.
 

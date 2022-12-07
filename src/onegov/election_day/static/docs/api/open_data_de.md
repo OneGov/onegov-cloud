@@ -124,7 +124,7 @@ Name|Beschreibung
 `candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
 `candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
-`panachage_votes_from_list_XX`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`list_panachage_votes_from_list_XX`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 
