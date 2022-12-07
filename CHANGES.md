@@ -1,8 +1,80 @@
 # Changes
 
+## 2022.55
+
+`2022-12-07` | [da8adc1346...783abfeefe](https://github.com/OneGov/onegov-cloud/compare/da8adc1346^...783abfeefe)
+
+### Ballot
+
+##### Add foreign keys to party and panachage results.
+
+`Bugfix` | [OGC-768](https://linear.app/onegovcloud/issue/OGC-768) | [6639df7046](https://github.com/onegov/onegov-cloud/commit/6639df7046aa1376071c3868ae7d8900b4c18c7b)
+
+### Directory
+
+##### Fix directory error
+
+`Bugfix` | [OGC-783](https://linear.app/onegovcloud/issue/OGC-783) | [4d0b84299f](https://github.com/onegov/onegov-cloud/commit/4d0b84299ffedc99e8f895c4aeaa476451394688)
+
+### Election Day
+
+##### Remove obsolete party color column.
+
+`Feature` | [OGC-676](https://linear.app/onegovcloud/issue/OGC-676) | [c6f8d7a351](https://github.com/onegov/onegov-cloud/commit/c6f8d7a351012c1a0fab5a41b579718098b1b133)
+
+##### Add views for superregions.
+
+`Feature` | [OGC-702](https://linear.app/onegovcloud/issue/OGC-702) | [d2f13fadb4](https://github.com/onegov/onegov-cloud/commit/d2f13fadb411041027a462671fd26478b15ed02e)
+
+##### Add entity filter to list views.
+
+`Feature` | [OGC-707](https://linear.app/onegovcloud/issue/OGC-707) | [3cab849cd6](https://github.com/onegov/onegov-cloud/commit/3cab849cd6512fe19e381e12731ece5f5b98147a)
+
+##### Add entity filter to candidates views.
+
+`Feature` | [OGC-706](https://linear.app/onegovcloud/issue/OGC-706) | [492ca66202](https://github.com/onegov/onegov-cloud/commit/492ca66202864899493f5be00b5c9552105540a8)
+
+##### Add party views configuration options to elections.
+
+`Feature` | [OGC-765](https://linear.app/onegovcloud/issue/OGC-765) | [7174ff013a](https://github.com/onegov/onegov-cloud/commit/7174ff013a3b0e4c3b1d3752f4228c59de174bb1)
+
+##### Update voters count documentation.
+
+`Feature` | [OGC-767](https://linear.app/onegovcloud/issue/OGC-767) | [983fdd465d](https://github.com/onegov/onegov-cloud/commit/983fdd465d8cef6da9da60fb1f237377f2183a8f)
+
+##### Rename list panachage result columns.
+
+`Feature` | [OGC-766](https://linear.app/onegovcloud/issue/OGC-766) | [9a6913102f](https://github.com/onegov/onegov-cloud/commit/9a6913102f1eacb655328a6cd0a58523c23db051)
+
+##### Remove party domain data migration command.
+
+`Other` | [OGC-709](https://linear.app/onegovcloud/issue/OGC-709) | [da8adc1346](https://github.com/onegov/onegov-cloud/commit/da8adc1346077e2b14c8610c0d2b827ab7a3c77a)
+
+##### Shorten filename length for csv and json
+
+`Bugfix` | [OGC-689](https://linear.app/onegovcloud/issue/OGC-689) | [4ecb615e44](https://github.com/onegov/onegov-cloud/commit/4ecb615e44a01591044b31d0314e6572ac76e552)
+
+### Town6
+
+##### Mobile optimizations
+
+`Feature` | [OGC-756](https://linear.app/onegovcloud/issue/OGC-756) | [b25607054c](https://github.com/onegov/onegov-cloud/commit/b25607054c42048395aec00bc7a5fb519446dbcc)
+
+##### Design adjustments
+
+`Feature` | [OGC-682](https://linear.app/onegovcloud/issue/OGC-682) | [43f62e2dcc](https://github.com/onegov/onegov-cloud/commit/43f62e2dcc7b38cd08de48730b7f63d49b27cc11)
+
+##### Option to hide "submit own event"
+
+`Feature` | [OGC-779](https://linear.app/onegovcloud/issue/OGC-779) | [783abfeefe](https://github.com/onegov/onegov-cloud/commit/783abfeefead47010f30fcf1923d987b00c06e3b)
+
+##### Add lead in lists on topic
+
+`Bugfix` | [OGC-801](https://linear.app/onegovcloud/issue/OGC-801) | [43fb79ed23](https://github.com/onegov/onegov-cloud/commit/43fb79ed237b5361932a72b3adc22a864d142822)
+
 ## 2022.54
 
-`2022-11-30` | [5c9db5044a...2b49b18a55](https://github.com/OneGov/onegov-cloud/compare/5c9db5044a^...2b49b18a55)
+`2022-11-30` | [5c9db5044a...76ac3712ea](https://github.com/OneGov/onegov-cloud/compare/5c9db5044a^...76ac3712ea)
 
 ### Election Day
 
@@ -2491,14 +2563,4 @@ Requires to run the update-last-result-change CLI command after upgrading.
 ##### Avoid re-creating PDFs and SVGs when setting an earlier date than the last modification date.
 
 `Bugfix` | [2c589dc418](https://github.com/onegov/onegov-cloud/commit/2c589dc41810bfcdf92647c0b35e26dd4f28764d)
-
-## 2022.5
-
-`2022-01-16` | [a545c14565...5b115ef214](https://github.com/OneGov/onegov-cloud/compare/a545c14565^...5b115ef214)
-
-### Election Day
-
-##### Add new domains for regional Elections.
-
-`Feature` | [OGC-166](https://linear.app/onegovcloud/issue/OGC-166) | [a545c14565](https://github.com/onegov/onegov-cloud/commit/a545c14565e99c78bb0fce63e0c31ed00733db99)
 
