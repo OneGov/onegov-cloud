@@ -238,7 +238,7 @@ class ElectionCompoundForm(Form):
     )
 
     show_party_panachage = BooleanField(
-        label=_("Party panachage"),
+        label=_("Panachage"),
         description=_(
             "Shows a tab with the panachage. Requires party results."
         ),

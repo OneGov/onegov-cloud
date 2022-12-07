@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-29 08:14+0100\n"
+"POT-Creation-Date: 2022-12-07 07:22+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -343,6 +343,25 @@ msgstr ""
 msgid "Shows a horizontal bar chart instead of a vertical bar chart."
 msgstr ""
 
+msgid "Party strengths"
+msgstr "Forza dei partiti"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
+"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
+"grafico a barre. Richiede i risultati dei partiti."
+
+msgid "Views"
+msgstr "Visualizzazioni"
+
+msgid "Panachage (parties)"
+msgstr "Panachage (parti)"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr "Mostra una scheda con il panachage. Richiede i risultati del partito."
+
 msgid "Date"
 msgstr "Data"
 
@@ -459,9 +478,6 @@ msgstr ""
 "Visualizzazione di una scheda con la ripartizione dei seggi sotto forma di "
 "un diagramma a barre. Sono necessari risultati di partito."
 
-msgid "Views"
-msgstr "Visualizzazioni"
-
 msgid "List groups"
 msgstr "Gruppi di liste"
 
@@ -472,21 +488,8 @@ msgstr ""
 "Mostra una scheda con i risultati del gruppo di liste. Richiede i risultati "
 "del partito con il conteggio dei votanti. Solo per Doppelter Pukelsheim."
 
-msgid "Party strengths"
-msgstr "Forza dei partiti"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a bar chart. Requires "
-"party results."
-msgstr ""
-"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
-"grafico a barre. Richiede i risultati dei partiti."
-
 msgid "Panachage"
 msgstr "Panachage"
-
-msgid "Shows a tab with the panachage. Requires party results."
-msgstr "Mostra una scheda con il panachage. Richiede i risultati del partito."
 
 msgid "Notifications"
 msgstr "Notifiche"
@@ -1392,9 +1395,6 @@ msgstr "Nessuna mappa disponibile per quest'anno."
 
 msgid "Blank list"
 msgstr "Lista bianca"
-
-msgid "Panachage (parties)"
-msgstr "Panachage (parti)"
 
 msgid "Panachage (lists)"
 msgstr "Panachage (liste)"
