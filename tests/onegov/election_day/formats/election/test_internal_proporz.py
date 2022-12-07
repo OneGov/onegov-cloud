@@ -147,6 +147,11 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     assert sorted([list.votes for list in election.lists]) == [
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
+    list_ = election.lists.filter_by(list_id='3').one()
+    assert list_.votes == 23653
+    assert sum([p.votes for p in list_.panachage_results]) == (
+        606 + 334 + 756 + 221 + 118 + 1048 + 2316
+    )
 
 
 def test_import_internal_proporz_missing_headers(session):
