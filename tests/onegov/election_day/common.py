@@ -406,6 +406,8 @@ def upload_proporz_election(client, create=True, canton='gr',
         new.form['mandates'] = 5
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'federation'
+        new.form['show_party_strengths'] = True
+        new.form['show_party_panachage'] = True
         new.form.submit()
 
     csv = PROPORZ_HEADER

@@ -277,13 +277,13 @@ class PdfGenerator():
                         sc[1]
                     ]]
                     table += [[
-                        MarkupParagraph(l[0], pdf.style.indent_2),
-                        l[1]
-                    ] for l in sc[2]]
+                        MarkupParagraph(line[0], pdf.style.indent_2),
+                        line[1]
+                    ] for line in sc[2]]
                 table += [[
-                    MarkupParagraph(l[0], pdf.style.indent_1),
-                    l[1]
-                ] for l in connection[2]]
+                    MarkupParagraph(line[0], pdf.style.indent_1),
+                    line[1]
+                ] for line in connection[2]]
                 spacers.append(len(table))
 
             pdf.table(
@@ -300,7 +300,7 @@ class PdfGenerator():
         chart = self.renderer.get_party_strengths_chart(
             election, 'pdf'
         )
-        if chart:
+        if election.show_party_strengths and chart:
             pdf.h2(_('Party strengths'))
             pdf.pdf(chart)
             if not election.horizontal_party_strengths:
@@ -341,7 +341,7 @@ class PdfGenerator():
 
         # Parties Panachage
         chart = self.renderer.get_parties_panachage_chart(election, 'pdf')
-        if chart:
+        if election.show_party_panachage and chart:
             pdf.h2(_('Panachage (parties)'))
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_panachage'))
