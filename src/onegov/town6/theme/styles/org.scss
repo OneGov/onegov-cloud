@@ -578,6 +578,11 @@ $pageref-color-hover: $iron;
     font-size: 1.1875rem !important;
 }
 
+.page-links .list-lead {
+    margin-bottom: 0;
+    color: $monsoon;
+}
+
 .page-links > li.medium-6 {
     padding-bottom: 2rem;
 
