@@ -195,3 +195,22 @@ def test_event_steps(client):
     assert "Bearbeiten Sie diese Veranstaltung." not in confirmation_page
     assert client.get(form_page.request.url, expect_errors=True).status_code \
         == 403
+
+
+def test_hide_event_submission_option(client):
+    events_page = client.get('/events')
+    assert "Veranstaltung vorschlagen" in events_page
+
+    client.login_admin()
+    settings = client.get('/event-settings')
+    settings.form['submit_own_events'] = False
+    settings.form.submit()
+
+    events_page = client.get('/events')
+    assert "Veranstaltung vorschlagen" not in events_page
+
+    settings.form['submit_own_events'] = True
+    settings.form.submit()
+
+    events_page = client.get('/events')
+    assert "Veranstaltung vorschlagen" in events_page
