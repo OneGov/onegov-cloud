@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="large-8 medium-8 cell">
+            <div class="medium-7 cell">
                 <div class="page-lead h5 limit-line-width">
                     <div>
                         ${layout.format_date(occurrence.localized_start, 'event')},
@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            <div class="large-4 medium-4 cell sidebar">
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
                 <div class="occurrence-map side-panel" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
                     <h3 i18n:translate>Map</h3>
                     <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>

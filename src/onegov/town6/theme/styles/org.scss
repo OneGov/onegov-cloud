@@ -9,7 +9,7 @@
     The maximum width of a line relative to the main font size. This limits textblocks
     to a readable length.
 */
-$max-line-width: 36rem;
+$max-line-width: 40rem;
 
 .limit-line-width {
     max-width: $max-line-width;
@@ -612,6 +612,10 @@ $pageref-color-hover: $iron;
             padding-bottom: 60%;
             transition: all 200ms linear;
             width: 100%;
+        }
+
+        .fa-external-link-alt {
+            display: none;
         }
 
         .list-title {
