@@ -111,7 +111,26 @@ class ElectionForm(Form):
         description=_(
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
-        depends_on=('election_type', 'proporz'),
+        depends_on=('election_type', 'proporz', 'show_party_strengths', 'y'),
+        render_kw=dict(force_simple=True)
+    )
+
+    show_party_strengths = BooleanField(
+        label=_("Party strengths"),
+        description=_(
+            "Shows a tab with the comparison of party strengths as a bar "
+            "chart. Requires party results."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
+    show_party_panachage = BooleanField(
+        label=_("Panachage (parties)"),
+        description=_(
+            "Shows a tab with the panachage. Requires party results."
+        ),
+        fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
 
@@ -330,6 +349,8 @@ class ElectionForm(Form):
         model.tacit = self.tacit.data
         model.has_expats = self.has_expats.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
+        model.show_party_strengths = self.show_party_strengths.data
+        model.show_party_panachage = self.show_party_panachage.data
 
         titles = {}
         if self.election_de.data:
@@ -420,6 +441,8 @@ class ElectionForm(Form):
         self.tacit.data = model.tacit
         self.has_expats.data = model.has_expats
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
+        self.show_party_strengths.data = model.show_party_strengths
+        self.show_party_panachage.data = model.show_party_panachage
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)

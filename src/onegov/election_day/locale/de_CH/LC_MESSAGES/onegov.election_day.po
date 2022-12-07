@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-29 08:14+0100\n"
+"POT-Creation-Date: 2022-12-07 07:22+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -348,6 +348,26 @@ msgstr ""
 "Zeigt ein horizontales Balkendiagramm anstelle eines vertikalen "
 "Balkendiagramms."
 
+msgid "Party strengths"
+msgstr "Parteistärken"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
+"Zeigt eine Registerkarte mit dem Vergleich der Parteistärken in Form eines "
+"Balkendiagramms an. Erfordert Parteiergebnisse."
+
+msgid "Views"
+msgstr "Ansichten"
+
+msgid "Panachage (parties)"
+msgstr "Panaschierstatistik (Parteien)"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
+"Zeigt eine Registerkarte mit Panaschierdaten an. Erfordert Parteiergebnisse."
+
 msgid "Date"
 msgstr "Datum"
 
@@ -463,9 +483,6 @@ msgstr ""
 "Zeigt eine Registerkarte mit der Sitzverteilung in Form eines "
 "Balkendiagramms an. Erfordert Parteiergebnisse."
 
-msgid "Views"
-msgstr "Ansichten"
-
 msgid "List groups"
 msgstr "Listengruppen"
 
@@ -476,22 +493,8 @@ msgstr ""
 "Zeigt eine Registerkarte mit Listengruppenergebnissen an. Erfordert "
 "Parteiergebnisse mit Wählerzahlen. Nur falls Doppelter Pukelsheim."
 
-msgid "Party strengths"
-msgstr "Parteistärken"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a bar chart. Requires "
-"party results."
-msgstr ""
-"Zeigt eine Registerkarte mit dem Vergleich der Parteistärken in Form eines "
-"Balkendiagramms an. Erfordert Parteiergebnisse."
-
 msgid "Panachage"
 msgstr "Panaschierstatistik"
-
-msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
-"Zeigt eine Registerkarte mit Panaschierdaten an. Erfordert Parteiergebnisse."
 
 msgid "Notifications"
 msgstr "Benachrichtigungen"
@@ -1401,9 +1404,6 @@ msgstr "Keine Karte für dieses Jahr verfügbar."
 
 msgid "Blank list"
 msgstr "Blankoliste"
-
-msgid "Panachage (parties)"
-msgstr "Panaschierstatistik (Parteien)"
 
 msgid "Panachage (lists)"
 msgstr "Panaschierstatistik (Listen)"
