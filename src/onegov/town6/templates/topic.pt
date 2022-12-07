@@ -24,6 +24,7 @@
                                     <span class="h5 list-title" tal:case="False">${title}</span>
                                 </tal:block>
                             </a>
+                            <p tal:condition="lead and not children_images" class="list-lead">${lead}</p>
                             <a tal:condition="edit_link and request.is_logged_in" class="edit-link" href="${edit_link}"><i class="far fa-edit"></i></a>
                         </li>
                     </ul>
