@@ -246,7 +246,7 @@ $qr-code-icon: '\f029';
     }
 }
 
-$navbar-shadow: 0 15px 10px -15px rgba(10, 10, 10, .25);
+$navbar-shadow: 0 15px 10px -15px rgba(0,0,0,0.15);
 $transition-duration: .1s;
 
 #nav-bar {
@@ -259,6 +259,10 @@ $transition-duration: .1s;
         &.shrink .cell {
             padding-bottom: 0;
             padding-top: 0;
+        }
+
+        button {
+            border-radius: 0;
         }
 
         .cell {
@@ -387,7 +391,7 @@ body#page-search .search-header-mobile .accordion-title {
 }
 
 
-$editbar-bg-color: $black;
+$editbar-bg-color: $tuatara;
 $editbar-bg-color-active: lighten($black, 15%);
 $editbar-fg-color: $white;
 $editbar-fg-color-active: $white;
@@ -402,6 +406,10 @@ $editbar-fg-color-active: $white;
     box-shadow: $navbar-shadow;
     margin-bottom: 2px;
     margin-top: -2px;
+
+    .is-dropdown-submenu-parent > a {
+        padding-top: .9rem !important;
+    }
 
     li {
         a::before {
@@ -418,6 +426,8 @@ $editbar-fg-color-active: $white;
     }
 
     > li > a {
+        border-left: 3px solid $editbar-bg-color;
+        border-right: 3px solid $editbar-bg-color;
         color: $editbar-fg-color;
 
         &::after {

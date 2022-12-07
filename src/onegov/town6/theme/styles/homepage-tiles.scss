@@ -22,16 +22,12 @@
         border-top: 0;
 
         a {
-            border-top: 0;
+            border-top: 1px solid transparent;
             padding-top: 0;
         }
     }
 
     li:last-child {
         padding-bottom: 0;
-    }
-
-    .more-list li a:not(.edit-link) {
-        border-top: 0;
     }
 }
