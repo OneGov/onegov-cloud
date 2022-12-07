@@ -5,6 +5,7 @@ from onegov.election_day.hidden_by_principal import \
     hide_candidates_chart
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_entity_filter
 from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
@@ -34,10 +35,15 @@ def view_election_candidates_data(self, request):
     lists = get_parameter(request, 'lists', list, None)
     elected = get_parameter(request, 'elected', bool, None)
     sort_by_lists = get_parameter(request, 'sort_by_lists', bool, None)
+    entity = request.params.get('entity', '')
 
     return get_candidates_data(
-        self, limit=limit, lists=lists, elected=elected,
-        sort_by_lists=sort_by_lists
+        self,
+        limit=limit,
+        lists=lists,
+        elected=elected,
+        sort_by_lists=sort_by_lists,
+        entities=[entity] if entity else None
     )
 
 
@@ -55,12 +61,15 @@ def view_election_candidates_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    entity = request.params.get('entity', '')
+
     return {
         'skip_rendering': hide_candidates_chart(self, request),
         'help_text': election_incomplete_text,
         'model': self,
         'layout': ElectionLayout(self, request),
         'type': 'candidates-chart',
+        'entity': entity
     }
 
 
@@ -74,7 +83,13 @@ def view_election_candidates(self, request):
 
     """" The main view. """
 
-    candidates = get_candidates_results(self, object_session(self)).all()
+    entity = request.params.get('entity', '')
+    entities = get_entity_filter(request, self, 'candidates', entity)
+    candidates = get_candidates_results(
+        self,
+        object_session(self),
+        entities=[entity] if entity else None
+    ).all()
     any_elected = any([candidate.elected for candidate in candidates])
 
     return {
@@ -83,7 +98,9 @@ def view_election_candidates(self, request):
         'election': self,
         'layout': ElectionLayout(self, request, 'candidates'),
         'candidates': candidates,
-        'any_elected': any_elected
+        'any_elected': any_elected,
+        'entity': entity,
+        'redirect_filters': {request.app.principal.label('entity'): entities}
     }
 
 
@@ -101,9 +118,16 @@ def view_election_lists_table(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    entity = request.params.get('entity', '')
+    candidates = get_candidates_results(
+        self,
+        object_session(self),
+        entities=[entity] if entity else None
+    ).all()
+
     return {
         'election': self,
-        'candidates': get_candidates_results(self, object_session(self)).all(),
+        'candidates': candidates,
         'layout': ElectionLayout(self, request, 'candidates'),
         'type': 'election-table',
         'scope': 'candidates',

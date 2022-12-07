@@ -104,7 +104,7 @@ The results may contain panachage results by adding one column per list:
 
 Name|Description
 ---|---
-`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`list_panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 #### Temporary results
 
@@ -258,8 +258,8 @@ Name|Description
 `color`|The color of the party as a hexadecimal value, e.g. '#a6b784'.
 `mandates`|The number of mandates.
 `votes`|The number of votes.
-`voters_count`|The cumulative number of votes per total number of mandates per election, for election compounds only.
-`voters_count_percentage`|The cumulative number of votes per total number of mandates per election, for election compounds only.
+`voters_count`|Voters count. The cumulative number of votes per total number of mandates per election. For election compounds only.
+`voters_count_percentage`|Voters count (percentage). The cumulative number of votes per total number of mandates per election (percentage). For election compounds only.
 
 #### Domain of influence
 

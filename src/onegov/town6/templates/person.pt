@@ -5,12 +5,12 @@
     <tal:b metal:fill-slot="content">
 
         <div class="grid-x">
-            <div class="large-8 medium-8 cell">
+            <div class="medium-7 cell">
                 <div metal:use-macro="layout.macros['person_card']" />
             </div>
 
-            <div class="large-4 medium-4 cell">
-                <div class="borderless-side-panel">
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="side-panel">
                     <h2 i18n:translate="">Exports</h2>
                     <ul class="person-export-list">
                         <li>

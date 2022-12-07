@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-29 08:14+0100\n"
+"POT-Creation-Date: 2022-12-07 07:22+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -346,6 +346,27 @@ msgstr ""
 msgid "Shows a horizontal bar chart instead of a vertical bar chart."
 msgstr ""
 
+msgid "Party strengths"
+msgstr "Forza da las partidas"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
+"Mussa ina carta da register cun la cumparegliaziun da las fermezzas da las "
+"partidas en furma d'in diagram a travs. Pretenda resultats da partidas."
+
+msgid "Views"
+msgstr "Vistas"
+
+msgid "Panachage (parties)"
+msgstr "Statistica da panaschar (partidas)"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
+"Mussa ina carta da register cun datas panaschadas. Pretenda resultats da "
+"partidas."
+
 msgid "Date"
 msgstr "Data"
 
@@ -463,9 +484,6 @@ msgstr ""
 "Mussa ina carta da register cun la repartiziun dals sezs en furma d'in "
 "diagram a travs. Pretenda resultats da partidas."
 
-msgid "Views"
-msgstr "Vistas"
-
 msgid "List groups"
 msgstr "Gruppas da glistas"
 
@@ -476,23 +494,8 @@ msgstr ""
 "Mussa ina carta da register cun resultats da gruppas da glistas. Pretenda "
 "resultats da partidas cun cifras electoralas. Mo en cas dal Pukelsheim dubel."
 
-msgid "Party strengths"
-msgstr "Forza da las partidas"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a bar chart. Requires "
-"party results."
-msgstr ""
-"Mussa ina carta da register cun la cumparegliaziun da las fermezzas da las "
-"partidas en furma d'in diagram a travs. Pretenda resultats da partidas."
-
 msgid "Panachage"
 msgstr "Statistica da panaschar"
-
-msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
-"Mussa ina carta da register cun datas panaschadas. Pretenda resultats da "
-"partidas."
 
 msgid "Notifications"
 msgstr "Communicaziuns"
@@ -1408,9 +1411,6 @@ msgstr "Per quest onn n'è disponibla nagina carta."
 
 msgid "Blank list"
 msgstr "Glista en blanco"
-
-msgid "Panachage (parties)"
-msgstr "Statistica da panaschar (partidas)"
 
 msgid "Panachage (lists)"
 msgstr "Statistica da panaschar (glistas)"

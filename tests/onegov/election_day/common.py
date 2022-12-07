@@ -101,8 +101,8 @@ PROPORZ_HEADER = (
     'candidate_year_of_birth,'
     'candidate_votes,'
     'candidate_party,'
-    'panachage_votes_from_list_1,'
-    'panachage_votes_from_list_2'
+    'list_panachage_votes_from_list_1,'
+    'list_panachage_votes_from_list_2'
     '\n'
 )
 
@@ -406,6 +406,8 @@ def upload_proporz_election(client, create=True, canton='gr',
         new.form['mandates'] = 5
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'federation'
+        new.form['show_party_strengths'] = True
+        new.form['show_party_panachage'] = True
         new.form.submit()
 
     csv = PROPORZ_HEADER

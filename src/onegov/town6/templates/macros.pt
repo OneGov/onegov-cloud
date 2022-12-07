@@ -270,7 +270,7 @@
 </metal:partners>
 
 <metal:partners define-macro="partner-cards" i18n:domain="onegov.town6" tal:define="subpage subpage|False">
-    <div class="partners grid-x grid-padding-x columns small-up-1 medium-up-3 large-up-4 align-center">
+    <div class="partners grid-x grid-padding-x columns small-up-2 medium-up-3 large-up-4 align-center">
         <div class="cell" tal:repeat="item partners">
             <metal:b use-macro="layout.macros['partner-card']" />
         </div>
@@ -280,8 +280,8 @@
 <metal:events define-macro="event-item-card">
     <a href="${item.url}">
         <div class="card" data-aos="fade">
-                <div style="width: 100%; padding-bottom: 55%; background-image: url(${item.image_url}); background-color: #a4a4a4; background-size: cover;"></div>
-                <div class="image-placeholder" tal:condition="not: item.image_url">
+                <div class="${'' if item.image_url else 'no-image'}" style="width: 100%; padding-bottom: 55%; background-image: url(${item.image_url}); background-color: #a4a4a4; background-size: cover;"></div>
+                <div class="image-placeholder no-image" tal:condition="not: item.image_url">
                     <i class="far fa-calendar-alt" aria-hidden="true"></i>
                 </div>
                 <div class="card-section" tal:condition="with_lead|False">
@@ -315,6 +315,8 @@
         <div class="cell small-12 large-3 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
+    </div>
+    <div class="newslist grid-x align-center">
         <a class="button hollow" href="${layout.events_url}" i18n:translate="">All events</a>
     </div>
 </metal:panel>
@@ -496,10 +498,11 @@
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.town6">
     <div class="newslist grid-x grid-padding-x align-center" tal:condition="news" data-equalizer data-equalize-on="medium">
-
         <div class="cell small-12 medium-${md_span|6} large-${lg_span|4} news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" tal:define="heading 'h4'" />
         </div>
+    </div>
+    <div class="newslist grid-x align-center">
         <a href="${layout.news_url}" class="news-all-entries button hollow"><span i18n:translate="">All articles</span></a>
     </div>
 </metal:newslist>
@@ -513,15 +516,13 @@
             <form class="signup" action="${form.action}" method="POST">
                 <div>${form.csrf_token}</div>
                 <div class="grid-x">
-                    <div class="cell small-8">
+                    <div class="cell small-12">
                         <label class="${'error' if form.address.errors else ''}">
                             <input data-typeahead-subject type="email"
                                name="address"
                                placeholder="E-Mail Address" i18n:attributes="placeholder"/>
                             <small class="error" tal:repeat="error form.address.errors">${error}</small>
                         </label>
-                    </div>
-                    <div class="cell small-4 ${'error' if form.address.errors else ''}">
                         <button type="submit"
                                 class="button" i18n:translate>
                             Signup
@@ -608,14 +609,12 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div class="small-12 medium-4 cell page-content-sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
+    <div class="small-12 medium-4 cell page-content-sidebar medium-offset-1 sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
         <div metal:define-slot="before-panels"></div>
         <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="contact or coordinates or location">
             <div tal:condition="contact and not hide">
                 <h3 i18n:translate>Contact</h3>
-                <div class="contact-panel-content">
-                    <tal:b content="structure contact" />
-                </div>
+                <tal:b content="structure contact" />
             </div>
             <br tal:condition="coordinates and contact" />
             <h3 i18n:translate tal:condition="not contact">Map</h3>
@@ -663,7 +662,7 @@
             </div>
         </tal:b>
         <tal:b condition="people or contact or coordinates or show_side_panel">
-            <div class="small-12 medium-8 cell page-content-main">
+            <div class="small-12 medium-7 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
@@ -1145,7 +1144,6 @@
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
-event
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
 </metal:occurrences>
 

@@ -84,11 +84,11 @@ $publications-icon: '\f1ea';
 
 
 .side-panel {
-
     @include clean-ul;
     @include breakpoint(medium up) {
-        margin-bottom: 2rem;
+        margin-bottom: 4rem;
     }
+    padding-left: 1.5rem;
 
     ul.bulleted {
         list-style-type: disc;
@@ -190,6 +190,26 @@ $checklist-icon: "\f0ae";
     }
 }
 
+.contact-panel-content>ul li+li {
+    margin-top: 0 !important;
+}
+
+.side-panel-with-bg {
+
+    .calendar-export-list {
+        list-style: none;
+        margin: 0;
+    }
+
+    &> *:last-child {
+        margin-bottom: 0 !important;
+    }
+}
+
+.marker-map {
+    border-radius: .7rem;
+}
+
 .homepage .side-panel:first-child,
 .side-panel {
 
@@ -237,23 +257,6 @@ $checklist-icon: "\f0ae";
     &.callout {
         background: $callout-panel-bg;
         border-color: $callout-panel-border-color;
-    }
-}
-
-/*
-    Custom record submission
-*/
-.submit-yours {
-    @include callout($gray-dark-medium);
-    @include smooth-edges;
-
-    padding: 1rem 1rem .5rem;
-
-    h2 {
-        color: $primary-color;
-        display: inline;
-        font-size: 1rem;
-        font-weight: bold;
     }
 }
 

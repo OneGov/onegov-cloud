@@ -802,9 +802,9 @@ def test_proporz_election_export(session):
             'candidate_gender': '',
             'candidate_year_of_birth': '',
             'candidate_votes': 111,
-            'panachage_votes_from_list_1': None,
-            'panachage_votes_from_list_2': None,
-            'panachage_votes_from_list_99': None,
+            'list_panachage_votes_from_list_1': None,
+            'list_panachage_votes_from_list_2': None,
+            'list_panachage_votes_from_list_99': None,
         }, {
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
@@ -846,9 +846,9 @@ def test_proporz_election_export(session):
             'candidate_gender': 'male',
             'candidate_year_of_birth': 1970,
             'candidate_votes': 520,
-            'panachage_votes_from_list_1': None,
-            'panachage_votes_from_list_2': 12,
-            'panachage_votes_from_list_99': 4,
+            'list_panachage_votes_from_list_1': None,
+            'list_panachage_votes_from_list_2': 12,
+            'list_panachage_votes_from_list_99': 4,
         }
     ]
 

@@ -786,18 +786,18 @@
 </metal:ballot-result-bar>
 
 <metal:candidates-chart define-macro="candidates-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|''; sort_by_lists sort_by_lists|''">
+    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|''; sort_by_lists sort_by_lists|''; entity entity|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}"
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists, 'entity': entity})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='candidates-chart')}">
+                data-embed-source="${request.link(model, name='candidates-chart', query_params={'entity': entity})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}">
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists, 'entity': entity})}">
             </div>
         </tal:block>
     </tal:block>

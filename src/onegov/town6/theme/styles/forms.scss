@@ -385,7 +385,13 @@ dl.field-display > dt {
 }
 
 .many-fields a.button {
-    margin-bottom: 0;
+    margin: 0 .5rem !important;
+    padding: .5rem !important;
+
+    &:hover {
+        margin: 0 .5rem !important;
+        padding: .5rem !important;
+    }
 }
 
 /*

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-29 08:14+0100\n"
+"POT-Creation-Date: 2022-12-07 07:22+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -346,6 +346,26 @@ msgstr ""
 "Affiche un graphique à barres horizontales au lieu d'un graphique à barres "
 "verticales."
 
+msgid "Party strengths"
+msgstr "Force des partis"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
+"Affiche un onglet avec la comparaison des forces des partis sous forme de "
+"graphique à barres. Nécessite les résultats des partis."
+
+msgid "Views"
+msgstr "Vues"
+
+msgid "Panachage (parties)"
+msgstr "Panachage (partis)"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
+"Affiche un onglet avec le panachage. Requiert les résultats des parties."
+
 msgid "Date"
 msgstr "Date"
 
@@ -462,9 +482,6 @@ msgstr ""
 "Affiche un onglet avec la comparaison de l'attribution des sièges sous forme "
 "de graphique à barres. Nécessite les résultats des partis."
 
-msgid "Views"
-msgstr "Vues"
-
 msgid "List groups"
 msgstr "Groupes de listes"
 
@@ -476,22 +493,8 @@ msgstr ""
 "résultats des partis avec le nombre de votants. Uniquement pour Doppelter "
 "Pukelsheim."
 
-msgid "Party strengths"
-msgstr "Force des partis"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a bar chart. Requires "
-"party results."
-msgstr ""
-"Affiche un onglet avec la comparaison des forces des partis sous forme de "
-"graphique à barres. Nécessite les résultats des partis."
-
 msgid "Panachage"
 msgstr "Panachage"
-
-msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
-"Affiche un onglet avec le panachage. Requiert les résultats des parties."
 
 msgid "Notifications"
 msgstr "Notifications"
@@ -1406,9 +1409,6 @@ msgstr "Aucune carte disponible pour cette année."
 
 msgid "Blank list"
 msgstr "Liste vierge"
-
-msgid "Panachage (parties)"
-msgstr "Panachage (partis)"
 
 msgid "Panachage (lists)"
 msgstr "Panachage (listes)"

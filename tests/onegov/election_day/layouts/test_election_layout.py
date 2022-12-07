@@ -395,6 +395,24 @@ def test_election_layout_menu_proporz(session):
         ('Downloads', 'ProporzElection/data', False, [])
     ]
 
+    election.show_party_strengths = False
+    election.show_party_panachage = False
+    assert ElectionLayout(election, request).menu == [
+        ('Lists', '', False, [
+            ('Lists', 'ProporzElection/lists', False, []),
+            ('__entities', 'ProporzElection/list-by-entity', False, []),
+            ('__districts', 'ProporzElection/list-by-district', False, []),
+            ('List connections', 'ProporzElection/connections', False, [])
+        ]),
+        ('Candidates', '', False, [
+            ('Candidates', 'ProporzElection/candidates', False, []),
+            ('__entities', 'ProporzElection/candidate-by-entity', False, []),
+            ('__districts', 'ProporzElection/candidate-by-district', False, [])
+        ]),
+        ('Election statistics', 'ProporzElection/statistics', False, []),
+        ('Downloads', 'ProporzElection/data', False, [])
+    ]
+
 
 @pytest.mark.parametrize('tab,expected', [
     ('lists', 'Election/lists-table'),
