@@ -747,7 +747,7 @@ def test_import_internal_proporz_panachage(session):
             'candidate_elected',
             'candidate_votes',
             'candidate_party',
-        ] + [f'panachage_votes_from_list_{h}' for h in headers])
+        ] + [f'list_panachage_votes_from_list_{h}' for h in headers])
         for list_id, panachage in results:
             lines.append([
                 'unknown',  # election_status

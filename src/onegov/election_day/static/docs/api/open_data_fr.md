@@ -124,7 +124,7 @@ Nom|Description
 `candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé).
 `candidate_year_of_birth`|L'année de naissance du candidat.
 `candidate_votes`|Le nombre de voix que ce candidat a obtenu.
-`panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+`list_panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 

@@ -126,7 +126,7 @@ Num|Descripziun
 `candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
-`panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+`list_panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 

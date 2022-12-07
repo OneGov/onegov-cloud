@@ -123,10 +123,13 @@ def parse_list_result(line, errors):
 
 def parse_panachage_headers(csv):
     headers = {}
+    prefix = 'list_panachage_votes_from_list_'
     for header in csv.headers:
-        if not header.startswith('panachage_votes_from_list_'):
+        if header.startswith('panachage_votes_from_list_'):
+            prefix = 'panachage_votes_from_list_'
+        if not header.startswith(prefix):
             continue
-        parts = header.split('panachage_votes_from_list_')
+        parts = header.split(prefix)
         if len(parts) > 1:
             try:
                 source_list_id = parts[1]

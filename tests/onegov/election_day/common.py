@@ -101,8 +101,8 @@ PROPORZ_HEADER = (
     'candidate_year_of_birth,'
     'candidate_votes,'
     'candidate_party,'
-    'panachage_votes_from_list_1,'
-    'panachage_votes_from_list_2'
+    'list_panachage_votes_from_list_1,'
+    'list_panachage_votes_from_list_2'
     '\n'
 )
 

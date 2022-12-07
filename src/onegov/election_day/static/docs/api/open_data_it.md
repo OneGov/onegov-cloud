@@ -124,7 +124,7 @@ Nome|Descrizione
 `candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
-`panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 I comuni non ancora contati non sono inclusi.
 
