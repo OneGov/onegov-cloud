@@ -270,7 +270,7 @@
 </metal:partners>
 
 <metal:partners define-macro="partner-cards" i18n:domain="onegov.town6" tal:define="subpage subpage|False">
-    <div class="partners grid-x grid-padding-x columns small-up-1 medium-up-3 large-up-4 align-center">
+    <div class="partners grid-x grid-padding-x columns small-up-2 medium-up-3 large-up-4 align-center">
         <div class="cell" tal:repeat="item partners">
             <metal:b use-macro="layout.macros['partner-card']" />
         </div>
@@ -280,8 +280,8 @@
 <metal:events define-macro="event-item-card">
     <a href="${item.url}">
         <div class="card" data-aos="fade">
-                <div style="width: 100%; padding-bottom: 55%; background-image: url(${item.image_url}); background-color: #a4a4a4; background-size: cover;"></div>
-                <div class="image-placeholder" tal:condition="not: item.image_url">
+                <div class="${'' if item.image_url else 'no-image'}" style="width: 100%; padding-bottom: 55%; background-image: url(${item.image_url}); background-color: #a4a4a4; background-size: cover;"></div>
+                <div class="image-placeholder no-image" tal:condition="not: item.image_url">
                     <i class="far fa-calendar-alt" aria-hidden="true"></i>
                 </div>
                 <div class="card-section" tal:condition="with_lead|False">

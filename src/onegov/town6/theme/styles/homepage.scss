@@ -4,6 +4,13 @@
         padding-bottom: 1rem;
     }
 
+    @media #{$small-only} {
+        h5 {
+            font-size: 1.2rem;
+        }
+
+    }
+
     .full.primary {
         small a:first-of-type {
             color: $primary-fg-color;
@@ -113,18 +120,22 @@
             padding: 1.5rem;
             padding-bottom: 0;
         }
+    }
 
-        @media #{$small-only} {
+    @media #{$small-only} {
+        .card.icon-link {
+            height: calc(100% - 1rem);
+            margin-bottom: 1rem;
+
             h5 {
                 margin-bottom: 0;
-                padding-bottom: 1.5rem;
+                padding: 1rem;
             }
 
             p {
                 display: none;
             }
         }
-
     }
 
     a .card p {
