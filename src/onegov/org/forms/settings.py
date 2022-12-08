@@ -981,7 +981,7 @@ class NewsletterSettingsForm(Form):
 class LinkMigrationForm(Form):
 
     old_domain = StringField(
-        label=_('New domain'),
+        label=_('Old domain'),
         description='govikon.onegovcloud.ch',
         validators=[InputRequired()]
     )
