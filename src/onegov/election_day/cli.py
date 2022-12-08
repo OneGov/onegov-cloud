@@ -3,8 +3,6 @@ import click
 import os
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
-from onegov.ballot import PanachageResult
-from onegov.ballot import PartyResult
 from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -207,48 +205,5 @@ def update_last_result_change():
                 count += 1
 
         click.secho(f'Updated {count} items', fg='green')
-
-    return update
-
-
-@cli.command('migrate-party-results')
-def migrate_party_results():
-    def update(request, app):
-        click.secho(f'Updating {app.schema}', fg='yellow')
-
-        session = request.app.session()
-        for item in session.query(Election):
-            results = session.query(PartyResult).filter_by(owner=item.id).all()
-            if results:
-                click.secho(f'Election {item.id}: migrating party results')
-                for result in results:
-                    result.election_id = item.id
-                    result.owner = None
-
-            results = session.query(PanachageResult).filter_by(
-                owner=item.id
-            ).all()
-            if results:
-                click.secho(f'Election {item.id}: migrating panachage results')
-                for result in results:
-                    result.election_id = item.id
-                    result.owner = None
-
-        for item in session.query(ElectionCompound):
-            results = session.query(PartyResult).filter_by(owner=item.id).all()
-            if results:
-                click.secho(f'Compound {item.id}: migrating party results')
-                for result in results:
-                    result.election_compound_id = item.id
-                    result.owner = None
-
-            results = session.query(PanachageResult).filter_by(
-                owner=item.id
-            ).all()
-            if results:
-                click.secho(f'Compound {item.id}: migrating panachage results')
-                for result in results:
-                    result.election_compound_id = item.id
-                    result.owner = None
 
     return update
