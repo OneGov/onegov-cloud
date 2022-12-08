@@ -249,8 +249,8 @@ def handle_migrate_links(self, request, form, layout=None):
         'helptext': test_results,
         'button_text': button_text,
         'callout': _(
-            'Migrates links from the current domain "${domain}" to the given '
-            'domain.',
+            'Migrates links from the given domain to the current domain '
+            '"${domain}".',
             mapping={'domain': domain}
         ),
     }

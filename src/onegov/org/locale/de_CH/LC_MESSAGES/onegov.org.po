@@ -1491,8 +1491,8 @@ msgstr "Newsletter aktivieren"
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 
-msgid "New domain"
-msgstr "Neuer Domain"
+msgid "Old domain"
+msgstr "Alte Domain"
 
 msgid "Test migration"
 msgstr "Migration testen"
@@ -4825,9 +4825,9 @@ msgstr "Total ${number} Links gefunden"
 
 #, python-format
 msgid ""
-"Migrates links from the current domain \"${domain}\" to the given domain."
+"Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migriert Links von der aktuellen Domain \"${domain}\" zur angegebenen Domain."
+"Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\"."
 
 msgid "Topics"
 msgstr "Themen"
