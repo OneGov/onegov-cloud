@@ -531,13 +531,14 @@ def test_view_election_party_strengths(election_day_app_gr):
 
     # Historical data with translations
     csv_parties = (
-        'year,name,name_fr_ch,id,total_votes,color,mandates,votes\r\n'
-        '2022,BDP,,1,60000,#efb52c,1,10000\r\n'
-        '2022,Die Mitte,Le Centre,2,60000,#ff6300,1,30000\r\n'
-        '2022,FDP,,3,60000,#4068c8,0,20000\r\n'
-        '2011,BDP,,1,40000,#efb52c,1,1000\r\n'
-        '2011,CVP,PDC,2,40000,#ff6300,1,15000\r\n'
-        '2011,FDP,,3,40000,#4068c8,1,10000\r\n'
+        'year,name,name_fr_ch,id,total_votes,color,mandates,'
+        'votes,voters_count,voters_count_percentage\r\n'
+        '2022,BDP,,1,60000,#efb52c,1,10000,100,16.67\r\n'
+        '2022,Die Mitte,Le Centre,2,60000,#ff6300,1,30000,300,50\r\n'
+        '2022,FDP,,3,60000,#4068c8,0,20000,200,33.33\r\n'
+        '2018,BDP,,1,40000,#efb52c,1,1000,10,2.5\r\n'
+        '2018,CVP,PDC,2,40000,#ff6300,1,15000,150.7,37.67\r\n'
+        '2018,FDP,,3,40000,#4068c8,1,10000,100,25.0\r\n'
     ).encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload-party-results')
@@ -548,7 +549,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     parties = client.get('/election/proporz-election/party-strengths-data')
     parties = parties.json
     assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
-    assert parties['labels'] == ['2011', '2022']
+    assert parties['labels'] == ['2018', '2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 5
     assert parties['results']
@@ -557,30 +558,30 @@ def test_view_election_party_strengths(election_day_app_gr):
         '{}-{}'.format(party['item'], party['group']): party
         for party in parties['results']
     }
-    assert parties['2011-BDP']['color'] == '#efb52c'
+    assert parties['2018-BDP']['color'] == '#efb52c'
     assert parties['2022-BDP']['color'] == '#efb52c'
-    assert parties['2011-Die Mitte']['color'] == '#ff6300'
+    assert parties['2018-Die Mitte']['color'] == '#ff6300'
     assert parties['2022-Die Mitte']['color'] == '#ff6300'
-    assert parties['2011-FDP']['color'] == '#4068c8'
+    assert parties['2018-FDP']['color'] == '#4068c8'
     assert parties['2022-FDP']['color'] == '#4068c8'
 
-    assert parties['2011-BDP']['active'] is False
-    assert parties['2011-Die Mitte']['active'] is False
-    assert parties['2011-FDP']['active'] is False
+    assert parties['2018-BDP']['active'] is False
+    assert parties['2018-Die Mitte']['active'] is False
+    assert parties['2018-FDP']['active'] is False
     assert parties['2022-BDP']['active'] is True
     assert parties['2022-Die Mitte']['active'] is True
     assert parties['2022-FDP']['active'] is True
 
-    assert parties['2011-BDP']['value']['front'] == 1
-    assert parties['2011-Die Mitte']['value']['front'] == 1
-    assert parties['2011-FDP']['value']['front'] == 1
+    assert parties['2018-BDP']['value']['front'] == 1
+    assert parties['2018-Die Mitte']['value']['front'] == 1
+    assert parties['2018-FDP']['value']['front'] == 1
     assert parties['2022-BDP']['value']['front'] == 1
     assert parties['2022-Die Mitte']['value']['front'] == 1
     assert parties['2022-FDP']['value']['front'] == 0
 
-    assert parties['2011-BDP']['value']['back'] == 2.5
-    assert parties['2011-Die Mitte']['value']['back'] == 37.5
-    assert parties['2011-FDP']['value']['back'] == 25
+    assert parties['2018-BDP']['value']['back'] == 2.5
+    assert parties['2018-Die Mitte']['value']['back'] == 37.5
+    assert parties['2018-FDP']['value']['back'] == 25
     assert parties['2022-BDP']['value']['back'] == 16.7
     assert parties['2022-Die Mitte']['value']['back'] == 50
     assert parties['2022-FDP']['value']['back'] == 33.3
@@ -597,6 +598,31 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert '25.0%' in results
     assert '33.3%' in results
     assert '8.3%' in results
+
+    # with exact voters counts
+    edit = client.get('/election/proporz-election/edit')
+    edit.form['voters_counts'] = True
+    edit.form['exact_voters_counts'] = True
+    edit.form.submit()
+
+    assert '>10.00<' in client.get(
+        '/election/proporz-election/party-strengths'
+    )
+    data = client.get('/election/proporz-election/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.67
+    data = client.get('/election/proporz-election/json').json
+    assert data['parties']['2']['2018']['voters_count']['total'] == 150.7
+
+    # with rounded voters counts
+    edit = client.get('/election/proporz-election/edit')
+    edit.form['exact_voters_counts'] = False
+    edit.form.submit()
+
+    assert '>10<' in client.get('/election/proporz-election/party-strengths')
+    data = client.get('/election/proporz-election/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.67
+    data = client.get('/election/proporz-election/json').json
+    assert data['parties']['2']['2018']['voters_count']['total'] == 151
 
     # translations
     client.get('/locale/fr_CH')

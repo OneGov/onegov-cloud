@@ -14,12 +14,7 @@ def has_party_results(item):
 
 def get_party_results(item, json_serializable=False):
 
-    """ Returns the aggregated party results as list.
-
-    Adds `voters_count` for election compounds with voters counts enabled, else
-    `votes`.
-
-    """
+    """ Returns the aggregated party results as list. """
 
     if not has_party_results(item):
         return [], {}
@@ -35,7 +30,6 @@ def get_party_results(item, json_serializable=False):
 
     # Get the results
     parties = {}
-    exact = getattr(item, 'exact_voters_counts', False) is True
     for result in results:
         party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
@@ -54,7 +48,7 @@ def get_party_results(item, json_serializable=False):
         }
 
         voters_count = result.voters_count or Decimal(0)
-        if not exact:
+        if not item.exact_voters_counts:
             voters_count = int(round(voters_count))
         elif json_serializable:
             voters_count = float(voters_count)
@@ -77,8 +71,7 @@ def get_party_results_deltas(item, years, parties):
 
     """
 
-    voters_counts = getattr(item, 'voters_counts', False) == True
-    attribute = 'voters_count' if voters_counts else 'votes'
+    attribute = 'voters_count' if item.voters_counts else 'votes'
     deltas = len(years) > 1
     results = {}
     for index, year in enumerate(years):
@@ -133,8 +126,7 @@ def get_party_results_horizontal_data(item):
             'results': [],
         }
 
-    voters_counts = getattr(item, 'voters_counts', False) == True
-    attribute = 'voters_count' if voters_counts else 'votes'
+    attribute = 'voters_count' if item.voters_counts else 'votes'
     years, parties = get_party_results(item)
     results = []
     if years:
@@ -177,8 +169,7 @@ def get_party_results_vertical_data(item):
             'title': item.title
         }
 
-    voters_counts = getattr(item, 'voters_counts', False) == True
-    attribute = 'voters_count' if voters_counts else 'votes'
+    attribute = 'voters_count' if item.voters_counts else 'votes'
     years, parties = get_party_results(item)
     groups = {}
     results = []

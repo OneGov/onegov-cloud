@@ -92,6 +92,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     #: Absolute majority
     absolute_majority = Column(Integer, nullable=True)
 
+    #: Display voters counts instead of votes in views with party results.
+    voters_counts = meta_property('voters_counts', default=False)
+
+    #: Display exact voters counts instead of rounded values.
+    exact_voters_counts = meta_property('exact_voters_counts', default=False)
+
     #: may be used to enable/disable the visibility of party strengths
     show_party_strengths = meta_property(
         'show_party_strengths',

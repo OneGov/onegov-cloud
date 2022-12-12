@@ -105,6 +105,24 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    voters_counts = BooleanField(
+        label=_("Voters counts"),
+        fieldset=_("View options"),
+        description=_(
+            "Shows voters counts instead of votes in the party strengths "
+            "view."
+        ),
+    )
+
+    exact_voters_counts = BooleanField(
+        label=_("Exact voters counts"),
+        fieldset=_("View options"),
+        description=_(
+            "Shows exact voters counts instead of rounded values."
+        ),
+        render_kw=dict(force_simple=True)
+    )
+
     horizontal_party_strengths = BooleanField(
         label=_("Horizonal party strengths chart"),
         fieldset=_("View options"),
@@ -348,6 +366,8 @@ class ElectionForm(Form):
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
         model.has_expats = self.has_expats.data
+        model.voters_counts = self.voters_counts.data
+        model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
@@ -441,6 +461,8 @@ class ElectionForm(Form):
         self.tacit.data = model.tacit
         self.has_expats.data = model.has_expats
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
+        self.voters_counts.data = model.voters_counts
+        self.exact_voters_counts.data = model.exact_voters_counts
         self.show_party_strengths.data = model.show_party_strengths
         self.show_party_panachage.data = model.show_party_panachage
 
