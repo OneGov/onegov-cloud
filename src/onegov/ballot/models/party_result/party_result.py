@@ -19,9 +19,6 @@ class PartyResult(Base, TimestampMixin):
     #: identifies the party result
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the election or election compound this result belongs to
-    owner = Column(Text, nullable=True)  # todo: delete me after migration!
-
     #: the election this result belongs to
     election_id = Column(
         Text,
