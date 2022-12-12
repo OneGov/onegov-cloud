@@ -441,8 +441,7 @@ def to_html_ul(value, convert_dashes=True):
         )
 
     elements = []
-    temp_li = []
-    temp_p = []
+    temp = []
 
     def ul(inner):
         return f'<ul class="bulleted">{inner}</ul>'
@@ -452,6 +451,8 @@ def to_html_ul(value, convert_dashes=True):
 
     def p(inner):
         return f'<p>{inner}</p>'
+
+    was_list = False
 
     for line in value.splitlines():
         if not line:
@@ -463,27 +464,17 @@ def to_html_ul(value, convert_dashes=True):
 
         line = line.lstrip('-').strip()
 
-        if not new_p_or_ul:
-            if is_list:
-                temp_li.append(li(line))
-            else:
-                temp_p.append(line)
-        else:
-            if temp_li:
-                elements.append(ul(''.join(temp_li)))
-                temp_li = []
+        if new_p_or_ul or was_list != is_list:
+            elements.append(
+                ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+            )
+            temp = []
+            was_list = False
 
-            if temp_p:
-                elements.append(p('<br>'.join(temp_p)))
-                temp_p = []
+        temp.append((li(line) if is_list else line)) if not new_p_or_ul else ''
 
         new_p_or_ul = False
-
-    if temp_li:
-        elements.append(ul(''.join(temp_li)))
-
-    if temp_p:
-        elements.append(p('<br>'.join(temp_p)))
+        was_list = is_list
 
     return ''.join(elements)
 
