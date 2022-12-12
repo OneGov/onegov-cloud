@@ -99,6 +99,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     model.explanations_pdf = (explanations_pdf, 'explanations.pdf')
     model.tacit = False
     model.has_expats = False
+    model.voters_counts = False
+    model.exact_voters_counts = False
     model.horizontal_party_strengths = False
     model.show_party_strengths = False
     model.show_party_panachage = False
@@ -129,6 +131,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert form.explanations_pdf.data['mimetype'] == 'application/pdf'
     assert form.tacit.data is False
     assert form.has_expats.data is False
+    assert form.voters_counts.data is False
+    assert form.exact_voters_counts.data is False
     assert form.horizontal_party_strengths.data is False
     assert form.show_party_strengths.data is False
     assert form.show_party_panachage.data is False
@@ -153,6 +157,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     form.explanations_pdf.action = 'delete'
     form.tacit.data = True
     form.has_expats.data = True
+    form.voters_counts.data = True
+    form.exact_voters_counts.data = True
     form.horizontal_party_strengths.data = True
     form.show_party_strengths.data = True
     form.show_party_panachage.data = True
@@ -182,6 +188,8 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert model.explanations_pdf is None
     assert model.tacit is True
     assert model.has_expats is True
+    assert model.voters_counts is True
+    assert model.exact_voters_counts is True
     assert model.horizontal_party_strengths is True
     assert model.show_party_strengths is True
     assert model.show_party_panachage is True
