@@ -765,4 +765,23 @@ def add_foreign_keys_to_panahcage_results(context):
         )
 
 
-# todo: drop owner
+@upgrade_task(
+    'Drop owner from party results',
+    requires='onegov.ballot:Add foreign keys to party results'
+)
+def drop_owner_from_party_results(context):
+    if context.has_column('party_results', 'owner'):
+        context.operations.drop_column(
+            'party_results', 'owner'
+        )
+
+
+@upgrade_task(
+    'Drop owner from panachage results',
+    requires='onegov.ballot:Add foreign keys to panachage results'
+)
+def drop_owner_from_panachage_results(context):
+    if context.has_column('panachage_results', 'owner'):
+        context.operations.drop_column(
+            'panachage_results', 'owner'
+        )

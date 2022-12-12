@@ -14,13 +14,12 @@ class PanachageResult(Base, TimestampMixin):
 
     case lists:
     It represents the votes transferred from one list to another.
-    target represents list.id (UUID) and owner is NULL
+    target represents list.id (UUID).
 
     case parties:
     It represents the total of votes reveived by panachage for a party across
     all the lists.
-    target represents the party name (as well as source is party name) and
-    the owner is the election.id (a string).
+    target/source represents the party names.
 
     """
 
@@ -28,10 +27,6 @@ class PanachageResult(Base, TimestampMixin):
 
     #: identifies the result
     id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: the owner of this result, maps to election.id
-    # where electon.id is derived from the title
-    owner = Column(Text, nullable=True)  # todo: delete me after migration!
 
     #: the election this result belongs to
     election_id = Column(
