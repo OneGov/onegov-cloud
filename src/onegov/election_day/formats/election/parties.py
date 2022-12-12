@@ -56,6 +56,7 @@ def parse_party_result(
     line, errors, party_results, totals, parties, election_year,
     locales, default_locale, colors, domain, domain_segment
 ):
+    totals_key = (domain, domain_segment)
     try:
         year = validate_integer(line, 'year', default=election_year)
 
@@ -91,14 +92,16 @@ def parse_party_result(
             optional=True, default=None
         )
         assert all((year, name_translations.get(default_locale)))
-        assert totals.get(year, total_votes) == total_votes
+
+        totals.setdefault(year, {})
+        assert totals[year].get(totals_key, total_votes) == total_votes
     except ValueError as e:
         errors.append(e.args[0])
     except AssertionError:
         errors.append(_("Invalid values"))
     else:
         key = f'{domain}/{domain_segment}/{year}/{party_id}'
-        totals[year] = total_votes
+        totals[totals_key] = total_votes
         if year == election_year:
             parties.add(party_id)
 
