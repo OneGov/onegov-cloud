@@ -101,7 +101,7 @@ def parse_party_result(
         errors.append(_("Invalid values"))
     else:
         key = f'{domain}/{domain_segment}/{year}/{party_id}'
-        totals[totals_key] = total_votes
+        totals[year][totals_key] = total_votes
         if year == election_year:
             parties.add(party_id)
 
