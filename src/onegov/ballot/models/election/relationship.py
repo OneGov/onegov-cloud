@@ -30,7 +30,7 @@ class ElectionRelationship(Base):
     )
 
     #: The source election.
-    source_election = relationship(
+    source = relationship(
         'Election',
         foreign_keys=[source_id],
         backref=backref(
@@ -41,7 +41,7 @@ class ElectionRelationship(Base):
     )
 
     #: The target election.
-    target_election = relationship(
+    target = relationship(
         'Election',
         foreign_keys=[target_id],
         backref=backref(
