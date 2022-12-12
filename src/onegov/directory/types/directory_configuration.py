@@ -179,7 +179,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             return value and str(value) or ''
 
         return separator.join(render(s) for s in (
-            data[as_internal_id(key)] for key in getattr(self, attribute)
+            data.get(as_internal_id(key)) for key in getattr(self, attribute)
         ))
 
     def safe_format(self, fmt, data):
@@ -223,7 +223,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
 
     def extract_searchable(self, data):
         # Remove non-searchable fields from data
-        data = {id: data.get(as_internal_id(id)) for id in self.searchable}
+        data = {as_internal_id(id): data.get(as_internal_id(id))
+                for id in self.searchable}
 
         return self.join(data, 'searchable')
 
