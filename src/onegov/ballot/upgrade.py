@@ -780,7 +780,7 @@ def drop_owner_from_party_results(context):
     'Drop owner from panachage results',
     requires='onegov.ballot:Add foreign keys to panachage results'
 )
-def drop_owner_from_panahcage_results(context):
+def drop_owner_from_panachage_results(context):
     if context.has_column('panachage_results', 'owner'):
         context.operations.drop_column(
             'panachage_results', 'owner'
