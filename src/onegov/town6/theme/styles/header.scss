@@ -348,7 +348,7 @@ $transition-duration: .1s;
         top: 50%;
     }
 
-    .input-group-field:not(:focus) + .typeahead {
+    .input-group-field:not(:focus) + .typeahead:not(:hover) {
         display: none;
     }
 }
