@@ -1,6 +1,7 @@
 from datetime import date
 from onegov.ballot import Election
-from onegov.ballot import ElectionAssociation
+from onegov.ballot import ElectionRelationship
+from onegov.core.utils import Bunch
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -193,8 +194,15 @@ class ElectionForm(Form):
         render_kw={'lang': 'rm'}
     )
 
-    related_elections = ChosenSelectMultipleField(
-        label=_("Related elections"),
+    related_elections_historical = ChosenSelectMultipleField(
+        label=_("Other legislative periods"),
+        fieldset=_("Related elections"),
+        choices=[]
+    )
+
+    related_elections_round = ChosenSelectMultipleField(
+        label=_("Rounds of voting or by-elections"),
+        fieldset=_("Related elections"),
         choices=[]
     )
 
@@ -332,7 +340,7 @@ class ElectionForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        self.related_elections.choices = [
+        choices = [
             (
                 election.id,
                 "{} {} {}".format(
@@ -342,6 +350,37 @@ class ElectionForm(Form):
                 ).strip().replace("  ", " ")
             ) for election in query
         ]
+        self.related_elections_historical.choices = choices
+        self.related_elections_round.choices = choices
+
+    def update_realtionships(self, model, type_):
+        # use symetric relationships
+        session = self.request.session
+        query = session.query(ElectionRelationship)
+        query = query.filter(
+            or_(
+                ElectionRelationship.source_id == model.id,
+                ElectionRelationship.target_id == model.id,
+            ),
+            ElectionRelationship.type == type_
+        )
+        for relationship in query:
+            session.delete(relationship)
+
+        data = getattr(self, f'related_elections_{type_}', Bunch(data=[])).data
+        for id_ in data:
+            if not model.id:
+                model.id = model.id_from_title(session)
+            session.add(
+                ElectionRelationship(
+                    source_id=model.id, target_id=id_, type=type_
+                )
+            )
+            session.add(
+                ElectionRelationship(
+                    source_id=id_, target_id=model.id, type=type_
+                )
+            )
 
     def update_model(self, model):
         principal = self.request.app.principal
@@ -405,23 +444,9 @@ class ElectionForm(Form):
 
         model.colors = self.parse_colors(self.colors.data)
 
-        # use symetric relationships
-        session = self.request.session
-        query = session.query(ElectionAssociation)
-        query = query.filter(
-            or_(
-                ElectionAssociation.source_id == model.id,
-                ElectionAssociation.target_id == model.id
-            )
-        )
-        for association in query:
-            session.delete(association)
-
-        for id_ in self.related_elections.data:
-            if not model.id:
-                model.id = model.id_from_title(session)
-            session.add(ElectionAssociation(source_id=model.id, target_id=id_))
-            session.add(ElectionAssociation(source_id=id_, target_id=model.id))
+        with self.request.session.no_autoflush:
+            self.update_realtionships(model, 'historical')
+            self.update_realtionships(model, 'round')
 
     def apply_model(self, model):
         titles = model.title_translations or {}
@@ -482,10 +507,19 @@ class ElectionForm(Form):
             ]
             self.election_type.data = 'proporz'
 
-        self.related_elections.choices = [
-            choice for choice in self.related_elections.choices
+        self.related_elections_historical.choices = [
+            choice for choice in self.related_elections_historical.choices
             if choice[0] != model.id
         ]
-        self.related_elections.data = [
+        self.related_elections_round.choices = [
+            choice for choice in self.related_elections_round.choices
+            if choice[0] != model.id
+        ]
+        self.related_elections_historical.data = [
             association.target_id for association in model.related_elections
+            if association.type == 'historical'
+        ]
+        self.related_elections_round.data = [
+            association.target_id for association in model.related_elections
+            if association.type == 'round'
         ]

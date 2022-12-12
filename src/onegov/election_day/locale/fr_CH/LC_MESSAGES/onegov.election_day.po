@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-07 07:22+0100\n"
+"POT-Creation-Date: 2022-12-12 14:21+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -338,6 +338,20 @@ msgstr "Suisses de l'étranger"
 msgid "The election contains seperate results for expats."
 msgstr "L'élection contient des résultats distincts pour les expatriés."
 
+msgid "Voters counts"
+msgstr "Nombres de votants"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Affiche le nombre de votants au lieu des votes dans la vue des forces du "
+"parti."
+
+msgid "Exact voters counts"
+msgstr "Nombres de votants exacts"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Affiche le nombre exact de votants au lieu des valeurs arrondies."
+
 msgid "Horizonal party strengths chart"
 msgstr "Graphique horizontal des forces du parti"
 
@@ -390,8 +404,14 @@ msgstr "Italian"
 msgid "Romansh"
 msgstr "Roumain"
 
+msgid "Other legislative periods"
+msgstr "Autres législatures"
+
 msgid "Related elections"
 msgstr "Élections connexes"
+
+msgid "Rounds of voting or by-elections"
+msgstr "Tours de scrutin ou élections partielles"
 
 msgid "Link"
 msgstr "Lien hypertexte"
@@ -457,20 +477,6 @@ msgstr "Doppelter Pukelsheim"
 
 msgid "Allows to show the list groups and lists views."
 msgstr "Permet d'afficher les vues des groupes de listes et des listes."
-
-msgid "Voters counts"
-msgstr "Nombres de votants"
-
-msgid "Shows voters counts instead of votes in the party strengths view."
-msgstr ""
-"Affiche le nombre de votants au lieu des votes dans la vue des forces du "
-"parti."
-
-msgid "Exact voters counts"
-msgstr "Nombres de votants exacts"
-
-msgid "Shows exact voters counts instead of rounded values."
-msgstr "Affiche le nombre exact de votants au lieu des valeurs arrondies."
 
 msgid "Seat allocation"
 msgstr "Attribution des sièges"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-07 07:22+0100\n"
+"POT-Creation-Date: 2022-12-12 14:21+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -340,6 +340,19 @@ msgstr "Auslandschweizer"
 msgid "The election contains seperate results for expats."
 msgstr "Die Wahl enthält gesonderte Ergebnisse für Auslandsschweizer."
 
+msgid "Voters counts"
+msgstr "Wählerzahlen"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Zeigt die Wählerzahlen statt der Stimmen in der Ansicht der Parteistärken an."
+
+msgid "Exact voters counts"
+msgstr "Exakte Wählerzahlen"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Zeigt exakte Wählerzahlen anstelle von gerundeten Werten."
+
 msgid "Horizonal party strengths chart"
 msgstr "Horizontales Parteistärkendiagramm"
 
@@ -392,8 +405,14 @@ msgstr "Italienisch"
 msgid "Romansh"
 msgstr "Rätoromanisch"
 
+msgid "Other legislative periods"
+msgstr "Andere Legislaturperioden"
+
 msgid "Related elections"
 msgstr "Zugehörige Wahlen"
+
+msgid "Rounds of voting or by-elections"
+msgstr "Wahlgänge oder Nachwahlen"
 
 msgid "Link"
 msgstr "Link url"
@@ -459,19 +478,6 @@ msgstr "Doppelter Pukelsheim"
 
 msgid "Allows to show the list groups and lists views."
 msgstr "Ermöglicht die Anzeige der Listengruppen- und Listenansichten."
-
-msgid "Voters counts"
-msgstr "Wählerzahlen"
-
-msgid "Shows voters counts instead of votes in the party strengths view."
-msgstr ""
-"Zeigt die Wählerzahlen statt der Stimmen in der Ansicht der Parteistärken an."
-
-msgid "Exact voters counts"
-msgstr "Exakte Wählerzahlen"
-
-msgid "Shows exact voters counts instead of rounded values."
-msgstr "Zeigt exakte Wählerzahlen anstelle von gerundeten Werten."
 
 msgid "Seat allocation"
 msgstr "Sitzverteilung"

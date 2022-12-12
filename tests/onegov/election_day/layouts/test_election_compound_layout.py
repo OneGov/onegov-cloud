@@ -1,6 +1,7 @@
 from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
@@ -152,6 +153,29 @@ def test_election_compound_layout_general(session):
         )
         assert layout.svg_link == 'ElectionCompound/parties-panachage-svg'
         assert layout.svg_name == 'electioncompound-panachage.svg'
+
+    with freeze_time("2014-01-01 13:00"):
+        second_compound = ElectionCompound(
+            title='Second Compound',
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+        session.add(second_compound)
+        session.flush()
+
+        relationship = ElectionCompoundRelationship(
+            source_id=compound.id,
+            target_id=second_compound.id
+        )
+        session.add(relationship)
+        session.flush()
+
+        assert ElectionCompoundLayout(compound, request).related_compounds == [
+            ('Second Compound', 'ElectionCompound/second-compound')
+        ]
+        assert ElectionCompoundLayout(
+            second_compound, request
+        ).related_compounds == []
 
     # test table links
     for tab, expected in (

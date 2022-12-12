@@ -310,3 +310,103 @@ def test_election_compound_form_model(
     assert model.lower_apportionment_pdf.name == 'lower_apportionment_pdf'
     assert model.lower_apportionment_pdf.reference.filename == 'my-file-l.pdf'
     assert model.lower_apportionment_pdf.reference.file.read() == b'my-file-l'
+
+
+def test_election_compound_form_relations(session):
+    session.add(
+        ElectionCompound(
+            title='First Compound',
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+    )
+    session.add(
+        ElectionCompound(
+            title='Second Compound',
+            domain='federation',
+            date=date(2011, 1, 2),
+        )
+    )
+
+    # Add a new election with relations
+    compound = ElectionCompound()
+
+    form = ElectionCompoundForm()
+    form.request = DummyRequest(session=session)
+    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.on_request()
+    assert form.related_compounds_historical.choices == [
+        ('second-compound', '02.01.2011 Second Compound'),
+        ('first-compound', '01.01.2011 First Compound'),
+    ]
+    assert form.related_compounds_round.choices == [
+        ('second-compound', '02.01.2011 Second Compound'),
+        ('first-compound', '01.01.2011 First Compound'),
+    ]
+
+    form.election_de.data = 'Third Compound'
+    form.date.data = date(2011, 1, 3)
+    form.domain.data = 'federation'
+    form.shortcode.data = 'SC'
+    form.related_compounds_historical.data = ['first-compound']
+    form.related_compounds_round.data = ['first-compound', 'second-compound']
+    form.update_model(compound)
+    session.add(compound)
+    session.flush()
+
+    # Change existing relations of a compound
+    compound = session.query(ElectionCompound).filter_by(
+        id='first-compound'
+    ).one()
+
+    form = ElectionCompoundForm()
+    form.request = DummyRequest(session=session)
+    form.request.app.principal = Canton(name='gr', canton='gr')
+    form.on_request()
+    assert form.related_compounds_historical.choices == [
+        ('third-compound', '03.01.2011 SC Third Compound'),
+        ('second-compound', '02.01.2011 Second Compound'),
+        ('first-compound', '01.01.2011 First Compound'),
+    ]
+    assert form.related_compounds_round.choices == [
+        ('third-compound', '03.01.2011 SC Third Compound'),
+        ('second-compound', '02.01.2011 Second Compound'),
+        ('first-compound', '01.01.2011 First Compound'),
+    ]
+    form.apply_model(compound)
+    assert form.related_compounds_historical.data == ['third-compound']
+    assert form.related_compounds_round.data == ['third-compound']
+
+    form.related_compounds_historical.data = ['second-compound']
+    form.related_compounds_round.data = ['second-compound', 'third-compound']
+    form.update_model(compound)
+    session.add(compound)
+    session.flush()
+
+    # Check all relations
+    compound = session.query(ElectionCompound).filter_by(
+        id='first-compound'
+    ).one()
+    form.apply_model(compound)
+    assert form.related_compounds_historical.data == ['second-compound']
+    assert set(form.related_compounds_round.data) == {
+        'second-compound', 'third-compound'
+    }
+
+    compound = session.query(ElectionCompound).filter_by(
+        id='second-compound'
+    ).one()
+    form.apply_model(compound)
+    assert form.related_compounds_historical.data == ['first-compound']
+    assert set(form.related_compounds_round.data) == {
+        'first-compound', 'third-compound'
+    }
+
+    compound = session.query(ElectionCompound).filter_by(
+        id='third-compound'
+    ).one()
+    form.apply_model(compound)
+    assert form.related_compounds_historical.data == []
+    assert set(form.related_compounds_round.data) == {
+        'first-compound', 'second-compound'
+    }

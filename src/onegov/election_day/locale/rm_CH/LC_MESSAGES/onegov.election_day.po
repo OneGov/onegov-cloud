@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-07 07:22+0100\n"
+"POT-Creation-Date: 2022-12-12 14:21+0100\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -340,6 +340,20 @@ msgstr "Svizzers a l'exteriur"
 msgid "The election contains seperate results for expats."
 msgstr "L'elecziun cuntegna resultats separads per Svizzers a l'exteriur."
 
+msgid "Voters counts"
+msgstr "Dumber d'electurs"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Mussa il dumber d'electurs empè da las vuschs en la visualisaziun da las "
+"fermezzas da las partidas."
+
+msgid "Exact voters counts"
+msgstr "Dumber d'electurs exact"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
+
 msgid "Horizonal party strengths chart"
 msgstr ""
 
@@ -391,8 +405,14 @@ msgstr "Talian"
 msgid "Romansh"
 msgstr "Rumantsch"
 
+msgid "Other legislative periods"
+msgstr ""
+
 msgid "Related elections"
 msgstr "Elecziuns appartegnentas"
+
+msgid "Rounds of voting or by-elections"
+msgstr ""
 
 msgid "Link"
 msgstr "Link url"
@@ -459,20 +479,6 @@ msgstr "Doppelter Pukelsheim"
 msgid "Allows to show the list groups and lists views."
 msgstr ""
 "Pussibilitescha la visualisaziun da la gruppa da glistas e da las glistas."
-
-msgid "Voters counts"
-msgstr "Dumber d'electurs"
-
-msgid "Shows voters counts instead of votes in the party strengths view."
-msgstr ""
-"Mussa il dumber d'electurs empè da las vuschs en la visualisaziun da las "
-"fermezzas da las partidas."
-
-msgid "Exact voters counts"
-msgstr "Dumber d'electurs exact"
-
-msgid "Shows exact voters counts instead of rounded values."
-msgstr "Mussa il dumber d'electurs exact empè da las valurs arrundadas."
 
 msgid "Seat allocation"
 msgstr "Repartiziun dals sezs"

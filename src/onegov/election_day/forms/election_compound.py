@@ -1,5 +1,8 @@
 from datetime import date
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundRelationship
+from onegov.core.utils import Bunch
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -9,6 +12,7 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from re import findall
+from sqlalchemy import or_
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
@@ -115,6 +119,17 @@ class ElectionCompoundForm(Form):
         label=_("Romansh"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'rm'}
+    )
+
+    related_compounds_historical = ChosenSelectMultipleField(
+        label=_("Other legislative periods"),
+        fieldset=_("Related elections"),
+        choices=[]
+    )
+    related_compounds_round = ChosenSelectMultipleField(
+        label=_("Rounds of voting or by-elections"),
+        fieldset=_("Related elections"),
+        choices=[]
     )
 
     related_link = URLField(
@@ -350,6 +365,53 @@ class ElectionCompoundForm(Form):
             ) for item in query.filter(Election.domain == 'municipality')
         ]
 
+        query = self.request.session.query(ElectionCompound)
+        query = query.order_by(
+            ElectionCompound.date.desc(),
+            ElectionCompound.shortcode
+        )
+        choices = [
+            (
+                compound.id,
+                "{} {} {}".format(
+                    layout.format_date(compound.date, 'date'),
+                    compound.shortcode or '',
+                    compound.title,
+                ).strip().replace("  ", " ")
+            ) for compound in query
+        ]
+        self.related_compounds_historical.choices = choices
+        self.related_compounds_round.choices = choices
+
+    def update_realtionships(self, model, type_):
+        # use symetric relationships
+        session = self.request.session
+        query = session.query(ElectionCompoundRelationship)
+        query = query.filter(
+            or_(
+                ElectionCompoundRelationship.source_id == model.id,
+                ElectionCompoundRelationship.target_id == model.id,
+            ),
+            ElectionCompoundRelationship.type == type_
+        )
+        for relationship in query:
+            session.delete(relationship)
+
+        data = getattr(self, f'related_compounds_{type_}', Bunch(data=[])).data
+        for id_ in data:
+            if not model.id:
+                model.id = model.id_from_title(session)
+            session.add(
+                ElectionCompoundRelationship(
+                    source_id=model.id, target_id=id_, type=type_
+                )
+            )
+            session.add(
+                ElectionCompoundRelationship(
+                    source_id=id_, target_id=model.id, type=type_
+                )
+            )
+
     def update_model(self, model):
         model.domain = self.domain.data
         model.domain_elections = self.domain_elections.data
@@ -421,6 +483,10 @@ class ElectionCompoundForm(Form):
 
         model.colors = self.parse_colors(self.colors.data)
 
+        with self.request.session.no_autoflush:
+            self.update_realtionships(model, 'historical')
+            self.update_realtionships(model, 'round')
+
     def apply_model(self, model):
         titles = model.title_translations or {}
         self.election_de.data = titles.get('de_CH')
@@ -476,3 +542,20 @@ class ElectionCompoundForm(Form):
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)
         ))
+
+        self.related_compounds_historical.choices = [
+            choice for choice in self.related_compounds_historical.choices
+            if choice[0] != model.id
+        ]
+        self.related_compounds_round.choices = [
+            choice for choice in self.related_compounds_round.choices
+            if choice[0] != model.id
+        ]
+        self.related_compounds_historical.data = [
+            association.target_id for association in model.related_compounds
+            if association.type == 'historical'
+        ]
+        self.related_compounds_round.data = [
+            association.target_id for association in model.related_compounds
+            if association.type == 'round'
+        ]

@@ -6,6 +6,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
@@ -1163,6 +1164,69 @@ def test_election_compound_export_parties(session):
             'panachage_votes_from_999': None,
         },
     ]
+
+
+def test_related_election_compounds(session):
+    first = ElectionCompound(
+        title='First',
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    second = ElectionCompound(
+        title='Second',
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    session.add(first)
+    session.add(second)
+    session.flush()
+    assert first.related_compounds.all() == []
+    assert first.referencing_compounds.all() == []
+    assert second.related_compounds.all() == []
+    assert second.referencing_compounds.all() == []
+
+    first.related_compounds.append(
+        ElectionCompoundRelationship(target_id=second.id)
+    )
+    session.flush()
+    assert first.related_compounds.one().source_id == 'first'
+    assert first.related_compounds.one().target_id == 'second'
+    assert first.referencing_compounds.all() == []
+    assert second.related_compounds.all() == []
+    assert second.referencing_compounds.one().source_id == 'first'
+    assert second.referencing_compounds.one().target_id == 'second'
+
+    second.related_compounds.append(
+        ElectionCompoundRelationship(target_id=first.id)
+    )
+    session.flush()
+    assert first.related_compounds.one().source_id == 'first'
+    assert first.related_compounds.one().target_id == 'second'
+    assert first.referencing_compounds.one().source_id == 'second'
+    assert first.referencing_compounds.one().target_id == 'first'
+    assert second.related_compounds.one().source_id == 'second'
+    assert second.related_compounds.one().target_id == 'first'
+    assert second.referencing_compounds.one().source_id == 'first'
+    assert second.referencing_compounds.one().target_id == 'second'
+
+    session.delete(second)
+    session.flush()
+    assert first.related_compounds.all() == []
+    assert first.referencing_compounds.all() == []
+    assert session.query(ElectionCompoundRelationship).all() == []
+
+    first.related_compounds.append(
+        ElectionCompoundRelationship(target_id=first.id)
+    )
+    session.flush()
+    assert first.related_compounds.one().source_id == 'first'
+    assert first.related_compounds.one().target_id == 'first'
+    assert first.referencing_compounds.one().source_id == 'first'
+    assert first.referencing_compounds.one().target_id == 'first'
+
+    session.delete(first)
+    session.flush()
+    assert session.query(ElectionCompoundRelationship).all() == []
 
 
 def test_election_compound_rename(session):

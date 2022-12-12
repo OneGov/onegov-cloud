@@ -10,10 +10,11 @@ from onegov.ballot.models import Candidate
 from onegov.ballot.models import CandidateResult
 from onegov.ballot.models import ComplexVote
 from onegov.ballot.models import Election
-from onegov.ballot.models import ElectionAssociation
 from onegov.ballot.models import ElectionCompound
 from onegov.ballot.models import ElectionCompoundAssociation
 from onegov.ballot.models import ElectionCompoundPart
+from onegov.ballot.models import ElectionCompoundRelationship
+from onegov.ballot.models import ElectionRelationship
 from onegov.ballot.models import ElectionResult
 from onegov.ballot.models import List
 from onegov.ballot.models import ListConnection
@@ -32,12 +33,13 @@ __all__ = [
     'CandidateResult',
     'ComplexVote',
     'Election',
-    'ElectionAssociation',
     'ElectionCollection',
     'ElectionCompound',
     'ElectionCompoundAssociation',
     'ElectionCompoundCollection',
     'ElectionCompoundPart',
+    'ElectionCompoundRelationship',
+    'ElectionRelationship',
     'ElectionResult',
     'List',
     'ListCollection',
