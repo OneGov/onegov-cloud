@@ -134,6 +134,18 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    use_historical_party_results = BooleanField(
+        label=_("Use party results from the last legislative period"),
+        fieldset=_("View options"),
+        description=_(
+            "Requires party results. Requires a related election from another "
+            "legislative period with party results. Requires that both "
+            "elections use the same party IDs."
+        ),
+        depends_on=('election_type', 'proporz'),
+        render_kw=dict(force_simple=True)
+    )
+
     show_party_strengths = BooleanField(
         label=_("Party strengths"),
         description=_(
@@ -408,6 +420,8 @@ class ElectionForm(Form):
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
+        model.use_historical_party_results = \
+            self.use_historical_party_results.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
 
@@ -486,6 +500,8 @@ class ElectionForm(Form):
         self.tacit.data = model.tacit
         self.has_expats.data = model.has_expats
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
+        self.use_historical_party_results.data = \
+            model.use_historical_party_results
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.show_party_strengths.data = model.show_party_strengths

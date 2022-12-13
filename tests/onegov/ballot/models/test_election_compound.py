@@ -1470,3 +1470,117 @@ def test_election_compound_attachments(
     assert model.explanations_pdf is None
     assert model.upper_apportionment_pdf is None
     assert model.lower_apportionment_pdf is None
+
+
+def test_election_compound_historical_party_strengths(session):
+    first = ElectionCompound(
+        title='First',
+        domain='federation',
+        date=date(2014, 1, 1)
+    )
+    second = ElectionCompound(
+        title='Second',
+        domain='federation',
+        date=date(2018, 1, 1)
+    )
+    third = ElectionCompound(
+        title='Third',
+        domain='federation',
+        date=date(2022, 1, 1)
+    )
+    session.add(first)
+    session.add(second)
+    session.add(third)
+    session.flush()
+
+    assert first.historical_party_results.count() == 0
+    assert second.historical_party_results.count() == 0
+    assert third.historical_party_results.count() == 0
+
+    # add results
+    for (compound, year, party_id, domain) in (
+        (first, 2014, 1, 'canton'),
+        (first, 2014, 2, 'canton'),
+        (first, 2014, 3, 'canton'),
+        (first, 2010, 1, 'canton'),
+        (first, 2010, 2, 'canton'),
+        (first, 2010, 3, 'canton'),
+        (second, 2022, 2, 'canton'),
+        (second, 2022, 3, 'canton'),
+        (second, 2018, 2, 'canton'),
+        (second, 2018, 3, 'canton'),
+        (second, 2018, 4, 'canton'),
+        (second, 2010, 2, 'canton'),
+        (second, 2010, 3, 'canton'),
+        (third, 2022, 1, 'canton'),
+        (third, 2022, 3, 'canton'),
+        (third, 2022, 5, 'canton'),
+        (third, 2022, 5, 'superregion'),
+    ):
+        compound.party_results.append(
+            PartyResult(
+                year=year,
+                number_of_mandates=0,
+                votes=1,
+                total_votes=100,
+                name_translations={'en_US': str(party_id)},
+                party_id=str(party_id),
+                domain=domain
+            )
+        )
+
+    # no relationships yet
+    assert first.historical_party_results.count() == 6
+    assert second.historical_party_results.count() == 7
+    assert third.historical_party_results.count() == 4
+
+    # add relationships
+    for (source_, target, type_) in (
+        (third, second, 'historical'),
+        (third, first, 'historical'),
+        (second, first, 'historical'),
+        (first, second, None),
+        (second, third, 'historical')
+    ):
+        session.add(
+            ElectionCompoundRelationship(
+                source_id=source_.id, target_id=target.id, type=type_
+            )
+        )
+
+    def extract(compound):
+        return sorted(
+            (result.election_compound_id, result.year, result.party_id)
+            for result in compound.historical_party_results
+        )
+
+    assert extract(first) == [
+        ('first', 2010, '1'),
+        ('first', 2010, '2'),
+        ('first', 2010, '3'),
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+    ]
+    assert extract(second) == [
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+        ('second', 2010, '2'),
+        ('second', 2010, '3'),
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('second', 2022, '2'),
+        ('second', 2022, '3'),
+    ]
+    assert extract(third) == [
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('third', 2022, '1'),
+        ('third', 2022, '3'),
+        ('third', 2022, '5'),
+        ('third', 2022, '5'),
+    ]
+    third.historical_party_results.filter_by(domain='superregion').count() == 1

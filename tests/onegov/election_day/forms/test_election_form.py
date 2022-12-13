@@ -102,6 +102,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     model.voters_counts = False
     model.exact_voters_counts = False
     model.horizontal_party_strengths = False
+    model.use_historical_party_results = False
     model.show_party_strengths = False
     model.show_party_panachage = False
     model.colors = {
@@ -134,6 +135,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert form.voters_counts.data is False
     assert form.exact_voters_counts.data is False
     assert form.horizontal_party_strengths.data is False
+    assert form.use_historical_party_results.data is False
     assert form.show_party_strengths.data is False
     assert form.show_party_panachage.data is False
     assert form.colors.data == (
@@ -160,6 +162,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     form.voters_counts.data = True
     form.exact_voters_counts.data = True
     form.horizontal_party_strengths.data = True
+    form.use_historical_party_results.data = True
     form.show_party_strengths.data = True
     form.show_party_panachage.data = True
     form.colors.data = (
@@ -191,6 +194,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert model.voters_counts is True
     assert model.exact_voters_counts is True
     assert model.horizontal_party_strengths is True
+    assert model.use_historical_party_results is True
     assert model.show_party_strengths is True
     assert model.show_party_panachage is True
     assert model.colors == {

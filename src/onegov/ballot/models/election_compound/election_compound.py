@@ -8,7 +8,9 @@ from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
-from onegov.ballot.models.party_result.mixins import PartyResultsMixin
+from onegov.ballot.models.party_result.mixins import \
+    HistoricalPartyResultsMixin
+from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -28,7 +30,8 @@ from sqlalchemy.orm import relationship
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultsOptionsMixin, PartyResultsMixin,
+    PartyResultsOptionsMixin, PartyResultsExportMixin,
+    HistoricalPartyResultsMixin,
     ExplanationsPdfMixin, DerivedAttributesMixin
 ):
 
@@ -168,6 +171,10 @@ class ElectionCompound(
 
     #: additional file in case of Doppelter Pukelsheim
     lower_apportionment_pdf = named_file()
+
+    @property
+    def relationships_for_historical_party_results(self):
+        return self.related_compounds
 
     def clear_results(self):
         """ Clears all related results. """

@@ -221,6 +221,17 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    use_historical_party_results = BooleanField(
+        label=_("Use party results from the last legislative period"),
+        fieldset=_("View options"),
+        description=_(
+            "Requires party results. Requires a related election from another "
+            "legislative period with party results. Requires that both "
+            "elections use the same party IDs."
+        ),
+        render_kw=dict(force_simple=True)
+    )
+
     show_seat_allocation = BooleanField(
         label=_("Seat allocation"),
         description=_(
@@ -428,6 +439,8 @@ class ElectionCompoundForm(Form):
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
+        model.use_historical_party_results = self.\
+            use_historical_party_results.data
 
         model.elections = []
         query = self.request.session.query(Election)
@@ -525,6 +538,8 @@ class ElectionCompoundForm(Form):
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
+        self.use_historical_party_results.data = \
+            model.use_historical_party_results
         self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
         self.show_party_strengths.data = model.show_party_strengths

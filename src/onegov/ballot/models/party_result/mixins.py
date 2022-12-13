@@ -25,10 +25,47 @@ class PartyResultsOptionsMixin:
     #: may be used to enable/disable the visibility of the list groups
     show_list_groups = meta_property(default=False)
 
+    #: may be used to enable fetching party results from previous elections
+    use_historical_party_results = meta_property(default=False)
 
-class PartyResultsMixin:
 
-    """ A mixin adding historical party resulta and allowing to export the
+class HistoricalPartyResultsMixin:
+
+    @property
+    def relationships_for_historical_party_results(self):
+        raise NotImplementedError()
+
+    @property
+    def historical_party_results(self):
+        """ Returns the party results while adding party results from the last
+        legislative period, Requires that a related election or compound has
+        been set with type "historical".
+
+        """
+
+        relationships = self.relationships_for_historical_party_results
+        if not relationships:
+            return self.party_results
+        relationships = relationships.filter_by(type='historical').all()
+        target = sorted(
+            (
+                related.target for related in relationships
+                if related.target.date < self.date
+            ),
+            key=lambda related: related.date,
+            reverse=True
+        )
+        if not target:
+            return self.party_results
+
+        return self.party_results.union(
+            target[0].party_results.filter_by(year=target[0].date.year)
+        )
+
+
+class PartyResultsExportMixin:
+
+    """  A mixin adding historical party resulta and allowing to export the
     party results optionally including the panachage data.
 
     Panachage data with an empty source is assumed to represent the votes from

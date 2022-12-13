@@ -19,7 +19,11 @@ def get_party_results(item, json_serializable=False):
     if not has_party_results(item):
         return [], {}
 
-    results = item.party_results.filter(PartyResult.domain == item.domain)
+    party_results = (
+        item.historical_party_results if item.use_historical_party_results
+        else item.party_results
+    )
+    results = party_results.filter(PartyResult.domain == item.domain)
     domain_segment = getattr(item, 'segment', None)
     if domain_segment:
         results = results.filter(PartyResult.domain_segment == domain_segment)
