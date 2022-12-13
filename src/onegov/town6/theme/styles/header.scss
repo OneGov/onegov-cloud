@@ -338,6 +338,13 @@ $transition-duration: .1s;
         box-shadow: none;
     }
 
+    input:hover,
+    input:focus {
+        border: 0;
+        border-bottom: 1px solid $primary-color;
+        box-shadow: none;
+    }
+
     .search-button {
         background: transparent !important;
         padding: 0 .5rem !important;
@@ -345,7 +352,7 @@ $transition-duration: .1s;
 
     .typeahead {
         position: absolute;
-        top: 50%;
+        top: 5rem;
     }
 
     .input-group-field:not(:focus) + .typeahead:not(:hover) {
