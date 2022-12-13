@@ -130,10 +130,6 @@ $morelist-default-padding: .5rem 0;
             padding-top: .5rem;
             transition: border-top 200ms linear;
             width: 100%;
-
-            &:hover {
-                border-top: 1px solid $primary-color;
-            }
         }
     }
 }
