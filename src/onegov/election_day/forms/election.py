@@ -212,7 +212,7 @@ class ElectionForm(Form):
         choices=[]
     )
 
-    related_elections_round = ChosenSelectMultipleField(
+    related_elections_other = ChosenSelectMultipleField(
         label=_("Rounds of voting or by-elections"),
         fieldset=_("Related elections"),
         choices=[]
@@ -363,7 +363,7 @@ class ElectionForm(Form):
             ) for election in query
         ]
         self.related_elections_historical.choices = choices
-        self.related_elections_round.choices = choices
+        self.related_elections_other.choices = choices
 
     def update_realtionships(self, model, type_):
         # use symetric relationships
@@ -460,7 +460,7 @@ class ElectionForm(Form):
 
         with self.request.session.no_autoflush:
             self.update_realtionships(model, 'historical')
-            self.update_realtionships(model, 'round')
+            self.update_realtionships(model, 'other')
 
     def apply_model(self, model):
         titles = model.title_translations or {}
@@ -527,15 +527,15 @@ class ElectionForm(Form):
             choice for choice in self.related_elections_historical.choices
             if choice[0] != model.id
         ]
-        self.related_elections_round.choices = [
-            choice for choice in self.related_elections_round.choices
+        self.related_elections_other.choices = [
+            choice for choice in self.related_elections_other.choices
             if choice[0] != model.id
         ]
         self.related_elections_historical.data = [
             association.target_id for association in model.related_elections
             if association.type == 'historical'
         ]
-        self.related_elections_round.data = [
+        self.related_elections_other.data = [
             association.target_id for association in model.related_elections
-            if association.type == 'round'
+            if association.type == 'other'
         ]

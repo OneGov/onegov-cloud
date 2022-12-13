@@ -903,7 +903,7 @@ def test_view_election_relations(election_day_app_gr):
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
     new.form['related_elections_historical'] = ['first-election']
-    new.form['related_elections_round'] = ['first-election']
+    new.form['related_elections_other'] = ['first-election']
     new.form.submit()
 
     csv = MAJORZ_HEADER

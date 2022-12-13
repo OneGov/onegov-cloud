@@ -212,18 +212,19 @@ def update_last_result_change():
 
 # todo: remove me after migration
 @cli.command('migrate-election-relationships')
-def migrate_election_relationships():
+@click.option('--force', is_flag=True, default=False)
+def migrate_election_relationships(force):
     def update(request, app):
         click.secho(f'Updating {app.schema}', fg='yellow')
 
         session = request.app.session()
         for item in session.query(ElectionRelationship):
-            if not item.type:
+            if not item.type or force:
                 days = abs((item.target.date - item.source.date).days)
-                type_ = 'round' if days < 365 else 'historical'
+                type_ = 'other' if days < 3.5 * 365 else 'historical'
                 item.type = type_
                 click.secho(
-                    f'{item.source_id} <-> {item.target_id}: {type_} ({days})'
+                    f'{item.source_id} -> {item.target_id}: {type_} ({days})'
                 )
 
     return update

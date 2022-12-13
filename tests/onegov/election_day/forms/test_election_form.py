@@ -263,7 +263,7 @@ def test_election_form_relations(session):
         ('second-election', '02.01.2011 Second Election'),
         ('first-election', '01.01.2011 First Election'),
     ]
-    assert form.related_elections_round.choices == [
+    assert form.related_elections_other.choices == [
         ('second-election', '02.01.2011 Second Election'),
         ('first-election', '01.01.2011 First Election'),
     ]
@@ -274,7 +274,7 @@ def test_election_form_relations(session):
     form.mandates.data = 1
     form.shortcode.data = 'SC'
     form.related_elections_historical.data = ['first-election']
-    form.related_elections_round.data = ['first-election', 'second-election']
+    form.related_elections_other.data = ['first-election', 'second-election']
     form.update_model(election)
     session.add(election)
     session.flush()
@@ -291,17 +291,17 @@ def test_election_form_relations(session):
         ('second-election', '02.01.2011 Second Election'),
         ('first-election', '01.01.2011 First Election'),
     ]
-    assert form.related_elections_round.choices == [
+    assert form.related_elections_other.choices == [
         ('third-election', '03.01.2011 SC Third Election'),
         ('second-election', '02.01.2011 Second Election'),
         ('first-election', '01.01.2011 First Election'),
     ]
     form.apply_model(election)
     assert form.related_elections_historical.data == ['third-election']
-    assert form.related_elections_round.data == ['third-election']
+    assert form.related_elections_other.data == ['third-election']
 
     form.related_elections_historical.data = ['second-election']
-    form.related_elections_round.data = ['second-election', 'third-election']
+    form.related_elections_other.data = ['second-election', 'third-election']
     form.update_model(election)
     session.add(election)
     session.flush()
@@ -310,20 +310,20 @@ def test_election_form_relations(session):
     election = session.query(Election).filter_by(id='first-election').one()
     form.apply_model(election)
     assert form.related_elections_historical.data == ['second-election']
-    assert set(form.related_elections_round.data) == {
+    assert set(form.related_elections_other.data) == {
         'second-election', 'third-election'
     }
 
     election = session.query(Election).filter_by(id='second-election').one()
     form.apply_model(election)
     assert form.related_elections_historical.data == ['first-election']
-    assert set(form.related_elections_round.data) == {
+    assert set(form.related_elections_other.data) == {
         'first-election', 'third-election'
     }
 
     election = session.query(Election).filter_by(id='third-election').one()
     form.apply_model(election)
     assert form.related_elections_historical.data == []
-    assert set(form.related_elections_round.data) == {
+    assert set(form.related_elections_other.data) == {
         'first-election', 'second-election'
     }

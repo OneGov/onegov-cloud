@@ -343,7 +343,7 @@ def test_election_compound_form_relations(session):
         ('second-compound', '02.01.2011 Second Compound'),
         ('first-compound', '01.01.2011 First Compound'),
     ]
-    assert form.related_compounds_round.choices == [
+    assert form.related_compounds_other.choices == [
         ('second-compound', '02.01.2011 Second Compound'),
         ('first-compound', '01.01.2011 First Compound'),
     ]
@@ -353,7 +353,7 @@ def test_election_compound_form_relations(session):
     form.domain.data = 'federation'
     form.shortcode.data = 'SC'
     form.related_compounds_historical.data = ['first-compound']
-    form.related_compounds_round.data = ['first-compound', 'second-compound']
+    form.related_compounds_other.data = ['first-compound', 'second-compound']
     form.update_model(compound)
     session.add(compound)
     session.flush()
@@ -372,17 +372,17 @@ def test_election_compound_form_relations(session):
         ('second-compound', '02.01.2011 Second Compound'),
         ('first-compound', '01.01.2011 First Compound'),
     ]
-    assert form.related_compounds_round.choices == [
+    assert form.related_compounds_other.choices == [
         ('third-compound', '03.01.2011 SC Third Compound'),
         ('second-compound', '02.01.2011 Second Compound'),
         ('first-compound', '01.01.2011 First Compound'),
     ]
     form.apply_model(compound)
     assert form.related_compounds_historical.data == ['third-compound']
-    assert form.related_compounds_round.data == ['third-compound']
+    assert form.related_compounds_other.data == ['third-compound']
 
     form.related_compounds_historical.data = ['second-compound']
-    form.related_compounds_round.data = ['second-compound', 'third-compound']
+    form.related_compounds_other.data = ['second-compound', 'third-compound']
     form.update_model(compound)
     session.add(compound)
     session.flush()
@@ -393,7 +393,7 @@ def test_election_compound_form_relations(session):
     ).one()
     form.apply_model(compound)
     assert form.related_compounds_historical.data == ['second-compound']
-    assert set(form.related_compounds_round.data) == {
+    assert set(form.related_compounds_other.data) == {
         'second-compound', 'third-compound'
     }
 
@@ -402,7 +402,7 @@ def test_election_compound_form_relations(session):
     ).one()
     form.apply_model(compound)
     assert form.related_compounds_historical.data == ['first-compound']
-    assert set(form.related_compounds_round.data) == {
+    assert set(form.related_compounds_other.data) == {
         'first-compound', 'third-compound'
     }
 
@@ -411,6 +411,6 @@ def test_election_compound_form_relations(session):
     ).one()
     form.apply_model(compound)
     assert form.related_compounds_historical.data == []
-    assert set(form.related_compounds_round.data) == {
+    assert set(form.related_compounds_other.data) == {
         'first-compound', 'second-compound'
     }

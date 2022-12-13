@@ -734,7 +734,7 @@ def test_view_election_compound_relations(election_day_app_zg):
     new.form['domain'] = 'canton'
     new.form['domain_elections'] = 'municipality'
     new.form['related_compounds_historical'] = ['first-compound']
-    new.form['related_compounds_round'] = ['first-compound']
+    new.form['related_compounds_other'] = ['first-compound']
     new.form.submit()
 
     upload_party_results(client, 'elections/first-compound')

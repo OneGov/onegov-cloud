@@ -126,7 +126,7 @@ class ElectionCompoundForm(Form):
         fieldset=_("Related elections"),
         choices=[]
     )
-    related_compounds_round = ChosenSelectMultipleField(
+    related_compounds_other = ChosenSelectMultipleField(
         label=_("Rounds of voting or by-elections"),
         fieldset=_("Related elections"),
         choices=[]
@@ -392,7 +392,7 @@ class ElectionCompoundForm(Form):
             ) for compound in query
         ]
         self.related_compounds_historical.choices = choices
-        self.related_compounds_round.choices = choices
+        self.related_compounds_other.choices = choices
 
     def update_realtionships(self, model, type_):
         # use symetric relationships
@@ -498,7 +498,7 @@ class ElectionCompoundForm(Form):
 
         with self.request.session.no_autoflush:
             self.update_realtionships(model, 'historical')
-            self.update_realtionships(model, 'round')
+            self.update_realtionships(model, 'other')
 
     def apply_model(self, model):
         titles = model.title_translations or {}
@@ -562,15 +562,15 @@ class ElectionCompoundForm(Form):
             choice for choice in self.related_compounds_historical.choices
             if choice[0] != model.id
         ]
-        self.related_compounds_round.choices = [
-            choice for choice in self.related_compounds_round.choices
+        self.related_compounds_other.choices = [
+            choice for choice in self.related_compounds_other.choices
             if choice[0] != model.id
         ]
         self.related_compounds_historical.data = [
             association.target_id for association in model.related_compounds
             if association.type == 'historical'
         ]
-        self.related_compounds_round.data = [
+        self.related_compounds_other.data = [
             association.target_id for association in model.related_compounds
-            if association.type == 'round'
+            if association.type == 'other'
         ]
