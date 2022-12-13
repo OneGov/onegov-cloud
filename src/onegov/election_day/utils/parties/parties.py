@@ -152,7 +152,16 @@ def get_party_results_horizontal_data(item):
                 active = year == years[-1]
                 party = parties.get(party_id, {}).get(year, {})
                 name = party_names.get(party_id)
-                value = round(party.get(attribute, {}).get('total', 0) or 0)
+                if len(years) == 1:
+                    value = round(
+                        party.get(attribute, {}).get('total', 0) or 0
+                    )
+                    percentage = False
+                else:
+                    value = float(
+                        (party.get(attribute, {}).get('permille', 0) or 0) / 10
+                    )
+                    percentage = True
                 results.append({
                     'text': f'{name} {year}' if active else year,
                     'value': value,
@@ -161,7 +170,8 @@ def get_party_results_horizontal_data(item):
                         'active' if active and party.get('mandates')
                         else 'inactive'
                     ),
-                    'color': party.get('color')
+                    'color': party.get('color'),
+                    'percentage': percentage
                 })
 
     return {'results': results}
