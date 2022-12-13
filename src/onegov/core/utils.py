@@ -454,7 +454,7 @@ def to_html_ul(value, convert_dashes=True):
 
     was_list = False
 
-    for line in value.splitlines():
+    for i, line in enumerate(value.splitlines()):
         if not line:
             continue
 
@@ -464,7 +464,7 @@ def to_html_ul(value, convert_dashes=True):
 
         line = line.lstrip('-').strip()
 
-        if new_p_or_ul or was_list != is_list:
+        if new_p_or_ul or (was_list != is_list and i > 0):
             elements.append(
                 ul(''.join(temp)) if was_list else p('<br>'.join(temp))
             )
@@ -475,6 +475,11 @@ def to_html_ul(value, convert_dashes=True):
 
         new_p_or_ul = False
         was_list = is_list
+
+    if temp:
+        elements.append(
+            ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+        )
 
     return ''.join(elements)
 
