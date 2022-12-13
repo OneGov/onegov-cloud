@@ -1053,85 +1053,97 @@ def test_election_utils_parties(import_test_datasets, session):
             {
                 'class': 'active',
                 'color': '#3f841a',
+                'percentage': True,
                 'text': 'SVP 2015',
-                'value': 35543,
+                'value': 30.5,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#3f841a',
+                'percentage': True,
                 'text': '2011',
-                'value': 33116,
+                'value': 28.3,
                 'value2': 1
             },
             {
                 'class': 'active',
                 'color': '#ff6300',
+                'percentage': True,
                 'text': 'CVP 2015',
-                'value': 30856,
+                'value': 26.4,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#ff6300',
+                'percentage': True,
                 'text': '2011',
-                'value': 28413,
+                'value': 24.3,
                 'value2': 1
             },
             {
                 'class': 'active',
                 'color': '#4068c8',
+                'percentage': True,
                 'text': 'FDP 2015',
-                'value': 20584,
+                'value': 17.6,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#4068c8',
+                'percentage': True,
                 'text': '2011',
-                'value': 22494,
+                'value': 19.2,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#db3c27',
+                'percentage': True,
                 'text': 'SP 2015',
-                'value': 16048,
+                'value': 13.8,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#db3c27',
+                'percentage': True,
                 'text': '2011',
-                'value': 6167,
+                'value': 5.3,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#a74c97',
+                'percentage': True,
                 'text': 'AL 2015',
-                'value': 8352,
+                'value': 7.2,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#a74c97',
+                'percentage': True,
                 'text': '2011',
-                'value': 17972,
+                'value': 15.4,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#aeca00',
+                'percentage': True,
                 'text': 'GLP 2015',
-                'value': 4178,
+                'value': 3.6,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#aeca00',
+                'percentage': True,
                 'text': '2011',
-                'value': 7943,
+                'value': 6.8,
                 'value2': 0
             }
         ]

@@ -118,7 +118,10 @@
                 label.append('text')
                     .attr('dx', -3)
                     .attr('class', 'left')
-                    .text(function(d) { return (!d.value2) ? d.value : d.value + ' / ' + (d.value2 || 0); })
+                    .text(function(d) {
+                        var suffix = (!d.percentage) ? '' : '%';
+                        return (!d.value2) ? d.value + suffix : d.value + suffix + ' / ' + (d.value2 || 0);
+                    })
                     .style('font-size', options.fontSizeSmall)
                     .style('font-family', options.fontFamily)
                     .style('text-anchor', 'end')
@@ -126,7 +129,10 @@
                 label.append('text')
                     .attr('dx', 8)
                     .attr('class', 'right')
-                    .text(function(d) { return (!d.value2) ? d.value : d.value + ' / ' + (d.value2 || 0); })
+                    .text(function(d) {
+                        var suffix = (!d.percentage) ? '' : '%';
+                        return (!d.value2) ? d.value + suffix : d.value + suffix + ' / ' + (d.value2 || 0);
+                    })
                     .style('font-size', options.fontSizeSmall)
                     .style('font-family', options.fontFamily)
                     .style('fill', options.colorInactive);
