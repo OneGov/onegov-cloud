@@ -4,6 +4,7 @@ from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
 
 @ElectionDayApp.screen_widget(
@@ -26,10 +27,11 @@ class ElectionCompoundSeatAllocationTableWidget(ModelBoundWidget):
     def get_variables(self, layout):
         model = self.model or layout.model
         years, parties = get_party_results(model)
+        seat_allocations = get_party_results_seat_allocation(years, parties)
         return {
             'election_compound': model,
-            'years': years[:2],
-            'parties': parties,
+            'years': years,
+            'seat_allocations': seat_allocations,
         }
 
 

@@ -11,6 +11,7 @@ from onegov.election_day.utils.parties import get_parties_panachage_data
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 from tests.onegov.election_day.common import print_errors
 
 
@@ -944,6 +945,15 @@ def test_election_utils_parties(import_test_datasets, session):
         ]
     }
 
+    assert get_party_results_seat_allocation(years, parties) == [
+        ['AL', 0, 0],
+        ['CVP', 1, 1],
+        ['FDP', 1, 1],
+        ['GLP', 0, 0],
+        ['SP', 0, 0],
+        ['SVP', 1, 1]
+    ]
+
     assert get_party_results_data(election) == {
         'axis_units': {'back': '%', 'front': ''},
         'groups': ['AL', 'CVP', 'FDP', 'GLP', 'SP', 'SVP'],
@@ -1198,6 +1208,22 @@ def test_election_utils_parties(import_test_datasets, session):
     assert_node(False, '#aeca00', 12, 'GLP')
     assert_node(False, '#db3c27', 13, 'SP')
     assert_node(True, '#3f841a', 14, 'SVP')
+
+    # incomplete data (only check for exceptions)
+    party_result = election.party_results.filter_by(year=2011, name='AL').one()
+    party_result.party_id = 'AL11'
+    party_result.party_id = '6'
+    election.party_results.filter_by(year=2011, name='FDP').delete()
+    election.party_results.filter_by(year=2015, name='CVP').delete()
+    session.flush()
+
+    years, parties = get_party_results(election)
+    get_party_results_deltas(election, years, parties)
+    get_party_results_seat_allocation(years, parties)
+    get_parties_panachage_data(election)
+    get_party_results_data(election)
+    election.horizontal_party_strengths = False
+    get_party_results_data(election)
 
 
 def test_get_connection_results_internal(import_test_datasets, session):

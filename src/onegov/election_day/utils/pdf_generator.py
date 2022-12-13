@@ -16,6 +16,7 @@ from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_deltas
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -493,24 +494,14 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.spacer()
             years, parties = get_party_results(compound)
-            years = years[:2]
+            lines = get_party_results_seat_allocation(years, parties)
             if years:
-                current_year = years[-1]
                 pdf.results(
                     head=[
                         _('Party'),
                         *years,
                     ],
-                    body=[
-                        [
-                            parties[party][current_year]['name'],
-                            *[
-                                parties[party][year]['mandates'] or '0'
-                                for year in years
-                            ]
-                        ]
-                        for party in parties
-                    ],
+                    body=lines,
                 )
             pdf.pagebreak()
 

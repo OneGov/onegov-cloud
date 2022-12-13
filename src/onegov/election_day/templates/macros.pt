@@ -424,6 +424,7 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
+        tal:condition="years"
         >
         <thead>
             <tr>
@@ -431,10 +432,12 @@
                 <th tal:repeat="year years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
             </tr>
         </thead>
-        <tbody tal:condition="years">
-            <tr tal:repeat="party parties" tal:define="current_year python: years[-1]">
-                <th>${parties[party][current_year]['name']}</th>
-                <td tal:repeat="year years" class="right-aligned">${parties[party][year]['mandates']}</td>
+        <tbody>
+            <tr tal:repeat="line seat_allocations">
+                <tal:block tal:repeat="cell line">
+                    <td tal:condition="repeat.cell.start">${cell}</td>
+                    <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                </tal:block>
             </tr>
         </tbody>
     </table>
