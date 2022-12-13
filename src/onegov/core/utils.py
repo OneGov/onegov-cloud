@@ -436,7 +436,7 @@ def to_html_ul(value, convert_dashes=True):
     value = value.replace('\n\n', '\n \n')
 
     if not convert_dashes:
-        return '<p>{}<p>'.format(
+        return '<p>{}</p>'.format(
             '<br>'.join(linkify(value).splitlines())
         )
 
