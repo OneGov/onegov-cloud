@@ -12,12 +12,12 @@ if (document.getElementById("autoplay-video")) {
             } else {
                 parent.removeChild(children[1]);
             }
-        } 
+        }
     }
 
     // Once only one video remains
     if (document.getElementsByClassName("homepage-video").length ==1) {
-    
+
         // Resize spacer
         var vid = document.querySelector('#autoplay-video');
         vid.addEventListener('loadeddata', (event) => {
@@ -25,18 +25,18 @@ if (document.getElementById("autoplay-video")) {
             var spacer = document.getElementById("spacer");
             spacer.style.paddingBottom = ratio + "%";
         });
-    
+
         // Find out if we're on desktop or mobile
         var w = window.matchMedia("(max-width: 700px)");
         var source = document.createElement("source");
         source.id = "hvid";
         vid.appendChild(source);
-    
+
         var link_mp4 = vid.dataset.linkMp4
         var link_mp4_low_res = vid.dataset.linkMp4LowRes
         var link_webm = vid.dataset.linkWebm
         var link_webm_low_res = vid.dataset.linkWebmLowRes
-        
+
         if (w.matches && (link_mp4_low_res || link_webm_low_res)) {
             vid.pause();
             source.removeAttribute("src");
