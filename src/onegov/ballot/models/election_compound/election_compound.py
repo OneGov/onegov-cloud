@@ -8,7 +8,8 @@ from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
-from onegov.ballot.models.party_result.mixins import PartyResultExportMixin
+from onegov.ballot.models.party_result.mixins import PartyResultsMixin
+from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
@@ -27,7 +28,8 @@ from sqlalchemy.orm import relationship
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultExportMixin, ExplanationsPdfMixin, DerivedAttributesMixin
+    PartyResultsOptionsMixin, PartyResultsMixin,
+    ExplanationsPdfMixin, DerivedAttributesMixin
 ):
 
     __tablename__ = 'election_compounds'
@@ -61,12 +63,6 @@ class ElectionCompound(
 
     #: Status of the compound and its elections
     manually_completed = Column(Boolean, nullable=False, default=False)
-
-    #: Display voters counts instead of votes in views with party results.
-    voters_counts = meta_property('voters_counts', default=False)
-
-    #: Display exact voters counts instead of rounded values.
-    exact_voters_counts = meta_property('exact_voters_counts', default=False)
 
     #: An election compound may contains n party results
     party_results = relationship(
@@ -172,21 +168,6 @@ class ElectionCompound(
 
     #: additional file in case of Doppelter Pukelsheim
     lower_apportionment_pdf = named_file()
-
-    #: may be used to enable/disable the visibility of the seat allocation
-    show_seat_allocation = meta_property('show_seat_allocation')
-
-    #: may be used to enable/disable the visibility of the list groups
-    show_list_groups = meta_property('show_list_groups')
-
-    #: may be used to enable/disable the visibility of party strengths
-    show_party_strengths = meta_property('show_party_strengths')
-
-    #: show a horizontal party strengths bar chart instead of a vertical
-    horizontal_party_strengths = meta_property('horizontal_party_strengths')
-
-    #: may be used to enable/disable the visibility of party panachage
-    show_party_panachage = meta_property('show_party_panachage')
 
     def clear_results(self):
         """ Clears all related results. """

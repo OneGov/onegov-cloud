@@ -1,10 +1,35 @@
 from collections import OrderedDict
+from onegov.core.orm.mixins import meta_property
 
 
-class PartyResultExportMixin:
+class PartyResultsOptionsMixin:
 
-    """ A mixin allowing to export the party results optionally including the
-    panachage data.
+    #: Display voters counts instead of votes in views.
+    voters_counts = meta_property(default=False)
+
+    #: Display exact voters counts instead of rounded values.
+    exact_voters_counts = meta_property(default=False)
+
+    #: may be used to enable/disable the visibility of party strengths
+    show_party_strengths = meta_property(default=False)
+
+    #: show a horizontal party strengths bar chart instead of a vertical
+    horizontal_party_strengths = meta_property(default=False)
+
+    #: may be used to enable/disable the visibility of party panachage
+    show_party_panachage = meta_property(default=False)
+
+    #: may be used to enable/disable the visibility of the seat allocation
+    show_seat_allocation = meta_property(default=False)
+
+    #: may be used to enable/disable the visibility of the list groups
+    show_list_groups = meta_property(default=False)
+
+
+class PartyResultsMixin:
+
+    """ A mixin adding historical party resulta and allowing to export the
+    party results optionally including the panachage data.
 
     Panachage data with an empty source is assumed to represent the votes from
     the blank list and exported with ID '999'.

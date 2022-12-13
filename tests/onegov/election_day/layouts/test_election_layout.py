@@ -354,6 +354,7 @@ def test_election_layout_menu_proporz(session):
     election.panachage_results.append(
         PanachageResult(target='t', source='t ', votes=0)
     )
+    election.show_party_panachage = True
     assert ElectionLayout(election, request).menu == [
         ('Lists', 'ProporzElection/lists', False, []),
         ('Candidates', 'ProporzElection/candidates', False, []),
@@ -375,6 +376,7 @@ def test_election_layout_menu_proporz(session):
         )
     )
     election.list_connections.append(ListConnection(connection_id='A'))
+    election.show_party_strengths = True
     assert ElectionLayout(election, request).menu == [
         ('Lists', '', False, [
             ('Lists', 'ProporzElection/lists', False, []),
