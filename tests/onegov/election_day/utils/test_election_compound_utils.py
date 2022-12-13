@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from onegov.ballot import ElectionCompound
+from onegov.ballot import PartyResult
 from onegov.core.utils import Bunch
 from onegov.election_day.utils.election_compound import \
     get_candidate_statistics
@@ -12,6 +13,7 @@ from onegov.election_day.utils.parties import get_parties_panachage_data
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
 
 # todo: test superregions with a BL dataset
@@ -506,6 +508,16 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         }
     )
 
+    assert get_party_results_seat_allocation(years, parties) == [
+        ['AL', 10],
+        ['CVP', 22],
+        ['FDP', 18],
+        ['GLP', 4],
+        ['Piraten', 0],
+        ['SP', 7],
+        ['SVP', 19]
+    ]
+
     assert get_party_results_data(election_compound) == {
         'axis_units': {'back': '%', 'front': ''},
         'groups': ['AL', 'CVP', 'FDP', 'GLP', 'Piraten', 'SP', 'SVP'],
@@ -661,6 +673,23 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     election_compound.horizontal_party_strengths = True
     data = get_party_results_data(election_compound)
     assert data['results'][0]['value'] == 74448
+
+    # incomplete data (only check for exceptions)
+    election_compound.party_results.append(
+        PartyResult(party_id='0', name='AL', year=2011, domain='canton')
+    )
+    election_compound.party_results.append(
+        PartyResult(party_id='7', name='XY', year=2011, domain='canton')
+    )
+    session.flush()
+
+    years, parties = get_party_results(election_compound)
+    get_party_results_deltas(election_compound, years, parties)
+    get_party_results_seat_allocation(years, parties)
+    get_parties_panachage_data(election_compound)
+    get_party_results_data(election_compound)
+    election_compound.horizontal_party_strengths = False
+    get_party_results_data(election_compound)
 
 
 def test_election_utils_candidate_statistics(

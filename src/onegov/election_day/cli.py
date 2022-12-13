@@ -3,6 +3,7 @@ import click
 import os
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionRelationship
 from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -205,5 +206,25 @@ def update_last_result_change():
                 count += 1
 
         click.secho(f'Updated {count} items', fg='green')
+
+    return update
+
+
+# todo: remove me after migration
+@cli.command('migrate-election-relationships')
+@click.option('--force', is_flag=True, default=False)
+def migrate_election_relationships(force):
+    def update(request, app):
+        click.secho(f'Updating {app.schema}', fg='yellow')
+
+        session = request.app.session()
+        for item in session.query(ElectionRelationship):
+            if not item.type or force:
+                days = abs((item.target.date - item.source.date).days)
+                type_ = 'other' if days < 3.5 * 365 else 'historical'
+                item.type = type_
+                click.secho(
+                    f'{item.source_id} -> {item.target_id}: {type_} ({days})'
+                )
 
     return update

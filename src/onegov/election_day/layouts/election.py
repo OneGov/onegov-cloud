@@ -297,13 +297,9 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def related_elections(self):
-        return [
-            (
-                association.target_election.title,
-                self.request.link(association.target_election)
-            )
-            for association in self.model.related_elections
-        ]
+        result = {r.target for r in self.model.related_elections}
+        result = sorted(result, key=lambda x: x.date, reverse=True)
+        return [(e.title, self.request.link(e)) for e in result]
 
     @cached_property
     def results(self):

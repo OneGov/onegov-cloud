@@ -221,3 +221,9 @@ class ElectionCompoundLayout(DetailLayout):
     @property
     def summarize(self):
         return False
+
+    @cached_property
+    def related_compounds(self):
+        result = {r.target for r in self.model.related_compounds}
+        result = sorted(result, key=lambda x: x.date, reverse=True)
+        return [(e.title, self.request.link(e)) for e in result]

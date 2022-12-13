@@ -785,3 +785,20 @@ def drop_owner_from_panachage_results(context):
         context.operations.drop_column(
             'panachage_results', 'owner'
         )
+
+
+@upgrade_task('Add type to election relationships')
+def add_type_election_relationships(context):
+    if context.has_table('election_associations'):
+        if context.has_table('election_relationships'):
+            context.operations.drop_table('election_relationships')
+        context.operations.rename_table(
+            'election_associations', 'election_relationships'
+        )
+
+    if context.has_table('election_relationships'):
+        if not context.has_column('election_relationships', 'type'):
+            context.operations.add_column(
+                'election_relationships',
+                Column('type', Text(), nullable=True)
+            )
