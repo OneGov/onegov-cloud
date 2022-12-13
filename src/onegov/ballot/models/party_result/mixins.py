@@ -117,7 +117,9 @@ class PartyResultsMixin:
         parties = sorted({key for r in results.values() for key in r.keys()})
         for year in sorted(results.keys(), reverse=True):
             for party_id in parties:
-                result = results[year].get(party_id, {})
+                if party_id not in results[year]:
+                    continue
+                result = results[year][party_id]
                 default_name = result['name_translations'].get(default_locale)
                 default_color = self.colors.get(default_name)
                 fallback_color = None
