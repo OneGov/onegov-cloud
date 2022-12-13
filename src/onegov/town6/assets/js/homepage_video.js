@@ -32,10 +32,10 @@ if (document.getElementById("autoplay-video")) {
         source.id = "hvid";
         vid.appendChild(source);
 
-        var link_mp4 = vid.dataset.linkMp4
-        var link_mp4_low_res = vid.dataset.linkMp4LowRes
-        var link_webm = vid.dataset.linkWebm
-        var link_webm_low_res = vid.dataset.linkWebmLowRes
+        var link_mp4 = vid.dataset.linkMp4;
+        var link_mp4_low_res = vid.dataset.linkMp4LowRes;
+        var link_webm = vid.dataset.linkWebm;
+        var link_webm_low_res = vid.dataset.linkWebmLowRes;
 
         if (w.matches && (link_mp4_low_res || link_webm_low_res)) {
             vid.pause();
