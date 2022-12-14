@@ -182,8 +182,8 @@
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.town6">
-
-  <div class="small-12 cell footer-links">
+  <div class="medium-4 cell"></div>
+  <div class="small-12 medium-4 cell footer-links">
     <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
             <a href="https://www.onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
