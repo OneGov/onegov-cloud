@@ -65,9 +65,8 @@
                     <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
                 </div>
 
-                <div class="side-panel">
+                <div tal:condition="request.is_manager and ticket" class="side-panel">
                     <tal:b metal:use-macro="layout.macros['ticket_callout']"
-                        tal:condition="request.is_manager and ticket"
                     />
                 </div>
 
