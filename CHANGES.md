@@ -1,8 +1,48 @@
 # Changes
 
+## 2022.57
+
+`2022-12-14` | [14496f2d9c...ca490622f2](https://github.com/OneGov/onegov-cloud/compare/14496f2d9c^...ca490622f2)
+
+### Election Day
+
+##### Remove obsolete migration command.
+
+`Other` | [OGC-703](https://linear.app/onegovcloud/issue/OGC-703) | [14496f2d9c](https://github.com/onegov/onegov-cloud/commit/14496f2d9c11fed5066a4d77443e11fa6c4c4b84)
+
+##### Only add years to labels in horizontal party strength bar charts in case of historical data.
+
+`Bugfix` | [OGC-834](https://linear.app/onegovcloud/issue/OGC-834) | [89bdd2aa39](https://github.com/onegov/onegov-cloud/commit/89bdd2aa39d417c3e678937b5b79d3408645cf12)
+
+### Town6
+
+##### Homepage tiles pretty hover effect
+
+`Feature` | [OGC-771](https://linear.app/onegovcloud/issue/OGC-771) | [b53d9287ac](https://github.com/onegov/onegov-cloud/commit/b53d9287acf5d52721d5fab28ca7fb3b9da8c42d)
+
+##### Random Video
+
+Multiple Videos can now be added and one will randomly be chosen
+
+`Feature` | [OGC-819](https://linear.app/onegovcloud/issue/OGC-819) | [bd18460e17](https://github.com/onegov/onegov-cloud/commit/bd18460e17f5995fa8cfeacc56dc0a3a4643c0a8)
+
+##### Small design adjustments
+
+`Feature` | [ca490622f2](https://github.com/onegov/onegov-cloud/commit/ca490622f23063432d09664f49748793c58bb577)
+
+##### Fix search bar suggestions
+
+`Bugfix` | [OGC-803](https://linear.app/onegovcloud/issue/OGC-803) | [ec9ab0225e](https://github.com/onegov/onegov-cloud/commit/ec9ab0225ebff8e71a4c83c25246d6fa9e5f0b66)
+
+##### Fix contact panel html
+
+Use paragraphs and lists instead of only lists
+
+`Bugfix` | [OGC-815](https://linear.app/onegovcloud/issue/OGC-815) | [42d1cdfa1d](https://github.com/onegov/onegov-cloud/commit/42d1cdfa1d1192d28a7a2df25ccd66d4b94ff5c0)
+
 ## 2022.56
 
-`2022-12-13` | [8edea2fdcc...58a4878787](https://github.com/OneGov/onegov-cloud/compare/8edea2fdcc^...58a4878787)
+`2022-12-13` | [8edea2fdcc...6ab36c0639](https://github.com/OneGov/onegov-cloud/compare/8edea2fdcc^...6ab36c0639)
 
 ### Directory
 
@@ -2545,28 +2585,4 @@ For election compounds with Doppelter Pukelsheim only. Also adds a new view and 
 ##### Fixes sorting search results with empty titles throwing an error.
 
 `Bugfix` | [73b49c2696](https://github.com/onegov/onegov-cloud/commit/73b49c2696528fdf657d27b351dbff4cb1732ab9)
-
-## 2022.7
-
-`2022-01-19` | [1ab8ecb547...c1a735c644](https://github.com/OneGov/onegov-cloud/compare/1ab8ecb547^...c1a735c644)
-
-### Election Day
-
-##### Allows SMS to be sent to multiple recipients at once.
-
-`Feature` | [155](https://github.com/onegov/onegov-cloud/issues/155) | [936c6fc4f7](https://github.com/onegov/onegov-cloud/commit/936c6fc4f713cdb1519b2e06efb6c2d4e17eed18)
-
-##### Fixes purging old SVGs and PDFs for large numbers not possible.
-
-`Bugfix` | [35b5389362](https://github.com/onegov/onegov-cloud/commit/35b5389362335bb50641365f139aaffe98d8aca1)
-
-### Town6
-
-##### Remove margin of alert-box on homepage.
-
-`Bugfix` | [OGC-202](https://linear.app/onegovcloud/issue/OGC-202) | [1ab8ecb547](https://github.com/onegov/onegov-cloud/commit/1ab8ecb547c6ac61d80af9af4caab47a47e88ed4)
-
-##### Link images from events on the home page.
-
-`Bugfix` | [OGC-203](https://linear.app/onegovcloud/issue/OGC-203) | [a8daa373a8](https://github.com/onegov/onegov-cloud/commit/a8daa373a82b4a7272191ae4c787b2af19980dfc)
 
