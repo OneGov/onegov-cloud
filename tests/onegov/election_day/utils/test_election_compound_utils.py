@@ -584,7 +584,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'active',
                 'color': '#EE7F00',
                 'percentage': False,
-                'text': 'CVP 2014',
+                'text': 'CVP',
                 'value': 931,
                 'value2': 22
             },
@@ -592,7 +592,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'active',
                 'color': '#019040',
                 'percentage': False,
-                'text': 'SVP 2014',
+                'text': 'SVP',
                 'value': 899,
                 'value2': 19
             },
@@ -600,7 +600,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'active',
                 'color': '#0E52A0',
                 'percentage': False,
-                'text': 'FDP 2014',
+                'text': 'FDP',
                 'value': 863,
                 'value2': 18
             },
@@ -608,7 +608,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'active',
                 'color': '#99C040',
                 'percentage': False,
-                'text': 'AL 2014',
+                'text': 'AL',
                 'value': 538,
                 'value2': 10
             },
@@ -616,7 +616,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'active',
                 'color': '#E53136',
                 'percentage': False,
-                'text': 'SP 2014',
+                'text': 'SP',
                 'value': 418,
                 'value2': 7
             },
@@ -624,7 +624,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'active',
                 'color': '#acc700',
                 'percentage': False,
-                'text': 'GLP 2014',
+                'text': 'GLP',
                 'value': 236,
                 'value2': 4
             },
@@ -632,7 +632,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
                 'class': 'inactive',
                 'color': '#F9B200',
                 'percentage': False,
-                'text': 'Piraten 2014',
+                'text': 'Piraten',
                 'value': 19,
                 'value2': 0
             }
