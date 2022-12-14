@@ -436,41 +436,50 @@ def to_html_ul(value, convert_dashes=True):
     value = value.replace('\n\n', '\n \n')
 
     if not convert_dashes:
-        return '<ul><li>{}</li></ul>'.format(
-            '</li><li>'.join(linkify(value).splitlines())
+        return '<p>{}</p>'.format(
+            '<br>'.join(linkify(value).splitlines())
         )
 
     elements = []
-    temp_li = []
+    temp = []
 
-    def ul(inner, bulleted=False):
-        return f'<ul class="bulleted">{inner}</ul>' if bulleted \
-            else f'<ul>{inner}</ul>'
+    def ul(inner):
+        return f'<ul class="bulleted">{inner}</ul>'
 
     def li(inner):
         return f'<li>{inner}</li>'
 
-    was_bulleted = False
-    for line in value.splitlines():
+    def p(inner):
+        return f'<p>{inner}</p>'
+
+    was_list = False
+
+    for i, line in enumerate(value.splitlines()):
         if not line:
             continue
+
         line = linkify(line)
-        now_bullet = line.startswith('-')
+        is_list = line.startswith('-')
+        new_p_or_ul = True if line == ' ' else False
+
         line = line.lstrip('-').strip()
-        if now_bullet and was_bulleted:
-            temp_li.append(li(line))
-        elif now_bullet != was_bulleted:
-            if temp_li:
-                elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
-                temp_li = []
-            temp_li.append(li(line))
-        else:
-            temp_li.append(li(line))
 
-        was_bulleted = now_bullet
+        if new_p_or_ul or (was_list != is_list and i > 0):
+            elements.append(
+                ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+            )
+            temp = []
+            was_list = False
 
-    if temp_li:
-        elements.append(ul(''.join(temp_li), bulleted=was_bulleted))
+        temp.append((li(line) if is_list else line)) if not new_p_or_ul else ''
+
+        new_p_or_ul = False
+        was_list = is_list
+
+    if temp:
+        elements.append(
+            ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+        )
 
     return ''.join(elements)
 
