@@ -1,7 +1,6 @@
 from collections import namedtuple
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
-from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link, LinkGroup
 from onegov.org.layout import EventBaseLayout
@@ -289,7 +288,6 @@ class TilesWidget:
         homepage_pages = layout.request.app.homepage_pages
         request = layout.request
         link = request.link
-        session = layout.app.session()
         classes = ('tile-sub-link', )
 
         for ix, page in enumerate(layout.root_pages):
