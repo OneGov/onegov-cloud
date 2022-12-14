@@ -90,9 +90,14 @@ $publications-icon: '\f1ea';
     }
     padding-left: 1.5rem;
 
+    @media #{$small-only} {
+        padding-left: 0;
+    }
+
     .contacts-albums-panel ul.panel-links.more-list {
         padding: 0;
     }
+
 
     .services-panel {
         a.online-counter::before { @include icon-bold($tasks-icon); }
