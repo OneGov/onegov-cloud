@@ -13,10 +13,10 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
+from onegov.org.forms.fields import HtmlLabel
 
 
 class NewsletterForm(Form):
-
     title = StringField(
         label=_("Title"),
         description=_("Used in the overview and the e-mail subject"),
@@ -45,18 +45,16 @@ class NewsletterForm(Form):
         layout = Layout(None, request)
 
         choices = tuple((
-            str(item.id),
-            '<div class="title">{}</div><div class="date">{}</div>'.format(
-                item.title,
-                layout.format_date(item.created, 'relative')
-            )
+            item.id,
+            HtmlLabel(item.id, item.title, layout.format_date(
+                item.created, 'relative')
+                      )
         ) for item in news)
 
         if not choices:
             return cls
 
         class NewsletterWithNewsForm(cls):
-
             news = MultiCheckboxField(
                 label=_("Latest news"),
                 choices=choices,
@@ -81,22 +79,18 @@ class NewsletterForm(Form):
 
         layout = Layout(None, request)
 
-        choices = tuple(
-            (
-                str(item.id),
-                '<div class="title">{}</div><div class="date">{}</div>'.format(
-                    item.title, layout.format_date(
-                        item.localized_start, 'datetime'
-                    )
-                )
-            ) for item in occurrences
-        )
+        choices = tuple((
+            item.id,
+            HtmlLabel(item.id, title=item.title,
+                      date=layout.format_date(item.localized_start, 'datetime')
+                      )
+        )for item in occurrences)
+
 
         if not choices:
             return cls
 
         class NewsletterWithOccurrencesForm(cls):
-
             occurrences = MultiCheckboxField(
                 label=_("Events"),
                 choices=choices,
@@ -121,21 +115,17 @@ class NewsletterForm(Form):
 
         layout = Layout(None, request)
 
-        choices = tuple(
-            (
-                str(item.id),
-                '<div class="title">{}</div><div class="date">{}</div>'.format(
-                    name_without_extension(item.name),
-                    layout.format_date(item.created, 'date')
-                )
-            ) for item in publications
-        )
+        choices = tuple((
+            item.id,
+            HtmlLabel(item.id, title=name_without_extension(item.name),
+                      date=layout.format_date(item.created, 'date')
+                      )
+        ) for item in publications)
 
         if not choices:
             return cls
 
         class NewsletterWithPublicationsForm(cls):
-
             publications = MultiCheckboxField(
                 label=_("Publications"),
                 choices=choices,
@@ -157,7 +147,6 @@ class NewsletterForm(Form):
 
 
 class NewsletterSendForm(Form):
-
     send = RadioField(
         _("Send"),
         choices=(
@@ -209,7 +198,6 @@ class NewsletterTestForm(Form):
         choices = tuple((r.id.hex, r.address) for r in recipients)
 
         class NewsletterSendFormWithRecipients(cls):
-
             selected_recipient = ChosenSelectField(
                 label=_("Recipient"),
                 choices=choices,
