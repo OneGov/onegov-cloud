@@ -317,21 +317,7 @@ class TilesWidget:
                 )
 
             elif page.type == 'news':
-                links = [
-                    Link(str(year), link(page.for_year(year)), classes=classes)
-                    for year in page.all_years
-                ]
-                if layout.org.show_newsletter:
-                    links.append(Link(
-                        _("Newsletter"), link(NewsletterCollection(session)),
-                        classes=classes
-                    ))
-
-                yield Tile(
-                    page=Link(page.title, link(page)),
-                    number=ix + 1,
-                    links=links
-                )
+                pass
             else:
                 raise NotImplementedError
 
