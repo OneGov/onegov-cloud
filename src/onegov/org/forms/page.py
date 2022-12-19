@@ -26,6 +26,11 @@ class LinkForm(PageBaseForm):
         render_kw={'class_': 'image-url file-url internal-url'}
     )
 
+    page_image = StringField(
+        label=_("Image"),
+        render_kw={'class_': 'image-url'}
+    )
+
 
 class PageForm(PageBaseForm):
     """ Defines the form for pages with the 'page' trait. """
