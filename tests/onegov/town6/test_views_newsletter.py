@@ -26,8 +26,6 @@ def test_show_newsletter(client):
 
     page = client.get('/news')
     assert "Newsletter" in page.text
-    page = client.get('/')
-    assert "Newsletter" in page.text
 
     page = client.get('/newsletter-settings')
     page.form['show_newsletter'] = False
@@ -40,7 +38,7 @@ def test_show_newsletter(client):
     page.form['show_newsletter'] = True
     page = page.form.submit().follow()
 
-    page = client.get('/')
+    page = client.get('/news')
     assert "Newsletter" in page.text
 
 
