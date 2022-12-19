@@ -215,6 +215,12 @@ form {
             margin-top: .25rem !important;
         }
     }
+
+    li {
+        align-items: baseline;
+        display: flex;
+        margin-bottom: .3rem;
+    }
 }
 
 /*
