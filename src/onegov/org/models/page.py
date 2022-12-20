@@ -90,6 +90,8 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
                 form_class=self.with_content_extensions(PageForm, request),
                 fields=(
                     'page_image',
+                    'show_preview_image',
+                    'show_page_image'
                 ),
                 after='title'
             )
