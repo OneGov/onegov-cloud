@@ -332,4 +332,31 @@ describe('Bar chart', () => {
     expect(chart.height()).toBe(20*24+40);
     expect(chart.width()).toBe(700+20);
   });
+
+  it('renders a svg with percentages @700', () => {
+    var document = jsdom.jsdom();
+    var chart = barChart({
+      width: 700,
+      data: {
+        "results": [
+          {"value": 100.50, "class": "active", "value2": 1, "text": "mit", "percentage": true},
+          {"value": 100.50, "class": "inactive", "value2": 0, "text": "mit", "percentage": true},
+          {"value": 20.75, "class": "active", "value2": 1, "text": "mit", "percentage": true},
+          {"value": 20.75, "class": "inactive", "value2": 0, "text": "mit", "percentage": true},
+          {"value": 100.50, "class": "active", "value2": 1, "text": "ohne", "percentage": false},
+          {"value": 100.50, "class": "inactive", "value2": 0, "text": "ohne", "percentage": false},
+          {"value": 20.75, "class": "active", "value2": 1, "text": "ohne", "percentage": false},
+          {"value": 20.75, "class": "inactive", "value2": 0, "text": "ohne", "percentage": false},
+          {"value": 100.50, "class": "active", "value2": 1, "text": "Default"},
+          {"value": 100.50, "class": "inactive", "value2": 0, "text": "Default"},
+          {"value": 20.75, "class": "active", "value2": 1, "text": "Default"},
+          {"value": 20.75, "class": "inactive", "value2": 0, "text": "Default"},
+        ]}
+    });
+    chart(document.body);
+    // require('fs').writeFile("bar_p@700.svg", document.svg(), function(err, result) {});
+    expect(document.svg()).toMatchSnapshot();
+    expect(chart.height()).toBe(12*24+40);
+    expect(chart.width()).toBe(700+20);
+  });
 });

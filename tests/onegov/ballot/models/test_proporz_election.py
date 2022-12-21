@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
+from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
@@ -1191,3 +1192,120 @@ def test_proporz_election_attachments(test_app, explanations_pdf):
     assert model.explanations_pdf.reference.content_type == 'application/pdf'
     del model.explanations_pdf
     assert model.explanations_pdf is None
+
+
+def test_proporz_election_historical_party_strengths(session):
+    first = ProporzElection(
+        title='First',
+        domain='federation',
+        date=date(2014, 1, 1),
+        number_of_mandates=1
+    )
+    second = ProporzElection(
+        title='Second',
+        domain='federation',
+        date=date(2018, 1, 1),
+        number_of_mandates=1
+    )
+    third = ProporzElection(
+        title='Third',
+        domain='federation',
+        date=date(2022, 1, 1),
+        number_of_mandates=1
+    )
+    session.add(first)
+    session.add(second)
+    session.add(third)
+    session.flush()
+
+    assert first.historical_party_results.count() == 0
+    assert second.historical_party_results.count() == 0
+    assert third.historical_party_results.count() == 0
+
+    # add results
+    for (election, year, party_id, domain) in (
+        (first, 2014, 1, 'canton'),
+        (first, 2014, 2, 'canton'),
+        (first, 2014, 3, 'canton'),
+        (first, 2010, 1, 'canton'),
+        (first, 2010, 2, 'canton'),
+        (first, 2010, 3, 'canton'),
+        (second, 2022, 2, 'canton'),
+        (second, 2022, 3, 'canton'),
+        (second, 2018, 2, 'canton'),
+        (second, 2018, 3, 'canton'),
+        (second, 2018, 4, 'canton'),
+        (second, 2010, 2, 'canton'),
+        (second, 2010, 3, 'canton'),
+        (third, 2022, 1, 'canton'),
+        (third, 2022, 3, 'canton'),
+        (third, 2022, 5, 'canton'),
+        (third, 2022, 5, 'superregion'),
+    ):
+        election.party_results.append(
+            PartyResult(
+                year=year,
+                number_of_mandates=0,
+                votes=1,
+                total_votes=100,
+                name_translations={'en_US': str(party_id)},
+                party_id=str(party_id),
+                domain=domain
+            )
+        )
+
+    # no relationships yet
+    assert first.historical_party_results.count() == 6
+    assert second.historical_party_results.count() == 7
+    assert third.historical_party_results.count() == 4
+
+    # add relationships
+    for (source_, target, type_) in (
+        (third, second, 'historical'),
+        (third, first, 'historical'),
+        (second, first, 'historical'),
+        (first, second, None),
+        (second, third, 'historical')
+    ):
+        session.add(
+            ElectionRelationship(
+                source_id=source_.id, target_id=target.id, type=type_
+            )
+        )
+
+    def extract(election):
+        return sorted(
+            (result.election_id, result.year, result.party_id)
+            for result in election.historical_party_results
+        )
+
+    assert extract(first) == [
+        ('first', 2010, '1'),
+        ('first', 2010, '2'),
+        ('first', 2010, '3'),
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+    ]
+    assert extract(second) == [
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+        ('second', 2010, '2'),
+        ('second', 2010, '3'),
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('second', 2022, '2'),
+        ('second', 2022, '3'),
+    ]
+    assert extract(third) == [
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('third', 2022, '1'),
+        ('third', 2022, '3'),
+        ('third', 2022, '5'),
+        ('third', 2022, '5'),
+    ]
+    third.historical_party_results.filter_by(domain='superregion').count() == 1

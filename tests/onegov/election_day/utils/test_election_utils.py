@@ -11,6 +11,7 @@ from onegov.election_day.utils.parties import get_parties_panachage_data
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 from tests.onegov.election_day.common import print_errors
 
 
@@ -944,6 +945,15 @@ def test_election_utils_parties(import_test_datasets, session):
         ]
     }
 
+    assert get_party_results_seat_allocation(years, parties) == [
+        ['AL', 0, 0],
+        ['CVP', 1, 1],
+        ['FDP', 1, 1],
+        ['GLP', 0, 0],
+        ['SP', 0, 0],
+        ['SVP', 1, 1]
+    ]
+
     assert get_party_results_data(election) == {
         'axis_units': {'back': '%', 'front': ''},
         'groups': ['AL', 'CVP', 'FDP', 'GLP', 'SP', 'SVP'],
@@ -1043,85 +1053,97 @@ def test_election_utils_parties(import_test_datasets, session):
             {
                 'class': 'active',
                 'color': '#3f841a',
+                'percentage': True,
                 'text': 'SVP 2015',
-                'value': 35543,
+                'value': 30.5,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#3f841a',
+                'percentage': True,
                 'text': '2011',
-                'value': 33116,
+                'value': 28.3,
                 'value2': 1
             },
             {
                 'class': 'active',
                 'color': '#ff6300',
+                'percentage': True,
                 'text': 'CVP 2015',
-                'value': 30856,
+                'value': 26.4,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#ff6300',
+                'percentage': True,
                 'text': '2011',
-                'value': 28413,
+                'value': 24.3,
                 'value2': 1
             },
             {
                 'class': 'active',
                 'color': '#4068c8',
+                'percentage': True,
                 'text': 'FDP 2015',
-                'value': 20584,
+                'value': 17.6,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#4068c8',
+                'percentage': True,
                 'text': '2011',
-                'value': 22494,
+                'value': 19.2,
                 'value2': 1
             },
             {
                 'class': 'inactive',
                 'color': '#db3c27',
+                'percentage': True,
                 'text': 'SP 2015',
-                'value': 16048,
+                'value': 13.8,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#db3c27',
+                'percentage': True,
                 'text': '2011',
-                'value': 6167,
+                'value': 5.3,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#a74c97',
+                'percentage': True,
                 'text': 'AL 2015',
-                'value': 8352,
+                'value': 7.2,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#a74c97',
+                'percentage': True,
                 'text': '2011',
-                'value': 17972,
+                'value': 15.4,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#aeca00',
+                'percentage': True,
                 'text': 'GLP 2015',
-                'value': 4178,
+                'value': 3.6,
                 'value2': 0
             },
             {
                 'class': 'inactive',
                 'color': '#aeca00',
+                'percentage': True,
                 'text': '2011',
-                'value': 7943,
+                'value': 6.8,
                 'value2': 0
             }
         ]
@@ -1198,6 +1220,22 @@ def test_election_utils_parties(import_test_datasets, session):
     assert_node(False, '#aeca00', 12, 'GLP')
     assert_node(False, '#db3c27', 13, 'SP')
     assert_node(True, '#3f841a', 14, 'SVP')
+
+    # incomplete data (only check for exceptions)
+    party_result = election.party_results.filter_by(year=2011, name='AL').one()
+    party_result.party_id = 'AL11'
+    party_result.party_id = '6'
+    election.party_results.filter_by(year=2011, name='FDP').delete()
+    election.party_results.filter_by(year=2015, name='CVP').delete()
+    session.flush()
+
+    years, parties = get_party_results(election)
+    get_party_results_deltas(election, years, parties)
+    get_party_results_seat_allocation(years, parties)
+    get_parties_panachage_data(election)
+    get_party_results_data(election)
+    election.horizontal_party_strengths = False
+    get_party_results_data(election)
 
 
 def test_get_connection_results_internal(import_test_datasets, session):

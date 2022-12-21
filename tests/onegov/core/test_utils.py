@@ -429,18 +429,18 @@ def test_to_html_ul():
         return f'<li>{args[0]}</li>'
 
     text = "\n".join(('Title', 'A'))
-    assert to_html_ul(text) == f'<ul>{li("Title", "A")}</ul>'
+    assert to_html_ul(text) == '<p>Title<br>A</p>'
 
     text = "\n".join(('- Title', '-A', '-B'))
     li_inner = li('Title', 'A', 'B')
     assert to_html_ul(text) == f'<ul class="bulleted">{li_inner}</ul>'
 
-    # two lists
+    # list and paragraph combined
     text = "\n".join(('-A', 'B'))
     assert to_html_ul(text) == f'<ul class="bulleted">{li("A")}</ul>' \
-                               f'<ul>{li("B")}</ul>'
+                               '<p>B</p>'
     text = "\n".join(('A', '-B'))
-    assert to_html_ul(text) == f'<ul>{li("A")}</ul>' \
+    assert to_html_ul(text) == '<p>A</p>' \
                                f'<ul class="bulleted">{li("B")}</ul>'
 
 

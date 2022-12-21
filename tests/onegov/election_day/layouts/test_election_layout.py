@@ -2,7 +2,7 @@ from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Candidate
 from onegov.ballot import Election
-from onegov.ballot import ElectionAssociation
+from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import ListConnection
 from onegov.ballot import PanachageResult
@@ -163,11 +163,11 @@ def test_election_layout(session):
         session.add(second_election)
         session.flush()
 
-        association = ElectionAssociation(
+        relationship = ElectionRelationship(
             source_id=election.id,
             target_id=second_election.id
         )
-        session.add(association)
+        session.add(relationship)
         session.flush()
 
         assert ElectionLayout(election, request).related_elections == [
@@ -354,6 +354,7 @@ def test_election_layout_menu_proporz(session):
     election.panachage_results.append(
         PanachageResult(target='t', source='t ', votes=0)
     )
+    election.show_party_panachage = True
     assert ElectionLayout(election, request).menu == [
         ('Lists', 'ProporzElection/lists', False, []),
         ('Candidates', 'ProporzElection/candidates', False, []),
@@ -375,6 +376,7 @@ def test_election_layout_menu_proporz(session):
         )
     )
     election.list_connections.append(ListConnection(connection_id='A'))
+    election.show_party_strengths = True
     assert ElectionLayout(election, request).menu == [
         ('Lists', '', False, [
             ('Lists', 'ProporzElection/lists', False, []),

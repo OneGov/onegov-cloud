@@ -102,6 +102,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     model.voters_counts = False
     model.exact_voters_counts = False
     model.horizontal_party_strengths = False
+    model.use_historical_party_results = False
     model.show_party_strengths = False
     model.show_party_panachage = False
     model.colors = {
@@ -134,6 +135,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert form.voters_counts.data is False
     assert form.exact_voters_counts.data is False
     assert form.horizontal_party_strengths.data is False
+    assert form.use_historical_party_results.data is False
     assert form.show_party_strengths.data is False
     assert form.show_party_panachage.data is False
     assert form.colors.data == (
@@ -160,6 +162,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     form.voters_counts.data = True
     form.exact_voters_counts.data = True
     form.horizontal_party_strengths.data = True
+    form.use_historical_party_results.data = True
     form.show_party_strengths.data = True
     form.show_party_panachage.data = True
     form.colors.data = (
@@ -191,6 +194,7 @@ def test_election_form_model(election_day_app_zg, related_link_labels,
     assert model.voters_counts is True
     assert model.exact_voters_counts is True
     assert model.horizontal_party_strengths is True
+    assert model.use_historical_party_results is True
     assert model.show_party_strengths is True
     assert model.show_party_panachage is True
     assert model.colors == {
@@ -255,7 +259,11 @@ def test_election_form_relations(session):
     form.request = DummyRequest(session=session)
     form.request.app.principal = Canton(name='gr', canton='gr')
     form.on_request()
-    assert form.related_elections.choices == [
+    assert form.related_elections_historical.choices == [
+        ('second-election', '02.01.2011 Second Election'),
+        ('first-election', '01.01.2011 First Election'),
+    ]
+    assert form.related_elections_other.choices == [
         ('second-election', '02.01.2011 Second Election'),
         ('first-election', '01.01.2011 First Election'),
     ]
@@ -265,7 +273,8 @@ def test_election_form_relations(session):
     form.domain.data = 'federation'
     form.mandates.data = 1
     form.shortcode.data = 'SC'
-    form.related_elections.data = ['first-election', 'second-election']
+    form.related_elections_historical.data = ['first-election']
+    form.related_elections_other.data = ['first-election', 'second-election']
     form.update_model(election)
     session.add(election)
     session.flush()
@@ -277,15 +286,22 @@ def test_election_form_relations(session):
     form.request = DummyRequest(session=session)
     form.request.app.principal = Canton(name='gr', canton='gr')
     form.on_request()
-    assert form.related_elections.choices == [
+    assert form.related_elections_historical.choices == [
+        ('third-election', '03.01.2011 SC Third Election'),
+        ('second-election', '02.01.2011 Second Election'),
+        ('first-election', '01.01.2011 First Election'),
+    ]
+    assert form.related_elections_other.choices == [
         ('third-election', '03.01.2011 SC Third Election'),
         ('second-election', '02.01.2011 Second Election'),
         ('first-election', '01.01.2011 First Election'),
     ]
     form.apply_model(election)
-    assert form.related_elections.data == ['third-election']
+    assert form.related_elections_historical.data == ['third-election']
+    assert form.related_elections_other.data == ['third-election']
 
-    form.related_elections.data = ['second-election']
+    form.related_elections_historical.data = ['second-election']
+    form.related_elections_other.data = ['second-election', 'third-election']
     form.update_model(election)
     session.add(election)
     session.flush()
@@ -293,14 +309,21 @@ def test_election_form_relations(session):
     # Check all relations
     election = session.query(Election).filter_by(id='first-election').one()
     form.apply_model(election)
-    assert form.related_elections.data == ['second-election']
+    assert form.related_elections_historical.data == ['second-election']
+    assert set(form.related_elections_other.data) == {
+        'second-election', 'third-election'
+    }
 
     election = session.query(Election).filter_by(id='second-election').one()
     form.apply_model(election)
-    assert set(form.related_elections.data) == set(
-        ['first-election', 'third-election']
-    )
+    assert form.related_elections_historical.data == ['first-election']
+    assert set(form.related_elections_other.data) == {
+        'first-election', 'third-election'
+    }
 
     election = session.query(Election).filter_by(id='third-election').one()
     form.apply_model(election)
-    assert form.related_elections.data == ['second-election']
+    assert form.related_elections_historical.data == []
+    assert set(form.related_elections_other.data) == {
+        'first-election', 'second-election'
+    }

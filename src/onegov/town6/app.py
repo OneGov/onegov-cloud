@@ -194,6 +194,7 @@ def get_common_asset():
     yield 'aos.js'
     yield 'aos-init.js'
     yield 'aos.css'
+    yield 'homepage_video.js'
 
 
 @TownApp.webasset('editor')

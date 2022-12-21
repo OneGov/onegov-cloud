@@ -1,8 +1,54 @@
 # Changes
 
+## 2022.56
+
+`2022-12-13` | [8edea2fdcc...58a4878787](https://github.com/OneGov/onegov-cloud/compare/8edea2fdcc^...58a4878787)
+
+### Directory
+
+##### Fix key format problem
+
+`Bugfix` | [OGC-814](https://linear.app/onegovcloud/issue/OGC-814) | [6042867716](https://github.com/onegov/onegov-cloud/commit/60428677168e7f9cfcf35abd692aa1118fc29476)
+
+### Election Day
+
+##### Enable voters counts for proporz elections.
+
+`Feature` | [OGC-353](https://linear.app/onegovcloud/issue/OGC-353) | [46780ffb4f](https://github.com/onegov/onegov-cloud/commit/46780ffb4fbdcc1dd9b942289b78eff82ff428df)
+
+##### Add historical party results.
+
+`Feature` | [OGC-703](https://linear.app/onegovcloud/issue/OGC-703) | [40cb21f883](https://github.com/onegov/onegov-cloud/commit/40cb21f88345c8fd954ce6ffeeed78cea96a8950)
+
+##### Show percentages instead of votes or voters counts in horziontal party strengths bar chart when having historical data.
+
+`Feature` | [OGC-828](https://linear.app/onegovcloud/issue/OGC-828) | [58a4878787](https://github.com/onegov/onegov-cloud/commit/58a4878787cf9ecba0e5010c861cbc707283fc7e)
+
+##### Remove obsolete migration step.
+
+`Other` | [OGC-768](https://linear.app/onegovcloud/issue/OGC-768) | [8edea2fdcc](https://github.com/onegov/onegov-cloud/commit/8edea2fdcc9881bc4d8e59fcd90875a31d36ac17)
+
+##### Drop owner columns of party and panachage results.
+
+`Other` | [OGC-768](https://linear.app/onegovcloud/issue/OGC-768) | [25f9dfee81](https://github.com/onegov/onegov-cloud/commit/25f9dfee81db2a61810de6e5b63b388141231207)
+
+##### Fix check for consistent total votes in party result import for results with multiple domains.
+
+`Bugfix` | [cf8ea1cda0](https://github.com/onegov/onegov-cloud/commit/cf8ea1cda0bc3686e441401719f0632eacc79e25)
+
+### Town6
+
+##### Show Hashtags and year only if they exist.
+
+`Feature` | [OGC-808](https://linear.app/onegovcloud/issue/OGC-808) | [8fc6ae7ef8](https://github.com/onegov/onegov-cloud/commit/8fc6ae7ef8c45f80f7d324abc74ac3eacb204438)
+
+##### Fix sidebar news
+
+`Bugfix` | [OGC-811](https://linear.app/onegovcloud/issue/OGC-811) | [db933a641b](https://github.com/onegov/onegov-cloud/commit/db933a641b02a9ded958aca18d3ce22b427e5d8b)
+
 ## 2022.55
 
-`2022-12-07` | [da8adc1346...783abfeefe](https://github.com/OneGov/onegov-cloud/compare/da8adc1346^...783abfeefe)
+`2022-12-07` | [da8adc1346...ce0bf0aac4](https://github.com/OneGov/onegov-cloud/compare/da8adc1346^...ce0bf0aac4)
 
 ### Ballot
 
@@ -2523,44 +2569,4 @@ For election compounds with Doppelter Pukelsheim only. Also adds a new view and 
 ##### Link images from events on the home page.
 
 `Bugfix` | [OGC-203](https://linear.app/onegovcloud/issue/OGC-203) | [a8daa373a8](https://github.com/onegov/onegov-cloud/commit/a8daa373a82b4a7272191ae4c787b2af19980dfc)
-
-## 2022.6
-
-`2022-01-18` | [0c38fb0d05...98e29a2470](https://github.com/OneGov/onegov-cloud/compare/0c38fb0d05^...98e29a2470)
-
-### Election Day
-
-##### Add map to election compound districts view.
-
-`Feature` | [OGC-163](https://linear.app/onegovcloud/issue/OGC-163) | [0c38fb0d05](https://github.com/onegov/onegov-cloud/commit/0c38fb0d051f519cda592488a006af7901f667f9)
-
-##### Add a management view for clearing the SVGs and PDFs of an election, election compound or vote.
-
-`Feature` | [172c03e0d8](https://github.com/onegov/onegov-cloud/commit/172c03e0d828ccb6ee851b68a63aa4084d2be114)
-
-##### Use a DB column for the last result change timespamps.
-
-Requires to run the update-last-result-change CLI command after upgrading.
-
-`Feature` | [OGC-151](https://linear.app/onegovcloud/issue/OGC-151) | [d95b9bca40](https://github.com/onegov/onegov-cloud/commit/d95b9bca4057d6925d392b46bf6d603ca2938fa5)
-
-##### Add last modified headers to all embeded views.
-
-`Bugfix` | [OGC-231](https://linear.app/onegovcloud/issue/OGC-231) | [854acc118b](https://github.com/onegov/onegov-cloud/commit/854acc118bcfbbfa0167ecc7f56a69766eac27e4)
-
-##### Hides districts in PDFs of regional elections.
-
-`Bugfix` | [OGC-232](https://linear.app/onegovcloud/issue/OGC-232) | [ab69b8152c](https://github.com/onegov/onegov-cloud/commit/ab69b8152c5a5e203ddc3ee68931c2cb8f6afb70)
-
-##### Avoid SVG and PDF name collisions in elections and election compounds.
-
-`Bugfix` | [3d1b3dfc12](https://github.com/onegov/onegov-cloud/commit/3d1b3dfc1283883852c9c7f3e5c82c047eec6987)
-
-##### Avoid raising errors in generate media, they will likely never be seen.
-
-`Bugfix` | [b5ae9f2375](https://github.com/onegov/onegov-cloud/commit/b5ae9f237589710b3f54ec47016afa06d99757e6)
-
-##### Avoid re-creating PDFs and SVGs when setting an earlier date than the last modification date.
-
-`Bugfix` | [2c589dc418](https://github.com/onegov/onegov-cloud/commit/2c589dc41810bfcdf92647c0b35e26dd4f28764d)
 

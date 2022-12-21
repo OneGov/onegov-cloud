@@ -311,7 +311,8 @@ def test_view_election_compound_part_party_strengths(election_day_app_bl):
         '/elections-part/elections/superregion/region-1/party-strengths-data'
     ).json
     assert data['results'][0]['text'] == 'Le Centre 2022'
-    assert data['results'][0]['value'] == 300
+    assert data['results'][0]['value'] == 50.0
+    assert data['results'][0]['percentage'] == True
 
 
 def test_view_election_compound_part_statistics(election_day_app_bl):

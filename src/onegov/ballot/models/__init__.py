@@ -10,7 +10,7 @@ See:
 from onegov.ballot.models.election import Candidate
 from onegov.ballot.models.election import CandidateResult
 from onegov.ballot.models.election import Election
-from onegov.ballot.models.election import ElectionAssociation
+from onegov.ballot.models.election import ElectionRelationship
 from onegov.ballot.models.election import ElectionResult
 from onegov.ballot.models.election import List
 from onegov.ballot.models.election import ListConnection
@@ -20,6 +20,7 @@ from onegov.ballot.models.election import ProporzElection
 from onegov.ballot.models.election_compound import ElectionCompound
 from onegov.ballot.models.election_compound import ElectionCompoundAssociation
 from onegov.ballot.models.election_compound import ElectionCompoundPart
+from onegov.ballot.models.election_compound import ElectionCompoundRelationship
 from onegov.ballot.models.party_result import PartyResult
 from onegov.ballot.models.vote import Ballot
 from onegov.ballot.models.vote import BallotResult
@@ -33,10 +34,11 @@ __all__ = [
     'CandidateResult',
     'ComplexVote',
     'Election',
-    'ElectionAssociation',
     'ElectionCompound',
     'ElectionCompoundAssociation',
     'ElectionCompoundPart',
+    'ElectionCompoundRelationship',
+    'ElectionRelationship',
     'ElectionResult',
     'List',
     'ListConnection',

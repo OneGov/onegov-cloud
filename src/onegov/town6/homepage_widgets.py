@@ -77,6 +77,17 @@ class AutoplayVideoWidget:
     """
 
 
+@TownApp.homepage_widget(tag='random_videos')
+class RandomVideosWidget:
+    template = """
+        <xsl:template match="random_videos">
+            <div id="random-video">
+                <xsl:apply-templates select="node()" />
+            </div>
+        </xsl:template>
+    """
+
+
 @TownApp.homepage_widget(tag='icon_link')
 class IconLinksWidget:
     template = """

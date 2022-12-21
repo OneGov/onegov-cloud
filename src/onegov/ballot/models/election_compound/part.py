@@ -1,5 +1,7 @@
 from onegov.ballot.models.election_compound.mixins import \
     DerivedAttributesMixin
+from onegov.ballot.models.party_result.mixins import \
+    HistoricalPartyResultsMixin
 from sqlalchemy.orm import object_session
 
 
@@ -12,7 +14,9 @@ class inherited_attribute:
         return getattr(instance.election_compound, self.name)
 
 
-class ElectionCompoundPart(DerivedAttributesMixin):
+class ElectionCompoundPart(
+    DerivedAttributesMixin, HistoricalPartyResultsMixin
+):
 
     """ A part of an election compound.
 
@@ -43,6 +47,7 @@ class ElectionCompoundPart(DerivedAttributesMixin):
     exact_voters_counts = inherited_attribute()
     horizontal_party_strengths = inherited_attribute()
     show_party_strengths = inherited_attribute()
+    use_historical_party_results = inherited_attribute()
 
     @property
     def title(self):
@@ -90,3 +95,7 @@ class ElectionCompoundPart(DerivedAttributesMixin):
                 return True
 
         return False
+
+    @property
+    def relationships_for_historical_party_results(self):
+        return self.election_compound.related_compounds

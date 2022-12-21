@@ -19,7 +19,11 @@ def get_party_results(item, json_serializable=False):
     if not has_party_results(item):
         return [], {}
 
-    results = item.party_results.filter(PartyResult.domain == item.domain)
+    party_results = (
+        item.historical_party_results if item.use_historical_party_results
+        else item.party_results
+    )
+    results = party_results.filter(PartyResult.domain == item.domain)
     domain_segment = getattr(item, 'segment', None)
     if domain_segment:
         results = results.filter(PartyResult.domain_segment == domain_segment)
@@ -128,11 +132,18 @@ def get_party_results_horizontal_data(item):
 
     attribute = 'voters_count' if item.voters_counts else 'votes'
     years, parties = get_party_results(item)
+
+    party_names = {}
+    for party_id, party in parties.items():
+        party_names[party_id] = None
+        for year in party.values():
+            party_names[party_id] = party_names[party_id] or year.get('name')
+
     results = []
     if years:
         year = years[-1]
         party_ids = {
-            values.get(year, {}).get(attribute).get('total', 0): party_id
+            values.get(year, {}).get(attribute, {}).get('total', 0): party_id
             for party_id, values in parties.items()
         }
         party_ids = [party_ids[key] for key in sorted(party_ids)]
@@ -140,17 +151,29 @@ def get_party_results_horizontal_data(item):
             for year in reversed(years):
                 active = year == years[-1]
                 party = parties.get(party_id, {}).get(year, {})
-                name = party.get('name')
-                value = round(party.get(attribute, {}).get('total', 0) or 0)
+                name = party_names.get(party_id)
+                if len(years) == 1:
+                    text = name
+                    value = round(
+                        party.get(attribute, {}).get('total', 0) or 0
+                    )
+                    percentage = False
+                else:
+                    text = f'{name} {year}' if active else year
+                    value = float(
+                        (party.get(attribute, {}).get('permille', 0) or 0) / 10
+                    )
+                    percentage = True
                 results.append({
-                    'text': f'{name} {year}' if active else year,
+                    'text': text,
                     'value': value,
                     'value2': party.get('mandates'),
                     'class': (
                         'active' if active and party.get('mandates')
                         else 'inactive'
                     ),
-                    'color': party.get('color')
+                    'color': party.get('color'),
+                    'percentage': percentage
                 })
 
     return {'results': results}
@@ -207,6 +230,33 @@ def get_party_results_vertical_data(item):
         'results': results,
         'title': item.title
     }
+
+
+def get_party_results_seat_allocation(years, parties):
+
+    """ Returns the aggregated party results for the seat allocation table.
+
+    """
+    if not years:
+        return []
+
+    party_names = {}
+    for party_id, party in parties.items():
+        party_names[party_id] = None
+        for year in party.values():
+            party_names[party_id] = party_names[party_id] or year.get('name')
+
+    result = []
+    for party_id, party in parties.items():
+        row = []
+        row.append(party_names.get(party_id, ''))
+        for year in years:
+            row.append(
+                parties.get(party_id, {}).get(year, {}).get('mandates', 0)
+            )
+        result.append(row)
+
+    return result
 
 
 def get_parties_panachage_data(item, request=None):
