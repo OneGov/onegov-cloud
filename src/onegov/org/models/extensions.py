@@ -474,7 +474,7 @@ class ImageExtension(ContentExtension):
             )
 
             show_preview_image = BooleanField(
-                label=_('Show image on preview'),
+                label=_('Show image on preview on the parent page'),
                 default=True,
             )
 
