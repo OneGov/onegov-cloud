@@ -45,7 +45,7 @@ class NewsletterForm(Form):
         layout = Layout(None, request)
 
         choices = tuple((
-            item.id,
+            str(item.id),
             HtmlLabel(item.id, item.title, layout.format_date(
                 item.created, 'relative')
                       )
@@ -80,7 +80,7 @@ class NewsletterForm(Form):
         layout = Layout(None, request)
 
         choices = tuple((
-            item.id,
+            str(item.id),
             HtmlLabel(item.id, title=item.title,
                       date=layout.format_date(item.localized_start, 'datetime')
                       )
@@ -116,7 +116,7 @@ class NewsletterForm(Form):
         layout = Layout(None, request)
 
         choices = tuple((
-            item.id,
+            str(item.id),
             HtmlLabel(item.id, title=name_without_extension(item.name),
                       date=layout.format_date(item.created, 'date')
                       )

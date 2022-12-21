@@ -29,10 +29,6 @@ class HtmlLabel:
         self.title = title
         self.date = date
 
-    # def __call__(self, *args, **kwargs):
-    #     # Named tuple?
-    #     return self.id, self.title
-
     def __html__(self):
         """ This method will be called by wtforms. """
         return '<div class="title">{}</div><div class="date">{}</div>'.format(
