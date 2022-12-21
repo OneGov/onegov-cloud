@@ -46,8 +46,8 @@ class NewsletterForm(Form):
 
         choices = tuple((
             str(item.id),
-            HtmlLabel(item.id, item.title, layout.format_date(
-                item.created, 'relative')
+            HtmlLabel(item.id, item.title, layout.format_date(item.created,
+                                                              'relative')
                       )
         ) for item in news)
 
@@ -85,7 +85,6 @@ class NewsletterForm(Form):
                       date=layout.format_date(item.localized_start, 'datetime')
                       )
         )for item in occurrences)
-
 
         if not choices:
             return cls
