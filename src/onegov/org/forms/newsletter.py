@@ -13,7 +13,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
-from onegov.org.forms.fields import HtmlLabel
+from markupsafe import Markup
 
 
 class NewsletterForm(Form):
@@ -46,9 +46,10 @@ class NewsletterForm(Form):
 
         choices = tuple((
             str(item.id),
-            HtmlLabel(item.id, item.title, layout.format_date(item.created,
-                                                              'relative')
-                      )
+            Markup("""
+            <div class="title">{}</div><div class="date">{}</div>
+            """.format(item.title, layout.format_date(item.created,
+                                                      'relative')))
         ) for item in news)
 
         if not choices:
@@ -81,9 +82,10 @@ class NewsletterForm(Form):
 
         choices = tuple((
             str(item.id),
-            HtmlLabel(item.id, title=item.title,
-                      date=layout.format_date(item.localized_start, 'datetime')
-                      )
+            Markup("""
+            <div class="title">{}</div><div class="date">{}</div>
+            """.format(item.title, layout.format_date(item.localized_start,
+                                                      'datetime')))
         )for item in occurrences)
 
         if not choices:
@@ -116,9 +118,10 @@ class NewsletterForm(Form):
 
         choices = tuple((
             str(item.id),
-            HtmlLabel(item.id, title=name_without_extension(item.name),
-                      date=layout.format_date(item.created, 'date')
-                      )
+            Markup("""
+            <div class="title">{}</div><div class="date">{}</div>
+            """.format(name_without_extension(item.name),
+                       layout.format_date(item.created, 'date')))
         ) for item in publications)
 
         if not choices:
