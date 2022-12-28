@@ -225,9 +225,6 @@ def handle_update_end_date(layout, request, self):
         self.publish_end_date = None
         return
 
-    if not end_date:
-        return
-
     try:
         end_hour = next(
             map(int, request.params.get('end-hour').split(':'))
@@ -243,7 +240,9 @@ def handle_update_end_date(layout, request, self):
         publish_end_date = standardize_date(
             publish_end_date, layout.timezone
         )
-        self.publish_end_date = publish_end_date
+        # Prevent adding invalid date range:
+        if not self.publish_date > publish_end_date:
+            self.publish_end_date = publish_end_date
     except OverflowError:
         self.publish_end_date = None
 
