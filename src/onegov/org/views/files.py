@@ -221,7 +221,8 @@ def handle_update_start_date(layout, request, self):
 def handle_update_end_date(layout, request, self):
     try:
         end_date = parse(request.params['end-date'], dayfirst=False)
-    except ValueError:
+    except (ValueError, KeyError):
+        self.publish_end_date = None
         return
 
     if not end_date:
