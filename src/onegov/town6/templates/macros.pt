@@ -1837,6 +1837,7 @@ event
                 <h3 i18n:translate>Access</h3>
                 <div class="publication" tal:define="
                     post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+                    publish_end_date file.publish_end_date and layout.to_timezone(file.publish_end_date, layout.timezone);
                     publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);"
                     >
                     <div tal:condition="file.published" class="file-status-tag">
@@ -1859,7 +1860,6 @@ event
                             <fieldset>
                                 <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
                                 <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
-
                                 <div class="publication-settings-input">
                                     <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
 
@@ -1870,7 +1870,26 @@ event
                                         </tal:b>
                                     </select>
 
-                                    <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                    <a ic-post-to="${post_url}&clear_start_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                        <i class="far fa-times-circle"></i>
+                                        <span class="show-for-sr" i18n:translate>Reset</span>
+                                    </a>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend tal:condition="publish_end_date" i18n:translate>Will be published until:</legend>
+                                <legend tal:condition="not:publish_end_date" i18n:translate>Publication end date:</legend>
+                                <div class="publication-settings-input">
+                                    <input type="date" name="end-date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_end_date and publish_end_date.date().isoformat() or ''}" required="required">
+
+                                    <select name="end-hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                        <option tal:condition="not:publish_end_date"></option>
+                                        <tal:b repeat="hour range(24)" tal:define="publish_end_time publish_end_date and '{:0>2}:00'.format(publish_end_date.hour)">
+                                            <option tal:define="end_time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_end_time == end_time" value="${end_time}">${end_time}</option>
+                                        </tal:b>
+                                    </select>
+
+                                    <a ic-post-to="${post_url}&clear_end_date=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
                                         <i class="far fa-times-circle"></i>
                                         <span class="show-for-sr" i18n:translate>Reset</span>
                                     </a>

@@ -5046,6 +5046,13 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
+msgid "Will be published until:"
+msgstr "Sarà pubblicato fino a:"
+
+msgid "Publication end date:"
+msgstr "Data di fine pubblicazione:"
+
+
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Riquadro della mappa (predefinito)"
 

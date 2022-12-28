@@ -5032,5 +5032,11 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
+msgid "Will be published until:"
+msgstr "Wird publiziert bis:"
+
+msgid "Publication end date:"
+msgstr "Enddatum der Publikation:"
+
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (Standard)"
