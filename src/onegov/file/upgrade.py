@@ -157,6 +157,13 @@ def add_publication_dates(context):
         default=True)
 
 
+@upgrade_task('Publication end dates')
+def add_publication_end_dates(context):
+    if not (context.has_column('files', 'publish_end_date')):
+        context.operations.add_column(
+            'files', Column('publish_end_date', UTCDateTime, nullable=True))
+
+
 @upgrade_task('Add signed property')
 def add_signed_property(context):
     context.add_column_with_defaults(
