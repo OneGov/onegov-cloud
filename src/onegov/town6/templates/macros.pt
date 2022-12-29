@@ -1902,7 +1902,8 @@ event
                 <h3 i18n:translate>Publication</h3>
                 <div class="publication" tal:define="
                     post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
-                    publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);"
+                    publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
+                    publish_end_date file.publish_end_date and layout.to_timezone(file.publish_end_date, layout.timezone);"
                     >
                     <div tal:condition="file.publication" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
@@ -1910,7 +1911,17 @@ event
                            class="is-a-publication">
                             <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Publication</span>
                         </a>
+                        <div>
+                            <div tal:condition="publish_end_date and not publish_date" i18n:translate>
+                                    Published until <span i18n:name="endDate1">${layout.format_date(publish_end_date, 'datetime')}</span>
+                            </div>
+                            <div tal:condition="publish_end_date and publish_date" i18n:translate>
+                                    Published from <span i18n:name="publishDate">${layout.format_date(publish_date, 'datetime')}</span>
+                                        until <span i18n:name="endDate">${layout.format_date(publish_end_date, 'datetime')}</span>
+                            </div>
+                        </div>
                     </div>
+
                     <div tal:condition="not:file.publication" class="file-status-tag">
                         <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='toggle-publication'))}"
                            ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"

@@ -168,6 +168,7 @@ def view_file_details(self, request, layout=None):
 def handle_publish(self, request):
     request.assert_valid_csrf_token()
     self.published = True
+    self.publish_end_date = None
     self.publish_date = None
 
 

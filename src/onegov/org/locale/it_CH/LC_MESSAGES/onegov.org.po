@@ -5049,6 +5049,12 @@ msgstr "Utente creato correttamente"
 msgid "Will be published until:"
 msgstr "Sarà pubblicato fino a:"
 
+msgid "Published until ${endDate1}"
+msgstr "Pubblicato fino a: ${endDate1}"
+
+msgid "Published from ${publishDate} until ${endDate}"
+msgstr "Pubblicato dal {publishDate} al ${endDate}"
+
 msgid "Publication end date:"
 msgstr "Data di fine pubblicazione:"
 
