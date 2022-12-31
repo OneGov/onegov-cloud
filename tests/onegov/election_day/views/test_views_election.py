@@ -38,14 +38,17 @@ def test_view_election_candidates(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client, status='final')
-    upload_proporz_election(client, status='final')
 
+    # Majorz election
+    upload_majorz_election(client, status='final')
+
+    # ... main
     candidates = client.get('/election/majorz-election/candidates')
     assert all((expected in candidates for expected in (
         "Engler Stefan", "20", "Schmid Martin", "18"
     )))
 
+    # ... bar chart data (with filters)
     for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
         candidates = client.get(
             f'/election/majorz-election/candidates-data{suffix}'
@@ -53,6 +56,7 @@ def test_view_election_candidates(election_day_app_gr):
         assert {r['text']: r['value'] for r in candidates.json['results']} == {
             'Engler Stefan': 20, 'Schmid Martin': 18
         }
+
     candidates = client.get(
         '/election/majorz-election/candidates-data?limit=1'
     )
@@ -60,22 +64,89 @@ def test_view_election_candidates(election_day_app_gr):
         'Engler Stefan': 20
     }
 
+    candidates = client.get(
+        '/election/majorz-election/candidates-data?entity=Vaz/Obervaz'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Engler Stefan': 20, 'Schmid Martin': 18
+    }
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/majorz-election/candidates-chart')
     assert '/election/majorz-election/candidates' in chart
 
+    chart = client.get(
+        '/election/majorz-election/candidates-chart?entity=Filisur'
+    )
+    assert 'entity=Filisur' in chart
+
+    # ... ebmedded table (with filters)
+    table = client.get('/election/majorz-election/candidates-table')
+    assert 'data-text="20"' in table
+
+    table = client.get(
+        '/election/majorz-election/candidates-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="20"' in table
+
+    table = client.get(
+        '/election/majorz-election/candidates-table?entity=Filisur'
+    )
+    assert 'data-text=' not in table
+
+    # Proporz election
+    upload_proporz_election(client, status='final')
+
+    # ....main
     candidates = client.get('/election/proporz-election/candidates')
     assert all((expected in candidates for expected in (
         "Caluori Corina", "1", "Casanova Angela", "0"
     )))
 
-    for suffix in ('', '?limit=', '?limit=a', '?limit=0', '?limit=1'):
+    # ... bar chart data (with filters)
+    for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
         candidates = client.get(
             f'/election/proporz-election/candidates-data{suffix}'
         )
         assert candidates.json['results'] == []
 
+    candidates = client.get(
+        '/election/proporz-election/candidates-data?elected=False&limit=1'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Caluori Corina': 2
+    }
+
+    candidates = client.get(
+        '/election/majorz-election/candidates-data?elected=False&'
+        'entity=Vaz/Obervaz'
+    )
+    assert {r['text']: r['value'] for r in candidates.json['results']} == {
+        'Engler Stefan': 20, 'Schmid Martin': 18
+    }
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/proporz-election/candidates-chart')
     assert '/election/proporz-election/candidates' in chart
+
+    chart = client.get(
+        '/election/proporz-election/candidates-chart?entity=Filisur'
+    )
+    assert 'entity=Filisur' in chart
+
+    # ... ebmedded table (with filters)
+    table = client.get('/election/proporz-election/candidates-table')
+    assert 'data-text="2"' in table
+
+    table = client.get(
+        '/election/proporz-election/candidates-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="2"' in table
+
+    table = client.get(
+        '/election/proporz-election/candidates-table?entity=Filisur'
+    )
+    assert 'data-text=' not in table
 
 
 def test_view_election_candidate_by_entity(election_day_app_gr):
@@ -205,38 +276,74 @@ def test_view_election_lists(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
+
+    # Majorz election
     upload_majorz_election(client)
 
+    # ... main
     main = client.get('/election/majorz-election/lists')
     assert '<h3>Listen</h3>' not in main
 
-    lists = client.get('/election/majorz-election/lists-data')
-    assert lists.json['results'] == []
+    # ... bar chart data
+    data = client.get('/election/majorz-election/lists-data')
+    assert data.json['results'] == []
 
+    # ... embedded chart
     chart = client.get('/election/majorz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/majorz-election/lists' in chart
 
+    # .... embedded table
+    table = client.get('/election/majorz-election/lists-table')
+    assert 'data-text=' not in table
+
+    # Proporz election
     upload_proporz_election(client)
 
+    # ... main
     main = client.get('/election/proporz-election/lists')
     assert '<h3>Listen</h3>' in main
 
+    # ... bar chart data (with filters)
     for suffix in ('', '?limit=', '?limit=a', '?limit=0'):
-        lists = client.get(f'/election/proporz-election/lists-data{suffix}')
-        assert {r['text']: r['value'] for r in lists.json['results']} == {
+        data = client.get(f'/election/proporz-election/lists-data{suffix}')
+        assert {r['text']: r['value'] for r in data.json['results']} == {
             'FDP': 8,
             'CVP': 6
         }
 
-    lists = client.get('/election/proporz-election/lists-data?limit=1')
-    assert {r['text']: r['value'] for r in lists.json['results']} == {
+    data = client.get('/election/proporz-election/lists-data?limit=1')
+    assert {r['text']: r['value'] for r in data.json['results']} == {
         'FDP': 8,
     }
 
+    data = client.get(
+        '/election/proporz-election/lists-data?entity=Vaz/Obervaz'
+    )
+    assert data.json['results']
+
+    data = client.get('/election/proporz-election/lists-data?entity=Filisur')
+    assert not data.json['results']
+
+    # ... embedded chart (with filters)
     chart = client.get('/election/proporz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/proporz-election/lists-data' in chart
+
+    chart = client.get('/election/proporz-election/lists-chart?entity=Filisur')
+    assert 'entity=Filisur' in chart
+
+    # ... embedded table (with filters)
+    table = client.get('/election/proporz-election/lists-table')
+    assert 'data-text="8"' in table
+
+    table = client.get(
+        '/election/proporz-election/lists-table?entity=Vaz/Obervaz'
+    )
+    assert 'data-text="8"' in table
+
+    table = client.get('/election/proporz-election/lists-table?entity=Filisur')
+    assert 'data-text=' not in table
 
 
 def test_view_election_list_by_entity(election_day_app_gr):
@@ -424,13 +531,14 @@ def test_view_election_party_strengths(election_day_app_gr):
 
     # Historical data with translations
     csv_parties = (
-        'year,name,name_fr_ch,id,total_votes,color,mandates,votes\r\n'
-        '2022,BDP,,1,60000,#efb52c,1,10000\r\n'
-        '2022,Die Mitte,Le Centre,2,60000,#ff6300,1,30000\r\n'
-        '2022,FDP,,3,60000,#4068c8,0,20000\r\n'
-        '2011,BDP,,1,40000,#efb52c,1,1000\r\n'
-        '2011,CVP,PDC,2,40000,#ff6300,1,15000\r\n'
-        '2011,FDP,,3,40000,#4068c8,1,10000\r\n'
+        'year,name,name_fr_ch,id,total_votes,color,mandates,'
+        'votes,voters_count,voters_count_percentage\r\n'
+        '2022,BDP,,1,60000,#efb52c,1,10000,100,16.67\r\n'
+        '2022,Die Mitte,Le Centre,2,60000,#ff6300,1,30000,300,50\r\n'
+        '2022,FDP,,3,60000,#4068c8,0,20000,200,33.33\r\n'
+        '2018,BDP,,1,40000,#efb52c,1,1000,10,2.5\r\n'
+        '2018,CVP,PDC,2,40000,#ff6300,1,15000,150.7,37.67\r\n'
+        '2018,FDP,,3,40000,#4068c8,1,10000,100,25.0\r\n'
     ).encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload-party-results')
@@ -441,7 +549,7 @@ def test_view_election_party_strengths(election_day_app_gr):
     parties = client.get('/election/proporz-election/party-strengths-data')
     parties = parties.json
     assert parties['groups'] == ['BDP', 'Die Mitte', 'FDP']
-    assert parties['labels'] == ['2011', '2022']
+    assert parties['labels'] == ['2018', '2022']
     assert parties['maximum']['back'] == 100
     assert parties['maximum']['front'] == 5
     assert parties['results']
@@ -450,30 +558,30 @@ def test_view_election_party_strengths(election_day_app_gr):
         '{}-{}'.format(party['item'], party['group']): party
         for party in parties['results']
     }
-    assert parties['2011-BDP']['color'] == '#efb52c'
+    assert parties['2018-BDP']['color'] == '#efb52c'
     assert parties['2022-BDP']['color'] == '#efb52c'
-    assert parties['2011-Die Mitte']['color'] == '#ff6300'
+    assert parties['2018-Die Mitte']['color'] == '#ff6300'
     assert parties['2022-Die Mitte']['color'] == '#ff6300'
-    assert parties['2011-FDP']['color'] == '#4068c8'
+    assert parties['2018-FDP']['color'] == '#4068c8'
     assert parties['2022-FDP']['color'] == '#4068c8'
 
-    assert parties['2011-BDP']['active'] is False
-    assert parties['2011-Die Mitte']['active'] is False
-    assert parties['2011-FDP']['active'] is False
+    assert parties['2018-BDP']['active'] is False
+    assert parties['2018-Die Mitte']['active'] is False
+    assert parties['2018-FDP']['active'] is False
     assert parties['2022-BDP']['active'] is True
     assert parties['2022-Die Mitte']['active'] is True
     assert parties['2022-FDP']['active'] is True
 
-    assert parties['2011-BDP']['value']['front'] == 1
-    assert parties['2011-Die Mitte']['value']['front'] == 1
-    assert parties['2011-FDP']['value']['front'] == 1
+    assert parties['2018-BDP']['value']['front'] == 1
+    assert parties['2018-Die Mitte']['value']['front'] == 1
+    assert parties['2018-FDP']['value']['front'] == 1
     assert parties['2022-BDP']['value']['front'] == 1
     assert parties['2022-Die Mitte']['value']['front'] == 1
     assert parties['2022-FDP']['value']['front'] == 0
 
-    assert parties['2011-BDP']['value']['back'] == 2.5
-    assert parties['2011-Die Mitte']['value']['back'] == 37.5
-    assert parties['2011-FDP']['value']['back'] == 25
+    assert parties['2018-BDP']['value']['back'] == 2.5
+    assert parties['2018-Die Mitte']['value']['back'] == 37.5
+    assert parties['2018-FDP']['value']['back'] == 25
     assert parties['2022-BDP']['value']['back'] == 16.7
     assert parties['2022-Die Mitte']['value']['back'] == 50
     assert parties['2022-FDP']['value']['back'] == 33.3
@@ -490,6 +598,31 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert '25.0%' in results
     assert '33.3%' in results
     assert '8.3%' in results
+
+    # with exact voters counts
+    edit = client.get('/election/proporz-election/edit')
+    edit.form['voters_counts'] = True
+    edit.form['exact_voters_counts'] = True
+    edit.form.submit()
+
+    assert '>10.00<' in client.get(
+        '/election/proporz-election/party-strengths'
+    )
+    data = client.get('/election/proporz-election/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.67
+    data = client.get('/election/proporz-election/json').json
+    assert data['parties']['2']['2018']['voters_count']['total'] == 150.7
+
+    # with rounded voters counts
+    edit = client.get('/election/proporz-election/edit')
+    edit.form['exact_voters_counts'] = False
+    edit.form.submit()
+
+    assert '>10<' in client.get('/election/proporz-election/party-strengths')
+    data = client.get('/election/proporz-election/party-strengths-data').json
+    assert data['results'][0]['value']['back'] == 16.67
+    data = client.get('/election/proporz-election/json').json
+    assert data['parties']['2']['2018']['voters_count']['total'] == 151
 
     # translations
     client.get('/locale/fr_CH')
@@ -754,7 +887,6 @@ def test_view_election_relations(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'First Election'
@@ -770,7 +902,8 @@ def test_view_election_relations(election_day_app_gr):
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
-    new.form['related_elections'] = ['first-election']
+    new.form['related_elections_historical'] = ['first-election']
+    new.form['related_elections_other'] = ['first-election']
     new.form.submit()
 
     csv = MAJORZ_HEADER

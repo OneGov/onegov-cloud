@@ -1,6 +1,7 @@
 from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
@@ -26,19 +27,6 @@ def test_election_compound_layout_general(session):
         'districts',
         'candidates',
         'party-strengths',
-        'parties-panachage',
-        'statistics',
-        'data'
-    )
-    compound.horizontal_party_strengths = True
-    layout = ElectionCompoundLayout(compound, request)
-    assert layout.all_tabs == (
-        'seat-allocation',
-        'party-strengths',
-        'list-groups',
-        'superregions',
-        'districts',
-        'candidates',
         'parties-panachage',
         'statistics',
         'data'
@@ -98,7 +86,6 @@ def test_election_compound_layout_general(session):
     layout = ElectionCompoundLayout(compound, request)
     assert layout.has_superregions is True
 
-    # test main view
     layout = ElectionCompoundLayout(compound, request)
     assert layout.main_view == 'ElectionCompound/superregions'
 
@@ -166,6 +153,44 @@ def test_election_compound_layout_general(session):
         )
         assert layout.svg_link == 'ElectionCompound/parties-panachage-svg'
         assert layout.svg_name == 'electioncompound-panachage.svg'
+
+    with freeze_time("2014-01-01 13:00"):
+        second_compound = ElectionCompound(
+            title='Second Compound',
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+        session.add(second_compound)
+        session.flush()
+
+        relationship = ElectionCompoundRelationship(
+            source_id=compound.id,
+            target_id=second_compound.id
+        )
+        session.add(relationship)
+        session.flush()
+
+        assert ElectionCompoundLayout(compound, request).related_compounds == [
+            ('Second Compound', 'ElectionCompound/second-compound')
+        ]
+        assert ElectionCompoundLayout(
+            second_compound, request
+        ).related_compounds == []
+
+    # test table links
+    for tab, expected in (
+        ('seat-allocation', 'ElectionCompound/seat-allocation-table'),
+        ('list-groups', 'ElectionCompound/list-groups-table'),
+        ('superregions', 'ElectionCompound/superregions-table'),
+        ('districts', 'ElectionCompound/districts-table'),
+        ('candidates', 'ElectionCompound/candidates-table'),
+        ('party-strengths', None),
+        ('parties-panachage', None),
+        ('statistics', 'ElectionCompound/statistics-table'),
+        ('data', None)
+    ):
+        layout = ElectionCompoundLayout(compound, DummyRequest(), tab=tab)
+        assert expected == layout.table_link()
 
 
 def test_election_compound_layout_menu(session):
@@ -252,18 +277,16 @@ def test_election_compound_layout_menu(session):
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
-
-def test_election_compound_layout_table_links():
-    for tab, expected in (
-        ('seat-allocation', 'ElectionCompound/seat-allocation-table'),
-        ('list-groups', 'ElectionCompound/list-groups-table'),
-        ('superregions', 'ElectionCompound/superregions-table'),
-        ('districts', 'ElectionCompound/districts-table'),
-        ('candidates', 'ElectionCompound/candidates-table'),
-        ('party-strengths', None),
-        ('parties-panachage', None),
-        ('data', None)
-    ):
-        election = ElectionCompound(date=date(2100, 1, 1), domain='federation')
-        layout = ElectionCompoundLayout(election, DummyRequest(), tab=tab)
-        assert expected == layout.table_link
+    # with horizontal_party_strengths
+    compound.horizontal_party_strengths = True
+    assert ElectionCompoundLayout(compound, request).menu == [
+        ('Seat allocation', 'ElectionCompound/seat-allocation', False, []),
+        ('Party strengths', 'ElectionCompound/party-strengths', False, []),
+        ('List groups', 'ElectionCompound/list-groups', False, []),
+        ('__superregions', 'ElectionCompound/superregions', False, []),
+        ('__regions', 'ElectionCompound/districts', False, []),
+        ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        ('Panachage', 'ElectionCompound/parties-panachage', False, []),
+        ('Election statistics', 'ElectionCompound/statistics', False, []),
+        ('Downloads', 'ElectionCompound/data', False, [])
+    ]

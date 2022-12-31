@@ -15,11 +15,12 @@ class ElectionLayout(DetailLayout):
     tabs_with_embedded_tables = (
         'lists', 'candidates', 'statistics', 'connections')
 
-    @cached_property
-    def table_link(self):
+    def table_link(self, query_params={}):
         if self.tab not in self.tabs_with_embedded_tables:
             return None
-        return self.request.link(self.model, f'{self.tab}-table')
+        return self.request.link(
+            self.model, f'{self.tab}-table', query_params=query_params
+        )
 
     @cached_property
     def all_tabs(self):
@@ -130,12 +131,14 @@ class ElectionLayout(DetailLayout):
             return (
                 self.proporz
                 and not self.tacit
+                and self.model.show_party_strengths is True
                 and self.model.party_results.first() is not None
             )
         if tab == 'parties-panachage':
             return (
                 self.proporz
                 and not self.tacit
+                and self.model.show_party_panachage is True
                 and self.model.panachage_results.first() is not None
             )
         if tab == 'statistics':
@@ -294,13 +297,9 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def related_elections(self):
-        return [
-            (
-                association.target_election.title,
-                self.request.link(association.target_election)
-            )
-            for association in self.model.related_elections
-        ]
+        result = {r.target for r in self.model.related_elections}
+        result = sorted(result, key=lambda x: x.date, reverse=True)
+        return [(e.title, self.request.link(e)) for e in result]
 
     @cached_property
     def results(self):

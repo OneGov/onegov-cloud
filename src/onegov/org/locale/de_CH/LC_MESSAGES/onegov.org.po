@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-11-22 08:21+0100\n"
+"POT-Creation-Date: 2022-12-05 15:00+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1491,8 +1491,8 @@ msgstr "Newsletter aktivieren"
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 
-msgid "New domain"
-msgstr "Neuer Domain"
+msgid "Old domain"
+msgstr "Alte Domain"
 
 msgid "Test migration"
 msgstr "Migration testen"
@@ -1514,6 +1514,10 @@ msgstr "Externe Seiten"
 
 msgid "Internal links only"
 msgstr "Interne Seiten"
+
+msgid "Enables website visitors to submit their own events"
+msgstr ""
+"Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -3486,7 +3490,7 @@ msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
-msgstr "Veranstaltung melden"
+msgstr "Veranstaltung vorschlagen"
 
 msgid "Submit your own event"
 msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
@@ -4200,7 +4204,7 @@ msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
 msgid "Submit an event"
-msgstr "Veranstaltung melden"
+msgstr "Veranstaltung vorschlagen"
 
 msgid ""
 "Only events taking place inside the town or events related to town societies "
@@ -4821,9 +4825,9 @@ msgstr "Total ${number} Links gefunden"
 
 #, python-format
 msgid ""
-"Migrates links from the current domain \"${domain}\" to the given domain."
+"Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migriert Links von der aktuellen Domain \"${domain}\" zur angegebenen Domain."
+"Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\"."
 
 msgid "Topics"
 msgstr "Themen"

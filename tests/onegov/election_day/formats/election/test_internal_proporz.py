@@ -113,26 +113,15 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
 
+    # check panachage results
+    assert election.panachage_results.all() == []
+
     # check panachage result from list 3
-    test_list = election.lists.first()
-    assert test_list.list_id == '3'
-    list_csv_votes = 23653
-    votes_panachage_csv = 606 + 334 + 756 + 221 + 118 + 1048 + 2316
-    assert test_list.votes == list_csv_votes
-
-    panachage_results = session.query(PanachageResult)
-    panachage_results = panachage_results.filter_by(owner=election.id).all()
-    assert not panachage_results, 'Owner of lists pana results must be NULL'
-
-    panachage_results = election.panachage_results
-
-    for pa_result in panachage_results:
-        assert len(pa_result.target) > 10, 'target must be a casted uuid'
-
-    panachge_vote_count = 0
-    for result in test_list.panachage_results:
-        panachge_vote_count += result.votes
-    assert panachge_vote_count == votes_panachage_csv
+    list_ = election.lists.filter_by(list_id='3').one()
+    assert list_.votes == 23653
+    assert sum([p.votes for p in list_.panachage_results]) == (
+        606 + 334 + 756 + 221 + 118 + 1048 + 2316
+    )
 
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(
@@ -158,6 +147,11 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     assert sorted([list.votes for list in election.lists]) == [
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
+    list_ = election.lists.filter_by(list_id='3').one()
+    assert list_.votes == 23653
+    assert sum([p.votes for p in list_.panachage_results]) == (
+        606 + 334 + 756 + 221 + 118 + 1048 + 2316
+    )
 
 
 def test_import_internal_proporz_missing_headers(session):
@@ -753,7 +747,7 @@ def test_import_internal_proporz_panachage(session):
             'candidate_elected',
             'candidate_votes',
             'candidate_party',
-        ] + [f'panachage_votes_from_list_{h}' for h in headers])
+        ] + [f'list_panachage_votes_from_list_{h}' for h in headers])
         for list_id, panachage in results:
             lines.append([
                 'unknown',  # election_status

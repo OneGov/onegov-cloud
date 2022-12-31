@@ -3,7 +3,7 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 
 
-def get_list_groups(election_compound, domain=None, domain_segment=None):
+def get_list_groups(election_compound):
     """" Get list groups data. """
 
     if not election_compound.pukelsheim:
@@ -27,10 +27,8 @@ def get_list_groups(election_compound, domain=None, domain_segment=None):
         )
     query = query.filter(
         PartyResult.year == election_compound.date.year,
-        PartyResult.domain == (domain or election_compound.domain)
+        PartyResult.domain == election_compound.domain
     )
-    if domain_segment:
-        query = query.filter(PartyResult.domain_segment == domain_segment)
     query = query.order_by(
         PartyResult.voters_count.desc(),
         PartyResult.name,

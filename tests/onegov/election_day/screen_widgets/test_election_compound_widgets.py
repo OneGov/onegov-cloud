@@ -1,5 +1,4 @@
 from datetime import date
-from decimal import Decimal
 from freezegun import freeze_time
 from lxml import etree
 from onegov.ballot import ElectionCompound
@@ -117,8 +116,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'parties': {},
         'request': request,
+        'seat_allocations': [],
         'years': []
     }
 
@@ -222,8 +221,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'groups': [],
         'layout': layout,
         'model': model,
-        'parties': {},
         'request': request,
+        'seat_allocations': [],
         'years': []
     }
 
@@ -348,93 +347,16 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ],
         'layout': layout,
         'model': model,
-        'parties': {
-            '0': {
-                '2020': {
-                    'color': None,
-                    'mandates': 27,
-                    'name': 'CVP',
-                    'voters_count': {
-                        'permille': Decimal('218.60'),
-                        'total': Decimal('3487.00')
-                    },
-                    'votes': {'permille': 219, 'total': 373080}
-                }
-            },
-            '1': {
-                '2020': {
-                    'color': None,
-                    'mandates': 2,
-                    'name': 'EVP',
-                    'voters_count': {
-                        'permille': Decimal('23.10'),
-                        'total': Decimal('369.00')
-                    },
-                    'votes': {'permille': 23, 'total': 39526}
-                }
-            },
-            '2': {
-                '2020': {
-                    'color': None,
-                    'mandates': 22,
-                    'name': 'FDP',
-                    'voters_count': {
-                        'permille': Decimal('181.50'),
-                        'total': Decimal('2894.00')
-                    },
-                    'votes': {'permille': 181, 'total': 309635}
-                }
-            },
-            '3': {
-                '2020': {
-                    'color': None,
-                    'mandates': 6,
-                    'name': 'GLP',
-                    'voters_count': {
-                        'permille': Decimal('73.00'),
-                        'total': Decimal('1165.00')
-                    },
-                    'votes': {'permille': 73, 'total': 124660}
-                }
-            },
-            '4': {
-                '2020': {
-                    'color': None,
-                    'mandates': 9,
-                    'name': 'GRÜ',
-                    'voters_count': {
-                        'permille': Decimal('89.30'),
-                        'total': Decimal('1424.00')
-                    },
-                    'votes': {'permille': 89, 'total': 152405}
-                }
-            },
-            '5': {
-                '2020': {
-                    'color': None,
-                    'mandates': 6,
-                    'name': 'SP',
-                    'voters_count': {
-                        'permille': Decimal('155.60'),
-                        'total': Decimal('2481.00')
-                    },
-                    'votes': {'permille': 156, 'total': 265457}
-                }
-            },
-            '6': {
-                '2020': {
-                    'color': None,
-                    'mandates': 35,
-                    'name': 'SVP',
-                    'voters_count': {
-                        'permille': Decimal('258.80'),
-                        'total': Decimal('4128.00')
-                    },
-                    'votes': {'permille': 259, 'total': 441744}
-                }
-            }
-        },
         'request': request,
+        'seat_allocations': [
+            ['CVP', 27],
+            ['EVP', 2],
+            ['FDP', 22],
+            ['GLP', 6],
+            ['GRÜ', 9],
+            ['SP', 6],
+            ['SVP', 35]
+        ],
         'years': ['2020']
     }
 

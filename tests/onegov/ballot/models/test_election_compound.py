@@ -6,6 +6,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
@@ -13,8 +14,7 @@ from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
-from onegov.ballot.models.election.election_compound import \
-    ElectionCompoundAssociation
+from onegov.ballot import ElectionCompoundAssociation
 from pytz import UTC
 from uuid import uuid4
 
@@ -435,7 +435,7 @@ def test_election_compound_model(session):
 
     # Add party results
     party_result = PartyResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         number_of_mandates=0,
         votes=0,
         total_votes=100,
@@ -448,7 +448,7 @@ def test_election_compound_model(session):
 
     # Add panachage results
     panachage_result = PanachageResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         source='A',
         target='B',
         votes=0,
@@ -469,7 +469,7 @@ def test_election_compound_model(session):
 
     # Add results again and delete compound
     party_result = PartyResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         number_of_mandates=0,
         votes=0,
         total_votes=100,
@@ -481,7 +481,7 @@ def test_election_compound_model(session):
     assert election_compound.party_results.one() == party_result
 
     panachage_result = PanachageResult(
-        owner=election_compound.id,
+        election_compound_id=election_compound.id,
         source='A',
         target='B',
         votes=0,
@@ -709,9 +709,9 @@ def test_election_compound_export(session):
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111,
-        'panachage_votes_from_list_1': None,
-        'panachage_votes_from_list_2': None,
-        'panachage_votes_from_list_99': None
+        'list_panachage_votes_from_list_1': None,
+        'list_panachage_votes_from_list_2': None,
+        'list_panachage_votes_from_list_99': None
     }
 
     assert export[1] == {
@@ -760,9 +760,9 @@ def test_election_compound_export(session):
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
-        'panachage_votes_from_list_1': None,
-        'panachage_votes_from_list_2': 12,
-        'panachage_votes_from_list_99': 4
+        'list_panachage_votes_from_list_1': None,
+        'list_panachage_votes_from_list_2': 12,
+        'list_panachage_votes_from_list_99': 4
     }
 
     assert export[2] == {
@@ -1166,33 +1166,130 @@ def test_election_compound_export_parties(session):
     ]
 
 
+def test_related_election_compounds(session):
+    first = ElectionCompound(
+        title='First',
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    second = ElectionCompound(
+        title='Second',
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    session.add(first)
+    session.add(second)
+    session.flush()
+    assert first.related_compounds.all() == []
+    assert first.referencing_compounds.all() == []
+    assert second.related_compounds.all() == []
+    assert second.referencing_compounds.all() == []
+
+    first.related_compounds.append(
+        ElectionCompoundRelationship(target_id=second.id)
+    )
+    session.flush()
+    assert first.related_compounds.one().source_id == 'first'
+    assert first.related_compounds.one().target_id == 'second'
+    assert first.referencing_compounds.all() == []
+    assert second.related_compounds.all() == []
+    assert second.referencing_compounds.one().source_id == 'first'
+    assert second.referencing_compounds.one().target_id == 'second'
+
+    second.related_compounds.append(
+        ElectionCompoundRelationship(target_id=first.id)
+    )
+    session.flush()
+    assert first.related_compounds.one().source_id == 'first'
+    assert first.related_compounds.one().target_id == 'second'
+    assert first.referencing_compounds.one().source_id == 'second'
+    assert first.referencing_compounds.one().target_id == 'first'
+    assert second.related_compounds.one().source_id == 'second'
+    assert second.related_compounds.one().target_id == 'first'
+    assert second.referencing_compounds.one().source_id == 'first'
+    assert second.referencing_compounds.one().target_id == 'second'
+
+    session.delete(second)
+    session.flush()
+    assert first.related_compounds.all() == []
+    assert first.referencing_compounds.all() == []
+    assert session.query(ElectionCompoundRelationship).all() == []
+
+    first.related_compounds.append(
+        ElectionCompoundRelationship(target_id=first.id)
+    )
+    session.flush()
+    assert first.related_compounds.one().source_id == 'first'
+    assert first.related_compounds.one().target_id == 'first'
+    assert first.referencing_compounds.one().source_id == 'first'
+    assert first.referencing_compounds.one().target_id == 'first'
+
+    session.delete(first)
+    session.flush()
+    assert session.query(ElectionCompoundRelationship).all() == []
+
+
 def test_election_compound_rename(session):
+    # Add data
     session.add(majorz_election())
     session.add(proporz_election())
     session.flush()
 
     election_compound = ElectionCompound(
         title='Elections',
-        id='elerctions',
+        id='x',
         domain='canton',
         date=date(2015, 6, 14),
     )
     election_compound.elections = session.query(Election).all()
     session.add(election_compound)
     session.flush()
-
-    query = session.query(
-        ElectionCompoundAssociation.election_compound_id.distinct()
+    session.add(
+        PartyResult(
+            election_compound_id=election_compound.id,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name_translations={'en_US': 'Libertarian'},
+            party_id='1'
+        )
     )
-    assert query.one()[0] == 'elerctions'
-
-    election_compound.id = 'elections'
-    assert query.one()[0] == 'elections'
-    assert len(election_compound.elections) == 2
-
+    session.add(
+        PanachageResult(
+            election_compound_id=election_compound.id,
+            source='A',
+            target='B',
+            votes=0,
+        )
+    )
     session.flush()
-    assert query.one()[0] == 'elections'
+
+    # Check IDs
+    assert session.query(
+        ElectionCompoundAssociation.election_compound_id
+    ).distinct().scalar() == 'x'
+    assert ('x',) in session.query(
+        PartyResult.election_compound_id
+    ).distinct().all()
+    assert ('x',) in session.query(
+        PanachageResult.election_compound_id
+    ).distinct().all()
+
+    # Change
+    election_compound.id = 'y'
+    session.flush()
+
+    # Check IDs
+    assert session.query(
+        ElectionCompoundAssociation.election_compound_id
+    ).distinct().scalar() == 'y'
     assert len(election_compound.elections) == 2
+    assert ('y',) in session.query(
+        PartyResult.election_compound_id
+    ).distinct().all()
+    assert ('y',) in session.query(
+        PanachageResult.election_compound_id
+    ).distinct().all()
 
 
 def test_election_compound_manual_completion(session):
@@ -1373,3 +1470,117 @@ def test_election_compound_attachments(
     assert model.explanations_pdf is None
     assert model.upper_apportionment_pdf is None
     assert model.lower_apportionment_pdf is None
+
+
+def test_election_compound_historical_party_strengths(session):
+    first = ElectionCompound(
+        title='First',
+        domain='federation',
+        date=date(2014, 1, 1)
+    )
+    second = ElectionCompound(
+        title='Second',
+        domain='federation',
+        date=date(2018, 1, 1)
+    )
+    third = ElectionCompound(
+        title='Third',
+        domain='federation',
+        date=date(2022, 1, 1)
+    )
+    session.add(first)
+    session.add(second)
+    session.add(third)
+    session.flush()
+
+    assert first.historical_party_results.count() == 0
+    assert second.historical_party_results.count() == 0
+    assert third.historical_party_results.count() == 0
+
+    # add results
+    for (compound, year, party_id, domain) in (
+        (first, 2014, 1, 'canton'),
+        (first, 2014, 2, 'canton'),
+        (first, 2014, 3, 'canton'),
+        (first, 2010, 1, 'canton'),
+        (first, 2010, 2, 'canton'),
+        (first, 2010, 3, 'canton'),
+        (second, 2022, 2, 'canton'),
+        (second, 2022, 3, 'canton'),
+        (second, 2018, 2, 'canton'),
+        (second, 2018, 3, 'canton'),
+        (second, 2018, 4, 'canton'),
+        (second, 2010, 2, 'canton'),
+        (second, 2010, 3, 'canton'),
+        (third, 2022, 1, 'canton'),
+        (third, 2022, 3, 'canton'),
+        (third, 2022, 5, 'canton'),
+        (third, 2022, 5, 'superregion'),
+    ):
+        compound.party_results.append(
+            PartyResult(
+                year=year,
+                number_of_mandates=0,
+                votes=1,
+                total_votes=100,
+                name_translations={'en_US': str(party_id)},
+                party_id=str(party_id),
+                domain=domain
+            )
+        )
+
+    # no relationships yet
+    assert first.historical_party_results.count() == 6
+    assert second.historical_party_results.count() == 7
+    assert third.historical_party_results.count() == 4
+
+    # add relationships
+    for (source_, target, type_) in (
+        (third, second, 'historical'),
+        (third, first, 'historical'),
+        (second, first, 'historical'),
+        (first, second, None),
+        (second, third, 'historical')
+    ):
+        session.add(
+            ElectionCompoundRelationship(
+                source_id=source_.id, target_id=target.id, type=type_
+            )
+        )
+
+    def extract(compound):
+        return sorted(
+            (result.election_compound_id, result.year, result.party_id)
+            for result in compound.historical_party_results
+        )
+
+    assert extract(first) == [
+        ('first', 2010, '1'),
+        ('first', 2010, '2'),
+        ('first', 2010, '3'),
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+    ]
+    assert extract(second) == [
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+        ('second', 2010, '2'),
+        ('second', 2010, '3'),
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('second', 2022, '2'),
+        ('second', 2022, '3'),
+    ]
+    assert extract(third) == [
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('third', 2022, '1'),
+        ('third', 2022, '3'),
+        ('third', 2022, '5'),
+        ('third', 2022, '5'),
+    ]
+    third.historical_party_results.filter_by(domain='superregion').count() == 1

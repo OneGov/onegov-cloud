@@ -27,11 +27,14 @@ class HiddenTabsMixin:
                     - tab2
         """
         mapping = {
-            'votes': 'vote',
-            'elections': 'election',
-            'election_compounds': 'elections'
+            'Vote': 'vote',
+            'ComplexVote': 'vote',
+            'Election': 'election',
+            'ProporzElection': 'election',
+            'ElectionCompound': 'elections',
+            'ElectionCompoundPart': 'elections-part',
         }
-        return mapping.get(self.model.__tablename__, '')
+        return mapping.get(self.model.__class__.__name__, '')
 
 
 class DetailLayout(DefaultLayout, HiddenTabsMixin):

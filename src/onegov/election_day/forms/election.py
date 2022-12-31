@@ -1,6 +1,7 @@
 from datetime import date
 from onegov.ballot import Election
-from onegov.ballot import ElectionAssociation
+from onegov.ballot import ElectionRelationship
+from onegov.core.utils import Bunch
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -105,13 +106,62 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    voters_counts = BooleanField(
+        label=_("Voters counts"),
+        fieldset=_("View options"),
+        description=_(
+            "Shows voters counts instead of votes in the party strengths "
+            "view."
+        ),
+    )
+
+    exact_voters_counts = BooleanField(
+        label=_("Exact voters counts"),
+        fieldset=_("View options"),
+        description=_(
+            "Shows exact voters counts instead of rounded values."
+        ),
+        render_kw=dict(force_simple=True)
+    )
+
     horizontal_party_strengths = BooleanField(
         label=_("Horizonal party strengths chart"),
         fieldset=_("View options"),
         description=_(
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
+        depends_on=('election_type', 'proporz', 'show_party_strengths', 'y'),
+        render_kw=dict(force_simple=True)
+    )
+
+    use_historical_party_results = BooleanField(
+        label=_("Use party results from the last legislative period"),
+        fieldset=_("View options"),
+        description=_(
+            "Requires party results. Requires a related election from another "
+            "legislative period with party results. Requires that both "
+            "elections use the same party IDs."
+        ),
         depends_on=('election_type', 'proporz'),
+        render_kw=dict(force_simple=True)
+    )
+
+    show_party_strengths = BooleanField(
+        label=_("Party strengths"),
+        description=_(
+            "Shows a tab with the comparison of party strengths as a bar "
+            "chart. Requires party results."
+        ),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
+    show_party_panachage = BooleanField(
+        label=_("Panachage (parties)"),
+        description=_(
+            "Shows a tab with the panachage. Requires party results."
+        ),
+        fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
 
@@ -156,8 +206,15 @@ class ElectionForm(Form):
         render_kw={'lang': 'rm'}
     )
 
-    related_elections = ChosenSelectMultipleField(
-        label=_("Related elections"),
+    related_elections_historical = ChosenSelectMultipleField(
+        label=_("Other legislative periods"),
+        fieldset=_("Related elections"),
+        choices=[]
+    )
+
+    related_elections_other = ChosenSelectMultipleField(
+        label=_("Rounds of voting or by-elections"),
+        fieldset=_("Related elections"),
         choices=[]
     )
 
@@ -295,7 +352,7 @@ class ElectionForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        self.related_elections.choices = [
+        choices = [
             (
                 election.id,
                 "{} {} {}".format(
@@ -305,6 +362,37 @@ class ElectionForm(Form):
                 ).strip().replace("  ", " ")
             ) for election in query
         ]
+        self.related_elections_historical.choices = choices
+        self.related_elections_other.choices = choices
+
+    def update_realtionships(self, model, type_):
+        # use symetric relationships
+        session = self.request.session
+        query = session.query(ElectionRelationship)
+        query = query.filter(
+            or_(
+                ElectionRelationship.source_id == model.id,
+                ElectionRelationship.target_id == model.id,
+            ),
+            ElectionRelationship.type == type_
+        )
+        for relationship in query:
+            session.delete(relationship)
+
+        data = getattr(self, f'related_elections_{type_}', Bunch(data=[])).data
+        for id_ in data:
+            if not model.id:
+                model.id = model.id_from_title(session)
+            session.add(
+                ElectionRelationship(
+                    source_id=model.id, target_id=id_, type=type_
+                )
+            )
+            session.add(
+                ElectionRelationship(
+                    source_id=id_, target_id=model.id, type=type_
+                )
+            )
 
     def update_model(self, model):
         principal = self.request.app.principal
@@ -329,7 +417,13 @@ class ElectionForm(Form):
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
         model.has_expats = self.has_expats.data
+        model.voters_counts = self.voters_counts.data
+        model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
+        model.use_historical_party_results = \
+            self.use_historical_party_results.data
+        model.show_party_strengths = self.show_party_strengths.data
+        model.show_party_panachage = self.show_party_panachage.data
 
         titles = {}
         if self.election_de.data:
@@ -364,23 +458,9 @@ class ElectionForm(Form):
 
         model.colors = self.parse_colors(self.colors.data)
 
-        # use symetric relationships
-        session = self.request.session
-        query = session.query(ElectionAssociation)
-        query = query.filter(
-            or_(
-                ElectionAssociation.source_id == model.id,
-                ElectionAssociation.target_id == model.id
-            )
-        )
-        for association in query:
-            session.delete(association)
-
-        for id_ in self.related_elections.data:
-            if not model.id:
-                model.id = model.id_from_title(session)
-            session.add(ElectionAssociation(source_id=model.id, target_id=id_))
-            session.add(ElectionAssociation(source_id=id_, target_id=model.id))
+        with self.request.session.no_autoflush:
+            self.update_realtionships(model, 'historical')
+            self.update_realtionships(model, 'other')
 
     def apply_model(self, model):
         titles = model.title_translations or {}
@@ -420,6 +500,12 @@ class ElectionForm(Form):
         self.tacit.data = model.tacit
         self.has_expats.data = model.has_expats
         self.horizontal_party_strengths.data = model.horizontal_party_strengths
+        self.use_historical_party_results.data = \
+            model.use_historical_party_results
+        self.voters_counts.data = model.voters_counts
+        self.exact_voters_counts.data = model.exact_voters_counts
+        self.show_party_strengths.data = model.show_party_strengths
+        self.show_party_panachage.data = model.show_party_panachage
 
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)
@@ -437,10 +523,19 @@ class ElectionForm(Form):
             ]
             self.election_type.data = 'proporz'
 
-        self.related_elections.choices = [
-            choice for choice in self.related_elections.choices
+        self.related_elections_historical.choices = [
+            choice for choice in self.related_elections_historical.choices
             if choice[0] != model.id
         ]
-        self.related_elections.data = [
+        self.related_elections_other.choices = [
+            choice for choice in self.related_elections_other.choices
+            if choice[0] != model.id
+        ]
+        self.related_elections_historical.data = [
             association.target_id for association in model.related_elections
+            if association.type == 'historical'
+        ]
+        self.related_elections_other.data = [
+            association.target_id for association in model.related_elections
+            if association.type == 'other'
         ]

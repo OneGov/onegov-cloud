@@ -981,7 +981,7 @@ class NewsletterSettingsForm(Form):
 class LinkMigrationForm(Form):
 
     old_domain = StringField(
-        label=_('New domain'),
+        label=_('Old domain'),
         description='govikon.onegovcloud.ch',
         validators=[InputRequired()]
     )
@@ -1016,4 +1016,13 @@ class LinkHealthCheckForm(Form):
             ('internal', _('Internal links only')),
         ),
         default='external'
+    )
+
+
+class EventSettingsForm(Form):
+
+    submit_events_visible = BooleanField(
+        label=_('Submit your event'),
+        description=_('Enables website visitors to submit their own events'),
+        default=True
     )

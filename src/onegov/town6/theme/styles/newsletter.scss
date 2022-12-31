@@ -73,8 +73,6 @@ $input-height: ($input-font-size * unitless-calc($input-line-height)) + (get-sid
 
 .signup {
     button {
-        height: $input-height;
-        padding-bottom: .5em;
-        padding-top: .5em;
+        margin-top: 0;
     }
 }

@@ -67,7 +67,7 @@ def test_homepage(client):
     assert '<b>0xdeadbeef</b>' not in homepage
     assert 'Alle Veranstaltungen' in homepage
     assert 'admin.digital' in homepage
-    assert 'Alle Beiträge' in homepage
+    assert 'Alle News' in homepage
 
     # Test chatbot on homepage
     assert not homepage.pyquery('.chatbot')

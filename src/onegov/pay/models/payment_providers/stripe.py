@@ -304,7 +304,7 @@ class StripeConnect(PaymentProvider):
 
         return """
             <input type="hidden" name="payment_token" id="{target}">
-            <button class="checkout-button stripe-connect"
+            <button class="checkout-button stripe-connect button"
                     data-target-id="{target}"
                     {attrs}>{label}</button>
         """.format(

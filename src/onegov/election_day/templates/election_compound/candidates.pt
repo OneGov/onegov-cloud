@@ -23,12 +23,13 @@
             <p tal:condition="not: elected_candidates" i18n:translate>No candidates elected yet.</p>
             <tal:block tal:condition="elected_candidates">
                 <tal:block metal:use-macro="layout.macros['election-compound-candidates-table']"/>
-                <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link" />
+                <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link()" />
             </tal:block>
 
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />
+        <div metal:use-macro="layout.macros['related_elections']" />
 
     </tal:block>
 </div>

@@ -4,6 +4,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 from onegov.election_day.utils.parties import get_party_results_vertical_data
 
 
@@ -56,12 +57,13 @@ def view_election_compound_seat_allocation(self, request):
     layout = ElectionCompoundLayout(self, request, 'seat-allocation')
 
     years, parties = get_party_results(self)
+    seat_allocations = get_party_results_seat_allocation(years, parties)
 
     return {
         'election_compound': self,
         'layout': layout,
-        'years': years[:2],
-        'parties': parties,
+        'seat_allocations': seat_allocations,
+        'years': years,
     }
 
 
@@ -92,12 +94,13 @@ def view_election_compound_seat_allocation_table(self, request):
         add_last_modified_header(response, self.last_modified)
 
     years, parties = get_party_results(self)
+    seat_allocations = get_party_results_seat_allocation(years, parties)
 
     return {
         'election_compound': self,
         'layout': ElectionCompoundLayout(self, request, 'seat-allocation'),
         'type': 'election-compound-table',
         'scope': 'seat-allocation',
-        'years': years[:2],
-        'parties': parties,
+        'seat_allocations': seat_allocations,
+        'years': years,
     }

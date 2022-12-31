@@ -29,7 +29,9 @@ def get_election_summary(election, request, url=None):
     }
 
 
-def get_election_compound_summary(election_compound, request, url=None):
+def get_election_compound_summary(
+    election_compound, request, url=None, type_='election_compound'
+):
 
     last_modified = election_compound.last_modified
     if last_modified:
@@ -45,7 +47,7 @@ def get_election_compound_summary(election_compound, request, url=None):
             'total': election_compound.progress[1] or 0
         },
         'title': election_compound.title_translations,
-        'type': 'election_compound',
+        'type': type_,
         'url': url or request.link(election_compound),
         'elections': [
             request.link(election) if isinstance(election, Election)

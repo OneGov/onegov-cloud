@@ -1,7 +1,7 @@
 from collections import OrderedDict
-
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
+from onegov.election_day import _
 
 
 def sublist_name_from_connection_id(conn_name, subconn_name):
@@ -125,3 +125,19 @@ def get_parameter(request, name, type_, default):
             return default
 
     raise NotImplementedError()
+
+
+def get_entity_filter(request, item, view, selected):
+    entities = [None] + [result.name for result in item.results]
+    return [
+        (
+            entity if entity else _('All'),
+            entity == selected,
+            request.link(
+                item,
+                view,
+                query_params={'entity': entity} if entity else {}
+            )
+        )
+        for entity in entities
+    ]

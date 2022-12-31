@@ -356,7 +356,6 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert '>10<' in client.get('/elections/elections/party-strengths')
     data = client.get('/elections/elections/party-strengths-data').json
     assert data['results'][0]['value']['back'] == 16.67
-    client.get('/elections/elections/json').json['parties']
     data = client.get('/elections/elections/json').json
     assert data['parties']['2']['2018']['voters_count']['total'] == 151
 
@@ -369,6 +368,15 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert 'Le Centre' in results
     assert 'PDC' in results
     assert 'BDP' in results
+
+    # with horizontal_party_strengths
+    edit = client.get('/elections/elections/edit')
+    edit.form['horizontal_party_strengths'] = True
+    edit.form.submit()
+    data = client.get('/elections/elections/party-strengths-data').json
+    assert data['results'][0]['text'] == 'Le Centre 2022'
+    assert data['results'][0]['value'] == 50.0
+    assert data['results'][0]['percentage'] == True
 
 
 def test_view_election_compound_seat_allocation(election_day_app_gr):
@@ -696,6 +704,53 @@ def test_view_election_compound_data(election_day_app_gr):
 
     export = client.get('/elections/elections/data-csv')
     assert all((expected in export for expected in ("3506", "Sieger", "153")))
+
+
+def test_view_election_compound_relations(election_day_app_zg):
+    client = Client(election_day_app_zg)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = '2022-01-01'
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+
+    new = client.get('/manage/election-compounds/new-election-compound')
+    new.form['election_de'] = 'First Compound'
+    new.form['date'] = '2022-01-01'
+    new.form['municipality_elections'] = ['election']
+    new.form['domain'] = 'canton'
+    new.form['domain_elections'] = 'municipality'
+    new.form.submit()
+
+    new = client.get('/manage/election-compounds/new-election-compound')
+    new.form['election_de'] = 'Second Compound'
+    new.form['date'] = '2022-01-01'
+    new.form['municipality_elections'] = ['election']
+    new.form['domain'] = 'canton'
+    new.form['domain_elections'] = 'municipality'
+    new.form['related_compounds_historical'] = ['first-compound']
+    new.form['related_compounds_other'] = ['first-compound']
+    new.form.submit()
+
+    upload_party_results(client, 'elections/first-compound')
+    upload_party_results(client, 'elections/second-compound')
+
+    for page in ('candidates', 'statistics', 'data'):
+        result = client.get(f'/elections/first-compound/{page}')
+        assert '<h2>Zugehörige Wahlen</h2>' in result
+        assert 'http://localhost/elections/second-compound' in result
+        assert 'Second Compound' in result
+
+        result = client.get(f'/elections/second-compound/{page}')
+        assert '<h2>Zugehörige Wahlen</h2>' in result
+        assert 'http://localhost/elections/first-compound' in result
+        assert 'First Compound' in result
 
 
 def test_views_election_compound_embedded_tables(election_day_app_gr):

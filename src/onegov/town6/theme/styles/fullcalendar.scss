@@ -43,6 +43,7 @@
             float: none;
 
             button {
+                border-radius: .7rem;
                 margin-bottom: 15px;
                 margin-left: 0;
             }
@@ -113,6 +114,7 @@
         .fc-day-header,
         .fc-day-number {
             font-size: .9em;
+            text-align: center !important;
         }
 
         .fc-event {

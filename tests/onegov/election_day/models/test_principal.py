@@ -221,6 +221,9 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
     ]
+    assert canton.get_districts(2022)
+    assert canton.get_regions(2022)
+    assert canton.get_superregions(2022)
     assert canton.get_superregion('Pratteln', 1900) == ''
     assert canton.get_superregion('Basel', 2021) == ''
     assert canton.get_superregion('Pratteln', 2021) == 'Region 3'
@@ -234,6 +237,9 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'region', 'district', 'none', 'municipality'
     ]
+    assert canton.get_districts(2022)
+    assert canton.get_regions(2022)
+    assert not canton.get_superregions(2022)
 
     # SG
     canton = Canton(name='sg', canton='sg')
@@ -243,6 +249,9 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'district', 'none', 'municipality'
     ]
+    assert canton.get_districts(2022)
+    assert not canton.get_regions(2022)
+    assert not canton.get_superregions(2022)
 
     # SZ
     canton = Canton(name='sz', canton='sz')
@@ -252,6 +261,9 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'district', 'none', 'municipality'
     ]
+    assert canton.get_districts(2022)
+    assert not canton.get_regions(2022)
+    assert not canton.get_superregions(2022)
 
     # ZG
     canton = Canton(name='zg', canton='zg')
@@ -261,6 +273,9 @@ def test_canton():
     assert list(canton.domains_election.keys()) == [
         'federation', 'canton', 'none', 'municipality'
     ]
+    assert not canton.get_districts(2022)
+    assert not canton.get_regions(2022)
+    assert not canton.get_superregions(2022)
 
 
 def test_municipality_entities():

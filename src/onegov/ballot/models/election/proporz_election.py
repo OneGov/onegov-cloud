@@ -7,9 +7,11 @@ from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
-from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
-from onegov.ballot.models.election.mixins import PartyResultExportMixin
+from onegov.ballot.models.party_result.party_result import PartyResult
+from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
+from onegov.ballot.models.party_result.mixins import \
+    HistoricalPartyResultsMixin
 from sqlalchemy import cast, func
 from sqlalchemy import String
 from sqlalchemy.orm import aliased
@@ -18,7 +20,9 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
-class ProporzElection(Election, PartyResultExportMixin):
+class ProporzElection(
+    Election, PartyResultsExportMixin, HistoricalPartyResultsMixin
+):
     __mapper_args__ = {
         'polymorphic_identity': 'proporz'
     }
@@ -43,20 +47,16 @@ class ProporzElection(Election, PartyResultExportMixin):
     #: An election may contains n party results
     party_results = relationship(
         'PartyResult',
-        primaryjoin=(
-            'foreign(PartyResult.owner) == ProporzElection.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election'),
         lazy='dynamic',
     )
 
     #: An election may contains n (party) panachage results
     panachage_results = relationship(
         'PanachageResult',
-        primaryjoin=(
-            'foreign(PanachageResult.owner) == Election.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election'),
         lazy='dynamic',
     )
 
@@ -140,6 +140,10 @@ class ProporzElection(Election, PartyResultExportMixin):
 
         return results.first() is not None
 
+    @property
+    def relationships_for_historical_party_results(self):
+        return self.related_elections
+
     def clear_results(self):
         """ Clears all the results. """
 
@@ -151,10 +155,10 @@ class ProporzElection(Election, PartyResultExportMixin):
             ListConnection.election_id == self.id
         ).delete()
         session.query(PartyResult).filter(
-            PartyResult.owner == self.id
+            PartyResult.election_id == self.id
         ).delete()
         session.query(PanachageResult).filter(
-            PanachageResult.owner == self.id
+            PanachageResult.election_id == self.id
         ).delete()
 
     def export(self, locales):
@@ -327,7 +331,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             row['candidate_year_of_birth'] = result.year_of_birth or ''
             row['candidate_votes'] = result.votes
             for target_id in panachage_lists:
-                key = f'panachage_votes_from_list_{target_id}'
+                key = f'list_panachage_votes_from_list_{target_id}'
                 row[key] = panachage.get(result.list_id, {}).get(target_id)
             rows.append(row)
 

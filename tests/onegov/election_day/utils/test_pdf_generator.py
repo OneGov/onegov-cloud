@@ -32,6 +32,8 @@ def test_generate_pdf_election(session, election_day_app_zg):
 
     # Proporz election
     proporz = add_proporz_election(session)
+    proporz.show_party_strengths = True
+    proporz.show_party_panachage = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(proporz, 'election.pdf', locale)
         with election_day_app_zg.filestorage.open('election.pdf', 'rb') as f:

@@ -9,6 +9,7 @@ from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
@@ -676,4 +677,128 @@ def add_domain_columns_to_party_results(context):
             context.operations.add_column(
                 'party_results',
                 Column(column, Text(), nullable=True)
+            )
+
+
+@upgrade_task(
+    'Drop party color column',
+    requires='onegov.ballot:Add party resuts columns',
+)
+def drop_party_color_column(context):
+    if context.has_column('party_results', 'color'):
+        context.operations.drop_column('party_results', 'color')
+
+
+@upgrade_task(
+    'Add foreign keys to party results',
+    requires='onegov.ballot:Add party results to compounds'
+)
+def add_foreign_keys_to_party_results(context):
+    if context.has_column('party_results', 'owner'):
+        context.operations.alter_column(
+            'party_results', 'owner', nullable=True
+        )
+
+    if not context.has_column('party_results', 'election_id'):
+        context.operations.add_column(
+            'party_results',
+            Column(
+                'election_id',
+                Text,
+                ForeignKey(
+                    'elections.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+
+    if not context.has_column('party_results', 'election_compound_id'):
+        context.operations.add_column(
+            'party_results',
+            Column(
+                'election_compound_id',
+                Text,
+                ForeignKey(
+                    'election_compounds.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task(
+    'Add foreign keys to panachage results',
+    requires='onegov.ballot:Add panachage results to compounds'
+)
+def add_foreign_keys_to_panahcage_results(context):
+    if not context.has_column('panachage_results', 'election_id'):
+        context.operations.add_column(
+            'panachage_results',
+            Column(
+                'election_id',
+                Text,
+                ForeignKey(
+                    'elections.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+    if not context.has_column('panachage_results', 'election_compound_id'):
+        context.operations.add_column(
+            'panachage_results',
+            Column(
+                'election_compound_id',
+                Text,
+                ForeignKey(
+                    'election_compounds.id',
+                    onupdate='CASCADE',
+                    ondelete='CASCADE'
+                ),
+                nullable=True
+            )
+        )
+
+
+@upgrade_task(
+    'Drop owner from party results',
+    requires='onegov.ballot:Add foreign keys to party results'
+)
+def drop_owner_from_party_results(context):
+    if context.has_column('party_results', 'owner'):
+        context.operations.drop_column(
+            'party_results', 'owner'
+        )
+
+
+@upgrade_task(
+    'Drop owner from panachage results',
+    requires='onegov.ballot:Add foreign keys to panachage results'
+)
+def drop_owner_from_panachage_results(context):
+    if context.has_column('panachage_results', 'owner'):
+        context.operations.drop_column(
+            'panachage_results', 'owner'
+        )
+
+
+@upgrade_task('Add type to election relationships')
+def add_type_election_relationships(context):
+    if context.has_table('election_associations'):
+        if context.has_table('election_relationships'):
+            context.operations.drop_table('election_relationships')
+        context.operations.rename_table(
+            'election_associations', 'election_relationships'
+        )
+
+    if context.has_table('election_relationships'):
+        if not context.has_column('election_relationships', 'type'):
+            context.operations.add_column(
+                'election_relationships',
+                Column('type', Text(), nullable=True)
             )

@@ -1,9 +1,14 @@
-from textwrap import dedent
-
-from onegov.ballot import ElectionCompound, Election, Vote
+from onegov.ballot import ComplexVote
+from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
+from onegov.ballot import ProporzElection
+from onegov.ballot import Vote
+from onegov.core.utils import Bunch
 from onegov.election_day.layouts.detail import DetailLayout
 from onegov.election_day.models import Principal
 from tests.onegov.election_day.common import DummyRequest
+from textwrap import dedent
 
 
 def test_hidden_tabs_mixin():
@@ -13,23 +18,24 @@ def test_hidden_tabs_mixin():
             hidden_elements:
               tabs:
                 elections:
-                  - lists
-                vote:
-                  - districts
+                  - party-panachage
+                elections-part:
+                  - party-strengths
                 election:
                   - statistics
+                vote:
+                  - districts
         """))
     request = DummyRequest()
     request.app.principal = principal
 
-    class DummyObject:
-        def __init__(self, model):
-            self.__tablename__ = model.__tablename__
-
     for model, tab in (
-            (Vote, 'districts'),
-            (Election, 'statistics'),
-            (ElectionCompound, 'lists')
+        (Vote(), 'districts'),
+        (ComplexVote(), 'districts'),
+        (Election(), 'statistics'),
+        (ProporzElection(), 'statistics'),
+        (ElectionCompound(), 'party-panachage'),
+        (ElectionCompoundPart(Bunch(id='1'), 'x', 'y'), 'party-strengths'),
     ):
-        layout = DetailLayout(DummyObject(model), request)
+        layout = DetailLayout(model, request)
         assert layout.hide_tab(tab) is True

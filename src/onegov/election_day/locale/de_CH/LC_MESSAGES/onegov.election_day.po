@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-29 08:14+0100\n"
+"POT-Creation-Date: 2022-12-13 13:10+0100\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -340,6 +340,19 @@ msgstr "Auslandschweizer"
 msgid "The election contains seperate results for expats."
 msgstr "Die Wahl enthält gesonderte Ergebnisse für Auslandsschweizer."
 
+msgid "Voters counts"
+msgstr "Wählerzahlen"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Zeigt die Wählerzahlen statt der Stimmen in der Ansicht der Parteistärken an."
+
+msgid "Exact voters counts"
+msgstr "Exakte Wählerzahlen"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Zeigt exakte Wählerzahlen anstelle von gerundeten Werten."
+
 msgid "Horizonal party strengths chart"
 msgstr "Horizontales Parteistärkendiagramm"
 
@@ -347,6 +360,38 @@ msgid "Shows a horizontal bar chart instead of a vertical bar chart."
 msgstr ""
 "Zeigt ein horizontales Balkendiagramm anstelle eines vertikalen "
 "Balkendiagramms."
+
+msgid "Use party results from the last legislative period"
+msgstr "Verwende Parteiresultate aus der letzten Legislaturperiode"
+
+msgid ""
+"Requires party results. Requires a related election from another legislative "
+"period with party results. Requires that both elections use the same party "
+"IDs."
+msgstr ""
+"Erfordert Parteiergebnisse. Erfordert eine zugehörige Wahl aus einer anderen "
+"Legislaturperiode mit Parteiergebnissen. Erfordert, dass beide Wahlen "
+"dieselben Partei-IDs verwenden."
+
+msgid "Party strengths"
+msgstr "Parteistärken"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
+"Zeigt eine Registerkarte mit dem Vergleich der Parteistärken in Form eines "
+"Balkendiagramms an. Erfordert Parteiergebnisse."
+
+msgid "Views"
+msgstr "Ansichten"
+
+msgid "Panachage (parties)"
+msgstr "Panaschierstatistik (Parteien)"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr ""
+"Zeigt eine Registerkarte mit Panaschierdaten an. Erfordert Parteiergebnisse."
 
 msgid "Date"
 msgstr "Datum"
@@ -372,8 +417,14 @@ msgstr "Italienisch"
 msgid "Romansh"
 msgstr "Rätoromanisch"
 
+msgid "Other legislative periods"
+msgstr "Andere Legislaturperioden"
+
 msgid "Related elections"
 msgstr "Zugehörige Wahlen"
+
+msgid "Rounds of voting or by-elections"
+msgstr "Wahlgänge oder Nachwahlen"
 
 msgid "Link"
 msgstr "Link url"
@@ -440,19 +491,6 @@ msgstr "Doppelter Pukelsheim"
 msgid "Allows to show the list groups and lists views."
 msgstr "Ermöglicht die Anzeige der Listengruppen- und Listenansichten."
 
-msgid "Voters counts"
-msgstr "Wählerzahlen"
-
-msgid "Shows voters counts instead of votes in the party strengths view."
-msgstr ""
-"Zeigt die Wählerzahlen statt der Stimmen in der Ansicht der Parteistärken an."
-
-msgid "Exact voters counts"
-msgstr "Exakte Wählerzahlen"
-
-msgid "Shows exact voters counts instead of rounded values."
-msgstr "Zeigt exakte Wählerzahlen anstelle von gerundeten Werten."
-
 msgid "Seat allocation"
 msgstr "Sitzverteilung"
 
@@ -462,9 +500,6 @@ msgid ""
 msgstr ""
 "Zeigt eine Registerkarte mit der Sitzverteilung in Form eines "
 "Balkendiagramms an. Erfordert Parteiergebnisse."
-
-msgid "Views"
-msgstr "Ansichten"
 
 msgid "List groups"
 msgstr "Listengruppen"
@@ -476,22 +511,8 @@ msgstr ""
 "Zeigt eine Registerkarte mit Listengruppenergebnissen an. Erfordert "
 "Parteiergebnisse mit Wählerzahlen. Nur falls Doppelter Pukelsheim."
 
-msgid "Party strengths"
-msgstr "Parteistärken"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a bar chart. Requires "
-"party results."
-msgstr ""
-"Zeigt eine Registerkarte mit dem Vergleich der Parteistärken in Form eines "
-"Balkendiagramms an. Erfordert Parteiergebnisse."
-
 msgid "Panachage"
 msgstr "Panaschierstatistik"
-
-msgid "Shows a tab with the panachage. Requires party results."
-msgstr ""
-"Zeigt eine Registerkarte mit Panaschierdaten an. Erfordert Parteiergebnisse."
 
 msgid "Notifications"
 msgstr "Benachrichtigungen"
@@ -1401,9 +1422,6 @@ msgstr "Keine Karte für dieses Jahr verfügbar."
 
 msgid "Blank list"
 msgstr "Blankoliste"
-
-msgid "Panachage (parties)"
-msgstr "Panaschierstatistik (Parteien)"
 
 msgid "Panachage (lists)"
 msgstr "Panaschierstatistik (Listen)"

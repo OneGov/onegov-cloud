@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
+from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
@@ -140,7 +141,7 @@ def test_proporz_election_create_all_models(session):
     session.flush()
 
     party_result = PartyResult(
-        owner=election.id,
+        election_id=election.id,
         number_of_mandates=0,
         votes=0,
         total_votes=100,
@@ -218,7 +219,7 @@ def test_proporz_election_create_all_models(session):
     assert candidate.election == election
     assert candidate.list == list
 
-    assert party_result.owner == election.id
+    assert party_result.election_id == election.id
 
     assert election_result.list_results.one() == list_result
     assert election_result.candidate_results.one() == candidate_result
@@ -802,9 +803,9 @@ def test_proporz_election_export(session):
             'candidate_gender': '',
             'candidate_year_of_birth': '',
             'candidate_votes': 111,
-            'panachage_votes_from_list_1': None,
-            'panachage_votes_from_list_2': None,
-            'panachage_votes_from_list_99': None,
+            'list_panachage_votes_from_list_1': None,
+            'list_panachage_votes_from_list_2': None,
+            'list_panachage_votes_from_list_99': None,
         }, {
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
@@ -846,9 +847,9 @@ def test_proporz_election_export(session):
             'candidate_gender': 'male',
             'candidate_year_of_birth': 1970,
             'candidate_votes': 520,
-            'panachage_votes_from_list_1': None,
-            'panachage_votes_from_list_2': 12,
-            'panachage_votes_from_list_99': 4,
+            'list_panachage_votes_from_list_1': None,
+            'list_panachage_votes_from_list_2': 12,
+            'list_panachage_votes_from_list_99': 4,
         }
     ]
 
@@ -1150,21 +1151,30 @@ def test_proporz_election_clear_results(session):
 
 def test_proporz_election_rename(session):
     election = proporz_election()
+    election.id = 'x'
     session.add(election)
     session.flush()
 
-    session.query(Candidate).one().election_id == 'election'
-    session.query(ElectionResult).one().election_id == 'election'
-    session.query(List).one().election_id == 'election'
-    session.query(ListConnection).first().election_id == 'election'
+    assert session.query(Candidate.election_id).distinct().scalar() == 'x'
+    assert session.query(ElectionResult.election_id).distinct().scalar() == 'x'
+    assert session.query(List.election_id).distinct().scalar() == 'x'
+    assert session.query(ListConnection.election_id).distinct().scalar() == 'x'
+    assert session.query(PartyResult.election_id).distinct().scalar() == 'x'
+    assert session.query(
+        PanachageResult.election_id
+    ).distinct().scalar() == 'x'
 
-    election.id = 'elerction'
+    election.id = 'y'
     session.flush()
 
-    session.query(Candidate).one().election_id == 'elerction'
-    session.query(ElectionResult).one().election_id == 'elerction'
-    session.query(List).one().election_id == 'elerction'
-    session.query(ListConnection).first().election_id == 'elerction'
+    assert session.query(Candidate.election_id).distinct().scalar() == 'y'
+    assert session.query(ElectionResult.election_id).distinct().scalar() == 'y'
+    assert session.query(List.election_id).distinct().scalar() == 'y'
+    assert session.query(ListConnection.election_id).distinct().scalar() == 'y'
+    assert session.query(PartyResult.election_id).distinct().scalar() == 'y'
+    assert session.query(
+        PanachageResult.election_id
+    ).distinct().scalar() == 'y'
 
 
 def test_proporz_election_attachments(test_app, explanations_pdf):
@@ -1182,3 +1192,120 @@ def test_proporz_election_attachments(test_app, explanations_pdf):
     assert model.explanations_pdf.reference.content_type == 'application/pdf'
     del model.explanations_pdf
     assert model.explanations_pdf is None
+
+
+def test_proporz_election_historical_party_strengths(session):
+    first = ProporzElection(
+        title='First',
+        domain='federation',
+        date=date(2014, 1, 1),
+        number_of_mandates=1
+    )
+    second = ProporzElection(
+        title='Second',
+        domain='federation',
+        date=date(2018, 1, 1),
+        number_of_mandates=1
+    )
+    third = ProporzElection(
+        title='Third',
+        domain='federation',
+        date=date(2022, 1, 1),
+        number_of_mandates=1
+    )
+    session.add(first)
+    session.add(second)
+    session.add(third)
+    session.flush()
+
+    assert first.historical_party_results.count() == 0
+    assert second.historical_party_results.count() == 0
+    assert third.historical_party_results.count() == 0
+
+    # add results
+    for (election, year, party_id, domain) in (
+        (first, 2014, 1, 'canton'),
+        (first, 2014, 2, 'canton'),
+        (first, 2014, 3, 'canton'),
+        (first, 2010, 1, 'canton'),
+        (first, 2010, 2, 'canton'),
+        (first, 2010, 3, 'canton'),
+        (second, 2022, 2, 'canton'),
+        (second, 2022, 3, 'canton'),
+        (second, 2018, 2, 'canton'),
+        (second, 2018, 3, 'canton'),
+        (second, 2018, 4, 'canton'),
+        (second, 2010, 2, 'canton'),
+        (second, 2010, 3, 'canton'),
+        (third, 2022, 1, 'canton'),
+        (third, 2022, 3, 'canton'),
+        (third, 2022, 5, 'canton'),
+        (third, 2022, 5, 'superregion'),
+    ):
+        election.party_results.append(
+            PartyResult(
+                year=year,
+                number_of_mandates=0,
+                votes=1,
+                total_votes=100,
+                name_translations={'en_US': str(party_id)},
+                party_id=str(party_id),
+                domain=domain
+            )
+        )
+
+    # no relationships yet
+    assert first.historical_party_results.count() == 6
+    assert second.historical_party_results.count() == 7
+    assert third.historical_party_results.count() == 4
+
+    # add relationships
+    for (source_, target, type_) in (
+        (third, second, 'historical'),
+        (third, first, 'historical'),
+        (second, first, 'historical'),
+        (first, second, None),
+        (second, third, 'historical')
+    ):
+        session.add(
+            ElectionRelationship(
+                source_id=source_.id, target_id=target.id, type=type_
+            )
+        )
+
+    def extract(election):
+        return sorted(
+            (result.election_id, result.year, result.party_id)
+            for result in election.historical_party_results
+        )
+
+    assert extract(first) == [
+        ('first', 2010, '1'),
+        ('first', 2010, '2'),
+        ('first', 2010, '3'),
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+    ]
+    assert extract(second) == [
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+        ('second', 2010, '2'),
+        ('second', 2010, '3'),
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('second', 2022, '2'),
+        ('second', 2022, '3'),
+    ]
+    assert extract(third) == [
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('third', 2022, '1'),
+        ('third', 2022, '3'),
+        ('third', 2022, '5'),
+        ('third', 2022, '5'),
+    ]
+    third.historical_party_results.filter_by(domain='superregion').count() == 1

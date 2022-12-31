@@ -2,6 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from uuid import uuid4
@@ -13,13 +14,12 @@ class PanachageResult(Base, TimestampMixin):
 
     case lists:
     It represents the votes transferred from one list to another.
-    target represents list.id (UUID) and owner is NULL
+    target represents list.id (UUID).
 
     case parties:
     It represents the total of votes reveived by panachage for a party across
     all the lists.
-    target represents the party name (as well as source is party name) and
-    the owner is the election.id (a string).
+    target/source represents the party names.
 
     """
 
@@ -28,9 +28,21 @@ class PanachageResult(Base, TimestampMixin):
     #: identifies the result
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the owner of this result, maps to election.id
-    # where electon.id is derived from the title
-    owner = Column(Text, nullable=True)
+    #: the election this result belongs to
+    election_id = Column(
+        Text,
+        ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
+    )
+
+    #: the election compound this result belongs to
+    election_compound_id = Column(
+        Text,
+        ForeignKey(
+            'election_compounds.id', onupdate='CASCADE', ondelete='CASCADE'
+        ),
+        nullable=True
+    )
 
     #: the target this result belongs to, maps to list.id
     target = Column(Text, nullable=False)

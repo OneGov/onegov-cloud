@@ -26,6 +26,13 @@ $event-image-max-height: 150px;
         width: auto;
     }
 
+    @media #{$small-only} {
+        .no-image,
+        .no-image.image-placeholder {
+            display: none;
+        }
+    }
+
     .contained {
         border-bottom: 1px solid $iron;
         border-top: 1px solid $iron;
