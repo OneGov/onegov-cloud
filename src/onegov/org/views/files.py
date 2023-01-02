@@ -198,9 +198,6 @@ def handle_update_publish_date(self, request):
         self.publish_end_date = None
         return
 
-    # To ensure the changes take effect, set published to false for
-    # `onegov.file.collection.FileCollection.publish_files`
-    self.published = False
     handle_update_start_date(layout, request, self)
     handle_update_end_date(layout, request, self)
 
@@ -211,7 +208,8 @@ def handle_update_start_date(layout, request, self):
         date = parse(request.params['date'], dayfirst=False)
     except (ValueError, KeyError):
         date = self.publish_date and self.publish_date.date()
-        date = date or layout.today()
+        if not date:
+            return
     try:
         hour = next(map(int, request.params.get('hour').split(':')))
     except (ValueError, KeyError, AttributeError):
@@ -244,7 +242,7 @@ def handle_update_end_date(layout, request, self):
             publish_end_date, layout.timezone
         )
         # Prevent adding invalid date range:
-        if not self.publish_date > publish_end_date:
+        if not self.publish_date or self.publish_date < publish_end_date:
             self.publish_end_date = publish_end_date
     except OverflowError:
         self.publish_end_date = None
