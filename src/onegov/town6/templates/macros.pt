@@ -1830,7 +1830,7 @@
                         </a>
                     </div>
 
-                    <div class="publication-settings ${publish_date and 'publication-date-set' or 'publication-date-not-set'}">
+                    <div class="publication-settings publication-date-set">
                         <form method="POST">
                             <div tal:condition="not:file.published">
                                 <fieldset>
