@@ -64,8 +64,6 @@ class GeverClientCAS:
         self.portal_session.headers.update({'Referer': self.portal_url})
 
         # Once logged in to the portal, get a CAS ticket
-
-        # somehow this is 400 response
         ticket_response = self.portal_session.post(
             self.ticket_url,
             json={"service": self.service_url + '/'}

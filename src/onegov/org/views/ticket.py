@@ -31,7 +31,7 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.ticket.errors import InvalidStateChange
-from onegov.town6.gever.gever_client import GeverClientCAS
+from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
 from sqlalchemy import select
 from webob import exc
