@@ -206,15 +206,19 @@ def handle_update_start_date(layout, request, self):
     try:
         # dates are returned as 2019-01-31
         date = parse(request.params['date'], dayfirst=False)
-    except (ValueError, KeyError):
-        date = self.publish_date and self.publish_date.date()
-        if not date:
+        hour = next(map(int, request.params.get('hour').split(':')))
+        if not date and not hour:
             return
+    except (ValueError, KeyError, AttributeError):
+        date = self.publish_date and self.publish_date.date()
+        date = date or layout.today()
+
     try:
         hour = next(map(int, request.params.get('hour').split(':')))
     except (ValueError, KeyError, AttributeError):
         hour = self.publish_date and self.publish_date.hour
         hour = hour or 0
+
     publish_date = datetime.datetime.combine(date, datetime.time(hour, 0))
     publish_date = standardize_date(publish_date, layout.timezone)
     self.publish_date = publish_date
