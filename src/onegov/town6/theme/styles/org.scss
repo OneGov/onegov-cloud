@@ -402,6 +402,10 @@ footer {
         transition: all 200ms linear;
     }
 
+    .card-section:first-child {
+        flex-grow: 4;
+    }
+
     h5 {
         color: $primary-color;
         padding-bottom: 1rem;
@@ -511,7 +515,7 @@ $formlist-padding: .75rem 0;
 
     .list-hint {
         border-bottom: 0 !important;
-        border-top: 1px solid #e0e3e5;
+        border-top: 1px solid $gray;
         color: #707070;
         margin-bottom: .2em;
         max-width: 90%;

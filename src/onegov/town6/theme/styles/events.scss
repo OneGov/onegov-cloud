@@ -11,14 +11,6 @@ $event-image-max-height: 150px;
         width: 100%;
     }
 
-    .card {
-        border: 0;
-
-        &:hover img {
-            transform: scale(1.05);
-        }
-    }
-
     .card img {
         max-height: $event-image-max-height;
         object-fit: cover;
@@ -39,10 +31,6 @@ $event-image-max-height: 150px;
     }
 
     h5 {
-        display: -webkit-box;
-        overflow: hidden;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
         padding-bottom: 0 !important;
         margin-bottom: 1rem;
     }
@@ -53,7 +41,7 @@ $event-image-max-height: 150px;
     }
 
     hr {
-        border-bottom: 1px dashed #cacaca;
+        border-bottom: 1px solid $gray;
         margin: .5rem 0;
     }
 
@@ -115,8 +103,6 @@ $event-image-max-height: 150px;
 
 // raise importance a bit by double-selecting
 .occurrence.occurrence {
-    margin-bottom: 2.25rem;
-
     h3 {
         font-weight: bold;
     }
@@ -173,4 +159,12 @@ $event-image-max-height: 150px;
 
 .occurrence-description {
     max-width: $max-line-width;
+}
+
+.event-more-link.button.hollow {
+    border: 1px solid $gray;
+}
+
+.card:hover .event-more-link.button.hollow {
+    border: 1px solid $primary-color;
 }

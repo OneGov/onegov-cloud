@@ -1141,40 +1141,66 @@
 </metal:calendar_day_content>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.town6">
+        <div class="grid-x grid-padding-x events" data-equalizer="events">
     <tal:b repeat="occurrence occurrences">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
+        </div>
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view">
-    <div class="occurrence" tal:define="use_links use_links|True">
-        <div class="grid-x">
+    <div class="occurrence subpage-cards medium-12 small-12 cell" tal:define="use_links use_links|True">
+        <div class="card">
+            <a href="${use_links and request.link(occurrence)}">
+                <div class="grid-x align-middle">
+                    <div class="cell small-7 card-section">
+                        <h5>${occurrence.title}</h5>
+                        <tal:b tal:define="
+                            date occurrence.localized_start;
+                            link use_links and request.link(occurrence)
+                        ">
+                            <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
 
-
-        <div class="large-3 medium-4 small-5 cell calendar-day-column">
-            <metal:b
-                tal:define="
-                    date occurrence.localized_start;
-                    image occurrence.event.image;
-                    link use_links and request.link(occurrence)
-                "
-                use-macro="layout.macros['calendar-day']"
-            />
+                            <div class="date-place">
+                                <div class="grid-x">
+                                    <div class="cell small-1 medium-2">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
+                                        <b>
+                                            ${layout.format_date(date, 'weekday_short').rstrip('.')}, ${date.day}. ${layout.format_date(date, 'month_long')}  ${date.year}
+                                        </b>
+                                    </div>
+                                </div>
+                                <hr/>
+                                <div class="grid-x">
+                                    <div class="cell small-1 medium-2">
+                                        <i class="fa fa-clock"></i>
+                                    </div>
+                                    <div class="cell small-11 medium-10" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
+                                        <div> ${time[0].upper()}${time[1:]}</div>
+                                    </div>
+                                </div>
+                                <hr/>
+                                <div class="grid-x">
+                                    <div class="cell small-1 medium-2">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="cell small-11 medium-10">
+                                        <div>${occurrence.location}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </tal:b>
+                    </div>
+                    <div class="cell small-5">
+                        <div tal:condition="occurrence.event.image" style="width: 100%; padding-bottom: 60%; background-image: url(${request.link(occurrence.event.image, name='thumbnail')}); background-size: cover; border-radius: 0 .7rem;"></div>
+                        <span class="button hollow event-more-link" style="margin: 1.5rem 1rem 1.5rem 0.7rem; display: block;">Mehr erfahren</span>
+                    </div>
+                </div>
+            </a>
         </div>
-        <div class="large-9 medium-8 small-7 cell calendar-text-column">
-            <h3 class="h4">
-                <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
-                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
-            </h3>
-            <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
-            <div class="occurrence-location">${occurrence.location}</div>
-            <div class="occurrence-time" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
-                ${time[0].upper()}${time[1:]}
-            </div>
-            <div class="occurrence-organizer">${occurrence.event.organizer}</div>
-            <div class="occurrence-tags"><span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span></div>
-        </div></div>
     </div>
 </metal:occurrence_list_view>
 
