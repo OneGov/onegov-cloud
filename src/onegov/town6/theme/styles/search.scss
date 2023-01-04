@@ -14,7 +14,27 @@
     }
 
     .typeahead ul {
+        border: 1px solid #0068a5;
+        border-radius: .7rem;
+        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .05);
         left: 0;
+        padding: .7rem 0;
+
+        li {
+            margin: 0;
+            padding: 0;
+
+            a,
+            button {
+                padding: .2rem .7rem;
+                text-align: left;
+                width: 100%;
+
+                &:hover {
+                    font-weight: normal !important;
+                }
+            }
+        }
     }
 
     input[type="text"]:not(:valid) ~ .reset-button {
