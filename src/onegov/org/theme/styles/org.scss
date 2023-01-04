@@ -6528,7 +6528,8 @@ a#results {
 }
 
 /* Hide page-image form field on topic-forms */
-[id^="page-editor-edit-page"] .field-page_image {
+[id^="page-editor-edit-page"] .field-page_image,
+[id^="page-editor-edit-link"] .field-page_image {
     display: none;
 }
 

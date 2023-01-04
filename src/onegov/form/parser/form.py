@@ -35,7 +35,7 @@ import re
 # database
 #
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 5 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 10 * MEGABYTE
 
 
 def parse_form(text, base_class=Form):

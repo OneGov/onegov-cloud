@@ -1,8 +1,79 @@
 # Changes
 
+## 2023.1
+
+`2023-01-03` | [20d01fd6f0...bf0dd341d5](https://github.com/OneGov/onegov-cloud/compare/20d01fd6f0^...bf0dd341d5)
+
+### Core
+
+##### Sets default file upload limit to 10 MB
+
+`Feature` | [OGC-827](https://linear.app/onegovcloud/issue/OGC-827) | [0b62b13e59](https://github.com/onegov/onegov-cloud/commit/0b62b13e59c4b692d6ba771cae7c0a728862a964)
+
+##### Monkey patches more.webassets to include assets into error views.
+
+Registers webassets_injector_tween after excview_tween_factory so that
+assets are included into error views too.
+
+`Bugfix` | [OGC-853](https://linear.app/onegovcloud/issue/OGC-853) | [d5defb78c6](https://github.com/onegov/onegov-cloud/commit/d5defb78c6d1c88de5c600027cdec8a10942bf7a)
+
+### Town
+
+##### Adds publication end date to files
+
+Files are set to private (via hourly cronjob) once the publication end date has been reached.
+
+`Feature` | [OGC-742](https://linear.app/onegovcloud/issue/OGC-742) | [d4fb7e33d0](https://github.com/onegov/onegov-cloud/commit/d4fb7e33d02a03a63ca8ff811c23b6e450e9d0c1)
+
+### Town6
+
+##### Small design adjustments
+
+`Feature` | [1aa84188e2](https://github.com/onegov/onegov-cloud/commit/1aa84188e2639460d2d9571bb63a702a47e8f2b3)
+
+##### Rename more news button
+
+`Feature` | [OGC-820](https://linear.app/onegovcloud/issue/OGC-820) | [5f6b1b70e9](https://github.com/onegov/onegov-cloud/commit/5f6b1b70e9508ca33ffe9ac28ea5b96afcbc86bc)
+
+##### No news in homepage tiles
+
+`Feature` | [OGC-832](https://linear.app/onegovcloud/issue/OGC-832) | [5b623dbc49](https://github.com/onegov/onegov-cloud/commit/5b623dbc498f668a5596865b64d8543ada17fc0a)
+
+##### Add time to event widget on homepage
+
+`Feature` | [OGC-836](https://linear.app/onegovcloud/issue/OGC-836) | [bdf30681da](https://github.com/onegov/onegov-cloud/commit/bdf30681daba33101fc54e5cf932967a56af48aa)
+
+##### Style overview of image sets
+
+`Feature` | [OGC-816](https://linear.app/onegovcloud/issue/OGC-816) | [10aafbf949](https://github.com/onegov/onegov-cloud/commit/10aafbf949908bfd1860480a1a55fe8b60c8f5d6)
+
+##### Add option for image for external link
+
+`Feature` | [OGC-839](https://linear.app/onegovcloud/issue/OGC-839) | [bf0dd341d5](https://github.com/onegov/onegov-cloud/commit/bf0dd341d5bf72c5251116ed1de4b4005daae41c)
+
+##### Credit card button styling
+
+`Bugfix` | [OGC-835](https://linear.app/onegovcloud/issue/OGC-835) | [20d01fd6f0](https://github.com/onegov/onegov-cloud/commit/20d01fd6f0daeb11f0fe9dec02873724f3f67e03)
+
+##### Fix tags field styling
+
+`Bugfix` | [OGC-617](https://linear.app/onegovcloud/issue/OGC-617) | [147a273dfd](https://github.com/onegov/onegov-cloud/commit/147a273dfd951b8acc39c5b7f039bf0a58f2c797)
+
+##### Don't break title beneath icon
+
+`Bugfix` | [OGC-843](https://linear.app/onegovcloud/issue/OGC-843) | [6982bd9e2f](https://github.com/onegov/onegov-cloud/commit/6982bd9e2f805f3557503292fedc6a2a75a09ad0)
+
+##### Fix upload image style error
+
+`Bugfix` | [OGC-621](https://linear.app/onegovcloud/issue/OGC-621) | [a87e0ee579](https://github.com/onegov/onegov-cloud/commit/a87e0ee5794be6cdb17e52b01b43ba5b255a065a)
+
+##### Fix html rendering in newsletters/new view
+
+`Bugfix` | [OGC-734](https://linear.app/onegovcloud/issue/OGC-734) | [8a3b755b12](https://github.com/onegov/onegov-cloud/commit/8a3b755b12d8ca0a99c665ab9471f66d78c2d747)
+
 ## 2022.57
 
-`2022-12-14` | [14496f2d9c...ca490622f2](https://github.com/OneGov/onegov-cloud/compare/14496f2d9c^...ca490622f2)
+`2022-12-14` | [14496f2d9c...ee3b7e737b](https://github.com/OneGov/onegov-cloud/compare/14496f2d9c^...ee3b7e737b)
 
 ### Election Day
 
@@ -2567,22 +2638,4 @@ Replace old SMTP mailer with Postmark API.
 ##### Style more side panels.
 
 `Bugfix` | [OGC-200](https://linear.app/onegovcloud/issue/OGC-200) | [ba24957bb8](https://github.com/onegov/onegov-cloud/commit/ba24957bb8eadc1cb48155c6f2855b4d6676f1a9)
-
-## 2022.8
-
-`2022-01-23` | [73b49c2696...28fc743aba](https://github.com/OneGov/onegov-cloud/compare/73b49c2696^...28fc743aba)
-
-### Election Day
-
-##### Add voters count to election compound party results.
-
-For election compounds with Doppelter Pukelsheim only. Also adds a new view and widgets based on the party results to display list groups and changes the existing list view to display voters counts instead of votes. Adds these views to the PDFs and SVGs. Futerhmore removes inconsistencies with displaying intermediate results, cleans up Doppelter Pukelsheim namings and descriptions and a lot of other things.
-
-`Feature` | [OGC-162](https://linear.app/onegovcloud/issue/OGC-162) | [d30032b59e](https://github.com/onegov/onegov-cloud/commit/d30032b59ebddd6255ce9f01b9c5d3770bd2067e)
-
-### Swissvotes
-
-##### Fixes sorting search results with empty titles throwing an error.
-
-`Bugfix` | [73b49c2696](https://github.com/onegov/onegov-cloud/commit/73b49c2696528fdf657d27b351dbff4cb1732ab9)
 

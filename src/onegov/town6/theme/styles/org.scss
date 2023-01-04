@@ -390,6 +390,24 @@ footer {
     }
 }
 
+.subpage-cards .card {
+    border: 2px solid rgba(0, 0, 0, .04);
+    box-shadow: 0 0 17px 0 rgba(0, 0, 0, .07);
+    height: calc(100% - 2rem);
+    margin-bottom: 2rem;
+    transition: all 200ms linear;
+
+    &:hover {
+        border: 2px solid $primary-color !important;
+        transition: all 200ms linear;
+    }
+
+    h5 {
+        color: $primary-color;
+        padding-bottom: 1rem;
+    }
+}
+
 
 /* Input */
 

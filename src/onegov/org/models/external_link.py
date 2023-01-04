@@ -32,6 +32,7 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     title = Column(Text, nullable=False)
     url = Column(Text, nullable=False)
+    page_image = meta_property()
 
     # The collection name this model should appear in
     member_of = Column(Text, nullable=True)

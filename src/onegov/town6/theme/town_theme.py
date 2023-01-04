@@ -132,7 +132,8 @@ class TownTheme(BaseTheme):
             'progress_indicator',
             'healthcheck',
             'qrcode',
-            'leaflet'
+            'leaflet',
+            'tags'
         ]
 
     @property
