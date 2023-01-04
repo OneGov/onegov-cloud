@@ -430,3 +430,11 @@ a.category-anchor {
     top: -150px;
     visibility: hidden;
 }
+
+.checkout-button {
+    margin-right: 1rem;
+
+    &:hover {
+        margin-right: .5rem;
+    }
+}

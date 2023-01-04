@@ -67,7 +67,13 @@ article.content .side-panel {
     }
 
     &> .grid-container {
-        padding: 5rem 0 3rem 0;
+        padding: 5rem 0 3rem;
+    }
+
+    @media #{$small-only} {
+        &> .grid-container {
+            padding: 3rem 0 2rem;
+        }
     }
 
     .grid-container.full {

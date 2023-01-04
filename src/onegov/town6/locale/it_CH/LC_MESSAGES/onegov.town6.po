@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-12-05 15:00+0100\n"
+"POT-Creation-Date: 2023-01-04 13:27+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -874,8 +874,8 @@ msgstr "Tutti gli articoli"
 msgid "No events found."
 msgstr "Nessun evento trovato."
 
-msgid "From"
-msgstr "Dalle"
+msgid "Learn more"
+msgstr "Per saperne di più"
 
 msgid "To"
 msgstr "A"
@@ -1008,6 +1008,12 @@ msgstr "Data di pubblicazione:"
 
 msgid "Reset"
 msgstr "Ripristina"
+
+msgid "Will be published until:"
+msgstr ""
+
+msgid "Publication end date:"
+msgstr ""
 
 msgid "Not a publication"
 msgstr "Non una pubblicazione"
@@ -2048,6 +2054,9 @@ msgstr "Festività"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
+
+#~ msgid "From"
+#~ msgstr "Dalle"
 
 #, fuzzy
 #~ msgid "Partner"
