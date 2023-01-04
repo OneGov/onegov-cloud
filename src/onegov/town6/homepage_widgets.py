@@ -194,9 +194,11 @@ class EventsWidget:
             EventCard(
                 text=o.title,
                 url=layout.request.link(o),
-                subtitle=event_layout.format_date(
-                    o.localized_start, 'event_short')
-                .title(),
+                subtitle=(
+                    event_layout.format_date(
+                        o.localized_start, 'event_short').title() + ", "
+                    + layout.format_time_range(
+                        o.localized_start, o.localized_end).title()),
                 image_url=o.event.image and layout.request.link(o.event.image),
                 location=o.location,
                 lead=get_lead(o.event.title)

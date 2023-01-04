@@ -106,6 +106,9 @@ class File(Base, Associable, TimestampMixin):
     #: hour through a cronjob (see :mod:`onegov.core.cronjobs`)!
     publish_date = Column(UTCDateTime, nullable=True)
 
+    #: the date up to which the file is published
+    publish_end_date = Column(UTCDateTime, nullable=True)
+
     #: true if marked for publication
     publication = Column(Boolean, nullable=False, default=False)
 

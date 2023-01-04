@@ -168,6 +168,7 @@ def view_file_details(self, request, layout=None):
 def handle_publish(self, request):
     request.assert_valid_csrf_token()
     self.published = True
+    self.publish_end_date = None
     self.publish_date = None
 
 
@@ -190,28 +191,65 @@ def toggle_publication(self, request):
 def handle_update_publish_date(self, request):
     request.assert_valid_csrf_token()
     layout = DefaultLayout(self, request)
-
-    if request.params.get('clear', None):
+    if request.params.get('clear_start_date', None):
         self.publish_date = None
         return
+    if request.params.get('clear_end_date', None):
+        self.publish_end_date = None
+        return
 
+    handle_update_start_date(layout, request, self)
+    handle_update_end_date(layout, request, self)
+
+
+def handle_update_start_date(layout, request, self):
     try:
         # dates are returned as 2019-01-31
         date = parse(request.params['date'], dayfirst=False)
-    except (ValueError, KeyError):
+        hour = next(map(int, request.params.get('hour').split(':')))
+        if not date and not hour:
+            return
+    except (ValueError, KeyError, AttributeError):
         date = self.publish_date and self.publish_date.date()
         date = date or layout.today()
 
     try:
         hour = next(map(int, request.params.get('hour').split(':')))
-    except ValueError:
+    except (ValueError, KeyError, AttributeError):
         hour = self.publish_date and self.publish_date.hour
         hour = hour or 0
 
     publish_date = datetime.datetime.combine(date, datetime.time(hour, 0))
     publish_date = standardize_date(publish_date, layout.timezone)
-
     self.publish_date = publish_date
+
+
+def handle_update_end_date(layout, request, self):
+    try:
+        end_date = parse(request.params['end-date'], dayfirst=False)
+    except (ValueError, KeyError):
+        self.publish_end_date = None
+        return
+    try:
+        end_hour = next(
+            map(int, request.params.get('end-hour').split(':'))
+        )
+    except (ValueError, KeyError):
+        end_hour = self.publish_end_date and self.publish_end_date.hour
+        end_hour = end_hour or 0
+
+    publish_end_date = datetime.datetime.combine(
+        end_date, datetime.time(end_hour, 0)
+    )
+    try:
+        publish_end_date = standardize_date(
+            publish_end_date, layout.timezone
+        )
+        # Prevent adding invalid date range:
+        if not self.publish_date or self.publish_date < publish_end_date:
+            self.publish_end_date = publish_end_date
+    except OverflowError:
+        self.publish_end_date = None
 
 
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
