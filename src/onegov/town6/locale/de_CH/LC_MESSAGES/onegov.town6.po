@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2022-12-05 15:00+0100\n"
+"POT-Creation-Date: 2023-01-04 13:27+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -879,8 +879,8 @@ msgstr "Alle Termine"
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
 
-msgid "From"
-msgstr "Von"
+msgid "Learn more"
+msgstr "Mehr erfahren"
 
 msgid "To"
 msgstr "Bis"
@@ -1013,6 +1013,12 @@ msgstr "Publikationsdatum:"
 
 msgid "Reset"
 msgstr "Zurücksetzen"
+
+msgid "Will be published until:"
+msgstr ""
+
+msgid "Publication end date:"
+msgstr ""
 
 msgid "Not a publication"
 msgstr "keine Publikation"
@@ -2051,6 +2057,9 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "From"
+#~ msgstr "Von"
 
 #~ msgid "Partner"
 #~ msgstr "Partner"
