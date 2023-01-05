@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from dateutil.parser import parse
 from onegov.core.orm.func import unaccent
 from onegov.form import Form
@@ -17,15 +17,55 @@ from wtforms.fields import RadioField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, ValidationError
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from sedate import pytz, replace_timezone
 
 
 def coerce_date(value):
     if isinstance(value, str):
         return parse(value).date()
     return value
+
+
+class DispatchTimeValidator:
+    """Ensures no scan jobs are submitted on the same day after 17:00"""
+
+    def __init__(self, max_hour=17):
+        self.max_hour = max_hour
+        self.timezone = "Europe/Zurich"
+
+    def __call__(self, form, field):
+        dispatch_date = field.data
+        now = datetime.now(pytz.timezone(self.timezone))
+
+        if isinstance(dispatch_date, date):
+            if dispatch_date != now.date():
+                return
+
+        if self.too_late_to_scan():
+            raise ValidationError(
+                f"Sorry, no scans are allowed after {self.max_hour}:00"
+            )
+
+    def too_late_to_scan(self):
+        now = datetime.now(pytz.timezone(self.timezone))
+        y, m, d = now.year, now.month, now.day
+        max_hour_date = self.tzdatetime(y, m, d, hour=self.max_hour, minute=0)
+        return now.time() > max_hour_date.time()
+
+    def tzdatetime(self, year, month, day, hour, minute):
+        """Returns the timezone-aware datetime"""
+        return replace_timezone(
+            datetime(year, month, day, hour, minute), self.timezone
+        )
+
+    def is_timezone_aware(self, d: datetime):
+        try:
+            return d.tzinfo is not None and d.tzinfo.utcoffset(d) is not None
+        except AttributeError:
+            return False
 
 
 class AddScanJobForm(Form):
@@ -53,7 +93,7 @@ class AddScanJobForm(Form):
         label=_("Dispatch date"),
         choices=[],
         depends_on=('type', 'normal'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), DispatchTimeValidator()],
         coerce=coerce_date
     )
 
@@ -316,7 +356,7 @@ class UnrestrictedScanJobForm(Form):
 
     dispatch_date = DateField(
         label=_("Dispatch date"),
-        validators=[InputRequired()],
+        validators=[InputRequired(), DispatchTimeValidator()],
         default=date.today,
     )
 
