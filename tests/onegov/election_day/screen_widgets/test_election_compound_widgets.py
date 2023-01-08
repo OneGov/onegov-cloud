@@ -182,8 +182,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     e_2 = election_2.title
     assert data == {
         'districts': {
-            e_1: ('Rheintal', f'ProporzElection/{e_1}'),
-            e_2: ('Rorschach', f'ProporzElection/{e_2}')
+            e_1: ('Rheintal', f'ProporzElection/{e_1}', ''),
+            e_2: ('Rorschach', f'ProporzElection/{e_2}', '')
         },
         'elected_candidates': [
             ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', e_1),
@@ -300,8 +300,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     ]
     assert data == {
         'districts': {
-            e_1: ('Rheintal', f'ProporzElection/{e_1}'),
-            e_2: ('Rorschach', f'ProporzElection/{e_2}')
+            e_1: ('Rheintal', f'ProporzElection/{e_1}', ''),
+            e_2: ('Rorschach', f'ProporzElection/{e_2}', '')
         },
         'elected_candidates': [
             ('Bruss-Schmidheiny', 'Carmen', '', None, None, 'SVP', '01', e_1),
