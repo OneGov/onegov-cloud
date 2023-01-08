@@ -102,6 +102,16 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert chart.status_code == 200
     assert '/elections/elections/party-strengths-data' in chart
 
+    assert 'panel_2022' in client.get(
+        '/elections/elections/party-strengths-table'
+    )
+    assert 'panel_2022' in client.get(
+        '/elections/elections/party-strengths-table?year=2022'
+    )
+    assert 'panel_2022' not in client.get(
+        '/elections/elections/party-strengths-table?year=2018'
+    )
+
     export = client.get('/elections/elections/data-parties-csv').text
     lines = [l for l in export.split('\r\n') if l]
     assert lines == [

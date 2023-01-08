@@ -425,11 +425,10 @@ def test_election_layout_menu_proporz(session):
     ('candidates', 'Election/candidates-table'),
     ('candidate-by-entity', None),
     ('candidate-by-district', None),
-    ('party-strengths', None),
+    ('party-strengths', 'Election/party-strengths-table'),
     ('parties-panachage', None),
     ('statistics', 'Election/statistics-table'),
     ('data', None)
-
 ])
 def test_election_layout_table_links(tab, expected):
     # Test link depending on tab

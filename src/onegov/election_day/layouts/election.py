@@ -13,7 +13,12 @@ class ElectionLayout(DetailLayout):
         self.tab = tab
 
     tabs_with_embedded_tables = (
-        'lists', 'candidates', 'statistics', 'connections')
+        'lists',
+        'candidates',
+        'party-strengths',
+        'statistics',
+        'connections'
+    )
 
     def table_link(self, query_params={}):
         if self.tab not in self.tabs_with_embedded_tables:

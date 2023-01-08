@@ -1436,55 +1436,57 @@
     </figure>
 </metal:party_strengths_figure>
 
-<metal:party_strengths define-macro="party_strengths" i18n:domain="onegov.election_day">
-    <div class="tab-navigation clearfix">
-        <nav class="top-bar" data-topbar role="navigation">
-            <ul class="title-area">
-                <li class="name menu-icon"><span i18n:translate="">Year</span></li>
-                <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
-            </ul>
-            <div class="top-bar-section">
-                <ul class="left tabs" data-tab>
-                    <tal:block tal:repeat="year sorted(years, reverse=True)">
-                        <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
-                    </tal:block>
+<metal:party-strengths-table define-macro="party-strengths-table" i18n:domain="onegov.election_day">
+    <tal:block tal:define="voters_counts layout.model.voters_counts|False; year year|None">
+        <div class="tab-navigation clearfix" tal:condition="not year">
+            <nav class="top-bar" data-topbar role="navigation">
+                <ul class="title-area">
+                    <li class="name menu-icon"><span i18n:translate="">Year</span></li>
+                    <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
                 </ul>
-            </div>
-        </nav>
-    </div>
-    <div class="tabs-content">
-        <tal:block tal:repeat="year sorted(years, reverse=True)">
-            <div tal:attributes="class 'content active' if repeat.year.start else 'content'" id="panel_${year}">
-                <table
-                    class="results tablesaw sortable"
-                    data-tablesaw-mode="columntoggle"
-                    data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                    data-tablesaw-minimap=""
-                    >
-                    <thead>
-                        <tr>
-                            <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
-                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">${layout.label('mandates')}</th>
-                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr tal:repeat="line results[year]">
-                            <tal:block tal:repeat="cell line">
-                                <td tal:condition="repeat.cell.start">${cell}</td>
-                                <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
-                            </tal:block>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </tal:block>
-    </div>
-</metal:party_strengths>
+                <div class="top-bar-section">
+                    <ul class="left tabs" data-tab>
+                        <tal:block tal:repeat="year sorted(years, reverse=True)">
+                            <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
+                        </tal:block>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="tabs-content">
+            <tal:block tal:repeat="current_year sorted(years, reverse=True)">
+                <div tal:attributes="class 'content active' if repeat.current_year.start or year == current_year else 'content'" id="panel_${current_year}" tal:condition="not year or year == current_year">
+                    <table
+                        class="results tablesaw sortable"
+                        data-tablesaw-mode="columntoggle"
+                        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                        data-tablesaw-minimap=""
+                        >
+                        <thead>
+                            <tr>
+                                <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
+                                <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">${layout.label('mandates')}</th>
+                                <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                                <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                                <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                                <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                                <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="line results[current_year]">
+                                <tal:block tal:repeat="cell line">
+                                    <td tal:condition="repeat.cell.start">${cell}</td>
+                                    <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                                </tal:block>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </tal:block>
+        </div>
+    </tal:block>
+</metal:party-strengths-table>
 
 <metal:figcaption_panachage define-macro="figcaption_panachage" i18n:domain="onegov.election_day">
     <figcaption i18n:translate="figcaption_panachage">
