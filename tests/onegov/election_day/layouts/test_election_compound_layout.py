@@ -184,7 +184,7 @@ def test_election_compound_layout_general(session):
         ('superregions', 'ElectionCompound/superregions-table'),
         ('districts', 'ElectionCompound/districts-table'),
         ('candidates', 'ElectionCompound/candidates-table'),
-        ('party-strengths', None),
+        ('party-strengths', 'ElectionCompound/party-strengths-table'),
         ('parties-panachage', None),
         ('statistics', 'ElectionCompound/statistics-table'),
         ('data', None)
