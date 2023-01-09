@@ -472,6 +472,46 @@
 </metal:election-compound-districts-table>
 
 
+<metal:election-compound-districts-map define-macro="election-compound-districts-map" i18n:domain="onegov.election_day">
+    <tal:block tal:define="map_type 'entities' if election_compound.domain_elections == 'municipality' else 'districts'">
+        <tal:block tal:condition="embed">
+            <div class="${map_type}-map"
+                data-canton="${layout.principal.id}"
+                data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+                data-dataurl="${request.link(election_compound, name='by-district')}"
+                data-embed-link="Embed map"
+                data-embed-source="${request.link(election_compound, name='districts-map')}"
+                data-thumbs="false"
+                data-color-scale="b"
+                data-label-left-hand=""
+                data-label-right-hand=""
+                data-label-expats="Expats"
+                data-hide-percentages="true"
+                data-hide-legend="true"
+                i18n:attributes="data-embed-link; data-label-expats"
+                >
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="${map_type}-map"
+                data-canton="${layout.principal.id}"
+                data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+                data-dataurl="${request.link(election_compound, name='by-district')}"
+                data-thumbs="false"
+                data-color-scale="b"
+                data-label-left-hand=""
+                data-label-right-hand=""
+                data-label-expats="Expats"
+                data-hide-percentages="true"
+                data-hide-legend="true"
+                i18n:attributes="data-label-expats"
+                >
+            </div>
+        </tal:block>
+    </tal:block>
+</metal:election-compound-districts-map>
+
+
 <metal:election-compound-superregions-table define-macro="election-compound-superregions-table" i18n:domain="onegov.election_day">
     <table
         class="election-compound-superregions-table results tablesaw sortable"
@@ -495,6 +535,44 @@
         </tbody>
     </table>
 </metal:election-compound-superregions-table>
+
+
+<metal:election-compound-superregions-map define-macro="election-compound-superregions-map" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="embed">
+        <div class="districts-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+            data-dataurl="${request.link(election_compound, name='by-superregion')}"
+            data-embed-link="Embed map"
+            data-embed-source="${request.link(election_compound, name='superregions-map')}"
+            data-thumbs="false"
+            data-color-scale="b"
+            data-label-left-hand=""
+            data-label-right-hand=""
+            data-label-expats="Expats"
+            data-hide-percentages="true"
+            data-hide-legend="true"
+            i18n:attributes="data-embed-link; data-label-expats"
+            >
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not: embed">
+        <div class="districts-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+            data-dataurl="${request.link(election_compound, name='by-superregion')}"
+            data-thumbs="false"
+            data-color-scale="b"
+            data-label-left-hand=""
+            data-label-right-hand=""
+            data-label-expats="Expats"
+            data-hide-percentages="true"
+            data-hide-legend="true"
+            i18n:attributes="data-label-expats"
+            >
+        </div>
+    </tal:block>
+</metal:election-compound-superregions-map>
 
 
 <metal:election-statistics-table define-macro="election-statistics-table" i18n:domain="onegov.election_day">

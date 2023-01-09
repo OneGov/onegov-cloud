@@ -10,11 +10,14 @@ from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
     ElectionCompoundCandidatesTableWidget,
+    ElectionCompoundDistrictsMapWidget,
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
     ElectionCompoundSeatAllocationChartWidget,
     ElectionCompoundSeatAllocationTableWidget,
+    ElectionCompoundSuperregionsMapWidget,
+    ElectionCompoundSuperregionsTableWidget,
     LastResultChangeWidget,
     NumberOfCountedEntitiesWidget,
     ProgressWidget,
@@ -46,6 +49,10 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
                  class="class-for-districts-table"/>
             </column>
             <column span="1">
+                <election-compound-districts-map
+                 class="class-for-districts-map"/>
+            </column>
+            <column span="1">
                 <election-compound-list-groups-table
                  class="class-for-list-groups-table"/>
             </column>
@@ -71,7 +78,14 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
                 <election-compound-seat-allocation-chart
                  class="class-for-seat-allocation-chart"/>
             </column>
-
+            <column span="1">
+                <election-compound-superregions-table
+                 class="class-for-superregions-table"/>
+            </column>
+            <column span="1">
+                <election-compound-superregions-map
+                 class="class-for-superregions-map"/>
+            </column>
         </row>
     """
     widgets = [
@@ -85,10 +99,13 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         TotalEntitiesWidget(),
         ElectionCompoundCandidatesTableWidget(),
         ElectionCompoundDistrictsTableWidget(),
+        ElectionCompoundDistrictsMapWidget(),
         ElectionCompoundListGroupsChartWidget(),
         ElectionCompoundListGroupsTableWidget(),
         ElectionCompoundSeatAllocationChartWidget(),
         ElectionCompoundSeatAllocationTableWidget(),
+        ElectionCompoundSuperregionsTableWidget(),
+        ElectionCompoundSuperregionsMapWidget(),
     ]
 
     # Empty
@@ -118,6 +135,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'model': model,
         'request': request,
         'seat_allocations': [],
+        'superregions': {},
         'years': []
     }
 
@@ -126,11 +144,14 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     etree.fromstring(result.encode('utf-8'))
 
     assert '>Compound</span>' in result
+    assert 'ElectionCompound/by-district' in result
+    assert 'ElectionCompound/by-superregion' in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
     assert 'class-for-candidates-table' in result
     assert 'class-for-districts-table' in result
+    assert 'class-for-districts-map' in result
     assert 'class-for-list-groups-table' in result
     assert 'class-for-list-groups-chart' in result
     assert 'class-for-number-of-counted-entities' in result
@@ -138,6 +159,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'class-for-last-result-change' in result
     assert 'class-for-seat-allocation-table' in result
     assert 'class-for-seat-allocation-chart' in result
+    assert 'class-for-superregions-table' in result
+    assert 'class-for-superregions-map' in result
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
@@ -223,6 +246,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'model': model,
         'request': request,
         'seat_allocations': [],
+        'superregions': {},
         'years': []
     }
 
@@ -243,11 +267,15 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '0' in result
     assert '2' in result
     assert '01.01.2022' in result
+    assert 'election-compound-superregions-table' in result
+    assert 'ElectionCompound/by-district' in result
+    assert 'ElectionCompound/by-superregion' in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
     assert 'class-for-candidates-table' in result
     assert 'class-for-districts-table' in result
+    assert 'class-for-districts-map' in result
     assert 'class-for-list-groups-table' in result
     assert 'class-for-list-groups-chart' in result
     assert 'class-for-number-of-counted-entities' in result
@@ -255,6 +283,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'class-for-last-result-change' in result
     assert 'class-for-seat-allocation-table' in result
     assert 'class-for-seat-allocation-chart' in result
+    assert 'class-for-superregions-table' in result
+    assert 'class-for-superregions-map' in result
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
@@ -357,6 +387,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             ['SP', 6],
             ['SVP', 35]
         ],
+        'superregions': {},
         'years': ['2020']
     }
 
@@ -375,11 +406,15 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '2' in result
     assert '2' in result
     assert '02.01.2022' in result
+    assert 'election-compound-superregions-table' in result
+    assert 'ElectionCompound/by-district' in result
+    assert 'ElectionCompound/by-superregion' in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
     assert 'class-for-candidates-table' in result
     assert 'class-for-districts-table' in result
+    assert 'class-for-districts-map' in result
     assert 'class-for-list-groups-table' in result
     assert 'class-for-list-groups-chart' in result
     assert 'class-for-number-of-counted-entities' in result
@@ -387,3 +422,5 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'class-for-last-result-change' in result
     assert 'class-for-seat-allocation-table' in result
     assert 'class-for-seat-allocation-chart' in result
+    assert 'class-for-superregions-table' in result
+    assert 'class-for-superregions-map' in result
