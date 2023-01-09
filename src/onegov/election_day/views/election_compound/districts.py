@@ -16,16 +16,9 @@ def view_election_compound_districts(self, request):
 
     """" The districts view. """
 
-    map_type = 'districts'
-    if self.domain_elections == 'municipality':
-        map_type = 'entities'
-
     return {
         'election_compound': self,
         'layout': ElectionCompoundLayout(self, request, 'districts'),
-        'map_type': map_type,
-        'data_url': request.link(self, name='by-district'),
-        'embed_source': request.link(self, name='districts-map'),
     }
 
 
