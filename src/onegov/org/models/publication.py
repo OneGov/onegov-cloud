@@ -3,7 +3,7 @@ import sedate
 from datetime import datetime
 from onegov.core.collection import GenericCollection
 from onegov.file import File
-from sqlalchemy import and_, text
+from sqlalchemy import and_
 
 
 class PublicationCollection(GenericCollection):
@@ -20,9 +20,6 @@ class PublicationCollection(GenericCollection):
         query = super().query().filter(
             self.model_class.published.is_(True),
             self.model_class.publication.is_(True),
-            text("reference->>'content_type' = :content_type").bindparams(
-                content_type='application/pdf'
-            )
         )
 
         if self.year:
