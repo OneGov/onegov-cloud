@@ -4,8 +4,6 @@ from onegov.core.request import CoreRequest
 from unittest.mock import patch
 from webtest.forms import Upload
 
-from onegov.wtfs.forms.scan_job import DispatchTimeValidator
-
 
 def test_views_scan_job(client):
     # Add municipality dates
