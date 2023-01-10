@@ -32,11 +32,12 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     with open(cfg_path, 'w') as f:
         f.write(yaml.dump(cfg))
 
-    def login(username):
+    def login(username, yubikey=None):
         with patch('onegov.user.models.user.remembered'):
             with patch('onegov.user.models.user.forget'):
                 session = session_manager.session()
                 user = session.query(User).filter_by(username=username).one()
+                assert user.second_factor.get('data') == yubikey
                 number = len(user.sessions or {}) + 1
                 user.save_current_session(Bunch(
                     browser_session=Bunch(_token=f'session-{number}'),
@@ -205,7 +206,7 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     assert 'member@example.org was added' in result.output
 
     # Transfer yubikey
-    login('admin@example.org')
+    login('admin@example.org', yubikey='cccccccdefgh')
     login('member@example.org')
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -227,8 +228,11 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     assert 'admin@example.org' not in result.output
     assert 'member@example.org' not in result.output
 
-    # Change role
+    # Check if changed
     login('admin@example.org')
+    login('member@example.org', yubikey='cccccccdefgh')
+
+    # Change role
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',
