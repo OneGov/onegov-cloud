@@ -46,7 +46,10 @@ class DispatchTimeValidator:
 
         if self.too_late_to_scan():
             raise ValidationError(
-                f"Sorry, no scans are allowed after {self.max_hour}:00"
+                _(
+                    "Sorry, no scans are allowed after this time on the same "
+                    "day."
+                )
             )
 
     def too_late_to_scan(self):
@@ -60,12 +63,6 @@ class DispatchTimeValidator:
         return replace_timezone(
             datetime(year, month, day, hour, minute), self.timezone
         )
-
-    def is_timezone_aware(self, d: datetime):
-        try:
-            return d.tzinfo is not None and d.tzinfo.utcoffset(d) is not None
-        except AttributeError:
-            return False
 
 
 class AddScanJobForm(Form):

@@ -4,6 +4,8 @@ from onegov.core.request import CoreRequest
 from unittest.mock import patch
 from webtest.forms import Upload
 
+from onegov.wtfs.forms.scan_job import DispatchTimeValidator
+
 
 def test_views_scan_job(client):
     # Add municipality dates
@@ -315,16 +317,15 @@ def test_views_scan_jobs_permissions(mock_method, client):
 
 def test_views_scan_job_submit_after_five_o_clock(client):
 
-    def max_date(dates):
-        return max([datetime.strptime(d, "%Y-%m-%d") for d in dates]).strftime(
-            "%Y-%m-%d"
-        )
-
     def find_maximum_date_in_select():
+        """ Selects the latest date in dropdown. """
         add = client.get("/scan-jobs").click("Hinzufügen")
         options = add.pyquery(f'select[id="{date_field_id}"]').find("option")
         date_slider_options = [el.get("value") for el in options]
-        return max_date(date_slider_options)
+        return max(
+            [datetime.strptime(d, "%Y-%m-%d") for d in date_slider_options]
+        ).strftime("%Y-%m-%d")
+
     date_field_id = "dispatch_date_normal"
     client.login_editor()
     date_now = find_maximum_date_in_select()
@@ -334,18 +335,13 @@ def test_views_scan_job_submit_after_five_o_clock(client):
         result.form[date_field_id] = date_now
         result.form["dispatch_boxes"] = "1"
         page = result.form.submit()
-        message = "Sorry, no scans are allowed after"
-        assert message in page
-        assert "Scan-Auftrag hinzugefügt" not in page
+        assert "am selben Tag leider keine Scans mehr möglich." in page
 
         client.logout()
         # Exact same procedure applies for member
         client.login_member()
-
         result = client.get("/scan-jobs").click("Hinzufügen")
         result.form[date_field_id] = date_now
         result.form["dispatch_boxes"] = "1"
         page = result.form.submit()
-        message = "Sorry, no scans are allowed after"
-        assert message in page
-        assert "Scan-Auftrag hinzugefügt" not in page
+        assert "am selben Tag leider keine Scans mehr möglich." in page
