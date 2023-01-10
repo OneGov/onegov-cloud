@@ -9,20 +9,22 @@ from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.screen_widgets import (
-    AllocatedMandatesWidget,
     AbsoluteMajorityWidget,
+    AllocatedMandatesWidget,
     ColumnWidget,
     CountedEntitiesWidget,
-    NumberOfCountedEntitiesWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
+    ElectionTurnoutWidget,
+    IfCompletedWidget,
+    IfNotCompletedWidget,
     LastResultChangeWidget,
     MandatesWidget,
+    NumberOfCountedEntitiesWidget,
     NumberOfMandatesWidget,
-    ElectionTurnoutWidget,
     ProgressWidget,
     RowWidget,
     TitleWidget,
@@ -82,6 +84,10 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <last-result-change class="my-class-f"/>
             </column>
+            <column span="1">
+                <if-completed>is-completed</if-completed>
+                <if-not-completed>is-not-completed</if-not-completed>
+            </column>
         </row>
     """
     widgets = [
@@ -101,6 +107,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionTurnoutWidget(),
         MandatesWidget(),
         NumberOfMandatesWidget(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
     ]
 
     # Empty
@@ -131,6 +139,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     etree.fromstring(result.encode('utf-8'))
 
     assert '>Election</span>' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -257,6 +267,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '2' in result
     assert '0 of 2' in result
     assert '01.01.2022' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -444,6 +456,8 @@ def test_majorz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '2' in result
     assert '2' in result
     assert '2 of 2' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
     assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
@@ -517,6 +531,10 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <last-result-change class="my-class-g"/>
             </column>
+            <column span="1">
+                <if-completed>is-completed</if-completed>
+                <if-not-completed>is-not-completed</if-not-completed>
+            </column>
         </row>
     """
     widgets = [
@@ -536,6 +554,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         NumberOfMandatesWidget(),
         MandatesWidget(),
         ElectionTurnoutWidget(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
     ]
 
     # Empty
@@ -567,6 +587,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     etree.fromstring(result.encode('utf-8'))
 
     assert '>Election</span>' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -728,6 +750,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '1' in result
     assert '0 of 1' in result
     assert '01.01.2022' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -895,6 +919,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '1' in result
     assert '3 of 1' in result
     assert '02.01.2022' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result

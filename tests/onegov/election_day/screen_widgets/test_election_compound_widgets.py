@@ -18,6 +18,8 @@ from onegov.election_day.screen_widgets import (
     ElectionCompoundSeatAllocationTableWidget,
     ElectionCompoundSuperregionsMapWidget,
     ElectionCompoundSuperregionsTableWidget,
+    IfCompletedWidget,
+    IfNotCompletedWidget,
     LastResultChangeWidget,
     NumberOfCountedEntitiesWidget,
     ProgressWidget,
@@ -86,6 +88,10 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
                 <election-compound-superregions-map
                  class="class-for-superregions-map"/>
             </column>
+            <column span="1">
+                <if-completed>is-completed</if-completed>
+                <if-not-completed>is-not-completed</if-not-completed>
+            </column>
         </row>
     """
     widgets = [
@@ -106,6 +112,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         ElectionCompoundSeatAllocationTableWidget(),
         ElectionCompoundSuperregionsTableWidget(),
         ElectionCompoundSuperregionsMapWidget(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
     ]
 
     # Empty
@@ -146,6 +154,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert '>Compound</span>' in result
     assert 'ElectionCompound/by-district' in result
     assert 'ElectionCompound/by-superregion' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
@@ -270,6 +280,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'election-compound-superregions-table' in result
     assert 'ElectionCompound/by-district' in result
     assert 'ElectionCompound/by-superregion' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
@@ -409,6 +421,8 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
     assert 'election-compound-superregions-table' in result
     assert 'ElectionCompound/by-district' in result
     assert 'ElectionCompound/by-superregion' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
     assert 'class-for-title' in result
     assert 'class-for-progress' in result
     assert 'class-for-counted-entities' in result
