@@ -172,6 +172,61 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
     assert result.exit_code == 0
     assert 'admin@example.org' not in result.output
 
+    # Change yubikey
+    login('admin@example.org')
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-yubikey', 'admin@example.org',
+        '--yubikey', 'cccccccdefgh'
+    ])
+    assert result.exit_code == 0
+    assert "admin@example.org's yubikey was changed" in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+
+    # Create new user
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'add', 'member', 'member@example.org',
+        '--password', 'hunter2',
+        '--no-prompt',
+    ])
+    assert result.exit_code == 0
+    assert 'Adding member@example.org to foo/bar' in result.output
+    assert 'member@example.org was added' in result.output
+
+    # Transfer yubikey
+    login('admin@example.org')
+    login('member@example.org')
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'transfer-yubikey', 'admin@example.org', 'member@example.org'
+    ])
+    assert result.exit_code == 0
+    assert (
+        "yubikey was transferred from admin@example.org to member@example.org"
+    ) in result.output
+
+    # List all sessions, check if logged-out
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'list-sessions'
+    ])
+    assert result.exit_code == 0
+    assert 'admin@example.org' not in result.output
+    assert 'member@example.org' not in result.output
+
     # Change role
     login('admin@example.org')
     result = runner.invoke(cli, [
@@ -272,6 +327,25 @@ def test_cli(postgres_dsn, session_manager, temporary_directory, redis_url):
         '--select', '/foo/bar',
         'change-password', 'admin@example.org',
         '--password', 'hunter2'
+    ])
+    assert result.exit_code == 1
+    assert 'admin@example.org does not exist' in result.output
+
+    # Try to change yubikey of deleted user
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'change-yubikey', 'admin@example.org',
+        '--yubikey', 'cccccccdefgh'
+    ])
+    assert result.exit_code == 1
+    assert 'admin@example.org does not exist' in result.output
+
+    # Try to transfer yubikey of deleted user
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'transfer-yubikey', 'admin@example.org', 'member@example.org'
     ])
     assert result.exit_code == 1
     assert 'admin@example.org does not exist' in result.output
