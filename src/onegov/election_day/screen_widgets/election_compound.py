@@ -5,6 +5,7 @@ from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
 
@@ -27,11 +28,13 @@ class ElectionCompoundSeatAllocationTableWidget(ModelBoundWidget):
 
     def get_variables(self, layout):
         model = self.model or layout.model
-        years, parties = get_party_results(model)
-        seat_allocations = get_party_results_seat_allocation(years, parties)
+        party_years, parties = get_party_results(model)
+        seat_allocations = get_party_results_seat_allocation(
+            party_years, parties
+        )
         return {
             'election_compound': model,
-            'years': years,
+            'party_years': party_years,
             'seat_allocations': seat_allocations,
         }
 
@@ -81,7 +84,7 @@ class ElectionCompoundListGroupsTableWidget(ModelBoundWidget):
     tag = 'election-compound-list-groups-table'
     template = """
         <xsl:template match="election-compound-list-groups-table">
-            <div class="{@class}" tal:define="names '{@names}'">
+            <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['election-compound-list-groups-table']"
                     />
@@ -96,6 +99,37 @@ class ElectionCompoundListGroupsTableWidget(ModelBoundWidget):
         return {
             'election': model,
             'groups': groups
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-party-strengths-table',
+    category='election_compound'
+)
+class ElectionCompoundPartyStrengthsTableWidget(ModelBoundWidget):
+    tag = 'election-compound-party-strengths-table'
+    template = """
+        <xsl:template match="election-compound-party-strengths-table">
+            <div class="{@class}" tal:define="year '{@year}'">
+                <tal:block
+                    metal:use-macro="layout.macros['party-strengths-table']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-compound-party-strengths-table year="" class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        party_years, parties = get_party_results(model)
+        party_deltas, party_results = get_party_results_deltas(
+            model, party_years, parties
+        )
+        return {
+            'election': model,
+            'party_years': party_years,
+            'party_deltas': party_deltas,
+            'party_results': party_results
         }
 
 
@@ -207,9 +241,7 @@ class ElectionCompoundListGroupsChartWidget(ChartWidget):
     tag = 'election-compound-list-groups-chart'
     template = """
         <xsl:template match="election-compound-list-groups-chart">
-            <div class="{@class}"
-                 tal:define="limit '0{@limit}'; names '{@names}'"
-                 >
+            <div class="{@class}">
                 <tal:block
                     metal:use-macro="layout.macros['list-groups-chart']"
                     />

@@ -136,7 +136,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'request': request,
         'seat_allocations': [],
         'superregions': {},
-        'years': []
+        'party_years': []
     }
 
     result = transform_structure(widgets, structure)
@@ -247,7 +247,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
         'request': request,
         'seat_allocations': [],
         'superregions': {},
-        'years': []
+        'party_years': []
     }
 
     result = transform_structure(widgets, structure)
@@ -388,7 +388,7 @@ def test_election_compound_widgets(election_day_app_sg, import_test_datasets):
             ['SVP', 35]
         ],
         'superregions': {},
-        'years': ['2020']
+        'party_years': ['2020']
     }
 
     assert '>Compound</span>' in result

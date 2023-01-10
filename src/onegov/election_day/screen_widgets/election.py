@@ -4,6 +4,8 @@ from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_candidates_results_by_entity
 from onegov.election_day.utils.election import get_list_results
+from onegov.election_day.utils.parties import get_party_results
+from onegov.election_day.utils.parties import get_party_results_deltas
 
 
 @ElectionDayApp.screen_widget(
@@ -85,6 +87,37 @@ class ElectionListsTableWidget(ModelBoundWidget):
         return {
             'election': model,
             'lists': lists
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-party-strengths-table',
+    category='proporz_election'
+)
+class ElectionPartyStrengthsTableWidget(ModelBoundWidget):
+    tag = 'election-party-strengths-table'
+    template = """
+        <xsl:template match="election-party-strengths-table">
+            <div class="{@class}" tal:define="year '{@year}'">
+                <tal:block
+                    metal:use-macro="layout.macros['party-strengths-table']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-party-strengths-table year="" class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        party_years, parties = get_party_results(model)
+        party_deltas, party_results = get_party_results_deltas(
+            model, party_years, parties
+        )
+        return {
+            'election': model,
+            'party_years': party_years,
+            'party_deltas': party_deltas,
+            'party_results': party_results
         }
 
 

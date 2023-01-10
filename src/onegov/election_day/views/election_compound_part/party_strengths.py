@@ -58,18 +58,20 @@ def view_election_compound_party_strengths_table(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    years, parties = get_party_results(self)
-    deltas, results = get_party_results_deltas(self, years, parties)
+    party_years, parties = get_party_results(self)
+    party_deltas, party_results = get_party_results_deltas(
+        self, party_years, parties
+    )
     year = request.params.get('year', '')
 
     return {
         'layout': ElectionCompoundPartLayout(self, request, 'party-strengths'),
         'type': 'election-compound-part-table',
         'scope': 'party-strengths',
-        'results': results,
-        'years': years,
+        'party_results': party_results,
+        'party_years': party_years,
         'year': year,
-        'deltas': deltas
+        'party_deltas': party_deltas
     }
 
 
@@ -85,13 +87,15 @@ def view_election_compound_part_party_strengths(self, request):
 
     layout = ElectionCompoundPartLayout(self, request, 'party-strengths')
 
-    years, parties = get_party_results(self)
-    deltas, results = get_party_results_deltas(self, years, parties)
+    party_years, parties = get_party_results(self)
+    party_deltas, party_results = get_party_results_deltas(
+        self, party_years, parties
+    )
 
     return {
         'election_compound_part': self,
         'layout': layout,
-        'results': results,
-        'years': years,
-        'deltas': deltas
+        'party_results': party_results,
+        'party_years': party_years,
+        'party_deltas': party_deltas
     }
