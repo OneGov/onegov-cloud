@@ -20,7 +20,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired, ValidationError
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
-from sedate import pytz, replace_timezone
+from sedate import pytz, replace_timezone, utcnow
 
 
 def coerce_date(value):
@@ -38,7 +38,7 @@ class DispatchTimeValidator:
 
     def __call__(self, form, field):
         dispatch_date = field.data
-        now = datetime.now(pytz.timezone(self.timezone))
+        now = utcnow()
 
         if isinstance(dispatch_date, date):
             if dispatch_date != now.date():
