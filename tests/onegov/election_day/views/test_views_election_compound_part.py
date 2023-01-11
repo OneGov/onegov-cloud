@@ -90,6 +90,19 @@ def test_view_election_compound_part_party_strengths(election_day_app_bl):
         '/elections-part/elections/superregion/region-1/party-strengths-data'
     ) in chart
 
+    # embedded tables
+    assert 'panel_2022' in client.get(
+        '/elections-part/elections/superregion/region-1/party-strengths-table'
+    )
+    assert 'panel_2022' in client.get(
+        '/elections-part/elections/superregion/region-1/party-strengths-table'
+        '?year=2022'
+    )
+    assert 'panel_2022' not in client.get(
+        '/elections-part/elections/superregion/region-1/party-strengths-table'
+        '?year=2018'
+    )
+
     # json
     assert client.get(
         '/elections-part/elections/superregion/region-1/json'

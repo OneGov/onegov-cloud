@@ -46,6 +46,35 @@ def view_election_party_strengths_chart(self, request):
 
 @ElectionDayApp.html(
     model=Election,
+    name='party-strengths-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_election_compound_party_strengths_table(self, request):
+
+    """" View the party strengths as table. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
+    years, parties = get_party_results(self)
+    deltas, results = get_party_results_deltas(self, years, parties)
+    year = request.params.get('year', '')
+
+    return {
+        'layout': ElectionLayout(self, request, 'party-strengths'),
+        'type': 'election-table',
+        'scope': 'party-strengths',
+        'results': results,
+        'years': years,
+        'year': year,
+        'deltas': deltas
+    }
+
+
+@ElectionDayApp.html(
+    model=Election,
     name='party-strengths',
     template='election/party_strengths.pt',
     permission=Public

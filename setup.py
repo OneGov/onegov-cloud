@@ -179,7 +179,8 @@ setup(
             'alabaster',
             'Jinja2',
             'sphinx',
-            'sphinx-autoapi'
+            'sphinx-autoapi',
+            'typing-extensions'
         ],
         'test': [
             'Pillow',

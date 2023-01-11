@@ -1,10 +1,13 @@
 from onegov.election_day.screen_widgets.election_compound import (
     ElectionCompoundCandidatesTableWidget,
+    ElectionCompoundDistrictsMapWidget,
     ElectionCompoundDistrictsTableWidget,
     ElectionCompoundListGroupsChartWidget,
     ElectionCompoundListGroupsTableWidget,
     ElectionCompoundSeatAllocationChartWidget,
-    ElectionCompoundSeatAllocationTableWidget
+    ElectionCompoundSeatAllocationTableWidget,
+    ElectionCompoundSuperregionsMapWidget,
+    ElectionCompoundSuperregionsTableWidget
 )
 from onegov.election_day.screen_widgets.election import (
     AllocatedMandatesWidget,
@@ -25,6 +28,8 @@ from onegov.election_day.screen_widgets.generic import (
     H2Widget,
     H3Widget,
     HRWidget,
+    IfCompletedWidget,
+    IfNotCompletedWidget,
     LastResultChangeWidget,
     LogoWidget,
     NumberOfCountedEntitiesWidget,
@@ -64,11 +69,14 @@ __all__ = (
     'ElectionCandidatesChartWidget',
     'ElectionCandidatesTableWidget',
     'ElectionCompoundCandidatesTableWidget',
+    'ElectionCompoundDistrictsMapWidget',
     'ElectionCompoundDistrictsTableWidget',
     'ElectionCompoundListGroupsChartWidget',
     'ElectionCompoundListGroupsTableWidget',
     'ElectionCompoundSeatAllocationChartWidget',
     'ElectionCompoundSeatAllocationTableWidget',
+    'ElectionCompoundSuperregionsMapWidget',
+    'ElectionCompoundSuperregionsTableWidget',
     'ElectionListsChartWidget',
     'ElectionListsTableWidget',
     'ElectionTurnoutWidget',
@@ -76,6 +84,8 @@ __all__ = (
     'H2Widget',
     'H3Widget',
     'HRWidget',
+    'IfCompletedWidget',
+    'IfNotCompletedWidget',
     'LastResultChangeWidget',
     'LogoWidget',
     'MandatesWidget',

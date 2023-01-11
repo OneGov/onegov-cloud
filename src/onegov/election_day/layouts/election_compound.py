@@ -18,6 +18,7 @@ class ElectionCompoundLayout(DetailLayout):
         'superregions',
         'districts',
         'candidates',
+        'party-strengths',
         'statistics'
     )
 

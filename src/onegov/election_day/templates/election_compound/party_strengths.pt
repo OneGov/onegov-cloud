@@ -26,7 +26,8 @@
                 </div>
             </div>
 
-            <div metal:use-macro="layout.macros['party_strengths']" tal:define="voters_counts election_compound.voters_counts"/>
+            <div metal:use-macro="layout.macros['party-strengths-table']"/>
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link()" />
 
         </tal:block>
 

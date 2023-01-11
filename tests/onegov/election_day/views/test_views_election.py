@@ -445,6 +445,16 @@ def test_view_election_party_strengths(election_day_app_gr):
     assert chart.status_code == 200
     assert '/election/proporz-election/party-strengths-data' in chart
 
+    assert 'panel_2022' in client.get(
+        '/election/proporz-election/party-strengths-table'
+    )
+    assert 'panel_2022' in client.get(
+        '/election/proporz-election/party-strengths-table?year=2022'
+    )
+    assert 'panel_2022' not in client.get(
+        '/election/proporz-election/party-strengths-table?year=2018'
+    )
+
     export = client.get('/election/proporz-election/data-parties-csv').text
     lines = [l for l in export.split('\r\n') if l]
     assert lines == [
@@ -776,8 +786,6 @@ def test_view_election_json(election_day_app_gr):
     assert all((expected in str(response.json) for expected in (
         "Engler", "Stefan", "20", "Schmid", "Martin", "18"
     )))
-    for tab in ElectionLayout.tabs_with_embedded_tables:
-        assert f'{tab}-table' in str(response.json['embed'])
 
     response = client.get('/election/proporz-election/json')
     assert response.headers['Access-Control-Allow-Origin'] == '*'

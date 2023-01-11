@@ -80,7 +80,9 @@ def view_election_json(self, request):
             media['charts'][tab] = request.link(self, f'{tab}-svg')
 
     for tab in ElectionLayout.tabs_with_embedded_tables:
-        embed[tab].append(request.link(self, f'{tab}-table'))
+        layout = ElectionLayout(self, request, tab=tab)
+        if layout.visible:
+            embed[tab].append(layout.table_link())
 
     years, parties = get_party_results(self, json_serializable=True)
 

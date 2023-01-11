@@ -12,6 +12,7 @@ class ElectionCompoundPartLayout(DetailLayout):
     tabs_with_embedded_tables = (
         'districts',
         'candidates',
+        'party-strengths',
         'statistics'
     )
 

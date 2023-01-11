@@ -3,6 +3,7 @@ from onegov.election_day.screen_widgets.generic import ChartWidget
 from onegov.election_day.screen_widgets.generic import ModelBoundWidget
 from onegov.election_day.utils.election_compound import get_elected_candidates
 from onegov.election_day.utils.election_compound import get_list_groups
+from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
@@ -57,7 +58,11 @@ class ElectionCompoundCandidatesTableWidget(ModelBoundWidget):
         request = layout.request
         session = request.session
         districts = {
-            election.id: (election.domain_segment, request.link(election))
+            election.id: (
+                election.domain_segment,
+                layout.request.link(election),
+                election.domain_supersegment,
+            )
             for election in model.elections
         }
         elected_candidates = get_elected_candidates(model, session).all()
@@ -114,6 +119,82 @@ class ElectionCompoundDistrictsTableWidget(ModelBoundWidget):
     def get_variables(self, layout):
         model = self.model or layout.model
         return {
+            'election_compound': model,
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-districts-map',
+    category='election_compound'
+)
+class ElectionCompoundDistrictsMapWidget(ModelBoundWidget):
+    tag = 'election-compound-districts-map'
+    template = """
+        <xsl:template match="election-compound-districts-map">
+            <div class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['election-compound-districts-map']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-compound-districts-map class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
+            'election_compound': model,
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-superregions-table',
+    category='election_compound'
+)
+class ElectionCompoundSuperregionsTableWidget(ModelBoundWidget):
+    tag = 'election-compound-superregions-table'
+    template = """
+        <xsl:template match="election-compound-superregions-table">
+            <div class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['election-compound-superregions-table']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-compound-superregions-table class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        superregions = get_superregions(model, layout.app.principal)
+        return {
+            'election_compound': model,
+            'superregions': superregions
+        }
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-superregions-map',
+    category='election_compound'
+)
+class ElectionCompoundSuperregionsMapWidget(ModelBoundWidget):
+    tag = 'election-compound-superregions-map'
+    template = """
+        <xsl:template match="election-compound-superregions-map">
+            <div class="{@class}">
+                <tal:block
+                    metal:use-macro="layout.macros['election-compound-superregions-map']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = '<election-compound-superregions-map class=""/>'
+
+    def get_variables(self, layout):
+        model = self.model or layout.model
+        return {
+            'embed': False,
             'election_compound': model,
         }
 

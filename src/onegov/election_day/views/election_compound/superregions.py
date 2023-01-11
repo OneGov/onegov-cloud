@@ -20,10 +20,7 @@ def view_election_compound_superregions(self, request):
     return {
         'election_compound': self,
         'layout': ElectionCompoundLayout(self, request, 'superregions'),
-        'map_type': 'districts',
         'superregions': get_superregions(self, request.app.principal),
-        'data_url': request.link(self, name='by-superregion'),
-        'embed_source': request.link(self, name='superregions-map'),
     }
 
 

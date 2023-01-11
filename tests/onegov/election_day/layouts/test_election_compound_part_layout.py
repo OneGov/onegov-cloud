@@ -92,7 +92,7 @@ def test_election_compound_part_layout_general(session):
     for tab, expected in (
         ('districts', 'ElectionCompoundPart/districts-table'),
         ('candidates', 'ElectionCompoundPart/candidates-table'),
-        ('party-strengths', None),
+        ('party-strengths', 'ElectionCompoundPart/party-strengths-table'),
         ('statistics', 'ElectionCompoundPart/statistics-table')
     ):
         layout = ElectionCompoundPartLayout(part, DummyRequest(), tab=tab)
