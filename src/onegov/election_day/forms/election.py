@@ -100,9 +100,12 @@ class ElectionForm(Form):
     )
 
     has_expats = BooleanField(
-        label=_("Expats"),
+        label=_("Expats are listed separately"),
         fieldset=_("View options"),
-        description=_("The election contains seperate results for expats."),
+        description=_(
+            "Expats are uploaded and listed as a separate row in the results. "
+            "Changing this option requires a new upload of the data."
+        ),
         render_kw=dict(force_simple=True)
     )
 
