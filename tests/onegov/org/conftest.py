@@ -1,5 +1,6 @@
 import os
 from datetime import date, timedelta
+from depot.manager import DepotManager
 from uuid import uuid4
 
 import onegov.ticket
@@ -48,6 +49,18 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
     with open(cfg_path, 'w') as f:
         f.write(dump(cfg))
     return cfg_path
+
+
+@pytest.fixture(scope='function', autouse=True)
+def depot(temporary_directory):
+    DepotManager.configure('default', {
+        'depot.backend': 'depot.io.local.LocalFileStorage',
+        'depot.storage_path': temporary_directory
+    })
+
+    yield DepotManager.get()
+
+    DepotManager._clear()
 
 
 class Client(BaseClient):
