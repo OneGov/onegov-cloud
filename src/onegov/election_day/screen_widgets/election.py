@@ -173,6 +173,27 @@ class ElectionListsChartWidget(ChartWidget):
 
 
 @ElectionDayApp.screen_widget(
+    tag='election-party-strengths-chart',
+    category='proporz_election'
+)
+class ElectionPartyStrengthsChartWidget(ChartWidget):
+    tag = 'election-party-strengths-chart'
+    template = """
+        <xsl:template match="election-party-strengths-chart">
+            <div class="{@class}"
+                 tal:define="horizontal '{@horizontal}'=='true'">
+                <tal:block
+                    metal:use-macro="layout.macros['party-strengths-chart']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = (
+        '<election-party-strengths-chart horizontal="false" class=""/>'
+    )
+
+
+@ElectionDayApp.screen_widget(
     tag='allocated-mandates',
     category='election'
 )

@@ -267,3 +267,25 @@ class ElectionCompoundSeatAllocationChartWidget(ChartWidget):
         </xsl:template>
     """
     usage = '<election-compound-seat-allocation-chart class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='election-compound-party-strengths-chart',
+    category='election_compound'
+)
+class ElectionCompoundPartyStrengthsChartWidget(ChartWidget):
+    tag = 'election-compound-party-strengths-chart'
+    template = """
+        <xsl:template match="election-compound-party-strengths-chart">
+            <div class="{@class}"
+                 tal:define="horizontal '{@horizontal}'=='true'">
+                <tal:block
+                    metal:use-macro="layout.macros['party-strengths-chart']"
+                    />
+            </div>
+        </xsl:template>
+    """
+    usage = (
+        '<election-compound-party-strengths-chart horizontal="false" '
+        'class=""/>'
+    )

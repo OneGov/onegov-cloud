@@ -518,7 +518,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         ['SVP', 19]
     ]
 
-    assert get_party_results_data(election_compound) == {
+    assert get_party_results_data(election_compound, False) == {
         'axis_units': {'back': '%', 'front': ''},
         'groups': ['AL', 'CVP', 'FDP', 'GLP', 'Piraten', 'SP', 'SVP'],
         'labels': ['2014'],
@@ -577,8 +577,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
         'title': 'Compound'
     }
 
-    election_compound.horizontal_party_strengths = True
-    assert get_party_results_data(election_compound) == {
+    assert get_party_results_data(election_compound, True) == {
         'results': [
             {
                 'class': 'active',
@@ -655,7 +654,7 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     deltas = get_party_results_deltas(election_compound, years, parties)
     assert deltas[1]['2014'][0][2] == Decimal('538.00')
 
-    data = get_party_results_data(election_compound)
+    data = get_party_results_data(election_compound, False)
     assert data['results'][0]['value']['back'] == 13.78
 
     # ... with votes
@@ -674,11 +673,10 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     deltas = get_party_results_deltas(election_compound, years, parties)
     assert deltas[1]['2014'][0][2] == 43062
 
-    data = get_party_results_data(election_compound)
+    data = get_party_results_data(election_compound, False)
     assert data['results'][0]['value']['back'] == 13.8
 
-    election_compound.horizontal_party_strengths = True
-    data = get_party_results_data(election_compound)
+    data = get_party_results_data(election_compound, True)
     assert data['results'][0]['value'] == 74448
 
     # incomplete data (only check for exceptions)
@@ -694,9 +692,8 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     get_party_results_deltas(election_compound, years, parties)
     get_party_results_seat_allocation(years, parties)
     get_parties_panachage_data(election_compound)
-    get_party_results_data(election_compound)
-    election_compound.horizontal_party_strengths = False
-    get_party_results_data(election_compound)
+    get_party_results_data(election_compound, False)
+    get_party_results_data(election_compound, True)
 
 
 def test_election_utils_candidate_statistics(

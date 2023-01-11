@@ -3,6 +3,7 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
@@ -20,7 +21,8 @@ def view_election_compound_part_party_strengths_data(self, request):
 
     """
 
-    return get_party_results_data(self)
+    horizontal = get_parameter(request, 'horizontal', bool, None)
+    return get_party_results_data(self, horizontal)
 
 
 @ElectionDayApp.html(
@@ -41,6 +43,7 @@ def view_election_compound_part_party_strengths_chart(self, request):
         'model': self,
         'layout': ElectionCompoundPartLayout(self, request),
         'type': 'party-strengths-chart',
+        'horizontal': self.horizontal_party_strengths
     }
 
 
