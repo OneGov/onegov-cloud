@@ -1,3 +1,4 @@
+from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.request import CoreRequest
 from unittest.mock import patch
@@ -310,3 +311,35 @@ def test_views_scan_jobs_permissions(mock_method, client):
     client.get(f'/scan-job/{id}/edit-unrestricted')
     client.delete(f'/scan-job/{id}')
     client.logout()
+
+
+def test_views_scan_job_submit_after_five_o_clock(client):
+
+    def find_maximum_date_in_select():
+        """ Selects the latest date in dropdown. """
+        add = client.get("/scan-jobs").click("Hinzufügen")
+        options = add.pyquery(f'select[id="{date_field_id}"]').find("option")
+        date_slider_options = [el.get("value") for el in options]
+        return max(
+            [datetime.strptime(d, "%Y-%m-%d") for d in date_slider_options]
+        ).strftime("%Y-%m-%d")
+
+    date_field_id = "dispatch_date_normal"
+    client.login_editor()
+    date_now = find_maximum_date_in_select()
+
+    with freeze_time(f"{date_now} 17:00"):
+        result = client.get("/scan-jobs").click("Hinzufügen")
+        result.form[date_field_id] = date_now
+        result.form["dispatch_boxes"] = "1"
+        page = result.form.submit()
+        assert "am selben Tag leider keine Scans mehr möglich." in page
+
+        client.logout()
+        # Exact same procedure applies for member
+        client.login_member()
+        result = client.get("/scan-jobs").click("Hinzufügen")
+        result.form[date_field_id] = date_now
+        result.form["dispatch_boxes"] = "1"
+        page = result.form.submit()
+        assert "am selben Tag leider keine Scans mehr möglich." in page
