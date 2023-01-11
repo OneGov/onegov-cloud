@@ -8,15 +8,30 @@
 }
 
 .searchbox {
+    margin-bottom: 2rem;
 
     .input-group {
         margin-bottom: 0;
+
+        input {
+            border-radius: .7rem;
+        }
+
+        .button {
+            margin-left: 1.5rem;
+            padding: .2rem .7rem !important;
+
+            &:hover {
+                margin-left: 1rem;
+                padding: .2rem 1.2rem !important;
+            }
+        }
     }
 
     .typeahead ul {
-        border: 1px solid #0068a5;
+        border: 1px solid $primary-color;
         border-radius: .7rem;
-        box-shadow: 0 0 17px 0 rgba(0, 0, 0, .05);
+        box-shadow: none;
         left: 0;
         padding: .7rem 0;
 
@@ -30,7 +45,9 @@
                 text-align: left;
                 width: 100%;
 
-                &:hover {
+                &:hover,
+                &:focus {
+                    color: $oil !important;
                     font-weight: normal !important;
                 }
             }
