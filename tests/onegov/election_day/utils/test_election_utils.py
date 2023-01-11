@@ -954,7 +954,7 @@ def test_election_utils_parties(import_test_datasets, session):
         ['SVP', 1, 1]
     ]
 
-    assert get_party_results_data(election) == {
+    assert get_party_results_data(election, False) == {
         'axis_units': {'back': '%', 'front': ''},
         'groups': ['AL', 'CVP', 'FDP', 'GLP', 'SP', 'SVP'],
         'labels': ['2011', '2015'],
@@ -1047,8 +1047,7 @@ def test_election_utils_parties(import_test_datasets, session):
         ],
         'title': 'proporz_internal_nationalratswahlen-2015'
     }
-    election.horizontal_party_strengths = True
-    assert get_party_results_data(election) == {
+    assert get_party_results_data(election, True) == {
         'results': [
             {
                 'class': 'active',
@@ -1233,9 +1232,8 @@ def test_election_utils_parties(import_test_datasets, session):
     get_party_results_deltas(election, years, parties)
     get_party_results_seat_allocation(years, parties)
     get_parties_panachage_data(election)
-    get_party_results_data(election)
-    election.horizontal_party_strengths = False
-    get_party_results_data(election)
+    get_party_results_data(election, True)
+    get_party_results_data(election, False)
 
 
 def test_get_connection_results_internal(import_test_datasets, session):

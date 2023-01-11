@@ -424,12 +424,12 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
-        tal:condition="years"
+        tal:condition="party_years"
         >
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
-                <th tal:repeat="year years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
+                <th tal:repeat="year party_years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
             </tr>
         </thead>
         <tbody>
@@ -937,11 +937,11 @@
 </metal:seat-allocation-chart i18n:domain="onegov.election_day">
 
 <metal:party-strengths-chart define-macro="party-strengths-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="not: model.horizontal_party_strengths|False">
+    <tal:block tal:condition="not horizontal">
         <tal:block tal:condition="embed">
             <div class="grouped-bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='party-strengths-data')}"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
                 data-show-back="true"
                 data-embed-link="Embed diagram"
                 data-embed-source="${request.link(model, name='party-strengths-chart')}">
@@ -949,23 +949,23 @@
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="grouped-bar-chart"
-                data-dataurl="${request.link(model, name='party-strengths-data')}"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
                 data-show-back="true">
             </div>
         </tal:block>
     </tal:block>
-    <tal:block tal:condition="model.horizontal_party_strengths|False">
+    <tal:block tal:condition="horizontal">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='party-strengths-data')}"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
                 data-embed-link="Embed diagram"
                 data-embed-source="${request.link(model, name='party-strengths-chart')}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='party-strengths-data')}">
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}">
             </div>
         </tal:block>
     </tal:block>
@@ -1219,7 +1219,7 @@
 
 <metal:tab_menu define-macro="tab_menu" i18n:domain="onegov.election_day">
     <div class="tab-navigation clearfix" tal:condition="layout.menu">
-        <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
+        <nav class="top-bar clearfix" data-topbar="" data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
             <ul class="title-area">
                 <li class="name menu-icon"><span>${layout.title()}</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
@@ -1502,7 +1502,7 @@
 
 <metal:party_strengths_figure define-macro="party_strengths_figure" i18n:domain="onegov.election_day">
     <figure>
-        <tal:block metal:use-macro="layout.macros['party-strengths-chart']" tal:define="embed True"/>
+        <tal:block metal:use-macro="layout.macros['party-strengths-chart']" tal:define="embed True; horizontal model.horizontal_party_strengths|False"/>
         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
         </a>
@@ -1516,23 +1516,23 @@
 
 <metal:party-strengths-table define-macro="party-strengths-table" i18n:domain="onegov.election_day">
     <tal:block tal:define="voters_counts layout.model.voters_counts|False; year year|None">
-        <div class="tab-navigation clearfix" tal:condition="not year">
-            <nav class="top-bar" data-topbar role="navigation">
+        <div class="tab-navigation clearfix" tal:condition="party_years and not year">
+            <nav class="top-bar" data-topbar="" role="navigation">
                 <ul class="title-area">
                     <li class="name menu-icon"><span i18n:translate="">Year</span></li>
                     <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
                 </ul>
                 <div class="top-bar-section">
-                    <ul class="left tabs" data-tab>
-                        <tal:block tal:repeat="year sorted(years, reverse=True)">
+                    <ul class="left tabs" data-tab="">
+                        <tal:block tal:repeat="year sorted(party_years, reverse=True)">
                             <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
                         </tal:block>
                     </ul>
                 </div>
             </nav>
         </div>
-        <div class="tabs-content">
-            <tal:block tal:repeat="current_year sorted(years, reverse=True)">
+        <div class="tabs-content" tal:condition="party_years">
+            <tal:block tal:repeat="current_year sorted(party_years, reverse=True)">
                 <div tal:attributes="class 'content active' if repeat.current_year.start or year == current_year else 'content'" id="panel_${current_year}" tal:condition="not year or year == current_year">
                     <table
                         class="results tablesaw sortable"
@@ -1548,11 +1548,11 @@
                                 <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
                                 <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
                                 <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                                <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
+                                <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="party_deltas">Difference</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr tal:repeat="line results[current_year]">
+                            <tr tal:repeat="line party_results[current_year]">
                                 <tal:block tal:repeat="cell line">
                                     <td tal:condition="repeat.cell.start">${cell}</td>
                                     <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
