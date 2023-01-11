@@ -176,7 +176,9 @@ class D3Renderer():
         chart = None
         data = None
         if isinstance(item, (Election, ElectionCompound)):
-            data = get_party_results_data(item)
+            data = get_party_results_data(
+                item, item.horizontal_party_strengths
+            )
             if data and data.get('results'):
                 if item.horizontal_party_strengths:
                     chart = self.get_chart('bar', fmt, data)

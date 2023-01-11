@@ -56,14 +56,14 @@ def view_election_compound_seat_allocation(self, request):
 
     layout = ElectionCompoundLayout(self, request, 'seat-allocation')
 
-    years, parties = get_party_results(self)
-    seat_allocations = get_party_results_seat_allocation(years, parties)
+    party_years, parties = get_party_results(self)
+    seat_allocations = get_party_results_seat_allocation(party_years, parties)
 
     return {
         'election_compound': self,
         'layout': layout,
         'seat_allocations': seat_allocations,
-        'years': years,
+        'party_years': party_years,
     }
 
 
@@ -93,8 +93,8 @@ def view_election_compound_seat_allocation_table(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    years, parties = get_party_results(self)
-    seat_allocations = get_party_results_seat_allocation(years, parties)
+    party_years, parties = get_party_results(self)
+    seat_allocations = get_party_results_seat_allocation(party_years, parties)
 
     return {
         'election_compound': self,
@@ -102,5 +102,5 @@ def view_election_compound_seat_allocation_table(self, request):
         'type': 'election-compound-table',
         'scope': 'seat-allocation',
         'seat_allocations': seat_allocations,
-        'years': years,
+        'party_years': party_years,
     }
