@@ -86,8 +86,8 @@ class ElectionCompoundForm(Form):
         label=_("Completes manually"),
         description=_(
             "Enables manual completion of the election compound. "
-            "No indidvidual election results are displayed until the election "
-            "compound is manually completed."
+            "All elections are completed only once the election compound "
+            "is completed."
         ),
         fieldset=_("Completion"),
         render_kw=dict(force_simple=True)

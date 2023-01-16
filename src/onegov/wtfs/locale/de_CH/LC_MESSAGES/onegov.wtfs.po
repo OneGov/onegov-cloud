@@ -612,3 +612,7 @@ msgstr "Benutzer gelöscht."
 
 msgid "User manual modified."
 msgstr "Benutzerhandbuch geändert."
+
+msgid "Sorry, no scans are allowed after this time on the same day."
+msgstr "Nach dieser Uhrzeit sind am selben Tag leider keine Scans mehr möglich."
+
