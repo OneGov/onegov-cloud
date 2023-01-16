@@ -1493,10 +1493,14 @@
 
 
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town6">
-    <span class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
-    <p condition="result.lead" class="list-lead">
-        ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-    </p>
+    <a href="${request.link(result)}">
+        <span class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
+    </a>
+    <a tal:condition="result.lead" href="${request.link(result)}">
+        <p class="list-lead preview">
+            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+        </p>
+    </a>
 </metal:search_result_default>
 
 

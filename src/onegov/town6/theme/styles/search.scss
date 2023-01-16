@@ -127,42 +127,6 @@
     }
 }
 
-/*
-    Search results
-*/
-ul.search-results {
-    * {
-        font-family: $header-font-family;
-    }
-
-    a {
-        display: block;
-        font-weight: bold;
-    }
-
-    ul {
-        list-style-type: none;
-        margin-left: 0;
-    }
-
-    > li {
-        margin-bottom: 1em;
-    }
-
-    div.event-child-results > ul {
-
-        list-style-type: disc;
-        margin-left: 1em;
-
-        > li {
-            font-size: .9rem;
-        }
-
-        a {
-            font-weight: normal;
-        }
-    }
-}
 
 .result-explanation li {
     background-color: $white-smoke;
