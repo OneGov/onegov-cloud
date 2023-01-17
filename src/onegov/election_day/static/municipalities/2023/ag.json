@@ -327,10 +327,6 @@
         "district": "Kulm",
         "name": "Birrwil"
     },
-    "4133": {
-        "district": "Kulm",
-        "name": "Burg (AG)"
-    },
     "4134": {
         "district": "Kulm",
         "name": "D\u00fcrren\u00e4sch"
@@ -403,10 +399,6 @@
         "district": "Laufenburg",
         "name": "Gipf-Oberfrick"
     },
-    "4166": {
-        "district": "Laufenburg",
-        "name": "Herznach"
-    },
     "4169": {
         "district": "Laufenburg",
         "name": "Kaisten"
@@ -435,10 +427,6 @@
         "district": "Laufenburg",
         "name": "Sisseln"
     },
-    "4179": {
-        "district": "Laufenburg",
-        "name": "Ueken"
-    },
     "4181": {
         "district": "Laufenburg",
         "name": "Wittnau"
@@ -458,6 +446,10 @@
     "4185": {
         "district": "Laufenburg",
         "name": "B\u00f6ztal"
+    },
+    "4186": {
+        "district": "Laufenburg",
+        "name": "Herznach-Ueken"
     },
     "4191": {
         "district": "Lenzburg",

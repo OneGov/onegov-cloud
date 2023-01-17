@@ -55,10 +55,6 @@
         "district": "Affoltern",
         "name": "Wettswil am Albis"
     },
-    "21": {
-        "district": "Andelfingen",
-        "name": "Adlikon"
-    },
     "22": {
         "district": "Andelfingen",
         "name": "Benken (ZH)"
@@ -91,17 +87,9 @@
         "district": "Andelfingen",
         "name": "Flurlingen"
     },
-    "30": {
-        "district": "Andelfingen",
-        "name": "Andelfingen"
-    },
     "31": {
         "district": "Andelfingen",
         "name": "Henggart"
-    },
-    "32": {
-        "district": "Andelfingen",
-        "name": "Humlikon"
     },
     "33": {
         "district": "Andelfingen",
@@ -618,6 +606,10 @@
     "261": {
         "district": "Z\u00fcrich",
         "name": "Z\u00fcrich"
+    },
+    "291": {
+        "district": "Andelfingen",
+        "name": "Andelfingen"
     },
     "292": {
         "district": "Andelfingen",
