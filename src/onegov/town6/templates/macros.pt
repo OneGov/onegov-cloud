@@ -836,7 +836,7 @@
                     </li>
                     <div class="person-card-context-specific-functions" tal:condition="python: len(functions) != 0 and len(organizations) != 0 and organizations is not None and functions is not None">
                         <div tal:define="map python: zip(organizations, functions)">
-                            <span i18n:translate>Funktionen:</span>
+                            <span i18n:translate>Functions:</span>
                             <ul>
                                 <li tal:repeat="(organization, function) map">
                                     <span>${organization}: ${function}</span>
