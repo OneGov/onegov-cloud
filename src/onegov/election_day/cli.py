@@ -177,6 +177,8 @@ def update_archived_results(host, scheme):
 
 @cli.command('update-last-result-change')
 def update_last_result_change():
+    """ Update the last result changes. """
+
     def update(request, app):
         click.secho(f'Updating {app.schema}', fg='yellow')
 
