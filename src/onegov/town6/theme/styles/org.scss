@@ -611,6 +611,17 @@ $pageref-color-hover: $iron;
             font-family: $header-font-family;
             padding-bottom: .5rem;
 
+            i.fa,
+            i.fas,
+            i.far {
+                margin-right: .5rem;
+            }
+
+            a.no-chevron .list-title::after {
+                opacity: 0;
+                transition: all 200ms linear;
+            }
+
             .list-lead {
                 color: $jet;
                 font-weight: normal;
@@ -636,9 +647,26 @@ $pageref-color-hover: $iron;
                 background: $ghost;
 
                 .list-title::after {
+                    opacity: 1 !important;
                     padding-right: 0;
                 }
             }
+        }
+    }
+}
+
+.side-panel .more-list {
+    li {
+        .list-link::after,
+        .list-title::after {
+            opacity: 0;
+            transition: all 200ms linear;
+        }
+
+        &:hover .list-link::after,
+        &:hover .list-title::after {
+            opacity: 1 !important;
+            padding-right: 0;
         }
     }
 }

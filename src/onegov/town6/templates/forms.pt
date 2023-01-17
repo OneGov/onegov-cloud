@@ -13,9 +13,11 @@
                 <div class="side-panel" tal:condition="forms">
                     <h3 i18n:translate="">Categories</h3>
                     <div class="side-panel-with-bg">
-                        <ul>
+                        <ul class="more-list">
                             <li tal:repeat="form forms">
-                                <a href="#${form}">${form}</a>
+                                <a class="list-link" href="#${form}">
+                                    <span class="list-title">${form}</span>
+                                </a>
                             </li>
                         </ul>
                     </div>                        

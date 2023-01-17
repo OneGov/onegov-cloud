@@ -74,10 +74,10 @@
                 <div class="occurrence-exports side-panel">
                     <h3 i18n:translate>Exports</h3>
                     <div class="side-panel-with-bg">
-                        <ul class="calendar-export-list">
-                            <li>
-                                <a href="${request.link(layout.model, name='ical')}" i18n:translate>
-                                    Export these events
+                        <ul class="more-list">
+                            <li tal:condition="len(occurrences) > 1">
+                                <a class="list-link" href="${request.link(layout.model, name='ical')}">
+                                    <i class="far fa-calendar-alt"></i> <span class="list-title" i18n:translate>Export these events</span>
                                 </a>
                             </li>
                         </ul>

@@ -638,14 +638,18 @@
         
         <div class="more-news side-panel" tal:condition="siblings|False">
             <h3 i18n:translate="">More news</h3>
-            <div tal:repeat="sibling siblings" class="card">
-                <a href="${request.link(sibling)}">
-                    ${sibling.title}
-                </a>
-                <p class="list-lead">
-                    ${layout.format_date(sibling.published_or_created, 'date_long')}
-                </p>
-            </div>
+            <ul class="more-list">
+                <li tal:repeat="sibling siblings">
+                    <a href="${request.link(sibling)}" class="list-link">
+                        <span class="list-title">${sibling.title}</span>
+                    </a>
+                    <a href="${request.link(sibling)}">
+                        <p class="list-lead preview">
+                            ${layout.format_date(sibling.published_or_created, 'date_long')}
+                        </p>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </metal:page_content>

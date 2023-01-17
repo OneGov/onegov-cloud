@@ -93,14 +93,6 @@ $event-image-max-height: 150px;
     margin-top: .5rem;
 }
 
-.calendar-export-list {
-    a::before {
-        @include icon($calendar-icon);
-        color: $body-font-color;
-        margin-right: 1ex;
-    }
-}
-
 // raise importance a bit by double-selecting
 .occurrence.occurrence {
     h3 {
