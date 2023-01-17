@@ -216,6 +216,10 @@ form {
         }
     }
 
+    .redactor-editor li {
+        display: list-item;
+    }
+
     li {
         align-items: baseline;
         display: flex;
