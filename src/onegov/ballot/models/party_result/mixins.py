@@ -89,8 +89,8 @@ class PartyResultsExportMixin:
         """
 
         result = []
-        parts = {r.domain: r.domain_segment for r in self.party_results}
-        for domain, domain_segment in sorted(parts.items()):
+        parts = {(r.domain, r.domain_segment) for r in self.party_results}
+        for domain, domain_segment in sorted(parts):
             result.extend(
                 self._export_parties(
                     locales, default_locale,
