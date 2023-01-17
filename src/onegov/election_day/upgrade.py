@@ -327,3 +327,13 @@ def make_election_day_models_polymorphic_type_non_nullable(context):
             """)
 
             context.operations.alter_column(table, 'type', nullable=False)
+
+
+@upgrade_task('Add domain and segment to screens')
+def add_domain_and_segment_to_screens(context):
+    for column in ('domain', 'domain_segment'):
+        if not context.has_column('election_day_screens', column):
+            context.operations.add_column(
+                'election_day_screens',
+                Column(column, Text, nullable=True)
+            )

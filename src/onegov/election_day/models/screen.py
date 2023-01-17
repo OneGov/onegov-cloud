@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
@@ -19,7 +20,8 @@ class ScreenType:
         'complex_vote',
         'majorz_election',
         'proporz_election',
-        'election_compound'
+        'election_compound',
+        'election_compound_part'
     )
 
     def __init__(self, type_):
@@ -36,7 +38,12 @@ class ScreenType:
             return ('generic', 'election', 'majorz_election')
         if self.type == 'proporz_election':
             return ('generic', 'election', 'proporz_election')
-        return ('generic', 'election_compound')
+        if self.type == 'election_compound':
+            return ('generic', 'election_compound')
+        if self.type == 'election_compound_part':
+            # todo:?
+            return ('generic', 'election_compound')
+        raise NotImplementedError()
 
 
 class Screen(Base, ContentMixin, TimestampMixin):
@@ -70,6 +77,18 @@ class Screen(Base, ContentMixin, TimestampMixin):
     )
     election_compound = relationship('ElectionCompound', backref='screens')
 
+    #: The domain of the election compound part.
+    domain = Column(Text, nullable=True)
+
+    #: The domain segment of the election compound part.
+    domain_segment = Column(Text, nullable=True)
+
+    @property
+    def election_compound_part(self):
+        return ElectionCompoundPart(
+            self.election_compound, self.domain, self.domain_segment
+        )
+
     #: The title
     description = Column(Text, nullable=True)
 
@@ -96,6 +115,8 @@ class Screen(Base, ContentMixin, TimestampMixin):
             return self.election
         if self.type == 'election_compound':
             return self.election_compound
+        if self.type == 'election_compound_part':
+            return self.election_compound_part
         raise NotImplementedError()
 
     @property

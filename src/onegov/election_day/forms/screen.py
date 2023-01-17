@@ -11,6 +11,7 @@ from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import CssField
 from onegov.form.fields import PanelField
 from onegov.form.validators import UniqueColumnValue
+from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -130,6 +131,28 @@ class ScreenForm(Form):
         depends_on=('type', 'election_compound'),
     )
 
+    election_compound_part = BooleanField(
+        _('Part of an Election Compound'),
+        default=False,
+        depends_on=('type', 'election_compound'),
+    )
+
+    domain = StringField(
+        label=_('Domain'),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('election_compound_part', 'y'),
+    )
+
+    domain_segment = StringField(
+        label=_('Segment'),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('election_compound_part', 'y'),
+    )
+
     tags_simple_vote = PanelField(
         label=_('Available tags'),
         hide_label=False,
@@ -215,6 +238,10 @@ class ScreenForm(Form):
             model.election_id = self.proporz_election.data
         elif self.type.data == 'election_compound':
             model.election_compound_id = self.election_compound.data
+        if self.election_compound_part.data:
+            model.type = 'election_compound_part'
+        model.domain = self.domain.data
+        model.domain_segment = self.domain_segment.data
         model.structure = self.structure.data
         model.css = self.css.data
 
@@ -224,6 +251,9 @@ class ScreenForm(Form):
         self.duration.data = model.duration
         self.description.data = model.description
         self.type.data = model.type
+        if model.type == 'election_compound_part':
+            self.type.data = 'election_compound'
+            self.election_compound_part.data = True
         self.simple_vote.data = ''
         self.complex_vote.data = ''
         self.majorz_election.data = ''
@@ -239,6 +269,8 @@ class ScreenForm(Form):
             self.proporz_election.data = model.election_id
         elif self.type.data == 'election_compound':
             self.election_compound.data = model.election_compound_id
+        self.domain.data = model.domain
+        self.domain_segment.data = model.domain_segment
         self.structure.data = model.structure
         self.css.data = model.css
 
