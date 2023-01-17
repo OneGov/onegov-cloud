@@ -74,7 +74,7 @@ def view_election_parties_data_as_json(self, request):
         ),
         'name': normalize_for_url(
             '{}-{}'.format(
-                self.title,
+                normalize_for_url(self.title[:50]),
                 request.translate(_("Parties")).lower()
             )
         )
@@ -97,7 +97,7 @@ def view_election_parties_data_as_csv(self, request):
         ),
         'name': normalize_for_url(
             '{}-{}'.format(
-                self.title,
+                normalize_for_url(self.title[:50]),
                 request.translate(_("Parties")).lower()
             )
         )
