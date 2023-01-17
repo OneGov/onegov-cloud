@@ -443,8 +443,8 @@ def test_external_map_link(browser, client):
 
 
 @pytest.mark.flaky(reruns=3)
-def test_context_specific_function_are_displayed_in_person_directory(
-    browser, client):
+def test_context_specific_function_are_displayed_in_person_directory(browser,
+                                                                     client):
 
     browser.login_admin()
     client.login_admin()
