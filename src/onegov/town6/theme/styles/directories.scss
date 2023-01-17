@@ -12,10 +12,6 @@
 */
 .with-thumbnails {
     list-style-type: none;
-    
-    .list-lead {
-        max-width: 90%;
-    }
 
     li {
         display: flex;
@@ -44,7 +40,6 @@
 }
 
 .directories-list {
-
     .card-section a {
         display: block;
         font-weight: bold;

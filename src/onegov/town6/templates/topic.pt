@@ -25,7 +25,7 @@
                                 </tal:block>
                             </a>
                             <a href="${url}" tal:condition="lead and not children_images">
-                                <p class="list-lead">${lead}</p>
+                                <p class="list-lead preview">${lead}</p>
                             </a>
                             <a tal:condition="edit_link and request.is_logged_in" class="edit-link" href="${edit_link}"><i class="far fa-edit"></i></a>
                         </li>

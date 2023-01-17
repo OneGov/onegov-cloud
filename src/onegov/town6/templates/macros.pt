@@ -625,8 +625,12 @@
             <h3 i18n:translate>People</h3>
             <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                 <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                    <a class="h5 person-link" href="${request.link(person)}">${person.title}</a>
-                    <div>${person.context_specific_function}</div>
+                    <a class="list-link" href="${request.link(person)}">
+                        <span class="list-title">${person.title}</span>
+                    </a>
+                    <a href="${request.link(person)}">
+                        <p class="list-lead preview">${person.context_specific_function}</p>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -1493,8 +1497,8 @@
 
 
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town6">
-    <a href="${request.link(result)}">
-        <span class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
     </a>
     <a tal:condition="result.lead" href="${request.link(result)}">
         <p class="list-lead preview">
@@ -1767,16 +1771,18 @@
                 <tal:b tal:repeat="record grouped[group]">
                     <li tal:condition="record != find_your_spot">
                     <tal:b tal:define="link edit_link(record)|nothing">
-                        <a class="list-title" tal:attributes="href link_func(record); target link">
-                                ${record.title}
+                        <a class="list-link" tal:attributes="href link_func(record); target link">
+                                <span class="h5 list-title">${record.title}</span>
                                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                         </a>
-                        <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                            tal:content="structure lead" tal:condition="lead">
-                        </div>
-                        <div class="list-hint hints" tal:define="hint hint(record)|False"
-                            tal:content="structure hint" tal:condition="hint">
-                        </div>
+                        <a tal:attributes="href link_func(record); target link">
+                            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                                tal:content="structure lead" tal:condition="lead">
+                            </p>
+                            <div class="list-hint hints" tal:define="hint hint(record)|False"
+                                tal:content="structure hint" tal:condition="hint">
+                            </div>
+                        </a>
                         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
                     </tal:b>
                     </li>

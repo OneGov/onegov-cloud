@@ -17,6 +17,7 @@
         </div>
 
         <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
+        <br>
 
         <div class="grid-x grid-padding-x reverse-on-mobile">
             <div class="cell medium-8">
@@ -31,14 +32,19 @@
                         </div>
 
                         <div>
-                            <a class="" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
+                            <a class="list-link" tal:attributes="href request.link(entry)">
+                                <span class="list-title h5">${entry.title}</span>
+                            </a>
+                            <metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
-                            <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
-                                <div class="list-lead">
-                                    <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                    <tal:b condition="not:custom_lead" replace="entry.lead" />
-                                </div>
-                            </tal:b>
+                            <a tal:attributes="href request.link(entry)">
+                                <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                                    <p class="list-lead preview">
+                                        <tal:b condition="custom_lead" replace="structure custom_lead" />
+                                        <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                    </p>
+                                </tal:b>
+                            </a>
                         </div>
                     </li>
                 </ul>
