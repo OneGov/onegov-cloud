@@ -1213,7 +1213,7 @@
             <div class="grid-x grid-padding-x date-range-selector">
                 <div class="large-6 cell">
                     <div class="grid-x">
-                        <label i18n:translate>From/label>
+                        <label i18n:translate>From</label>
                         <input class="small" name="start" type="date" value="${start}" placeholder="${layout.today().isoformat()}">
                     </div>
                 </div>
