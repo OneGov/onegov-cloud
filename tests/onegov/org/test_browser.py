@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
 from onegov.file import FileCollection
+from onegov.people import Person
 from tests.shared.utils import create_image
 from pytz import UTC
 from sedate import utcnow
@@ -439,3 +440,32 @@ def test_external_map_link(browser, client):
     browser.visit('/topics/themen')
     browser.find_by_css(".button-state").click()
     assert browser.is_text_present("Karte Geo-BS")
+
+
+@pytest.mark.flaky(reruns=3)
+def test_context_specific_function_are_displayed_in_person_directory(
+    browser, client):
+
+    browser.login_admin()
+    client.login_admin()
+    browser.visit('/people/new')
+    browser.fill_form({
+        'first_name': 'Berry',
+        'last_name': 'Boolean'
+    })
+
+    browser.find_by_value("Absenden").click()
+    person = client.app.session().query(Person)\
+        .filter(Person.last_name == 'Boolean')\
+        .one()
+
+    browser.visit('/editor/new/page/1')
+    browser.fill_form({
+        'title': 'All About Berry',
+        'people_' + person.id.hex: True,
+        'people_' + person.id.hex + '_function': 'Logician'
+    })
+    browser.find_by_value("Absenden").click()
+
+    browser.visit(f"/person/{person.id.hex}")
+    browser.find_by_text('All About Berry: Logician')
