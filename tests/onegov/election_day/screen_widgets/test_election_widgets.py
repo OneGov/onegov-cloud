@@ -18,6 +18,8 @@ from onegov.election_day.screen_widgets import (
     ElectionCandidatesTableWidget,
     ElectionListsChartWidget,
     ElectionListsTableWidget,
+    ElectionPartyStrengthsChartWidget,
+    ElectionPartyStrengthsTableWidget,
     ElectionTurnoutWidget,
     IfCompletedWidget,
     IfNotCompletedWidget,
@@ -535,6 +537,21 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
                 <if-completed>is-completed</if-completed>
                 <if-not-completed>is-not-completed</if-not-completed>
             </column>
+            <column span="1">
+                <election-party-strengths-chart class="my-class-h"
+                    horizontal="true"/>
+            </column>
+            <column span="1">
+                <election-party-strengths-chart class="my-class-i"
+                    horizontal="false"/>
+            </column>
+            <column span="1">
+                <election-party-strengths-table class="my-class-j"/>
+            </column>
+            <column span="1">
+                <election-party-strengths-table class="my-class-k"
+                    year="2019"/>
+            </column>
         </row>
     """
     widgets = [
@@ -549,6 +566,8 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         ElectionCandidatesTableWidget(),
         ElectionListsChartWidget(),
         ElectionListsTableWidget(),
+        ElectionPartyStrengthsChartWidget(),
+        ElectionPartyStrengthsTableWidget(),
         LastResultChangeWidget(),
         AllocatedMandatesWidget(),
         NumberOfMandatesWidget(),
@@ -579,6 +598,9 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         'layout': layout,
         'lists': [],
         'model': model,
+        'party_deltas': False,
+        'party_results': {},
+        'party_years': [],
         'request': request
     }
 
@@ -605,6 +627,10 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
+    assert 'my-class-j' in result
+    assert 'my-class-k' in result
 
     # Add intermediate results
     with freeze_time('2022-01-01 12:00'):
@@ -705,6 +731,9 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
             (146, 'SP Migrant.', 0)
         ],
         'model': model,
+        'party_deltas': False,
+        'party_results': {},
+        'party_years': [],
         'request': request
     }
 
@@ -752,6 +781,14 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '01.01.2022' in result
     assert 'is-completed' not in result
     assert 'is-not-completed' in result
+    assert (
+        'data-dataurl="ProporzElection/party-strengths-data?horizontal=True"'
+    ) in result
+    assert (
+        'data-dataurl="ProporzElection/party-strengths-data?horizontal=False"'
+    ) in result
+    assert 'tab-navigation' not in result
+    assert 'tabs-content' not in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -768,6 +805,10 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
+    assert 'my-class-j' in result
+    assert 'my-class-k' in result
 
     # Add final results
     with freeze_time('2022-01-02 12:00'):
@@ -785,6 +826,16 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
         assert not errors
         session.add(model)
         session.flush()
+        errors = import_test_datasets(
+            'internal',
+            'parties',
+            'zg',
+            'canton',
+            'proporz',
+            election=model,
+            dataset_name='nationalratswahlen-2015-parteien',
+        )
+        assert not errors
 
     layout = ElectionLayout(model, request)
     default = {'layout': layout, 'request': request}
@@ -871,6 +922,26 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
             (347, 'SP Migrant.', 0)
         ],
         'model': model,
+        'party_deltas': True,
+        'party_results': {
+            '2011': [
+                ['AL', 0, 17972, '15.4%', ''],
+                ['CVP', 1, 28413, '24.3%', ''],
+                ['FDP', 1, 22494, '19.2%', ''],
+                ['GLP', 0, 7943, '6.8%', ''],
+                ['SP', 0, 6167, '5.3%', ''],
+                ['SVP', 1, 33116, '28.3%', '']
+            ],
+            '2015': [
+                ['AL', 0, 8352, '7.2%', '-8.2%'],
+                ['CVP', 1, 30856, '26.4%', '2.1%'],
+                ['FDP', 1, 20584, '17.6%', '-1.6%'],
+                ['GLP', 0, 4178, '3.6%', '-3.2%'],
+                ['SP', 0, 16048, '13.8%', '8.5%'],
+                ['SVP', 1, 35543, '30.5%', '2.2%']
+            ]
+        },
+        'party_years': ['2011', '2015'],
         'request': request
     }
 
@@ -921,6 +992,14 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert '02.01.2022' in result
     assert 'is-completed' in result
     assert 'is-not-completed' not in result
+    assert (
+        'data-dataurl="ProporzElection/party-strengths-data?horizontal=True"'
+    ) in result
+    assert (
+        'data-dataurl="ProporzElection/party-strengths-data?horizontal=False"'
+    ) in result
+    assert 'panel_2011' in result
+    assert '>15.4%<' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -937,3 +1016,7 @@ def test_proporz_election_widgets(election_day_app_zg, import_test_datasets):
     assert 'my-class-e' in result
     assert 'my-class-f' in result
     assert 'my-class-g' in result
+    assert 'my-class-h' in result
+    assert 'my-class-i' in result
+    assert 'my-class-j' in result
+    assert 'my-class-k' in result

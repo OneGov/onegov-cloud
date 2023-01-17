@@ -380,10 +380,9 @@ def test_view_election_compound_party_strengths(election_day_app_gr):
     assert 'BDP' in results
 
     # with horizontal_party_strengths
-    edit = client.get('/elections/elections/edit')
-    edit.form['horizontal_party_strengths'] = True
-    edit.form.submit()
-    data = client.get('/elections/elections/party-strengths-data').json
+    data = client.get(
+        '/elections/elections/party-strengths-data?horizontal=1'
+    ).json
     assert data['results'][0]['text'] == 'Le Centre 2022'
     assert data['results'][0]['value'] == 50.0
     assert data['results'][0]['percentage'] == True
