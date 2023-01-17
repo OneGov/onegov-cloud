@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-12-05 15:00+0100\n"
+"POT-Creation-Date: 2022-12-21 08:33+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -948,6 +948,9 @@ msgstr ""
 msgid "Recipient"
 msgstr "Empfänger"
 
+msgid "Will be used as image in the page overview on the parent page"
+msgstr "Wird als Bild in der Seitenübersicht auf der übergeordneten Seite verwendet."
+
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
@@ -1515,6 +1518,9 @@ msgstr "Externe Seiten"
 msgid "Internal links only"
 msgstr "Interne Seiten"
 
+msgid "Submit your event"
+msgstr "Veranstaltung vorschlagen"
+
 msgid "Enables website visitors to submit their own events"
 msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
@@ -1638,9 +1644,6 @@ msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "Daypass"
 msgstr "Tageskarte"
@@ -1898,6 +1901,9 @@ msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen.
 msgid "Re-publish event"
 msgstr "Veranstaltung wieder veröffentlichen"
 
+msgid "Newsletter"
+msgstr "Newsletter"
+
 msgid "New"
 msgstr "Neu"
 
@@ -2064,6 +2070,12 @@ msgstr "Honey pot aktivieren"
 
 msgid "Spam protection"
 msgstr "Spamschutz"
+
+msgid "Show image on preview on the parent page"
+msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
+
+msgid "Show image on page"
+msgstr "Bild auf der Seite anzeigen"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -3488,9 +3500,6 @@ msgstr "Schlagwort"
 
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
-
-msgid "Submit your event"
-msgstr "Veranstaltung vorschlagen"
 
 msgid "Submit your own event"
 msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
