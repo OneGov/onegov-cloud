@@ -24,11 +24,29 @@ def test_election_compound_part_model(session):
     compound = session.query(ElectionCompound).one()
     part = ElectionCompoundPart(compound, 'superregion', 'First Superregion')
 
+    assert part == ElectionCompoundPart(
+        compound, 'superregion', 'First Superregion'
+    )
+    assert part != None
+    assert part != []
+    assert part != ''
+    assert part != ElectionCompoundPart(
+        None, 'superregion', 'First Superregion'
+    )
+    assert part != ElectionCompoundPart(
+        compound, 'superregion', 'Second Superregion'
+    )
+    assert part != ElectionCompoundPart(
+        compound, 'region', 'First Superregion'
+    )
+
     assert part.date == date(2015, 6, 14)
     assert part.completes_manually is False
     assert part.manually_completed is False
+    assert part.pukelsheim is False
     assert part.completed is False
     assert part.last_result_change is None
+    assert part.last_change
     assert part.last_modified
     assert part.domain_elections == 'region'
     assert part.colors == {}
@@ -78,6 +96,7 @@ def test_election_compound_part_model(session):
 
     assert part.completed is False
     assert part.last_result_change == last_result_change
+    assert part.last_change
     assert part.last_modified
     assert [e.id for e in part.elections] == ['first-election']
     assert part.progress == (0, 1)

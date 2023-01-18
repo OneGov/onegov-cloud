@@ -41,7 +41,6 @@ class ScreenType:
         if self.type == 'election_compound':
             return ('generic', 'election_compound')
         if self.type == 'election_compound_part':
-            # todo:?
             return ('generic', 'election_compound')
         raise NotImplementedError()
 
@@ -85,9 +84,10 @@ class Screen(Base, ContentMixin, TimestampMixin):
 
     @property
     def election_compound_part(self):
-        return ElectionCompoundPart(
-            self.election_compound, self.domain, self.domain_segment
-        )
+        if self.election_compound and self.domain and self.domain_segment:
+            return ElectionCompoundPart(
+                self.election_compound, self.domain, self.domain_segment
+            )
 
     #: The title
     description = Column(Text, nullable=True)
