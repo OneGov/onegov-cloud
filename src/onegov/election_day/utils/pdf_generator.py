@@ -16,6 +16,7 @@ from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_deltas
+from onegov.election_day.utils.parties import get_party_results_seat_allocation
 from onegov.pdf import LexworkSigner
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -277,13 +278,13 @@ class PdfGenerator():
                         sc[1]
                     ]]
                     table += [[
-                        MarkupParagraph(l[0], pdf.style.indent_2),
-                        l[1]
-                    ] for l in sc[2]]
+                        MarkupParagraph(line[0], pdf.style.indent_2),
+                        line[1]
+                    ] for line in sc[2]]
                 table += [[
-                    MarkupParagraph(l[0], pdf.style.indent_1),
-                    l[1]
-                ] for l in connection[2]]
+                    MarkupParagraph(line[0], pdf.style.indent_1),
+                    line[1]
+                ] for line in connection[2]]
                 spacers.append(len(table))
 
             pdf.table(
@@ -300,10 +301,11 @@ class PdfGenerator():
         chart = self.renderer.get_party_strengths_chart(
             election, 'pdf'
         )
-        if chart:
+        if election.show_party_strengths and chart:
             pdf.h2(_('Party strengths'))
             pdf.pdf(chart)
-            pdf.figcaption(_('figcaption_party_strengths'))
+            if not election.horizontal_party_strengths:
+                pdf.figcaption(_('figcaption_party_strengths'))
             pdf.spacer()
             years, parties = get_party_results(election)
             deltas, results = get_party_results_deltas(
@@ -340,7 +342,7 @@ class PdfGenerator():
 
         # Parties Panachage
         chart = self.renderer.get_parties_panachage_chart(election, 'pdf')
-        if chart:
+        if election.show_party_panachage and chart:
             pdf.h2(_('Panachage (parties)'))
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_panachage'))
@@ -492,24 +494,14 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.spacer()
             years, parties = get_party_results(compound)
-            years = years[:2]
+            lines = get_party_results_seat_allocation(years, parties)
             if years:
-                current_year = years[-1]
                 pdf.results(
                     head=[
                         _('Party'),
                         *years,
                     ],
-                    body=[
-                        [
-                            parties[party][current_year]['name'],
-                            *[
-                                parties[party][year]['mandates'] or '0'
-                                for year in years
-                            ]
-                        ]
-                        for party in parties
-                    ],
+                    body=lines,
                 )
             pdf.pagebreak()
 
@@ -593,7 +585,7 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.figcaption('<b>{}</b>: {}'.format(
                 pdf.translate(_('Voters count')),
-                pdf.translate(_('figcaption_party_strengths'))
+                pdf.translate(_('figcaption_list_groups'))
             ))
             pdf.spacer()
             pdf.results(
@@ -618,7 +610,8 @@ class PdfGenerator():
         if compound.show_party_strengths and chart:
             pdf.h2(_('Party strengths'))
             pdf.pdf(chart)
-            pdf.figcaption(_('figcaption_party_strengths'))
+            if not compound.horizontal_party_strengths:
+                pdf.figcaption(_('figcaption_party_strengths'))
             pdf.spacer()
             years, parties = get_party_results(compound)
             deltas, results = get_party_results_deltas(

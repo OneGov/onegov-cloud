@@ -210,6 +210,27 @@ def test_file_publication(files):
     assert files.query().filter_by(published=True).count() == 2
 
 
+def test_file_publication_with_end_date(files):
+    horizon = utcnow()
+
+    files.add(
+        filename='published_for_epoch',
+        content=b'',
+        published=False,
+        publish_date=horizon - timedelta(hours=1),
+        publish_end_date=horizon + timedelta(hours=1)
+    )
+
+    files.publish_files(horizon=horizon)
+    assert files.query().filter_by(published=True).count() == 1
+
+    # publishing after the publish_end_date ...
+    files.publish_files(horizon=(horizon + timedelta(hours=2)))
+
+    # should no longer be published.
+    assert files.query().filter_by(published=True).count() == 0
+
+
 def test_filter_by_signature_digest(files):
     file = files.add(
         filename='foo',

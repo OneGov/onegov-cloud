@@ -4,6 +4,7 @@ from freezegun import freeze_time
 from io import BytesIO
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ProporzElection
+from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.models import Canton
 from pytz import utc
@@ -56,6 +57,7 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
             'Trins',
             'Val Müstair'
         ),
+        domain_supersegment=39 * [''],
         number_of_mandates=(
             2,
             1,
@@ -108,6 +110,37 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     assert election_compound.allocated_mandates == 120
     assert election_compound.number_of_mandates == 120
     assert len(election_compound.elected_candidates) == 120
+
+    election = election_compound.elections[0]
+    list_ = election.lists.filter_by(name='FDP').one()
+    candidate = election.candidates.filter_by(family_name='Crameri').one()
+    assert list_.votes == 360
+    assert list_.panachage_results.filter_by(source='999').one().votes == 61
+    assert candidate.votes == 659
+
+    # roundtrip
+    csv = convert_list_of_dicts_to_csv(
+        election_compound.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+    ).encode('utf-8')
+
+    errors = import_election_compound_internal(
+        election_compound, Canton(canton='gr'), BytesIO(csv), 'text/plain'
+    )
+
+    assert not errors
+    assert election_compound.last_result_change
+    assert election_compound.completed
+    assert election_compound.progress == (39, 39)
+    assert election_compound.allocated_mandates == 120
+    assert election_compound.number_of_mandates == 120
+    assert len(election_compound.elected_candidates) == 120
+
+    election = election_compound.elections[0]
+    list_ = election.lists.filter_by(name='FDP').one()
+    candidate = election.candidates.filter_by(family_name='Crameri').one()
+    assert list_.votes == 360
+    assert list_.panachage_results.filter_by(source='999').one().votes == 61
+    assert candidate.votes == 659
 
 
 def test_import_internal_compound_missing_headers(session):
@@ -218,6 +251,7 @@ def test_import_internal_compound_invalid_values(session):
                         'entity_invalid_votes',
                         'list_name',
                         'list_id',
+                        'list_color',
                         'list_number_of_mandates',
                         'list_votes',
                         'list_connection',
@@ -228,6 +262,7 @@ def test_import_internal_compound_invalid_values(session):
                         'candidate_elected',
                         'candidate_votes',
                         'candidate_party',
+                        'candidate_party_color',
                     )),
                     ','.join((
                         'xxx',  # election_status
@@ -241,6 +276,7 @@ def test_import_internal_compound_invalid_values(session):
                         'xxx',  # entity_invalid_votes
                         'xxx',  # list_name
                         'xxx',  # list_id
+                        '',  # list_color
                         'xxx',  # list_number_of_mandates
                         'xxx',  # list_votes
                         'xxx',  # list_connection
@@ -251,6 +287,7 @@ def test_import_internal_compound_invalid_values(session):
                         'xxx',  # candidate_elected
                         'xxx',  # candidate_votes
                         'xxx',  # candidate_party
+                        '',  # candidate_party_color
                     )),
                     # St. Gallen
                     ','.join((
@@ -265,6 +302,7 @@ def test_import_internal_compound_invalid_values(session):
                         '0',  # entity_invalid_votes
                         '',  # list_name
                         '',  # list_id
+                        '',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -275,6 +313,7 @@ def test_import_internal_compound_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        '',  # candidate_party_color
                     )),
                     # Rorschach
                     ','.join((
@@ -288,7 +327,8 @@ def test_import_internal_compound_invalid_values(session):
                         '0',  # entity_blank_votes
                         '0',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '1',  # list_id
+                        'xxx',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -299,6 +339,7 @@ def test_import_internal_compound_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        'xxx',  # candidate_party_color
                     )),
                     # Rheintal
                     ','.join((
@@ -313,6 +354,7 @@ def test_import_internal_compound_invalid_values(session):
                         '0',  # entity_invalid_votes
                         '',  # list_name
                         '',  # list_id
+                        '',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -323,6 +365,7 @@ def test_import_internal_compound_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        '',  # candidate_party_color
                     )),
                 ))
                 ).encode('utf-8')), 'text/plain',
@@ -335,7 +378,8 @@ def test_import_internal_compound_invalid_values(session):
         (2, 'Invalid status'),
         (2, 'Not an alphanumeric: list_id'),
         (3, 'Empty value: list_id'),
-        (4, 'Empty value: list_id'),
+        (4, 'Invalid color: candidate_party_color'),
+        (4, 'Invalid color: list_color'),
     ]
 
 

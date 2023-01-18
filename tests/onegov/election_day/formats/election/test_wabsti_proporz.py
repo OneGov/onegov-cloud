@@ -1,6 +1,6 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, PanachageResult
+from onegov.ballot import Election
 from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.models import Canton
@@ -46,21 +46,12 @@ def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
     assert election.allocated_mandates == 0
 
     # Test panachage results
-    panachage_results = session.query(PanachageResult)
-    panachage_results = panachage_results.filter_by(owner=election.id).all()
-    assert panachage_results
-    for pa_result in panachage_results:
-        assert len(pa_result.target) > 10, 'target must be a casted uuid'
+    assert election.panachage_results.all() == []
 
     # Test panachage results for ALG list
-    test_list = election.lists.first()
-    assert test_list.list_id == '01'
-    votes_panachage_csv = 1614  # count all where source != target
-
-    panachge_vote_count = 0
-    for result in test_list.panachage_results:
-        panachge_vote_count += result.votes
-    assert panachge_vote_count == votes_panachage_csv
+    list_ = election.lists.filter_by(list_id='01').one()
+    assert list_.votes == 5844
+    assert sum([p.votes for p in list_.panachage_results]) == 1614
 
 
 def test_import_wabsti_proporz_cantonal_complete(

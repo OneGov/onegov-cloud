@@ -25,7 +25,7 @@ from sqlalchemy_utils import observes
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
             ContactExtension, ContactHiddenOnPageExtension,
-            PersonLinkExtension, CoordinatesExtension):
+            PersonLinkExtension, CoordinatesExtension, ImageExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     es_type_name = 'topics'
@@ -86,7 +86,15 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             ])
 
         if trait == 'page':
-            return self.with_content_extensions(PageForm, request)
+            return move_fields(
+                form_class=self.with_content_extensions(PageForm, request),
+                fields=(
+                    'page_image',
+                    'show_preview_image',
+                    'show_page_image'
+                ),
+                after='title'
+            )
 
         raise NotImplementedError
 
@@ -172,6 +180,8 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
                 form_class=form_class,
                 fields=(
                     'page_image',
+                    'show_preview_image',
+                    'show_page_image'
                 ),
                 after='title'
             )

@@ -2,7 +2,7 @@ from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Candidate
 from onegov.ballot import Election
-from onegov.ballot import ElectionAssociation
+from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import ListConnection
 from onegov.ballot import PanachageResult
@@ -163,11 +163,11 @@ def test_election_layout(session):
         session.add(second_election)
         session.flush()
 
-        association = ElectionAssociation(
+        relationship = ElectionRelationship(
             source_id=election.id,
             target_id=second_election.id
         )
-        session.add(association)
+        session.add(relationship)
         session.flush()
 
         assert ElectionLayout(election, request).related_elections == [
@@ -354,6 +354,7 @@ def test_election_layout_menu_proporz(session):
     election.panachage_results.append(
         PanachageResult(target='t', source='t ', votes=0)
     )
+    election.show_party_panachage = True
     assert ElectionLayout(election, request).menu == [
         ('Lists', 'ProporzElection/lists', False, []),
         ('Candidates', 'ProporzElection/candidates', False, []),
@@ -375,6 +376,7 @@ def test_election_layout_menu_proporz(session):
         )
     )
     election.list_connections.append(ListConnection(connection_id='A'))
+    election.show_party_strengths = True
     assert ElectionLayout(election, request).menu == [
         ('Lists', '', False, [
             ('Lists', 'ProporzElection/lists', False, []),
@@ -395,6 +397,24 @@ def test_election_layout_menu_proporz(session):
         ('Downloads', 'ProporzElection/data', False, [])
     ]
 
+    election.show_party_strengths = False
+    election.show_party_panachage = False
+    assert ElectionLayout(election, request).menu == [
+        ('Lists', '', False, [
+            ('Lists', 'ProporzElection/lists', False, []),
+            ('__entities', 'ProporzElection/list-by-entity', False, []),
+            ('__districts', 'ProporzElection/list-by-district', False, []),
+            ('List connections', 'ProporzElection/connections', False, [])
+        ]),
+        ('Candidates', '', False, [
+            ('Candidates', 'ProporzElection/candidates', False, []),
+            ('__entities', 'ProporzElection/candidate-by-entity', False, []),
+            ('__districts', 'ProporzElection/candidate-by-district', False, [])
+        ]),
+        ('Election statistics', 'ProporzElection/statistics', False, []),
+        ('Downloads', 'ProporzElection/data', False, [])
+    ]
+
 
 @pytest.mark.parametrize('tab,expected', [
     ('lists', 'Election/lists-table'),
@@ -405,14 +425,13 @@ def test_election_layout_menu_proporz(session):
     ('candidates', 'Election/candidates-table'),
     ('candidate-by-entity', None),
     ('candidate-by-district', None),
-    ('party-strengths', None),
+    ('party-strengths', 'Election/party-strengths-table'),
     ('parties-panachage', None),
     ('statistics', 'Election/statistics-table'),
     ('data', None)
-
 ])
 def test_election_layout_table_links(tab, expected):
     # Test link depending on tab
     election = Election(date=date(2100, 1, 1), domain='federation')
     layout = ElectionLayout(election, DummyRequest(), tab=tab)
-    assert expected == layout.table_link
+    assert expected == layout.table_link()

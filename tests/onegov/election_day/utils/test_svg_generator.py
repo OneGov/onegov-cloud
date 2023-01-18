@@ -57,6 +57,7 @@ def test_generate_svg(election_day_app_gr, session):
             item = add_election_compound(
                 session, elections=[item], pukelsheim=True,
             )
+            item.horizontal_party_stengths = True
             assert generate(item, 'list-groups', 'de_CH') == 1
             assert generate(item, 'lists', 'de_CH') == 0
             assert generate(item, 'candidates', 'de_CH') == 0

@@ -80,7 +80,7 @@ def view_vote_json(self, request):
     for tab in layout.tabs_with_embedded_tables:
         layout = VoteLayout(self, request, tab)
         if layout.visible:
-            embed[tab].append(layout.table_link)
+            embed[tab].append(layout.table_link())
 
     counted = self.progress[0]
     nays_percentage = self.nays_percentage if counted else None

@@ -6,8 +6,8 @@ from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
-from onegov.election_day.models import DataSource
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -159,36 +159,26 @@ def generate_archive():
     return generate
 
 
-@cli.command('delete-associated')
-@click.option('--wabsti-token')
-@click.option('--delete-compound', help='Delete the compound if it exists')
-def delete_associated(wabsti_token, delete_compound):
-    def delete(request, app):
-        query = request.session.query(DataSource)
-        query = query.filter(DataSource.token == wabsti_token)
-        data_source = query.one()
+@cli.command('update-archived-results')
+@click.option('--host', default='localhost:8080')
+@click.option('--scheme', default='http')
+def update_archived_results(host, scheme):
+    """ Update the archive results, e.g. after a database transfer. """
 
-        compound = None
-        session = request.session
+    def generate(request, app):
+        click.secho(f'Updating {app.schema}', fg='yellow')
+        request.host = host
+        request.environ['wsgi.url_scheme'] = scheme
+        archive = ArchivedResultCollection(request.session)
+        archive.update_all(request)
 
-        for item in data_source.items:
-            election = item.item
-            click.secho(f'Deleting election {election.shortcode}')
-            if not compound and election.compound:
-                compound = election.compound
-            election.clear_results()
-            session.delete(item)
-            session.delete(election)
-
-        if delete_compound and compound:
-            click.secho(f'Deleting {compound.title}')
-            session.delete(compound)
-
-    return delete
+    return generate
 
 
 @cli.command('update-last-result-change')
 def update_last_result_change():
+    """ Update the last result changes. """
+
     def update(request, app):
         click.secho(f'Updating {app.schema}', fg='yellow')
 

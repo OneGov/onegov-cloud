@@ -194,7 +194,7 @@ def test_submit_event(client, skip_opening_email):
         settings.form.submit()
         client = client.spawn()
 
-    form_page = client.get('/events').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung vorschlagen")
 
     assert "Das Formular enthält Fehler" in form_page.form.submit()
 
@@ -370,7 +370,7 @@ def test_submit_event(client, skip_opening_email):
 def test_edit_event(client):
 
     # Submit and publish an event
-    form_page = client.get('/events').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung vorschlagen")
     event_date = date.today() + timedelta(days=1)
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
@@ -420,7 +420,7 @@ def test_edit_event(client):
 def test_delete_event(client):
 
     # Submit and publish an event
-    form_page = client.get('/events').click("Veranstaltung melden")
+    form_page = client.get('/events').click("Veranstaltung vorschlagen")
     event_date = date.today() + timedelta(days=1)
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Event"
@@ -483,7 +483,7 @@ def test_import_export_events(client):
     transaction.commit()
 
     # Submit and publish an event
-    page = client.get('/events').click("Veranstaltung melden")
+    page = client.get('/events').click("Veranstaltung vorschlagen")
     event_date = date.today() + timedelta(days=1)
     page.form['email'] = "sinfonieorchester@govikon.org"
     page.form['title'] = "Weihnachtssingen"
@@ -572,7 +572,7 @@ def test_import_export_events_with_custom_tags(client):
         yaml.dump(data, f)
 
     # Submit and publish an event
-    page = client.get('/events').click("Veranstaltung melden")
+    page = client.get('/events').click("Veranstaltung vorschlagen")
     event_date = date.today() + timedelta(days=1)
     page.form['email'] = "sinfonieorchester@govikon.org"
     page.form['title'] = "Weihnachtssingen"
@@ -655,5 +655,5 @@ def test_event_form_with_custom_lead(client):
     with fs.open('eventsettings.yml', 'w') as f:
         yaml.dump(data, f)
 
-    page = client.get('/events').click("Veranstaltung melden")
+    page = client.get('/events').click("Veranstaltung vorschlagen")
     assert 'A completely different lead text' in page

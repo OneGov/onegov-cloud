@@ -114,9 +114,9 @@ setup(
         'pdfdocument',
         'pdfrw',
         'pdftotext',
+        'pglast',
         'phonenumbers',
         'polib',
-        'psqlparse',
         'psycopg2',
         'purl',
         'pycurl',
@@ -180,7 +180,8 @@ setup(
             'alabaster',
             'Jinja2',
             'sphinx',
-            'sphinx-autoapi'
+            'sphinx-autoapi',
+            'typing-extensions'
         ],
         'test': [
             'Pillow',

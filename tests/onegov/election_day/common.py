@@ -101,8 +101,8 @@ PROPORZ_HEADER = (
     'candidate_year_of_birth,'
     'candidate_votes,'
     'candidate_party,'
-    'panachage_votes_from_list_1,'
-    'panachage_votes_from_list_2'
+    'list_panachage_votes_from_list_1,'
+    'list_panachage_votes_from_list_2'
     '\n'
 )
 
@@ -406,6 +406,8 @@ def upload_proporz_election(client, create=True, canton='gr',
         new.form['mandates'] = 5
         new.form['election_type'] = 'proporz'
         new.form['domain'] = 'federation'
+        new.form['show_party_strengths'] = True
+        new.form['show_party_panachage'] = True
         new.form.submit()
 
     csv = PROPORZ_HEADER
@@ -439,15 +441,20 @@ def upload_proporz_election(client, create=True, canton='gr',
     return upload
 
 
-def upload_party_results(client, slug='election/proporz-election'):
+def upload_party_results(
+    client, slug='election/proporz-election', domain='', domain_segment=''
+):
     csv_parties = (
-        "year,total_votes,id,name,color,mandates,"
+        "domain,domain_segment,year,total_votes,id,name,color,mandates,"
         "votes,voters_count,voters_count_percentage,"
         "panachage_votes_from_1,panachage_votes_from_2,"
         "panachage_votes_from_3,panachage_votes_from_999\n"
-        "2022,11270,1,BDP,#efb52c,1,60387,603.01,41.73,,11,12,100\n"
-        "2022,11270,2,CVP,#ff6300,1,49117,491.02,33.98,21,,22,200\n"
-        "2022,11270,3,FDP,,0,35134,351.04,24.29,31,32,,300\n"
+        f"{domain},{domain_segment},2022,11270,1,BDP,"
+        "#efb52c,1,60387,603.01,41.73,,11,12,100\n"
+        f"{domain},{domain_segment},2022,11270,2,"
+        "CVP,#ff6300,1,49117,491.02,33.98,21,,22,200\n"
+        f"{domain},{domain_segment},2022,11270,3,"
+        "FDP,,0,35134,351.04,24.29,31,32,,300\n"
     ).encode('utf-8')
 
     upload = client.get(f'/{slug}/upload-party-results')

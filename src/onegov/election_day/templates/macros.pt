@@ -14,18 +14,26 @@
 </metal:gender-singular>
 
 <metal:title-translation define-macro="title-translation" i18n:domain="onegov.election_day">
-    <tal:b switch="item.title == item.title_translations.get(request.locale)">
+    <tal:b switch="item.title == item.title_translations.get(request.locale)|True">
         <tal:b case="True">${item.title}</tal:b>
         <tal:b case="False"><span lang="${request.default_locale.replace('_', '-')}">${item.title}</span></tal:b>
     </tal:b>
 </metal:title-translation>
 
-<metal:years-dropdown define-macro="years-dropdown" i18n:domain="onegov.election_day">
+<metal:redirect-filters define-macro="redirect-filters" i18n:domain="onegov.election_day">
+    <tal:block tal:repeat="(name, options) redirect_filters.items()">
+        <div metal:use-macro="layout.macros['redirect-dropdown']"/>
+    </tal:block>
+</metal:redirect-filters>
+
+
+<metal:redirect-dropdown define-macro="redirect-dropdown" i18n:domain="onegov.election_day">
     <div class="row">
         <div class="small-12 columns">
-            <form>
-                <select onchange="this.options[this.selectedIndex].onclick()">
-                    <tal:block tal:repeat="(name, active, link) years">
+            <form tal:define="id name.lower()">
+                <label for="filter-${id}">${name}</label>
+                <select id="filter-${id}" name="filter-${id}" onchange="this.options[this.selectedIndex].onclick()">
+                    <tal:block tal:repeat="(name, active, link) options">
                         <option tal:condition="active" selected>${name}</option>
                         <option tal:condition="not active" onclick="location.href='${link}'">${name}</option>
                     </tal:block>
@@ -33,7 +41,7 @@
             </form>
         </div>
     </div>
-</metal:years-dropdown>
+</metal:redirect-dropdown>
 
 <metal:election-actions define-macro="election-actions" i18n:domain="onegov.election_day">
     <div tal:condition="request.is_logged_in" class="clearfix">
@@ -416,17 +424,20 @@
         data-tablesaw-mode="columntoggle"
         data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
         data-tablesaw-minimap=""
+        tal:condition="party_years"
         >
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
-                <th tal:repeat="year years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
+                <th tal:repeat="year party_years" data-tablesaw-priority="1" class="right-aligned">${year}</th>
             </tr>
         </thead>
-        <tbody tal:condition="years">
-            <tr tal:repeat="party parties" tal:define="current_year python: years[-1]">
-                <th>${parties[party][current_year]['name']}</th>
-                <td tal:repeat="year years" class="right-aligned">${parties[party][year]['mandates']}</td>
+        <tbody>
+            <tr tal:repeat="line seat_allocations">
+                <tal:block tal:repeat="cell line">
+                    <td tal:condition="repeat.cell.start">${cell}</td>
+                    <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                </tal:block>
             </tr>
         </tbody>
     </table>
@@ -461,6 +472,46 @@
 </metal:election-compound-districts-table>
 
 
+<metal:election-compound-districts-map define-macro="election-compound-districts-map" i18n:domain="onegov.election_day">
+    <tal:block tal:define="map_type 'entities' if election_compound.domain_elections == 'municipality' else 'districts'">
+        <tal:block tal:condition="embed">
+            <div class="${map_type}-map"
+                data-canton="${layout.principal.id}"
+                data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+                data-dataurl="${request.link(election_compound, name='by-district')}"
+                data-embed-link="Embed map"
+                data-embed-source="${request.link(election_compound, name='districts-map')}"
+                data-thumbs="false"
+                data-color-scale="b"
+                data-label-left-hand=""
+                data-label-right-hand=""
+                data-label-expats="Expats"
+                data-hide-percentages="true"
+                data-hide-legend="true"
+                i18n:attributes="data-embed-link; data-label-expats"
+                >
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="${map_type}-map"
+                data-canton="${layout.principal.id}"
+                data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+                data-dataurl="${request.link(election_compound, name='by-district')}"
+                data-thumbs="false"
+                data-color-scale="b"
+                data-label-left-hand=""
+                data-label-right-hand=""
+                data-label-expats="Expats"
+                data-hide-percentages="true"
+                data-hide-legend="true"
+                i18n:attributes="data-label-expats"
+                >
+            </div>
+        </tal:block>
+    </tal:block>
+</metal:election-compound-districts-map>
+
+
 <metal:election-compound-superregions-table define-macro="election-compound-superregions-table" i18n:domain="onegov.election_day">
     <table
         class="election-compound-superregions-table results tablesaw sortable"
@@ -477,13 +528,52 @@
         </thead>
         <tbody>
             <tr tal:repeat="superregion superregions">
-                <th class="column-superregion left-aligned" tal:condition="layout.has_superregions">${superregion}</th>
+                <th class="column-superregion left-aligned" tal:condition="layout.has_superregions"><a href="${request.link(superregions[superregion]['superregion'])}">${superregion}</a></th>
                 <td class="column-mandates right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['mandates']['allocated'], superregions[superregion]['mandates']['total'])" /></td>
                 <td class="column-counted right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (superregions[superregion]['progress']['counted'], superregions[superregion]['progress']['total'])" /></td>
             </tr>
         </tbody>
     </table>
 </metal:election-compound-superregions-table>
+
+
+<metal:election-compound-superregions-map define-macro="election-compound-superregions-map" i18n:domain="onegov.election_day">
+    <tal:block tal:condition="embed">
+        <div class="districts-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+            data-dataurl="${request.link(election_compound, name='by-superregion')}"
+            data-embed-link="Embed map"
+            data-embed-source="${request.link(election_compound, name='superregions-map')}"
+            data-thumbs="false"
+            data-color-scale="b"
+            data-label-left-hand=""
+            data-label-right-hand=""
+            data-label-expats="Expats"
+            data-hide-percentages="true"
+            data-hide-legend="true"
+            i18n:attributes="data-embed-link; data-label-expats"
+            >
+        </div>
+    </tal:block>
+    <tal:block tal:condition="not: embed">
+        <div class="districts-map"
+            data-canton="${layout.principal.id}"
+            data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
+            data-dataurl="${request.link(election_compound, name='by-superregion')}"
+            data-thumbs="false"
+            data-color-scale="b"
+            data-label-left-hand=""
+            data-label-right-hand=""
+            data-label-expats="Expats"
+            data-hide-percentages="true"
+            data-hide-legend="true"
+            i18n:attributes="data-label-expats"
+            >
+        </div>
+    </tal:block>
+</metal:election-compound-superregions-map>
+
 
 <metal:election-statistics-table define-macro="election-statistics-table" i18n:domain="onegov.election_day">
     <table
@@ -777,36 +867,36 @@
 </metal:ballot-result-bar>
 
 <metal:candidates-chart define-macro="candidates-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|''; sort_by_lists sort_by_lists|''">
+    <tal:block tal:define="limit limit|''; lists lists|''; elected elected|''; sort_by_lists sort_by_lists|''; entity entity|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}"
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists, 'entity': entity})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='candidates-chart')}">
+                data-embed-source="${request.link(model, name='candidates-chart', query_params={'entity': entity})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists})}">
+                data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists, 'entity': entity})}">
             </div>
         </tal:block>
     </tal:block>
 </metal:candidates-chart i18n:domain="onegov.election_day">
 
 <metal:lists-chart define-macro="lists-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:define="limit limit|''; names names|''; sort_by_names sort_by_names|''">
+    <tal:block tal:define="limit limit|''; names names|''; sort_by_names sort_by_names|''; entity entity|''">
         <tal:block tal:condition="embed">
             <div class="bar-chart"
                 i18n:attributes="data-embed-link"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names})}"
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names, 'entity': entity})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='lists-chart')}">
+                data-embed-source="${request.link(model, name='lists-chart', query_params={'entity': entity})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
             <div class="bar-chart"
-                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names})}">
+                data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names, 'entity': entity})}">
             </div>
         </tal:block>
     </tal:block>
@@ -847,20 +937,37 @@
 </metal:seat-allocation-chart i18n:domain="onegov.election_day">
 
 <metal:party-strengths-chart define-macro="party-strengths-chart" i18n:domain="onegov.election_day">
-    <tal:block tal:condition="embed">
-        <div class="grouped-bar-chart"
-            i18n:attributes="data-embed-link"
-            data-dataurl="${request.link(model, name='party-strengths-data')}"
-            data-show-back="true"
-            data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='party-strengths-chart')}">
-        </div>
+    <tal:block tal:condition="not horizontal">
+        <tal:block tal:condition="embed">
+            <div class="grouped-bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
+                data-show-back="true"
+                data-embed-link="Embed diagram"
+                data-embed-source="${request.link(model, name='party-strengths-chart')}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="grouped-bar-chart"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
+                data-show-back="true">
+            </div>
+        </tal:block>
     </tal:block>
-    <tal:block tal:condition="not: embed">
-        <div class="grouped-bar-chart"
-            data-dataurl="${request.link(model, name='party-strengths-data')}"
-            data-show-back="true">
-        </div>
+    <tal:block tal:condition="horizontal">
+        <tal:block tal:condition="embed">
+            <div class="bar-chart"
+                i18n:attributes="data-embed-link"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
+                data-embed-link="Embed diagram"
+                data-embed-source="${request.link(model, name='party-strengths-chart')}">
+            </div>
+        </tal:block>
+        <tal:block tal:condition="not: embed">
+            <div class="bar-chart"
+                data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}">
+            </div>
+        </tal:block>
     </tal:block>
 </metal:party-strengths-chart i18n:domain="onegov.election_day">
 
@@ -1060,10 +1167,10 @@
 </metal:related_link>
 
 <metal:related_elections define-macro="related_elections" i18n:domain="onegov.election_day">
-    <div class="row related" tal:condition="layout.related_elections">
+    <div class="row related" tal:define="related_elections layout.related_elections|layout.related_compounds|None" tal:condition="related_elections">
         <div class="columns small-12">
             <h2 i18n:translate="">Related elections</h2>
-            <p tal:repeat="(title, link) layout.related_elections">
+            <p tal:repeat="(title, link) related_elections">
                 <a href="${link}" class="related-link">${title}</a>
             </p>
         </div>
@@ -1112,7 +1219,7 @@
 
 <metal:tab_menu define-macro="tab_menu" i18n:domain="onegov.election_day">
     <div class="tab-navigation clearfix" tal:condition="layout.menu">
-        <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
+        <nav class="top-bar clearfix" data-topbar="" data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
             <ul class="title-area">
                 <li class="name menu-icon"><span>${layout.title()}</span></li>
                 <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
@@ -1182,11 +1289,11 @@
 
 <metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
     <nav role="navigation" aria-label="Breadcrumb Navigation">
-        <ul class="breadcrumbs back-links">
+        <ul class="breadcrumbs back-links" tal:define="compound item.compound|item.election_compound|None">
             <li><a href="${layout.homepage_link}" i18n:translate="homepage">Start</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date.year))}">${item.date.year}</a></li>
             <li><a href="${request.link(layout.archive.for_date(item.date))}">${layout.format_date(item.date, 'day_long')}</a></li>
-            <li tal:condition="item.compound|None"><a href="${request.link(item.compound)}"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item.compound"/></a></li>
+            <li tal:condition="compound"><a href="${request.link(compound)}"><span metal:use-macro="layout.macros['title-translation']" tal:define="item compound"/></a></li>
             <li><a href="${request.link(item)}" aria-current="page"><span metal:use-macro="layout.macros['title-translation']" tal:define="item item"/></a></li>
         </ul>
     </nav>
@@ -1395,11 +1502,11 @@
 
 <metal:party_strengths_figure define-macro="party_strengths_figure" i18n:domain="onegov.election_day">
     <figure>
-        <tal:block metal:use-macro="layout.macros['party-strengths-chart']" tal:define="embed True"/>
+        <tal:block metal:use-macro="layout.macros['party-strengths-chart']" tal:define="embed True; horizontal model.horizontal_party_strengths|False"/>
         <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
             <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
         </a>
-        <figcaption i18n:translate="figcaption_party_strengths">
+            <figcaption i18n:translate="figcaption_party_strengths" tal:condition="not: model.horizontal_party_strengths|False">
             The diagram shows the votes and mandates of the parties. The rimmed bars
             (left scale) correspond to the number of mandates, the colored bars (right scale)
             to the voices (percentages).
@@ -1407,55 +1514,57 @@
     </figure>
 </metal:party_strengths_figure>
 
-<metal:party_strengths define-macro="party_strengths" i18n:domain="onegov.election_day">
-    <div class="tab-navigation clearfix">
-        <nav class="top-bar" data-topbar role="navigation">
-            <ul class="title-area">
-                <li class="name menu-icon"><span i18n:translate="">Year</span></li>
-                <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
-            </ul>
-            <div class="top-bar-section">
-                <ul class="left tabs" data-tab>
-                    <tal:block tal:repeat="year sorted(years, reverse=True)">
-                        <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
-                    </tal:block>
+<metal:party-strengths-table define-macro="party-strengths-table" i18n:domain="onegov.election_day">
+    <tal:block tal:define="voters_counts layout.model.voters_counts|False; year year|None">
+        <div class="tab-navigation clearfix" tal:condition="party_years and not year">
+            <nav class="top-bar" data-topbar="" role="navigation">
+                <ul class="title-area">
+                    <li class="name menu-icon"><span i18n:translate="">Year</span></li>
+                    <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
                 </ul>
-            </div>
-        </nav>
-    </div>
-    <div class="tabs-content">
-        <tal:block tal:repeat="year sorted(years, reverse=True)">
-            <div tal:attributes="class 'content active' if repeat.year.start else 'content'" id="panel_${year}">
-                <table
-                    class="results tablesaw sortable"
-                    data-tablesaw-mode="columntoggle"
-                    data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                    data-tablesaw-minimap=""
-                    >
-                    <thead>
-                        <tr>
-                            <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
-                            <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">${layout.label('mandates')}</th>
-                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
-                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
-                            <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="deltas">Difference</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr tal:repeat="line results[year]">
-                            <tal:block tal:repeat="cell line">
-                                <td tal:condition="repeat.cell.start">${cell}</td>
-                                <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
-                            </tal:block>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </tal:block>
-    </div>
-</metal:party_strengths>
+                <div class="top-bar-section">
+                    <ul class="left tabs" data-tab="">
+                        <tal:block tal:repeat="year sorted(party_years, reverse=True)">
+                            <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
+                        </tal:block>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="tabs-content" tal:condition="party_years">
+            <tal:block tal:repeat="current_year sorted(party_years, reverse=True)">
+                <div tal:attributes="class 'content active' if repeat.current_year.start or year == current_year else 'content'" id="panel_${current_year}" tal:condition="not year or year == current_year">
+                    <table
+                        class="results tablesaw sortable"
+                        data-tablesaw-mode="columntoggle"
+                        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+                        data-tablesaw-minimap=""
+                        >
+                        <thead>
+                            <tr>
+                                <th data-tablesaw-priority="persist" i18n:translate="">Party</th>
+                                <th data-tablesaw-priority="1" class="right-aligned" i18n:translate="">${layout.label('mandates')}</th>
+                                <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                                <th tal:condition="not voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="single_votes">Votes</th>
+                                <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                                <th tal:condition="voters_counts" data-tablesaw-priority="2" class="right-aligned" i18n:translate="">Voters count</th>
+                                <th data-tablesaw-priority="5" class="right-aligned" i18n:translate="" tal:condition="party_deltas">Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr tal:repeat="line party_results[current_year]">
+                                <tal:block tal:repeat="cell line">
+                                    <td tal:condition="repeat.cell.start">${cell}</td>
+                                    <td tal:condition="not: repeat.cell.start" class="right-aligned">${cell}</td>
+                                </tal:block>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </tal:block>
+        </div>
+    </tal:block>
+</metal:party-strengths-table>
 
 <metal:figcaption_panachage define-macro="figcaption_panachage" i18n:domain="onegov.election_day">
     <figcaption i18n:translate="figcaption_panachage">

@@ -18,6 +18,7 @@ class ElectionCompoundLayout(DetailLayout):
         'superregions',
         'districts',
         'candidates',
+        'party-strengths',
         'statistics'
     )
 
@@ -25,18 +26,17 @@ class ElectionCompoundLayout(DetailLayout):
     proporz = True
     type = 'compound'
 
-    @cached_property
-    def table_link(self):
+    def table_link(self, query_params={}):
         if self.tab not in self.tabs_with_embedded_tables:
             return None
         return self.request.link(
-            self.model, f'{self.tab}-table'
+            self.model, f'{self.tab}-table', query_params=query_params
         )
 
     @cached_property
     def all_tabs(self):
         """ Return the tabs in order of their appearance. """
-        return (
+        result = [
             'seat-allocation',
             'list-groups',
             'superregions',
@@ -46,7 +46,11 @@ class ElectionCompoundLayout(DetailLayout):
             'parties-panachage',
             'statistics',
             'data'
-        )
+        ]
+        if self.model.horizontal_party_strengths:
+            result.remove('party-strengths')
+            result.insert(1, 'party-strengths')
+        return tuple(result)
 
     @cached_property
     def results(self):
@@ -218,3 +222,9 @@ class ElectionCompoundLayout(DetailLayout):
     @property
     def summarize(self):
         return False
+
+    @cached_property
+    def related_compounds(self):
+        result = {r.target for r in self.model.related_compounds}
+        result = sorted(result, key=lambda x: x.date, reverse=True)
+        return [(e.title, self.request.link(e)) for e in result]

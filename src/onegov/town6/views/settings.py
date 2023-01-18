@@ -7,12 +7,12 @@ from onegov.org import _
 from onegov.town6.forms.settings import GeneralSettingsForm,\
     ChatSettingsForm
 
-from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm,\
-    HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm,\
-    MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm,\
-    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm,\
-    LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm,\
-    GeverSettingsForm
+from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
+    HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
+    MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
+    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm, \
+    LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm, \
+    EventSettingsForm, GeverSettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -21,7 +21,8 @@ from onegov.org.views.settings import (
     handle_footer_settings, handle_module_settings, handle_map_settings,
     handle_analytics_settings, handle_holiday_settings,
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
-    handle_link_health_check, handle_social_media_settings)
+    handle_link_health_check, handle_social_media_settings,
+    handle_event_settings)
 
 from onegov.town6.app import TownApp
 
@@ -281,5 +282,15 @@ def town_handle_migrate_links(self, request, form):
     permission=Secret, form=LinkHealthCheckForm)
 def town_handle_link_health_check(self, request, form):
     return handle_link_health_check(
+        self, request, form, DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=Organisation, name='event-settings', template='form.pt',
+    permission=Secret, form=EventSettingsForm, setting=_("Events"),
+    icon='fa-calendar-alt', order=-200)
+def town_handle_event(self, request, form):
+    return handle_event_settings(
         self, request, form, DefaultLayout(self, request)
     )

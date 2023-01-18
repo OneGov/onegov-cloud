@@ -132,6 +132,32 @@ class TitleWidget(ModelBoundWidget):
     usage = '<title class=""/>'
 
 
+@ElectionDayApp.screen_widget(tag='if-completed', category='generic')
+class IfCompletedWidget(ModelBoundWidget):
+    tag = 'if-completed'
+    template = """
+        <xsl:template match="if-completed">
+            <tal:block tal:condition="model.completed">
+                <xsl:apply-templates select="node()"/>
+            </tal:block>
+        </xsl:template>
+    """
+    usage = '<if-completed></if-completed>'
+
+
+@ElectionDayApp.screen_widget(tag='if-not-completed', category='generic')
+class IfNotCompletedWidget(ModelBoundWidget):
+    tag = 'if-not-completed'
+    template = """
+        <xsl:template match="if-not-completed">
+            <tal:block tal:condition="not model.completed">
+                <xsl:apply-templates select="node()"/>
+            </tal:block>
+        </xsl:template>
+    """
+    usage = '<if-not-completed></if-not-completed>'
+
+
 @ElectionDayApp.screen_widget(tag='progress', category='generic')
 class ProgressWidget(ModelBoundWidget):
     tag = 'progress'

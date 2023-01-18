@@ -206,7 +206,7 @@ def test_send_ticket_email(client):
     def submit_event(client, email):
         start = date.today() + timedelta(days=1)
 
-        page = client.get('/events').click("Veranstaltung melden")
+        page = client.get('/events').click("Veranstaltung vorschlagen")
         page.form['email'] = email
         page.form['title'] = "My Event"
         page.form['description'] = "My event is an event."
@@ -332,7 +332,7 @@ def test_email_for_new_tickets(client):
     # same for new events
     start = date.today() + timedelta(days=1)
 
-    page = client.get('/events').click("Veranstaltung melden")
+    page = client.get('/events').click("Veranstaltung vorschlagen")
     page.form['email'] = "person@example.org"
     page.form['title'] = "My Event"
     page.form['description'] = "My event is an event."

@@ -3,7 +3,7 @@ from freezegun import freeze_time
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import Election
-from onegov.ballot import ElectionAssociation
+from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from uuid import uuid4
 
@@ -531,6 +531,7 @@ def test_election_export(session):
         absolute_majority=144
     )
     election.title_translations['it_CH'] = 'Elezione'
+    election.colors = {'Republican Party': '#112233'}
 
     candidate_1 = Candidate(
         id=uuid4(),
@@ -619,6 +620,7 @@ def test_election_export(session):
         'candidate_id': '2',
         'candidate_elected': False,
         'candidate_party': 'Democratic Party',
+        'candidate_party_color': '',
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111,
@@ -653,6 +655,7 @@ def test_election_export(session):
         'candidate_id': '1',
         'candidate_elected': True,
         'candidate_party': 'Republican Party',
+        'candidate_party_color': '#112233',
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520,
@@ -832,7 +835,7 @@ def test_related_elections(session):
     assert second.related_elections.all() == []
     assert second.referencing_elections.all() == []
 
-    first.related_elections.append(ElectionAssociation(target_id=second.id))
+    first.related_elections.append(ElectionRelationship(target_id=second.id))
     session.flush()
     assert first.related_elections.one().source_id == 'first'
     assert first.related_elections.one().target_id == 'second'
@@ -841,7 +844,7 @@ def test_related_elections(session):
     assert second.referencing_elections.one().source_id == 'first'
     assert second.referencing_elections.one().target_id == 'second'
 
-    second.related_elections.append(ElectionAssociation(target_id=first.id))
+    second.related_elections.append(ElectionRelationship(target_id=first.id))
     session.flush()
     assert first.related_elections.one().source_id == 'first'
     assert first.related_elections.one().target_id == 'second'
@@ -856,9 +859,9 @@ def test_related_elections(session):
     session.flush()
     assert first.related_elections.all() == []
     assert first.referencing_elections.all() == []
-    assert session.query(ElectionAssociation).all() == []
+    assert session.query(ElectionRelationship).all() == []
 
-    first.related_elections.append(ElectionAssociation(target_id=first.id))
+    first.related_elections.append(ElectionRelationship(target_id=first.id))
     session.flush()
     assert first.related_elections.one().source_id == 'first'
     assert first.related_elections.one().target_id == 'first'
@@ -867,7 +870,7 @@ def test_related_elections(session):
 
     session.delete(first)
     session.flush()
-    assert session.query(ElectionAssociation).all() == []
+    assert session.query(ElectionRelationship).all() == []
 
 
 def test_election_rename(session):

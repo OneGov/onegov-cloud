@@ -70,10 +70,13 @@ def view_topic(self, request, layout=None):
                 child.content['url'] if child.trait == 'link' else
                 request.link(child),
                 request.link(
-                    Editor('edit', child)) if child.trait == 'link' else None
+                    Editor('edit', child)) if child.trait == 'link' else None,
+                child.page_image,
+                child.show_preview_image
             )
             for child in children
-        ]
+        ],
+        'children_images': any(child.page_image for child in children)
     }
 
 

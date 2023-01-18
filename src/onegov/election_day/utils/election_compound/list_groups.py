@@ -7,7 +7,7 @@ def get_list_groups(election_compound):
     """" Get list groups data. """
 
     if not election_compound.pukelsheim:
-        return {}
+        return []
 
     query = election_compound.party_results
     if election_compound.exact_voters_counts:
@@ -15,7 +15,6 @@ def get_list_groups(election_compound):
             PartyResult.name.label('name'),
             PartyResult.voters_count,
             PartyResult.number_of_mandates,
-            PartyResult.color
         )
     else:
         query = query.with_entities(
@@ -25,10 +24,10 @@ def get_list_groups(election_compound):
                 Integer
             ).label('voters_count'),
             PartyResult.number_of_mandates,
-            PartyResult.color
         )
     query = query.filter(
-        PartyResult.year == election_compound.date.year
+        PartyResult.year == election_compound.date.year,
+        PartyResult.domain == election_compound.domain
     )
     query = query.order_by(
         PartyResult.voters_count.desc(),
@@ -56,7 +55,7 @@ def get_list_groups_data(election_compound):
                     'active' if completed and result.number_of_mandates
                     else 'inactive'
                 ),
-                'color': result.color
+                'color': election_compound.colors.get(result.name)
             } for result in results
         ],
     }

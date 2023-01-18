@@ -26,6 +26,7 @@ from wtforms.validators import NumberRange
 from wtforms.validators import Regexp
 from wtforms.validators import URL
 
+import re
 
 # increasing the default filesize is *strongly discouarged*, as we are not
 # storing those files in the database, so they need to fit in memory
@@ -34,7 +35,7 @@ from wtforms.validators import URL
 # database
 #
 MEGABYTE = 1000 ** 2
-DEFAULT_UPLOAD_LIMIT = 5 * MEGABYTE
+DEFAULT_UPLOAD_LIMIT = 10 * MEGABYTE
 
 
 def parse_form(text, base_class=Form):
@@ -55,6 +56,15 @@ def parse_form(text, base_class=Form):
     form_class._source = text
 
     return form_class
+
+
+def normalize_label_for_dependency(label):
+    """ Removes all between '(' and ')' Parentheses (inclusive) """
+    if '(' in label and ')' in label:
+        label = re.sub("([(]).*?([)])", "", label)
+        return label[:-1] if label[-1] == " " else label
+    else:
+        return label
 
 
 def handle_field(builder, field, dependency=None):
@@ -260,9 +270,8 @@ def handle_field(builder, field, dependency=None):
         for choice in field.choices:
             if not choice.fields:
                 continue
-
-            dependency = FieldDependency(field.id, choice.label)
-
+            normalized_label = normalize_label_for_dependency(choice.label)
+            dependency = FieldDependency(field.id, normalized_label)
             for choice_field in choice.fields:
                 handle_field(builder, choice_field, dependency)
 

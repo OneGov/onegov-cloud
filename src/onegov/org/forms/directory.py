@@ -151,9 +151,19 @@ class DirectoryBaseForm(Form):
         depends_on=('address_block_title_type', 'fixed'),
     )
 
+    marker_type = RadioField(
+        label=_("Marker Type"),
+        fieldset=_("Marker"),
+        choices=[
+            ('icon', _("Icon")),
+            ('numbers', _("Numbers"))
+        ],
+        default='icon')
+
     marker_icon = IconField(
         label=_("Icon"),
-        fieldset=_("Marker"))
+        fieldset=_("Marker"),
+        depends_on=('marker_type', 'icon'))
 
     marker_color_type = RadioField(
         label=_("Marker Color"),
@@ -276,6 +286,16 @@ class DirectoryBaseForm(Form):
                 field.id for field in
                 flatten_fieldsets(parse_formcode(self.structure.data))
             }
+        except FormError:
+            return None
+
+    @cached_property
+    def known_fields(self):
+        try:
+            return [
+                field for field in
+                flatten_fieldsets(parse_formcode(self.structure.data))
+            ]
         except FormError:
             return None
 
@@ -422,6 +442,14 @@ class DirectoryBaseForm(Form):
     @property
     def configuration(self):
         content_fields = list(self.extract_field_ids(self.content_fields))
+
+        # Remove file and url fields from search
+        file_fields = [f.human_id for f in self.known_fields if (
+            f.type == 'fileinput' or f.type == 'url'
+        )]
+        searchable_content_fields = [
+            f for f in content_fields if f not in file_fields
+        ]
         content_hide_labels = list(
             self.extract_field_ids(self.content_hide_labels))
         contact_fields = list(self.extract_field_ids(self.contact_fields))
@@ -437,7 +465,7 @@ class DirectoryBaseForm(Form):
             lead=self.lead_format.data,
             order=safe_format_keys(order_format),
             keywords=keyword_fields,
-            searchable=content_fields + contact_fields,
+            searchable=searchable_content_fields + contact_fields,
             display={
                 'content': content_fields,
                 'contact': contact_fields,

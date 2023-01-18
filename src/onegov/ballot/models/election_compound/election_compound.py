@@ -1,72 +1,38 @@
 from collections import OrderedDict
-from onegov.ballot.models.election.candidate import Candidate
-from onegov.ballot.models.election.mixins import PartyResultExportMixin
+from onegov.ballot.models.election_compound.association import \
+    ElectionCompoundAssociation
+from onegov.ballot.models.election_compound.mixins import \
+    DerivedAttributesMixin
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
 from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
+from onegov.ballot.models.party_result.mixins import \
+    HistoricalPartyResultsMixin
+from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
+from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
-from onegov.core.orm.types import UUID
-from onegov.core.utils import Bunch
 from onegov.core.utils import groupbylist
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
-from sqlalchemy import ForeignKey
-from sqlalchemy import func
 from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
-from uuid import uuid4
-
-
-class ElectionCompoundAssociation(Base):
-
-    __tablename__ = 'election_compound_associations'
-
-    #: identifies the candidate result
-    id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: The election compound ID
-    election_compound_id = Column(
-        Text,
-        ForeignKey('election_compounds.id', onupdate='CASCADE')
-    )
-
-    #: The election ID
-    election_id = Column(
-        Text,
-        ForeignKey('elections.id', onupdate='CASCADE'),
-        primary_key=True
-    )
-
-    election_compound = relationship(
-        'ElectionCompound', backref=backref(
-            'associations',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
-    )
-
-    election = relationship(
-        'Election', backref=backref(
-            'associations',
-            cascade='all, delete-orphan',
-            lazy='dynamic'
-        )
-    )
 
 
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultExportMixin, ExplanationsPdfMixin
+    PartyResultsOptionsMixin, PartyResultsExportMixin,
+    HistoricalPartyResultsMixin,
+    ExplanationsPdfMixin, DerivedAttributesMixin
 ):
 
     __tablename__ = 'election_compounds'
@@ -101,29 +67,19 @@ class ElectionCompound(
     #: Status of the compound and its elections
     manually_completed = Column(Boolean, nullable=False, default=False)
 
-    #: Display voters counts instead of votes in views with party results.
-    voters_counts = meta_property('voters_counts', default=False)
-
-    #: Display exact voters counts instead of rounded values.
-    exact_voters_counts = meta_property('exact_voters_counts', default=False)
-
     #: An election compound may contains n party results
     party_results = relationship(
         'PartyResult',
-        primaryjoin=(
-            'foreign(PartyResult.owner) == ElectionCompound.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election_compound'),
         lazy='dynamic',
     )
 
     #: An election compound may contains n panachage results
     panachage_results = relationship(
         'PanachageResult',
-        primaryjoin=(
-            'foreign(PanachageResult.owner) == ElectionCompound.id'
-        ),
         cascade='all, delete-orphan',
+        backref=backref('election_compound'),
         lazy='dynamic',
     )
 
@@ -155,36 +111,8 @@ class ElectionCompound(
                 self.last_result_change = new
 
     @property
-    def number_of_mandates(self):
-        """ The (total) number of mandates. """
-        return sum([
-            election.number_of_mandates for election in self.elections
-        ])
-
-    @property
-    def allocated_mandates(self):
-        """ Number of already allocated mandates/elected candidates. """
-
-        election_ids = [e.id for e in self.elections if e.completed]
-        if not election_ids:
-            return 0
-        session = object_session(self)
-        mandates = session.query(
-            func.count(func.nullif(Candidate.elected, False))
-        )
-        mandates = mandates.filter(Candidate.election_id.in_(election_ids))
-        mandates = mandates.first()
-        return mandates[0] if mandates else 0
-
-    @property
-    def counted(self):
-        """ True if all elections have been counted. """
-
-        for election in self.elections:
-            if not election.counted:
-                return False
-
-        return True
+    def session(self):
+        return object_session(self)
 
     @property
     def progress(self):
@@ -211,13 +139,6 @@ class ElectionCompound(
         return sum(1 for r in result if r), len(result)
 
     @property
-    def counted_entities(self):
-        return [
-            election.domain_segment for election in self.elections
-            if election.completed
-        ]
-
-    @property
     def has_results(self):
         """ Returns True, if the election compound has any results. """
 
@@ -230,44 +151,6 @@ class ElectionCompound(
                 return True
 
         return False
-
-    @property
-    def results(self):
-        return [
-            Bunch(
-                domain_segment=election.domain_segment,
-                domain_supersegment=election.domain_supersegment,
-                counted=election.counted,
-                turnout=election.turnout,
-                eligible_voters=election.eligible_voters,
-                expats=election.expats,
-                counted_eligible_voters=election.counted_eligible_voters,
-                received_ballots=election.received_ballots,
-                counted_received_ballots=election.counted_received_ballots,
-                accounted_ballots=election.accounted_ballots,
-                blank_ballots=election.blank_ballots,
-                invalid_ballots=election.invalid_ballots,
-                accounted_votes=election.accounted_votes,
-            )
-            for election in self.elections
-        ]
-
-    @property
-    def completed(self):
-        """ Returns True, if all elections are completed. """
-
-        elections = self.elections
-        if not elections:
-            return False
-
-        for election in elections:
-            if not election.completed:
-                return False
-
-        if self.completes_manually and not self.manually_completed:
-            return False
-
-        return True
 
     @property
     def elected_candidates(self):
@@ -289,17 +172,9 @@ class ElectionCompound(
     #: additional file in case of Doppelter Pukelsheim
     lower_apportionment_pdf = named_file()
 
-    #: may be used to enable/disable the visibility of the seat allocation
-    show_seat_allocation = meta_property('show_seat_allocation')
-
-    #: may be used to enable/disable the visibility of the list groups
-    show_list_groups = meta_property('show_list_groups')
-
-    #: may be used to enable/disable the visibility of party strengths
-    show_party_strengths = meta_property('show_party_strengths')
-
-    #: may be used to enable/disable the visibility of party panachage
-    show_party_panachage = meta_property('show_party_panachage')
+    @property
+    def relationships_for_historical_party_results(self):
+        return self.related_compounds
 
     def clear_results(self):
         """ Clears all related results. """

@@ -7,6 +7,7 @@ from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_aggregated_list_results
 from onegov.election_day.utils.election import get_connection_results_api
+from webob.exc import HTTPNotFound
 
 
 @ElectionDayApp.html(
@@ -38,7 +39,7 @@ def view_election_data_as_json(self, request):
 
     return {
         'data': self.export(sorted(request.app.locales)),
-        'name': normalize_for_url(self.title)
+        'name': normalize_for_url(self.title[:60])
     }
 
 
@@ -53,7 +54,7 @@ def view_election_data_as_csv(self, request):
 
     return {
         'data': self.export(sorted(request.app.locales)),
-        'name': normalize_for_url(self.title)
+        'name': normalize_for_url(self.title[:60])
     }
 
 
@@ -61,6 +62,9 @@ def view_election_data_as_csv(self, request):
 def view_election_parties_data_as_json(self, request):
 
     """ View the raw parties data as JSON. """
+
+    if not self.type == 'proporz':
+        raise HTTPNotFound()
 
     @request.after
     def add_last_modified(response):
@@ -74,7 +78,7 @@ def view_election_parties_data_as_json(self, request):
         ),
         'name': normalize_for_url(
             '{}-{}'.format(
-                self.title,
+                normalize_for_url(self.title[:50]),
                 request.translate(_("Parties")).lower()
             )
         )
@@ -85,6 +89,9 @@ def view_election_parties_data_as_json(self, request):
 def view_election_parties_data_as_csv(self, request):
 
     """ View the raw parties data as CSV. """
+
+    if not self.type == 'proporz':
+        raise HTTPNotFound()
 
     @request.after
     def add_last_modified(response):
@@ -97,7 +104,7 @@ def view_election_parties_data_as_csv(self, request):
         ),
         'name': normalize_for_url(
             '{}-{}'.format(
-                self.title,
+                normalize_for_url(self.title[:50]),
                 request.translate(_("Parties")).lower()
             )
         )

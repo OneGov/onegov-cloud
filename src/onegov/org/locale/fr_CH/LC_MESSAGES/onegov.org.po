@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-18 15:09+0200\n"
+"POT-Creation-Date: 2022-12-21 08:33+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -376,11 +376,17 @@ msgstr "La première ligne de l'adresse"
 msgid "Static title"
 msgstr "Titre statique"
 
-msgid "Icon"
-msgstr "Icône"
+msgid "Marker Type"
+msgstr "Type de marqueur"
 
 msgid "Marker"
 msgstr "Marqueur"
+
+msgid "Icon"
+msgstr "Icône"
+
+msgid "Numbers"
+msgstr ""
 
 msgid "Marker Color"
 msgstr "Couleur du marqueur"
@@ -943,6 +949,9 @@ msgstr ""
 msgid "Recipient"
 msgstr "Destinataire"
 
+msgid "Will be used as image in the page overview on the parent page"
+msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
+
 msgid "Describes what this page is about"
 msgstr "Décrit de quoi parle cette page"
 
@@ -1109,6 +1118,9 @@ msgstr "URL pointant vers le logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (carré)"
+
+msgid "Standard Image"
+msgstr "Image standard"
 
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "Adresse e-mail de réponse (Reply-To)"
@@ -1491,8 +1503,8 @@ msgstr "Activer la newsletter"
 msgid "Include logo in newsletter"
 msgstr "Afficher le logo dans la newsletter"
 
-msgid "New domain"
-msgstr "Nouveau domaine"
+msgid "Old domain"
+msgstr "Ancien domaine"
 
 msgid "Test migration"
 msgstr "Tester migration"
@@ -1514,6 +1526,12 @@ msgstr "Liens externes uniquement"
 
 msgid "Internal links only"
 msgstr "Liens internes uniquement"
+
+msgid "Submit your event"
+msgstr "Soumettez votre événement"
+
+msgid "Enables website visitors to submit their own events"
+msgstr "Permet aux visiteurs du site web de soumettre leurs propres événements"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -1632,9 +1650,6 @@ msgstr "Répertoires"
 
 msgid "All events"
 msgstr "Tous les événements"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "Daypass"
 msgstr "Carte journalière"
@@ -1888,6 +1903,9 @@ msgstr "Vous pouvez republier un événement importé plus tard."
 msgid "Re-publish event"
 msgstr "Republier l'événement"
 
+msgid "Newsletter"
+msgstr "Newsletter"
+
 msgid "New"
 msgstr "Nouveau"
 
@@ -2054,6 +2072,12 @@ msgstr "Activer les honey pot"
 
 msgid "Spam protection"
 msgstr "Protection contre le spam"
+
+msgid "Show image on preview on the parent page"
+msgstr "Afficher l'image sur l'aperçu de la page parent"
+
+msgid "Show image on page"
+msgstr "Afficher l'image sur la page"
 
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -3482,9 +3506,6 @@ msgstr "Étiquette"
 msgid "Export these events"
 msgstr "Exporter ces événements"
 
-msgid "Submit your event"
-msgstr "Soumettez votre événement"
-
 msgid "Submit your own event"
 msgstr "Soumettez votre propre événement"
 
@@ -4834,9 +4855,9 @@ msgstr "Total de ${number} liens trouvés"
 
 #, python-format
 msgid ""
-"Migrates links from the current domain \"${domain}\" to the given domain."
+"Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Fait migrer les liens du domaine actuel \"${domain}\" vers le domaine donné."
+"Fait migrer les liens du domaine donné vers le domaine actuel \"${domain}\"."
 
 msgid "Topics"
 msgstr "Sujets"
@@ -5042,6 +5063,19 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Will be published until:"
+msgstr "Sera publié jusqu'au:"
+
+msgid "Published until ${endDate1}"
+msgstr "Publié jusqu'au ${endDate1}"
+
+msgid "Published from ${publishDate} until ${endDate}"
+msgstr "Publié du {publishDate} jusqu'au ${endDate}"
+
+msgid "Publication end date:"
+msgstr "Date de fin de publication:"
+
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (défaut)"

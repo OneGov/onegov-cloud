@@ -250,6 +250,42 @@ def change_yubikey(username, yubikey):
     return change
 
 
+@cli.command(name='transfer-yubikey', context_settings={'singular': True})
+@click.argument('source')
+@click.argument('target')
+def transfer_yubikey(source, target):
+    """ Transfers the Yubikey from one user to another. """
+
+    def transfer(request, app):
+        users = UserCollection(app.session())
+
+        if not users.exists(source):
+            abort("{} does not exist".format(source))
+        if not users.exists(target):
+            abort("{} does not exist".format(target))
+
+        source_user = users.by_username(source)
+        target_user = users.by_username(target)
+
+        if not source_user.second_factor:
+            abort("{} is not linked to a yubikey".format(source))
+        if target_user.second_factor:
+            abort("{} is already linked to a yubikey".format(target))
+
+        target_user.second_factor = source_user.second_factor
+        source_user.second_factor = None
+
+        target_user.logout_all_sessions(request.app)
+        source_user.logout_all_sessions(request.app)
+
+        click.secho(
+            "yubikey was transferred from {} to {}".format(source, target),
+            fg='green'
+        )
+
+    return transfer
+
+
 @cli.command(name='change-role', context_settings={'singular': True})
 @click.argument('username')
 @click.argument('role')

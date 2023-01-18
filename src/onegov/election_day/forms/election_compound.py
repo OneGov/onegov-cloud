@@ -1,5 +1,8 @@
 from datetime import date
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundRelationship
+from onegov.core.utils import Bunch
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -9,6 +12,7 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from re import findall
+from sqlalchemy import or_
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
 from wtforms.fields import RadioField
@@ -82,8 +86,8 @@ class ElectionCompoundForm(Form):
         label=_("Completes manually"),
         description=_(
             "Enables manual completion of the election compound. "
-            "No indidvidual election results are displayed until the election "
-            "compound is manually completed."
+            "All elections are completed only once the election compound "
+            "is completed."
         ),
         fieldset=_("Completion"),
         render_kw=dict(force_simple=True)
@@ -115,6 +119,17 @@ class ElectionCompoundForm(Form):
         label=_("Romansh"),
         fieldset=_("Title of the election"),
         render_kw={'lang': 'rm'}
+    )
+
+    related_compounds_historical = ChosenSelectMultipleField(
+        label=_("Other legislative periods"),
+        fieldset=_("Related elections"),
+        choices=[]
+    )
+    related_compounds_other = ChosenSelectMultipleField(
+        label=_("Rounds of voting or by-elections"),
+        fieldset=_("Related elections"),
+        choices=[]
     )
 
     related_link = URLField(
@@ -196,6 +211,27 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    horizontal_party_strengths = BooleanField(
+        label=_("Horizonal party strengths chart"),
+        fieldset=_("View options"),
+        description=_(
+            "Shows a horizontal bar chart instead of a vertical bar chart."
+        ),
+        depends_on=('show_party_strengths', 'y'),
+        render_kw=dict(force_simple=True)
+    )
+
+    use_historical_party_results = BooleanField(
+        label=_("Use party results from the last legislative period"),
+        fieldset=_("View options"),
+        description=_(
+            "Requires party results. Requires a related election from another "
+            "legislative period with party results. Requires that both "
+            "elections use the same party IDs."
+        ),
+        render_kw=dict(force_simple=True)
+    )
+
     show_seat_allocation = BooleanField(
         label=_("Seat allocation"),
         description=_(
@@ -238,6 +274,7 @@ class ElectionCompoundForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        hide_label=False,
         fieldset=_('Colors'),
         text=(
             'AL #a74c97\n'
@@ -339,6 +376,53 @@ class ElectionCompoundForm(Form):
             ) for item in query.filter(Election.domain == 'municipality')
         ]
 
+        query = self.request.session.query(ElectionCompound)
+        query = query.order_by(
+            ElectionCompound.date.desc(),
+            ElectionCompound.shortcode
+        )
+        choices = [
+            (
+                compound.id,
+                "{} {} {}".format(
+                    layout.format_date(compound.date, 'date'),
+                    compound.shortcode or '',
+                    compound.title,
+                ).strip().replace("  ", " ")
+            ) for compound in query
+        ]
+        self.related_compounds_historical.choices = choices
+        self.related_compounds_other.choices = choices
+
+    def update_realtionships(self, model, type_):
+        # use symetric relationships
+        session = self.request.session
+        query = session.query(ElectionCompoundRelationship)
+        query = query.filter(
+            or_(
+                ElectionCompoundRelationship.source_id == model.id,
+                ElectionCompoundRelationship.target_id == model.id,
+            ),
+            ElectionCompoundRelationship.type == type_
+        )
+        for relationship in query:
+            session.delete(relationship)
+
+        data = getattr(self, f'related_compounds_{type_}', Bunch(data=[])).data
+        for id_ in data:
+            if not model.id:
+                model.id = model.id_from_title(session)
+            session.add(
+                ElectionCompoundRelationship(
+                    source_id=model.id, target_id=id_, type=type_
+                )
+            )
+            session.add(
+                ElectionCompoundRelationship(
+                    source_id=id_, target_id=model.id, type=type_
+                )
+            )
+
     def update_model(self, model):
         model.domain = self.domain.data
         model.domain_elections = self.domain_elections.data
@@ -354,6 +438,9 @@ class ElectionCompoundForm(Form):
         model.manually_completed = self.manually_completed.data
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
+        model.horizontal_party_strengths = self.horizontal_party_strengths.data
+        model.use_historical_party_results = self.\
+            use_historical_party_results.data
 
         model.elections = []
         query = self.request.session.query(Election)
@@ -409,6 +496,10 @@ class ElectionCompoundForm(Form):
 
         model.colors = self.parse_colors(self.colors.data)
 
+        with self.request.session.no_autoflush:
+            self.update_realtionships(model, 'historical')
+            self.update_realtionships(model, 'other')
+
     def apply_model(self, model):
         titles = model.title_translations or {}
         self.election_de.data = titles.get('de_CH')
@@ -446,6 +537,9 @@ class ElectionCompoundForm(Form):
         self.manually_completed.data = model.manually_completed
         self.voters_counts.data = model.voters_counts
         self.exact_voters_counts.data = model.exact_voters_counts
+        self.horizontal_party_strengths.data = model.horizontal_party_strengths
+        self.use_historical_party_results.data = \
+            model.use_historical_party_results
         self.show_seat_allocation.data = model.show_seat_allocation
         self.show_list_groups.data = model.show_list_groups
         self.show_party_strengths.data = model.show_party_strengths
@@ -463,3 +557,20 @@ class ElectionCompoundForm(Form):
         self.colors.data = '\n'.join((
             f'{name} {model.colors[name]}' for name in sorted(model.colors)
         ))
+
+        self.related_compounds_historical.choices = [
+            choice for choice in self.related_compounds_historical.choices
+            if choice[0] != model.id
+        ]
+        self.related_compounds_other.choices = [
+            choice for choice in self.related_compounds_other.choices
+            if choice[0] != model.id
+        ]
+        self.related_compounds_historical.data = [
+            association.target_id for association in model.related_compounds
+            if association.type == 'historical'
+        ]
+        self.related_compounds_other.data = [
+            association.target_id for association in model.related_compounds
+            if association.type == 'other'
+        ]

@@ -4,11 +4,43 @@
         padding-top: .5rem;
     }
 
-    .card-divider a {
-        color: $body-font-color;
+    .card-divider {
+        padding: 1rem 1.5rem;
     }
 
     .card-divider h5 {
+        color: $jet;
         margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    li {
+        border-top: 1px solid #f5f5f5;
+
+        a::after {
+            @include icon-bold($more-link-icon);
+            // float: right;
+            opacity: 0;
+            padding-left: 2rem;
+            transition: all 200ms linear;
+        }
+
+        &:hover a::after {
+            opacity: 1;
+            padding-left: 2.5rem;
+        }
+    }
+
+    li:first-child {
+        border-top: 0;
+
+        a.tile-sub-link {
+            border-top: 1px solid transparent !important;
+            padding-top: 0;
+        }
+    }
+
+    li:last-child {
+        padding-bottom: 0;
     }
 }

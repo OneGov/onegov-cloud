@@ -25,6 +25,8 @@ install-packages \
     libgbm1 \
     libnspr4 \
     libnss3 \
+    libu2f-udev \
+    libvulkan1 \
     libx11-xcb1 \
     libxcb-dri3-0 \
     libxshmfence1 \

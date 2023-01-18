@@ -461,6 +461,8 @@ class HoneyPotExtension(ContentExtension):
 class ImageExtension(ContentExtension):
 
     page_image = meta_property()
+    show_preview_image = meta_property(default=True)
+    show_page_image = meta_property(default=True)
 
     def extend_form(self, form_class, request):
 
@@ -469,6 +471,16 @@ class ImageExtension(ContentExtension):
             page_image = StringField(
                 label=_("Image"),
                 render_kw={'class_': 'image-url'}
+            )
+
+            show_preview_image = BooleanField(
+                label=_('Show image on preview on the parent page'),
+                default=True,
+            )
+
+            show_page_image = BooleanField(
+                label=_('Show image on page'),
+                default=True,
             )
 
         return PageImageForm

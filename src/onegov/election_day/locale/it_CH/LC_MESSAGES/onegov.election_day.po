@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-24 10:20+0200\n"
+"POT-Creation-Date: 2023-01-18 11:59+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -98,6 +98,10 @@ msgstr "Non alfanumerico: ${col}"
 msgid "Invalid gender: ${value}"
 msgstr "Genere non valido: ${value}"
 
+#, python-format
+msgid "Invalid color: ${col}"
+msgstr "Colore non valido: ${col}"
+
 msgid "This format does not support separate results for expats"
 msgstr "Questo formato non supporta risultati separati per gli espatriati"
 
@@ -132,6 +136,10 @@ msgstr "Valori della lista delle connessioni non validi"
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} no e list_id's"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment non valido: ${domain_segment}"
 
 msgid "Invalid values"
 msgstr "Valori non validi"
@@ -320,11 +328,69 @@ msgstr "Comune"
 msgid "Tacit election"
 msgstr "Elezione tacita"
 
-msgid "Expats"
-msgstr "Svizzeri all'estero"
+msgid "View options"
+msgstr "Opzioni di visualizzazione"
 
-msgid "The election contains seperate results for expats."
-msgstr "L'elezione contiene risultati separati per gli espatriati."
+msgid "Expats are listed separately"
+msgstr ""
+
+msgid ""
+"Expats are uploaded and listed as a separate row in the results. Changing "
+"this option requires a new upload of the data."
+msgstr ""
+
+msgid "Voters counts"
+msgstr "Numero di elettori"
+
+msgid "Shows voters counts instead of votes in the party strengths view."
+msgstr ""
+"Indica il numero di elettori anziché i voti nella visualizzazione della "
+"forza dei partiti"
+
+msgid "Exact voters counts"
+msgstr "Numero di elettori esatto"
+
+msgid "Shows exact voters counts instead of rounded values."
+msgstr "Mostra il numero di elettori esatto anziché i valori arrotondati."
+
+msgid "Horizonal party strengths chart"
+msgstr "Tableau des forces horizontales des partis"
+
+msgid "Shows a horizontal bar chart instead of a vertical bar chart."
+msgstr ""
+"Affiche un graphique à barres horizontales au lieu d'un graphique à barres "
+"verticales."
+
+msgid "Use party results from the last legislative period"
+msgstr "Utiliser les résultats des partis de la dernière période législative"
+
+msgid ""
+"Requires party results. Requires a related election from another legislative "
+"period with party results. Requires that both elections use the same party "
+"IDs."
+msgstr ""
+"Exige les résultats des partis. Exige une élection connexe d'une autre "
+"période législative avec des résultats de parti. Il faut que les deux "
+"élections utilisent les mêmes identifiants de parti."
+
+msgid "Party strengths"
+msgstr "Forza dei partiti"
+
+msgid ""
+"Shows a tab with the comparison of party strengths as a bar chart. Requires "
+"party results."
+msgstr ""
+"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
+"grafico a barre. Richiede i risultati dei partiti."
+
+msgid "Views"
+msgstr "Visualizzazioni"
+
+msgid "Panachage (parties)"
+msgstr "Panachage (parti)"
+
+msgid "Shows a tab with the panachage. Requires party results."
+msgstr "Mostra una scheda con il panachage. Richiede i risultati del partito."
 
 msgid "Date"
 msgstr "Data"
@@ -350,8 +416,14 @@ msgstr "Italiano"
 msgid "Romansh"
 msgstr "Romancio"
 
+msgid "Other legislative periods"
+msgstr ""
+
 msgid "Related elections"
 msgstr "Elezioni correlate"
+
+msgid "Rounds of voting or by-elections"
+msgstr ""
 
 msgid "Link"
 msgstr "Link"
@@ -393,12 +465,9 @@ msgid "Completes manually"
 msgstr "Viene concluso manualmente"
 
 msgid ""
-"Enables manual completion of the election compound. No indidvidual election "
-"results are displayed until the election compound is manually completed."
-msgstr ""
-"Permette di completare manualmente il componente delle elezioni. Nessun "
-"risultato elettorale individuale viene visualizzato fino a quando il "
-"componente elettorale non viene completato manualmente."
+"Enables manual completion of the election compound. All elections are "
+"completed only once the election compound is completed."
+msgstr "Permette di completare manualmente il componente delle elezioni."
 
 msgid "Completion"
 msgstr "Conclusione"
@@ -415,25 +484,8 @@ msgstr "Sottoripartizione (PDF)"
 msgid "Doppelter Pukelsheim"
 msgstr "Doppelter Pukelsheim"
 
-msgid "View options"
-msgstr "Opzioni di visualizzazione"
-
 msgid "Allows to show the list groups and lists views."
 msgstr "Permette di visualizzare i gruppi di liste e le liste."
-
-msgid "Voters counts"
-msgstr "Numero di elettori"
-
-msgid "Shows voters counts instead of votes in the party strengths view."
-msgstr ""
-"Indica il numero di elettori anziché i voti nella visualizzazione della "
-"forza dei partiti"
-
-msgid "Exact voters counts"
-msgstr "Numero di elettori esatto"
-
-msgid "Shows exact voters counts instead of rounded values."
-msgstr "Mostra il numero di elettori esatto anziché i valori arrotondati."
 
 msgid "Seat allocation"
 msgstr "Ripartizione dei seggi"
@@ -445,9 +497,6 @@ msgstr ""
 "Visualizzazione di una scheda con la ripartizione dei seggi sotto forma di "
 "un diagramma a barre. Sono necessari risultati di partito."
 
-msgid "Views"
-msgstr "Visualizzazioni"
-
 msgid "List groups"
 msgstr "Gruppi di liste"
 
@@ -458,21 +507,8 @@ msgstr ""
 "Mostra una scheda con i risultati del gruppo di liste. Richiede i risultati "
 "del partito con il conteggio dei votanti. Solo per Doppelter Pukelsheim."
 
-msgid "Party strengths"
-msgstr "Forza dei partiti"
-
-msgid ""
-"Shows a tab with the comparison of party strengths as a bar chart. Requires "
-"party results."
-msgstr ""
-"Mostra una scheda con il confronto delle forze dei partiti sotto forma di "
-"grafico a barre. Richiede i risultati dei partiti."
-
 msgid "Panachage"
 msgstr "Panachage"
-
-msgid "Shows a tab with the panachage. Requires party results."
-msgstr "Mostra una scheda con il panachage. Richiede i risultati del partito."
 
 msgid "Notifications"
 msgstr "Notifiche"
@@ -531,6 +567,12 @@ msgstr "Votazione"
 
 msgid "Election"
 msgstr "Elezione"
+
+msgid "Part of an Election Compound"
+msgstr ""
+
+msgid "Domain Segment"
+msgstr ""
 
 msgid "Available tags"
 msgstr "Tag disponibili"
@@ -595,6 +637,9 @@ msgstr "Titolo dello controprogetto"
 
 msgid "Title of the tie breaker"
 msgstr "Titolo dello spareggio"
+
+msgid "Expats"
+msgstr "Svizzeri all'estero"
 
 msgid "Link to homepage"
 msgstr "Link alla pagina iniziale"
@@ -838,6 +883,7 @@ msgstr "Indicazione riguardo al numero di elettori"
 #. be allocated in the district concerned. The result is called the voters
 #. count. The voters count determines the allocation to the list groups. The
 #. election is finished as soon as the number of mandates appears.
+#.
 msgid "figcaption_list_groups"
 msgstr ""
 "In una prima fase, la cosiddetta sovraripartizione, tutti i voti espressi "
@@ -865,8 +911,8 @@ msgstr "Contenuto"
 msgid "Sitemap"
 msgstr "Sitemap"
 
-#. Default: Start
 #.
+#. Default: Start
 msgid "homepage"
 msgstr "Pagina iniziale"
 
@@ -1377,9 +1423,6 @@ msgstr "Nessuna mappa disponibile per quest'anno."
 
 msgid "Blank list"
 msgstr "Lista bianca"
-
-msgid "Panachage (parties)"
-msgstr "Panachage (parti)"
 
 msgid "Panachage (lists)"
 msgstr "Panachage (liste)"

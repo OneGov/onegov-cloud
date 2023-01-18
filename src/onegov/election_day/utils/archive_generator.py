@@ -14,6 +14,12 @@ from fs.errors import NoSysPath
 
 
 class ArchiveGenerator:
+    """
+        Iterates over all Votes, Election and ElectionCompounds and runs the
+        csv export function on each of them.
+        This creates a bunch of csv files, which are zipped and the path to
+        the zip is returned.
+    """
     def __init__(self, app):
         self.app = app
         self.session = self.app.session()
@@ -21,7 +27,7 @@ class ArchiveGenerator:
                                                                recreate=True)
         self.temp_fs = TempFS()
         self.archive_parent_dir = "zip"
-        self.MAX_FILENAME_LENGTH = 240
+        self.MAX_FILENAME_LENGTH = 60
 
     def generate_csv(self):
         """
@@ -44,9 +50,9 @@ class ArchiveGenerator:
 
         names = ["votes", "elections", "elections"]
         entities = [
-            self.all_votes(),
-            self.all_elections(),
-            self.all_election_compounds()
+            self.all_counted_votes_with_results(),
+            self.all_counted_election_with_results(),
+            self.all_counted_election_compounds_with_results()
         ]
         for entity_name, entity in zip(names, entities):
 
@@ -63,6 +69,22 @@ class ArchiveGenerator:
                     with self.temp_fs.open(combined_path, "w") as f:
                         rows = item.export(sorted(self.app.locales))
                         f.write(convert_list_of_dicts_to_csv(rows))
+
+        # Additionally, create 'flat csv' containing all votes in a single file
+        votes = entities[0]
+        if votes:
+            filename = "all_votes.csv"
+            combined_path = path.combine("votes", filename)
+            with self.temp_fs.open(combined_path, "w") as f:
+                votes_exports = self.get_all_rows_for_votes(votes)
+                f.write(convert_list_of_dicts_to_csv(votes_exports))
+
+    def get_all_rows_for_votes(self, votes):
+        all_votes = []
+        for v in votes:
+            vote_row = v.export(sorted(self.app.locales))
+            all_votes.extend(vote_row)
+        return all_votes
 
     def group_by_year(self, entities):
         """Creates a list of lists, grouped by year.
@@ -122,18 +144,35 @@ class ArchiveGenerator:
                                 )
                         return zip_path
 
-    def all_votes(self):
-        return self.session.query(Vote).order_by(desc(Vote.date)).all()
+    def all_counted_votes_with_results(self):
+        all_votes = self.session.query(Vote).order_by(desc(Vote.date)).all()
+        closed_votes = self.filter_by_final_results(all_votes)
+        return closed_votes
 
-    def all_elections(self):
-        return self.session.query(Election).order_by(desc(Election.date)).all()
+    def all_counted_election_with_results(self):
+        all_elections = (
+            self.session.query(Election).order_by(desc(Election.date)).all()
+        )
+        final_elections = self.filter_by_final_results(all_elections)
+        return final_elections
 
-    def all_election_compounds(self):
-        return (
+    def all_counted_election_compounds_with_results(self):
+        all_election_compounds = (
             self.session.query(ElectionCompound)
             .order_by(desc(ElectionCompound.date))
             .all()
         )
+        final_election_compounds = self.filter_by_final_results(
+            all_election_compounds
+        )
+        return final_election_compounds
+
+    def filter_by_final_results(self, all_entities):
+        finalized = []
+        for entity in all_entities:
+            if entity.counted and entity.has_results:
+                finalized.append(entity)
+        return finalized
 
     @property
     def archive_system_path(self):

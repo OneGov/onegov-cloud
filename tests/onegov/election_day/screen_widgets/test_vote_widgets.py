@@ -10,6 +10,8 @@ from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.screen_widgets import (
     ColumnWidget,
     CountedEntitiesWidget,
+    IfCompletedWidget,
+    IfNotCompletedWidget,
     LastResultChangeWidget,
     NumberOfCountedEntitiesWidget,
     ProgressWidget,
@@ -70,6 +72,10 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <last-result-change class="my-class-a"/>
             </column>
+            <column span="1">
+                <if-completed>is-completed</if-completed>
+                <if-not-completed>is-not-completed</if-not-completed>
+            </column>
         </row>
     """
     widgets = [
@@ -85,6 +91,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
         VoteProposalResultBarWidget(),
         VoteProposalDistrictsMap(),
         VoteProposalEntitiesMap(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
     ]
 
     # Empty
@@ -116,6 +124,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'Not yet counted' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -172,6 +182,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-dataurl="Ballot/by-district"' in result
     assert '1' in result
     assert '11' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
@@ -235,6 +247,8 @@ def test_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'data-dataurl="Ballot/by-district"' in result
     assert '11' in result
     assert '11' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
     assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
@@ -320,6 +334,10 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
             <column span="1">
                 <last-result-change class="my-class-m"/>
             </column>
+            <column span="1">
+                <if-completed>is-completed</if-completed>
+                <if-not-completed>is-not-completed</if-not-completed>
+            </column>
         </row>
     """
     widgets = [
@@ -348,6 +366,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
         VoteProposalEntitiesMap(),
         VoteTieBreakerDistrictsMap(),
         VoteTieBreakerEntitiesMap(),
+        IfCompletedWidget(),
+        IfNotCompletedWidget(),
     ]
 
     # Empty
@@ -384,6 +404,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert 'Not yet counted' in result
     assert 'data-dataurl="Ballot/by-entity"' in result
     assert 'data-dataurl="Ballot/by-district"' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
     assert 'my-class-3' in result
@@ -462,6 +484,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '42.21 %' in result
     assert '43.20 %' in result
     assert '42.32 %' in result
+    assert 'is-completed' not in result
+    assert 'is-not-completed' in result
     assert '01.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result
@@ -547,6 +571,8 @@ def test_complex_vote_widgets(election_day_app_zg, import_test_datasets):
     assert '44.93 %' in result
     assert '45.92 %' in result
     assert '44.17 %' in result
+    assert 'is-completed' in result
+    assert 'is-not-completed' not in result
     assert '02.01.2022' in result
     assert 'my-class-1' in result
     assert 'my-class-2' in result

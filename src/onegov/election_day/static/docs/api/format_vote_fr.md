@@ -6,26 +6,28 @@ Les formats de fichier acceptés sont les fichiers générés à la main par le 
 
 ## Contenu
 
-<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
-- [Spécifications de format des votes](#spécifications-de-format-des-votes)
-    - [Contenu](#contenu)
-    - [Avant-propos](#avant-propos)
-        - [Entités](#entités)
-    - [Formats](#formats)
-        - [Format standard](#format-standard)
-            - [Colonnes](#colonnes)
-            - [Résultats temporaires](#résultats-temporaires)
-            - [Modèle](#modèle)
-        - [OneGov](#onegov)
-            - [Colonnes](#colonnes-1)
-            - [Résultats temporaires](#résultats-temporaires-1)
-            - [Modèle](#modèle-1)
-        - [Wabsti](#wabsti)
-            - [Colonnes](#colonnes-2)
-            - [Résultats temporaires](#résultats-temporaires-2)
-            - [Modèle](#modèle-2)
-        - [WabstiCExport](#wabsticexport)
-<!-- TOC END -->
+<!-- https://atom.io/packages/atom-mdtoc -->
+<!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
+
+- 1. [Contenu](#Contenu)   
+- 2. [Avant-propos](#Avant-propos)   
+   - 2.1. [Entités](#Entites)   
+- 3. [Formats](#Formats)   
+   - 3.1. [Format standard](#Format-standard)   
+      - 3.1.1. [Colonnes](#Colonnes)   
+      - 3.1.2. [Résultats temporaires](#Resultats-temporaires)   
+      - 3.1.3. [Modèle](#Modele)   
+   - 3.2. [OneGov](#OneGov)   
+      - 3.2.1. [Colonnes](#Colonnes-1)   
+      - 3.2.2. [Résultats temporaires](#Resultats-temporaires-1)   
+      - 3.2.3. [Modèle](#Modele-1)   
+   - 3.3. [Wabsti](#Wabsti)   
+      - 3.3.1. [Colonnes](#Colonnes-2)   
+      - 3.3.2. [Résultats temporaires](#Resultats-temporaires-2)   
+      - 3.3.3. [Modèle](#Modele-2)   
+   - 3.4. [WabstiCExport](#WabstiCExport)   
+
+<!-- /MDTOC -->
 
 
 ## Avant-propos

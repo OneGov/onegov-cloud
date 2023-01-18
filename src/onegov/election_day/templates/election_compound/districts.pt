@@ -22,22 +22,9 @@
 
             <div class="row" tal:condition="layout.show_map">
                 <div class="small-12 small-centered medium-8 large-6 columns map-container">
-                    <div tal:condition="data_url" class="${map_type}-map"
-                        data-canton="${layout.principal.id}"
-                        data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
-                        data-dataurl="${data_url}"
-                        data-embed-source="${embed_source}"
-                        data-embed-link="Embed map"
-                        data-thumbs="false"
-                        data-color-scale="b"
-                        data-label-left-hand=""
-                        data-label-right-hand=""
-                        data-label-expats="Expats"
-                        data-hide-percentages="true"
-                        data-hide-legend="true"
-                        i18n:attributes="data-embed-link; data-label-expats"
-                        >
-                    </div>
+
+                    <tal:block metal:use-macro="layout.macros['election-compound-districts-map']" tal:define="embed True"/>
+
                     <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
                         <i class="fa fa-download"></i><tal:block i18n:translate="">Download map</tal:block>
                     </a>
@@ -45,11 +32,12 @@
             </div>
 
             <tal:block metal:use-macro="layout.macros['election-compound-districts-table']" />
-            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link" />
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link()" />
 
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']"/>
+        <div metal:use-macro="layout.macros['related_elections']" />
 
     </tal:block>
 </div>

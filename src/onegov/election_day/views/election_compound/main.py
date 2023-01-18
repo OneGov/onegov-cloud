@@ -1,3 +1,4 @@
+from collections import defaultdict
 from morepath import redirect
 from onegov.ballot import ElectionCompound
 from onegov.core.security import Public
@@ -54,19 +55,34 @@ def view_election_compound_json(self, request):
         add_last_modified_header(response, last_modified)
 
     session = request.app.session()
-    embed = {'districts-map': request.link(self, 'districts-map')}
+    embed = defaultdict(list)
     media = {'charts': {}}
     layout = ElectionCompoundLayout(self, request)
     layout.last_modified = last_modified
     if layout.pdf_path:
         media['pdf'] = request.link(self, 'pdf')
-    for tab in ('party-strengths', 'parties-panachage'):
+    embed['districts-map'].append(request.link(self, 'districts-map'))
+    if layout.has_superregions:
+        embed['superregions-map'].append(
+            request.link(self, 'superregions-map')
+        )
+    for tab in (
+        'seat-allocation',
+        'list-groups',
+        'party-strengths',
+        'parties-panachage',
+    ):
         layout = ElectionCompoundLayout(self, request, tab=tab)
         layout.last_modified = last_modified
         if layout.visible:
-            embed[tab] = request.link(self, '{}-chart'.format(tab))
+            embed[tab].append(request.link(self, '{}-chart'.format(tab)))
         if layout.svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
+
+    for tab in ElectionCompoundLayout.tabs_with_embedded_tables:
+        layout = ElectionCompoundLayout(self, request, tab=tab)
+        if layout.visible:
+            embed[tab].append(layout.table_link())
 
     elected_candidates = get_elected_candidates(self, session).all()
     candidate_statistics = get_candidate_statistics(self, elected_candidates)
@@ -85,6 +101,8 @@ def view_election_compound_json(self, request):
         for election in self.elections
     }
     superregions = get_superregions(self, request.app.principal)
+    for superregion in superregions.values():
+        superregion['superregion'] = request.link(superregion['superregion'])
 
     years, parties = get_party_results(self, json_serializable=True)
 

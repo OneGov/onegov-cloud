@@ -154,12 +154,39 @@ class Principal:
 
         return True
 
+    def get_districts(self, year):
+        if self.has_districts:
+            districts = {
+                entity.get('district', None)
+                for entity in self.entities.get(year, {}).values()
+            }
+            return {district for district in districts if district}
+        return set()
+
+    def get_regions(self, year):
+        if self.has_regions:
+            regions = {
+                entity.get('region', None)
+                for entity in self.entities.get(year, {}).values()
+            }
+            return {region for region in regions if region}
+        return set()
+
     def get_superregion(self, region, year):
         if self.has_superregions:
             for entity in self.entities.get(year, {}).values():
                 if entity.get('region') == region:
                     return entity.get('superregion', '')
         return ''
+
+    def get_superregions(self, year):
+        if self.has_superregions:
+            superregions = {
+                entity.get('superregion', None)
+                for entity in self.entities.get(year, {}).values()
+            }
+            return {superregion for superregion in superregions if superregion}
+        return set()
 
     @cached_property
     def notifications(self):

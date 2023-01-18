@@ -55,6 +55,11 @@ class GeneralSettingsForm(Form):
         description=_("URL pointing to the logo"),
         render_kw={'class_': 'image-url'})
 
+    standard_image = StringField(
+        label=_("Standard Image"),
+        render_kw={'class_': 'image-url'}
+    )
+
     reply_to = EmailField(
         _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
         description=_("Replies to automated e-mails go to this address."))
@@ -977,7 +982,7 @@ class NewsletterSettingsForm(Form):
 class LinkMigrationForm(Form):
 
     old_domain = StringField(
-        label=_('New domain'),
+        label=_('Old domain'),
         description='govikon.onegovcloud.ch',
         validators=[InputRequired()]
     )
@@ -1043,3 +1048,12 @@ class GeverSettingsForm(Form):
         super().process_obj(model)
         self.gever_username.data = model.gever_username or ""
         self.gever_password.data = model.gever_password or ""
+
+
+class EventSettingsForm(Form):
+
+    submit_events_visible = BooleanField(
+        label=_('Submit your event'),
+        description=_('Enables website visitors to submit their own events'),
+        default=True
+    )

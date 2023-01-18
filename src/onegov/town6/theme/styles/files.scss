@@ -29,7 +29,7 @@ $pdf-preview-max-width: 256px;
 /*
     Files list
 */
-.files {
+section#content .files {
     // used for better performance
     table-layout: fixed;
     width: 100%;

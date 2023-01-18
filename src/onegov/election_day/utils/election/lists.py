@@ -1,12 +1,15 @@
 from collections import defaultdict
 from collections import OrderedDict
 from itertools import groupby
+from onegov.ballot import ElectionResult
 from onegov.ballot import List
+from onegov.ballot import ListResult
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path
 from onegov.election_day import _
 from onegov.election_day.utils.common import LastUpdatedOrderedDict
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.orm import object_session
 from sqlalchemy.sql.expression import case
@@ -93,19 +96,34 @@ def get_aggregated_list_results(election, session, use_checks=False):
     }
 
 
-def get_list_results(election, limit=None, names=None, sort_by_names=None):
+def get_list_results(election, limit=None, names=None, sort_by_names=None,
+                     entities=None):
     """ Returns the aggregated list results as list. """
 
     session = object_session(election)
     result = session.query(
-        List.name, List.votes.label('votes'),
-        List.list_id, List.number_of_mandates
+        func.sum(ListResult.votes).label('votes'),
+        List.name,
+        List.number_of_mandates
     )
+    result = result.join(ListResult.list)
     result = result.filter(List.election_id == election.id)
     if names:
         result = result.filter(List.name.in_(names))
-
-    order = [desc(List.votes)]
+    if entities:
+        election_result_id = session.query(ElectionResult.id).filter(
+            ElectionResult.election_id == election.id,
+            ElectionResult.name.in_(entities)
+        )
+        election_result_id = [result.id for result in election_result_id]
+        result = result.filter(
+            ListResult.election_result_id.in_(election_result_id)
+        )
+    result = result.group_by(
+        List.name,
+        List.number_of_mandates
+    )
+    order = [desc('votes')]
     if names and sort_by_names:
         order.insert(0, case(
             [
@@ -123,13 +141,13 @@ def get_list_results(election, limit=None, names=None, sort_by_names=None):
 
 
 def get_lists_data(
-    election, limit=None, names=None, mandates_only=False, sort_by_names=None
+    election, limit=None, names=None, mandates_only=False, sort_by_names=None,
+    entities=None
 ):
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     completed = election.completed
     colors = election.colors
-    default_color = '#999' if election.colors else ''
 
     if election.type == 'majorz':
         return {
@@ -148,10 +166,11 @@ def get_lists_data(
                     'active' if completed and list_.number_of_mandates
                     else 'inactive'
                 ),
-                'color': colors.get(list_.name) or default_color
+                'color': colors.get(list_.name)
             }
             for list_ in get_list_results(
-                election, limit=limit, names=names, sort_by_names=sort_by_names
+                election, limit=limit, names=names,
+                sort_by_names=sort_by_names, entities=entities
             )
         ],
         'majority': None,
@@ -175,26 +194,37 @@ def get_lists_panachage_data(election, request):
     nodes = OrderedDict()
     nodes['left.999'] = {'name': blank}
     for list_ in election.lists.order_by(List.name):
-        nodes[f'left.{list_.list_id}'] = {'name': list_.name}
+        nodes[f'left.{list_.list_id}'] = {
+            'name': list_.name,
+            'color': election.colors.get(list_.name),
+            'active': list_.number_of_mandates > 0
+        }
     for list_ in election.lists:
-        nodes[f'right.{list_.list_id}'] = {'name': list_.name}
+        nodes[f'right.{list_.list_id}'] = {
+            'name': list_.name,
+            'color': election.colors.get(list_.name),
+            'active': list_.number_of_mandates > 0
+        }
     node_keys = list(nodes.keys())
 
     links = []
     for list_target in election.lists:
-        target = node_keys.index(f'right.{list_target.list_id}')
+        target_index = node_keys.index(f'right.{list_target.list_id}')
         remaining = list_target.votes - sum(
             [r.votes for r in list_target.panachage_results]
         )
         for result in list_target.panachage_results:
-            source = node_keys.index(f'left.{result.source}')
+            source_item = nodes.get(f'left.{result.source}', {})
+            source_index = node_keys.index(f'left.{result.source}')
             votes = result.votes
             if list_target.list_id == result.source:
                 votes += remaining
             links.append({
-                'source': source,
-                'target': target,
-                'value': votes
+                'source': source_index,
+                'target': target_index,
+                'value': votes,
+                'color': source_item.get('color'),
+                'active': source_item.get('active')
             })
 
     count = 0

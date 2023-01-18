@@ -4,6 +4,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
@@ -18,8 +19,27 @@ class PartyResult(Base, TimestampMixin):
     #: identifies the party result
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the election or election  compound this result belongs to
-    owner = Column(Text, nullable=False)
+    #: the election this result belongs to
+    election_id = Column(
+        Text,
+        ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
+    )
+
+    #: the election compound this result belongs to
+    election_compound_id = Column(
+        Text,
+        ForeignKey(
+            'election_compounds.id', onupdate='CASCADE', ondelete='CASCADE'
+        ),
+        nullable=True
+    )
+
+    #: the domain of this result
+    domain = Column(Text, nullable=True)
+
+    #: the domain segment of this result
+    domain_segment = Column(Text, nullable=True)
 
     #: the number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
@@ -48,9 +68,6 @@ class PartyResult(Base, TimestampMixin):
 
     #: the year
     year = Column(Integer, nullable=False, default=lambda: 0)
-
-    #: the color code
-    color = Column(Text, nullable=True)
 
     #: the id of the party
     party_id = Column(Text, nullable=False)

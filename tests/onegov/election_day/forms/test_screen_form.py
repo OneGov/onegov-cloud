@@ -2,6 +2,7 @@ from datetime import date
 from onegov.ballot import ComplexVote
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
 from onegov.election_day.forms import ScreenForm
@@ -98,6 +99,7 @@ def test_screen_form_update_apply(session):
     session.add(proporz)
     session.add(compound)
     session.flush()
+    part = ElectionCompoundPart(compound, 'domain', 'segment')
 
     # Create model
     model = Screen(
@@ -126,6 +128,9 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == majorz.id
     assert form.proporz_election.data == ''
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
     assert form.structure.data == '<title />'
     assert form.css.data == 'h1 { font-size: 20em; }'
 
@@ -140,9 +145,14 @@ def test_screen_form_update_apply(session):
     form.majorz_election.data = 'xxx'
     form.proporz_election.data = proporz.id
     form.election_compound.data = 'xxx'
+    form.election_compound_part.data = True
+    form.domain.data = 'domain'
+    form.domain_segment.data = 'segment'
     form.structure.data = '<h1><title /></h1>'
     form.css.data = ''
     form.update_model(model)
+    session.flush()
+    session.expire(model)
     assert model.number == 6
     assert model.group == 'A'
     assert model.duration == 10
@@ -151,6 +161,9 @@ def test_screen_form_update_apply(session):
     assert model.vote_id is None
     assert model.election_id == proporz.id
     assert model.election_compound_id is None
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     assert model.structure == '<h1><title /></h1>'
     assert model.css == ''
     form = ScreenForm()
@@ -165,6 +178,9 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == proporz.id
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
     assert form.structure.data == '<h1><title /></h1>'
     assert form.css.data == ''
 
@@ -176,10 +192,15 @@ def test_screen_form_update_apply(session):
     form.proporz_election.data = 'xxx'
     form.election_compound.data = compound.id
     form.update_model(model)
+    session.flush()
+    session.expire(model)
     assert model.type == 'election_compound'
     assert model.vote_id is None
     assert model.election_id is None
     assert model.election_compound_id == compound.id
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     form = ScreenForm()
     form.apply_model(model)
     assert form.type.data == 'election_compound'
@@ -188,6 +209,41 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == ''
     assert form.election_compound.data == compound.id
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
+
+    # Election compound part
+    form.type.data = 'election_compound'
+    form.simple_vote.data = 'xxx'
+    form.complex_vote.data = 'xxx'
+    form.majorz_election.data = 'xxx'
+    form.proporz_election.data = 'xxx'
+    form.election_compound.data = compound.id
+    form.election_compound_part.data = True
+    form.domain.data = 'domain'
+    form.domain_segment.data = 'segment'
+    form.update_model(model)
+    session.flush()
+    session.expire(model)
+    assert model.type == 'election_compound_part'
+    assert model.vote_id is None
+    assert model.election_id is None
+    assert model.election_compound_id == compound.id
+    assert model.election_compound_part == part
+    assert model.domain == 'domain'
+    assert model.domain_segment == 'segment'
+    form = ScreenForm()
+    form.apply_model(model)
+    assert form.type.data == 'election_compound'
+    assert form.simple_vote.data == ''
+    assert form.complex_vote.data == ''
+    assert form.majorz_election.data == ''
+    assert form.proporz_election.data == ''
+    assert form.election_compound.data == compound.id
+    assert form.election_compound_part.data is True
+    assert form.domain.data == 'domain'
+    assert form.domain_segment.data == 'segment'
 
     # Simple vote
     form.type.data = 'simple_vote'
@@ -197,10 +253,15 @@ def test_screen_form_update_apply(session):
     form.proporz_election.data = 'xxx'
     form.election_compound.data = 'xxx'
     form.update_model(model)
+    session.flush()
+    session.expire(model)
     assert model.type == 'simple_vote'
     assert model.vote_id == simple.id
     assert model.election_id is None
     assert model.election_compound_id is None
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     form = ScreenForm()
     form.apply_model(model)
     assert form.type.data == 'simple_vote'
@@ -209,6 +270,9 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == ''
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
 
     # Complex vote
     form.type.data = 'complex_vote'
@@ -218,10 +282,15 @@ def test_screen_form_update_apply(session):
     form.proporz_election.data = 'xxx'
     form.election_compound.data = 'xxx'
     form.update_model(model)
+    session.flush()
+    session.expire(model)
     assert model.type == 'complex_vote'
     assert model.vote_id == complex.id
     assert model.election_id is None
     assert model.election_compound_id is None
+    assert model.election_compound_part is None
+    assert model.domain is None
+    assert model.domain_segment is None
     form = ScreenForm()
     form.apply_model(model)
     assert form.type.data == 'complex_vote'
@@ -230,6 +299,9 @@ def test_screen_form_update_apply(session):
     assert form.majorz_election.data == ''
     assert form.proporz_election.data == ''
     assert form.election_compound.data == ''
+    assert form.election_compound_part.data is False
+    assert form.domain.data is None
+    assert form.domain_segment.data is None
 
 
 def test_screen_form_populate(election_day_app_zg):
@@ -327,6 +399,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
         '<logo class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
@@ -348,6 +422,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
         '<logo class=""/>\n'
         '<number-of-counted-entities class=""/>\n'
@@ -388,6 +464,8 @@ def test_screen_form_populate(election_day_app_zg):
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
         '<logo class=""/>\n'
         '<mandates class=""/>\n'
@@ -409,11 +487,15 @@ def test_screen_form_populate(election_day_app_zg):
         '<election-lists-chart limit="" names="," sort-by-names=""'
         ' class=""/>\n'
         '<election-lists-table class="" names=","/>\n'
+        '<election-party-strengths-chart horizontal="false" class=""/>\n'
+        '<election-party-strengths-table year="" class=""/>\n'
         '<election-turnout class=""/>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
         '<logo class=""/>\n'
         '<mandates class=""/>\n'
@@ -429,15 +511,23 @@ def test_screen_form_populate(election_day_app_zg):
         '<column span="" class=""></column>\n'
         '<counted-entities class=""/>\n'
         '<election-compound-candidates-table class=""/>\n'
+        '<election-compound-districts-map class=""/>\n'
         '<election-compound-districts-table class=""/>\n'
         '<election-compound-list-groups-chart class=""/>\n'
         '<election-compound-list-groups-table class="" />\n'
+        '<election-compound-party-strengths-chart horizontal="false" '
+        'class=""/>\n'
+        '<election-compound-party-strengths-table year="" class=""/>\n'
         '<election-compound-seat-allocation-chart class=""/>\n'
         '<election-compound-seat-allocation-table class=""/>\n'
+        '<election-compound-superregions-map class=""/>\n'
+        '<election-compound-superregions-table class=""/>\n'
         '<h1 class=""></h1>\n'
         '<h2 class=""></h2>\n'
         '<h3 class=""></h3>\n'
         '<hr class=""/>\n'
+        '<if-completed></if-completed>\n'
+        '<if-not-completed></if-not-completed>\n'
         '<last-result-change class=""/>\n'
         '<logo class=""/>\n'
         '<number-of-counted-entities class=""/>\n'

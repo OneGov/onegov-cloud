@@ -201,6 +201,7 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
         r'/vote/.*',
         r'/election/.*',
         r'/elections/.*',
+        r'/elections-part/.*',
         r'/screen/.*',
     )
     iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
@@ -270,6 +271,7 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/vote/.*',
         '/election/.*',
         '/elections/.*',
+        '/elections-part/.*',
         '/screen/.*',
         '/catalog.rdf',
         '/sitemap',

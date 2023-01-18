@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-18 15:09+0200\n"
+"POT-Creation-Date: 2022-12-21 08:33+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -375,11 +375,17 @@ msgstr "Die erste Zeile der Adresse"
 msgid "Static title"
 msgstr "Fixer Titel"
 
-msgid "Icon"
-msgstr "Symbol"
+msgid "Marker Type"
+msgstr "Marker-Typ"
 
 msgid "Marker"
 msgstr "Marker"
+
+msgid "Icon"
+msgstr "Symbol"
+
+msgid "Numbers"
+msgstr "Zahlen"
 
 msgid "Marker Color"
 msgstr "Marker Farbe"
@@ -942,6 +948,9 @@ msgstr ""
 msgid "Recipient"
 msgstr "Empfänger"
 
+msgid "Will be used as image in the page overview on the parent page"
+msgstr "Wird als Bild in der Seitenübersicht auf der übergeordneten Seite verwendet."
+
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
@@ -1107,6 +1116,9 @@ msgstr "Link zum Logo"
 
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
+
+msgid "Standard Image"
+msgstr "Standardbild"
 
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "E-Mail Antwort Adresse (Reply-To)"
@@ -1482,8 +1494,8 @@ msgstr "Newsletter aktivieren"
 msgid "Include logo in newsletter"
 msgstr "Logo im Newsletter anzeigen"
 
-msgid "New domain"
-msgstr "Neuer Domain"
+msgid "Old domain"
+msgstr "Alte Domain"
 
 msgid "Test migration"
 msgstr "Migration testen"
@@ -1505,6 +1517,13 @@ msgstr "Externe Seiten"
 
 msgid "Internal links only"
 msgstr "Interne Seiten"
+
+msgid "Submit your event"
+msgstr "Veranstaltung vorschlagen"
+
+msgid "Enables website visitors to submit their own events"
+msgstr ""
+"Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1625,9 +1644,6 @@ msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "Daypass"
 msgstr "Tageskarte"
@@ -1885,6 +1901,9 @@ msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen.
 msgid "Re-publish event"
 msgstr "Veranstaltung wieder veröffentlichen"
 
+msgid "Newsletter"
+msgstr "Newsletter"
+
 msgid "New"
 msgstr "Neu"
 
@@ -2051,6 +2070,12 @@ msgstr "Honey pot aktivieren"
 
 msgid "Spam protection"
 msgstr "Spamschutz"
+
+msgid "Show image on preview on the parent page"
+msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
+
+msgid "Show image on page"
+msgstr "Bild auf der Seite anzeigen"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -3479,9 +3504,6 @@ msgstr "Schlagwort"
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
-msgid "Submit your event"
-msgstr "Veranstaltung melden"
-
 msgid "Submit your own event"
 msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
@@ -4194,7 +4216,7 @@ msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
 msgid "Submit an event"
-msgstr "Veranstaltung melden"
+msgstr "Veranstaltung vorschlagen"
 
 msgid ""
 "Only events taking place inside the town or events related to town societies "
@@ -4815,9 +4837,9 @@ msgstr "Total ${number} Links gefunden"
 
 #, python-format
 msgid ""
-"Migrates links from the current domain \"${domain}\" to the given domain."
+"Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migriert Links von der aktuellen Domain \"${domain}\" zur angegebenen Domain."
+"Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\"."
 
 msgid "Topics"
 msgstr "Themen"
@@ -5025,6 +5047,18 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Will be published until:"
+msgstr "Wird publiziert bis:"
+
+msgid "Published until ${endDate1}"
+msgstr "Publiziert bis ${endDate1}"
+
+msgid "Published from ${publishDate} until ${endDate}"
+msgstr "Publiziert von ${publishDate} bis ${endDate}"
+
+msgid "Publication end date:"
+msgstr "Enddatum der Publikation:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (Standard)"

@@ -1,7 +1,6 @@
 from decimal import Decimal
 from onegov.ballot import PartyResult
 from onegov.election_day import _
-from sqlalchemy.orm import object_session
 
 
 def has_party_results(item):
@@ -15,31 +14,30 @@ def has_party_results(item):
 
 def get_party_results(item, json_serializable=False):
 
-    """ Returns the aggregated party results as list.
-
-    Adds `voters_count` for election compounds with voters counts enabled, else
-    `votes`.
-
-    """
+    """ Returns the aggregated party results as list. """
 
     if not has_party_results(item):
         return [], {}
 
-    session = object_session(item)
-
-    exact = getattr(item, 'exact_voters_counts', False) is True
+    party_results = (
+        item.historical_party_results if item.use_historical_party_results
+        else item.party_results
+    )
+    results = party_results.filter(PartyResult.domain == item.domain)
+    domain_segment = getattr(item, 'segment', None)
+    if domain_segment:
+        results = results.filter(PartyResult.domain_segment == domain_segment)
 
     # Get the totals votes per year
-    query = session.query(PartyResult.year, PartyResult.total_votes)
-    query = query.filter(PartyResult.owner == item.id).distinct()
-    totals_votes = dict(query)
+    totals_votes = {r.year: r.total_votes for r in results}
     years = sorted((str(key) for key in totals_votes.keys()))
 
+    # Get the results
     parties = {}
-    for result in item.party_results:
+    for result in results:
         party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
-        year['color'] = result.color
+        year['color'] = item.colors.get(result.name)
         year['mandates'] = result.number_of_mandates
         year['name'] = result.name
 
@@ -54,7 +52,7 @@ def get_party_results(item, json_serializable=False):
         }
 
         voters_count = result.voters_count or Decimal(0)
-        if not exact:
+        if not item.exact_voters_counts:
             voters_count = int(round(voters_count))
         elif json_serializable:
             voters_count = float(voters_count)
@@ -77,8 +75,7 @@ def get_party_results_deltas(item, years, parties):
 
     """
 
-    voters_counts = getattr(item, 'voters_counts', False) == True
-    attribute = 'voters_count' if voters_counts else 'votes'
+    attribute = 'voters_count' if item.voters_counts else 'votes'
     deltas = len(years) > 1
     results = {}
     for index, year in enumerate(years):
@@ -113,7 +110,75 @@ def get_party_results_deltas(item, years, parties):
     return deltas, results
 
 
-def get_party_results_data(item):
+def get_party_results_data(item, horizontal):
+    """ Retuns the data used for the diagrams showing the party results. """
+    if horizontal:
+        return get_party_results_horizontal_data(item)
+    return get_party_results_vertical_data(item)
+
+
+def get_party_results_horizontal_data(item):
+
+    """ Retuns the data used for the horitzonal bar diagram showing the party
+    results.
+
+    """
+
+    if not has_party_results(item):
+        return {
+            'results': [],
+        }
+
+    attribute = 'voters_count' if item.voters_counts else 'votes'
+    years, parties = get_party_results(item)
+
+    party_names = {}
+    for party_id, party in parties.items():
+        party_names[party_id] = None
+        for year in party.values():
+            party_names[party_id] = party_names[party_id] or year.get('name')
+
+    results = []
+    if years:
+        year = years[-1]
+        party_ids = {
+            values.get(year, {}).get(attribute, {}).get('total', 0): party_id
+            for party_id, values in parties.items()
+        }
+        party_ids = [party_ids[key] for key in sorted(party_ids)]
+        for party_id in reversed(party_ids):
+            for year in reversed(years):
+                active = year == years[-1]
+                party = parties.get(party_id, {}).get(year, {})
+                name = party_names.get(party_id)
+                if len(years) == 1:
+                    text = name
+                    value = round(
+                        party.get(attribute, {}).get('total', 0) or 0
+                    )
+                    percentage = False
+                else:
+                    text = f'{name} {year}' if active else year
+                    value = float(
+                        (party.get(attribute, {}).get('permille', 0) or 0) / 10
+                    )
+                    percentage = True
+                results.append({
+                    'text': text,
+                    'value': value,
+                    'value2': party.get('mandates'),
+                    'class': (
+                        'active' if active and party.get('mandates')
+                        else 'inactive'
+                    ),
+                    'color': party.get('color'),
+                    'percentage': percentage
+                })
+
+    return {'results': results}
+
+
+def get_party_results_vertical_data(item):
 
     """ Retuns the data used for the grouped bar diagram showing the party
     results.
@@ -126,8 +191,7 @@ def get_party_results_data(item):
             'title': item.title
         }
 
-    voters_counts = getattr(item, 'voters_counts', False) == True
-    attribute = 'voters_count' if voters_counts else 'votes'
+    attribute = 'voters_count' if item.voters_counts else 'votes'
     years, parties = get_party_results(item)
     groups = {}
     results = []
@@ -167,6 +231,33 @@ def get_party_results_data(item):
     }
 
 
+def get_party_results_seat_allocation(years, parties):
+
+    """ Returns the aggregated party results for the seat allocation table.
+
+    """
+    if not years:
+        return []
+
+    party_names = {}
+    for party_id, party in parties.items():
+        party_names[party_id] = None
+        for year in party.values():
+            party_names[party_id] = party_names[party_id] or year.get('name')
+
+    result = []
+    for party_id, party in parties.items():
+        row = []
+        row.append(party_names.get(party_id, ''))
+        for year in years:
+            row.append(
+                parties.get(party_id, {}).get(year, {}).get('mandates', 0)
+            )
+        result.append(row)
+
+    return result
+
+
 def get_parties_panachage_data(item, request=None):
     """" Get the panachage data as JSON. Used to for the panachage sankey
     chart.
@@ -193,7 +284,12 @@ def get_parties_panachage_data(item, request=None):
     def right_node(party):
         return parties.index(party) + len(parties)
 
-    colors = dict(set((r.party_id, r.color) for r in party_results))
+    active = {r.party_id: r.number_of_mandates > 0 for r in party_results}
+    colors = {
+        r.party_id: item.colors[r.name]
+        for r in party_results
+        if r.name in item.colors
+    }
     intra_party_votes = dict(set((r.party_id, r.votes) for r in party_results))
 
     # Create the links
@@ -207,14 +303,16 @@ def get_parties_panachage_data(item, request=None):
             'source': left_node(result.source),
             'target': right_node(result.target),
             'value': result.votes,
-            'color': colors.get(result.source, '#999')
+            'color': colors.get(result.source),
+            'active': active.get(result.source, False)
         })
     for party, votes in intra_party_votes.items():
         links.append({
             'source': left_node(party),
             'target': right_node(party),
             'value': votes,
-            'color': colors.get(party, '#999')
+            'color': colors.get(party),
+            'active': active.get(party, False)
         })
 
     # Create the nodes
@@ -224,7 +322,8 @@ def get_parties_panachage_data(item, request=None):
         {
             'name': names.get(party_id, '') or blank,
             'id': count + 1,
-            'color': colors.get(party_id, '#999')
+            'color': colors.get(party_id),
+            'active': active.get(party_id, False)
         }
         for count, party_id in enumerate(2 * parties)
     ]

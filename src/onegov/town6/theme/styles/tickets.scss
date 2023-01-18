@@ -227,9 +227,13 @@ tr.ticket:hover {
     background-color: $yellow-pastel;
 }
 
-.ticket-button {
+.button.ticket-button {
     font-size: 1em;
     margin: 0;
+
+    :hover {
+        margin: 0;
+    }
 }
 
 .new-note {
@@ -324,10 +328,15 @@ $ticket-filters-padding: .5rem;
         overflow-y: auto;
         padding: 0;
 
-        li:hover {
-            @include primary-color-background;
-            a { color: $white; }
+        li {
+            border-radius: .7rem;
+
+            &:hover {
+                @include primary-color-background;
+                a { color: $white; }
+            }
         }
+
 
         li:first-of-type {
             padding-bottom: .25rem;
@@ -688,5 +697,13 @@ button {
     input {
         display: inline-block;
         width: 50%;
+    }
+}
+
+.tickets-layout {
+    .button,
+    .button:hover {
+        margin-right: 0;
+        padding: .5rem !important;
     }
 }

@@ -8,19 +8,12 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class ElectionAssociation(Base):
-    """ An association between elections.
+class ElectionRelationship(Base):
+    """ A relationship between elections. """
 
-    This might be used for example to connect different rounds of elections
-    together. Using a separate table for the associations allows to add further
-    attributes to association in a later stage, for example translated names,
-    such as 'Erster Wahlgang'.
+    __tablename__ = 'election_relationships'
 
-    """
-
-    __tablename__ = 'election_associations'
-
-    #: Identifies the assiciation.
+    #: Identifies the relationship.
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The source election ID.
@@ -37,7 +30,7 @@ class ElectionAssociation(Base):
     )
 
     #: The source election.
-    source_election = relationship(
+    source = relationship(
         'Election',
         foreign_keys=[source_id],
         backref=backref(
@@ -48,7 +41,7 @@ class ElectionAssociation(Base):
     )
 
     #: The target election.
-    target_election = relationship(
+    target = relationship(
         'Election',
         foreign_keys=[target_id],
         backref=backref(
@@ -57,3 +50,6 @@ class ElectionAssociation(Base):
             lazy='dynamic'
         )
     )
+
+    #: the type of relationship
+    type = Column(Text, nullable=True)

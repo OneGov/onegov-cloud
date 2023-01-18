@@ -41,7 +41,7 @@ def test_homepage(client):
     </row-wide>
     <row>
         <column span="12">
-            <homepage-tiles show-title="True"/>
+            <homepage-tiles/>
         </column>
     </row>
     <row>
@@ -65,14 +65,9 @@ def test_homepage(client):
     homepage = client.get('/')
 
     assert '<b>0xdeadbeef</b>' not in homepage
-    assert 'Veranstaltungen' in homepage
-    assert 'Fokus' in homepage
-    assert 'Dienstleistungen' in homepage
+    assert 'Alle Veranstaltungen' in homepage
     assert 'admin.digital' in homepage
-    assert 'Aktuelles' in homepage
-    assert 'Alle Beiträge' in homepage
-    assert 'Ausgewählte Themen' in homepage
-    assert 'Partner' in homepage
+    assert 'Alle News' in homepage
 
     # Test chatbot on homepage
     assert not homepage.pyquery('.chatbot')

@@ -13,10 +13,10 @@ from onegov.org.forms import HolidaySettingsForm
 from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
-from onegov.org.forms.settings import OrgTicketSettingsForm,\
-    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm,\
-    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm,\
-    SocialMediaSettingsForm, GeverSettingsForm
+from onegov.org.forms.settings import OrgTicketSettingsForm, \
+    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
+    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm, \
+    SocialMediaSettingsForm, EventSettingsForm, GeverSettingsForm
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -257,8 +257,8 @@ def handle_migrate_links(self, request, form, layout=None):
         'helptext': test_results,
         'button_text': button_text,
         'callout': _(
-            'Migrates links from the current domain "${domain}" to the given '
-            'domain.',
+            'Migrates links from the given domain to the current domain '
+            '"${domain}".',
             mapping={'domain': domain}
         ),
     }
@@ -294,3 +294,11 @@ def handle_link_health_check(self, request, form, layout=None):
         'stats': stats,
         'healthcheck': healthcheck
     }
+
+
+@OrgApp.form(
+    model=Organisation, name='event-settings', template='form.pt',
+    permission=Secret, form=EventSettingsForm, setting=_("Events"),
+    icon='fa-calendar-alt', order=-700)
+def handle_event_settings(self, request, form, layout=None):
+    return handle_generic_settings(self, request, form, _("Events"), layout)

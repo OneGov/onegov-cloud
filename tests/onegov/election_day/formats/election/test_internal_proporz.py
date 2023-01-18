@@ -113,26 +113,15 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
 
+    # check panachage results
+    assert election.panachage_results.all() == []
+
     # check panachage result from list 3
-    test_list = election.lists.first()
-    assert test_list.list_id == '3'
-    list_csv_votes = 23653
-    votes_panachage_csv = 606 + 334 + 756 + 221 + 118 + 1048 + 2316
-    assert test_list.votes == list_csv_votes
-
-    panachage_results = session.query(PanachageResult)
-    panachage_results = panachage_results.filter_by(owner=election.id).all()
-    assert not panachage_results, 'Owner of lists pana results must be NULL'
-
-    panachage_results = election.panachage_results
-
-    for pa_result in panachage_results:
-        assert len(pa_result.target) > 10, 'target must be a casted uuid'
-
-    panachge_vote_count = 0
-    for result in test_list.panachage_results:
-        panachge_vote_count += result.votes
-    assert panachge_vote_count == votes_panachage_csv
+    list_ = election.lists.filter_by(list_id='3').one()
+    assert list_.votes == 23653
+    assert sum([p.votes for p in list_.panachage_results]) == (
+        606 + 334 + 756 + 221 + 118 + 1048 + 2316
+    )
 
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(
@@ -158,6 +147,11 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     assert sorted([list.votes for list in election.lists]) == [
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
+    list_ = election.lists.filter_by(list_id='3').one()
+    assert list_.votes == 23653
+    assert sum([p.votes for p in list_.panachage_results]) == (
+        606 + 334 + 756 + 221 + 118 + 1048 + 2316
+    )
 
 
 def test_import_internal_proporz_missing_headers(session):
@@ -237,6 +231,7 @@ def test_import_internal_proporz_invalid_values(session):
                         'entity_invalid_votes',
                         'list_name',
                         'list_id',
+                        'list_color',
                         'list_number_of_mandates',
                         'list_votes',
                         'list_connection',
@@ -247,6 +242,7 @@ def test_import_internal_proporz_invalid_values(session):
                         'candidate_elected',
                         'candidate_votes',
                         'candidate_party',
+                        'candidate_party_color',
                         'candidate_gender',
                         'candidate_year_of_birth',
                     )),
@@ -263,6 +259,7 @@ def test_import_internal_proporz_invalid_values(session):
                         'xxx',  # entity_invalid_votes
                         'xxx',  # list_name
                         'xxx',  # list_id
+                        '',  # list_color
                         'xxx',  # list_number_of_mandates
                         'xxx',  # list_votes
                         'xxx',  # list_connection
@@ -273,6 +270,7 @@ def test_import_internal_proporz_invalid_values(session):
                         'xxx',  # candidate_elected
                         'xxx',  # candidate_votes
                         'xxx',  # candidate_party
+                        '',  # candidate_party_color
                         '',  # candidate_gender
                         '',  # candidate_year_of_birth
                     )),
@@ -289,6 +287,7 @@ def test_import_internal_proporz_invalid_values(session):
                         '0',  # entity_invalid_votes
                         '',  # list_name
                         '',  # list_id
+                        '',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -299,6 +298,7 @@ def test_import_internal_proporz_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        '',  # candidate_party_color
                         'xxx',  # candidate_gender
                         '',  # candidate_year_of_birth
                     )),
@@ -315,6 +315,7 @@ def test_import_internal_proporz_invalid_values(session):
                         '0',  # entity_invalid_votes
                         '',  # list_name
                         '1',  # list_id
+                        '',  # list_color
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -325,8 +326,37 @@ def test_import_internal_proporz_invalid_values(session):
                         '',  # candidate_elected
                         '',  # candidate_votes
                         '',  # candidate_party
+                        '',  # candidate_party_color
                         '',  # candidate_gender
                         'xxx',  # candidate_year_of_birth
+                    )),
+                    ','.join((
+                        'unknown',  # election_status
+                        '3251',  # entity_id
+                        'True',  # entity_counted
+                        '100',  # entity_eligible_voters
+                        '30',  # entity_expats
+                        '10',  # entity_received_ballots
+                        '0',  # entity_blank_ballots
+                        '0',  # entity_invalid_ballots
+                        '0',  # entity_blank_votes
+                        '0',  # entity_invalid_votes
+                        '',  # list_name
+                        '1',  # list_id
+                        'xxx',  # list_color
+                        '',  # list_number_of_mandates
+                        '',  # list_votes
+                        '',  # list_connection
+                        '',  # list_connection_parent
+                        '',  # candidate_family_name
+                        '',  # candidate_first_name
+                        '',  # candidate_id
+                        '',  # candidate_elected
+                        '',  # candidate_votes
+                        '',  # candidate_party
+                        'xxx',  # candidate_party_color
+                        '',  # candidate_gender
+                        '',  # candidate_year_of_birth
                     )),
                 ))
                 ).encode('utf-8')), 'text/plain',
@@ -345,6 +375,8 @@ def test_import_internal_proporz_invalid_values(session):
         (3, 'Invalid gender: xxx'),
         (4, 'Invalid integer: candidate_year_of_birth'),
         (4, 'Invalid integer: entity_expats'),
+        (5, 'Invalid color: candidate_party_color'),
+        (5, 'Invalid color: list_color'),
     ]
 
 
@@ -715,7 +747,7 @@ def test_import_internal_proporz_panachage(session):
             'candidate_elected',
             'candidate_votes',
             'candidate_party',
-        ] + [f'panachage_votes_from_list_{h}' for h in headers])
+        ] + [f'list_panachage_votes_from_list_{h}' for h in headers])
         for list_id, panachage in results:
             lines.append([
                 'unknown',  # election_status
@@ -842,6 +874,7 @@ def test_import_internal_proproz_optional_columns(session):
                     'entity_invalid_votes',
                     'list_name',
                     'list_id',
+                    'list_color',
                     'list_number_of_mandates',
                     'list_votes',
                     'list_connection',
@@ -852,6 +885,7 @@ def test_import_internal_proproz_optional_columns(session):
                     'candidate_elected',
                     'candidate_votes',
                     'candidate_party',
+                    'candidate_party_color',
                     'candidate_gender',
                     'candidate_year_of_birth',
                 )),
@@ -866,8 +900,9 @@ def test_import_internal_proproz_optional_columns(session):
                     '1',  # entity_invalid_ballots
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
-                    '',  # list_name
+                    'JFDP',  # list_name
                     '10.5',  # list_id
+                    '#112233',  # list_color
                     '',  # list_number_of_mandates
                     '',  # list_votes
                     '',  # list_connection
@@ -877,7 +912,8 @@ def test_import_internal_proproz_optional_columns(session):
                     '1',  # candidate_id
                     'false',  # candidate_elected
                     '1',  # candidate_votes
-                    '',  # candidate_party
+                    'FDP',  # candidate_party
+                    '#123456',  # candidate_party_color
                     'female',  # candidate_gender
                     '1970',  # candidate_year_of_birth
                 ))
@@ -889,3 +925,4 @@ def test_import_internal_proproz_optional_columns(session):
     assert candidate.gender == 'female'
     assert candidate.year_of_birth == 1970
     assert election.results.filter_by(entity_id='1701').one().expats == 30
+    assert election.colors == {'FDP': '#123456', 'JFDP': '#112233'}

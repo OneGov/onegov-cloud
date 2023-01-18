@@ -80,6 +80,9 @@ class Layout(OrgLayout):
                 image_url=getattr(self.org, f'partner_{ix}_img'),
                 lead=getattr(self.org, f'partner_{ix}_name'),
             ) for ix in range(1, partner_count + 1)
+            if (getattr(self.org, f'partner_{ix}_url')
+                or getattr(self.org, f'partner_{ix}_img')
+                or getattr(self.org, f'partner_{ix}_name'))
         ]
 
     @property
@@ -2022,6 +2025,9 @@ class DirectoryEntryBaseLayout(DefaultLayout):
             self.custom_body_attributes['data-default-marker-icon']\
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'f111'
+
     @property
     def directory(self):
         return self.model.directory
@@ -2057,6 +2063,12 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 )
 class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
                                      StepsLayoutExtension):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.directory.marker_type == 'numbers':
+            self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
+
     @property
     def step_position(self):
         return 1
