@@ -148,9 +148,9 @@ def test_context_specific_function(session):
     topics = [topic]
     session.flush()
 
-    organization, function = person_functions_by_organization(person, topics)
-    assert organization == ["Komission"]
-    assert function == [context_specific_function]
+    organization_to_function = person_functions_by_organization(person, topics)
+    assert organization_to_function[0] == f"Komission: " \
+                                          f"{context_specific_function}"
 
 
 def test_context_specific_function_substring_removed(session):
@@ -181,6 +181,6 @@ def test_context_specific_function_substring_removed(session):
     topics = [topic1, topic2]
     session.flush()
 
-    org, function = person_functions_by_organization(person, topics)
-    assert org == organizations
-    assert function == ["Präsidentin", "Mitglied"]
+    organization_to_function = person_functions_by_organization(person, topics)
+    assert organization_to_function[0] == f"{organizations[0]}: Präsidentin"
+    assert organization_to_function[1] == f"{organizations[1]}: Mitglied"

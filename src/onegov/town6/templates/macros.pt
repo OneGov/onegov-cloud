@@ -809,7 +809,7 @@
             </div>
             <div class="cell small-12 medium-8 large-9">
                 <ul>
-                    <li tal:condition="person.function and not (organizations and functions)" class="person-card-function">
+                    <li tal:condition="person.function and not organization_to_function" class="person-card-function">
                         <em>${person.function}</em>
                     </li>
                     <li class="person-card-personal">
@@ -834,15 +834,13 @@
                     <li tal:condition="person.website and 'website' not in exclude" class="person-card-website">
                         <a href="${person.website}">${person.website}</a>
                     </li>
-                    <div class="person-card-context-specific-functions" tal:condition="python: len(functions) != 0 and len(organizations) != 0 and organizations is not None and functions is not None">
-                        <div tal:define="map python: zip(organizations, functions)">
-                            <span i18n:translate>Functions:</span>
-                            <ul>
-                                <li tal:repeat="(organization, function) map">
-                                    <span>${organization}: ${function}</span>
-                                </li>
-                            </ul>
-                        </div>
+                    <div class="person-card-context-specific-functions" tal:condition="python: organization_to_function">
+                        <span i18n:translate>Functions:</span>
+                        <ul>
+                            <li tal:repeat="item organization_to_function">
+                                <span>${item}</span>
+                            </li>
+                        </ul>
                     </div>
                     <li class="person-card-notes" tal:condition="person.notes and 'notes' not in exclude">
                         <span>${person.notes}</span>
