@@ -19,7 +19,7 @@ def test_external_links_in_forms(client):
     # Tests the to redirect given in the link on forms page
     assert page.request.url.endswith('/forms')
     assert 'Neue externe Verknüpfung hinzugefügt' in page
-    entries = page.pyquery('a.list-title')
+    entries = page.pyquery('a.list-link')
 
     urls = [e.attrib['href'] for e in entries]
     assert url in urls
