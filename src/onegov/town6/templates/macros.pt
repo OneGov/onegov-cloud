@@ -835,7 +835,7 @@
                         <a href="${person.website}">${person.website}</a>
                     </li>
                     <div class="person-card-context-specific-functions" tal:condition="python: organization_to_function">
-                        <span i18n:translate>Functions:</span>
+                        <span i18n:translate="">Functions:</span>
                         <ul>
                             <li tal:repeat="item organization_to_function">
                                 <span>${item}</span>

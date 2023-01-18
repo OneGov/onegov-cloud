@@ -970,8 +970,8 @@ msgstr "Prénom"
 msgid "Last name"
 msgstr "Nom de famille"
 
-msgid "Function"
-msgstr "Fonction"
+msgid "Functions:"
+msgstr "Fonctions:"
 
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
