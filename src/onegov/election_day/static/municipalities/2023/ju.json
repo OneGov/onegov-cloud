@@ -87,10 +87,6 @@
         "district": "Les Franches-Montagnes",
         "name": "Les Breuleux"
     },
-    "6744": {
-        "district": "Les Franches-Montagnes",
-        "name": "La Chaux-des-Breuleux"
-    },
     "6745": {
         "district": "Les Franches-Montagnes",
         "name": "Les Enfers"
@@ -167,10 +163,6 @@
         "district": "Porrentruy",
         "name": "Courtedoux"
     },
-    "6787": {
-        "district": "Porrentruy",
-        "name": "Damphreux"
-    },
     "6789": {
         "district": "Porrentruy",
         "name": "Fahy"
@@ -182,10 +174,6 @@
     "6792": {
         "district": "Porrentruy",
         "name": "Grandfontaine"
-    },
-    "6793": {
-        "district": "Porrentruy",
-        "name": "Lugnez"
     },
     "6800": {
         "district": "Porrentruy",
@@ -210,5 +198,9 @@
     "6810": {
         "district": "Porrentruy",
         "name": "La Baroche"
+    },
+    "6811": {
+        "district": "Porrentruy",
+        "name": "Damphreux-Lugnez"
     }
 }

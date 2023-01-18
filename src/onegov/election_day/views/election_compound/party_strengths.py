@@ -3,6 +3,7 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_parameter
 from onegov.election_day.utils.parties import get_party_results
 from onegov.election_day.utils.parties import get_party_results_data
 from onegov.election_day.utils.parties import get_party_results_deltas
@@ -20,7 +21,8 @@ def view_election_compound_party_strengths_data(self, request):
 
     """
 
-    return get_party_results_data(self)
+    horizontal = get_parameter(request, 'horizontal', bool, None)
+    return get_party_results_data(self, horizontal)
 
 
 @ElectionDayApp.html(
@@ -41,6 +43,7 @@ def view_election_compound_party_strengths_chart(self, request):
         'model': self,
         'layout': ElectionCompoundLayout(self, request),
         'type': 'party-strengths-chart',
+        'horizontal': self.horizontal_party_strengths
     }
 
 
@@ -58,18 +61,20 @@ def view_election_compound_party_strengths_table(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    years, parties = get_party_results(self)
-    deltas, results = get_party_results_deltas(self, years, parties)
+    party_years, parties = get_party_results(self)
+    party_deltas, party_results = get_party_results_deltas(
+        self, party_years, parties
+    )
     year = request.params.get('year', '')
 
     return {
         'layout': ElectionCompoundLayout(self, request, 'party-strengths'),
         'type': 'election-compound-table',
         'scope': 'party-strengths',
-        'results': results,
-        'years': years,
+        'party_results': party_results,
+        'party_years': party_years,
         'year': year,
-        'deltas': deltas
+        'party_deltas': party_deltas
     }
 
 
@@ -85,15 +90,17 @@ def view_election_compound_party_strengths(self, request):
 
     layout = ElectionCompoundLayout(self, request, 'party-strengths')
 
-    years, parties = get_party_results(self)
-    deltas, results = get_party_results_deltas(self, years, parties)
+    party_years, parties = get_party_results(self)
+    party_deltas, party_results = get_party_results_deltas(
+        self, party_years, parties
+    )
 
     return {
         'election_compound': self,
         'layout': layout,
-        'results': results,
-        'years': years,
-        'deltas': deltas
+        'party_results': party_results,
+        'party_years': party_years,
+        'party_deltas': party_deltas
     }
 
 

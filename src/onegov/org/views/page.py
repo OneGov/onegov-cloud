@@ -71,7 +71,8 @@ def view_topic(self, request, layout=None):
                 request.link(child),
                 request.link(
                     Editor('edit', child)) if child.trait == 'link' else None,
-                child.page_image
+                child.page_image,
+                child.show_preview_image
             )
             for child in children
         ],

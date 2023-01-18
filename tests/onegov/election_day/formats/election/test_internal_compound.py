@@ -57,6 +57,7 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
             'Trins',
             'Val Müstair'
         ),
+        domain_supersegment=39 * [''],
         number_of_mandates=(
             2,
             1,

@@ -7,7 +7,7 @@ def get_list_groups(election_compound):
     """" Get list groups data. """
 
     if not election_compound.pukelsheim:
-        return {}
+        return []
 
     query = election_compound.party_results
     if election_compound.exact_voters_counts:

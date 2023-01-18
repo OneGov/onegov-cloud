@@ -31,15 +31,27 @@ class ElectionCompoundPart(
 
     def __init__(self, election_compound, domain, segment):
         self.election_compound = election_compound
-        self.election_compound_id = election_compound.id
+        self.election_compound_id = (
+            election_compound.id if election_compound else None
+        )
         self.domain = domain
         self.segment = segment
         self.id = segment.replace(' ', '-').lower()
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, ElectionCompoundPart)
+            and self.election_compound_id == other.election_compound_id
+            and self.domain == other.domain
+            and self.segment == other.segment
+        )
+
     date = inherited_attribute()
     completes_manually = inherited_attribute()
     manually_completed = inherited_attribute()
+    pukelsheim = inherited_attribute()
     last_result_change = inherited_attribute()
+    last_change = inherited_attribute()
     last_modified = inherited_attribute()
     domain_elections = inherited_attribute()
     colors = inherited_attribute()

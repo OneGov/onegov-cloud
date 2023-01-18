@@ -110,10 +110,9 @@ def get_party_results_deltas(item, years, parties):
     return deltas, results
 
 
-def get_party_results_data(item):
+def get_party_results_data(item, horizontal):
     """ Retuns the data used for the diagrams showing the party results. """
-
-    if item.horizontal_party_strengths:
+    if horizontal:
         return get_party_results_horizontal_data(item)
     return get_party_results_vertical_data(item)
 
