@@ -34,7 +34,7 @@ def view_people(self, request, layout=None):
 def view_person(self, request, layout=None):
 
     pages = request.session.query(Topic)
-    pages = pages.filter(Topic.people != None).all()
+    pages = pages.filter(Topic.people is not None).all()
     orgs, functions = person_functions_by_organization(self, pages)
 
     return {
