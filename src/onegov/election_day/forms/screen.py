@@ -146,7 +146,7 @@ class ScreenForm(Form):
     )
 
     domain_segment = StringField(
-        label=_('Segment'),
+        label=_('Domain Segment'),
         validators=[
             InputRequired()
         ],
