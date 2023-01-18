@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-11 11:05+0100\n"
+"POT-Creation-Date: 2023-01-18 11:59+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -567,6 +567,12 @@ msgstr "Votazione"
 
 msgid "Election"
 msgstr "Elezione"
+
+msgid "Part of an Election Compound"
+msgstr ""
+
+msgid "Domain Segment"
+msgstr ""
 
 msgid "Available tags"
 msgstr "Tag disponibili"

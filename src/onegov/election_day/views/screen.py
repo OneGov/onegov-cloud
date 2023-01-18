@@ -4,6 +4,7 @@ from onegov.core.widgets import inject_variables
 from onegov.core.widgets import transform_structure
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
+from onegov.election_day.layouts import ElectionCompoundPartLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.models import Screen
@@ -33,6 +34,8 @@ def view_screen(self, request):
         layout = ElectionLayout(self.model, request)
     elif self.type == 'election_compound':
         layout = ElectionCompoundLayout(self.model, request)
+    elif self.type == 'election_compound_part':
+        layout = ElectionCompoundPartLayout(self.model, request)
 
     template = PageTemplate(transform_structure(widgets, self.structure))
 
