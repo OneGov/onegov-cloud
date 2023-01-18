@@ -239,6 +239,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     marker_icon = content_property()
     marker_color = content_property()
 
+    overview_two_columns = content_property()
+
     @property
     def entry_cls_name(self):
         return 'ExtendedDirectoryEntry'

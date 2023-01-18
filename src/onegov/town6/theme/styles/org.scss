@@ -606,6 +606,17 @@ $pageref-color-hover: $iron;
             }
         }
 
+        .list-lead {
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            display: -webkit-box;
+            overflow: hidden;
+
+            &.preview {
+                color: $monsoon;
+            }
+        }
+
         &:not(.medium-6) {
             @include more-link-after;
             font-family: $header-font-family;
@@ -653,6 +664,22 @@ $pageref-color-hover: $iron;
             }
         }
     }
+}
+
+.read-more-link {
+    display: block;
+    width: 100%;
+}
+
+.read-more-link::after {
+    @include icon-bold($more-link-icon);
+    float: right;
+    padding-right: .5rem;
+    transition: all 200ms linear;
+}
+
+.card:hover .read-more-link::after {
+    padding-right: 0;
 }
 
 .side-panel .more-list {

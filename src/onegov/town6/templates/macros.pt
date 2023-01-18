@@ -490,7 +490,7 @@
                     <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
                 </div>
             </a>
-            <a href="${url}" class="news-more-link" i18n:translate="">read more</a>
+            <a href="${url}" class="read-more-link" i18n:translate="">read more</a>
         </div>
     </div>
 </metal:newslist>

@@ -93,6 +93,11 @@ class DirectoryBaseForm(Form):
         fieldset=_("Display"),
         render_kw={'class_': 'formcode-format'})
 
+    overview_two_columns = BooleanField(
+        label=_("Overview layout with tiles"),
+        fieldset=_("Display"),
+        default=False)
+
     content_fields = TextAreaField(
         label=_("Main view"),
         fieldset=_("Display"),

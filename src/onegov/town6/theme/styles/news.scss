@@ -68,26 +68,14 @@
     }
 }
 
-body:not(.homepage-layout)
-{
+body:not(.homepage-layout) {
     .newslist {
         justify-content: left;
     }
 
     .news-all-entries {
         display: none;
-}
-}
-
-.news-more-link::after {
-    @include icon-bold($more-link-icon);
-    float: right;
-    padding-right: .5rem;
-    transition: all 200ms linear;
-}
-
-.card:hover .news-more-link::after {
-    padding-right: 0;
+    }
 }
 
 .more-news .card {
