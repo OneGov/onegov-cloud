@@ -337,3 +337,12 @@ def add_domain_and_segment_to_screens(context):
                 'election_day_screens',
                 Column(column, Text, nullable=True)
             )
+
+
+@upgrade_task('Add has results to archived results')
+def add_has_results_to_archived_results(context):
+    if not context.has_column('archived_results', 'has_results'):
+        context.operations.add_column(
+            'archived_results',
+            Column('has_results', Boolean, nullable=True)
+        )
