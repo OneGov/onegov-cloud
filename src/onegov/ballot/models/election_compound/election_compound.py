@@ -10,6 +10,7 @@ from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.party_result.mixins import \
     HistoricalPartyResultsMixin
+from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
@@ -30,7 +31,7 @@ from sqlalchemy.orm import relationship
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultsOptionsMixin, PartyResultsExportMixin,
+    PartyResultsOptionsMixin, PartyResultsCheckMixin, PartyResultsExportMixin,
     HistoricalPartyResultsMixin,
     ExplanationsPdfMixin, DerivedAttributesMixin
 ):
@@ -142,9 +143,9 @@ class ElectionCompound(
     def has_results(self):
         """ Returns True, if the election compound has any results. """
 
-        if self.party_results.first():
+        if self.has_party_results:
             return True
-        if self.panachage_results.first():
+        if self.has_party_panachage_results:
             return True
         for election in self.elections:
             if election.has_results:

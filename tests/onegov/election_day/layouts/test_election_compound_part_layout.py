@@ -62,7 +62,7 @@ def test_election_compound_part_layout_general(session):
             domain_segment='Region 1',
             year=2017,
             number_of_mandates=0,
-            votes=0,
+            votes=10,
             total_votes=100,
             name_translations={'de_CH': 'A'},
             party_id='1'
@@ -150,7 +150,7 @@ def test_election_compound_part_layout_menu(session):
             domain_segment='Region 1',
             year=2017,
             number_of_mandates=0,
-            votes=0,
+            votes=10,
             total_votes=100,
             name_translations={'de_CH': 'A'},
             party_id='1'

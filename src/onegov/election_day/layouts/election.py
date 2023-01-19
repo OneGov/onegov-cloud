@@ -137,14 +137,14 @@ class ElectionLayout(DetailLayout):
                 self.proporz
                 and not self.tacit
                 and self.model.show_party_strengths is True
-                and self.model.party_results.first() is not None
+                and self.has_party_results
             )
         if tab == 'parties-panachage':
             return (
                 self.proporz
                 and not self.tacit
                 and self.model.show_party_panachage is True
-                and self.model.panachage_results.first() is not None
+                and self.has_party_panachage_results
             )
         if tab == 'statistics':
             return not self.tacit
@@ -188,7 +188,13 @@ class ElectionLayout(DetailLayout):
     @cached_property
     def has_party_results(self):
         if self.proporz:
-            return self.model.party_results.first() is not None
+            return self.model.has_party_results
+        return False
+
+    @cached_property
+    def has_party_panachage_results(self):
+        if self.proporz:
+            return self.model.has_party_panachage_results
         return False
 
     @cached_property

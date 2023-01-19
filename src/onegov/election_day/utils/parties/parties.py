@@ -3,20 +3,11 @@ from onegov.ballot import PartyResult
 from onegov.election_day import _
 
 
-def has_party_results(item):
-    """ Returns True, if the item has party results. """
-
-    if getattr(item, 'type', 'proporz') == 'proporz':
-        if item.party_results.first():
-            return True
-    return False
-
-
 def get_party_results(item, json_serializable=False):
 
     """ Returns the aggregated party results as list. """
 
-    if not has_party_results(item):
+    if not getattr(item, 'has_party_results', False):
         return [], {}
 
     party_results = (
@@ -124,7 +115,7 @@ def get_party_results_horizontal_data(item):
 
     """
 
-    if not has_party_results(item):
+    if not getattr(item, 'has_party_results', False):
         return {
             'results': [],
         }
@@ -185,7 +176,7 @@ def get_party_results_vertical_data(item):
 
     """
 
-    if not has_party_results(item):
+    if not getattr(item, 'has_party_results', False):
         return {
             'results': [],
             'title': item.title
@@ -264,7 +255,7 @@ def get_parties_panachage_data(item, request=None):
 
     """
 
-    if getattr(item, 'type', 'proporz') == 'majorz':
+    if not getattr(item, 'has_party_panachage_results', False):
         return {}
 
     results = item.panachage_results.all()

@@ -215,6 +215,8 @@ def test_election_compound_model(session):
     assert election_compound.progress == (0, 0)
     assert election_compound.counted_entities == []
     assert election_compound.has_results is False
+    assert election_compound.has_party_results is False
+    assert election_compound.has_party_panachage_results is False
     assert election_compound.results == []
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
@@ -256,7 +258,9 @@ def test_election_compound_model(session):
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
     assert election_compound.allocated_mandates == 0
-    assert election_compound.has_results == False
+    assert election_compound.has_results is False
+    assert election_compound.has_party_results is False
+    assert election_compound.has_party_panachage_results is False
     assert [r.__dict__ for r in election_compound.results] == [
         {
             'accounted_ballots': 0,
@@ -289,7 +293,7 @@ def test_election_compound_model(session):
             'turnout': 0
         }
     ]
-    assert election_compound.completed == False
+    assert election_compound.completed is False
     assert election_compound.elected_candidates == []
 
     # Add results and candidates
@@ -336,7 +340,9 @@ def test_election_compound_model(session):
     assert election_compound.progress == (0, 2)
     assert election_compound.counted_entities == []
     assert election_compound.allocated_mandates == 0
-    assert election_compound.has_results == False
+    assert election_compound.has_results is False
+    assert election_compound.has_party_results is False
+    assert election_compound.has_party_panachage_results is False
     assert [r.__dict__ for r in election_compound.results] == [
         {
             'accounted_ballots': 258,
@@ -369,7 +375,7 @@ def test_election_compound_model(session):
             'turnout': 0
         }
     ]
-    assert election_compound.completed == False
+    assert election_compound.completed is False
 
     # Set results as counted
     session.query(ElectionResult).first().counted = True
@@ -411,7 +417,7 @@ def test_election_compound_model(session):
         }
     ]
 
-    assert election_compound.completed == False
+    assert election_compound.completed is False
 
     for result in session.query(ElectionResult):
         result.counted = True
@@ -445,6 +451,16 @@ def test_election_compound_model(session):
     session.add(party_result)
     session.flush()
     assert election_compound.party_results.one() == party_result
+    assert election_compound.has_party_results is False
+    party_result.votes = 10
+    assert election_compound.has_party_results is True
+    party_result.votes = 0
+    party_result.voters_count = 10
+    assert election_compound.has_party_results is True
+    party_result.votes = 0
+    party_result.voters_count = 0
+    party_result.number_of_mandates = 1
+    assert election_compound.has_party_results is True
 
     # Add panachage results
     panachage_result = PanachageResult(
@@ -456,6 +472,7 @@ def test_election_compound_model(session):
     session.add(panachage_result)
     session.flush()
     assert election_compound.panachage_results.one() == panachage_result
+    assert election_compound.has_party_panachage_results is True
 
     election_compound.last_result_change = election_compound.timestamp()
 

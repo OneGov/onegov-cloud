@@ -87,7 +87,7 @@ class ElectionCompoundPartLayout(DetailLayout):
 
     @cached_property
     def has_party_results(self):
-        return self.model.party_results.first() is not None
+        return self.model.has_party_results
 
     @cached_property
     def visible(self):
