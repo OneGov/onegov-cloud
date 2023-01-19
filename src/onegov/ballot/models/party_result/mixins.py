@@ -1,5 +1,7 @@
 from collections import OrderedDict
+from onegov.ballot.models.party_result.party_result import PartyResult
 from onegov.core.orm.mixins import meta_property
+from sqlalchemy import or_
 
 
 class PartyResultsOptionsMixin:
@@ -27,6 +29,23 @@ class PartyResultsOptionsMixin:
 
     #: may be used to enable fetching party results from previous elections
     use_historical_party_results = meta_property(default=False)
+
+
+class PartyResultsCheckMixin:
+
+    @property
+    def has_party_results(self):
+        return self.party_results.filter(
+            or_(
+                PartyResult.votes > 0,
+                PartyResult.voters_count > 0,
+                PartyResult.number_of_mandates > 0
+            )
+        ).first() is not None
+
+    @property
+    def has_party_panachage_results(self):
+        return self.panachage_results.first() is not None
 
 
 class HistoricalPartyResultsMixin:

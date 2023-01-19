@@ -61,6 +61,7 @@ def test_election_compound_part_model(session):
     assert part.progress == (0, 0)
     assert part.party_results.first() is None
     assert part.has_results is False
+    assert part.has_party_results is False
     assert part.number_of_mandates == 0
     assert part.allocated_mandates == 0
     assert part.counted is True
@@ -102,6 +103,7 @@ def test_election_compound_part_model(session):
     assert part.progress == (0, 1)
     assert part.party_results.first() is None
     assert part.has_results is False
+    assert part.has_party_results is False
     assert part.number_of_mandates == 1
     assert part.allocated_mandates == 0
     assert part.counted is False
@@ -168,6 +170,7 @@ def test_election_compound_part_model(session):
     assert part.progress == (0, 1)
     assert part.party_results.first() is None
     assert part.has_results is False
+    assert part.has_party_results is False
     assert part.number_of_mandates == 1
     assert part.allocated_mandates == 0
     assert part.counted is False
@@ -197,7 +200,7 @@ def test_election_compound_part_model(session):
     assert part.progress == (0, 1)
     assert part.counted_entities == []
     assert part.allocated_mandates == 0
-    assert part.has_results == True
+    assert part.has_results is True
     assert [r.__dict__ for r in part.results] == [
         {
             'accounted_ballots': 258,
@@ -222,7 +225,7 @@ def test_election_compound_part_model(session):
     assert part.progress == (1, 1)
     assert part.counted_entities == ['First Region']
     assert part.allocated_mandates == 0
-    assert part.has_results == True
+    assert part.has_results is True
     assert [r.__dict__ for r in part.results] == [
         {
             'accounted_ballots': 258,
@@ -253,17 +256,16 @@ def test_election_compound_part_model(session):
             party_id='1'
         )
     )
-    compound.party_results.append(
-        PartyResult(
-            domain='superregion',
-            domain_segment='First Superregion',
-            number_of_mandates=0,
-            votes=20,
-            total_votes=100,
-            name_translations={'en_US': 'Libertarian'},
-            party_id='1'
-        )
+    party_result = PartyResult(
+        domain='superregion',
+        domain_segment='First Superregion',
+        number_of_mandates=0,
+        votes=0,
+        total_votes=100,
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1'
     )
+    compound.party_results.append(party_result)
     compound.party_results.append(
         PartyResult(
             domain='superregion',
@@ -276,7 +278,17 @@ def test_election_compound_part_model(session):
         )
     )
     session.flush()
-    assert part.party_results.one().votes == 20
+    assert part.has_party_results is False
+    party_result.votes = 10
+    assert part.party_results.one().votes == 10
+    assert part.has_party_results is True
+    party_result.votes = 0
+    party_result.voters_count = 10
+    assert part.has_party_results is True
+    party_result.votes = 0
+    party_result.voters_count = 0
+    party_result.number_of_mandates = 1
+    assert part.has_party_results is True
 
     # Clear results
     compound.clear_results()
