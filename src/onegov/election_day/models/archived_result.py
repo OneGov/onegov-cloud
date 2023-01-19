@@ -10,6 +10,7 @@ from onegov.core.orm.mixins.content import dictionary_based_property_factory
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -64,6 +65,9 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     @property
     def progress(self):
         return self.counted_entities or 0, self.total_entities or 0
+
+    #: Number of already counted political entitites
+    has_results = Column(Boolean, nullable=True)
 
     #: The link to the detailed results
     url = Column(Text, nullable=False)
@@ -170,6 +174,7 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
         self.name = source.name
         self.total_entities = source.total_entities
         self.counted_entities = source.counted_entities
+        self.has_results = source.has_results
         self.url = source.url
         self.title_translations = deepcopy(dict(source.title_translations))
         self.shortcode = source.shortcode
