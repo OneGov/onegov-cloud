@@ -231,31 +231,31 @@
                 if (interactive) {
                     node.on('mouseover', function(d) {
                     	link.transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 0.1);
                     	link.filter(function(s) { return d.id == s.source.id; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     	link.filter(function(t) { return d.id == t.target.id; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     });
                     node.on('mouseout', function(d) {
                         link.transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     });
                     link.on('mouseover', function(d) {
                     	link.filter(function(s) { return s != d; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 0.1);
                     });
                     link.on('mouseout', function(d) {
                         link.transition()
-                            .duration(700)
+                            .duration(500)
                     		.style('opacity', 1);
                     });
                 }
