@@ -102,3 +102,18 @@ def view_election_compound_part_party_strengths(self, request):
         'party_years': party_years,
         'party_deltas': party_deltas
     }
+
+
+@ElectionDayApp.svg_file(
+    model=ElectionCompoundPart,
+    name='party-strengths-svg'
+)
+def view_election_compound_part_party_strengths_svg(self, request):
+
+    """ View the party strengths as SVG. """
+
+    layout = ElectionCompoundPartLayout(self, request, 'party-strengths')
+    return {
+        'path': layout.svg_path,
+        'name': layout.svg_name
+    }

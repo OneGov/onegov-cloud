@@ -61,6 +61,7 @@ class ElectionCompoundPart(
     horizontal_party_strengths = inherited_attribute()
     show_party_strengths = inherited_attribute()
     use_historical_party_results = inherited_attribute()
+    session_manager = inherited_attribute()
 
     @property
     def title(self):
