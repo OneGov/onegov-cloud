@@ -83,7 +83,7 @@
                     .attr('class', 'name')
                     .text(function(d) { return d.text; })
                     .style('fill', function(d) {
-                        return (d.color && d.class != 'active') ? options.colorInactive : '#000';
+                        return (d.class == 'active') ? '#000' : options.colorInactive;
                     })
                     .style('font-size', options.fontSize)
                     .style('font-family', options.fontFamily)
