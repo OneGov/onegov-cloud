@@ -6,7 +6,7 @@ from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.layout import PersonLayout, PersonCollectionLayout
-from onegov.org.models import AtoZ
+from onegov.org.models import AtoZ, Topic
 from onegov.people import Person, PersonCollection
 
 
@@ -33,11 +33,51 @@ def view_people(self, request, layout=None):
 @OrgApp.html(model=Person, template='person.pt', permission=Public)
 def view_person(self, request, layout=None):
 
+    pages = request.session.query(Topic)
+    pages = pages.filter(Topic.people is not None).all()
+
+    organization_to_function = person_functions_by_organization(self, pages)
+
     return {
         'title': self.title,
         'person': self,
-        'layout': layout or PersonLayout(self, request)
+        'layout': layout or PersonLayout(self, request),
+        'organization_to_function': organization_to_function
     }
+
+
+def person_functions_by_organization(subject, pages):
+    """ Collects 1:1 mappings of all context-specific functions and
+     organizations for a person. Returns a List of strings in the form:
+
+        - Organization 1, Function A
+        - Organization 2, Function B
+
+    This is not necessarily the same as person.function!
+    """
+
+    organization_to_function = []
+
+    def remove_duplicated_text(function, topic):
+        if topic.title in function and not topic.title == function:
+            function = function.replace(topic.title, "")
+            function = function.rstrip()
+        return function
+
+    for topic in pages:
+        people = topic.people
+        if people is None:
+            continue
+        for person in people:
+            if person.id == subject.id:
+                try:
+                    func = person.context_specific_function
+                except AttributeError:
+                    continue
+                if func:
+                    func = remove_duplicated_text(func, topic)
+                    organization_to_function.append(f"{topic.title}: {func}")
+    return organization_to_function
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',

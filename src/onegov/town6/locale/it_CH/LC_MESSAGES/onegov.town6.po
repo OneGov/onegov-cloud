@@ -2055,6 +2055,9 @@ msgstr "Festività"
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
+msgid "Function"
+msgstr "Funzioni"
+
 #~ msgid "From"
 #~ msgstr "Dalle"
 
