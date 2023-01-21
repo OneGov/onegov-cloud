@@ -3,6 +3,7 @@ from freezegun import freeze_time
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import Vote
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils import svg_filename
@@ -67,6 +68,7 @@ def test_svg_filename(session):
         session.add(compound)
         session.add(vote)
         session.flush()
+        part = ElectionCompoundPart(compound, 'superregion', 'Region 1')
 
         ts = 1388577600
         he = '4b9e99d2bd5e48d9a569e5f82175d1d2ed59105f8d82a12dc51b673ff12dc1f2'
@@ -80,6 +82,10 @@ def test_svg_filename(session):
             f'elections-{hc}.{ts}.chart.de.svg'
         assert svg_filename(compound, 'chart', 'rm') == \
             f'elections-{hc}.{ts}.chart.rm.svg'
+        assert svg_filename(part, 'chart', 'de') == \
+            f'elections-{hc}-region-1.{ts}.chart.de.svg'
+        assert svg_filename(part, 'chart', 'rm') == \
+            f'elections-{hc}-region-1.{ts}.chart.rm.svg'
 
         hv = 'ab274474a6aa82c100dddca63977facb556f66f489fb558c044a456f9ba919ce'
         assert svg_filename(vote, 'chart', 'de') == \

@@ -43,11 +43,14 @@ def svg_filename(item, type_, locale, last_modified=None):
     if isinstance(item, Ballot):
         hash = str(item.id)
         ts = int((last_modified or item.vote.last_modified).timestamp())
+    elif isinstance(item, ElectionCompoundPart):
+        hash = '{}-{}'.format(
+            sha256(item.election_compound_id.encode('utf-8')).hexdigest(),
+            item.segment.replace(' ', '-').lower()
+        )
+        ts = int((last_modified or item.last_modified).timestamp())
     else:
         hash = sha256(item.id.encode('utf-8')).hexdigest()
         ts = int((last_modified or item.last_modified).timestamp())
-
-    if isinstance(item, ElectionCompoundPart):
-        hash = '{}-{}'.format(hash, item.segment.replace(' ', '-').lower())
 
     return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale)
