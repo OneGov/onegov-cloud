@@ -103,7 +103,7 @@ Die Resultate können Listenpanaschierdaten enthalten, indem pro Liste eine Spal
 
 Name|Beschreibung
 ---|---
-`list_panachage_votes_from_list_{XX}|panachage_votes_from_list_{XX}`|Die Anzahl Listenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Die Anzahl Listenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 #### Temporäre Resultate
 

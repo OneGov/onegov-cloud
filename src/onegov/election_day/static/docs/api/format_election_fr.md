@@ -102,7 +102,7 @@ Les résultats sont susceptibles de contenir les résultats du panachage de list
 
 Nom|Description
 ---|---
-`list_panachage_votes_from_list_{XX}|panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
 
 #### Résultats temporaires
 

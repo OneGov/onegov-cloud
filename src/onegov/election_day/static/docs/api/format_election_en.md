@@ -104,7 +104,7 @@ The results may contain list panachage results by adding one column per list:
 
 Name|Description
 ---|---
-`list_panachage_votes_from_list_{XX}|panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 #### Temporary results
 
