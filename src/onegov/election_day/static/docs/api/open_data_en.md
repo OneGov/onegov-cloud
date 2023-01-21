@@ -114,6 +114,7 @@ Name|Description
 `list_votes`|The number of votes this list has got. Only relevant for elections based on proportional representation.
 `list_connection`|The ID of the list connection this list is connected to. Only relevant for elections based on proportional representation.
 `list_connection_parent`|The ID of the parent list connection this list is connected to. Only relevant for elections based on proportional representation.
+`list_panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 `candidate_family_name`|The family name of the candidate.
 `candidate_first_name`|The first name of the candidate.
 `candidate_id`|The ID of the candidate.
@@ -123,7 +124,6 @@ Name|Description
 `candidate_gender`|The gender of the candidate: `female`, `male` or `undetermined`.
 `candidate_year_of_birth`|The year of the candidate.
 `candidate_votes`|The number of votes this candidate got.
-`list_panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 Not yet counted municipalities are not included.
 

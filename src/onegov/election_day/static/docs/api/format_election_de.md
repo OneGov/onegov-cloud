@@ -7,38 +7,38 @@ Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von "Wabst
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Inhalt](#Inhalt)
-- 2. [Vorbemerkungen](#Vorbemerkungen)
-   - 2.1. [Einheiten](#Einheiten)
-   - 2.2. [Stille Wahlen](#Stille-Wahlen)
-   - 2.3. [Regionale Wahlen](#Regionale-Wahlen)
-- 3. [Formate](#Formate)
-   - 3.1. [OneGov](#OneGov)
-      - 3.1.1. [Spalten](#Spalten)
-      - 3.1.2. [Panaschierdaten](#Panaschierdaten)
-      - 3.1.3. [Temporäre Resultate](#Temporare-Resultate)
-      - 3.1.4. [Verbundene Wahlen](#Verbundene-Wahlen)
-      - 3.1.5. [Vorlage](#Vorlage)
-   - 3.2. [Wabsti Majorz](#Wabsti-Majorz)
-      - 3.2.1. [Spalten Datenexport](#Spalten-Datenexport)
-      - 3.2.2. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate)
-      - 3.2.3. [Temporäre Resultate](#Temporare-Resultate-1)
-      - 3.2.4. [Vorlagen](#Vorlagen)
-   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)
-      - 3.3.1. [Spalten Datenexport der Resultate](#Spalten-Datenexport-der-Resultate)
-      - 3.3.2. [Panaschierdaten](#Panaschierdaten-1)
-      - 3.3.3. [Spalten Datenexport der Statistik](#Spalten-Datenexport-der-Statistik)
-      - 3.3.4. [Spalten Listenverbindungen](#Spalten-Listenverbindungen)
-      - 3.3.5. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate-1)
-      - 3.3.6. [Temporäre Resultate](#Temporare-Resultate-2)
-      - 3.3.7. [Vorlagen](#Vorlagen-1)
-   - 3.4. [WabstiCExport Majorz](#WabstiCExport-Majorz)
-   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)
-   - 3.6. [Parteiresultate](#Parteiresultate)
-      - 3.6.1. [Einflussbereich](#Einflussbereich)
-      - 3.6.2. [Panaschierdaten](#Panaschierdaten-2)
-      - 3.6.3. [Vorlagen](#Vorlagen-2)
-   - 3.7. [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#Automatische-Erstellung-verbundene-Wahl-und-Wahlen-mit-REST-API)
+- 1. [Inhalt](#inhalt)   
+- 2. [Vorbemerkungen](#vorbemerkungen)   
+   - 2.1. [Einheiten](#einheiten)   
+   - 2.2. [Stille Wahlen](#stille-wahlen)   
+   - 2.3. [Regionale Wahlen](#regionale-wahlen)   
+- 3. [Formate](#formate)   
+   - 3.1. [OneGov](#onegov)   
+      - 3.1.1. [Spalten](#spalten)   
+      - 3.1.2. [Listenpanaschierdaten](#listenpanaschierdaten)   
+      - 3.1.3. [Temporäre Resultate](#temporäre-resultate)   
+      - 3.1.4. [Verbundene Wahlen](#verbundene-wahlen)   
+      - 3.1.5. [Vorlage](#vorlage)   
+   - 3.2. [Wabsti Majorz](#wabsti-majorz)   
+      - 3.2.1. [Spalten Datenexport](#spalten-datenexport)   
+      - 3.2.2. [Spalten Kandidatenresultate](#spalten-kandidatenresultate)   
+      - 3.2.3. [Temporäre Resultate](#temporäre-resultate)   
+      - 3.2.4. [Vorlagen](#vorlagen)   
+   - 3.3. [Wabsti Proporz](#wabsti-proporz)   
+      - 3.3.1. [Spalten Datenexport der Resultate](#spalten-datenexport-der-resultate)   
+      - 3.3.2. [Panaschierdaten](#panaschierdaten)   
+      - 3.3.3. [Spalten Datenexport der Statistik](#spalten-datenexport-der-statistik)   
+      - 3.3.4. [Spalten Listenverbindungen](#spalten-listenverbindungen)   
+      - 3.3.5. [Spalten Kandidatenresultate](#spalten-kandidatenresultate)   
+      - 3.3.6. [Temporäre Resultate](#temporäre-resultate)   
+      - 3.3.7. [Vorlagen](#vorlagen)   
+   - 3.4. [WabstiCExport Majorz](#wabsticexport-majorz)   
+   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)   
+   - 3.6. [Parteiresultate](#parteiresultate)   
+      - 3.6.1. [Einflussbereich](#einflussbereich)   
+      - 3.6.2. [Panaschierdaten](#panaschierdaten)   
+      - 3.6.3. [Vorlagen](#vorlagen)   
+   - 3.7. [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#automatische-erstellung-verbundene-wahl-und-wahlen-mit-rest-api)   
 
 <!-- /MDTOC -->
 
@@ -97,13 +97,13 @@ Name|Beschreibung
 `candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
 `candidate_votes`|Anzahl Kandidierendenstimmen in der Einheit.
 
-#### Panaschierdaten
+#### Listenpanaschierdaten
 
-Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
+Die Resultate können Listenpanaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
 
 Name|Beschreibung
 ---|---
-`list_panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`list_panachage_votes_from_list_{XX}|panachage_votes_from_list_{XX}`|Die Anzahl Listenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 #### Temporäre Resultate
 
