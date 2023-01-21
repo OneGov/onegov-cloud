@@ -972,8 +972,8 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Function"
-msgstr "Funktion"
+msgid "Functions:"
+msgstr "Funktionen:"
 
 msgid "Direct Phone Number"
 msgstr "Direktnummer"
