@@ -1,4 +1,5 @@
 from datetime import date
+from freezegun import freeze_time
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import ElectionResult
@@ -6,6 +7,7 @@ from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionCompoundPartLayout
 from tests.onegov.election_day.common import DummyRequest
+from unittest.mock import Mock
 
 
 def test_election_compound_part_layout_general(session):
@@ -87,6 +89,31 @@ def test_election_compound_part_layout_general(session):
     layout = ElectionCompoundPartLayout(part, request)
     assert layout.hide_tab('party-strengths') is True
     assert layout.main_view == 'ElectionCompoundPart/districts'
+
+    # test file paths
+    with freeze_time("2014-01-01 12:00"):
+        compound = ElectionCompound(
+            title="ElectionCompound",
+            domain='canton',
+            date=date(2011, 1, 1),
+        )
+        session.add(compound)
+        session.flush()
+        part = ElectionCompoundPart(compound, 'superregion', 'Region 1')
+        hs = '2ef359817c8f8a7354e201f891cd7c11a13f4e025aa25239c3ad0cabe58bc49b'
+        ts = '1388577600'
+
+        request = DummyRequest()
+        request.app.filestorage = Mock()
+
+        layout = ElectionCompoundPartLayout(part, request, 'party-strengths')
+        assert layout.svg_path == (
+            f'svg/elections-{hs}-region-1.{ts}.party-strengths.de.svg'
+        )
+        assert layout.svg_link == 'ElectionCompoundPart/party-strengths-svg'
+        assert layout.svg_name == (
+            'electioncompound-region-1-party-strengths.svg'
+        )
 
     # test table links
     for tab, expected in (

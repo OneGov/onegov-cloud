@@ -1,3 +1,4 @@
+from onegov.ballot import ElectionCompoundPart
 from datetime import timedelta
 from freezegun import freeze_time
 from io import StringIO
@@ -69,6 +70,21 @@ def test_generate_svg(election_day_app_gr, session):
             assert generate(item, 'entities-map', 'de_CH') == 0
             assert generate(item, 'districts-map', 'de_CH') == 0
 
+            item = ElectionCompoundPart(item, 'superregion', 'Region 1')
+            party_result = item.election_compound.party_results.first()
+            party_result.domain = 'superregion'
+            party_result.domain_segment = 'Region 1'
+            assert generate(item, 'list-groups', 'de_CH') == 0
+            assert generate(item, 'lists', 'de_CH') == 0
+            assert generate(item, 'candidates', 'de_CH') == 0
+            assert generate(item, 'connections', 'de_CH') == 0
+            assert generate(item, 'seat-allocation', 'de_CH') == 0
+            assert generate(item, 'party-strengths', 'de_CH') == 1
+            assert generate(item, 'parties-panachage', 'de_CH') == 0
+            assert generate(item, 'lists-panachage', 'de_CH') == 0
+            assert generate(item, 'entities-map', 'de_CH') == 0
+            assert generate(item, 'districts-map', 'de_CH') == 0
+
             item = add_vote(session, 'complex').proposal
             assert generate(item, 'lists', 'de_CH') == 0
             assert generate(item, 'candidates', 'de_CH') == 0
@@ -85,7 +101,7 @@ def test_generate_svg(election_day_app_gr, session):
         with freeze_time("2015-05-05 15:00"):
             assert generate(item, 'map', 'it_CH') == 0
 
-        assert gc.call_count == 17
+        assert gc.call_count == 18
 
         ts = '1396620000'
         hm = '41c18975bf916862ed817b7c569b6f242ca7ad9f86ca73bbabd8d9cb26858440'
@@ -107,6 +123,7 @@ def test_generate_svg(election_day_app_gr, session):
             f'elections-{hc}.{ts}.seat-allocation.de_CH.svg',
             f'elections-{hc}.{ts}.party-strengths.de_CH.svg',
             f'elections-{hc}.{ts}.parties-panachage.de_CH.svg',
+            f'elections-{hc}-region-1.{ts}.party-strengths.de_CH.svg',
             f'ballot-{hb}.{ts}.entities-map.de_CH.svg',
             f'ballot-{hb}.{ts}.districts-map.de_CH.svg',
             f'ballot-{hb}.{ts}.entities-map.it_CH.svg'
