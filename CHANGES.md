@@ -1,8 +1,48 @@
 # Changes
 
+## 2023.4
+
+`2023-01-21` | [f5e079cd91...73c44510bd](https://github.com/OneGov/onegov-cloud/compare/f5e079cd91^...73c44510bd)
+
+### Election Day
+
+##### Add SVGs for parts of election compounds.
+
+`Feature` | [OGC-752](https://linear.app/onegovcloud/issue/OGC-752) | [a3ed30722e](https://github.com/onegov/onegov-cloud/commit/a3ed30722e6c597cb8bdf9b194e5a405ca0faabd)
+
+##### Update translations.
+
+`Feature` | [OGC-726](https://linear.app/onegovcloud/issue/OGC-726) | [78577ae649](https://github.com/onegov/onegov-cloud/commit/78577ae649ce033cf629f6d114d4baf16991a5ef)
+
+##### Improve list panaschage format description.
+
+`Feature` | [1ca8e4425f](https://github.com/onegov/onegov-cloud/commit/1ca8e4425fcb621c37aafb882bb6e5a4283a285e)
+
+##### Always gray out inactive bar chart rows.
+
+`Bugfix` | [f5e079cd91](https://github.com/onegov/onegov-cloud/commit/f5e079cd91f1297e2d49010512a85d7519b49240)
+
+##### Zeroize not yet counted results when importing majorz election from WabstiC.
+
+`Bugfix` | [OGC-894](https://linear.app/onegovcloud/issue/OGC-894) | [24c7e69e89](https://github.com/onegov/onegov-cloud/commit/24c7e69e893cc04a75004ee2c2a1c9a8df4a7fb7)
+
+##### Gray out candidates in bar charts only if any mandates have been allocated.
+
+`Bugfix` | [27a5a146af](https://github.com/onegov/onegov-cloud/commit/27a5a146af055abab06a9411f4cae3f27e29f75c)
+
+##### Fix API doc table formatting.
+
+`Bugfix` | [73c44510bd](https://github.com/onegov/onegov-cloud/commit/73c44510bd5b248eb8060d3803648e29d342a5e3)
+
+### Town6
+
+##### Display context-specific functions on person in the directory
+
+`Feature` | [OGC-731](https://linear.app/onegovcloud/issue/OGC-731) | [e7966c9fde](https://github.com/onegov/onegov-cloud/commit/e7966c9fdeddd1947a3f161894f56993832c8879)
+
 ## 2023.3
 
-`2023-01-19` | [38d07a8207...34c2f3bc93](https://github.com/OneGov/onegov-cloud/compare/38d07a8207^...34c2f3bc93)
+`2023-01-19` | [38d07a8207...67c7233665](https://github.com/OneGov/onegov-cloud/compare/38d07a8207^...67c7233665)
 
 ### Election Day
 
@@ -2678,36 +2718,4 @@ Bills may be paid with the displayed information.
 ##### Make join of debug server more tolerant.
 
 `Bugfix` | [834757a243](https://github.com/onegov/onegov-cloud/commit/834757a243f319d8cf06ad07b5ab89c5514b5835)
-
-## 2022.11
-
-`2022-02-06` | [e68aed973c...f01da08089](https://github.com/OneGov/onegov-cloud/compare/e68aed973c^...f01da08089)
-
-### Core
-
-##### Add batch sending of emails.
-
-Replace old SMTP mailer with Postmark API.
-
-`Feature` | [OGC-153](https://linear.app/onegovcloud/issue/OGC-153) | [e68aed973c](https://github.com/onegov/onegov-cloud/commit/e68aed973c50374a97591a5096a454d7c2c6ce9a)
-
-### Election Day
-
-##### Allow to bulk deletion of subscribers.
-
-`Feature` | [OGC-147](https://linear.app/onegovcloud/issue/OGC-147) | [ee40c2bb36](https://github.com/onegov/onegov-cloud/commit/ee40c2bb36167e8a403886884895f8427c478324)
-
-##### Add double opt-in and out to email subscriptions.
-
-`Feature` | [OGC-147](https://linear.app/onegovcloud/issue/OGC-147) | [2c6e8ddc88](https://github.com/onegov/onegov-cloud/commit/2c6e8ddc8880ad8c16f877bb837a633802916b7c)
-
-##### Fixes party result calculation for missing voters counts.
-
-`Bugfix` | [07cd12c9d1](https://github.com/onegov/onegov-cloud/commit/07cd12c9d12dabcf2a554169e8e2a7359853ae66)
-
-### Server
-
-##### Fixes race condition in debug server.
-
-`Bugfix` | [022d4e358f](https://github.com/onegov/onegov-cloud/commit/022d4e358f09fda012cbfe4d84b0eb1e3629651e)
 
