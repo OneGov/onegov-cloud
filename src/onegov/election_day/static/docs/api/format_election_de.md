@@ -82,7 +82,7 @@ Name|Beschreibung
 `entity_invalid_votes`|Anzahl ungültige Stimmen der Einheit. Null falls Proporzwahl.
 `list_name`|Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
 `list_id`|ID der Liste des Kandidierenden. Nur bei Proporzwahlen. Kann alphanumerisch oder numerisch sein.
-`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
+`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784`. Nur bei Proporzwahlen.
 `list_number_of_mandates`|Gesamte Anzahl der Mandate der Liste. Nur bei Proporzwahlen.
 `list_votes`|Anzahl der Listenstimmen pro Gemeinde. Nur bei Proporzwahlen.
 `list_connection`|ID der Listenverbindung oder Unterlistenverbindung (wenn list_connetion_parent vorhanden). Nur bei Proporzwahlen.
@@ -92,7 +92,7 @@ Name|Beschreibung
 `candidate_first_name`|Vorname des Kandidaten.
 `candidate_elected`|True, falls der Kandidierenden gewählt wurde.
 `candidate_party`|Der Name der Partei.
-`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784`.
 `candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
 `candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
 `candidate_votes`|Anzahl Kandidierendenstimmen in der Einheit.
@@ -252,7 +252,7 @@ Name|Beschreibung
 `name`|Der Name der Partei in der Standardsprache. Optional*.
 `name_{locale}`|Übersetzter Name der Partei, z. B. `name_de_ch` für den deutschen Namen. Optional. Stellen Sie sicher, dass Sie den Namen der Partei in der Standardsprache entweder in der Spalte `name` oder `name_{default_locale}` angeben.
 `id`|ID der Partei (beliebige Zahl).
-`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784`.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 `voters_count`|Wählerzahlen. Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl. Nur für verbundene Wahlen.

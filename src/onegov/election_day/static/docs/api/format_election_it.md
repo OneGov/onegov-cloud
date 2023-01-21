@@ -36,7 +36,7 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezion
       - [WabstiCExport Sistema Maggioritario](#WabstiCExport-Sistema-Maggioritario)
       - [WabstiCExport Sistema Proporzionale](#WabstiCExport-Sistema-Proporzionale)
       - [Risultati dei partiti](#Risultati-dei-partiti)
-         - [Einflussbereich](#Einflussbereich)
+         - [Circondario](#Circondario)
          - [Risultati panachage](#Risultati-panachage-2)
          - [Modelli](#Modelli-2)
 
@@ -81,7 +81,7 @@ Nome|Descrizione
 `entity_invalid_votes`|Numero di voti nulli nel Comune. Zero nel caso di elezione con sistema proporzionale.
 `list_name`|Nome della lista di candidati. Solo con elezioni con sistema proporzionale.
 `list_id`|ID della lista del candidato. Solo con elezioni con sistema proporzionale. Può essere numerico o alfanumerico.
-`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
+`list_color`|Colore della lista come valore esadecimale, ad es. `#a6b784`.  Solo con elezioni con sistema proporzionale.
 `list_number_of_mandates`|Numero totale di mandati della lista. Solo con elezioni con sistema proporzionale.
 `list_votes`|Numero di voti di lista per comune. Solo con elezioni con sistema proporzionale.
 `list_connection`|ID dell'apparentamento della lista. Solo con elezioni con sistema proporzionale.
@@ -91,7 +91,7 @@ Nome|Descrizione
 `candidate_first_name`|Nome del candidato.
 `candidate_elected`|Vero, se il candidato è stato eletto.
 `candidate_party`|Il nome del partito.
-`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`candidate_party_color`|Colore del partito come valore esadecimale, ad es. `#a6b784`.
 `candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti per il candidato nel Comune.
@@ -254,15 +254,15 @@ Nome|Descrizione
 `name_{locale}`|Nome tradotto del partito, ad es. `name_de_ch` per il nome tedesco. Quale opzione. Si assicuri di aver indicato nella colonna name oppure nella colonna name_{default_locale} il nome del partito nella lingua definita come standard.
 `name`|Il nome del partito.
 `id`|ID del partito (qualsiasi numero).
-`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`color`|Colore del partito come valore esadecimale, ad es. `#a6b784`.
 `mandates`|Il numero di mandati.
 `votes`|Il numero di voti.
 `voters_count`|Numero di elettori. Il numero cumulativo di voti per il numero totale di mandati per elezione. Solo per i composti elettorali.
 `voters_count_percentage`|Numero di elettori (percentuali). Il numero cumulativo di voti per il numero totale di mandati per elezione (percentuali). Solo per i composti elettorali.
 
-#### Einflussbereich
+#### Circondario
 
-`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden, `domain` wird in diesem Fall implizit auf den `domain` der Wahl oder des Verbundes gesetzt. Aktuell wird nur der `domain` der Wahl oder des Verbundes sowie `domain = 'superregion'` bei verbundenen Wahlen unterstützt.
+`domain` e `domain_segment` consentono di registrare i risultati di partito per un altro circondario rispetto a quello dell'elezione o della combinazione di elezioni. In questo contesto `domain` corrisponde a un circondario subordinato dell'elezione o della combinazione di elezioni, ad es. nel caso di elezioni parlamentari cantonali, a seconda del Cantone `superregion`, `region`, `district` oppure `municipality`. `domain_segment` corrisponde a un'unità in questo circondario subordinato, ad es. `Region 1`, `Bergün`, `Toggenburg` oppure `Zug`. Di norma sia `domain` sia `domain_segment` possono essere lasciati in bianco od omessi; in questo caso `domain` viene impostato automaticamente su `domain` dell'elezione o della combinazione di elezioni. Attualmente vengono supportati solo `domain` dell'elezione o della combinazione di elezioni nonché `domain = 'superregion'` in caso di elezioni legate tra loro.
 
 #### Risultati panachage
 

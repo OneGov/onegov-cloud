@@ -35,7 +35,7 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
    - 3.4. [WabstiCExport Maiorz](#WabstiCExport-Maiorz)
    - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)
    - 3.6. [Resultats da la(s) partida(s)](#Resultats-da-las-partidas)
-      - 3.6.1. [Einflussbereich](#Einflussbereich)
+      - 3.6.1. [Champ d'influenza](#Champ-d-influenza)
       - 3.6.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas-2)
       - 3.6.3. [Projects](#Projects-2)
 
@@ -80,7 +80,7 @@ Num|Descripziun
 `entity_invalid_votes`|Dumber da vuschs nunvalaivlas da la vischnanca. Nulla en cas d'ina elecziun da proporz.
 `list_name`|Num da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
 `list_id`|ID da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
-`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
+`list_color`|La colur da la glista sco valur hexadecimala, p.ex. `#a6b784`. Mo tar elecziuns da proporz.
 `list_number_of_mandates`|Dumber total da mandats da la glista. Mo tar elecziuns da proporz.
 `list_votes`|Dumber a vuschs da la glista. Mo tar elecziuns da proporz.
 `list_connection`|ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
@@ -90,7 +90,7 @@ Num|Descripziun
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
 `candidate_party`|Il num da la partida.
-`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`candidate_party_color`|La colur da la partida sco valur hexadecimala, p.ex. `#a6b784`.
 `candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
@@ -252,15 +252,15 @@ Num|Descripziun
 `name`|Il num da la partida en la lingua da standard. Opziunal*.
 `name_{locale}`|Translaziun dal num da la partida, p.ex. `name_de_CH` per il num tudestg. Opziunal. Guardai che Vus inditgeschias il num da la partida en la lingua da standard ubain en la colonna name ubain en la colonna name_{default_locale}.
 `id`|ID da la partida (cifra casuala).
-`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`color`|La colur da la partida sco valur hexadecimala, p.ex. `#a6b784`.
 `mandates`|Il dumber da sezs da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `voters_count`|Wählerzahlen. Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl. Nur für verbundene Wahlen.
 `voters_count_percentage`|Wählerzahlen (prozentual). Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl (prozentual). Nur für verbundene Wahlen.
 
-#### Einflussbereich
+#### Champ d'influenza
 
-`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden, `domain` wird in diesem Fall implizit auf den `domain` der Wahl oder des Verbundes gesetzt. Aktuell wird nur der `domain` der Wahl oder des Verbundes sowie `domain = 'superregion'` bei verbundenen Wahlen unterstützt.
+`domain` e `domain_segment` permettan d'endatar ils resultats da la partida per in auter champ d'influenza che quel da l'elecziun u da la colliaziun. `domain` correspunda ad in champ d'influenza subordinà da l'elecziun u da la colliaziun, p.ex. en las elecziuns da parlaments chantunals tut tenor chantun `superregion`, `region`, `district` u `municipality`. `domain_segment` correspunda ad in'unitad en quest champ d'influenza subordinà, p.ex. `Regiun 1`, `Bravuogn`, `Toggenburg` u `Zug`. Normalmain po tant il champ `domain` sco er il champ `domain_segment` vegnir laschà vid u vegnir laschà davent. Il champ `domain` survegn lura implicitamain il `domain` da l'elecziun u da la colliaziun. Actualmain vegnan sustegnids mo il `domain` da l'elecziun u da la colliaziun sco er il `domain = superregion` en elecziuns colliadas.
 
 #### Resultats pon cuntegnair datas panaschadas
 

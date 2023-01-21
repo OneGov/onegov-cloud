@@ -366,13 +366,16 @@ msgstr ""
 "verticales."
 
 msgid "Use party results from the last legislative period"
-msgstr ""
+msgstr "Utiliser les résultats des partis de la dernière période législative"
 
 msgid ""
 "Requires party results. Requires a related election from another legislative "
 "period with party results. Requires that both elections use the same party "
 "IDs."
 msgstr ""
+"Exige les résultats des partis. Exige une élection connexe d'une autre "
+"période législative avec des résultats de parti. Il faut que les deux "
+"élections utilisent les mêmes identifiants de parti."
 
 msgid "Party strengths"
 msgstr "Force des partis"
