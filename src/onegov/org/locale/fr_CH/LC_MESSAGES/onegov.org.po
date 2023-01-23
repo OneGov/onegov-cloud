@@ -5123,3 +5123,12 @@ msgstr "Ticket téléchargé à Gever."
 
 msgid "Upload to Gever"
 msgstr "Télécharger à Gever"
+
+msgid "Password for the associated Gever account."
+msgstr "Mot de passe pour le compte Gever associé"
+
+msgid "Username for the associated Gever account."
+msgstr "Nom d'utilisateur pour le compte Gever associé."
+
+msgid "Gever API Endpoint where the documents are uploaded."
+msgstr "Point de terminaison de l'API Gever où les documents sont téléchargés."
