@@ -954,6 +954,9 @@ msgstr ""
 msgid "Recipient"
 msgstr "Destinatario"
 
+msgid "Will be used as image in the page overview on the parent page"
+msgstr "Verrà utilizzato come immagine nella panoramica della pagina sulla pagina padre"
+
 msgid "Describes what this page is about"
 msgstr "Descrive il contenuto di questa pagina"
 
@@ -975,8 +978,8 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Function"
-msgstr "Funzione"
+msgid "Functions:"
+msgstr "Funzioni:"
 
 msgid "Direct Phone Number"
 msgstr "Numero di telefono diretto"
@@ -1507,7 +1510,7 @@ msgid "Include logo in newsletter"
 msgstr "Includi il logo nella newsletter"
 
 msgid "Old domain"
-msgstr ""
+msgstr "Vecchio dominio"
 
 msgid "Test migration"
 msgstr "Migrazione di prova"
@@ -2080,6 +2083,12 @@ msgstr "Abilita l'honey pot"
 
 msgid "Spam protection"
 msgstr "Protezione contro lo spam"
+
+msgid "Show image on preview on the parent page"
+msgstr "Mostra l'immagine in anteprima nella pagina madre"
+
+msgid "Show image on page"
+msgstr "Mostra l'immagine nella pagina"
 
 msgid "This month"
 msgstr "Questo mese"

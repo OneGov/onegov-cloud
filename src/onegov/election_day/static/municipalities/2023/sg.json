@@ -219,10 +219,6 @@
         "district": "Toggenburg",
         "name": "Lichtensteig"
     },
-    "3396": {
-        "district": "Toggenburg",
-        "name": "Neckertal"
-    },
     "3379": {
         "district": "Toggenburg",
         "name": "Wattwil"
@@ -242,6 +238,10 @@
     "3395": {
         "district": "Toggenburg",
         "name": "B\u00fctschwil-Ganterschwil"
+    },
+    "3396": {
+        "district": "Toggenburg",
+        "name": "Neckertal"
     },
     "3401": {
         "district": "Wil",

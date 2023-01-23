@@ -28,7 +28,9 @@ class LinkForm(PageBaseForm):
 
     page_image = StringField(
         label=_("Image"),
-        render_kw={'class_': 'image-url'}
+        render_kw={'class_': 'image-url'},
+        description=_(
+            'Will be used as image in the page overview on the parent page')
     )
 
 

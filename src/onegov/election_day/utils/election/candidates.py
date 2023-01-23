@@ -182,7 +182,8 @@ def get_candidates_data(
                 ),
                 'value': candidate.votes,
                 'class': (
-                    'active' if candidate.elected and election.completed
+                    'active'
+                    if candidate.elected or not election.allocated_mandates
                     else 'inactive'
                 ),
                 'color': (

@@ -480,7 +480,7 @@
 <metal:newslist define-macro="news-item-card" i18n:domain="onegov.town6">
     <div class="card news-card" data-aos="fade" data-aos-duration="800" data-equalizer-watch tal:define="url request.link(item)">
         <a href="${url}">
-            <div tal:condition="item.page_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></div>
+            <div tal:condition="item.page_image and item.show_preview_image" style="width: 100%; padding-bottom: 55%; background-image: url(${item.page_image}); background-size: cover;"></div>
         </a>
         <div class="card-section">
             <a href="${url}">
@@ -655,7 +655,7 @@
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
-    <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.trait == 'news' and page.page_image | None;">
+    <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image | None;">
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
@@ -817,7 +817,7 @@
             </div>
             <div class="cell small-12 medium-8 large-9">
                 <ul>
-                    <li tal:condition="person.function" class="person-card-function">
+                    <li tal:condition="person.function and not organization_to_function" class="person-card-function">
                         <em>${person.function}</em>
                     </li>
                     <li class="person-card-personal">
@@ -842,6 +842,14 @@
                     <li tal:condition="person.website and 'website' not in exclude" class="person-card-website">
                         <a href="${person.website}">${person.website}</a>
                     </li>
+                    <div class="person-card-context-specific-functions" tal:condition="python: organization_to_function">
+                        <span i18n:translate="">Functions:</span>
+                        <ul>
+                            <li tal:repeat="item organization_to_function">
+                                <span>${item}</span>
+                            </li>
+                        </ul>
+                    </div>
                     <li class="person-card-notes" tal:condition="person.notes and 'notes' not in exclude">
                         <span>${person.notes}</span>
                     </li>
@@ -1221,7 +1229,7 @@
             <div class="grid-x grid-padding-x date-range-selector">
                 <div class="large-6 cell">
                     <div class="grid-x">
-                        <label i18n:translate>From/label>
+                        <label i18n:translate>From</label>
                         <input class="small" name="start" type="date" value="${start}" placeholder="${layout.today().isoformat()}">
                     </div>
                 </div>

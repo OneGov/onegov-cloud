@@ -112,21 +112,21 @@ Num|Descripziun
 `entity_accounted_votes`|Il dumber da las vuschs valaivlas da la vischnanca/dal lieu.
 `list_name`|Il num da la glista da la persuna che candidescha. Mo en cas d'elecziuns da proporz.
 `list_id`|La ID da la glista, per la quala la candidata u il candidat candidescha. Mo tar elecziuns da proporz.
-`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
+`list_color`|La colur da la glista sco valur hexadecimala, p.ex. `#a6b784`. Mo tar elecziuns da proporz.
 `list_number_of_mandates`|Il dumber da mandats da la glista. Mo tar elecziuns da proporz.
 `list_votes`|Il dumber da las vuschs da las glistas. Mo tar elecziuns da proporz.
 `list_connection`|La ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
 `list_connection_parent`|La ID da la colliaziun da glistas surordinada. Mo en cas d'elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
+`list_panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 `candidate_family_name`|Il num da famiglia da la persuna che candidescha.
 `candidate_first_name`|Il prenum da la persuna che candidescha.
 `candidate_id`|La ID da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
 `candidate_party`|Il num da la partida.
-`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`candidate_party_color`|La colur da la partida sco valur hexadecimala, p.ex. `#a6b784`.
 `candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
-`list_panachage_votes_from_list_XX`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
@@ -153,7 +153,7 @@ Num|Descripziun
 `total_votes`|Il dumber total da las vuschs da l'elecziun.
 `name`|Il num da la partida en la lingua da standard.
 `name_{locale}`|Translaziun dal num da la partida, p.ex. `name_de_ch` per il num tudestg.
-`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`color`|La colur da la partida sco valur hexadecimala, p.ex. `#a6b784`.
 `mandates`|Il dumber da mandats da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `voters_count`|Wählerzahlen. Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl. Nur für verbundene Wahlen.

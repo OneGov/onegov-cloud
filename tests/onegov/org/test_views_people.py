@@ -1,3 +1,6 @@
+from uuid import UUID
+from onegov.org.models import Topic
+from onegov.org.views.people import person_functions_by_organization
 from onegov.people import Person
 
 
@@ -125,3 +128,59 @@ def test_delete_linked_person_issue_149(client):
 
     # this used to throw an error before issue 149 was fixed
     edit_page.form.submit().follow()
+
+
+def test_context_specific_function(session):
+
+    person = Person(
+        id=UUID("fa471984-7bf3-41ce-a336-0d01a08cd6ba"),
+        first_name="Hans",
+        last_name="Maulwurf",
+    )
+    session.add(person)
+    context_specific_function = "President"
+    person_to_function = [[person.id.hex, context_specific_function]]
+
+    topic = Topic(title="Komission", name="topic")
+    # Pretend we have ContentMixin:
+    setattr(topic, 'content', {'people': person_to_function})
+    session.add(topic)
+    topics = [topic]
+    session.flush()
+
+    organization_to_function = person_functions_by_organization(person, topics)
+    assert organization_to_function[0] == f"Komission: " \
+                                          f"{context_specific_function}"
+
+
+def test_context_specific_function_substring_removed(session):
+    organizations = ["Urnenbüro", "Forum der Ortsparteien und Quartiervereine"]
+    context_specific_functions = [
+        "Präsidentin Urnenbüro",
+        "Mitglied Forum der Ortsparteien und Quartiervereine"
+    ]
+
+    person = Person(
+        id=UUID("fa471984-7bf3-41ce-a336-0d01a08cd6ba"),
+        first_name="Klara",
+        last_name="Fall",
+    )
+    session.add(person)
+    person_to_function1 = [[person.id.hex, context_specific_functions[0]]]
+    person_to_function2 = [[person.id.hex, context_specific_functions[1]]]
+
+    topic1 = Topic(title=organizations[0], name="topic1")
+    topic2 = Topic(title=organizations[1], name="topic2")
+
+    # Pretend we have ContentMixin:
+    setattr(topic1, 'content', {'people': person_to_function1})
+    setattr(topic2, 'content', {'people': person_to_function2})
+    session.add(topic1)
+    session.add(topic2)
+
+    topics = [topic1, topic2]
+    session.flush()
+
+    organization_to_function = person_functions_by_organization(person, topics)
+    assert organization_to_function[0] == f"{organizations[0]}: Präsidentin"
+    assert organization_to_function[1] == f"{organizations[1]}: Mitglied"

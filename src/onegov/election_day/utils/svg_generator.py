@@ -1,6 +1,7 @@
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.election_day import log
 from onegov.election_day.utils import svg_filename
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -92,6 +93,9 @@ class SvgGenerator():
                 'seat-allocation', 'list-groups', 'party-strengths',
                 'parties-panachage',
             ),
+            'compound-part': (
+                'party-strengths',
+            ),
             'ballot': (
                 'entities-map', 'districts-map'
             ) if principal.has_districts else ('entities-map',)
@@ -131,6 +135,19 @@ class SvgGenerator():
                         created += self.generate_svg(
                             compound, type_, filename, locale
                         )
+                for segment in principal.get_superregions(compound.date.year):
+                    compound_part = ElectionCompoundPart(
+                        compound, 'superregion', segment
+                    )
+                    for type_ in types['compound-part']:
+                        filename = svg_filename(
+                            compound_part, type_, locale, last_modified
+                        )
+                        filenames.append(filename)
+                        if filename not in existing:
+                            created += self.generate_svg(
+                                compound_part, type_, filename, locale
+                            )
 
         if principal.use_maps:
             for ballot in self.session.query(Ballot):

@@ -256,6 +256,15 @@ def import_election_wabstic_majorz(
             )
             continue
 
+        # Clear results if not counted yet
+        if not entity['counted']:
+            entity['eligible_voters'] = 0
+            entity['received_ballots'] = 0
+            entity['blank_ballots'] = 0
+            entity['invalid_ballots'] = 0
+            entity['blank_votes'] = 0
+            entity['invalid_votes'] = 0
+
     # Parse the candidates
     added_candidates = {}
     for line in wm_kandidaten.lines:
@@ -335,6 +344,10 @@ def import_election_wabstic_majorz(
         if entity_id not in added_results:
             added_results[entity_id] = {}
         added_results[entity_id][candidate_id] = votes
+
+        # Clear results if not counted yet
+        if not added_entities[entity_id]['counted']:
+            added_results[entity_id][candidate_id] = 0
 
     if complete and complete == 2 and remaining_entities != 0:
         errors.append(FileImportError(

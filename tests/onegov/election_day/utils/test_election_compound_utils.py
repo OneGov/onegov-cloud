@@ -717,6 +717,7 @@ def test_election_utils_candidate_statistics(
             'Walchwil',
             'Zug',
         ),
+        domain_supersegment=11 * [''],
         number_of_mandates=(
             15,
             10,

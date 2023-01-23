@@ -270,7 +270,7 @@ def view_rdf(self, request):
             if party_result:
                 if not hasattr(item, 'party_results'):
                     continue
-                if not item.party_results.first():
+                if not item.has_party_results:
                     continue
 
             url = request.link(item, 'data-{}'.format(fmt))

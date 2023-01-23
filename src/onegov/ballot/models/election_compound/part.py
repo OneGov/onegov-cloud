@@ -2,6 +2,7 @@ from onegov.ballot.models.election_compound.mixins import \
     DerivedAttributesMixin
 from onegov.ballot.models.party_result.mixins import \
     HistoricalPartyResultsMixin
+from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from sqlalchemy.orm import object_session
 
 
@@ -15,7 +16,7 @@ class inherited_attribute:
 
 
 class ElectionCompoundPart(
-    DerivedAttributesMixin, HistoricalPartyResultsMixin
+    DerivedAttributesMixin, PartyResultsCheckMixin, HistoricalPartyResultsMixin
 ):
 
     """ A part of an election compound.
@@ -31,15 +32,27 @@ class ElectionCompoundPart(
 
     def __init__(self, election_compound, domain, segment):
         self.election_compound = election_compound
-        self.election_compound_id = election_compound.id
+        self.election_compound_id = (
+            election_compound.id if election_compound else None
+        )
         self.domain = domain
         self.segment = segment
         self.id = segment.replace(' ', '-').lower()
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, ElectionCompoundPart)
+            and self.election_compound_id == other.election_compound_id
+            and self.domain == other.domain
+            and self.segment == other.segment
+        )
+
     date = inherited_attribute()
     completes_manually = inherited_attribute()
     manually_completed = inherited_attribute()
+    pukelsheim = inherited_attribute()
     last_result_change = inherited_attribute()
+    last_change = inherited_attribute()
     last_modified = inherited_attribute()
     domain_elections = inherited_attribute()
     colors = inherited_attribute()
@@ -48,6 +61,7 @@ class ElectionCompoundPart(
     horizontal_party_strengths = inherited_attribute()
     show_party_strengths = inherited_attribute()
     use_historical_party_results = inherited_attribute()
+    session_manager = inherited_attribute()
 
     @property
     def title(self):
@@ -88,7 +102,7 @@ class ElectionCompoundPart(
     def has_results(self):
         """ Returns True, if the election compound has any results. """
 
-        if self.party_results.first():
+        if self.has_party_results:
             return True
         for election in self.elections:
             if election.has_results:

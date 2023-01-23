@@ -2065,6 +2065,9 @@ msgstr "Jours fériés"
 msgid "Link Migration"
 msgstr "Migration des liens"
 
+msgid "Functions"
+msgstr "Fonctions"
+
 #~ msgid "From"
 #~ msgstr "De"
 

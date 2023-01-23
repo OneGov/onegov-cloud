@@ -74,6 +74,21 @@ $person-email-icon: '\f0e0';
         }
     }
 
+    .person-card-context-specific-functions {
+
+        padding-top: 1em;
+
+        ul {
+            list-style: outside;
+            margin-bottom: 0;
+            margin-left: 0;
+
+            li::before {
+                margin-right: .5ex;
+            }
+        }
+    }
+
     &.person-single-item {
         .person-card-website::before {
             @include icon-bold($person-website-icon);

@@ -7,37 +7,37 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Cuntegn](#Cuntegn)
-- 2. [Remartgas preliminaras](#Remartgas-preliminaras)
-   - 2.1. [Unitads](#Unitads)
-   - 2.2. [Elecziun taciturnas](#Elecziun-taciturnas)
-   - 2.3. [Elecziuns regiunalas](#Elecziuns-regiunalas)
-- 3. [Formats](#Formats)
-   - 3.1. [Onegov](#Onegov)
-      - 3.1.1. [Colonnas](#Colonnas)
-      - 3.1.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas)
-      - 3.1.3. [Resultats temporars](#Resultats-temporars)
-      - 3.1.4. [Elecziuns colliadas](#Elecziuns-colliadas)
-      - 3.1.5. [Project](#Project)
-   - 3.2. [Wabsti Maiorz](#Wabsti-Maiorz)
-      - 3.2.1. [Colonnas "Export da datas"](#Colonnas-Export-da-datas)
-      - 3.2.2. [Colonnas "Resultats da las candidatas e dals candidats"](#Colonnas-Resultats-da-las-candidatas-e-dals-candidats)
-      - 3.2.3. [Resultats temporars](#Resultats-temporars-1)
-      - 3.2.4. [Projects](#Projects)
-   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)
-      - 3.3.1. [Colonnas "Export da datas dals resultats"](#Colonnas-Export-da-datas-dals-resultats)
-      - 3.3.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas-1)
-      - 3.3.3. [Colonnas "Export da datas da la statistica"](#Colonnas-Export-da-datas-da-la-statistica)
-      - 3.3.4. [Colonnas "Colliaziuns da glistas"](#Colonnas-Colliaziuns-da-glistas)
-      - 3.3.5. [Colonnas "Resultats da las candidatas e dals candidats"](#Colonnas-Resultats-da-las-candidatas-e-dals-candidats-1)
-      - 3.3.6. [Resultats temporars](#Resultats-temporars-2)
-      - 3.3.7. [Projects](#Projects-1)
-   - 3.4. [WabstiCExport Maiorz](#WabstiCExport-Maiorz)
-   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)
-   - 3.6. [Resultats da la(s) partida(s)](#Resultats-da-las-partidas)
-      - 3.6.1. [Einflussbereich](#Einflussbereich)
-      - 3.6.2. [Resultats pon cuntegnair datas panaschadas](#Resultats-pon-cuntegnair-datas-panaschadas-2)
-      - 3.6.3. [Projects](#Projects-2)
+- 1. [Cuntegn](#cuntegn)   
+- 2. [Remartgas preliminaras](#remartgas-preliminaras)   
+   - 2.1. [Unitads](#unitads)   
+   - 2.2. [Elecziun taciturnas](#elecziun-taciturnas)   
+   - 2.3. [Elecziuns regiunalas](#elecziuns-regiunalas)   
+- 3. [Formats](#formats)   
+   - 3.1. [Onegov](#onegov)   
+      - 3.1.1. [Colonnas](#colonnas)   
+      - 3.1.2. [Resultats pon cuntegnair datas panaschadas da glistas](#resultats-pon-cuntegnair-datas-panaschadas-da-glistas)   
+      - 3.1.3. [Resultats temporars](#resultats-temporars)   
+      - 3.1.4. [Elecziuns colliadas](#elecziuns-colliadas)   
+      - 3.1.5. [Project](#project)   
+   - 3.2. [Wabsti Maiorz](#wabsti-maiorz)   
+      - 3.2.1. [Colonnas "Export da datas"](#colonnas-export-da-datas)   
+      - 3.2.2. [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)   
+      - 3.2.3. [Resultats temporars](#resultats-temporars)   
+      - 3.2.4. [Projects](#projects)   
+   - 3.3. [Wabsti Proporz](#wabsti-proporz)   
+      - 3.3.1. [Colonnas "Export da datas dals resultats"](#colonnas-export-da-datas-dals-resultats)   
+      - 3.3.2. [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)   
+      - 3.3.3. [Colonnas "Export da datas da la statistica"](#colonnas-export-da-datas-da-la-statistica)   
+      - 3.3.4. [Colonnas "Colliaziuns da glistas"](#colonnas-colliaziuns-da-glistas)   
+      - 3.3.5. [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)   
+      - 3.3.6. [Resultats temporars](#resultats-temporars)   
+      - 3.3.7. [Projects](#projects)   
+   - 3.4. [WabstiCExport Maiorz](#wabsticexport-maiorz)   
+   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)   
+   - 3.6. [Resultats da la(s) partida(s)](#resultats-da-las-partidas)   
+      - 3.6.1. [Champ d'influenza](#champ-dinfluenza)   
+      - 3.6.2. [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)   
+      - 3.6.3. [Projects](#projects)   
 
 <!-- /MDTOC -->
 
@@ -80,7 +80,7 @@ Num|Descripziun
 `entity_invalid_votes`|Dumber da vuschs nunvalaivlas da la vischnanca. Nulla en cas d'ina elecziun da proporz.
 `list_name`|Num da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
 `list_id`|ID da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
-`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
+`list_color`|La colur da la glista sco valur hexadecimala, p.ex. `#a6b784`. Mo tar elecziuns da proporz.
 `list_number_of_mandates`|Dumber total da mandats da la glista. Mo tar elecziuns da proporz.
 `list_votes`|Dumber a vuschs da la glista. Mo tar elecziuns da proporz.
 `list_connection`|ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
@@ -90,18 +90,18 @@ Num|Descripziun
 `candidate_first_name`|Prenum da la candidata u dal candidat.
 `candidate_elected`|True, sche la candidata u il candidat è vegnì elegì.
 `candidate_party`|Il num da la partida.
-`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`candidate_party_color`|La colur da la partida sco valur hexadecimala, p.ex. `#a6b784`.
 `candidate_gender`|La schlattaina da la candidata u dal candidat: `female` (feminin), `male` (masculin) u `undetermined` (nundeterminà). Opziunal.
 `candidate_year_of_birth`|L'annada da la candidata u dal candidat. Opziunal.
 `candidate_votes`|Dumber da vuschs da candidat en la vischnanca.
 
-#### Resultats pon cuntegnair datas panaschadas
+#### Resultats pon cuntegnair datas panaschadas da glistas
 
-Ils resultats pon cuntegnair datas panaschadas, tras quai ch'i vegn agiuntada ina colonna per glista:
+Ils resultats pon cuntegnair datas panaschadas da glistas, tras quai ch'i vegn agiuntada ina colonna per glista:
 
 Num|Descripziun
 ---|---
-`list_panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 #### Resultats temporars
 
@@ -252,15 +252,15 @@ Num|Descripziun
 `name`|Il num da la partida en la lingua da standard. Opziunal*.
 `name_{locale}`|Translaziun dal num da la partida, p.ex. `name_de_CH` per il num tudestg. Opziunal. Guardai che Vus inditgeschias il num da la partida en la lingua da standard ubain en la colonna name ubain en la colonna name_{default_locale}.
 `id`|ID da la partida (cifra casuala).
-`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`color`|La colur da la partida sco valur hexadecimala, p.ex. `#a6b784`.
 `mandates`|Il dumber da sezs da la partida.
 `votes`|Il dumber da vuschs da la partida.
 `voters_count`|Wählerzahlen. Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl. Nur für verbundene Wahlen.
 `voters_count_percentage`|Wählerzahlen (prozentual). Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl (prozentual). Nur für verbundene Wahlen.
 
-#### Einflussbereich
+#### Champ d'influenza
 
-`domain` und `domain_segment` ermöglichen, Parteiresultate für einen anderen Einflussbereich als den der Wahl oder des Verbundes zu erfassen. `domain` entspricht dabei einem untergeordneten Einflussbereichs der Wahl oder des Verbundes, z.B. bei kantonalen Parlamentswahlen je nach Kanton `superregion`, `region`, `district` oder `municipality`. `domain_segment` entspricht einer Einheit in diesem untergeordneten Einflussbereich, z.B. `Region 1`, `Bergün`, `Toggenburg` oder `Zug`. Im Normalfall können sowohl `domain` als auch `domain_segment` leer oder weggelassen werden, `domain` wird in diesem Fall implizit auf den `domain` der Wahl oder des Verbundes gesetzt. Aktuell wird nur der `domain` der Wahl oder des Verbundes sowie `domain = 'superregion'` bei verbundenen Wahlen unterstützt.
+`domain` e `domain_segment` permettan d'endatar ils resultats da la partida per in auter champ d'influenza che quel da l'elecziun u da la colliaziun. `domain` correspunda ad in champ d'influenza subordinà da l'elecziun u da la colliaziun, p.ex. en las elecziuns da parlaments chantunals tut tenor chantun `superregion`, `region`, `district` u `municipality`. `domain_segment` correspunda ad in'unitad en quest champ d'influenza subordinà, p.ex. `Regiun 1`, `Bravuogn`, `Toggenburg` u `Zug`. Normalmain po tant il champ `domain` sco er il champ `domain_segment` vegnir laschà vid u vegnir laschà davent. Il champ `domain` survegn lura implicitamain il `domain` da l'elecziun u da la colliaziun. Actualmain vegnan sustegnids mo il `domain` da l'elecziun u da la colliaziun sco er il `domain = superregion` en elecziuns colliadas.
 
 #### Resultats pon cuntegnair datas panaschadas
 
