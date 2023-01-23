@@ -93,6 +93,25 @@ class DirectoryBaseForm(Form):
         fieldset=_("Display"),
         render_kw={'class_': 'formcode-format'})
 
+    numbering = RadioField(
+        label=_("Numbering"),
+        fieldset=_("Display"),
+        choices=[
+            ('none', _("None")),
+            ('standard', _("Standard")),
+            ('custom', _("Custom"))
+        ],
+        default='none')
+
+    numbers = TextAreaField(
+        label=_("Custom Numbering"),
+        fieldset=_("Display"),
+        depends_on=('numbering', 'custom'),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'integer_range'
+        })
+
     content_fields = TextAreaField(
         label=_("Main view"),
         fieldset=_("Display"),
@@ -156,19 +175,9 @@ class DirectoryBaseForm(Form):
         depends_on=('address_block_title_type', 'fixed'),
     )
 
-    marker_type = RadioField(
-        label=_("Marker Type"),
-        fieldset=_("Marker"),
-        choices=[
-            ('icon', _("Icon")),
-            ('numbers', _("Numbers"))
-        ],
-        default='icon')
-
     marker_icon = IconField(
         label=_("Icon"),
-        fieldset=_("Marker"),
-        depends_on=('marker_type', 'icon'))
+        fieldset=_("Marker"))
 
     marker_color_type = RadioField(
         label=_("Marker Color"),
@@ -339,6 +348,14 @@ class DirectoryBaseForm(Form):
         if field.data and '\n' in field.data:
             raise ValidationError(
                 _("Please select at most one thumbnail field")
+            )
+
+    def validate_numbers(self, field):
+        if self.numbering.data == 'custom' and (
+            '\n' in field.data or field.data == ''
+        ):
+            raise ValidationError(
+                _("Please select exactly one numbering field")
             )
 
     def ensure_public_fields_for_submissions(self):

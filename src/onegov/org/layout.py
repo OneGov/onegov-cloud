@@ -2422,7 +2422,7 @@ class DirectoryEntryBaseLayout(DefaultLayout):
             self.custom_body_attributes['data-default-marker-icon'] \
                 = self.directory.marker_icon.encode('unicode-escape')[2:]
 
-        if self.directory.marker_type == 'numbers':
+        if self.directory.numbering == 'numbers':
             self.custom_body_attributes['data-default-marker-icon'] = 'f111'
 
     @property
@@ -2459,7 +2459,8 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.directory.marker_type == 'numbers':
+
+        if self.directory.numbering == 'standard':
             self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
 
     @cached_property
