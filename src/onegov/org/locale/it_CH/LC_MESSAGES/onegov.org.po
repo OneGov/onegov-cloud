@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-12-05 15:00+0100\n"
+"POT-Creation-Date: 2023-01-23 15:13+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -346,6 +346,9 @@ msgstr "Visualizza"
 
 msgid "Lead-Format"
 msgstr "Formato principale"
+
+msgid "Overview layout with tiles"
+msgstr "Panoramica con le piastrelle"
 
 msgid "Main view"
 msgstr "Vista principale"
@@ -1503,8 +1506,8 @@ msgstr "Attiva la newsletter"
 msgid "Include logo in newsletter"
 msgstr "Includi il logo nella newsletter"
 
-msgid "New domain"
-msgstr "Vecchio dominio"
+msgid "Old domain"
+msgstr ""
 
 msgid "Test migration"
 msgstr "Migrazione di prova"
@@ -1526,6 +1529,9 @@ msgstr "Solo collegamenti esterni"
 
 msgid "Internal links only"
 msgstr "Solo collegamenti interni"
+
+msgid "Submit your event"
+msgstr "Invia il tuo evento"
 
 msgid "Enables website visitors to submit their own events"
 msgstr "Consente ai visitatori del sito web di presentare i propri eventi"
@@ -1650,9 +1656,6 @@ msgstr "Cartelle"
 
 msgid "All events"
 msgstr "Tutti gli eventi"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "Daypass"
 msgstr "Biglietto giornaliero"
@@ -1907,6 +1910,9 @@ msgstr "Puoi ripubblicare un evento importato in un secondo momento."
 
 msgid "Re-publish event"
 msgstr "Ripubblica l'evento"
+
+msgid "Newsletter"
+msgstr "Newsletter"
 
 msgid "New"
 msgstr "Nuovo"
@@ -3486,9 +3492,6 @@ msgstr "Tag"
 msgid "Export these events"
 msgstr "Esporta questi eventi"
 
-msgid "Submit your event"
-msgstr "Invia il tuo evento"
-
 msgid "Submit your own event"
 msgstr "Invia il tuo evento"
 
@@ -4842,7 +4845,8 @@ msgstr "Totale di ${number} collegamenti trovati."
 msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
-"Migra i collegamenti dal dominio specificato al dominio corrente \"${domain}\"."
+"Migra i collegamenti dal dominio specificato al dominio corrente "
+"\"${domain}\"."
 
 msgid "Topics"
 msgstr "Argomenti"
@@ -5048,18 +5052,20 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-msgid "Will be published until:"
-msgstr "Sarà pubblicato fino a:"
+#~ msgid "New domain"
+#~ msgstr "Vecchio dominio"
 
-msgid "Published until ${endDate1}"
-msgstr "Pubblicato fino a: ${endDate1}"
+#~ msgid "Will be published until:"
+#~ msgstr "Sarà pubblicato fino a:"
 
-msgid "Published from ${publishDate} until ${endDate}"
-msgstr "Pubblicato dal {publishDate} al ${endDate}"
+#~ msgid "Published until ${endDate1}"
+#~ msgstr "Pubblicato fino a: ${endDate1}"
 
-msgid "Publication end date:"
-msgstr "Data di fine pubblicazione:"
+#~ msgid "Published from ${publishDate} until ${endDate}"
+#~ msgstr "Pubblicato dal {publishDate} al ${endDate}"
 
+#~ msgid "Publication end date:"
+#~ msgstr "Data di fine pubblicazione:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Riquadro della mappa (predefinito)"

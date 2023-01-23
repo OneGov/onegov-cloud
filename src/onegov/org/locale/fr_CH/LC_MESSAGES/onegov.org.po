@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-12-05 15:00+0100\n"
+"POT-Creation-Date: 2023-01-23 15:13+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -345,6 +345,9 @@ msgstr "Afficher"
 
 msgid "Lead-Format"
 msgstr "Format Principal"
+
+msgid "Overview layout with tiles"
+msgstr "Vue d'ensemble avec les tuiles"
 
 msgid "Main view"
 msgstr "Affichage principal"
@@ -1524,6 +1527,9 @@ msgstr "Liens externes uniquement"
 msgid "Internal links only"
 msgstr "Liens internes uniquement"
 
+msgid "Submit your event"
+msgstr "Soumettez votre événement"
+
 msgid "Enables website visitors to submit their own events"
 msgstr "Permet aux visiteurs du site web de soumettre leurs propres événements"
 
@@ -1644,9 +1650,6 @@ msgstr "Répertoires"
 
 msgid "All events"
 msgstr "Tous les événements"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "Daypass"
 msgstr "Carte journalière"
@@ -1899,6 +1902,9 @@ msgstr "Vous pouvez republier un événement importé plus tard."
 
 msgid "Re-publish event"
 msgstr "Republier l'événement"
+
+msgid "Newsletter"
+msgstr "Newsletter"
 
 msgid "New"
 msgstr "Nouveau"
@@ -3494,9 +3500,6 @@ msgstr "Étiquette"
 msgid "Export these events"
 msgstr "Exporter ces événements"
 
-msgid "Submit your event"
-msgstr "Soumettez votre événement"
-
 msgid "Submit your own event"
 msgstr "Soumettez votre propre événement"
 
@@ -5055,18 +5058,17 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "Will be published until:"
-msgstr "Sera publié jusqu'au:"
+#~ msgid "Will be published until:"
+#~ msgstr "Sera publié jusqu'au:"
 
-msgid "Published until ${endDate1}"
-msgstr "Publié jusqu'au ${endDate1}"
+#~ msgid "Published until ${endDate1}"
+#~ msgstr "Publié jusqu'au ${endDate1}"
 
-msgid "Published from ${publishDate} until ${endDate}"
-msgstr "Publié du {publishDate} jusqu'au ${endDate}"
+#~ msgid "Published from ${publishDate} until ${endDate}"
+#~ msgstr "Publié du {publishDate} jusqu'au ${endDate}"
 
-msgid "Publication end date:"
-msgstr "Date de fin de publication:"
-
+#~ msgid "Publication end date:"
+#~ msgstr "Date de fin de publication:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (défaut)"

@@ -93,11 +93,6 @@ class DirectoryBaseForm(Form):
         fieldset=_("Display"),
         render_kw={'class_': 'formcode-format'})
 
-    overview_two_columns = BooleanField(
-        label=_("Overview layout with tiles"),
-        fieldset=_("Display"),
-        default=False)
-
     content_fields = TextAreaField(
         label=_("Main view"),
         fieldset=_("Display"),
@@ -139,6 +134,11 @@ class DirectoryBaseForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
         })
+
+    overview_two_columns = BooleanField(
+        label=_("Overview layout with tiles"),
+        fieldset=_("Display"),
+        default=False)
 
     address_block_title_type = RadioField(
         label=_("Address Block Title"),
