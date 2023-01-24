@@ -276,6 +276,12 @@ def keyword_count(request, collection):
 def view_directory(self, request, layout=None):
 
     entries = request.exclude_invisible(self.query())
+    for e in entries:
+        if self.directory.numbering == 'custom':
+            e.number = e.content['values'].get(
+                as_internal_id(self.directory.numbers))
+        else:
+            e.number = None
     keyword_counts = keyword_count(request, self)
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
