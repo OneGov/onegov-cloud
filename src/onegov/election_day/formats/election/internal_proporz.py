@@ -139,8 +139,7 @@ def parse_panachage_headers(csv):
     return headers
 
 
-def parse_panachage_results(line, errors, panachage, panachage_headers,
-                            counted):
+def parse_panachage_results(line, errors, panachage, panachage_headers):
     try:
         target = validate_list_id(
             line, 'list_id', treat_empty_as_default=False)
@@ -151,7 +150,7 @@ def parse_panachage_results(line, errors, panachage, panachage_headers,
                     continue
                 votes = validate_integer(line, col_name, default=None)
                 if votes is not None:
-                    panachage[target][source] = votes if counted else 0
+                    panachage[target][source] = votes
 
     except ValueError as e:
         errors.append(e.args[0])
@@ -299,7 +298,7 @@ def import_election_internal_proporz(
             line, line_errors, election_id
         )
         parse_panachage_results(
-            line, line_errors, panachage, panachage_headers, counted
+            line, line_errors, panachage, panachage_headers
         )
 
         # Skip expats if not enabled
