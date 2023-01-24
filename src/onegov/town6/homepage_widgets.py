@@ -382,7 +382,7 @@ class ContactsAndAlbumsWidget:
                         text=_("People"),
                         url=request.class_link(PersonCollection),
                         subtitle=_("All contacts"),
-                        classes=('h5',)
+                        classes=('list-link list-title',)
                     )
                 ]
             )

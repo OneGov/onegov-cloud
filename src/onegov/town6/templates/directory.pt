@@ -17,28 +17,43 @@
         </div>
 
         <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
+        <br>
 
         <div class="grid-x grid-padding-x reverse-on-mobile">
-            <div class="cell medium-8">
+            <div class="cell medium-8 large-7">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 
-                <ul class="more-list directory-list ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
-                    <li tal:repeat="entry entries">
-                        <div class="thumbnail" tal:condition="show_thumbnails">
-                            <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
-                                <img data-src="${thumbnail}" class="lazyload" data-no-alt align="top" alt="" />
-                            </tal:b>
-                        </div>
+                <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="entries">
+                    <li class="small-12 ${'medium-6' if overview_two_columns else ''} cell" tal:repeat="entry entries">
+                        <div class="${'card' if overview_two_columns else 'grid-x grid-padding-x'}">
+                            <div class="${'' if overview_two_columns else 'small-3 cell'}" tal:condition="show_thumbnails" >
+                                <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
+                                    <a tal:attributes="href request.link(entry)">
+                                        <div tal:condition="overview_two_columns" class="card-image" style="width: 100%; padding-bottom: 55%; background-image: url(${thumbnail}); background-size: cover;"></div>
+                                        <img tal:condition="not overview_two_columns" data-src="${thumbnail}" class="lazyload" data-no-alt align="top" alt="" />
+                                    </a>
+                                </tal:b>
+                            </div>
 
-                        <div>
-                            <a class="" tal:attributes="href request.link(entry)">${entry.title}</a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
+                            <div class="
+                                ${'card-section' if overview_two_columns else 'cell'}
+                                ${'small-9 cell' if show_thumbnails and not overview_two_columns else ''}
+                            ">
+                                <a class="list-link" tal:attributes="href request.link(entry)">
+                                    <span class="list-title h5 entry-number">${entries.index(entry)+1}. </span><span class="list-title h5">${entry.title}</span>
+                                </a>
+                                <metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
-                            <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
-                                <div class="list-lead">
-                                    <tal:b condition="custom_lead" replace="structure custom_lead" />
-                                    <tal:b condition="not:custom_lead" replace="entry.lead" />
-                                </div>
-                            </tal:b>
+                                <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                                    <a tal:attributes="href request.link(entry)">
+                                        <p class="list-lead preview">
+                                            <tal:b condition="custom_lead" replace="structure custom_lead" />
+                                            <tal:b condition="not:custom_lead" replace="entry.lead" />
+                                        </p>
+                                    </a>
+                                    <a tal:condition="overview_two_columns" class="read-more-link" tal:attributes="href request.link(entry)" i18n:translate="">More</a>
+                                </tal:b>
+                            </div>
                         </div>
                     </li>
                 </ul>
@@ -50,7 +65,7 @@
 
             </div>
 
-            <div class="cell medium-4 sidebar">
+            <div class="cell medium-4 large-offset-1 sidebar">
                 <div class="grid-x" tal:condition="searchwidget">
                     <div class="cell medium-12">
                         <tal:b replace="structure searchwidget.html(layout)" />

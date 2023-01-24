@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-12-21 08:33+0100\n"
+"POT-Creation-Date: 2023-01-23 15:13+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -346,6 +346,9 @@ msgstr "Visualizza"
 
 msgid "Lead-Format"
 msgstr "Formato principale"
+
+msgid "Overview layout with tiles"
+msgstr "Panoramica con le piastrelle"
 
 msgid "Main view"
 msgstr "Vista principale"
@@ -5058,18 +5061,20 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-msgid "Will be published until:"
-msgstr "Sarà pubblicato fino a:"
+#~ msgid "New domain"
+#~ msgstr "Vecchio dominio"
 
-msgid "Published until ${endDate1}"
-msgstr "Pubblicato fino a: ${endDate1}"
+#~ msgid "Will be published until:"
+#~ msgstr "Sarà pubblicato fino a:"
 
-msgid "Published from ${publishDate} until ${endDate}"
-msgstr "Pubblicato dal {publishDate} al ${endDate}"
+#~ msgid "Published until ${endDate1}"
+#~ msgstr "Pubblicato fino a: ${endDate1}"
 
-msgid "Publication end date:"
-msgstr "Data di fine pubblicazione:"
+#~ msgid "Published from ${publishDate} until ${endDate}"
+#~ msgstr "Pubblicato dal {publishDate} al ${endDate}"
 
+#~ msgid "Publication end date:"
+#~ msgstr "Data di fine pubblicazione:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Riquadro della mappa (predefinito)"

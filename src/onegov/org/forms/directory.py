@@ -135,6 +135,11 @@ class DirectoryBaseForm(Form):
             'data-fields-include': 'fileinput'
         })
 
+    overview_two_columns = BooleanField(
+        label=_("Overview layout with tiles"),
+        fieldset=_("Display"),
+        default=False)
+
     address_block_title_type = RadioField(
         label=_("Address Block Title"),
         fieldset=_("Address Block"),

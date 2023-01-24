@@ -210,7 +210,7 @@ def test_news_overview_detail(client):
     news_list = client.get('/news')
     news_detail = news_list.click('Foo')
 
-    more_news = news_detail.pyquery(".more-news a")
+    more_news = news_detail.pyquery(".more-list a span")
     more_news = ' '.join([a.text for a in more_news])
 
     assert "/image.png" in news_detail

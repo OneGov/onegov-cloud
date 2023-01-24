@@ -22,8 +22,8 @@
             <div class="columns medium-8">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 
-                <ul class="with-lead ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
-                    <li tal:repeat="entry entries">
+                <ul class="directory-list with-lead ${show_thumbnails and 'with-thumbnails' or ''}  ${'row' if overview_two_columns else ''}" tal:condition="entries">
+                    <li tal:repeat="entry entries" class="small-12 ${'medium-6' if overview_two_columns else ''} columns">
                         <div class="thumbnail" tal:condition="show_thumbnails">
                             <tal:b define="thumbnail thumbnail_link(entry)" condition="thumbnail">
                                 <img data-src="${thumbnail}" class="lazyload" data-no-alt align="top" alt="" />

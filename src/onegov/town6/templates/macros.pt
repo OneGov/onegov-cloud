@@ -490,7 +490,7 @@
                     <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
                 </div>
             </a>
-            <a href="${url}" class="news-more-link" i18n:translate="">read more</a>
+            <a href="${url}" class="read-more-link" i18n:translate="">read more</a>
         </div>
     </div>
 </metal:newslist>
@@ -625,8 +625,12 @@
             <h3 i18n:translate>People</h3>
             <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                 <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                    <a class="h5 person-link" href="${request.link(person)}">${person.title}</a>
-                    <div>${person.context_specific_function}</div>
+                    <a class="list-link" href="${request.link(person)}">
+                        <span class="list-title">${person.title}</span>
+                    </a>
+                    <a href="${request.link(person)}">
+                        <p class="list-lead preview">${person.context_specific_function}</p>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -634,14 +638,18 @@
         
         <div class="more-news side-panel" tal:condition="siblings|False">
             <h3 i18n:translate="">More news</h3>
-            <div tal:repeat="sibling siblings" class="card">
-                <a href="${request.link(sibling)}">
-                    ${sibling.title}
-                </a>
-                <p class="list-lead">
-                    ${layout.format_date(sibling.published_or_created, 'date_long')}
-                </p>
-            </div>
+            <ul class="more-list">
+                <li tal:repeat="sibling siblings">
+                    <a href="${request.link(sibling)}" class="list-link">
+                        <span class="list-title">${sibling.title}</span>
+                    </a>
+                    <a href="${request.link(sibling)}">
+                        <p class="list-lead preview">
+                            ${layout.format_date(sibling.published_or_created, 'date_long')}
+                        </p>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </metal:page_content>
@@ -1501,10 +1509,14 @@
 
 
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town6">
-    <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <tal:b condition="result.lead">
-        ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-    </tal:b>
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <a tal:condition="result.lead" href="${request.link(result)}">
+        <p class="list-lead preview">
+            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+        </p>
+    </a>
 </metal:search_result_default>
 
 
@@ -1771,16 +1783,18 @@
                 <tal:b tal:repeat="record grouped[group]">
                     <li tal:condition="record != find_your_spot">
                     <tal:b tal:define="link edit_link(record)|nothing">
-                        <a class="list-title" tal:attributes="href link_func(record); target link">
-                                ${record.title}
+                        <a class="list-link" tal:attributes="href link_func(record); target link">
+                                <span class="h5 list-title">${record.title}</span>
                                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                         </a>
-                        <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                            tal:content="structure lead" tal:condition="lead">
-                        </div>
-                        <div class="list-hint hints" tal:define="hint hint(record)|False"
-                            tal:content="structure hint" tal:condition="hint">
-                        </div>
+                        <a tal:attributes="href link_func(record); target link">
+                            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                                tal:content="structure lead" tal:condition="lead">
+                            </p>
+                            <div class="list-hint hints" tal:define="hint hint(record)|False"
+                                tal:content="structure hint" tal:condition="hint">
+                            </div>
+                        </a>
                         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
                     </tal:b>
                     </li>

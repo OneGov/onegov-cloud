@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-12-21 08:33+0100\n"
+"POT-Creation-Date: 2023-01-23 15:13+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -344,6 +344,9 @@ msgstr "Anzeige"
 
 msgid "Lead-Format"
 msgstr "Lead-Format"
+
+msgid "Overview layout with tiles"
+msgstr "Übersicht mit Kacheln"
 
 msgid "Main view"
 msgstr "Hauptansicht"
@@ -5045,17 +5048,17 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-msgid "Will be published until:"
-msgstr "Wird publiziert bis:"
+#~ msgid "Will be published until:"
+#~ msgstr "Wird publiziert bis:"
 
-msgid "Published until ${endDate1}"
-msgstr "Publiziert bis ${endDate1}"
+#~ msgid "Published until ${endDate1}"
+#~ msgstr "Publiziert bis ${endDate1}"
 
-msgid "Published from ${publishDate} until ${endDate}"
-msgstr "Publiziert von ${publishDate} bis ${endDate}"
+#~ msgid "Published from ${publishDate} until ${endDate}"
+#~ msgstr "Publiziert von ${publishDate} bis ${endDate}"
 
-msgid "Publication end date:"
-msgstr "Enddatum der Publikation:"
+#~ msgid "Publication end date:"
+#~ msgstr "Enddatum der Publikation:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (Standard)"

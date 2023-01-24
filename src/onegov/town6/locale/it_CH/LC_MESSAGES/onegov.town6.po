@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-01-04 13:27+0100\n"
+"POT-Creation-Date: 2023-01-17 14:32+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -503,6 +503,9 @@ msgstr "Nessuna cartella ancora definita."
 
 msgid "No entries found."
 msgstr "Non è stato trovato nessun risultato."
+
+msgid "More"
+msgstr "Più"
 
 msgid "Further Information"
 msgstr "Ulteriori informazioni"

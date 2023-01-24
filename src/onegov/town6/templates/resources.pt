@@ -14,9 +14,9 @@
             <div class="cell small-12 medium-4 medium-offset-1 sidebar">
                 <div class="side-panel">
                     <h3 i18n:translate="">Categories</h3>
-                    <ul>
+                    <ul class="more-list">
                         <li tal:repeat="resource resources">
-                            <a href="#${resource}">${resource}</a>
+                            <a class="list-link list-title" href="#${resource}">${resource}</a>
                         </li>
                     </ul>
                 </div>
