@@ -160,10 +160,8 @@ def test_election_summarized_properties(session):
     )
 
     assert election.eligible_voters == 0
-    assert election.counted_eligible_voters == 0
     assert election.expats == 0
     assert election.received_ballots == 0
-    assert election.counted_received_ballots == 0
     assert election.accounted_ballots == 0
     assert election.blank_ballots == 0
     assert election.invalid_ballots == 0
@@ -172,10 +170,8 @@ def test_election_summarized_properties(session):
 
     # OGC-533
     # assert session.query(Election.eligible_voters).scalar() == 0
-    # assert session.query(Election.counted_eligible_voters).scalar() == 0
     # assert session.query(Election.expats).scalar() == 0
     # assert session.query(Election.received_ballots).scalar() == 0
-    # assert session.query(Election.counted_received_ballots).scalar() == 0
     # assert session.query(Election.accounted_ballots).scalar() == 0
     # assert session.query(Election.blank_ballots).scalar() == 0
     # assert session.query(Election.invalid_ballots).scalar() == 0
@@ -202,10 +198,8 @@ def test_election_summarized_properties(session):
     session.flush()
 
     assert election.eligible_voters == 600
-    assert election.counted_eligible_voters == 600
     assert election.expats == 60
     assert election.received_ballots == 480
-    assert election.counted_received_ballots == 480
     assert election.accounted_ballots == 438
     assert election.blank_ballots == 24
     assert election.invalid_ballots == 18
@@ -213,37 +207,13 @@ def test_election_summarized_properties(session):
     assert election.turnout == 80.0
 
     assert session.query(Election.eligible_voters).scalar() == 600
-    assert session.query(Election.counted_eligible_voters).scalar() == 600
     assert session.query(Election.expats).scalar() == 60
     assert session.query(Election.received_ballots).scalar() == 480
-    assert session.query(Election.counted_received_ballots).scalar() == 480
     assert session.query(Election.accounted_ballots).scalar() == 438
     assert session.query(Election.blank_ballots).scalar() == 24
     assert session.query(Election.invalid_ballots).scalar() == 18
     assert session.query(Election.accounted_votes).scalar() == 858
     # assert session.query(Election.turnout).scalar() == 80.0  OGC-533
-
-    # Test turnout calculation
-    x = 5
-    election.results.append(
-        ElectionResult(
-            name='name',
-            entity_id=x,
-            counted=False,
-            eligible_voters=100 * x,
-            received_ballots=80 * x,
-            blank_ballots=4 * x,
-            invalid_ballots=3 * x,
-            blank_votes=2 * x,
-            invalid_votes=x
-        )
-    )
-    session.flush()
-    assert election.eligible_voters != election.counted_eligible_voters
-
-    # turnout should not change due to a new incomplete result
-    assert election.turnout == 80.0
-    # assert session.query(Election.turnout).scalar() == 80.0 OGC-533
 
 
 def test_election_derived_properties(session):
