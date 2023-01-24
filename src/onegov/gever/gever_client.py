@@ -114,8 +114,6 @@ class GeverClientCAS:
         }
         last_char = endpoint[-1]
         endpoint += "@tus-upload" if last_char == "/" else "/@tus-upload"
-        assert endpoint == "https://apitest.onegovgever.ch/ordnungssystem" \
-                           "/umwelt/dossier-1811/@tus-upload"
 
         resp = self.request(
             "POST", endpoint, headers=headers

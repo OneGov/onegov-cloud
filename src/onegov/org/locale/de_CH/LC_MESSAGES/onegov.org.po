@@ -5086,11 +5086,14 @@ msgstr "Beim Hochladen auf Gever ist ein Fehler aufgetreten."
 msgid "Upload to Gever"
 msgstr "Hochladen auf Gever"
 
-msgid "Password for the associated Gever account."
-msgstr "Passwort für das zugehörige Gever-Konto."
+msgid "Password for the associated Gever account"
+msgstr "Passwort für das zugehörige Gever-Konto"
 
-msgid "Username for the associated Gever account."
-msgstr "Benutzername für das zugehörige Gever-Konto."
+msgid "Username for the associated Gever account"
+msgstr "Benutzername für das zugehörige Gever-Konto"
 
 msgid "Gever API Endpoint where the documents are uploaded."
 msgstr "Gever API-Endpunkt, wo die Dokumente hochgeladen werden."
+
+msgid "Website address including https://"
+msgstr "Webseiten-Adresse inklusive https://"

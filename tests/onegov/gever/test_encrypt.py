@@ -1,17 +1,25 @@
 import base64
-
+import hashlib
 from cryptography.fernet import Fernet
+from onegov.gever.encrypt import encrypt_symmetric
 
 
-def test_encrypt_decrypt():
-    text_to_encrypt = "the-secret".encode('utf-8')
-    rnd = "QGqJPLetYMnULqtDlFmAzvpBf0NMGJWQESoafwUs6OsDWt8AKNxmmasMCsibcnG6"
-    key = rnd[32:]
-    key_as_bytes = key.encode("utf-8")  # create bytes
-    key_as_bytes_base_64 = base64.b64encode(key_as_bytes)
+def test_encryption_decryption_cycle():
 
-    f = Fernet(key_as_bytes_base_64)
-    encrypted_text = f.encrypt(text_to_encrypt)
-    decrypted = f.decrypt(encrypted_text)
+    # Fernet key must be 32 url-safe base64-encoded bytes
+    too_long_key = \
+        b"QLetYMnULqtDlFmAzvpBf0NMGJWQESoafwUs6OsDWt8AKNxmmasMCsibcnG6"
 
-    assert decrypted == text_to_encrypt
+    hash_object = hashlib.sha256()
+    hash_object.update(too_long_key)
+    short_key = hash_object.digest()
+
+    assert len(short_key) == 32
+
+    key_base64 = base64.b64encode(short_key)
+    text_to_encrypt = "the_secret"
+    encrypted_text = encrypt_symmetric(text_to_encrypt, key_base64)
+    f = Fernet(key_base64)
+
+    decrypted = f.decrypt(encrypted_text).decode('utf-8')
+    assert decrypted == "the_secret"

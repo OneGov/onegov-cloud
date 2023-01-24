@@ -12,7 +12,8 @@ from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
-from onegov.form.parser.core import PasswordField
+from wtforms.fields import PasswordField
+from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -1021,31 +1022,40 @@ class LinkHealthCheckForm(Form):
 
 
 class GeverSettingsForm(Form):
+
     gever_username = StringField(
-        "Username Gever Account",
+        _("Username"),
         [InputRequired()],
-        description="Username for the associated " "Gever account",
+        description=_("Username for the associated Gever account"),
     )
 
     gever_password = PasswordField(
-        "Password Gever Account",
+        _("Password"),
         [InputRequired()],
-        description="Password for the associated Gever account",
+        description=_("Password for the associated Gever account"),
     )
 
     gever_endpoint = URLField(
-        "Gever API Endpoint where the documents are " "uploaded",
+        _("Gever API Endpoint where the documents are uploaded."),
         [InputRequired()],
-        description="For Example: https://example.org/eingangskorb_fa",
+        description=_("Website address including https://"),
     )
 
     def populate_obj(self, model):
-        super().populate_obj(model)  # model refers to the Organization
-        model.gever_username = self.gever_username.data or ""
-        model.gever_password = self.gever_password.data or ""
+        super().populate_obj(model)
+        key_base64 = self.request.app.hashed_identity_key
+        try:
+            encrypted = encrypt_symmetric(self.gever_password.data, key_base64)
+            encrypted = encrypted.decode("utf-8")
+            model.gever_username = self.gever_username.data or ""
+            model.gever_password = encrypted or ""
+        except Exception:
+            model.gever_username = ""
+            model.gever_password = ""
 
     def process_obj(self, model):
         super().process_obj(model)
+
         self.gever_username.data = model.gever_username or ""
         self.gever_password.data = model.gever_password or ""
 

@@ -9,6 +9,7 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
+from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import InternalTicketChatMessageForm
@@ -733,18 +734,22 @@ def view_ticket_status(self, request, form, layout=None):
 def view_send_to_gever(self, request):
     query = request.session.query(Organisation)
     org: Organisation = query.first()
+    username = org.gever_username
+    password = org.gever_password
+    endpoint = org.gever_endpoint
 
-    if not (org.gever_username and org.gever_password):
+    if not (username and password):
         request.alert("Could not find valid credentials. You can set them in "
                       "Gever API Settings.")
         return morepath.redirect(request.link(self))
-
-    endpoint = org.gever_endpoint
 
     if not endpoint:
         request.alert("The Gever API Endpoint has not been found. The url has "
                       "to be set in Settings -> Gever API")
         return morepath.redirect(request.link(self))
+
+    key = request.app.hashed_identity_key
+    password_dec = decrypt_symmetric(password.encode('utf-8'), key)
 
     pdf = TicketPdf.from_ticket(request, self)
     filename = '{}_{}.pdf'.format(
@@ -753,8 +758,7 @@ def view_send_to_gever(self, request):
     )
 
     base_url = "{0.scheme}://{0.netloc}/".format(urlsplit(endpoint))
-    client = GeverClientCAS(org.gever_username, org.gever_password,
-                            service_url=base_url)
+    client = GeverClientCAS(username, password_dec, service_url=base_url)
     try:
         resp = client.upload_file(pdf.read(), filename, endpoint)
     except ValueError:
@@ -770,7 +774,6 @@ def view_send_to_gever(self, request):
         request.alert(msg)
         return morepath.redirect(request.link(self))
 
-    # if we land here, there was a successful upload.
     TicketMessage.create(
         self,
         request,
