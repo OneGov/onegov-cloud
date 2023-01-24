@@ -2062,6 +2062,8 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
 
         if self.directory.numbering == 'standard':
             self.custom_body_attributes['data-default-marker-icon'] = 'numbers'
+        elif self.directory.numbering == 'custom':
+            self.custom_body_attributes['data-default-marker-icon'] = 'custom'
 
     @property
     def step_position(self):

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-01-23 15:13+0100\n"
+"POT-Creation-Date: 2023-01-24 09:39+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -346,8 +346,20 @@ msgstr "Afficher"
 msgid "Lead-Format"
 msgstr "Format Principal"
 
-msgid "Overview layout with tiles"
-msgstr "Vue d'ensemble avec les tuiles"
+msgid "Numbering"
+msgstr "Numérotation"
+
+msgid "None"
+msgstr "Aucune"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Custom"
+msgstr "Personnalisé"
+
+msgid "Custom Numbering"
+msgstr "Numérotation personnalisée"
 
 msgid "Main view"
 msgstr "Affichage principal"
@@ -367,6 +379,9 @@ msgstr "Vignette"
 msgid "Pictures to be displayed as thumbnails on an entry"
 msgstr "Images à afficher sous forme de vignettes sur une entrée"
 
+msgid "Overview layout with tiles"
+msgstr "Vue d'ensemble avec les tuiles"
+
 msgid "Address Block Title"
 msgstr "Titre du bloc d'adresses"
 
@@ -379,26 +394,17 @@ msgstr "La première ligne de l'adresse"
 msgid "Static title"
 msgstr "Titre statique"
 
-msgid "Marker Type"
-msgstr "Type de marqueur"
-
-msgid "Marker"
-msgstr "Marqueur"
-
 msgid "Icon"
 msgstr "Icône"
 
-msgid "Numbers"
-msgstr ""
+msgid "Marker"
+msgstr "Marqueur"
 
 msgid "Marker Color"
 msgstr "Couleur du marqueur"
 
 msgid "Default"
 msgstr "Défaut"
-
-msgid "Custom"
-msgstr "Personnalisé"
 
 msgid "Color"
 msgstr "Couleur"
@@ -488,6 +494,9 @@ msgstr "Les champs suivants sont inconnus : ${fields}"
 
 msgid "Please select at most one thumbnail field"
 msgstr "Veuillez sélectionner un champ de vignette au maximum"
+
+msgid "Please select exactly one numbering field"
+msgstr "Veuillez sélectionner exactement un champ de numérotation"
 
 #, python-format
 msgid ""
@@ -976,8 +985,8 @@ msgstr "Prénom"
 msgid "Last name"
 msgstr "Nom de famille"
 
-msgid "Functions:"
-msgstr "Fonctions:"
+msgid "Function"
+msgstr ""
 
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
@@ -3839,9 +3848,6 @@ msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
 msgid "local"
 msgstr "local"
 
-msgid "None"
-msgstr "Aucune"
-
 msgid "No links found."
 msgstr "Aucun lien trouvé."
 
@@ -5066,6 +5072,12 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Marker Type"
+#~ msgstr "Type de marqueur"
+
+#~ msgid "Functions:"
+#~ msgstr "Fonctions:"
 
 #~ msgid "Will be published until:"
 #~ msgstr "Sera publié jusqu'au:"

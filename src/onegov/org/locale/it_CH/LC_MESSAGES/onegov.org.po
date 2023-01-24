@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-01-23 15:13+0100\n"
+"POT-Creation-Date: 2023-01-24 09:39+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -347,8 +347,20 @@ msgstr "Visualizza"
 msgid "Lead-Format"
 msgstr "Formato principale"
 
-msgid "Overview layout with tiles"
-msgstr "Panoramica con le piastrelle"
+msgid "Numbering"
+msgstr "Numerazione"
+
+msgid "None"
+msgstr "Nessuno"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Custom"
+msgstr "Personalizzato"
+
+msgid "Custom Numbering"
+msgstr "Numerazione personalizzata"
 
 msgid "Main view"
 msgstr "Vista principale"
@@ -368,6 +380,9 @@ msgstr "Anteprima immagine"
 msgid "Pictures to be displayed as thumbnails on an entry"
 msgstr "Immagini da visualizzare come anteprima su un elemento"
 
+msgid "Overview layout with tiles"
+msgstr "Panoramica con le piastrelle"
+
 msgid "Address Block Title"
 msgstr "Titolo blocco indirizzi"
 
@@ -380,26 +395,17 @@ msgstr "La prima riga dell'indirizzo"
 msgid "Static title"
 msgstr "Titolo statico"
 
-msgid "Marker Type"
-msgstr "Tipo di indicatore"
-
-msgid "Marker"
-msgstr "Indicatore"
-
 msgid "Icon"
 msgstr "Icona"
 
-msgid "Numbers"
-msgstr ""
+msgid "Marker"
+msgstr "Indicatore"
 
 msgid "Marker Color"
 msgstr "Colore indicatore"
 
 msgid "Default"
 msgstr "Predefinito"
-
-msgid "Custom"
-msgstr "Personalizzato"
 
 msgid "Color"
 msgstr "Colore"
@@ -489,6 +495,9 @@ msgstr "I seguenti campi sono sconosciuti: ${fields}"
 
 msgid "Please select at most one thumbnail field"
 msgstr "Seleziona al massimo un campo anteprima"
+
+msgid "Please select exactly one numbering field"
+msgstr "Selezionare esattamente un campo di numerazione"
 
 #, python-format
 msgid ""
@@ -955,7 +964,9 @@ msgid "Recipient"
 msgstr "Destinatario"
 
 msgid "Will be used as image in the page overview on the parent page"
-msgstr "Verrà utilizzato come immagine nella panoramica della pagina sulla pagina padre"
+msgstr ""
+"Verrà utilizzato come immagine nella panoramica della pagina sulla pagina "
+"padre"
 
 msgid "Describes what this page is about"
 msgstr "Descrive il contenuto di questa pagina"
@@ -978,8 +989,8 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Functions:"
-msgstr "Funzioni:"
+msgid "Function"
+msgstr "Funzione"
 
 msgid "Direct Phone Number"
 msgstr "Numero di telefono diretto"
@@ -3832,9 +3843,6 @@ msgstr ""
 msgid "local"
 msgstr "locale"
 
-msgid "None"
-msgstr "Nessuno"
-
 msgid "No links found."
 msgstr "Nessun collegamento trovato."
 
@@ -5060,6 +5068,12 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Marker Type"
+#~ msgstr "Tipo di indicatore"
+
+#~ msgid "Functions:"
+#~ msgstr "Funzioni:"
 
 #~ msgid "New domain"
 #~ msgstr "Vecchio dominio"

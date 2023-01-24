@@ -276,10 +276,12 @@ def keyword_count(request, collection):
 def view_directory(self, request, layout=None):
 
     entries = request.exclude_invisible(self.query())
-    for e in entries:
+    for i, e in enumerate(entries):
         if self.directory.numbering == 'custom':
             e.number = e.content['values'].get(
-                as_internal_id(self.directory.numbers))
+                as_internal_id(self.directory.numbers)) or 'x'
+        elif self.directory.numbering == 'standard':
+            e.number = i + 1
         else:
             e.number = None
     keyword_counts = keyword_count(request, self)

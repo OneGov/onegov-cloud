@@ -4,16 +4,24 @@
 var vectorMarkerSVGTemplate = '<svg width="28" height="37" viewBox="0 0 28 37" xmlns="http://www.w3.org/2000/svg" version="1.1"><path transform="translate(2 2)" text-anchor="middle" fill="{{marker-color}}" fill-rule="nonzero" stroke="{{border-color}}" stroke-width="3" d="M12,0 C5.37136723,0 0,5.37130729 0,11.9998721 C0,14.6408328 0.85563905,17.0808246 2.30116496,19.0628596 L12,31.5826752 L21.698835,19.0628596 C23.1443609,17.0808246 24,14.6408328 24,11.9998721 C24,5.37130729 18.6286328,0 12,0 L12,0 Z"></path><text x="50%" y="50%" fill="{{icon-color}}" font-family="{{font_family}}" font-weight="{{font_weight}}" font-size="14" text-anchor="middle" alignment-baseline="center">{{icon}}</text></svg>';
 
 var entry_counter = 0
+var entry_numbers = Array.from(document.getElementsByClassName("entry-number"));
+console.log(entry_numbers);
+entry_numbers = entry_numbers.map(function (entry) {
+    return entry.textContent.replace('. ','')
+});
+console.log(entry_numbers);
 
 function VectorMarkerSVG(markerColor, borderColor, iconColor, icon) {
+    font_family = 'inherit'
     if (icon === 'numbers') {
-        entry_counter += 1
-        font_family = 'inherit'
-        icon = entry_counter
+        icon = entry_counter + 1
+    } else if (icon == 'custom') {
+        icon = entry_numbers[entry_counter]
     } else {
         icon = '&#x' + (icon || 'f111').replace('\\', '');
         font_family = fa_version === 5 && "'Font Awesome 5 Free'" || 'FontAwesome'
     }
+    entry_counter += 1
     return vectorMarkerSVGTemplate
         .replace('{{marker-color}}', markerColor)
         .replace('{{border-color}}', borderColor)

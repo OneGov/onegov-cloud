@@ -60,17 +60,9 @@
 }
 
 .directory-list {
-    .entry-number {
-        display: none;
-    }
-
     .learn-more {
         display: block;
-        width: 100%;
         text-align: center;
+        width: 100%;
     }
-}
-
-body[data-default-marker-icon="numbers"] .entry-number {
-    display: inherit;
 }

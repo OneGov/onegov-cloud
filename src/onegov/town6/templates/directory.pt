@@ -40,7 +40,7 @@
                                 ${'small-9 cell' if show_thumbnails and not overview_two_columns else ''}
                             ">
                                 <a class="list-link" tal:attributes="href request.link(entry)">
-                                    <span tal:condition="entry.number" class="list-title h5">${entry.number}. </span><span class="list-title h5">${entry.title}</span>
+                                    <span tal:condition="entry.number" class="h5 entry-number">${entry.number}. </span><span class="list-title h5">${entry.title}</span>
                                 </a>
                                 <metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
