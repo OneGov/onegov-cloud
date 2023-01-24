@@ -281,29 +281,18 @@ def get_parties_panachage_data(item, request=None):
         for r in party_results
         if r.name in item.colors
     }
-    intra_party_votes = dict(set((r.party_id, r.votes) for r in party_results))
 
     # Create the links
     links = []
     for result in results:
         if result.source == result.target:
             continue
-        if result.target in intra_party_votes:
-            intra_party_votes[result.target] -= result.votes
         links.append({
             'source': left_node(result.source),
             'target': right_node(result.target),
             'value': result.votes,
             'color': colors.get(result.source),
             'active': active.get(result.source, False)
-        })
-    for party, votes in intra_party_votes.items():
-        links.append({
-            'source': left_node(party),
-            'target': right_node(party),
-            'value': votes,
-            'color': colors.get(party),
-            'active': active.get(party, False)
         })
 
     # Create the nodes

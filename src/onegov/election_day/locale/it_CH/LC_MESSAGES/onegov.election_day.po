@@ -1237,16 +1237,13 @@ msgstr "Anno"
 msgid "Difference"
 msgstr "Differenza"
 
-#. Default: The diagram shows the origin of the votes. The bars on the left
-#. correspond to the unchanged votes (including the blank list), the bars on
-#. the right side to the final results. The width of the bars and connections
-#. is proportional to the votes.
+#. Default: The diagram shows the origin of votes won and lost by panache. On
+#. the left side are the lost votes, on the right side the won votes. The width
+#. of the bars and the connections is proportional to the number of votes.
 #.
 msgid "figcaption_panachage"
 msgstr ""
-"Il diagramma mostra l'origine dei voti. Le barre sulla sinistra "
-"corrispondono ai voti invariati (inclusi quelli della lista bianca), le "
-"barre sulla parte destra ai risultati finali. L'ampiezza delle barre e delle "
+"Il diagramma mostra l'origine dei voti. L'ampiezza delle barre e delle "
 "connessioni è proporzionale ai voti."
 
 msgid "Count"
