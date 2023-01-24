@@ -43,7 +43,6 @@
             float: none;
 
             button {
-                border-radius: .7rem;
                 margin-bottom: 15px;
                 margin-left: 0;
             }
@@ -194,6 +193,20 @@
             background: $charcoal;
             color: $white;
             opacity: 1;
+        }
+    }
+
+    .fc-state-default {
+        border-radius: 0;
+
+        &.fc-corner-left {
+            border-bottom-left-radius: .7rem;
+            border-top-left-radius: .7rem;
+        }
+
+        &.fc-corner-right {
+            border-bottom-right-radius: .7rem;
+            border-top-right-radius: .7rem;
         }
     }
 }

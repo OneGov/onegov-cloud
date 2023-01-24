@@ -362,6 +362,9 @@ msgstr "Personalizzato"
 msgid "Custom Numbering"
 msgstr "Numerazione personalizzata"
 
+msgid "Overview layout with tiles"
+msgstr "Panoramica con le piastrelle"
+
 msgid "Main view"
 msgstr "Vista principale"
 
