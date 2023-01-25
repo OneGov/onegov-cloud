@@ -5144,3 +5144,6 @@ msgstr "Cela va télécharger ce ticket vers l'instance Gever, si elle est confi
 
 msgid "Upload Ticket"
 msgstr "Télécharger le ticket"
+
+msgid "Link must start with 'https'"
+msgstr "Le lien doit commencer par 'https'"

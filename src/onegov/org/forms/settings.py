@@ -1021,6 +1021,11 @@ class LinkHealthCheckForm(Form):
     )
 
 
+def validate_https(form, field):
+    if not field.data.startswith('https'):
+        raise ValidationError(_("Link must start with 'https'"))
+
+
 class GeverSettingsForm(Form):
 
     gever_username = StringField(
@@ -1037,7 +1042,7 @@ class GeverSettingsForm(Form):
 
     gever_endpoint = URLField(
         _("Gever API Endpoint where the documents are uploaded."),
-        [InputRequired()],
+        [InputRequired(), validate_https],
         description=_("Website address including https://"),
     )
 

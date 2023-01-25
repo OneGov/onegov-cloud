@@ -5126,3 +5126,6 @@ msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
 
 msgid "Upload Ticket"
 msgstr "Caricare il biglietto"
+
+msgid "Link must start with 'https'"
+msgstr "Il link deve iniziare con 'https'"

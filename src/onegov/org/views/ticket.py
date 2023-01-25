@@ -761,7 +761,7 @@ def view_send_to_gever(self, request):
     client = GeverClientCAS(username, password_dec, service_url=base_url)
     try:
         resp = client.upload_file(pdf.read(), filename, endpoint)
-    except ValueError:
+    except (KeyError, ValueError):
         msg = _("Encountered an error while uploading to Gever.")
         request.alert(msg)
         return morepath.redirect(request.link(self))

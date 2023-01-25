@@ -5106,3 +5106,6 @@ msgstr "Dadurch wird dieses Ticket auf die Gever-Instanz hochgeladen, sofern kon
 
 msgid "Upload Ticket"
 msgstr "Ticket hochladen"
+
+msgid "Link must start with 'https'"
+msgstr "Link muss mit 'https' beginnen"
