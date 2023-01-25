@@ -179,7 +179,7 @@
                                                             <div class="input-group">
                                                                 <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
                                                                 <div class="input-group-button">
-                                                                    <button type="submit" class="search-button" i18n:translate="">
+                                                                    <button type="submit" class="search-button button" i18n:translate="">
                                                                         Perform Search
                                                                     </button>
                                                                 </div>
