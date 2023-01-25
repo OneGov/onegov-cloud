@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-01-23 15:13+0100\n"
+"POT-Creation-Date: 2023-01-24 09:39+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -345,6 +345,21 @@ msgstr "Anzeige"
 msgid "Lead-Format"
 msgstr "Lead-Format"
 
+msgid "Numbering"
+msgstr "Nummerierung"
+
+msgid "None"
+msgstr "Keine"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Custom"
+msgstr "Eigene"
+
+msgid "Custom Numbering"
+msgstr "Eigene Nummerierung"
+
 msgid "Overview layout with tiles"
 msgstr "Übersicht mit Kacheln"
 
@@ -366,6 +381,9 @@ msgstr "Thumbnail"
 msgid "Pictures to be displayed as thumbnails on an entry"
 msgstr "Bilder für Darstellung als Thumbnail auf dem Eintrag"
 
+msgid "Overview layout with tiles"
+msgstr "Übersicht mit Kacheln"
+
 msgid "Address Block Title"
 msgstr "Addressblock Titel"
 
@@ -378,26 +396,17 @@ msgstr "Die erste Zeile der Adresse"
 msgid "Static title"
 msgstr "Fixer Titel"
 
-msgid "Marker Type"
-msgstr "Marker-Typ"
-
-msgid "Marker"
-msgstr "Marker"
-
 msgid "Icon"
 msgstr "Symbol"
 
-msgid "Numbers"
-msgstr "Zahlen"
+msgid "Marker"
+msgstr "Marker"
 
 msgid "Marker Color"
 msgstr "Marker Farbe"
 
 msgid "Default"
 msgstr "Standard"
-
-msgid "Custom"
-msgstr "Eigene"
 
 msgid "Color"
 msgstr "Farbe"
@@ -487,6 +496,9 @@ msgstr "Die folgenden Felder sind unbekannt: ${fields}"
 
 msgid "Please select at most one thumbnail field"
 msgstr "Bitte wählen Sie höchstens ein Thumbnail Feld"
+
+msgid "Please select exactly one numbering field"
+msgstr "Bitte wählen Sie genau ein Feld für die Nummerierung aus"
 
 #, python-format
 msgid ""
@@ -952,7 +964,8 @@ msgid "Recipient"
 msgstr "Empfänger"
 
 msgid "Will be used as image in the page overview on the parent page"
-msgstr "Wird als Bild in der Seitenübersicht auf der übergeordneten Seite verwendet."
+msgstr ""
+"Wird als Bild in der Seitenübersicht auf der übergeordneten Seite verwendet."
 
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
@@ -975,8 +988,8 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Functions:"
-msgstr "Funktionen:"
+msgid "Function"
+msgstr "Funktion"
 
 msgid "Direct Phone Number"
 msgstr "Direktnummer"
@@ -3826,9 +3839,6 @@ msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
 msgid "local"
 msgstr "lokal"
 
-msgid "None"
-msgstr "Keine"
-
 msgid "No links found."
 msgstr "Keine Verknüpfungen gefunden."
 
@@ -5047,6 +5057,15 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Marker Type"
+#~ msgstr "Marker-Typ"
+
+#~ msgid "Numbers"
+#~ msgstr "Zahlen"
+
+#~ msgid "Functions:"
+#~ msgstr "Funktionen:"
 
 #~ msgid "Will be published until:"
 #~ msgstr "Wird publiziert bis:"

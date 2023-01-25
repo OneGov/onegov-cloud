@@ -745,3 +745,48 @@ def test_add_directory_entries_with_duplicate_names(client):
         pytest.fail(
             "DuplicateEntryError not handled upon inserting duplicate "
             "entries in /directories")
+
+
+def test_directory_numbering(client):
+    client.login_admin()
+
+    page = client.get('/directories').click('Verzeichnis')
+    page.form['title'] = "Trainers"
+    page.form['structure'] = """
+        Name *= ___
+        Number = 0..10
+    """
+    page.form['title_format'] = '[Name]'
+    page.form['numbering'] = 'none'
+    page.form.submit()
+
+    page = client.get('/directories/trainers').click("^Eintrag$")
+    page.form['name'] = 'Emily Larlham'
+    page.form['number'] = 4
+    page.form.submit()
+
+    page = client.get('/directories/trainers').click("^Eintrag$")
+    page.form['name'] = 'Zak George'
+    page.form['number'] = 5
+    page.form.submit()
+
+    page = client.get('/directories/trainers')
+    numbers = page.pyquery('.entry-number')
+    assert numbers == []
+
+    page = page.click("Konfigurieren")
+    page.form['numbering'] = 'standard'
+    page.form.submit()
+
+    page = client.get('/directories/trainers')
+    numbers = page.pyquery('.entry-number')
+    assert [t.text for t in numbers] == ['1. ', '2. ']
+
+    page = page.click("Konfigurieren")
+    page.form['numbering'] = 'custom'
+    page.form['numbers'] = 'number'
+    page.form.submit()
+
+    page = client.get('/directories/trainers')
+    numbers = page.pyquery('.entry-number')
+    assert [t.text for t in numbers] == ['4. ', '5. ']
