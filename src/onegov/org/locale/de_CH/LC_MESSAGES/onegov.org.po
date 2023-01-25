@@ -5097,3 +5097,12 @@ msgstr "Gever API-Endpunkt, wo die Dokumente hochgeladen werden."
 
 msgid "Website address including https://"
 msgstr "Webseiten-Adresse inklusive https://"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Wollen Sie dieses Ticket wirklich hochladen?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr "Dadurch wird dieses Ticket auf die Gever-Instanz hochgeladen, sofern konfiguriert."
+
+msgid "Upload Ticket"
+msgstr "Ticket hochladen"

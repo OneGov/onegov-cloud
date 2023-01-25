@@ -5117,3 +5117,12 @@ msgstr "Endpoint API di Gever dove vengono caricati i documenti."
 
 msgid "Website address including https://"
 msgstr "Indirizzo del sito web incluso https://"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Vuole davvero caricare questo biglietto?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
+
+msgid "Upload Ticket"
+msgstr "Caricare il biglietto"
