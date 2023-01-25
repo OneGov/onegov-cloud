@@ -1,8 +1,52 @@
 # Changes
 
+## 2023.5
+
+`2023-01-25` | [550401978d...636481c58a](https://github.com/OneGov/onegov-cloud/compare/550401978d^...636481c58a)
+
+### Feriennet
+
+##### Increase amount of activities shown per page
+
+`Feature` | [PRO-1013](https://linear.app/projuventute/issue/PRO-1013) | [3be762ea96](https://github.com/onegov/onegov-cloud/commit/3be762ea96da4680a8c169a111cd74a90d9ad1c6)
+
+##### Replace sponsor images
+
+`Feature` | [PRO-1138](https://linear.app/projuventute/issue/PRO-1138) | [636481c58a](https://github.com/onegov/onegov-cloud/commit/636481c58a002569f1940eb8902ecde956af6440)
+
+##### Fix order of occasions in volunteer overview
+
+`Bugfix` | [OGC-1044](https://linear.app/onegovcloud/issue/OGC-1044) | [f2c282d806](https://github.com/onegov/onegov-cloud/commit/f2c282d8061c9a3dbcd06f915467132fd78b1a8f)
+
+### Org
+
+##### Multiple options for numbering on directories
+
+`Feature` | [OGC-901](https://linear.app/onegovcloud/issue/OGC-901) | [eae9a7af91](https://github.com/onegov/onegov-cloud/commit/eae9a7af9151f34644f169866c92057bdc7074fa)
+
+### Town6
+
+##### Redesign all lists
+
+More unity among all lists.
+
+`Feature` | [ce2a235252](https://github.com/onegov/onegov-cloud/commit/ce2a23525250b3ec906a37d9c95f7f8ff29ab52e)
+
+##### Open all files in new tab if set to true
+
+`Bugfix` | [OGC-864](https://linear.app/onegovcloud/issue/OGC-864) | [550401978d](https://github.com/onegov/onegov-cloud/commit/550401978d46257bb6ebe08ec45056a494fb7a79)
+
+##### Calendar Buttons
+
+`Bugfix` | [OGC-876](https://linear.app/onegovcloud/issue/OGC-876) | [e899c42614](https://github.com/onegov/onegov-cloud/commit/e899c4261439905848b00f1cc8ec129cf4ce1054)
+
+##### Search-Button mobile
+
+`Bugfix` | [OGC-842](https://linear.app/onegovcloud/issue/OGC-842) | [251d95fca7](https://github.com/onegov/onegov-cloud/commit/251d95fca7a2e4d56ca791d1803db61482429aa3)
+
 ## 2023.4
 
-`2023-01-21` | [f5e079cd91...73c44510bd](https://github.com/OneGov/onegov-cloud/compare/f5e079cd91^...73c44510bd)
+`2023-01-21` | [f5e079cd91...c270610705](https://github.com/OneGov/onegov-cloud/compare/f5e079cd91^...c270610705)
 
 ### Election Day
 
@@ -2670,52 +2714,4 @@ Bills may be paid with the displayed information.
 ##### Fixes hidden form fields not being hidden.
 
 `Bugfix` | [ec15c054bb](https://github.com/onegov/onegov-cloud/commit/ec15c054bb03ff0b802d863349c7ab4a6fb1f987)
-
-## 2022.12
-
-`2022-02-08` | [32c4931bf0...e7bcf7d0af](https://github.com/OneGov/onegov-cloud/compare/32c4931bf0^...e7bcf7d0af)
-
-### Agency
-
-##### Show membership function in membership instead of person function.
-
-`Bugfix` | [OGC-288](https://linear.app/onegovcloud/issue/OGC-288) | [a22c0e1a7b](https://github.com/onegov/onegov-cloud/commit/a22c0e1a7b40b77592ffe548c07b6a197b1dfc68)
-
-### Ferien
-
-##### Add checkbox to confirm that the notification is not spam.
-
-`Feature` | [PRO-995](https://linear.app/projuventute/issue/PRO-995) | [0328795335](https://github.com/onegov/onegov-cloud/commit/0328795335684e89298ee065ca1ee55d9856bbe6)
-
-### Feriennet
-
-##### Exchange sponsor banners
-
-`Other` | [OGC-989](https://linear.app/onegovcloud/issue/OGC-989) | [a401fa7bfd](https://github.com/onegov/onegov-cloud/commit/a401fa7bfdb875db813b10081699bc031b7c3e2d)
-
-##### Update Italian translations.
-
-`Other` | [PRO-983](https://linear.app/projuventute/issue/PRO-983) | [607cae50d5](https://github.com/onegov/onegov-cloud/commit/607cae50d5dbf1542e3f958d1b1cd813ca5150bb)
-
-### Fsi
-
-##### Send mails in batches.
-
-`Feature` | [OGC-289](https://linear.app/onegovcloud/issue/OGC-289) | [2baa95326a](https://github.com/onegov/onegov-cloud/commit/2baa95326a84d62c424b3f0113164da016ca2458)
-
-### Org
-
-##### Fixes hidden contact in directory-entries.
-
-`Bugfix` | [OGC-297](https://linear.app/onegovcloud/issue/OGC-297) | [32c4931bf0](https://github.com/onegov/onegov-cloud/commit/32c4931bf08e68bc519e8d5986e29d444cb23918)
-
-##### Change email-adress in top-bar to account
-
-`Other` | [PRO-926](https://linear.app/projuventute/issue/PRO-926) | [c422144454](https://github.com/onegov/onegov-cloud/commit/c422144454c532a628ecb8ec23db1f94d6157267)
-
-### Server
-
-##### Make join of debug server more tolerant.
-
-`Bugfix` | [834757a243](https://github.com/onegov/onegov-cloud/commit/834757a243f319d8cf06ad07b5ab89c5514b5835)
 
