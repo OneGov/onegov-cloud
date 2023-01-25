@@ -12,7 +12,7 @@
                 <tal:b repeat="activity_group grouped(records, 'activity_id')">
                     <h2><a href="${activity_link(activity_group[0].activity_name)}">${activity_group[0].activity_title}</a></h2>
 
-                    <tal:b repeat="occasion_group grouped(activity_group, 'occasion_id')">
+                    <tal:b repeat="occasion_group sorted(grouped(activity_group, 'occasion_id'), key=lambda x:x[0].occasion_number)">
                         <h3 id="${occasion_group[0].occasion_id.hex}">
                             ${occasion_group[0].occasion_number}.
                             <tal:b i18n:translate>Occasion</tal:b>
