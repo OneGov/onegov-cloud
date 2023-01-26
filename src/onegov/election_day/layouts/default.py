@@ -163,3 +163,10 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def archive_download(self):
         return self.request.link(self.principal, name="archive-download")
+
+    @property
+    def last_archive_modification(self):
+        filestorage_info = self.request.app.filestorage.getinfo(
+            "archive/zip/archive.zip", namespaces="details"
+        )
+        return filestorage_info.modified

@@ -844,8 +844,8 @@ msgstr "% NA"
 msgid "Archive Search"
 msgstr "Tschertga en l'archiv"
 
-msgid "Download the entire archive"
-msgstr "Chargiar giu l'entir archiv"
+msgid "Download the entire archive (Status: ${date})"
+msgstr "Chargiar giu l'entir archiv (Stadi: ${date})"
 
 msgid "Search in ${title}"
 msgstr "­Tschertgar en ${title}"
