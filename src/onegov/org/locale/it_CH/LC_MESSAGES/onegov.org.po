@@ -5072,26 +5072,20 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
+msgid "Publication end date:"
+msgstr "Data di fine pubblicazione:"
+
+msgid "Functions:"
+msgstr "Funzioni:"
+
+msgid "Will be published until:"
+msgstr "Sarà pubblicato fino a:"
+
 #~ msgid "Marker Type"
 #~ msgstr "Tipo di indicatore"
 
-#~ msgid "Functions:"
-#~ msgstr "Funzioni:"
-
 #~ msgid "New domain"
 #~ msgstr "Vecchio dominio"
-
-#~ msgid "Will be published until:"
-#~ msgstr "Sarà pubblicato fino a:"
-
-#~ msgid "Published until ${endDate1}"
-#~ msgstr "Pubblicato fino a: ${endDate1}"
-
-#~ msgid "Published from ${publishDate} until ${endDate}"
-#~ msgstr "Pubblicato dal {publishDate} al ${endDate}"
-
-#~ msgid "Publication end date:"
-#~ msgstr "Data di fine pubblicazione:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Riquadro della mappa (predefinito)"
