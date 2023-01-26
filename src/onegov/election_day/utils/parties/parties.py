@@ -132,11 +132,11 @@ def get_party_results_horizontal_data(item):
     results = []
     if years:
         year = years[-1]
-        party_ids = {
-            values.get(year, {}).get(attribute, {}).get('total', 0): party_id
+        party_ids = [
+            (values.get(year, {}).get(attribute, {}).get('total', 0), party_id)
             for party_id, values in parties.items()
-        }
-        party_ids = [party_ids[key] for key in sorted(party_ids)]
+        ]
+        party_ids = [item[1] for item in sorted(party_ids)]
         for party_id in reversed(party_ids):
             for year in reversed(years):
                 active = year == years[-1]
