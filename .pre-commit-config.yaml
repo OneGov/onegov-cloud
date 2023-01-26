@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: check-merge-conflict
+      - id: check-ast
+      - id: debug-statements
+  - repo: https://github.com/seantis/pre-commit-hooks
+    rev: v1.0.1
+    hooks:
+      - id: nocheckin
+        exclude: .pre-commit-config.yaml
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        files: '^src/.*\.py'
+  - repo: https://github.com/elidupuis/mirrors-sass-lint
+    rev: '5cc45653263b423398e4af2561fae362903dd45d'
+    hooks:
+    - id: sass-lint
+      files: '^src/.*\.scss'

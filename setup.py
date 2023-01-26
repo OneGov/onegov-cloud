@@ -172,7 +172,8 @@ setup(
             'lingua==3.12',
             'gitpython==3.0.9',
             'honyaku@git+https://github.com/seantis/honyaku#egg=honyaku',
-            'flake8'
+            'flake8',
+            'pre-commit'
         ],
         'docs': [
             'docutils',

@@ -5,6 +5,9 @@ install: in_virtual_env
 	# install requirements
 	pip install -e '.[test,dev,docs]' --upgrade-strategy=eager
 
+	# enable pre-commit
+	pre-commit install
+
 	# ensure required folder structure
 	mkdir -p ./profiles
 
@@ -19,6 +22,9 @@ update: in_virtual_env
 
 	# force update the latest honyaku release
 	pip install git+https://github.com/seantis/honyaku#egg=honyaku --force
+
+	# update the pre-commit hooks
+	pre-commit autoupdate
 
 	# apply install step to avoid deviations
 	make install
