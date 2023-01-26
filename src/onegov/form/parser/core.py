@@ -924,7 +924,7 @@ def parse_field_block(field_block, field_classes,
 
 
 def format_pricing(pricing):
-    if not pricing or not pricing[0]:
+    if not pricing:
         return ''
 
     return ' ({:.2f} {})'.format(pricing[0], pricing[1])
