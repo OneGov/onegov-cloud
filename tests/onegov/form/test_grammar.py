@@ -239,6 +239,7 @@ def test_prices():
     assert not f.checked
     assert f.pricing.amount == Decimal('100.00')
     assert f.pricing.currency == 'CHF'
+    assert not f.pricing.credit_card_payment
 
     f = field.parseString("(x) Luxurious Choice (200 CHF)")
     assert f.type == 'radio'
@@ -246,6 +247,15 @@ def test_prices():
     assert f.checked
     assert f.pricing.amount == Decimal('200.00')
     assert f.pricing.currency == 'CHF'
+    assert not f.pricing.credit_card_payment
+
+    f = field.parseString("(x) Mail delivery (5 CHF!)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.pricing.amount == Decimal('5.00')
+    assert f.pricing.currency == 'CHF'
+    assert f.pricing.credit_card_payment
 
     field = checkbox()
 
@@ -255,6 +265,7 @@ def test_prices():
     assert f.checked
     assert f.pricing.amount == Decimal('150.50')
     assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
 
     f = field.parseString("[ ] Priority Boarding (15.00 USD)")
     assert f.type == 'checkbox'
@@ -262,6 +273,7 @@ def test_prices():
     assert not f.checked
     assert f.pricing.amount == Decimal('15.00')
     assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
 
     f = field.parseString("[ ] Discount (-5.00 USD)")
     assert f.type == 'checkbox'
@@ -269,6 +281,15 @@ def test_prices():
     assert not f.checked
     assert f.pricing.amount == Decimal('-5.00')
     assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
+
+    f = field.parseString("[x] Mail delivery (5 CHF!)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.pricing.amount == Decimal('5.00')
+    assert f.pricing.currency == 'CHF'
+    assert f.pricing.credit_card_payment
 
 
 def test_non_prices():

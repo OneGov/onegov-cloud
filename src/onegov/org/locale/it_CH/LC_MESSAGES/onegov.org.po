@@ -5092,3 +5092,56 @@ msgstr "Sarà pubblicato fino a:"
 
 #~ msgid "Homepage Image #1"
 #~ msgstr "Immagine n. 1 della pagina principale"
+
+msgid "Could not find valid credentials. You can set them in Gever API Settings."
+msgstr "Impossibile trovare credenziali valide. "
+"È possibile impostarle nelle Impostazioni API di Gever"
+
+
+msgid "The Gever API Endpoint has not been found. The url has to "
+"be set in Settings -> Gever API"
+msgstr "L'endpoint API di Gever non è stato trovato. "
+"L'url deve essere impostato in Impostazioni -> API di Gever."
+
+
+msgid "Successfully uploaded the PDF of this ticket to Gever"
+msgstr "Il PDF di questo biglietto è stato caricato con successo su Gever."
+
+msgid "Encountered an error while uploading to Gever."
+"Response status code is ${status}."
+msgstr "Si è verificato un errore durante il caricamento su Gever."
+"Il codice di stato della risposta è ${status}."
+
+
+msgid "Encountered an error while uploading to Gever."
+msgstr "Si è verificato un errore durante il caricamento su Gever."
+
+msgid "Ticket uploaded to Gever."
+msgstr "Biglietto caricato su Gever."
+
+msgid "Upload to Gever"
+msgstr "Caricare a Gever"
+
+msgid "Password for the associated Gever account"
+msgstr "Password per l'account Gever associato"
+
+msgid "Username for the associated Gever account"
+msgstr "Nome utente per l'account Gever associato"
+
+msgid "Gever API Endpoint where the documents are uploaded."
+msgstr "Endpoint API di Gever dove vengono caricati i documenti."
+
+msgid "Website address including https://"
+msgstr "Indirizzo del sito web incluso https://"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Vuole davvero caricare questo biglietto?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
+
+msgid "Upload Ticket"
+msgstr "Caricare il biglietto"
+
+msgid "Link must start with 'https'"
+msgstr "Il link deve iniziare con 'https'"

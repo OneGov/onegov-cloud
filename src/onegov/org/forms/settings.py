@@ -12,6 +12,8 @@ from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from wtforms.fields import PasswordField
+from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -1017,6 +1019,50 @@ class LinkHealthCheckForm(Form):
         ),
         default='external'
     )
+
+
+def validate_https(form, field):
+    if not field.data.startswith('https'):
+        raise ValidationError(_("Link must start with 'https'"))
+
+
+class GeverSettingsForm(Form):
+
+    gever_username = StringField(
+        _("Username"),
+        [InputRequired()],
+        description=_("Username for the associated Gever account"),
+    )
+
+    gever_password = PasswordField(
+        _("Password"),
+        [InputRequired()],
+        description=_("Password for the associated Gever account"),
+    )
+
+    gever_endpoint = URLField(
+        _("Gever API Endpoint where the documents are uploaded."),
+        [InputRequired(), validate_https],
+        description=_("Website address including https://"),
+    )
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        key_base64 = self.request.app.hashed_identity_key
+        try:
+            encrypted = encrypt_symmetric(self.gever_password.data, key_base64)
+            encrypted = encrypted.decode("utf-8")
+            model.gever_username = self.gever_username.data or ""
+            model.gever_password = encrypted or ""
+        except Exception:
+            model.gever_username = ""
+            model.gever_password = ""
+
+    def process_obj(self, model):
+        super().process_obj(model)
+
+        self.gever_username.data = model.gever_username or ""
+        self.gever_password.data = model.gever_password or ""
 
 
 class EventSettingsForm(Form):

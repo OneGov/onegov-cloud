@@ -331,8 +331,16 @@ form can be modeled::
         [x] Second IP Address (20 CHF)
         [x] Backup (20 CHF)
 
+    Delivery =
+        (x) Pickup (0 CHF)
+        ( ) Delivery (5 CHF!)
+
 The additional pricing metadata can be used to provide simple order forms.
 As in any other form, dependencies are taken into account.
+
+The optional `!` at the end of the price indicates that credit card payment
+will become mandatory if this option is selected. It is possible to achieve
+this without a price increase too: (0 CHF!)
 
 """
 
@@ -346,7 +354,6 @@ from decimal import Decimal
 from onegov.core.cache import lru_cache
 from onegov.core.utils import Bunch
 from onegov.form import errors
-from onegov.form.errors import MixedTypeError
 from onegov.form.parser.grammar import checkbox, field_help_identifier
 from onegov.form.parser.grammar import code
 from onegov.form.parser.grammar import date
@@ -886,7 +893,7 @@ def parse_field_block(field_block, field_classes,
         assert types <= {'radio', 'checkbox'}
 
         if not len(types) == 1:
-            raise MixedTypeError(key)
+            raise errors.MixedTypeError(key)
 
     result = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)

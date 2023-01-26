@@ -4,7 +4,7 @@ from wtforms.fields import StringField, BooleanField, IntegerField
 from onegov.core.security import Secret
 from onegov.form import Form, merge_forms, move_fields
 from onegov.org import _
-from onegov.town6.forms.settings import GeneralSettingsForm, \
+from onegov.town6.forms.settings import GeneralSettingsForm,\
     ChatSettingsForm
 
 from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
@@ -12,7 +12,7 @@ from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
     MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
     OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm, \
     LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm, \
-    EventSettingsForm
+    EventSettingsForm, GeverSettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -30,7 +30,6 @@ from onegov.town6.layout import SettingsLayout, DefaultLayout
 
 
 def get_custom_settings_form(model, request, homepage_settings_form=None):
-
     class CustomFieldsForm(Form):
         online_counter_label = StringField(
             fieldset=_("Online Counter"),
@@ -107,7 +106,6 @@ def get_custom_settings_form(model, request, homepage_settings_form=None):
 
 
 def custom_footer_settings_form(model, request):
-
     class ExtendedFooterSettings(Form):
         always_show_partners = BooleanField(
             label=_('Show partners on all pages'),
@@ -138,7 +136,6 @@ def town_handle_general_settings(self, request, form):
               permission=Secret, form=get_custom_settings_form,
               setting=_("Homepage"), icon='fa-home', order=-995)
 def custom_handle_settings(self, request, form):
-
     form.delete_field('homepage_cover')
 
     return handle_homepage_settings(
@@ -178,6 +175,14 @@ def town_handle_links_settings(self, request, form):
 def handle_chat_settings(self, request, form):
     return handle_generic_settings(
         self, request, form, _("Chat"), SettingsLayout(self, request))
+
+
+@TownApp.form(model=Organisation, name='gever-credentials', template='form.pt',
+              permission=Secret, form=GeverSettingsForm,
+              setting="Gever API", icon='fa-key', order=400)
+def town_handle_gever_settings(self, request, form):
+    return handle_generic_settings(self, request, form, "Gever API",
+                                   SettingsLayout(self, request))
 
 
 @TownApp.form(
