@@ -232,6 +232,29 @@ def test_add_custom_form(client):
     form_page.form.submit().follow()
 
 
+def test_add_custom_form_payment_metod_validation_error(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF!)
+    """)
+    form_page = form_page.form.submit()
+    # here it will fail because it's mixing required cc with required
+    # manual payments
+    assert "'Delivery' enthält einen Preis der eine Kredit" in form_page.text
+
+    # now it will fail because there is no payment processor
+    form_page.form['payment_method'] = 'free'
+    form_page = form_page.form.submit()
+    assert "benötigen Sie einen Standard-Zahlungsanbieter" in form_page
+
+
 def test_add_duplicate_form(client):
     client.login_editor()
 
@@ -383,6 +406,42 @@ def test_manual_form_payment(client):
     assert "info@example.org" in payments
     assert "35.00" in payments
     assert "Offen" in payments
+
+
+def test_form_payment_required(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
+        E-Mail *= @@@
+
+        Posters *=
+            [ ] Local Businesses (0 CHF)
+            [ ] Executive Committee (10 CHF)
+            [ ] Town Square (20 CHF)
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF!)
+    """), type='custom', payment_method='free')
+
+    transaction.commit()
+
+    page = client.get('/form/govikon-poster')
+    assert '10.00 CHF' in page
+    assert '20.00 CHF' in page
+    assert '5.00 CHF' in page
+
+    page.form['e_mail'] = 'info@example.org'
+    page.select_checkbox('posters', "Executive Committee")
+    page.select_checkbox('posters', "Town Square")
+    page.form['delivery'] = 'Delivery'
+
+    page = page.form.submit().follow()
+    assert "Totalbetrag" in page
+    assert "35.00 CHF" in page
+    # even though the payment method is 'free', because we selected
+    # an option that requires cc payment, it should only allow cc
+    # payment
+    assert "Später bezahlen" not in page
 
 
 def test_dependent_number_form(client):

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2023-01-26 13:51+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -138,6 +138,15 @@ msgstr "'{label}' est un nom réservé. Veuillez utiliser un nom différent."
 msgid "Define at least one required field"
 msgstr "Définissez au moins un champs requis"
 
+#, python-format
+msgid ""
+"The field '{label}' contains a price that requires a credit card payment. "
+"This is only allowed if credit card payments are optional."
+msgstr ""
+"Le champ '{label}' contient un prix qui exige un paiement par carte de "
+"crédit. Ceci n'est autorisé que si les paiements par carte de crédit sont "
+"facultatifs."
+
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
 
@@ -158,6 +167,9 @@ msgstr "Supprimer le fichier"
 
 msgid "Replace file"
 msgstr "Remplacer le fichier"
+
+msgid "Text modules"
+msgstr "Modules de texte"
 
 msgid "Select an Option"
 msgstr "Sélectionnez une option"

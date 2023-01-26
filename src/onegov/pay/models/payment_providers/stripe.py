@@ -217,7 +217,12 @@ class StripeConnect(PaymentProvider):
             new_price = self.fee_policy.compensate(price.amount)
             new_fee = self.fee_policy.from_amount(new_price)
 
-            return Price(new_price, price.currency, new_fee)
+            return Price(
+                new_price,
+                price.currency,
+                new_fee,
+                price.credit_card_payment
+            )
 
         return price
 

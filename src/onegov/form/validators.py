@@ -123,14 +123,20 @@ class ValidFormDefinition:
     duplicate = _("The field '{label}' exists more than once.")
     reserved = _("'{label}' is a reserved name. Please use a different name.")
     required = _("Define at least one required field")
+    payment_method = _(
+        "The field '{label}' contains a price that requires a credit card "
+        "payment. This is only allowed if credit card payments are optional."
+    )
 
     def __init__(self,
                  require_email_field=True,
                  reserved_fields=None,
-                 require_title_fields=False):
+                 require_title_fields=False,
+                 validate_payment_method=True):
         self.require_email_field = require_email_field
         self.reserved_fields = reserved_fields or set()
         self.require_title_fields = require_title_fields
+        self.validate_payment_method = validate_payment_method
 
     def __call__(self, form, field):
         if field.data:
@@ -138,7 +144,7 @@ class ValidFormDefinition:
             from onegov.form import parse_form
 
             try:
-                form = parse_form(field.data)()
+                parsed_form = parse_form(field.data)()
             except InvalidFormSyntax as e:
                 field.render_kw = field.render_kw or {}
                 field.render_kw['data-highlight-line'] = e.line
@@ -155,14 +161,14 @@ class ValidFormDefinition:
                 raise ValidationError(field.gettext(self.message))
             else:
                 if self.require_email_field:
-                    if not form.has_required_email_field:
+                    if not parsed_form.has_required_email_field:
                         raise ValidationError(field.gettext(self.email))
 
-                if self.require_title_fields and not form.title_fields:
+                if self.require_title_fields and not parsed_form.title_fields:
                     raise ValidationError(field.gettext(self.required))
 
                 if self.reserved_fields:
-                    for formfield_id, formfield in form._fields.items():
+                    for formfield_id, formfield in parsed_form._fields.items():
                         if formfield_id in self.reserved_fields:
 
                             raise ValidationError(
@@ -170,6 +176,28 @@ class ValidFormDefinition:
                                     label=formfield.label.text
                                 )
                             )
+
+                if self.validate_payment_method and 'payment_method' in form:
+                    for __, formfield in parsed_form._fields.items():
+                        if not hasattr(formfield, 'pricing'):
+                            continue
+
+                        if not formfield.pricing.has_payment_rule:
+                            continue
+
+                        # NOTE: If we end up allowing 'manual' in addition to
+                        #       'free' we should also check if the application
+                        #       has a payment_provider set.
+                        if form.payment_method.data != 'free':
+                            # add the error message to both affected fields
+                            error = field.gettext(self.payment_method).format(
+                                label=formfield.label.text
+                            )
+                            # sometimes this will be a tuple and not a list
+                            errors = list(form.payment_method.errors)
+                            errors.append(error)
+                            form.payment_method.errors = errors
+                            raise ValidationError(error)
 
 
 class StrictOptional(Optional):

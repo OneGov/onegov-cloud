@@ -1,11 +1,10 @@
-#
 # Italian translations for PACKAGE package
 # Traduzioni italiane per il pacchetto PACKAGE.
 # This file is distributed under the same license as the PACKAGE package.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2023-01-26 13:51+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -137,6 +136,15 @@ msgstr "'{label}' è un nome riservato. Per favore usa un nome diverso."
 msgid "Define at least one required field"
 msgstr "Definire almeno un campo obbligatorio"
 
+#, python-format
+msgid ""
+"The field '{label}' contains a price that requires a credit card payment. "
+"This is only allowed if credit card payments are optional."
+msgstr ""
+"Il campo '{label}' contiene un prezzo che richiede un pagamento con carta di"
+" credito. Ciò è consentito solo se i pagamenti con carta di credito sono "
+"facoltativi."
+
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 
@@ -157,6 +165,9 @@ msgstr "Cancellare il file"
 
 msgid "Replace file"
 msgstr "Sostituire il file"
+
+msgid "Text modules"
+msgstr "Moduli di testo"
 
 msgid "Select an Option"
 msgstr "Selezionare un'opzione"

@@ -635,7 +635,7 @@
             </ul>
         </div>
         <div id="after-panels" metal:define-slot="after-panels"></div>
-        
+
         <div class="more-news side-panel" tal:condition="siblings|False">
             <h3 i18n:translate="">More news</h3>
             <ul class="more-list">
@@ -1346,7 +1346,7 @@
             data-link-webm-low-res="${link_webm_low_res}"
         >
             Your browser does not support the video tag.
-        </video> 
+        </video>
         <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer"></div>
     </div>
 </metal:autoplay_video>
@@ -1559,7 +1559,7 @@
             </dd>
         </dl>
 
-        <tal:b condition="price" switch="payment_method">
+        <tal:b condition="price" switch="'cc' if price.credit_card_payment else payment_method">
             <tal:b case="'manual'">
                 <label style="display: none;">
                     <input type="radio" name="payment_method" value="manual" checked>
