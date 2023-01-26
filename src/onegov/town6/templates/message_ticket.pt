@@ -32,6 +32,9 @@
                 <tal:b case="'unarchive'" i18n:translate>
                     Ticket recovered from archive.
                 </tal:b>
+                <tal:b case="'uploaded'" i18n:translate>
+                    Ticket uploaded to Gever.
+                </tal:b>
             </tal:b>
         </metal:b>
     </metal:b>

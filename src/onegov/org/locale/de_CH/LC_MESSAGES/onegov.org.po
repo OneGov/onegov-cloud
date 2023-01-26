@@ -3442,6 +3442,9 @@ msgstr "Ticket archiviert."
 msgid "Ticket recovered from archive."
 msgstr "Ticket aus dem Archiv geholt."
 
+msgid "Ticket uploaded to Gever."
+msgstr "Ticket zu Gever hochgeladen."
+
 msgid ""
 "The newsletter is disabled. You can only see this page because you are "
 "logged in."
@@ -5081,3 +5084,50 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (Standard)"
+
+msgid "Could not find valid credentials. You can set them in Gever API Settings."
+msgstr "Es konnten keine gültigen Anmeldedaten gefunden werden."
+"Sie können sie in den Gever API-Einstellungen festlegen."
+
+msgid "The Gever API Endpoint has not been found. The url has to "
+"be set in Settings -> Gever API"
+msgstr "Der Gever API Endpunkt wurde nicht gefunden. "
+"Die Url kann unter Einstellungen -> Gever API eingestellt werden."
+
+msgid "Successfully uploaded the PDF of this ticket to Gever"
+msgstr "Das PDF dieses Tickets wurde erfolgreich hochgeladen zu Gever."
+
+msgid "Encountered an error while uploading to Gever."
+"Response status code is ${status}."
+msgstr "Beim Hochladen auf Gever ist ein Fehler aufgetreten."
+"Der Statuscode der Antwort lautet ${status}."
+
+msgid "Encountered an error while uploading to Gever."
+msgstr "Beim Hochladen auf Gever ist ein Fehler aufgetreten."
+
+msgid "Upload to Gever"
+msgstr "Hochladen auf Gever"
+
+msgid "Password for the associated Gever account"
+msgstr "Passwort für das zugehörige Gever-Konto"
+
+msgid "Username for the associated Gever account"
+msgstr "Benutzername für das zugehörige Gever-Konto"
+
+msgid "Gever API Endpoint where the documents are uploaded."
+msgstr "Gever API-Endpunkt, wo die Dokumente hochgeladen werden."
+
+msgid "Website address including https://"
+msgstr "Webseiten-Adresse inklusive https://"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Wollen Sie dieses Ticket wirklich hochladen?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr "Dadurch wird dieses Ticket auf die Gever-Instanz hochgeladen, sofern konfiguriert."
+
+msgid "Upload Ticket"
+msgstr "Ticket hochladen"
+
+msgid "Link must start with 'https'"
+msgstr "Link muss mit 'https' beginnen"

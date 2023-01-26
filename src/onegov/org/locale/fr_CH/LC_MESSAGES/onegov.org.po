@@ -5114,3 +5114,53 @@ msgstr "L'utilisateur a bien été créé"
 
 #~ msgid "Homepage Image #6"
 #~ msgstr "Image n°6 de page d'accueil"
+
+msgid "Could not find valid credentials. You can set them in Gever API Settings."
+msgstr "Impossible de trouver des informations d'identification valides. "
+"Vous pouvez les définir dans les paramètres de L'API Gever."
+
+msgid "The Gever API Endpoint has not been found. The url has to "
+"be set in Settings -> Gever API"
+msgstr "Le point de terminaison de l'API Gever n'a pas été trouvé."
+"L'url peut être définie dans Paramètres -> API Gever."
+
+msgid "Successfully uploaded the PDF of this ticket to Gever"
+msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
+
+msgid "Encountered an error while uploading to Gever."
+"Response status code is ${status}."
+msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
+"Le code d'état de la réponse est ${status}."
+
+msgid "Encountered an error while uploading to Gever."
+msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
+
+msgid "Ticket uploaded to Gever."
+msgstr "Ticket téléchargé à Gever."
+
+msgid "Upload to Gever"
+msgstr "Télécharger à Gever"
+
+msgid "Password for the associated Gever account"
+msgstr "Mot de passe pour le compte Gever associé"
+
+msgid "Username for the associated Gever account"
+msgstr "Nom d'utilisateur pour le compte Gever associé"
+
+msgid "Gever API Endpoint where the documents are uploaded."
+msgstr "Point de terminaison de l'API Gever où les documents sont téléchargés."
+
+msgid "Website address including https://"
+msgstr "Adresse du site internet avec https://"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Voulez-vous vraiment télécharger ce ticket ?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr "Cela va télécharger ce ticket vers l'instance Gever, si elle est configurée."
+
+msgid "Upload Ticket"
+msgstr "Télécharger le ticket"
+
+msgid "Link must start with 'https'"
+msgstr "Le lien doit commencer par 'https'"

@@ -25,6 +25,7 @@ setup(
         'onegov.foundation6',
         'onegov.fsi',
         'onegov.gazette',
+        'onegov.gever',
         'onegov.gis',
         'onegov.intranet',
         'onegov.newsletter',
