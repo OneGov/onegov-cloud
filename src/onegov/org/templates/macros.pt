@@ -1329,7 +1329,7 @@
             </dd>
         </dl>
 
-        <tal:b condition="price" switch="payment_method">
+        <tal:b condition="price" switch="'cc' if price.credit_card_payment else payment_method">
             <tal:b case="'manual'">
                 <label style="display: none;">
                     <input type="radio" name="payment_method" value="manual" checked>

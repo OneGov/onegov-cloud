@@ -203,7 +203,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """
 
         if price and price.amount > 0:
-            return process_payment(self.payment_method, price, provider, token)
+            if price.credit_card_payment is True:
+                payment_method = 'cc'
+            else:
+                payment_method = self.payment_method
+            return process_payment(payment_method, price, provider, token)
 
         return True
 

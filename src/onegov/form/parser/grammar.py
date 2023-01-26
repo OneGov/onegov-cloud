@@ -388,7 +388,13 @@ def marker_box(characters):
     """
 
     check = mark_enclosed_in(characters)('checked')
-    pricing = Group(enclosed_in(decimal() + currency(), '()'))('pricing')
+
+    cc_payment = Literal('!').setParseAction(matches('!'))
+    cc_payment = Optional(cc_payment, default=False)('credit_card_payment')
+
+    pricing = Group(
+        enclosed_in(decimal() + currency() + cc_payment, '()')
+    )('pricing')
 
     label_text = with_whitespace_inside(text_without(characters + '()'))
     label = MatchFirst((

@@ -347,14 +347,14 @@ def test_parse_radio_with_pricing():
     text = dedent("""
         Drink =
             ( ) Coffee (2.50 CHF)
-            (x) Tea (1.50 CHF)
+            (x) Tea (1.50 CHF!)
         << beer cant be cheaper than water >>
     """)
 
     form = parse_form(text)()
     assert form.drink.pricing.rules == {
-        'Coffee': Price(Decimal(2.5), 'CHF'),
-        'Tea': Price(Decimal(1.5), 'CHF')
+        'Coffee': Price(2.5, 'CHF'),
+        'Tea': Price(1.5, 'CHF', credit_card_payment=True)
     }
     assert form.drink.description == 'beer cant be cheaper than water'
 
@@ -363,17 +363,18 @@ def test_parse_checkbox_with_pricing():
 
     text = dedent("""
         Extras =
-            [ ] Bacon (2.50 CHF)
+            [ ] Bacon (2.50 CHF!)
             [x] Cheese (1.50 CHF)
     """)
 
     form = parse_form(text)()
     assert form.extras.pricing.rules == {
-        'Bacon': Price(Decimal(2.5), 'CHF'),
-        'Cheese': Price(Decimal(1.5), 'CHF')
+        'Bacon': Price(2.5, 'CHF', credit_card_payment=True),
+        'Cheese': Price(1.5, 'CHF')
     }
     assert form.extras.pricing.rules['Bacon'].amount == Decimal(2.5)
     assert form.extras.pricing.rules['Bacon'].currency == 'CHF'
+    assert form.extras.pricing.rules['Bacon'].credit_card_payment is True
 
 
 def test_dependent_validation():
