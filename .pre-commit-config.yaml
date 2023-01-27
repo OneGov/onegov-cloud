@@ -16,7 +16,7 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-        files: '^src/.*\.py'
+        files: '^(src|tests).*\.py'
   - repo: https://github.com/elidupuis/mirrors-sass-lint
     rev: '5cc45653263b423398e4af2561fae362903dd45d'
     hooks:
