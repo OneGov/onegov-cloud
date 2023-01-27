@@ -5076,23 +5076,17 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
+msgid "Publication end date:"
+msgstr "Date de fin de publication:"
+
+msgid "Functions:"
+msgstr "Fonctions:"
+
+msgid "Will be published until:"
+msgstr "Sera publié jusqu'au:"
+
 #~ msgid "Marker Type"
 #~ msgstr "Type de marqueur"
-
-#~ msgid "Functions:"
-#~ msgstr "Fonctions:"
-
-#~ msgid "Will be published until:"
-#~ msgstr "Sera publié jusqu'au:"
-
-#~ msgid "Published until ${endDate1}"
-#~ msgstr "Publié jusqu'au ${endDate1}"
-
-#~ msgid "Published from ${publishDate} until ${endDate}"
-#~ msgstr "Publié du {publishDate} jusqu'au ${endDate}"
-
-#~ msgid "Publication end date:"
-#~ msgstr "Date de fin de publication:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (défaut)"

@@ -5061,26 +5061,20 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
+msgid "Publication end date:"
+msgstr "Enddatum der Publikation:"
+
+msgid "Functions:"
+msgstr "Funktionen:"
+
+msgid "Will be published until:"
+msgstr "Wird publiziert bis:"
+
 #~ msgid "Marker Type"
 #~ msgstr "Marker-Typ"
 
 #~ msgid "Numbers"
 #~ msgstr "Zahlen"
-
-#~ msgid "Functions:"
-#~ msgstr "Funktionen:"
-
-#~ msgid "Will be published until:"
-#~ msgstr "Wird publiziert bis:"
-
-#~ msgid "Published until ${endDate1}"
-#~ msgstr "Publiziert bis ${endDate1}"
-
-#~ msgid "Published from ${publishDate} until ${endDate}"
-#~ msgstr "Publiziert von ${publishDate} bis ${endDate}"
-
-#~ msgid "Publication end date:"
-#~ msgstr "Enddatum der Publikation:"
 
 #~ msgid "Mapbox (Default)"
 #~ msgstr "Mapbox (Standard)"
