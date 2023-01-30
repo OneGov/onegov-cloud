@@ -227,7 +227,7 @@ msgid "Could not read the empty votes"
 msgstr "Impossibile leggere 'Schede bianche'"
 
 #, python-format
-msgid "Error in anzgdependent: ${msg}"
+msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
 msgid "Term"
