@@ -25,10 +25,11 @@ def get_party_results(item, json_serializable=False):
 
     # Get the results
     parties = {}
+    colors = item.historical_colors
     for result in results:
         party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
-        year['color'] = item.colors.get(result.name)
+        year['color'] = colors.get(result.name)
         year['mandates'] = result.number_of_mandates
         year['name'] = result.name
 
@@ -276,10 +277,11 @@ def get_parties_panachage_data(item, request=None):
         return parties.index(party) + len(parties)
 
     active = {r.party_id: r.number_of_mandates > 0 for r in party_results}
+    colors = item.historical_colors
     colors = {
-        r.party_id: item.colors[r.name]
+        r.party_id: colors[r.name]
         for r in party_results
-        if r.name in item.colors
+        if r.name in colors
     }
     intra_party_votes = dict(set((r.party_id, r.votes) for r in party_results))
 

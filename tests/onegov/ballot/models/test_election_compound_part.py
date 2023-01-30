@@ -4,6 +4,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundPart
+from onegov.ballot import ElectionCompoundRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import PartyResult
 from pytz import UTC
@@ -294,3 +295,126 @@ def test_election_compound_part_model(session):
     compound.clear_results()
     assert part.last_result_change is None
     assert part.party_results.first() is None
+
+
+def test_election_compound_part_historical_party_strengths(session):
+    first_compound = ElectionCompound(
+        title='First',
+        domain='canton',
+        date=date(2014, 1, 1),
+        colors={'a': 'x'}
+    )
+    second_compound = ElectionCompound(
+        title='Second',
+        domain='canton',
+        date=date(2018, 1, 1),
+        colors={'a': 'y', 'b': 'y'}
+    )
+    third_compound = ElectionCompound(
+        title='Third',
+        domain='canton',
+        date=date(2022, 1, 1),
+        colors={'b': 'z', 'c': 'z'}
+    )
+    session.add(first_compound)
+    session.add(second_compound)
+    session.add(third_compound)
+    session.flush()
+    first = ElectionCompoundPart(first_compound, 'superregion', '1')
+    second = ElectionCompoundPart(second_compound, 'superregion', '1')
+    third = ElectionCompoundPart(third_compound, 'superregion', '1')
+
+    assert first.historical_party_results.count() == 0
+    assert second.historical_party_results.count() == 0
+    assert third.historical_party_results.count() == 0
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
+
+    # add results
+    for (compound, year, party_id, domain, segment) in (
+        (first_compound, 2014, 1, 'superregion', '1'),
+        (first_compound, 2014, 2, 'superregion', '1'),
+        (first_compound, 2014, 3, 'superregion', '1'),
+        (first_compound, 2010, 1, 'superregion', '1'),
+        (first_compound, 2010, 2, 'superregion', '2'),
+        (first_compound, 2010, 3, 'canton', ''),
+        (second_compound, 2022, 2, 'superregion', '1'),
+        (second_compound, 2022, 3, 'superregion', '1'),
+        (second_compound, 2018, 2, 'superregion', '1'),
+        (second_compound, 2018, 3, 'superregion', '1'),
+        (second_compound, 2018, 4, 'superregion', '1'),
+        (second_compound, 2010, 2, 'superregion', '2'),
+        (second_compound, 2010, 3, 'canton', ''),
+        (third_compound, 2022, 1, 'superregion', '1'),
+        (third_compound, 2022, 3, 'superregion', '1'),
+        (third_compound, 2022, 5, 'superregion', '2'),
+        (third_compound, 2022, 5, 'canton', ''),
+    ):
+        compound.party_results.append(
+            PartyResult(
+                year=year,
+                number_of_mandates=0,
+                votes=1,
+                total_votes=100,
+                name_translations={'en_US': str(party_id)},
+                party_id=str(party_id),
+                domain=domain,
+                domain_segment=segment
+            )
+        )
+
+    # no relationships yet
+    assert first.historical_party_results.count() == 4
+    assert second.historical_party_results.count() == 5
+    assert third.historical_party_results.count() == 2
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
+
+    # add relationships
+    for (source_, target, type_) in (
+        (third_compound, second_compound, 'historical'),
+        (third_compound, first_compound, 'historical'),
+        (second_compound, first_compound, 'historical'),
+        (first_compound, second_compound, None),
+        (second_compound, third_compound, 'historical')
+    ):
+        session.add(
+            ElectionCompoundRelationship(
+                source_id=source_.id, target_id=target.id, type=type_
+            )
+        )
+
+    def extract(compound):
+        return sorted(
+            (result.election_compound_id, result.year, result.party_id)
+            for result in compound.historical_party_results
+        )
+
+    assert extract(first) == [
+        ('first', 2010, '1'),
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+    ]
+    assert extract(second) == [
+        ('first', 2014, '1'),
+        ('first', 2014, '2'),
+        ('first', 2014, '3'),
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('second', 2022, '2'),
+        ('second', 2022, '3'),
+    ]
+    assert extract(third) == [
+        ('second', 2018, '2'),
+        ('second', 2018, '3'),
+        ('second', 2018, '4'),
+        ('third', 2022, '1'),
+        ('third', 2022, '3'),
+    ]
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y', 'c': 'z'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z', 'a': 'y'}
