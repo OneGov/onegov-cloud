@@ -221,42 +221,42 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert get_list_groups_data(election_compound) == {
         'results': [
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#EE7F00',
                 'text': 'CVP',
                 'value': 931,
                 'value2': 22
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#019040',
                 'text': 'SVP',
                 'value': 899,
                 'value2': 19
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#0E52A0',
                 'text': 'FDP',
                 'value': 863,
                 'value2': 18
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#99C040',
                 'text': 'AL',
                 'value': 538,
                 'value2': 10
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#E53136',
                 'text': 'SP',
                 'value': 418,
                 'value2': 7
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#acc700',
                 'text': 'GLP',
                 'value': 236,

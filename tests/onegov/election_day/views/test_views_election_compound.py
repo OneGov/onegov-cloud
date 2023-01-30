@@ -497,21 +497,21 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     assert groups == {
         'results': [
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#efb52c',
                 'text': 'BDP',
                 'value': 603,
                 'value2': 1
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#ff6300',
                 'text': 'CVP',
                 'value': 491,
                 'value2': 1
             },
             {
-                'class': 'inactive',
+                'class': 'active',  # no mandates allocated yet
                 'color': None,
                 'text': 'FDP',
                 'value': 351,

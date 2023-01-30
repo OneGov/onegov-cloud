@@ -122,6 +122,7 @@ def get_party_results_horizontal_data(item):
 
     attribute = 'voters_count' if item.voters_counts else 'votes'
     years, parties = get_party_results(item)
+    allocated_mandates = item.allocated_mandates
 
     party_names = {}
     for party_id, party in parties.items():
@@ -159,7 +160,9 @@ def get_party_results_horizontal_data(item):
                     'value': value,
                     'value2': party.get('mandates'),
                     'class': (
-                        'active' if active and party.get('mandates')
+                        'active' if active and (
+                            party.get('mandates') or not allocated_mandates
+                        )
                         else 'inactive'
                     ),
                     'color': party.get('color'),
