@@ -52,7 +52,7 @@
                     </p>
 
                     <tal:b
-                        define="banner layout.app.banner(request, 'bookings')"
+                        define="banner layout.app.banner(request)"
                         condition="banner"
                         replace="structure banner"
                     />

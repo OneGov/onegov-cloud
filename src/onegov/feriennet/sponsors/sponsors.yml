@@ -32,24 +32,14 @@
   height: 48px
   top: -5px
   banners:
-    bookings:
-      src:
-        de: sponsors/concordia-banner-de.jpg
-        fr: sponsors/concordia-banner-fr.jpg
-        it: sponsors/concordia-banner-it.jpg
-      url:
-        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-de'
-        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-fr'
-        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-it'
-    invoices:
-      src:
-        de: sponsors/concordia-banner-de.jpg
-        fr: sponsors/concordia-banner-fr.jpg
-        it: sponsors/concordia-banner-it.jpg
-      url:
-        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-de'
-        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-fr'
-        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-it'
+    src:
+      de: sponsors/concordia-banner-de.jpg
+      fr: sponsors/concordia-banner-fr.jpg
+      it: sponsors/concordia-banner-it.jpg
+    url:
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-fr'
+      it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-it'
 
 - name:
     de: Viva Kids | Credit Suisse Schweiz
@@ -71,21 +61,11 @@
 
 - name: ProJuventute
   banners:
-    bookings:
-      src:
-        de: sponsors/projuventute-banner-kinogutschein.jpeg
-        fr:
-        it:
-      url:
-        de: 'https://shop.projuventute.ch/de/A~UBRV-0600/0~0~1/Kinogutschein?utm_source=Feriennet&utm_medium=Banner&utm_campaign=kino'
-        fr:
-        it:
-    invoices:
-      src:
-        de: sponsors/projuventute-banner-kinogutschein.jpeg
-        fr:
-        it:
-      url:
-        de: 'https://shop.projuventute.ch/de/A~UBRV-0600/0~0~1/Kinogutschein?utm_source=Feriennet&utm_medium=Banner&utm_campaign=kino'
-        fr:
-        it:
+    src:
+      de: sponsors/projuventute-banner-kinogutschein.jpeg
+      fr:
+      it:
+    url:
+      de: 'https://shop.projuventute.ch/de/A~UBRV-0600/0~0~1/Kinogutschein?utm_source=Feriennet&utm_medium=Banner&utm_campaign=kino'
+      fr:
+      it:
