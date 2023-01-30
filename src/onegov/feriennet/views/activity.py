@@ -1,4 +1,5 @@
 import sedate
+import random
 
 from datetime import date, timedelta
 from itertools import groupby
@@ -409,8 +410,18 @@ def view_activities(self, request):
 
     filters = {k: v for k, v in filters.items() if v}
 
+    # Aktuell nome zom teste
+    main_sponsor = 'hauptsponsor'
+    sponsors = ['näbesponsor 1', 'näbesponsor 2']
+
+    activities = self.batch if show_activities else None
+    activities = [a for a in activities]
+
     return {
-        'activities': self.batch if show_activities else None,
+        'activities': activities,
+        'main_sponsor': main_sponsor,
+        'sponsors': sponsors,
+        'random': random,
         'layout': layout,
         'title': _("Activities"),
         'filters': filters,

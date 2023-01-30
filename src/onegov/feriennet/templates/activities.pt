@@ -12,11 +12,18 @@
 
                 <div class="activities-list" tal:condition="activities">
                     <div class="activity-list-item" tal:repeat="activity activities">
-                        <div class="row collapse">
+                        <div class="row collapse" tal:define="index activities.index(activity)%20">
+                            <tal:b condition="index == 7">
+                                <h3>${main_sponsor}</h3>
+                            </tal:b>
+                            <tal:b condition="index == 14">
+                                <h3>${random.choice(sponsors)}</h3>
+                            </tal:b>
+
                             <div class="columns small-2 thumbnail-column">
                                 <a class="thumbnail" href="${request.link(activity)}">
                                     <div tal:condition="activity.thumbnail|nothing"
-                                         style="background-image: url('${activity.thumbnail}');"></div>
+                                        style="background-image: url('${activity.thumbnail}');"></div>
                                 </a>
                             </div>
 
@@ -71,6 +78,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
