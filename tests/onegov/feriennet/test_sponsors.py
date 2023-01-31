@@ -116,3 +116,82 @@ def test_timestamp_sponsor():
         assert de.name == "Evilcorp"
         assert de.logo == '1507825800000'
         assert de.banners == '1507825800000'
+
+
+def test_random_sponsors_at_activities(client, scenario):
+    client.login_admin()
+
+    # Add activities for the list
+    scenario.add_period(title="Ferienpass 2022", confirmed=True)
+    for i in range(40):
+        scenario.add_activity(
+            title=f'Backen{i}',
+            lead='Backen mit Johann.',
+            state='accepted',
+            location='Bäckerei Govikon, Rathausplatz, 4001 Govikon',
+            tags=['Farm', 'Adventure'],
+            content={}
+        )
+        scenario.add_occasion(
+            age=(1, 11),
+            cost=None,
+            spots=(4, 5),
+        )
+    scenario.commit()
+
+    data = [
+        {
+            'name': 'CompanyOne',
+            'banners': {
+                'src': {
+                    'de': 'sponsors/CompanyOne-de.jpg',
+                },
+                'url': {
+                    'de': 'https://www.company-one.ch',
+                },
+                'info': {
+                    'de': 'main sponsor'
+                }
+            }
+        },
+        {
+            'name': 'CompanyTwo',
+            'banners': {
+                'src': {
+                    'de': 'sponsors/CompanyTwo-de.jpg',
+                },
+                'url': {
+                    'de': 'https://www.company-two.ch',
+                },
+                'info': {
+                    'de': 'other sponsor'
+                }
+            }
+        },
+        {
+            'name': 'CompanyThree',
+            'banners': {
+                'src': {
+                    'de': 'sponsors/CompanyThree-de.jpg',
+                },
+                'url': {
+                    'de': 'https://www.company-three.ch',
+                },
+                'info': {
+                    'de': 'other sponsor'
+                }
+            }
+        }
+    ]
+
+    del client.app.sponsors
+    client.app.sponsors = [Sponsor(**sponsor) for sponsor in data]
+
+    page = client.get('/activities?pages=0-1')
+    activities = page.pyquery('.banner p')
+    activities = [a.text for a in activities]
+
+    assert 'main sponsor' in activities[0]
+    assert 'other sponsor' in activities[1]
+    assert 'main sponsor' in activities[2]
+    assert 'other sponsor' in activities[3]

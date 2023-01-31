@@ -410,7 +410,6 @@ def view_activities(self, request):
 
     filters = {k: v for k, v in filters.items() if v}
 
-    # Aktuell nome zom teste
     all_sponsors = layout.app.banners(request)
     main_sponsor = all_sponsors[0]
     sponsors = all_sponsors[1:len(all_sponsors)]
