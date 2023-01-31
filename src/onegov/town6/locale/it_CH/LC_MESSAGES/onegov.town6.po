@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-01-17 14:32+0100\n"
+"POT-Creation-Date: 2023-01-31 13:21+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -211,6 +211,18 @@ msgstr "Nuova nota"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Upload to Gever"
+msgstr ""
+
+msgid "Do you really want to upload this ticket?"
+msgstr ""
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr ""
+
+msgid "Upload Ticket"
+msgstr ""
 
 msgid "Confirmation"
 msgstr "Conferma"
@@ -771,6 +783,9 @@ msgstr "Richiesta di modifica"
 msgid "New Entry"
 msgstr "Nuovo elemento"
 
+msgid "Functions:"
+msgstr ""
+
 msgid "Open"
 msgstr "Aperto"
 
@@ -879,6 +894,9 @@ msgstr "Nessun evento trovato."
 
 msgid "Learn more"
 msgstr "Per saperne di più"
+
+msgid "From"
+msgstr "Dalle"
 
 msgid "To"
 msgstr "A"
@@ -1489,6 +1507,9 @@ msgstr "Biglietto archiviato."
 msgid "Ticket recovered from archive."
 msgstr "Biglietto recuperato dall'archivio."
 
+msgid "Ticket uploaded to Gever."
+msgstr ""
+
 msgid "Your search returned no results."
 msgstr "La tua ricerca non ha restituito alcun risultato."
 
@@ -1573,13 +1594,13 @@ msgstr "Tag"
 msgid "Date"
 msgstr "Data"
 
+msgid "Actions"
+msgstr "Azioni"
+
 msgid "Export these events"
 msgstr "Esporta questi eventi"
 
 msgid "Submit your event"
-msgstr "Invia il tuo evento"
-
-msgid "Submit your own event"
 msgstr "Invia il tuo evento"
 
 msgid "No payment providers defined."
@@ -2058,11 +2079,11 @@ msgstr "Festività"
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
-msgid "Function"
-msgstr "Funzioni"
+#~ msgid "Submit your own event"
+#~ msgstr "Invia il tuo evento"
 
-#~ msgid "From"
-#~ msgstr "Dalle"
+#~ msgid "Function"
+#~ msgstr "Funzioni"
 
 #, fuzzy
 #~ msgid "Partner"
