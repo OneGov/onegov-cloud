@@ -738,14 +738,9 @@ def view_send_to_gever(self, request):
     password = org.gever_password
     endpoint = org.gever_endpoint
 
-    if not (username and password):
-        request.alert("Could not find valid credentials. You can set them in "
-                      "Gever API Settings.")
-        return morepath.redirect(request.link(self))
-
-    if not endpoint:
-        request.alert("The Gever API Endpoint has not been found. The url has "
-                      "to be set in Settings -> Gever API")
+    if not (username and password and endpoint):
+        request.alert(_("Could not find valid credentials. You can set them "
+                        "in Gever API Settings."))
         return morepath.redirect(request.link(self))
 
     key = request.app.hashed_identity_key

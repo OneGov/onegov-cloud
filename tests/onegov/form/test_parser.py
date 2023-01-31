@@ -732,6 +732,51 @@ def test_integer_range():
     assert not form.errors
 
 
+def test_integer_range_with_pricing():
+
+    form_class = parse_form("Stamps = 0..30 (0.85 CHF)")
+    form = form_class(MultiDict([
+        ('stamps', '')
+    ]))
+    form.validate()
+    assert not form.errors
+    assert form.stamps.pricing.rules == {
+        range(0, 30): Price(Decimal('0.85'), 'CHF'),
+    }
+    assert not form.stamps.pricing.has_payment_rule
+    assert form.stamps.pricing.price(form.stamps) is None
+
+    form = form_class(MultiDict([
+        ('stamps', '0')
+    ]))
+    form.validate()
+    assert not form.errors
+    # special case: we don't want `Price(0, 'CHF')` since the
+    # price might be flagged, which we don't want
+    assert form.stamps.pricing.price(form.stamps) is None
+
+    form = form_class(MultiDict([
+        ('stamps', '10')
+    ]))
+    form.validate()
+    assert not form.errors
+    assert form.stamps.pricing.price(form.stamps) == Price(8.5, 'CHF')
+
+    form_class = parse_form("Stamps *= 0..30 (0.85 CHF!)")
+    form = form_class(MultiDict([
+        ('stamps', '20')
+    ]))
+    form.validate()
+    assert not form.errors
+    assert form.stamps.pricing.rules == {
+        range(0, 30): Price(Decimal('0.85'), 'CHF', credit_card_payment=True),
+    }
+    assert form.stamps.pricing.has_payment_rule
+    assert form.stamps.pricing.price(form.stamps) == Price(
+        17, 'CHF', credit_card_payment=True
+    )
+
+
 def test_decimal_range():
 
     form_class = parse_form("Percentage = 0.00..100.00")

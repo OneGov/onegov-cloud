@@ -5080,13 +5080,8 @@ msgstr "Wird publiziert bis:"
 #~ msgstr "Mapbox (Standard)"
 
 msgid "Could not find valid credentials. You can set them in Gever API Settings."
-msgstr "Es konnten keine gültigen Anmeldedaten gefunden werden."
-"Sie können sie in den Gever API-Einstellungen festlegen."
-
-msgid "The Gever API Endpoint has not been found. The url has to "
-"be set in Settings -> Gever API"
-msgstr "Der Gever API Endpunkt wurde nicht gefunden. "
-"Die Url kann unter Einstellungen -> Gever API eingestellt werden."
+msgstr "Es konnten keine gültigen Anmeldedaten gefunden werden. "
+"Sie können diese in den Gever API-Einstellungen festlegen."
 
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Das PDF dieses Tickets wurde erfolgreich hochgeladen zu Gever."
