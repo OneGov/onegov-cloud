@@ -339,7 +339,7 @@ def decimal():
         .setParseAction(as_decimal)('amount')
 
 
-def range_field(value_expression, parse_action, type):
+def range_field(value_expression, parse_action, type, allow_price=False):
     """ Generic range field parser. """
 
     r = (value_expression + Suppress('..') + value_expression)
@@ -353,7 +353,8 @@ def integer_range_field():
     """ Returns an integer range parser. """
 
     number = Combine(Optional('-') + numeric)
-    return range_field(number, as_integer_range, 'integer_range')
+    integer_range = range_field(number, as_integer_range, 'integer_range')
+    return integer_range + Optional(pricing())
 
 
 def decimal_range_field():
@@ -377,6 +378,24 @@ def currency():
     return Regex(r'[a-zA-Z]{3}').setParseAction(as_uppercase)('currency')
 
 
+def pricing():
+    """ Returns a pricing parser.
+
+    For example:
+        (10.0 CHF)
+        (0 usd!)
+        (-0.50 Cny)
+    """
+
+    cc_payment = Literal('!').setParseAction(matches('!'))
+    cc_payment = Optional(cc_payment, default=False)('credit_card_payment')
+
+    pricing = Group(
+        enclosed_in(decimal() + currency() + cc_payment, '()')
+    )('pricing')
+    return pricing
+
+
 def marker_box(characters):
     """ Returns a marker box:
 
@@ -388,22 +407,15 @@ def marker_box(characters):
     """
 
     check = mark_enclosed_in(characters)('checked')
-
-    cc_payment = Literal('!').setParseAction(matches('!'))
-    cc_payment = Optional(cc_payment, default=False)('credit_card_payment')
-
-    pricing = Group(
-        enclosed_in(decimal() + currency() + cc_payment, '()')
-    )('pricing')
-
     label_text = with_whitespace_inside(text_without(characters + '()'))
+    pricing_parser = pricing()
     label = MatchFirst((
-        label_text + FollowedBy(pricing),
+        label_text + FollowedBy(pricing_parser),
         Combine(label_text + with_whitespace_inside(text)),
         label_text
     )).setParseAction(as_joined_string)('label')
 
-    return check + label + Optional(pricing)
+    return check + label + Optional(pricing_parser)
 
 
 def radio():

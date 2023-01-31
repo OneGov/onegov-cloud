@@ -291,6 +291,26 @@ def test_prices():
     assert f.pricing.currency == 'CHF'
     assert f.pricing.credit_card_payment
 
+    field = integer_range_field()
+    f = field.parseString("0..30 (0.85 CHF)")
+    assert f.type == 'integer_range'
+    assert f[0] == range(0, 30)
+    assert f.pricing.amount == Decimal('0.85')
+    assert f.pricing.currency == 'CHF'
+    assert not f.pricing.credit_card_payment
+
+    f = field.parseString("5..10 (2 USD!)")
+    assert f.type == 'integer_range'
+    assert f[0] == range(5, 10)
+    assert f.pricing.amount == Decimal('2')
+    assert f.pricing.currency == 'USD'
+    assert f.pricing.credit_card_payment
+
+    f = field.parseString("0..10")
+    assert f.type == 'integer_range'
+    assert f[0] == range(0, 10)
+    assert not f.pricing
+
 
 def test_non_prices():
     field = radio()
