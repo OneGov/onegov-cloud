@@ -5098,12 +5098,6 @@ msgstr "Impossibile trovare credenziali valide. "
 "È possibile impostarle nelle Impostazioni API di Gever"
 
 
-msgid "The Gever API Endpoint has not been found. The url has to "
-"be set in Settings -> Gever API"
-msgstr "L'endpoint API di Gever non è stato trovato. "
-"L'url deve essere impostato in Impostazioni -> API di Gever."
-
-
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Il PDF di questo biglietto è stato caricato con successo su Gever."
 
