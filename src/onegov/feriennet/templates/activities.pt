@@ -14,10 +14,16 @@
                     <div class="activity-list-item" tal:repeat="activity activities">
                         <div class="row collapse" tal:define="index activities.index(activity)%20">
                             <tal:b condition="index == 7">
-                                <h3>${main_sponsor}</h3>
-                            </tal:b>
-                            <tal:b condition="index == 14">
-                                <h3>${random.choice(sponsors)}</h3>
+                                <tal:b
+                                    condition="main_sponsor"
+                                    replace="structure main_sponsor"
+                                />
+                                </tal:b>
+                            <tal:b condition="index == 14 and sponsors" tal:define="sponsor random.choice(sponsors)">
+                                <tal:b
+                                    condition="sponsor"
+                                    replace="structure sponsor"
+                                />
                             </tal:b>
 
                             <div class="columns small-2 thumbnail-column">

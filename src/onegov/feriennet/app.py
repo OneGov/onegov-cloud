@@ -90,12 +90,9 @@ class FeriennetApp(OrgApp):
     def public_organiser_data(self):
         return self.org.meta.get('public_organiser_data', ('name', 'website'))
 
-    def banner(self, request):
-        """ Randomly returns the html to one of the available booking banners.
-
-        """
+    def get_sponsors(self, request):
         language = request.locale[:2]
-        candidates = [
+        sponsors = [
             sponsor for sponsor in self.sponsors
             if (
                 getattr(sponsor, 'banners', None)
@@ -103,8 +100,35 @@ class FeriennetApp(OrgApp):
             )
         ]
 
-        if not candidates:
+        if not sponsors:
             return None
+        else:
+            return sponsors
+
+    def banners(self, request):
+        sponsors = self.get_sponsors(request)
+        banners = []
+
+        for sponsor in sponsors:
+            sponsor = sponsor.compiled(request)
+            info = sponsor.banners.get('info', None)
+            banners.append(
+                BANNER_TEMPLATE.format(
+                    id=id,
+                    src=sponsor.url_for(request, sponsor.banners['src']),
+                    url=sponsor.banners['url'],
+                    tracker=sponsor.banners.get('tracker', ''),
+                    info=info if info else ""
+                )
+            )
+
+        return banners
+
+    def random_banner(self, request):
+        """ Randomly returns the html to one of the available booking banners.
+
+        """
+        candidates = self.get_sponsors(request)
 
         winner = random.choice(candidates)
         winner = winner.compiled(request)
