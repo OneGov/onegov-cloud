@@ -227,6 +227,7 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
+            pricing=field.pricing,
             validators=[
                 NumberRange(
                     field.range.start,

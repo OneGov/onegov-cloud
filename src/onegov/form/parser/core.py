@@ -202,6 +202,11 @@ There are two types of number fields. An integer and a float field::
     I'm a float field = 0.00..99.00
     I'm an float field of a different range = -100.00..100.00
 
+Integer fields optionally can have a price attached to them which will be
+multiplied by the supplied integer.
+
+    Number of stamps to include = 0..30 (0.85 CHF)
+
 Code
 ~~~~
 
@@ -596,9 +601,10 @@ class Field:
     """ Represents a parsed field. """
 
     def __init__(self, label, required, parent=None, fieldset=None,
-                 field_help=None, **kwargs):
+                 field_help=None, human_id=None, **kwargs):
 
         self.label = label
+        self._human_id = human_id or label
         self.required = required
         self.parent = parent
         self.fieldset = fieldset
@@ -616,16 +622,16 @@ class Field:
         if self.parent:
             return '/'.join((
                 self.parent.human_id,
-                self.label
+                self._human_id
             ))
 
         if self.fieldset.human_id:
             return '/'.join((
                 self.fieldset.human_id,
-                self.label
+                self._human_id
             ))
 
-        return self.label
+        return self._human_id
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,
@@ -747,7 +753,41 @@ class StdnumField(Field):
         )
 
 
-class RangeField:
+class IntegerRangeField(Field):
+    type = 'integer_range'
+
+    @classmethod
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
+        if field.pricing:
+            label = identifier.label + format_pricing(field.pricing)
+            # map one price to the whole range, the price will be
+            # multiplied by the selected value from the range
+            pricing = {field[0]: field.pricing}
+        else:
+            label = identifier.label
+            pricing = None
+
+        return cls(
+            # only modify the label visually, we don't want to
+            # affect the field id
+            human_id=identifier.label,
+            label=label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            range=field[0],
+            pricing=pricing,
+            field_help=field_help
+        )
+
+    def parse(self, value):
+        return int(float(value))  # automatically truncates dots
+
+
+class DecimalRangeField(Field):
+    type = 'decimal_range'
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,
@@ -761,17 +801,6 @@ class RangeField:
             field_help=field_help
 
         )
-
-
-class IntegerRangeField(RangeField, Field):
-    type = 'integer_range'
-
-    def parse(self, value):
-        return int(float(value))  # automatically truncates dots
-
-
-class DecimalRangeField(RangeField, Field):
-    type = 'decimal_range'
 
     def parse(self, value):
         return Decimal(value)
