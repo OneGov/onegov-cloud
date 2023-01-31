@@ -12,15 +12,13 @@ def test_translate_sponsor():
             'fr': 'le-logo.png'
         },
         banners={
-            'bookings': {
-                'url': {
-                    'de': 'die-url',
-                    'fr': 'le-url'
-                },
-                'info': {
-                    'de': 'Partner',
-                    'fr': 'Partenaires'
-                }
+            'url': {
+                'de': 'die-url',
+                'fr': 'le-url'
+            },
+            'info': {
+                'de': 'Partner',
+                'fr': 'Partenaires'
             }
         }
     )
@@ -30,10 +28,8 @@ def test_translate_sponsor():
     assert de.background is None
     assert de.logo == 'das-logo.png'
     assert de.banners == {
-        'bookings': {
-            'url': 'die-url',
-            'info': 'Partner'
-        }
+        'url': 'die-url',
+        'info': 'Partner'
     }
 
     fr = sponsor.compiled(Bunch(locale='fr_CH'))
@@ -41,10 +37,8 @@ def test_translate_sponsor():
     assert fr.background is None
     assert fr.logo == 'le-logo.png'
     assert fr.banners == {
-        'bookings': {
-            'url': 'le-url',
-            'info': 'Partenaires'
-        }
+        'url': 'le-url',
+        'info': 'Partenaires'
     }
 
 
@@ -65,58 +59,30 @@ def test_sponsors(client, scenario):
         {
             'name': 'CompanyOne',
             'banners': {
-                'bookings': {
-                    'src': {
-                        'de': 'sponsors/CompanyOne-de.jpg',
-                        'fr': 'sponsors/CompanyOne-fr.jpg'
-                    },
-                    'url': {
-                        'de': 'https://www.company-one.ch',
-                        'fr': 'https://www.company-one.ch/fr'
-                    }
+                'src': {
+                    'de': 'sponsors/CompanyOne-de.jpg',
+                    'fr': 'sponsors/CompanyOne-fr.jpg'
                 },
-                'invoices': {
-                    'src': {
-                        'de': 'sponsors/CompanyOne-de.jpg',
-                        'fr': 'sponsors/CompanyOne-fr.jpg'
-                    },
-                    'url': {
-                        'de': 'https://www.company-one.ch',
-                        'fr': 'https://www.company-one.ch/fr'
-                    }
+                'url': {
+                    'de': 'https://www.company-one.ch',
+                    'fr': 'https://www.company-one.ch/fr'
                 }
             }
         },
         {
             'name': 'CompanyTwo',
             'banners': {
-                'bookings': {
-                    'src': {
-                        'fr': 'sponsors/CompanyTwo-fr.jpg',
-                        'de': None
-                    },
-                    'url': {
-                        'fr': 'https://www.company-two.ch',
-                        'de': None
-                    },
-                    'info': {
-                        'fr': 'Partenaiere',
-                        'de': None
-                    }
+                'src': {
+                    'fr': 'sponsors/CompanyTwo-fr.jpg',
+                    'de': None
                 },
-                'invoices': {
-                    'src': {
-                        'fr': 'sponsors/Companytwo-fr.jpg',
-                        'de': None
-                    },
-                    'url': {
-                        'fr': 'https://www.company-two.ch',
-                        'de': None
-                    },
-                    'info': {
-                        'fr': 'Partenaiere',
-                        'de': None
-                    }
+                'url': {
+                    'fr': 'https://www.company-two.ch',
+                    'de': None
+                },
+                'info': {
+                    'fr': 'Partenaiere',
+                    'de': None
                 }
             }
         }
