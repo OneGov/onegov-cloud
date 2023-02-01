@@ -739,7 +739,8 @@ class Pricing:
                     if not isinstance(key, range):
                         continue
 
-                    if value in key:
+                    # python ranges exclude stop, but form ranges include them
+                    if value in key or value == key.stop:
                         if value != 0:
                             # we special case this, because we don't
                             # want to e.g. require credit card payments

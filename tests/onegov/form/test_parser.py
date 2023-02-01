@@ -734,14 +734,14 @@ def test_integer_range():
 
 def test_integer_range_with_pricing():
 
-    form_class = parse_form("Stamps = 0..30 (0.85 CHF)")
+    form_class = parse_form("Stamps = 0..20 (0.85 CHF)")
     form = form_class(MultiDict([
         ('stamps', '')
     ]))
     form.validate()
     assert not form.errors
     assert form.stamps.pricing.rules == {
-        range(0, 30): Price(Decimal('0.85'), 'CHF'),
+        range(0, 20): Price(Decimal('0.85'), 'CHF'),
     }
     assert not form.stamps.pricing.has_payment_rule
     assert form.stamps.pricing.price(form.stamps) is None
@@ -762,14 +762,14 @@ def test_integer_range_with_pricing():
     assert not form.errors
     assert form.stamps.pricing.price(form.stamps) == Price(8.5, 'CHF')
 
-    form_class = parse_form("Stamps *= 0..30 (0.85 CHF!)")
+    form_class = parse_form("Stamps *= 0..20 (0.85 CHF!)")
     form = form_class(MultiDict([
         ('stamps', '20')
     ]))
     form.validate()
     assert not form.errors
     assert form.stamps.pricing.rules == {
-        range(0, 30): Price(Decimal('0.85'), 'CHF', credit_card_payment=True),
+        range(0, 20): Price(Decimal('0.85'), 'CHF', credit_card_payment=True),
     }
     assert form.stamps.pricing.has_payment_rule
     assert form.stamps.pricing.price(form.stamps) == Price(
