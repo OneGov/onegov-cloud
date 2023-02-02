@@ -5120,3 +5120,8 @@ msgstr "Ticket hochladen"
 
 msgid "Link must start with 'https'"
 msgstr "Link muss mit 'https' beginnen"
+
+msgid "The total amount for the currently entered data is ${total} but has to be "
+"at least ${minimum}. Please adjust your inputs."
+msgstr "Der Totalbetrag für Ihre Eingaben beläuft sich auf ${total} allerdings "
+"ist der Minimalbetrag ${minimum}. Bitte ändern Sie ihre Eingaben."

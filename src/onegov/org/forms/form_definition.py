@@ -3,7 +3,7 @@ from onegov.form import Form, merge_forms, FormDefinitionCollection
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import PaymentMethodForm
+from onegov.org.forms.generic import PaymentForm
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
@@ -41,7 +41,7 @@ class FormDefinitionBaseForm(Form):
 
 class FormDefinitionForm(merge_forms(
     FormDefinitionBaseForm,
-    PaymentMethodForm
+    PaymentForm
 )):
     pass
 

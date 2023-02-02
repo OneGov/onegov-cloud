@@ -231,6 +231,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     price_per_submission = content_property()
     currency = content_property()
 
+    minimum_price_total = meta_property()
     payment_method = meta_property()
 
     searchwidget_config = content_property()

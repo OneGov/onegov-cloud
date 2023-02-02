@@ -4,6 +4,7 @@ from onegov.pay import log
 from onegov.pay import PaymentProvider
 from onegov.pay.errors import CARD_ERRORS
 from onegov.pay.models.payment import ManualPayment
+from onegov.pay.utils import Price
 
 
 class PayApp(WebassetsApp):
@@ -57,6 +58,10 @@ class PayApp(WebassetsApp):
         charged to the user).
 
         """
+
+        if price and price.amount < 0:
+            # if we somehow got a negative price, treat it the same as no price
+            return Price(0, price.currency)
 
         if self.default_payment_provider:
             return self.default_payment_provider.adjust_price(price)
