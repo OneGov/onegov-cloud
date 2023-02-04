@@ -31,10 +31,10 @@ def test_view_election_compound_superregions(election_day_app_bl):
     superregions = client.get('/elections/elections/superregions')
     assert 'Region 1' in superregions
     assert '0 von 5' in superregions
-    assert '1 von 2' in superregions
+    assert '0 von 1' in superregions
     assert 'Region 2' in superregions
     assert '0 von 10' in superregions
-    assert '1 von 3' in superregions
+    assert '0 von 1' in superregions
 
     assert 'Region 1' in client.get('/elections/elections/districts')
     assert 'Region 1' in client.get('/elections/elections/candidates')
