@@ -49,6 +49,7 @@ LEVELS = (
         'onegov.stepsequence',
         'onegov.ticket',
         'onegov.user',
+        'onegov.websockets',
     ),
 
     # applications,
