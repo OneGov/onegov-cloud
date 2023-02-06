@@ -214,6 +214,8 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
 
     layout = layout or EventLayout(self, request)
     layout.editbar_links = []
+    # Hide the progress indicator, since there are no steps:
+    layout.registered_steps = None
 
     return {
         'layout': layout,
@@ -221,7 +223,7 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
         'form': form,
         'form_width': 'large',
         'lead': '',
-        'button_text': _('Continue')
+        'button_text': _('Submit')
     }
 
 
