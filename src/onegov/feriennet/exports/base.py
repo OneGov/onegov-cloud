@@ -12,6 +12,7 @@ from onegov.feriennet.exports.const import ROLES
 from onegov.feriennet.exports.const import SALUTATIONS
 from onegov.feriennet.utils import decode_name
 from onegov.org.models import Export
+from datetime import datetime
 
 
 SPACES = re.compile(r'[ ]+')
@@ -202,3 +203,30 @@ class FeriennetExport(Export):
         yield _("Organiser Website"), user_data.get('website', '')
         yield _("Organiser Bank Account"), user_data.get('bank_account', '')
         yield _("Organiser Beneficiary"), user_data.get('bank_beneficiary', '')
+
+    def volunteer_fields(self, volunteer):
+        need = volunteer.need
+        occasion = need.occasion
+        activity = occasion.activity
+        dates = [
+            (d.localized_start, d.localized_end)
+            for d in occasion.dates
+        ]
+
+        yield _("Activity Title"), activity.title
+        yield _("Occasion Dates"), dates
+        yield _("Occasion Rescinded"), occasion.cancelled
+        yield _("Need Name"), need.name
+        yield _("Need Number"), '{} - {}'.format(
+            need.number.lower, need.number.upper - 1)
+        yield _("Confirmed Volunteers"), sum(
+            v.state == "confirmed" for v in need.volunteers)
+        yield _("Volunteer State"), volunteer.state
+        yield _("First Name"), volunteer.first_name
+        yield _("Last Name"), volunteer.last_name
+        yield _("Birth Date"), volunteer.birth_date
+        yield _("Organisation"), volunteer.organisation
+        yield _("Place"), volunteer.place
+        yield _("E-Mail"), volunteer.email
+        yield _("Phone"), volunteer.phone
+        yield _("Address"), volunteer.address
