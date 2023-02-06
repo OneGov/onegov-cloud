@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-01-31 13:21+0100\n"
+"POT-Creation-Date: 2023-02-06 11:35+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -218,16 +218,17 @@ msgid "PDF"
 msgstr "PDF"
 
 msgid "Upload to Gever"
-msgstr ""
+msgstr "Télécharger à Gever"
 
 msgid "Do you really want to upload this ticket?"
-msgstr ""
+msgstr "Voulez-vous vraiment télécharger ce ticket ?"
 
 msgid "This will upload this ticket to the Gever instance, if configured."
 msgstr ""
+"Cela va télécharger ce ticket vers l'instance Gever, si elle est configurée."
 
 msgid "Upload Ticket"
-msgstr ""
+msgstr "Télécharger le ticket"
 
 msgid "Confirmation"
 msgstr ""
@@ -789,7 +790,7 @@ msgid "New Entry"
 msgstr "Nouvelle entrée"
 
 msgid "Functions:"
-msgstr ""
+msgstr "Fonctions:"
 
 msgid "Open"
 msgstr "Ouvert"
@@ -1034,10 +1035,10 @@ msgid "Reset"
 msgstr "Réinitialiser"
 
 msgid "Will be published until:"
-msgstr ""
+msgstr "Sera publié jusqu'au:"
 
 msgid "Publication end date:"
-msgstr ""
+msgstr "Date de fin de publication:"
 
 msgid "Not a publication"
 msgstr "Pas une publication"
@@ -1516,7 +1517,7 @@ msgid "Ticket recovered from archive."
 msgstr "Ticket récupéré dans les archives"
 
 msgid "Ticket uploaded to Gever."
-msgstr ""
+msgstr "Ticket téléchargé à Gever."
 
 msgid "Your search returned no results."
 msgstr "Votre recherche n'a donné aucun résultat."
