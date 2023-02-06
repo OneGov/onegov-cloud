@@ -51,10 +51,30 @@
 - name: ProJuventute
   banners:
     src:
-      de: sponsors/projuventute-banner-kinogutschein.jpeg
+      de: sponsors/V2_Werbebanner_Feriennet_2022_670x210_150_DPI.jpg
       fr:
       it:
     url:
-      de: 'https://shop.projuventute.ch/de/A~UBRV-0600/0~0~1/Kinogutschein?utm_source=Feriennet&utm_medium=Banner&utm_campaign=kino'
+      de: 'https://www.projuventute.ch/de/eltern/entwicklung-gesundheit/resilienz-bei-kindern?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Resilienz'
+      fr:
+      it:
+- name: ProJuventute
+  banners:
+    src:
+      de: sponsors/V2_Werbebanner_Feriennet_2022_670x210_150_DPI3.jpg
+      fr:
+      it:
+    url:
+      de: 'https://www.projuventute.ch/de/eltern/schule-ausbildung/freizeitaktivitaeten-ideen?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Freizeit'
+      fr:
+      it:
+- name: ProJuventute
+  banners:
+    src:
+      de: sponsors/V2_Werbebanner_Feriennet_2022_670x210_150_DPI3.jpg
+      fr:
+      it:
+    url:
+      de: 'https://www.projuventute.ch/de/eltern/medien-internet/handy-ab-wann?utm_source=Feriennet&utm_medium=Banner&utm_campaign=Handy'
       fr:
       it:
