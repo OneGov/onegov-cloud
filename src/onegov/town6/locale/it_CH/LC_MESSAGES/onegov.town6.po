@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-01-17 14:32+0100\n"
+"POT-Creation-Date: 2023-02-06 11:35+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -211,6 +211,18 @@ msgstr "Nuova nota"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Upload to Gever"
+msgstr "Caricare a Gever"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Vuole davvero caricare questo biglietto?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
+
+msgid "Upload Ticket"
+msgstr "Caricare il biglietto"
 
 msgid "Confirmation"
 msgstr "Conferma"
@@ -771,6 +783,9 @@ msgstr "Richiesta di modifica"
 msgid "New Entry"
 msgstr "Nuovo elemento"
 
+msgid "Functions:"
+msgstr "Funzioni:"
+
 msgid "Open"
 msgstr "Aperto"
 
@@ -879,6 +894,9 @@ msgstr "Nessun evento trovato."
 
 msgid "Learn more"
 msgstr "Per saperne di più"
+
+msgid "From"
+msgstr "Dalle"
 
 msgid "To"
 msgstr "A"
@@ -1013,10 +1031,10 @@ msgid "Reset"
 msgstr "Ripristina"
 
 msgid "Will be published until:"
-msgstr ""
+msgstr "Sarà pubblicato fino a:"
 
 msgid "Publication end date:"
-msgstr ""
+msgstr "Data di fine pubblicazione:"
 
 msgid "Not a publication"
 msgstr "Non una pubblicazione"
@@ -1488,6 +1506,9 @@ msgstr "Biglietto archiviato."
 
 msgid "Ticket recovered from archive."
 msgstr "Biglietto recuperato dall'archivio."
+
+msgid "Ticket uploaded to Gever."
+msgstr "Biglietto caricato su Gever."
 
 msgid "Your search returned no results."
 msgstr "La tua ricerca non ha restituito alcun risultato."
@@ -2058,11 +2079,8 @@ msgstr "Festività"
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
-msgid "Function"
-msgstr "Funzioni"
-
-#~ msgid "From"
-#~ msgstr "Dalle"
+#~ msgid "Function"
+#~ msgstr "Funzioni"
 
 #, fuzzy
 #~ msgid "Partner"
