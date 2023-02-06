@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-06 11:35+0100\n"
+"POT-Creation-Date: 2023-02-06 15:51+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -4231,6 +4231,10 @@ msgid "This event has already been published"
 msgstr "Diese Veranstaltung wurde bereits veröffentlicht."
 
 #, python-format
+msgid "Successfully created the event ${title}"
+msgstr "Event ${title} erfolgreich erstellt"
+
+#, python-format
 msgid "You have accepted the event ${title}"
 msgstr "Sie haben die Veranstaltung ${title} angenommen"
 
@@ -4251,6 +4255,9 @@ msgstr ""
 "durchgeführt werden. Nicht publiziert werden rein kommerzielle "
 "Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
 "Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
+
+msgid "Create an event"
+msgstr "Veranstaltung erfassen"
 
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"

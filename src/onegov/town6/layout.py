@@ -1300,6 +1300,11 @@ class OccurrencesLayout(EventBaseLayout):
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
                 ),
+                Link(
+                    text=_("Create an event"),
+                    url=self.request.link(self.model, 'enter-event'),
+                    attrs={'class': 'new-form'}
+                )
             )
 
 
