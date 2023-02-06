@@ -125,6 +125,15 @@ configuration: &global-config
   # requests: 100
   # expiration: 900
 
+  # Websocket server port number and authentication token.
+  #
+  # If not given, the port number will default to 8765 and a random token
+  # will be created every time the host reboots. Tokens should be configured
+  # explicitly on production systems.
+  #
+  websockets_port: 8765
+  websockets_token: super-secret-token
+
   # Install https://github.com/seantis/d3-renderer
   # d3_renderer: 'http://localhost:1337'
 

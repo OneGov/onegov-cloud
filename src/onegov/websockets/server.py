@@ -10,10 +10,7 @@ from websockets import serve
 
 
 CONNECTIONS = {}
-
-# todo: configuration
-# todo: authentication
-# todo: status endpoint
+TOKEN = ''
 
 
 def get_payload(message, expected):
@@ -79,7 +76,7 @@ async def handle_authentication(websocket, payload):
     assert payload.get('type') == 'authenticate'
 
     token = payload.get('token')
-    if not token or not isinstance(token, str):  # todo: authenticate
+    if not token or not token == TOKEN:
         await error(websocket, 'authentication failed')
         return
 
@@ -167,13 +164,17 @@ async def handle_start(websocket):
     log.debug(f'{websocket.id} disconnected')
 
 
-async def main():
-    log.debug('Serving on ws://localhost:8765')
-    async with serve(handle_start, "localhost", 8765):
+async def main(host='localhost', port=8765, token=None):
+    assert token, "Please provide a token!"
+    global TOKEN
+    TOKEN = token
+    log.debug(f'Serving on ws://{host}:{port}')
+    async with serve(handle_start, host, port):
         await Future()
 
 
+# todo: remove me?
 if __name__ == "__main__":
     basicConfig()
     log.setLevel(DEBUG)
-    run(main())
+    run(main(token='token'))
