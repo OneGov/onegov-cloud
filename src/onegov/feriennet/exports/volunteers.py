@@ -1,5 +1,4 @@
 from onegov.activity import Occasion, OccasionNeed
-from onegov.activity import Volunteer
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
@@ -36,7 +35,8 @@ class VolunteerExport(FeriennetExport):
             .joinedload(Occasion.period)
         )
         q = q.options(undefer('*'))
-        q = q.order_by(Occasion.order, OccasionNeed.name)
+        q = q.order_by(OccasionNeed.name)
+        q = q.order_by(Occasion.activity_id)
 
         return q
 

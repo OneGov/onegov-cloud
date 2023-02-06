@@ -12,7 +12,6 @@ from onegov.feriennet.exports.const import ROLES
 from onegov.feriennet.exports.const import SALUTATIONS
 from onegov.feriennet.utils import decode_name
 from onegov.org.models import Export
-from datetime import datetime
 
 
 SPACES = re.compile(r'[ ]+')
