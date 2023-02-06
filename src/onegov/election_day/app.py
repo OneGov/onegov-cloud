@@ -219,6 +219,9 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
             request.content_security_policy.frame_ancestors.add('https://*')
 
         request.content_security_policy.connect_src.add(SELF)
+        # todo: move to integration if possible
+        request.content_security_policy.connect_src.add('ws:')
+        request.content_security_policy.connect_src.add('wss:')
         if app.principal:
             for domain in getattr(app.principal, 'csp_script_src', []):
                 request.content_security_policy.script_src.add(domain)

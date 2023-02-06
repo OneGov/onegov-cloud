@@ -1,6 +1,7 @@
 import click
 
 from asyncio import run
+from json import loads
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.websockets import log
@@ -140,7 +141,9 @@ def broadcast(group_context, message, host, port, schema, token):
     Requires either the selection of a websockets-enabled application or
     passing the optional parameters.
 
-        onegov-websockets --select '/onegov_org/govikon' broadcast
+        onegov-websockets --select '/onegov_org/govikon' \
+            broadcast '{"event":"refresh","path":"events/abcd"}'
+
 
     """
 
@@ -158,7 +161,7 @@ def broadcast(group_context, message, host, port, schema, token):
                 await broadast_message(
                     websocket,
                     app.schema or schema,
-                    message
+                    loads(message)
                 )
                 click.echo(f'{message} sent to {app.schema or schema}')
 

@@ -36,8 +36,17 @@ metal:define-macro="layout">
         });
     </script>
     <script metal:use-macro="layout.macros['tablesaw_translations']" />
+    <script>
+        WebsocketConfig = {
+          endpoint: "${layout.app.websocket_endpoint(request)}",
+          schema: "${layout.app.schema}"
+        };
+    </script>
 </head>
 <body>
+    <div class="alert-box info websockets-refresh" style="display:none;">
+        <p i18n:translate="">This site has updates, you may want to <a href="javascript:window.location.reload();">refresh it</a>.</p>
+    </div>
     <div class="row accessibility-links">
         <a accesskey="0" class="show-only-on-tab" href="${layout.homepage_link}" i18n:translate="">Homepage</a>
         <a accesskey="1" class="show-only-on-tab" href="#content" i18n:translate="">Content</a>

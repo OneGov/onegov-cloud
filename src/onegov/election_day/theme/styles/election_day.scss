@@ -441,7 +441,8 @@ table {
     }
 
     th.right-aligned-small {
-        span, a {
+        span,
+        a {
             float: right;
             text-align: right;
         }
@@ -878,8 +879,8 @@ form {
     font-size: 1rem;
 
     &.alert {
-        background-color: #D72D0F;
-        border-color: #D72D0F;
+        background-color: #d72d0f;
+        border-color: #d72d0f;
     }
 
     p {
@@ -899,12 +900,12 @@ form {
 */
 
 label.error {
-    color: #A2220B;
+    color: #a2220b;
 }
 
 small.error,
 span.error {
-    background-color: #D72D0F;
+    background-color: #d72d0f;
 }
 
 /*
@@ -1246,4 +1247,17 @@ a:focus {
     right: 0;
     text-align: center;
     width: 200px;
-    }
+}
+
+.websockets-refresh {
+    // background-color: $aluminum;
+    // padding: 1rem;
+    position: sticky;
+    text-align: center;
+    top: 0;
+    z-index: 999;
+    //
+    // p {
+    //     margin-bottom: 0;
+    // }
+}
