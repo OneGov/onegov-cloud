@@ -19,13 +19,13 @@
 
 - name: CONCORDIA
   logo_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo-feriennet-0-0-fnet-de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo-feriennet-0-0-fnet-fr'
-    it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo-feriennet-0-0-fnet-it'
+    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=logo-fn1hj23-2023-0-pjweb-de'
+    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo-fn1hj23-2023-0-pjweb-fr'
+    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=logo-fn1hj23-2023-0-pjweb-it'
   mail_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail-feriennet-0-0-fnet-de'
-    fr: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail-feriennet-0-0-fnet-fr'
-    it: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail-feriennet-0-0-fnet-it'
+    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail-fn1hj23-2023-0-pjweb-de'
+    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=mail-fn1hj23-2023-0-pjweb-fr'
+    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=mail-fn1hj23-2023-0-pjweb-it'
   logo: sponsors/concordia.svg
   background: '#fff'
   width: 200px
@@ -37,9 +37,9 @@
       fr: sponsors/concordia-banner-fr.jpg
       it: sponsors/concordia-banner-it.jpg
     url:
-      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-de'
-      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-fr'
-      it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fn221hj-2022-0-projuventute-it'
+      de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fn1hj23-2023-0-pjweb-de'
+      fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn1hj23-2023-0-pjweb-fr'
+      it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner-fn1hj23-2023-0-pjweb-it'
     info:
       de: 'Partner von Pro Juventute'
       fr: 'Partenaire Pro Juventute'
