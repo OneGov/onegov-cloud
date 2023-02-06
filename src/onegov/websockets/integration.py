@@ -1,6 +1,6 @@
 from asyncio import run
 from morepath import App
-from onegov.core.crypto import stored_random_token
+from onegov.websockets import log
 from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
 from websockets import connect
@@ -16,15 +16,15 @@ class WebsocketsApp(App):
 
         """
 
-        self.websockets_host = cfg.get('websockets_host', 'localhost')
-        self.websockets_port = cfg.get('websockets_port', 8765)
-        self.websockets_token = (
-            cfg.get('websockets_token')
-            or stored_random_token('WebsocketsApp', 'websockets_token')
+        self.websockets_host = cfg.get('websockets_host')
+        self.websockets_port = cfg.get('websockets_port')
+        self.websockets_token = cfg.get('websockets_token')
+        assert all((
+            self.websockets_host, self.websockets_port, self.websockets_token,
+        )), "Missing websockets configuration"
+        assert self.websockets_token != 'super-secret-token', (
+            "Do not use the default websockets token"
         )
-
-        # you don't want to use the token given in the example file
-        assert self.websockets_token != 'super-secret-token'
 
     def send_websocket(self, message):
         """ Sends an application-bound broadcast message to all connected
@@ -46,4 +46,10 @@ class WebsocketsApp(App):
                     message
                 )
 
-        run(main())
+        try:
+            run(main())
+        except Exception as exception:
+            log.exception(exception)
+            return False
+
+        return True

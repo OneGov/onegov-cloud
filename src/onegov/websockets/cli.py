@@ -5,41 +5,60 @@ from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.websockets import log
 from onegov.websockets.client import authenticate
+from onegov.websockets.client import broadcast as broadast_message
 from onegov.websockets.client import register
 from onegov.websockets.client import status as get_status
-from onegov.websockets.client import broadcast as broadast_message
 from onegov.websockets.server import main
+from sentry_sdk import init as init_sentry
 from websockets import connect
 
 
 cli = command_group()
 
 
-@cli.command('serve')
+@cli.group(
+    invoke_without_command=True,
+    context_settings={
+        'matches_required': False,
+        'default_selector': '*'
+    }
+)
 @click.option('--host')
 @click.option('--port')
 @click.option('--token')
+@click.option('--sentry-dsn')
+@click.option('--sentry-environment', default='testing')
+@click.option('--sentry-release')
 @pass_group_context
-def serve(group_context, host, port, token):
+def serve(
+    group_context,
+    host, port, token,
+    sentry_dsn, sentry_environment, sentry_release
+):
     """ Starts the global websocket server.
 
-    Requires either the selection of a websockets-enabled application or
-    passing the optional parameters.
+    Takes configuration from the first found app if missing.
 
-        onegov-websockets --select '/onegov_org/govikon' serve
+        onegov-websockets serve
 
     """
 
-    def _serve(request, app):
-        run(
-            main(
-                host or app.websockets_host,
-                port or app.websockets_port,
-                token or app.websockets_token
-            )
+    if not all((host, port, token)) and group_context.config.applications:
+        app = group_context.config.applications[0]
+        host = host or app.configuration.get('websockets_host')
+        port = port or app.configuration.get('websockets_port')
+        token = token or app.configuration.get('websockets_token')
+
+    assert all((host, port, token)), "invalid configuration"
+
+    if sentry_dsn:
+        init_sentry(
+            dsn=sentry_dsn,
+            release=sentry_release,
+            environment=sentry_environment,
         )
 
-    return _serve
+    run(main(host, port, token))
 
 
 @cli.command('listen')

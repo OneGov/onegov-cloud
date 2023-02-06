@@ -126,11 +126,7 @@ configuration: &global-config
   # expiration: 900
 
   # Websocket server port number and authentication token.
-  #
-  # If not given, the port number will default to 8765 and a random token
-  # will be created every time the host reboots. Tokens should be configured
-  # explicitly on production systems.
-  #
+  websockets_host: localhost
   websockets_port: 8765
   websockets_token: super-secret-token
 
