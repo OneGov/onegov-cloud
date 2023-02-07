@@ -337,7 +337,7 @@ class FormEditorLayout(DefaultLayout):
     cls_before='DirectoryEntryLayout',
     cls_after='TicketChatMessageLayout'
 )
-class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
+class FormSubmissionLayout(StepsLayoutExtension, DefaultLayout):
 
     def __init__(self, model, request, title=None):
         super().__init__(model, request)
@@ -719,22 +719,6 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-            links.append(
-                Link(
-                    text=_("Upload to Gever"),
-                    url=self.request.link(self.model, 'send-to-gever'),
-                    attrs={'class': 'upload'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to upload this ticket?"),
-                            _("This will upload this ticket to the "
-                              "Gever instance, if configured."),
-                            _("Upload Ticket"),
-                            _("Cancel")
-                        )
-                    )
-                )
-            )
 
             return links
 
@@ -767,7 +751,7 @@ class TicketNoteLayout(DefaultLayout):
 @step_sequences.registered_step(
     3, _('Confirmation'),
     cls_before='ReservationLayout')
-class TicketChatMessageLayout(DefaultLayout, StepsLayoutExtension):
+class TicketChatMessageLayout(StepsLayoutExtension, DefaultLayout):
 
     def __init__(self, model, request, internal=False):
         super().__init__(model, request)
@@ -1141,7 +1125,7 @@ class ResourceLayout(DefaultLayout):
 @step_sequences.registered_step(
     2, _("Check"),
     cls_before='ReservationLayout', cls_after='TicketChatMessageLayout')
-class ReservationLayout(ResourceLayout, StepsLayoutExtension):
+class ReservationLayout(StepsLayoutExtension, ResourceLayout):
     editbar_links = None
 
     @property
@@ -1423,7 +1407,7 @@ class OccurrenceLayout(EventBaseLayout):
     cls_before='EventLayout',
     cls_after='TicketChatMessageLayout'
 )
-class EventLayout(EventBaseLayout, StepsLayoutExtension):
+class EventLayout(StepsLayoutExtension, EventBaseLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -2072,8 +2056,8 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 @step_sequences.registered_step(
     1, _('Form'), cls_after='FormSubmissionLayout'
 )
-class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
-                                     StepsLayoutExtension):
+class DirectoryEntryCollectionLayout(StepsLayoutExtension,
+                                     DirectoryEntryBaseLayout):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2228,7 +2212,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
-class DirectoryEntryLayout(DirectoryEntryBaseLayout, StepsLayoutExtension):
+class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
 
     @property
     def step_position(self):

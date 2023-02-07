@@ -33,7 +33,8 @@ def town_view_directories(self, request):
               permission=Secret, form=get_directory_form_class)
 def town_handle_new_directory(self, request, form):
     return handle_new_directory(
-        self, request, form, DirectoryCollectionLayout(self, request))
+        self, request, form,
+        DirectoryCollectionLayout(self, request, hide_steps=True))
 
 
 @TownApp.form(model=ExtendedDirectoryEntryCollection, name='edit',

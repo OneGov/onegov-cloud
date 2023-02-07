@@ -890,6 +890,9 @@ msgstr "File Excel"
 msgid "JSON File"
 msgstr "File JSON"
 
+msgid "Minimum price total"
+msgstr "Prezzo minimo totale"
+
 msgid "Payment Method"
 msgstr "Modalità di pagamento"
 
@@ -901,6 +904,9 @@ msgstr "Pagamenti con carta di credito opzionali"
 
 msgid "Credit card payments required"
 msgstr "Pagamenti con carta di credito obbligatori"
+
+msgid "The price must be larger than zero"
+msgstr "Il prezzo deve essere maggiore di zero"
 
 msgid ""
 "You need to setup a default payment provider to enable credit card payments"
@@ -1077,6 +1083,15 @@ msgstr "Codici postali ammessi (uno per riga)"
 msgid "Days before an allocation may be reserved by anyone"
 msgstr "Giorni prima che un'assegnazione possa essere prenotata da chiunque"
 
+msgid "Default view"
+msgstr "Visualizzazione predefinita"
+
+msgid "Week view"
+msgstr "Visualizzazione settimanale"
+
+msgid "Month view"
+msgstr "Visualizzazione mensile"
+
 msgid "Per item"
 msgstr "Per elemento"
 
@@ -1089,15 +1104,6 @@ msgstr "Prezzo per elemento"
 msgid "Price per hour"
 msgstr "Tariffa oraria"
 
-msgid "Default view"
-msgstr "Visualizzazione predefinita"
-
-msgid "Week view"
-msgstr "Visualizzazione settimanale"
-
-msgid "Month view"
-msgstr "Visualizzazione mensile"
-
 msgid "Please select the form field that holds the zip-code"
 msgstr "Seleziona il campo del modulo che contiene il codice postale"
 
@@ -1106,9 +1112,6 @@ msgstr "Inserisci almeno un codice postale"
 
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
-
-msgid "The price must be larger than zero"
-msgstr "Il prezzo deve essere maggiore di zero"
 
 msgid "New Reservations"
 msgstr "Nuove prenotazioni"
@@ -2372,8 +2375,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3230,6 +3233,9 @@ msgid ""
 "you no longer want to receive this e-mail please contact an administrator so "
 "they can remove you from the recipients list."
 msgstr ""
+"Questa è la notifica per le prenotazioni per ${request.app.org.title}. Se "
+"non si desidera più ricevere questa e-mail, contattare un amministratore per "
+"farsi rimuovere dall'elenco dei destinatari."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr "Un amministratore ha appena creato per te un nuovo account su ${org}."
@@ -4445,6 +4451,14 @@ msgstr ""
 msgid "The registration window was deleted"
 msgstr "La finestra di registrazione è stata cancellata"
 
+#, python-format
+msgid ""
+"The total amount for the currently entered data is ${total} but has to be at "
+"least ${minimum}. Please adjust your inputs."
+msgstr ""
+"L'importo totale per i dati attualmente inseriti è ${total} ma deve essere "
+"almeno ${minimum}. Si prega di modificare i dati inseriti."
+
 msgid "Pay Online and Complete"
 msgstr "Paga online e completa"
 
@@ -4800,7 +4814,7 @@ msgid "New Item"
 msgstr "Nuovo elemento"
 
 msgid "Edit resource"
-msgstr ""
+msgstr "Modifica risorsa"
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"

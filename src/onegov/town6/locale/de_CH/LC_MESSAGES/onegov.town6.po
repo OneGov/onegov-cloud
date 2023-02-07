@@ -1612,14 +1612,14 @@ msgstr "Schlagwort"
 msgid "Date"
 msgstr "Datum"
 
+msgid "Actions"
+msgstr "Aktionen"
+
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
-
-msgid "Submit your own event"
-msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
@@ -2086,6 +2086,9 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Submit your own event"
+#~ msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
 #~ msgid "Functions"
 #~ msgstr "Funktionen"

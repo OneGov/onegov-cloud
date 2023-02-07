@@ -52,7 +52,7 @@
                     </p>
 
                     <tal:b
-                        define="banner layout.app.banner(request, 'bookings')"
+                        define="banner layout.app.random_banner(request)"
                         condition="banner"
                         replace="structure banner"
                     />
@@ -60,7 +60,7 @@
                     <div class="row attendee-bookings-row" tal:repeat="attendee attendees" tal:condition="has_bookings" id="attendee-${attendee.id.hex}">
                         <div class="columns small-12">
                             <div class="attendee-bookings">
-                                <h3>${attendee.name} ${attendee.gender == 'male' and '👦' or '👧'}</h3>
+                                <h3>${attendee.name} ${'👦' if attendee.gender == 'male' else '👧'}</h3>
 
                                 <div class="icons">
                                     <a class="calendar-edit-icon before hide-for-print" href="${request.link(attendee)}" title="Edit" i18n:attributes="title">

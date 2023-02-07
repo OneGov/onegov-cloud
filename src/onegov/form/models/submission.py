@@ -88,10 +88,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     registration_window_id = Column(
         UUID, ForeignKey("registration_windows.id"), nullable=True)
 
-    #: payment options -> copied from the dfinition at the moment of
+    #: payment options -> copied from the definition at the moment of
     #: submission. This is stored alongside the submission as the original
     #: form setting may change later.
     payment_method = Column(Text, nullable=False, default='manual')
+    minimum_price_total = meta_property()
 
     #: extensions
     extensions = meta_property(default=list)
