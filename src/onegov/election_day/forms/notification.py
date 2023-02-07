@@ -15,7 +15,7 @@ class TriggerNotificationForm(Form):
         validators=[
             InputRequired()
         ],
-        default=['email', 'sms', 'webhooks']
+        default=['websockets', 'email', 'sms', 'webhooks']
     )
 
     def on_request(self):
@@ -24,6 +24,9 @@ class TriggerNotificationForm(Form):
         principal = self.request.app.principal
 
         self.notifications.choices = []
+        self.notifications.choices.append(
+            ('websockets', _("Websocket / Browser"))
+        )
         if principal.email_notification:
             self.notifications.choices.append(('email', _("Email")))
         if principal.sms_notification:

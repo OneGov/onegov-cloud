@@ -89,6 +89,18 @@ class Notification(Base, TimestampMixin):
         raise NotImplementedError
 
 
+class WebsocketNotification(Notification):
+
+    __mapper_args__ = {'polymorphic_identity': 'websocket'}
+
+    def trigger(self, request, model):
+        """ Sends a refresh event to all connected websockets. """
+        self.update_from_model(model)
+        request.app.send_websocket_refresh(
+            request.link(model, relative=True)
+        )
+
+
 class WebhookNotification(Notification):
 
     __mapper_args__ = {'polymorphic_identity': 'webhooks'}

@@ -143,7 +143,7 @@ metal:define-macro="layout">
         WebsocketConfig = {
             endpoint: "${layout.app.websocket_endpoint(request)}",
             schema: "${layout.app.schema}",
-            onrefresh: function(event) { $(".page-refresh").toggle(); }
+            onrefresh: function(event) { $(".page-refresh").show(); }
         };
     </script>
 </body>

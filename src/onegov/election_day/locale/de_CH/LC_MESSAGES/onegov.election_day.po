@@ -521,6 +521,9 @@ msgstr "Panaschierstatistik"
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
+msgid "Websocket / Browser"
+msgstr "Websocket / Browser"
+
 msgid "Email"
 msgstr "E-Mail"
 
