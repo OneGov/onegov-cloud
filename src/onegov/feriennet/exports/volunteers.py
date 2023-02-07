@@ -35,7 +35,6 @@ class VolunteerExport(FeriennetExport):
             .joinedload(Occasion.period)
         )
         q = q.options(undefer('*'))
-        q = q.order_by(OccasionNeed.name)
         q = q.order_by(Occasion.activity_id)
 
         return q

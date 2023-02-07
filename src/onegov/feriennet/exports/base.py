@@ -10,6 +10,7 @@ from onegov.feriennet.exports.const import FREQUENCIES
 from onegov.feriennet.exports.const import GENDERS
 from onegov.feriennet.exports.const import ROLES
 from onegov.feriennet.exports.const import SALUTATIONS
+from onegov.feriennet.exports.const import STATES
 from onegov.feriennet.utils import decode_name
 from onegov.org.models import Export
 
@@ -220,7 +221,7 @@ class FeriennetExport(Export):
             need.number.lower, need.number.upper - 1)
         yield _("Confirmed Volunteers"), sum(
             v.state == "confirmed" for v in need.volunteers)
-        yield _("Volunteer State"), volunteer.state
+        yield _("Volunteer State"), STATES[volunteer.state]
         yield _("First Name"), volunteer.first_name
         yield _("Last Name"), volunteer.last_name
         yield _("Birth Date"), volunteer.birth_date

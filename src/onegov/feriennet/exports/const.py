@@ -34,9 +34,13 @@ GENDERS = {
     'female': _("Girl")
 }
 
-
 ROLES = {
     'admin': _("Administrator"),
     'editor': _("Editor"),
     'member': _("Member"),
+}
+
+STATES = {
+    'open': _("Open"),
+    'confirmed': _("Confirmed")
 }
