@@ -912,6 +912,12 @@ msgstr "Die Datei ist ungültig."
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Das Formular enthält Fehler. Bitte die markierten Felder überprüfen."
 
+msgid "This page has been updated."
+msgstr "Diese Seite wurde aktualisiert."
+
+msgid "Reload page."
+msgstr "Seite neu laden."
+
 msgid "Homepage"
 msgstr "Startseite"
 

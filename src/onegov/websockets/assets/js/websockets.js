@@ -1,16 +1,5 @@
-function handleRefreshEvent(path) {
-    // Toggle refresh alerts
-    if (window.location.pathname.search(path) !== -1) {
-        const collection = document.getElementsByClassName("websockets-refresh");
-        for (let i = 0; i < collection.length; i++) {
-            collection[i].style.display = "block";
-        }
-    }
-}
-
-
 window.addEventListener("DOMContentLoaded", function() {
-    if (WebsocketConfig) {
+    if (typeof(WebsocketConfig) !== "undefined") {
       try {
         const websocket = new WebSocket(WebsocketConfig.endpoint);
         websocket.addEventListener("open", function() {
@@ -21,11 +10,13 @@ window.addEventListener("DOMContentLoaded", function() {
           websocket.send(JSON.stringify(payload));
         });
         websocket.addEventListener('message', function(message) {
-            console.log('Message from server ', message.data);  // todo: remove me!
-            const payload = JSON.parse(message.data)
-            if (payload.type === 'notification') {
-                if (payload.message.event === 'refresh') {
-                    handleRefreshEvent(payload.message.path);
+            const data = JSON.parse(message.data)
+            if (data.type === 'notification') {
+                if (data.message.event === 'refresh') {
+                    const path = data.message.path;
+                    if (WebsocketConfig.onrefresh && path && window.location.pathname.search(path) !== -1) {
+                        WebsocketConfig.onrefresh(data.message);
+                    }
                 }
             }
         });

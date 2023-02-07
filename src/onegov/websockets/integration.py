@@ -15,7 +15,7 @@ class WebsocketsApp(WebassetsApp):
     - general communication (send_websocket)
     - refresh event (send_websocket_refresh with regex path)
         - js integration
-        - .websockets-refresh
+        - .page-refresh
     """
 
     def configure_websockets(self, **cfg):

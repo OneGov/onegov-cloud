@@ -182,9 +182,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return url
 
-    def link(self, *args, query_params={}, **kwargs):
+    def link(self, *args, query_params={}, relative=False, **kwargs):
         """ Extends the default link generating function of Morepath. """
-        result = self.transform(super().link(*args, **kwargs))
+        result = super().link(*args, **kwargs)
+        if not relative:
+            result = self.transform(result)
         for key, value in query_params.items():
             result = append_query_param(result, key, value)
             pass
