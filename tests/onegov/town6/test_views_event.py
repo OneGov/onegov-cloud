@@ -200,6 +200,9 @@ def test_event_steps(client):
 def test_create_events_directly(client):
     client.login_admin()
     form_page = client.get('/events').click("Veranstaltung erfassen")
+    # As admin or editor, the progress indicator should not be displayed.
+    # This only makes sense in the publishing process for visitors.
+    assert 'progress-indicator' not in form_page
 
     start_date = date.today() + timedelta(days=1)
     end_date = start_date + timedelta(days=4)

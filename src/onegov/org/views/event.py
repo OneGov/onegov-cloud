@@ -213,8 +213,7 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
 
     layout = layout or EventLayout(self, request)
     layout.editbar_links = []
-    # Hide the progress indicator, since there are no steps:
-    layout.registered_steps = None
+    layout.hide_steps = True
 
     return {
         'layout': layout,
