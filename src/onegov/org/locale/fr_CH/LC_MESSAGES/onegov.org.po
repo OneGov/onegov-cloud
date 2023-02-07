@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-06 15:51+0100\n"
+"POT-Creation-Date: 2023-02-07 15:00+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -4248,8 +4248,8 @@ msgid "This event has already been published"
 msgstr "Cet événement a déjà été publié"
 
 #, python-format
-msgid "Successfully created the event ${title}"
-msgstr "L'événement ${title} a été créé avec succès"
+msgid "Successfully created the event '${title}'"
+msgstr "L'événement '${title}' a été créé avec succès"
 
 #, python-format
 msgid "You have accepted the event ${title}"

@@ -226,7 +226,7 @@ def test_create_events_directly(client):
     form_page.form.set('weekly', True, index=6)
 
     events_redirect = form_page.form.submit().follow().follow()
-    assert "Event My Event erfolgreich erstellt" in events_redirect
+    assert "Event 'My Event' erfolgreich erstellt" in events_redirect
 
 
 def test_hide_event_submission_option(client):

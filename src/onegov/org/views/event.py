@@ -94,9 +94,8 @@ def publish_event(self, request):
     ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
 
     if not ticket:
-        request.success(_("Successfully created the event ${title}", mapping={
-            'title': self.title
-        }))
+        request.success(_("Successfully created the event '${title}'",
+                        mapping={'title': self.title}))
         return request.redirect(request.link(
             OccurrenceCollection(request.session)
         ))
