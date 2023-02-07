@@ -3,12 +3,15 @@ from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
+from onegov.form.filters import as_float
 from onegov.org import _
 from wtforms.fields import BooleanField
 from wtforms.fields import DateField
+from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
 
 
 class DateRangeForm(Form):
@@ -94,7 +97,14 @@ class ExportForm(Form):
         raise NotImplementedError()
 
 
-class PaymentMethodForm(Form):
+class PaymentForm(Form):
+
+    minimum_price_total = DecimalField(
+        label=_("Minimum price total"),
+        fieldset=_("Payments"),
+        filters=(as_float, ),
+        validators=[Optional()])
+
     payment_method = RadioField(
         label=_("Payment Method"),
         fieldset=_("Payments"),
@@ -105,6 +115,13 @@ class PaymentMethodForm(Form):
             ('free', _("Credit card payments optional")),
             ('cc', _("Credit card payments required"))
         ])
+
+    def ensure_valid_total_price(self):
+        if not float(self.minimum_price_total.data) >= 0:
+            self.minimum_price_total.errors.append(_(
+                "The price must be larger than zero"
+            ))
+            return False
 
     def ensure_valid_payment_method(self):
         if self.payment_method.data == 'manual':

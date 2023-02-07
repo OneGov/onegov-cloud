@@ -127,16 +127,20 @@ class ValidFormDefinition:
         "The field '{label}' contains a price that requires a credit card "
         "payment. This is only allowed if credit card payments are optional."
     )
+    minimum_price = _(
+        "A minimum price total can only be set if at least one priced field "
+        "is defined."
+    )
 
     def __init__(self,
                  require_email_field=True,
                  reserved_fields=None,
                  require_title_fields=False,
-                 validate_payment_method=True):
+                 validate_prices=True):
         self.require_email_field = require_email_field
         self.reserved_fields = reserved_fields or set()
         self.require_title_fields = require_title_fields
-        self.validate_payment_method = validate_payment_method
+        self.validate_prices = validate_prices
 
     def __call__(self, form, field):
         if field.data:
@@ -177,8 +181,8 @@ class ValidFormDefinition:
                                 )
                             )
 
-                if self.validate_payment_method and 'payment_method' in form:
-                    for __, formfield in parsed_form._fields.items():
+                if self.validate_prices and 'payment_method' in form:
+                    for formfield in parsed_form:
                         if not hasattr(formfield, 'pricing'):
                             continue
 
@@ -193,11 +197,40 @@ class ValidFormDefinition:
                             error = field.gettext(self.payment_method).format(
                                 label=formfield.label.text
                             )
-                            # sometimes this will be a tuple and not a list
-                            errors = list(form.payment_method.errors)
+                            # if the payment_method field is below the form
+                            # definition field, then validate will not have
+                            # been run yet and we can only add process_errors
+                            errors = form.payment_method.errors
+                            if not isinstance(errors, list):
+                                errors = form.payment_method.process_errors
+                                assert isinstance(errors, list)
+
                             errors.append(error)
-                            form.payment_method.errors = errors
                             raise ValidationError(error)
+
+                if self.validate_prices and 'minimum_price_total' in form:
+                    has_pricing = (
+                        hasattr(form, 'currency') and form.currency.data
+                        or any(hasattr(formfield, 'pricing')
+                               for formfield in parsed_form._fields.values()))
+
+                    if form.minimum_price_total.data and not has_pricing:
+                        # add the error message to all affected fields
+                        # FIXME: ideally we would get more consistent about
+                        #        having a field like 'pricing_method' that
+                        #        we can attach this error to. It doesn't
+                        #        really make sense to show it on 'currency'
+                        error = field.gettext(self.minimum_price)
+                        # if the minimum_price_total field is below the form
+                        # definition field, then validate will not have
+                        # been run yet and we can only add process_errors
+                        errors = form.minimum_price_total.errors
+                        if not isinstance(errors, list):
+                            errors = form.minimum_price_total.process_errors
+                            assert isinstance(errors, list)
+
+                        errors.append(error)
+                        raise ValidationError(error)
 
 
 class StrictOptional(Optional):

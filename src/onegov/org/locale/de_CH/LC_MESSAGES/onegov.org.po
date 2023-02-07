@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-06 11:35+0100\n"
+"POT-Creation-Date: 2023-02-07 09:26+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -887,6 +887,9 @@ msgstr "Excel Datei"
 msgid "JSON File"
 msgstr "JSON Datei"
 
+msgid "Minimum price total"
+msgstr "Minimalpreis"
+
 msgid "Payment Method"
 msgstr "Zahlungsmethode"
 
@@ -898,6 +901,9 @@ msgstr "Kreditkarten-Zahlungen optional"
 
 msgid "Credit card payments required"
 msgstr "Kreditkarten-Zahlung erforderlich"
+
+msgid "The price must be larger than zero"
+msgstr "Der Preis muss grösser als Null sein"
 
 msgid ""
 "You need to setup a default payment provider to enable credit card payments"
@@ -1072,6 +1078,15 @@ msgstr "Erlaubte Postleitzahlen (eine PLZ pro Zeile)"
 msgid "Days before an allocation may be reserved by anyone"
 msgstr "Anzahl Tage bevor Einteilungen von allen reserviert werden können"
 
+msgid "Default view"
+msgstr "Standardansicht"
+
+msgid "Week view"
+msgstr "Wochenansicht"
+
+msgid "Month view"
+msgstr "Monatsansicht"
+
 msgid "Per item"
 msgstr "Pro Eintrag"
 
@@ -1084,15 +1099,6 @@ msgstr "Preis pro Eintrag"
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
 
-msgid "Default view"
-msgstr "Standardansicht"
-
-msgid "Week view"
-msgstr "Wochenansicht"
-
-msgid "Month view"
-msgstr "Monatsansicht"
-
 msgid "Please select the form field that holds the zip-code"
 msgstr "Bitte wählen Sie das Formfeld welches die Postleitzahl enthält"
 
@@ -1102,9 +1108,6 @@ msgstr "Bitte geben Sie mindestens eine Postleitzahl ein"
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr ""
 "Bitte geben Sie eine Postleitzahl pro Zeile ein, ohne Leerzeichen und Kommas"
-
-msgid "The price must be larger than zero"
-msgstr "Der Preis muss grösser als Null sein"
 
 msgid "New Reservations"
 msgstr "Neue Reservationen"
@@ -2361,8 +2364,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4421,6 +4424,14 @@ msgstr "${count} Anmeldungen storniert / abgelehnt über das Ticket-System"
 
 msgid "The registration window was deleted"
 msgstr "Der Anmeldezeitraum wurde gelöscht"
+
+#, python-format
+msgid ""
+"The total amount for the currently entered data is ${total} but has to be at "
+"least ${minimum}. Please adjust your inputs."
+msgstr ""
+"Der Totalbetrag für Ihre Eingaben beläuft sich auf ${total} allerdings ist "
+"der Minimalbetrag ${minimum}. Bitte ändern Sie ihre Eingaben."
 
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"

@@ -18,7 +18,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import PaymentMethodForm
+from onegov.org.forms.generic import PaymentForm
 from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
 from wtforms_components import ColorField
@@ -565,18 +565,25 @@ class DirectoryBaseForm(Form):
             self.marker_color = self.default_marker_color
 
 
-class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentMethodForm)):
+class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentForm)):
 
-    payment_method_args = PaymentMethodForm.payment_method.kwargs.copy()
+    minimum_price_args = PaymentForm.minimum_price_total.kwargs.copy()
+    minimum_price_args['fieldset'] = _("New entries")
+    minimum_price_args['depends_on'] = ('enable_submissions', 'y')
+
+    minimum_price_total = DecimalField(**minimum_price_args)
+
+    payment_method_args = PaymentForm.payment_method.kwargs.copy()
     payment_method_args['fieldset'] = _("New entries")
-    payment_method_args['depends_on'] = (
-        'enable_submissions', 'y', 'price', 'paid')
+    payment_method_args['depends_on'] = ('enable_submissions', 'y')
 
     payment_method = RadioField(**payment_method_args)
 
 
 DirectoryForm = move_fields(
-    DirectoryForm, ('payment_method', ), after='currency')
+    DirectoryForm,
+    ('minimum_price_total', 'payment_method'),
+    after='currency')
 
 
 class DirectoryImportForm(Form):

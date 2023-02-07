@@ -106,6 +106,10 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     #: for both manual and cc payments, 'cc' for forced cc payments)
     payment_method = Column(Text, nullable=False, default='manual')
 
+    #: the minimum price total a form submission must exceed in order to
+    #: be submitted
+    minimum_price_total = meta_property()
+
     __mapper_args__ = {
         "polymorphic_on": 'type',
         'polymorphic_identity': 'generic'

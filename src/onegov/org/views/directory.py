@@ -453,6 +453,7 @@ def handle_submit_directory_entry(self, request, form, layout=None):
             form=form,
             state='pending',
             payment_method=self.directory.payment_method,
+            minimum_price_total=self.directory.minimum_price_total,
             email=form.submitter.data,
             meta={
                 'handler_code': 'DIR',
