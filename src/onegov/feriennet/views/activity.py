@@ -414,8 +414,7 @@ def view_activities(self, request):
     main_sponsor = all_sponsors[0]
     sponsors = all_sponsors[1:len(all_sponsors)]
 
-    activities = self.batch if show_activities else None
-    activities = [a for a in activities]
+    activities = list(self.batch) if show_activities else []
 
     return {
         'activities': activities,
