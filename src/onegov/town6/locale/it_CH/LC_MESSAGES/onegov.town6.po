@@ -1594,13 +1594,13 @@ msgstr "Tag"
 msgid "Date"
 msgstr "Data"
 
+msgid "Actions"
+msgstr "Azioni"
+
 msgid "Export these events"
 msgstr "Esporta questi eventi"
 
 msgid "Submit your event"
-msgstr "Invia il tuo evento"
-
-msgid "Submit your own event"
 msgstr "Invia il tuo evento"
 
 msgid "No payment providers defined."
@@ -2078,6 +2078,9 @@ msgstr "Festività"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
+
+#~ msgid "Submit your own event"
+#~ msgstr "Invia il tuo evento"
 
 #~ msgid "Function"
 #~ msgstr "Funzioni"

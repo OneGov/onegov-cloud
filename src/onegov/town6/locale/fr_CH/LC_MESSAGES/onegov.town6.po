@@ -1604,14 +1604,14 @@ msgstr "Étiquette"
 msgid "Date"
 msgstr "Date"
 
+msgid "Actions"
+msgstr "Actions"
+
 msgid "Export these events"
 msgstr "Exporter ces événements"
 
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
-
-msgid "Submit your own event"
-msgstr "Soumettez votre propre événement"
 
 msgid "No payment providers defined."
 msgstr "Aucun fournisseur de paiement n'a été défini."
@@ -2086,6 +2086,9 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+#~ msgid "Submit your own event"
+#~ msgstr "Soumettez votre propre événement"
 
 #~ msgid "Functions"
 #~ msgstr "Fonctions"
