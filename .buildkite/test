@@ -87,6 +87,7 @@ export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
+    -n 8 \
     --test-group "$GROUP" \
     --test-group-count "$GROUP_COUNT" \
     --cov \
