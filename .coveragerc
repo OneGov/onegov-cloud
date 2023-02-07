@@ -1,7 +1,0 @@
-[run]
-data_file = /tmp/.coverage
-include = */onegov/*
-omit = */tests/*
-
-[report]
-ignore_errors = True

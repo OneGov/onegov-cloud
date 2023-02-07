@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-01-24 09:39+0100\n"
+"POT-Creation-Date: 2023-02-06 11:35+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -360,9 +360,6 @@ msgstr "Personnalisé"
 
 msgid "Custom Numbering"
 msgstr "Numérotation personnalisée"
-
-msgid "Overview layout with tiles"
-msgstr "Vue d'ensemble avec les tuiles"
 
 msgid "Main view"
 msgstr "Affichage principal"
@@ -1541,6 +1538,27 @@ msgstr "Liens externes uniquement"
 
 msgid "Internal links only"
 msgstr "Liens internes uniquement"
+
+msgid "Link must start with 'https'"
+msgstr "Le lien doit commencer par 'https'"
+
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+msgid "Username for the associated Gever account"
+msgstr "Nom d'utilisateur pour le compte Gever associé"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Password for the associated Gever account"
+msgstr "Mot de passe pour le compte Gever associé"
+
+msgid "Gever API Endpoint where the documents are uploaded."
+msgstr "Point de terminaison de l'API Gever où les documents sont téléchargés."
+
+msgid "Website address including https://"
+msgstr "Adresse du site internet avec https://"
 
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
@@ -3857,14 +3875,8 @@ msgstr "Aucun lien trouvé."
 msgid "Select an item to view it"
 msgstr "Sélectionnez un élément pour le visualiser"
 
-msgid "Username"
-msgstr "Nom d'utilisateur"
-
 msgid "Identicon"
 msgstr "Identicon"
-
-msgid "Password"
-msgstr "Mot de passe"
 
 msgid "Not a valid color."
 msgstr "Couleur non valide."
@@ -5037,6 +5049,26 @@ msgstr "Votre demand a déjà été clòturée. "
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
 
+msgid ""
+"Could not find valid credentials. You can set them in Gever API Settings."
+msgstr ""
+"Impossible de trouver des informations d'identification valides. Vous pouvez "
+"les définir dans les paramètres de L'API Gever."
+
+msgid "Encountered an error while uploading to Gever."
+msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
+
+#, python-format
+msgid ""
+"Encountered an error while uploading to Gever. Response status code is "
+"${status}."
+msgstr ""
+"Une erreur s'est produite lors du téléchargement sur Gever. Le code d'état "
+"de la réponse est ${status}."
+
+msgid "Successfully uploaded the PDF of this ticket to Gever"
+msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
+
 msgid "My"
 msgstr "Mes"
 
@@ -5076,15 +5108,6 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "Publication end date:"
-msgstr "Date de fin de publication:"
-
-msgid "Functions:"
-msgstr "Fonctions:"
-
-msgid "Will be published until:"
-msgstr "Sera publié jusqu'au:"
-
 #~ msgid "Marker Type"
 #~ msgstr "Type de marqueur"
 
@@ -5108,48 +5131,3 @@ msgstr "Sera publié jusqu'au:"
 
 #~ msgid "Homepage Image #6"
 #~ msgstr "Image n°6 de page d'accueil"
-
-msgid "Could not find valid credentials. You can set them in Gever API Settings."
-msgstr "Impossible de trouver des informations d'identification valides. "
-"Vous pouvez les définir dans les paramètres de L'API Gever."
-
-msgid "Successfully uploaded the PDF of this ticket to Gever"
-msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
-
-msgid "Encountered an error while uploading to Gever."
-"Response status code is ${status}."
-msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
-"Le code d'état de la réponse est ${status}."
-
-msgid "Encountered an error while uploading to Gever."
-msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
-
-msgid "Ticket uploaded to Gever."
-msgstr "Ticket téléchargé à Gever."
-
-msgid "Upload to Gever"
-msgstr "Télécharger à Gever"
-
-msgid "Password for the associated Gever account"
-msgstr "Mot de passe pour le compte Gever associé"
-
-msgid "Username for the associated Gever account"
-msgstr "Nom d'utilisateur pour le compte Gever associé"
-
-msgid "Gever API Endpoint where the documents are uploaded."
-msgstr "Point de terminaison de l'API Gever où les documents sont téléchargés."
-
-msgid "Website address including https://"
-msgstr "Adresse du site internet avec https://"
-
-msgid "Do you really want to upload this ticket?"
-msgstr "Voulez-vous vraiment télécharger ce ticket ?"
-
-msgid "This will upload this ticket to the Gever instance, if configured."
-msgstr "Cela va télécharger ce ticket vers l'instance Gever, si elle est configurée."
-
-msgid "Upload Ticket"
-msgstr "Télécharger le ticket"
-
-msgid "Link must start with 'https'"
-msgstr "Le lien doit commencer par 'https'"

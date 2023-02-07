@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-01-17 14:32+0100\n"
+"POT-Creation-Date: 2023-02-06 11:35+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -216,6 +216,19 @@ msgstr "Nouveau commentaire"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Upload to Gever"
+msgstr "Télécharger à Gever"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Voulez-vous vraiment télécharger ce ticket ?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr ""
+"Cela va télécharger ce ticket vers l'instance Gever, si elle est configurée."
+
+msgid "Upload Ticket"
+msgstr "Télécharger le ticket"
 
 msgid "Confirmation"
 msgstr ""
@@ -776,6 +789,9 @@ msgstr "Demande de modification"
 msgid "New Entry"
 msgstr "Nouvelle entrée"
 
+msgid "Functions:"
+msgstr "Fonctions:"
+
 msgid "Open"
 msgstr "Ouvert"
 
@@ -881,6 +897,9 @@ msgstr "Aucun événement trouvé."
 
 msgid "Learn more"
 msgstr "En savoir plus"
+
+msgid "From"
+msgstr "De"
 
 msgid "To"
 msgstr "Vers"
@@ -1016,10 +1035,10 @@ msgid "Reset"
 msgstr "Réinitialiser"
 
 msgid "Will be published until:"
-msgstr ""
+msgstr "Sera publié jusqu'au:"
 
 msgid "Publication end date:"
-msgstr ""
+msgstr "Date de fin de publication:"
 
 msgid "Not a publication"
 msgstr "Pas une publication"
@@ -1497,6 +1516,9 @@ msgstr "Ticket a été archivé"
 msgid "Ticket recovered from archive."
 msgstr "Ticket récupéré dans les archives"
 
+msgid "Ticket uploaded to Gever."
+msgstr "Ticket téléchargé à Gever."
+
 msgid "Your search returned no results."
 msgstr "Votre recherche n'a donné aucun résultat."
 
@@ -1582,14 +1604,14 @@ msgstr "Étiquette"
 msgid "Date"
 msgstr "Date"
 
+msgid "Actions"
+msgstr "Actions"
+
 msgid "Export these events"
 msgstr "Exporter ces événements"
 
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
-
-msgid "Submit your own event"
-msgstr "Soumettez votre propre événement"
 
 msgid "No payment providers defined."
 msgstr "Aucun fournisseur de paiement n'a été défini."
@@ -2065,11 +2087,11 @@ msgstr "Jours fériés"
 msgid "Link Migration"
 msgstr "Migration des liens"
 
-msgid "Functions"
-msgstr "Fonctions"
+#~ msgid "Submit your own event"
+#~ msgstr "Soumettez votre propre événement"
 
-#~ msgid "From"
-#~ msgstr "De"
+#~ msgid "Functions"
+#~ msgstr "Fonctions"
 
 #~ msgid "Partner"
 #~ msgstr "Partenaire"

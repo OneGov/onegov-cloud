@@ -76,8 +76,15 @@ def handle_new_page(self, request, form, src=None, layout=None):
 
 def handle_edit_page(self, request, form, layout=None):
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
-    if layout:
-        layout.site_title = site_title
+
+    layout = layout or EditorLayout(self, request, site_title)
+    layout.site_title = site_title
+
+    if self.page.deletable and self.page.trait == "link":
+        edit_links = self.page.get_edit_links(request)
+        layout.editbar_links = filter(
+            lambda link: link.text == _("Delete"), edit_links
+        )
 
     if form.submitted(request):
         form.populate_obj(self.page)
@@ -88,7 +95,7 @@ def handle_edit_page(self, request, form, layout=None):
         form.process(obj=self.page)
 
     return {
-        'layout': layout or EditorLayout(self, request, site_title),
+        'layout': layout,
         'title': site_title,
         'form': form,
         'form_width': 'large'
