@@ -3369,7 +3369,7 @@ msgid ""
 "This is the weekly OneGov Cloud status e-mail. If you don't want to receive "
 "this e-mail you may deactivate it by clicking on"
 msgstr ""
-"Dies ist das eöchentliche Status E-Mail der OneGov Cloud. Sie können sich "
+"Dies ist das wöchentliche Status E-Mail der OneGov Cloud. Sie können sich "
 "jederzeit über den folgenden Link"
 
 msgid "Directory entry adopted."
