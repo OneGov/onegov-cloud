@@ -4245,6 +4245,10 @@ msgid "This event has already been published"
 msgstr "Questo evento è stato pubblicato"
 
 #, python-format
+msgid "Successfully created the event '${title}'"
+msgstr "Creato con successo l'evento '${titolo}'"
+
+#, python-format
 msgid "You have accepted the event ${title}"
 msgstr "Hai accettato l'evento ${title}"
 
@@ -4265,6 +4269,9 @@ msgstr ""
 "non vengono pubblicati. Non c'è alcun diritto alla pubblicazione e gli "
 "eventi già pubblicati possono essere rimossi dalla pagina senza preavviso o "
 "motivo."
+
+msgid "Create an event"
+msgstr "Inserire l'evento"
 
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"

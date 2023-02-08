@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-02-06 11:35+0100\n"
+"POT-Creation-Date: 2023-02-06 15:48+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -347,6 +347,9 @@ msgstr "Jeden ${days} bis zum ${end}."
 
 msgid "Import"
 msgstr "Import"
+
+msgid "Create an event"
+msgstr "Veranstaltung erfassen"
 
 msgid "This event can't be editet."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."

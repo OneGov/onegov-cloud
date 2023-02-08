@@ -91,11 +91,19 @@ def publish_event(self, request):
 
     self.publish()
 
+    ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+
+    if not ticket:
+        request.success(_("Successfully created the event '${title}'",
+                        mapping={'title': self.title}))
+        return request.redirect(request.link(
+            OccurrenceCollection(request.session)
+        ))
+
     request.success(_("You have accepted the event ${title}", mapping={
         'title': self.title
     }))
 
-    ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
     if not self.source:
         # prevent sending emails for imported events when published via ticket
         send_ticket_mail(
@@ -171,6 +179,52 @@ def handle_new_event(self, request, form, layout=None):
     }
 
 
+@OrgApp.form(
+    model=OccurrenceCollection,
+    name='enter-event',
+    template='form.pt',
+    form=event_form,
+    permission=Private
+)
+def handle_new_event_without_workflow(self, request, form, layout=None):
+    """ Create and submit a new event.
+
+        The event is created and ticket workflow is skipped by setting
+        the state to 'submitted'.
+
+    """
+
+    self.title = _("Create an event")
+
+    if form.submitted(request):
+        event = EventCollection(self.session).add(
+            title=form.title.data,
+            start=form.start,
+            end=form.end,
+            timezone=form.timezone,
+        )
+        event.meta.update({
+            'session_ids': [get_session_id(request)],
+            'token': random_token()
+        })
+        event.state = 'submitted'
+        form.populate_obj(event)
+        return morepath.redirect((request.link(event, 'publish')))
+
+    layout = layout or EventLayout(self, request)
+    layout.editbar_links = []
+    layout.hide_steps = True
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'form': form,
+        'form_width': 'large',
+        'lead': '',
+        'button_text': _('Submit')
+    }
+
+
 @OrgApp.html(
     model=Event,
     template='event.pt',
@@ -191,7 +245,6 @@ def view_event(self, request, layout=None):
     A logged-in user can view all events and might edit them, an anonymous user
     will be redirected.
     """
-
     assert_anonymous_access_only_temporary(request, self)
 
     session = request.session
