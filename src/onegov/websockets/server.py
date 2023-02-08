@@ -1,9 +1,6 @@
 from asyncio import Future
-from asyncio import run
 from json import dumps
 from json import loads
-from logging import basicConfig
-from logging import DEBUG
 from onegov.websockets import log
 from websockets import broadcast
 from websockets import serve
@@ -164,17 +161,9 @@ async def handle_start(websocket):
     log.debug(f'{websocket.id} disconnected')
 
 
-async def main(host='localhost', port=8765, token=None):
-    assert token, "Please provide a token!"
+async def main(host, port, token):
     global TOKEN
     TOKEN = token
     log.debug(f'Serving on ws://{host}:{port}')
     async with serve(handle_start, host, port):
         await Future()
-
-
-# todo: remove me?
-if __name__ == "__main__":
-    basicConfig()
-    log.setLevel(DEBUG)
-    run(main(token='token'))

@@ -26,27 +26,39 @@ class WebsocketsApp(WebassetsApp):
 
         """
 
-        self.websockets_host = cfg.get('websockets_host')
-        self.websockets_port = cfg.get('websockets_port')
-        self.websockets_token = cfg.get('websockets_token')
+        config = cfg.get('websockets', {})
+        self._websockets_client_url = config.get('client_url')
+        self.websockets_manage_url = config.get('manage_url')
+        self.websockets_manage_token = config.get('manage_token')
         assert all((
-            self.websockets_host, self.websockets_port, self.websockets_token,
+            self._websockets_client_url,
+            self.websockets_manage_url,
+            self.websockets_manage_token,
         )), "Missing websockets configuration"
-        assert self.websockets_token != 'super-secret-token', (
+        assert self.websockets_manage_token != 'super-secret-token', (
             "Do not use the default websockets token"
         )
 
-    def websocket_endpoint(self, request):
-        """ Returns the public websocket endpoint that can be used with JS. """
+    def websockets_client_url(self, request):
+        """ Returns the public websocket endpoint that can be used with JS.
 
-        # todo: does this work with X_VHM?
-        # todo: do we need websockets_public_port and evt. public_host?
-        # todo: do we need an actual endpoint like '/ws'?
-        url = urlparse(request.url)
+        Upgrades the scheme to wss if request URL is https and fills in netloc
+        based on the request URL if missing.
+        """
+
+        client_url = urlparse(self._websockets_client_url)
+        scheme = client_url.scheme
+        netloc = client_url.netloc
+        path = client_url.path
+
+        request_url = urlparse(request.url)
+        if request_url.scheme == 'https':
+            scheme = 'wss'
+        netloc = netloc or request_url.netloc
+
         return ParseResult(
-            'wss' if url.scheme == 'https' else 'ws',
-            f'{url.hostname}:{self.websockets_port}',
-            '', '', '', ''
+            scheme=scheme, netloc=netloc, path=path,
+            params='', query='', fragment=''
         ).geturl()
 
     def send_websocket_refresh(self, path):
@@ -60,13 +72,11 @@ class WebsocketsApp(WebassetsApp):
 
         """
 
-        url = f'ws://{self.websockets_host}:{self.websockets_port}'
-
         async def main():
-            async with connect(url) as websocket:
+            async with connect(self.websockets_manage_url) as websocket:
                 await authenticate(
                     websocket,
-                    self.websockets_token
+                    self.websockets_manage_token
                 )
                 await broadcast(
                     websocket,

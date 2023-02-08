@@ -14,7 +14,7 @@ window.addEventListener("DOMContentLoaded", function() {
             if (data.type === 'notification') {
                 if (data.message.event === 'refresh') {
                     const path = data.message.path;
-                    if (WebsocketConfig.onrefresh && path && window.location.pathname.search(path) !== -1) {
+                    if (WebsocketConfig.onrefresh && path && window.location.href.search(path) !== -1) {
                         WebsocketConfig.onrefresh(data.message);
                     }
                 }

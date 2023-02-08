@@ -141,7 +141,7 @@ metal:define-macro="layout">
     <tal:block tal:content="structure layout.principal.analytics|nothing" />
     <script>
         WebsocketConfig = {
-            endpoint: "${layout.app.websocket_endpoint(request)}",
+            endpoint: "${layout.app.websockets_client_url(request)}",
             schema: "${layout.app.schema}",
             onrefresh: function(event) { $(".page-refresh").show(); }
         };

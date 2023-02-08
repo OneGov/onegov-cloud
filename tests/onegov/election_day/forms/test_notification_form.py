@@ -13,27 +13,40 @@ def test_notification_form():
     form = TriggerNotificationForm()
     form.request = DummyRequest()
     form.on_request()
-    assert form.notifications.choices == []
+    assert form.notifications.choices == [
+        ('websockets', 'Websocket / Browser')
+    ]
+    assert 'websockets' in form.notifications.default
     assert not form.validate()
 
     form.request.app.principal.email_notification = True
     form.on_request()
-    assert form.notifications.choices == [('email', 'Email')]
+    assert form.notifications.choices == [
+        ('websockets', 'Websocket / Browser'),
+        ('email', 'Email')
+    ]
     assert 'email' in form.notifications.default
 
     form.request.app.principal.sms_notification = 'http://example.com'
     form.on_request()
-    assert form.notifications.choices == [('email', 'Email'), ('sms', 'SMS')]
-    assert 'email' in form.notifications.default
+    assert form.notifications.choices == [
+        ('websockets', 'Websocket / Browser'),
+        ('email', 'Email'),
+        ('sms', 'SMS')
+    ]
     assert 'sms' in form.notifications.default
 
     form.request.app.principal.webhooks = {'http://abc.com/1': None}
     form.on_request()
     assert form.notifications.choices == [
-        ('email', 'Email'), ('sms', 'SMS'), ('webhooks', 'Webhooks')
+        ('websockets', 'Websocket / Browser'),
+        ('email', 'Email'),
+        ('sms', 'SMS'),
+        ('webhooks', 'Webhooks')
     ]
-    assert form.notifications.data == ['email', 'sms', 'webhooks']
-    assert 'sms' in form.notifications.default
+    assert form.notifications.data == [
+        'websockets', 'email', 'sms', 'webhooks'
+    ]
     assert 'webhooks' in form.notifications.default
 
 
@@ -41,7 +54,9 @@ def test_notifications_form(session):
     form = TriggerNotificationsForm()
     form.request = DummyRequest(session=session)
     form.on_request()
-    assert form.notifications.choices == []
+    assert form.notifications.choices == [
+        ('websockets', 'Websocket / Browser')
+    ]
     assert form.elections.choices == []
     assert form.election_compounds.choices == []
     assert form.votes.choices == []
@@ -115,9 +130,13 @@ def test_notifications_form(session):
     # Test on_request
     form.on_request()
     assert form.notifications.choices == [
+        ('websockets', 'Websocket / Browser'),
         ('email', 'Email'), ('sms', 'SMS'), ('webhooks', 'Webhooks')
     ]
-    assert form.notifications.data == ['email', 'sms', 'webhooks']
+    assert form.notifications.data == [
+        'websockets', 'email', 'sms', 'webhooks'
+    ]
+    assert 'websockets' in form.notifications.default
     assert 'email' in form.notifications.default
     assert 'sms' in form.notifications.default
     assert 'webhooks' in form.notifications.default
