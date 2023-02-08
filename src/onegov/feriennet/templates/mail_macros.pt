@@ -10,15 +10,19 @@
     <p>
         <hr />
     </p>
-    <p style="text-align: center; margin-bottom: 0;">
-        <span i18n:translate>Pro Juventute FERIENNET is supported by:</span>
-        <p style="text-align: center;">
-            <tal:b repeat="sponsor layout.app.mail_sponsors(request)">
-              <a href="${sponsor.mail_url}">${sponsor.name}</a>
-              <tal:b condition="not repeat.sponsor.end">–</tal:b>
-            </tal:b>
-        </p>
-    </p>
+    <tal:b define="sponsor layout.app.mail_sponsor(request)">
+        <div tal:condition="sponsor" style="text-align: center;">
+            <p>
+                <span i18n:translate>Pro Juventute FERIENNET is supported by:</span>
+                <a href="${sponsor.mail_url}">${sponsor.name}</a>
+            </p>
+            <p style="margin-bottom: 0;">
+                <a href="${sponsor.mail_url}" style="margin-bottom: 0; display: flex;">
+                    <img style="" src="${sponsor.banners.src}">
+                </a>
+            </p>
+        </div>
+    </tal:b>
 </metal:reservations>
 
 <metal:sender define-macro="sender" i18n:domain="onegov.org">
