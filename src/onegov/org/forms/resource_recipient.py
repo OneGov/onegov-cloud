@@ -36,14 +36,14 @@ class ResourceRecipientForm(Form):
 
     new_reservations = BooleanField(
         label=_("New Reservations"),
-        fieldset="Notifications *",
+        fieldset=_("Notifications *"),
         description=("Bei jeder neuen Reservation wird eine Benachrichtigung "
                      "an den obenstehendes Empfänger gesendet."),
     )
 
     daily_reservations = BooleanField(
         label=_("Daily Reservations"),
-        fieldset="Notifications *",
+        fieldset=_("Notifications *"),
         description=("An jedem unten ausgewählten Tag wird um 06:00 eine "
                      "Benachrichtigung mit den Reservationen des Tages an den "
                      "obenstehenden Empfänger gesendet."),

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-07 09:26+0100\n"
+"POT-Creation-Date: 2023-02-08 15:40+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1115,6 +1115,9 @@ msgstr "Inserisci un codice postale per riga, senza spazi o virgole"
 
 msgid "New Reservations"
 msgstr "Nuove prenotazioni"
+
+msgid "Notifications *"
+msgstr "Notifiche *"
 
 msgid "Daily Reservations"
 msgstr "Prenotazioni giornaliere"
@@ -2375,8 +2378,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
