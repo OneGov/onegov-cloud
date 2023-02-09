@@ -1517,6 +1517,7 @@
             ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
         </p>
     </a>
+    <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="far fa-edit"></i></a>
 </metal:search_result_external_links>
 
 

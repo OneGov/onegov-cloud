@@ -1284,6 +1284,7 @@
 
 <metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.org">
     <a href="${result.url}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
+    <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
     <tal:b condition="result.lead">
         ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
     </tal:b>
