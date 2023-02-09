@@ -26,7 +26,7 @@ cli = command_group()
     }
 )
 @click.option('--host')
-@click.option('--port')
+@click.option('--port', type=int)
 @click.option('--token')
 @click.option('--sentry-dsn')
 @click.option('--sentry-environment', default='testing')
@@ -87,8 +87,8 @@ def listen(group_context, url, schema):
 
         async def main():
             async with connect(url) as websocket:
-                await register(websocket, app.schema or schema)
-                log.info(f'Listing on {url} @ {app.schema or schema}')
+                await register(websocket, schema or app.schema)
+                log.info(f'Listing on {url} @ {schema or app.schema}')
                 async for message in websocket:
                     log.info(message)
 
@@ -159,10 +159,10 @@ def broadcast(group_context, message, url, schema, token):
                 )
                 await broadast_message(
                     websocket,
-                    app.schema or schema,
+                    schema or app.schema,
                     loads(message)
                 )
-                click.echo(f'{message} sent to {app.schema or schema}')
+                click.echo(f'{message} sent to {schema or app.schema}')
 
         run(main())
 

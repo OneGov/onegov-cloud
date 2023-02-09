@@ -11,11 +11,28 @@ from websockets import connect
 class WebsocketsApp(WebassetsApp):
     """
 
-    todo: description
-    - general communication (send_websocket)
-    - refresh event (send_websocket_refresh with regex path)
-        - js integration
-        - .page-refresh
+    Add applicatiod-bound websocket broadcast communication.
+
+    To receive broadcast messages using JavaScript in the browser, include the
+    asset and add a global configure object::
+
+        WebsocketConfig = {
+                endpoint: "${layout.app.websockets_client_url(request)}",
+                schema: "${layout.app.schema}",
+            };
+
+    To send broadcast messages, call ``send_websocket`` with a
+    JSON-serializable message.
+
+    WebsocketsApp supports a builtin broadcast event for refreshing pages. Call
+    ``send_websocket_refresh`` with an absolute URL or path to trigger a page
+    refresh and make sure to include a callback in the global configuration::
+
+        WebsocketConfig = {
+            ...
+            onrefresh: function(event) { ... }
+        };
+
     """
 
     def configure_websockets(self, **cfg):
@@ -64,7 +81,7 @@ class WebsocketsApp(WebassetsApp):
     def send_websocket_refresh(self, path):
         """ Sends a refresh event to all clients connected to the app. """
 
-        self.send_websocket({'event': 'refresh', 'path': path})
+        return self.send_websocket({'event': 'refresh', 'path': path})
 
     def send_websocket(self, message):
         """ Sends an application-bound broadcast message to all connected
