@@ -1282,6 +1282,14 @@
 </metal:search_result_people>
 
 
+<metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.org">
+    <a href="${result.url}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
+    <tal:b condition="result.lead">
+        ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+    </tal:b>
+</metal:search_result_external_links>
+
+
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <tal:b condition="result.lead">

@@ -1508,6 +1508,18 @@
 </metal:search_result_people>
 
 
+<metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
+    <a href="${result.url}" class="list-link">
+        <span class="h5 list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
+    </a>
+    <a tal:condition="result.lead" href="${result.url}">
+        <p class="list-lead preview">
+            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+        </p>
+    </a>
+</metal:search_result_external_links>
+
+
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town6">
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
