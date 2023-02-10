@@ -1294,7 +1294,6 @@ class OccurrencesLayout(EventBaseLayout):
                         ),
                     ]
                 ),
-
             )
 
 

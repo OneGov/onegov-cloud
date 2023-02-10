@@ -345,6 +345,9 @@ msgstr "Tous les ${days} jusqu'à ${end}"
 msgid "Import"
 msgstr "Imprimer"
 
+msgid "Create an event"
+msgstr "Saisir un événement"
+
 msgid "This event can't be editet."
 msgstr "Cet événement ne peut pas être édité."
 

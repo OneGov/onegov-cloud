@@ -348,6 +348,9 @@ msgstr "Jeden ${days} bis zum ${end}."
 msgid "Import"
 msgstr "Import"
 
+msgid "Create an event"
+msgstr "Veranstaltung erfassen"
+
 msgid "This event can't be editet."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
 
@@ -836,7 +839,7 @@ msgid ""
 "Persons living outside the following zipcodes may only reserve this "
 "allocation on the ${date}: ${zipcodes}"
 msgstr ""
-"Personen die ausserhalb der folgenden Postleitzahlen leben können diese "
+"Personen, die ausserhalb der folgenden Postleitzahlen leben, können diese "
 "Reservation erst am ${date} tätigen: ${zipcodes}"
 
 msgid "Quota"

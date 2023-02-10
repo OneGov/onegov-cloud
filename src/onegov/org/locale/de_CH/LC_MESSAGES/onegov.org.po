@@ -475,6 +475,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Publikation"
 
+msgid "Required publication dates"
+msgstr "Publikationsdaten erforderlich"
+
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
 
@@ -2364,8 +2367,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 

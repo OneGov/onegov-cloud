@@ -476,6 +476,9 @@ msgstr ""
 msgid "Publication"
 msgstr "Publication"
 
+msgid "Required publication dates"
+msgstr "Les dates de publication sont requises"
+
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informations complémentaires du demandeur requises à l'e-mail"
 
@@ -2365,8 +2368,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
