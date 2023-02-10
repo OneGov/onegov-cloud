@@ -340,9 +340,6 @@ msgstr "Ogni ${days} fino al ${end}"
 msgid "Import"
 msgstr "Importa"
 
-msgid "Create an event"
-msgstr "Inserire l'evento"
-
 msgid "This event can't be editet."
 msgstr "Questo evento non può essere modificato."
 

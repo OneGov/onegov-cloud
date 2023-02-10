@@ -194,7 +194,7 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
 
     """
 
-    self.title = _("Create an event")
+    self.title = _("Add event")
 
     if form.submitted(request):
         event = EventCollection(self.session).add(
