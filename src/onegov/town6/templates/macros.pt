@@ -1163,6 +1163,13 @@
     </tal:b>
         </div>
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
+    <div tal:condition="not occurrences">
+        <!-- "${layout.events_url}" -->
+        <br>
+        <a href="${layout.events_url}" class="">Alle Veranstaltungen</a>
+        <br>
+        <a href="${layout.events_url}&amp;range=past" class="">Vergangene Veranstaltungen</a>
+    </div>
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
