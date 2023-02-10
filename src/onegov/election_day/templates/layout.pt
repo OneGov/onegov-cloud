@@ -139,7 +139,7 @@ metal:define-macro="layout">
         </div>
     </footer>
     <tal:block tal:content="structure layout.principal.analytics|nothing" />
-    <script>
+    <script tal:condition="getattr(layout, 'use_websockets', False)">
         WebsocketConfig = {
             endpoint: "${layout.app.websockets_client_url(request)}",
             schema: "${layout.app.schema}",

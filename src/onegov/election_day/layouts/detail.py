@@ -44,6 +44,8 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     """
 
+    use_websockets = True
+
     @cached_property
     def has_results(self):
         return self.model.has_results
