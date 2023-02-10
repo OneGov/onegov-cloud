@@ -2143,6 +2143,9 @@ msgstr "Lo scorso anno"
 msgid "Older"
 msgstr "Più vecchia"
 
+msgid "Past Events"
+msgstr "Eventi passate"
+
 msgid "Do you really want to delete this note?"
 msgstr "Vuoi davvero eliminare questa nota?"
 
