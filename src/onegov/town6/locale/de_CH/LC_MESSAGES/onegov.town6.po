@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-02-06 15:48+0100\n"
+"POT-Creation-Date: 2023-02-10 17:08+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1612,9 +1612,6 @@ msgstr "Schlagwort"
 msgid "Date"
 msgstr "Datum"
 
-msgid "Actions"
-msgstr "Aktionen"
-
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
@@ -2086,6 +2083,9 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Actions"
+#~ msgstr "Aktionen"
 
 #~ msgid "Submit your own event"
 #~ msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
