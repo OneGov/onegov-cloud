@@ -6,13 +6,13 @@ from unittest.mock import patch
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_integration(broadcast, authenticate, connect, app):
-    assert app.websockets_manage_url == 'ws://localhost:8765'
+    assert app.websockets_manage_url == 'ws://127.0.0.1:9876'
     assert app.websockets_manage_token == 'super-super-secret-token'
-    assert app._websockets_client_url == 'ws://localhost:8765'
+    assert app._websockets_client_url == 'ws://127.0.0.1:9876'
 
     # websockets_client_url
-    request = Bunch(url='http://localhost:8080:/org/govikon')
-    assert app.websockets_client_url(request) == 'ws://localhost:8765'
+    request = Bunch(url='http://127.0.0.1:8080:/org/govikon')
+    assert app.websockets_client_url(request) == 'ws://127.0.0.1:9876'
 
     app._websockets_client_url = 'ws:///ws'
     request = Bunch(url='https://govikon.org')

@@ -16,15 +16,15 @@ def test_cli_serve(main, init_sentry, cfg_path):
     assert result.exit_code == 0
     assert init_sentry.call_count == 0
     assert main.call_count == 1
-    assert main.call_args[0][0] == 'localhost'
-    assert main.call_args[0][1] == 8765
+    assert main.call_args[0][0] == '127.0.0.1'
+    assert main.call_args[0][1] == 9876
     assert main.call_args[0][2] == 'super-super-secret-token'
 
     result = runner.invoke(cli, [
         '--config', cfg_path,
         '--select', '/foo/bar',
         'serve',
-        '--host', '127.0.0.1',
+        '--host', '127.0.0.2',
         '--port', '8887',
         '--token', 'not-so-secret-token',
         '--sentry-dsn', 'https://sentry.io/foo-bar',
@@ -40,7 +40,7 @@ def test_cli_serve(main, init_sentry, cfg_path):
     }
 
     assert main.call_count == 2
-    assert main.call_args[0][0] == '127.0.0.1'
+    assert main.call_args[0][0] == '127.0.0.2'
     assert main.call_args[0][1] == 8887
     assert main.call_args[0][2] == 'not-so-secret-token'
 
@@ -58,7 +58,7 @@ def test_cli_status(status, authenticate, connect, cfg_path):
     ])
     assert result.exit_code == 0
     assert connect.call_count == 1
-    assert connect.call_args[0][0] == 'ws://localhost:8765'
+    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
     assert authenticate.call_count == 1
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
     assert status.call_count == 1
@@ -94,7 +94,7 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
     ])
     assert result.exit_code == 0
     assert connect.call_count == 1
-    assert connect.call_args[0][0] == 'ws://localhost:8765'
+    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
     assert authenticate.call_count == 1
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
     assert broadcast.call_count == 1
