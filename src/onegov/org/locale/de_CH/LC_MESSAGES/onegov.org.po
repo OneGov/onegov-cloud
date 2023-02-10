@@ -1115,6 +1115,9 @@ msgstr ""
 msgid "New Reservations"
 msgstr "Neue Reservationen"
 
+msgid "Notifications *"
+msgstr "Benachrichtigungen *"
+
 msgid "Daily Reservations"
 msgstr "Tägliche Reservationen"
 

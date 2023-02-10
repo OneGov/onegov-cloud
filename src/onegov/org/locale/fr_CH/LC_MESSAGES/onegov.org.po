@@ -1116,6 +1116,9 @@ msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
 msgid "New Reservations"
 msgstr "Nouvelles réservations"
 
+msgid "Notifications *"
+msgstr "Notifications *"
+
 msgid "Daily Reservations"
 msgstr "Réservations quotidiennes"
 
