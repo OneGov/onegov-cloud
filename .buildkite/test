@@ -90,7 +90,7 @@ run-as "$(id -u test)":test py.test \
     --test-group "$GROUP" \
     --test-group-count "$GROUP_COUNT" \
     --cov \
-    --cov-config=.coveragerc \
+    --cov-config=pyproject.toml \
     --codecov \
     --codecov-branch="$BUILDKITE_BRANCH" \
     --codecov-commit="$BUILDKITE_COMMIT" \

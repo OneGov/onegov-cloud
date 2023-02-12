@@ -221,6 +221,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     enable_submissions = meta_property()
     enable_change_requests = meta_property()
     enable_publication = meta_property()
+    required_publication = meta_property()
     submitter_meta_fields = meta_property()
 
     submissions_guideline = content_property()
@@ -231,6 +232,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     price_per_submission = content_property()
     currency = content_property()
 
+    minimum_price_total = meta_property()
     payment_method = meta_property()
 
     searchwidget_config = content_property()
