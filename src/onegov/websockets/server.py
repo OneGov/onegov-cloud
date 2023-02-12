@@ -73,7 +73,10 @@ async def handle_authentication(websocket, payload):
     assert payload.get('type') == 'authenticate'
 
     token = payload.get('token')
-    if not token or not token == TOKEN:
+    if not token or not isinstance(token, str):
+        await error(websocket, 'invalid token')
+        return
+    if token != TOKEN:
         await error(websocket, 'authentication failed')
         return
 
@@ -112,7 +115,10 @@ async def handle_broadcast(websocket, payload):
     message = payload.get('message')
     schema = payload.get('schema')
     if not schema or not isinstance(schema, str):
-        await error(websocket, 'invalid schema')
+        await error(websocket, f'invalid schema: {schema}')
+        return
+    if not message:
+        await error(websocket, 'missing message')
         return
 
     await acknowledge(websocket)

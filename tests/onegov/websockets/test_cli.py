@@ -1,6 +1,44 @@
 from click.testing import CliRunner
 from onegov.websockets.cli import cli
+from os import path
+from pytest import fixture
 from unittest.mock import patch
+from yaml import dump
+
+
+@fixture(scope='function')
+def cfg_path(
+    postgres_dsn, session_manager, temporary_directory, redis_url,
+    websocket_config
+):
+    cfg = {
+        'applications': [
+            {
+                'path': '/foo/*',
+                'application': (
+                    'tests.onegov.websockets.conftest.WebsocketsTestApp'
+                ),
+                'namespace': 'foo',
+                'configuration': {
+                    'dsn': postgres_dsn,
+                    'redis_url': redis_url,
+                    'websockets': {
+                        'client_url': websocket_config['url'],
+                        'manage_url': websocket_config['url'],
+                        'manage_token': websocket_config['token']
+                    }
+                }
+            }
+        ]
+    }
+
+    session_manager.ensure_schema_exists('foo-bar')
+
+    cfg_path = path.join(temporary_directory, 'onegov.yml')
+    with open(cfg_path, 'w') as f:
+        f.write(dump(cfg))
+
+    return cfg_path
 
 
 @patch('onegov.websockets.cli.init_sentry')

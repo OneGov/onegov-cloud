@@ -3,7 +3,7 @@ from json import loads
 from onegov.websockets import log
 
 
-async def acknowledged(websocket, fail=False):
+async def acknowledged(websocket):
     """ Wait for an OK from the server. """
 
     message = await websocket.recv()
@@ -12,8 +12,7 @@ async def acknowledged(websocket, fail=False):
     except Exception:
         log.error(f'Unexpected response: {message}')
         await websocket.close()
-        if fail:
-            raise IOError(message)
+        raise IOError(message)
 
 
 async def register(websocket, schema):
@@ -37,7 +36,7 @@ async def authenticate(websocket, token):
             'token': token
         })
     )
-    await acknowledged(websocket, fail=True)
+    await acknowledged(websocket)
 
 
 async def broadcast(websocket, schema, message):
