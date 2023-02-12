@@ -167,7 +167,7 @@ class FormSubmissionCollection:
         return query
 
     def add(self, name, form, state, id=None, payment_method=None,
-            meta=None, email=None, spots=None):
+            minimum_price_total=None, meta=None, email=None, spots=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -220,6 +220,11 @@ class FormSubmissionCollection:
             or definition and definition.payment_method
             or 'manual'
         )
+        submission.minimum_price_total = (
+            minimum_price_total
+            or definition and definition.minimum_price_total
+            or 0.0
+        )
 
         # extensions are inherited from definitions
         if definition:
@@ -244,7 +249,7 @@ class FormSubmissionCollection:
         return submission
 
     def add_external(self, form, state, id=None, payment_method=None,
-                     meta=None, email=None):
+                     minimum_price_total=None, meta=None, email=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -261,6 +266,7 @@ class FormSubmissionCollection:
             state=state,
             id=id,
             payment_method=payment_method,
+            minimum_price_total=minimum_price_total,
             meta=meta,
             email=email,
         )

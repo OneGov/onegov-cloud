@@ -5,7 +5,7 @@ from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
-from onegov.org.forms.generic import PaymentMethodForm
+from onegov.org.forms.generic import PaymentForm
 from onegov.org.forms.reservation import RESERVED_FIELDS,\
     ExportToExcelWorksheets
 from wtforms.fields import BooleanField
@@ -130,6 +130,17 @@ class ResourceBaseForm(Form):
         ],
     )
 
+    # only used for rooms, not day-passes
+    default_view = RadioField(
+        label=_("Default view"),
+        fieldset=_("View"),
+        default='agendaWeek',
+        validators=[InputRequired()],
+        choices=(
+            ('agendaWeek', _("Week view")),
+            ('month', _("Month view")),
+        ))
+
     pricing_method = RadioField(
         label=_("Price"),
         fieldset=_("Payments"),
@@ -165,17 +176,6 @@ class ResourceBaseForm(Form):
         depends_on=('pricing_method', '!free'),
         validators=[InputRequired()],
     )
-
-    # only used for rooms, not day-passes
-    default_view = RadioField(
-        label=_("Default view"),
-        fieldset=_("View"),
-        default='agendaWeek',
-        validators=[InputRequired()],
-        choices=(
-            ('agendaWeek', _("Week view")),
-            ('month', _("Month view")),
-        ))
 
     def on_request(self):
         if hasattr(self.model, 'type'):
@@ -298,7 +298,7 @@ class ResourceBaseForm(Form):
         self.zipcode_block = obj.zipcode_block
 
 
-class ResourceForm(merge_forms(ResourceBaseForm, PaymentMethodForm)):
+class ResourceForm(merge_forms(ResourceBaseForm, PaymentForm)):
     pass
 
 

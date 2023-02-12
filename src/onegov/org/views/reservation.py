@@ -263,7 +263,8 @@ def handle_reservation_form(self, request, form, layout=None):
                 form=self.form_class(),
                 state='pending',
                 id=token,
-                payment_method=self.payment_method
+                payment_method=self.payment_method,
+                minimum_price_total=self.minimum_price_total,
             )
 
         # update the data on the submission

@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-01-17 14:32+0100\n"
+"POT-Creation-Date: 2023-02-10 17:08+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -212,6 +212,18 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Upload to Gever"
+msgstr "Caricare a Gever"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Vuole davvero caricare questo biglietto?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
+
+msgid "Upload Ticket"
+msgstr "Caricare il biglietto"
+
 msgid "Confirmation"
 msgstr "Conferma"
 
@@ -327,6 +339,9 @@ msgstr "Ogni ${days} fino al ${end}"
 
 msgid "Import"
 msgstr "Importa"
+
+msgid "Create an event"
+msgstr "Inserire l'evento"
 
 msgid "This event can't be editet."
 msgstr "Questo evento non può essere modificato."
@@ -771,6 +786,9 @@ msgstr "Richiesta di modifica"
 msgid "New Entry"
 msgstr "Nuovo elemento"
 
+msgid "Functions:"
+msgstr "Funzioni:"
+
 msgid "Open"
 msgstr "Aperto"
 
@@ -879,6 +897,9 @@ msgstr "Nessun evento trovato."
 
 msgid "Learn more"
 msgstr "Per saperne di più"
+
+msgid "From"
+msgstr "Dalle"
 
 msgid "To"
 msgstr "A"
@@ -1013,10 +1034,10 @@ msgid "Reset"
 msgstr "Ripristina"
 
 msgid "Will be published until:"
-msgstr ""
+msgstr "Sarà pubblicato fino a:"
 
 msgid "Publication end date:"
-msgstr ""
+msgstr "Data di fine pubblicazione:"
 
 msgid "Not a publication"
 msgstr "Non una pubblicazione"
@@ -1489,6 +1510,9 @@ msgstr "Biglietto archiviato."
 msgid "Ticket recovered from archive."
 msgstr "Biglietto recuperato dall'archivio."
 
+msgid "Ticket uploaded to Gever."
+msgstr "Biglietto caricato su Gever."
+
 msgid "Your search returned no results."
 msgstr "La tua ricerca non ha restituito alcun risultato."
 
@@ -1577,9 +1601,6 @@ msgid "Export these events"
 msgstr "Esporta questi eventi"
 
 msgid "Submit your event"
-msgstr "Invia il tuo evento"
-
-msgid "Submit your own event"
 msgstr "Invia il tuo evento"
 
 msgid "No payment providers defined."
@@ -2058,11 +2079,14 @@ msgstr "Festività"
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
-msgid "Function"
-msgstr "Funzioni"
+#~ msgid "Actions"
+#~ msgstr "Azioni"
 
-#~ msgid "From"
-#~ msgstr "Dalle"
+#~ msgid "Submit your own event"
+#~ msgstr "Invia il tuo evento"
+
+#~ msgid "Function"
+#~ msgstr "Funzioni"
 
 #, fuzzy
 #~ msgid "Partner"
