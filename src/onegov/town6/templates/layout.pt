@@ -276,5 +276,12 @@
             <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
             <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
         </div>
-</body>
+        <script tal:condition="request.is_manager">
+            WebsocketConfig = {
+                endpoint: "${layout.app.websockets_client_url(request)}",
+                schema: "${layout.app.schema}",
+                channel: "${layout.app.websockets_channel}"
+            };
+        </script>
+    </body>
 </html>

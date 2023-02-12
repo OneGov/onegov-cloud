@@ -52,7 +52,8 @@ def request_accreditation(self, request, form):
                     'id': str(translator.id),
                     'submitter_email': form.email.data,
                     **form.get_ticket_data()
-                }
+                },
+                request=request
             )
             TicketMessage.create(ticket, request, 'opened')
             ticket.create_snapshot(request)

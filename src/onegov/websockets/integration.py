@@ -17,9 +17,9 @@ class WebsocketsApp(WebassetsApp):
     asset and add a global configure object::
 
         WebsocketConfig = {
-                endpoint: "${layout.app.websockets_client_url(request)}",
-                schema: "${layout.app.schema}",
-            };
+            endpoint: "${layout.app.websockets_client_url(request)}",
+            schema: "${layout.app.schema}",
+        };
 
     To send broadcast messages, call ``send_websocket`` with a
     JSON-serializable message.
@@ -83,7 +83,7 @@ class WebsocketsApp(WebassetsApp):
 
         return self.send_websocket({'event': 'refresh', 'path': path})
 
-    def send_websocket(self, message):
+    def send_websocket(self, message, channel=None):
         """ Sends an application-bound broadcast message to all connected
         clients.
 
@@ -98,7 +98,8 @@ class WebsocketsApp(WebassetsApp):
                 await broadcast(
                     websocket,
                     self.schema,
-                    message
+                    message,
+                    channel
                 )
 
         try:

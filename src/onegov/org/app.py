@@ -30,11 +30,12 @@ from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
+from onegov.websockets import WebsocketsApp
 from purl import URL
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp):
+             DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
     serve_static_files = True
     request_class = OrgRequest
@@ -206,6 +207,17 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         key_base64 = base64.b64encode(short_key)
         return key_base64
 
+    # todo: move to websocets integration
+    @property
+    def websockets_channel(self):
+        """ An unguessable channel ID used for broadcasting notifications
+        through websockets to logged-in users.
+
+        This is not meant to be save, do not broadcast sensible information!
+        """
+
+        return self.sign(self.schema).replace(self.schema, '')
+
     @property
     def custom_event_form_lead(self):
         return self.cache.get_or_create(
@@ -332,6 +344,8 @@ def org_content_security_policy():
     policy.child_src.add('https://checkout.stripe.com')
 
     policy.connect_src.add(SELF)
+    policy.connect_src.add('ws:')
+    policy.connect_src.add('wss:')
     policy.connect_src.add('https://checkout.stripe.com')
     policy.connect_src.add('https://sentry.io')
     policy.connect_src.add('https://*.google-analytics.com')

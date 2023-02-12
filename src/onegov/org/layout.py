@@ -582,6 +582,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
         if self.request.is_manager:
             self.request.include('sortable')
+            self.request.include('websockets')
 
         if self.org.open_files_target_blank:
             self.request.include('all_blank')

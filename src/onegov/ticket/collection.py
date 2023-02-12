@@ -170,7 +170,9 @@ class TicketCollection(TicketCollectionPagination):
             if not self.is_existing_ticket_number(candidate):
                 return candidate
 
-    def open_ticket(self, handler_code, handler_id, **handler_data):
+    def open_ticket(
+        self, handler_code, handler_id, request=None, **handler_data
+    ):
         """ Opens a new ticket using the given handler. """
 
         ticket = Ticket.get_polymorphic_class(handler_code, default=Ticket)()
@@ -186,6 +188,17 @@ class TicketCollection(TicketCollectionPagination):
         ticket.handler.refresh()
 
         self.session.flush()
+
+        # sent ticket notification
+        if request:
+            request.app.send_websocket(
+                channel=request.app.websockets_channel,
+                message={
+                    'event': 'ticket',
+                    'number': ticket.number,
+                    'url': request.link(ticket),
+                }
+            )
 
         return ticket
 

@@ -301,7 +301,8 @@ def report_person_change(self, request, form):
                     'submitter_email': form.submitter_email.data,
                     'submitter_message': form.submitter_message.data,
                     'proposed_changes': form.proposed_changes
-                }
+                },
+                request=request
             )
             TicketMessage.create(ticket, request, 'opened')
             ticket.create_snapshot(request)

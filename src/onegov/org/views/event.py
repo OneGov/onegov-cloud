@@ -257,7 +257,9 @@ def view_event(self, request, layout=None):
             if not ticket:
                 with session.no_autoflush:
                     ticket = TicketCollection(session).open_ticket(
-                        handler_code='EVN', handler_id=self.id.hex
+                        handler_code='EVN',
+                        handler_id=self.id.hex,
+                        request=request
                     )
                     TicketMessage.create(ticket, request, 'opened')
 

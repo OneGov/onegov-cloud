@@ -499,7 +499,9 @@ def finalize_reservation(self, request):
             forms.submissions.complete_submission(submission)
         with forms.session.no_autoflush:
             ticket = TicketCollection(request.session).open_ticket(
-                handler_code='RSV', handler_id=token
+                handler_code='RSV',
+                handler_id=token,
+                request=request
             )
             TicketMessage.create(ticket, request, 'opened')
 

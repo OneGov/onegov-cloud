@@ -357,7 +357,8 @@ def report_translator_change(self, request, form):
                     'submitter_email': request.current_username,
                     'submitter_message': form.submitter_message.data,
                     'proposed_changes': form.proposed_changes
-                }
+                },
+                request=request
             )
             TicketMessage.create(ticket, request, 'opened')
             ticket.create_snapshot(request)

@@ -221,7 +221,8 @@ def handle_complete_submission(self, request):
             with collection.session.no_autoflush:
                 ticket = TicketCollection(request.session).open_ticket(
                     handler_code=self.meta.get('handler_code', 'FRM'),
-                    handler_id=self.id.hex
+                    handler_id=self.id.hex,
+                    request=request
                 )
                 TicketMessage.create(ticket, request, 'opened')
 
