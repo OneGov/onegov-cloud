@@ -75,14 +75,16 @@ def get_party_results_deltas(item, years, parties):
             result = ['', '', '', '']
             party = parties[key]
             values = party.get(year)
-            if values:
-                permille = values.get(attribute, {}).get('permille')
-                result = [
-                    values.get('name', ''),
-                    values.get('mandates', ''),
-                    values.get(attribute, {}).get('total', ''),
-                    f'{permille/10}%' if permille else ''
-                ]
+            if not values:
+                continue
+
+            permille = values.get(attribute, {}).get('permille')
+            result = [
+                values.get('name', ''),
+                values.get('mandates', ''),
+                values.get(attribute, {}).get('total', ''),
+                f'{permille/10}%' if permille else ''
+            ]
 
             if deltas:
                 delta = ''
