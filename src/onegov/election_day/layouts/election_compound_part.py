@@ -47,6 +47,10 @@ class ElectionCompoundPartLayout(DetailLayout):
     def results(self):
         return self.model.results
 
+    @cached_property
+    def totals(self):
+        return self.model.totals
+
     def label(self, value):
         if value == 'district':
             if self.model.election_compound.domain_elections == 'region':

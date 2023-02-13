@@ -218,6 +218,16 @@ def test_election_compound_model(session):
     assert election_compound.has_party_results is False
     assert election_compound.has_party_panachage_results is False
     assert election_compound.results == []
+    assert election_compound.totals.__dict__ == {
+        'turnout': 0,
+        'eligible_voters': 0,
+        'expats': 0,
+        'received_ballots': 0,
+        'accounted_ballots': 0,
+        'blank_ballots': 0,
+        'invalid_ballots': 0,
+        'accounted_votes': 0
+    }
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
@@ -289,6 +299,7 @@ def test_election_compound_model(session):
             'turnout': 0
         }
     ]
+    assert sum(election_compound.totals.__dict__.values()) == 0
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
 
@@ -367,6 +378,7 @@ def test_election_compound_model(session):
             'turnout': 75.0
         }
     ]
+    assert sum(election_compound.totals.__dict__.values()) == 0
     assert election_compound.completed is False
 
     # Set results as counted
@@ -404,7 +416,7 @@ def test_election_compound_model(session):
             'turnout': 75.0
         }
     ]
-
+    assert sum(election_compound.totals.__dict__.values()) == 0
     assert election_compound.completed is False
 
     for result in session.query(ElectionResult):
@@ -416,6 +428,16 @@ def test_election_compound_model(session):
     ]
     assert election_compound.allocated_mandates == 0
     assert election_compound.completed == True
+    assert election_compound.totals.__dict__ == {
+        'accounted_ballots': 258 + 258,
+        'accounted_votes': 216 + 474,
+        'blank_ballots': 12 + 12,
+        'eligible_voters': 400 + 400,
+        'expats': 40 + 40,
+        'invalid_ballots': 30 + 30,
+        'received_ballots': 300 + 300,
+        'turnout': 75.0,
+    }
 
     # Set candidates as elected
     session.query(Candidate).filter_by(candidate_id='1').one().elected = True

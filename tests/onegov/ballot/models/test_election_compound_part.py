@@ -124,6 +124,7 @@ def test_election_compound_part_model(session):
             'turnout': 0
         }
     ]
+    assert sum(part.totals.__dict__.values()) == 0
 
     # Add results and candidates
     candidates = (('Paul', 'Peter'), ('Max', 'Miro'))
@@ -189,6 +190,7 @@ def test_election_compound_part_model(session):
             'turnout': 75.0
         },
     ]
+    assert sum(part.totals.__dict__.values()) == 0
 
     # Set results as counted
     part.elections[0].results[0].counted = True
@@ -213,6 +215,7 @@ def test_election_compound_part_model(session):
             'turnout': 75.0
         }
     ]
+    assert sum(part.totals.__dict__.values()) == 0
 
     part.elections[0].results[1].counted = True
     assert part.completed is True
@@ -236,6 +239,16 @@ def test_election_compound_part_model(session):
             'turnout': 75.0
         }
     ]
+    assert part.totals.__dict__ == {
+        'accounted_ballots': 258,
+        'accounted_votes': 216,
+        'blank_ballots': 12,
+        'eligible_voters': 400,
+        'expats': 40,
+        'invalid_ballots': 30,
+        'received_ballots': 300,
+        'turnout': 75.0
+    }
 
     # Add party results
     compound.party_results.append(
