@@ -1,4 +1,5 @@
 import time
+import json
 
 from psycopg2.extras import NumericRange
 from pytest import mark
@@ -231,7 +232,7 @@ def test_browse_billing(browser, scenario, postgres):
     assert not browser.is_element_present_by_css('.remove-manual')
 
 
-def test_volunteers(browser, scenario):
+def test_volunteers_export(browser, scenario):
     scenario.add_period(title="Ferienpass 2019", active=True, confirmed=True)
     scenario.add_activity(title="Zoo", state='accepted')
     scenario.add_user(username='member@example.org', role='member')
@@ -301,3 +302,31 @@ def test_volunteers(browser, scenario):
     # now the volunteer is in the list
     browser.visit('/attendees/zoo')
     assert browser.is_text_present("Foo")
+
+    browser.visit('/export/helfer')
+    browser.fill_form({
+        'period': scenario.periods[0].id.hex,
+        'file_format': "json",
+    })
+    browser.find_by_value("Absenden").click()
+    volunteer_export = json.loads(browser.find_by_tag('pre').text)[0]
+    volunteer_json = {
+        'Angebot Titel': 'Zoo',
+        'Durchführung Daten': [
+            ['2023-02-23T00:00:00+01:00', '2023-02-23T01:00:00+01:00']
+        ],
+        'Durchführung Abgesagt': False,
+        'Bedarf Name': 'Begleiter',
+        'Bedarf Anzahl': '1 - 3',
+        'Bestätigte Helfer': 1,
+        'Helfer Status': 'Bestätigt',
+        'Vorname': 'Foo',
+        'Nachname': 'Bar',
+        'Geburtsdatum': '1984-06-04',
+        'Organisation': '',
+        'Ort': 'Bartown',
+        'E-Mail': 'foo@bar.org',
+        'Telefon': '1234',
+        'Adresse': 'Foostreet 1'
+    }
+    assert volunteer_export == volunteer_json

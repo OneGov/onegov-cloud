@@ -371,7 +371,7 @@ msgid "Last Name"
 msgstr "Nachname"
 
 msgid "Birth Date"
-msgstr "geburtsdatum"
+msgstr "Geburtsdatum"
 
 msgid "Organisation"
 msgstr "Organisation"
