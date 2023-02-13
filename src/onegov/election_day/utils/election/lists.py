@@ -146,7 +146,7 @@ def get_lists_data(
 ):
     """" View the lists as JSON. Used to for the lists bar chart. """
 
-    completed = election.completed
+    allocated_mandates = election.allocated_mandates
     colors = election.colors
 
     if election.type == 'majorz':
@@ -161,9 +161,10 @@ def get_lists_data(
             {
                 'text': list_.name,
                 'value': list_.votes,
-                'value2': list_.number_of_mandates if completed else None,
+                'value2': list_.number_of_mandates,
                 'class': (
-                    'active' if completed and list_.number_of_mandates
+                    'active'
+                    if list_.number_of_mandates or not allocated_mandates
                     else 'inactive'
                 ),
                 'color': colors.get(list_.name)
