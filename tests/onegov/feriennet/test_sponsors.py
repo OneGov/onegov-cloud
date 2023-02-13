@@ -1,6 +1,9 @@
+import os
+
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.feriennet.sponsors import Sponsor
+from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 
 
 def test_translate_sponsor():
@@ -195,3 +198,64 @@ def test_random_sponsors_at_activities(client, scenario):
     assert 'other sponsor' in activities[1]
     assert 'main sponsor' in activities[2]
     assert 'other sponsor' in activities[3]
+
+
+def test_banner_in_mail(client):
+    with freeze_time('2023-02-13'):
+        client.login_admin()
+        page = client.get('/userprofile')
+        page.form['ticket_statistics'] = 'daily'
+        page.form.submit()
+
+        data = [
+            {
+                'name': 'CompanyOne',
+                'banners': {
+                    'src': {
+                        'de': 'sponsors/CompanyOne-de.jpg',
+                    }
+                },
+                'mail_url': {
+                    'de': 'https://www.company-one.ch',
+                }
+            },
+            {
+                'name': 'CompanyTwo',
+                'banners': {
+                    'src': {
+                        'de': 'sponsors/CompanyTwo-de.jpg',
+                    }
+                },
+                'mail_url': {
+                    'de': 'https://www.company-two.ch',
+                }
+            }
+        ]
+
+        del client.app.sponsors
+        client.app.sponsors = [Sponsor(**sponsor) for sponsor in data]
+
+        job = get_cronjob_by_name(client.app, 'send_daily_ticket_statistics')
+        job.app = client.app
+
+        url = get_cronjob_url(job)
+        client.get(url)
+
+        request_page = client.get('/auth/login').click('Passwort zurücksetzen')
+        assert 'Passwort zurücksetzen' in request_page
+
+        request_page.form['email'] = 'admin@example.org'
+        request_page.form.submit()
+        assert len(os.listdir(client.app.maildir)) == 1
+
+        email = client.get_email(0)
+
+        img_1 = '<img src="http://localhost/static/sponsors/CompanyOne-de.jpg'
+        img_2 = '<img src="http://localhost/static/sponsors/CompanyTwo-de.jpg'
+        link_1 = '<a href="https://www.company-one.ch">CompanyOne</a>'
+        link_2 = '<a href="https://www.company-two.ch">CompanyTwo</a>'
+
+        assert img_1 in email['HtmlBody']
+        assert img_2 not in email['HtmlBody']
+        assert link_1 in email['HtmlBody']
+        assert link_2 in email['HtmlBody']
