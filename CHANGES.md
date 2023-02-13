@@ -998,7 +998,7 @@ Also cleanup the documentation.
 
 `Bugfix` | [OGC-589](https://linear.app/onegovcloud/issue/OGC-589) | [fb904c42d3](https://github.com/onegov/onegov-cloud/commit/fb904c42d33f08f8212215819a666912523f4260)
 
-### Core 
+### Core
 
 ##### Use autoapi for documentation.
 
@@ -1982,7 +1982,7 @@ Banners can now be added with custom info texts
 
 ##### Add logout commands to CLI.
 
-Also ensure that users are logged out when they are modified via the 
+Also ensure that users are logged out when they are modified via the
 CLI.
 
 `Feature` | [SEA-708](https://linear.app/seantis/issue/SEA-708) | [b4a5abb62a](https://github.com/onegov/onegov-cloud/commit/b4a5abb62ac93160f0416354735f7a20c5464e32)
@@ -2219,7 +2219,7 @@ Topics, people, etc. can now be assigned the access level "member"
 
 ##### Fixes pages cache not distinquishing query parameters.
 
-Some cached (data) views used for the screen widgets may have query 
+Some cached (data) views used for the screen widgets may have query
 parameters such as limit or other filters.
 
 `Bugfix` | [d8d29f07a6](https://github.com/onegov/onegov-cloud/commit/d8d29f07a67162416f4e4fcdfc2781ce3b2ef859)
@@ -2787,4 +2787,3 @@ Bills may be paid with the displayed information.
 ##### Fixes keyword converter struggling with plus signs.
 
 `Bugfix` | [OGC-240](https://linear.app/onegovcloud/issue/OGC-240) | [c60082c6dc](https://github.com/onegov/onegov-cloud/commit/c60082c6dcbba1f8e48cbc6c7255aae8213a43eb)
-
