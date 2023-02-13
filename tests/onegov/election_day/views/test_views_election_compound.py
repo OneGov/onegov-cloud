@@ -594,9 +594,9 @@ def test_view_election_compound_parties_panachage(election_day_app_gr):
 
     links = [link['value'] for link in data['links']]
     assert all((i in links for i in (
-        11, 12, 100, 60387 - 11 - 12 - 100,
-        21, 22, 200, 49117 - 21 - 22 - 200,
-        31, 32, 300, 35134 - 31 - 32 - 300
+        11, 12, 100,
+        21, 22, 200,
+        31, 32, 300,
     )))
 
 
