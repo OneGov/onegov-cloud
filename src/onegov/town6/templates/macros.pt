@@ -1164,7 +1164,6 @@
         </div>
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
     <div tal:condition="not occurrences">
-        <!-- "${layout.events_url}" -->
         <br>
         <a href="${layout.events_url}" class="">Alle Veranstaltungen</a>
         <br>
