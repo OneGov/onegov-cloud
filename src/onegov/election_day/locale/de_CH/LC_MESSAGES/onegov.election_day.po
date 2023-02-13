@@ -229,7 +229,7 @@ msgid "Could not read the empty votes"
 msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 
 #, python-format
-msgid "Error in anzgdependent: ${msg}"
+msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
 msgid "Term"
