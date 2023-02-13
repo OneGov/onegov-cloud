@@ -258,7 +258,7 @@ def test_import_internal_proporz_invalid_values(session):
                         'xxx',  # entity_blank_votes
                         'xxx',  # entity_invalid_votes
                         'xxx',  # list_name
-                        'xxx',  # list_id
+                        'x x x',  # list_id
                         '',  # list_color
                         'xxx',  # list_number_of_mandates
                         'xxx',  # list_votes
@@ -842,6 +842,23 @@ def test_import_internal_proporz_panachage(session):
     assert set([e.error.interpolate() for e in errors]) == {
         "Panachage results id 3 not in list_id's"
     }
+
+    # Alphanumerical list_ids are also valid
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv(
+            ['eins', 'zwei.drei', 'vier_fuenf', '999'],
+            [
+                ('eins', ['1', '', '3', '']),
+                ('zwei.drei', ['4', '5', '', '']),
+                ('vier_fuenf', ['', '8', '9', '999']),
+            ]
+        )
+    )
+    assert not errors
+    assert query.filter_by(source='eins').one().votes == 4
+    assert query.filter_by(source='zwei.drei').one().votes == 8
+    assert query.filter_by(source='vier_fuenf').one().votes == 3
 
 
 def test_import_internal_proproz_optional_columns(session):
