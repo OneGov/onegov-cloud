@@ -81,12 +81,12 @@ class FeriennetApp(OrgApp):
             sponsor.compiled(request) for sponsor in self.sponsors
             if getattr(sponsor, 'mail_url', None)
         ]
-        sponsor = False
+
         if sponsors:
-            sponsor = sponsors[0]
-            sponsor.banners['src'] = sponsor.url_for(
-                request, sponsor.banners['src'])
-        return sponsor
+            sponsors[0].banners['src'] = sponsors[0].url_for(
+                request, sponsors[0].banners['src'])
+
+        return sponsors
 
     @property
     def default_period(self):
