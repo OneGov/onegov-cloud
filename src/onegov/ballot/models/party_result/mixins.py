@@ -63,9 +63,9 @@ class HistoricalPartyResultsMixin:
         """
 
         relationships = self.relationships_for_historical_party_results
+        relationships = relationships.filter_by(type='historical').all()
         if not relationships:
             return self.party_results
-        relationships = relationships.filter_by(type='historical').all()
         target = sorted(
             (
                 related.target for related in relationships
@@ -80,6 +80,18 @@ class HistoricalPartyResultsMixin:
         return self.party_results.union(
             target[0].party_results.filter_by(year=target[0].date.year)
         )
+
+    @property
+    def historical_colors(self):
+        result = getattr(self, 'colors', {}).copy()
+        if not result:
+            return result
+        relationships = self.relationships_for_historical_party_results
+        relationships = relationships.filter_by(type='historical')
+        for relation in relationships:
+            for key, value in getattr(relation.target, 'colors', {}).items():
+                result.setdefault(key, value)
+        return result
 
 
 class PartyResultsExportMixin:

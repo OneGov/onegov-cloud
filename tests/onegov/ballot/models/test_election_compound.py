@@ -1493,17 +1493,20 @@ def test_election_compound_historical_party_strengths(session):
     first = ElectionCompound(
         title='First',
         domain='federation',
-        date=date(2014, 1, 1)
+        date=date(2014, 1, 1),
+        colors={'a': 'x'}
     )
     second = ElectionCompound(
         title='Second',
         domain='federation',
-        date=date(2018, 1, 1)
+        date=date(2018, 1, 1),
+        colors={'a': 'y', 'b': 'y'}
     )
     third = ElectionCompound(
         title='Third',
         domain='federation',
-        date=date(2022, 1, 1)
+        date=date(2022, 1, 1),
+        colors={'b': 'z', 'c': 'z'}
     )
     session.add(first)
     session.add(second)
@@ -1513,6 +1516,9 @@ def test_election_compound_historical_party_strengths(session):
     assert first.historical_party_results.count() == 0
     assert second.historical_party_results.count() == 0
     assert third.historical_party_results.count() == 0
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
 
     # add results
     for (compound, year, party_id, domain) in (
@@ -1550,6 +1556,9 @@ def test_election_compound_historical_party_strengths(session):
     assert first.historical_party_results.count() == 6
     assert second.historical_party_results.count() == 7
     assert third.historical_party_results.count() == 4
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
 
     # add relationships
     for (source_, target, type_) in (
@@ -1600,4 +1609,9 @@ def test_election_compound_historical_party_strengths(session):
         ('third', 2022, '5'),
         ('third', 2022, '5'),
     ]
-    third.historical_party_results.filter_by(domain='superregion').count() == 1
+    assert third.historical_party_results.filter_by(
+        domain='superregion'
+    ).count() == 1
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y', 'c': 'z'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z', 'a': 'y'}
