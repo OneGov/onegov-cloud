@@ -267,8 +267,6 @@ def test_election_compound_model(session):
             'accounted_votes': 0,
             'blank_ballots': 0,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 0,
@@ -282,8 +280,6 @@ def test_election_compound_model(session):
             'accounted_votes': 0,
             'blank_ballots': 0,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 0,
@@ -349,30 +345,26 @@ def test_election_compound_model(session):
             'accounted_votes': 216,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 400,
             'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
-            'turnout': 0
+            'turnout': 75.0
         },
         {
             'accounted_ballots': 258,
             'accounted_votes': 474,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 400,
             'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
-            'turnout': 0
+            'turnout': 75.0
         }
     ]
     assert election_compound.completed is False
@@ -390,8 +382,6 @@ def test_election_compound_model(session):
             'accounted_votes': 216,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 200,
-            'counted_received_ballots': 150,
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 400,
@@ -405,15 +395,13 @@ def test_election_compound_model(session):
             'accounted_votes': 474,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 400,
             'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
-            'turnout': 0
+            'turnout': 75.0
         }
     ]
 

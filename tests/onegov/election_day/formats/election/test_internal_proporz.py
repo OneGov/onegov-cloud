@@ -512,7 +512,7 @@ def test_import_internal_proporz_temporary_results(session):
                     '',  # list_name
                     '10.5',  # list_id
                     '',  # list_number_of_mandates
-                    '',  # list_votes
+                    '1',  # list_votes
                     '',  # list_connection
                     '',  # list_connection_parent
                     'xxx',  # candidate_family_name
@@ -533,9 +533,9 @@ def test_import_internal_proporz_temporary_results(session):
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
                     '',  # list_name
-                    '03B.04',  # list_id
+                    '10.5',  # list_id
                     '',  # list_number_of_mandates
-                    '',  # list_votes
+                    '1',  # list_votes
                     '',  # list_connection
                     '',  # list_connection_parent
                     'xxx',  # candidate_family_name
@@ -553,6 +553,14 @@ def test_import_internal_proporz_temporary_results(session):
 
     # 1 Counted, 1 Uncounted, 10 Missing
     assert election.progress == (1, 11)
+    assert election.eligible_voters == 111
+    assert election.expats == 0
+    assert election.received_ballots == 11
+    assert election.blank_ballots == 1
+    assert election.invalid_ballots == 1
+    assert election.accounted_votes == 52
+    assert election.lists.one().votes == 1
+    assert election.candidates.one().votes == 1
 
 
 def test_import_internal_proporz_regional(session):
