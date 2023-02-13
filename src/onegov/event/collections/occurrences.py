@@ -218,7 +218,7 @@ class OccurrenceCollection(Pagination):
         if self.start is not None or self.outdated is False:
             if self.start is None:
                 start = date.today()
-            elif self.range:
+            elif self.range == 'past':
                 start = self.start
             else:
                 start = self.start
