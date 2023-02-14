@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-18 13:30+0200\n"
+"POT-Creation-Date: 2023-02-14 15:23+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -559,6 +559,12 @@ msgstr "Weiterbildung"
 msgid "Healthy Snacks"
 msgstr "Gesunde Snacks"
 
+msgid "Just for Boys"
+msgstr "Nur Jungen"
+
+msgid "Just for Girls"
+msgstr "Nur Mädchen"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -622,8 +628,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "AGB"
 

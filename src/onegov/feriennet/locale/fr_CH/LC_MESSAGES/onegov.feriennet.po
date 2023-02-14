@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-18 13:30+0200\n"
+"POT-Creation-Date: 2023-02-14 15:23+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -561,6 +561,12 @@ msgstr "Formation continue"
 msgid "Healthy Snacks"
 msgstr "Encas sains"
 
+msgid "Just for Boys"
+msgstr "Seulement garçons"
+
+msgid "Just for Girls"
+msgstr "Seulement filles"
+
 msgid "Title"
 msgstr "Titre"
 
@@ -624,8 +630,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "Conditions de participation"
 
