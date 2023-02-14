@@ -1164,12 +1164,13 @@
         </div>
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
     <div tal:condition="not occurrences">
-        <div tal:condition="'range' in layout.og_url">
-            <br>
-            <a href="${layout.events_url}" class="">Alle Veranstaltungen</a>
-        </div>
         <br>
-        <a href="${layout.events_url}&amp;range=past" class="">Vergangene Veranstaltungen</a>
+        <div tal:condition="'range' in layout.og_url">
+            <a href="${layout.events_url}" class="button hollow">Alle Veranstaltungen</a>
+        </div>
+        <div>
+            <a href="${layout.events_url}&amp;range=past" class="button hollow">Vergangene Veranstaltungen</a>
+        </div>
     </div>
 </metal:occurrences>
 
