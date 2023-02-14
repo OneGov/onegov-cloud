@@ -3280,7 +3280,7 @@ msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
 
 msgid "If you don't want to change your password, you can ignore this email."
-msgstr "Se desideri modificare la password, ignora questa e-mail."
+msgstr "Se non desideri modificare la password, ignora questa e-mail."
 
 msgid "Your request has received a payment."
 msgstr "La tua richiesta ha ricevuto un pagamento."

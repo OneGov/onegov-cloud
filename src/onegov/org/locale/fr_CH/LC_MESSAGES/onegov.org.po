@@ -18,7 +18,7 @@ msgid "Open"
 msgstr "Ouvert"
 
 msgid "Pending"
-msgstr "En attente"
+msgstr "En traitement"
 
 msgid "Closed"
 msgstr "Fermé"
