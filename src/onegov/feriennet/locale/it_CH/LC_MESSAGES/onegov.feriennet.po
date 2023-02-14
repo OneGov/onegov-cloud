@@ -561,10 +561,10 @@ msgid "Healthy Snacks"
 msgstr "Merende equilibrate"
 
 msgid "Just for Boys"
-msgstr "Solo per ragazzi"
+msgstr "Solo ragazzi"
 
 msgid "Just for Girls"
-msgstr "Solo per ragazze"
+msgstr "Solo ragazze"
 
 msgid "Title"
 msgstr "Titolo"
