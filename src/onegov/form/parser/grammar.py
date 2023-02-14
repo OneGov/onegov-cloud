@@ -15,7 +15,7 @@ from pyparsing import (
     pyparsing_unicode,
     OneOrMore,
     Optional,
-    ParseException,
+    ParseFatalException,
     ParserElement,
     Regex,
     Suppress,
@@ -98,7 +98,7 @@ def as_date(instring, loc, tokens):
     try:
         return dateobj(int(tokens[0]), int(tokens[1]), int(tokens[2]))
     except ValueError:
-        raise ParseException(instring, loc, "Invalid date")
+        raise ParseFatalException(instring, loc, "Invalid date")
 
 
 def approximate_total_days(delta):
@@ -108,10 +108,11 @@ def approximate_total_days(delta):
 
 def is_valid_date_range(instring, loc, tokens):
     """ Checks if the date range is valid """
-    if not tokens:
-        return
-
-    after, before = tokens
+    if tokens:
+        after, before = tokens
+    else:
+        # invalid, will be caught below
+        after = before = None
 
     if after is None:
         if before is not None:
@@ -129,7 +130,7 @@ def is_valid_date_range(instring, loc, tokens):
     elif after < before:
         return tokens
 
-    raise ParseException(instring, loc, "Invalid date range")
+    raise ParseFatalException(instring, loc, "Invalid date range")
 
 
 def as_relative_delta(tokens):
@@ -312,9 +313,10 @@ def relative_delta():
 
         +1 days
         -4 weeks
+        0 years
     """
 
-    sign = Literal('-') | Literal('+')
+    sign = Optional(Literal('-') | Literal('+'))
     grain = (Literal('days') | Literal('weeks') | Literal('months')
              | Literal('years'))
     return (Combine(sign + numeric) + grain).setParseAction(as_relative_delta)

@@ -1004,7 +1004,7 @@ def match(expr, text):
     """ Returns true if the given parser expression matches the given text. """
     try:
         expr.parseString(text)
-    except pp.ParseException:
+    except pp.ParseBaseException:
         return False
     else:
         return True
@@ -1016,7 +1016,7 @@ def try_parse(expr, text):
     """
     try:
         return expr.parseString(text)
-    except pp.ParseException:
+    except pp.ParseBaseException:
         return None
 
 

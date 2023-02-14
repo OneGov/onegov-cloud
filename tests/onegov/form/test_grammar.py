@@ -28,7 +28,7 @@ from onegov.form.parser.grammar import (
     valid_date_range,
     with_whitespace_inside,
 )
-from pyparsing import ParseException
+from pyparsing import ParseFatalException
 
 
 def test_text_without():
@@ -171,23 +171,23 @@ def test_valid_date_range():
 
 
 def test_valid_date_range_invalid_date():
-    with pytest.raises(ParseException):
+    with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(..2000.20.45)')
 
 
 def test_valid_date_range_invalid_mixed_range():
-    with pytest.raises(ParseException):
+    with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(2010.01.01..today)')
 
 
 def test_valid_date_range_invalid_range_order():
-    with pytest.raises(ParseException):
+    with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(today..today)')
 
-    with pytest.raises(ParseException):
+    with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(-350 days..-1 years)')
 
-    with pytest.raises(ParseException):
+    with pytest.raises(ParseFatalException):
         valid_date_range().parseString('(2020.01.01..2010.01.01)')
 
 
@@ -214,6 +214,14 @@ def test_dates_with_valid_date_range():
         'type': 'datetime',
         'valid_date_range': {'start': None, 'stop': relativedelta()}
     }
+
+
+def test_dates_with_invalid_date_range():
+    with pytest.raises(ParseFatalException):
+        date().parseString('YYYY.MM.DD (-350 days..-1 years)')
+
+    with pytest.raises(ParseFatalException):
+        datetime().parseString('YYYY.MM.DD HH:MM (today..today)')
 
 
 def test_stdnum():
