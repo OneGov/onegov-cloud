@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-02 08:55+0100\n"
+"POT-Creation-Date: 2023-02-14 11:27+0100\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -163,6 +163,18 @@ msgstr "Ungültige AHV-Nummer."
 
 msgid "This value already exists."
 msgstr "Dieser Wert ist bereits vorhanden."
+
+#, python-format
+msgid "Needs to be between {min_date} and {max_date}."
+msgstr "Muss zwischen dem {min_date} und dem {max_date} sein."
+
+#, python-format
+msgid "Needs to be on or after {date}."
+msgstr "Muss am oder nach dem {date} sein."
+
+#, python-format
+msgid "Needs to be on or before {date}."
+msgstr "Muss am oder vor dem {date} sein.""
 
 msgid "Uploaded file"
 msgstr "Hochgeladene Datei"

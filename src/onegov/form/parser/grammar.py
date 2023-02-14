@@ -1,5 +1,7 @@
 import re
 
+from datetime import date as dateobj
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form.utils import decimal_range
 from pyparsing import (
@@ -13,6 +15,7 @@ from pyparsing import (
     pyparsing_unicode,
     OneOrMore,
     Optional,
+    ParseException,
     ParserElement,
     Regex,
     Suppress,
@@ -86,6 +89,52 @@ def as_regex(tokens):
     """ Converts the token to a working regex if possible. """
     if tokens:
         return re.compile(tokens[0])
+
+
+def as_date(instring, loc, tokens):
+    """ Converts the token to a date if possible. """
+    if not tokens:
+        return
+    try:
+        return dateobj(int(tokens[0]), int(tokens[1]), int(tokens[2]))
+    except ValueError:
+        raise ParseException(instring, loc, "Invalid date")
+
+
+def approximate_total_days(delta):
+    """ Computes an approximate day delta from a relativedelta. """
+    return delta.years * 365.25 + delta.months * 30.5 + delta.days
+
+
+def is_valid_date_range(instring, loc, tokens):
+    """ Checks if the date range is valid """
+    if not tokens:
+        return
+
+    after, before = tokens
+
+    if after is None:
+        if before is not None:
+            return tokens
+        # invalid
+    elif before is None:
+        return tokens
+    elif type(after) is not type(before):
+        # invalid
+        pass
+    elif isinstance(after, relativedelta):
+        if approximate_total_days(after) < approximate_total_days(before):
+            return tokens
+        # invalid
+    elif after < before:
+        return tokens
+
+    raise ParseException(instring, loc, "Invalid date range")
+
+
+def as_relative_delta(tokens):
+    if tokens:
+        return relativedelta(**{tokens[1]: int(tokens[0])})
 
 
 def unwrap(tokens):
@@ -245,6 +294,53 @@ def url():
     return Suppress(Regex(r'https?://')).setParseAction(tag(type='url'))
 
 
+def absolute_date():
+    """ Returns an absolute date parser.
+
+    Example::
+
+        2020.10.10
+    """
+    date_expr = numeric + Suppress('.') + numeric + Suppress('.') + numeric
+    return date_expr.setParseAction(as_date)
+
+
+def relative_delta():
+    """ Returns a relative delta parser.
+
+    Example::
+
+        +1 days
+        -4 weeks
+    """
+
+    sign = Literal('-') | Literal('+')
+    grain = (Literal('days') | Literal('weeks') | Literal('months')
+             | Literal('years'))
+    return (Combine(sign + numeric) + grain).setParseAction(as_relative_delta)
+
+
+def valid_date_range():
+    """ Returns a valid date range parser.
+
+    Example::
+
+        (..today)
+        (2010.01.01..2020.01.01)
+        (-2 weeks..+4 months)
+
+    """
+
+    today = Literal('today').setParseAction(literal(relativedelta()))
+    value_expr = Optional(
+        today | relative_delta() | absolute_date(),
+        default=None
+    )
+    date_range = value_expr('start') + Suppress('..') + value_expr('stop')
+    date_range.setParseAction(is_valid_date_range)
+    return Group(enclosed_in(date_range, '()'))('valid_date_range')
+
+
 def date():
     """ Returns a date parser.
 
@@ -254,7 +350,8 @@ def date():
 
     """
 
-    return Suppress('YYYY.MM.DD').setParseAction(tag(type='date'))
+    date = Suppress('YYYY.MM.DD').setParseAction(tag(type='date'))
+    return date + Optional(valid_date_range())
 
 
 def datetime():
@@ -266,7 +363,8 @@ def datetime():
 
     """
 
-    return Suppress('YYYY.MM.DD HH:MM').setParseAction(tag(type='datetime'))
+    dt = Suppress('YYYY.MM.DD HH:MM').setParseAction(tag(type='datetime'))
+    return dt + Optional(valid_date_range())
 
 
 def time():
@@ -339,7 +437,7 @@ def decimal():
         .setParseAction(as_decimal)('amount')
 
 
-def range_field(value_expression, parse_action, type, allow_price=False):
+def range_field(value_expression, parse_action, type):
     """ Generic range field parser. """
 
     r = (value_expression + Suppress('..') + value_expression)
