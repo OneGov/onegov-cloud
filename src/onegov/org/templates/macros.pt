@@ -1029,7 +1029,7 @@
 
     <div tal:condition="not occurrences" i18n:translate>No events found.</div>
     <div tal:condition="not occurrences">
-        <div tal:condition="'range' not in layout.og_url">
+        <div tal:condition="'range' in layout.og_url">
             <br>
             <a href="${layout.events_url}" class="">Alle Veranstaltungen</a>
         </div>
