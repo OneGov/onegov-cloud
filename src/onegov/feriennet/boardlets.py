@@ -72,8 +72,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.booking_end,
                 )
             }),
-            icon=icon(self.period.finalized if self.period.finalizable
-                      else self.period.is_booking_in_past)
+            icon=icon(self.period.is_booking_in_past)
         )
 
         yield BoardletFact(
