@@ -3,7 +3,7 @@ from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
-from onegov.form.fields import UploadField
+from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
 from onegov.form.validators import ExpectedExtensions
@@ -177,6 +177,9 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'fileinput':
+        expected_extensions = ExpectedExtensions(field.extensions)
+        # build an accept attribute for the file input
+        accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
             field_class=UploadField,
             field_id=field.id,
@@ -184,9 +187,28 @@ def handle_field(builder, field, dependency=None):
             dependency=dependency,
             required=field.required,
             validators=[
-                ExpectedExtensions(field.extensions),
+                expected_extensions,
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
+            render_kw={'accept': accept},
+            description=field.field_help
+        )
+
+    elif field.type == 'multiplefileinput':
+        expected_extensions = ExpectedExtensions(field.extensions)
+        # build an accept attribute for the file input
+        accept = ','.join(expected_extensions.whitelist)
+        builder.add_field(
+            field_class=UploadMultipleField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[
+                expected_extensions,
+                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
+            ],
+            render_kw={'accept': accept},
             description=field.field_help
         )
 

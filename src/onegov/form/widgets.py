@@ -1,7 +1,6 @@
 import humanize
 
 from contextlib import suppress
-from html import escape
 from markupsafe import Markup
 from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
@@ -113,33 +112,38 @@ class UploadWidget(FileInput):
     def __call__(self, field, **kwargs):
         force_simple = kwargs.pop('force_simple', False)
         resend_upload = kwargs.pop('resend_upload', False)
+        wrapper_css_class = kwargs.pop('wrapper_css_class', '')
+        if wrapper_css_class:
+            wrapper_css_class = ' ' + wrapper_css_class
         input_html = super().__call__(field, **kwargs)
 
         if force_simple or field.errors or not field.data:
             return Markup("""
-                <div class="upload-widget without-data">
+                <div class="upload-widget without-data{}">
                     {}
                 </div>
-            """.format(input_html))
+            """).format(wrapper_css_class, input_html)
         else:
             preview = ''
             src = self.image_source(field)
             if src:
-                preview = f"""
+                preview = Markup("""
                     <div class="uploaded-image"><img src="{src}"></div>
-                """
+                """).format(src=src)
 
             previous = ''
             if field.data and resend_upload:
-                previous = f"""
-                    <input type="hidden" name="{field.id}"
-                           value="{field.data.get('filename', '')}">
-                    <input type="hidden" name="{field.id}"
-                           value="{field.data.get('data', '')}">
-                """
+                previous = Markup("""
+                    <input type="hidden" name="{name}" value="{filename}">
+                    <input type="hidden" name="{name}" value="{data}">
+                """).format(
+                    name=field.id,
+                    filename=field.data.get('filename', ''),
+                    data=field.data.get('data', ''),
+                )
 
             return Markup("""
-                <div class="upload-widget with-data">
+                <div class="upload-widget with-data{wrapper_css_class}">
                     <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
 
                     {preview}
@@ -172,12 +176,10 @@ class UploadWidget(FileInput):
 
                     {previous}
                 </div>
-            """.format(
-                # be careful, we do our own html generation here without any
-                # safety harness - we need to carefully escape values the user
-                # might supply
+            """).format(
                 filesize=humanize.naturalsize(field.data['size']),
-                filename=escape(field.data['filename'], quote=True),
+                filename=field.data['filename'],
+                wrapper_css_class=wrapper_css_class,
                 name=field.id,
                 input_html=input_html,
                 existing_file_label=field.gettext(_('Uploaded file')),
@@ -186,7 +188,56 @@ class UploadWidget(FileInput):
                 replace_label=field.gettext(_('Replace file')),
                 preview=preview,
                 previous=previous
-            ))
+            )
+
+
+class UploadMultipleWidget(FileInput):
+    """ A widget for the :class:`onegov.form.fields.UploadMultipleField` class,
+    which supports keeping, removing and replacing already uploaded files.
+
+    This is necessary as file inputs are read-only on the client and it's
+    therefore rather easy for users to lose their input otherwise (e.g. a
+    form with a file is rejected because of some mistake - the file disappears
+    once the response is rendered on the client).
+
+    We deviate slightly from the norm by rendering the errors ourselves
+    since we're essentially a list of fields and not a single field most
+    of the time.
+
+    """
+
+    def __init__(self):
+        self.multiple = True
+
+    def __call__(self, field, **kwargs):
+        force_simple = kwargs.pop('force_simple', False)
+        resend_upload = kwargs.pop('resend_upload', False)
+        input_html = super().__call__(field, **kwargs)
+        simple_template = Markup("""
+            <div class="upload-widget without-data">
+                {}
+            </div>
+        """)
+
+        if not len(field) or force_simple:
+            return simple_template.format(input_html)
+        else:
+            existing_html = Markup('').join(
+                subfield(
+                    force_simple=force_simple,
+                    resend_upload=resend_upload,
+                    wrapper_css_class='error' if subfield.errors else '',
+                    **kwargs
+                ) + Markup('\n').join(
+                    Markup('<small class="error">{}</small>').format(error)
+                    for error in subfield.errors
+                ) for subfield in field
+            )
+            additional_html = Markup('{label}: {input_html}').format(
+                label=field.gettext(_('Upload additional files')),
+                input_html=input_html
+            )
+            return existing_html + simple_template.format(additional_html)
 
 
 class TextAreaWithTextModules(TextArea):

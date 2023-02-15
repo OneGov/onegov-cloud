@@ -396,6 +396,7 @@ def create_parser_elements():
     elements.date = date()
     elements.time = time()
     elements.fileinput = fileinput()
+    elements.multiplefileinput = fileinput()
     elements.radio = radio()
     elements.checkbox = checkbox()
     elements.integer_range = integer_range_field()
@@ -515,6 +516,11 @@ def construct_checkbox(loader, node):
 @constructor('!fileinput')
 def construct_fileinput(loader, node):
     return ELEMENTS.fileinput.parseString(node.value)
+
+
+@constructor('!multiplefileinput')
+def construct_multiplefileinput(loader, node):
+    return ELEMENTS.multiplefileinput.parseString(node.value)
 
 
 @constructor('!password')
@@ -806,8 +812,7 @@ class DecimalRangeField(Field):
         return Decimal(value)
 
 
-class FileinputField(Field):
-    type = 'fileinput'
+class FileinputBase:
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,
@@ -820,6 +825,14 @@ class FileinputField(Field):
             extensions=field.extensions,
             field_help=field_help
         )
+
+
+class FileinputField(FileinputBase, Field):
+    type = 'fileinput'
+
+
+class MultipleFileinputField(FileinputBase, Field):
+    type = 'multiplefileinput'
 
 
 class OptionsField:

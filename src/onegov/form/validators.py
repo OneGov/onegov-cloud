@@ -43,7 +43,8 @@ class FileSizeLimit:
     """ Makes sure an uploaded file is not bigger than the given number of
     bytes.
 
-    Expects an :class:`onegov.form.fields.UploadField` instance.
+    Expects an :class:`onegov.form.fields.UploadField` or
+    :class:`onegov.form.fields.UploadMultipleField` instance.
 
     """
 
@@ -66,7 +67,8 @@ class FileSizeLimit:
 class WhitelistedMimeType:
     """ Makes sure an uploaded file is in a whitelist of allowed mimetypes.
 
-    Expects an :class:`onegov.form.fields.UploadField` instance.
+    Expects an :class:`onegov.form.fields.UploadField` or
+    :class:`onegov.form.fields.UploadMultipleField` instance.
     """
 
     whitelist = {
@@ -104,13 +106,20 @@ class ExpectedExtensions(WhitelistedMimeType):
 
     Usage::
 
-        ExpectedFileType('*')  # no check, really
-        ExpectedFileType('pdf')  # makes sure the given file is a pdf
+        ExpectedExtensions(['*'])  # default whitelist
+        ExpectedExtensions(['pdf'])  # makes sure the given file is a pdf
     """
 
     def __init__(self, extensions):
-        mimetypes = set(
-            types_map.get('.' + ext.lstrip('.'), None) for ext in extensions)
+        # normalize extensions
+        if len(extensions) == 1 and extensions[0] == '*':
+            mimetypes = None
+        else:
+            mimetypes = {
+                mimetype for ext in extensions
+                # we silently discard any extensions we don't know for now
+                if (mimetype := types_map.get('.' + ext.lstrip('.'), None))
+            }
         super().__init__(whitelist=mimetypes)
 
 
