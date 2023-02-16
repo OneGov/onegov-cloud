@@ -118,9 +118,9 @@ class OccurrenceCollection(Pagination):
             start = today.replace(day=1)
             return start, start + relativedelta(months=1, days=-1)
         if range == 'past':
-            milenium = date(2000, 1, 1)
+            millennium = date(2000, 1, 1)
             yesterday = today - timedelta(days=1)
-            return milenium, yesterday
+            return millennium, yesterday
         pass
 
     def for_filter(self, **kwargs):
