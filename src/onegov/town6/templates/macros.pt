@@ -734,18 +734,18 @@
                         </div>
                     </tal:b>
                 </tal:b>
-                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter zip(field.data or [], rendered.split('<br>'))">
-                    <tal:b tal:define="file_data iter[0];
+                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter zip(field, rendered.split('<br>'))">
+                    <tal:b tal:define="subfield iter[0];
                                        rendered iter[1];
-                                       url layout.file_data_download_link(file_data);
-                                       show_image allow_views and field.is_image(file_data)">
+                                       url layout.field_download_link(subfield);
+                                       show_image allow_views and subfield.is_image">
                         <a href="${url}" tal:condition="not show_image">
                             <tal:b replace="structure rendered" />
                         </a>
                         <br tal:condition="not show_image and not repeat.iter.end" />
                         <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="show_image">
                             <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
-                            <div class="photoswipe" tal:define="image layout.file_data_file(file_data)" tal:condition="image and as_thumbnail">
+                            <div class="photoswipe" tal:define="image layout.field_file(subfield)" tal:condition="image and as_thumbnail">
                                 <p class="has-img thumbnail">
                                     <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
                                 </p>
