@@ -286,9 +286,9 @@ class UploadMultipleField(FieldList, FileField):
         if not valuelist:
             return
 
-        for fieldstorage in valuelist:
-            if not hasattr(fieldstorage, 'file'):
-                # don't create an entry if it's not a new upload
+        for fs in valuelist:
+            if not (hasattr(fs, 'file') or hasattr(fs, 'stream')):
+                # don't create an entry if we didn't get a fieldstorage
                 continue
 
             # we fake the formdata for the new field
@@ -296,7 +296,7 @@ class UploadMultipleField(FieldList, FileField):
             # needs to get wrapped to be usable in WTForms
             formdata = MultiDict()
             name = f'{self.short_name}{self._separator}{len(self)}'
-            formdata.add(name, fieldstorage)
+            formdata.add(name, fs)
             self._add_entry(formdata)
 
 

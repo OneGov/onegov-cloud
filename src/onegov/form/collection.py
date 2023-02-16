@@ -332,9 +332,8 @@ class FormSubmissionCollection:
             field_id: [
                 index
                 for index, data in enumerate(submission.data.get(field_id, []))
-                # we exclude files that should be removed or never be added in
-                # the first place
-                if data is not None and data != {}
+                # we exclude files that should be removed but we also
+                if data != {}
             ]
             for field_id, field in form._fields.items()
             if isinstance(field, UploadMultipleField)
@@ -345,7 +344,13 @@ class FormSubmissionCollection:
             for id, indeces in multi_files.items()
             if (file_metas := submission.data.get(id))
             for idx in indeces
-            if file_metas[idx]['data'].startswith('@')
+            # if a file is set to 'keep' it will be None unless
+            # the data has been resubmitted or the original data
+            # was passed in, it might be a bit cleaner to look
+            # at the field.action to determine which files to
+            # keep and which ones to delete/replace...
+            if file_metas[idx] is None
+            or file_metas[idx]['data'].startswith('@')
 
         }
         files_to_keep |= multi_files_to_keep
@@ -386,11 +391,14 @@ class FormSubmissionCollection:
 
         for field_id, indeces in multi_files.items():
             datalist = []
-            for new_idx, old_idx in enumerate(indeces):
+            # we can't use enumerate because we need to guard against
+            # old_keys t
+            new_idx = 0
+            for old_idx in indeces:
                 data = submission.data[field_id][old_idx]
                 old_key = f'{field_id}:{old_idx}'
                 new_key = f'{field_id}:{new_idx}'
-                if old_key in files_to_keep:
+                if old_key in multi_files_to_keep:
                     # update the key in the note field if the index changed
                     if old_idx != new_idx:
                         for f in submission.files:
@@ -399,6 +407,9 @@ class FormSubmissionCollection:
                                 break
                 else:
                     field = getattr(form, field_id)[old_idx]
+                    if getattr(field, 'file', None) is None:
+                        # skip this subfield
+                        continue
 
                     f = FormFile(
                         id=random_token(),
@@ -416,6 +427,7 @@ class FormSubmissionCollection:
                     data['data'] = '@{}'.format(f.id)
 
                 datalist.append(data)
+                new_idx += 1
 
             if submission.data[field_id] != datalist:
                 submission.data[field_id] = datalist

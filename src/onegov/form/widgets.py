@@ -219,7 +219,7 @@ class UploadMultipleWidget(FileInput):
             </div>
         """)
 
-        if not len(field) or force_simple:
+        if force_simple or len(field) == 0:
             return simple_template.format(input_html)
         else:
             existing_html = Markup('').join(
