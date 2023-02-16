@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-02 08:55+0100\n"
+"POT-Creation-Date: 2023-02-16 11:29+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -174,6 +174,9 @@ msgstr "Supprimer le fichier"
 
 msgid "Replace file"
 msgstr "Remplacer le fichier"
+
+msgid "Upload additional files"
+msgstr "Télécharger des fichiers supplémentaires"
 
 msgid "Text modules"
 msgstr "Modules de texte"
