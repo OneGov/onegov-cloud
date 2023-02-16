@@ -173,14 +173,29 @@ A date (without time) is defined by this exact string: ``YYYY.MM.DD``::
 
 Note that this doesn't mean that the date format can be influenced.
 
+A date field optionally can be limited to a relative or absolute date range.
+Note that the edges of the interval are inclusive. The list of possible
+grains for relative dates are ``years``, ``months``, ``weeks`` and ``days``
+as well as the special value ``today``.
+
+    I'm a future date field = YYYY.MM.DD (+1 days..)
+    I'm on today or in the future = YYYY.MM.DD (today..)
+    At least two weeks ago = YYYY.MM.DD (..-2 weeks)
+    Between 2010 and 2020 = YYYY.MM.DD (2010.01.01..2020.12.31)
+
 Datetime
 ~~~~~~~~
 
 A date (with time) is defined by this exact string: ``YYYY.MM.DD HH:MM``::
 
     I'm a datetime field = YYYY.MM.DD HH:MM
+    I'm a futue datetime field = YYYY.MM.DD HH:MM (today..)
 
 Again, this doesn't mean that the datetime format can be influenced.
+
+The same range validation that can be applied to date fields can also be
+applied to datetime. Note however that the Validation will be applied to
+to the date portion. The time portion is ignored completely.
 
 Time
 ~~~~
@@ -670,6 +685,19 @@ class UrlField(Field):
 class DateField(Field):
     type = 'date'
 
+    @classmethod
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            field_help=field_help,
+            valid_date_range=field.valid_date_range
+        )
+
     def parse(self, value):
         # the first int in an ambiguous date is assumed to be a day
         # (since our software runs in europe first and foremost)
@@ -678,6 +706,19 @@ class DateField(Field):
 
 class DatetimeField(Field):
     type = 'datetime'
+
+    @classmethod
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            field_help=field_help,
+            valid_date_range=field.valid_date_range
+        )
 
     def parse(self, value):
         # the first int in an ambiguous date is assumed to be a day
@@ -976,7 +1017,7 @@ def match(expr, text):
     """ Returns true if the given parser expression matches the given text. """
     try:
         expr.parseString(text)
-    except pp.ParseException:
+    except pp.ParseBaseException:
         return False
     else:
         return True
@@ -988,7 +1029,7 @@ def try_parse(expr, text):
     """
     try:
         return expr.parseString(text)
-    except pp.ParseException:
+    except pp.ParseBaseException:
         return None
 
 

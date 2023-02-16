@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-16 11:29+0100\n"
+"POT-Creation-Date: 2023-02-14 12:56+0100\n"
 "PO-Revision-Date: 2022-03-07 13:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -160,6 +160,18 @@ msgstr "Non è un numero di sicurezza sociale svizzero valido."
 
 msgid "This value already exists."
 msgstr "Questo valore esiste già."
+
+#, python-format
+msgid "Needs to be between {min_date} and {max_date}."
+msgstr "Deve essere compreso tra {min_date} e {max_date}."
+
+#, python-format
+msgid "Needs to be on or after {date}."
+msgstr "Deve essere durante o dopo il {date}."
+
+#, python-format
+msgid "Needs to be on or before {date}."
+msgstr "Deve essere durante o prima del {date}."
 
 msgid "Uploaded file"
 msgstr "File caricato"

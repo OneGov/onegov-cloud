@@ -3,7 +3,11 @@ import importlib
 import phonenumbers
 import re
 
+from babel.dates import format_date
 from cgi import FieldStorage
+from datetime import date
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
 from onegov.form import _
 from onegov.form.errors import DuplicateLabelError
@@ -380,3 +384,67 @@ class InputRequiredIf(InputRequired):
             super(InputRequiredIf, self).__call__(form, field)
         else:
             Optional().__call__(form, field)
+
+
+class ValidDateRange:
+    """ Makes sure the selected date is in a valid range. """
+
+    message = _("Needs to be between {min_date} and {max_date}.")
+    after_message = _("Needs to be on or after {date}.")
+    before_message = _("Needs to be on or before {date}.")
+
+    def __init__(self, min, max):
+        self.min = min
+        self.max = max
+
+    @property
+    def min_date(self):
+        if isinstance(self.min, relativedelta):
+            return date.today() + self.min
+        return self.min
+
+    @property
+    def max_date(self):
+        if isinstance(self.max, relativedelta):
+            return date.today() + self.max
+        return self.max
+
+    def __call__(self, form, field):
+        if field.data is None:
+            return
+
+        value = field.data
+        if isinstance(value, datetime):
+            value = value.date()
+        assert isinstance(value, date)
+
+        if hasattr(form, 'request'):
+            locale = form.request.locale
+        else:
+            locale = 'de_CH'
+
+        min_date = self.min_date
+        max_date = self.max_date
+        if min_date is not None and max_date is not None:
+            # FIXME: To be properly I18n just like with `Layout.format_date`
+            #        the date format should depend on the locale.
+            if not (min_date <= value <= max_date):
+                min_str = format_date(
+                    min_date, format='dd.MM.yyyy', locale=locale)
+                max_str = format_date(
+                    max_date, format='dd.MM.yyyy', locale=locale)
+                raise ValidationError(field.gettext(self.message).format(
+                    min_date=min_str, max_date=max_str
+                ))
+
+        elif min_date is not None and value < min_date:
+            min_str = format_date(min_date, format='dd.MM.yyyy', locale=locale)
+            raise ValidationError(
+                field.gettext(self.after_message).format(date=min_str)
+            )
+
+        elif max_date is not None and value > max_date:
+            max_str = format_date(max_date, format='dd.MM.yyyy', locale=locale)
+            raise ValidationError(
+                field.gettext(self.before_message).format(date=max_str)
+            )

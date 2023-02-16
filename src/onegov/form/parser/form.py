@@ -10,6 +10,9 @@ from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidDateRange
+from onegov.form.widgets import DateRangeInput
+from onegov.form.widgets import DateTimeLocalRangeInput
 from wtforms_components import Email, If, TimeField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
@@ -147,23 +150,43 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'date':
+        widget = None
+        validators = []
+        if field.valid_date_range:
+            start = field.valid_date_range.start
+            stop = field.valid_date_range.stop
+            widget = DateRangeInput(start, stop)
+            validators.append(ValidDateRange(start, stop))
+
         builder.add_field(
             field_class=DateField,
             field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
-            description=field.field_help
+            description=field.field_help,
+            validators=validators,
+            widget=widget
         )
 
     elif field.type == 'datetime':
+        widget = None
+        validators = []
+        if field.valid_date_range:
+            start = field.valid_date_range.start
+            stop = field.valid_date_range.stop
+            widget = DateTimeLocalRangeInput(start, stop)
+            validators.append(ValidDateRange(start, stop))
+
         builder.add_field(
             field_class=DateTimeLocalField,
             field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
-            description=field.field_help
+            description=field.field_help,
+            validators=validators,
+            widget=widget
         )
 
     elif field.type == 'time':

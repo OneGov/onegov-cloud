@@ -1,12 +1,16 @@
 import humanize
 
 from contextlib import suppress
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from markupsafe import Markup
 from morepath.error import LinkError
 from onegov.chat import TextModuleCollection
 from onegov.core.templates import PageTemplate
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import _
+from wtforms.widgets import DateInput
+from wtforms.widgets import DateTimeLocalInput
 from wtforms.widgets import FileInput
 from wtforms.widgets import ListWidget
 from wtforms.widgets import Select
@@ -451,4 +455,51 @@ class HoneyPotWidget(TextInput):
     def __call__(self, field, **kwargs):
         field.meta.request.include('lazy-wolves')
         kwargs['class_'] = (kwargs.get('class_', '') + ' lazy-wolves').strip()
+        return super().__call__(field, **kwargs)
+
+
+class DateRangeMixin:
+
+    def __init__(self, min=None, max=None):
+        self.min = min
+        self.max = max
+
+    @property
+    def min_date(self):
+        if isinstance(self.min, relativedelta):
+            return date.today() + self.min
+        return self.min
+
+    @property
+    def max_date(self):
+        if isinstance(self.max, relativedelta):
+            return date.today() + self.max
+        return self.max
+
+
+class DateRangeInput(DateRangeMixin, DateInput):
+    """ A date widget which set the min and max values that are
+    supported in some browsers based on a date or relativedelta.
+    """
+
+    def __call__(self, field, **kwargs):
+        if self.min is not None:
+            kwargs.setdefault('min', self.min_date.isoformat())
+        if self.max is not None:
+            kwargs.setdefault('max', self.max_date.isoformat())
+
+        return super().__call__(field, **kwargs)
+
+
+class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
+    """ A datetime-local widget which set the min and max values that
+    are supported in some browsers based on a date or relativedelta.
+    """
+
+    def __call__(self, field, **kwargs):
+        if self.min is not None:
+            kwargs.setdefault('min', self.min_date.isoformat() + 'T00:00')
+        if self.max is not None:
+            kwargs.setdefault('max', self.max_date.isoformat() + 'T23:59')
+
         return super().__call__(field, **kwargs)
