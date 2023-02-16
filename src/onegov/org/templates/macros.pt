@@ -1026,17 +1026,14 @@
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
         </div>
     </tal:b>
-
-    <div tal:condition="not occurrences" i18n:translate>No events found.</div>
-    <div tal:condition="not occurrences">
+    <tal:b condition="not occurrences" >
+        <p i18n:translate>No events found.</p>
         <br>
-        <div tal:condition="'range' in layout.og_url">
-            <a href="${layout.events_url}">Alle Veranstaltungen</a>
-        </div>
-        <div>
-            <a href="${layout.events_url}&amp;range=past">Vergangene Veranstaltungen</a>
-        </div>
-    </div>
+        <tal condition="'range' in layout.og_url">
+            <p><a href="${layout.events_url}">Alle Veranstaltungen</a>
+            <br><a href="${layout.events_url}&amp;range=past">Vergangene Veranstaltungen</a>
+        </tal>
+    </tal:b>
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view">
