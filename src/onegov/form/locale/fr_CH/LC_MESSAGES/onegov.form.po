@@ -187,6 +187,9 @@ msgstr "Supprimer le fichier"
 msgid "Replace file"
 msgstr "Remplacer le fichier"
 
+msgid "Upload additional files"
+msgstr "Télécharger des fichiers supplémentaires"
+
 msgid "Text modules"
 msgstr "Modules de texte"
 

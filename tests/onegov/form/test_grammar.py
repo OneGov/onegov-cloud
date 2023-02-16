@@ -293,6 +293,10 @@ def test_fileinput():
     assert f.type == 'fileinput'
     assert f.extensions == ['png', 'jpg', 'gif']
 
+    f = field.parseString("*.pdf (multiple)")
+    assert f.type == 'multiplefileinput'
+    assert f.extensions == ['pdf']
+
 
 def test_prices():
     field = radio()

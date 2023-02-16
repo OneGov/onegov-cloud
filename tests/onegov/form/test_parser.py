@@ -314,6 +314,15 @@ def test_parse_fileinput():
 
     assert form.file.label.text == 'File'
     assert isinstance(form.file, FileField)
+    assert form.file.widget.multiple is False
+
+
+def test_parse_multiplefileinput():
+    form = parse_form("Files = *.pdf|*.doc (multiple)")()
+
+    assert form.files.label.text == 'Files'
+    assert isinstance(form.files, FileField)
+    assert form.files.widget.multiple is True
 
 
 def test_parse_radio():

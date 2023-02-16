@@ -185,6 +185,9 @@ msgstr "Cancellare il file"
 msgid "Replace file"
 msgstr "Sostituire il file"
 
+msgid "Upload additional files"
+msgstr "Caricare file aggiuntivi"
+
 msgid "Text modules"
 msgstr "Moduli di testo"
 
