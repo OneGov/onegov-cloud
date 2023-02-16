@@ -257,12 +257,14 @@ def test_occurrence_collection_query(session):
         assert query(outdated=True, range='weekend').count() == 1
         assert query(outdated=True, range='week').count() == 5
         assert query(outdated=True, range='month').count() == 5
+        assert query(outdated=True, range='past').count() == 1
 
         assert query(outdated=False, range='today').count() == 1
         assert query(outdated=False, range='tomorrow').count() == 2
         assert query(outdated=False, range='weekend').count() == 1
         assert query(outdated=False, range='week').count() == 4
         assert query(outdated=False, range='month').count() == 4
+        assert query(outdated=False, range='past').count() == 1
 
 
 def test_occurrence_collection_pagination(session):
@@ -486,42 +488,49 @@ def test_occurrence_collection_range_to_dates():
         assert to_dates('weekend') == (date(2018, 12, 7), date(2018, 12, 9))
         assert to_dates('week') == (date(2018, 12, 3), date(2018, 12, 9))
         assert to_dates('month') == (date(2018, 12, 1), date(2018, 12, 31))
+        assert to_dates('past') == (date(2000, 1, 1), date(2018, 12, 2))
     with freeze_time("2018-12-06"):
         assert to_dates('today') == (date(2018, 12, 6), date(2018, 12, 6))
         assert to_dates('tomorrow') == (date(2018, 12, 7), date(2018, 12, 7))
         assert to_dates('weekend') == (date(2018, 12, 7), date(2018, 12, 9))
         assert to_dates('week') == (date(2018, 12, 3), date(2018, 12, 9))
         assert to_dates('month') == (date(2018, 12, 1), date(2018, 12, 31))
+        assert to_dates('past') == (date(2000, 1, 1), date(2018, 12, 5))
     with freeze_time("2018-12-07"):
         assert to_dates('today') == (date(2018, 12, 7), date(2018, 12, 7))
         assert to_dates('tomorrow') == (date(2018, 12, 8), date(2018, 12, 8))
         assert to_dates('weekend') == (date(2018, 12, 7), date(2018, 12, 9))
         assert to_dates('week') == (date(2018, 12, 3), date(2018, 12, 9))
         assert to_dates('month') == (date(2018, 12, 1), date(2018, 12, 31))
+        assert to_dates('past') == (date(2000, 1, 1), date(2018, 12, 6))
     with freeze_time("2018-12-08"):
         assert to_dates('today') == (date(2018, 12, 8), date(2018, 12, 8))
         assert to_dates('tomorrow') == (date(2018, 12, 9), date(2018, 12, 9))
         assert to_dates('weekend') == (date(2018, 12, 7), date(2018, 12, 9))
         assert to_dates('week') == (date(2018, 12, 3), date(2018, 12, 9))
         assert to_dates('month') == (date(2018, 12, 1), date(2018, 12, 31))
+        assert to_dates('past') == (date(2000, 1, 1), date(2018, 12, 7))
     with freeze_time("2018-12-09"):
         assert to_dates('today') == (date(2018, 12, 9), date(2018, 12, 9))
         assert to_dates('tomorrow') == (date(2018, 12, 10), date(2018, 12, 10))
         assert to_dates('weekend') == (date(2018, 12, 7), date(2018, 12, 9))
         assert to_dates('week') == (date(2018, 12, 3), date(2018, 12, 9))
         assert to_dates('month') == (date(2018, 12, 1), date(2018, 12, 31))
+        assert to_dates('past') == (date(2000, 1, 1), date(2018, 12, 8))
     with freeze_time("2018-12-10"):
         assert to_dates('today') == (date(2018, 12, 10), date(2018, 12, 10))
         assert to_dates('tomorrow') == (date(2018, 12, 11), date(2018, 12, 11))
         assert to_dates('weekend') == (date(2018, 12, 14), date(2018, 12, 16))
         assert to_dates('week') == (date(2018, 12, 10), date(2018, 12, 16))
         assert to_dates('month') == (date(2018, 12, 1), date(2018, 12, 31))
+        assert to_dates('past') == (date(2000, 1, 1), date(2018, 12, 9))
     with freeze_time("2019-01-31"):
         assert to_dates('today') == (date(2019, 1, 31), date(2019, 1, 31))
         assert to_dates('tomorrow') == (date(2019, 2, 1), date(2019, 2, 1))
         assert to_dates('weekend') == (date(2019, 2, 1), date(2019, 2, 3))
         assert to_dates('week') == (date(2019, 1, 28), date(2019, 2, 3))
         assert to_dates('month') == (date(2019, 1, 1), date(2019, 1, 31))
+        assert to_dates('past') == (date(2000, 1, 1), date(2019, 1, 30))
 
     assert to_dates(None) == (None, None)
     assert to_dates('') == (None, None)
