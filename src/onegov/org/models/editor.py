@@ -38,7 +38,7 @@ class Editor:
     def is_supported_action(action):
         """ Returns True if the given action is supported. """
         return action in {
-            'new', 'paste', 'edit', 'delete', 'change-url', 'sort'
+            'new', 'paste', 'edit', 'delete', 'change-url', 'sort', 'move'
         }
 
     @property

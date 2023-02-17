@@ -1533,6 +1533,7 @@ $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f040';
 $export-link-icon: '\f019';
+$move-link-icon: '\e1d2';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $import-link-icon: '\f093';
@@ -1665,6 +1666,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
     .export-link::before { @include icon($export-link-icon); }
+    .move-link::before { @include icon($move-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
@@ -6357,6 +6359,13 @@ $pageref-color-hover: $iron;
             width: 1.5ex;
         }
     }
+}
+
+/*
+    Tree structure with indent
+*/
+ul.sort-tree {
+    margin-left: 2rem;
 }
 
 /*

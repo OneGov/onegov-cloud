@@ -41,11 +41,14 @@ def handle_page_form(self, request, form, layout=None):
         return handle_new_page(self, request, form, src, layout)
     elif self.action == 'sort':
         return morepath.redirect(request.link(self, 'sort'))
+    elif self.action == 'move':  # copy and paste or move like sort
+        return morepath.redirect(request.link(self, 'move'))
     else:
         raise NotImplementedError
 
 
 def handle_new_page(self, request, form, src=None, layout=None):
+    print('tschupre handle new page')
     site_title = self.page.trait_messages[self.trait]['new_page_title']
     if layout:
         layout.site_title = site_title
@@ -75,6 +78,7 @@ def handle_new_page(self, request, form, src=None, layout=None):
 
 
 def handle_edit_page(self, request, form, layout=None):
+    print('tschupre handle edit page')
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
 
     layout = layout or EditorLayout(self, request, site_title)
@@ -165,6 +169,7 @@ def handle_change_page_url(self, request, form, layout=None):
     permission=Private
 )
 def view_topics_sort(self, request, layout=None):
+    print('tschupre sort topics')
     layout = layout or EditorLayout(self, request, 'sort')
 
     return {
@@ -172,4 +177,41 @@ def view_topics_sort(self, request, layout=None):
         'layout': layout,
         'page': self.page,
         'pages': self.page.children
+    }
+
+
+@OrgApp.html(
+    model=Editor,
+    template='move.pt',
+    name='move',
+    permission=Private
+)
+def view_topics_move(self, request, layout=None):
+    print('tschupre move topics')
+    layout = layout or EditorLayout(self, request, 'move')
+    # print(f'type(page): {type(self.page)}')
+    # print(f'page.root: {self.page.root}')
+    # print(f'page.parent: {self.page.parent}')
+    # print(f'page: {self.page}')
+    # print(f'child pages: {self.page.children}')
+
+    # loop through tree
+    pages = []
+
+    def collect_child_pages(page):
+        print(page)
+        pages.append(page)
+        for p in page.children:
+            collect_child_pages(p)
+
+    collect_child_pages(self.page.root)
+    # print(f'pages: {pages}')
+
+    return {
+        'title': _("Move"),
+        'layout': layout,
+        'page': self.page,
+        'pages': pages,
+        'root': self.page.root,
+        'children': self.page.root.children,
     }
