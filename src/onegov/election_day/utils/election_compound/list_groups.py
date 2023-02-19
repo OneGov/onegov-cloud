@@ -44,7 +44,7 @@ def get_list_groups_data(election_compound):
     if not results:
         return {'results': []}
 
-    completed = election_compound.completed
+    allocated_mandates = election_compound.allocated_mandates
     return {
         'results': [
             {
@@ -52,7 +52,8 @@ def get_list_groups_data(election_compound):
                 'value': round(result.voters_count or 0),
                 'value2': result.number_of_mandates,
                 'class': (
-                    'active' if completed and result.number_of_mandates
+                    'active'
+                    if result.number_of_mandates or not allocated_mandates
                     else 'inactive'
                 ),
                 'color': election_compound.colors.get(result.name)

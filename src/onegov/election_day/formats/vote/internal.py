@@ -145,14 +145,14 @@ def import_vote_internal(vote, principal, file, mimetype):
                 dict(
                     name=entity.get('name', ''),
                     district=entity.get('district', ''),
-                    counted=counted,
-                    yeas=yeas,
-                    nays=nays,
-                    eligible_voters=eligible_voters,
-                    expats=expats,
                     entity_id=entity_id,
-                    empty=empty,
-                    invalid=invalid
+                    counted=counted,
+                    yeas=yeas if counted else 0,
+                    nays=nays if counted else 0,
+                    eligible_voters=eligible_voters if counted else 0,
+                    expats=expats if counted else 0,
+                    empty=empty if counted else 0,
+                    invalid=invalid if counted else 0
                 )
             )
 

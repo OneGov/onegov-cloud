@@ -229,7 +229,7 @@ msgid "Could not read the empty votes"
 msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 
 #, python-format
-msgid "Error in anzgdependent: ${msg}"
+msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
 msgid "Term"
@@ -1261,17 +1261,14 @@ msgstr "Onn"
 msgid "Difference"
 msgstr "Differenza"
 
-#. Default: The diagram shows the origin of the votes. The bars on the left
-#. correspond to the unchanged votes (including the blank list), the bars on
-#. the right side to the final results. The width of the bars and connections
-#. is proportional to the votes.
+#. Default: The diagram shows the origin of votes won and lost by panache. On
+#. the left side are the lost votes, on the right side the won votes. The width
+#. of the bars and the connections is proportional to the number of votes.
 #.
 msgid "figcaption_panachage"
 msgstr ""
 "Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
-"pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
-"midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
-"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
+"pervia dal panaschar. La ladezza da las travs e da las colliaziuns è "
 "proporziunala a las vuschs."
 
 msgid "Count"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-18 13:30+0200\n"
+"POT-Creation-Date: 2023-02-14 15:23+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -70,7 +70,7 @@ msgstr "${count} Buchungen pro Person"
 
 #, python-format
 msgid "${count} Attendees"
-msgstr "${count} Teilnehmer"
+msgstr "${count} Teilnehmende"
 
 #, python-format
 msgid "${count} Girls"
@@ -170,22 +170,22 @@ msgid "Booking Date"
 msgstr "Buchungsdatum"
 
 msgid "Attendee First Name"
-msgstr "Teilnehmer Vorname"
+msgstr "Teilnehmende Vorname"
 
 msgid "Attendee Last Name"
-msgstr "Teilnehmer Nachname"
+msgstr "Teilnehmende Nachname"
 
 msgid "Attendee Birth Date"
-msgstr "Teilnehmer Geburtsdatum"
+msgstr "Teilnehmende Geburtsdatum"
 
 msgid "Attendee Gender"
-msgstr "Teilnehmer Geschlecht"
+msgstr "Teilnehmende Geschlecht"
 
 msgid "Attendee Notes"
-msgstr "Teilnehmer Bemerkungen"
+msgstr "Teilnehmende Bemerkungen"
 
 msgid "Attendee Booking-Limit"
-msgstr "Teilnehmer Buchungslimite"
+msgstr "Teilnehmende Buchungslimite"
 
 msgid "Occasion Rescinded"
 msgstr "Durchführung Abgesagt"
@@ -559,6 +559,12 @@ msgstr "Weiterbildung"
 msgid "Healthy Snacks"
 msgstr "Gesunde Snacks"
 
+msgid "Just for Boys"
+msgstr "Nur Jungen"
+
+msgid "Just for Girls"
+msgstr "Nur Mädchen"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -611,7 +617,7 @@ msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
 msgid "Attendee"
-msgstr "Teilnehmer"
+msgstr "Teilnehmende"
 
 msgid "Note"
 msgstr "Bemerkung"
@@ -622,8 +628,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "AGB"
 
@@ -835,11 +841,11 @@ msgstr ""
 
 #, python-format
 msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
-msgstr "${title} (abgesagt) <small>${dates}, ${count} Teilnehmer</small>"
+msgstr "${title} (abgesagt) <small>${dates}, ${count} Teilnehmende</small>"
 
 #, python-format
 msgid "${title} <small>${dates}, ${count} Attendees</small>"
-msgstr "${title} <small>${dates}, ${count} Teilnehmer</small>"
+msgstr "${title} <small>${dates}, ${count} Teilnehmende</small>"
 
 msgid "Dates"
 msgstr "Daten"
@@ -857,7 +863,7 @@ msgid "Minimum Number of Participants"
 msgstr "Mindestzahl Teilnehmende"
 
 msgid "Participants"
-msgstr "Teilnehmer"
+msgstr "Teilnehmende"
 
 msgid "Maximum Number of Participants"
 msgstr "Anzahl Plätze"
@@ -928,7 +934,8 @@ msgid ""
 "The minium number of participants cannot be higher than the maximum number "
 "of participants"
 msgstr ""
-"The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
+"The Mindestzahl der Teilnehmenden darf nicht grösser als die Anzahl Plätze "
+"sein"
 
 msgid ""
 "The maximum number of spots is lower than the number of already accepted "
@@ -1354,7 +1361,7 @@ msgstr ""
 "bestehen bevor Durchführungen erfasst werden können."
 
 msgid "Attendees"
-msgstr "Teilnehmer"
+msgstr "Teilnehmende"
 
 msgid "Show Ticket"
 msgstr "Zum Ticket"
@@ -2492,7 +2499,7 @@ msgid "Your activity has been archived"
 msgstr "Ihr Angebot wurde archiviert"
 
 msgid "Edit Attendee"
-msgstr "Teilnehmer bearbeiten"
+msgstr "Teilnehmende bearbeiten"
 
 #, python-format
 msgid "Booking Limit of ${name}"
@@ -2855,7 +2862,7 @@ msgstr "Bedarf bearbeiten"
 
 #, python-format
 msgid "Attendees for ${period}"
-msgstr "Teilnehmer ${period}"
+msgstr "Teilnehmende ${period}"
 
 msgid "Deactivate"
 msgstr "Deaktivieren"

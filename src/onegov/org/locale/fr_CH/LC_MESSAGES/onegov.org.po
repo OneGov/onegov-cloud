@@ -18,7 +18,7 @@ msgid "Open"
 msgstr "Ouvert"
 
 msgid "Pending"
-msgstr "En attente"
+msgstr "En traitement"
 
 msgid "Closed"
 msgstr "Fermé"
@@ -2135,6 +2135,9 @@ msgstr "L'an dernier"
 
 msgid "Older"
 msgstr "Plus âgés"
+
+msgid "Past Events"
+msgstr "Événements passées"
 
 msgid "Do you really want to delete this note?"
 msgstr "Voulez-vous vraiment supprimer cette note ?"

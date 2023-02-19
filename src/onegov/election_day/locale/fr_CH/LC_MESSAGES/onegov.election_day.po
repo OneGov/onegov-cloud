@@ -228,7 +228,7 @@ msgid "Could not read the empty votes"
 msgstr "Impossible de connaître les votes blancs"
 
 #, python-format
-msgid "Error in anzgdependent: ${msg}"
+msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
 msgid "Term"
@@ -1257,17 +1257,16 @@ msgstr "Année"
 msgid "Difference"
 msgstr "Différence"
 
-#. Default: The diagram shows the origin of the votes. The bars on the left
-#. correspond to the unchanged votes (including the blank list), the bars on
-#. the right side to the final results. The width of the bars and connections
-#. is proportional to the votes.
+#. Default: The diagram shows the origin of votes won and lost by panache. On
+#. the left side are the lost votes, on the right side the won votes. The width
+#. of the bars and the connections is proportional to the number of votes.
 #.
 msgid "figcaption_panachage"
 msgstr ""
-"Le diagramme montre l'origine des votes. Les barres de gauche correspondent "
-"aux votes inchangés (y compris la liste vierge), les barres du côté droit "
-"aux résultats finale. La largeur des barres et des connexions est "
-"proportionnelle aux votes."
+"Le diagramme montre l'origine des votes gagnés et perdus par le panache. Sur "
+"le côté gauche se trouvent les votes perdus, sur le côté droit les votes "
+"gagnés. La largeur des barres et des connexions est proportionnelle au "
+"nombre de votes."
 
 msgid "Count"
 msgstr "Compter"
