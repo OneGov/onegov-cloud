@@ -44,7 +44,7 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     """
 
-    use_websockets = True
+    use_websocket = True
 
     @cached_property
     def has_results(self):

@@ -95,8 +95,13 @@ class WebsocketNotification(Notification):
 
     def trigger(self, request, model):
         """ Sends a refresh event to all connected websockets. """
+
         self.update_from_model(model)
-        request.app.send_websocket_refresh(request.link(model))
+
+        request.app.send_websocket({
+            'event': 'refresh',
+            'path': request.link(model)
+        })
 
 
 class WebhookNotification(Notification):

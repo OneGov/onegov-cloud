@@ -45,7 +45,7 @@ class NotificationCollection:
     def trigger(self, request, model, options):
         """ Triggers and adds the selected notifications. """
 
-        if 'websockets' in options:
+        if 'websocket' in options:
             notification = WebsocketNotification()
             notification.trigger(request, model)
             self.session.add(notification)
@@ -77,7 +77,7 @@ class NotificationCollection:
         if not (elections or election_compounds or votes) or not options:
             return
 
-        if 'websockets' in options:
+        if 'websocket' in options:
             for election in elections:
                 notification = WebsocketNotification()
                 notification.trigger(request, election)

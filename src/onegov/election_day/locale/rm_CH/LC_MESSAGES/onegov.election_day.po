@@ -523,8 +523,8 @@ msgstr "Statistica da panaschar"
 msgid "Notifications"
 msgstr "Communicaziuns"
 
-msgid "Websocket / Browser"
-msgstr ""
+msgid "Browser"
+msgstr "Browser"
 
 msgid "Email"
 msgstr "E-mail"

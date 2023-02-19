@@ -14,15 +14,15 @@ def test_notification_form():
     form.request = DummyRequest()
     form.on_request()
     assert form.notifications.choices == [
-        ('websockets', 'Websocket / Browser')
+        ('websocket', 'Browser')
     ]
-    assert 'websockets' in form.notifications.default
+    assert 'websocket' in form.notifications.default
     assert not form.validate()
 
     form.request.app.principal.email_notification = True
     form.on_request()
     assert form.notifications.choices == [
-        ('websockets', 'Websocket / Browser'),
+        ('websocket', 'Browser'),
         ('email', 'Email')
     ]
     assert 'email' in form.notifications.default
@@ -30,7 +30,7 @@ def test_notification_form():
     form.request.app.principal.sms_notification = 'http://example.com'
     form.on_request()
     assert form.notifications.choices == [
-        ('websockets', 'Websocket / Browser'),
+        ('websocket', 'Browser'),
         ('email', 'Email'),
         ('sms', 'SMS')
     ]
@@ -39,13 +39,13 @@ def test_notification_form():
     form.request.app.principal.webhooks = {'http://abc.com/1': None}
     form.on_request()
     assert form.notifications.choices == [
-        ('websockets', 'Websocket / Browser'),
+        ('websocket', 'Browser'),
         ('email', 'Email'),
         ('sms', 'SMS'),
         ('webhooks', 'Webhooks')
     ]
     assert form.notifications.data == [
-        'websockets', 'email', 'sms', 'webhooks'
+        'websocket', 'email', 'sms', 'webhooks'
     ]
     assert 'webhooks' in form.notifications.default
 
@@ -55,7 +55,7 @@ def test_notifications_form(session):
     form.request = DummyRequest(session=session)
     form.on_request()
     assert form.notifications.choices == [
-        ('websockets', 'Websocket / Browser')
+        ('websocket', 'Browser')
     ]
     assert form.elections.choices == []
     assert form.election_compounds.choices == []
@@ -130,13 +130,13 @@ def test_notifications_form(session):
     # Test on_request
     form.on_request()
     assert form.notifications.choices == [
-        ('websockets', 'Websocket / Browser'),
+        ('websocket', 'Browser'),
         ('email', 'Email'), ('sms', 'SMS'), ('webhooks', 'Webhooks')
     ]
     assert form.notifications.data == [
-        'websockets', 'email', 'sms', 'webhooks'
+        'websocket', 'email', 'sms', 'webhooks'
     ]
-    assert 'websockets' in form.notifications.default
+    assert 'websocket' in form.notifications.default
     assert 'email' in form.notifications.default
     assert 'sms' in form.notifications.default
     assert 'webhooks' in form.notifications.default

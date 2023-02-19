@@ -139,11 +139,15 @@ metal:define-macro="layout">
         </div>
     </footer>
     <tal:block tal:content="structure layout.principal.analytics|nothing" />
-    <script tal:condition="getattr(layout, 'use_websockets', False)">
+    <script tal:condition="getattr(layout, 'use_websocket', False)">
         WebsocketConfig = {
             endpoint: "${layout.app.websockets_client_url(request)}",
             schema: "${layout.app.schema}",
-            onrefresh: function(event) { $(".page-refresh").show(); }
+            onnotifcation: function(message) {
+                if (message.event === 'refresh' && window.location.href.search(message.path) !== -1) {
+                    $(".page-refresh").show();
+                }
+            }
         };
     </script>
 </body>

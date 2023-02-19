@@ -521,8 +521,8 @@ msgstr "Panachage"
 msgid "Notifications"
 msgstr "Notifications"
 
-msgid "Websocket / Browser"
-msgstr ""
+msgid "Browser"
+msgstr "Navigateur"
 
 msgid "Email"
 msgstr "Email"
