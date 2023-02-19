@@ -920,7 +920,7 @@ msgid "This page has been updated."
 msgstr "Cette page a été actualisée."
 
 msgid "Reload page."
-msgstr ""
+msgstr "Rechargez la page."
 
 msgid "Homepage"
 msgstr "Page d'accueil"
