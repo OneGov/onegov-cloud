@@ -21,13 +21,11 @@ def test_integration(broadcast, authenticate, connect, websockets_app):
         'wss://govikon.org/ws'
 
     # broadcast
-    assert websockets_app.send_websocket_refresh('https://govikon.org/events')
+    assert websockets_app.send_websocket({'custom': 'data'})
     assert connect.called
     assert authenticate.called
     assert broadcast.called
 
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
     assert broadcast.call_args[0][1] == websockets_app.schema
-    assert broadcast.call_args[0][2] == {
-        'event': 'refresh', 'path': 'https://govikon.org/events'
-    }
+    assert broadcast.call_args[0][2] == {'custom': 'data'}
