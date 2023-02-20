@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-10-18 13:30+0200\n"
+"POT-Creation-Date: 2023-02-20 10:04+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -69,8 +69,12 @@ msgid "${count} Bookings per Attendee"
 msgstr "${count} prenotazioni per partecipante"
 
 #, python-format
-msgid "${count} Attendees"
-msgstr "${count} partecipante"
+msgid "${count} registered Attendees"
+msgstr "${count} partecipanti registrati"
+
+#, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} dei quali senza prenotazioni accettate"
 
 #, python-format
 msgid "${count} Girls"
@@ -623,8 +627,8 @@ msgstr "Ignorare restrizioni di età"
 msgid "Accept TOS"
 msgstr "Accettare CG"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "CG"
 
@@ -3057,3 +3061,7 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#, python-format
+#~ msgid "${count} Attendees"
+#~ msgstr "${count} partecipante"

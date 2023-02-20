@@ -270,22 +270,29 @@ class AttendeesBoardlet(FeriennetBoardlet):
                 'male': 0,
             }
 
-        attendees = self.session.query(Attendee)\
-            .filter(Attendee.id.in_(
-                self.session.query(Booking.attendee_id).filter_by(
-                    period_id=self.period.id
-                )
-            ))
+        attendee_ids = self.session.query(Booking.attendee_id).filter_by(
+            period_id=self.period.id
+        )
+
+        attendees = self.session.query(Attendee).filter(
+            Attendee.id.in_(attendee_ids)
+        )
+
+        accepted_attendees = self.session.query(Booking.attendee_id).filter(
+            Booking.attendee_id.in_(attendee_ids),
+            Booking.state == 'accepted'
+        ).distinct()
 
         return {
             'total': attendees.count(),
             'girls': attendees.filter_by(gender='female').count(),
             'boys': attendees.filter_by(gender='male').count(),
+            'without_booking': attendees.count() - accepted_attendees.count()
         }
 
     @property
     def title(self):
-        return _("${count} Attendees", mapping={
+        return _("${count} registered Attendees", mapping={
             'count': self.attendee_counts['total']
         })
 
@@ -300,6 +307,14 @@ class AttendeesBoardlet(FeriennetBoardlet):
     def facts(self):
         if not self.period:
             return
+
+        yield BoardletFact(
+            text=_("${count} of which without accepted bookings",
+                   mapping={
+                       'count': self.attendee_counts['without_booking']
+                   }),
+            icon='fa-minus'
+        )
 
         yield BoardletFact(
             text=_("${count} Girls", mapping={
