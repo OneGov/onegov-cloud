@@ -171,7 +171,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
     def join(self, data, attribute, separator='\n'):
         def render(value):
             if isinstance(value, (list, tuple)):
-                return '\n'.join(v.strip() for v in value)
+                return '\n'.join((v and str(v) or '').strip() for v in value)
 
             if isinstance(value, str):
                 return value.strip()

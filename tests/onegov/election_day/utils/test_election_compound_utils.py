@@ -221,42 +221,42 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert get_list_groups_data(election_compound) == {
         'results': [
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#EE7F00',
                 'text': 'CVP',
                 'value': 931,
                 'value2': 22
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#019040',
                 'text': 'SVP',
                 'value': 899,
                 'value2': 19
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#0E52A0',
                 'text': 'FDP',
                 'value': 863,
                 'value2': 18
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#99C040',
                 'text': 'AL',
                 'value': 538,
                 'value2': 10
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#E53136',
                 'text': 'SP',
                 'value': 418,
                 'value2': 7
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#acc700',
                 'text': 'GLP',
                 'value': 236,
@@ -396,13 +396,6 @@ def test_election_compound_utils_parties(import_test_datasets, session):
     assert_link(False, '#F9B200', 5, 15, 101)
     assert_link(True, '#E53136', 6, 15, 196)
     assert_link(False, None, 0, 15, 7035)
-    assert_link(True, '#0E52A0', 3, 11, 52266)
-    assert_link(True, '#E53136', 6, 14, 23873)
-    assert_link(True, '#019040', 7, 15, 60468)
-    assert_link(False, '#F9B200', 5, 13, 1014)
-    assert_link(True, '#99C040', 1, 9, 29934)
-    assert_link(True, '#EE7F00', 2, 10, 51273)
-    assert_link(True, '#acc700', 4, 12, 13261)
 
     def assert_node(active, color, id_, name):
         assert {

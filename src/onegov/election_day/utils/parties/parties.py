@@ -25,10 +25,11 @@ def get_party_results(item, json_serializable=False):
 
     # Get the results
     parties = {}
+    colors = item.historical_colors
     for result in results:
         party = parties.setdefault(result.party_id, {})
         year = party.setdefault(str(result.year), {})
-        year['color'] = item.colors.get(result.name)
+        year['color'] = colors.get(result.name)
         year['mandates'] = result.number_of_mandates
         year['name'] = result.name
 
@@ -75,14 +76,16 @@ def get_party_results_deltas(item, years, parties):
             result = ['', '', '', '']
             party = parties[key]
             values = party.get(year)
-            if values:
-                permille = values.get(attribute, {}).get('permille')
-                result = [
-                    values.get('name', ''),
-                    values.get('mandates', ''),
-                    values.get(attribute, {}).get('total', ''),
-                    f'{permille/10}%' if permille else ''
-                ]
+            if not values:
+                continue
+
+            permille = values.get(attribute, {}).get('permille')
+            result = [
+                values.get('name', ''),
+                values.get('mandates', ''),
+                values.get(attribute, {}).get('total', ''),
+                f'{permille/10}%' if permille else ''
+            ]
 
             if deltas:
                 delta = ''
@@ -122,6 +125,7 @@ def get_party_results_horizontal_data(item):
 
     attribute = 'voters_count' if item.voters_counts else 'votes'
     years, parties = get_party_results(item)
+    allocated_mandates = item.allocated_mandates
 
     party_names = {}
     for party_id, party in parties.items():
@@ -159,7 +163,9 @@ def get_party_results_horizontal_data(item):
                     'value': value,
                     'value2': party.get('mandates'),
                     'class': (
-                        'active' if active and party.get('mandates')
+                        'active' if active and (
+                            party.get('mandates') or not allocated_mandates
+                        )
                         else 'inactive'
                     ),
                     'color': party.get('color'),
@@ -276,34 +282,24 @@ def get_parties_panachage_data(item, request=None):
         return parties.index(party) + len(parties)
 
     active = {r.party_id: r.number_of_mandates > 0 for r in party_results}
+    colors = item.historical_colors
     colors = {
-        r.party_id: item.colors[r.name]
+        r.party_id: colors[r.name]
         for r in party_results
-        if r.name in item.colors
+        if r.name in colors
     }
-    intra_party_votes = dict(set((r.party_id, r.votes) for r in party_results))
 
     # Create the links
     links = []
     for result in results:
         if result.source == result.target:
             continue
-        if result.target in intra_party_votes:
-            intra_party_votes[result.target] -= result.votes
         links.append({
             'source': left_node(result.source),
             'target': right_node(result.target),
             'value': result.votes,
             'color': colors.get(result.source),
             'active': active.get(result.source, False)
-        })
-    for party, votes in intra_party_votes.items():
-        links.append({
-            'source': left_node(party),
-            'target': right_node(party),
-            'value': votes,
-            'color': colors.get(party),
-            'active': active.get(party, False)
         })
 
     # Create the nodes

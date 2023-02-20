@@ -57,6 +57,10 @@ class ElectionCompoundLayout(DetailLayout):
         return self.model.results
 
     @cached_property
+    def totals(self):
+        return self.model.totals
+
+    @cached_property
     def has_districts(self):
         if not self.principal.has_districts:
             return False

@@ -43,6 +43,14 @@ def test_render_upload_field():
     })) == '&lt;b.txt&gt; (1.0 kB)'
 
 
+def test_render_upload_multiple_field():
+    assert render_field(MockField('UploadMultipleField', [
+        {'filename': 'a.txt', 'size': 3000},
+        {},  # deleted file will not be rendered
+        {'filename': '<b.txt>', 'size': 1000},
+    ])) == 'a.txt (3.0 kB)<br>&lt;b.txt&gt; (1.0 kB)'
+
+
 def test_render_radio_field():
     assert render_field(MockField('RadioField', 'selected')) == '✓ selected'
 

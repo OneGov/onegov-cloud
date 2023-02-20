@@ -283,6 +283,12 @@ class DirectoryBaseForm(Form):
         fieldset=_("Publication"),
         default=False)
 
+    required_publication = BooleanField(
+        label=_("Required publication dates"),
+        fieldset=_("Publication"),
+        depends_on=('enable_publication', 'y'),
+        default=False)
+
     submitter_meta_fields = MultiCheckboxField(
         label=_("Information to be provided in addition to the E-mail"),
         choices=(

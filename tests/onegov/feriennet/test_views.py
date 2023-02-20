@@ -1102,7 +1102,7 @@ def test_confirmed_booking_view(scenario, client):
     assert "nicht genügend Anmeldungen" not in page
 
     # Related contacts are now visible
-    assert page.pyquery('.attendees-toggle').text() == '1 Teilnehmer'
+    assert page.pyquery('.attendees-toggle').text() == '1 Teilnehmende'
     assert "Elternteil" in page
 
     # Unless that option was disabled

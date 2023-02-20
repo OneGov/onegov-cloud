@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-07 09:26+0100\n"
+"POT-Creation-Date: 2023-02-10 17:06+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -474,6 +474,9 @@ msgstr ""
 
 msgid "Publication"
 msgstr "Publikation"
+
+msgid "Required publication dates"
+msgstr "Publikationsdaten erforderlich"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Zusätzliche zur E-Mail benötigte Informationen des Antragstellers"
@@ -1111,6 +1114,9 @@ msgstr ""
 
 msgid "New Reservations"
 msgstr "Neue Reservationen"
+
+msgid "Notifications *"
+msgstr "Benachrichtigungen *"
 
 msgid "Daily Reservations"
 msgstr "Tägliche Reservationen"
@@ -2129,6 +2135,9 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
+msgid "Past events"
+msgstr "Vergangene Veranstaltungen"
+
 msgid "Do you really want to delete this note?"
 msgstr "Möchten Sie diese Notiz wirklich löschen?"
 
@@ -2364,8 +2373,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
