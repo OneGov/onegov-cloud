@@ -354,6 +354,97 @@ def test_files(session):
     assert session.query(File).count() == 0
 
 
+def test_multi_files(session):
+    press_releases = DirectoryCollection(session).add(
+        title="Press Releases",
+        structure="""
+            Title *= ___
+            Files = *.txt (multiple)
+        """,
+        configuration=DirectoryConfiguration(
+            title=('Title', ),
+            order=('Title', ),
+        )
+    )
+
+    txts = (
+        Bunch(
+            data=object(),
+            file=BytesIO(b'just kidding'),
+            filename='press-release.txt'
+        ),
+        Bunch(
+            data=object(),
+            file=BytesIO(b'no really'),
+            filename='press-release-2.txt'
+        ),
+    )
+
+    iphone_found = press_releases.add(values=dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        files=txts
+    ))
+
+    def commit():
+        nonlocal iphone_found, press_releases
+
+        transaction.commit()
+        iphone_found = session.query(DirectoryEntry).one()
+        press_releases = session.query(Directory).one()
+
+    assert len(iphone_found.files) == 2
+    assert iphone_found.values['files'][0]['size'] == 12
+    assert iphone_found.values['files'][0]['mimetype'] == 'text/plain'
+    assert iphone_found.values['files'][0]['filename'] == 'press-release.txt'
+    assert iphone_found.values['files'][1]['size'] == 9
+    assert iphone_found.values['files'][1]['mimetype'] == 'text/plain'
+    assert iphone_found.values['files'][1]['filename'] == 'press-release-2.txt'
+    assert session.query(File).count() == 2
+
+    files = session.query(File).all()
+    assert files[0].note == 'files:0'
+    assert files[1].note == 'files:1'
+    file1_id = files[0].id
+    file2_id = files[1].id
+    press_releases.update(iphone_found, dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        files=(
+            # delte the first file -> onegov.form
+            Bunch(data={}, action='delete'),
+            # keep the second file -> onegov.form
+            Bunch(data=None, action='keep')
+        )
+    ))
+    commit()
+
+    assert session.query(File).count() == 1
+    new_file_1 = session.query(File).one()
+    # the note should have been updated
+    assert new_file_1.note == 'files:0'
+    assert new_file_1.id == file2_id
+
+    iphone_found = press_releases.update(iphone_found, values=dict(
+        title="iPhone Found in Ancient Ruins in the Andes",
+        files=txts
+    ))
+    commit()
+
+    assert session.query(File).count() == 2
+    files = session.query(File).all()
+    # neither of the files should be the original, because neither
+    # had a `keep` action.
+    assert files[0].note == 'files:0'
+    assert files[0].id != file1_id
+    assert files[1].note == 'files:1'
+    assert files[1].id != file2_id
+
+    # deleting the model cascades to the session
+    session.delete(iphone_found)
+    session.flush()
+
+    assert session.query(File).count() == 0
+
+
 def test_migrate_text_field(session):
     rooms = DirectoryCollection(session).add(
         title="Rooms",

@@ -24,15 +24,6 @@ class WebsocketsApp(WebassetsApp):
     To send broadcast messages, call ``send_websocket`` with a
     JSON-serializable message.
 
-    WebsocketsApp supports a builtin broadcast event for refreshing pages. Call
-    ``send_websocket_refresh`` with an absolute URL or path to trigger a page
-    refresh and make sure to include a callback in the global configuration::
-
-        WebsocketConfig = {
-            ...
-            onrefresh: function(event) { ... }
-        };
-
     """
 
     def configure_websockets(self, **cfg):
@@ -77,11 +68,6 @@ class WebsocketsApp(WebassetsApp):
             scheme=scheme, netloc=netloc, path=path,
             params='', query='', fragment=''
         ).geturl()
-
-    def send_websocket_refresh(self, path):
-        """ Sends a refresh event to all clients connected to the app. """
-
-        return self.send_websocket({'event': 'refresh', 'path': path})
 
     def send_websocket(self, message, channel=None):
         """ Sends an application-bound broadcast message to all connected

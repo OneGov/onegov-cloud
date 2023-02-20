@@ -68,6 +68,7 @@ def view_occurrences(self, request, layout=None):
             ('weekend', _("This weekend")),
             ('week', _("This week")),
             ('month', _("This month")),
+            ('past', _("Past events")),
         )
     ]
 

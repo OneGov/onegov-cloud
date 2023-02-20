@@ -351,6 +351,12 @@ def test_import_internal_vote_temporary_results(session):
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
     ) == [1702, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+    assert vote.yeas == 40
+    assert vote.nays == 20
+    assert vote.eligible_voters == 200
+    assert vote.expats == 0
+    assert vote.empty == 2
+    assert vote.invalid == 2
 
 
 def test_import_internal_vote_optional_columns(session):

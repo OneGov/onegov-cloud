@@ -34,7 +34,7 @@ form {
 
         min-width: 75%;
 
-        &.error {
+        &.error, .upload-widget.error {
             color: $alert-color;
 
             & input,

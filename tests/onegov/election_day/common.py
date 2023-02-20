@@ -186,6 +186,7 @@ class DummyApp:
         self.application_id = application_id
         self.principal = DummyPrincipal()
         self.schema = 'onegov_election_day-{}'.format(self.principal.name)
+        self.websocket_data = []
 
     def session(self):
         return self._session
@@ -193,6 +194,10 @@ class DummyApp:
     def send_marketing_email_batch(self, prepared_emails):
         # we'll allow sending empty batches for DummyApp
         assert not list(prepared_emails)
+
+    def send_websocket(self, data):
+        self.websocket_data.append(data)
+        return True
 
 
 class DummyRequest:

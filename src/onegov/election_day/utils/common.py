@@ -129,7 +129,7 @@ def get_parameter(request, name, type_, default):
 
 def get_entity_filter(request, item, view, selected):
     entities = [None] + [result.name for result in item.results]
-    return [
+    return sorted((
         (
             entity if entity else _('All'),
             entity == selected,
@@ -140,4 +140,4 @@ def get_entity_filter(request, item, view, selected):
             )
         )
         for entity in entities
-    ]
+    ))

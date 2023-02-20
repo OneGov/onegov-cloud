@@ -427,21 +427,40 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def include_code_editor(self):
         self.request.include('code_editor')
 
-    def field_download_link(self, field):
-        if not field.type == 'UploadField':
+    def file_data_download_link(self, file_data):
+        if file_data is None:
             return None
 
-        if field.data.get('data', '').startswith('@'):
+        if (ref := file_data.get('data', '')).startswith('@'):
             return self.request.class_link(File, {
-                'id': field.data['data'].lstrip('@')
+                'id': ref.lstrip('@')
             })
 
-    def field_file(self, field):
-        if not field.type == 'UploadField':
+    def file_data_file(self, file_data):
+        if file_data is None:
             return None
-        if field.data.get('data', '').startswith('@'):
+
+        if (ref := file_data.get('data', '')).startswith('@'):
             return self.request.session.query(File).filter_by(
-                id=field.data['data'].lstrip('@')).first()
+                id=ref.lstrip('@')).first()
+
+    def field_download_link(self, field):
+        if field.type == 'UploadField':
+            return self.file_data_download_link(field.data)
+        elif field.type == 'UploadMultipleField':
+            return [
+                self.file_data_download_link(file_data)
+                for file_data in (field.data or [])
+            ]
+
+    def field_file(self, field):
+        if field.type == 'UploadField':
+            return self.file_data_file(field.data)
+        elif field.type == 'UploadMultipleField':
+            return [
+                self.file_data_file(file_data)
+                for file_data in (field.data or [])
+            ]
 
     @cached_property
     def move_person_url_template(self):
