@@ -231,7 +231,7 @@ class BookingsBoardlet(FeriennetBoardlet):
                 icon='fa-minus',
             )
             yield BoardletFact(
-                text=_("${count} cancelled", mapping={
+                text=_("${count} not carried out or cancelled", mapping={
                     'count': self.counts['cancelled']
                 }),
                 icon='fa-minus',

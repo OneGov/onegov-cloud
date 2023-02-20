@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-20 10:04+0100\n"
+"POT-Creation-Date: 2023-02-20 11:24+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -53,8 +53,8 @@ msgid "${count} accepted"
 msgstr "${count} accettato"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} annullato"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} annullati o cancellati"
 
 #, python-format
 msgid "${count} denied"
@@ -3061,6 +3061,10 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#, python-format
+#~ msgid "${count} cancelled"
+#~ msgstr "${count} annullato"
 
 #, python-format
 #~ msgid "${count} Attendees"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-20 10:04+0100\n"
+"POT-Creation-Date: 2023-02-20 11:24+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -53,8 +53,8 @@ msgid "${count} accepted"
 msgstr "${count} angenommen"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} abgesagt"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} abgesagt oder storniert"
 
 #, python-format
 msgid "${count} denied"
@@ -70,7 +70,7 @@ msgstr "${count} Buchungen pro Person"
 
 #, python-format
 msgid "${count} registered Attendees"
-msgstr "${count} registierte Teilnehmer"
+msgstr "${count} registierte Teilnehmende"
 
 #, python-format
 msgid "${count} of which without accepted bookings"
@@ -90,7 +90,7 @@ msgstr "${amount}% Zufriedenheit"
 
 #, python-format
 msgid "${count} Attendees Without Occasion"
-msgstr "${count} Teilnehmende ohne Durchführung"
+msgstr "${count} Person(en) ohne Durchführung"
 
 #, python-format
 msgid "${amount} CHF outstanding"
@@ -3064,6 +3064,10 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#, python-format
+#~ msgid "${count} cancelled"
+#~ msgstr "${count} abgesagt"
 
 #, python-format
 #~ msgid "${count} Attendees"
