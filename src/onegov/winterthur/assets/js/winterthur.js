@@ -44,36 +44,3 @@ $(document).ready(function() {
         }
     });
 });
-
-
-$(document).ready(function() {
-    const fieldsWithOnlyPositiveNumbers = ['#duration', '#personnel', '#backup', "#mission_count"];
-    const regexp = /^vehicles_.*_count$/;
-    const vehicleCountField = [...document.querySelectorAll("[id]")].filter(el => regexp.test(el.id));
-    const nonNullinputFields = fieldsWithOnlyPositiveNumbers.map(numberFields =>
-        document.querySelector(numberFields)).concat(vehicleCountField).filter(field => field !== null
-    );
-    validateOnPositiveIntegers(nonNullinputFields);
-});
-
-// Allow numbers, backspace, delete, left and right arrow keys to be entered in fields.
-// Prevent everything else.
-function validateOnPositiveIntegers(integerFields) {
-
-    function validateKeyCode(event) {
-        const code = event.keyCode;
-        if (code === 8 || code === 46 || code === 37 || code === 39) {
-            return true;
-        } else if (code < 48 || code > 57) {
-            return false;
-        } else return true;
-    }
-
-    integerFields.forEach(field => {
-        field.addEventListener('keypress', function (event) {
-            if (!validateKeyCode(event)) {
-                event.preventDefault();
-            }
-        });
-    });
-}
