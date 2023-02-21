@@ -631,7 +631,7 @@
             </ul>
         </div>
         <div id="after-panels" metal:define-slot="after-panels"></div>
-        
+
         <div class="more-news side-panel" tal:condition="siblings|False">
             <h3 i18n:translate="">More news</h3>
             <div tal:repeat="sibling siblings" class="card">
@@ -838,7 +838,7 @@
                         <span i18n:translate="">Functions:</span>
                         <ul>
                             <li tal:repeat="item organization_to_function">
-                                <span>${item}</span>
+                                ${item}
                             </li>
                         </ul>
                     </div>
@@ -1338,7 +1338,7 @@
             data-link-webm-low-res="${link_webm_low_res}"
         >
             Your browser does not support the video tag.
-        </video> 
+        </video>
         <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer"></div>
     </div>
 </metal:autoplay_video>
