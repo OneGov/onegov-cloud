@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-01-24 09:39+0100\n"
+"POT-Creation-Date: 2023-02-10 17:06+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -18,7 +18,7 @@ msgid "Open"
 msgstr "Ouvert"
 
 msgid "Pending"
-msgstr "En attente"
+msgstr "En traitement"
 
 msgid "Closed"
 msgstr "Fermé"
@@ -361,9 +361,6 @@ msgstr "Personnalisé"
 msgid "Custom Numbering"
 msgstr "Numérotation personnalisée"
 
-msgid "Overview layout with tiles"
-msgstr "Vue d'ensemble avec les tuiles"
-
 msgid "Main view"
 msgstr "Affichage principal"
 
@@ -478,6 +475,9 @@ msgstr ""
 
 msgid "Publication"
 msgstr "Publication"
+
+msgid "Required publication dates"
+msgstr "Les dates de publication sont requises"
 
 msgid "Information to be provided in addition to the E-mail"
 msgstr "Informations complémentaires du demandeur requises à l'e-mail"
@@ -890,6 +890,9 @@ msgstr "Fichier Excel"
 msgid "JSON File"
 msgstr "Fichier JSON"
 
+msgid "Minimum price total"
+msgstr "Prix minimum total"
+
 msgid "Payment Method"
 msgstr "Méthode de paiement"
 
@@ -901,6 +904,9 @@ msgstr "Paiements par carte de crédit en option"
 
 msgid "Credit card payments required"
 msgstr "Paiements par carte de crédit requis"
+
+msgid "The price must be larger than zero"
+msgstr "Le prix doit être supérieur à zéro"
 
 msgid ""
 "You need to setup a default payment provider to enable credit card payments"
@@ -989,7 +995,7 @@ msgid "Last name"
 msgstr "Nom de famille"
 
 msgid "Function"
-msgstr ""
+msgstr "Fonction"
 
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
@@ -1077,6 +1083,15 @@ msgid "Days before an allocation may be reserved by anyone"
 msgstr ""
 "Des jours avant une attribution peuvent être réservés par n'importe qui"
 
+msgid "Default view"
+msgstr "Affichage par défaut"
+
+msgid "Week view"
+msgstr "Affichage de la semaine"
+
+msgid "Month view"
+msgstr "Affichage du mois"
+
 msgid "Per item"
 msgstr "Par article"
 
@@ -1089,15 +1104,6 @@ msgstr "Prix par article"
 msgid "Price per hour"
 msgstr "Prix par heure"
 
-msgid "Default view"
-msgstr "Affichage par défaut"
-
-msgid "Week view"
-msgstr "Affichage de la semaine"
-
-msgid "Month view"
-msgstr "Affichage du mois"
-
 msgid "Please select the form field that holds the zip-code"
 msgstr "Veuillez sélectionner le champ de formulaire contenant le code postal."
 
@@ -1107,11 +1113,11 @@ msgstr "Veuillez saisir au moins un code postal"
 msgid "Please enter one zip-code per line, without spaces or commas"
 msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
 
-msgid "The price must be larger than zero"
-msgstr "Le prix doit être supérieur à zéro"
-
 msgid "New Reservations"
 msgstr "Nouvelles réservations"
+
+msgid "Notifications *"
+msgstr "Notifications *"
 
 msgid "Daily Reservations"
 msgstr "Réservations quotidiennes"
@@ -1541,6 +1547,27 @@ msgstr "Liens externes uniquement"
 
 msgid "Internal links only"
 msgstr "Liens internes uniquement"
+
+msgid "Link must start with 'https'"
+msgstr "Le lien doit commencer par 'https'"
+
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+msgid "Username for the associated Gever account"
+msgstr "Nom d'utilisateur pour le compte Gever associé"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Password for the associated Gever account"
+msgstr "Mot de passe pour le compte Gever associé"
+
+msgid "Gever API Endpoint where the documents are uploaded."
+msgstr "Point de terminaison de l'API Gever où les documents sont téléchargés."
+
+msgid "Website address including https://"
+msgstr "Adresse du site internet avec https://"
 
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
@@ -2108,6 +2135,9 @@ msgstr "L'an dernier"
 
 msgid "Older"
 msgstr "Plus âgés"
+
+msgid "Past Events"
+msgstr "Événements passées"
 
 msgid "Do you really want to delete this note?"
 msgstr "Voulez-vous vraiment supprimer cette note ?"
@@ -3214,6 +3244,10 @@ msgid ""
 "you no longer want to receive this e-mail please contact an administrator so "
 "they can remove you from the recipients list."
 msgstr ""
+"Ceci est la notification pour les réservations pour ${request.app.org."
+"title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez contacter un "
+"administrateur afin qu'il puisse vous supprimer de la liste des "
+"destinataires."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -3857,14 +3891,8 @@ msgstr "Aucun lien trouvé."
 msgid "Select an item to view it"
 msgstr "Sélectionnez un élément pour le visualiser"
 
-msgid "Username"
-msgstr "Nom d'utilisateur"
-
 msgid "Identicon"
 msgstr "Identicon"
-
-msgid "Password"
-msgstr "Mot de passe"
 
 msgid "Not a valid color."
 msgstr "Couleur non valide."
@@ -4236,6 +4264,10 @@ msgid "This event has already been published"
 msgstr "Cet événement a déjà été publié"
 
 #, python-format
+msgid "Successfully created the event '${title}'"
+msgstr "L'événement '${title}' a été créé avec succès"
+
+#, python-format
 msgid "You have accepted the event ${title}"
 msgstr "Vous avez accepté l'événement ${title}"
 
@@ -4255,6 +4287,9 @@ msgstr ""
 "aux sociétés de la ville sont publiés. Les événements purement commerciaux "
 "ne sont pas publiés. Il n'ont aucuns droits à être publiés et les événements "
 "déjà publiés peuvent être supprimés de la page sans notification ni motif."
+
+msgid "Create an event"
+msgstr "Saisir un événement"
 
 msgid "Your request has been registered"
 msgstr "Yotre demande a été enregistrée."
@@ -4428,6 +4463,14 @@ msgstr ""
 
 msgid "The registration window was deleted"
 msgstr "La fenêtre d'inscription a été supprimée"
+
+#, python-format
+msgid ""
+"The total amount for the currently entered data is ${total} but has to be at "
+"least ${minimum}. Please adjust your inputs."
+msgstr ""
+"Le montant total pour les données actuellement saisies est de ${total} mais "
+"doit être au moins ${minimum}. Veuillez ajuster vos entrées."
 
 msgid "Pay Online and Complete"
 msgstr "Payer en ligne et compléter"
@@ -4785,7 +4828,7 @@ msgid "New Item"
 msgstr "Nouveau article"
 
 msgid "Edit resource"
-msgstr ""
+msgstr "Modifier la ressource"
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"
@@ -5037,6 +5080,26 @@ msgstr "Votre demand a déjà été clòturée. "
 msgid "Your message has been received"
 msgstr "Votre message a été reçu"
 
+msgid ""
+"Could not find valid credentials. You can set them in Gever API Settings."
+msgstr ""
+"Impossible de trouver des informations d'identification valides. Vous pouvez "
+"les définir dans les paramètres de L'API Gever."
+
+msgid "Encountered an error while uploading to Gever."
+msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
+
+#, python-format
+msgid ""
+"Encountered an error while uploading to Gever. Response status code is "
+"${status}."
+msgstr ""
+"Une erreur s'est produite lors du téléchargement sur Gever. Le code d'état "
+"de la réponse est ${status}."
+
+msgid "Successfully uploaded the PDF of this ticket to Gever"
+msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
+
 msgid "My"
 msgstr "Mes"
 
@@ -5076,15 +5139,6 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-msgid "Publication end date:"
-msgstr "Date de fin de publication:"
-
-msgid "Functions:"
-msgstr "Fonctions:"
-
-msgid "Will be published until:"
-msgstr "Sera publié jusqu'au:"
-
 #~ msgid "Marker Type"
 #~ msgstr "Type de marqueur"
 
@@ -5108,48 +5162,3 @@ msgstr "Sera publié jusqu'au:"
 
 #~ msgid "Homepage Image #6"
 #~ msgstr "Image n°6 de page d'accueil"
-
-msgid "Could not find valid credentials. You can set them in Gever API Settings."
-msgstr "Impossible de trouver des informations d'identification valides. "
-"Vous pouvez les définir dans les paramètres de L'API Gever."
-
-msgid "Successfully uploaded the PDF of this ticket to Gever"
-msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
-
-msgid "Encountered an error while uploading to Gever."
-"Response status code is ${status}."
-msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
-"Le code d'état de la réponse est ${status}."
-
-msgid "Encountered an error while uploading to Gever."
-msgstr "Une erreur s'est produite lors du téléchargement sur Gever."
-
-msgid "Ticket uploaded to Gever."
-msgstr "Ticket téléchargé à Gever."
-
-msgid "Upload to Gever"
-msgstr "Télécharger à Gever"
-
-msgid "Password for the associated Gever account"
-msgstr "Mot de passe pour le compte Gever associé"
-
-msgid "Username for the associated Gever account"
-msgstr "Nom d'utilisateur pour le compte Gever associé"
-
-msgid "Gever API Endpoint where the documents are uploaded."
-msgstr "Point de terminaison de l'API Gever où les documents sont téléchargés."
-
-msgid "Website address including https://"
-msgstr "Adresse du site internet avec https://"
-
-msgid "Do you really want to upload this ticket?"
-msgstr "Voulez-vous vraiment télécharger ce ticket ?"
-
-msgid "This will upload this ticket to the Gever instance, if configured."
-msgstr "Cela va télécharger ce ticket vers l'instance Gever, si elle est configurée."
-
-msgid "Upload Ticket"
-msgstr "Télécharger le ticket"
-
-msgid "Link must start with 'https'"
-msgstr "Le lien doit commencer par 'https'"

@@ -497,21 +497,21 @@ def test_view_election_compound_list_groups(election_day_app_gr):
     assert groups == {
         'results': [
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#efb52c',
                 'text': 'BDP',
                 'value': 603,
                 'value2': 1
             },
             {
-                'class': 'inactive',
+                'class': 'active',
                 'color': '#ff6300',
                 'text': 'CVP',
                 'value': 491,
                 'value2': 1
             },
             {
-                'class': 'inactive',
+                'class': 'active',  # no mandates allocated yet
                 'color': None,
                 'text': 'FDP',
                 'value': 351,
@@ -594,9 +594,9 @@ def test_view_election_compound_parties_panachage(election_day_app_gr):
 
     links = [link['value'] for link in data['links']]
     assert all((i in links for i in (
-        11, 12, 100, 60387 - 11 - 12 - 100,
-        21, 22, 200, 49117 - 21 - 22 - 200,
-        31, 32, 300, 35134 - 31 - 32 - 300
+        11, 12, 100,
+        21, 22, 200,
+        31, 32, 300,
     )))
 
 

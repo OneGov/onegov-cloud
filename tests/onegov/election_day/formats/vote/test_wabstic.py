@@ -149,7 +149,6 @@ def test_import_wabstic_vote_missing_headers(session):
             '\n'.join((
                 ','.join((
                     'Art',
-                    'SortWahlkreis',
                     'SortGeschaeft',
                 )),
             ))
@@ -179,7 +178,7 @@ def test_import_wabstic_vote_missing_headers(session):
         'text/plain'
     )
     assert [(e.filename, e.error.interpolate()) for e in errors] == [
-        ('sg_geschaefte', "Missing columns: 'ausmittlungsstand, anzgdependent'"
+        ('sg_geschaefte', "Missing columns: 'sortwahlkreis'"
          ),
         ('sg_gemeinden', "Missing columns: 'art, sperrung'")
     ]

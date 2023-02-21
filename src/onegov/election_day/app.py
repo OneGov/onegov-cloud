@@ -26,9 +26,10 @@ from onegov.election_day.theme import ElectionDayTheme
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.user import UserApp
+from onegov.websockets import WebsocketsApp
 
 
-class ElectionDayApp(Framework, FormApp, UserApp, DepotApp):
+class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
     """ The election day application. Include this in your onegov.yml to serve
     it with onegov-server.
 

@@ -125,6 +125,12 @@ configuration: &global-config
   # requests: 100
   # expiration: 900
 
+  # Websocket server configuration.
+  websockets:
+    client_url: ws://localhost:8765
+    manage_url: ws://localhost:8765
+    manage_token: super-secret-token
+
   # Install https://github.com/seantis/d3-renderer
   # d3_renderer: 'http://localhost:1337'
 

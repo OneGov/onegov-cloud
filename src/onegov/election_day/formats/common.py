@@ -301,10 +301,11 @@ def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
      """
     result = getattr(line, col)
     if result:
-        if match(r'^[0-9]+[A-Za-z0-9\.]*$', result):
+        if match(r'^[A-Za-z0-9_\.]+$', result):
             return result
         raise ValueError(
-            _('Not an alphanumeric: ${col}', mapping={'col': col}))
+            _('Not an alphanumeric: ${col}', mapping={'col': col})
+        )
     elif treat_empty_as_default:
         return default
     raise ValueError(_('Empty value: ${col}', mapping={'col': col}))

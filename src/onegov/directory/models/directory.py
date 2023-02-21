@@ -25,6 +25,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy_utils import aggregated, observes
 from uuid import uuid4
+from wtforms import FieldList
 
 
 INHERIT = object()
@@ -32,6 +33,11 @@ INHERIT = object()
 
 class DirectoryFile(File):
     __mapper_args__ = {'polymorphic_identity': 'directory'}
+
+    @property
+    def access(self):
+        # we don't want these files to show up in search engines
+        return 'secret' if self.published else 'private'
 
 
 class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
@@ -136,9 +142,24 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         updated = {f.id: values[f.id] for f in self.basic_fields}
 
         # treat file fields differently
-        known_file_ids = {f.id for f in self.file_fields}
+        known_file_ids = {
+            f.id if idx is None else f'{f.id}:{idx}'
+            for f in self.file_fields
+            # add an id for each file in a multiple upload field
+            for idx in (
+                range(len(values[f.id]))
+                if hasattr(values[f.id], '__len__')
+                else [None]
+            )
+        }
 
         if self.file_fields:
+
+            def get_value_field_from_note(file_id):
+                id, __, idx = file_id.rpartition(':')
+                if idx is None or not idx.isdigit():
+                    return values[file_id]
+                return values[id][int(idx)]
 
             # files which are not given or whose value is {} are removed
             # (this is in line with onegov.form's file upload field+widget)
@@ -148,27 +169,28 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                 if f.note not in known_file_ids:
                     continue
 
-                if isinstance(values[f.note], dict):
+                value_field = get_value_field_from_note(f.note)
+                if isinstance(value_field, dict):
                     continue
 
                 delete = (
-                    f.note not in values
-                    or values[f.note] is None
-                    or values[f.note].data == {}
-                    or values[f.note].data is not None
+                    value_field is None
+                    or value_field.data == {}
+                    or value_field.data is not None
                 )
 
                 if delete:
                     session.delete(f)
 
             for field in self.file_fields:
-                if not values[field.id]:
-                    updated[field.id] = values[field.id]
+                field_values = values[field.id]
+                if not field_values:
+                    updated[field.id] = field_values
                     continue
                 # migrate files during an entry migration
-                if isinstance(values[field.id], dict):
-                    updated[field.id] = values[field.id]
-                    file_id = values[field.id]['data'].lstrip('@')
+                if isinstance(field_values, dict):
+                    updated[field.id] = field_values
+                    file_id = field_values['data'].lstrip('@')
                     with session.no_autoflush:
                         f = session.query(File).filter_by(id=file_id).first()
                         if f and f.type != 'directory':
@@ -182,41 +204,122 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                             updated[field.id].update({'data': f'@{new.id}'})
 
                     continue
+                elif isinstance(field_values, list):
+                    updated[field.id] = field_values
+                    for idx, field_value in enumerate(field_values):
+                        file_id = field_value['data'].lstrip('@')
+                        with session.no_autoflush:
+                            f = session.query(File).filter_by(
+                                id=file_id
+                            ).first()
+                            if f and f.type != 'directory':
+                                new = DirectoryFile(
+                                    id=random_token(),
+                                    name=f.name,
+                                    note=f.note,
+                                    reference=f.reference
+                                )
+                                entry.files.append(new)
+                                updated[field.id][idx].update(
+                                    {'data': f'@{new.id}'}
+                                )
 
-                # keep files if selected in the dialog
-                if getattr(values[field.id], 'action', None) == 'keep':
-                    updated[field.id] = entry.values[field.id]
                     continue
+                elif field.type == 'fileinput':
+                    # keep files if selected in the dialog
+                    if getattr(field_values, 'action', None) == 'keep':
+                        original = (entry.values or {}).get(field.id, {})
+                        updated[field.id] = original
+                        continue
 
-                # delete files if selected in the dialog
-                if getattr(values[field.id], 'action', None) == 'delete':
-                    updated[field.id] = {}
-                    continue
+                    # delete files if selected in the dialog
+                    if getattr(field_values, 'action', None) == 'delete':
+                        updated[field.id] = {}
+                        continue
 
-                # if there was no file supplied, we can't add it
-                if not getattr(values[field.id], 'file', None):
-                    updated[field.id] = {}
-                    continue
+                    # if there was no file supplied, we can't add it
+                    if not getattr(field_values, 'file', None):
+                        updated[field.id] = {}
+                        continue
 
-                # create a new file
-                new_file = DirectoryFile(
-                    id=random_token(),
-                    name=values[field.id].filename,
-                    note=field.id,
-                    reference=as_fileintent(
-                        content=values[field.id].file,
-                        filename=values[field.id].filename
+                    # create a new file
+                    new_file = DirectoryFile(
+                        id=random_token(),
+                        name=field_values.filename,
+                        note=field.id,
+                        reference=as_fileintent(
+                            content=field_values.file,
+                            filename=field_values.filename
+                        )
                     )
-                )
-                entry.files.append(new_file)
+                    entry.files.append(new_file)
 
-                # keep a reference to the file in the values
-                updated[field.id] = {
-                    'data': '@' + new_file.id,
-                    'filename': values[field.id].filename,
-                    'mimetype': new_file.reference.file.content_type,
-                    'size': new_file.reference.file.content_length
-                }
+                    # keep a reference to the file in the values
+                    updated[field.id] = {
+                        'data': '@' + new_file.id,
+                        'filename': field_values.filename,
+                        'mimetype': new_file.reference.file.content_type,
+                        'size': new_file.reference.file.content_length
+                    }
+                    continue
+
+                # FIXME: there's quite a bit of copy pasta between the
+                #        filefield and multiplefilefield case, we should
+                #        try to refactor this so we can handle both more
+                #        easily
+                new_idx = 0
+                updated[field.id] = []
+                for old_idx, subfield_values in enumerate(field_values):
+                    old_values = (entry.values or {}).get(field.id) or []
+
+                    # keep files if selected in the dialog
+                    if getattr(subfield_values, 'action', None) == 'keep':
+                        if len(old_values) <= old_idx:
+                            # it doesn't exist so we can't keep it
+                            continue
+
+                        original = old_values[old_idx]
+                        updated[field.id].append(original)
+                        # update the file.note so it points to the correct
+                        # index in the list if necessary
+                        file_id = original['data'].lstrip('@')
+                        for file in entry.files:
+                            if file.id == file_id:
+                                new_key = f'{field.id}:{new_idx}'
+                                if file.note != new_key:
+                                    file.note = new_key
+                                break
+                        new_idx += 1
+                        continue
+
+                    # delete files if selected in the dialog
+                    if getattr(subfield_values, 'action', None) == 'delete':
+                        continue
+
+                    # if there was no file supplied, we can't add it
+                    if not getattr(subfield_values, 'file', None):
+                        continue
+
+                    # create a new file
+                    new_file = DirectoryFile(
+                        id=random_token(),
+                        name=subfield_values.filename,
+                        note=f'{field.id}:{new_idx}',
+                        reference=as_fileintent(
+                            content=subfield_values.file,
+                            filename=subfield_values.filename
+                        )
+                    )
+                    entry.files.append(new_file)
+
+                    # keep a reference to the file in the values
+                    updated[field.id].append({
+                        'data': '@' + new_file.id,
+                        'filename': subfield_values.filename,
+                        'mimetype': new_file.reference.file.content_type,
+                        'size': new_file.reference.file.content_length
+                    })
+                    new_idx += 1
 
         # update the values
         if force_update or entry.values != updated:
@@ -295,11 +398,17 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
     @property
     def basic_fields(self):
-        return tuple(f for f in self.fields if f.type != 'fileinput')
+        return tuple(
+            f for f in self.fields
+            if f.type not in ('fileinput', 'multiplefileinput')
+        )
 
     @property
     def file_fields(self):
-        return tuple(f for f in self.fields if f.type == 'fileinput')
+        return tuple(
+            f for f in self.fields
+            if f.type in ('fileinput', 'multiplefileinput')
+        )
 
     def field_by_id(self, id):
         query = (f for f in self.fields if f.human_id == id or f.id == id)
@@ -361,6 +470,11 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                     if form_field is None:
                         continue
 
-                    form_field.data = obj.values.get(field.id)
+                    data = obj.values.get(field.id)
+                    if isinstance(form_field, FieldList):
+                        for subdata in data:
+                            form_field.append_entry(subdata)
+                    else:
+                        form_field.data = data
 
         return DirectoryEntryForm

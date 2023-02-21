@@ -77,13 +77,13 @@ def parse_election_result(line, errors, entities, election, principal,
                     superregion=superregion,
                     counted=counted,
                     entity_id=entity_id,
-                    eligible_voters=eligible_voters,
-                    expats=expats,
-                    received_ballots=received_ballots,
-                    blank_ballots=blank_ballots,
-                    invalid_ballots=invalid_ballots,
-                    blank_votes=blank_votes,
-                    invalid_votes=invalid_votes,
+                    eligible_voters=eligible_voters if counted else 0,
+                    expats=expats if counted else 0,
+                    received_ballots=received_ballots if counted else 0,
+                    blank_ballots=blank_ballots if counted else 0,
+                    invalid_ballots=invalid_ballots if counted else 0,
+                    blank_votes=blank_votes if counted else 0,
+                    invalid_votes=invalid_votes if counted else 0,
                 )
 
     return False
@@ -109,7 +109,7 @@ def parse_list(line, errors, election_id, colors):
         )
 
 
-def parse_list_result(line, errors):
+def parse_list_result(line, errors, counted):
     try:
         votes = validate_integer(line, 'list_votes')
     except ValueError as e:
@@ -117,7 +117,7 @@ def parse_list_result(line, errors):
     else:
         return dict(
             id=uuid4(),
-            votes=votes
+            votes=votes if counted else 0
         )
 
 
@@ -191,7 +191,7 @@ def parse_candidate(line, errors, election_id, colors):
         )
 
 
-def parse_candidate_result(line, errors):
+def parse_candidate_result(line, errors, counted):
     try:
         votes = validate_integer(line, 'candidate_votes')
     except ValueError as e:
@@ -199,7 +199,7 @@ def parse_candidate_result(line, errors):
     else:
         return dict(
             id=uuid4(),
-            votes=votes,
+            votes=votes if counted else 0,
         )
 
 
@@ -288,11 +288,12 @@ def import_election_internal_proporz(
         )
         if result is True:
             continue
+        counted = (result or {}).get('counted', False)
         status = parse_election(line, line_errors)
         candidate = parse_candidate(line, line_errors, election_id, colors)
-        candidate_result = parse_candidate_result(line, line_errors)
+        candidate_result = parse_candidate_result(line, line_errors, counted)
         list_ = parse_list(line, line_errors, election_id, colors)
-        list_result = parse_list_result(line, line_errors)
+        list_result = parse_list_result(line, line_errors, counted)
         connection, subconnection = parse_connection(
             line, line_errors, election_id
         )

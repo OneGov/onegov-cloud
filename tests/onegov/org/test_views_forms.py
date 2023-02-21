@@ -232,6 +232,40 @@ def test_add_custom_form(client):
     form_page.form.submit().follow()
 
 
+def test_add_custom_form_minimum_price_validation(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Stamp A = 0..20 (1.10 CHF)
+        Stamp B = 0..20 (0.85 CHF)
+
+        Discount *=
+            (x) First four B stamps free (-3.40 CHF)
+    """)
+    form_page.form['minimum_price_total'] = '5.00'
+    form_page = form_page.form.submit().follow()
+
+    form_page.form['e_mail'] = 'my@name.com'
+    form_page.form['stamp_b'] = '6'
+    # the validation happens on the next page
+    form_page = form_page.form.submit().follow()
+
+    assert "Der Totalbetrag für Ihre Eingaben" in form_page
+    assert "beläuft sich auf 1.70 CHF" in form_page
+    assert "allerdings ist der Minimalbetrag 5.00 CHF" in form_page
+
+    # now that we reached the minimum price we should succeed
+    form_page.form['stamp_a'] = '3'
+    form_page = form_page.form.submit()
+    assert "Totalbetrag" in form_page
+    assert "5.00 CHF" in form_page
+    assert "Minimalbetrag" not in form_page
+
+
 def test_add_custom_form_payment_metod_validation_error(client):
     client.login_editor()
 
@@ -253,6 +287,29 @@ def test_add_custom_form_payment_metod_validation_error(client):
     form_page.form['payment_method'] = 'free'
     form_page = form_page.form.submit()
     assert "benötigen Sie einen Standard-Zahlungsanbieter" in form_page
+
+
+def test_add_custom_form_payment_validation_error(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = 'E-Mail *= @@@'
+    form_page.form['minimum_price_total'] = '5.00'
+    form_page = form_page.form.submit()
+    # this should fail because we're setting a minimum price, but there
+    # are no form fields that have pricing assigned to them
+    assert "Ein Minimalpreis kann nur gesetzt werden" in form_page.text
+
+    # now it should succeed
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF)
+    """)
+    form_page = form_page.form.submit().follow()
 
 
 def test_add_duplicate_form(client):

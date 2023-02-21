@@ -138,13 +138,13 @@ def import_vote_wabstim(vote, principal, file, mimetype):
                     BallotResult(
                         name=entity.get('name', ''),
                         district=entity.get('district', ''),
-                        counted=counted,
-                        yeas=yeas[ballot_type],
-                        nays=nays[ballot_type],
-                        eligible_voters=eligible_voters,
                         entity_id=entity_id,
-                        empty=empty[ballot_type],
-                        invalid=invalid
+                        counted=counted,
+                        yeas=yeas[ballot_type] if counted else 0,
+                        nays=nays[ballot_type] if counted else 0,
+                        eligible_voters=eligible_voters if counted else 0,
+                        empty=empty[ballot_type] if counted else 0,
+                        invalid=invalid if counted else 0
                     )
                 )
 

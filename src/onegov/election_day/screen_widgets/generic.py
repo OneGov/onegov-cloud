@@ -1,4 +1,5 @@
 from onegov.election_day import ElectionDayApp
+from onegov.qrcode import QrCode
 
 
 @ElectionDayApp.screen_widget(tag='h1', category='generic')
@@ -108,6 +109,31 @@ class LogoWidget:
     def get_variables(self, layout):
         logo = layout.app.logo
         return {'logo': layout.request.link(logo) if logo else ''}
+
+
+@ElectionDayApp.screen_widget(tag='qr-code', category='generic')
+class QrCodeWidget:
+    tag = 'qr-code'
+    template = """
+        <xsl:template match="qr-code">
+            <tal:block tal:define="url '{@url}'; src qr_code(url)">
+                <img tal:attributes="src src"
+                     class="{@class}"
+                     />
+            </tal:block>
+
+        </xsl:template>
+    """
+    usage = '<qr-code class="" url="https://"/>'
+
+    @staticmethod
+    def qr_code(url):
+        return 'data:image/png;base64,{}'.format(
+            QrCode(payload=url, encoding='base64').encoded_image.decode()
+        )
+
+    def get_variables(self, layout):
+        return {'qr_code': self.qr_code}
 
 
 class ModelBoundWidget:

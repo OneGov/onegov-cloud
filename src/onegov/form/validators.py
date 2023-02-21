@@ -3,7 +3,11 @@ import importlib
 import phonenumbers
 import re
 
+from babel.dates import format_date
 from cgi import FieldStorage
+from datetime import date
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
 from onegov.form import _
 from onegov.form.errors import DuplicateLabelError
@@ -43,7 +47,8 @@ class FileSizeLimit:
     """ Makes sure an uploaded file is not bigger than the given number of
     bytes.
 
-    Expects an :class:`onegov.form.fields.UploadField` instance.
+    Expects an :class:`onegov.form.fields.UploadField` or
+    :class:`onegov.form.fields.UploadMultipleField` instance.
 
     """
 
@@ -66,7 +71,8 @@ class FileSizeLimit:
 class WhitelistedMimeType:
     """ Makes sure an uploaded file is in a whitelist of allowed mimetypes.
 
-    Expects an :class:`onegov.form.fields.UploadField` instance.
+    Expects an :class:`onegov.form.fields.UploadField` or
+    :class:`onegov.form.fields.UploadMultipleField` instance.
     """
 
     whitelist = {
@@ -104,13 +110,20 @@ class ExpectedExtensions(WhitelistedMimeType):
 
     Usage::
 
-        ExpectedFileType('*')  # no check, really
-        ExpectedFileType('pdf')  # makes sure the given file is a pdf
+        ExpectedExtensions(['*'])  # default whitelist
+        ExpectedExtensions(['pdf'])  # makes sure the given file is a pdf
     """
 
     def __init__(self, extensions):
-        mimetypes = set(
-            types_map.get('.' + ext.lstrip('.'), None) for ext in extensions)
+        # normalize extensions
+        if len(extensions) == 1 and extensions[0] == '*':
+            mimetypes = None
+        else:
+            mimetypes = {
+                mimetype for ext in extensions
+                # we silently discard any extensions we don't know for now
+                if (mimetype := types_map.get('.' + ext.lstrip('.'), None))
+            }
         super().__init__(whitelist=mimetypes)
 
 
@@ -127,16 +140,20 @@ class ValidFormDefinition:
         "The field '{label}' contains a price that requires a credit card "
         "payment. This is only allowed if credit card payments are optional."
     )
+    minimum_price = _(
+        "A minimum price total can only be set if at least one priced field "
+        "is defined."
+    )
 
     def __init__(self,
                  require_email_field=True,
                  reserved_fields=None,
                  require_title_fields=False,
-                 validate_payment_method=True):
+                 validate_prices=True):
         self.require_email_field = require_email_field
         self.reserved_fields = reserved_fields or set()
         self.require_title_fields = require_title_fields
-        self.validate_payment_method = validate_payment_method
+        self.validate_prices = validate_prices
 
     def __call__(self, form, field):
         if field.data:
@@ -177,8 +194,8 @@ class ValidFormDefinition:
                                 )
                             )
 
-                if self.validate_payment_method and 'payment_method' in form:
-                    for __, formfield in parsed_form._fields.items():
+                if self.validate_prices and 'payment_method' in form:
+                    for formfield in parsed_form:
                         if not hasattr(formfield, 'pricing'):
                             continue
 
@@ -193,11 +210,40 @@ class ValidFormDefinition:
                             error = field.gettext(self.payment_method).format(
                                 label=formfield.label.text
                             )
-                            # sometimes this will be a tuple and not a list
-                            errors = list(form.payment_method.errors)
+                            # if the payment_method field is below the form
+                            # definition field, then validate will not have
+                            # been run yet and we can only add process_errors
+                            errors = form.payment_method.errors
+                            if not isinstance(errors, list):
+                                errors = form.payment_method.process_errors
+                                assert isinstance(errors, list)
+
                             errors.append(error)
-                            form.payment_method.errors = errors
                             raise ValidationError(error)
+
+                if self.validate_prices and 'minimum_price_total' in form:
+                    has_pricing = (
+                        hasattr(form, 'currency') and form.currency.data
+                        or any(hasattr(formfield, 'pricing')
+                               for formfield in parsed_form._fields.values()))
+
+                    if form.minimum_price_total.data and not has_pricing:
+                        # add the error message to all affected fields
+                        # FIXME: ideally we would get more consistent about
+                        #        having a field like 'pricing_method' that
+                        #        we can attach this error to. It doesn't
+                        #        really make sense to show it on 'currency'
+                        error = field.gettext(self.minimum_price)
+                        # if the minimum_price_total field is below the form
+                        # definition field, then validate will not have
+                        # been run yet and we can only add process_errors
+                        errors = form.minimum_price_total.errors
+                        if not isinstance(errors, list):
+                            errors = form.minimum_price_total.process_errors
+                            assert isinstance(errors, list)
+
+                        errors.append(error)
+                        raise ValidationError(error)
 
 
 class StrictOptional(Optional):
@@ -338,3 +384,67 @@ class InputRequiredIf(InputRequired):
             super(InputRequiredIf, self).__call__(form, field)
         else:
             Optional().__call__(form, field)
+
+
+class ValidDateRange:
+    """ Makes sure the selected date is in a valid range. """
+
+    message = _("Needs to be between {min_date} and {max_date}.")
+    after_message = _("Needs to be on or after {date}.")
+    before_message = _("Needs to be on or before {date}.")
+
+    def __init__(self, min, max):
+        self.min = min
+        self.max = max
+
+    @property
+    def min_date(self):
+        if isinstance(self.min, relativedelta):
+            return date.today() + self.min
+        return self.min
+
+    @property
+    def max_date(self):
+        if isinstance(self.max, relativedelta):
+            return date.today() + self.max
+        return self.max
+
+    def __call__(self, form, field):
+        if field.data is None:
+            return
+
+        value = field.data
+        if isinstance(value, datetime):
+            value = value.date()
+        assert isinstance(value, date)
+
+        if hasattr(form, 'request'):
+            locale = form.request.locale
+        else:
+            locale = 'de_CH'
+
+        min_date = self.min_date
+        max_date = self.max_date
+        if min_date is not None and max_date is not None:
+            # FIXME: To be properly I18n just like with `Layout.format_date`
+            #        the date format should depend on the locale.
+            if not (min_date <= value <= max_date):
+                min_str = format_date(
+                    min_date, format='dd.MM.yyyy', locale=locale)
+                max_str = format_date(
+                    max_date, format='dd.MM.yyyy', locale=locale)
+                raise ValidationError(field.gettext(self.message).format(
+                    min_date=min_str, max_date=max_str
+                ))
+
+        elif min_date is not None and value < min_date:
+            min_str = format_date(min_date, format='dd.MM.yyyy', locale=locale)
+            raise ValidationError(
+                field.gettext(self.after_message).format(date=min_str)
+            )
+
+        elif max_date is not None and value > max_date:
+            max_str = format_date(max_date, format='dd.MM.yyyy', locale=locale)
+            raise ValidationError(
+                field.gettext(self.before_message).format(date=max_str)
+            )

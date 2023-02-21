@@ -75,6 +75,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: the payment method
     payment_method = content_property()
 
+    #: the minimum price total the reservation must exceed
+    minimum_price_total = content_property()
+
     #: the currency of the price to pay
     currency = content_property()
 

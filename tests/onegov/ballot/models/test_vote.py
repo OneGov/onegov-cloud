@@ -407,52 +407,6 @@ def test_vote_progress(session):
     assert vote.counted_entities == ['A', 'B']
 
 
-def test_vote_turnout(session):
-    vote = Vote(
-        title="Abstimmung",
-        domain='federation',
-        date=date(2015, 6, 18)
-    )
-
-    vote.ballots.append(Ballot(type='proposal'))
-
-    session.add(vote)
-    session.flush()
-
-    vote.proposal.results.append(
-        BallotResult(
-            name='1',
-            counted=True,
-            eligible_voters=100,
-            yeas=10,
-            entity_id=1
-        )
-    )
-
-    session.flush()
-    assert vote.counted_eligible_voters == vote.eligible_voters
-    assert vote.turnout == 10
-    assert vote.proposal.turnout == 10
-
-    vote.proposal.results.append(
-        BallotResult(
-            name='2',
-            counted=False,
-            eligible_voters=100,
-            yeas=10,
-            entity_id=2
-        )
-    )
-    session.flush()
-
-    assert vote.proposal.eligible_voters != \
-        vote.proposal.counted_eligible_voters
-
-    assert vote.eligible_voters != vote.counted_eligible_voters
-    assert vote.turnout == 10
-    assert vote.proposal.turnout == 10
-
-
 def test_vote_results_by_district(session):
     vote = Vote(
         title="Abstimmung",
@@ -573,7 +527,6 @@ def test_ballot_results_aggregation(session):
     assert ballot.empty == 19
     assert ballot.invalid == 5
     assert ballot.eligible_voters == 4132
-    assert ballot.counted_eligible_voters == 4132
     assert ballot.expats == 18
     assert ballot.cast_ballots == 937
     assert ballot.accepted is True
@@ -586,7 +539,6 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.empty).scalar() == 19
     assert session.query(Ballot.invalid).scalar() == 5
     assert session.query(Ballot.eligible_voters).scalar() == 4132
-    assert session.query(Ballot.counted_eligible_voters).scalar() == 4132
     assert session.query(Ballot.expats).scalar() == 18
     assert session.query(Ballot.cast_ballots).scalar() == 937
     assert session.query(Ballot.accepted).scalar() is True
@@ -599,7 +551,6 @@ def test_ballot_results_aggregation(session):
     assert vote.empty == 19
     assert vote.invalid == 5
     assert vote.eligible_voters == 4132
-    assert vote.counted_eligible_voters == 4132
     assert vote.expats == 18
     assert vote.cast_ballots == 937
     assert vote.counted is True
@@ -611,7 +562,6 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.empty).scalar() == 19
     assert session.query(Vote.invalid).scalar() == 5
     assert session.query(Vote.eligible_voters).scalar() == 4132
-    assert session.query(Vote.counted_eligible_voters).scalar() == 4132
     assert session.query(Vote.expats).scalar() == 18
     assert session.query(Vote.cast_ballots).scalar() == 937
 
@@ -633,7 +583,6 @@ def test_ballot_results_aggregation(session):
     assert ballot.empty == 19
     assert ballot.invalid == 5
     assert ballot.eligible_voters == 4552
-    assert ballot.counted_eligible_voters == 4132
     assert ballot.expats == 28
     assert ballot.cast_ballots == 937
     assert ballot.accepted is None
@@ -647,7 +596,6 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.invalid).scalar() == 5
     assert session.query(Ballot.eligible_voters).scalar() == 4552
     # OGC-533
-    # assert session.query(Ballot.counted_eligible_voters).scalar() == 4132
     assert session.query(Ballot.expats).scalar() == 28
     assert session.query(Ballot.cast_ballots).scalar() == 937
     assert session.query(Ballot.accepted).scalar() is None
@@ -660,7 +608,6 @@ def test_ballot_results_aggregation(session):
     assert vote.empty == 19
     assert vote.invalid == 5
     assert vote.eligible_voters == 4552
-    assert vote.counted_eligible_voters == 4132
     assert vote.expats == 28
     assert vote.cast_ballots == 937
     assert vote.counted is False
@@ -673,7 +620,6 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.invalid).scalar() == 5
     assert session.query(Vote.eligible_voters).scalar() == 4552
     # OGC-533
-    # assert session.query(Vote.counted_eligible_voters).scalar() == 4132
     assert session.query(Vote.expats).scalar() == 28
     assert session.query(Vote.cast_ballots).scalar() == 937
 
@@ -686,7 +632,6 @@ def test_ballot_results_aggregation(session):
     assert ballot.empty == 19
     assert ballot.invalid == 5
     assert ballot.eligible_voters == 4552
-    assert ballot.counted_eligible_voters == 4552
     assert ballot.expats == 28
     assert ballot.cast_ballots == 937
     assert ballot.accepted is True
@@ -699,7 +644,6 @@ def test_ballot_results_aggregation(session):
     assert session.query(Ballot.empty).scalar() == 19
     assert session.query(Ballot.invalid).scalar() == 5
     assert session.query(Ballot.eligible_voters).scalar() == 4552
-    assert session.query(Ballot.counted_eligible_voters).scalar() == 4552
     assert session.query(Ballot.expats).scalar() == 28
     assert session.query(Ballot.cast_ballots).scalar() == 937
     assert session.query(Ballot.accepted).scalar() is True
@@ -712,7 +656,6 @@ def test_ballot_results_aggregation(session):
     assert vote.empty == 19
     assert vote.invalid == 5
     assert vote.eligible_voters == 4552
-    assert vote.counted_eligible_voters == 4552
     assert vote.expats == 28
     assert vote.cast_ballots == 937
     assert vote.counted is True
@@ -724,7 +667,6 @@ def test_ballot_results_aggregation(session):
     assert session.query(Vote.empty).scalar() == 19
     assert session.query(Vote.invalid).scalar() == 5
     assert session.query(Vote.eligible_voters).scalar() == 4552
-    assert session.query(Vote.counted_eligible_voters).scalar() == 4552
     assert session.query(Vote.expats).scalar() == 28
     assert session.query(Vote.cast_ballots).scalar() == 937
 

@@ -2,6 +2,7 @@ import re
 import tempfile
 
 from cgi import FieldStorage
+from copy import deepcopy
 from datetime import datetime
 from onegov.core.utils import Bunch
 from onegov.core.utils import dictionary_to_binary
@@ -16,6 +17,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.form.fields import PhoneNumberField
 from onegov.form.fields import UploadField
+from onegov.form.fields import UploadMultipleField
 from onegov.form.validators import ValidPhoneNumber
 from unittest.mock import patch
 
@@ -156,7 +158,7 @@ def test_upload_field():
     assert field.file.read() == b'foobar'
 
     # ... with select and keep upload
-    previous = field.data.copy()
+    previous = field.data
     form, field = create_field()
     textfile = create_file('text/plain', 'foobaz.txt', b'foobaz')
     field.process(DummyPostData({'upload': [
@@ -196,6 +198,158 @@ def test_upload_field():
     assert dictionary_to_binary(field.data) == b'foobaz'
     assert field.filename == 'foobaz.txt'
     assert field.file.read() == b'foobaz'
+
+
+def test_upload_multiple_field():
+    def create_field():
+        form = Form()
+        field = UploadMultipleField()
+        field = field.bind(form, 'uploads')
+        return form, field
+
+    # Test rendering and initial submit
+    form, field = create_field()
+    field.process(None)
+    assert len(field) == 0
+
+    html = field()
+    assert 'without-data' in html
+    assert 'multiple' in html
+    assert 'name="uploads"' in html
+    assert 'with-data' not in html
+    assert 'name="uploads-0"' not in html
+
+    file1 = create_file('text/plain', 'baz.txt', b'baz')
+    file2 = create_file('text/plain', 'foobar.txt', b'foobar')
+    field.process(DummyPostData({'uploads': [file1, file2]}))
+    assert len(field.data) == 2
+    assert field.data[0]['filename'] == 'baz.txt'
+    assert field.data[0]['mimetype'] == 'text/plain'
+    assert field.data[0]['size'] == 3
+    assert field.data[1]['filename'] == 'foobar.txt'
+    assert field.data[1]['mimetype'] == 'text/plain'
+    assert field.data[1]['size'] == 6
+
+    assert len(field) == 2
+    file_field1, file_field2 = field
+    assert file_field1.name == 'uploads-0'
+    assert file_field1.action == 'replace'
+    assert dictionary_to_binary(file_field1.data) == b'baz'
+    assert file_field1.filename == 'baz.txt'
+    assert file_field1.file.read() == b'baz'
+    assert file_field2.name == 'uploads-1'
+    assert file_field2.action == 'replace'
+    assert dictionary_to_binary(file_field2.data) == b'foobar'
+    assert file_field2.filename == 'foobar.txt'
+    assert file_field2.file.read() == b'foobar'
+
+    html = field(force_simple=True)
+    assert 'without-data' in html
+    assert 'multiple' in html
+    assert 'name="uploads"' in html
+    assert 'with-data' not in html
+    assert 'name="uploads-0"' not in html
+
+    html = field()
+    assert 'with-data' in html
+    assert 'name="uploads-0"' in html
+    assert 'Uploaded file: baz.txt (3 Bytes) ✓' in html
+    assert 'name="uploads-1"' in html
+    assert 'Uploaded file: foobar.txt (6 Bytes) ✓' in html
+    assert 'name="uploads-2"' not in html
+    assert 'keep' in html
+    assert 'type="file"' in html
+    assert 'value="baz.txt"' not in html
+    assert 'value="foobar.txt"' not in html
+    assert 'Upload additional files' in html
+    assert 'name="uploads"' in html
+    assert 'without-data' in html
+    assert 'multiple' in html
+
+    html = field(resend_upload=True)
+    assert 'with-data' in html
+    assert 'Uploaded file: baz.txt (3 Bytes) ✓' in html
+    assert 'Uploaded file: foobar.txt (6 Bytes) ✓' in html
+    assert 'keep' in html
+    assert 'type="file"' in html
+    assert 'value="baz.txt"' in html
+    assert 'value="foobar.txt"' in html
+
+    # Test submit
+    form, field = create_field()
+    field.process(DummyPostData({}))
+    assert field.validate(form)
+    assert field.data == []
+
+    form, field = create_field()
+    field.process(DummyPostData({'uploads': 'abcd'}))
+    assert field.validate(form)  # fails silently
+    assert field.data == []
+
+    # ... simple
+    form, field = create_field()
+    field.process(DummyPostData({'uploads': file2}))
+    assert field.validate(form)
+    assert len(field) == 1
+    assert field[0].action == 'replace'
+    assert field.data[0]['filename'] == 'foobar.txt'
+    assert field.data[0]['mimetype'] == 'text/plain'
+    assert field.data[0]['size'] == 6
+    assert dictionary_to_binary(field.data[0]) == b'foobar'
+    assert field[0].filename == 'foobar.txt'
+    assert field[0].file.read() == b'foobar'
+
+    # ... keep first file and upload a second
+    previous = deepcopy(field.data)
+    form, field = create_field()
+    field.process(DummyPostData({
+        'uploads': file1,
+        'uploads-0': ['keep', file2]
+    }), data=previous)
+    assert field.validate(form)
+    assert len(field) == 2
+    assert field[0].action == 'keep'
+    assert field[1].action == 'replace'
+    assert field.data[1]['filename'] == 'baz.txt'
+    assert field.data[1]['mimetype'] == 'text/plain'
+    assert field.data[1]['size'] == 3
+    assert dictionary_to_binary(field.data[1]) == b'baz'
+    assert field[1].filename == 'baz.txt'
+    assert field[1].file.read() == b'baz'
+
+    # ... delete the first file and keep the second
+    previous = deepcopy(field.data)
+    form, field = create_field()
+    field.process(DummyPostData({
+        'uploads': '',
+        'uploads-0': ['delete', file2],
+        'uploads-1': ['keep', file1],
+    }), data=previous)
+    assert field.validate(form)
+    assert len(field) == 2
+    assert field[0].action == 'delete'
+    assert field.data[0] == {}
+    assert field[1].action == 'keep'
+
+    # ... keep second file with keep upload instead of assuming
+    # it will be passed backed in via data
+    previous = deepcopy(field.data)
+    form, field = create_field()
+    field.process(DummyPostData({
+        'uploads': '',
+        # if we omit the first file from the post data the corresponding
+        # field will disappear and become the new 0 index
+        'uploads-1': [
+            'keep', file1, previous[1]['filename'], previous[1]['data']
+        ],
+    }))
+    assert field.validate(form)
+    assert len(field) == 1
+    assert field[0].action == 'keep'
+    assert field[0].data['filename'] == 'baz.txt'
+    assert field[0].data['mimetype'] == 'text/plain'
+    assert field[0].data['size'] == 3
+    assert dictionary_to_binary(field.data[0]) == b'baz'
 
 
 def test_multi_checkbox_field_disabled():

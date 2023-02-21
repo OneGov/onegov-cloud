@@ -275,7 +275,7 @@ def test_import_internal_compound_invalid_values(session):
                         'xxx',  # entity_blank_votes
                         'xxx',  # entity_invalid_votes
                         'xxx',  # list_name
-                        'xxx',  # list_id
+                        'x x x',  # list_id
                         '',  # list_color
                         'xxx',  # list_number_of_mandates
                         'xxx',  # list_votes

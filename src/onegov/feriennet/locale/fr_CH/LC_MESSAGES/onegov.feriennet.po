@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-06 15:52+0100\n"
+"POT-Creation-Date: 2023-02-14 15:23+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -43,7 +43,7 @@ msgstr "${count} souhaits"
 
 #, python-format
 msgid "${count} Bookings"
-msgstr "${count} réservations"
+msgstr "${count} réservation(s)"
 
 #, python-format
 msgid "${count} Wishes per Attendee"
@@ -67,7 +67,7 @@ msgstr "${count} bloqués"
 
 #, python-format
 msgid "${count} Bookings per Attendee"
-msgstr "${count} réservations par participant·e"
+msgstr "${count} réservation(s) par participant·e"
 
 #, python-format
 msgid "${count} Attendees"
@@ -593,6 +593,12 @@ msgstr "Formation continue"
 
 msgid "Healthy Snacks"
 msgstr "Encas sains"
+
+msgid "Just for Boys"
+msgstr "Seulement garçons"
+
+msgid "Just for Girls"
+msgstr "Seulement filles"
 
 msgid "Title"
 msgstr "Titre"
@@ -1415,7 +1421,7 @@ msgstr "${count} les réservations seront supprimées"
 
 #, python-format
 msgid "Remove ${count} bookings"
-msgstr "Supprimer ${count} réservations"
+msgstr "Supprimer ${count} réservation(s)"
 
 msgid "Import Bank Statement"
 msgstr "Importer un relevé bancaire"
@@ -1781,7 +1787,7 @@ msgid "Add to calendar"
 msgstr "Ajouter au calendrier"
 
 msgid "Limited to ${number} bookings"
-msgstr "Limité à ${number} réservations"
+msgstr "Limité à ${number} réservation(s)"
 
 msgid "Unlimited bookings"
 msgstr "Réservations illimitées"
@@ -2307,10 +2313,10 @@ msgid "Booking"
 msgstr "Réservation"
 
 msgid "${cost} for ${count} bookings"
-msgstr "${cost} pour ${count} réservations"
+msgstr "${cost} pour ${count} réservation(s)"
 
 msgid "Free of charge for ${count} bookings"
-msgstr "Gratuit pour ${count} réservations"
+msgstr "Gratuit pour ${count} réservation(s)"
 
 msgid "${cost} per booking"
 msgstr "${cost} par réservation"
@@ -2532,7 +2538,7 @@ msgstr ""
 "de référence majeure."
 
 msgid "Add manual booking"
-msgstr "Ajouter une réservation manuelle"
+msgstr "Ajouter une remise ou un supplément"
 
 msgid "Show invoice"
 msgstr "Afficher la facture"
@@ -2581,7 +2587,7 @@ msgid "Mark as paid"
 msgstr "Signalé la réservation comme payée"
 
 msgid "Remove manual booking"
-msgstr "Supprimer la réservation manuelle"
+msgstr "Supprimer une remise ou un supplément"
 
 #, python-format
 msgid "Billing for ${title}"
@@ -2637,7 +2643,7 @@ msgstr "Aucune réservation manuelle n'a été créée."
 
 #, python-format
 msgid "Created ${count} manual bookings"
-msgstr "${count} réservations manuelles créées"
+msgstr "${count} réservation(s) manuelles créées"
 
 msgid "Invite a companion"
 msgstr "Inviter un·e amie·e"
@@ -2987,7 +2993,7 @@ msgid "ESR (Raiffeisen)"
 msgstr "BVR (Raiffeisen)"
 
 msgid "ESR participant number / QR-IBAN"
-msgstr "Numéro de participant·e BVR / QR-IBAN"
+msgstr "Numéro de client BVR / QR-IBAN"
 
 msgid "ESR identification number"
 msgstr "Numéro de référence BVR"

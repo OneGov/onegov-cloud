@@ -77,9 +77,7 @@ class DerivedAttributesMixin:
                 turnout=election.turnout,
                 eligible_voters=election.eligible_voters,
                 expats=election.expats,
-                counted_eligible_voters=election.counted_eligible_voters,
                 received_ballots=election.received_ballots,
-                counted_received_ballots=election.counted_received_ballots,
                 accounted_ballots=election.accounted_ballots,
                 blank_ballots=election.blank_ballots,
                 invalid_ballots=election.invalid_ballots,
@@ -87,3 +85,28 @@ class DerivedAttributesMixin:
             )
             for election in self.elections
         ]
+
+    @property
+    def totals(self):
+        results = [r for r in self.results if r.counted]
+
+        def _sum(attr):
+            return sum((getattr(r, attr) for r in results)) or 0
+
+        result = Bunch(
+            turnout=0,
+            eligible_voters=_sum('eligible_voters'),
+            expats=_sum('expats'),
+            received_ballots=_sum('received_ballots'),
+            accounted_ballots=_sum('accounted_ballots'),
+            blank_ballots=_sum('blank_ballots'),
+            invalid_ballots=_sum('invalid_ballots'),
+            accounted_votes=_sum('accounted_votes'),
+        )
+
+        if result.eligible_voters:
+            result.turnout = (
+                100 * result.received_ballots / result.eligible_voters
+            )
+
+        return result
