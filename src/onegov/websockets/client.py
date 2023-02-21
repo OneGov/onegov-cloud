@@ -15,13 +15,14 @@ async def acknowledged(websocket):
         raise IOError(message)
 
 
-async def register(websocket, schema):
+async def register(websocket, schema, channel):
     """ Registers for broadcast messages. """
 
     await websocket.send(
         dumps({
             'type': 'register',
-            'schema': schema
+            'schema': schema,
+            'channel': channel
         })
     )
     await acknowledged(websocket)
@@ -39,7 +40,7 @@ async def authenticate(websocket, token):
     await acknowledged(websocket)
 
 
-async def broadcast(websocket, schema, message):
+async def broadcast(websocket, schema, channel, message):
     """ Broadcasts the given message to all connected clients.
 
     Assumes prior authentication.
@@ -50,6 +51,7 @@ async def broadcast(websocket, schema, message):
         dumps({
             'type': 'broadcast',
             'schema': schema,
+            'channel': channel,
             'message': message
         })
     )

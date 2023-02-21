@@ -22,8 +22,8 @@
                                         />
                                     </div>
                                 </tal:b>
-                                <tal:b condition="index == 14 and sponsors" tal:define="sponsor random.choice(sponsors)">
-                                    <div class="banner">
+                                <tal:b condition="index == 14 and sponsors">
+                                    <div class="banner" tal:define="sponsor random.choice(sponsors)">
                                         <tal:b
                                             condition="sponsor"
                                             replace="structure sponsor"
