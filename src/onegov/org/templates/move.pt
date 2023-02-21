@@ -9,22 +9,23 @@
                     <p i18n:translate="">Move the items using drag and drop. The new positions are automatically saved directly after moving.</p>
                 </div>
                 <p> Select parent of topic '${page.title}'</p>
-                <ul class="sort-items">
-                    <li>
+                <ul class="sort-items sort-tree" data-sortable data-sortable-url="${layout.sortable_url_template}">
+                    <li data-sortable-id="${root.id}">
                         ${root.title}
                     </li>
                 </ul>
-                <span tal:define="children python:root.children">
-                    <ul class="sort-items sort-tree" metal:define-macro="child_list" tal:repeat="child children" data-sortable data-sortable-url="${layout.sortable_url_template}">
-                        <li>
-                            ${child.title}
-                        </li>
-                        <span tal:define="children child.children">
-                            <div metal:use-macro="template.macros['child_list']" />
-                        </span>
-                    </ul>
-                </span>
-                <a href="${request.link(page)}" class="button" i18n:translate="">Back to page</a>
+                <tal:block tal:define="children root.children" tal:condition="root.children"></tal:block>
+                <tal:block metal:define-macro="child_list">
+                <ul class="sort-items sort-tree" data-sortable data-sortable-url="${layout.sortable_url_template}">
+                <tal:block tal:repeat="child children" tal:condition="children">
+                    <li data-sortable-id="${child.id}">
+                        ${child.title} (id=${child.id})
+                    </li>
+                    <div metal:use-macro="template.macros['child_list']" tal:define="children child.children" tal:condition="child.children"/>
+                </tal:block>
+                </ul>
+                </tal:block>
+                <br><a href="${request.link(page)}" class="button" i18n:translate="">Back to page</a>
             </div>
         </div>
     </tal:block>
