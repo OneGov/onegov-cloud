@@ -1,5 +1,3 @@
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from onegov.ballot.models.vote.mixins import DerivedAttributesMixin
 from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
 from onegov.core.orm import Base
@@ -64,8 +62,3 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
         ForeignKey('ballots.id', ondelete='CASCADE'),
         nullable=False
     )
-
-    @hybrid_property
-    def counted_eligible_voters(self):
-        """ The number of votes for turnout calculation """
-        return 0 if not self.counted else self.eligible_voters

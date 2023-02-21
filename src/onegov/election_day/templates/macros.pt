@@ -670,7 +670,7 @@
                     <th class="column-district left-aligned">${result.domain_segment}</th>
                     <td class="column-superregion left-aligned" tal:condition="layout.has_superregions">${result.domain_supersegment}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
-                    <td class="right-aligned" data-text="${result.eligible_voters}" tal:condition="expats">${layout.format_number(result.expats)}</td>
+                    <td class="right-aligned" data-text="${result.expats}" tal:condition="expats">${layout.format_number(result.expats)}</td>
                     <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
                     <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
                     <td class="right-aligned" data-text="${result.blank_ballots}">${layout.format_number(result.blank_ballots)}</td>
@@ -680,6 +680,20 @@
                 </tal:block>
             </tr>
         </tbody>
+        <tfoot>
+            <tr class="total">
+                <td i18n:translate="">Total</td>
+                <td class="column-superregion left-aligned" tal:condition="layout.has_superregions"></td>
+                <td class="right-aligned" data-text="${layout.totals.eligible_voters}">${layout.format_number(layout.totals.eligible_voters)}</td>
+                <td class="right-aligned" data-text="${layout.totals.expats}" tal:condition="expats">${layout.format_number(layout.totals.expats)}</td>
+                <td class="right-aligned" data-text="${layout.totals.received_ballots}">${layout.format_number(layout.totals.received_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.accounted_ballots}">${layout.format_number(layout.totals.accounted_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.blank_ballots}">${layout.format_number(layout.totals.blank_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.invalid_ballots}">${layout.format_number(layout.totals.invalid_ballots)}</td>
+                <td class="right-aligned" data-text="${layout.totals.accounted_votes}">${layout.format_number(layout.totals.accounted_votes)}</td>
+                <td class="right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(layout.totals.turnout)} %</td>
+            </tr>
+        </tfoot>
     </table>
 </metal:election-compound-statistics-table>
 
@@ -1568,10 +1582,9 @@
 
 <metal:figcaption_panachage define-macro="figcaption_panachage" i18n:domain="onegov.election_day">
     <figcaption i18n:translate="figcaption_panachage">
-        The diagram shows the origin of the votes. The bars on the left correspond
-        to the unchanged votes (including the blank list), the bars on the right
-        side to the final results. The width of the bars and connections is
-        proportional to the votes.
+        The diagram shows the origin of votes won and lost by panache.
+        On the left side are the lost votes, on the right side the won votes.
+        The width of the bars and the connections is proportional to the number of votes.
     </figcaption>
 </metal:figcaption_panachage>
 

@@ -218,6 +218,16 @@ def test_election_compound_model(session):
     assert election_compound.has_party_results is False
     assert election_compound.has_party_panachage_results is False
     assert election_compound.results == []
+    assert election_compound.totals.__dict__ == {
+        'turnout': 0,
+        'eligible_voters': 0,
+        'expats': 0,
+        'received_ballots': 0,
+        'accounted_ballots': 0,
+        'blank_ballots': 0,
+        'invalid_ballots': 0,
+        'accounted_votes': 0
+    }
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
     assert election_compound.related_link is None
@@ -267,8 +277,6 @@ def test_election_compound_model(session):
             'accounted_votes': 0,
             'blank_ballots': 0,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 0,
@@ -282,8 +290,6 @@ def test_election_compound_model(session):
             'accounted_votes': 0,
             'blank_ballots': 0,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 0,
@@ -293,6 +299,7 @@ def test_election_compound_model(session):
             'turnout': 0
         }
     ]
+    assert sum(election_compound.totals.__dict__.values()) == 0
     assert election_compound.completed is False
     assert election_compound.elected_candidates == []
 
@@ -349,32 +356,29 @@ def test_election_compound_model(session):
             'accounted_votes': 216,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 400,
             'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
-            'turnout': 0
+            'turnout': 75.0
         },
         {
             'accounted_ballots': 258,
             'accounted_votes': 474,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 400,
             'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
-            'turnout': 0
+            'turnout': 75.0
         }
     ]
+    assert sum(election_compound.totals.__dict__.values()) == 0
     assert election_compound.completed is False
 
     # Set results as counted
@@ -390,8 +394,6 @@ def test_election_compound_model(session):
             'accounted_votes': 216,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 200,
-            'counted_received_ballots': 150,
             'domain_segment': 'First district',
             'domain_supersegment': '',
             'eligible_voters': 400,
@@ -405,18 +407,16 @@ def test_election_compound_model(session):
             'accounted_votes': 474,
             'blank_ballots': 12,
             'counted': False,
-            'counted_eligible_voters': 0,
-            'counted_received_ballots': 0,
             'domain_segment': 'Second district',
             'domain_supersegment': '',
             'eligible_voters': 400,
             'expats': 40,
             'invalid_ballots': 30,
             'received_ballots': 300,
-            'turnout': 0
+            'turnout': 75.0
         }
     ]
-
+    assert sum(election_compound.totals.__dict__.values()) == 0
     assert election_compound.completed is False
 
     for result in session.query(ElectionResult):
@@ -428,6 +428,16 @@ def test_election_compound_model(session):
     ]
     assert election_compound.allocated_mandates == 0
     assert election_compound.completed == True
+    assert election_compound.totals.__dict__ == {
+        'accounted_ballots': 258 + 258,
+        'accounted_votes': 216 + 474,
+        'blank_ballots': 12 + 12,
+        'eligible_voters': 400 + 400,
+        'expats': 40 + 40,
+        'invalid_ballots': 30 + 30,
+        'received_ballots': 300 + 300,
+        'turnout': 75.0,
+    }
 
     # Set candidates as elected
     session.query(Candidate).filter_by(candidate_id='1').one().elected = True
@@ -1493,17 +1503,20 @@ def test_election_compound_historical_party_strengths(session):
     first = ElectionCompound(
         title='First',
         domain='federation',
-        date=date(2014, 1, 1)
+        date=date(2014, 1, 1),
+        colors={'a': 'x'}
     )
     second = ElectionCompound(
         title='Second',
         domain='federation',
-        date=date(2018, 1, 1)
+        date=date(2018, 1, 1),
+        colors={'a': 'y', 'b': 'y'}
     )
     third = ElectionCompound(
         title='Third',
         domain='federation',
-        date=date(2022, 1, 1)
+        date=date(2022, 1, 1),
+        colors={'b': 'z', 'c': 'z'}
     )
     session.add(first)
     session.add(second)
@@ -1513,6 +1526,9 @@ def test_election_compound_historical_party_strengths(session):
     assert first.historical_party_results.count() == 0
     assert second.historical_party_results.count() == 0
     assert third.historical_party_results.count() == 0
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
 
     # add results
     for (compound, year, party_id, domain) in (
@@ -1550,6 +1566,9 @@ def test_election_compound_historical_party_strengths(session):
     assert first.historical_party_results.count() == 6
     assert second.historical_party_results.count() == 7
     assert third.historical_party_results.count() == 4
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
 
     # add relationships
     for (source_, target, type_) in (
@@ -1600,4 +1619,9 @@ def test_election_compound_historical_party_strengths(session):
         ('third', 2022, '5'),
         ('third', 2022, '5'),
     ]
-    third.historical_party_results.filter_by(domain='superregion').count() == 1
+    assert third.historical_party_results.filter_by(
+        domain='superregion'
+    ).count() == 1
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y', 'c': 'z'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z', 'a': 'y'}

@@ -169,6 +169,45 @@ def test_import_party_results(session):
         ('2', '1', 20),
     ]
 
+    # with alphanumeric panachage results
+    errors = import_party_results(
+        election,
+        principal,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'year',
+                    'total_votes',
+                    'id',
+                    'name',
+                    'color',
+                    'mandates',
+                    'votes',
+                    'panachage_votes_from_eins.zwei',
+                    'panachage_votes_from_drei_vier',
+                    'panachage_votes_from_999'
+                )),
+                '2015,10000,eins.zwei,P1,#123456,1,5000,10,11,12',
+                '2015,10000,drei_vier,P2,#aabbcc,0,5000,20,21,22',
+            ))
+        ).encode('utf-8')), 'text/plain',
+        ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
+    )
+
+    assert not errors
+    assert sorted([r.party_id for r in election.party_results]) == [
+        'drei_vier', 'eins.zwei'
+    ]
+    results = sorted([
+        (r.target, r.source, r.votes) for r in election.panachage_results
+    ])
+    assert results == [
+        ('drei_vier', '', 22),
+        ('drei_vier', 'eins.zwei', 20),
+        ('eins.zwei', '', 12),
+        ('eins.zwei', 'drei_vier', 11),
+    ]
+
     # with voters count
     errors = import_party_results(
         election,
@@ -348,7 +387,7 @@ def test_import_party_results_invalid_values(session):
                 ','.join((
                     'xxx',
                     'xxx',
-                    'xxx',
+                    'x x x',
                     'xxx',
                     'xxx',
                     'xxx',

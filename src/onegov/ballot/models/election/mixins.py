@@ -25,8 +25,5 @@ class DerivedAttributesMixin:
         if not self.eligible_voters:
             return 0
 
-        if not self.counted_eligible_voters:
-            return 0
-
-        return self.counted_received_ballots /\
-            self.counted_eligible_voters * 100
+        return self.received_ballots /\
+            self.eligible_voters * 100

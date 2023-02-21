@@ -9,24 +9,24 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Inhalt](#Inhalt)   
-- 2. [Vorbemerkungen](#Vorbemerkungen)   
-   - 2.1. [Einheiten](#Einheiten)   
-- 3. [Formate](#Formate)   
-   - 3.1. [Standardformat](#Standardformat)   
-      - 3.1.1. [Spalten](#Spalten)   
-      - 3.1.2. [Temporäre Resultate](#Temporare-Resultate)   
-      - 3.1.3. [Vorlage](#Vorlage)   
-   - 3.2. [OneGov](#OneGov)   
-      - 3.2.1. [Spalten](#Spalten-1)   
-      - 3.2.2. [Temporäre Resultate](#Temporare-Resultate-1)   
-      - 3.2.3. [Vorlage](#Vorlage-1)   
-   - 3.3. [Wabsti](#Wabsti)   
-      - 3.3.1. [Spalten](#Spalten-2)   
-      - 3.3.2. [Temporäre Resultate](#Temporare-Resultate-2)   
-      - 3.3.3. [Vorlage](#Vorlage-2)   
-   - 3.4. [WabstiCExport](#WabstiCExport)   
-      - 3.4.1. [Ermittlung des Status einer Wahl](#Ermittlung-des-Status-einer-Wahl)   
+- 1. [Inhalt](#Inhalt)
+- 2. [Vorbemerkungen](#Vorbemerkungen)
+   - 2.1. [Einheiten](#Einheiten)
+- 3. [Formate](#Formate)
+   - 3.1. [Standardformat](#Standardformat)
+      - 3.1.1. [Spalten](#Spalten)
+      - 3.1.2. [Temporäre Resultate](#Temporare-Resultate)
+      - 3.1.3. [Vorlage](#Vorlage)
+   - 3.2. [OneGov](#OneGov)
+      - 3.2.1. [Spalten](#Spalten-1)
+      - 3.2.2. [Temporäre Resultate](#Temporare-Resultate-1)
+      - 3.2.3. [Vorlage](#Vorlage-1)
+   - 3.3. [Wabsti](#Wabsti)
+      - 3.3.1. [Spalten](#Spalten-2)
+      - 3.3.2. [Temporäre Resultate](#Temporare-Resultate-2)
+      - 3.3.3. [Vorlage](#Vorlage-2)
+   - 3.4. [WabstiCExport](#WabstiCExport)
+      - 3.4.1. [Ermittlung des Status einer Wahl](#Ermittlung-des-Status-einer-Wahl)
 
 <!-- /MDTOC -->
 
@@ -139,12 +139,14 @@ Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 
 Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
 
-#### Ermittlung des Status einer Wahl
+#### Ermittlung des Status einer Abstimmung
 
 In der Format-Spezifikation der Datei `SG_Geschaefte.csv` befinden sich folgende Spalten:
 
 - `Ausmittlungsstand`: Wird vom Benutzer am Wabsti-Client ausgelöst für die gesamte Datenlieferung
-- `AnzGdePendent`: Indikator, ob die Einzelwahl abgeschlossen ist, auch wenn mehrere Wahlen in der Datenlierung sind.
+- `AnzGdePendent`/`AnzPendentGde`: Indikator, ob die Einzelabstimmung abgeschlossen ist, auch wenn mehrere Abstimmungen in der Datenlieferung sind.
 
-Seit 2020 wird `AnzGdePendent` statt `Ausmittlungsstand` dazu verwendet, um den Status der Gesamtwahl zu setzen.
+Seit 2020 wird `AnzGdePendent` statt `Ausmittlungsstand` dazu verwendet, um den Status der Gesamtabstimmung zu setzen.
 Der Status ist `final` wenn `AnzGdePendent = 0` ist.
+
+Seit 2023 wird `AnzPendentGde` statt `AnzGdePendent` dazu verwendet, um den Status der Gesamtabstimmung zu setzen.

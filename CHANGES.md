@@ -1,8 +1,207 @@
 # Changes
 
+## 2023.7
+
+`2023-02-13` | [0504bce18a...fe2d12b7fc](https://github.com/OneGov/onegov-cloud/compare/0504bce18a^...fe2d12b7fc)
+
+### Election Day
+
+##### Allow alphanumeric list and party IDs.
+
+`Feature` | [OGC-936](https://linear.app/onegovcloud/issue/OGC-936) | [99aca42cb5](https://github.com/onegov/onegov-cloud/commit/99aca42cb59868bdff1790a0c52c6448f1147538)
+
+##### Avoid displaying bar charts with only inactive bars.
+
+Show bar chart bars as active as long as no mandate has been allocated.
+
+`Feature` | [OGC-934](https://linear.app/onegovcloud/issue/OGC-934) | [fcf926e009](https://github.com/onegov/onegov-cloud/commit/fcf926e009668fa279ef7ec54f76401b79d94e21)
+
+##### Add historical colors for party results.
+
+`Feature` | [OGC-931](https://linear.app/onegovcloud/issue/OGC-931) | [792624b1ae](https://github.com/onegov/onegov-cloud/commit/792624b1ae489b9be502cd22ed1eafb11463979f)
+
+##### Add QR-code widget.
+
+`Feature` | [OGC-884](https://linear.app/onegovcloud/issue/OGC-884) | [5bd0e8e784](https://github.com/onegov/onegov-cloud/commit/5bd0e8e784b26d128d84e87a89dd7bade150b60b)
+
+##### Add total rows to election compound and election compound part statistics.
+
+`Feature` | [OGC-975](https://linear.app/onegovcloud/issue/OGC-975) | [e27e1ca5e2](https://github.com/onegov/onegov-cloud/commit/e27e1ca5e209805b81c6143f8e83b08bae4c561c)
+
+##### Prefer AnzPendentGde instead of AnzGdePendent for WabstiC formats.
+
+`Feature` | [OGC-907](https://linear.app/onegovcloud/issue/OGC-907) | [0df166b2d9](https://github.com/onegov/onegov-cloud/commit/0df166b2d9b37e67d797774926c8b55754f1d52d)
+
+##### Hide empty party strength lines.
+
+`Bugfix` | [OGC-941](https://linear.app/onegovcloud/issue/OGC-941) | [96c78d3231](https://github.com/onegov/onegov-cloud/commit/96c78d32310b7fe793100eb0ed419a3a841b379d)
+
+##### Remove counted_eligible_voters and counted_received ballots.
+
+This was only partial solution and should have been provided for all  attributes and results. Instead of these attributes, we now make sure to zeroize uncounted entities.
+
+`Bugfix` | [OGC-893](https://linear.app/onegovcloud/issue/OGC-893) | [ad627783b5](https://github.com/onegov/onegov-cloud/commit/ad627783b53bb230ebd8be07860bea62902567aa)
+
+##### Standardize panachage diagrams.
+
+`Bugfix` | [OGC-906](https://linear.app/onegovcloud/issue/OGC-906) | [9d3ca42e1f](https://github.com/onegov/onegov-cloud/commit/9d3ca42e1f80066e6f31705c5786063027eca9c0)
+
+##### Sort entity filter by name.
+
+`Bugfix` | [OGC-974](https://linear.app/onegovcloud/issue/OGC-974) | [3f67840bb4](https://github.com/onegov/onegov-cloud/commit/3f67840bb4c06783fe9ee9afed867a8829f91826)
+
+### Org
+
+##### Allows publication dates on directory entries to be required
+
+This is useful for directories where the publication has to be limited
+e.g. for planning applications, where a public participation period is
+mandated, but publishing it beyond that would raise privacy concerns.
+
+`Feature` | [OGC-913](https://linear.app/onegovcloud/issue/OGC-913) | [0504bce18a](https://github.com/onegov/onegov-cloud/commit/0504bce18af027830c98b5c4f454bd5e77f245ba)
+
+##### Fixes rendering of external links in search results
+
+`Bugfix` | [OGC-959](https://linear.app/onegovcloud/issue/OGC-959) | [b186e5dbd8](https://github.com/onegov/onegov-cloud/commit/b186e5dbd8feffa67cf9f65066671f06af0abff2)
+
+### Town6
+
+##### Adds Missing commas in the error message.
+
+`Bugfix` | [OGC-943](https://linear.app/onegovcloud/issue/OGC-943) | [73cd1a05ce](https://github.com/onegov/onegov-cloud/commit/73cd1a05ce824cbec8330fc623c60400ffe3c04c)
+
+##### Add the translation string.
+
+`Bugfix` | [OGC-945](https://linear.app/onegovcloud/issue/OGC-945) | [6af98f0f3a](https://github.com/onegov/onegov-cloud/commit/6af98f0f3a96a6568c2489246106f9ef020e78aa)
+
+### Websockets
+
+##### Add websocket server and client.
+
+`Feature` | [OGC-935](https://linear.app/onegovcloud/issue/OGC-935) | [4d1f7ea474](https://github.com/onegov/onegov-cloud/commit/4d1f7ea474ce4925266d0aa161e3204fe6f171ca)
+
+## 2023.6
+
+`2023-02-08` | [0ea641df42...ca101f7ca1](https://github.com/OneGov/onegov-cloud/compare/0ea641df42^...ca101f7ca1)
+
+### Election Day
+
+##### Fixes horizontal party strengths bar char data.
+
+`Bugfix` | [030c1eda6a](https://github.com/onegov/onegov-cloud/commit/030c1eda6ae5c21a20a7657cc5770965d40cb9f9)
+
+##### Allow uploading intermediate party results to proporz elections.
+
+`Bugfix` | [fb9ab7bdba](https://github.com/onegov/onegov-cloud/commit/fb9ab7bdba7380e3ec20e81e02f80b8d8b9c368a)
+
+##### Fixes progress of superregions.
+
+`Bugfix` | [OGC-952](https://linear.app/onegovcloud/issue/OGC-952) | [769321a7f8](https://github.com/onegov/onegov-cloud/commit/769321a7f8f2b8656b7f0c56347ac064a40a800b)
+
+### Feriennet
+
+##### Text for Banners
+
+`Feature` | [PRO-880](https://linear.app/projuventute/issue/PRO-880) | [ecb1042703](https://github.com/onegov/onegov-cloud/commit/ecb1042703ebf259a131ce395ca74aedefcafccf)
+
+##### Replace privacy protection links
+
+`Feature` | [OGC-1072](https://linear.app/onegovcloud/issue/OGC-1072) | [9ed0040f97](https://github.com/onegov/onegov-cloud/commit/9ed0040f97657a2a919323c1c1dc46ed7a5b832d)
+
+##### Remove CS Logo
+
+`Feature` | [PRO-1131](https://linear.app/projuventute/issue/PRO-1131) | [a96b8c2ad9](https://github.com/onegov/onegov-cloud/commit/a96b8c2ad9e803ec2e05f446c5b4cb3a39e2335e)
+
+##### Banners between activities
+
+Sponsor banners appear now on the activities overview.
+
+`Feature` | [PRO-1136](https://linear.app/projuventute/issue/PRO-1136) | [3c534cce29](https://github.com/onegov/onegov-cloud/commit/3c534cce292e030c48ae859324d4d4eb689460a0)
+
+### Form
+
+##### Extends pricing options with a credit card payment flag
+
+This allows users to define custom forms where the credit card payment
+is mandatory based on whether or not the person submitting the form has
+selected a certain option or not.
+
+E.g. a delivery field where they have to pay online right away if they
+want the item to be delivered, but they can pay later in person if
+they choose to pick it up themselves instead:
+
+```
+Delivery *=
+    ( ) Pickup (0 CHF)
+    ( ) Delivery (5 CHF!)
+```
+
+`Feature` | [OGC-910](https://linear.app/onegovcloud/issue/OGC-910) | [de8388987a](https://github.com/onegov/onegov-cloud/commit/de8388987a23599982f02c67cae954c6bbd68d57)
+
+##### Adds optional pricing to integer range fields
+
+Price will be multiplied by the amount entered into the field.
+The credit card payment flag works on this field as well. E.g:
+
+```
+Number of stamps *= 0..30 (0.85 CHF!)
+```
+
+`Feature` | [OGC-942](https://linear.app/onegovcloud/issue/OGC-942) | [413ccbb518](https://github.com/onegov/onegov-cloud/commit/413ccbb5183ad8630eb0c3a88f58299e4aff837b)
+
+##### Fixes bug in price range checking.
+
+`Bugfix` | [5841945229](https://github.com/onegov/onegov-cloud/commit/584194522977f5c8d6c9ea9f09d2e61a101a9ba1)
+
+### Org
+
+##### Display edit bar with delete function for links.
+
+This makes deleting links more accessible, which
+was in fact already possible.
+
+`Feature` | [OGC-739](https://linear.app/onegovcloud/issue/OGC-739) | [8097916390](https://github.com/onegov/onegov-cloud/commit/80979163905b074a7fa80a4983da0df11a4718ac)
+
+##### Adds a minimum price field to forms, directories and resources.
+
+Treats submissions with negative price totals like free submissions.
+
+`Feature` | [OGC-944](https://linear.app/onegovcloud/issue/OGC-944) | [6821a8b20b](https://github.com/onegov/onegov-cloud/commit/6821a8b20bfa5828847a085f834c952f360f4985)
+
+### Town6
+
+##### Integration OneGov Gever.
+
+`Feature` | [OGC-618](https://linear.app/onegovcloud/issue/OGC-618) | [b6871d13c2](https://github.com/onegov/onegov-cloud/commit/b6871d13c26acdf7944a153e2eaab98ded454b95)
+
+##### Change appearance of "subit your event"
+
+`Feature` | [OGC-854](https://linear.app/onegovcloud/issue/OGC-854) | [772ebf219b](https://github.com/onegov/onegov-cloud/commit/772ebf219b7d13c3ab76f0a6163526d087c9b016)
+
+##### Allows steps in layouts to be hidden on a per view basis
+
+This allows sharing the same layout between e.g. a guest view which has
+a sequence of steps and an editor view which does not.
+
+Hides the step sequence when adding a new directory entry as admin.
+
+`Feature` | [OGC-956](https://linear.app/onegovcloud/issue/OGC-956) | [27f0c3570f](https://github.com/onegov/onegov-cloud/commit/27f0c3570fbbfda2a8dcc0ad2037eba01b24d1f0)
+
+##### Create events directly without ticket.
+
+`Feature` | [OGC-745](https://linear.app/onegovcloud/issue/OGC-745) | [ee95988a70](https://github.com/onegov/onegov-cloud/commit/ee95988a70f348a91edcb015e9c61cd12912645f)
+
+##### Fixes translations not being applied.
+
+`Bugfix` | [OGC-926](https://linear.app/onegovcloud/issue/OGC-926) | [75b1dd85c3](https://github.com/onegov/onegov-cloud/commit/75b1dd85c3027944a1d15d78f249c4949f353b6e)
+
+##### Ensure translations are applied.
+
+`Bugfix` | [2a6f73d5b5](https://github.com/onegov/onegov-cloud/commit/2a6f73d5b5ec10321a1128997313cc701acc52c1)
+
 ## 2023.5
 
-`2023-01-25` | [550401978d...636481c58a](https://github.com/OneGov/onegov-cloud/compare/550401978d^...636481c58a)
+`2023-01-25` | [550401978d...b49ae8b1f9](https://github.com/OneGov/onegov-cloud/compare/550401978d^...b49ae8b1f9)
 
 ### Feriennet
 
@@ -2604,114 +2803,4 @@ Bills may be paid with the displayed information.
 ##### Catch more invalid ticket state changes.
 
 `Other` | [OGC-290](https://linear.app/onegovcloud/issue/OGC-290) | [b44a8e49f6](https://github.com/onegov/onegov-cloud/commit/b44a8e49f6711458b5c4333096e6b1a630fb42a7)
-
-## 2022.14
-
-`2022-02-17` | [4fe96a321f...d0df117ff2](https://github.com/OneGov/onegov-cloud/compare/4fe96a321f^...d0df117ff2)
-
-### Election Day
-
-##### Add REST interface for party results of election compounds.
-
-`Feature` | [OGC-295](https://linear.app/onegovcloud/issue/OGC-295) | [3d6dd520f9](https://github.com/onegov/onegov-cloud/commit/3d6dd520f99a0938c0fa48865d54bc807e425b88)
-
-##### Add election compound import format.
-
-`Feature` | [OGC-291](https://linear.app/onegovcloud/issue/OGC-291) | [c439b05596](https://github.com/onegov/onegov-cloud/commit/c439b055966b422c6366525c8b4e4463056ec529)
-
-##### Sort elections of compounds by shortcode only.
-
-`Bugfix` | [OGC-294](https://linear.app/onegovcloud/issue/OGC-294) | [624eab47f6](https://github.com/onegov/onegov-cloud/commit/624eab47f625c1a3d2ceec24ea843fcb951db017)
-
-##### Fixes wildcard archive search.
-
-`Bugfix` | [OGC-303](https://linear.app/onegovcloud/issue/OGC-303) | [fe458ad8e7](https://github.com/onegov/onegov-cloud/commit/fe458ad8e70226a89a623c94577c5de1608e9d4a)
-
-##### Always show number of mandates ander voters count in list groups.
-
-`Other` | [OGC-162](https://linear.app/onegovcloud/issue/OGC-162) | [c7000e717c](https://github.com/onegov/onegov-cloud/commit/c7000e717c8569171d7a3d61e7f258f3e3746a4f)
-
-##### Update figcaption of list groups diagram.
-
-`Other` | [OGC-162](https://linear.app/onegovcloud/issue/OGC-162) | [56dcc274d9](https://github.com/onegov/onegov-cloud/commit/56dcc274d934c5ac6193c448ca26b34b20070ac3)
-
-##### Update translations.
-
-`Other` | [OGC-291](https://linear.app/onegovcloud/issue/OGC-291) | [1ea31ea9b0](https://github.com/onegov/onegov-cloud/commit/1ea31ea9b0ca2df9f441d9786a91e304c3494083)
-
-##### Separate manual completion of election compounds from the Double Pukelsheim setting.
-
-`Other` | [OGC-167](https://linear.app/onegovcloud/issue/OGC-167) | [9dbbd5caca](https://github.com/onegov/onegov-cloud/commit/9dbbd5cacabdce5c416d9f88bf1bb80961e28c4e)
-
-##### Store the voters count as decimal numbers.
-
-`Other` | [OGC-296](https://linear.app/onegovcloud/issue/OGC-296) | [0d36c8d33a](https://github.com/onegov/onegov-cloud/commit/0d36c8d33a74384b0a08bc51cf583c7e5bd99bfd)
-
-### Org
-
-##### Fixes setting up logging too late.
-
-`Bugfix` | [OGC-309](https://linear.app/onegovcloud/issue/OGC-309) | [4fe96a321f](https://github.com/onegov/onegov-cloud/commit/4fe96a321fbd02daecf347fbe9a7860221394647)
-
-##### Fixes submission not deletable if not completed.
-
-`Bugfix` | [OGC-243](https://linear.app/onegovcloud/issue/OGC-243) | [0c01377bbf](https://github.com/onegov/onegov-cloud/commit/0c01377bbf0c6f250c150781aa3cc3f83507ea58)
-
-##### Use the same unsubscribe link in the daily statistics mail body and headers.
-
-`Bugfix` | [c9fc2ae586](https://github.com/onegov/onegov-cloud/commit/c9fc2ae586c8544181d5c06fa160b3d73aa9f777)
-
-##### Disable newsletter by default.
-
-`Other` | [OGC-314](https://linear.app/onegovcloud/issue/OGC-314) | [6d322f612f](https://github.com/onegov/onegov-cloud/commit/6d322f612f00b8a356390453a4b7446e38245370)
-
-##### Fixes keyword converter struggling with plus signs.
-
-`Bugfix` | [OGC-240](https://linear.app/onegovcloud/issue/OGC-240) | [c60082c6dc](https://github.com/onegov/onegov-cloud/commit/c60082c6dcbba1f8e48cbc6c7255aae8213a43eb)
-
-## 2022.13
-
-`2022-02-13` | [b6ae0228ad...250eadea7f](https://github.com/OneGov/onegov-cloud/compare/b6ae0228ad^...250eadea7f)
-
-### Core
-
-##### Ignores inactive recipient errors in postmark mailer.
-
-`Bugfix` | [d679ef3917](https://github.com/onegov/onegov-cloud/commit/d679ef3917ba23488447e2f7ad18a24c75e7195d)
-
-##### Fixes CLI commands without selectors not logging.
-
-`Bugfix` | [OGC-309](https://linear.app/onegovcloud/issue/OGC-309) | [456156a694](https://github.com/onegov/onegov-cloud/commit/456156a6947166f0d88494841385e72ab449574c)
-
-### Election Day
-
-##### Update translations.
-
-`Other` | [OGC-147](https://linear.app/onegovcloud/issue/OGC-147) | [4f60ddc732](https://github.com/onegov/onegov-cloud/commit/4f60ddc732b95b10a4cd5b2e83edc7e0117b8e6e)
-
-### Feriennet
-
-##### Update bank statement import hint.
-
-`Other` | [PRO-998](https://linear.app/projuventute/issue/PRO-998) | [127c6efdc5](https://github.com/onegov/onegov-cloud/commit/127c6efdc5235061ae738c7b6c1d01cbf93a7d96)
-
-### Org
-
-##### Use a honeypot for newsletter signup.
-
-`Feature` | [OGC-306](https://linear.app/onegovcloud/issue/OGC-306) | [7bfcfca307](https://github.com/onegov/onegov-cloud/commit/7bfcfca307859967c5c4452261caa89d81b0bb22)
-
-##### Send daily ticket statistics as marketing mails.
-
-`Feature` | [OGC-305](https://linear.app/onegovcloud/issue/OGC-305) | [1ea0e47ca8](https://github.com/onegov/onegov-cloud/commit/1ea0e47ca8a33c1b70deb4ba2c15ca697d9b6cca)
-
-##### Set form defaults for room allocations to not partly available.
-
-`Other` | [OGC-308](https://linear.app/onegovcloud/issue/OGC-308) | [c3b82dda74](https://github.com/onegov/onegov-cloud/commit/c3b82dda74e68c63d9bb3697e555f008c414b270)
-
-### Town6
-
-##### Fixes hidden form fields not being hidden.
-
-`Bugfix` | [ec15c054bb](https://github.com/onegov/onegov-cloud/commit/ec15c054bb03ff0b802d863349c7ab4a6fb1f987)
 

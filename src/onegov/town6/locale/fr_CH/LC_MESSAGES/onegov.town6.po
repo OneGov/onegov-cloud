@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-02-06 11:35+0100\n"
+"POT-Creation-Date: 2023-02-10 17:08+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -344,6 +344,9 @@ msgstr "Tous les ${days} jusqu'à ${end}"
 
 msgid "Import"
 msgstr "Imprimer"
+
+msgid "Create an event"
+msgstr "Saisir un événement"
 
 msgid "This event can't be editet."
 msgstr "Cet événement ne peut pas être édité."
@@ -1604,9 +1607,6 @@ msgstr "Étiquette"
 msgid "Date"
 msgstr "Date"
 
-msgid "Actions"
-msgstr "Actions"
-
 msgid "Export these events"
 msgstr "Exporter ces événements"
 
@@ -2086,6 +2086,9 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+#~ msgid "Actions"
+#~ msgstr "Actions"
 
 #~ msgid "Submit your own event"
 #~ msgstr "Soumettez votre propre événement"

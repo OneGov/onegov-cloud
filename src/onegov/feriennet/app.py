@@ -1,5 +1,3 @@
-import random
-
 from cached_property import cached_property
 from onegov.activity import Period, PeriodCollection, InvoiceCollection
 from onegov.activity.models.invoice_reference import Schema
@@ -25,14 +23,14 @@ BANNER_TEMPLATE = """
             <p class="banner-info">{info}</p>
         </a>
         <img src="{tracker}"
-                 border="0"
-                 height="1"
-                 width="1"
-                 onerror="
-                    this.getAttribute('src').length != 0
-                    && this.parentNode.parentNode.remove()
-                 "
-                 alt="Advertisement">
+                border="0"
+                height="1"
+                width="1"
+                onerror="
+                this.getAttribute('src').length != 0
+                && this.parentNode.parentNode.remove()
+                "
+                alt="Advertisement">
     </div>
 </div>
 """
@@ -129,25 +127,6 @@ class FeriennetApp(OrgApp):
             )
 
         return banners
-
-    def random_banner(self, request):
-        """ Randomly returns the html to one of the available booking banners.
-
-        """
-        candidates = self.get_sponsors(request)
-
-        winner = random.choice(candidates)
-        winner = winner.compiled(request)
-
-        info = winner.banners.get('info', None)
-
-        return BANNER_TEMPLATE.format(
-            id=id,
-            src=winner.url_for(request, winner.banners['src']),
-            url=winner.banners['url'],
-            tracker=winner.banners.get('tracker', ''),
-            info=info if info else ""
-        )
 
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', True)

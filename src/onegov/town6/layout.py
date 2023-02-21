@@ -719,7 +719,22 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-
+            links.append(
+                Link(
+                    text=_("Upload to Gever"),
+                    url=self.request.link(self.model, 'send-to-gever'),
+                    attrs={'class': 'upload'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to upload this ticket?"),
+                            _("This will upload this ticket to the "
+                              "Gever instance, if configured."),
+                            _("Upload Ticket"),
+                            _("Cancel")
+                        )
+                    )
+                )
+            )
             return links
 
 
@@ -1284,6 +1299,11 @@ class OccurrencesLayout(EventBaseLayout):
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
                 ),
+                Link(
+                    text=_("Create an event"),
+                    url=self.request.link(self.model, 'enter-event'),
+                    attrs={'class': 'new-form'}
+                )
             )
 
 
