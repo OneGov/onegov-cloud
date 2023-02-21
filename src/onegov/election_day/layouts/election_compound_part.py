@@ -1,6 +1,8 @@
 from cached_property import cached_property
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout
+from onegov.election_day.utils import svg_filename
 
 
 class ElectionCompoundPartLayout(DetailLayout):
@@ -45,6 +47,10 @@ class ElectionCompoundPartLayout(DetailLayout):
     def results(self):
         return self.model.results
 
+    @cached_property
+    def totals(self):
+        return self.model.totals
+
     def label(self, value):
         if value == 'district':
             if self.model.election_compound.domain_elections == 'region':
@@ -87,7 +93,7 @@ class ElectionCompoundPartLayout(DetailLayout):
 
     @cached_property
     def has_party_results(self):
-        return self.model.party_results.first() is not None
+        return self.model.has_party_results
 
     @cached_property
     def visible(self):
@@ -111,9 +117,42 @@ class ElectionCompoundPartLayout(DetailLayout):
             ) for tab in self.all_tabs if self.tab_visible(tab)
         ]
 
-    @property
+    @cached_property
     def svg_path(self):
+        """ Returns the path to the SVG or None, if it is not available. """
+
+        path = 'svg/{}'.format(
+            svg_filename(
+                self.model,
+                self.tab,
+                self.request.locale,
+                last_modified=self.last_modified
+            )
+        )
+        if self.request.app.filestorage.exists(path):
+            return path
+
         return None
+
+    @cached_property
+    def svg_link(self):
+        """ Returns a link to the SVG download view. """
+
+        return self.request.link(self.model, name='{}-svg'.format(self.tab))
+
+    @cached_property
+    def svg_name(self):
+        """ Returns a nice to read SVG filename. """
+
+        return '{}.svg'.format(
+            normalize_for_url(
+                '{}-{}-{}'.format(
+                    self.model.election_compound.id,
+                    self.model.id,
+                    self.request.translate(self.title() or '')
+                )
+            )
+        )
 
     @property
     def summarize(self):

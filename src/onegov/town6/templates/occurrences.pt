@@ -71,27 +71,24 @@
                     </div>
                 </div>
 
-                <div class="occurrence-exports side-panel">
-                    <h3 i18n:translate>Exports</h3>
+                <div class="occurrence-actions side-panel">
+                    <h3 i18n:translate>Actions</h3>
                     <div class="side-panel-with-bg">
-                        <ul class="calendar-export-list">
-                            <li>
-                                <a href="${request.link(layout.model, name='ical')}" i18n:translate>
-                                    Export these events
+                        <ul class="more-list">
+                            <li tal:condition="len(occurrences) > 1">
+                                <a class="list-link" href="${request.link(layout.model, name='ical')}">
+                                    <i class="far fa-calendar-alt"></i> <span class="list-title" i18n:translate>Export these events</span>
+                                </a>
+                            </li>
+                            <li tal:condition="layout.org.meta.get('submit_events_visible', True)">
+                                <a class="list-link" href="${add_link}">
+                                    <i class="far fa-calendar-plus"></i> <span class="list-title" i18n:translate>Submit your event</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </div>
-
-                <div class="submit-yours side-panel" tal:condition="layout.org.meta.get('submit_events_visible', True)">
-                    <h3 i18n:translate="">Submit your event</h3>
-                    <p>
-                        <span i18n:translate="">Submit your own event</span>
-                        <a href="${add_link}" i18n:translate="">Submit your event</a>
-                    </p>
-                </div>
-          </div>
+        </div>
 
         </div>
     </tal:b>

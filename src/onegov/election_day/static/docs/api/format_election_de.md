@@ -7,38 +7,38 @@ Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von "Wabst
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Inhalt](#Inhalt)
-- 2. [Vorbemerkungen](#Vorbemerkungen)
-   - 2.1. [Einheiten](#Einheiten)
-   - 2.2. [Stille Wahlen](#Stille-Wahlen)
-   - 2.3. [Regionale Wahlen](#Regionale-Wahlen)
-- 3. [Formate](#Formate)
-   - 3.1. [OneGov](#OneGov)
-      - 3.1.1. [Spalten](#Spalten)
-      - 3.1.2. [Panaschierdaten](#Panaschierdaten)
-      - 3.1.3. [Temporäre Resultate](#Temporare-Resultate)
-      - 3.1.4. [Verbundene Wahlen](#Verbundene-Wahlen)
-      - 3.1.5. [Vorlage](#Vorlage)
-   - 3.2. [Wabsti Majorz](#Wabsti-Majorz)
-      - 3.2.1. [Spalten Datenexport](#Spalten-Datenexport)
-      - 3.2.2. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate)
-      - 3.2.3. [Temporäre Resultate](#Temporare-Resultate-1)
-      - 3.2.4. [Vorlagen](#Vorlagen)
-   - 3.3. [Wabsti Proporz](#Wabsti-Proporz)
-      - 3.3.1. [Spalten Datenexport der Resultate](#Spalten-Datenexport-der-Resultate)
-      - 3.3.2. [Panaschierdaten](#Panaschierdaten-1)
-      - 3.3.3. [Spalten Datenexport der Statistik](#Spalten-Datenexport-der-Statistik)
-      - 3.3.4. [Spalten Listenverbindungen](#Spalten-Listenverbindungen)
-      - 3.3.5. [Spalten Kandidatenresultate](#Spalten-Kandidatenresultate-1)
-      - 3.3.6. [Temporäre Resultate](#Temporare-Resultate-2)
-      - 3.3.7. [Vorlagen](#Vorlagen-1)
-   - 3.4. [WabstiCExport Majorz](#WabstiCExport-Majorz)
-   - 3.5. [WabstiCExport Proporz](#WabstiCExport-Proporz)
-   - 3.6. [Parteiresultate](#Parteiresultate)
-      - 3.6.1. [Einflussbereich](#Einflussbereich)
-      - 3.6.2. [Panaschierdaten](#Panaschierdaten-2)
-      - 3.6.3. [Vorlagen](#Vorlagen-2)
-   - 3.7. [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#Automatische-Erstellung-verbundene-Wahl-und-Wahlen-mit-REST-API)
+- 1. [Inhalt](#inhalt)   
+- 2. [Vorbemerkungen](#vorbemerkungen)   
+   - 2.1. [Einheiten](#einheiten)   
+   - 2.2. [Stille Wahlen](#stille-wahlen)   
+   - 2.3. [Regionale Wahlen](#regionale-wahlen)   
+- 3. [Formate](#formate)   
+   - 3.1. [OneGov](#onegov)   
+      - 3.1.1. [Spalten](#spalten)   
+      - 3.1.2. [Listenpanaschierdaten](#listenpanaschierdaten)   
+      - 3.1.3. [Temporäre Resultate](#temporäre-resultate)   
+      - 3.1.4. [Verbundene Wahlen](#verbundene-wahlen)   
+      - 3.1.5. [Vorlage](#vorlage)   
+   - 3.2. [Wabsti Majorz](#wabsti-majorz)   
+      - 3.2.1. [Spalten Datenexport](#spalten-datenexport)   
+      - 3.2.2. [Spalten Kandidatenresultate](#spalten-kandidatenresultate)   
+      - 3.2.3. [Temporäre Resultate](#temporäre-resultate)   
+      - 3.2.4. [Vorlagen](#vorlagen)   
+   - 3.3. [Wabsti Proporz](#wabsti-proporz)   
+      - 3.3.1. [Spalten Datenexport der Resultate](#spalten-datenexport-der-resultate)   
+      - 3.3.2. [Panaschierdaten](#panaschierdaten)   
+      - 3.3.3. [Spalten Datenexport der Statistik](#spalten-datenexport-der-statistik)   
+      - 3.3.4. [Spalten Listenverbindungen](#spalten-listenverbindungen)   
+      - 3.3.5. [Spalten Kandidatenresultate](#spalten-kandidatenresultate)   
+      - 3.3.6. [Temporäre Resultate](#temporäre-resultate)   
+      - 3.3.7. [Vorlagen](#vorlagen)   
+   - 3.4. [WabstiCExport Majorz](#wabsticexport-majorz)   
+   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)   
+   - 3.6. [Parteiresultate](#parteiresultate)   
+      - 3.6.1. [Einflussbereich](#einflussbereich)   
+      - 3.6.2. [Panaschierdaten](#panaschierdaten)   
+      - 3.6.3. [Vorlagen](#vorlagen)   
+   - 3.7. [Automatische Erstellung verbundene Wahl und Wahlen mit REST-API](#automatische-erstellung-verbundene-wahl-und-wahlen-mit-rest-api)   
 
 <!-- /MDTOC -->
 
@@ -82,7 +82,7 @@ Name|Beschreibung
 `entity_invalid_votes`|Anzahl ungültige Stimmen der Einheit. Null falls Proporzwahl.
 `list_name`|Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
 `list_id`|ID der Liste des Kandidierenden. Nur bei Proporzwahlen. Kann alphanumerisch oder numerisch sein.
-`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784'. Nur bei Proporzwahlen.
+`list_color`|Die Farbe der Liste als Hexadezimalwert, z.B. `#a6b784`. Nur bei Proporzwahlen.
 `list_number_of_mandates`|Gesamte Anzahl der Mandate der Liste. Nur bei Proporzwahlen.
 `list_votes`|Anzahl der Listenstimmen pro Gemeinde. Nur bei Proporzwahlen.
 `list_connection`|ID der Listenverbindung oder Unterlistenverbindung (wenn list_connetion_parent vorhanden). Nur bei Proporzwahlen.
@@ -92,18 +92,18 @@ Name|Beschreibung
 `candidate_first_name`|Vorname des Kandidaten.
 `candidate_elected`|True, falls der Kandidierenden gewählt wurde.
 `candidate_party`|Der Name der Partei.
-`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`candidate_party_color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784`.
 `candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt). Optional.
 `candidate_year_of_birth`|Der Jahrgang des Kandidierenden. Optional.
 `candidate_votes`|Anzahl Kandidierendenstimmen in der Einheit.
 
-#### Panaschierdaten
+#### Listenpanaschierdaten
 
-Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
+Die Resultate können Listenpanaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
 
 Name|Beschreibung
 ---|---
-`list_panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Die Anzahl Listenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 #### Temporäre Resultate
 
@@ -252,7 +252,7 @@ Name|Beschreibung
 `name`|Der Name der Partei in der Standardsprache. Optional*.
 `name_{locale}`|Übersetzter Name der Partei, z. B. `name_de_ch` für den deutschen Namen. Optional. Stellen Sie sicher, dass Sie den Namen der Partei in der Standardsprache entweder in der Spalte `name` oder `name_{default_locale}` angeben.
 `id`|ID der Partei (beliebige Zahl).
-`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784'.
+`color`|Die Farbe der Partei als Hexadezimalwert, z.B. `#a6b784`.
 `mandates`|Die Anzahl Mandate der Partei.
 `votes`|Die Anzahl Stimmen der Partei.
 `voters_count`|Wählerzahlen. Die kumulierte Anzahl Stimmen pro Gesamtanzahl Mandate pro Wahl. Nur für verbundene Wahlen.

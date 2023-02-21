@@ -197,6 +197,41 @@ def test_event_steps(client):
         == 403
 
 
+def test_create_events_directly(client):
+    client.login_admin()
+    form_page = client.get('/events').click("^Veranstaltung$")
+    # As admin or editor, the progress indicator should not be displayed.
+    # This only makes sense in the publishing process for visitors.
+    assert 'progress-indicator' not in form_page
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+
+    # Fill out event
+    form_page.form['email'] = "test@example.org"
+    form_page.form['title'] = "My Event"
+    form_page.form['description'] = "My event is an event."
+    form_page.form['location'] = "Location"
+    form_page.form['organizer'] = "The Organizer"
+    form_page.form.set('tags', True, index=0)
+    form_page.form.set('tags', True, index=1)
+    form_page.form['start_date'] = start_date.isoformat()
+    form_page.form['start_time'] = "18:00"
+    form_page.form['end_time'] = "22:00"
+    form_page.form['end_date'] = end_date.isoformat()
+    form_page.form['repeat'] = 'weekly'
+    form_page.form.set('weekly', True, index=0)
+    form_page.form.set('weekly', True, index=1)
+    form_page.form.set('weekly', True, index=2)
+    form_page.form.set('weekly', True, index=3)
+    form_page.form.set('weekly', True, index=4)
+    form_page.form.set('weekly', True, index=5)
+    form_page.form.set('weekly', True, index=6)
+
+    events_redirect = form_page.form.submit().follow().follow()
+    assert "Event 'My Event' erfolgreich erstellt" in events_redirect
+
+
 def test_hide_event_submission_option(client):
     events_page = client.get('/events')
     assert "Veranstaltung vorschlagen" in events_page

@@ -3,6 +3,7 @@ import phonenumbers
 import sedate
 
 from cssutils.css import CSSStyleSheet
+from itertools import zip_longest
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
@@ -21,15 +22,19 @@ from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import UploadWidget
+from onegov.form.widgets import UploadMultipleWidget
+from werkzeug.datastructures import MultiDict
 from wtforms_components import TimeField as DefaultTimeField
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.fields import Field
+from wtforms.fields import FieldList
 from wtforms.fields import FileField
 from wtforms.fields import SelectField
 from wtforms.fields import SelectMultipleField
 from wtforms.fields import StringField
 from wtforms.fields import TelField
 from wtforms.fields import TextAreaField
+from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
@@ -198,6 +203,123 @@ class UploadFileWithORMSupport(UploadField):
             }
         else:
             super().process_data(value)
+
+
+class UploadMultipleField(FieldList, FileField):
+    """ A custom file field that turns the uploaded files into a list of
+    compressed base64 strings together with the filename, size and mimetype.
+
+    This acts both like a single file field with multiple and like a list
+    of :class:`onegov.form.fields.UploadFile` for uploaded files. This way
+    we get the best of both worlds.
+
+    """
+
+    widget = UploadMultipleWidget()
+
+    upload_field_class = UploadField
+    upload_widget = UploadWidget()
+
+    def __init__(
+        self,
+        label=None,
+        validators=None,
+        filters=(),
+        description='',
+        id=None,
+        default=(),
+        widget=None,
+        render_kw=None,
+        name=None,
+        upload_widget=None,
+        _form=None,
+        _prefix='',
+        _translations=None,
+        _meta=None,
+    ):
+        if upload_widget is None:
+            upload_widget = self.upload_widget
+
+        # a lot of the arguments we just pass through to the subfield
+        unbound_field = self.upload_field_class(
+            validators=validators,
+            filters=filters,
+            description=description,
+            widget=upload_widget,
+            render_kw=render_kw,
+        )
+        super().__init__(
+            unbound_field,
+            label,
+            min_entries=0,
+            max_entries=None,
+            id=id,
+            default=default,
+            widget=widget,
+            render_kw=render_kw,
+            name=name,
+            _form=_form,
+            _prefix=_prefix,
+            _translations=_translations,
+            _meta=_meta
+        )
+
+    def process(self, formdata, data=unset_value, extra_filters=None):
+        self.process_errors = []
+
+        # process the sub-fields
+        super().process(formdata, data=data, extra_filters=extra_filters)
+
+        # process the top-level multiple file field
+        if formdata is not None:
+            if self.name in formdata:
+                self.raw_data = formdata.getlist(self.name)
+            else:
+                self.raw_data = []
+
+            try:
+                self.process_formdata(self.raw_data)
+            except ValueError as e:
+                self.process_errors.append(e.args[0])
+
+    def process_formdata(self, valuelist):
+        if not valuelist:
+            return
+
+        for fs in valuelist:
+            if not (hasattr(fs, 'file') or hasattr(fs, 'stream')):
+                # don't create an entry if we didn't get a fieldstorage
+                continue
+
+            # we fake the formdata for the new field
+            # we use a werkzeug MultiDict because the webob version
+            # needs to get wrapped to be usable in WTForms
+            formdata = MultiDict()
+            name = f'{self.short_name}{self._separator}{len(self)}'
+            formdata.add(name, fs)
+            self._add_entry(formdata)
+
+
+class UploadMultipleFilesWithORMSupport(UploadMultipleField):
+    """ Extends the upload multiple field with onegov.file support. """
+
+    upload_field_class = UploadFileWithORMSupport
+
+    def __init__(self, *args, **kwargs):
+        self.file_class = kwargs.pop('file_class')
+        super().__init__(*args, **kwargs)
+
+    def populate_obj(self, obj, name):
+        files = getattr(obj, name, None)
+        output = []
+        for field, file in zip_longest(self.entries, files):
+            dummy = object()
+            dummy.file = file
+            field.populate_obj(dummy, 'file')
+            if dummy.file is not None:
+                output.append(dummy.file)
+
+        setattr(obj, name, output)
 
 
 class TextAreaFieldWithTextModules(TextAreaField):

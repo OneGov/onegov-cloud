@@ -3,13 +3,16 @@ from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
-from onegov.form.fields import UploadField
+from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
+from onegov.form.validators import ValidDateRange
+from onegov.form.widgets import DateRangeInput
+from onegov.form.widgets import DateTimeLocalRangeInput
 from wtforms_components import Email, If, TimeField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
@@ -147,23 +150,43 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'date':
+        widget = None
+        validators = []
+        if field.valid_date_range:
+            start = field.valid_date_range.start
+            stop = field.valid_date_range.stop
+            widget = DateRangeInput(start, stop)
+            validators.append(ValidDateRange(start, stop))
+
         builder.add_field(
             field_class=DateField,
             field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
-            description=field.field_help
+            description=field.field_help,
+            validators=validators,
+            widget=widget
         )
 
     elif field.type == 'datetime':
+        widget = None
+        validators = []
+        if field.valid_date_range:
+            start = field.valid_date_range.start
+            stop = field.valid_date_range.stop
+            widget = DateTimeLocalRangeInput(start, stop)
+            validators.append(ValidDateRange(start, stop))
+
         builder.add_field(
             field_class=DateTimeLocalField,
             field_id=field.id,
             label=field.label,
             dependency=dependency,
             required=field.required,
-            description=field.field_help
+            description=field.field_help,
+            validators=validators,
+            widget=widget
         )
 
     elif field.type == 'time':
@@ -177,6 +200,9 @@ def handle_field(builder, field, dependency=None):
         )
 
     elif field.type == 'fileinput':
+        expected_extensions = ExpectedExtensions(field.extensions)
+        # build an accept attribute for the file input
+        accept = ','.join(expected_extensions.whitelist)
         builder.add_field(
             field_class=UploadField,
             field_id=field.id,
@@ -184,9 +210,28 @@ def handle_field(builder, field, dependency=None):
             dependency=dependency,
             required=field.required,
             validators=[
-                ExpectedExtensions(field.extensions),
+                expected_extensions,
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ],
+            render_kw={'accept': accept},
+            description=field.field_help
+        )
+
+    elif field.type == 'multiplefileinput':
+        expected_extensions = ExpectedExtensions(field.extensions)
+        # build an accept attribute for the file input
+        accept = ','.join(expected_extensions.whitelist)
+        builder.add_field(
+            field_class=UploadMultipleField,
+            field_id=field.id,
+            label=field.label,
+            dependency=dependency,
+            required=field.required,
+            validators=[
+                expected_extensions,
+                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
+            ],
+            render_kw={'accept': accept},
             description=field.field_help
         )
 
@@ -227,6 +272,7 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
+            pricing=field.pricing,
             validators=[
                 NumberRange(
                     field.range.start,

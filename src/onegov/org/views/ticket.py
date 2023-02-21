@@ -9,6 +9,7 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
+from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
 from onegov.org.forms import InternalTicketChatMessageForm
@@ -21,7 +22,8 @@ from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote
+from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
+    Organisation
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
@@ -30,9 +32,11 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.ticket.errors import InvalidStateChange
+from onegov.gever.gever_client import GeverClientCAS
 from onegov.user import User, UserCollection
 from sqlalchemy import select
 from webob import exc
+from urllib.parse import urlsplit
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -724,6 +728,54 @@ def view_ticket_status(self, request, form, layout=None):
         'form': form,
         'pick_up_hint': pick_up_hint
     }
+
+
+@OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)
+def view_send_to_gever(self, request):
+    query = request.session.query(Organisation)
+    org: Organisation = query.first()
+    username = org.gever_username
+    password = org.gever_password
+    endpoint = org.gever_endpoint
+
+    if not (username and password and endpoint):
+        request.alert(_("Could not find valid credentials. You can set them "
+                        "in Gever API Settings."))
+        return morepath.redirect(request.link(self))
+
+    key = request.app.hashed_identity_key
+    password_dec = decrypt_symmetric(password.encode('utf-8'), key)
+
+    pdf = TicketPdf.from_ticket(request, self)
+    filename = '{}_{}.pdf'.format(
+        normalize_for_url(self.number),
+        date.today().strftime('%Y%m%d')
+    )
+
+    base_url = "{0.scheme}://{0.netloc}/".format(urlsplit(endpoint))
+    client = GeverClientCAS(username, password_dec, service_url=base_url)
+    try:
+        resp = client.upload_file(pdf.read(), filename, endpoint)
+    except (KeyError, ValueError):
+        msg = _("Encountered an error while uploading to Gever.")
+        request.alert(msg)
+        return morepath.redirect(request.link(self))
+
+    # server will respond with status 204 after a successful upload.
+    if not (resp.status_code == 204 and "Location" in resp.headers.keys()):
+        msg = _("Encountered an error while uploading to Gever. Response "
+                "status code is ${status}.", mapping={
+                    "status": resp.status_code})
+        request.alert(msg)
+        return morepath.redirect(request.link(self))
+
+    TicketMessage.create(
+        self,
+        request,
+        "uploaded"
+    )
+    request.success(_("Successfully uploaded the PDF of this ticket to Gever"))
+    return morepath.redirect(request.link(self))
 
 
 def get_filters(self, request):

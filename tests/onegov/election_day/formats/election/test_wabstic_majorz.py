@@ -44,6 +44,39 @@ def test_import_wabstic_majorz(session, import_test_datasets):
     ]
 
 
+def test_import_wabstic_intermediate(session, import_test_datasets):
+
+    election, errors = import_test_datasets(
+        'wabstic',
+        'election',
+        'sg',
+        'canton',
+        election_type='majorz',
+        number_of_mandates=1,
+        date_=date(2022, 3, 12),
+        dataset_name='staenderatswahlen-2022-intermediate',
+        has_expats=True,
+        election_number='1',
+        election_district='1'
+    )
+
+    assert not errors
+    assert election.last_result_change
+    assert not election.completed
+    assert election.progress == (1, 78)
+    assert election.results.count() == 78
+    assert election.absolute_majority == 0
+    assert election.eligible_voters == 5000
+    assert election.received_ballots == 1820
+    assert election.accounted_ballots == 1790
+    assert election.blank_ballots == 10
+    assert election.invalid_ballots == 20
+    assert election.accounted_votes == 1790
+    assert election.allocated_mandates == 0
+    assert election.elected_candidates == []
+    assert sum((c.votes for c in election.candidates)) == 1790
+
+
 def test_import_wabstic_majorz_missing_headers(session):
     session.add(
         Election(
@@ -328,7 +361,7 @@ def test_import_wabstic_majorz_expats(session):
                         ','.join((
                             entity_id,  # BfsNrGemeinde
                             '10000',  # Stimmberechtigte
-                            '',  # Sperrung
+                            '1234',  # Sperrung
                             '',  # StmAbgegeben
                             '',  # StmLeer
                             '1',  # StmUngueltig

@@ -88,10 +88,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     registration_window_id = Column(
         UUID, ForeignKey("registration_windows.id"), nullable=True)
 
-    #: payment options -> copied from the dfinition at the moment of
+    #: payment options -> copied from the definition at the moment of
     #: submission. This is stored alongside the submission as the original
     #: form setting may change later.
     payment_method = Column(Text, nullable=False, default='manual')
+    minimum_price_total = meta_property()
 
     #: extensions
     extensions = meta_property(default=list)
@@ -203,7 +204,11 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """
 
         if price and price.amount > 0:
-            return process_payment(self.payment_method, price, provider, token)
+            if price.credit_card_payment is True:
+                payment_method = 'cc'
+            else:
+                payment_method = self.payment_method
+            return process_payment(payment_method, price, provider, token)
 
         return True
 
@@ -250,3 +255,8 @@ class CompleteFormSubmission(FormSubmission):
 
 class FormFile(File):
     __mapper_args__ = {'polymorphic_identity': 'formfile'}
+
+    @property
+    def access(self):
+        # we don't want these files to show up in search engines
+        return 'secret' if self.published else 'private'

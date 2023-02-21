@@ -93,6 +93,7 @@ autoapi_dirs = [
     "../src/onegov/town6",
     "../src/onegov/translator_directory",
     "../src/onegov/user",
+    "../src/onegov/websockets",
     "../src/onegov/winterthur",
     "../src/onegov/wtfs",
 ]

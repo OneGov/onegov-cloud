@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2023-02-14 12:56+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -138,6 +138,22 @@ msgstr "'{label}' est un nom réservé. Veuillez utiliser un nom différent."
 msgid "Define at least one required field"
 msgstr "Définissez au moins un champs requis"
 
+#, python-format
+msgid ""
+"The field '{label}' contains a price that requires a credit card payment. "
+"This is only allowed if credit card payments are optional."
+msgstr ""
+"Le champ '{label}' contient un prix qui exige un paiement par carte de "
+"crédit. Ceci n'est autorisé que si les paiements par carte de crédit sont "
+"facultatifs."
+
+msgid ""
+"A minimum price total can only be set if at least one priced field is "
+"defined."
+msgstr ""
+"Un total de prix minimum ne peut être paramétré que si au moins un champ "
+"payant est défini."
+
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
 
@@ -146,6 +162,18 @@ msgstr "Numéro de sécurité sociale suisse invalid."
 
 msgid "This value already exists."
 msgstr "Cette valeur existe déjà."
+
+#, python-format
+msgid "Needs to be between {min_date} and {max_date}."
+msgstr "Doit avoir lieu entre {min_date} et {max_date}."
+
+#, python-format
+msgid "Needs to be on or after {date}."
+msgstr "Doit avoir lieu le {date} ou après."
+
+#, python-format
+msgid "Needs to be on or before {date}."
+msgstr "Doit avoir lieu le {date} ou avant."
 
 msgid "Uploaded file"
 msgstr "Fichier téléchargé"
@@ -158,6 +186,12 @@ msgstr "Supprimer le fichier"
 
 msgid "Replace file"
 msgstr "Remplacer le fichier"
+
+msgid "Upload additional files"
+msgstr "Télécharger des fichiers supplémentaires"
+
+msgid "Text modules"
+msgstr "Modules de texte"
 
 msgid "Select an Option"
 msgstr "Sélectionnez une option"

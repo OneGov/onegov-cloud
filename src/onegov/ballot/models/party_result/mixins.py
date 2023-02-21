@@ -1,5 +1,7 @@
 from collections import OrderedDict
+from onegov.ballot.models.party_result.party_result import PartyResult
 from onegov.core.orm.mixins import meta_property
+from sqlalchemy import or_
 
 
 class PartyResultsOptionsMixin:
@@ -29,6 +31,23 @@ class PartyResultsOptionsMixin:
     use_historical_party_results = meta_property(default=False)
 
 
+class PartyResultsCheckMixin:
+
+    @property
+    def has_party_results(self):
+        return self.party_results.filter(
+            or_(
+                PartyResult.votes > 0,
+                PartyResult.voters_count > 0,
+                PartyResult.number_of_mandates > 0
+            )
+        ).first() is not None
+
+    @property
+    def has_party_panachage_results(self):
+        return self.panachage_results.first() is not None
+
+
 class HistoricalPartyResultsMixin:
 
     @property
@@ -44,9 +63,9 @@ class HistoricalPartyResultsMixin:
         """
 
         relationships = self.relationships_for_historical_party_results
+        relationships = relationships.filter_by(type='historical').all()
         if not relationships:
             return self.party_results
-        relationships = relationships.filter_by(type='historical').all()
         target = sorted(
             (
                 related.target for related in relationships
@@ -61,6 +80,18 @@ class HistoricalPartyResultsMixin:
         return self.party_results.union(
             target[0].party_results.filter_by(year=target[0].date.year)
         )
+
+    @property
+    def historical_colors(self):
+        result = getattr(self, 'colors', {}).copy()
+        if not result:
+            return result
+        relationships = self.relationships_for_historical_party_results
+        relationships = relationships.filter_by(type='historical')
+        for relation in relationships:
+            for key, value in getattr(relation.target, 'colors', {}).items():
+                result.setdefault(key, value)
+        return result
 
 
 class PartyResultsExportMixin:

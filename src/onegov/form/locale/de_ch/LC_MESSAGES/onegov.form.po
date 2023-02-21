@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-03-20 09:55+0100\n"
+"POT-Creation-Date: 2023-02-14 12:56+0100\n"
 "PO-Revision-Date: 2022-03-07 13:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -140,6 +140,21 @@ msgstr ""
 msgid "Define at least one required field"
 msgstr "Definieren Sie mindestens ein benötigtes Feld"
 
+#, python-format
+msgid ""
+"The field '{label}' contains a price that requires a credit card payment. "
+"This is only allowed if credit card payments are optional."
+msgstr ""
+"Das Feld '{label}' enthält einen Preis der eine Kreditkartenzahlung "
+"voraussetzt. Das ist nur erlaubt wenn Kreditkartenzahlungen optional sind."
+
+msgid ""
+"A minimum price total can only be set if at least one priced field is "
+"defined."
+msgstr ""
+"Ein Minimalpreis kann nur gesetzt werden, wenn mindestens ein "
+"kostenpflichtiges Feld definiert ist."
+
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
 
@@ -148,6 +163,18 @@ msgstr "Ungültige AHV-Nummer."
 
 msgid "This value already exists."
 msgstr "Dieser Wert ist bereits vorhanden."
+
+#, python-format
+msgid "Needs to be between {min_date} and {max_date}."
+msgstr "Muss zwischen dem {min_date} und dem {max_date} sein."
+
+#, python-format
+msgid "Needs to be on or after {date}."
+msgstr "Muss am oder nach dem {date} sein."
+
+#, python-format
+msgid "Needs to be on or before {date}."
+msgstr "Muss am oder vor dem {date} sein."
 
 msgid "Uploaded file"
 msgstr "Hochgeladene Datei"
@@ -160,6 +187,12 @@ msgstr "Datei löschen"
 
 msgid "Replace file"
 msgstr "Datei ersetzen"
+
+msgid "Upload additional files"
+msgstr "Zusätzliche Dateien hochladen"
+
+msgid "Text modules"
+msgstr "Textbausteine"
 
 msgid "Select an Option"
 msgstr "Eine Option auswählen"

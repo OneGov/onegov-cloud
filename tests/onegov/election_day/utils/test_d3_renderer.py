@@ -3,6 +3,7 @@ from datetime import date
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import Vote
 from onegov.election_day import _
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -146,55 +147,65 @@ def test_d3_renderer_get_charts(election_day_app_zg):
         date=date(2011, 1, 1),
     )
     vote.ballots.append(Ballot(type='proposal'))
-
     session = election_day_app_zg.session()
     session.add(election)
     session.add(compound)
     session.add(vote)
+    session.flush()
+    part = ElectionCompoundPart(compound, 'superregion', 'Region 1')
 
     d3 = D3Renderer(election_day_app_zg)
 
     assert d3.get_lists_chart(election, 'svg') is None
     assert d3.get_lists_chart(compound, 'svg') is None
+    assert d3.get_lists_chart(part, 'svg') is None
     assert d3.get_lists_chart(vote, 'svg') is None
     assert d3.get_lists_chart(vote.proposal, 'svg') is None
 
     assert d3.get_candidates_chart(election, 'svg') is None
     assert d3.get_candidates_chart(compound, 'svg') is None
+    assert d3.get_candidates_chart(part, 'svg') is None
     assert d3.get_candidates_chart(vote, 'svg') is None
     assert d3.get_candidates_chart(vote.proposal, 'svg') is None
 
     assert d3.get_connections_chart(election, 'svg') is None
     assert d3.get_connections_chart(compound, 'svg') is None
+    assert d3.get_connections_chart(part, 'svg') is None
     assert d3.get_connections_chart(vote, 'svg') is None
     assert d3.get_connections_chart(vote.proposal, 'svg') is None
 
     assert d3.get_seat_allocation_chart(election, 'svg') is None
     assert d3.get_seat_allocation_chart(compound, 'svg') is None
+    assert d3.get_seat_allocation_chart(part, 'svg') is None
     assert d3.get_seat_allocation_chart(vote, 'svg') is None
     assert d3.get_seat_allocation_chart(vote.proposal, 'svg') is None
 
     assert d3.get_party_strengths_chart(election, 'svg') is None
     assert d3.get_party_strengths_chart(compound, 'svg') is None
+    assert d3.get_party_strengths_chart(part, 'svg') is None
     assert d3.get_party_strengths_chart(vote, 'svg') is None
     assert d3.get_party_strengths_chart(vote.proposal, 'svg') is None
 
     assert d3.get_lists_panachage_chart(election, 'svg') is None
     assert d3.get_lists_panachage_chart(compound, 'svg') is None
+    assert d3.get_lists_panachage_chart(part, 'svg') is None
     assert d3.get_lists_panachage_chart(vote, 'svg') is None
     assert d3.get_lists_panachage_chart(vote.proposal, 'svg') is None
 
     assert d3.get_parties_panachage_chart(election, 'svg') is None
     assert d3.get_parties_panachage_chart(compound, 'svg') is None
+    assert d3.get_parties_panachage_chart(part, 'svg') is None
     assert d3.get_parties_panachage_chart(vote, 'svg') is None
     assert d3.get_parties_panachage_chart(vote.proposal, 'svg') is None
 
     assert d3.get_entities_map(election, 'svg') is None
     assert d3.get_entities_map(compound, 'svg') is None
+    assert d3.get_entities_map(part, 'svg') is None
     assert d3.get_entities_map(vote, 'svg') is None
     assert d3.get_entities_map(vote.proposal, 'svg') is None
 
     assert d3.get_districts_map(election, 'svg') is None
     assert d3.get_districts_map(compound, 'svg') is None
+    assert d3.get_districts_map(part, 'svg') is None
     assert d3.get_districts_map(vote, 'svg') is None
     assert d3.get_districts_map(vote.proposal, 'svg') is None

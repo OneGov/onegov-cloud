@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-18 11:59+0100\n"
+"POT-Creation-Date: 2023-02-07 07:02+0100\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -227,7 +227,7 @@ msgid "Could not read the empty votes"
 msgstr "Impossibile leggere 'Schede bianche'"
 
 #, python-format
-msgid "Error in anzgdependent: ${msg}"
+msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
 msgid "Term"
@@ -332,12 +332,15 @@ msgid "View options"
 msgstr "Opzioni di visualizzazione"
 
 msgid "Expats are listed separately"
-msgstr ""
+msgstr "Gli Svizzeri all'estero vengono elencati separatamente"
 
 msgid ""
 "Expats are uploaded and listed as a separate row in the results. Changing "
 "this option requires a new upload of the data."
 msgstr ""
+"Gli Svizzeri all'estero vengono caricati ed elencati nei risultati in una "
+"riga separata. La modifica di questa opzione richiede un nuovo caricamento "
+"dei dati."
 
 msgid "Voters counts"
 msgstr "Numero di elettori"
@@ -354,24 +357,24 @@ msgid "Shows exact voters counts instead of rounded values."
 msgstr "Mostra il numero di elettori esatto anziché i valori arrotondati."
 
 msgid "Horizonal party strengths chart"
-msgstr "Tableau des forces horizontales des partis"
+msgstr "Diagramma orizzontale della forza dei partiti"
 
 msgid "Shows a horizontal bar chart instead of a vertical bar chart."
 msgstr ""
-"Affiche un graphique à barres horizontales au lieu d'un graphique à barres "
-"verticales."
+"Mostra un diagramma a barre orizzontali anziché un diagramma a barre "
+"verticali."
 
 msgid "Use party results from the last legislative period"
-msgstr "Utiliser les résultats des partis de la dernière période législative"
+msgstr "Utilizzare i risultati di partito dell'ultima legislatura"
 
 msgid ""
 "Requires party results. Requires a related election from another legislative "
 "period with party results. Requires that both elections use the same party "
 "IDs."
 msgstr ""
-"Exige les résultats des partis. Exige une élection connexe d'une autre "
-"période législative avec des résultats de parti. Il faut que les deux "
-"élections utilisent les mêmes identifiants de parti."
+"Sono necessari risultati di partito. È necessaria un'elezione corrispondente "
+"di un'altra legislatura con risultati di partito. È necessario che entrambe "
+"le elezioni utilizzino gli stessi ID di partito."
 
 msgid "Party strengths"
 msgstr "Forza dei partiti"
@@ -417,13 +420,13 @@ msgid "Romansh"
 msgstr "Romancio"
 
 msgid "Other legislative periods"
-msgstr ""
+msgstr "Altre legislature"
 
 msgid "Related elections"
 msgstr "Elezioni correlate"
 
 msgid "Rounds of voting or by-elections"
-msgstr ""
+msgstr "Turni elettorali oppure elezioni complementari"
 
 msgid "Link"
 msgstr "Link"
@@ -467,7 +470,9 @@ msgstr "Viene concluso manualmente"
 msgid ""
 "Enables manual completion of the election compound. All elections are "
 "completed only once the election compound is completed."
-msgstr "Permette di completare manualmente il componente delle elezioni."
+msgstr ""
+"Permette di completare manualmente il componente delle elezioni. Tutte le "
+"elezioni sono concluse quando la combinazione di elezioni è completata."
 
 msgid "Completion"
 msgstr "Conclusione"
@@ -512,6 +517,9 @@ msgstr "Panachage"
 
 msgid "Notifications"
 msgstr "Notifiche"
+
+msgid "Browser"
+msgstr "Browser"
 
 msgid "Email"
 msgstr "E-mail"
@@ -902,6 +910,12 @@ msgstr "Il file non è valido."
 msgid "The form contains errors. Please check the marked fields."
 msgstr "Il modulo contiene errori. Controlli per favore i campi evidenziati."
 
+msgid "This page has been updated."
+msgstr ""
+
+msgid "Reload page."
+msgstr ""
+
 msgid "Homepage"
 msgstr "Pagina iniziale"
 
@@ -1232,16 +1246,13 @@ msgstr "Anno"
 msgid "Difference"
 msgstr "Differenza"
 
-#. Default: The diagram shows the origin of the votes. The bars on the left
-#. correspond to the unchanged votes (including the blank list), the bars on
-#. the right side to the final results. The width of the bars and connections
-#. is proportional to the votes.
+#. Default: The diagram shows the origin of votes won and lost by panache. On
+#. the left side are the lost votes, on the right side the won votes. The width
+#. of the bars and the connections is proportional to the number of votes.
 #.
 msgid "figcaption_panachage"
 msgstr ""
-"Il diagramma mostra l'origine dei voti. Le barre sulla sinistra "
-"corrispondono ai voti invariati (inclusi quelli della lista bianca), le "
-"barre sulla parte destra ai risultati finali. L'ampiezza delle barre e delle "
+"Il diagramma mostra l'origine dei voti. L'ampiezza delle barre e delle "
 "connessioni è proporzionale ai voti."
 
 msgid "Count"

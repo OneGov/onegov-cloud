@@ -2,6 +2,7 @@ from hashlib import sha256
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.ballot import Vote
 
 
@@ -12,7 +13,7 @@ def filename_prefix(item):
         return 'vote'
     if isinstance(item, Election):  # includes ProporzElection
         return 'election'
-    if isinstance(item, ElectionCompound):
+    if isinstance(item, (ElectionCompound, ElectionCompoundPart)):
         return 'elections'
     return item.__class__.__name__.lower()
 
@@ -42,6 +43,12 @@ def svg_filename(item, type_, locale, last_modified=None):
     if isinstance(item, Ballot):
         hash = str(item.id)
         ts = int((last_modified or item.vote.last_modified).timestamp())
+    elif isinstance(item, ElectionCompoundPart):
+        hash = '{}-{}'.format(
+            sha256(item.election_compound_id.encode('utf-8')).hexdigest(),
+            item.segment.replace(' ', '-').lower()
+        )
+        ts = int((last_modified or item.last_modified).timestamp())
     else:
         hash = sha256(item.id.encode('utf-8')).hexdigest()
         ts = int((last_modified or item.last_modified).timestamp())

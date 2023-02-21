@@ -14,7 +14,7 @@ from unittest.mock import Mock
 import pytest
 
 
-def test_election_layout(session):
+def test_election_layout_general(session):
     majorz = Election(
         title='Majorz Election',
         domain='canton',
@@ -179,7 +179,7 @@ def test_election_layout(session):
         PartyResult(
             year=2017,
             number_of_mandates=0,
-            votes=0,
+            votes=10,
             total_votes=100,
             name_translations={'de_CH': 'A'},
             party_id='1'
@@ -369,7 +369,7 @@ def test_election_layout_menu_proporz(session):
         PartyResult(
             year=2017,
             number_of_mandates=0,
-            votes=0,
+            votes=10,
             total_votes=100,
             name_translations={'de_CH': 'A'},
             party_id='1'

@@ -61,7 +61,8 @@ def town_view_directory(self, request):
     name='new')
 def town_handle_new_directory_entry(self, request, form):
     return handle_new_directory_entry(
-        self, request, form, DirectoryEntryCollectionLayout(self, request))
+        self, request, form,
+        DirectoryEntryCollectionLayout(self, request, hide_steps=True))
 
 
 @TownApp.form(

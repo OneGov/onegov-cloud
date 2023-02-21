@@ -232,6 +232,86 @@ def test_add_custom_form(client):
     form_page.form.submit().follow()
 
 
+def test_add_custom_form_minimum_price_validation(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Stamp A = 0..20 (1.10 CHF)
+        Stamp B = 0..20 (0.85 CHF)
+
+        Discount *=
+            (x) First four B stamps free (-3.40 CHF)
+    """)
+    form_page.form['minimum_price_total'] = '5.00'
+    form_page = form_page.form.submit().follow()
+
+    form_page.form['e_mail'] = 'my@name.com'
+    form_page.form['stamp_b'] = '6'
+    # the validation happens on the next page
+    form_page = form_page.form.submit().follow()
+
+    assert "Der Totalbetrag für Ihre Eingaben" in form_page
+    assert "beläuft sich auf 1.70 CHF" in form_page
+    assert "allerdings ist der Minimalbetrag 5.00 CHF" in form_page
+
+    # now that we reached the minimum price we should succeed
+    form_page.form['stamp_a'] = '3'
+    form_page = form_page.form.submit()
+    assert "Totalbetrag" in form_page
+    assert "5.00 CHF" in form_page
+    assert "Minimalbetrag" not in form_page
+
+
+def test_add_custom_form_payment_metod_validation_error(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF!)
+    """)
+    form_page = form_page.form.submit()
+    # here it will fail because it's mixing required cc with required
+    # manual payments
+    assert "'Delivery' enthält einen Preis der eine Kredit" in form_page.text
+
+    # now it will fail because there is no payment processor
+    form_page.form['payment_method'] = 'free'
+    form_page = form_page.form.submit()
+    assert "benötigen Sie einen Standard-Zahlungsanbieter" in form_page
+
+
+def test_add_custom_form_payment_validation_error(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = 'E-Mail *= @@@'
+    form_page.form['minimum_price_total'] = '5.00'
+    form_page = form_page.form.submit()
+    # this should fail because we're setting a minimum price, but there
+    # are no form fields that have pricing assigned to them
+    assert "Ein Minimalpreis kann nur gesetzt werden" in form_page.text
+
+    # now it should succeed
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF)
+    """)
+    form_page = form_page.form.submit().follow()
+
+
 def test_add_duplicate_form(client):
     client.login_editor()
 
@@ -383,6 +463,42 @@ def test_manual_form_payment(client):
     assert "info@example.org" in payments
     assert "35.00" in payments
     assert "Offen" in payments
+
+
+def test_form_payment_required(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Govikon Poster', definition=textwrap.dedent("""
+        E-Mail *= @@@
+
+        Posters *=
+            [ ] Local Businesses (0 CHF)
+            [ ] Executive Committee (10 CHF)
+            [ ] Town Square (20 CHF)
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF!)
+    """), type='custom', payment_method='free')
+
+    transaction.commit()
+
+    page = client.get('/form/govikon-poster')
+    assert '10.00 CHF' in page
+    assert '20.00 CHF' in page
+    assert '5.00 CHF' in page
+
+    page.form['e_mail'] = 'info@example.org'
+    page.select_checkbox('posters', "Executive Committee")
+    page.select_checkbox('posters', "Town Square")
+    page.form['delivery'] = 'Delivery'
+
+    page = page.form.submit().follow()
+    assert "Totalbetrag" in page
+    assert "35.00 CHF" in page
+    # even though the payment method is 'free', because we selected
+    # an option that requires cc payment, it should only allow cc
+    # payment
+    assert "Später bezahlen" not in page
 
 
 def test_dependent_number_form(client):

@@ -1,6 +1,8 @@
 import pytest
 import re
 
+from datetime import date as dateobj
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form.utils import decimal_range
 from onegov.form.parser.grammar import (
@@ -22,9 +24,11 @@ from onegov.form.parser.grammar import (
     textarea,
     textfield,
     time,
+    url,
+    valid_date_range,
     with_whitespace_inside,
-    url
 )
+from pyparsing import ParseFatalException
 
 
 def test_text_without():
@@ -148,16 +152,76 @@ def test_url():
     assert f.asDict() == {'type': 'url'}
 
 
+def test_valid_date_range():
+    dr = valid_date_range().parseString('(..today)')
+    assert dr.valid_date_range.start is None
+    assert dr.valid_date_range.stop == relativedelta()
+
+    dr = valid_date_range().parseString('(-4 years..+2 months)')
+    assert dr.valid_date_range.start == relativedelta(years=-4)
+    assert dr.valid_date_range.stop == relativedelta(months=+2)
+
+    dr = valid_date_range().parseString('(-22 weeks..+180 days)')
+    assert dr.valid_date_range.start == relativedelta(weeks=-22)
+    assert dr.valid_date_range.stop == relativedelta(days=+180)
+
+    dr = valid_date_range().parseString('(2010.01.01..2020.01.01)')
+    assert dr.valid_date_range.start == dateobj(2010, 1, 1)
+    assert dr.valid_date_range.stop == dateobj(2020, 1, 1)
+
+
+def test_valid_date_range_invalid_date():
+    with pytest.raises(ParseFatalException):
+        valid_date_range().parseString('(..2000.20.45)')
+
+
+def test_valid_date_range_invalid_mixed_range():
+    with pytest.raises(ParseFatalException):
+        valid_date_range().parseString('(2010.01.01..today)')
+
+
+def test_valid_date_range_invalid_range_order():
+    with pytest.raises(ParseFatalException):
+        valid_date_range().parseString('(today..today)')
+
+    with pytest.raises(ParseFatalException):
+        valid_date_range().parseString('(-350 days..-1 years)')
+
+    with pytest.raises(ParseFatalException):
+        valid_date_range().parseString('(2020.01.01..2010.01.01)')
+
+
 def test_dates():
+    field = date().parseString('YYYY.MM.DD')
+    assert field.asDict() == {'type': 'date'}
 
-    field = date().searchString('YYYY.MM.DD')
-    field.asDict() == {'type': 'date', 'label': 'Date'}
+    field = datetime().parseString('YYYY.MM.DD HH:MM')
+    assert field.asDict() == {'type': 'datetime'}
 
-    field = datetime().searchString('YYYY.MM.DD HH:MM')
-    field.asDict() == {'type': 'datetime', 'label': 'Datetime'}
+    field = time().parseString('HH:MM')
+    assert field.asDict() == {'type': 'time'}
 
-    field = time().searchString('HH:MM')
-    field.asDict() == {'type': 'time', 'label': 'Time'}
+
+def test_dates_with_valid_date_range():
+    field = date().parseString('YYYY.MM.DD (today..)')
+    assert field.asDict() == {
+        'type': 'date',
+        'valid_date_range': {'start': relativedelta(), 'stop': None}
+    }
+
+    field = datetime().parseString('YYYY.MM.DD HH:MM (..today)')
+    assert field.asDict() == {
+        'type': 'datetime',
+        'valid_date_range': {'start': None, 'stop': relativedelta()}
+    }
+
+
+def test_dates_with_invalid_date_range():
+    with pytest.raises(ParseFatalException):
+        date().parseString('YYYY.MM.DD (-350 days..-1 years)')
+
+    with pytest.raises(ParseFatalException):
+        datetime().parseString('YYYY.MM.DD HH:MM (today..today)')
 
 
 def test_stdnum():
@@ -229,6 +293,10 @@ def test_fileinput():
     assert f.type == 'fileinput'
     assert f.extensions == ['png', 'jpg', 'gif']
 
+    f = field.parseString("*.pdf (multiple)")
+    assert f.type == 'multiplefileinput'
+    assert f.extensions == ['pdf']
+
 
 def test_prices():
     field = radio()
@@ -239,6 +307,7 @@ def test_prices():
     assert not f.checked
     assert f.pricing.amount == Decimal('100.00')
     assert f.pricing.currency == 'CHF'
+    assert not f.pricing.credit_card_payment
 
     f = field.parseString("(x) Luxurious Choice (200 CHF)")
     assert f.type == 'radio'
@@ -246,6 +315,15 @@ def test_prices():
     assert f.checked
     assert f.pricing.amount == Decimal('200.00')
     assert f.pricing.currency == 'CHF'
+    assert not f.pricing.credit_card_payment
+
+    f = field.parseString("(x) Mail delivery (5 CHF!)")
+    assert f.type == 'radio'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.pricing.amount == Decimal('5.00')
+    assert f.pricing.currency == 'CHF'
+    assert f.pricing.credit_card_payment
 
     field = checkbox()
 
@@ -255,6 +333,7 @@ def test_prices():
     assert f.checked
     assert f.pricing.amount == Decimal('150.50')
     assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
 
     f = field.parseString("[ ] Priority Boarding (15.00 USD)")
     assert f.type == 'checkbox'
@@ -262,6 +341,7 @@ def test_prices():
     assert not f.checked
     assert f.pricing.amount == Decimal('15.00')
     assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
 
     f = field.parseString("[ ] Discount (-5.00 USD)")
     assert f.type == 'checkbox'
@@ -269,6 +349,35 @@ def test_prices():
     assert not f.checked
     assert f.pricing.amount == Decimal('-5.00')
     assert f.pricing.currency == 'USD'
+    assert not f.pricing.credit_card_payment
+
+    f = field.parseString("[x] Mail delivery (5 CHF!)")
+    assert f.type == 'checkbox'
+    assert f.label == 'Mail delivery'
+    assert f.checked
+    assert f.pricing.amount == Decimal('5.00')
+    assert f.pricing.currency == 'CHF'
+    assert f.pricing.credit_card_payment
+
+    field = integer_range_field()
+    f = field.parseString("0..30 (0.85 CHF)")
+    assert f.type == 'integer_range'
+    assert f[0] == range(0, 30)
+    assert f.pricing.amount == Decimal('0.85')
+    assert f.pricing.currency == 'CHF'
+    assert not f.pricing.credit_card_payment
+
+    f = field.parseString("5..10 (2 USD!)")
+    assert f.type == 'integer_range'
+    assert f[0] == range(5, 10)
+    assert f.pricing.amount == Decimal('2')
+    assert f.pricing.currency == 'USD'
+    assert f.pricing.credit_card_payment
+
+    f = field.parseString("0..10")
+    assert f.type == 'integer_range'
+    assert f[0] == range(0, 10)
+    assert not f.pricing
 
 
 def test_non_prices():

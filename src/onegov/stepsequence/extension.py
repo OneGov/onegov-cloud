@@ -32,6 +32,10 @@ class StepsLayoutExtension(StepBaseExtension):
     For steps registered on layouts.
     """
 
+    def __init__(self, *args, **kwargs):
+        self.hide_steps = kwargs.pop('hide_steps', False)
+        super().__init__(*args, **kwargs)
+
     @property
     def step_position(self):
         """ Can be overwritten by the model and based request params. """
@@ -42,10 +46,13 @@ class StepsLayoutExtension(StepBaseExtension):
         return step_sequences.registry[self.__class__.__name__]
 
     def get_step_sequence(self, position=None):
-        """ Retrieve the full step sequence for thue current model.
+        """ Retrieve the full step sequence for the current model.
         If the latter has multiple steps registered, you must provide
         the position or a ValueError gets raised.
         """
+        if self.hide_steps is True:
+            return []
+
         step = self.registered_steps.get(
             position=position or self.step_position)
         return step and step_sequences.by_id(step.id)

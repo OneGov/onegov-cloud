@@ -110,21 +110,21 @@ Nom|Description
 `entity_accounted_votes`|Le nombre de votes comptabilisés pour cette municipalité.
 `list_name`|Le nom de la liste sur laquelle ce candidat apparaît. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 `list_id`|L'identifiant de liste de ce candidat apparaît dessus. Uniquement valable pour les élections basées sur la représentation proportionnelle.
-`list_color`|La couleur de la liste en valeur hexadécimale, par exemple `#a6b784'.
+`list_color`|La couleur de la liste en valeur hexadécimale, par exemple `#a6b784`.
 `list_number_of_mandates`|Le nombre de mandats que cette liste a obtenus. Uniquement valable pour les élections basées sur la représentation proportionnelle.
 `list_votes`|Le nombre de votes que cette liste a obtenu. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 `list_connection`|L'Identifiant de la connexion de la liste à laquelle cette liste est connectée. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 `list_connection_parent`|L'Identifiant de la connexion de liste parent à laquelle cette liste est connectée. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
+`list_panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
 `candidate_family_name`|Le nom de famille du candidat.
 `candidate_first_name`|Le prénom du candidat.
 `candidate_id`|L'identifiant du candidat.
 `candidate_elected`|Vrai si le candidat a été élu.
 `candidate_party`|Nom de le parti.
-`candidate_party_color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784'.
+`candidate_party_color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784`.
 `candidate_gender`|Le sexe du candidat : `female` (féminin), `male` (masculin) ou `undetermined` (indéterminé).
 `candidate_year_of_birth`|L'année de naissance du candidat.
 `candidate_votes`|Le nombre de voix que ce candidat a obtenu.
-`list_panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 
@@ -152,7 +152,7 @@ Nom|Description
 `name`|Le dénomination du parti dans la langue par défaut.
 `name_{locale}`|Nom traduit du parti, par exemple `name_de_ch` pour le nom allemand.
 `id`|Identifiant du parti.
-`color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784'.
+`color`|La couleur du parti en valeur hexadécimale, par exemple `#a6b784`.
 `mandates`|Le nombre de mandats.
 `votes`|Le nombre de votes.
 `voters_count`|Nombre de votants. Le nombre cumulé de voix par rapport au nombre total de mandats par élection. Uniquement pour les composantes des élections.

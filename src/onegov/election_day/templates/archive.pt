@@ -3,7 +3,7 @@
      tal:define="communal_instance layout.principal.domain == 'municipality'">
     <tal:block metal:fill-slot="title">
         <tal:block condition="date">
-            <tal:block i18n:translate="">Archive</tal:block> ${date} - 
+            <tal:block i18n:translate="">Archive</tal:block> ${date} -
         </tal:block>
         ${request.app.principal.name}: <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
     </tal:block>
@@ -111,13 +111,13 @@
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
                                         </a>
                                     </th>
-                                    <td class="right-aligned" tal:condition="election.progress[0] and not communal_instance">
+                                    <td class="right-aligned" tal:condition="election.has_results and not communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>
-                                    <td style="min-width: 25%;" i18n:translate="" colspan="2" class="right-aligned" tal:condition="not election.progress[0]">
+                                    <td style="min-width: 25%;" i18n:translate="" colspan="2" class="right-aligned" tal:condition="not election.has_results">
                                         No results yet
                                     </td>
-                                    <td class="right-aligned" tal:condition="election.progress[0]">
+                                    <td class="right-aligned" tal:condition="election.has_results">
                                         ${layout.format_date(election.last_result_change, 'datetime')}
                                     </td>
                                 </tr>
@@ -125,7 +125,7 @@
                         </table>
 
                         <table class="overview vote tablesaw" data-tablesaw-mode="stack"  tal:condition="type == 'vote'"
-                            tal:define="votes_started any(item.progress[0] for item in archive_items[date][domain][type])"
+                            tal:define="votes_started any(item.has_results for item in archive_items[date][domain][type])"
                         >
                             <thead>
                                 <tr>
@@ -150,10 +150,10 @@
                                     </th>
                                     <tal:block tal:switch="votes_started">
                                         <tal:block tal:case="True">
-                                            <td tal:condition="vote.progress[0]">
+                                            <td tal:condition="vote.has_results">
                                                 <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
                                             </td>
-                                            <td class="right-aligned" colspan="5" tal:condition="not vote.progress[0]" i18n:translate>
+                                            <td class="right-aligned" colspan="5" tal:condition="not vote.has_results" i18n:translate>
                                                 No results yet
                                             </td>
                                         </tal:block>
@@ -161,16 +161,16 @@
                                             No results yet
                                         </td>
                                     </tal:block>
-                                    <td class="right-aligned" tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.has_results">
                                             ${layout.format_number(vote.display_yeas_percentage(request))}
                                     </td>
-                                    <td class="right-aligned" tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.has_results">
                                             ${layout.format_number(vote.display_nays_percentage(request))}
                                     </td>
-                                    <td class="right-aligned" tal:condition="vote.progress[0] and not communal_instance" >
+                                    <td class="right-aligned" tal:condition="vote.has_results and not communal_instance" >
                                             <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                     </td>
-                                    <td class="right-aligned" tal:condition="vote.progress[0]">
+                                    <td class="right-aligned" tal:condition="vote.has_results">
                                         ${layout.format_date(vote.last_result_change, 'datetime')}
                                     </td>
                                 </tr>

@@ -9,6 +9,7 @@ from onegov.election_day.screen_widgets import H2Widget
 from onegov.election_day.screen_widgets import H3Widget
 from onegov.election_day.screen_widgets import HRWidget
 from onegov.election_day.screen_widgets import LogoWidget
+from onegov.election_day.screen_widgets import QrCodeWidget
 from onegov.election_day.screen_widgets import RowWidget
 from onegov.election_day.screen_widgets import TextWidget
 
@@ -32,6 +33,10 @@ def test_generic_widgets():
             <column span="1" class="my-fourth-column">
                 <text class="my-text">Lorem</text>
             </column>
+            <column span="1" class="my-fifth-column">
+                '<qr-code class="my-first-qr-code" url="https://a.b"/>'
+                '<qr-code class="my-second-qr-code" url="https://c.d"/>'
+            </column>
         </row>
     """
     widgets = [
@@ -41,6 +46,7 @@ def test_generic_widgets():
         H3Widget(),
         HRWidget(),
         LogoWidget(),
+        QrCodeWidget(),
         RowWidget(),
         TextWidget()
     ]
@@ -51,7 +57,9 @@ def test_generic_widgets():
     )
 
     data = inject_variables(widgets, layout, structure)
-    assert data == {'logo': 'logo.svg'}
+    assert len(data) == 2
+    assert data['logo'] == 'logo.svg'
+    assert data['qr_code']
 
     result = transform_structure(widgets, structure)
     result = PageTemplate(result)(**data)
@@ -81,6 +89,10 @@ def test_generic_widgets():
     assert columns[3].tag == 'div'
     assert columns[3].attrib == {
         'class': 'small-12 medium-1 columns my-fourth-column'
+    }
+    assert columns[4].tag == 'div'
+    assert columns[4].attrib == {
+        'class': 'small-12 medium-1 columns my-fifth-column'
     }
 
     h1 = next(columns[0].iterchildren())
@@ -121,3 +133,15 @@ def test_generic_widgets():
         'class': 'my-text'
     }
     assert text.text == 'Lorem'
+
+    qr_codes = list(columns[4].iterchildren())
+    assert len(qr_codes) == 2
+    assert qr_codes[0].tag == 'img'
+    assert qr_codes[1].tag == 'img'
+    assert len(qr_codes[0].attrib) == 2
+    assert len(qr_codes[1].attrib) == 2
+    assert qr_codes[0].attrib['class'] == 'my-first-qr-code'
+    assert qr_codes[1].attrib['class'] == 'my-second-qr-code'
+    assert qr_codes[0].attrib['src'].startswith('data:image/png;base64,')
+    assert qr_codes[1].attrib['src'].startswith('data:image/png;base64,')
+    assert qr_codes[0].attrib['src'] != qr_codes[1].attrib['src']

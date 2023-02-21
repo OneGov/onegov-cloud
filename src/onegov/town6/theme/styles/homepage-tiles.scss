@@ -2,6 +2,9 @@
     .card-section {
         padding-bottom: .5rem;
         padding-top: .5rem;
+        ul.more-list {
+            margin: 0 -.5rem;
+        }
     }
 
     .card-divider {
@@ -19,7 +22,6 @@
 
         a::after {
             @include icon-bold($more-link-icon);
-            // float: right;
             opacity: 0;
             padding-left: 2rem;
             transition: all 200ms linear;
@@ -28,6 +30,14 @@
         &:hover a::after {
             opacity: 1;
             padding-left: 2.5rem;
+        }
+
+        a {
+            display: block;
+            font-size: 1.1875rem;
+            font-weight: bold;
+            padding-top: .5rem;
+            width: 100%;
         }
     }
 

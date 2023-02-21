@@ -94,10 +94,9 @@ $publications-icon: '\f1ea';
         padding-left: 0;
     }
 
-    .contacts-albums-panel ul.panel-links.more-list {
-        padding: 0;
+    ul.more-list {
+        margin: 0 -.5rem;
     }
-
 
     .services-panel {
         a.online-counter::before { @include icon-bold($tasks-icon); }
@@ -273,15 +272,14 @@ $checklist-icon: "\f0ae";
         color: #444;
         margin-top: -10px !important;
     }
-
-    .person-link {
-        color: $anchor-color;
-        line-height: inherit;
-    }
 }
 
 .page-content-sidebar {
     .newsletter-sidepanel {
         margin-top: 2rem;
     }
+}
+
+.date-filters input {
+    margin-bottom: 0;
 }

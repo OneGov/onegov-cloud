@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-01-04 13:27+0100\n"
+"POT-Creation-Date: 2023-02-10 17:08+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -219,6 +219,20 @@ msgstr "Neue Notiz"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Upload to Gever"
+msgstr "Hochladen auf Gever"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Wollen Sie dieses Ticket wirklich hochladen?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr ""
+"Dadurch wird dieses Ticket auf die Gever-Instanz hochgeladen, sofern "
+"konfiguriert."
+
+msgid "Upload Ticket"
+msgstr "Ticket hochladen"
+
 msgid "Confirmation"
 msgstr "Bestätigung"
 
@@ -333,6 +347,9 @@ msgstr "Jeden ${days} bis zum ${end}."
 
 msgid "Import"
 msgstr "Import"
+
+msgid "Create an event"
+msgstr "Veranstaltung erfassen"
 
 msgid "This event can't be editet."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
@@ -510,6 +527,9 @@ msgstr "Noch keine Verzeichnisse definiert."
 
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
+
+msgid "More"
+msgstr "Mehr"
 
 msgid "Further Information"
 msgstr "Weitere Informationen"
@@ -776,6 +796,9 @@ msgstr "Änderungsvorschlag"
 msgid "New Entry"
 msgstr "Neuer Eintrag"
 
+msgid "Functions:"
+msgstr "Funktionen:"
+
 msgid "Open"
 msgstr "Offen"
 
@@ -816,7 +839,7 @@ msgid ""
 "Persons living outside the following zipcodes may only reserve this "
 "allocation on the ${date}: ${zipcodes}"
 msgstr ""
-"Personen die ausserhalb der folgenden Postleitzahlen leben können diese "
+"Personen, die ausserhalb der folgenden Postleitzahlen leben, können diese "
 "Reservation erst am ${date} tätigen: ${zipcodes}"
 
 msgid "Quota"
@@ -881,6 +904,9 @@ msgstr "Keine Veranstaltungen gefunden."
 
 msgid "Learn more"
 msgstr "Mehr erfahren"
+
+msgid "From"
+msgstr "Von"
 
 msgid "To"
 msgstr "Bis"
@@ -1015,10 +1041,10 @@ msgid "Reset"
 msgstr "Zurücksetzen"
 
 msgid "Will be published until:"
-msgstr ""
+msgstr "Wird publiziert bis:"
 
 msgid "Publication end date:"
-msgstr ""
+msgstr "Enddatum der Publikation:"
 
 msgid "Not a publication"
 msgstr "keine Publikation"
@@ -1499,6 +1525,9 @@ msgstr "Ticket archiviert."
 msgid "Ticket recovered from archive."
 msgstr "Ticket aus dem Archiv geholt."
 
+msgid "Ticket uploaded to Gever."
+msgstr "Ticket zu Gever hochgeladen."
+
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden."
 
@@ -1588,9 +1617,6 @@ msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
-
-msgid "Submit your own event"
-msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
@@ -2063,6 +2089,13 @@ msgstr "Funktionen"
 
 #~ msgid "From"
 #~ msgstr "Von"
+
+#~ msgid "Actions"
+#~ msgstr "Aktionen"
+
+#~ msgid "Submit your own event"
+#~ msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
+
 
 #~ msgid "Partner"
 #~ msgstr "Partner"

@@ -387,15 +387,15 @@
                 ${field()}
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:b>
-            <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
-                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
+            <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField'); field_list field.type == 'UploadMultipleField'">
+                <label tal:attributes="class field.errors and not field_list and 'error' or None" tal:condition="not checkbox_fields and not radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </label>
 
                 <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </div>
-                <small class="error" tal:repeat="error field.errors">${error}</small>
+                <small class="error" tal:condition="not field_list" tal:repeat="error field.errors">${error}</small>
             </tal:b>
         </tal:b>
     </div></div>
@@ -490,7 +490,7 @@
                     <p class="news-lead">${get_lead(item.content.lead, 300, consider_sentences=False)}</p>
                 </div>
             </a>
-            <a href="${url}" class="news-more-link" i18n:translate="">read more</a>
+            <a href="${url}" class="read-more-link" i18n:translate="">read more</a>
         </div>
     </div>
 </metal:newslist>
@@ -625,8 +625,12 @@
             <h3 i18n:translate>People</h3>
             <ul class="more-list" data-sortable data-sortable-url="${layout.move_person_url_template}">
                 <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
-                    <a class="h5 person-link" href="${request.link(person)}">${person.title}</a>
-                    <div>${person.context_specific_function}</div>
+                    <a class="list-link" href="${request.link(person)}">
+                        <span class="list-title">${person.title}</span>
+                    </a>
+                    <a href="${request.link(person)}">
+                        <p class="list-lead preview">${person.context_specific_function}</p>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -634,14 +638,18 @@
 
         <div class="more-news side-panel" tal:condition="siblings|False">
             <h3 i18n:translate="">More news</h3>
-            <div tal:repeat="sibling siblings" class="card">
-                <a href="${request.link(sibling)}">
-                    ${sibling.title}
-                </a>
-                <p class="list-lead">
-                    ${layout.format_date(sibling.published_or_created, 'date_long')}
-                </p>
-            </div>
+            <ul class="more-list">
+                <li tal:repeat="sibling siblings">
+                    <a href="${request.link(sibling)}" class="list-link">
+                        <span class="list-title">${sibling.title}</span>
+                    </a>
+                    <a href="${request.link(sibling)}">
+                        <p class="list-lead preview">
+                            ${layout.format_date(sibling.published_or_created, 'date_long')}
+                        </p>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </metal:page_content>
@@ -709,24 +717,46 @@
     <dl class="field-display" tal:repeat="(field, rendered) rendered_fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
         <dt tal:condition="layout.show_label(field)">${field.label.text}</dt>
         <dd>
-            <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
-                <tal:b define="url layout.field_download_link(field)">
-                    <a href="${url}" tal:condition="not allow_views or not field.is_image">
-                        <tal:b replace="structure rendered" />
-                    </a>
-                    <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
-                        <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
-                        <div class="photoswipe" tal:define="image layout.field_file(field)" tal:condition="image and as_thumbnail">
-                            <p class="has-img thumbnail">
-                                <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
-                            </p>
+            <tal:b tal:switch="field.type" condition="allow_downloads or allow_views">
+                <tal:b tal:case="'UploadField'">
+                    <tal:b tal:define="url layout.field_download_link(field)">
+                        <a href="${url}" tal:condition="not allow_views or not field.is_image">
+                            <tal:b replace="structure rendered" />
+                        </a>
+                        <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
+                            <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
+                            <div class="photoswipe" tal:define="image layout.field_file(field)" tal:condition="image and as_thumbnail">
+                                <p class="has-img thumbnail">
+                                    <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                                </p>
+                            </div>
+                            <tal:b metal:use-macro="layout.macros.photoswipe" />
                         </div>
-                        <tal:b metal:use-macro="layout.macros.photoswipe" />
-                    </div>
+                    </tal:b>
+                </tal:b>
+                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter zip(field, rendered.split('<br>'))">
+                    <tal:b tal:define="subfield iter[0];
+                                       rendered iter[1];
+                                       url layout.field_download_link(subfield);
+                                       show_image allow_views and subfield.is_image">
+                        <a href="${url}" tal:condition="not show_image">
+                            <tal:b replace="structure rendered" />
+                        </a>
+                        <br tal:condition="not show_image and not repeat.iter.end" />
+                        <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="show_image">
+                            <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
+                            <div class="photoswipe" tal:define="image layout.field_file(subfield)" tal:condition="image and as_thumbnail">
+                                <p class="has-img thumbnail">
+                                    <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                                </p>
+                            </div>
+                            <tal:b metal:use-macro="layout.macros.photoswipe" />
+                        </div>
 
+                    </tal:b>
                 </tal:b>
             </tal:b>
-            <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'" >
+            <tal:b condition="not (allow_downloads or allow_views) or field.type not in ('UploadField', 'UploadMultipleField')" >
                 <tal:b tal:switch="linkify_display|False">
                     <tal:b tal:case="True" replace="structure layout.linkify_field(field, rendered)" />
                     <tal:b tal:case="False" replace="structure rendered" />
@@ -1154,7 +1184,14 @@
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
     </tal:b>
         </div>
-    <div tal:condition="not occurrences" i18n:translate>No events found.</div>
+    <tal:b condition="not occurrences">
+        <p i18n:translate>No events found.</p>
+        <br>
+        <tal condition="'range' in layout.og_url">
+            <p><a href="${layout.events_url}" class="button hollow" i18n:translate>All events</a>
+            <br><a href="${layout.events_url}&amp;range=past" class="button hollow" i18n:translate>Past events</a>
+        </tal>
+    </tal:b>
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view" i18n:domain="onegov.town6">
@@ -1500,11 +1537,28 @@
 </metal:search_result_people>
 
 
+<metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.town6">
+    <a href="${result.url}" class="list-link">
+        <span class="h5 list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></span>
+    </a>
+    <a tal:condition="result.lead" href="${result.url}">
+        <p class="list-lead preview">
+            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+        </p>
+    </a>
+    <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="far fa-edit"></i></a>
+</metal:search_result_external_links>
+
+
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.town6">
-    <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <tal:b condition="result.lead">
-        ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
-    </tal:b>
+    <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></h5>
+    </a>
+    <a tal:condition="result.lead" href="${request.link(result)}">
+        <p class="list-lead preview">
+            ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+        </p>
+    </a>
 </metal:search_result_default>
 
 
@@ -1547,7 +1601,7 @@
             </dd>
         </dl>
 
-        <tal:b condition="price" switch="payment_method">
+        <tal:b condition="price" switch="'cc' if price.credit_card_payment else payment_method">
             <tal:b case="'manual'">
                 <label style="display: none;">
                     <input type="radio" name="payment_method" value="manual" checked>
@@ -1771,16 +1825,18 @@
                 <tal:b tal:repeat="record grouped[group]">
                     <li tal:condition="record != find_your_spot">
                     <tal:b tal:define="link edit_link(record)|nothing">
-                        <a class="list-title" tal:attributes="href link_func(record); target link">
-                                ${record.title}
+                        <a class="list-link" tal:attributes="href link_func(record); target link">
+                                <span class="h5 list-title">${record.title}</span>
                                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
                         </a>
-                        <div class="list-lead" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
-                            tal:content="structure lead" tal:condition="lead">
-                        </div>
-                        <div class="list-hint hints" tal:define="hint hint(record)|False"
-                            tal:content="structure hint" tal:condition="hint">
-                        </div>
+                        <a tal:attributes="href link_func(record); target link">
+                            <p class="list-lead preview" tal:define="lead lead_func(record)|layout.linkify(record.meta.get('lead'))"
+                                tal:content="structure lead" tal:condition="lead">
+                            </p>
+                            <div class="list-hint hints" tal:define="hint hint(record)|False"
+                                tal:content="structure hint" tal:condition="hint">
+                            </div>
+                        </a>
                         <a class="edit-link" href="${link}" tal:condition="link"><i class="far fa-edit"></i></a>
                     </tal:b>
                     </li>

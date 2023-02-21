@@ -246,7 +246,9 @@ def test_proporz_election_create_all_models(session):
     assert session.query(PanachageResult).all() == []
 
 
-def test_proporz_election_has_lists_panachage_data(session):
+def test_proporz_election_has_data(session):
+    # todo:
+
     election = ProporzElection(
         title='Legislative Election',
         domain='federation',
@@ -266,12 +268,13 @@ def test_proporz_election_has_lists_panachage_data(session):
             name="List B",
         )
     )
-
     session.add(election)
     session.flush()
+    assert election.has_lists_panachage_data is False
+    assert election.has_party_results is False
+    assert election.has_party_panachage_results is False
 
-    assert not election.has_lists_panachage_data
-
+    # lists panachage
     election.lists[0].panachage_results.append(
         PanachageResult(
             target=election.lists[0].id,
@@ -288,8 +291,42 @@ def test_proporz_election_has_lists_panachage_data(session):
     )
 
     session.flush()
-
     assert election.has_lists_panachage_data
+
+    # party results
+    party_result = PartyResult(
+        election_id=election.id,
+        number_of_mandates=0,
+        votes=0,
+        total_votes=100,
+        name_translations={'en_US': 'Libertarian'},
+        party_id='1'
+    )
+    session.add(party_result)
+    session.flush()
+    assert election.party_results.one() == party_result
+    assert election.has_party_results is False
+    party_result.votes = 10
+    assert election.has_party_results is True
+    party_result.votes = 0
+    party_result.voters_count = 10
+    assert election.has_party_results is True
+    party_result.votes = 0
+    party_result.voters_count = 0
+    party_result.number_of_mandates = 1
+    assert election.has_party_results is True
+
+    # party panachage
+    panachage_result = PanachageResult(
+        election_id=election.id,
+        source='A',
+        target='B',
+        votes=0,
+    )
+    session.add(panachage_result)
+    session.flush()
+    assert election.panachage_results.one() == panachage_result
+    assert election.has_party_panachage_results is True
 
 
 def test_proporz_election_results(session):
@@ -1199,19 +1236,22 @@ def test_proporz_election_historical_party_strengths(session):
         title='First',
         domain='federation',
         date=date(2014, 1, 1),
-        number_of_mandates=1
+        number_of_mandates=1,
+        colors={'a': 'x'}
     )
     second = ProporzElection(
         title='Second',
         domain='federation',
         date=date(2018, 1, 1),
-        number_of_mandates=1
+        number_of_mandates=1,
+        colors={'a': 'y', 'b': 'y'}
     )
     third = ProporzElection(
         title='Third',
         domain='federation',
         date=date(2022, 1, 1),
-        number_of_mandates=1
+        number_of_mandates=1,
+        colors={'b': 'z', 'c': 'z'}
     )
     session.add(first)
     session.add(second)
@@ -1221,6 +1261,9 @@ def test_proporz_election_historical_party_strengths(session):
     assert first.historical_party_results.count() == 0
     assert second.historical_party_results.count() == 0
     assert third.historical_party_results.count() == 0
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
 
     # add results
     for (election, year, party_id, domain) in (
@@ -1258,6 +1301,9 @@ def test_proporz_election_historical_party_strengths(session):
     assert first.historical_party_results.count() == 6
     assert second.historical_party_results.count() == 7
     assert third.historical_party_results.count() == 4
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z'}
 
     # add relationships
     for (source_, target, type_) in (
@@ -1308,4 +1354,9 @@ def test_proporz_election_historical_party_strengths(session):
         ('third', 2022, '5'),
         ('third', 2022, '5'),
     ]
-    third.historical_party_results.filter_by(domain='superregion').count() == 1
+    assert third.historical_party_results.filter_by(
+        domain='superregion'
+    ).count() == 1
+    assert first.historical_colors == {'a': 'x'}
+    assert second.historical_colors == {'a': 'y', 'b': 'y', 'c': 'z'}
+    assert third.historical_colors == {'b': 'z', 'c': 'z', 'a': 'y'}

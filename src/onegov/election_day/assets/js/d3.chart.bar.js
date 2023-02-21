@@ -82,6 +82,9 @@
                     .attr('dy', '4')
                     .attr('class', 'name')
                     .text(function(d) { return d.text; })
+                    .style('fill', function(d) {
+                        return (d.class == 'active') ? '#000' : options.colorInactive;
+                    })
                     .style('font-size', options.fontSize)
                     .style('font-family', options.fontFamily)
                     .style('text-anchor', 'end');
@@ -156,27 +159,34 @@
                 // Fade-Effect on mouseover
                 if (interactive) {
                     bar.on('mouseover', function(d) {
+                        name.filter(function(s) { return s != d; })
+                            .transition()
+                            .duration(500)
+                            .style('opacity', 0.3);
                         bar.filter(function(s) { return s == d; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                             .style('opacity', 1.0);
                         bar.filter(function(s) { return s != d; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                             .style('opacity', 0.1);
                         label.filter(function(s) { return s != d; })
                             .transition()
-                            .duration(700)
+                            .duration(500)
                             .style('opacity', 0.1);
                     });
                     bar.on('mouseout', function(d) {
+                        name.transition()
+                            .duration(500)
+                            .style('opacity', 1);
                         bar.transition()
-                            .duration(700)
+                            .duration(500)
                             .style('opacity', function(d) {
                                 return d.color && d.class != 'active' ? 0.4 : 1;
                             });
                         label.transition()
-                            .duration(700)
+                            .duration(500)
                             .style('opacity', 1);
                     });
                 }

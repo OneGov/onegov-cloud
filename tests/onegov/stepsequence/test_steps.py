@@ -36,20 +36,20 @@ def test_step_layout_extension(sequences):
             self.model = model
 
     @sequences.registered_step(1, 'Start', cls_after='MiddleLayout')
-    class StartLayout(BaseLayout, StepsLayoutExtension):
+    class StartLayout(StepsLayoutExtension, BaseLayout):
         @property
         def step_position(self):
             return 1
 
     @sequences.registered_step(2, 'Middle', cls_after='MiddleLayout',
                                cls_before='StartLayout')
-    class MiddleLayout(BaseLayout, StepsLayoutExtension):
+    class MiddleLayout(StepsLayoutExtension, BaseLayout):
         @property
         def step_position(self):
             return 2
 
     @sequences.registered_step(3, 'End', cls_before='MiddleLayout')
-    class EndLayout(BaseLayout, StepsLayoutExtension):
+    class EndLayout(StepsLayoutExtension, BaseLayout):
         @property
         def step_position(self):
             return 3
@@ -60,6 +60,9 @@ def test_step_layout_extension(sequences):
 
     assert start.get_step_sequence() == end.get_step_sequence() == \
            middle.get_step_sequence()
+
+    start_with_hidden_steps = StartLayout(None, hide_steps=True)
+    assert start_with_hidden_steps.get_step_sequence() == []
 
 
 def test_step_registry(sequences):

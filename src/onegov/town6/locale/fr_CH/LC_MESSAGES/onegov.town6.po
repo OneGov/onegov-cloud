@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-01-04 13:27+0100\n"
+"POT-Creation-Date: 2023-02-10 17:08+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -217,6 +217,19 @@ msgstr "Nouveau commentaire"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Upload to Gever"
+msgstr "Télécharger à Gever"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Voulez-vous vraiment télécharger ce ticket ?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr ""
+"Cela va télécharger ce ticket vers l'instance Gever, si elle est configurée."
+
+msgid "Upload Ticket"
+msgstr "Télécharger le ticket"
+
 msgid "Confirmation"
 msgstr ""
 
@@ -331,6 +344,9 @@ msgstr "Tous les ${days} jusqu'à ${end}"
 
 msgid "Import"
 msgstr "Imprimer"
+
+msgid "Create an event"
+msgstr "Saisir un événement"
 
 msgid "This event can't be editet."
 msgstr "Cet événement ne peut pas être édité."
@@ -506,6 +522,9 @@ msgstr "Aucun dossier défini pour l'instant."
 
 msgid "No entries found."
 msgstr "Aucune entrée trouvée."
+
+msgid "More"
+msgstr "Plus"
 
 msgid "Further Information"
 msgstr "Plus d'informations"
@@ -773,6 +792,9 @@ msgstr "Demande de modification"
 msgid "New Entry"
 msgstr "Nouvelle entrée"
 
+msgid "Functions:"
+msgstr "Fonctions:"
+
 msgid "Open"
 msgstr "Ouvert"
 
@@ -878,6 +900,9 @@ msgstr "Aucun événement trouvé."
 
 msgid "Learn more"
 msgstr "En savoir plus"
+
+msgid "From"
+msgstr "De"
 
 msgid "To"
 msgstr "Vers"
@@ -1013,10 +1038,10 @@ msgid "Reset"
 msgstr "Réinitialiser"
 
 msgid "Will be published until:"
-msgstr ""
+msgstr "Sera publié jusqu'au:"
 
 msgid "Publication end date:"
-msgstr ""
+msgstr "Date de fin de publication:"
 
 msgid "Not a publication"
 msgstr "Pas une publication"
@@ -1494,6 +1519,9 @@ msgstr "Ticket a été archivé"
 msgid "Ticket recovered from archive."
 msgstr "Ticket récupéré dans les archives"
 
+msgid "Ticket uploaded to Gever."
+msgstr "Ticket téléchargé à Gever."
+
 msgid "Your search returned no results."
 msgstr "Votre recherche n'a donné aucun résultat."
 
@@ -1584,9 +1612,6 @@ msgstr "Exporter ces événements"
 
 msgid "Submit your event"
 msgstr "Soumettez votre événement"
-
-msgid "Submit your own event"
-msgstr "Soumettez votre propre événement"
 
 msgid "No payment providers defined."
 msgstr "Aucun fournisseur de paiement n'a été défini."
@@ -2067,6 +2092,14 @@ msgstr "Fonctions"
 
 #~ msgid "From"
 #~ msgstr "De"
+
+#~ msgid "Actions"
+#~ msgstr "Actions"
+
+#~ msgid "Submit your own event"
+#~ msgstr "Soumettez votre propre événement"
+
+
 
 #~ msgid "Partner"
 #~ msgstr "Partenaire"

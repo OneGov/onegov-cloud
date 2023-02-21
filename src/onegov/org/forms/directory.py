@@ -18,7 +18,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import PaymentMethodForm
+from onegov.org.forms.generic import PaymentForm
 from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
 from wtforms_components import ColorField
@@ -93,6 +93,25 @@ class DirectoryBaseForm(Form):
         fieldset=_("Display"),
         render_kw={'class_': 'formcode-format'})
 
+    numbering = RadioField(
+        label=_("Numbering"),
+        fieldset=_("Display"),
+        choices=[
+            ('none', _("None")),
+            ('standard', _("Standard")),
+            ('custom', _("Custom"))
+        ],
+        default='none')
+
+    numbers = TextAreaField(
+        label=_("Custom Numbering"),
+        fieldset=_("Display"),
+        depends_on=('numbering', 'custom'),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'integer_range'
+        })
+
     content_fields = TextAreaField(
         label=_("Main view"),
         fieldset=_("Display"),
@@ -135,6 +154,11 @@ class DirectoryBaseForm(Form):
             'data-fields-include': 'fileinput'
         })
 
+    overview_two_columns = BooleanField(
+        label=_("Overview layout with tiles"),
+        fieldset=_("Display"),
+        default=False)
+
     address_block_title_type = RadioField(
         label=_("Address Block Title"),
         fieldset=_("Address Block"),
@@ -151,19 +175,9 @@ class DirectoryBaseForm(Form):
         depends_on=('address_block_title_type', 'fixed'),
     )
 
-    marker_type = RadioField(
-        label=_("Marker Type"),
-        fieldset=_("Marker"),
-        choices=[
-            ('icon', _("Icon")),
-            ('numbers', _("Numbers"))
-        ],
-        default='icon')
-
     marker_icon = IconField(
         label=_("Icon"),
-        fieldset=_("Marker"),
-        depends_on=('marker_type', 'icon'))
+        fieldset=_("Marker"))
 
     marker_color_type = RadioField(
         label=_("Marker Color"),
@@ -269,6 +283,12 @@ class DirectoryBaseForm(Form):
         fieldset=_("Publication"),
         default=False)
 
+    required_publication = BooleanField(
+        label=_("Required publication dates"),
+        fieldset=_("Publication"),
+        depends_on=('enable_publication', 'y'),
+        default=False)
+
     submitter_meta_fields = MultiCheckboxField(
         label=_("Information to be provided in addition to the E-mail"),
         choices=(
@@ -334,6 +354,14 @@ class DirectoryBaseForm(Form):
         if field.data and '\n' in field.data:
             raise ValidationError(
                 _("Please select at most one thumbnail field")
+            )
+
+    def validate_numbers(self, field):
+        if self.numbering.data == 'custom' and (
+            '\n' in field.data or field.data == ''
+        ):
+            raise ValidationError(
+                _("Please select exactly one numbering field")
             )
 
     def ensure_public_fields_for_submissions(self):
@@ -543,18 +571,25 @@ class DirectoryBaseForm(Form):
             self.marker_color = self.default_marker_color
 
 
-class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentMethodForm)):
+class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentForm)):
 
-    payment_method_args = PaymentMethodForm.payment_method.kwargs.copy()
+    minimum_price_args = PaymentForm.minimum_price_total.kwargs.copy()
+    minimum_price_args['fieldset'] = _("New entries")
+    minimum_price_args['depends_on'] = ('enable_submissions', 'y')
+
+    minimum_price_total = DecimalField(**minimum_price_args)
+
+    payment_method_args = PaymentForm.payment_method.kwargs.copy()
     payment_method_args['fieldset'] = _("New entries")
-    payment_method_args['depends_on'] = (
-        'enable_submissions', 'y', 'price', 'paid')
+    payment_method_args['depends_on'] = ('enable_submissions', 'y')
 
     payment_method = RadioField(**payment_method_args)
 
 
 DirectoryForm = move_fields(
-    DirectoryForm, ('payment_method', ), after='currency')
+    DirectoryForm,
+    ('minimum_price_total', 'payment_method'),
+    after='currency')
 
 
 class DirectoryImportForm(Form):

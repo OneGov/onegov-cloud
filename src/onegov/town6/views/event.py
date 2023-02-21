@@ -1,8 +1,9 @@
 
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.event import Event, OccurrenceCollection
-from onegov.org.views.event import event_form as org_event_form, \
-    handle_new_event, view_event, handle_edit_event
+from onegov.org.views.event import event_form as org_event_form,\
+    handle_new_event, view_event, handle_edit_event,\
+    handle_new_event_without_workflow
 from onegov.town6 import TownApp
 from onegov.town6.forms.event import EventForm
 from onegov.town6.layout import EventLayout
@@ -23,6 +24,19 @@ def town_handle_new_event(self, request, form):
     layout = EventLayout(self, request)
     request.include('many')
     return handle_new_event(self, request, form, layout)
+
+
+@TownApp.form(
+    model=OccurrenceCollection,
+    name='enter-event',
+    template='form.pt',
+    form=event_form,
+    permission=Private
+)
+def town_handle_new_event_without_workflow(self, request, form):
+    layout = EventLayout(self, request)
+    request.include('many')
+    return handle_new_event_without_workflow(self, request, form, layout)
 
 
 @TownApp.html(

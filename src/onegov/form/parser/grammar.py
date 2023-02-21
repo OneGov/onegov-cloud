@@ -1,5 +1,7 @@
 import re
 
+from datetime import date as dateobj
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form.utils import decimal_range
 from pyparsing import (
@@ -13,6 +15,7 @@ from pyparsing import (
     pyparsing_unicode,
     OneOrMore,
     Optional,
+    ParseFatalException,
     ParserElement,
     Regex,
     Suppress,
@@ -86,6 +89,53 @@ def as_regex(tokens):
     """ Converts the token to a working regex if possible. """
     if tokens:
         return re.compile(tokens[0])
+
+
+def as_date(instring, loc, tokens):
+    """ Converts the token to a date if possible. """
+    if not tokens:
+        return
+    try:
+        return dateobj(int(tokens[0]), int(tokens[1]), int(tokens[2]))
+    except ValueError:
+        raise ParseFatalException(instring, loc, "Invalid date")
+
+
+def approximate_total_days(delta):
+    """ Computes an approximate day delta from a relativedelta. """
+    return delta.years * 365.25 + delta.months * 30.5 + delta.days
+
+
+def is_valid_date_range(instring, loc, tokens):
+    """ Checks if the date range is valid """
+    if tokens:
+        after, before = tokens
+    else:
+        # invalid, will be caught below
+        after = before = None
+
+    if after is None:
+        if before is not None:
+            return tokens
+        # invalid
+    elif before is None:
+        return tokens
+    elif type(after) is not type(before):
+        # invalid
+        pass
+    elif isinstance(after, relativedelta):
+        if approximate_total_days(after) < approximate_total_days(before):
+            return tokens
+        # invalid
+    elif after < before:
+        return tokens
+
+    raise ParseFatalException(instring, loc, "Invalid date range")
+
+
+def as_relative_delta(tokens):
+    if tokens:
+        return relativedelta(**{tokens[1]: int(tokens[0])})
 
 
 def unwrap(tokens):
@@ -245,6 +295,54 @@ def url():
     return Suppress(Regex(r'https?://')).setParseAction(tag(type='url'))
 
 
+def absolute_date():
+    """ Returns an absolute date parser.
+
+    Example::
+
+        2020.10.10
+    """
+    date_expr = numeric + Suppress('.') + numeric + Suppress('.') + numeric
+    return date_expr.setParseAction(as_date)
+
+
+def relative_delta():
+    """ Returns a relative delta parser.
+
+    Example::
+
+        +1 days
+        -4 weeks
+        0 years
+    """
+
+    sign = Optional(Literal('-') | Literal('+'))
+    grain = (Literal('days') | Literal('weeks') | Literal('months')
+             | Literal('years'))
+    return (Combine(sign + numeric) + grain).setParseAction(as_relative_delta)
+
+
+def valid_date_range():
+    """ Returns a valid date range parser.
+
+    Example::
+
+        (..today)
+        (2010.01.01..2020.01.01)
+        (-2 weeks..+4 months)
+
+    """
+
+    today = Literal('today').setParseAction(literal(relativedelta()))
+    value_expr = Optional(
+        today | relative_delta() | absolute_date(),
+        default=None
+    )
+    date_range = value_expr('start') + Suppress('..') + value_expr('stop')
+    date_range.setParseAction(is_valid_date_range)
+    return Group(enclosed_in(date_range, '()'))('valid_date_range')
+
+
 def date():
     """ Returns a date parser.
 
@@ -254,7 +352,8 @@ def date():
 
     """
 
-    return Suppress('YYYY.MM.DD').setParseAction(tag(type='date'))
+    date = Suppress('YYYY.MM.DD').setParseAction(tag(type='date'))
+    return date + Optional(valid_date_range())
 
 
 def datetime():
@@ -266,7 +365,8 @@ def datetime():
 
     """
 
-    return Suppress('YYYY.MM.DD HH:MM').setParseAction(tag(type='datetime'))
+    dt = Suppress('YYYY.MM.DD HH:MM').setParseAction(tag(type='datetime'))
+    return dt + Optional(valid_date_range())
 
 
 def time():
@@ -302,20 +402,29 @@ def fileinput():
     For all kindes of files::
         *.*
 
-    For specific files:
+    For specific files::
         *.pdf|*.doc
+
+    For multiple file upload::
+        *.pdf (multiple)
     """
     any_extension = Suppress('*.*')
     some_extension = Suppress('*.') + Word(alphanums) + Optional(Suppress('|'))
+    extensions = Group(any_extension | OneOrMore(some_extension))
+    multiple = enclosed_in(Literal('multiple'), '()')
 
     def extract_file_types(tokens):
-        tokens['type'] = 'fileinput'
+        if len(tokens) == 2 and tokens[1] == 'multiple':
+            tokens['type'] = 'multiplefileinput'
+        else:
+            tokens['type'] = 'fileinput'
+
         if len(tokens[0]) == 0:
             tokens['extensions'] = ['*']
         else:
             tokens['extensions'] = [ext.lower() for ext in tokens[0].asList()]
 
-    parser = Group(any_extension | OneOrMore(some_extension))
+    parser = extensions + Optional(multiple)
     parser.setParseAction(extract_file_types)
 
     return parser
@@ -353,7 +462,8 @@ def integer_range_field():
     """ Returns an integer range parser. """
 
     number = Combine(Optional('-') + numeric)
-    return range_field(number, as_integer_range, 'integer_range')
+    integer_range = range_field(number, as_integer_range, 'integer_range')
+    return integer_range + Optional(pricing())
 
 
 def decimal_range_field():
@@ -377,6 +487,24 @@ def currency():
     return Regex(r'[a-zA-Z]{3}').setParseAction(as_uppercase)('currency')
 
 
+def pricing():
+    """ Returns a pricing parser.
+
+    For example:
+        (10.0 CHF)
+        (0 usd!)
+        (-0.50 Cny)
+    """
+
+    cc_payment = Literal('!').setParseAction(matches('!'))
+    cc_payment = Optional(cc_payment, default=False)('credit_card_payment')
+
+    pricing = Group(
+        enclosed_in(decimal() + currency() + cc_payment, '()')
+    )('pricing')
+    return pricing
+
+
 def marker_box(characters):
     """ Returns a marker box:
 
@@ -388,16 +516,15 @@ def marker_box(characters):
     """
 
     check = mark_enclosed_in(characters)('checked')
-    pricing = Group(enclosed_in(decimal() + currency(), '()'))('pricing')
-
     label_text = with_whitespace_inside(text_without(characters + '()'))
+    pricing_parser = pricing()
     label = MatchFirst((
-        label_text + FollowedBy(pricing),
+        label_text + FollowedBy(pricing_parser),
         Combine(label_text + with_whitespace_inside(text)),
         label_text
     )).setParseAction(as_joined_string)('label')
 
-    return check + label + Optional(pricing)
+    return check + label + Optional(pricing_parser)
 
 
 def radio():

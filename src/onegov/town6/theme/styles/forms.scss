@@ -34,7 +34,7 @@ form {
 
         min-width: 75%;
 
-        &.error {
+        &.error, .upload-widget.error {
             color: $alert-color;
 
             & input,
@@ -206,6 +206,10 @@ form {
         position: absolute;
     }
 
+    textarea.formcode-select {
+        display: none !important;
+    }
+
     .formcode-select {
         @include form-element;
         height: 100%;
@@ -225,6 +229,10 @@ form {
         display: flex;
         margin-bottom: .3rem;
     }
+}
+
+form .icon-widget li {
+    display: block;
 }
 
 /*

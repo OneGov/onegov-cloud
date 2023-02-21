@@ -29,6 +29,7 @@ from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
+from wtforms.validators import InputRequired
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
@@ -49,6 +50,9 @@ def get_directory_entry_form_class(model, request):
             if not model.directory.enable_publication and not request.is_admin:
                 self.delete_field('publication_start')
                 self.delete_field('publication_end')
+            elif model.directory.required_publication:
+                self.publication_start.validators[0] = InputRequired()
+                self.publication_end.validators[0] = InputRequired()
 
     return OptionalMapPublicationForm
 
@@ -276,6 +280,14 @@ def keyword_count(request, collection):
 def view_directory(self, request, layout=None):
 
     entries = request.exclude_invisible(self.query())
+    for i, e in enumerate(entries):
+        if self.directory.numbering == 'custom':
+            e.number = e.content['values'].get(
+                as_internal_id(self.directory.numbers)) or 'x'
+        elif self.directory.numbering == 'standard':
+            e.number = i + 1
+        else:
+            e.number = None
     keyword_counts = keyword_count(request, self)
     filters = get_filters(request, self, keyword_counts)
     layout = layout or DirectoryEntryCollectionLayout(self, request)
@@ -290,7 +302,8 @@ def view_directory(self, request, layout=None):
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),
         'show_thumbnails': layout.thumbnail_field_id and True or False,
-        'thumbnail_link': layout.thumbnail_link
+        'thumbnail_link': layout.thumbnail_link,
+        'overview_two_columns': self.directory.overview_two_columns
     }
 
 
@@ -444,6 +457,7 @@ def handle_submit_directory_entry(self, request, form, layout=None):
             form=form,
             state='pending',
             payment_method=self.directory.payment_method,
+            minimum_price_total=self.directory.minimum_price_total,
             email=form.submitter.data,
             meta={
                 'handler_code': 'DIR',

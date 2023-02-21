@@ -9,6 +9,7 @@ from onegov.ballot.models.election.list_connection import ListConnection
 from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.party_result.party_result import PartyResult
+from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
 from onegov.ballot.models.party_result.mixins import \
     HistoricalPartyResultsMixin
@@ -21,7 +22,8 @@ from sqlalchemy.orm import relationship
 
 
 class ProporzElection(
-    Election, PartyResultsExportMixin, HistoricalPartyResultsMixin
+    Election, PartyResultsCheckMixin, PartyResultsExportMixin,
+    HistoricalPartyResultsMixin
 ):
     __mapper_args__ = {
         'polymorphic_identity': 'proporz'

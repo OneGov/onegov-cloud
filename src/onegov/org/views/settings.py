@@ -16,7 +16,7 @@ from onegov.org.forms import ModuleSettingsForm
 from onegov.org.forms.settings import OrgTicketSettingsForm, \
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
     NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm, \
-    SocialMediaSettingsForm, EventSettingsForm
+    SocialMediaSettingsForm, EventSettingsForm, GeverSettingsForm
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -175,6 +175,14 @@ def handle_map_settings(self, request, form, layout=None):
     icon='fa-line-chart ', order=-600)
 def handle_analytics_settings(self, request, form, layout=None):
     return handle_generic_settings(self, request, form, _("Analytics"), layout)
+
+
+@OrgApp.form(
+    model=Organisation, name='gever-credentials', template='form.pt',
+    permission=Secret, form=GeverSettingsForm, setting="Gever API",
+    icon='fa-key', order=400)
+def handle_gever_settings(self, request, form, layout=None):
+    return handle_generic_settings(self, request, form, "Gever API", layout)
 
 
 @OrgApp.form(

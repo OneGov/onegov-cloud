@@ -324,7 +324,7 @@ def test_import_wabsti_proporz_invalid_values(session):
                     'xxx',
                     'xxx',
                     'xxx',
-                    'xxx',
+                    'x x x',
                     'xxx',
                     'xxx',
                     'xxx',
@@ -349,7 +349,7 @@ def test_import_wabsti_proporz_invalid_values(session):
                     'LUV',
                 )),
                 ','.join((
-                    'xxx',
+                    'x x x',
                     'xxx',
                     'xxx',
                 )),

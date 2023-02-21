@@ -76,7 +76,7 @@
                                         <td class="top-aligned" tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
                                         <td class="top-aligned" tal:condition="vote.domain == 'none'" i18n:translate>Regional</td>
                                         <td class="right-aligned top-aligned" tal:condition="not: communal_instance">
-                                            <tal:b tal:condition="vote.progress[0]">
+                                            <tal:b tal:condition="vote.has_results">
                                                 <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                             </tal:b>
                                         </td>

@@ -98,6 +98,19 @@ class Form(BaseForm):
                 'yes': (10.0, 'CHF')
             })
 
+            stamps = IntegerRangeField(
+            'No. Stamps',
+            range=range(0, 30),
+            pricing={range(0, 30): (0.85, 'CHF')}
+        )
+
+            delivery = RadioField('Delivery', choices=[
+                ('pick_up', 'Pick up'),
+                ('post', 'Post')
+            ], pricing={
+                'post': (5.0, 'CHF', True)
+            })
+
             discount_code = StringField('Discount Code', pricing={
                 'CAMPAIGN2017': (-5.0, 'CHF')
             })
@@ -105,6 +118,9 @@ class Form(BaseForm):
     Note that the pricing has no implicit meaning. This is simply a way to
     attach prices and to get the total through the ``prices()`` and ``total()``
     calls. What you do with these prices is up to you.
+
+    Pricing can optionally take a third boolean value indicating that this
+    option will make credit card payments mandatory.
 
     """
 
@@ -352,7 +368,11 @@ class Form(BaseForm):
 
         return Price(
             sum(price.amount for field_id, price in prices),
-            prices[0][1].currency
+            prices[0][1].currency,
+            credit_card_payment=any(
+                price.credit_card_payment
+                for field_id, price in prices
+            )
         )
 
     def submitted(self, request):
@@ -686,27 +706,62 @@ class Pricing:
 
     def __init__(self, rules):
         self.rules = {
-            rule: Price(Decimal(value), currency)
-            for rule, (value, currency) in rules.items()
+            rule: Price(
+                pricing[0],
+                pricing[1],
+                credit_card_payment=pricing[2] if len(pricing) > 2 else False,
+            )
+            for rule, pricing in rules.items()
         }
 
+    @property
+    def has_payment_rule(self):
+        return any(
+            price.credit_card_payment for price in self.rules.values()
+        )
+
     def price(self, field):
-        if isinstance(field.data, list):
-            total = None
+        values = field.data
+        if not isinstance(field.data, list):
+            values = [values]
 
-            for value in field.data:
-                price = self.rules.get(value, None)
+        total = None
+        credit_card_payment = False
+        for value in values:
+            price = self.rules.get(value, None)
+            amount = None
 
-                if price is not None:
-                    total = (total or Decimal(0)) + price.amount
-                    currency = price.currency
+            if price is not None:
+                amount = price.amount
+            elif isinstance(value, int):
+                # check integer ranges (for integer range fields)
+                for key, price in self.rules.items():
+                    if not isinstance(key, range):
+                        continue
 
-            if total is None:
-                return None
-            else:
-                return Price(total, currency)
+                    # python ranges exclude stop, but form ranges include them
+                    if value in key or value == key.stop:
+                        if value != 0:
+                            # we special case this, because we don't
+                            # want to e.g. require credit card payments
+                            # if 0 items have been selected
+                            amount = price.amount * value
+                        break
 
-        return self.rules.get(field.data, None)
+            if amount is not None:
+                total = (total or Decimal(0)) + amount
+                currency = price.currency
+                if price.credit_card_payment is True:
+                    credit_card_payment = True
+
+        if total is None:
+            return None
+        else:
+            return Price(
+                total,
+                currency,
+                credit_card_payment=credit_card_payment
+            )
 
 
 def merge_forms(*forms):

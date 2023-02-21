@@ -16,6 +16,7 @@ from onegov.winterthur.models import MissionReportVehicleUse
 from uuid import UUID
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
+from wtforms.validators import NumberRange
 
 
 def mission_report_form(model, request):
@@ -86,6 +87,7 @@ def mission_report_form(model, request):
         )
 
         builder.add_field(
+            validators=[NumberRange(0, 10000)],
             field_class=IntegerField,
             field_id=vehicle_field_id,
             label=request.translate(_("Count")),

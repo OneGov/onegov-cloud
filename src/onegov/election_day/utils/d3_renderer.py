@@ -4,6 +4,7 @@ from io import StringIO
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ElectionCompoundPart
 from onegov.core.custom import json
 from onegov.core.utils import module_path
 from onegov.election_day import _
@@ -175,7 +176,9 @@ class D3Renderer():
     def get_party_strengths_chart(self, item, fmt, return_data=False):
         chart = None
         data = None
-        if isinstance(item, (Election, ElectionCompound)):
+        if isinstance(
+            item, (Election, ElectionCompound, ElectionCompoundPart)
+        ):
             data = get_party_results_data(
                 item, item.horizontal_party_strengths
             )
