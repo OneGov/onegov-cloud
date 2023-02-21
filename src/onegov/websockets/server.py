@@ -54,15 +54,21 @@ async def handle_listen(websocket, payload):
         await error(websocket, f'invalid schema: {schema}')
         return
 
+    channel = payload.get('channel')
+    if channel is not None and not isinstance(channel, str):
+        await error(websocket, f'invalid channel: {channel}')
+        return
+
     await acknowledge(websocket)
 
-    log.debug(f'{websocket.id} listens @ {schema}')
-    connections = CONNECTIONS.setdefault(schema, set())
+    schema_channel = f'{schema}-{channel}' if channel else schema
+    log.debug(f'{websocket.id} listens @ {schema_channel}')
+    connections = CONNECTIONS.setdefault(schema_channel, set())
     connections.add(websocket)
     try:
         await websocket.wait_closed()
     finally:
-        connections = CONNECTIONS.setdefault(schema, set())
+        connections = CONNECTIONS.setdefault(schema_channel, set())
         if websocket in connections:
             connections.remove(websocket)
 
@@ -114,8 +120,12 @@ async def handle_broadcast(websocket, payload):
 
     message = payload.get('message')
     schema = payload.get('schema')
+    channel = payload.get('channel')
     if not schema or not isinstance(schema, str):
         await error(websocket, f'invalid schema: {schema}')
+        return
+    if channel is not None and not isinstance(channel, str):
+        await error(websocket, f'invalid channel: {channel}')
         return
     if not message:
         await error(websocket, 'missing message')
@@ -123,7 +133,8 @@ async def handle_broadcast(websocket, payload):
 
     await acknowledge(websocket)
 
-    connections = CONNECTIONS.get(schema, set())
+    schema_channel = f'{schema}-{channel}' if channel else schema
+    connections = CONNECTIONS.get(schema_channel, set())
     if connections:
         broadcast(
             connections,
@@ -135,7 +146,7 @@ async def handle_broadcast(websocket, payload):
 
     log.debug(
         f'{websocket.id} sent {message}'
-        f' to {len(connections)} receiver(s) @ {schema}'
+        f' to {len(connections)} receiver(s) @ {schema_channel}'
     )
 
 
