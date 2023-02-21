@@ -333,8 +333,6 @@ def org_content_security_policy():
     policy.child_src.add('https://checkout.stripe.com')
 
     policy.connect_src.add(SELF)
-    policy.connect_src.add('ws:')
-    policy.connect_src.add('wss:')
     policy.connect_src.add('https://checkout.stripe.com')
     policy.connect_src.add('https://sentry.io')
     policy.connect_src.add('https://*.google-analytics.com')
