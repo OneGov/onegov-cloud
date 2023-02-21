@@ -48,6 +48,12 @@ async def test_server_invalid(websocket_server):
             {'type': 'error', 'message': 'invalid schema: [\'abcd\']'}
         )
     ])
+    await assert_send_receive([
+        (
+            {'type': 'register', 'schema': 'abcd', 'channel': ['abcd']},
+            {'type': 'error', 'message': 'invalid channel: [\'abcd\']'}
+        )
+    ])
 
     # Invalid auth
     await assert_send_receive([
@@ -96,6 +102,16 @@ async def test_server_invalid(websocket_server):
             {'type': 'acknowledged'}
         ),
         (
+            {'type': 'broadcast', 'schema': 'abcd', 'channel': ['abcd']},
+            {'type': 'error', 'message': 'invalid channel: [\'abcd\']'}
+        )
+    ])
+    await assert_send_receive([
+        (
+            {'type': 'authenticate', 'token': 'super-super-secret-token'},
+            {'type': 'acknowledged'}
+        ),
+        (
             {'type': 'broadcast', 'schema': 'schema'},
             {'type': 'error', 'message': 'missing message'}
         )
@@ -112,7 +128,10 @@ async def test_client_invalid(websocket_server):
     # register
     async with connect(websocket_server.url) as websocket:
         with raises(IOError, match='invalid schema'):
-            await register(websocket, ['schema'])
+            await register(websocket, ['schema'], None)
+    async with connect(websocket_server.url) as websocket:
+        with raises(IOError, match='invalid channel'):
+            await register(websocket, 'schema', ['channel'])
 
     # authenticate
     async with connect(websocket_server.url) as websocket:
@@ -126,11 +145,15 @@ async def test_client_invalid(websocket_server):
     async with connect(websocket_server.url) as websocket:
         await authenticate(websocket, 'super-super-secret-token')
         with raises(IOError, match='invalid schema'):
-            await broadcast(websocket, ['schema'], 'message')
+            await broadcast(websocket, ['schema'], None, 'message')
+    async with connect(websocket_server.url) as websocket:
+        await authenticate(websocket, 'super-super-secret-token')
+        with raises(IOError, match='invalid channel'):
+            await broadcast(websocket, 'schema', ['channel'], 'message')
     async with connect(websocket_server.url) as websocket:
         await authenticate(websocket, 'super-super-secret-token')
         with raises(IOError, match='missing message'):
-            await broadcast(websocket, 'schema', '')
+            await broadcast(websocket, 'schema', 'channel', '')
 
 
 @mark.asyncio
@@ -142,13 +165,16 @@ async def test_manage(websocket_server):
         assert not response['connections'].get('bar')
 
         async with connect(websocket_server.url) as listen:
-            await register(listen, 'bar')
+            await register(listen, 'bar', 'two')
 
             response = await status(manage)
-            assert response['connections'].get('bar') == 1
+            assert response['connections'].get('bar-two') == 1
 
-            await broadcast(manage, 'baz', {'foo': 'baz'})
-            await broadcast(manage, 'bar', {'foo': 'bar'})
+            await broadcast(manage, 'baz', None, {'foo': 'baz'})
+            await broadcast(manage, 'baz', 'two', {'foo': 'baz'})
+            await broadcast(manage, 'bar', None, {'foo': 'bar'})
+            await broadcast(manage, 'bar', 'one', {'foo': 'bar'})
+            await broadcast(manage, 'bar', 'two', {'foo': 'bar'})
 
             assert loads(await listen.recv()) == {
                 "type": "notification",
@@ -156,4 +182,4 @@ async def test_manage(websocket_server):
             }
 
         response = await status(manage)
-        assert not response['connections'].get('bar')
+        assert not response['connections'].get('bar-two')

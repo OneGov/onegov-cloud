@@ -55,7 +55,7 @@ async def handle_listen(websocket, payload):
         return
 
     channel = payload.get('channel')
-    if not isinstance(channel, str):
+    if channel is not None and not isinstance(channel, str):
         await error(websocket, f'invalid channel: {channel}')
         return
 
@@ -124,7 +124,7 @@ async def handle_broadcast(websocket, payload):
     if not schema or not isinstance(schema, str):
         await error(websocket, f'invalid schema: {schema}')
         return
-    if not isinstance(channel, str):
+    if channel is not None and not isinstance(channel, str):
         await error(websocket, f'invalid channel: {channel}')
         return
     if not message:

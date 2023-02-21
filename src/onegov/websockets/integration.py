@@ -69,6 +69,16 @@ class WebsocketsApp(WebassetsApp):
             params='', query='', fragment=''
         ).geturl()
 
+    @property
+    def websockets_private_channel(self):
+        """ An unguessable channel ID used for broadcasting notifications
+        through websockets to logged-in users.
+
+        This is not meant to be save, do not broadcast sensible information!
+        """
+
+        return self.sign(self.schema).replace(self.schema, '')
+
     def send_websocket(self, message, channel=None):
         """ Sends an application-bound broadcast message to all connected
         clients.
@@ -84,8 +94,8 @@ class WebsocketsApp(WebassetsApp):
                 await broadcast(
                     websocket,
                     self.schema,
-                    message,
-                    channel
+                    channel,
+                    message
                 )
 
         try:

@@ -15,7 +15,7 @@ async def acknowledged(websocket):
         raise IOError(message)
 
 
-async def register(websocket, schema, channel=None):
+async def register(websocket, schema, channel):
     """ Registers for broadcast messages. """
 
     await websocket.send(
@@ -40,7 +40,7 @@ async def authenticate(websocket, token):
     await acknowledged(websocket)
 
 
-async def broadcast(websocket, schema, message, channel=None):
+async def broadcast(websocket, schema, channel, message):
     """ Broadcasts the given message to all connected clients.
 
     Assumes prior authentication.

@@ -192,7 +192,7 @@ class TicketCollection(TicketCollectionPagination):
         # sent ticket notification
         if request:
             request.app.send_websocket(
-                channel=request.app.websockets_channel,
+                channel=request.app.websockets_private_channel,
                 message={
                     'event': 'ticket',
                     'number': ticket.number,
