@@ -232,7 +232,6 @@ def test_banner_in_mail(client):
             }
         ]
 
-        del client.app.sponsors
         client.app.sponsors = [Sponsor(**sponsor) for sponsor in data]
 
         job = get_cronjob_by_name(client.app, 'send_daily_ticket_statistics')
