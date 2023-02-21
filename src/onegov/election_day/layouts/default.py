@@ -26,6 +26,7 @@ class DefaultLayout(ChameleonLayout):
         self.request.include('common')
         self.request.include('chosen')
         self.request.include('custom')
+        self.request.include('websockets')
 
         if 'headerless' in request.params:
             request.browser_session['headerless'] = True

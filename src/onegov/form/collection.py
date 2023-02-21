@@ -6,7 +6,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.core.collection import GenericCollection
 from onegov.file.utils import as_fileintent
 from onegov.form.errors import UnableToComplete
-from onegov.form.fields import UploadField
+from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.form.models import (
     FormDefinition,
     FormSubmission,
@@ -312,23 +312,48 @@ class FormSubmissionCollection:
         }
 
         # move uploaded files to a separate table
-        files = set(
-            field_id for field_id, field in form._fields.items()
+        files = {
+            field_id
+            for field_id, field in form._fields.items()
             if isinstance(field, UploadField) and field_id not in exclude
-        )
+            # we exclude files that should be removed
+            and submission.data.get(field_id) != {}
+        }
 
-        files_to_remove = set(
+        files_to_add = {
             id for id in files
-            if submission.data.get(id) == {}
-        )
+            if (file_meta := submission.data.get(id))
+            and not file_meta['data'].startswith('@')
+        }
 
-        files_to_add = set(
-            id for id in (files - files_to_remove)
-            if submission.data.get(id)
-            and not submission.data[id]['data'].startswith('@')
-        )
+        files_to_keep = files - files_to_add
 
-        files_to_keep = files - files_to_remove - files_to_add
+        multi_files = {
+            field_id: [
+                index
+                for index, data in enumerate(submission.data.get(field_id, []))
+                # we exclude files that should be removed but we also
+                if data != {}
+            ]
+            for field_id, field in form._fields.items()
+            if isinstance(field, UploadMultipleField)
+            and field_id not in exclude
+        }
+        multi_files_to_keep = {
+            f'{id}:{idx}'
+            for id, indeces in multi_files.items()
+            if (file_metas := submission.data.get(id))
+            for idx in indeces
+            # if a file is set to 'keep' it will be None unless
+            # the data has been resubmitted or the original data
+            # was passed in, it might be a bit cleaner to look
+            # at the field.action to determine which files to
+            # keep and which ones to delete/replace...
+            if file_metas[idx] is None
+            or file_metas[idx]['data'].startswith('@')
+
+        }
+        files_to_keep |= multi_files_to_keep
 
         # delete all files which are not part of the updated form
         # if no files are given, delete all files belonging to the submission
@@ -340,7 +365,7 @@ class FormSubmissionCollection:
         if trash and inspect(submission).persistent:
             self.session.refresh(submission)
 
-        # store the new fields in the separate table
+        # store the new files in the separate table
 
         for field_id in files_to_add:
             field = getattr(form, field_id)
@@ -363,6 +388,53 @@ class FormSubmissionCollection:
             # we need to mark these changes as only top-level json changes
             # are automatically propagated
             submission.data.changed()
+
+        for field_id, indeces in multi_files.items():
+            datalist = []
+            # we can't use enumerate because we need to guard against
+            # old_keys t
+            new_idx = 0
+            for old_idx in indeces:
+                data = submission.data[field_id][old_idx]
+                old_key = f'{field_id}:{old_idx}'
+                new_key = f'{field_id}:{new_idx}'
+                if old_key in multi_files_to_keep:
+                    # update the key in the note field if the index changed
+                    if old_idx != new_idx:
+                        for f in submission.files:
+                            if f.note == old_key:
+                                f.note = new_key
+                                break
+                else:
+                    field = getattr(form, field_id)[old_idx]
+                    if getattr(field, 'file', None) is None:
+                        # skip this subfield
+                        continue
+
+                    f = FormFile(
+                        id=random_token(),
+                        name=field.filename,
+                        note=new_key,
+                        reference=as_fileintent(
+                            content=field.file,
+                            filename=field.filename
+                        )
+                    )
+
+                    submission.files.append(f)
+
+                    # replace the data in the submission with a reference
+                    data['data'] = '@{}'.format(f.id)
+
+                datalist.append(data)
+                new_idx += 1
+
+            if submission.data[field_id] != datalist:
+                submission.data[field_id] = datalist
+
+                # we need to mark these changes as only top-level json changes
+                # are automatically propagated
+                submission.data.changed()
 
     def remove_old_pending_submissions(self, older_than,
                                        include_external=False):

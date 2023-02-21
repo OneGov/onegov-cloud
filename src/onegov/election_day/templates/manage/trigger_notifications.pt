@@ -30,8 +30,8 @@
                         <ul tal:condition="last_notifications[model]">
                             <li tal:repeat="last_notification last_notifications[model]">${layout.format_date(last_notification.last_change, 'datetime_long')}: ${last_notification.type} (${layout.format_date(last_notification.last_modified, 'datetime_long')})</li>
                         </ul>
-                        <ul>
-                            <li><i tal:condition="not last_notifications[model]" i18n:translate>No notifications yet.</i></li>
+                        <ul tal:condition="not last_notifications[model]">
+                            <li><i i18n:translate>No notifications yet.</i></li>
                         </ul>
                     </li>
                 </tal:block>

@@ -177,6 +177,9 @@ msgstr ""
 msgid "Replace file"
 msgstr ""
 
+msgid "Upload additional files"
+msgstr ""
+
 msgid "Text modules"
 msgstr ""
 

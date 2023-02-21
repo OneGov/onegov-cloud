@@ -18,7 +18,7 @@ async def test_page_refresh(browser):
                     WebsocketConfig = {{
                         endpoint: "{browser.websocket_server_url}",
                         schema: "schema",
-                        onrefresh: function(event) {{
+                        onnotifcation: function(event) {{
                             document.getElementById("x").className += "y";
                         }}
                     }};
@@ -37,6 +37,6 @@ async def test_page_refresh(browser):
         response = await status(manage)
         assert response['connections'].get('schema') == 1
 
-        await broadcast(manage, 'schema', {'event': 'refresh', 'path': '/'})
+        await broadcast(manage, 'schema', {'custom': 'data'})
 
     assert len(browser.find_by_css('.y')) == 1

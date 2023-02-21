@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-20 11:24+0100\n"
+"POT-Creation-Date: 2023-02-14 15:23+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -563,6 +563,12 @@ msgstr "Formazione continua"
 
 msgid "Healthy Snacks"
 msgstr "Merende equilibrate"
+
+msgid "Just for Boys"
+msgstr "Solo ragazzi"
+
+msgid "Just for Girls"
+msgstr "Solo ragazze"
 
 msgid "Title"
 msgstr "Titolo"

@@ -402,20 +402,29 @@ def fileinput():
     For all kindes of files::
         *.*
 
-    For specific files:
+    For specific files::
         *.pdf|*.doc
+
+    For multiple file upload::
+        *.pdf (multiple)
     """
     any_extension = Suppress('*.*')
     some_extension = Suppress('*.') + Word(alphanums) + Optional(Suppress('|'))
+    extensions = Group(any_extension | OneOrMore(some_extension))
+    multiple = enclosed_in(Literal('multiple'), '()')
 
     def extract_file_types(tokens):
-        tokens['type'] = 'fileinput'
+        if len(tokens) == 2 and tokens[1] == 'multiple':
+            tokens['type'] = 'multiplefileinput'
+        else:
+            tokens['type'] = 'fileinput'
+
         if len(tokens[0]) == 0:
             tokens['extensions'] = ['*']
         else:
             tokens['extensions'] = [ext.lower() for ext in tokens[0].asList()]
 
-    parser = Group(any_extension | OneOrMore(some_extension))
+    parser = extensions + Optional(multiple)
     parser.setParseAction(extract_file_types)
 
     return parser
