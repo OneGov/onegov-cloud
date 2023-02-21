@@ -383,6 +383,13 @@ def respond_with_caching_header(reference, request):
             response.headers.add('Cache-Control', 'private')
 
 
+def respond_with_x_robots_tag_header(reference, request):
+    if getattr(reference, 'access', None) == 'secret':
+        @request.after
+        def include_private_header(response):
+            response.headers.add('X-Robots-Tag', 'noindex')
+
+
 @DepotApp.path(model=File, path='/storage/{id}')
 def get_file(app, id):
     return FileCollection(app.session()).by_id(id)
@@ -392,6 +399,7 @@ def get_file(app, id):
 def view_file(self, request):
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
+    respond_with_x_robots_tag_header(self, request)
     return self.reference.file
 
 
@@ -409,6 +417,7 @@ def view_thumbnail(self, request):
 
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
+    respond_with_x_robots_tag_header(self, request)
 
     thumbnail_id = self.get_thumbnail_id(size)
 
