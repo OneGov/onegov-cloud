@@ -386,7 +386,7 @@ def respond_with_caching_header(reference, request):
 def respond_with_x_robots_tag_header(reference, request):
     if getattr(reference, 'access', None) == 'secret':
         @request.after
-        def include_private_header(response):
+        def include_x_robots_tag_header(response):
             response.headers.add('X-Robots-Tag', 'noindex')
 
 
