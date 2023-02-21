@@ -1434,9 +1434,7 @@ ul.panel-links {
     }
 
     .marker-map {
-        border-bottom: 1rem solid $white;
         box-sizing: content-box;
-        margin: -1rem 1rem 1rem;
 
         a {
             font-size: 10px;
@@ -1479,10 +1477,6 @@ ul.panel-links {
     background-color: $topbar-bg-color;
     border: 0;
 
-    .marker-map {
-        border-bottom: 1rem solid $topbar-bg-color;
-    }
-
     h2 {
         @include primary-color-background;
         border-bottom: 0;
@@ -1494,7 +1488,7 @@ ul.panel-links {
         > ul:first-of-type:not(.bulleted) {
             li:first-child {
                 @include primary-color-background;
-                margin-bottom: 1rem;
+                margin: -.5rem -1rem 1rem;
                 padding: .75rem 1rem;
                 text-transform: uppercase;
 
@@ -1505,11 +1499,10 @@ ul.panel-links {
         }
 
         > ul:not(.bulleted) {
-            padding: 0 0 .25rem;
+           padding: 0 0 .25rem;
 
             li {
                 min-height: .5rem;
-                padding: 0 1rem;
 
                 + li {
                     margin-top: .25rem;
@@ -1519,6 +1512,10 @@ ul.panel-links {
 
         > ul:last-of-type {
             padding: 0 0 1rem;
+        }
+
+        p {
+            font-size: .875rem;
         }
     }
 }
