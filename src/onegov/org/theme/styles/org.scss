@@ -1491,7 +1491,7 @@ ul.panel-links {
     }
 
     &.without-title {
-        > ul:first-of-type {
+        > ul:first-of-type:not(.bulleted) {
             li:first-child {
                 @include primary-color-background;
                 margin-bottom: 1rem;
