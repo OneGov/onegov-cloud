@@ -44,7 +44,13 @@ def create_winterthur_app(request, use_elasticsearch):
     app = create_app(
         app_class=WinterthurApp,
         request=request,
-        use_elasticsearch=use_elasticsearch)
+        use_elasticsearch=use_elasticsearch,
+        websockets={
+            'client_url': 'ws://localhost:8766',
+            'manage_url': 'ws://localhost:8766',
+            'manage_token': 'super-super-secret-token'
+        }
+    )
 
     session = app.session()
 
