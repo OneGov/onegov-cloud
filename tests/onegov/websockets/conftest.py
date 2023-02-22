@@ -4,6 +4,7 @@ from onegov.websockets import WebsocketsApp
 from onegov.websockets.server import main
 from pytest import fixture
 from pytest_localserver.http import WSGIServer
+from tests.shared.client import Client
 from tests.shared.utils import create_app
 from threading import Thread
 
@@ -56,7 +57,6 @@ class WebsocketsRoot:
 @WebsocketsApp.html(model=WebsocketsRoot)
 def view_root(self, request):
     request.include('websockets')
-    request.content_security_policy.connect_src.add('ws:')
     return self.html
 
 
@@ -64,6 +64,7 @@ def view_root(self, request):
 def websockets_app(request, websocket_config):
     websockets = {
         'client_url': websocket_config['url'],
+        'client_csp': websocket_config['url'],
         'manage_url': websocket_config['url'],
         'manage_token': websocket_config['token']
     }
@@ -75,6 +76,11 @@ def websockets_app(request, websocket_config):
     )
     yield app
     app.session_manager.dispose()
+
+
+@fixture(scope='function')
+def client(websockets_app):
+    yield Client(websockets_app)
 
 
 @fixture(scope='function')
