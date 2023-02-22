@@ -1,7 +1,10 @@
 var onWebsocketNotification = function(message) {
   if (message.event === 'browser-notification' && message.title && "Notification" in window) {
     if (Notification.permission === "granted") {
-      new Notification(message.title);
+      new Notification(
+        message.title,
+        // { tag: 'xyz' } todo: use me to avoid duplicate message by multiple tabs!
+      );
     }
   }
 }

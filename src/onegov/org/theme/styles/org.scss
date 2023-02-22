@@ -2559,6 +2559,7 @@ $ticket-notification-disabled-icon: '\f1f6';
 $archive-ticket-icon: '\f1c6';
 
 .ticket-notifications {
+    float: right;
 
     &::before {
         @include icon($ticket-notification-disabled-icon);

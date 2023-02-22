@@ -708,12 +708,15 @@ button {
         margin-right: 0;
         padding: .5rem !important;
     }
+
+    .main-title {
+        max-width: none;
+    }
+
 }
 
 .ticket-notifications {
-    margin-top: .5rem !important;
-    position: absolute;
-    right: 1rem;
+    float: right;
 
     &::before { @include icon-bold($ticket-notification-disabled-icon); }
 

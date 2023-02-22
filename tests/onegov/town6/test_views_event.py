@@ -5,9 +5,13 @@ import transaction
 from datetime import date, timedelta
 from onegov.event import Event
 from tests.onegov.town6.common import step_class
+from unittest.mock import patch
 
 
-def test_event_steps(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_event_steps(broadcast, authenticate, connect, client):
 
     form_page = client.get('/events').click("Veranstaltung vorschlagen")
     start_date = date.today() + timedelta(days=1)
@@ -87,6 +91,13 @@ def test_event_steps(client):
     message = client.get_email(0)
     assert message['To'] == "test@example.org"
     assert ticket_nr in message['TextBody']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3] == {
+        'event': 'browser-notification', 'title': 'Neues Ticket'
+    }
 
     # Make corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
