@@ -5,7 +5,8 @@ window.addEventListener("DOMContentLoaded", function() {
         websocket.addEventListener("open", function() {
           let payload = {
             type: "register",
-            schema: WebsocketConfig.schema
+            schema: WebsocketConfig.schema,
+            channel: WebsocketConfig.channel
           }
           websocket.send(JSON.stringify(payload));
         });

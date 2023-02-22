@@ -7,7 +7,7 @@ from websockets import connect
 
 
 @mark.asyncio
-async def test_page_refresh(browser):
+async def test_browser_integration(browser):
 
     WebsocketsRoot.html = f"""
         <!doctype html>
@@ -18,6 +18,7 @@ async def test_page_refresh(browser):
                     WebsocketConfig = {{
                         endpoint: "{browser.websocket_server_url}",
                         schema: "schema",
+                        channel: "two",
                         onnotifcation: function(event) {{
                             document.getElementById("x").className += "y";
                         }}
@@ -35,8 +36,10 @@ async def test_page_refresh(browser):
         await authenticate(manage, 'super-super-secret-token')
 
         response = await status(manage)
-        assert response['connections'].get('schema') == 1
+        assert response['connections'].get('schema-two') == 1
 
-        await broadcast(manage, 'schema', {'custom': 'data'})
+        await broadcast(manage, 'schema', 'one', {'custom': 'data'})
+        assert len(browser.find_by_css('.y')) == 0
 
-    assert len(browser.find_by_css('.y')) == 1
+        await broadcast(manage, 'schema', 'two', {'custom': 'data'})
+        assert len(browser.find_by_css('.y')) == 1

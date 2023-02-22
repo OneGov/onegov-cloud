@@ -22,6 +22,7 @@ def cfg_path(
                 'configuration': {
                     'dsn': postgres_dsn,
                     'redis_url': redis_url,
+                    'identity_secret': 'much-secret',
                     'websockets': {
                         'client_url': websocket_config['url'],
                         'manage_url': websocket_config['url'],
@@ -137,7 +138,8 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
     assert authenticate.call_args[0][1] == 'super-super-secret-token'
     assert broadcast.call_count == 1
     assert broadcast.call_args[0][1] == 'foo-bar'
-    assert broadcast.call_args[0][2] == {'a': 'b'}
+    assert broadcast.call_args[0][2] is None
+    assert broadcast.call_args[0][3] == {'a': 'b'}
     assert '{"a": "b"} sent to foo-bar' in result.output
 
     result = runner.invoke(cli, [
@@ -146,6 +148,7 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
         'broadcast',
         '--url', 'wss://govikon.org/ws',
         '--schema', 'foo-baz',
+        '--channel', 'one',
         '--token', 'not-so-secret-token',
         '{"a": "b"}'
     ])
@@ -156,5 +159,81 @@ def test_cli_broadcast(broadcast, authenticate, connect, cfg_path):
     assert authenticate.call_args[0][1] == 'not-so-secret-token'
     assert broadcast.call_count == 2
     assert broadcast.call_args[0][1] == 'foo-baz'
-    assert broadcast.call_args[0][2] == {'a': 'b'}
-    assert '{"a": "b"} sent to foo-baz' in result.output
+    assert broadcast.call_args[0][2] == 'one'
+    assert broadcast.call_args[0][3] == {'a': 'b'}
+    assert '{"a": "b"} sent to foo-baz-one' in result.output
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'broadcast',
+        '--private',
+        '{"a": "b"}'
+    ])
+    assert result.exit_code == 0
+    assert connect.call_count == 3
+    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert authenticate.call_count == 3
+    assert authenticate.call_args[0][1] == 'super-super-secret-token'
+    assert broadcast.call_count == 3
+    assert broadcast.call_args[0][1] == 'foo-bar'
+    assert broadcast.call_args[0][2]
+    assert broadcast.call_args[0][3] == {'a': 'b'}
+    assert 'foo-bar-{}'.format(broadcast.call_args[0][2]) in result.output
+
+# todo: listen
+
+# @cli.command('listen')
+# @click.option('--url')
+# @click.option('--schema')
+# @click.option('--channel')
+# @click.option('--private', is_flag=True, default=False)
+
+
+@patch('onegov.websockets.cli.connect')
+@patch('onegov.websockets.cli.register')
+def test_cli_listen(register, connect, cfg_path):
+    runner = CliRunner()
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'listen',
+    ])
+    assert result.exit_code == 0
+    assert connect.call_count == 1
+    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert register.call_count == 1
+    assert register.call_args[0][1] == 'foo-bar'
+    assert register.call_args[0][2] is None
+    assert 'Listing on ws://127.0.0.1:9876 @ foo-bar' in result.output
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'listen',
+        '--url', 'wss://govikon.org/ws',
+        '--schema', 'foo-baz',
+        '--channel', 'one',
+    ])
+    assert result.exit_code == 0
+    assert connect.call_count == 2
+    assert connect.call_args[0][0] == 'wss://govikon.org/ws'
+    assert register.call_count == 2
+    assert register.call_args[0][1] == 'foo-baz'
+    assert register.call_args[0][2] == 'one'
+    assert 'Listing on wss://govikon.org/ws @ foo-baz-one' in result.output
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/bar',
+        'listen',
+        '--private',
+    ])
+    assert result.exit_code == 0
+    assert connect.call_count == 3
+    assert connect.call_args[0][0] == 'ws://127.0.0.1:9876'
+    assert register.call_count == 3
+    assert register.call_args[0][1] == 'foo-bar'
+    assert register.call_args[0][2]
+    assert 'foo-bar-{}'.format(register.call_args[0][2]) in result.output
