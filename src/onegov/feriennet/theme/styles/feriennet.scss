@@ -437,12 +437,23 @@ ul.tags {
 }
 
 .side-panel {
-    .organiser {
-        padding: .5rem 1rem 1rem;
+    padding: .5rem 1rem 1rem;
 
-        * {
-            font-weight: normal;
-        }
+    .title {
+        background: $primary-color;
+        color: $white;
+        display: block;
+        margin: -.5rem -1rem 1rem;
+        padding: .75rem 1rem;
+        text-transform: uppercase;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    .organiser * {
+        font-weight: normal;
     }
 }
 
