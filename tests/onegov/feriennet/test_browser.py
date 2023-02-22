@@ -309,11 +309,17 @@ def test_volunteers_export(browser, scenario):
         'file_format': "json",
     })
     browser.find_by_value("Absenden").click()
+
     volunteer_export = json.loads(browser.find_by_tag('pre').text)[0]
+
+    occasion_date = scenario.date_offset(10)
+    start_time = occasion_date.strftime('%Y-%m-%dT00:00:00+01:00')
+    end_time = occasion_date.strftime('%Y-%m-%dT01:00:00+01:00')
+
     volunteer_json = {
         'Angebot Titel': 'Zoo',
         'Durchführung Daten': [
-            ['2023-02-23T00:00:00+01:00', '2023-02-23T01:00:00+01:00']
+            [start_time, end_time]
         ],
         'Durchführung Abgesagt': False,
         'Bedarf Name': 'Begleiter',
