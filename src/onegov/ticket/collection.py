@@ -2,6 +2,7 @@ import random
 
 from collections import namedtuple
 from onegov.core.collection import Pagination
+from onegov.ticket import _
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.model import Ticket
 from sqlalchemy import desc, distinct, func
@@ -191,12 +192,15 @@ class TicketCollection(TicketCollectionPagination):
 
         # sent ticket notification
         if request:
+            title = _(
+                '${org}: New ticket',
+                mapping={'org': request.app.org.title}
+            )
             request.app.send_websocket(
                 channel=request.app.websockets_private_channel,
                 message={
-                    'event': 'ticket',
-                    'number': ticket.number,
-                    'url': request.link(ticket),
+                    'event': 'browser-notification',
+                    'title': request.translate(title)
                 }
             )
 
