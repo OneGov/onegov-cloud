@@ -12,7 +12,7 @@
 #   actual values. See examples below.
 # - Entries without logo_url and just for banners need to be added below
 #   entries with logo_url
-#
+# - First Entry ist main sponsor and must have logo_url, mail_url and banner
 
 
 # Entries with logo_url
