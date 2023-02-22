@@ -158,7 +158,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         )
 
         yield BoardletFact(
-            text=_("${count} of which are overfull", mapping={
+            text=_("${count} overfull", mapping={
                 'count': self.occasion_states()['overfull'],
             }),
             icon='fa-exclamation-circle',
@@ -166,7 +166,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         )
 
         yield BoardletFact(
-            text=_("${count} of which are full", mapping={
+            text=_("${count} full", mapping={
                 'count': self.occasion_states()['full'],
             }),
             icon='fa-circle',
@@ -174,7 +174,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         )
 
         yield BoardletFact(
-            text=_("${count} of which are operable", mapping={
+            text=_("${count} operable", mapping={
                 'count': self.occasion_states()['operable'],
             }),
             icon='fa-check-circle',
@@ -182,7 +182,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         )
 
         yield BoardletFact(
-            text=_("${count} of which are unoperable", mapping={
+            text=_("${count} unoperable", mapping={
                 'count': self.occasion_states()['unoperable'],
             }),
             icon='fa-stop-circle',
@@ -190,7 +190,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         )
 
         yield BoardletFact(
-            text=_("${count} of which are empty", mapping={
+            text=_("${count} empty", mapping={
                 'count': self.occasion_states()['empty'],
             }),
             icon='fa-circle-o',
@@ -198,7 +198,7 @@ class ActivitiesBoardlet(FeriennetBoardlet):
         )
 
         yield BoardletFact(
-            text=_("${count} of which are cancelled", mapping={
+            text=_("${count} cancelled", mapping={
                 'count': self.occasion_states()['cancelled'],
             }),
             icon='fa-times-circle',
@@ -360,7 +360,7 @@ class AttendeesBoardlet(FeriennetBoardlet):
 
     @property
     def title(self):
-        return _("${count} registered Attendees", mapping={
+        return _("${count} Attendees", mapping={
             'count': self.attendee_counts['total']
         })
 
@@ -377,15 +377,6 @@ class AttendeesBoardlet(FeriennetBoardlet):
             return
 
         yield BoardletFact(
-            text=_("${count} of which without accepted bookings",
-                   mapping={
-                       'count': self.attendee_counts['without_booking']
-                   }),
-            icon='fa-minus',
-            css_class='' if self.attendee_counts['without_booking'] else 'zero'
-        )
-
-        yield BoardletFact(
             text=_("${count} Girls", mapping={
                 'count': self.attendee_counts['girls']
             }),
@@ -399,6 +390,15 @@ class AttendeesBoardlet(FeriennetBoardlet):
             }),
             icon='fa-male',
             css_class='' if self.attendee_counts['boys'] else 'zero'
+        )
+
+        yield BoardletFact(
+            text=_("${count} of which without accepted bookings",
+                   mapping={
+                       'count': self.attendee_counts['without_booking']
+                   }),
+            icon='fa-minus',
+            css_class='' if self.attendee_counts['without_booking'] else 'zero'
         )
 
 
