@@ -28,12 +28,7 @@ class WebsocketsApp(WebassetsApp):
     """
 
     def configure_websockets(self, **cfg):
-        """ Configures global websocket settings.
-
-        Defaults to port 8765 and a randomly generated token which is available
-        until the next reboot of the host.
-
-        """
+        """ Configures global websocket settings. """
 
         config = cfg.get('websockets', {})
         self._websockets_client_url = config.get('client_url')

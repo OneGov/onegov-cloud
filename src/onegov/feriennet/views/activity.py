@@ -864,8 +864,7 @@ def propose_activity(self, request):
 
         ticket = TicketCollection(session).open_ticket(
             handler_code='FER',
-            handler_id=publication_request.id.hex,
-            request=request
+            handler_id=publication_request.id.hex
         )
         TicketMessage.create(ticket, request, 'opened')
 

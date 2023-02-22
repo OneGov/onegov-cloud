@@ -221,8 +221,7 @@ def handle_complete_submission(self, request):
             with collection.session.no_autoflush:
                 ticket = TicketCollection(request.session).open_ticket(
                     handler_code=self.meta.get('handler_code', 'FRM'),
-                    handler_id=self.id.hex,
-                    request=request
+                    handler_id=self.id.hex
                 )
                 TicketMessage.create(ticket, request, 'opened')
 
@@ -249,6 +248,14 @@ def handle_complete_submission(self, request):
                         'model': ticket
                     }
                 )
+
+            request.app.send_websocket(
+                channel=request.app.websockets_private_channel,
+                message={
+                    'event': 'browser-notification',
+                    'title': request.translate(_('New ticket'))
+                }
+            )
 
             if request.auto_accept(ticket):
                 try:

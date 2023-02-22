@@ -93,7 +93,16 @@ def client_with_es(es_town_app):
 
 
 def create_town_app(request, use_elasticsearch=False):
-    app = create_app(TownApp, request, use_elasticsearch)
+    app = create_app(
+        TownApp,
+        request,
+        use_elasticsearch,
+        websockets={
+            'client_url': 'ws://localhost:8766',
+            'manage_url': 'ws://localhost:8766',
+            'manage_token': 'super-super-secret-token'
+        }
+    )
     app.configure_payment_providers(**{
         'payment_providers_enabled': True,
         'payment_provider_defaults': {

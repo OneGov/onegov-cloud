@@ -52,8 +52,7 @@ def request_accreditation(self, request, form):
                     'id': str(translator.id),
                     'submitter_email': form.email.data,
                     **form.get_ticket_data()
-                },
-                request=request
+                }
             )
             TicketMessage.create(ticket, request, 'opened')
             ticket.create_snapshot(request)
@@ -76,6 +75,14 @@ def request_accreditation(self, request, form):
                     'model': ticket
                 }
             )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket'))
+            }
+        )
 
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))

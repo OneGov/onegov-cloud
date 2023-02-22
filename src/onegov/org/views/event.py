@@ -257,9 +257,7 @@ def view_event(self, request, layout=None):
             if not ticket:
                 with session.no_autoflush:
                     ticket = TicketCollection(session).open_ticket(
-                        handler_code='EVN',
-                        handler_id=self.id.hex,
-                        request=request
+                        handler_code='EVN', handler_id=self.id.hex
                     )
                     TicketMessage.create(ticket, request, 'opened')
 
@@ -281,6 +279,14 @@ def view_event(self, request, layout=None):
                             'model': ticket
                         }
                     )
+
+                request.app.send_websocket(
+                    channel=request.app.websockets_private_channel,
+                    message={
+                        'event': 'browser-notification',
+                        'title': request.translate(_('New ticket'))
+                    }
+                )
 
                 if request.auto_accept(ticket):
                     try:

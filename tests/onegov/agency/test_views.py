@@ -15,6 +15,7 @@ from tests.onegov.org.common import get_cronjob_url
 from tests.shared.utils import encode_map_value
 from time import sleep
 from transaction import commit
+from unittest.mock import patch
 
 
 def test_views_general(client):
@@ -498,7 +499,10 @@ def test_view_pdf_settings(client):
     assert 'Placeholder for table of contents' in pdf
 
 
-def test_view_mutations(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_view_mutations(broadcast, authenticate, connect, client):
     # Add data
     client.login_admin()
 
@@ -540,6 +544,13 @@ def test_view_mutations(client):
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
 
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3] == {
+        'event': 'browser-notification', 'title': 'Neues Ticket'
+    }
+
     agency_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
     manage = client.get(agency_ticket_number)
     assert "Mutationsmeldung" in manage
@@ -568,6 +579,13 @@ def test_view_mutations(client):
     change.form['function'] = 'Janitor'
     change = change.form.submit().follow()
     assert "Vielen Dank für Ihre Eingabe!" in change
+
+    assert connect.call_count == 2
+    assert authenticate.call_count == 2
+    assert broadcast.call_count == 2
+    assert broadcast.call_args[0][3] == {
+        'event': 'browser-notification', 'title': 'Neues Ticket'
+    }
 
     person_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
     manage = client.get(person_ticket_number)

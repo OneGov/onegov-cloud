@@ -2,7 +2,6 @@ import random
 
 from collections import namedtuple
 from onegov.core.collection import Pagination
-from onegov.ticket import _
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.model import Ticket
 from sqlalchemy import desc, distinct, func
@@ -171,9 +170,7 @@ class TicketCollection(TicketCollectionPagination):
             if not self.is_existing_ticket_number(candidate):
                 return candidate
 
-    def open_ticket(
-        self, handler_code, handler_id, request=None, **handler_data
-    ):
+    def open_ticket(self, handler_code, handler_id, **handler_data):
         """ Opens a new ticket using the given handler. """
 
         ticket = Ticket.get_polymorphic_class(handler_code, default=Ticket)()
@@ -189,20 +186,6 @@ class TicketCollection(TicketCollectionPagination):
         ticket.handler.refresh()
 
         self.session.flush()
-
-        # sent ticket notification
-        if request:
-            title = _(
-                '${org}: New ticket',
-                mapping={'org': request.app.org.title}
-            )
-            request.app.send_websocket(
-                channel=request.app.websockets_private_channel,
-                message={
-                    'event': 'browser-notification',
-                    'title': request.translate(title)
-                }
-            )
 
         return ticket
 

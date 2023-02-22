@@ -499,9 +499,7 @@ def finalize_reservation(self, request):
             forms.submissions.complete_submission(submission)
         with forms.session.no_autoflush:
             ticket = TicketCollection(request.session).open_ticket(
-                handler_code='RSV',
-                handler_id=token,
-                request=request
+                handler_code='RSV', handler_id=token
             )
             TicketMessage.create(ticket, request, 'opened')
 
@@ -535,6 +533,14 @@ def finalize_reservation(self, request):
                     'model': ticket
                 }
             )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket'))
+            }
+        )
 
         if request.auto_accept(ticket):
             try:

@@ -8,6 +8,7 @@ from datetime import datetime, date, timedelta
 from onegov.event.models import Event
 from tests.shared.utils import create_image
 from tests.shared.utils import get_meta
+from unittest.mock import patch
 from webtest.forms import Upload
 
 
@@ -184,10 +185,13 @@ def fill_event_form(form_page, start_date, end_date, add_image=False):
     return form_page
 
 
-@pytest.mark.parametrize('skip_opening_email', [True, False])
-def test_submit_event(client, skip_opening_email):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+@pytest.mark.parametrize('skip', [True, False])
+def test_submit_event(broadcast, authenticate, connect, client, skip):
 
-    if skip_opening_email:
+    if skip:
         client.login_admin()
         settings = client.get('/ticket-settings')
         settings.form['tickets_skip_opening_email'] = ['EVN']
@@ -243,7 +247,7 @@ def test_submit_event(client, skip_opening_email):
 
     # Submit event
     confirmation_page = preview_page.form.submit().follow()
-    if skip_opening_email:
+    if skip:
         assert len(os.listdir(client.app.maildir)) == 0
         return
 
@@ -257,6 +261,13 @@ def test_submit_event(client, skip_opening_email):
     message = client.get_email(0)
     assert message['To'] == "test@example.org"
     assert ticket_nr in message['TextBody']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3] == {
+        'event': 'browser-notification', 'title': 'Neues Ticket'
+    }
 
     # Make corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")

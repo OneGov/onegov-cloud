@@ -24,6 +24,11 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
                     'dsn': postgres_dsn,
                     'depot_backend': 'depot.io.memory.MemoryFileStorage',
                     'redis_url': redis_url,
+                    'websockets': {
+                        'client_url': 'ws://localhost:8766',
+                        'manage_url': 'ws://localhost:8766',
+                        'manage_token': 'super-super-secret-token'
+                    }
                 }
             }
         ]

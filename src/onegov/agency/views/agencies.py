@@ -504,8 +504,7 @@ def report_agency_change(self, request, form):
                     'submitter_email': form.submitter_email.data,
                     'submitter_message': form.submitter_message.data,
                     'proposed_changes': form.proposed_changes
-                },
-                request=request
+                }
             )
             TicketMessage.create(ticket, request, 'opened')
             ticket.create_snapshot(request)
@@ -529,6 +528,14 @@ def report_agency_change(self, request, form):
                     'model': ticket
                 }
             )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket'))
+            }
+        )
 
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))
