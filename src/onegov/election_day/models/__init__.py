@@ -5,6 +5,7 @@ from onegov.election_day.models.notification import EmailNotification
 from onegov.election_day.models.notification import Notification
 from onegov.election_day.models.notification import SmsNotification
 from onegov.election_day.models.notification import WebhookNotification
+from onegov.election_day.models.notification import WebsocketNotification
 from onegov.election_day.models.principal import Canton
 from onegov.election_day.models.principal import Municipality
 from onegov.election_day.models.principal import Principal
@@ -31,4 +32,5 @@ __all__ = [
     'Subscriber',
     'UploadToken',
     'WebhookNotification',
+    'WebsocketNotification',
 ]

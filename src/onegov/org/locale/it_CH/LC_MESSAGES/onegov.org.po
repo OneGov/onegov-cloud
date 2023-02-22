@@ -2146,6 +2146,9 @@ msgstr "Lo scorso anno"
 msgid "Older"
 msgstr "Più vecchia"
 
+msgid "Past Events"
+msgstr "Eventi passate"
+
 msgid "Do you really want to delete this note?"
 msgstr "Vuoi davvero eliminare questa nota?"
 
@@ -3280,7 +3283,7 @@ msgid "Click the following link to set a new password:"
 msgstr "Clicca sul collegamento seguente per impostare una nuova password:"
 
 msgid "If you don't want to change your password, you can ignore this email."
-msgstr "Se desideri modificare la password, ignora questa e-mail."
+msgstr "Se non desideri modificare la password, ignora questa e-mail."
 
 msgid "Your request has received a payment."
 msgstr "La tua richiesta ha ricevuto un pagamento."
@@ -4276,8 +4279,8 @@ msgstr ""
 "eventi già pubblicati possono essere rimossi dalla pagina senza preavviso o "
 "motivo."
 
-msgid "Create an event"
-msgstr "Inserire l'evento"
+msgid "Add event"
+msgstr "Aggiungi evento"
 
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"

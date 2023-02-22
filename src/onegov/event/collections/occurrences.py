@@ -24,9 +24,9 @@ class OccurrenceCollection(Pagination):
     automatically when adding a new event.
 
     Occurrences can be filtered by relative date ranges (``today``,
-    ``tomorrow``, ``weekend``, ``week``, ``month``) or by a given start date
-    and/or end date. The range filter is dominant and overwrites the start and
-    end dates if provided.
+    ``tomorrow``, ``weekend``, ``week``, ``month``, ``past``) or by a
+    given start date and/or end date. The range filter is dominant and
+    overwrites the start and end dates if provided.
 
     By default, only current occurrences are used.
 
@@ -34,7 +34,7 @@ class OccurrenceCollection(Pagination):
 
     """
 
-    date_ranges = ('today', 'tomorrow', 'weekend', 'week', 'month')
+    date_ranges = ('today', 'tomorrow', 'weekend', 'week', 'month', 'past')
 
     def __init__(
         self,
@@ -90,6 +90,7 @@ class OccurrenceCollection(Pagination):
             - weekend (next or current Friday to Sunday)
             - week (current Monday to Sunday)
             - month (current)
+            - past (events in the past)
 
         """
         if range not in self.date_ranges:
@@ -116,6 +117,10 @@ class OccurrenceCollection(Pagination):
         if range == 'month':
             start = today.replace(day=1)
             return start, start + relativedelta(months=1, days=-1)
+        if range == 'past':
+            millennium = date(2000, 1, 1)
+            yesterday = today - timedelta(days=1)
+            return millennium, yesterday
         pass
 
     def for_filter(self, **kwargs):
@@ -213,6 +218,8 @@ class OccurrenceCollection(Pagination):
         if self.start is not None or self.outdated is False:
             if self.start is None:
                 start = date.today()
+            elif self.range == 'past':
+                start = self.start
             else:
                 start = self.start
                 if self.outdated is False:
@@ -267,7 +274,11 @@ class OccurrenceCollection(Pagination):
                 ])
             )
 
-        query = query.order_by(Occurrence.start, Occurrence.title)
+        if self.range == 'past':
+            # reverse order for past events: most recent event on top
+            query = query.order_by(Occurrence.start.desc(), Occurrence.title)
+        else:
+            query = query.order_by(Occurrence.start, Occurrence.title)
 
         return query
 

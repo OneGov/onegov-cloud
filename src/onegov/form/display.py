@@ -137,6 +137,18 @@ class UploadFieldRenderer(BaseRenderer):
         )
 
 
+@registry.register_for('UploadMultipleField')
+class UploadMultipleFieldRenderer(BaseRenderer):
+
+    def __call__(self, field):
+        return '<br>'.join(
+            '{filename} ({size})'.format(
+                filename=self.escape(data['filename']),
+                size=humanize.naturalsize(data['size'])
+            ) for data in field.data if data
+        )
+
+
 @registry.register_for('RadioField')
 class RadioFieldRenderer(BaseRenderer):
 

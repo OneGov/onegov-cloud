@@ -52,7 +52,7 @@
                     </p>
 
                     <tal:b
-                        define="banner layout.app.random_banner(request)"
+                        define="banner layout.app.banners(request)[0]"
                         condition="banner"
                         replace="structure banner"
                     />

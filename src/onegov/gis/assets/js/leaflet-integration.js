@@ -5,11 +5,11 @@ var vectorMarkerSVGTemplate = '<svg width="28" height="37" viewBox="0 0 28 37" x
 
 var entry_counter = 0
 var entry_numbers = Array.from(document.getElementsByClassName("entry-number"));
-console.log(entry_numbers);
+// console.log(entry_numbers);
 entry_numbers = entry_numbers.map(function (entry) {
     return entry.textContent.replace('. ','')
 });
-console.log(entry_numbers);
+// console.log(entry_numbers);
 
 function VectorMarkerSVG(markerColor, borderColor, iconColor, icon) {
     font_family = 'inherit'
