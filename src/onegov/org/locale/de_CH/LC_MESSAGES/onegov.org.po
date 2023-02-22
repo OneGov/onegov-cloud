@@ -4268,8 +4268,8 @@ msgstr ""
 "Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
 "Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
 
-msgid "Create an event"
-msgstr "Veranstaltung erfassen"
+msgid "Add event"
+msgstr "Veranstaltung hinzufügen"
 
 msgid "Your request has been registered"
 msgstr "Ihre Anfrage wurde erfasst"
