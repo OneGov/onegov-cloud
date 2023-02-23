@@ -40,7 +40,9 @@ def test_upload_vote_unknown_result(election_day_app_zg):
         '1706,unbekannt,7405,16516,80,1',  # Oberägeri
     )).encode('utf-8')
     upload.form['proposal'] = Upload('data.csv', proposal, 'text/plain')
-    result = upload.form.submit().click("Hier klicken").maybe_follow()
+    result = upload.form.submit().click(
+        "Hier klicken um die Seite"
+    ).maybe_follow()
     result = ' '.join([td.text for td in result.pyquery('tr > *')])
 
     assert "Noch keine Resultate" not in result
@@ -55,7 +57,9 @@ def test_upload_vote_unknown_result(election_day_app_zg):
         '1711,unbekannt,7405,16516,80,1',
     )).encode('utf-8')
     upload.form['proposal'] = Upload('data.csv', proposal, 'text/plain')
-    result = upload.form.submit().click("Hier klicken").maybe_follow()
+    result = upload.form.submit().click(
+        "Hier klicken um die Seite"
+    ).maybe_follow()
 
     assert "Noch keine Resultate" in result
     assert archive.query().one().progress == (0, 11)
