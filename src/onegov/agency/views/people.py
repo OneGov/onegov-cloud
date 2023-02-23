@@ -330,7 +330,8 @@ def report_person_change(self, request, form):
             channel=request.app.websockets_private_channel,
             message={
                 'event': 'browser-notification',
-                'title': request.translate(_('New ticket'))
+                'title': request.translate(_('New ticket')),
+                'created': ticket.created.isoformat()
             }
         )
 

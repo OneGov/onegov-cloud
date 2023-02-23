@@ -146,9 +146,9 @@ def test_submit_form(broadcast, authenticate, connect, client):
     assert connect.call_count == 1
     assert authenticate.call_count == 1
     assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     # unless he opts out of it
     form_page = client.get('/forms').click('Profile')
@@ -167,9 +167,9 @@ def test_submit_form(broadcast, authenticate, connect, client):
     assert connect.call_count == 2
     assert authenticate.call_count == 2
     assert broadcast.call_count == 2
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
 
 def test_pending_submission_error_file_upload(client):

@@ -547,9 +547,9 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     assert connect.call_count == 1
     assert authenticate.call_count == 1
     assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     agency_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
     manage = client.get(agency_ticket_number)
@@ -583,9 +583,9 @@ def test_view_mutations(broadcast, authenticate, connect, client):
     assert connect.call_count == 2
     assert authenticate.call_count == 2
     assert broadcast.call_count == 2
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     person_ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
     manage = client.get(person_ticket_number)

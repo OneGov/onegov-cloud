@@ -810,9 +810,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert connect.call_count == 1
     assert authenticate.call_count == 1
     assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     client.logout()
     client.login_admin()
@@ -916,9 +916,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert connect.call_count == 2
     assert authenticate.call_count == 2
     assert broadcast.call_count == 2
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     client.logout()
     client.login_admin()
@@ -1039,9 +1039,9 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     assert connect.call_count == 3
     assert authenticate.call_count == 3
     assert broadcast.call_count == 3
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     client.logout()
     client.login_admin()
@@ -1278,9 +1278,9 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
         assert connect.call_count == websocket_messages
         assert authenticate.call_count == websocket_messages
         assert broadcast.call_count == websocket_messages
-        assert broadcast.call_args[0][3] == {
-            'event': 'browser-notification', 'title': 'Neues Ticket'
-        }
+        assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+        assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+        assert broadcast.call_args[0][3]['created']
 
         client.login_admin()
         page = client.get('/tickets/ALL/open').click('Annehmen').follow()

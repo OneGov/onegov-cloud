@@ -265,9 +265,9 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert connect.call_count == 1
     assert authenticate.call_count == 1
     assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     # Make corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")

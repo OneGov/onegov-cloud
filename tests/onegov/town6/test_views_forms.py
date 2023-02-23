@@ -47,9 +47,9 @@ def test_form_steps(broadcast, authenticate, connect, client):
     assert connect.call_count == 1
     assert authenticate.call_count == 1
     assert broadcast.call_count == 1
-    assert broadcast.call_args[0][3] == {
-        'event': 'browser-notification', 'title': 'Neues Ticket'
-    }
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
 
 def test_registration_ticket_workflow(client):
