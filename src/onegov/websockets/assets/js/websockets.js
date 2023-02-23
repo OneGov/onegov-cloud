@@ -13,7 +13,7 @@ window.addEventListener("DOMContentLoaded", function() {
       websocket.addEventListener('message', function(message) {
         const data = JSON.parse(message.data)
         if (data.type === 'notification' && WebsocketConfig.onnotifcation) {
-            WebsocketConfig.onnotifcation(data.message);
+            WebsocketConfig.onnotifcation(data.message, websocket);
         }
       });
     } catch (error) {}
