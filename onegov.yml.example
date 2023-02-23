@@ -80,7 +80,7 @@ configuration: &global-config
   # Some browsers send a special header when a user clicks on refresh while
   # holding down shift. The following setting will recompile themes whenever
   # that happens.
-  allow_shift_f5_compile: false
+  allow_shift_f5_compile: true
 
   # OneGov keeps track of queries run against postgres and reports the
   # redundant ones when 'redundant' is selected. Other possible values are
