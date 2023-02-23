@@ -19,7 +19,7 @@ async def test_browser_integration(browser):
                         endpoint: "{browser.websocket_server_url}",
                         schema: "schema",
                         channel: "two",
-                        onnotifcation: function(event) {{
+                        onnotifcation: function(message, websocket) {{
                             document.getElementById("x").className += "y";
                         }}
                     }};
