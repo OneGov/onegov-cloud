@@ -415,6 +415,9 @@ msgstr ""
 "Verschiebt die gesamte Organisation mit allen Personen und "
 "Unterorganisationen an den entsprechenden Ort."
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
 msgid "PDF created"
 msgstr "PDF erstellt"
 

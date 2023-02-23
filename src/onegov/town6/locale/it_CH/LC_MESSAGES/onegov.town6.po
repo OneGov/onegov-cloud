@@ -212,6 +212,12 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Destination"
+msgstr "Destinazione"
+
+msgid "- Root -"
+msgstr "- Principale -"
+
 msgid "Upload to Gever"
 msgstr "Caricare a Gever"
 
@@ -343,10 +349,10 @@ msgstr "Importa"
 msgid "Create an event"
 msgstr "Inserire l'evento"
 
-msgid "This event can't be editet."
+msgid "This event can't be edited."
 msgstr "Questo evento non può essere modificato."
 
-msgid "Imported events can not be editet."
+msgid "Imported events can not be edited."
 msgstr "Gli eventi importati non possono essere modificati."
 
 msgid "Do you really want to delete this event?"

@@ -1843,6 +1843,12 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Destination"
+msgstr "Destinazione"
+
+msgid "- Root -"
+msgstr "- Principale -"
+
 msgid "New Message"
 msgstr "Nuovo messaggio"
 
@@ -1925,10 +1931,10 @@ msgstr "Elimina allocazione"
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
 
-msgid "This event can't be editet."
+msgid "This event can't be edited."
 msgstr "Questo evento non può essere modificato."
 
-msgid "Imported events can not be editet."
+msgid "Imported events can not be edited."
 msgstr "Gli eventi importati non possono essere modificati."
 
 msgid "Do you really want to delete this event?"
@@ -2455,6 +2461,9 @@ msgstr "Aggiunto un nuovo argomento"
 
 msgid "Edit Topic"
 msgstr "Modifica argomento"
+
+msgid "Move Topic"
+msgstr "Spostare argomento"
 
 msgid "The topic was deleted"
 msgstr "L'argomento è stato eliminato"
@@ -5094,6 +5103,9 @@ msgstr ""
 
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Il PDF di questo biglietto è stato caricato con successo su Gever."
+
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Sposta l'argomento e tutti i suoi sottoargomenti nella destinazione indicata."
 
 msgid "My"
 msgstr "Il mio"
