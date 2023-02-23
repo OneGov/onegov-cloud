@@ -154,7 +154,8 @@ class ContactExtension(ContentExtension):
     @contact.setter
     def contact(self, value):
         self.content['contact'] = value
-        self.content['contact_html'] = to_html_ul(value, convert_dashes=True)
+        self.content['contact_html'] = to_html_ul(
+            value, convert_dashes=True, with_title=True)
 
     @property
     def contact_html(self):
