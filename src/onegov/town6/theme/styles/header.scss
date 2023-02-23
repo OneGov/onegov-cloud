@@ -22,6 +22,7 @@ $manage-recipients: '\f0e0';
 $manage-subscribers: '\f0c0';
 $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
+$move-link-icon: '\f047';
 $new-daypass-icon: '\f3ff';
 $new-daily-item-icon: '\f518';
 $new-resource-link-icon: '\f0c1';
@@ -465,6 +466,7 @@ $editbar-fg-color-active: $white;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
+    .move-link::before { @include icon($move-link-icon); }
     .export-link::before { @include icon-bold($export-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
