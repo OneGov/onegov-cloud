@@ -5,8 +5,8 @@ from webob.exc import HTTPForbidden
 
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
-from onegov.org.forms.page import PageUrlForm
-from onegov.org.layout import EditorLayout
+from onegov.org.forms.page import MovePageForm, PageUrlForm
+from onegov.org.layout import EditorLayout, PageLayout
 from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
 from onegov.page import PageCollection
@@ -22,6 +22,8 @@ def get_form_class(editor, request):
                 src.trait, editor.action, request)
     if editor.action == 'change-url':
         return PageUrlForm
+    if editor.action == 'move':
+        return MovePageForm
     return editor.page.get_form_class(editor.trait, editor.action, request)
 
 
@@ -41,14 +43,13 @@ def handle_page_form(self, request, form, layout=None):
         return handle_new_page(self, request, form, src, layout)
     elif self.action == 'sort':
         return morepath.redirect(request.link(self, 'sort'))
-    elif self.action == 'move':  # copy and paste or move like sort
-        return morepath.redirect(request.link(self, 'move'))
+    elif self.action == 'move':
+        return handle_move_page(self, request, form)
     else:
         raise NotImplementedError
 
 
 def handle_new_page(self, request, form, src=None, layout=None):
-    print('tschupre handle new page')
     site_title = self.page.trait_messages[self.trait]['new_page_title']
     if layout:
         layout.site_title = site_title
@@ -78,7 +79,6 @@ def handle_new_page(self, request, form, src=None, layout=None):
 
 
 def handle_edit_page(self, request, form, layout=None):
-    print('tschupre handle edit page')
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
 
     layout = layout or EditorLayout(self, request, site_title)
@@ -103,6 +103,26 @@ def handle_edit_page(self, request, form, layout=None):
         'title': site_title,
         'form': form,
         'form_width': 'large'
+    }
+
+
+def handle_move_page(self, request, form, layout=None):
+    layout = layout or PageLayout(self.page, request)
+    layout.site_title = self.page.trait_messages[self.trait]['move_page_title']
+
+    if form.submitted(request):
+        form.update_model(self.page)
+        # form.populate_obj(self.page)
+        request.success(_("Your changes were saved"))
+
+        return morepath.redirect(request.link(self.page))
+
+    return {
+        'layout': layout,
+        'title': layout.site_title,
+        'helptext': _("Moves the topic and all its sub topics to the "
+                      "given destination."),
+        'form': form,
     }
 
 
@@ -169,7 +189,6 @@ def handle_change_page_url(self, request, form, layout=None):
     permission=Private
 )
 def view_topics_sort(self, request, layout=None):
-    print('tschupre sort topics')
     layout = layout or EditorLayout(self, request, 'sort')
 
     return {
@@ -177,41 +196,4 @@ def view_topics_sort(self, request, layout=None):
         'layout': layout,
         'page': self.page,
         'pages': self.page.children
-    }
-
-
-@OrgApp.html(
-    model=Editor,
-    template='move.pt',
-    name='move',
-    permission=Private
-)
-def view_topics_move(self, request, layout=None):
-    print('tschupre move topics')
-    layout = layout or EditorLayout(self, request, 'move')
-    # print(f'type(page): {type(self.page)}')
-    # print(f'page.root: {self.page.root}')
-    # print(f'page.parent: {self.page.parent}')
-    # print(f'page: {self.page}')
-    # print(f'child pages: {self.page.children}')
-
-    # loop through tree
-    pages = []
-
-    def collect_child_pages(page):
-        print(page)
-        pages.append(page)
-        for p in page.children:
-            collect_child_pages(p)
-
-    collect_child_pages(self.page.root)
-    # print(f'pages: {pages}')
-
-    return {
-        'title': _("Move"),
-        'layout': layout,
-        'page': self.page,
-        'pages': pages,
-        'root': self.page.root,
-        'children': self.page.root.children,
     }
