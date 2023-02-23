@@ -31,7 +31,7 @@ def test_pages_cache(client):
     root_page = client.get(root_url)
     links = edit_bar_links(root_page, 'text')
     assert 'URL ändern' in links
-    assert len(links) == 6
+    assert len(links) == 7
 
     # Test changing the url of the root page organisation
     assert 'URL ändern' not in editor.get(root_page.request.url)
