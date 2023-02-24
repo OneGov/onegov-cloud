@@ -207,7 +207,7 @@ Onegov cloud uses one database for all applications and instances.
 
 add the mapbox token to you onegov.yml (generic)
 
-    mapbox_token: 'pk.eyJ1Ijoic2VhbnRpcyIsImEiOiJjaW02ZW92OXEwMDRpeG1rbXZ5ZXJxdmtlIn0.cYzFzNi7AB4vYJgokrPVwQ'
+    mapbox_token: '<token>'
 
 > NOTE: Make sure you don't miss the single quotes
 
@@ -215,11 +215,11 @@ add the mapbox token to you onegov.yml (generic)
 
 This will transfer the databases from remote to your local setup e.g. Community Ottenbach and many more
 
-Assuming the remote db is tacken form server 'erebos'
+Assuming the remote db is taken form server 'erebos'
 
     onegov-core transfer erebos.seantis.ch --add-admins
 
-> While doing so a 'Permission denied' error may occurs saying 'could not change directory' pointing to your local folder ../onegov-cloud. This does not hinder your local setup to work. Root cause of the error unknown.
+> While doing so a 'Permission denied' error may occur saying 'could not change directory' pointing to your local folder ../onegov-cloud. This does not hinder your local setup to work. Root cause of the error unknown.
 
 **2) Org, Town, Town6, Agency, FSI and Translator Directory**
 
