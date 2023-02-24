@@ -1441,7 +1441,10 @@ msgid "Register as Volunteer"
 msgstr "Inscrivez-vous comme bénévole"
 
 msgid "Sort"
-msgstr ""
+msgstr "Trier"
+
+msgid "Move"
+msgstr "Déplacer"
 
 msgid "Half day"
 msgstr "Demi-journée"

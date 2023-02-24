@@ -1779,6 +1779,9 @@ msgstr "Supprimer le formulaire"
 msgid "Export"
 msgstr "Exporter"
 
+msgid "Move"
+msgstr "Déplacer"
+
 msgid "Change URL"
 msgstr "Changer URL"
 

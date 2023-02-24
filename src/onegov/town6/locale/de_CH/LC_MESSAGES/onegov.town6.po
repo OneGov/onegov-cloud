@@ -163,6 +163,9 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
+msgid "Move"
+msgstr "Verschieben"
+
 msgid "Change URL"
 msgstr "URL ändern"
 

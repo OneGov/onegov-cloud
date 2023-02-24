@@ -1787,6 +1787,9 @@ msgstr "Elimina modulo"
 msgid "Export"
 msgstr "Esporta"
 
+msgid "Move"
+msgstr "Spostare"
+
 msgid "Change URL"
 msgstr "Modifica URL"
 
