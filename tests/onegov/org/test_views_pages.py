@@ -187,6 +187,69 @@ def test_hide_page(client):
     assert 'Test' not in page
 
 
+def setup_main_and_subpage(client):
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+    client.login_admin()
+    root_page = client.get(root_url)
+    page_1 = root_page.click('Thema')
+    page_1.form['title'] = "Mainpage"
+    page_1.form['text'] = (
+        "## Living in Govikon is Really Great\n"
+        "*Experts say it's a fact that Govikon does not really exist.*"
+    )
+    assert page_1.form.submit().follow().status_code == 200
+    # create subpage
+    page_1 = client.get('/topics/organisation/mainpage')
+    page_2 = page_1.click('Thema')
+    page_2.form['title'] = "Subpage"
+    page_2.form['text'] = (
+        "## Govikon and its lake view\n"
+        "*It is terrific!*"
+    )
+    assert page_2.form.submit().follow().status_code == 200
+
+
+def test_move_page_to_root(client):
+    setup_main_and_subpage(client)
+
+    # move subpage to top level (as mainpage)
+    page = client.get('/topics/organisation/mainpage/subpage')
+    move_page = page.click('Verschieben')
+    assert 'move' in move_page.form.action
+    assert move_page.form.submit().follow().status_code == 200  # by default
+    # the root element is selected
+
+    # verify main page and subpage are on the root level now
+    mainpage = client.get('/topics/organisation/mainpage')
+    assert mainpage.status_code == 200
+    assert mainpage.pyquery('.main-title').text() == 'Mainpage'
+
+    subpage = client.get('/topics/subpage')
+    assert subpage.status_code == 200
+    assert subpage.pyquery('.main-title').text() == 'Subpage'
+
+
+def test_move_page_with_child_to_root(client):
+    setup_main_and_subpage(client)
+
+    # move main page to top level
+    mainpage = client.get('/topics/organisation/mainpage')
+    move_page = mainpage.click('Verschieben')
+    assert 'move' in move_page.form.action
+    assert move_page.form.submit().follow().status_code == 200  # by default
+    # the root element is selected
+
+    # verify main page on root level, subpage is still the sub-page of
+    # the main page
+    mainpage = client.get('/topics/mainpage')
+    assert mainpage.status_code == 200
+    assert mainpage.pyquery('.main-title').text() == 'Mainpage'
+
+    subpage = client.get('/topics/mainpage/subpage')
+    assert subpage.status_code == 200
+    assert subpage.pyquery('.main-title').text() == 'Subpage'
+
+
 def test_links(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     client.login_admin()
