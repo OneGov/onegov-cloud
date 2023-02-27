@@ -62,7 +62,7 @@ class PageUrlForm(ChangeAdjacencyListUrlForm):
 
 
 class MovePageForm(Form):
-    """ Form to move a page including its sub pages. """
+    """ Form to move a page including its subpages. """
 
     parent_id = ChosenSelectField(
         label=_("Destination"),
