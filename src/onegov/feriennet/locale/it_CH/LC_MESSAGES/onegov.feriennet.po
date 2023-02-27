@@ -489,7 +489,7 @@ msgid "Exports user accounts."
 msgstr "Esportare gli account utente."
 
 msgid "Exports volunteers in the given period."
-msgstr ""
+msgstr "Esportazioni volontarie nel periodo indicato."
 
 msgid "Accessible"
 msgstr "Adatta a persone con disabilità"
