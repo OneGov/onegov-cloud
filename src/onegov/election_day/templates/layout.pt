@@ -143,11 +143,7 @@ metal:define-macro="layout">
         WebsocketConfig = {
             endpoint: "${layout.app.websockets_client_url(request)}",
             schema: "${layout.app.schema}",
-            onnotifcation: function(message) {
-                if (message.event === 'refresh' && window.location.href.search(message.path) !== -1) {
-                    $(".page-refresh").show();
-                }
-            }
+            onnotifcation: function(message, websocket) {onWebsocketNotification(message, websocket);}
         };
     </script>
 </body>

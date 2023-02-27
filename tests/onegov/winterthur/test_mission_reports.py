@@ -142,3 +142,71 @@ def test_view_mission_reports(winterthur_app):
 
     page = client.get(f'/mission-reports?year={date.year}')
     assert page.pyquery('.total-missions b')[0].text == '5'
+
+
+def test_mission_reports_validating_integer_fields(winterthur_app):
+
+    client = Client(winterthur_app)
+    client.login_admin()
+    page = client.get('/mission-reports/vehicles/+new')
+    page.form['name'] = 'Personentrnasportfahrzeug'
+    page.form['description'] = 'Note'
+    page.form.submit()
+    page = client.get('/mission-reports/+new')
+    page.form['day'] = f'{dt.now().year}-05-05'
+    page.form['duration'] = 5
+    page.form['nature'] = 'Fire with a lot of smoke'
+    page.form['location'] = 'Montreux'
+    page.form['personnel'] = 10
+    page.form['backup'] = 5
+    page.form['time'] = '00:00'
+
+    inputs = page.pyquery("input[name^='vehicles']")
+    checkbox_vehicle = inputs[0].attrib["name"]
+    vehicle_count_input = inputs[1].attrib["name"]
+
+    page.form[checkbox_vehicle] = 'y'
+    page.form[vehicle_count_input] = '-1'  # negative integer: disallowed
+
+    page = page.form.submit()
+    assert 'Das Formular enthält Fehler' in page
+    page.form[vehicle_count_input] = '1'
+
+    page = page.form.submit().follow()
+    assert 'Der Einsatzbericht wurde hinzugefügt' in page
+
+
+def test_mission_reports_validating_integer_fields_multi(winterthur_app):
+
+    client = Client(winterthur_app)
+    client.login_admin()
+    page = client.get('/mission-reports/vehicles/+new')
+    page.form['name'] = 'Personentrnasportfahrzeug'
+    page.form['description'] = 'Note'
+    page.form.submit()
+    page = client.get('/mission-reports/+new')
+    page.form['day'] = f'{dt.now().year}-05-05'
+    page.form['duration'] = 5
+    page.form['nature'] = 'Fire with a lot of smoke'
+    page.form['location'] = 'Montreux'
+    page.form['personnel'] = 10
+    page.form['backup'] = 5
+    page.form['time'] = '00:00'
+
+    # change to multi
+    page.form['mission_type'] = 'multi'
+    page.form['mission_count'] = '-2'  # negative integer: disallowed
+
+    inputs = page.pyquery("input[name^='vehicles']")
+    checkbox_vehicle = inputs[0].attrib["name"]
+    vehicle_count_input = inputs[1].attrib["name"]
+
+    page.form[checkbox_vehicle] = 'y'
+    page.form[vehicle_count_input] = 1
+
+    page = page.form.submit()
+    assert 'Das Formular enthält Fehler' in page
+    page.form['mission_count'] = 2
+
+    page = page.form.submit().follow()
+    assert 'Der Einsatzbericht wurde hinzugefügt' in page

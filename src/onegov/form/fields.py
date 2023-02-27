@@ -264,6 +264,12 @@ class UploadMultipleField(FieldList, FileField):
             _meta=_meta
         )
 
+    def __bool__(self):
+        # because FieldList implements __len__ this field would evaluate
+        # to False if no files have been uploaded, which is not generally
+        # what we want
+        return True
+
     def process(self, formdata, data=unset_value, extra_filters=None):
         self.process_errors = []
 
