@@ -211,19 +211,9 @@ add the mapbox token to you onegov.yml (generic)
 
 > NOTE: Make sure you don't miss the single quotes
 
-**1) Use existing organisation - Transfer remote database to local setup**
+**Org, Town, Town6, Agency, FSI and Translator Directory**
 
-This will transfer the databases from remote to your local setup e.g. Community Ottenbach and many more
-
-Assuming the remote db is taken form server 'erebos'
-
-    onegov-core transfer erebos.seantis.ch --add-admins
-
-> While doing so a 'Permission denied' error may occur saying 'could not change directory' pointing to your local folder ../onegov-cloud. This does not hinder your local setup to work. Root cause of the error unknown.
-
-**2) Org, Town, Town6, Agency, FSI and Translator Directory**
-
-Create a new organisation in the database together with a new admin (adjust the path according to your configuration):
+Create a new organization in the database together with a new admin (adjust the path according to your configuration):
 
     onegov-org --select /onegov_town6/govikon add "Gemeinde Govikon"
     onegov-user --select /onegov_town6/govikon add admin admin@example.org --password test --no-prompt
@@ -239,10 +229,9 @@ Run your local setup - start onegov server:
 
     onegov-server
 
-And open the local url in your browser (depending on what you setup, a new community or an existing by transfering from a remote server, see above):
+And open the local url in your browser (depending on what you setup, a new community or an existing by transferring from a remote server, see above):
 
     http://localhost:8080/onegov_town6/govikon
-    http://localhost:8080/onegov_town6/ottenbach
 
 To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variable:
 
