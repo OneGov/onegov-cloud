@@ -1,4 +1,5 @@
 from asyncio import run
+from more.content_security.core import content_security_policy_tween_factory
 from more.webassets import WebassetsApp
 from onegov.websockets import log
 from onegov.websockets.client import authenticate
@@ -17,21 +18,12 @@ class WebsocketsApp(WebassetsApp):
     asset and add a global configure object::
 
         WebsocketConfig = {
-                endpoint: "${layout.app.websockets_client_url(request)}",
-                schema: "${layout.app.schema}",
-            };
+            endpoint: "${layout.app.websockets_client_url(request)}",
+            schema: "${layout.app.schema}",
+        };
 
     To send broadcast messages, call ``send_websocket`` with a
     JSON-serializable message.
-
-    WebsocketsApp supports a builtin broadcast event for refreshing pages. Call
-    ``send_websocket_refresh`` with an absolute URL or path to trigger a page
-    refresh and make sure to include a callback in the global configuration::
-
-        WebsocketConfig = {
-            ...
-            onrefresh: function(event) { ... }
-        };
 
     """
 
@@ -78,12 +70,17 @@ class WebsocketsApp(WebassetsApp):
             params='', query='', fragment=''
         ).geturl()
 
-    def send_websocket_refresh(self, path):
-        """ Sends a refresh event to all clients connected to the app. """
+    @property
+    def websockets_private_channel(self):
+        """ An unguessable channel ID used for broadcasting notifications
+        through websockets to logged-in users.
 
-        return self.send_websocket({'event': 'refresh', 'path': path})
+        This is not meant to be save, do not broadcast sensible information!
+        """
 
-    def send_websocket(self, message):
+        return self.sign(self.schema).replace(self.schema, '')
+
+    def send_websocket(self, message, channel=None):
         """ Sends an application-bound broadcast message to all connected
         clients.
 
@@ -98,6 +95,7 @@ class WebsocketsApp(WebassetsApp):
                 await broadcast(
                     websocket,
                     self.schema,
+                    channel,
                     message
                 )
 
@@ -108,6 +106,26 @@ class WebsocketsApp(WebassetsApp):
             return False
 
         return True
+
+
+@WebsocketsApp.tween_factory(under=content_security_policy_tween_factory)
+def websocket_csp_tween_factory(app, handler):
+
+    def websocket_csp_tween(request):
+        """
+        Adds the websocket client to the connect-src content security policy.
+        """
+
+        result = handler(request)
+        configuration = request.app.configuration
+        if 'websockets' in configuration:
+            csp = configuration['websockets'].get('client_csp')
+            if csp:
+                request.content_security_policy.connect_src.add(csp)
+
+        return result
+
+    return websocket_csp_tween
 
 
 @WebsocketsApp.webasset_path()

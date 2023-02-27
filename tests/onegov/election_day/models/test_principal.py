@@ -342,34 +342,6 @@ def test_principal_years_available():
                 assert principal.is_year_available(year, map_required=False)
 
 
-def test_principal_notifications_enabled():
-    assert Municipality(
-        name='Kriens', municipality='1059'
-    ).notifications is False
-
-    assert Municipality(
-        name='Kriens', municipality='1059',
-        webhooks={'a', 'b'}
-    ).notifications is True
-
-    assert Municipality(
-        name='Kriens', municipality='1059',
-        sms_notification='https://wab.kriens.ch'
-    ).notifications is True
-
-    assert Municipality(
-        name='Kriens', municipality='1059',
-        email_notification=True
-    ).notifications is True
-
-    assert Municipality(
-        name='Kriens', municipality='1059',
-        webhooks={'a', 'b'},
-        sms_notification='https://wab.kriens.ch',
-        email_notification=True
-    ).notifications is True
-
-
 def test_principal_label(election_day_app_zg):
 
     def translate(text, locale):

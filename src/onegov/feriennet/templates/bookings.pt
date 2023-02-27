@@ -52,7 +52,7 @@
                     </p>
 
                     <tal:b
-                        define="banner layout.app.random_banner(request)"
+                        define="banner layout.app.banners(request)[0]"
                         condition="banner"
                         replace="structure banner"
                     />
@@ -201,8 +201,19 @@
                                                                             <span class="show-for-sr">
                                                                                 ${row.children} <tal:b i18n:translate>Children</tal:b>
                                                                             </span>
-                                                                            <tal:b repeat="n tuple(range(0, row.children))">
-                                                                                <i class="fa fa-child" aria-hidden="true"></i>
+                                                                            <tal:b tal:define="attendees attendees_by_username(request, row.parent_username)">
+                                                                                <a data-toggle="#attendee-${row.parent_username.replace('@', '_').replace('.', '_')}">
+                                                                                    <tal:b tal:repeat="attendee attendees">
+                                                                                        <span title="${attendee.name}">
+                                                                                            <i class="fa fa-child" aria-hidden="true"></i>
+                                                                                        </span>
+                                                                                    </tal:b>
+                                                                                </a>
+                                                                                <div id="attendee-${row.parent_username.replace('@', '_').replace('.', '_')}" style="display: none; color: grey;">
+                                                                                    <span tal:repeat="attendee attendees">
+                                                                                        ${attendee.name}<tal:b condition="attendee != attendees[-1]">, <br></tal:b>
+                                                                                    </span>
+                                                                                </div>
                                                                             </tal:b>
                                                                         </td>
                                                                         <td>${row.place}</td>

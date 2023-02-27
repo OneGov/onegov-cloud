@@ -100,39 +100,38 @@ class ManageLayout(DefaultLayout):
             submenu
         ))
 
-        if self.principal.notifications:
-            submenu = []
-            if principal.sms_notification:
-                submenu.append((
-                    _("SMS subscribers"),
-                    self.request.link(SmsSubscriberCollection(session)),
-                    isinstance(self.model, SmsSubscriberCollection),
-                    []
-                ))
-            if self.principal.email_notification:
-                submenu.append((
-                    _("Email subscribers"),
-                    self.request.link(EmailSubscriberCollection(session)),
-                    isinstance(self.model, EmailSubscriberCollection),
-                    []
-                ))
+        submenu = []
+        if principal.sms_notification:
             submenu.append((
-                _("Trigger notifications"),
-                self.request.link(
-                    self.principal, name='trigger-notifications'
-                ),
-                'trigger-notifications' in self.request.url,
+                _("SMS subscribers"),
+                self.request.link(SmsSubscriberCollection(session)),
+                isinstance(self.model, SmsSubscriberCollection),
                 []
             ))
-            result.append((
-                _("Subscribers"),
-                '',
-                (
-                    isinstance(self.model, SmsSubscriberCollection)
-                    or isinstance(self.model, EmailSubscriberCollection)
-                ),
-                submenu
+        if self.principal.email_notification:
+            submenu.append((
+                _("Email subscribers"),
+                self.request.link(EmailSubscriberCollection(session)),
+                isinstance(self.model, EmailSubscriberCollection),
+                []
             ))
+        submenu.append((
+            _("Trigger notifications"),
+            self.request.link(
+                self.principal, name='trigger-notifications'
+            ),
+            'trigger-notifications' in self.request.url,
+            []
+        ))
+        result.append((
+            _("Notifications"),
+            '',
+            (
+                isinstance(self.model, SmsSubscriberCollection)
+                or isinstance(self.model, EmailSubscriberCollection)
+            ),
+            submenu
+        ))
 
         result.append((
             _("Screens"),

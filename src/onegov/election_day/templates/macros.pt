@@ -68,7 +68,7 @@
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(election, 'clear-media')}">Clear media</a>
                 </li>
-                <li tal:condition="layout.principal.notifications">
+                <li>
                     <a i18n:translate="" class="action-trigger" href="${request.link(election, 'trigger')}">Trigger notifications</a>
                 </li>
                 <li>
@@ -104,7 +104,7 @@
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(compound, 'clear-media')}">Clear media</a>
                 </li>
-                <li tal:condition="layout.principal.notifications">
+                <li>
                     <a i18n:translate="" class="action-trigger" href="${request.link(compound, 'trigger')}">Trigger notifications</a>
                 </li>
                 <li>
@@ -137,7 +137,7 @@
                 <li>
                     <a i18n:translate="" class="action-clear" href="${request.link(vote, 'clear-media')}">Clear media</a>
                 </li>
-                <li tal:condition="layout.principal.notifications">
+                <li>
                     <a i18n:translate="" class="action-trigger" href="${request.link(vote, 'trigger')}">Trigger notifications</a>
                 </li>
                 <li>

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-18 11:59+0100\n"
+"POT-Creation-Date: 2023-02-07 07:02+0100\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -521,6 +521,9 @@ msgstr "Panachage"
 msgid "Notifications"
 msgstr "Notifications"
 
+msgid "Browser"
+msgstr "Navigateur"
+
 msgid "Email"
 msgstr "Email"
 
@@ -912,6 +915,12 @@ msgstr "Ce fichier n'est pas valide."
 msgid "The form contains errors. Please check the marked fields."
 msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés."
+
+msgid "This page has been updated."
+msgstr "Cette page a été actualisée."
+
+msgid "Reload page."
+msgstr "Rechargez la page."
 
 msgid "Homepage"
 msgstr "Page d'accueil"

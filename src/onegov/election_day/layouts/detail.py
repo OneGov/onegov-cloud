@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from datetime import date
 from onegov.election_day.layouts.default import DefaultLayout
 
 
@@ -43,6 +44,10 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
     used in the macros.
 
     """
+
+    @cached_property
+    def use_websocket(self):
+        return self.model.date == date.today()
 
     @cached_property
     def has_results(self):
