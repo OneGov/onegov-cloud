@@ -188,16 +188,6 @@ class Principal:
             return {superregion for superregion in superregions if superregion}
         return set()
 
-    @cached_property
-    def notifications(self):
-        if (
-            (len(self.webhooks) > 0)
-            or self.sms_notification
-            or self.email_notification
-        ):
-            return True
-        return False
-
     def label(self, value):
         raise NotImplementedError()
 

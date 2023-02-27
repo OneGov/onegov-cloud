@@ -4291,8 +4291,8 @@ msgstr ""
 "eventi già pubblicati possono essere rimossi dalla pagina senza preavviso o "
 "motivo."
 
-msgid "Create an event"
-msgstr "Inserire l'evento"
+msgid "Add event"
+msgstr "Aggiungi evento"
 
 msgid "Your request has been registered"
 msgstr "La tua richiesta è stata registrata"

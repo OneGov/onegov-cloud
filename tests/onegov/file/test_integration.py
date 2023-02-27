@@ -107,6 +107,27 @@ def test_serve_file(app):
     assert result.content_type == 'text/plain'
     assert result.content_length == 6
     assert 'filename="readme.txt"' in result.content_disposition
+    assert 'X-Robots-Tag' not in result.headers
+
+
+def test_serve_secret_file(app):
+    ensure_correct_depot(app)
+
+    transaction.begin()
+    # directory files are secret by default
+    files = FileCollection(app.session(), type='directory')
+    file_id = files.add('readme.txt', b'README').id
+    transaction.commit()
+
+    client = Client(app)
+    result = client.get('/storage/{}'.format(file_id))
+
+    assert result.body == b'README'
+    assert result.content_type == 'text/plain'
+    assert result.content_length == 6
+    assert 'filename="readme.txt"' in result.content_disposition
+    assert 'X-Robots-Tag' in result.headers
+    assert result.headers['X-Robots-Tag'] == 'noindex'
 
 
 def test_application_separation(app):

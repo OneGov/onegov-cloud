@@ -361,6 +361,7 @@ def view_my_bookings(self, request):
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
+        'attendees_by_username': attendees_by_username,
         'subscribe_link': subscribe_link,
         'grouped_bookings': grouped_bookings,
         'total_by_attendee': get_total,

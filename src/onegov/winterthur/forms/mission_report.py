@@ -54,6 +54,7 @@ class MissionReportForm(Form):
 
     mission_count = IntegerField(
         _("Mission count"),
+        validators=[NumberRange(0, 10000)],
         depends_on=('mission_type', 'multi'),
         default=1
     )

@@ -358,6 +358,36 @@ msgstr "Conto bancario organizzatore"
 msgid "Organiser Beneficiary"
 msgstr "Beneficiario organizzazione"
 
+msgid "Confirmed Volunteers"
+msgstr "Aiutanti confermati"
+
+msgid "Volunteer State"
+msgstr "Stato dell'aiutante"
+
+msgid "First Name"
+msgstr "Nome"
+
+msgid "Last Name"
+msgstr "Cognome"
+
+msgid "Birth Date"
+msgstr "Data di nascita"
+
+msgid "Organisation"
+msgstr "Organizzazione"
+
+msgid "Place"
+msgstr "Località utente"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Telefono"
+
+msgid "Address"
+msgstr "Indirizzo"
+
 msgid "Wishlist / Bookings"
 msgstr "Lista desideri / Prenotazioni"
 
@@ -457,6 +487,9 @@ msgstr "Utente"
 
 msgid "Exports user accounts."
 msgstr "Esportare gli account utente."
+
+msgid "Exports volunteers in the given period."
+msgstr ""
 
 msgid "Accessible"
 msgstr "Adatta a persone con disabilità"
@@ -598,12 +631,6 @@ msgstr "Mappa"
 
 msgid "You already entered a child with this name"
 msgstr "Ha già inserito un bambino con questo nome"
-
-msgid "First Name"
-msgstr "Nome"
-
-msgid "Last Name"
-msgstr "Cognome"
 
 msgid "Birthdate"
 msgstr "Data di nascita"
@@ -1222,17 +1249,8 @@ msgstr "Appellativo"
 msgid "Personal"
 msgstr "Personale"
 
-msgid "Organisation"
-msgstr "Organizzazione"
-
-msgid "Address"
-msgstr "Indirizzo"
-
 msgid "Zip Code"
 msgstr "CAP"
-
-msgid "Place"
-msgstr "Località utente"
 
 msgid "Political Municipality"
 msgstr "Comune politico"
@@ -1242,9 +1260,6 @@ msgstr "Indirizzo e-mail"
 
 msgid "If different than username"
 msgstr "Se diverso dal nome utente"
-
-msgid "Phone"
-msgstr "Telefono"
 
 msgid "Emergency Contact"
 msgstr "Contatto in caso di emergenza"
@@ -2093,9 +2108,6 @@ msgstr "La sua richiesta è stata completata con successo."
 #. Canonical text for ${tos} is: "TOS"
 msgid "I have read the ${tos} and accept them."
 msgstr "Ho letto e sono d'accordo con i ${tos}."
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "Manage user"
 msgstr "Gestione utente"

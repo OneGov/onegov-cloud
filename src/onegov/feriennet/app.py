@@ -74,11 +74,17 @@ class FeriennetApp(OrgApp):
     def sponsors(self):
         return load_sponsors(utils.module_path('onegov.feriennet', 'sponsors'))
 
-    def mail_sponsors(self, request):
-        return [
+    def mail_sponsor(self, request):
+        sponsors = [
             sponsor.compiled(request) for sponsor in self.sponsors
             if getattr(sponsor, 'mail_url', None)
         ]
+
+        if sponsors:
+            sponsors[0].banners['src'] = sponsors[0].url_for(
+                request, sponsors[0].banners['src'])
+
+        return sponsors
 
     @property
     def default_period(self):

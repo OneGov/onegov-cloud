@@ -20,7 +20,7 @@
                 No map available for this year.
             </div>
 
-            <div tal:condition="layout.principal.notifications" class="panel callout">
+            <div class="panel callout">
                 <p>
                     <strong><a href="${request.link(vote, 'trigger')}" i18n:translate="">Click here to trigger the notifications.</a></strong>
                 </p>
