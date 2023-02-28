@@ -44,7 +44,7 @@ def handle_page_form(self, request, form, layout=None):
     elif self.action == 'sort':
         return morepath.redirect(request.link(self, 'sort'))
     elif self.action == 'move':
-        return handle_move_page(self, request, form)
+        return handle_move_page(self, request, form, layout=layout)
     else:
         raise NotImplementedError
 
