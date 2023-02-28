@@ -171,13 +171,20 @@ class MoveAgencyForm(Form):
         session = self.request.session
         agencies = ExtendedAgencyCollection(session)
 
-        parent_id = None
-        parent = None
+        new_parent_id = None
+        new_parent = None
         if self.parent_id.data and self.parent_id.data.isdigit():
-            parent_id = int(self.parent_id.data)
-            parent = agencies.by_id(parent_id)
-        model.name = agencies.get_unique_child_name(model.title, parent)
-        model.parent_id = parent_id
+            new_parent_id = int(self.parent_id.data)
+            new_parent = agencies.by_id(new_parent_id)
+
+        # prevent assigning yourself as parent
+        if model.id != new_parent_id:
+            model.name = agencies.get_unique_child_name(model.title,
+                                                        new_parent)
+            model.parent_id = new_parent_id
+            return True
+
+        return False
 
     def apply_model(self, model):
         def remove(item):
