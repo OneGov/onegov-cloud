@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-14 15:23+0100\n"
+"POT-Creation-Date: 2023-02-22 15:50+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -37,6 +37,30 @@ msgid "${count} Occasions"
 msgstr "${count} Durchführungen"
 
 #, python-format
+msgid "${count} overfull"
+msgstr "${count} überbelegt"
+
+#, python-format
+msgid "${count} full"
+msgstr "${count} belegt"
+
+#, python-format
+msgid "${count} operable"
+msgstr "${count} durchführbar"
+
+#, python-format
+msgid "${count} unoperable"
+msgstr "${count} unterbelegt"
+
+#, python-format
+msgid "${count} empty"
+msgstr "${count} unbelegt"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} abgesagt"
+
+#, python-format
 msgid "${count} Wishes"
 msgstr "${count} Wünsche"
 
@@ -53,8 +77,8 @@ msgid "${count} accepted"
 msgstr "${count} angenommen"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} abgesagt"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} abgesagt oder storniert"
 
 #, python-format
 msgid "${count} denied"
@@ -70,7 +94,7 @@ msgstr "${count} Buchungen pro Person"
 
 #, python-format
 msgid "${count} Attendees"
-msgstr "${count} Teilnehmende"
+msgstr "${count} Teilnehmer"
 
 #, python-format
 msgid "${count} Girls"
@@ -81,12 +105,16 @@ msgid "${count} Boys"
 msgstr "${count} Männlich"
 
 #, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} davon ohne akzeptierte Buchungen"
+
+#, python-format
 msgid "${amount}% Happiness"
 msgstr "${amount}% Zufriedenheit"
 
 #, python-format
 msgid "${count} Attendees Without Occasion"
-msgstr "${count} Teilnehmende ohne Durchführung"
+msgstr "${count} Person(en) ohne Durchführung"
 
 #, python-format
 msgid "${amount} CHF outstanding"
@@ -3079,3 +3107,31 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#, python-format
+#~ msgid "${count} of which are overfull"
+#~ msgstr "${count} davon sind überbelegt"
+
+#, python-format
+#~ msgid "${count} of which are full"
+#~ msgstr "${count} davon sind belegt"
+
+#, python-format
+#~ msgid "${count} of which are operable"
+#~ msgstr "${count} davon sind durchführbar"
+
+#, python-format
+#~ msgid "${count} of which are unoperable"
+#~ msgstr "${count} davon sind unterbelegt"
+
+#, python-format
+#~ msgid "${count} of which are empty"
+#~ msgstr "${count} davon sind unbelegt"
+
+#, python-format
+#~ msgid "${count} of which are cancelled"
+#~ msgstr "${count} davon sind abgesagt"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} registierte Teilnehmende"

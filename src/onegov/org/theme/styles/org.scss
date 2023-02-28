@@ -6159,6 +6159,10 @@ h2 + div.timeline {
 
     li {
         font-size: .9rem;
+
+        &.zero {
+            color: $base;
+        }
     }
 
     &.boardlet-warning {

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-14 15:23+0100\n"
+"POT-Creation-Date: 2023-02-22 15:50+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -38,6 +38,30 @@ msgid "${count} Occasions"
 msgstr "${count} événement(s)"
 
 #, python-format
+msgid "${count} overfull"
+msgstr "${count} avec trop de participants"
+
+#, python-format
+msgid "${count} full"
+msgstr "${count} complet"
+
+#, python-format
+msgid "${count} operable"
+msgstr "{count} avec suffisamment de participants"
+
+#, python-format
+msgid "${count} unoperable"
+msgstr "{count} avec trop peu de participants"
+
+#, python-format
+msgid "${count} empty"
+msgstr "${count} pas de participants"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} annulés"
+
+#, python-format
 msgid "${count} Wishes"
 msgstr "${count} souhaits"
 
@@ -54,8 +78,8 @@ msgid "${count} accepted"
 msgstr "${count} acceptés"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} annulés"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} annulé(e) ou déprogrammé(e)"
 
 #, python-format
 msgid "${count} denied"
@@ -80,6 +104,10 @@ msgstr "${count} filles"
 #, python-format
 msgid "${count} Boys"
 msgstr "${count} garçons"
+
+#, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} dont sans réservations acceptées"
 
 #, python-format
 msgid "${amount}% Happiness"
@@ -3092,3 +3120,7 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} participants inscrits"
