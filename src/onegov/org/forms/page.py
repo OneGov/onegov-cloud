@@ -1,11 +1,9 @@
-from onegov.core.security import Private
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
 from onegov.page.collection import PageCollection
-from unidecode import unidecode
 from wtforms.fields import BooleanField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -73,18 +71,14 @@ class MovePageForm(Form):
     )
 
     def on_request(self):
-        self.request.include('common')
-        self.request.include('chosen')
-
         pages = PageCollection(self.request.session)
         self.iterate_page_tree(pages.roots, indent='',
                                page_list=self.parent_id.choices)
 
         # adding root element
-        if self.request.has_permission(pages, Private):
-            self.parent_id.choices.insert(
-                0, ('root', self.request.translate(_("- Root -")))
-            )
+        self.parent_id.choices.insert(
+            0, ('root', self.request.translate(_("- Root -")))
+        )
 
     def iterate_page_tree(self, pages, indent='', page_list=None):
         """
@@ -92,39 +86,26 @@ class MovePageForm(Form):
         to show the page hierarchy in the choices list
         """
         for page in pages:
-            if self.request.has_permission(page, Private):
-                item = (str(page.id), f'{indent} {unidecode(page.title)}')
-                page_list.append(item)
+            item = (str(page.id), f'{indent} {page.title}')
+            page_list.append(item)
 
             self.iterate_page_tree(page.children, indent=indent + ' -',
                                    page_list=page_list)
 
     def update_model(self, model):
         session = self.request.session
-        agencies = PageCollection(session)
+        pages = PageCollection(session)
 
-        parent_id = None
-        parent = None
+        new_parent_id = None
+        new_parent = None
         if self.parent_id.data and self.parent_id.data.isdigit():
-            parent_id = int(self.parent_id.data)
-            parent = agencies.by_id(parent_id)
-        model.name = agencies.get_unique_child_name(model.title, parent)
-        model.parent_id = parent_id
+            new_parent_id = int(self.parent_id.data)
+            new_parent = pages.by_id(new_parent_id)
 
-    def apply_model(self, model):
+        # prevent assigning yourself as parent
+        if model.id != new_parent_id:
+            model.name = pages.get_unique_child_name(model.title, new_parent)
+            model.parent_id = new_parent_id
+            return True
 
-        def remove(item):
-            item = (str(item.id), item.title)
-            if item in self.parent_id.choices:
-                self.parent_id.choices.remove(item)
-
-        def remove_with_children(item):
-            remove(item)
-            for child in item.children:
-                remove_with_children(child)
-
-        if model.parent:
-            remove(model.parent)
-        else:
-            self.parent_id.choices.pop(0)
-        remove_with_children(model)
+        return False
