@@ -44,7 +44,6 @@ def test_move_topics(client):
     page = page.click('Thema')
     page.form['title'] = "Topic 2"
     page = page.form.submit().follow()
-    # page.request.url == 'http://localhost/topics/themen/topic-1-1'
 
     page = page.click('Verschieben')  # move topic 2 under topic 1
     parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 1')
@@ -60,6 +59,17 @@ def test_move_topics(client):
     print(page.request.url)
     assert client.get('/topics/topic-1')
     assert client.get('/topics/topic-1/topic-2')
+
+    # test moving topic to itself
+    page = client.get('/topics/topic-1/topic-2')
+    page = page.click('Verschieben')
+    parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 2')
+    page.form['parent_id'].select(parent_id)
+    page = page.form.submit().follow()
+    # query for alert box
+    assert page.pyquery('.callout')
+    assert 'Failed to move page {}'.format("'Topic 2'") in page
+    assert client.get('/topics/topic-1/topic-2')  # has not been moved
 
 
 def test_contact_info_visible(client):

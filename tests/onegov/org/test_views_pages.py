@@ -1,6 +1,7 @@
 from freezegun import freeze_time
 
 from tests.onegov.org.common import edit_bar_links
+from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
 from tests.shared.utils import get_meta, create_image
 from webtest import Upload
 
@@ -208,6 +209,9 @@ def setup_main_and_subpage(client):
     )
     assert page_2.form.submit().follow().status_code == 200
 
+    assert client.get('/topics/organisation/mainpage')
+    assert client.get('/topics/organisation/mainpage/subpage')
+
 
 def test_move_page_to_root(client):
     setup_main_and_subpage(client)
@@ -216,10 +220,11 @@ def test_move_page_to_root(client):
     page = client.get('/topics/organisation/mainpage/subpage')
     move_page = page.click('Verschieben')
     assert 'move' in move_page.form.action
-    assert move_page.form.submit().follow().status_code == 200  # by default
-    # the root element is selected
+    move_page.form['parent_id'].select('root')
+    move_page = move_page.form.submit().follow()
+    assert move_page.status_code == 200
 
-    # verify main page and subpage are on the root level now
+    # verify main page remains but subpage is on the root level now
     mainpage = client.get('/topics/organisation/mainpage')
     assert mainpage.status_code == 200
     assert mainpage.pyquery('.main-title').text() == 'Mainpage'
@@ -236,8 +241,9 @@ def test_move_page_with_child_to_root(client):
     mainpage = client.get('/topics/organisation/mainpage')
     move_page = mainpage.click('Verschieben')
     assert 'move' in move_page.form.action
-    assert move_page.form.submit().follow().status_code == 200  # by default
-    # the root element is selected
+    move_page.form['parent_id'].select('root')
+    move_page = move_page.form.submit().follow()
+    assert move_page.status_code == 200
 
     # verify main page on root level, subpage is still the sub-page of
     # the main page
@@ -248,6 +254,24 @@ def test_move_page_with_child_to_root(client):
     subpage = client.get('/topics/mainpage/subpage')
     assert subpage.status_code == 200
     assert subpage.pyquery('.main-title').text() == 'Subpage'
+
+
+def test_move_page_assign_yourself_as_parent(client):
+    setup_main_and_subpage(client)
+
+    mainpage = client.get('/topics/organisation/mainpage')
+    move_page = mainpage.click('Verschieben')
+    assert 'move' in move_page.form.action
+    parent_id = get_select_option_id_by_text(move_page.form['parent_id'],
+                                             'Mainpage')
+    move_page.form['parent_id'].select(parent_id)
+    move_page = move_page.form.submit().follow()
+    assert move_page.status_code == 200
+    print(move_page.request.url)
+
+    # check for callout
+    assert move_page.pyquery('.callout')
+    move_page.mustcontain('Failed to move page {}'.format("'Mainpage'"))
 
 
 def test_links(client):
