@@ -24,13 +24,15 @@ def test_town_go_back(onboarding_app):
     a.form['name'] = 'New York'
     a.form['user'] = 'admin@example.org'
     a.form['color'] = '#ff00ff'
+    a.form['user_name'] = 'Major'
+    a.form['phone_number'] = '+41791112233'
+    a.form['checkbox'].value = True
     a = a.form.submit().follow()
 
     assert 'New York' in a
     assert 'admin@example.org' in a
     assert '#f0f' in a
     assert 'new-york.example.org' in a
-
     a = a.click("Zurück")
     assert 'New York' in a
     assert 'admin@example.org' in a
@@ -38,6 +40,9 @@ def test_town_go_back(onboarding_app):
 
     a.form['name'] = 'New Jersey'
     a.form['user'] = 'major@example.org'
+    a.form['user_name'] = 'Major'
+    a.form['phone_number'] = '+41791112233'
+    a.form['checkbox'].value = True
     a = a.form.submit().follow()
 
     assert 'New Jersey' in a
@@ -53,11 +58,15 @@ def test_town_valid_values(onboarding_app):
     a.form['name'] = 'a' * 64
     a.form['user'] = 'admin'
     a.form['color'] = 'grüen'
+    a.form['user_name'] = 'Major'
+    a.form['phone_number'] = '07911233'
+    a.form['checkbox'].value = True
     a = a.form.submit()
 
     assert "Feld kann nicht länger als 63 Zeichen sein" in a
     assert "Ungültige Email-Adresse" in a
     assert "'grüen' is not a recognized color" in a
+    assert "Ungültige Telefonnummer" in a
 
 
 def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
@@ -67,6 +76,9 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
     a.form['name'] = 'New York0'
     a.form['user'] = 'admin@example.org'
     a.form['color'] = '#ff00ff'
+    a.form['user_name'] = 'Major'
+    a.form['phone_number'] = '+41791112233'
+    a.form['checkbox'].value = True
 
     assert 'Nur Buchstaben sind erlaubt' in a.form.submit()
     a.form['name'] = 'New York'
