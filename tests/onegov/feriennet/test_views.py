@@ -2380,16 +2380,20 @@ def test_send_email_with_attachment(client, scenario):
     page = page.click('Versand')
     assert "Test" in page
     assert "Test.txt" not in page
-    page.form['roles'] = ['admin', 'editor']
+    page.form['roles'] = ['member', 'editor']
     page.form['no_spam'] = True
     page.form.submit().follow()
 
     # Plaintext version
-    email = client.get_email(0)
-    assert "[Test](http" in email['TextBody']
+    email_1 = client.get_email(0, 0)
+    assert "[Test](http" in email_1['TextBody']
 
     # HTML version
-    assert ">Test</a>" in email['HtmlBody']
+    assert ">Test</a>" in email_1['HtmlBody']
+
+    # Test if user gets an email, even if he is not in the recipient list
+    email_2 = client.get_email(0, 1)
+    assert email_2['To'] == 'admin@example.org'
 
 
 def test_max_age_exact(client, scenario):
