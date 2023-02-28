@@ -89,16 +89,9 @@ def view_ticket(self, request, layout=None):
 
     counts = request.session.execute(
         select(stmt.c).where(stmt.c.channel_id == self.number)).first()
-    layout = layout or TicketLayout(self, request)
-
-    # if we have gever, show the upload button
-    org = request.app.org
-    if not org.gever_endpoint:
-        links = layout.editbar_links
-        links = filter(lambda link: link.text != _("Upload to Gever"), links)
-        layout.editbar_links = links
 
     # if we have a payment, show the payment button
+    layout = layout or TicketLayout(self, request)
     payment_button = None
     payment = handler.payment
     edit_amount_url = None
