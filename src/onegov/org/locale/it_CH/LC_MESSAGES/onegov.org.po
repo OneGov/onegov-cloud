@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-10 17:06+0100\n"
+"POT-Creation-Date: 2023-02-28 12:02+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2146,9 +2146,6 @@ msgstr "Lo scorso anno"
 msgid "Older"
 msgstr "Più vecchia"
 
-msgid "Past Events"
-msgstr "Eventi passate"
-
 msgid "Do you really want to delete this note?"
 msgstr "Vuoi davvero eliminare questa nota?"
 
@@ -2855,6 +2852,9 @@ msgstr "Ricorrenza"
 
 msgid "No events found."
 msgstr "Nessun evento trovato."
+
+msgid "Past events"
+msgstr ""
 
 msgid "Filter by date"
 msgstr "Filtro per data"
@@ -4102,11 +4102,11 @@ msgstr "Ripristina password"
 
 #, python-format
 msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
+"A password reset link has been sent to ${email}, provided an active account "
+"exists for this email address."
 msgstr ""
 "Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account esistente)."
+"${email} (se si tratta di un account attivo esistente).
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -5133,6 +5133,17 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Past Events"
+#~ msgstr "Eventi passate"
+
+#, python-format
+#~ msgid ""
+#~ "A password reset link has been sent to ${email}, provided an account "
+#~ "exists for this email address."
+#~ msgstr ""
+#~ "Il collegamento per reimpostare la password è stato inviato all'indirizzo "
+#~ "${email} (se si tratta di un account esistente)."
 
 #~ msgid "Marker Type"
 #~ msgstr "Tipo di indicatore"

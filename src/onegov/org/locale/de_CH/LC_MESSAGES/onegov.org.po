@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-10 17:06+0100\n"
+"POT-Creation-Date: 2023-02-28 12:02+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2135,9 +2135,6 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
-msgid "Past events"
-msgstr "Vergangene Veranstaltungen"
-
 msgid "Do you really want to delete this note?"
 msgstr "Möchten Sie diese Notiz wirklich löschen?"
 
@@ -2849,6 +2846,9 @@ msgstr "Wiederholungen"
 
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
+
+msgid "Past events"
+msgstr "Vergangene Veranstaltungen"
 
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
@@ -4090,10 +4090,11 @@ msgstr "Passwort zurücksetzen"
 
 #, python-format
 msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
+"A password reset link has been sent to ${email}, provided an active account "
+"exists for this email address."
 msgstr ""
-"Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
+"Eine E-Mail wurde an ${email} gesendet (sofern ein aktives Konto mit "
+"dieser E-Mail Adresse existiert)."
 
 msgid "Password changed."
 msgstr "Passwort geändert."
@@ -5116,6 +5117,13 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#, python-format
+#~ msgid ""
+#~ "A password reset link has been sent to ${email}, provided an account "
+#~ "exists for this email address."
+#~ msgstr ""
+#~ "Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
 
 #~ msgid "Marker Type"
 #~ msgstr "Marker-Typ"
