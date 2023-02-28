@@ -114,7 +114,7 @@ def handle_move_page(self, request, form, layout=None):
         if form.update_model(self.page):
             request.success(_("Your changes were saved"))
         else:
-            request.warning(_("Failed to move page {}".format(
+            request.warning(_("Failed to move page \"{}\"".format(
                 self.page.title)))
 
         return morepath.redirect(request.link(self.page))

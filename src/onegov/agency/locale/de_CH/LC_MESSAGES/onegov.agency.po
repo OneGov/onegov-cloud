@@ -519,9 +519,15 @@ msgstr "Benutzer können Mutationen melden"
 msgid "Data"
 msgstr "Daten"
 
+msgid "Agency moved"
+msgstr "Organisation verschoben"
+
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+msgid "Failed to move agency '{}'"
+msgstr "Fehler beim Verschieben der Organisation '{}'"
 
 #~ msgid "Street and house number"
 #~ msgstr "Strasse und Hausnummer"

@@ -2457,6 +2457,9 @@ msgstr "Thema Bearbeiten"
 msgid "Move Topic"
 msgstr "Thema Verschieben"
 
+msgid "Failed to move page \"{}\""
+msgstr "Fehler beim Verschieben der Seite \"{}\""
+
 msgid "The topic was deleted"
 msgstr "Das Thema wurde gelöscht"
 
