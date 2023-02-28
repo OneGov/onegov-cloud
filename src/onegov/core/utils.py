@@ -427,7 +427,7 @@ def paragraphify(text):
 
 
 def to_html_ul(value, convert_dashes=True, with_title=False):
-    """ Linkify and convert to text to one or multiple ul's.
+    """ Linkify and convert to text to one or multiple ul's or paragraphs.
     """
     if not value:
         return ''
