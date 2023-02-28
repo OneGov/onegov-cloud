@@ -884,7 +884,14 @@ def group_by_column(request, query, group_column, sort_column,
 
     transform = transform or (lambda v: v)
 
+    # groupby expects the input iterable (records) to already be sorted
+    records = sorted(records, key=group_key)
     for group, items in groupby(records, group_key):
+        # A subtle bug:
+        # `grouped[group]` may be overwritten in subsequent iterations, if the
+        # same `group` key appears again. This leads to loss of items, if
+        # multiple iterables are assigned to the default group.
+
         grouped[group] = sorted([i for i in items], key=sort_key)
         grouped[group] = [transform(i) for i in grouped[group]]
 
