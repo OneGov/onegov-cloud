@@ -51,7 +51,7 @@ def handlers():
 @pytest.fixture(scope='session')
 def forms():
     yield list(builtin_form_definitions(
-        module_path('onegov.town6', 'forms/builtin')))
+        module_path('onegov.town6', 'forms/builtin/de')))
 
 
 @pytest.fixture(scope='function')

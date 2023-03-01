@@ -1,5 +1,6 @@
 import textwrap
 from datetime import date
+from itertools import chain, repeat
 
 from onegov.form import FormCollection
 from onegov.ticket import Ticket
@@ -7,6 +8,7 @@ from onegov.user import UserCollection
 from tests.onegov.town6.common import step_class
 import transaction
 from freezegun import freeze_time
+from collections import namedtuple
 
 
 def test_form_steps(client):
@@ -232,3 +234,59 @@ def test_form_group_sort(client):
 
     assert groups == page.pyquery(
         '.page-content-main h2').text().strip().split(' ')
+
+
+def test_ogc_857_forms_without_group_are_displayed(client, forms):
+
+    Form = namedtuple('Form', ['name', 'title', 'definition'])
+    forms = [Form(*t) for t in forms]
+
+    groups = {
+        'Abstimmungen und Wahlen': 2,
+        'Einwohnerkontrolle': 2,
+        'Finanzen / Steuern': 1,
+        '': 2,  # if no group, the default group "General" is set
+        'Friedhof / Bestattungen': 3,
+        'Gemeindeammannamt': 1,
+        'Jugend / Sport / Vereine': 1,
+        'Kommunikation': 2,
+        'Planung / Bau': 1,
+        'Shop': 1,
+        'Soziales / Gesundheit': 2,
+        'Umwelt / Energie / Sicherheit': 1,
+    }
+    total = sum(value for value in groups.values())
+    # the numbers above are random, but make sure the sum is the total length:
+    assert total == len(forms)
+
+    def expand_groups_i_times(_groups):
+        """ Returns list that repeats each key the desired amount of times"""
+        return list(chain.from_iterable(
+            repeat(key, i) for key, i in _groups.items())
+        )
+
+    group_stream = expand_groups_i_times(groups)
+
+    client.login_admin()
+    for form, group in zip(forms, group_stream):
+        form_page = client.get(f"/form/{form.name}/edit")
+        if group:
+            form_page.form['group'] = group
+            form_page.form.submit()
+
+    form_page = client.get('/forms')
+    titles = [form.title for form in forms]
+    for t in titles:
+        assert t in form_page
+
+    custom_form_title = "Explicit General Group"
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = custom_form_title
+    form_page.form['definition'] = "E-Mail * = @@@"
+    form_page.form['group'] = "Allgemein"
+    form_page.form.submit()
+    form_page = client.get('/forms')
+    # Before ogc-857, forms in "General" group have been overwritten
+    titles += custom_form_title
+    for t in titles:
+        assert t in form_page
