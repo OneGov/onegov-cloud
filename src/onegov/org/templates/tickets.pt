@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="post-title">
-        <button class="tiny secondary radius button ticket-notifications"></button>
+        <button class="tiny secondary radius button ticket-notifications" i18n:attributes="title" title="Enable notifications about new tickets. Only works when being logged in and having the browser with the site open."></button>
     </tal:b>
     <tal:b metal:fill-slot="content">
         <tal:block metal:use-macro="layout.macros['modal']" tal:define="modal_id 'archive-confirm-modal'">

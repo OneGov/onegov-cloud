@@ -3849,6 +3849,13 @@ msgid "New messages have been disabled because the ticket has been closed."
 msgstr ""
 "I nuovi messaggi sono stati disabilitati perché il biglietto è stato chiuso."
 
+msgid ""
+"Enable notifications about new tickets. Only works when being logged in and "
+"having the browser with the site open."
+msgstr ""
+"Abilita le notifiche sui nuovi ticket. Funziona solo quando si è connessi e "
+"si ha il browser con il sito aperto."
+
 msgid "Archive all selected tickets?"
 msgstr "Archiviare tutti i biglietti selezionati?"
 
