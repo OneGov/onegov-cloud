@@ -62,6 +62,16 @@ msgstr ""
 "Login fehlgeschlagen, da ihr Nutzer keine Gruppenzugehörigkeiten hat. "
 "Kontaktieren Sie ihren Azure AD System-Administrator"
 
+msgid "SAML2"
+msgstr "SAML2"
+
+msgid ""
+"Can't login because your user has no groups. Contact your SAML2 system "
+"administrator"
+msgstr ""
+"Login fehlgeschlagen, da ihr Nutzer keine Gruppenzugehörigkeiten hat. "
+"Kontaktieren Sie ihren SAML2 System-Administrator"
+
 msgid "Name"
 msgstr "Name"
 
