@@ -26,21 +26,12 @@ def combine_grouped(items, external_links, sort=None):
 @OrgApp.html(model=FormCollection, template='forms.pt', permission=Public)
 def view_form_collection(self, request, layout=None):
 
-    q = self.definitions.query()
-    initial_length = len([item.name for item in q.all()])
-
     forms = group_by_column(
         request=request,
         query=self.definitions.query(),
         group_column=FormDefinition.group,
         sort_column=FormDefinition.order
     )
-
-    total_len_all_groups = 0
-    for key, value in forms.items():
-        names_per_group_list = [item.name for item in value]
-        total_len_all_groups += len(names_per_group_list)
-    assert total_len_all_groups == initial_length
 
     ext_forms = group_by_column(
         request,
