@@ -544,9 +544,15 @@ def test_form_registration_window_form_existing(start, end):
     form.request = Bunch(
         translate=lambda txt: txt,
         include=lambda src: None,
-        app=Bunch(org=Bunch(geo_provider=None, open_files_target_blank=False)),
+        app=Bunch(
+            org=Bunch(geo_provider=None, open_files_target_blank=False),
+            schema='',
+            websockets_private_channel='',
+            websockets_client_url=lambda *args: '',
+        ),
         is_manager=True,
-        locale='de_CH'
+        locale='de_CH',
+        url=''
     )
     form.model = Bunch(registration_windows=[
         Bunch(start=date(2000, 1, 10), end=date(2000, 1, 20))

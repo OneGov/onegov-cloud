@@ -863,7 +863,8 @@ def propose_activity(self, request):
             request.app.active_period)
 
         ticket = TicketCollection(session).open_ticket(
-            handler_code='FER', handler_id=publication_request.id.hex
+            handler_code='FER',
+            handler_id=publication_request.id.hex
         )
         TicketMessage.create(ticket, request, 'opened')
 
@@ -889,6 +890,15 @@ def propose_activity(self, request):
                 'model': ticket
             }
         )
+
+    request.app.send_websocket(
+        channel=request.app.websockets_private_channel,
+        message={
+            'event': 'browser-notification',
+            'title': request.translate(_('New ticket')),
+            'created': ticket.created.isoformat()
+        }
+    )
 
     request.success(_("Thank you for your proposal!"))
 

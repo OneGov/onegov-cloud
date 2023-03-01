@@ -15,12 +15,7 @@ class WebsocketsApp(WebassetsApp):
     Add applicatiod-bound websocket broadcast communication.
 
     To receive broadcast messages using JavaScript in the browser, include the
-    asset and add a global configure object::
-
-        WebsocketConfig = {
-            endpoint: "${layout.app.websockets_client_url(request)}",
-            schema: "${layout.app.schema}",
-        };
+    asset 'websockets' and call ``openWebsocket``.
 
     To send broadcast messages, call ``send_websocket`` with a
     JSON-serializable message.
@@ -28,12 +23,7 @@ class WebsocketsApp(WebassetsApp):
     """
 
     def configure_websockets(self, **cfg):
-        """ Configures global websocket settings.
-
-        Defaults to port 8765 and a randomly generated token which is available
-        until the next reboot of the host.
-
-        """
+        """ Configures global websocket settings. """
 
         config = cfg.get('websockets', {})
         self._websockets_client_url = config.get('client_url')

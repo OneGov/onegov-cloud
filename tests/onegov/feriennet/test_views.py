@@ -1,7 +1,6 @@
-import pytest
-
 import onegov.feriennet
 import os
+import pytest
 import re
 import requests_mock
 import transaction
@@ -17,6 +16,7 @@ from onegov.gis import Coordinates
 from onegov.pay import Payment
 from psycopg2.extras import NumericRange
 from tests.shared import utils
+from unittest.mock import patch
 from webtest import Upload
 
 
@@ -218,7 +218,11 @@ def test_activity_permissions(client, scenario):
     assert admin.get(url, status=200)
 
 
-def test_activity_communication(client, scenario):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_activity_communication(broadcast, authenticate, connect, client,
+                                scenario):
     scenario.add_period()
     scenario.add_activity(
         title="Learn Python",
@@ -239,6 +243,13 @@ def test_activity_communication(client, scenario):
     assert len(os.listdir(client.app.maildir)) == 1
     assert "Ihre Anfrage wurde unter der " \
            "folgenden Referenz registriert" in admin.get_email(0)['HtmlBody']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
