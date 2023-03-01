@@ -2135,9 +2135,6 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
-msgid "Past events"
-msgstr "Vergangene Veranstaltungen"
-
 msgid "Do you really want to delete this note?"
 msgstr "Möchten Sie diese Notiz wirklich löschen?"
 
@@ -2849,6 +2846,9 @@ msgstr "Wiederholungen"
 
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
+
+msgid "Past events"
+msgstr "Vergangene Veranstaltungen"
 
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
@@ -5116,12 +5116,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "Marker Type"
-#~ msgstr "Marker-Typ"
-
-#~ msgid "Numbers"
-#~ msgstr "Zahlen"
-
-#~ msgid "Mapbox (Default)"
-#~ msgstr "Mapbox (Standard)"
