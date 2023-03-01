@@ -132,11 +132,7 @@ class DirectoriesWidget:
                     ExtendedDirectoryEntryCollection,
                     {'directory_name': d.name}
                 ),
-                subtitle=(
-                    d.count == 1
-                    and _("1 entry")
-                    or _("${count} entries", mapping={'count': d.count})
-                )
+                subtitle=d.lead
             ) for d in layout.request.exclude_invisible(directories.query())
         ]
 
