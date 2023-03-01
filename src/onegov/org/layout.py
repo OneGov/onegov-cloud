@@ -602,6 +602,12 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         if self.request.is_manager:
             self.request.include('sortable')
             self.request.include('websockets')
+            self.custom_body_attributes['data-websocket-endpoint'] = \
+                self.app.websockets_client_url(request)
+            self.custom_body_attributes['data-websocket-schema'] = \
+                self.app.schema
+            self.custom_body_attributes['data-websocket-channel'] = \
+                self.app.websockets_private_channel
 
         if self.org.open_files_target_blank:
             self.request.include('all_blank')

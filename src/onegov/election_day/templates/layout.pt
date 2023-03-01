@@ -37,7 +37,7 @@ metal:define-macro="layout">
     </script>
     <script metal:use-macro="layout.macros['tablesaw_translations']" />
 </head>
-<body>
+<body tal:attributes="layout.body_attributes|{}">
     <div class="alert-box info page-refresh" style="display:none;">
         <p>
             <tal:block i18n:translate="">This page has been updated.</tal:block>
@@ -139,12 +139,5 @@ metal:define-macro="layout">
         </div>
     </footer>
     <tal:block tal:content="structure layout.principal.analytics|nothing" />
-    <script tal:condition="getattr(layout, 'use_websocket', False)">
-        WebsocketConfig = {
-            endpoint: "${layout.app.websockets_client_url(request)}",
-            schema: "${layout.app.schema}",
-            onnotifcation: function(message, websocket) {onWebsocketNotification(message, websocket);}
-        };
-    </script>
 </body>
 </html>

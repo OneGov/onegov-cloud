@@ -15,12 +15,7 @@ class WebsocketsApp(WebassetsApp):
     Add applicatiod-bound websocket broadcast communication.
 
     To receive broadcast messages using JavaScript in the browser, include the
-    asset and add a global configure object::
-
-        WebsocketConfig = {
-            endpoint: "${layout.app.websockets_client_url(request)}",
-            schema: "${layout.app.schema}",
-        };
+    asset 'websockets' and call ``openWebsocket``.
 
     To send broadcast messages, call ``send_websocket`` with a
     JSON-serializable message.
