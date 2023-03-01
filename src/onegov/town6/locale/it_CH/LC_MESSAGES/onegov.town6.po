@@ -340,8 +340,10 @@ msgstr "Ogni ${days} fino al ${end}"
 msgid "Import"
 msgstr "Importa"
 
-msgid "Create an event"
-msgstr "Inserire l'evento"
+#.
+#. Used in sentence: "${event} published."
+msgid "Event"
+msgstr "Evento"
 
 msgid "This event can't be editet."
 msgstr "Questo evento non può essere modificato."
@@ -895,6 +897,9 @@ msgstr "Tutti gli articoli"
 msgid "No events found."
 msgstr "Nessun evento trovato."
 
+msgid "Past events"
+msgstr "Eventi passate"
+
 msgid "Learn more"
 msgstr "Per saperne di più"
 
@@ -1434,10 +1439,6 @@ msgstr "Evento montato."
 msgid "${event} published."
 msgstr "${event} pubblicato."
 
-#. Used in sentence: "${event} published."
-msgid "Event"
-msgstr "Evento"
-
 msgid "Event deleted."
 msgstr "Evento eliminato."
 
@@ -1596,6 +1597,9 @@ msgstr "Tag"
 
 msgid "Date"
 msgstr "Data"
+
+msgid "Actions"
+msgstr "Azioni"
 
 msgid "Export these events"
 msgstr "Esporta questi eventi"
@@ -2078,23 +2082,3 @@ msgstr "Festività"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
-
-#~ msgid "Actions"
-#~ msgstr "Azioni"
-
-#~ msgid "Submit your own event"
-#~ msgstr "Invia il tuo evento"
-
-#~ msgid "Function"
-#~ msgstr "Funzioni"
-
-#, fuzzy
-#~ msgid "Partner"
-#~ msgstr "Visualizzazione dei partner"
-
-#~ msgid "Ticket Settings"
-#~ msgstr "Impostazioni del biglietto"
-
-#, fuzzy
-#~ msgid "Newsletter Settings"
-#~ msgstr "Abbonamento alla newsletter"
