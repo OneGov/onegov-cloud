@@ -2146,9 +2146,6 @@ msgstr "Lo scorso anno"
 msgid "Older"
 msgstr "Più vecchia"
 
-msgid "Past Events"
-msgstr "Eventi passate"
-
 msgid "Do you really want to delete this note?"
 msgstr "Vuoi davvero eliminare questa nota?"
 
@@ -2855,6 +2852,9 @@ msgstr "Ricorrenza"
 
 msgid "No events found."
 msgstr "Nessun evento trovato."
+
+msgid "Past events"
+msgstr "Eventi passate"
 
 msgid "Filter by date"
 msgstr "Filtro per data"
@@ -5133,15 +5133,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "Marker Type"
-#~ msgstr "Tipo di indicatore"
-
-#~ msgid "New domain"
-#~ msgstr "Vecchio dominio"
-
-#~ msgid "Mapbox (Default)"
-#~ msgstr "Riquadro della mappa (predefinito)"
-
-#~ msgid "Homepage Image #1"
-#~ msgstr "Immagine n. 1 della pagina principale"

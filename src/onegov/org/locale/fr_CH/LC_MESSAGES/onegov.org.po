@@ -2136,9 +2136,6 @@ msgstr "L'an dernier"
 msgid "Older"
 msgstr "Plus âgés"
 
-msgid "Past Events"
-msgstr "Événements passées"
-
 msgid "Do you really want to delete this note?"
 msgstr "Voulez-vous vraiment supprimer cette note ?"
 
@@ -2852,6 +2849,9 @@ msgstr "Récurrence"
 
 msgid "No events found."
 msgstr "Aucun événement trouvé."
+
+msgid "Past events"
+msgstr "Événements passées"
 
 msgid "Filter by date"
 msgstr "Filtrer par date"
@@ -5138,27 +5138,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "Marker Type"
-#~ msgstr "Type de marqueur"
-
-#~ msgid "Mapbox (Default)"
-#~ msgstr "Mapbox (défaut)"
-
-#~ msgid "Homepage Image #1"
-#~ msgstr "Image n°1 de page d'accueil"
-
-#~ msgid "Homepage Image #2"
-#~ msgstr "Image n°2 de page d'accueil"
-
-#~ msgid "Homepage Image #3"
-#~ msgstr "Image n°3 de page d'accueil"
-
-#~ msgid "Homepage Image #4"
-#~ msgstr "Image n°4 de page d'accueil"
-
-#~ msgid "Homepage Image #5"
-#~ msgstr "Image n°5 de page d'accueil"
-
-#~ msgid "Homepage Image #6"
-#~ msgstr "Image n°6 de page d'accueil"

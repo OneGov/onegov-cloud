@@ -62,7 +62,8 @@ For example:
     TYPE: Feature
     LINK: OGC-101
 
-Commits that do not follow this scheme are not included in the changelog.
+> Commits that do not follow this schema are not included in the changelog.
+
 
 **Pull request messages** should contain the first line of the commit message (`<Module>: <Message>`) for the title and the rest for the message.
 
@@ -109,6 +110,13 @@ To run OneGov Cloud locally, you must meet the following requirements:
 * Python 3.10+
 * Redis 5+
 * NodeJS 9+
+* Docker Compose
+* OpenJDK JRE 8 (for elasiticsearch setup)
+* ElasticSearch
+
+To install the requirements for Ubuntu do:
+
+    sudo apt install postgresql postgresql-contrib redis-server nodejs python3 docker-compose openjdk-8-jre-headless elasticsearch
 
 ### Libraries
 
@@ -179,16 +187,37 @@ in `onegov.yml`:
     GRANT ALL PRIVILEGES ON DATABASE onegov TO dev;
     ALTER DATABASE onegov SET timezone TO 'UTC';
 
+Use the 'exit' command once your done to quit the postgres cli.
+
+    postgres=# exit
+
+
 Onegov cloud uses one database for all applications and instances.
 
-## Setting up the application(s)
+
+## Setting up the application(s) locally
+
+### Create folder structure for local storage and change owner accordingly
+
+    sudo mkdir -p /usr/local/var/onegov/depot
+    sudo mkdir -p /usr/local/var/onegov/files
+    sudo chown -R $USER:$USER /usr/local/var/onegov
+
+### Configure token
+
+add the mapbox token to you onegov.yml (generic)
+
+    mapbox_token: '<token>'
+
+> NOTE: Make sure you don't miss the single quotes
 
 **Org, Town, Town6, Agency, FSI and Translator Directory**
 
-Create a new organisation in the database together with a new admin (adjust the path according to your configuration):
+Create a new organization in the database together with a new admin (adjust the path according to your configuration):
 
     onegov-org --select /onegov_town6/govikon add "Gemeinde Govikon"
     onegov-user --select /onegov_town6/govikon add admin admin@example.org --password test --no-prompt
+
 
 **Election Day and Swissvotes**
 
@@ -196,11 +225,11 @@ Create the `principal.yaml` and flush redis. You may want to add a user (see abo
 
 ## Running the instance(s)
 
-Run the server:
+Run your local setup - start onegov server:
 
     onegov-server
 
-And open the local url in your browser:
+And open the local url in your browser (depending on what you setup, a new community or an existing by transferring from a remote server, see above):
 
     http://localhost:8080/onegov_town6/govikon
 
@@ -208,11 +237,12 @@ To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variabl
 
     export ONEGOV_DEVELOPMENT='1'
 
-Run the elastic search cluster, D3renderer and the SMTP server:
+**Optional**
+Run the elastic search cluster, D3renderer and the SMTP server: (for me sudo was required)
 
     docker-compose up -d
 
-## Updates
+## Update your local setup
 
 To run updates, you want to first update your sources:
 

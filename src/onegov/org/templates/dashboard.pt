@@ -7,13 +7,14 @@
             <div class="boardlet boardlet-${boardlet.state}" tal:repeat="boardlet group">
                 <h2>${boardlet.title}</h2>
                 <ul class="dense">
-                    <li tal:repeat="fact boardlet.facts">
-                        <i class="fa fa-fw ${fact.icon}" aria-hidden="true"></i>
-
-                        <span class="boardlet-fact">
-                            ${fact.text}
-                        </span>
-                    </li>
+                    <tal:b tal:repeat="fact boardlet.facts">
+                        <li class="${fact.css_class}">
+                            <i class="fa fa-fw ${fact.icon}" aria-hidden="true"></i>
+                            <span class="boardlet-fact">
+                                ${fact.text}
+                            </span>
+                        </li>
+                    </tal:b>
                 </ul>
             </div>
         </div>        
