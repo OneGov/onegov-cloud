@@ -39,16 +39,19 @@ def test_move_topics(client):
     page = page.click('Thema')
     page.form['title'] = "Topic 1"
     page = page.form.submit().follow()
+    assert page.status_code == 200
 
     page = client.get('/topics/themen')
     page = page.click('Thema')
     page.form['title'] = "Topic 2"
     page = page.form.submit().follow()
+    assert page.status_code == 200
 
     page = page.click('Verschieben')  # move topic 2 under topic 1
     parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 1')
     page.form['parent_id'].select(parent_id)
     page = page.form.submit().follow()
+    assert page.status_code == 200
     assert client.get('/topics/themen/topic-1/topic-2')
 
     # move page topic-1 to 'root' including subpage
@@ -65,11 +68,10 @@ def test_move_topics(client):
     page = page.click('Verschieben')
     parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 2')
     page.form['parent_id'].select(parent_id)
-    page = page.form.submit().follow()
-    # query for alert box
-    assert page.pyquery('.callout')
-    assert 'Failed to move page {}'.format("'Topic 2'") in page
-    assert client.get('/topics/topic-1/topic-2')  # has not been moved
+    page = page.form.submit()
+    assert page.pyquery('.alert')
+    assert page.pyquery('.error')
+    assert 'Invalid destination selected' in page
 
 
 def test_contact_info_visible(client):

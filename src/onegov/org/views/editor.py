@@ -111,11 +111,8 @@ def handle_move_page(self, request, form, layout=None):
     layout.site_title = self.page.trait_messages[self.trait]['move_page_title']
 
     if form.submitted(request):
-        if form.update_model(self.page):
-            request.success(_("Your changes were saved"))
-        else:
-            request.warning(_("Failed to move page \"{}\"".format(
-                self.page.title)))
+        form.update_model(self.page)
+        request.success(_("Your changes were saved"))
 
         return morepath.redirect(request.link(self.page))
 

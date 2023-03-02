@@ -92,6 +92,22 @@ class MovePageForm(Form):
             self.iterate_page_tree(page.children, indent=indent + ' -',
                                    page_list=page_list)
 
+    def ensure_valid_parent(self):
+        """
+        As a new destination (parent page) every menu item is valid except
+        yourself. You cannot assign yourself as the new destination
+        """
+        if self.parent_id.data and self.parent_id.data.isdigit():
+            new_parent_id = int(self.parent_id.data)
+            page_id_from_url = int(self.request.url.rsplit('/')[-1])
+            # prevent selecting yourself as new parent
+            if page_id_from_url == new_parent_id:
+                self.parent_id.errors.append(
+                    _("Invalid destination selected."))
+                return False
+
+        return True
+
     def update_model(self, model):
         session = self.request.session
         pages = PageCollection(session)
@@ -102,10 +118,5 @@ class MovePageForm(Form):
             new_parent_id = int(self.parent_id.data)
             new_parent = pages.by_id(new_parent_id)
 
-        # prevent assigning yourself as parent
-        if model.id != new_parent_id:
-            model.name = pages.get_unique_child_name(model.title, new_parent)
-            model.parent_id = new_parent_id
-            return True
-
-        return False
+        model.name = pages.get_unique_child_name(model.title, new_parent)
+        model.parent_id = new_parent_id

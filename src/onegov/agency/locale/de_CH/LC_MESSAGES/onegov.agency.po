@@ -526,8 +526,8 @@ msgstr "Organisation verschoben"
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
 
-msgid "Failed to move agency '{}'"
-msgstr "Fehler beim Verschieben der Organisation '{}'"
+msgid "Invalid destination selected"
+msgstr "Ungültiger Zielort gewählt"
 
 #~ msgid "Street and house number"
 #~ msgstr "Strasse und Hausnummer"

@@ -331,10 +331,8 @@ def change_agency_url(self, request, form):
 def move_agency(self, request, form):
 
     if form.submitted(request):
-        if form.update_model(self):
-            request.success(_("Agency moved"))
-        else:
-            request.warning(_("Failed to move agency '{}'".format(self.title)))
+        form.update_model(self)
+        request.success(_("Agency moved"))
         return redirect(request.link(self.proxy()))
 
     form.apply_model(self)

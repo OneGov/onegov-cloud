@@ -2468,8 +2468,8 @@ msgstr "Modifica argomento"
 msgid "Move Topic"
 msgstr "Spostare argomento"
 
-msgid "Failed to move page \"{}\""
-msgstr "Errore durante lo spostamento della pagina \"{}\""
+msgid "Invalid destination selected"
+msgstr "Destinazione non valida selezionata"
 
 msgid "The topic was deleted"
 msgstr "L'argomento è stato eliminato"

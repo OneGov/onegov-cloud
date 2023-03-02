@@ -265,13 +265,10 @@ def test_move_page_assign_yourself_as_parent(client):
     parent_id = get_select_option_id_by_text(move_page.form['parent_id'],
                                              'Mainpage')
     move_page.form['parent_id'].select(parent_id)
-    move_page = move_page.form.submit().follow()
-    assert move_page.status_code == 200
-    print(move_page.request.url)
-
-    # check for callout
-    assert move_page.pyquery('.callout')
-    move_page.mustcontain('Failed to move page {}'.format("'Mainpage'"))
+    move_page = move_page.form.submit()
+    assert move_page.pyquery('.alert')
+    assert move_page.pyquery('.error')
+    move_page.mustcontain('Invalid destination selected')
 
 
 def test_links(client):
