@@ -24,6 +24,11 @@ class InvalidFormSyntax(FormError):
         self.line = line
 
 
+class InvalidIndentSyntax(FormError):
+    def __init__(self, line):
+        self.line = line
+
+
 class FieldCompileError(FormError):
     def __init__(self, field_name):
         self.field_name = field_name
