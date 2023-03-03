@@ -45,11 +45,11 @@ def test_render_form(client):
         Field('Textfield long', '*= ___', long_field_help),
         Field('Email long', '* = @@@', long_field_help),
         Field('Checkbox', """*=
-                [ ] 4051
-                [ ] 4052""", long_field_help),
+    [ ] 4051
+    [ ] 4052""", long_field_help),
         Field('Select', """=
-                (x) A
-                ( ) B""", long_field_help),
+    (x) A
+    ( ) B""", long_field_help),
         Field('Alter', '= 0..150', long_field_help),
         Field('Percentage', '= 0.00..100.00', long_field_help),
         Field('IBAN', '= # iban', long_field_help),
@@ -62,11 +62,11 @@ def test_render_form(client):
     # Those should render description externally, checked visually
     not_rendering_placeholder = [
         Field('Checkbox2', """*=
-                   [ ] 4051
-                   [ ] 4052""", short_comment),
+    [ ] 4051
+    [ ] 4052""", short_comment),
         Field('Select2', """=
-                    (x) A
-                    ( ) B""", short_comment),
+    (x) A
+    ( ) B""", short_comment),
         Field('Image2', '= *.jpg|*.png|*.gif', short_comment),
         Field('Dokument2', '= *.pdf', short_comment)
     ]
