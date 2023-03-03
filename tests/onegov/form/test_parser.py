@@ -1044,7 +1044,7 @@ def test_normalization():
     ('  ', True),
     ('   ', True),
 ])
-def test_raise_indentation_error(indent, shall_raise):
+def test_indentation_error(indent, shall_raise):
     # wrong indent see 'Telefonnummer'
     text = dedent(
         """
