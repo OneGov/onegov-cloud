@@ -32,6 +32,14 @@ class Snippets:
             '    [ ] B\n'
             '    [ ] C'
         )),
+        (_("Collapsable List"), (
+            '\n'
+            '    [ ] Option Name'
+            '\n'
+            '        Field A = ___'
+            '\n'
+            '        Field B = ___'
+        )),
 
         (_("Files"), None),
         (_("Image"), '*.jpg|*.png|*.gif'),
