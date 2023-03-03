@@ -1053,7 +1053,6 @@
         <p i18n:translate>No events found.</p>
         <br>
         <tal condition="'range' in layout.og_url">
-            <p><a href="${layout.events_url}" i18n:translate>All events</a>
             <br><a href="${layout.events_url}&amp;range=past" i18n:translate>Past events</a>
         </tal>
     </tal:b>
