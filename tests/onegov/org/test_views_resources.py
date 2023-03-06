@@ -1,21 +1,22 @@
 import json
-import tempfile
-import textwrap
-
-from datetime import datetime, date
 import os
 import pytest
-from pathlib import Path
-from openpyxl import load_workbook
+import tempfile
+import textwrap
 import transaction
+
+from datetime import datetime, date
 from freezegun import freeze_time
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormSubmission
+from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
-from onegov.org.models import ResourceRecipientCollection
+from openpyxl import load_workbook
+from pathlib import Path
+from unittest.mock import patch
 
 
 def test_resource_slots(client):
@@ -691,7 +692,10 @@ def test_auto_accept_reservations(client):
 
 
 @freeze_time("2015-08-28", tick=True)
-def test_reserve_allocation(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_reserve_allocation(broadcast, authenticate, connect, client):
     # prepate the required data
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.by_name('tageskarte')
@@ -768,6 +772,13 @@ def test_reserve_allocation(client):
     assert 'Tageskarte' in message
     assert '28. August 2015' in message
     assert '4' in message
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     # edit its details
     details = ticket.click('Details bearbeiten')

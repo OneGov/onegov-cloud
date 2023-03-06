@@ -2854,7 +2854,7 @@ msgid "No events found."
 msgstr "Nessun evento trovato."
 
 msgid "Past events"
-msgstr ""
+msgstr "Eventi passate"
 
 msgid "Filter by date"
 msgstr "Filtro per data"
@@ -3848,6 +3848,13 @@ msgstr "Aggiungi un messaggio al biglietto."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr ""
 "I nuovi messaggi sono stati disabilitati perché il biglietto è stato chiuso."
+
+msgid ""
+"Enable notifications about new tickets. Only works when being logged in and "
+"having the browser with the site open."
+msgstr ""
+"Abilita le notifiche sui nuovi ticket. Funziona solo quando si è connessi e "
+"si ha il browser con il sito aperto."
 
 msgid "Archive all selected tickets?"
 msgstr "Archiviare tutti i biglietti selezionati?"
@@ -5133,26 +5140,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "Past Events"
-#~ msgstr "Eventi passate"
-
-#, python-format
-#~ msgid ""
-#~ "A password reset link has been sent to ${email}, provided an account "
-#~ "exists for this email address."
-#~ msgstr ""
-#~ "Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-#~ "${email} (se si tratta di un account esistente)."
-
-#~ msgid "Marker Type"
-#~ msgstr "Tipo di indicatore"
-
-#~ msgid "New domain"
-#~ msgstr "Vecchio dominio"
-
-#~ msgid "Mapbox (Default)"
-#~ msgstr "Riquadro della mappa (predefinito)"
-
-#~ msgid "Homepage Image #1"
-#~ msgstr "Immagine n. 1 della pagina principale"

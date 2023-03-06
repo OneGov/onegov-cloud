@@ -167,9 +167,9 @@ function asMarkerMap(map, input) {
         // Can be used in combination with the CoordinatesField that uses a marker map to store the address at the same
         // time as the coordinates
         var addrInput = $('input#address');
-        var zipCodeInput = $('input#zip_code')
-        var cityInput = $('input#city')
-        var countryInput = $('input#country')
+        var zipCodeInput = $('input#zip_code');
+        var cityInput = $('input#city');
+        var countryInput = $('input#country');
 
         if (addrInput.length && zipCodeInput.length && cityInput.length) {
             var properties = geocode_result.properties;
@@ -188,7 +188,14 @@ function asMarkerMap(map, input) {
         title = title || '';
         marker = L.marker(position, {icon: icon, draggable: draggableMarker, title});
         marker.addTo(map);
-        map.setZoom(zoom);
+        if (map.getZoom() !== zoom) {
+            // setZoom will reset the animation and potentially screw
+            // our position, so we stop the animation and do a flyTo
+            // instead which sets both parameters at once, but we only
+            // need to do this if the zoom level has been changed
+            map.stop();
+            map.flyTo(position, zoom);
+        }
 
         marker.on('dragend', function() {
             setCoordinates(
@@ -241,7 +248,8 @@ function asMarkerMap(map, input) {
         if (hasMarker()) {
             removeMarker();
         }
-        addMarker(null, null, result.geocode.name);
+        var position = new L.LatLng(result.geocode.center.lat, result.geocode.center.lng);
+        addMarker(position, null, result.geocode.name);
         fillAddressFormFields(result.geocode);
         pointButton.state('remove-point');
     });

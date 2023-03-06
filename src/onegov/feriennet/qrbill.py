@@ -1,6 +1,7 @@
 from base64 import b64encode
 from io import StringIO
 from onegov.feriennet import log
+from onegov.feriennet.utils import NAME_SEPARATOR
 from qrbill.bill import QRBill, IBAN_ALLOWED_COUNTRIES, QR_IID
 from stdnum import iban
 
@@ -65,8 +66,9 @@ def generate_qr_bill(schema, request, user, invoice):
         return None
 
     # Debtor
+    realname = (user.realname or '').replace(NAME_SEPARATOR, ' ')
     debtor = {
-        'name': user.data.get('organisation') or user.realname,
+        'name': user.data.get('organisation') or realname,
         'street': user.data.get('address', None),
         'pcode': user.data.get('zip_code', None),
         'city': user.data.get('place', None),

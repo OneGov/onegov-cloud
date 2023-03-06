@@ -81,7 +81,8 @@ def test_ticket_pdf(org_app):
         locale='de_CH',
         host_url=host_url,
         class_link=class_link,
-        link=link
+        link=link,
+        url=''
     )
     collection = ResourceCollection(libres_context)
     forms = FormCollection(session)

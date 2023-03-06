@@ -37,6 +37,11 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
                 'configuration': {
                     'dsn': postgres_dsn,
                     'redis_url': redis_url
+                },
+                'websockets': {
+                    'client_url': 'ws://localhost:8766',
+                    'manage_url': 'ws://localhost:8766',
+                    'manage_token': 'super-super-secret-token'
                 }
             }
         ]
@@ -121,7 +126,16 @@ def org_app_url(request, org_app):
 
 
 def create_org_app(request, use_elasticsearch, cls=OrgApp):
-    app = create_app(cls, request, use_elasticsearch=use_elasticsearch)
+    app = create_app(
+        cls,
+        request,
+        use_elasticsearch=use_elasticsearch,
+        websockets={
+            'client_url': 'ws://localhost:8766',
+            'manage_url': 'ws://localhost:8766',
+            'manage_token': 'super-super-secret-token'
+        }
+    )
     app.configure_payment_providers(**{
         'payment_providers_enabled': True,
         'payment_provider_defaults': {
