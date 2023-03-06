@@ -1,8 +1,18 @@
 # Changes
 
+## 2023.11
+
+`2023-03-06` | [db16f8cb70...db16f8cb70](https://github.com/OneGov/onegov-cloud/compare/db16f8cb70^...db16f8cb70)
+
+### Core
+
+##### Pin Chameleon and resolve build container issues
+
+`Bugfix` | [db16f8cb70](https://github.com/onegov/onegov-cloud/commit/db16f8cb70be1db510202780570d21cc4b763577)
+
 ## 2023.10
 
-`2023-03-06` | [b7781dac32...8981201d9d](https://github.com/OneGov/onegov-cloud/compare/b7781dac32^...8981201d9d)
+`2023-03-06` | [b7781dac32...f086f478b9](https://github.com/OneGov/onegov-cloud/compare/b7781dac32^...f086f478b9)
 
 ### Core
 
@@ -2913,60 +2923,4 @@ Bills may be paid with the displayed information.
 ##### Adjust daycare calculation.
 
 `Feature` | [OGC-210](https://linear.app/onegovcloud/issue/OGC-210) | [e9e2e193c4](https://github.com/onegov/onegov-cloud/commit/e9e2e193c4d1f702aca13632c3cc292d203cd447)
-
-## 2022.18
-
-`2022-03-03` | [c26f5a6d76...83b91cc916](https://github.com/OneGov/onegov-cloud/compare/c26f5a6d76^...83b91cc916)
-
-### Election Day
-
-##### Add superregions to compounds.
-
-`Feature` | [OGC-320](https://linear.app/onegovcloud/issue/OGC-320) | [9143e8c31b](https://github.com/onegov/onegov-cloud/commit/9143e8c31b58ae6ee4f75e8ed9d7a1b81bb835cc)
-
-##### Allow to use voters count in non-pukelsheim compounds.
-
-`Feature` | [OGC-321](https://linear.app/onegovcloud/issue/OGC-321) | [66de846c45](https://github.com/onegov/onegov-cloud/commit/66de846c45e94ef0b9d3e7ecfc4d1a48b4b5848a)
-
-##### Add total voters count column to party results.
-
-`Feature` | [OGC-344](https://linear.app/onegovcloud/issue/OGC-344) | [c40f83a48a](https://github.com/onegov/onegov-cloud/commit/c40f83a48a84c869af6f4a544d87fb89c6592a12)
-
-##### Always include votes and voters count in party result JSON views.
-
-`Feature` | [OGC-348](https://linear.app/onegovcloud/issue/OGC-348) | [e4e79bc6de](https://github.com/onegov/onegov-cloud/commit/e4e79bc6deea29306485ae320338c3bd916ec268)
-
-##### Fixes JSON serialization of party results.
-
-`Bugfix` | [f0b9bd9158](https://github.com/onegov/onegov-cloud/commit/f0b9bd9158a8007ddffeb0b5f073c0b7e21d8bcb)
-
-### Feriennet
-
-##### Use less ressources by avoiding cloning browser.
-
-`Bugfix` | [OGC-349](https://linear.app/onegovcloud/issue/OGC-349) | [f356e26c6d](https://github.com/onegov/onegov-cloud/commit/f356e26c6df1362a57be886eb24e00999547558f)
-
-### Org
-
-##### Only show archived tickets in the ticket archive.
-
-`Other` | [OGC-242](https://linear.app/onegovcloud/issue/OGC-242) | [c26f5a6d76](https://github.com/onegov/onegov-cloud/commit/c26f5a6d76d68eb498f498c3ba84add0bafd8743)
-
-##### Fixes migrate newsletter command.
-
-`Bugfix` | [71e0992d12](https://github.com/onegov/onegov-cloud/commit/71e0992d12999efb93e3f8747897baacc098be01)
-
-##### Fixes sorting of root pages.
-
-`Bugfix` | [OGC-259](https://linear.app/onegovcloud/issue/OGC-259) | [b3a5813554](https://github.com/onegov/onegov-cloud/commit/b3a5813554afc4fcbac1c77a4dce06eb2ccef69f)
-
-##### Fixes ordering of pages in tiles widget.
-
-`Bugfix` | [OGC-261](https://linear.app/onegovcloud/issue/OGC-261) | [cdbb4de64f](https://github.com/onegov/onegov-cloud/commit/cdbb4de64fea7321345f653726d128ee1e5b6259)
-
-### Town6
-
-##### Fix calendar nav icon.
-
-`Bugfix` | [OGC-302](https://linear.app/onegovcloud/issue/OGC-302) | [b5e20598c2](https://github.com/onegov/onegov-cloud/commit/b5e20598c2a0e0a5a3823c6504f9b72199ab7c58)
 
