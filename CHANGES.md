@@ -1,8 +1,30 @@
 # Changes
 
+## 2023.10
+
+`2023-03-06` | [b7781dac32...8981201d9d](https://github.com/OneGov/onegov-cloud/compare/b7781dac32^...8981201d9d)
+
+### Core
+
+##### Pin Watchdog
+
+`Bugfix` | [b7781dac32](https://github.com/onegov/onegov-cloud/commit/b7781dac326d39822a0dd3675f9992795e90e129)
+
+### Feriennet
+
+##### New Google Analytics Code
+
+`Feature` | [PRO-1155](https://linear.app/projuventute/issue/PRO-1155) | [89a5fd502f](https://github.com/onegov/onegov-cloud/commit/89a5fd502faf30e2cce46db7e39fdb0f0959ac5c)
+
+### Town6
+
+##### Update widget in initial homepage structure.
+
+`Feature` | [OGC-600](https://linear.app/onegovcloud/issue/OGC-600) | [8981201d9d](https://github.com/onegov/onegov-cloud/commit/8981201d9d0abaa07bd4c2f04e5b5157a47cbde2)
+
 ## 2023.9
 
-`2023-03-06` | [aaba33b401...4d998b90be](https://github.com/OneGov/onegov-cloud/compare/aaba33b401^...4d998b90be)
+`2023-03-06` | [aaba33b401...978ee79f4d](https://github.com/OneGov/onegov-cloud/compare/aaba33b401^...978ee79f4d)
 
 ### Election Day
 
@@ -2947,48 +2969,4 @@ Bills may be paid with the displayed information.
 ##### Fix calendar nav icon.
 
 `Bugfix` | [OGC-302](https://linear.app/onegovcloud/issue/OGC-302) | [b5e20598c2](https://github.com/onegov/onegov-cloud/commit/b5e20598c2a0e0a5a3823c6504f9b72199ab7c58)
-
-## 2022.17
-
-`2022-02-28` | [afe9de72f0...1feabb29f9](https://github.com/OneGov/onegov-cloud/compare/afe9de72f0^...1feabb29f9)
-
-### Election Day
-
-##### Improve archive titles for screenreaders.
-
-`Feature` | [OGC-281](https://linear.app/onegovcloud/issue/OGC-281) | [2ddd563610](https://github.com/onegov/onegov-cloud/commit/2ddd5636106682617ed509fe1e99b970800ef3ca)
-
-##### Make some tests less flaky.
-
-`Bugfix` | [afe9de72f0](https://github.com/onegov/onegov-cloud/commit/afe9de72f0c57ec580f323bb30ba0708e1fa7f40)
-
-##### Add alt text to logo.
-
-`Other` | [OGC-281](https://linear.app/onegovcloud/issue/OGC-281) | [03b25811ff](https://github.com/onegov/onegov-cloud/commit/03b25811ffdbd2daffa06410a99e596f1679282b)
-
-##### Show file import errors in cleanup subscriber form.
-
-`Bugfix` | [40e9bf14f1](https://github.com/onegov/onegov-cloud/commit/40e9bf14f1b9583dc54e3f93b2766fc6dd17d9f8)
-
-### Feriennet
-
-##### Update translations.
-
-`Other` | [PRO-981](https://linear.app/projuventute/issue/PRO-981) | [175330c738](https://github.com/onegov/onegov-cloud/commit/175330c738910d6b55decf4eb770b9c88963ee71)
-
-##### Remove Lidle and WUP app.
-
-`Other` | [PRO-994](https://linear.app/projuventute/issue/PRO-994) | [c89335fd6e](https://github.com/onegov/onegov-cloud/commit/c89335fd6e66ecdb4080bb2cd89fd72ab14a8f20)
-
-### Fsi
-
-##### Improve LDAP log messages.
-
-`Other` | [OGC-325](https://linear.app/onegovcloud/issue/OGC-325) | [d897928ebc](https://github.com/onegov/onegov-cloud/commit/d897928ebc0f699ea8b912e76fdcc773e38e717b)
-
-### Org
-
-##### Fixes disabling newsletter not working.
-
-`Bugfix` | [OGC-211](https://linear.app/onegovcloud/issue/OGC-211) | [1bce8a9f37](https://github.com/onegov/onegov-cloud/commit/1bce8a9f371b3f20f99dbd4c46aad8d14d83a136)
 
