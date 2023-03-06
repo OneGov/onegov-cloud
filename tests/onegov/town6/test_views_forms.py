@@ -249,7 +249,7 @@ def test_form_group_sort(client):
         '.page-content-main h2').text().strip().split(' ')
 
 
-def test_ogc_857_forms_without_group_are_displayed(client, forms):
+def test_forms_without_group_are_displayed(client, forms):
 
     Form = namedtuple('Form', ['name', 'title', 'definition'])
     forms = [Form(*t) for t in forms]
