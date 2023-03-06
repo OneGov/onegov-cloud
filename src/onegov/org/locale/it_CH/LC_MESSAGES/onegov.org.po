@@ -998,8 +998,8 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Function"
-msgstr "Funzione"
+msgid "Functions:"
+msgstr "Funzioni:"
 
 msgid "Direct Phone Number"
 msgstr "Numero di telefono diretto"

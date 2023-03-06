@@ -303,3 +303,36 @@ def test_forms_without_group_are_displayed(client, forms):
     titles += custom_form_title
     for t in titles:
         assert t in form_page
+        
+        
+def test_navbar_links_visibility(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Profile', definition=textwrap.dedent("""
+        First name * = ___
+        Last name * = ___
+        E-Mail * = @@@
+    """), type='custom')
+
+    transaction.commit()
+
+    client.login_admin()
+
+    page = client.get("/forms").click("Profile")
+    page.form["first_name"] = "Foo"
+    page.form["last_name"] = "Bar"
+    page.form["e_mail"] = "admin@example.org"
+    page = page.form.submit().follow().form.submit().follow()
+    ticket_number = page.pyquery(".ticket-number").text()
+    page = client.get("/tickets/ALL/open").click(ticket_number)
+    # the Gever upload button should not be shown ...
+    assert "Hochladen auf Gever" not in page
+
+    settings = client.get('/settings').click('Gever API')
+    settings.form['gever_username'] = 'foo'
+    settings.form['gever_password'] = 'bar'
+    settings.form['gever_endpoint'] = 'https://example.org/'
+    settings.form.submit()
+
+    page = client.get("/tickets/ALL/open").click(ticket_number)
+    # ... until it has been activated in settings
+    assert "Hochladen auf Gever" in page

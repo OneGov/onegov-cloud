@@ -9,6 +9,9 @@ install: in_virtual_env
 	# enable pre-commit
 	pre-commit install
 
+	# enable pre-commit
+	pre-commit install
+
 	# ensure required folder structure
 	mkdir -p ./profiles
 
