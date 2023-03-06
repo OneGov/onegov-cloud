@@ -206,6 +206,11 @@ def test_template_layout(postgres_dsn, redis_url):
         enable_elasticsearch=False,
         depot_backend='depot.io.memory.MemoryFileStorage',
         redis_url=redis_url,
+        websockets={
+            'client_url': 'ws://localhost:8766',
+            'manage_url': 'ws://localhost:8766',
+            'manage_token': 'super-super-secret-token'
+        }
     )
     app.set_application_id('tests/foo')
 

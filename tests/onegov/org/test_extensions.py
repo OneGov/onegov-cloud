@@ -342,9 +342,9 @@ def test_contact_extension():
     )
 
     assert topic.contact_html == (
-        '<p>'
-        'Steve Jobs<br>'
-        '<a href="mailto:steve@apple.com">steve@apple.com</a><br>'
+        '<p><span class="title">'
+        'Steve Jobs</span></p>'
+        '<p><a href="mailto:steve@apple.com">steve@apple.com</a><br>'
         '<a href="https://www.apple.com" rel="nofollow">'
         'https://www.apple.com</a>'
         '</p>'

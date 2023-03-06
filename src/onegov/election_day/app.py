@@ -401,6 +401,9 @@ def get_custom_asset():
     # Form
     yield 'error-focus.js'
 
+    # notifications
+    yield 'notifications.js'
+
 
 @ElectionDayApp.webasset('backend_common')
 def get_backend_common_asset():

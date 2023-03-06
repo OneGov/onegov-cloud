@@ -29,6 +29,11 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
                         ),
                         'create': 'true'
                     },
+                    'websockets': {
+                        'client_url': 'ws://localhost:8766',
+                        'manage_url': 'ws://localhost:8766',
+                        'manage_token': 'super-super-secret-token'
+                    }
                 }
             }
         ]
@@ -46,7 +51,12 @@ def create_agency_app(request, use_elasticsearch=False):
         AgencyApp,
         request,
         use_maildir=True,
-        use_elasticsearch=use_elasticsearch
+        use_elasticsearch=use_elasticsearch,
+        websockets={
+            'client_url': 'ws://localhost:8766',
+            'manage_url': 'ws://localhost:8766',
+            'manage_token': 'super-super-secret-token'
+        }
     )
     org = create_new_organisation(app, name="Govikon")
     org.meta['reply_to'] = 'mails@govikon.ch'

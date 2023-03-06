@@ -76,7 +76,8 @@ def test_translator_mutation_form(translator_app):
         is_member=False,
         is_translator=False,
         include=lambda x: x,
-        translate=lambda x: f'_{x}'
+        translate=lambda x: f'_{x}',
+        url=''
     )
 
     form = TranslatorMutationForm()

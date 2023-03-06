@@ -1,14 +1,14 @@
 import textwrap
-from datetime import date
-
 import transaction
-from freezegun import freeze_time
-from webtest import Upload
 
+from datetime import date
+from freezegun import freeze_time
 from onegov.form import FormCollection, as_internal_id
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from tests.shared.utils import create_image
+from unittest.mock import patch
+from webtest import Upload
 
 
 def test_view_form_alert(client):
@@ -89,7 +89,10 @@ def test_render_form(client):
             f'Description not captured by field {field.type}'
 
 
-def test_submit_form(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_submit_form(broadcast, authenticate, connect, client):
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         # Your Details
@@ -140,6 +143,13 @@ def test_submit_form(client):
     message = client.get_email(-1)['TextBody']
     assert 'Fury' in message
 
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
+
     # unless he opts out of it
     form_page = client.get('/forms').click('Profile')
     form_page = form_page.form.submit().follow()
@@ -153,6 +163,13 @@ def test_submit_form(client):
 
     message = client.get_email(-1)['TextBody']
     assert 'Fury' not in message
+
+    assert connect.call_count == 2
+    assert authenticate.call_count == 2
+    assert broadcast.call_count == 2
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
 
 def test_pending_submission_error_file_upload(client):

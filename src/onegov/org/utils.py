@@ -456,7 +456,7 @@ class AllocationEventInfo:
             Resource,
             {
                 'name': self.resource.name,
-                'date': self.allocation.start,
+                'date': self.allocation.display_start(),
                 'view': 'agendaDay'
             },
             name='occupancy'

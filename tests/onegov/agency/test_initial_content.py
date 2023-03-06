@@ -22,7 +22,16 @@ homepage_structure = """<row>
 
 
 def test_initial_content(request):
-    app = create_app(AgencyApp, request, use_maildir=False)
+    app = create_app(
+        AgencyApp,
+        request,
+        use_maildir=False,
+        websockets={
+            'client_url': 'ws://localhost:8766',
+            'manage_url': 'ws://localhost:8766',
+            'manage_token': 'super-super-secret-token'
+        }
+    )
     org = create_new_organisation(app, "Test", 'de_CH')
 
     assert org.locales == 'de_CH'

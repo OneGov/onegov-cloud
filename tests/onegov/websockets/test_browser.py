@@ -15,14 +15,16 @@ async def test_browser_integration(browser):
             <body>
                 <div id="x"></div>
                 <script>
-                    WebsocketConfig = {{
-                        endpoint: "{browser.websocket_server_url}",
-                        schema: "schema",
-                        channel: "two",
-                        onnotifcation: function(event) {{
-                            document.getElementById("x").className += "y";
-                        }}
-                    }};
+                    window.addEventListener("DOMContentLoaded", function() {{
+                        openWebsocket(
+                            "{browser.websocket_server_url}",
+                            "schema",
+                            "two",
+                            function(message, websocket) {{
+                                document.getElementById("x").className += "y";
+                            }}
+                        );
+                    }});
                 </script>
             </body>
         </html>
@@ -30,7 +32,6 @@ async def test_browser_integration(browser):
 
     browser.visit('/')
     assert 'websockets.bundle.js' in browser.html
-    browser.wait_for_js_variable('WebsocketConfig')
 
     async with connect(browser.websocket_server_url) as manage:
         await authenticate(manage, 'super-super-secret-token')

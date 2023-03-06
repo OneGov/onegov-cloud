@@ -6,6 +6,8 @@ $pending-ticket-bg: $blue-light;
 $closed-ticket-bg: $green-light;
 $archived-ticket-bg: $brown-light;
 $ticket-number-bg: $yellow-light;
+$ticket-notification-enabled-icon: '\f0f3';
+$ticket-notification-disabled-icon: '\f1f6';
 
 @mixin status-batch($bg) {
     background: $bg;
@@ -705,5 +707,20 @@ button {
     .button:hover {
         margin-right: 0;
         padding: .5rem !important;
+    }
+
+    .main-title {
+        max-width: none;
+    }
+
+}
+
+.ticket-notifications {
+    float: right;
+
+    &::before { @include icon-bold($ticket-notification-disabled-icon); }
+
+    &.granted {
+        &::before { @include icon-bold($ticket-notification-enabled-icon); }
     }
 }

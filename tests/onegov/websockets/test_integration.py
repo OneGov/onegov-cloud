@@ -31,3 +31,8 @@ def test_integration(broadcast, authenticate, connect, websockets_app):
     assert broadcast.call_args[0][1] == websockets_app.schema
     assert broadcast.call_args[0][2] == 'one'
     assert broadcast.call_args[0][3] == {'custom': 'data'}
+
+
+def test_csp_tween(client):
+    csp = client.get('/').headers['content-security-policy']
+    assert 'connect-src ws://127.0.0.1:9876' in csp

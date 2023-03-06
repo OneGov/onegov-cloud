@@ -2135,9 +2135,6 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
-msgid "Past events"
-msgstr "Vergangene Veranstaltungen"
-
 msgid "Do you really want to delete this note?"
 msgstr "Möchten Sie diese Notiz wirklich löschen?"
 
@@ -2850,6 +2847,9 @@ msgstr "Wiederholungen"
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
 
+msgid "Past events"
+msgstr "Vergangene Veranstaltungen"
+
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
 
@@ -3378,7 +3378,7 @@ msgid ""
 "This is the weekly OneGov Cloud status e-mail. If you don't want to receive "
 "this e-mail you may deactivate it by clicking on"
 msgstr ""
-"Dies ist das eöchentliche Status E-Mail der OneGov Cloud. Sie können sich "
+"Dies ist das wöchentliche Status E-Mail der OneGov Cloud. Sie können sich "
 "jederzeit über den folgenden Link"
 
 msgid "Directory entry adopted."
@@ -3839,6 +3839,13 @@ msgstr "Fügen Sie der Anfrage eine Nachricht hinzu."
 
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
+
+msgid ""
+"Enable notifications about new tickets. Only works when being logged in and "
+"having the browser with the site open."
+msgstr ""
+"Benachrichtigungen über neue Tickets aktivieren. Funktioniert nur falls "
+"eingeloggt und solange der Browser mit der Website geöffnet ist."
 
 msgid "Archive all selected tickets?"
 msgstr "Alle ausgewählten Tickets archivieren?"
@@ -5116,12 +5123,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "Marker Type"
-#~ msgstr "Marker-Typ"
-
-#~ msgid "Numbers"
-#~ msgstr "Zahlen"
-
-#~ msgid "Mapbox (Default)"
-#~ msgstr "Mapbox (Standard)"

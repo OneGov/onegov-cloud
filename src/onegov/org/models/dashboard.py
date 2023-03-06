@@ -85,3 +85,5 @@ class BoardletFact:
 
     # the font awesome (fa-*) icon to use, if any
     icon: str = None
+
+    css_class: str = None

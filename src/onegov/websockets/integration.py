@@ -1,4 +1,5 @@
 from asyncio import run
+from more.content_security.core import content_security_policy_tween_factory
 from more.webassets import WebassetsApp
 from onegov.websockets import log
 from onegov.websockets.client import authenticate
@@ -14,12 +15,7 @@ class WebsocketsApp(WebassetsApp):
     Add applicatiod-bound websocket broadcast communication.
 
     To receive broadcast messages using JavaScript in the browser, include the
-    asset and add a global configure object::
-
-        WebsocketConfig = {
-            endpoint: "${layout.app.websockets_client_url(request)}",
-            schema: "${layout.app.schema}",
-        };
+    asset 'websockets' and call ``openWebsocket``.
 
     To send broadcast messages, call ``send_websocket`` with a
     JSON-serializable message.
@@ -27,12 +23,7 @@ class WebsocketsApp(WebassetsApp):
     """
 
     def configure_websockets(self, **cfg):
-        """ Configures global websocket settings.
-
-        Defaults to port 8765 and a randomly generated token which is available
-        until the next reboot of the host.
-
-        """
+        """ Configures global websocket settings. """
 
         config = cfg.get('websockets', {})
         self._websockets_client_url = config.get('client_url')
@@ -105,6 +96,26 @@ class WebsocketsApp(WebassetsApp):
             return False
 
         return True
+
+
+@WebsocketsApp.tween_factory(under=content_security_policy_tween_factory)
+def websocket_csp_tween_factory(app, handler):
+
+    def websocket_csp_tween(request):
+        """
+        Adds the websocket client to the connect-src content security policy.
+        """
+
+        result = handler(request)
+        configuration = request.app.configuration
+        if 'websockets' in configuration:
+            csp = configuration['websockets'].get('client_csp')
+            if csp:
+                request.content_security_policy.connect_src.add(csp)
+
+        return result
+
+    return websocket_csp_tween
 
 
 @WebsocketsApp.webasset_path()
