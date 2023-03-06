@@ -171,11 +171,12 @@ class MoveAgencyForm(Form):
         """
         As a new destination (parent page) every menu item is valid except
         yourself. You cannot assign yourself as the new destination
+        :return: bool
         """
         if self.parent_id.data and self.parent_id.data.isdigit():
             new_parent_id = int(self.parent_id.data)
-            page_id_from_url = int(self.request.url.rsplit('/')[-2])
-            if page_id_from_url == new_parent_id:
+            # prevent selecting yourself as new parent
+            if self.model.id == new_parent_id:
                 self.parent_id.errors.append(
                     _("Invalid destination selected."))
                 return False
