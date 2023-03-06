@@ -303,8 +303,8 @@ def test_forms_without_group_are_displayed(client, forms):
     titles += custom_form_title
     for t in titles:
         assert t in form_page
-        
-        
+
+
 def test_navbar_links_visibility(client):
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
