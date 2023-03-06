@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-14 15:23+0100\n"
+"POT-Creation-Date: 2023-02-22 15:50+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -38,6 +38,30 @@ msgid "${count} Occasions"
 msgstr "${count} événement(s)"
 
 #, python-format
+msgid "${count} overfull"
+msgstr "${count} avec trop de participants"
+
+#, python-format
+msgid "${count} full"
+msgstr "${count} complet"
+
+#, python-format
+msgid "${count} operable"
+msgstr "{count} avec suffisamment de participants"
+
+#, python-format
+msgid "${count} unoperable"
+msgstr "{count} avec trop peu de participants"
+
+#, python-format
+msgid "${count} empty"
+msgstr "${count} pas de participants"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} annulés"
+
+#, python-format
 msgid "${count} Wishes"
 msgstr "${count} souhaits"
 
@@ -54,8 +78,8 @@ msgid "${count} accepted"
 msgstr "${count} acceptés"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} annulés"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} annulé(e) ou déprogrammé(e)"
 
 #, python-format
 msgid "${count} denied"
@@ -80,6 +104,10 @@ msgstr "${count} filles"
 #, python-format
 msgid "${count} Boys"
 msgstr "${count} garçons"
+
+#, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} dont sans réservations acceptées"
 
 #, python-format
 msgid "${amount}% Happiness"
@@ -359,6 +387,36 @@ msgstr "Compte bancaire prestataire"
 msgid "Organiser Beneficiary"
 msgstr "Bénéficiaire prestataire"
 
+msgid "Confirmed Volunteers"
+msgstr "Bénévoles confirmés"
+
+msgid "Volunteer State"
+msgstr "État des bénévoles"
+
+msgid "First Name"
+msgstr "Prénom"
+
+msgid "Last Name"
+msgstr "Nom"
+
+msgid "Birth Date"
+msgstr "Date de naissance"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Place"
+msgstr "Lieu"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Address"
+msgstr "Adresse"
+
 msgid "Wishlist / Bookings"
 msgstr "Liste des souhaits / Réservations"
 
@@ -458,6 +516,9 @@ msgstr "Utilisateurs·trices "
 
 msgid "Exports user accounts."
 msgstr "Exporter les comptes utilisateurs·trices"
+
+msgid "Exports volunteers in the given period."
+msgstr "Exporter les volontaires avec la période donnée."
 
 msgid "Accessible"
 msgstr "Accessible à tous"
@@ -599,12 +660,6 @@ msgstr "Carte"
 
 msgid "You already entered a child with this name"
 msgstr "Vous avec déjà saisi un enfant avec ce nom"
-
-msgid "First Name"
-msgstr "Prénom"
-
-msgid "Last Name"
-msgstr "Nom"
 
 msgid "Birthdate"
 msgstr "Date de naissance"
@@ -1230,17 +1285,8 @@ msgstr "Civilité"
 msgid "Personal"
 msgstr "Personnel"
 
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "Address"
-msgstr "Adresse"
-
 msgid "Zip Code"
 msgstr "Code postal"
-
-msgid "Place"
-msgstr "Lieu"
 
 msgid "Political Municipality"
 msgstr "Commune politique"
@@ -1250,9 +1296,6 @@ msgstr "Adresse e-mail"
 
 msgid "If different than username"
 msgstr "Si différent du nom d'utilisateur"
-
-msgid "Phone"
-msgstr "Téléphone"
 
 msgid "Emergency Contact"
 msgstr "Contact en cas d'urgence"
@@ -2108,9 +2151,6 @@ msgstr "Votre demande a été traitée."
 #. Canonical text for ${tos} is: "TOS"
 msgid "I have read the ${tos} and accept them."
 msgstr "J'ai lu les ${tos} et je les accepte."
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "Manage user"
 msgstr "Gérer les utilisateurs·trices"
@@ -3080,3 +3120,7 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} participants inscrits"

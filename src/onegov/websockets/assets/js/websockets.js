@@ -11,10 +11,10 @@ window.addEventListener("DOMContentLoaded", function() {
         websocket.send(JSON.stringify(payload));
       });
       websocket.addEventListener('message', function(message) {
-          const data = JSON.parse(message.data)
-          if (data.type === 'notification' && WebsocketConfig.onnotifcation) {
-              WebsocketConfig.onnotifcation(data.message);
-          }
+        const data = JSON.parse(message.data)
+        if (data.type === 'notification' && WebsocketConfig.onnotifcation) {
+            WebsocketConfig.onnotifcation(data.message, websocket);
+        }
       });
     } catch (error) {}
   }

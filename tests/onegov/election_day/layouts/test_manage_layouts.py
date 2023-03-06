@@ -44,6 +44,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -74,7 +82,7 @@ def test_manage_layouts(session):
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', False, []),
         ]),
-        ('Subscribers', '', False, [
+        ('Notifications', '', False, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', False, []),
             (
                 'Email subscribers',
@@ -116,6 +124,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -143,6 +159,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -169,6 +193,14 @@ def test_manage_layouts(session):
         ]),
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', True, []),
+        ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
         ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
@@ -199,6 +231,14 @@ def test_manage_layouts(session):
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
         ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
     assert layout.breadcrumbs == [
@@ -227,6 +267,14 @@ def test_manage_layouts(session):
         ('Import configuration', '', True, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
             ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
+        ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
         ]),
         ('Screens', 'ScreenCollection/archive', False, [])
     ]
@@ -257,7 +305,7 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
-        ('Subscribers', '', True, [
+        ('Notifications', '', True, [
             (
                 'Email subscribers',
                 'EmailSubscriberCollection/archive',
@@ -299,7 +347,7 @@ def test_manage_layouts(session):
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
-        ('Subscribers', '', True, [
+        ('Notifications', '', True, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', True, []),
             (
                 'Trigger notifications',
@@ -334,6 +382,14 @@ def test_manage_layouts(session):
         ]),
         ('Import configuration', '', False, [
             ('Upload tokens', 'UploadTokenCollection/archive', False, []),
+        ]),
+        ('Notifications', '', False, [
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
         ]),
         ('Screens', 'ScreenCollection/archive', True, [])
     ]
