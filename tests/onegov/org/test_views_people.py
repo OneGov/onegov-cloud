@@ -1,4 +1,6 @@
 from uuid import UUID
+from markupsafe import Markup
+from onegov.core.request import CoreRequest
 from onegov.org.models import Topic
 from onegov.org.views.people import person_functions_by_organization
 from onegov.people import Person
@@ -130,30 +132,7 @@ def test_delete_linked_person_issue_149(client):
     edit_page.form.submit().follow()
 
 
-def test_context_specific_function(session):
-
-    person = Person(
-        id=UUID("fa471984-7bf3-41ce-a336-0d01a08cd6ba"),
-        first_name="Hans",
-        last_name="Maulwurf",
-    )
-    session.add(person)
-    context_specific_function = "President"
-    person_to_function = [[person.id.hex, context_specific_function]]
-
-    topic = Topic(title="Komission", name="topic")
-    # Pretend we have ContentMixin:
-    setattr(topic, 'content', {'people': person_to_function})
-    session.add(topic)
-    topics = [topic]
-    session.flush()
-
-    organization_to_function = person_functions_by_organization(person, topics)
-    assert organization_to_function[0] == f"Komission: " \
-                                          f"{context_specific_function}"
-
-
-def test_context_specific_function_substring_removed(session):
+def test_context_specific_function_substring_removed(session, org_app):
     organizations = ["Urnenbüro", "Forum der Ortsparteien und Quartiervereine"]
     context_specific_functions = [
         "Präsidentin Urnenbüro",
@@ -177,10 +156,27 @@ def test_context_specific_function_substring_removed(session):
     setattr(topic2, 'content', {'people': person_to_function2})
     session.add(topic1)
     session.add(topic2)
-
     topics = [topic1, topic2]
+    request = CoreRequest(
+        environ={
+            "wsgi.url_scheme": "https",
+            "PATH_INFO": "/",
+            "SERVER_NAME": "",
+            "SERVER_PORT": "",
+            "SERVER_PROTOCOL": "https",
+            "HTTP_HOST": "localhost",
+        }, app=org_app,
+    )
+    link1, link2 = (request.link(t) for t in topics)
     session.flush()
 
-    organization_to_function = person_functions_by_organization(person, topics)
-    assert organization_to_function[0] == f"{organizations[0]}: Präsidentin"
-    assert organization_to_function[1] == f"{organizations[1]}: Mitglied"
+    organization_to_function = person_functions_by_organization(
+        person, topics, request
+    )
+
+    org_link_1 = f'<a href="{link1}">{organizations[0]}</a>'
+    org_link_2 = f'<a href="{link2}">{organizations[1]}</a>'
+    first_expected = Markup(f"<span>{org_link_1}: Präsidentin</span>")
+    second_expected = Markup(f"<span>{org_link_2}: Mitglied</span>")
+    assert organization_to_function[0] == first_expected
+    assert organization_to_function[1] == second_expected

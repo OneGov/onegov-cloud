@@ -868,7 +868,7 @@
                         <span i18n:translate="">Functions:</span>
                         <ul>
                             <li tal:repeat="item organization_to_function">
-                                <span>${item}</span>
+                                ${item}
                             </li>
                         </ul>
                     </div>
