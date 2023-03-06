@@ -312,7 +312,7 @@
 
 <metal:panel define-macro="event-cards">
     <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center" data-equalizer="events" data-equalize-on="medium">
-        <div class="cell small-12 large-3 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
+        <div class="cell small-12 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
     </div>

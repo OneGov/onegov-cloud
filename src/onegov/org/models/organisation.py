@@ -50,7 +50,7 @@ class Organisation(Base, TimestampMixin):
     hide_reservations = meta_property()
     publications_label = meta_property()
     hide_publications = meta_property()
-    event_limit_homepage = meta_property(default=4)
+    event_limit_homepage = meta_property(default=3)
     news_limit_homepage = meta_property(default=2)
     focus_widget_image = meta_property()
     daypass_label = meta_property()
