@@ -12,15 +12,16 @@
     <link tal:condition="layout.favicon_mac_url|nothing" rel="icon" type="image/png" href="${layout.favicon_mac_url}" sizes="32x32">
     <link tal:condition="layout.favicon_pinned_tab_safari_url|nothing" rel="mask-icon" href="${layout.favicon_pinned_tab_safari_url}" color="${layout.primary_color}">
     <meta name="theme-color" content="${layout.primary_color}">
-    <!--! Google Tag Manager -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6FPC8HFZVM"></script>
+    <!-- Google Tag Manager -->
     <script>
         /* eslint-disable */
-        window.dataLayer = window.dataLayer || []; 
-        function gtag(){dataLayer.push(arguments);} 
-        gtag('js', new Date()); gtag('config', 'G-6FPC8HFZVM');
-        /* eslint-enable */
-    </script> 
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+        var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+        j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+         })(window,document,'script','dataLayer','GTM-WTBG4FX');
+         /* eslint-enable */
+    </script>
+    <!-- End Google Tag Manager -->
 
 </metal:favicon>
 
@@ -37,11 +38,13 @@
         </div>
     </footer>
 
-    <!--! Google Tag Manager (noscript) -->
+    <!-- Google Tag Manager (noscript) -->
     <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KM9K588"
-        height="0" width="0" style="display:none;visibility:hidden" />
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WTBG4FX"
+        height="0" width="0" style="display:none;visibility:hidden">
+    </iframe>
     </noscript>
+    <!-- End Google Tag Manager (noscript) -->
 </metal:footer>
 
 <metal:footer_sponsors define-macro="footer_sponsors" i18n:domain="onegov.feriennet">
