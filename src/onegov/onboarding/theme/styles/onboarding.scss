@@ -145,6 +145,10 @@ footer {
     z-index: 9999;
 }
 
+.large-12.columns:has(.colorPicker-picker) {
+    margin-top: 1em;
+}
+
 .colorPicker_hexWrap {
     float: left;
     width: 100%;
