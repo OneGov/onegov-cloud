@@ -1,7 +1,6 @@
 import textwrap
-from datetime import date
 from itertools import chain, repeat
-
+from datetime import date
 from onegov.form import FormCollection
 from onegov.ticket import Ticket
 from onegov.user import UserCollection
@@ -9,9 +8,13 @@ from tests.onegov.town6.common import step_class
 import transaction
 from freezegun import freeze_time
 from collections import namedtuple
+from unittest.mock import patch
 
 
-def test_form_steps(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_form_steps(broadcast, authenticate, connect, client):
     page = client.get('/form/familienausweis')
     assert step_class(page, 1) == 'is-current'
 
@@ -38,6 +41,16 @@ def test_form_steps(client):
     assert step_class(page, 1) == 'is-complete'
     assert step_class(page, 2) == 'is-complete'
     assert step_class(page, 3) == 'is-current'
+
+    msg = client.get_email(-1)['TextBody']
+    assert 'Ihre Anfrage wurde unter der folgenden Referenz registriert' in msg
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
 
 def test_registration_ticket_workflow(client):

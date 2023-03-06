@@ -60,6 +60,16 @@ msgstr ""
 "Non è possibile effettuare il login perché l'utente non ha gruppi. Contatta "
 "il tuo amministratore di sistema AzureAD."
 
+msgid "SAML2"
+msgstr "SAML2"
+
+msgid ""
+"Can't login because your user has no groups. Contact your SAML2 system "
+"administrator"
+msgstr ""
+"Non è possibile effettuare il login perché l'utente non ha gruppi. Contatta "
+"il tuo amministratore di sistema SAML2."
+
 msgid "Name"
 msgstr "Nome"
 

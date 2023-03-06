@@ -15,6 +15,7 @@ class DummyRequest():
     is_admin = False
     current_user = Bunch(id=Bunch(hex='abcd'))
     path = ''
+    url = ''
 
     def class_link(self, cls, name=''):
         return f'{cls.__name__}/{name}'

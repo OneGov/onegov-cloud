@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+for module in $(ls -1 src/onegov/); do
+  do/translate onegov.$module
+done

@@ -35,7 +35,8 @@ def test_hidden_tabs_mixin():
         (Election(), 'statistics'),
         (ProporzElection(), 'statistics'),
         (ElectionCompound(), 'party-panachage'),
-        (ElectionCompoundPart(Bunch(id='1'), 'x', 'y'), 'party-strengths'),
+        (ElectionCompoundPart(Bunch(id='1', date=None), 'x', 'y'),
+         'party-strengths'),
     ):
         layout = DetailLayout(model, request)
         assert layout.hide_tab(tab) is True

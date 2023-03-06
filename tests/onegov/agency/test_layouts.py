@@ -17,6 +17,11 @@ class DummyOrg:
 
 class DummyApp:
     org = DummyOrg()
+    schema = 'schema'
+    websockets_private_channel = 'channel'
+
+    def websockets_client_url(self, request):
+        return ''
 
 
 class DummyRequest:

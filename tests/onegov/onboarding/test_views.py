@@ -101,7 +101,12 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
         identity_secure=False,
         redis_url=redis_url,
         enable_elasticsearch=False,
-        depot_backend='depot.io.memory.MemoryFileStorage'
+        depot_backend='depot.io.memory.MemoryFileStorage',
+        websockets={
+            'client_url': 'ws://localhost:8766',
+            'manage_url': 'ws://localhost:8766',
+            'manage_token': 'super-super-secret-token'
+        }
     )
     town.set_application_id(town.namespace + '/' + 'new_york')
     town.settings.cronjobs = Bunch(enabled=False)

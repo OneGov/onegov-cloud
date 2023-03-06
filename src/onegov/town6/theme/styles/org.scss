@@ -415,11 +415,20 @@ footer {
 
 /* Input */
 
-select, textarea, input[type="text"], input[type="password"],
-input[type="datetime"], input[type="datetime-local"],
-input[type="date"], input[type="month"], input[type="time"],
-input[type="week"], input[type="number"], input[type="email"],
-input[type="tel"], input[type="url"] {
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="url"] {
     height: auto;
 }
 
@@ -817,11 +826,20 @@ $pageref-color-hover: $iron;
 */
 
 body:not(.editor-layout) {
-    select, textarea, input[type="text"], input[type="password"],
-    input[type="datetime"], input[type="datetime-local"],
-    input[type="date"], input[type="month"], input[type="time"],
-    input[type="week"], input[type="number"], input[type="email"],
-    input[type="tel"], input[type="url"] {
+    select,
+    textarea,
+    input[type="text"],
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="url"] {
         font-size: 16px !important;
     }
 }
@@ -846,7 +864,9 @@ a > i.fa-external-link-alt {
     margin-left: .3rem;
 }
 
-.page-links, .forms-list, .more-list {
+.page-links,
+.forms-list,
+.more-list {
     .edit-link .fa-edit {
         color: #cacaca;
         display: block;
@@ -945,5 +965,5 @@ ul.recipients {
 }
 
 .sidebar {
-    box-shadow: inset 10px 0px 8px -10px rgba(0,0,0,0.07);
+    box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
 }

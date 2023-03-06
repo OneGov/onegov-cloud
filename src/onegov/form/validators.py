@@ -13,6 +13,7 @@ from onegov.form import _
 from onegov.form.errors import DuplicateLabelError
 from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
+from onegov.form.errors import MixedTypeError
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms.fields import SelectField
 from wtforms.validators import InputRequired
@@ -172,7 +173,7 @@ class ValidFormDefinition:
                 raise ValidationError(
                     field.gettext(self.duplicate).format(label=e.label)
                 )
-            except FieldCompileError as e:
+            except (FieldCompileError, MixedTypeError) as e:
                 raise ValidationError(e.field_name)
             except AttributeError:
                 raise ValidationError(field.gettext(self.message))
