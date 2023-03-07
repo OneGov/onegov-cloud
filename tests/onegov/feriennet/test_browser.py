@@ -1,5 +1,6 @@
 import time
 import json
+import pytest
 
 from psycopg2.extras import NumericRange
 from pytest import mark
@@ -232,7 +233,15 @@ def test_browse_billing(browser, scenario, postgres):
     assert not browser.is_element_present_by_css('.remove-manual')
 
 
-def test_volunteers_export(browser, scenario):
+# The parametrization is used to ensure all the volunteer states can
+# be reached by clicking in the browser and verify that the states
+# can be exported properly
+@pytest.mark.parametrize('to_volunteer_state', [
+    ('Kontaktiert'),
+    ('Bestätigt'),
+    ('Offen'),
+])
+def test_volunteers_export(browser, scenario, to_volunteer_state):
     scenario.add_period(title="Ferienpass 2019", active=True, confirmed=True)
     scenario.add_activity(title="Zoo", state='accepted')
     scenario.add_user(username='member@example.org', role='member')
@@ -290,18 +299,31 @@ def test_volunteers_export(browser, scenario):
     browser.visit('/attendees/zoo')
     assert not browser.is_text_present("Foo")
 
-    # the admin can see the signed up users
+    # the admin can see the signed-up users
     browser.visit(f'/volunteers/{scenario.latest_period.id.hex}')
     assert browser.is_text_present("Foo")
-    assert not browser.is_text_present("Bestätigt")
+
+    # verify initial volunteer state
+    assert browser.is_text_present("Offen")
 
     browser.find_by_css('.actions-button').first.click()
-    browser.links.find_by_partial_text("Als bestätigt markieren").click()
-    assert browser.is_text_present("Bestätigt")
-
-    # now the volunteer is in the list
-    browser.visit('/attendees/zoo')
-    assert browser.is_text_present("Foo")
+    # move volunteer through different volunteer states
+    if to_volunteer_state == 'Offen':
+        pass
+    elif to_volunteer_state == 'Kontaktiert':
+        assert not browser.is_text_present("Bestätigt")
+        browser.links.find_by_partial_text("Als kontaktiert markieren").click()
+        assert browser.is_text_present("Kontaktiert")
+    elif to_volunteer_state == 'Bestätigt':
+        assert not browser.is_text_present("Bestätigt")
+        browser.links.find_by_partial_text("Als bestätigt markieren").click()
+        assert browser.is_text_present("Bestätigt")
+        # now the volunteer is in the list
+        browser.visit('/attendees/zoo')
+        assert browser.is_text_present("Foo")
+    else:
+        # invalid case
+        assert False
 
     browser.visit('/export/helfer')
     browser.fill_form({
@@ -316,6 +338,11 @@ def test_volunteers_export(browser, scenario):
     start_time = occasion_date.strftime('%Y-%m-%dT00:00:00+01:00')
     end_time = occasion_date.strftime('%Y-%m-%dT01:00:00+01:00')
 
+    def get_number_of_confirmed_volunteers(state):
+        if state == 'Bestätigt':
+            return 1
+        return 0
+
     volunteer_json = {
         'Angebot Titel': 'Zoo',
         'Durchführung Daten': [
@@ -324,8 +351,9 @@ def test_volunteers_export(browser, scenario):
         'Durchführung Abgesagt': False,
         'Bedarf Name': 'Begleiter',
         'Bedarf Anzahl': '1 - 3',
-        'Bestätigte Helfer': 1,
-        'Helfer Status': 'Bestätigt',
+        'Bestätigte Helfer': get_number_of_confirmed_volunteers(
+            to_volunteer_state),
+        'Helfer Status': to_volunteer_state,
         'Vorname': 'Foo',
         'Nachname': 'Bar',
         'Geburtsdatum': '1984-06-04',

@@ -8,6 +8,7 @@ from onegov.org.forms import PersonForm
 from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic
 from onegov.people import Person, PersonCollection
+from markupsafe import Markup
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
@@ -35,20 +36,21 @@ def view_person(self, request, layout=None):
 
     pages = request.session.query(Topic)
     pages = pages.filter(Topic.people is not None).all()
-
-    organization_to_function = person_functions_by_organization(self, pages)
+    org_to_func = person_functions_by_organization(self, pages, request)
 
     return {
         'title': self.title,
         'person': self,
         'layout': layout or PersonLayout(self, request),
-        'organization_to_function': organization_to_function
+        'organization_to_function': org_to_func
     }
 
 
-def person_functions_by_organization(subject, pages):
+def person_functions_by_organization(subject, pages, request):
     """ Collects 1:1 mappings of all context-specific functions and
-     organizations for a person. Returns a List of strings in the form:
+     organizations for a person. The organizations include the link.
+
+     Returns a List of strings in the form:
 
         - Organization 1, Function A
         - Organization 2, Function B
@@ -76,7 +78,11 @@ def person_functions_by_organization(subject, pages):
                     continue
                 if func:
                     func = remove_duplicated_text(func, topic)
-                    organization_to_function.append(f"{topic.title}: {func}")
+                    org_with_link = f"<a href=\"{request.link(topic)}\">" \
+                                    f"{topic.title}</a>"
+                    organization_to_function.append(
+                        Markup(f"<span>{org_with_link}: {func}</span>")
+                    )
     return organization_to_function
 
 

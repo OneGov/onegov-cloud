@@ -312,7 +312,7 @@
 
 <metal:panel define-macro="event-cards">
     <div tal:condition="event_panel|nothing" class="events grid-x grid-padding-x  align-center" data-equalizer="events" data-equalize-on="medium">
-        <div class="cell small-12 large-3 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
+        <div class="cell small-12 medium-4 event-item flex-container" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
         </div>
     </div>
@@ -868,7 +868,7 @@
                         <span i18n:translate="">Functions:</span>
                         <ul>
                             <li tal:repeat="item organization_to_function">
-                                <span>${item}</span>
+                                ${item}
                             </li>
                         </ul>
                     </div>
@@ -1186,11 +1186,7 @@
         </div>
     <tal:b condition="not occurrences">
         <p i18n:translate>No events found.</p>
-        <br>
-        <tal condition="'range' in layout.og_url">
-            <p><a href="${layout.events_url}" class="button hollow" i18n:translate>All events</a>
-            <br><a href="${layout.events_url}&amp;range=past" class="button hollow" i18n:translate>Past events</a>
-        </tal>
+        <br><a tal:condition="'range' not in request.url" href="${layout.events_url}&amp;range=past" class="button hollow" i18n:translate>Past events</a>
     </tal:b>
 </metal:occurrences>
 
