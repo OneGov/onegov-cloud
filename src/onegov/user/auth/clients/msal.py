@@ -61,6 +61,8 @@ class MSALClient():
     # Needed attributes in id_token_claim
     attributes: AzureADAttributes = attrib()
 
+    primary: bool = attrib()
+
     @cached_property
     def connection(self):
         """ Returns the msal instance. Upon initiation, the client tries to
@@ -113,7 +115,8 @@ class MSALConnections():
                 validate_authority=cfg.get('validate_authority', True),
                 attributes=AzureADAttributes.from_cfg(
                     cfg.get('attributes', {})
-                )
+                ),
+                primary=cfg.get('primary', False),
             ) for app_id, cfg in config.items()
         }
         for app_id, client in clients.items():

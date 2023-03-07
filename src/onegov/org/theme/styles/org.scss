@@ -444,8 +444,21 @@ del {
     Login page
 */
 #page-auth-login #content {
+
+    $first-color: #ffc56c;
+    $first-hover: darken($first-color, 10%);
+
     .alternatives {
         margin-top: 1.5rem;
+
+        input[type="submit"].button {
+            background: $first-color;
+            color: $body-font-color;
+
+            &:hover {
+                background: $first-hover;
+            }
+        }
     }
 
     h2 {
@@ -467,9 +480,6 @@ del {
     }
 
     .provider-login {
-        $first-color: #ffc56c;
-        $first-hover: darken($first-color, 10%);
-
         @for $i from 1 through 4 {
             a:nth-child(#{$i}) {
                 background: lighten($first-color, ($i - 1) * 5%);
