@@ -26,7 +26,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
-from onegov.org.models import ExportCollection
+from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
@@ -682,7 +682,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
 
 
 class AdjacencyListMixin:
-    """ Provides layouts for for models inheriting from
+    """ Provides layouts for models inheriting from
         :class:`onegov.core.orm.abstract.AdjacencyList`
     """
 
@@ -2794,7 +2794,16 @@ class HomepageLayout(DefaultLayout):
                     _("Sort"),
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
-                )
+                ),
+                Link(
+                    _("Add"),
+                    self.request.link(Editor('new', self.model, 'page',
+                                             root_page=True)),
+                    classes=(
+                        'new-page',
+                        'show-new-content-placeholder'
+                    ),
+                ),
             ]
 
     @cached_property

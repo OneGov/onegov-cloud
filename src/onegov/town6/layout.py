@@ -15,7 +15,7 @@ from onegov.org.elements import QrCodeLink
 from onegov.org.exports.base import OrgExport
 from onegov.org.models import (
     ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
-    ExportCollection, PublicationCollection, PageMove, News
+    ExportCollection, PublicationCollection, PageMove, News, Editor
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection
@@ -2409,5 +2409,14 @@ class HomepageLayout(DefaultLayout):
                     _("Sort"),
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
-                )
+                ),
+                Link(
+                    _("Add"),
+                    self.request.link(Editor('new', self.model, 'page',
+                                             root_page=True)),
+                    classes=(
+                        'new-page',
+                        'show-new-content-placeholder'
+                    ),
+                ),
             ]

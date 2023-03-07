@@ -5,7 +5,7 @@ from webob.exc import HTTPForbidden
 
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
-from onegov.org.forms.page import PageUrlForm
+from onegov.org.forms.page import PageUrlForm, PageForm
 from onegov.org.layout import EditorLayout
 from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
@@ -22,6 +22,8 @@ def get_form_class(editor, request):
                 src.trait, editor.action, request)
     if editor.action == 'change-url':
         return PageUrlForm
+    if isinstance(editor.page, list) and editor.action == 'new':
+        return PageForm
     return editor.page.get_form_class(editor.trait, editor.action, request)
 
 
@@ -46,6 +48,11 @@ def handle_page_form(self, request, form, layout=None):
 
 
 def handle_new_page(self, request, form, src=None, layout=None):
+    root = False
+    if isinstance(self.page, list):
+        root = True
+        self.page = self.page[0]
+
     site_title = self.page.trait_messages[self.trait]['new_page_title']
     if layout:
         layout.site_title = site_title
@@ -53,7 +60,7 @@ def handle_new_page(self, request, form, src=None, layout=None):
     if form.submitted(request):
         pages = PageCollection(request.session)
         page = pages.add(
-            parent=self.page,
+            parent=self.page if not root else None,
             title=form.title.data,
             type=self.page.type,
             meta={'trait': self.trait}

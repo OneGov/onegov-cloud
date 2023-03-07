@@ -7,7 +7,7 @@ class Editor:
     completely and turned into SQL queries.
 
     """
-    def __init__(self, action, page, trait=None):
+    def __init__(self, action, page, trait=None, root_page=False):
         """ The editor is defined by an action and a page/context.
 
         :action:
@@ -20,7 +20,7 @@ class Editor:
             New pages inherit the type from the parent.
 
         :trait:
-            The trait of the page. Currently either 'link' or 'page'.
+            The trait of the page. Currently, either 'link' or 'page'.
             Only necessary if it's a new page. The trait controls the content
             of the page and leads to different forms.
 
@@ -33,6 +33,7 @@ class Editor:
         self.action = action
         self.page = page
         self.trait = action == 'new' and trait or page.trait
+        self.root_page = root_page
 
     @staticmethod
     def is_supported_action(action):
@@ -44,4 +45,6 @@ class Editor:
     @property
     def page_id(self):
         """ Returns the page id so morepath can create a link to this. """
+        if self.root_page:
+            return 0
         return self.page.id
