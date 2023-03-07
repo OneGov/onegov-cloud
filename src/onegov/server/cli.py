@@ -457,7 +457,7 @@ class WsgiServer(FileSystemEventHandler):
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """
 
-        if event.event_type == 'opened':
+        if getattr(event, 'event_type', None) == 'opened':
             return
 
         src_path = event.src_path
