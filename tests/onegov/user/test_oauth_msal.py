@@ -38,7 +38,7 @@ def app(postgres_dsn, redis_url):
     return app
 
 
-def configure_provider(app, app_id):
+def configure_provider(app, app_id, primary=False):
     client_id = os.environ.get('MSAL_TEST_CLIENT_ID')
     client_secret = os.environ.get('MSAL_TEST_CLIENT_SECRET')
     config = textwrap.dedent(f"""
@@ -46,6 +46,7 @@ def configure_provider(app, app_id):
           msal:
             tenants:
               "{app_id}":
+                primary: {'true' if primary else 'false'}
                 tenant_id: '{TEST_TENANT}'
                 client_id: '{client_id}'
                 client_secret: '{client_secret}'
@@ -85,10 +86,39 @@ def test_msal_configuration(app):
     assert client.attributes.first_name == 'given_name'
     assert client.attributes.last_name == 'family_name'
     assert client.attributes.preferred_username == 'preferred_username'
+    assert client.primary is False
 
     assert provider.roles.app_specific(app) == {
         'admins': 'ads', 'editors': 'eds', 'members': 'mems'
     }
+    assert provider.is_primary(app) is False
+
+
+def test_msal_configuration_primary(app):
+
+    namespace = 'msal'
+    app_id = f'{namespace}/test'
+    app.namespace = namespace
+    app.set_application_id(app_id)
+    configure_provider(app, app_id, primary=True)
+
+    provider = app.providers[0]
+    client = provider.tenants.client(app)
+    assert not client.validate_authority
+
+    # Test default configuration of the commented blocks
+    assert client.attributes.source_id == 'sub'
+    assert client.attributes.username == 'email'
+    assert client.attributes.groups == 'groups'
+    assert client.attributes.first_name == 'given_name'
+    assert client.attributes.last_name == 'family_name'
+    assert client.attributes.preferred_username == 'preferred_username'
+    assert client.primary is True
+
+    assert provider.roles.app_specific(app) == {
+        'admins': 'ads', 'editors': 'eds', 'members': 'mems'
+    }
+    assert provider.is_primary(app) is True
 
 
 @pytest.mark.skipif(MSAL_TEST_FQGN, reason='Running in CI/CD')

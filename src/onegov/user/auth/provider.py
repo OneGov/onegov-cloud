@@ -972,7 +972,7 @@ class SAML2Provider(
         if not cfg:
             return None
 
-        provider = cls(
+        return cls(
             tenants=SAML2Connections.from_cfg(cfg.get('tenants')),
             custom_hint=cfg.get('hint', None),
             roles=RolesMapping(cfg.get('roles', {
@@ -983,9 +983,6 @@ class SAML2Provider(
                 }
             }))
         )
-        if cfg.get('primary', False):
-            provider.primary = True
-        return provider
 
     def button_text(self, request):
         client = self.tenants.client(request.app)
