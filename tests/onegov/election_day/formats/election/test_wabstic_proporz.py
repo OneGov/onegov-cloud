@@ -433,7 +433,7 @@ def test_import_wabstic_proporz_expats(session):
                         ','.join((
                             entity_id,  # BfsNrGemeinde
                             '10000',  # Stimmberechtigte
-                            '',  # Sperrung
+                            '10',  # Sperrung
                             '',  # StmAbgegeben
                             '1',  # StmLeer
                             '',  # StmUngueltig
