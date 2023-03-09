@@ -261,7 +261,11 @@ class LaxDataRequired(DataRequired):
     """
 
     def __call__(self, form, field):
-        if isinstance(field.data, (int, float, Decimal)):
+        if field.data is False:
+            # guard against False, False is an instance of int, since
+            # bool derives from int, so we need to check this first
+            pass
+        elif isinstance(field.data, (int, float, Decimal)):
             # we just accept any numeric data regardless of amount
             return
 
