@@ -7,7 +7,7 @@ class Editor:
     completely and turned into SQL queries.
 
     """
-    def __init__(self, action, page, trait=None, root_page=False):
+    def __init__(self, action, page, trait=None):
         """ The editor is defined by an action and a page/context.
 
         :action:
@@ -32,19 +32,18 @@ class Editor:
 
         self.action = action
         self.page = page
-        self.trait = action == 'new' and trait or page.trait
-        self.root_page = root_page
+        self.trait = action in ['new', 'new-root'] and trait or page.trait
 
     @staticmethod
     def is_supported_action(action):
         """ Returns True if the given action is supported. """
         return action in {
-            'new', 'paste', 'edit', 'delete', 'change-url', 'sort'
+            'new', 'new-root', 'paste', 'edit', 'delete', 'change-url', 'sort'
         }
 
     @property
     def page_id(self):
         """ Returns the page id so morepath can create a link to this. """
-        if self.root_page:
+        if self.action == 'new-root':
             return 0
         return self.page.id

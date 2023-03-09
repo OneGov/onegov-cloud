@@ -694,13 +694,13 @@ class AdjacencyListMixin:
 
     def get_breadcrumbs(self, item):
         """ Yields the breadcrumbs for the given adjacency list item. """
-
         yield Link(_("Homepage"), self.homepage_url)
 
-        for ancestor in item.ancestors:
-            yield Link(ancestor.title, self.request.link(ancestor))
+        if item:
+            for ancestor in item.ancestors:
+                yield Link(ancestor.title, self.request.link(ancestor))
 
-        yield Link(item.title, self.request.link(item))
+            yield Link(item.title, self.request.link(item))
 
     def get_sidebar(self, type=None):
         """ Yields the sidebar for the given adjacency list item. """
@@ -2797,8 +2797,7 @@ class HomepageLayout(DefaultLayout):
                 ),
                 Link(
                     _("Add"),
-                    self.request.link(Editor('new', self.model, 'page',
-                                             root_page=True)),
+                    self.request.link(Editor('new-root', self.model, 'page')),
                     classes=(
                         'new-page',
                         'show-new-content-placeholder'

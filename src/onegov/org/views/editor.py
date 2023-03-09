@@ -22,7 +22,8 @@ def get_form_class(editor, request):
                 src.trait, editor.action, request)
     if editor.action == 'change-url':
         return PageUrlForm
-    if isinstance(editor.page, list) and editor.action == 'new':
+    if not editor.page:
+        # this is the case when adding a new 'root' page (parent = None)
         return PageForm
     return editor.page.get_form_class(editor.trait, editor.action, request)
 
@@ -32,6 +33,8 @@ def get_form_class(editor, request):
 def handle_page_form(self, request, form, layout=None):
     if self.action == 'new':
         return handle_new_page(self, request, form, layout=layout)
+    if self.action == 'new-root':
+        return handle_new_root_page(self, request, form, layout=layout)
     elif self.action == 'edit':
         return handle_edit_page(self, request, form, layout=layout)
     elif self.action == 'change-url':
@@ -48,19 +51,15 @@ def handle_page_form(self, request, form, layout=None):
 
 
 def handle_new_page(self, request, form, src=None, layout=None):
-    root = False
-    if isinstance(self.page, list):
-        root = True
-        self.page = self.page[0]
-
     site_title = self.page.trait_messages[self.trait]['new_page_title']
+
     if layout:
         layout.site_title = site_title
 
     if form.submitted(request):
         pages = PageCollection(request.session)
         page = pages.add(
-            parent=self.page if not root else None,
+            parent=self.page,
             title=form.title.data,
             type=self.page.type,
             meta={'trait': self.trait}
@@ -68,6 +67,36 @@ def handle_new_page(self, request, form, src=None, layout=None):
         form.populate_obj(page)
 
         request.success(page.trait_messages[page.trait]['new_page_added'])
+        return morepath.redirect(request.link(page))
+
+    if src:
+        form.process(obj=src)
+
+    return {
+        'layout': layout or EditorLayout(self, request, site_title),
+        'title': site_title,
+        'form': form,
+        'form_width': 'large'
+    }
+
+
+def handle_new_root_page(self, request, form, src=None, layout=None):
+    site_title = _("New Topic")
+
+    if layout:
+        layout.site_title = site_title
+
+    if form.submitted(request):
+        pages = PageCollection(request.session)
+        page = pages.add(
+            parent=None,  # root page
+            title=form.title.data,
+            type='topic',
+            meta={'trait': 'page'},
+        )
+        form.populate_obj(page)
+
+        request.success(_("Added a new topic"))
         return morepath.redirect(request.link(page))
 
     if src:
