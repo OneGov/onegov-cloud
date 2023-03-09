@@ -1068,6 +1068,15 @@ def ensure_a_fieldset(lines):
             yield ix, line
 
 
+def validate_indent(indent):
+    """
+    Returns `False` if indent is other than a multiple of 4, else True
+    """
+    if len(indent) % 4 != 0:
+        return False
+    return True
+
+
 def translate_to_yaml(text):
     """ Takes the given form text and constructs an easier to parse yaml
     string.
@@ -1088,6 +1097,8 @@ def translate_to_yaml(text):
     for ix, line in lines:
 
         indent = ' ' * (4 + (len(line) - len(line.lstrip())))
+        if not validate_indent(indent):
+            raise errors.InvalidIndentSyntax(line=ix + 1)
 
         # the top level are the fieldsets
         if match(ELEMENTS.fieldset_title, line):

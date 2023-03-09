@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form.errors import InvalidIndentSyntax
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
@@ -1037,3 +1038,33 @@ def test_normalization():
     label = "Ich möchte die Bestellung mittels Post erhalten (200.00 CHF)"
     norm = normalize_label_for_dependency(label)
     assert norm == "Ich möchte die Bestellung mittels Post erhalten"
+
+
+@pytest.mark.parametrize('indent,shall_raise', [
+    ('', False),
+    (' ', True),
+    ('  ', True),
+    ('   ', True),
+])
+def test_indentation_error(indent, shall_raise):
+    # wrong indent see 'Telefonnummer'
+    text = dedent(
+        """
+        # Kiosk
+        Name des Kiosks = ___
+        # Kontaktangaben
+        Kontaktperson = ___
+        {}Telefonnummer = ___
+        """.format(indent)
+    )
+
+    if shall_raise:
+        with pytest.raises(InvalidIndentSyntax) as excinfo:
+            parse_formcode(text)
+
+        assert excinfo.value.line == 6
+    else:
+        try:
+            parse_formcode(text)
+        except InvalidIndentSyntax as e:
+            pytest.fail('Unexpected exception {}'.format(type(e).__name__))
