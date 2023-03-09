@@ -22,7 +22,7 @@ def get_form_class(editor, request):
                 src.trait, editor.action, request)
     if editor.action == 'change-url':
         return PageUrlForm
-    if not editor.page:
+    if editor.action == 'new-root':
         # this is the case when adding a new 'root' page (parent = None)
         return PageForm
     return editor.page.get_form_class(editor.trait, editor.action, request)
