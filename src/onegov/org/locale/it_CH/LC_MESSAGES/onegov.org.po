@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-10 17:06+0100\n"
+"POT-Creation-Date: 2023-02-28 12:02+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -998,8 +998,8 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Function"
-msgstr "Funzione"
+msgid "Functions:"
+msgstr "Funzioni:"
 
 msgid "Direct Phone Number"
 msgstr "Numero di telefono diretto"
@@ -4109,11 +4109,11 @@ msgstr "Ripristina password"
 
 #, python-format
 msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
+"A password reset link has been sent to ${email}, provided an active account "
+"exists for this email address."
 msgstr ""
 "Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account esistente)."
+"${email} (se si tratta di un account attivo esistente).
 
 msgid "Password changed."
 msgstr "Password modificata."

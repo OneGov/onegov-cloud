@@ -121,6 +121,8 @@ class SAML2Client():
     attributes: SAML2Attributes = attrib()
     """ Mapping of attribute names """
 
+    primary: bool = attrib()
+
     _connections = {}
 
     def get_binding(self, request):
@@ -367,7 +369,8 @@ class SAML2Connections():
                 treat_as_ldap=cfg.get('treat_as_ldap', False),
                 want_resonse_signed=cfg.get('want_resonse_signed', True),
                 attributes=SAML2Attributes.from_cfg(
-                    cfg.get('attributes', {}))
+                    cfg.get('attributes', {})),
+                primary=cfg.get('primary', False),
             ) for app_id, cfg in config.items()
         }
         return cls(connections=clients)

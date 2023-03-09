@@ -726,22 +726,23 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-            links.append(
-                Link(
-                    text=_("Upload to Gever"),
-                    url=self.request.link(self.model, 'send-to-gever'),
-                    attrs={'class': 'upload'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to upload this ticket?"),
-                            _("This will upload this ticket to the "
-                              "Gever instance, if configured."),
-                            _("Upload Ticket"),
-                            _("Cancel")
+            if self.request.app.org.gever_endpoint:
+                links.append(
+                    Link(
+                        text=_("Upload to Gever"),
+                        url=self.request.link(self.model, 'send-to-gever'),
+                        attrs={'class': 'upload'},
+                        traits=(
+                            Confirm(
+                                _("Do you really want to upload this ticket?"),
+                                _("This will upload this ticket to the "
+                                  "Gever instance, if configured."),
+                                _("Upload Ticket"),
+                                _("Cancel")
+                            )
                         )
                     )
                 )
-            )
             return links
 
 

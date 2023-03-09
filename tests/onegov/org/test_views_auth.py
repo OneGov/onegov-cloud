@@ -122,6 +122,21 @@ def test_reset_password(client):
     login_page.form['password'] = 'new_password'
     assert "Sie wurden angemeldet" in login_page.form.submit().follow().text
 
+    # Deactivate member login
+    client.login_admin()
+    page = client.get('/usermanagement')
+    page = page.click('Ansicht', index=2)
+    page = page.click('Bearbeiten')
+    page.form['state'] = 'inactive'
+    assert page.form.submit().status_code == 302
+    client.logout()
+
+    # Do not send email if user is deactivated
+    assert 'Passwort zurücksetzen' in request_page.text
+    request_page.form['email'] = 'member@example.org'
+    request_page.form.submit()
+    assert len(os.listdir(client.app.maildir)) == 1
+
 
 def test_unauthorized(client):
 
