@@ -7,6 +7,7 @@ from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
+from onegov.form.validators import LaxDataRequired
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -15,7 +16,6 @@ from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import FileField
 from wtforms.fields import URLField
-from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
@@ -56,7 +56,7 @@ def test_parse_text():
     assert form.first_name.label.text == 'First name'
     assert form.first_name.description == 'Fill in all in UPPER case'
     assert len(form.first_name.validators) == 1
-    assert isinstance(form.first_name.validators[0], DataRequired)
+    assert isinstance(form.first_name.validators[0], LaxDataRequired)
 
     assert form.last_name.label.text == 'Last name'
     assert len(form.last_name.validators) == 1
@@ -832,9 +832,10 @@ def test_integer_range():
     form.validate()
     assert form.errors
 
-    form_class = parse_form("Age *= 21..150")
+    # 0 should validate on a required field
+    form_class = parse_form("Items *= 0..10")
     form = form_class(MultiDict([
-        ('age', '21')
+        ('items', '0')
     ]))
 
     form.validate()
@@ -920,9 +921,10 @@ def test_decimal_range():
     form.validate()
     assert form.errors
 
+    # 0 should validate on a decimal field
     form_class = parse_form("Percentage = 0.00..100.00")
     form = form_class(MultiDict([
-        ('percentage', '33.33')
+        ('percentage', '0.0')
     ]))
 
     form.validate()
