@@ -6,6 +6,7 @@ from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
 from onegov.form.fields import UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
+from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import Stdnum
@@ -23,7 +24,6 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
-from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
 from wtforms.validators import Regexp
@@ -360,7 +360,7 @@ class WTFormsClassBuilder:
         # InputRequired will fail, but DataRequired will not.
         #
         # As a consequence, falsey values can't be submitted for now.
-        validators.insert(0, DataRequired())
+        validators.insert(0, LaxDataRequired())
 
     def validators_add_dependency(self, validators, dependency):
 
@@ -371,7 +371,7 @@ class WTFormsClassBuilder:
         validators.insert(0, validator)
 
         # if the dependency is fulfilled, the field is required
-        validator = If(dependency.fulfilled, DataRequired())
+        validator = If(dependency.fulfilled, LaxDataRequired())
         validator.field_flags = {'required': True}
         validators.insert(0, validator)
 

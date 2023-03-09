@@ -7,6 +7,7 @@ from babel.dates import format_date
 from cgi import FieldStorage
 from datetime import date
 from datetime import datetime
+from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from mimetypes import types_map
 from onegov.form import _
@@ -16,6 +17,7 @@ from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms.fields import SelectField
+from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import StopValidation
@@ -245,6 +247,26 @@ class ValidFormDefinition:
 
                         errors.append(error)
                         raise ValidationError(error)
+
+
+class LaxDataRequired(DataRequired):
+    """ A copy of wtform's DataRequired validator, but with a more lax approach
+    to required validation checking. It accepts some specific falsy values,
+    such as numeric falsy values, that would otherwise fail DataRequired.
+
+    This is necessary in order for us to validate stored submissions, which
+    get validated after the initial submission in order to avoid losing file
+    uploads.
+
+    """
+
+    def __call__(self, form, field):
+        if isinstance(field.data, (int, float, Decimal)):
+            # we just accept any numeric data regardless of amount
+            return
+
+        # fall back to wtform's validator
+        super().__call__(form, field)
 
 
 class StrictOptional(Optional):
