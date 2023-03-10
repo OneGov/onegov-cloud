@@ -114,7 +114,7 @@ class MovePageForm(Form):
                                    page_list=child_pages)
             if new_parent_id in [int(child[0]) for child in child_pages]:
                 self.parent_id.errors.append(
-                    _("Invalid destination selected."))
+                    _("Invalid destination selected"))
                 return False
         return True
 
