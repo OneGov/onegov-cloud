@@ -1,9 +1,10 @@
 """ Provides commands used to initialize election day websites. """
-import click
-import os
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import ListPanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import Vote
+from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.election_day.collections import ArchivedResultCollection
@@ -14,6 +15,9 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
+from uuid import UUID
+import click
+import os
 
 cli = command_group()
 
@@ -209,3 +213,84 @@ def update_last_result_change():
         click.secho(f'Updated {count} items', fg='green')
 
     return update
+
+
+@cli.command('migrate-panachage-results')
+@click.option('--clear', is_flag=True, default=False)
+@click.option('--dry-run', is_flag=True, default=False)
+@click.option('--verbose', is_flag=True, default=False)
+def migrate_panachage_results(clear, dry_run, verbose):
+
+    def migrate(request, app):
+        click.secho(f'Migrating {app.schema}', fg='yellow')
+
+        migrated = 0
+        ignored = 0
+
+        if clear:
+            # todo:
+            pass
+
+        session = request.app.session()
+        for item in session.query(PanachageResult):
+            type_ = 'list'
+            try:
+                UUID(item.target)
+            except ValueError:
+                type_ = 'party'
+
+            try:
+                if type_ == 'list':
+                    # list
+                    assert item.votes >= 0
+                    assert not item.election_id
+                    assert not item.election_compound_id
+                    assert item.source  # blank list is '999'
+                    assert item.target
+                    if not dry_run:
+                        session.add(
+                            ListPanachageResult(
+                                votes=item.votes,
+                                source=item.source,
+                                target=UUID(item.target)
+                            )
+                        )
+                else:
+                    # party
+                    assert item.votes >= 0
+                    assert item.election_id or item.election_compound_id
+                    assert item.source != '999'  # blank list is ''
+                    assert item.target
+                    if not dry_run:
+                        session.add(
+                            PartyPanachageResult(
+                                votes=item.votes,
+                                source=item.source,
+                                target=item.target,
+                                election_id=item.election_id,
+                                election_compound_id=item.election_compound_id
+                            )
+                        )
+            except AssertionError:
+                ignored += 1
+                if verbose:
+                    click.secho(
+                        f'Ignoring {type_} '
+                        f'{item.source}->{item.target}: {item.votes} '
+                        f'[e: {item.election_id}] '
+                        f'[c:{item.election_compound_id}]',
+                        fg='red'
+                    )
+
+        if dry_run:
+            click.secho(
+                f'would migrate {migrated}, ignore {ignored}',
+                fg='green'
+            )
+        else:
+            click.secho(
+                f'{migrated} migrated, {ignored} ignored',
+                fg='green'
+            )
+
+    return migrate

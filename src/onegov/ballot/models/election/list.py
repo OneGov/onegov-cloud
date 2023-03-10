@@ -64,10 +64,7 @@ class List(Base, TimestampMixin):
 
     #: a (proporz) list contains votes from other other lists
     panachage_results = relationship(
-        'PanachageResult',
-        primaryjoin=(
-            'foreign(PanachageResult.target) == cast(List.id, TEXT)'
-        ),
+        'ListPanachageResult',
         cascade='all, delete-orphan',
         lazy='dynamic'
     )

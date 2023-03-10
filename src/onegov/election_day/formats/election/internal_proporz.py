@@ -4,7 +4,7 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
@@ -404,7 +404,7 @@ def import_election_internal_proporz(
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())
-    session.bulk_insert_mappings(PanachageResult, (
+    session.bulk_insert_mappings(ListPanachageResult, (
         dict(
             id=uuid4(),
             source=source,

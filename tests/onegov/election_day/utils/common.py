@@ -9,8 +9,9 @@ from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
+from onegov.ballot import ListPanachageResult
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import Vote
@@ -130,29 +131,29 @@ def add_proporz_election(session, year=2015):
         )
     )
     election.panachage_results.append(
-        PanachageResult(source='0', target='1', votes=12)
+        PartyPanachageResult(source='0', target='1', votes=12)
     )
     election.panachage_results.append(
-        PanachageResult(source='1', target='0', votes=21)
+        PartyPanachageResult(source='1', target='0', votes=21)
     )
 
     list_1.panachage_results.append(
-        PanachageResult(target=str(list_1.id), source=2, votes=1)
+        ListPanachageResult(target=str(list_1.id), source=2, votes=1)
     )
     list_1.panachage_results.append(
-        PanachageResult(target=str(list_1.id), source=3, votes=1)
+        ListPanachageResult(target=str(list_1.id), source=3, votes=1)
     )
     list_2.panachage_results.append(
-        PanachageResult(target=str(list_2.id), source=1, votes=2)
+        ListPanachageResult(target=str(list_2.id), source=1, votes=2)
     )
     list_2.panachage_results.append(
-        PanachageResult(target=str(list_2.id), source=3, votes=2)
+        ListPanachageResult(target=str(list_2.id), source=3, votes=2)
     )
     list_3.panachage_results.append(
-        PanachageResult(target=str(list_3.id), source=1, votes=3)
+        ListPanachageResult(target=str(list_3.id), source=1, votes=3)
     )
     list_3.panachage_results.append(
-        PanachageResult(target=str(list_3.id), source=2, votes=3)
+        ListPanachageResult(target=str(list_3.id), source=2, votes=3)
     )
 
     candidate_1 = Candidate(
@@ -269,10 +270,10 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
         )
     )
     compound.panachage_results.append(
-        PanachageResult(source='0', target='1', votes=12)
+        PartyPanachageResult(source='0', target='1', votes=12)
     )
     compound.panachage_results.append(
-        PanachageResult(source='1', target='0', votes=21)
+        PartyPanachageResult(source='1', target='0', votes=21)
     )
 
     return compound

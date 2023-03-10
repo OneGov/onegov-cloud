@@ -4,7 +4,7 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
@@ -479,7 +479,7 @@ def import_election_wabsti_proporz(
         if list_.list_id in panachage:
             for source, votes in panachage[list_.list_id].items():
                 list_.panachage_results.append(
-                    PanachageResult(source=source, votes=votes)
+                    ListPanachageResult(source=source, votes=votes)
                 )
 
     for candidate in candidates.values():

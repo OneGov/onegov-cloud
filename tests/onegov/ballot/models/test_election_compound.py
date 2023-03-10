@@ -11,7 +11,8 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionCompoundAssociation
@@ -188,10 +189,10 @@ def proporz_election(
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        PanachageResult(source=list_2.list_id, votes=12)
+        ListPanachageResult(source=list_2.list_id, votes=12)
     )
     list_1.panachage_results.append(
-        PanachageResult(source='99', votes=4)
+        ListPanachageResult(source='99', votes=4)
     )
 
     return election
@@ -473,7 +474,7 @@ def test_election_compound_model(session):
     assert election_compound.has_party_results is True
 
     # Add panachage results
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_compound_id=election_compound.id,
         source='A',
         target='B',
@@ -507,7 +508,7 @@ def test_election_compound_model(session):
     session.flush()
     assert election_compound.party_results.one() == party_result
 
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_compound_id=election_compound.id,
         source='A',
         target='B',
@@ -521,7 +522,7 @@ def test_election_compound_model(session):
     session.flush()
 
     assert session.query(PartyResult).first() is None
-    assert session.query(PanachageResult).first() is None
+    assert session.query(PartyPanachageResult).first() is None
 
 
 def test_election_compound_id_generation(session):
@@ -1070,14 +1071,14 @@ def test_election_compound_export_parties(session):
     # Add panachage results
     for idx, source in enumerate(('5', '3', '0', '')):
         election_compound.panachage_results.append(
-            PanachageResult(
+            PartyPanachageResult(
                 target='5',
                 source=source,
                 votes=idx + 1
             )
         )
     election_compound.panachage_results.append(
-        PanachageResult(
+        PartyPanachageResult(
             target='3',
             source='5',
             votes=5,
@@ -1282,7 +1283,7 @@ def test_election_compound_rename(session):
         )
     )
     session.add(
-        PanachageResult(
+        PartyPanachageResult(
             election_compound_id=election_compound.id,
             source='A',
             target='B',
@@ -1299,7 +1300,7 @@ def test_election_compound_rename(session):
         PartyResult.election_compound_id
     ).distinct().all()
     assert ('x',) in session.query(
-        PanachageResult.election_compound_id
+        PartyPanachageResult.election_compound_id
     ).distinct().all()
 
     # Change
@@ -1315,7 +1316,7 @@ def test_election_compound_rename(session):
         PartyResult.election_compound_id
     ).distinct().all()
     assert ('y',) in session.query(
-        PanachageResult.election_compound_id
+        PartyPanachageResult.election_compound_id
     ).distinct().all()
 
 

@@ -7,7 +7,8 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from uuid import uuid4
@@ -83,7 +84,7 @@ def proporz_election():
     )
 
     election.panachage_results.append(
-        PanachageResult(target=lid, source=1, votes=0)
+        PartyPanachageResult(target=lid, source=1, votes=0)
     )
 
     election.last_result_change = election.timestamp()
@@ -177,7 +178,7 @@ def test_proporz_election_create_all_models(session):
     session.add(list_result)
     session.flush()
 
-    panachage_result = PanachageResult(
+    panachage_result = ListPanachageResult(
         target=list.id,
         source=1,
         votes=0
@@ -243,7 +244,7 @@ def test_proporz_election_create_all_models(session):
     assert session.query(List).all() == []
     assert session.query(ListConnection).all() == []
     assert session.query(ListResult).all() == []
-    assert session.query(PanachageResult).all() == []
+    assert session.query(ListPanachageResult).all() == []
 
 
 def test_proporz_election_has_data(session):
@@ -276,14 +277,14 @@ def test_proporz_election_has_data(session):
 
     # lists panachage
     election.lists[0].panachage_results.append(
-        PanachageResult(
+        ListPanachageResult(
             target=election.lists[0].id,
             source=2,
             votes=0
         )
     )
     election.lists[1].panachage_results.append(
-        PanachageResult(
+        ListPanachageResult(
             target=election.lists[1].id,
             source=1,
             votes=0
@@ -317,7 +318,7 @@ def test_proporz_election_has_data(session):
     assert election.has_party_results is True
 
     # party panachage
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_id=election.id,
         source='A',
         target='B',
@@ -428,43 +429,43 @@ def test_proporz_election_results(session):
 
     # Add panachage results
     list_1.panachage_results.append(
-        PanachageResult(target=list_1.id, source=2, votes=1)
+        ListPanachageResult(target=list_1.id, source=2, votes=1)
     )
     list_1.panachage_results.append(
-        PanachageResult(target=list_1.id, source=3, votes=1)
+        ListPanachageResult(target=list_1.id, source=3, votes=1)
     )
     list_1.panachage_results.append(
-        PanachageResult(target=list_1.id, source=4, votes=1)
+        ListPanachageResult(target=list_1.id, source=4, votes=1)
     )
 
     list_2.panachage_results.append(
-        PanachageResult(target=list_2.id, source=1, votes=2)
+        ListPanachageResult(target=list_2.id, source=1, votes=2)
     )
     list_2.panachage_results.append(
-        PanachageResult(target=list_2.id, source=3, votes=2)
+        ListPanachageResult(target=list_2.id, source=3, votes=2)
     )
     list_2.panachage_results.append(
-        PanachageResult(target=list_2.id, source=4, votes=2)
+        ListPanachageResult(target=list_2.id, source=4, votes=2)
     )
 
     list_3.panachage_results.append(
-        PanachageResult(target=list_3.id, source=1, votes=3)
+        ListPanachageResult(target=list_3.id, source=1, votes=3)
     )
     list_3.panachage_results.append(
-        PanachageResult(target=list_3.id, source=2, votes=3)
+        ListPanachageResult(target=list_3.id, source=2, votes=3)
     )
     list_3.panachage_results.append(
-        PanachageResult(target=list_3.id, source=4, votes=3)
+        ListPanachageResult(target=list_3.id, source=4, votes=3)
     )
 
     list_4.panachage_results.append(
-        PanachageResult(target=list_4.id, source=1, votes=4)
+        ListPanachageResult(target=list_4.id, source=1, votes=4)
     )
     list_4.panachage_results.append(
-        PanachageResult(target=list_4.id, source=2, votes=4)
+        ListPanachageResult(target=list_4.id, source=2, votes=4)
     )
     list_4.panachage_results.append(
-        PanachageResult(target=list_4.id, source=3, votes=4)
+        ListPanachageResult(target=list_4.id, source=3, votes=4)
     )
 
     # Add 5 candidates
@@ -789,10 +790,10 @@ def test_proporz_election_export(session):
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        PanachageResult(source=list_2.list_id, votes=12)
+        ListPanachageResult(source=list_2.list_id, votes=12)
     )
     list_1.panachage_results.append(
-        PanachageResult(source='99', votes=4)
+        ListPanachageResult(source='99', votes=4)
     )
 
     session.flush()
@@ -1053,14 +1054,14 @@ def test_proporz_election_export_parties(session):
 
     for idx, source in enumerate(('1', '2', '3', '')):
         election.panachage_results.append(
-            PanachageResult(
+            PartyPanachageResult(
                 target='1',
                 source=source,
                 votes=idx + 1
             )
         )
     election.panachage_results.append(
-        PanachageResult(
+        PartyPanachageResult(
             target='2',
             source='1',
             votes=5,
@@ -1181,8 +1182,9 @@ def test_proporz_election_clear_results(session):
     assert session.query(ElectionResult).first() is None
     assert session.query(List).first() is None
     assert session.query(ListConnection).first() is None
+    assert session.query(ListPanachageResult).first() is None
     assert session.query(ListResult).first() is None
-    assert session.query(PanachageResult).first() is None
+    assert session.query(PartyPanachageResult).first() is None
     assert session.query(PartyResult).first() is None
 
 
@@ -1198,7 +1200,7 @@ def test_proporz_election_rename(session):
     assert session.query(ListConnection.election_id).distinct().scalar() == 'x'
     assert session.query(PartyResult.election_id).distinct().scalar() == 'x'
     assert session.query(
-        PanachageResult.election_id
+        PartyPanachageResult.election_id
     ).distinct().scalar() == 'x'
 
     election.id = 'y'
@@ -1210,7 +1212,7 @@ def test_proporz_election_rename(session):
     assert session.query(ListConnection.election_id).distinct().scalar() == 'y'
     assert session.query(PartyResult.election_id).distinct().scalar() == 'y'
     assert session.query(
-        PanachageResult.election_id
+        PartyPanachageResult.election_id
     ).distinct().scalar() == 'y'
 
 

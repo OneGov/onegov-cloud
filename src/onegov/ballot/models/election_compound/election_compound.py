@@ -78,7 +78,7 @@ class ElectionCompound(
 
     #: An election compound may contains n panachage results
     panachage_results = relationship(
-        'PanachageResult',
+        'PartyPanachageResult',
         cascade='all, delete-orphan',
         backref=backref('election_compound'),
         lazy='dynamic',

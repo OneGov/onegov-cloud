@@ -1,5 +1,5 @@
 from onegov.ballot import ElectionCompound
-from onegov.ballot import PanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError
@@ -247,7 +247,7 @@ def import_party_results(
             for source, votes in panachage_results[target].items():
                 if source in parties or source == '999':
                     election.panachage_results.append(
-                        PanachageResult(
+                        PartyPanachageResult(
                             id=uuid4(),
                             source=source if source != '999' else '',
                             target=target,

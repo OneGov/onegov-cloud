@@ -5,7 +5,7 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import ListConnection
-from onegov.ballot import PanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionLayout
@@ -352,7 +352,7 @@ def test_election_layout_menu_proporz(session):
     ]
 
     election.panachage_results.append(
-        PanachageResult(target='t', source='t ', votes=0)
+        PartyPanachageResult(target='t', source='t ', votes=0)
     )
     election.show_party_panachage = True
     assert ElectionLayout(election, request).menu == [
