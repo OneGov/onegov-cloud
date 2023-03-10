@@ -84,6 +84,7 @@ class MovePageForm(Form):
         """
         Iterates over the page tree and lists the elements with ident
         to show the page hierarchy in the choices list
+        :returns list of tuples(str:id, str:title)
         """
         for page in pages:
             item = (str(page.id), f'{indent} {page.title}')
@@ -95,13 +96,23 @@ class MovePageForm(Form):
     def ensure_valid_parent(self):
         """
         As a new destination (parent page) every menu item is valid except
-        yourself. You cannot assign yourself as the new destination
+        yourself or a child of yourself.
         :return: bool
         """
         if self.parent_id.data and self.parent_id.data.isdigit():
             new_parent_id = int(self.parent_id.data)
+
             # prevent selecting yourself as new parent
             if self.model.page_id == new_parent_id:
+                self.parent_id.errors.append(
+                    _("Invalid destination selected."))
+                return False
+
+            # prevent selecting a child node
+            child_pages = []
+            self.iterate_page_tree(self.model.page.children, indent='',
+                                   page_list=child_pages)
+            if new_parent_id in [int(child[0]) for child in child_pages]:
                 self.parent_id.errors.append(
                     _("Invalid destination selected."))
                 return False
