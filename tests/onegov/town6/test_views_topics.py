@@ -63,8 +63,18 @@ def test_move_topics(client):
     assert client.get('/topics/topic-1')
     assert client.get('/topics/topic-1/topic-2')
 
-    # test moving topic to itself
+    # test moving topic to itself (which is invalid)
     page = client.get('/topics/topic-1/topic-2')
+    page = page.click('Verschieben')
+    parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 2')
+    page.form['parent_id'].select(parent_id)
+    page = page.form.submit()
+    assert page.pyquery('.alert')
+    assert page.pyquery('.error')
+    assert 'Invalid destination selected' in page
+
+    # test moving topic to a child (which is invalid)
+    page = client.get('/topics/topic-1')
     page = page.click('Verschieben')
     parent_id = get_select_option_id_by_text(page.form['parent_id'], 'Topic 2')
     page.form['parent_id'].select(parent_id)

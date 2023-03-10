@@ -271,6 +271,20 @@ def test_move_page_assign_yourself_as_parent(client):
     move_page.mustcontain('Invalid destination selected')
 
 
+def test_move_page_assigning_a_child_as_parent(client):
+    setup_main_and_subpage(client)
+    mainpage = client.get('/topics/organisation/mainpage')
+    move_page = mainpage.click('Verschieben')
+    assert 'move' in move_page.form.action
+    parent_id = get_select_option_id_by_text(move_page.form['parent_id'],
+                                             'Subpage')
+    move_page.form['parent_id'].select(parent_id)
+    move_page = move_page.form.submit()
+    assert move_page.pyquery('.alert')
+    assert move_page.pyquery('.error')
+    move_page.mustcontain('Invalid destination selected')
+
+
 def test_links(client):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     client.login_admin()
