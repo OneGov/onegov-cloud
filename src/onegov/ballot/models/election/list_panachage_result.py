@@ -22,8 +22,8 @@ class ListPanachageResult(Base, TimestampMixin):
         nullable=False
     )
 
-    #: the source this result belongs to, maps to list.list_id, may also refer
-    #: to the blank list ('999')
+    #: the source this result belongs to, maps to list.list_id; may also refer
+    #: to the blank list by being '999'
     source = Column(Text, nullable=False)
 
     # votes

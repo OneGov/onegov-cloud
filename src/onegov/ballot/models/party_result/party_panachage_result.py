@@ -31,12 +31,11 @@ class PartyPanachageResult(Base, TimestampMixin):
         nullable=True
     )
 
-    # todo: UUID ??
-
-    #: the target this result belongs to, maps to list.id
+    #: the party target this result belongs to, maps to party_id
     target = Column(Text, nullable=False)
 
-    #: the source this result belongs to, maps to list.id
+    #: the party source this result belongs to, maps to party_id; might also
+    #: refer to the black list by being empty
     source = Column(Text, nullable=False)
 
     # votes

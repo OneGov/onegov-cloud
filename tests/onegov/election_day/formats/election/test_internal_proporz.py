@@ -1,6 +1,6 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, PanachageResult
+from onegov.ballot import Election, ListPanachageResult
 from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import import_election_internal_proporz
@@ -798,7 +798,7 @@ def test_import_internal_proporz_panachage(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    query = session.query(PanachageResult)
+    query = session.query(ListPanachageResult)
 
     # No panachage results
     errors = import_election_internal_proporz(

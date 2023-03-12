@@ -227,11 +227,12 @@ def migrate_panachage_results(clear, dry_run, verbose):
         migrated = 0
         ignored = 0
 
-        if clear:
-            # todo:
-            pass
-
         session = request.app.session()
+
+        if clear:
+            session.query(ListPanachageResult).delete()
+            session.query(PartyPanachageResult).delete()
+
         for item in session.query(PanachageResult):
             type_ = 'list'
             try:
