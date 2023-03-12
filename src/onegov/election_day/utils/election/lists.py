@@ -213,9 +213,6 @@ def get_lists_panachage_data(election, request):
     list_ids[None] = '999'
     for list_target in election.lists:
         target_index = node_keys.index(f'right.{list_target.list_id}')
-        remaining = list_target.votes - sum(
-            [r.votes for r in list_target.panachage_results]
-        )
         for result in list_target.panachage_results:
             source_list_id = list_ids[result.source_id]
             source_key = f'left.{source_list_id}'
@@ -223,7 +220,7 @@ def get_lists_panachage_data(election, request):
             source_index = node_keys.index(source_key)
             votes = result.votes
             if list_target.list_id == source_list_id:
-                votes += remaining
+                continue
             links.append({
                 'source': source_index,
                 'target': target_index,
