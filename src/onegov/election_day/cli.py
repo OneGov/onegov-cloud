@@ -1,6 +1,7 @@
 """ Provides commands used to initialize election day websites. """
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import List
 from onegov.ballot import ListPanachageResult
 from onegov.ballot import PartyPanachageResult
 from onegov.ballot import Vote
@@ -15,9 +16,11 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
+from transaction import abort
 from uuid import UUID
 import click
 import os
+
 
 cli = command_group()
 
@@ -217,21 +220,29 @@ def update_last_result_change():
 
 @cli.command('migrate-panachage-results')
 @click.option('--clear', is_flag=True, default=False)
+@click.option('--cleanup', is_flag=True, default=False)
 @click.option('--dry-run', is_flag=True, default=False)
 @click.option('--verbose', is_flag=True, default=False)
-def migrate_panachage_results(clear, dry_run, verbose):
+def migrate_panachage_results(clear, cleanup, dry_run, verbose):
 
     def migrate(request, app):
         click.secho(f'Migrating {app.schema}', fg='yellow')
 
         migrated = 0
         ignored = 0
+        ignored_items = set()
 
         session = request.app.session()
 
         if clear:
             session.query(ListPanachageResult).delete()
             session.query(PartyPanachageResult).delete()
+
+        list_ids = {result.id for result in session.query(List.id)}
+        election_ids = {result.id for result in session.query(Election.id)}
+        election_compound_ids = {
+            result.id for result in session.query(ElectionCompound.id)
+        }
 
         for item in session.query(PanachageResult):
             type_ = 'list'
@@ -248,6 +259,7 @@ def migrate_panachage_results(clear, dry_run, verbose):
                     assert not item.election_compound_id
                     assert item.source  # blank list is '999'
                     assert item.target
+                    assert UUID(item.target) in list_ids
                     if not dry_run:
                         session.add(
                             ListPanachageResult(
@@ -260,6 +272,14 @@ def migrate_panachage_results(clear, dry_run, verbose):
                     # party
                     assert item.votes >= 0
                     assert item.election_id or item.election_compound_id
+                    assert (
+                        not item.election_id
+                        or item.election_id in election_ids
+                    )
+                    assert (
+                        not item.election_compound_id
+                        or item.election_compound_id in election_compound_ids
+                    )
                     assert item.source != '999'  # blank list is ''
                     assert item.target
                     if not dry_run:
@@ -272,8 +292,12 @@ def migrate_panachage_results(clear, dry_run, verbose):
                                 election_compound_id=item.election_compound_id
                             )
                         )
+                migrated += 1
             except AssertionError:
                 ignored += 1
+                ignored_items.add(
+                    item.election_id or item.election_compound_id
+                )
                 if verbose:
                     click.secho(
                         f'Ignoring {type_} '
@@ -283,15 +307,15 @@ def migrate_panachage_results(clear, dry_run, verbose):
                         fg='red'
                     )
 
+        if cleanup:
+            session.query(PanachageResult).delete()
+
+        click.secho(f'{migrated} migrated, {ignored} ignored', fg='green')
+        if ignored_items and ignored_items != {None}:
+            click.secho(f'Ignored: {ignored_items}', fg='yellow')
+
         if dry_run:
-            click.secho(
-                f'would migrate {migrated}, ignore {ignored}',
-                fg='green'
-            )
-        else:
-            click.secho(
-                f'{migrated} migrated, {ignored} ignored',
-                fg='green'
-            )
+            click.secho('Dry run, aborting', fg='green')
+            abort()
 
     return migrate
