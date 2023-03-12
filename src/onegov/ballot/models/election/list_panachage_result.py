@@ -29,5 +29,5 @@ class ListPanachageResult(Base, TimestampMixin):
         nullable=True
     )
 
-    # votes
+    #: the number of votes
     votes = Column(Integer, nullable=False, default=lambda: 0)
