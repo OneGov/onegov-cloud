@@ -45,7 +45,7 @@ class PartyResultsCheckMixin:
 
     @property
     def has_party_panachage_results(self):
-        return self.panachage_results.first() is not None
+        return self.party_panachage_results.first() is not None
 
 
 class HistoricalPartyResultsMixin:
@@ -176,7 +176,7 @@ class PartyResultsExportMixin:
 
         # get the panachage results
         if domain == self.domain:
-            for result in self.panachage_results:
+            for result in self.party_panachage_results:
                 year = results.setdefault(self.date.year, {})
                 target = year.setdefault(result.target, {})
                 target[result.source] = result.votes
@@ -217,7 +217,7 @@ class PartyResultsExportMixin:
                 )
 
                 # add the panachage results
-                if self.panachage_results.count():
+                if self.party_panachage_results.count():
                     for source in parties:
                         column = f'panachage_votes_from_{source}'
                         row[column] = result.get(source, None)

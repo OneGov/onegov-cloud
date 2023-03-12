@@ -247,7 +247,7 @@ def test_election_compound_layout_menu(session):
             party_id='1'
         )
     )
-    compound.panachage_results.append(
+    compound.party_panachage_results.append(
         PartyPanachageResult(target='t', source='t ', votes=0)
     )
     assert ElectionCompoundLayout(compound, request).menu == [

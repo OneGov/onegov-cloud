@@ -482,7 +482,7 @@ def test_election_compound_model(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election_compound.panachage_results.one() == panachage_result
+    assert election_compound.party_panachage_results.one() == panachage_result
     assert election_compound.has_party_panachage_results is True
 
     election_compound.last_result_change = election_compound.timestamp()
@@ -491,7 +491,7 @@ def test_election_compound_model(session):
     election_compound.clear_results()
     assert election_compound.last_result_change is None
     assert election_compound.party_results.first() is None
-    assert election_compound.panachage_results.first() is None
+    assert election_compound.party_panachage_results.first() is None
     assert session.query(Candidate).first() is None
     assert session.query(ElectionResult).first() is None
 
@@ -516,7 +516,7 @@ def test_election_compound_model(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election_compound.panachage_results.one() == panachage_result
+    assert election_compound.party_panachage_results.one() == panachage_result
 
     session.delete(election_compound)
     session.flush()
@@ -1070,14 +1070,14 @@ def test_election_compound_export_parties(session):
 
     # Add panachage results
     for idx, source in enumerate(('5', '3', '0', '')):
-        election_compound.panachage_results.append(
+        election_compound.party_panachage_results.append(
             PartyPanachageResult(
                 target='5',
                 source=source,
                 votes=idx + 1
             )
         )
-    election_compound.panachage_results.append(
+    election_compound.party_panachage_results.append(
         PartyPanachageResult(
             target='3',
             source='5',

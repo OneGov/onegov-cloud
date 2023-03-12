@@ -130,10 +130,10 @@ def add_proporz_election(session, year=2015):
             votes=20
         )
     )
-    election.panachage_results.append(
+    election.party_panachage_results.append(
         PartyPanachageResult(source='0', target='1', votes=12)
     )
-    election.panachage_results.append(
+    election.party_panachage_results.append(
         PartyPanachageResult(source='1', target='0', votes=21)
     )
 
@@ -269,10 +269,10 @@ def add_election_compound(session, year=2015, elections=None, **kwargs):
             votes=20
         )
     )
-    compound.panachage_results.append(
+    compound.party_panachage_results.append(
         PartyPanachageResult(source='0', target='1', votes=12)
     )
-    compound.panachage_results.append(
+    compound.party_panachage_results.append(
         PartyPanachageResult(source='1', target='0', votes=21)
     )
 

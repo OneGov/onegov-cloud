@@ -57,7 +57,7 @@ class ProporzElection(
     )
 
     #: An election may contains n party panachage results
-    panachage_results = relationship(
+    party_panachage_results = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
         backref=backref('election'),

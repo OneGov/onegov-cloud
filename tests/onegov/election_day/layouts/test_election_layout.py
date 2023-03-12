@@ -351,7 +351,7 @@ def test_election_layout_menu_proporz(session):
         ('Downloads', 'ProporzElection/data', False, [])
     ]
 
-    election.panachage_results.append(
+    election.party_panachage_results.append(
         PartyPanachageResult(target='t', source='t ', votes=0)
     )
     election.show_party_panachage = True

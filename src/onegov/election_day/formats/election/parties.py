@@ -233,7 +233,7 @@ def import_party_results(
     session = object_session(election)
     for result in election.party_results:
         session.delete(result)
-    for result in election.panachage_results:
+    for result in election.party_panachage_results:
         session.delete(result)
 
     election.colors = colors
@@ -246,7 +246,7 @@ def import_party_results(
         if target in parties:
             for source, votes in panachage_results[target].items():
                 if source in parties or source == '999':
-                    election.panachage_results.append(
+                    election.party_panachage_results.append(
                         PartyPanachageResult(
                             id=uuid4(),
                             source=source if source != '999' else '',

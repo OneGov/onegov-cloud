@@ -83,7 +83,7 @@ def proporz_election():
         )
     )
 
-    election.panachage_results.append(
+    election.party_panachage_results.append(
         PartyPanachageResult(target=lid, source=1, votes=0)
     )
 
@@ -324,7 +324,7 @@ def test_proporz_election_has_data(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election.panachage_results.one() == panachage_result
+    assert election.party_panachage_results.one() == panachage_result
     assert election.has_party_panachage_results is True
 
 
@@ -1051,14 +1051,14 @@ def test_proporz_election_export_parties(session):
     ]
 
     for idx, source in enumerate(('1', '2', '3', '')):
-        election.panachage_results.append(
+        election.party_panachage_results.append(
             PartyPanachageResult(
                 target='1',
                 source=source,
                 votes=idx + 1
             )
         )
-    election.panachage_results.append(
+    election.party_panachage_results.append(
         PartyPanachageResult(
             target='2',
             source='1',
@@ -1173,7 +1173,7 @@ def test_proporz_election_clear_results(session):
     assert election.candidates.all() == []
     assert election.results.all() == []
     assert election.party_results.all() == []
-    assert election.panachage_results.all() == []
+    assert election.party_panachage_results.all() == []
 
     assert session.query(Candidate).first() is None
     assert session.query(CandidateResult).first() is None
