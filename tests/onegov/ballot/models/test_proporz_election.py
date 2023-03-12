@@ -247,8 +247,6 @@ def test_proporz_election_create_all_models(session):
 
 
 def test_proporz_election_has_data(session):
-    # todo:
-
     election = ProporzElection(
         title='Legislative Election',
         domain='federation',

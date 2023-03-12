@@ -1509,8 +1509,6 @@ def test_view_accreditation_errors(directions, client):
     page = page.form.submit().follow()
     assert 'Ihre Anfrage wird in Kürze bearbeitet' in page
 
-    # todo:
-
     client.login_admin()
     page = client.get('/tickets/ALL/open').click('Annehmen').follow()
     assert 'Benito' in page
