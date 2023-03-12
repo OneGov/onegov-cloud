@@ -9,7 +9,7 @@ from uuid import uuid4
 
 class ListPanachageResult(Base, TimestampMixin):
 
-    __tablename__ = 'ballot_list_panachage_results'
+    __tablename__ = 'list_panachage_results'
 
     #: identifies the result
     id = Column(UUID, primary_key=True, default=uuid4)
