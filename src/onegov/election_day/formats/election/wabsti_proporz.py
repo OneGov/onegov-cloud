@@ -474,12 +474,17 @@ def import_election_wabsti_proporz(
     for connection in subconnections.values():
         election.list_connections.append(connection)
 
+    list_ids = {list.list_id: list.id for list in lists.values()}
+    list_ids['999'] = None
     for list_ in lists.values():
         election.lists.append(list_)
         if list_.list_id in panachage:
             for source, votes in panachage[list_.list_id].items():
                 list_.panachage_results.append(
-                    ListPanachageResult(source=source, votes=votes)
+                    ListPanachageResult(
+                        source_id=list_ids[source],
+                        votes=votes
+                    )
                 )
 
     for candidate in candidates.values():

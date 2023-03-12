@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import date
 from decimal import Decimal
 from onegov.ballot import Candidate
@@ -179,8 +180,8 @@ def test_proporz_election_create_all_models(session):
     session.flush()
 
     panachage_result = ListPanachageResult(
-        target=list.id,
-        source=1,
+        target_id=list.id,
+        source_id=None,
         votes=0
     )
 
@@ -253,20 +254,18 @@ def test_proporz_election_has_data(session):
         domain='federation',
         date=date(2015, 6, 14),
     )
-    election.lists.append(
-        List(
-            number_of_mandates=0,
-            list_id="1",
-            name="List A",
-        )
+    list_1 = List(
+        number_of_mandates=0,
+        list_id="1",
+        name="List A",
     )
-    election.lists.append(
-        List(
-            number_of_mandates=0,
-            list_id="2",
-            name="List B",
-        )
+    list_2 = List(
+        number_of_mandates=0,
+        list_id="2",
+        name="List B",
     )
+    election.lists.append(list_1)
+    election.lists.append(list_2)
     session.add(election)
     session.flush()
     assert election.has_lists_panachage_data is False
@@ -276,15 +275,15 @@ def test_proporz_election_has_data(session):
     # lists panachage
     election.lists[0].panachage_results.append(
         ListPanachageResult(
-            target=election.lists[0].id,
-            source=2,
+            target_id=list_1.id,
+            source_id=list_2.id,
             votes=0
         )
     )
     election.lists[1].panachage_results.append(
         ListPanachageResult(
-            target=election.lists[1].id,
-            source=1,
+            target_id=list_2.id,
+            source_id=list_1.id,
             votes=0
         )
     )
@@ -427,43 +426,91 @@ def test_proporz_election_results(session):
 
     # Add panachage results
     list_1.panachage_results.append(
-        ListPanachageResult(target=list_1.id, source=2, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_2.id,
+            votes=1
+        )
     )
     list_1.panachage_results.append(
-        ListPanachageResult(target=list_1.id, source=3, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_3.id,
+            votes=1
+        )
     )
     list_1.panachage_results.append(
-        ListPanachageResult(target=list_1.id, source=4, votes=1)
+        ListPanachageResult(
+            target_id=list_1.id,
+            source_id=list_4.id,
+            votes=1
+        )
     )
 
     list_2.panachage_results.append(
-        ListPanachageResult(target=list_2.id, source=1, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_1.id,
+            votes=2
+        )
     )
     list_2.panachage_results.append(
-        ListPanachageResult(target=list_2.id, source=3, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_3.id,
+            votes=2
+        )
     )
     list_2.panachage_results.append(
-        ListPanachageResult(target=list_2.id, source=4, votes=2)
+        ListPanachageResult(
+            target_id=list_2.id,
+            source_id=list_4.id,
+            votes=2
+        )
     )
 
     list_3.panachage_results.append(
-        ListPanachageResult(target=list_3.id, source=1, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_1.id,
+            votes=3
+        )
     )
     list_3.panachage_results.append(
-        ListPanachageResult(target=list_3.id, source=2, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_2.id,
+            votes=3
+        )
     )
     list_3.panachage_results.append(
-        ListPanachageResult(target=list_3.id, source=4, votes=3)
+        ListPanachageResult(
+            target_id=list_3.id,
+            source_id=list_4.id,
+            votes=3
+        )
     )
 
     list_4.panachage_results.append(
-        ListPanachageResult(target=list_4.id, source=1, votes=4)
+        ListPanachageResult(
+            target_id=list_4.id,
+            source_id=list_1.id,
+            votes=4
+        )
     )
     list_4.panachage_results.append(
-        ListPanachageResult(target=list_4.id, source=2, votes=4)
+        ListPanachageResult(
+            target_id=list_4.id,
+            source_id=list_2.id,
+            votes=4
+        )
     )
     list_4.panachage_results.append(
-        ListPanachageResult(target=list_4.id, source=3, votes=4)
+        ListPanachageResult(
+            target_id=list_4.id,
+            source_id=list_3.id,
+            votes=4
+        )
     )
 
     # Add 5 candidates
@@ -788,16 +835,22 @@ def test_proporz_election_export(session):
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        ListPanachageResult(source=list_2.list_id, votes=12)
+        ListPanachageResult(
+            source_id=list_2.id,
+            votes=12
+        )
     )
     list_1.panachage_results.append(
-        ListPanachageResult(source='99', votes=4)
+        ListPanachageResult(
+            source_id=None,
+            votes=4
+        )
     )
 
     session.flush()
 
     assert election.export(['de_CH', 'fr_CH', 'it_CH']) == [
-        {
+        OrderedDict({
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
@@ -841,8 +894,9 @@ def test_proporz_election_export(session):
             'candidate_votes': 111,
             'list_panachage_votes_from_list_1': None,
             'list_panachage_votes_from_list_2': None,
-            'list_panachage_votes_from_list_99': None,
-        }, {
+            'list_panachage_votes_from_list_999': None,
+        }),
+        OrderedDict({
             'election_title_de_CH': 'Wahl',
             'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
@@ -885,8 +939,8 @@ def test_proporz_election_export(session):
             'candidate_votes': 520,
             'list_panachage_votes_from_list_1': None,
             'list_panachage_votes_from_list_2': 12,
-            'list_panachage_votes_from_list_99': 4,
-        }
+            'list_panachage_votes_from_list_999': 4,
+        })
     ]
 
 

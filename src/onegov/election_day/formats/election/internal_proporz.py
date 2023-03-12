@@ -399,6 +399,7 @@ def import_election_internal_proporz(
 
     result_uids = {r['entity_id']: r['id'] for r in results.values()}
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
+    list_uids['999'] = None
     session = object_session(election)
     # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
@@ -407,8 +408,8 @@ def import_election_internal_proporz(
     session.bulk_insert_mappings(ListPanachageResult, (
         dict(
             id=uuid4(),
-            source=source,
-            target=str(list_uids[list_id]),
+            source_id=list_uids[source],
+            target_id=list_uids[list_id],
             votes=votes,
         )
         for list_id in panachage

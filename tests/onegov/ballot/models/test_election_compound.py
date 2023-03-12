@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
@@ -189,10 +190,10 @@ def proporz_election(
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        ListPanachageResult(source=list_2.list_id, votes=12)
+        ListPanachageResult(source_id=list_2.id, votes=12)
     )
     list_1.panachage_results.append(
-        ListPanachageResult(source='99', votes=4)
+        ListPanachageResult(source_id=None, votes=4)
     )
 
     return election
@@ -606,7 +607,7 @@ def test_election_compound_export(session):
     ).all()
     session.flush()
     export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
-    assert export[0] == {
+    assert export[0] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -645,8 +646,8 @@ def test_election_compound_export(session):
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
-    }
-    assert export[1] == {
+    })
+    assert export[1] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -685,13 +686,13 @@ def test_election_compound_export(session):
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520
-    }
+    })
 
     election_compound.elections = session.query(Election).all()
     session.flush()
     export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
 
-    assert export[0] == {
+    assert export[0] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -739,10 +740,10 @@ def test_election_compound_export(session):
         'candidate_votes': 111,
         'list_panachage_votes_from_list_1': None,
         'list_panachage_votes_from_list_2': None,
-        'list_panachage_votes_from_list_99': None
-    }
+        'list_panachage_votes_from_list_999': None
+    })
 
-    assert export[1] == {
+    assert export[1] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -790,10 +791,10 @@ def test_election_compound_export(session):
         'candidate_votes': 520,
         'list_panachage_votes_from_list_1': None,
         'list_panachage_votes_from_list_2': 12,
-        'list_panachage_votes_from_list_99': 4
-    }
+        'list_panachage_votes_from_list_999': 4
+    })
 
-    assert export[2] == {
+    assert export[2] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -832,9 +833,9 @@ def test_election_compound_export(session):
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
-    }
+    })
 
-    assert export[3] == {
+    assert export[3] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -873,7 +874,7 @@ def test_election_compound_export(session):
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520
-    }
+    })
 
 
 def test_election_compound_export_parties(session):

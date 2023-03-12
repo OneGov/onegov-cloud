@@ -1,12 +1,14 @@
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election, ListPanachageResult
+from onegov.ballot import Election
+from onegov.ballot import List
+from onegov.ballot import ListPanachageResult
 from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.models import Canton
-
-from tests.onegov.election_day.common import print_errors, create_principal
+from tests.onegov.election_day.common import create_principal
+from tests.onegov.election_day.common import print_errors
 
 
 def test_import_internal_proporz_cantonal(session, import_test_datasets):
@@ -829,12 +831,14 @@ def test_import_internal_proporz_panachage(session):
             ]
         )
     )
+    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids['999'] = None
     assert not errors
     assert query.count() == 4
-    assert query.filter_by(source='1').one().votes == 4
-    assert query.filter_by(source='2').one().votes == 8
-    assert query.filter_by(source='3').one().votes == 3
-    assert query.filter_by(source='999').one().votes == 999
+    assert query.filter_by(source_id=list_ids['1']).one().votes == 4
+    assert query.filter_by(source_id=list_ids['2']).one().votes == 8
+    assert query.filter_by(source_id=list_ids['3']).one().votes == 3
+    assert query.filter_by(source_id=list_ids['999']).one().votes == 999
 
     # Panachage data with missing lists throws an error
     errors = import_election_internal_proporz(
@@ -863,10 +867,12 @@ def test_import_internal_proporz_panachage(session):
             ]
         )
     )
+    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids['999'] = None
     assert not errors
-    assert query.filter_by(source='eins').one().votes == 4
-    assert query.filter_by(source='zwei.drei').one().votes == 8
-    assert query.filter_by(source='vier_fuenf').one().votes == 3
+    assert query.filter_by(source_id=list_ids['eins']).one().votes == 4
+    assert query.filter_by(source_id=list_ids['zwei.drei']).one().votes == 8
+    assert query.filter_by(source_id=list_ids['vier_fuenf']).one().votes == 3
 
 
 def test_import_internal_proproz_optional_columns(session):

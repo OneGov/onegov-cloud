@@ -238,7 +238,15 @@ def migrate_panachage_results(clear, cleanup, dry_run, verbose):
             session.query(ListPanachageResult).delete()
             session.query(PartyPanachageResult).delete()
 
-        list_ids = {result.id for result in session.query(List.id)}
+        # Lookup tables for ListPanachageResult
+        lists = session.query(List.election_id, List.list_id, List.id).all()
+        election_by_list_ids = {list.id: list.election_id for list in lists}
+        list_id_by_list = {}
+        for election_id, list_id, id_ in lists:
+            list_id_by_list.setdefault(election_id, {'999': None})
+            list_id_by_list[election_id][list_id] = id_
+
+        # Lookup tables for PartyPanachageResult
         election_ids = {result.id for result in session.query(Election.id)}
         election_compound_ids = {
             result.id for result in session.query(ElectionCompound.id)
@@ -254,18 +262,20 @@ def migrate_panachage_results(clear, cleanup, dry_run, verbose):
             try:
                 if type_ == 'list':
                     # list
+                    target_id = UUID(item.target)
                     assert item.votes >= 0
                     assert not item.election_id
                     assert not item.election_compound_id
-                    assert item.source  # blank list is '999'
-                    assert item.target
-                    assert UUID(item.target) in list_ids
+                    assert target_id in election_by_list_ids
+                    election_id = election_by_list_ids[target_id]
+                    assert item.source in list_id_by_list[election_id]
+                    source_id = list_id_by_list[election_id][item.source]
                     if not dry_run:
                         session.add(
                             ListPanachageResult(
                                 votes=item.votes,
-                                source=item.source,
-                                target=UUID(item.target)
+                                target_id=target_id,
+                                source_id=source_id
                             )
                         )
                 else:
