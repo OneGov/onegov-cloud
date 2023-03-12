@@ -352,7 +352,7 @@ def test_election_layout_menu_proporz(session):
     ]
 
     election.party_panachage_results.append(
-        PartyPanachageResult(target='t', source='t ', votes=0)
+        PartyPanachageResult(target='t', source='t ', votes=10)
     )
     election.show_party_panachage = True
     assert ElectionLayout(election, request).menu == [

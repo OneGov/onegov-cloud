@@ -484,6 +484,9 @@ def test_election_compound_model(session):
     session.add(panachage_result)
     session.flush()
     assert election_compound.party_panachage_results.one() == panachage_result
+    assert election_compound.has_party_panachage_results is False
+
+    panachage_result.votes = 10
     assert election_compound.has_party_panachage_results is True
 
     election_compound.last_result_change = election_compound.timestamp()

@@ -273,13 +273,12 @@ def test_proporz_election_has_data(session):
     assert election.has_party_panachage_results is False
 
     # lists panachage
-    election.lists[0].panachage_results.append(
-        ListPanachageResult(
-            target_id=list_1.id,
-            source_id=list_2.id,
-            votes=0
-        )
+    panachage_result = ListPanachageResult(
+        target_id=list_1.id,
+        source_id=list_2.id,
+        votes=0
     )
+    election.lists[0].panachage_results.append(panachage_result)
     election.lists[1].panachage_results.append(
         ListPanachageResult(
             target_id=list_2.id,
@@ -289,7 +288,9 @@ def test_proporz_election_has_data(session):
     )
 
     session.flush()
-    assert election.has_lists_panachage_data
+    assert election.has_lists_panachage_data is False
+    panachage_result.votes = 10
+    assert election.has_lists_panachage_data is True
 
     # party results
     party_result = PartyResult(
@@ -324,6 +325,8 @@ def test_proporz_election_has_data(session):
     session.add(panachage_result)
     session.flush()
     assert election.party_panachage_results.one() == panachage_result
+    assert election.has_party_panachage_results is False
+    panachage_result.votes = 10
     assert election.has_party_panachage_results is True
 
 

@@ -140,7 +140,10 @@ class ProporzElection(
         ids = ids.filter(List.election_id == self.id)
 
         results = session.query(ListPanachageResult)
-        results = results.filter(ListPanachageResult.target_id.in_(ids))
+        results = results.filter(
+            ListPanachageResult.target_id.in_(ids),
+            ListPanachageResult.votes > 0
+        )
 
         return results.first() is not None
 

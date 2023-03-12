@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from onegov.ballot.models.party_result.party_panachage_result import \
+    PartyPanachageResult
 from onegov.ballot.models.party_result.party_result import PartyResult
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy import or_
@@ -45,7 +47,9 @@ class PartyResultsCheckMixin:
 
     @property
     def has_party_panachage_results(self):
-        return self.party_panachage_results.first() is not None
+        return self.party_panachage_results.filter(
+            PartyPanachageResult.votes > 0
+        ).first() is not None
 
 
 class HistoricalPartyResultsMixin:
