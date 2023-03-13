@@ -400,7 +400,6 @@ class PersonLinkExtension(ContentExtension):
 
         for person in self.get_selectable_people(request):
             field_id = fieldset_id + '_' + person.id.hex
-
             builder.add_field(
                 field_class=BooleanField,
                 field_id=field_id,
@@ -414,7 +413,7 @@ class PersonLinkExtension(ContentExtension):
                 label=request.translate(_("Function")),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
-                default=person.function or ""
+                default=getattr(person, 'function', None),
             )
 
         return builder.form_class
