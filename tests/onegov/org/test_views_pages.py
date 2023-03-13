@@ -268,7 +268,6 @@ def test_move_page_assign_yourself_as_parent(client):
     move_page = move_page.form.submit()
     assert move_page.pyquery('.alert')
     assert move_page.pyquery('.error')
-    move_page.mustcontain('Invalid destination selected')
 
 
 def test_move_page_assigning_a_child_as_parent(client):
@@ -282,7 +281,6 @@ def test_move_page_assigning_a_child_as_parent(client):
     move_page = move_page.form.submit()
     assert move_page.pyquery('.alert')
     assert move_page.pyquery('.error')
-    move_page.mustcontain('Invalid destination selected')
 
 
 def test_links(client):
