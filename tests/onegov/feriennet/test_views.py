@@ -1,7 +1,6 @@
-import pytest
-
 import onegov.feriennet
 import os
+import pytest
 import re
 import requests_mock
 import transaction
@@ -17,6 +16,7 @@ from onegov.gis import Coordinates
 from onegov.pay import Payment
 from psycopg2.extras import NumericRange
 from tests.shared import utils
+from unittest.mock import patch
 from webtest import Upload
 
 
@@ -218,7 +218,11 @@ def test_activity_permissions(client, scenario):
     assert admin.get(url, status=200)
 
 
-def test_activity_communication(client, scenario):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_activity_communication(broadcast, authenticate, connect, client,
+                                scenario):
     scenario.add_period()
     scenario.add_activity(
         title="Learn Python",
@@ -239,6 +243,13 @@ def test_activity_communication(client, scenario):
     assert len(os.listdir(client.app.maildir)) == 1
     assert "Ihre Anfrage wurde unter der " \
            "folgenden Referenz registriert" in admin.get_email(0)['HtmlBody']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
@@ -2380,16 +2391,20 @@ def test_send_email_with_attachment(client, scenario):
     page = page.click('Versand')
     assert "Test" in page
     assert "Test.txt" not in page
-    page.form['roles'] = ['admin', 'editor']
+    page.form['roles'] = ['member', 'editor']
     page.form['no_spam'] = True
     page.form.submit().follow()
 
     # Plaintext version
-    email = client.get_email(0)
-    assert "[Test](http" in email['TextBody']
+    email_1 = client.get_email(0, 0)
+    assert "[Test](http" in email_1['TextBody']
 
     # HTML version
-    assert ">Test</a>" in email['HtmlBody']
+    assert ">Test</a>" in email_1['HtmlBody']
+
+    # Test if user gets an email, even if he is not in the recipient list
+    email_2 = client.get_email(0, 1)
+    assert email_2['To'] == 'admin@example.org'
 
 
 def test_max_age_exact(client, scenario):

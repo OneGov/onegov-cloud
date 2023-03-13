@@ -436,6 +436,14 @@ def import_election_wabstic_proporz(
             )
             continue
 
+        # Clear results if not counted yet
+        if not entity['counted']:
+            entity['eligible_voters'] = 0
+            entity['received_ballots'] = 0
+            entity['blank_ballots'] = 0
+            entity['invalid_ballots'] = 0
+            entity['blank_votes'] = 0
+
     # Parse the lists
     added_lists = {}
     added_connections = {}
@@ -503,7 +511,6 @@ def import_election_wabstic_proporz(
         )
 
     # Parse the list results
-
     added_list_results = {}
     for line in wp_listengde.lines:
 
@@ -553,8 +560,11 @@ def import_election_wabstic_proporz(
             added_list_results[entity_id] = {}
         added_list_results[entity_id][list_id] = votes
 
-    # Parse the candidates
+        # Clear results if not counted yet
+        if not added_entities[entity_id]['counted']:
+            added_list_results[entity_id][list_id] = 0
 
+    # Parse the candidates
     added_candidates = {}
     for line in wpstatic_kandidaten.lines:
         line_errors = []
@@ -603,6 +613,7 @@ def import_election_wabstic_proporz(
             list_id=added_lists[list_id]['id']
         )
 
+    # parse the candidate results (elected)
     for line in wp_kandidaten.lines:
         line_errors = []
 
@@ -634,6 +645,7 @@ def import_election_wabstic_proporz(
             )
             continue
 
+    # parse the candidate results (votes)
     added_results = {}
     for line in wp_kandidatengde.lines:
         line_errors = []
@@ -678,6 +690,10 @@ def import_election_wabstic_proporz(
         if entity_id not in added_results:
             added_results[entity_id] = {}
         added_results[entity_id][candidate_id] = votes
+
+        # Clear results if not counted yet
+        if not added_entities[entity_id]['counted']:
+            added_results[entity_id][candidate_id] = 0
 
     if errors:
         return errors

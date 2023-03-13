@@ -13,7 +13,7 @@ from pdftotext import PDF
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
-from unittest import mock
+from unittest.mock import patch
 from webtest import Upload
 
 
@@ -101,7 +101,7 @@ def test_view_translator(client):
         'lat': 46, 'lon': 7, 'zoom': 12
     })
     drive_distance = 111.11
-    with mock.patch(
+    with patch(
             'onegov.gis.utils.MapboxRequests.directions',
             return_value=FakeResponse({
                 'code': 'Ok',
@@ -260,7 +260,7 @@ def test_view_translator(client):
     page.form['coordinates'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 12
     })
-    with mock.patch(
+    with patch(
             'onegov.gis.utils.MapboxRequests.directions',
             return_value=FakeResponse({
                 'code': 'Ok',
@@ -674,7 +674,10 @@ def test_view_redirects(client):
         assert page.request.url == data['logout']
 
 
-def test_view_translator_mutation(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_view_translator_mutation(broadcast, authenticate, connect, client):
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -736,7 +739,7 @@ def test_view_translator_mutation(client):
     page.form['education_as_interpreter'] = False
     page.form['certificates_ids'] = cert_ids[0:1]
     page.form['comments'] = 'No comments'
-    with mock.patch(
+    with patch(
             'onegov.gis.utils.MapboxRequests.directions',
             return_value=FakeResponse({
                 'code': 'Ok',
@@ -790,7 +793,7 @@ def test_view_translator_mutation(client):
         'economy', 'art_leisure'
     ])
     page.form['expertise_professional_guilds_other'] = ['Exorzismus']
-    with mock.patch(
+    with patch(
             'onegov.gis.utils.MapboxRequests.directions',
             return_value=FakeResponse({
                 'code': 'Ok',
@@ -803,6 +806,13 @@ def test_view_translator_mutation(client):
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'member@example.org'
     assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     client.logout()
     client.login_admin()
@@ -889,7 +899,7 @@ def test_view_translator_mutation(client):
     page.form['bank_address'] = 'Bankplatz Kriens'
     page.form['account_owner'] = 'Aunt Anny'
     page.form['iban'] = 'CH5604835012345678009'
-    with mock.patch(
+    with patch(
             'onegov.gis.utils.MapboxRequests.directions',
             return_value=FakeResponse({
                 'code': 'Ok',
@@ -902,6 +912,13 @@ def test_view_translator_mutation(client):
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'editor@example.org'
     assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
+
+    assert connect.call_count == 2
+    assert authenticate.call_count == 2
+    assert broadcast.call_count == 2
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     client.logout()
     client.login_admin()
@@ -1005,7 +1022,7 @@ def test_view_translator_mutation(client):
     page.form['education_as_interpreter'] = True
     page.form['certificates'] = cert_ids[1:3]
     page.form['comments'] = 'Kein Kommentar'
-    with mock.patch(
+    with patch(
             'onegov.gis.utils.MapboxRequests.directions',
             return_value=FakeResponse({
                 'code': 'Ok',
@@ -1018,6 +1035,13 @@ def test_view_translator_mutation(client):
     mail = client.get_email(0, flush_queue=True)
     assert mail['To'] == 'test@test.com'
     assert 'Bob, Uncle: Ihr Ticket wurde eröffnet' in mail['Subject']
+
+    assert connect.call_count == 3
+    assert authenticate.call_count == 3
+    assert broadcast.call_count == 3
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     client.logout()
     client.login_admin()
@@ -1155,7 +1179,10 @@ def test_view_translator_mutation(client):
     assert 'Kein Kommentar' not in page
 
 
-def test_view_accreditation(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_view_accreditation(broadcast, authenticate, connect, client):
     session = client.app.session()
     language_ids = [str(lang.id) for lang in create_languages(session)]
     transaction.commit()
@@ -1167,6 +1194,8 @@ def test_view_accreditation(client):
         'lat': 46, 'lon': 7, 'zoom': 12
     })
     settings.form.submit()
+
+    websocket_messages = 0
 
     def request_accreditation():
         client.logout()
@@ -1230,7 +1259,7 @@ def test_view_accreditation(client):
         page.form['remarks'] = 'Some remarks'
         page.form['confirm_submission'] = True
 
-        with mock.patch(
+        with patch(
                 'onegov.gis.utils.MapboxRequests.directions',
                 return_value=FakeResponse({
                     'code': 'Ok',
@@ -1243,6 +1272,15 @@ def test_view_accreditation(client):
         mail = client.get_email(0, flush_queue=True)
         assert mail['To'] == 'hugo.benito@translators.com'
         assert 'Benito, Hugo: Ihr Ticket wurde eröffnet' in mail['Subject']
+
+        nonlocal websocket_messages
+        websocket_messages += 1
+        assert connect.call_count == websocket_messages
+        assert authenticate.call_count == websocket_messages
+        assert broadcast.call_count == websocket_messages
+        assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+        assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+        assert broadcast.call_args[0][3]['created']
 
         client.login_admin()
         page = client.get('/tickets/ALL/open').click('Annehmen').follow()
@@ -1363,7 +1401,7 @@ def test_view_accreditation(client):
     assert '756.1234.4568.90' in page
 
 
-@mock.patch(
+@patch(
     'onegov.gis.utils.MapboxRequests.directions',
     return_value=FakeResponse({'code': 'Ok', 'routes': [{'distance': 2000}]})
 )

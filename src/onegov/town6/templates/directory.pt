@@ -80,7 +80,7 @@
                     </div>
                 </div>
 
-                <div class="submit-yours side-panel" tal:condition="directory.enable_submissions or request.is_manager">
+                <div class="submit-yours side-panel" tal:condition="directory.enable_submissions">
                     <dl>
                         <dt>
                             <a href="${submit}">

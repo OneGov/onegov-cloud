@@ -53,7 +53,7 @@ class PeriodBoardlet(FeriennetBoardlet):
             return
 
         def icon(checked):
-            return checked and 'fa-check-square-o' or 'fa-square-o'
+            return 'fa-check-square-o' if checked else 'fa-square-o'
 
         yield BoardletFact(
             text=_("Prebooking: ${dates}", mapping={
@@ -72,8 +72,7 @@ class PeriodBoardlet(FeriennetBoardlet):
                     self.period.booking_end,
                 )
             }),
-            icon=icon(self.period.finalized if self.period.finalizable
-                      else self.period.is_booking_in_past)
+            icon=icon(self.period.is_booking_in_past)
         )
 
         yield BoardletFact(
@@ -110,6 +109,22 @@ class ActivitiesBoardlet(FeriennetBoardlet):
                 .subquery()
         )).filter_by(state='accepted').count()
 
+    def occasion_states(self):
+        collecion = MatchCollection(self.session, self.period)
+        occasions = [o[0] for o in collecion.occasions]
+        states = set(occasions)
+        occasion_states = {
+            'overfull': 0,
+            'full': 0,
+            'operable': 0,
+            'unoperable': 0,
+            'empty': 0,
+            'cancelled': 0,
+        }
+        for s in states:
+            occasion_states[s] = occasions.count(s)
+        return occasion_states
+
     @property
     def title(self):
         return _("${count} Activities", mapping={
@@ -132,14 +147,62 @@ class ActivitiesBoardlet(FeriennetBoardlet):
             text=_("${count} Activities", mapping={
                 'count': self.activities_count
             }),
-            icon='fa-dot-circle-o'
+            icon='fa-square'
         )
 
         yield BoardletFact(
             text=_("${count} Occasions", mapping={
                 'count': self.occasions_count
             }),
-            icon='fa-circle-o'
+            icon='fa-chevron-circle-down'
+        )
+
+        yield BoardletFact(
+            text=_("${count} overfull", mapping={
+                'count': self.occasion_states()['overfull'],
+            }),
+            icon='fa-exclamation-circle',
+            css_class='' if self.occasion_states()['overfull'] else 'zero'
+        )
+
+        yield BoardletFact(
+            text=_("${count} full", mapping={
+                'count': self.occasion_states()['full'],
+            }),
+            icon='fa-circle',
+            css_class='' if self.occasion_states()['full'] else 'zero'
+        )
+
+        yield BoardletFact(
+            text=_("${count} operable", mapping={
+                'count': self.occasion_states()['operable'],
+            }),
+            icon='fa-check-circle',
+            css_class='' if self.occasion_states()['operable'] else 'zero'
+        )
+
+        yield BoardletFact(
+            text=_("${count} unoperable", mapping={
+                'count': self.occasion_states()['unoperable'],
+            }),
+            icon='fa-stop-circle',
+            css_class='' if self.occasion_states()['unoperable'] else 'zero'
+        )
+
+        yield BoardletFact(
+            text=_("${count} empty", mapping={
+                'count': self.occasion_states()['empty'],
+            }),
+            icon='fa-circle-o',
+            css_class='' if self.occasion_states()['empty'] else 'zero'
+        )
+
+        yield BoardletFact(
+            text=_("${count} cancelled", mapping={
+                'count': self.occasion_states()['cancelled'],
+            }),
+            icon='fa-times-circle',
+            css_class='' if self.occasion_states()['cancelled'] else 'zero'
         )
 
 
@@ -229,25 +292,29 @@ class BookingsBoardlet(FeriennetBoardlet):
                 text=_("${count} accepted", mapping={
                     'count': self.counts['accepted']
                 }),
-                icon='fa-minus',
+                icon='fa-check-square',
+                css_class='' if self.counts['accepted'] else 'zero'
             )
             yield BoardletFact(
-                text=_("${count} cancelled", mapping={
+                text=_("${count} not carried out or cancelled", mapping={
                     'count': self.counts['cancelled']
                 }),
-                icon='fa-minus',
+                icon='fa-minus-square',
+                css_class='' if self.counts['cancelled'] else 'zero'
             )
             yield BoardletFact(
                 text=_("${count} denied", mapping={
                     'count': self.counts['denied']
                 }),
-                icon='fa-minus',
+                icon='fa-minus-square',
+                css_class='' if self.counts['denied'] else 'zero'
             )
             yield BoardletFact(
                 text=_("${count} blocked", mapping={
                     'count': self.counts['blocked']
                 }),
-                icon='fa-minus',
+                icon='fa-minus-square',
+                css_class='' if self.counts['blocked'] else 'zero'
             )
             yield BoardletFact(
                 text=_("${count} Bookings per Attendee", mapping={
@@ -271,17 +338,24 @@ class AttendeesBoardlet(FeriennetBoardlet):
                 'male': 0,
             }
 
-        attendees = self.session.query(Attendee)\
-            .filter(Attendee.id.in_(
-                self.session.query(Booking.attendee_id).filter_by(
-                    period_id=self.period.id
-                )
-            ))
+        attendee_ids = self.session.query(Booking.attendee_id).filter_by(
+            period_id=self.period.id
+        )
+
+        attendees = self.session.query(Attendee).filter(
+            Attendee.id.in_(attendee_ids)
+        )
+
+        accepted_attendees = self.session.query(Booking.attendee_id).filter(
+            Booking.attendee_id.in_(attendee_ids),
+            Booking.state == 'accepted'
+        ).distinct()
 
         return {
             'total': attendees.count(),
             'girls': attendees.filter_by(gender='female').count(),
             'boys': attendees.filter_by(gender='male').count(),
+            'without_booking': attendees.count() - accepted_attendees.count()
         }
 
     @property
@@ -306,14 +380,25 @@ class AttendeesBoardlet(FeriennetBoardlet):
             text=_("${count} Girls", mapping={
                 'count': self.attendee_counts['girls']
             }),
-            icon='fa-female'
+            icon='fa-female',
+            css_class='' if self.attendee_counts['girls'] else 'zero'
         )
 
         yield BoardletFact(
             text=_("${count} Boys", mapping={
                 'count': self.attendee_counts['boys']
             }),
-            icon='fa-male'
+            icon='fa-male',
+            css_class='' if self.attendee_counts['boys'] else 'zero'
+        )
+
+        yield BoardletFact(
+            text=_("${count} of which without accepted bookings",
+                   mapping={
+                       'count': self.attendee_counts['without_booking']
+                   }),
+            icon='fa-minus',
+            css_class='' if self.attendee_counts['without_booking'] else 'zero'
         )
 
 
@@ -365,6 +450,7 @@ class MatchingBoardlet(FeriennetBoardlet):
                 'count': self.unlucky_count
             }),
             icon='fa-frown-o',
+            css_class='' if self.unlucky_count else 'zero'
         )
 
 
@@ -413,12 +499,14 @@ class BillingPortlet(FeriennetBoardlet):
                 'amount': self.layout.format_number(self.amounts['total'])
             }),
             icon='fa-circle',
+            css_class='' if self.amounts['total'] else 'zero'
         )
         yield BoardletFact(
             text=_("${amount} CHF paid", mapping={
                 'amount': self.layout.format_number(self.amounts['paid'])
             }),
             icon='fa-plus-circle',
+            css_class='' if self.amounts['paid'] else 'zero'
         )
         yield BoardletFact(
             text=_("${amount} CHF outstanding", mapping={
@@ -427,4 +515,5 @@ class BillingPortlet(FeriennetBoardlet):
                 )
             }),
             icon='fa-minus-circle',
+            css_class='' if self.amounts['outstanding'] else 'zero'
         )

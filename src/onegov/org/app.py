@@ -30,11 +30,12 @@ from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
+from onegov.websockets import WebsocketsApp
 from purl import URL
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp, UserApp):
+             DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
     serve_static_files = True
     request_class = OrgRequest
@@ -571,6 +572,7 @@ def get_common_asset():
     yield 'internal_link_check.js'
     yield 'tickets.js'
     yield 'items_selectable.js'
+    yield 'notifications.js'
 
 
 @OrgApp.webasset('accordion')

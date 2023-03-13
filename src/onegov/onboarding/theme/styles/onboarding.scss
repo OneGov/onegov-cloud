@@ -145,6 +145,23 @@ footer {
     z-index: 9999;
 }
 
+label {
+    margin-bottom: 3ex;
+
+    // Align checkbox label if the text wraps to next line
+    input[type="checkbox"] {
+        vertical-align: sub;
+        margin-right: 0.75em;
+    }
+
+    span.label-text {
+        display: inline-block;
+        max-width: 90%;
+        vertical-align: text-top;
+    }
+}
+
+
 .colorPicker_hexWrap {
     float: left;
     width: 100%;

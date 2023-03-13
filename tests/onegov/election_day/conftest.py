@@ -62,8 +62,8 @@ def create_election_day(
     tmp = request.getfixturevalue('temporary_directory')
 
     websockets = {
-        'client_url': 'ws://localhost:8765',
-        'manage_url': 'ws://localhost:8765',
+        'client_url': 'ws://localhost:8766',
+        'manage_url': 'ws://localhost:8766',
         'manage_token': 'super-super-secret-token'
     }
     app = create_app(

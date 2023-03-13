@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-14 15:23+0100\n"
+"POT-Creation-Date: 2023-02-22 15:50+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -37,6 +37,30 @@ msgid "${count} Occasions"
 msgstr "${count} eventi"
 
 #, python-format
+msgid "${count} overfull"
+msgstr "${count} con troppi partecipanti"
+
+#, python-format
+msgid "${count} full"
+msgstr "${count} completo"
+
+#, python-format
+msgid "${count} operable"
+msgstr "${count} con abbastanza partecipanti"
+
+#, python-format
+msgid "${count} unoperable"
+msgstr "${count} con non abbastanza partecipanti"
+
+#, python-format
+msgid "${count} empty"
+msgstr "${count} con nessun partecipante"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} annullato"
+
+#, python-format
 msgid "${count} Wishes"
 msgstr "${count} Desideri"
 
@@ -53,8 +77,8 @@ msgid "${count} accepted"
 msgstr "${count} accettato"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} annullato"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} annullati o cancellati"
 
 #, python-format
 msgid "${count} denied"
@@ -79,6 +103,10 @@ msgstr "${count} femmina"
 #, python-format
 msgid "${count} Boys"
 msgstr "${count} maschio"
+
+#, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} dei quali senza prenotazioni accettate"
 
 #, python-format
 msgid "${amount}% Happiness"
@@ -489,7 +517,7 @@ msgid "Exports user accounts."
 msgstr "Esportare gli account utente."
 
 msgid "Exports volunteers in the given period."
-msgstr ""
+msgstr "Esportazioni volontarie nel periodo indicato."
 
 msgid "Accessible"
 msgstr "Adatta a persone con disabilità"
@@ -3078,3 +3106,7 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} partecipanti registrati"

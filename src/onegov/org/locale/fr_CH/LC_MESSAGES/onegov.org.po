@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-10 17:06+0100\n"
+"POT-Creation-Date: 2023-02-28 12:02+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -994,8 +994,8 @@ msgstr "Prénom"
 msgid "Last name"
 msgstr "Nom de famille"
 
-msgid "Function"
-msgstr "Fonction"
+msgid "Functions:"
+msgstr "Fonctions:"
 
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
@@ -2145,9 +2145,6 @@ msgstr "L'an dernier"
 msgid "Older"
 msgstr "Plus âgés"
 
-msgid "Past Events"
-msgstr "Événements passées"
-
 msgid "Do you really want to delete this note?"
 msgstr "Voulez-vous vraiment supprimer cette note ?"
 
@@ -2867,6 +2864,9 @@ msgstr "Récurrence"
 
 msgid "No events found."
 msgstr "Aucun événement trouvé."
+
+msgid "Past events"
+msgstr "Événements passées"
 
 msgid "Filter by date"
 msgstr "Filtrer par date"
@@ -3871,6 +3871,13 @@ msgstr "Ajoutez un message a la demande."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
 
+msgid ""
+"Enable notifications about new tickets. Only works when being logged in and "
+"having the browser with the site open."
+msgstr ""
+"Activez les notifications sur les nouveaux tickets. Ne fonctionne que "
+"lorsque l'on est connecté et que le navigateur avec le site est ouvert."
+
 msgid "Archive all selected tickets?"
 msgstr "Archiver tous les billets sélectionnés?"
 
@@ -4123,11 +4130,11 @@ msgstr "Réinitialisation de mot de passe"
 
 #, python-format
 msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
+"A password reset link has been sent to ${email}, provided an active account "
+"exists for this email address."
 msgstr ""
-"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, pour "
-"peu qu'un compte existe pour cette adresse e-mail."
+"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, "
+"pour peu qu'un compte actif existe pour cette adresse e-mail."
 
 msgid "Password changed."
 msgstr "Mot de passe modifié."
@@ -5156,27 +5163,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "Marker Type"
-#~ msgstr "Type de marqueur"
-
-#~ msgid "Mapbox (Default)"
-#~ msgstr "Mapbox (défaut)"
-
-#~ msgid "Homepage Image #1"
-#~ msgstr "Image n°1 de page d'accueil"
-
-#~ msgid "Homepage Image #2"
-#~ msgstr "Image n°2 de page d'accueil"
-
-#~ msgid "Homepage Image #3"
-#~ msgstr "Image n°3 de page d'accueil"
-
-#~ msgid "Homepage Image #4"
-#~ msgstr "Image n°4 de page d'accueil"
-
-#~ msgid "Homepage Image #5"
-#~ msgstr "Image n°5 de page d'accueil"
-
-#~ msgid "Homepage Image #6"
-#~ msgstr "Image n°6 de page d'accueil"

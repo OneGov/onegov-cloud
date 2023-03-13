@@ -25,6 +25,8 @@ class TownAssistant(Assistant):
         if form.submitted(request):
             request.browser_session['name'] = form.data['name']
             request.browser_session['user'] = form.data['user']
+            request.browser_session['user_name'] = form.data['user_name']
+            request.browser_session['phone_number'] = form.data['phone_number']
             request.browser_session['color'] = form.data['color'].get_hex()
 
             return morepath.redirect(request.link(self.for_next_step()))
@@ -32,6 +34,12 @@ class TownAssistant(Assistant):
         form.name.data = request.browser_session.get('name', form.name.data)
         form.user.data = request.browser_session.get('user', form.user.data)
         form.color.data = request.browser_session.get('color', form.color.data)
+        form.user_name.data = request.browser_session.get(
+            "user_name", form.user_name.data
+        )
+        form.color.phone_number = request.browser_session.get(
+            "phone_number", form.phone_number.data
+        )
 
         return {
             'name': 'town-start',
@@ -51,6 +59,8 @@ class TownAssistant(Assistant):
                 return morepath.redirect(request.link(self.for_prev_step()))
 
         name = request.browser_session['name']
+        user_name = request.browser_session['user_name']
+        phone_number = request.browser_session['phone_number']
         user = request.browser_session['user']
         color = request.browser_session['color']
 
@@ -68,14 +78,19 @@ class TownAssistant(Assistant):
                 self.app.send_zulip(
                     subject='OneGov Onboarding',
                     content='\n'.join((
-                        f"A new OneGov Cloud instance was started by {user}:",
-                        f"[{name}]({product['url']})"
+                        f"A new OneGov Cloud instance was started by "
+                        f"{user_name}:",
+                        f"[{name}]({product['url']})",
+                        f"Email: {user}",
+                        f"Phone: {phone_number}"
                     ))
                 )
             finally:
                 del request.browser_session['name']
                 del request.browser_session['user']
                 del request.browser_session['color']
+                del request.browser_session['phone_number']
+                del request.browser_session['user_name']
 
             if error:
                 return {

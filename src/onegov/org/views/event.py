@@ -280,6 +280,15 @@ def view_event(self, request, layout=None):
                         }
                     )
 
+                request.app.send_websocket(
+                    channel=request.app.websockets_private_channel,
+                    message={
+                        'event': 'browser-notification',
+                        'title': request.translate(_('New ticket')),
+                        'created': ticket.created.isoformat()
+                    }
+                )
+
                 if request.auto_accept(ticket):
                     try:
                         ticket.accept_ticket(request.auto_accept_user)

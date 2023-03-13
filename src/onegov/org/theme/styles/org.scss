@@ -444,8 +444,21 @@ del {
     Login page
 */
 #page-auth-login #content {
+
+    $first-color: #ffc56c;
+    $first-hover: darken($first-color, 10%);
+
     .alternatives {
         margin-top: 1.5rem;
+
+        input[type="submit"].button {
+            background: $first-color;
+            color: $body-font-color;
+
+            &:hover {
+                background: $first-hover;
+            }
+        }
     }
 
     h2 {
@@ -467,9 +480,6 @@ del {
     }
 
     .provider-login {
-        $first-color: #ffc56c;
-        $first-hover: darken($first-color, 10%);
-
         @for $i from 1 through 4 {
             a:nth-child(#{$i}) {
                 background: lighten($first-color, ($i - 1) * 5%);
@@ -2553,7 +2563,23 @@ $closed-ticket-icon: '\f05d';
 $all-ticket-icon: '\f055';
 $ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
+$ticket-notification-enabled-icon: '\f0f3';
+$ticket-notification-disabled-icon: '\f1f6';
 $archive-ticket-icon: '\f1c6';
+
+.ticket-notifications {
+    float: right;
+
+    &::before {
+        @include icon($ticket-notification-disabled-icon);
+    }
+
+    &.granted {
+        &::before {
+            @include icon($ticket-notification-enabled-icon);
+        }
+    }
+}
 
 .my-tickets::before {
     @include icon($my-ticket-icon);
@@ -4005,7 +4031,8 @@ ul.search-results {
         width: 20%;
     }
 
-    .fc-view-container, .reservation-list {
+    .fc-view-container,
+    .reservation-list {
         display: inline-block;
         float: left;
         width: 80%;
@@ -4021,7 +4048,8 @@ ul.search-results {
         }
     }
 
-    .fc-view-container, .reservation-list {
+    .fc-view-container,
+    .reservation-list {
         width: 75%;
     }
 }
@@ -4033,7 +4061,8 @@ ul.search-results {
         width: 100%;
     }
 
-    .fc-view-container, .reservation-list {
+    .fc-view-container,
+    .reservation-list {
         display: block;
         width: 100%;
     }
@@ -5062,7 +5091,7 @@ h2 + div.timeline {
     @include panel;
     @include smooth-edges;
 
-    padding: 1rem 1rem;
+    padding: 1rem;
 
     i.unpublished-hint::before {
         width: 2ex;
@@ -6161,6 +6190,10 @@ h2 + div.timeline {
 
     li {
         font-size: .9rem;
+
+        &.zero {
+            color: $base;
+        }
     }
 
     &.boardlet-warning {
@@ -6384,31 +6417,31 @@ a#results {
 
 .reservation-list {
 
-    position: relative;
-    margin-bottom: 1.5rem;
-    overflow-x: auto;
     /* HACK: Overflow clipping is broken in Chromium when scrolling
              for all the not-selected events due to the use of opacity
              and/or filter. So we use a filter on the container element
              to fix this. This is dumb, but this bug has been around for
              almost a decade and still hasn't been fixed... */
     filter: blur(0);
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    position: relative;
 
     table {
         margin-bottom: 0;
 
         tr {
+            scroll-margin-top: 7rem;  // sass-lint:disable-line no-misspelled-properties
             scroll-snap-margin-top: 7rem;
-            scroll-margin-top: 7rem;
         }
 
         th:first-child {
             background-color: #fff;
-            position: sticky;
             left: 0;
-            width: 0;
-            white-space: nowrap;
+            position: sticky;
             text-align: center;
+            white-space: nowrap;
+            width: 0;
             z-index: 1;
         }
 
@@ -6421,9 +6454,9 @@ a#results {
         }
 
         .event {
-            color: #fff;
             border: 0;
             border-radius: 2px;
+            color: #fff;
             margin-bottom: 2px;
             padding: 2px 4px;
             white-space: nowrap;
@@ -6433,7 +6466,6 @@ a#results {
             }
 
             &.selected {
-                cursor: default;
                 background-image: repeating-linear-gradient(
                     45deg,
                     rgba($steel, .25),
@@ -6441,27 +6473,28 @@ a#results {
                     rgba($iron, .25) 10px,
                     rgba($iron, .25) 20px
                 );
+                cursor: default;
             }
 
             &.not-selected:not(:hover) {
-                opacity: .75;
                 filter: grayscale(.75);
+                opacity: .75;
             }
         }
 
         .event-unavailable {
-            cursor: not-allowed;
             background-color: $red;
+            cursor: not-allowed;
         }
 
         .event-partly-available {
-            cursor: pointer;
             background-color: $orange;
+            cursor: pointer;
         }
 
         .event-available {
-            cursor: pointer;
             background-color: $green;
+            cursor: pointer;
         }
     }
 }
@@ -6490,6 +6523,7 @@ a#results {
     .toggle-topbar {
         left: 0;
         right: 0;
+
         span {
             color: #666 !important;
         }
@@ -6503,9 +6537,10 @@ a#results {
     #quicklinks-submenu {
         li {
             border-left: 1px solid $editbar-bg-color;
+
             a {
-                padding: .5rem;
                 color: #666;
+                padding: .5rem;
                 text-transform: none;
             }
         }

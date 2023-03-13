@@ -4,7 +4,7 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
@@ -399,16 +399,17 @@ def import_election_internal_proporz(
 
     result_uids = {r['entity_id']: r['id'] for r in results.values()}
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
+    list_uids['999'] = None
     session = object_session(election)
     # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())
-    session.bulk_insert_mappings(PanachageResult, (
+    session.bulk_insert_mappings(ListPanachageResult, (
         dict(
             id=uuid4(),
-            source=source,
-            target=str(list_uids[list_id]),
+            source_id=list_uids[source],
+            target_id=list_uids[list_id],
             votes=votes,
         )
         for list_id in panachage

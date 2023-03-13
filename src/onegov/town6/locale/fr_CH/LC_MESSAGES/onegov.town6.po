@@ -354,8 +354,10 @@ msgstr "Tous les ${days} jusqu'à ${end}"
 msgid "Import"
 msgstr "Imprimer"
 
-msgid "Create an event"
-msgstr "Saisir un événement"
+#.
+#. Used in sentence: "${event} published."
+msgid "Event"
+msgstr "Événement"
 
 msgid "This event can't be edited."
 msgstr "Cet événement ne peut pas être édité."
@@ -907,6 +909,9 @@ msgstr "Toutes les dates"
 msgid "No events found."
 msgstr "Aucun événement trouvé."
 
+msgid "Past events"
+msgstr "Événements passées"
+
 msgid "Learn more"
 msgstr "En savoir plus"
 
@@ -1452,10 +1457,6 @@ msgstr "Événement édité"
 msgid "${event} published."
 msgstr "${event} publié."
 
-#. Used in sentence: "${event} published."
-msgid "Event"
-msgstr "Événement"
-
 msgid "Event deleted."
 msgstr "Événement effacé."
 
@@ -1615,6 +1616,9 @@ msgstr "Étiquette"
 
 msgid "Date"
 msgstr "Date"
+
+msgid "Actions"
+msgstr "Actions"
 
 msgid "Export these events"
 msgstr "Exporter ces événements"
@@ -1947,6 +1951,13 @@ msgstr "Ajoutez un message a la demande."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Les nouveaux messages ont été désactivés car le ticket a été fermé."
 
+msgid ""
+"Enable notifications about new tickets. Only works when being logged in and "
+"having the browser with the site open."
+msgstr ""
+"Activez les notifications sur les nouveaux tickets. Ne fonctionne que "
+"lorsque l'on est connecté et que le navigateur avec le site est ouvert."
+
 msgid "Archive all selected tickets?"
 msgstr "Archiver tous les billets sélectionnés ?"
 
@@ -2096,20 +2107,3 @@ msgstr "Jours fériés"
 msgid "Link Migration"
 msgstr "Migration des liens"
 
-#~ msgid "Actions"
-#~ msgstr "Actions"
-
-#~ msgid "Submit your own event"
-#~ msgstr "Soumettez votre propre événement"
-
-#~ msgid "Functions"
-#~ msgstr "Fonctions"
-
-#~ msgid "Partner"
-#~ msgstr "Partenaire"
-
-#~ msgid "Ticket Settings"
-#~ msgstr "Paramètres tickets"
-
-#~ msgid "Newsletter Settings"
-#~ msgstr "Paramètres de la newsletter"

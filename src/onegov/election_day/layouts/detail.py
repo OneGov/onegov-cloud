@@ -45,9 +45,16 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     """
 
-    @cached_property
-    def use_websocket(self):
-        return self.model.date == date.today()
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        if self.model.date == date.today():
+            self.body_attributes = {
+                'data-websocket-endpoint': self.app.websockets_client_url(
+                    request
+                ),
+                'data-websocket-schema': self.app.schema
+            }
 
     @cached_property
     def has_results(self):

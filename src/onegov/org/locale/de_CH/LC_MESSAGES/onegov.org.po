@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-10 17:06+0100\n"
+"POT-Creation-Date: 2023-02-28 12:02+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -994,8 +994,8 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Function"
-msgstr "Funktion"
+msgid "Functions:"
+msgstr "Funktionen:"
 
 msgid "Direct Phone Number"
 msgstr "Direktnummer"
@@ -2144,9 +2144,6 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
-msgid "Past events"
-msgstr "Vergangene Veranstaltungen"
-
 msgid "Do you really want to delete this note?"
 msgstr "Möchten Sie diese Notiz wirklich löschen?"
 
@@ -2864,6 +2861,9 @@ msgstr "Wiederholungen"
 
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
+
+msgid "Past events"
+msgstr "Vergangene Veranstaltungen"
 
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
@@ -3855,6 +3855,13 @@ msgstr "Fügen Sie der Anfrage eine Nachricht hinzu."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
 
+msgid ""
+"Enable notifications about new tickets. Only works when being logged in and "
+"having the browser with the site open."
+msgstr ""
+"Benachrichtigungen über neue Tickets aktivieren. Funktioniert nur falls "
+"eingeloggt und solange der Browser mit der Website geöffnet ist."
+
 msgid "Archive all selected tickets?"
 msgstr "Alle ausgewählten Tickets archivieren?"
 
@@ -4105,10 +4112,11 @@ msgstr "Passwort zurücksetzen"
 
 #, python-format
 msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
+"A password reset link has been sent to ${email}, provided an active account "
+"exists for this email address."
 msgstr ""
-"Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
+"Eine E-Mail wurde an ${email} gesendet (sofern ein aktives Konto mit "
+"dieser E-Mail Adresse existiert)."
 
 msgid "Password changed."
 msgstr "Passwort geändert."
@@ -5134,12 +5142,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "Marker Type"
-#~ msgstr "Marker-Typ"
-
-#~ msgid "Numbers"
-#~ msgstr "Zahlen"
-
-#~ msgid "Mapbox (Default)"
-#~ msgstr "Mapbox (Standard)"
