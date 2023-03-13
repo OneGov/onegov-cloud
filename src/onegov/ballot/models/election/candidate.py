@@ -71,6 +71,13 @@ class Candidate(Base, TimestampMixin):
         lazy='dynamic',
     )
 
+    #: a (proporz) candidate contains votes from other other lists
+    panachage_results = relationship(
+        'CandidatePanachageResult',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+
     #: the total votes
     votes = summarized_property('votes')
 
