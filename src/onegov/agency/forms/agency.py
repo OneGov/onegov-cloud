@@ -178,7 +178,7 @@ class MoveAgencyForm(Form):
             # prevent selecting yourself as new parent
             if self.model.id == new_parent_id:
                 self.parent_id.errors.append(
-                    _("Invalid destination selected."))
+                    _("Invalid destination selected"))
                 return False
 
         return True
