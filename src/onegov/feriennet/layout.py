@@ -673,7 +673,7 @@ class BillingCollectionPaymentWithDate(DefaultLayout):
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(_("Billing"), self.request.link(self.model)),
-            Link(_("Payment with Date"), '#')
+            Link(_("Payment with date"), '#')
         )
 
 

@@ -136,4 +136,4 @@ def test_exports(client, scenario):
     assert len(items) == 1
     data = dict(items[0])
     assert len(data['Invoice Item References'].splitlines()) == 2
-    assert data['Invoice Item Payment Date'] == date(2020, 3, 5)
+    assert data['Invoice Item Payment date'] == date(2020, 3, 5)

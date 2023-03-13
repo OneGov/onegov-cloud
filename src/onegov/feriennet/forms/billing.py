@@ -151,6 +151,6 @@ class ManualBookingForm(Form):
 class PaymentWithDateForm(Form):
 
     payment_date = DateField(
-        label=_("Payment Date"),
+        label=_("Payment date"),
         validators=(InputRequired(), ),
     )

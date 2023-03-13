@@ -540,12 +540,10 @@ def view_paid_date_form(self, request, form):
 
     user = request.params['for-user']
 
-    lead = f'Mark paid with specific date for {user}'
-
     return {
         'layout': BillingCollectionPaymentWithDate(
             self, request),
         'title': _("Mark paid with specific date"),
-        'lead': _(lead),
+        'lead': _("Mark paid for ${user}", mapping={'user': user}),
         'form': form
     }
