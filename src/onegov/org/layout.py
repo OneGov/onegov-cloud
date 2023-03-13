@@ -2798,6 +2798,7 @@ class HomepageLayout(DefaultLayout):
                 Link(
                     _("Add"),
                     self.request.link(Editor('new-root', self.model, 'page')),
+                    attrs={'class': ('new-page')},
                     classes=(
                         'new-page',
                         'show-new-content-placeholder'
