@@ -71,7 +71,7 @@ def test_move_topics(client):
     page = page.form.submit()
     assert page.pyquery('.alert')
     assert page.pyquery('.error')
-    assert 'Invalid destination selected' in page
+    assert 'Ungültiger Zielort gewählt' in page
 
     # test moving topic to a child (which is invalid)
     page = client.get('/topics/topic-1')
@@ -81,7 +81,7 @@ def test_move_topics(client):
     page = page.form.submit()
     assert page.pyquery('.alert')
     assert page.pyquery('.error')
-    assert 'Invalid destination selected' in page
+    assert 'Ungültiger Zielort gewählt' in page
 
 
 def test_contact_info_visible(client):
