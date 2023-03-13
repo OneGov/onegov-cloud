@@ -55,8 +55,8 @@ def test_import_party_results_fixtures(session):
         ('07', {'de_CH': 'VERDA'}, total_votes, 0, 300),
     ]
 
-    assert election.panachage_results
-    for pana_r in election.panachage_results:
+    assert election.party_panachage_results
+    for pana_r in election.party_panachage_results:
         assert pana_r.votes == 0
 
 
@@ -160,7 +160,7 @@ def test_import_party_results(session):
         'P2': '#aabbee',
     }
     results = sorted([
-        (r.target, r.source, r.votes) for r in election.panachage_results
+        (r.target, r.source, r.votes) for r in election.party_panachage_results
     ])
     assert results == [
         ('1', '', 12),
@@ -199,7 +199,7 @@ def test_import_party_results(session):
         'drei_vier', 'eins.zwei'
     ]
     results = sorted([
-        (r.target, r.source, r.votes) for r in election.panachage_results
+        (r.target, r.source, r.votes) for r in election.party_panachage_results
     ])
     assert results == [
         ('drei_vier', '', 22),
@@ -534,7 +534,7 @@ def test_import_party_results_domains(session):
         ('district', 'ABC', {'No party results for year 2022'}, {}, 0),
     ):
         election.party_results.delete()
-        election.panachage_results.delete()
+        election.party_panachage_results.delete()
         errors = import_party_results(
             election,
             principal,
@@ -564,7 +564,7 @@ def test_import_party_results_domains(session):
         assert parties == {
             pr.domain: pr.domain_segment for pr in election.party_results
         }
-        assert election.panachage_results.count() == panachage
+        assert election.party_panachage_results.count() == panachage
 
     # Compound
     for domain, segment, result, parties, panachage in (
@@ -578,7 +578,7 @@ def test_import_party_results_domains(session):
         ('superregion', 'ABC', {'Invalid domain_segment: ABC'}, {}, 0),
     ):
         compound.party_results.delete()
-        compound.panachage_results.delete()
+        compound.party_panachage_results.delete()
         errors = import_party_results(
             compound,
             principal,
@@ -608,4 +608,4 @@ def test_import_party_results_domains(session):
         assert parties == {
             pr.domain: pr.domain_segment for pr in compound.party_results
         }
-        assert compound.panachage_results.count() == panachage
+        assert compound.party_panachage_results.count() == panachage

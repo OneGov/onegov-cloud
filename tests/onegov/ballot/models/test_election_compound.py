@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import date
 from datetime import datetime
 from decimal import Decimal
@@ -11,7 +12,8 @@ from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionCompoundAssociation
@@ -188,10 +190,10 @@ def proporz_election(
     election.results.append(election_result)
 
     list_1.panachage_results.append(
-        PanachageResult(source=list_2.list_id, votes=12)
+        ListPanachageResult(source_id=list_2.id, votes=12)
     )
     list_1.panachage_results.append(
-        PanachageResult(source='99', votes=4)
+        ListPanachageResult(source_id=None, votes=4)
     )
 
     return election
@@ -473,7 +475,7 @@ def test_election_compound_model(session):
     assert election_compound.has_party_results is True
 
     # Add panachage results
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_compound_id=election_compound.id,
         source='A',
         target='B',
@@ -481,7 +483,10 @@ def test_election_compound_model(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election_compound.panachage_results.one() == panachage_result
+    assert election_compound.party_panachage_results.one() == panachage_result
+    assert election_compound.has_party_panachage_results is False
+
+    panachage_result.votes = 10
     assert election_compound.has_party_panachage_results is True
 
     election_compound.last_result_change = election_compound.timestamp()
@@ -490,7 +495,7 @@ def test_election_compound_model(session):
     election_compound.clear_results()
     assert election_compound.last_result_change is None
     assert election_compound.party_results.first() is None
-    assert election_compound.panachage_results.first() is None
+    assert election_compound.party_panachage_results.first() is None
     assert session.query(Candidate).first() is None
     assert session.query(ElectionResult).first() is None
 
@@ -507,7 +512,7 @@ def test_election_compound_model(session):
     session.flush()
     assert election_compound.party_results.one() == party_result
 
-    panachage_result = PanachageResult(
+    panachage_result = PartyPanachageResult(
         election_compound_id=election_compound.id,
         source='A',
         target='B',
@@ -515,13 +520,13 @@ def test_election_compound_model(session):
     )
     session.add(panachage_result)
     session.flush()
-    assert election_compound.panachage_results.one() == panachage_result
+    assert election_compound.party_panachage_results.one() == panachage_result
 
     session.delete(election_compound)
     session.flush()
 
     assert session.query(PartyResult).first() is None
-    assert session.query(PanachageResult).first() is None
+    assert session.query(PartyPanachageResult).first() is None
 
 
 def test_election_compound_id_generation(session):
@@ -605,7 +610,7 @@ def test_election_compound_export(session):
     ).all()
     session.flush()
     export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
-    assert export[0] == {
+    assert export[0] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -644,8 +649,8 @@ def test_election_compound_export(session):
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
-    }
-    assert export[1] == {
+    })
+    assert export[1] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -684,13 +689,13 @@ def test_election_compound_export(session):
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520
-    }
+    })
 
     election_compound.elections = session.query(Election).all()
     session.flush()
     export = election_compound.export(['de_CH', 'fr_CH', 'it_CH'])
 
-    assert export[0] == {
+    assert export[0] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -738,10 +743,10 @@ def test_election_compound_export(session):
         'candidate_votes': 111,
         'list_panachage_votes_from_list_1': None,
         'list_panachage_votes_from_list_2': None,
-        'list_panachage_votes_from_list_99': None
-    }
+        'list_panachage_votes_from_list_999': None
+    })
 
-    assert export[1] == {
+    assert export[1] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -789,10 +794,10 @@ def test_election_compound_export(session):
         'candidate_votes': 520,
         'list_panachage_votes_from_list_1': None,
         'list_panachage_votes_from_list_2': 12,
-        'list_panachage_votes_from_list_99': 4
-    }
+        'list_panachage_votes_from_list_999': 4
+    })
 
-    assert export[2] == {
+    assert export[2] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -831,9 +836,9 @@ def test_election_compound_export(session):
         'candidate_gender': '',
         'candidate_year_of_birth': '',
         'candidate_votes': 111
-    }
+    })
 
-    assert export[3] == {
+    assert export[3] == OrderedDict({
         'compound_title_de_CH': 'Elections',
         'compound_title_fr_CH': '',
         'compound_title_it_CH': 'Elezioni',
@@ -872,7 +877,7 @@ def test_election_compound_export(session):
         'candidate_gender': 'male',
         'candidate_year_of_birth': 1970,
         'candidate_votes': 520
-    }
+    })
 
 
 def test_election_compound_export_parties(session):
@@ -1069,15 +1074,15 @@ def test_election_compound_export_parties(session):
 
     # Add panachage results
     for idx, source in enumerate(('5', '3', '0', '')):
-        election_compound.panachage_results.append(
-            PanachageResult(
+        election_compound.party_panachage_results.append(
+            PartyPanachageResult(
                 target='5',
                 source=source,
                 votes=idx + 1
             )
         )
-    election_compound.panachage_results.append(
-        PanachageResult(
+    election_compound.party_panachage_results.append(
+        PartyPanachageResult(
             target='3',
             source='5',
             votes=5,
@@ -1282,7 +1287,7 @@ def test_election_compound_rename(session):
         )
     )
     session.add(
-        PanachageResult(
+        PartyPanachageResult(
             election_compound_id=election_compound.id,
             source='A',
             target='B',
@@ -1299,7 +1304,7 @@ def test_election_compound_rename(session):
         PartyResult.election_compound_id
     ).distinct().all()
     assert ('x',) in session.query(
-        PanachageResult.election_compound_id
+        PartyPanachageResult.election_compound_id
     ).distinct().all()
 
     # Change
@@ -1315,7 +1320,7 @@ def test_election_compound_rename(session):
         PartyResult.election_compound_id
     ).distinct().all()
     assert ('y',) in session.query(
-        PanachageResult.election_compound_id
+        PartyPanachageResult.election_compound_id
     ).distinct().all()
 
 
