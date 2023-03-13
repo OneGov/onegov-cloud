@@ -662,6 +662,21 @@ class BillingCollectionManualBookingLayout(DefaultLayout):
         )
 
 
+class BillingCollectionPaymentWithDate(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Billing"), self.request.link(self.model)),
+            Link(_("Payment with Date"), '#')
+        )
+
+
 class InvoiceLayout(DefaultLayout):
 
     def __init__(self, model, request, title):

@@ -4,6 +4,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
 from sqlalchemy import func
 from wtforms.fields import BooleanField
+from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
 from wtforms.fields import SelectField
@@ -145,3 +146,11 @@ class ManualBookingForm(Form):
         self.username.choices = tuple(
             (u.username, u.realname) for u in self.available_usernames
         )
+
+
+class PaymentWithDateForm(Form):
+
+    payment_date = DateField(
+        label=_("Payment Date"),
+        validators=(InputRequired(), ),
+    )
