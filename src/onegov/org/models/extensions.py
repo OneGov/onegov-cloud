@@ -414,6 +414,7 @@ class PersonLinkExtension(ContentExtension):
                 label=request.translate(_("Function")),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
+                default=person.function or ""
             )
 
         return builder.form_class
