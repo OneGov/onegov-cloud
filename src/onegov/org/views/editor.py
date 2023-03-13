@@ -80,7 +80,7 @@ def handle_new_page(self, request, form, src=None, layout=None):
     }
 
 
-def handle_new_root_page(self, request, form, src=None, layout=None):
+def handle_new_root_page(self, request, form, layout=None):
     site_title = _("New Topic")
 
     if layout:
@@ -99,8 +99,8 @@ def handle_new_root_page(self, request, form, src=None, layout=None):
         request.success(_("Added a new topic"))
         return morepath.redirect(request.link(page))
 
-    if src:
-        form.process(obj=src)
+    if not request.POST:
+        form.process(obj=self.page)
 
     return {
         'layout': layout or EditorLayout(self, request, site_title),
