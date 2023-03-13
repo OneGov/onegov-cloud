@@ -131,9 +131,10 @@ def view_billing(self, request, form):
                 )
             )
 
-        yield mark_paid_with_date_link(details.title,
-                                       details.invoice_id.hex)
         yield manual_booking_link(details.first.username)
+        if not details.paid:
+            yield mark_paid_with_date_link(details.title,
+                                           details.invoice_id.hex)
 
         if details.disable_changes:
             traits = (
