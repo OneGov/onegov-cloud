@@ -1202,18 +1202,18 @@
                 is_visible (abs(current_page.page-page.page) < 4) or repeat.page.start or repeat.page.end;
             ">
                 <tal:block condition="repeat.page.start and previous">
-                    <li class="arrow">
-                        <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
+                    <li role="none" class="arrow">
+                        <a role="menuitem" href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
                     </li>
                 </tal:block>
 
-                <li tal:condition="is_visible" class="${'current' if is_current else ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
-                    <a href="${request.link(page)}">${page.page + 1}<span tal:condition="is_current" i18n:translate="" class="visually-hidden"> (active)</span></a>
+                <li tal:condition="is_visible" role="none" class="${'current' if is_current else ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
+                    <a role="menuitem" href="${request.link(page)}">${page.page + 1}<span tal:condition="is_current" i18n:translate="" class="visually-hidden"> (active)</span></a>
                 </li>
 
                 <tal:block condition="repeat.page.end and next">
-                    <li class="arrow">
-                        <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
+                    <li role="none" class="arrow">
+                        <a role="menuitem" href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
                     </li>
                 </tal:block>
             </tal:block>
