@@ -115,7 +115,7 @@ Nome|Descrizione
 `list_votes`|Numero di voti ricevuti da questa lista. Valido solo per elezioni basate sul sistema proporzionale.
 `list_connection`|L'identificato del collegamento della lista a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
 `list_connection_parent`|L'identificativo del collegamento della lista padre a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
-`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+`list_panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. Enthält keine Stimmen aus der eigenen Liste.
 `candidate_family_name`|Cognome del candidato.
 `candidate_first_name`|Nome del candidato.
 `candidate_id`|L'identificativo del candidato.
@@ -125,6 +125,7 @@ Nome|Descrizione
 `candidate_gender`|Il genere del/la candidato/a: `female` (femminile), `male` (maschile) oppure `undetermined` (altro). Facoltativo.
 `candidate_year_of_birth`|L'anno di nascita del/la candidato/a. Facoltativo.
 `candidate_votes`|Numero di voti ricevuti da questo candidato.
+`candidate_panachage_votes_from_list_{XX}`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 I comuni non ancora contati non sono inclusi.
 
