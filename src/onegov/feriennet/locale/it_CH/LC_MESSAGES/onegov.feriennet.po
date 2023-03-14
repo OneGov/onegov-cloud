@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-22 15:50+0100\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -326,7 +326,7 @@ msgstr "Voce di fattura testo"
 msgid "Invoice Item Paid"
 msgstr "Voce di fattura pagata"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Data di pagamento"
 
 msgid "Invoice Item Transaction ID"
@@ -485,6 +485,12 @@ msgstr "Organizzatore"
 
 msgid "Member"
 msgstr "Membro"
+
+msgid "Contacted"
+msgstr "Contatto"
+
+msgid "Confirmed"
+msgstr "Confermato"
 
 msgid "Invoice Items"
 msgstr "Voci fattura"
@@ -808,6 +814,9 @@ msgstr "Per un utente specifico"
 
 msgid "For users with tags"
 msgstr "Per gli utenti di una categoria specifica"
+
+msgid "Payment date"
+msgstr "Data di pagamento"
 
 msgid "My donation"
 msgstr "La mia donazionoe"
@@ -1460,6 +1469,9 @@ msgid "Manual bookings can only be added once the billing has been confirmed."
 msgstr ""
 "Le prenotazioni manuali possono essere create solo dopo la conferma della "
 "fatturazione."
+
+msgid "Payment with date"
+msgstr "Pagamento con data"
 
 msgid "Donation"
 msgstr "Donazione"
@@ -2358,12 +2370,6 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Contacted"
-msgstr "Contatto"
-
-msgid "Confirmed"
-msgstr "Confermato"
-
 msgid "Contact by e-mail"
 msgstr "Contattare per e-mail"
 
@@ -2549,6 +2555,9 @@ msgstr ""
 msgid "Add manual booking"
 msgstr "Aggiungere prenotazione manuale"
 
+msgid "Mark paid with specific date"
+msgstr "Contrassegnare il pagamento con una data specifica"
+
 msgid "Show invoice"
 msgstr "Mostra fattura"
 
@@ -2655,6 +2664,10 @@ msgstr "Non sono state create prenotazioni manualmente."
 #, python-format
 msgid "Created ${count} manual bookings"
 msgstr "${count} sono state create prenotazioni manualmente"
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Mark ha pagato per ${user}"
 
 msgid "Invite a companion"
 msgstr "Invitare gli amici"
