@@ -7,38 +7,38 @@ En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont accept
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Contenu](#contenu)   
-- 2. [Avant-propos](#avant-propos)   
-   - 2.1. [Entités](#entités)   
-   - 2.2. [Élections tacites](#élections-tacites)   
-   - 2.3. [Élections régionales](#élections-régionales)   
-- 3. [Formats](#formats)   
-   - 3.1. [Onegov](#onegov)   
-      - 3.1.1. [Colonnes](#colonnes)   
-      - 3.1.2. [Résultats du panachage de listes](#résultats-du-panachage-de-listes)   
-      - 3.1.3. [Résultats temporaires](#résultats-temporaires)   
-      - 3.1.4. [Composantes des élections](#composantes-des-élections)   
-      - 3.1.5. [Modèle](#modèle)   
-   - 3.2. [Wabsti Majorz](#wabsti-majorz)   
-      - 3.2.1. [Exportation des données de colonnes](#exportation-des-données-de-colonnes)   
-      - 3.2.2. [Résultats des candidats de colonnes](#résultats-des-candidats-de-colonnes)   
-      - 3.2.3. [Résultats temporaires](#résultats-temporaires)   
-      - 3.2.4. [Modèles](#modèles)   
-   - 3.3. [Wabsti Proporz](#wabsti-proporz)   
-      - 3.3.1. [Exportation des données de résultats pour les colonnes](#exportation-des-données-de-résultats-pour-les-colonnes)   
-      - 3.3.2. [Résultats du panachage](#résultats-du-panachage)   
-      - 3.3.3. [Exportation des données de statistiques pour les colonnes](#exportation-des-données-de-statistiques-pour-les-colonnes)   
-      - 3.3.4. [Connexions de liste des colonnes](#connexions-de-liste-des-colonnes)   
-      - 3.3.5. [Résultats de candidats des colonnes](#résultats-de-candidats-des-colonnes)   
-      - 3.3.6. [Résultats temporaires](#résultats-temporaires)   
-      - 3.3.7. [Modèles](#modèles)   
-   - 3.4. [WabstiCExport Majorz](#wabsticexport-majorz)   
-   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)   
-   - 3.6. [Résultats du parti](#résultats-du-parti)   
-      - 3.6.1. [Domaine d'influence](#domaine-dinfluence)   
-      - 3.6.2. [Résultats du panachage](#résultats-du-panachage)   
-      - 3.6.3. [Modèles](#modèles)   
-   - 3.7. [Création automatique des composantes des élections](#création-automatique-des-composantes-des-élections)   
+- 1. [Contenu](#contenu)
+- 2. [Avant-propos](#avant-propos)
+   - 2.1. [Entités](#entités)
+   - 2.2. [Élections tacites](#élections-tacites)
+   - 2.3. [Élections régionales](#élections-régionales)
+- 3. [Formats](#formats)
+   - 3.1. [Onegov](#onegov)
+      - 3.1.1. [Colonnes](#colonnes)
+      - 3.1.2. [Résultats du panachage de listes](#résultats-du-panachage-de-listes)
+      - 3.1.3. [Résultats temporaires](#résultats-temporaires)
+      - 3.1.4. [Composantes des élections](#composantes-des-élections)
+      - 3.1.5. [Modèle](#modèle)
+   - 3.2. [Wabsti Majorz](#wabsti-majorz)
+      - 3.2.1. [Exportation des données de colonnes](#exportation-des-données-de-colonnes)
+      - 3.2.2. [Résultats des candidats de colonnes](#résultats-des-candidats-de-colonnes)
+      - 3.2.3. [Résultats temporaires](#résultats-temporaires)
+      - 3.2.4. [Modèles](#modèles)
+   - 3.3. [Wabsti Proporz](#wabsti-proporz)
+      - 3.3.1. [Exportation des données de résultats pour les colonnes](#exportation-des-données-de-résultats-pour-les-colonnes)
+      - 3.3.2. [Résultats du panachage](#résultats-du-panachage)
+      - 3.3.3. [Exportation des données de statistiques pour les colonnes](#exportation-des-données-de-statistiques-pour-les-colonnes)
+      - 3.3.4. [Connexions de liste des colonnes](#connexions-de-liste-des-colonnes)
+      - 3.3.5. [Résultats de candidats des colonnes](#résultats-de-candidats-des-colonnes)
+      - 3.3.6. [Résultats temporaires](#résultats-temporaires)
+      - 3.3.7. [Modèles](#modèles)
+   - 3.4. [WabstiCExport Majorz](#wabsticexport-majorz)
+   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)
+   - 3.6. [Résultats du parti](#résultats-du-parti)
+      - 3.6.1. [Domaine d'influence](#domaine-dinfluence)
+      - 3.6.2. [Résultats du panachage](#résultats-du-panachage)
+      - 3.6.3. [Modèles](#modèles)
+   - 3.7. [Création automatique des composantes des élections](#création-automatique-des-composantes-des-élections)
 
 <!-- /MDTOC -->
 
@@ -102,7 +102,16 @@ Les résultats sont susceptibles de contenir les résultats du panachage de list
 
 Nom|Description
 ---|---
-`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide. Les votes de la liste propre sont ignorés.
+
+#### Résultats du panachage de candidats
+
+Les résultats sont susceptibles de contenir les résultats du panachage des candidats, ce qui suppose une colonne supplémentaire par liste :
+
+Nom|Description
+---|---
+`candidate_panachage_votes_from_list_{XX}`|Le nombre de votes que ce candidat a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+
 
 #### Résultats temporaires
 

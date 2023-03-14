@@ -7,38 +7,38 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezion
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
-- [Specifica Formato Elezioni](#specifica-formato-elezioni)   
-   - [Contenuto](#contenuto)   
-   - [Prefazione](#prefazione)   
-      - [Enti](#enti)   
-      - [Elezioni tacite](#elezioni-tacite)   
-      - [Elezioni regionali](#elezioni-regionali)   
-   - [Formati](#formati)   
-      - [Onegov](#onegov)   
-         - [Colonne](#colonne)   
-         - [Risultati panachage della lista](#risultati-panachage-della-lista)   
-         - [Risultati temporanei](#risultati-temporanei)   
-         - [Componenti delle elezioni](#componenti-delle-elezioni)   
-         - [Modello](#modello)   
-      - [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)   
-         - [Esportazione delle colonne dati](#esportazione-delle-colonne-dati)   
-         - [Colonne risultati candidati](#colonne-risultati-candidati)   
-         - [Risultati temporanei](#risultati-temporanei)   
-         - [Modelli](#modelli)   
-      - [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)   
-         - [Colonne esportazione dei dati dei risultati](#colonne-esportazione-dei-dati-dei-risultati)   
-         - [Risultati panachage](#risultati-panachage)   
-         - [Colonne esportazione di dati di statistica](#colonne-esportazione-di-dati-di-statistica)   
-         - [Colonne apparentamenti delle liste](#colonne-apparentamenti-delle-liste)   
-         - [Colonne risultati candidati](#colonne-risultati-candidati)   
-         - [Risultati temporanei](#risultati-temporanei)   
-         - [Modelli](#modelli)   
-      - [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)   
-      - [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)   
-      - [Risultati dei partiti](#risultati-dei-partiti)   
-         - [Circondario](#circondario)   
-         - [Risultati panachage](#risultati-panachage)   
-         - [Modelli](#modelli)   
+- [Specifica Formato Elezioni](#specifica-formato-elezioni)
+   - [Contenuto](#contenuto)
+   - [Prefazione](#prefazione)
+      - [Enti](#enti)
+      - [Elezioni tacite](#elezioni-tacite)
+      - [Elezioni regionali](#elezioni-regionali)
+   - [Formati](#formati)
+      - [Onegov](#onegov)
+         - [Colonne](#colonne)
+         - [Risultati panachage della lista](#risultati-panachage-della-lista)
+         - [Risultati temporanei](#risultati-temporanei)
+         - [Componenti delle elezioni](#componenti-delle-elezioni)
+         - [Modello](#modello)
+      - [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
+         - [Esportazione delle colonne dati](#esportazione-delle-colonne-dati)
+         - [Colonne risultati candidati](#colonne-risultati-candidati)
+         - [Risultati temporanei](#risultati-temporanei)
+         - [Modelli](#modelli)
+      - [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
+         - [Colonne esportazione dei dati dei risultati](#colonne-esportazione-dei-dati-dei-risultati)
+         - [Risultati panachage](#risultati-panachage)
+         - [Colonne esportazione di dati di statistica](#colonne-esportazione-di-dati-di-statistica)
+         - [Colonne apparentamenti delle liste](#colonne-apparentamenti-delle-liste)
+         - [Colonne risultati candidati](#colonne-risultati-candidati)
+         - [Risultati temporanei](#risultati-temporanei)
+         - [Modelli](#modelli)
+      - [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
+      - [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
+      - [Risultati dei partiti](#risultati-dei-partiti)
+         - [Circondario](#circondario)
+         - [Risultati panachage](#risultati-panachage)
+         - [Modelli](#modelli)
 
 <!-- /MDTOC -->
 
@@ -102,7 +102,16 @@ I risultati possono contenere dei risultati di panachage della lista aggiungendo
 
 Nome|Descrizione
 ---|---
-`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota. Stimmen aus der eigenen Liste werden ignoriert.
+
+
+#### Kandidierendenpanaschierdaten
+
+Die Resultate können Kandidierendenpanaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
+
+Nome|Descrizione
+---|---
+`candidate_panachage_votes_from_list_{XX}`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
 
 #### Risultati temporanei
 

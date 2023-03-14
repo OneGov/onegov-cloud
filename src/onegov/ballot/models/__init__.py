@@ -8,6 +8,7 @@ See:
 
 """
 from onegov.ballot.models.election import Candidate
+from onegov.ballot.models.election import CandidatePanachageResult
 from onegov.ballot.models.election import CandidateResult
 from onegov.ballot.models.election import Election
 from onegov.ballot.models.election import ElectionRelationship
@@ -32,6 +33,7 @@ __all__ = [
     'Ballot',
     'BallotResult',
     'Candidate',
+    'CandidatePanachageResult',
     'CandidateResult',
     'ComplexVote',
     'Election',
