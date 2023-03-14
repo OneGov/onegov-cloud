@@ -363,9 +363,10 @@ class ProporzElection(
             row['candidate_gender'] = result.gender or ''
             row['candidate_year_of_birth'] = result.year_of_birth or ''
             row['candidate_votes'] = result.votes
-            for id_ in sorted(list_ids.values()):
-                key = f'list_panachage_votes_from_list_{id_}'
-                row[key] = list_panachage.get(result.list_id, {}).get(id_)
+            if list_panachage:
+                for id_ in sorted(list_ids.values()):
+                    key = f'list_panachage_votes_from_list_{id_}'
+                    row[key] = list_panachage.get(result.list_id, {}).get(id_)
             if candidate_panachage:
                 for id_ in sorted(list_ids.values()):
                     key = f'candidate_panachage_votes_from_list_{id_}'
