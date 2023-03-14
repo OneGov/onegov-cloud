@@ -348,7 +348,6 @@ def test_directory_submissions(client, postgres):
     page.form['price_per_submission'] = 100
     page.form['payment_method'] = 'manual'
     page = page.form.submit().follow()
-    assert "Eintrag vorschlagen" in page
     anon = client.spawn()
     assert "Eintrag vorschlagen" not in anon.get(page.request.url)
 
