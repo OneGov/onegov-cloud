@@ -469,3 +469,32 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
 
     browser.visit(f"/person/{person.id.hex}")
     browser.find_by_text('All About Berry: Logician')
+
+
+def test_quadratic_crop_on_image_upload(browser, client):
+    browser.login_admin()
+    client.login_admin()
+
+    path = module_path('tests.onegov.org', 'fixtures/bach.jpg')
+
+    browser.visit('/people/new')
+    browser.find_by_value("Person")
+    browser.fill_form({
+        'first_name': 'Johann',
+        'last_name': 'Bach',
+    })
+    # upload the file
+    browser.find_by_css('.button.secondary.postfix').click()
+    browser.drop_file('#redactor-droparea', path)
+    browser.find_by_value("Absenden").click()
+    browser.find_by_text("Eine neue Person wurde hinzugefügt")
+
+    person = client.app.session().query(Person)\
+        .filter(Person.last_name == 'Bach')\
+        .one()
+
+    assert person.first_name == 'Johann'
+    assert person.last_name == 'Bach'
+
+    # this kind of gets implicitly set after the form has been submitted:
+    assert person.quadratic_picture_url is not None

@@ -34,6 +34,13 @@ def add_notes_column(context):
         'people', Column('notes', Text, nullable=True))
 
 
+@upgrade_task('Add quadratic picture url')
+def add_person_quadratic_picture_url_column(context):
+    if not context.has_column('people', 'quadratic_picture_url'):
+        context.operations.add_column(
+            'people', Column('quadratic_picture_url', Text, nullable=True))
+
+
 @upgrade_task('Add person type column')
 def add_person_type_column(context):
     if not context.has_column('people', 'type'):

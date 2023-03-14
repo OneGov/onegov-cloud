@@ -93,6 +93,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: an URL leading to a picture of the person
     picture_url = Column(Text, nullable=True)
 
+    #: Like picture_url, but with a 1:1 aspect ratio
+    quadratic_picture_url = Column(Text, nullable=True)
+
     #: the email of the person
     email = Column(Text, nullable=True)
 

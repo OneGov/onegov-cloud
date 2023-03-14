@@ -6,9 +6,11 @@ from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.layout import PersonLayout, PersonCollectionLayout
-from onegov.org.models import AtoZ, Topic
+from onegov.org.models import AtoZ, Topic, ImageFileCollection
+from onegov.org.path import get_file_for_org
 from onegov.people import Person, PersonCollection
 from markupsafe import Markup
+from onegov.people.portrait_crop import crop_to_portrait_with_face_detection
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
@@ -91,9 +93,29 @@ def person_functions_by_organization(subject, pages, request):
 def handle_new_person(self, request, form, layout=None):
 
     if form.submitted(request):
+        form_data = form.get_useful_data()
         person = self.add(**form.get_useful_data())
-        request.success(_("Added a new person"))
+        picture_url = form_data['picture_url']
+        if picture_url:
+            picture_id = picture_url.rsplit('/', 1)[-1]
+            f = get_file_for_org(request, request.app, picture_id)
+            actual_profile_image = request.app.bound_depot.get(
+                f.reference.file_id
+            )
+            quadratic_image: bytes = crop_to_portrait_with_face_detection(
+                actual_profile_image._file_path
+            )
+            try:
+                file = ImageFileCollection(request.session).add(
+                    filename=f"quadratic_{actual_profile_image.filename}",
+                    content=quadratic_image
+                )
+                person.quadratic_picture_url = request.link(file)
+                form.populate_obj(person)
+            except FileExistsError:
+                form.populate_obj(person)
 
+        request.success(_("Added a new person"))
         return morepath.redirect(request.link(person))
 
     layout = layout or PersonCollectionLayout(self, request)
@@ -110,7 +132,6 @@ def handle_new_person(self, request, form, layout=None):
 @OrgApp.form(model=Person, name='edit', template='form.pt',
              permission=Private, form=PersonForm)
 def handle_edit_person(self, request, form, layout=None):
-
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
