@@ -370,6 +370,7 @@ def test_import_internal_proporz_invalid_values(session):
     assert errors == [
         (2, 'Invalid integer: candidate_votes'),
         (2, 'Invalid integer: entity_id'),
+        (2, 'Invalid integer: entity_id'),
         (2, 'Invalid integer: list_votes'),
         (2, 'Invalid status'),
         (2, 'Not an alphanumeric: list_id'),
