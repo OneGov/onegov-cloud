@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-28 12:02+0100\n"
+"POT-Creation-Date: 2023-03-13 12:46+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -994,8 +994,8 @@ msgstr "Prénom"
 msgid "Last name"
 msgstr "Nom de famille"
 
-msgid "Functions:"
-msgstr "Fonctions:"
+msgid "Function"
+msgstr "Fonction"
 
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
@@ -1676,13 +1676,6 @@ msgstr "Mensuel (le premier lundi du mois)"
 
 msgid "Never"
 msgstr "Jamais"
-
-msgid "1 entry"
-msgstr "1 entrée"
-
-#, python-format
-msgid "${count} entries"
-msgstr "${count} entrées"
 
 msgid "All directories"
 msgstr "Tous les dossiers"
@@ -2741,6 +2734,9 @@ msgstr "Erreurs"
 msgid "Duration [s]"
 msgstr "Durée [s]"
 
+msgid "Alternatives"
+msgstr "Alternatives"
+
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
 
@@ -2752,9 +2748,6 @@ msgstr "Avez-vous oublié votre mot de passe ?"
 
 msgid "Reset password"
 msgstr "Réinitialisez le mot de passe"
-
-msgid "Alternatives"
-msgstr "Alternatives"
 
 msgid "You are here"
 msgstr "Vous êtes ici"
@@ -4118,8 +4111,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, "
-"pour peu qu'un compte actif existe pour cette adresse e-mail."
+"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, pour "
+"peu qu'un compte actif existe pour cette adresse e-mail."
 
 msgid "Password changed."
 msgstr "Mot de passe modifié."
@@ -5145,3 +5138,11 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+
+#~ msgid "1 entry"
+#~ msgstr "1 entrée"
+
+#, python-format
+#~ msgid "${count} entries"
+#~ msgstr "${count} entrées"
