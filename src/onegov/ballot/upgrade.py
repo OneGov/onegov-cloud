@@ -802,3 +802,9 @@ def add_type_election_relationships(context):
                 'election_relationships',
                 Column('type', Text(), nullable=True)
             )
+
+
+@upgrade_task('Remove old panachage results')
+def remove_old_panachage_results(context):
+    if context.has_table('panachage_results'):
+        context.operations.drop_table('panachage_results')
