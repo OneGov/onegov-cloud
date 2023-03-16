@@ -63,7 +63,11 @@ def view_election_list_by_district(self, request):
         'options': options,
         'map_type': 'districts',
         'data_url': data_url,
-        'embed_source': request.link(self, name='list-by-district-chart')
+        'embed_source': request.link(
+            self,
+            name='list-by-district-chart',
+            query_params={'locale': request.locale}
+        )
     }
 
 

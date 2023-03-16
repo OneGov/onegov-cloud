@@ -106,7 +106,13 @@ def view_vote_statistics_table_proposal(self, request):
 
     ballot = getattr(self, 'proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='statistics-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='statistics-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -122,7 +128,13 @@ def view_vote_statistics_table_counter_proposal(self, request):
 
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='statistics-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='statistics-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -138,6 +150,12 @@ def view_vote_statistics_table_tie_breaker(self, request):
 
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
-        return redirect(request.link(ballot, name='statistics-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='statistics-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
