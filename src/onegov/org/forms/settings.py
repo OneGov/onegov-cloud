@@ -622,7 +622,7 @@ class ModuleSettingsForm(Form):
             ('parliamentary_group', _("Parliamentary Group")),
             ('email', _("E-Mail")),
             ('phone', _("Phone")),
-            ('phone_direct', _("Direct Phone Number")),
+            ('phone_direct', _("Direct Phone Number / Mobile")),
             ('website', _("Website")),
             ('address', _("Address")),
             ('notes', _("Notes")),

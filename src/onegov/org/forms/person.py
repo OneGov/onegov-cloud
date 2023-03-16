@@ -20,7 +20,7 @@ class PersonForm(Form):
 
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))
-    phone_direct = StringField(_("Direct Phone Number"))
+    phone_direct = StringField(_("Direct Phone Number / Mobile"))
     born = StringField(_("Born"))
     profession = StringField(_("Profession"))
     political_party = StringField(_("Political Party"))

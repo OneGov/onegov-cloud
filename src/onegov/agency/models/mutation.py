@@ -72,7 +72,7 @@ class PersonMutation(Mutation):
             'function': _("Function"),
             'email': _("E-Mail"),
             'phone': _("Phone"),
-            'phone_direct': _("Direct Phone Number"),
+            'phone_direct': _("Direct Phone Number / Mobile"),
             'born': _("Born"),
             'profession': _("Profession"),
             'political_party': _("Political Party"),

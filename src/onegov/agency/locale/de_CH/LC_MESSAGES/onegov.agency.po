@@ -165,8 +165,8 @@ msgstr "Funktion"
 msgid "Phone"
 msgstr "Telefon"
 
-msgid "Direct Phone Number"
-msgstr "Direktnummer"
+msgid "Direct Phone Number / Mobile"
+msgstr "Direktnummer / Mobil"
 
 msgid "Born"
 msgstr "Jahrgang"

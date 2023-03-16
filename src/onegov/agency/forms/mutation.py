@@ -113,7 +113,7 @@ class PersonMutationForm(MutationForm):
 
     phone_direct = StringField(
         fieldset=_("Proposed changes"),
-        label=_("Direct Phone Number")
+        label=_("Direct Phone Number / Mobile")
     )
 
     born = StringField(
