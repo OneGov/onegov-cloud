@@ -26,7 +26,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
-from onegov.org.models import ExportCollection
+from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
@@ -682,7 +682,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
 
 
 class AdjacencyListMixin:
-    """ Provides layouts for for models inheriting from
+    """ Provides layouts for models inheriting from
         :class:`onegov.core.orm.abstract.AdjacencyList`
     """
 
@@ -694,13 +694,13 @@ class AdjacencyListMixin:
 
     def get_breadcrumbs(self, item):
         """ Yields the breadcrumbs for the given adjacency list item. """
-
         yield Link(_("Homepage"), self.homepage_url)
 
-        for ancestor in item.ancestors:
-            yield Link(ancestor.title, self.request.link(ancestor))
+        if item:
+            for ancestor in item.ancestors:
+                yield Link(ancestor.title, self.request.link(ancestor))
 
-        yield Link(item.title, self.request.link(item))
+            yield Link(item.title, self.request.link(item))
 
     def get_sidebar(self, type=None):
         """ Yields the sidebar for the given adjacency list item. """
@@ -2794,7 +2794,16 @@ class HomepageLayout(DefaultLayout):
                     _("Sort"),
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
-                )
+                ),
+                Link(
+                    _("Add"),
+                    self.request.link(Editor('new-root', self.model, 'page')),
+                    attrs={'class': ('new-page')},
+                    classes=(
+                        'new-page',
+                        'show-new-content-placeholder'
+                    ),
+                ),
             ]
 
     @cached_property
