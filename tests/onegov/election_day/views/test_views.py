@@ -37,17 +37,12 @@ def test_i18n(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    homepage = client.get('/')
-    assert "Foo" in homepage
-
-    homepage = homepage.click('Français').follow()
-    assert "Bar" in homepage
-
-    homepage = homepage.click('Italiano').follow()
-    assert "Baz" in homepage
-
-    homepage = homepage.click('Rumantsch').follow()
-    assert "Qux" in homepage
+    assert "Foo" in client.get('/')
+    assert "Baz" in client.get('/?locale=it_CH')
+    assert "Foo" in client.get('/?locale=en_US')
+    assert "Bar" in client.get('/').click('Français').follow()
+    assert "Baz" in client.get('/').click('Italiano').follow()
+    assert "Qux" in client.get('/').click('Rumantsch').follow()
 
     new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Tick'
@@ -60,17 +55,12 @@ def test_i18n(election_day_app_zg):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    homepage = client.get('/')
-    assert "Quack" in homepage
-
-    homepage = homepage.click('Français').follow()
-    assert "Trick" in homepage
-
-    homepage = homepage.click('Italiano').follow()
-    assert "Track" in homepage
-
-    homepage = homepage.click('Deutsch').follow()
-    assert "Tick" in homepage
+    assert "Quack" in client.get('/')
+    assert "Track" in client.get('/?locale=it_CH')
+    assert "Quack" in client.get('/?locale=en_US')
+    assert "Trick" in client.get('/').click('Français').follow()
+    assert "Track" in client.get('/').click('Italiano').follow()
+    assert "Tick" in client.get('/').click('Deutsch').follow()
 
 
 def test_cache_control(election_day_app_zg):

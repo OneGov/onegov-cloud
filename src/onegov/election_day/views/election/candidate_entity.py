@@ -65,7 +65,11 @@ def view_election_candidate_by_entity(self, request):
         'options': options,
         'map_type': 'entities',
         'data_url': data_url,
-        'embed_source': request.link(self, name='candidate-by-entity-chart'),
+        'embed_source': request.link(
+            self,
+            name='candidate-by-entity-chart',
+            query_params={'locale': request.locale}
+        ),
         'hide_percentages': hide_candidate_entity_map_percentages(request)
     }
 

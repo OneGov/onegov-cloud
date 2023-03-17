@@ -94,7 +94,13 @@ def view_vote_districts_map_proposal(self, request):
 
     ballot = getattr(self, 'proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='districts-map'))
+        return redirect(
+            request.link(
+                ballot,
+                name='districts-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -110,7 +116,13 @@ def view_vote_districts_map_counter_proposal(self, request):
 
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='districts-map'))
+        return redirect(
+            request.link(
+                ballot,
+                name='districts-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -126,7 +138,13 @@ def view_vote_districts_map_tie_breaker(self, request):
 
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
-        return redirect(request.link(ballot, name='districts-map'))
+        return redirect(
+            request.link(
+                ballot,
+                name='districts-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -165,7 +183,13 @@ def view_vote_districts_table_proposal(self, request):
 
     ballot = getattr(self, 'proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='districts-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='districts-table',
+                query_params=request.params,
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -181,7 +205,13 @@ def view_vote_districts_table_counter_proposal(self, request):
 
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='districts-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='districts-table',
+                query_params=request.params,
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -197,7 +227,13 @@ def view_vote_districts_table_tie_breaker(self, request):
 
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
-        return redirect(request.link(ballot, name='districts-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='districts-table',
+                query_params=request.params,
+            )
+        )
 
     raise HTTPNotFound()
 

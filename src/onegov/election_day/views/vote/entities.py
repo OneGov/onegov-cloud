@@ -94,7 +94,13 @@ def view_vote_entities_map_proposal(self, request):
 
     ballot = getattr(self, 'proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-map'))
+        return redirect(
+            request.link(
+                ballot,
+                name='entities-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -110,7 +116,13 @@ def view_vote_entities_map_counter_proposal(self, request):
 
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-map'))
+        return redirect(
+            request.link(
+                ballot,
+                name='entities-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -126,7 +138,13 @@ def view_vote_entities_map_tie_breaker(self, request):
 
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-map'))
+        return redirect(
+            request.link(
+                ballot,
+                name='entities-map',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -157,6 +175,16 @@ def view_ballot_entities_as_map(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.vote.last_modified)
 
+    locale = request.params.get('locale')
+    if locale in request.app.locales:
+        request.locale = locale
+
+    # def translate(text):
+    #     if locale in request.app.locales:
+    #         translator = request.app.translations.get(locale)
+    #         return text.interpolate(translator.gettext(text))
+    #     return text
+
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
@@ -185,6 +213,10 @@ def view_ballot_as_table(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.vote.last_modified)
 
+    locale = request.params.get('locale')
+    if locale in request.app.locales:
+        request.locale = locale
+
     return {
         'ballot': self,
         'layout': VoteLayout(self.vote, request, f'{self.type}-entities'),
@@ -205,7 +237,13 @@ def view_vote_entities_table_proposal(self, request):
 
     ballot = getattr(self, 'proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='entities-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -221,7 +259,13 @@ def view_vote_entities_table_counter_proposal(self, request):
 
     ballot = getattr(self, 'counter_proposal', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='entities-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
@@ -237,7 +281,13 @@ def view_vote_entities_table_tie_breaker(self, request):
 
     ballot = getattr(self, 'tie_breaker', None)
     if ballot:
-        return redirect(request.link(ballot, name='entities-table'))
+        return redirect(
+            request.link(
+                ballot,
+                name='entities-table',
+                query_params=request.params
+            )
+        )
 
     raise HTTPNotFound()
 
