@@ -7,6 +7,7 @@ from onegov.ballot.collections import VoteCollection
 from onegov.ballot.models import Ballot
 from onegov.ballot.models import BallotResult
 from onegov.ballot.models import Candidate
+from onegov.ballot.models import CandidatePanachageResult
 from onegov.ballot.models import CandidateResult
 from onegov.ballot.models import ComplexVote
 from onegov.ballot.models import Election
@@ -31,6 +32,7 @@ __all__ = [
     'BallotResult',
     'Candidate',
     'CandidateCollection',
+    'CandidatePanachageResult',
     'CandidateResult',
     'ComplexVote',
     'Election',

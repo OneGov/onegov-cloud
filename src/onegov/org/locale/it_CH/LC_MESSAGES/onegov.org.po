@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-02-28 12:02+0100\n"
+"POT-Creation-Date: 2023-03-13 12:46+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -998,8 +998,8 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Functions:"
-msgstr "Funzioni:"
+msgid "Function"
+msgstr "Funzione"
 
 msgid "Direct Phone Number"
 msgstr "Numero di telefono diretto"
@@ -1684,13 +1684,6 @@ msgstr "Mensile (il primo lunedì del mese)"
 
 msgid "Never"
 msgstr "Mai"
-
-msgid "1 entry"
-msgstr "1 elemento"
-
-#, python-format
-msgid "${count} entries"
-msgstr "${count} elementi"
 
 msgid "All directories"
 msgstr "Tutte le cartelle"
@@ -2759,6 +2752,9 @@ msgstr "Errori"
 msgid "Duration [s]"
 msgstr "Durata [s]"
 
+msgid "Alternatives"
+msgstr "Alternative"
+
 msgid "Don't have an account yet?"
 msgstr "Non hai ancora un account?"
 
@@ -2770,9 +2766,6 @@ msgstr "Hai dimenticato la password?"
 
 msgid "Reset password"
 msgstr "Reimposta la password"
-
-msgid "Alternatives"
-msgstr "Alternative"
 
 msgid "You are here"
 msgstr "Ti trovi qui"
@@ -4128,7 +4121,7 @@ msgid ""
 "exists for this email address."
 msgstr ""
 "Il collegamento per reimpostare la password è stato inviato all'indirizzo "
-"${email} (se si tratta di un account attivo esistente).
+"${email} (se si tratta di un account attivo esistente)."
 
 msgid "Password changed."
 msgstr "Password modificata."
@@ -5158,3 +5151,11 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+
+#~ msgid "1 entry"
+#~ msgstr "1 elemento"
+
+#, python-format
+#~ msgid "${count} entries"
+#~ msgstr "${count} elementi"

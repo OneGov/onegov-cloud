@@ -88,3 +88,23 @@ def test_homepage(client):
     client.app.org.disable_chat = True
     transaction.commit()
     assert not client.get('/').pyquery('.chat')
+
+
+def test_add_new_root_topic(client):
+    # ensure a root page can be added once admin is logged-in
+    client.login_admin().follow()
+
+    page = client.get('/')
+    assert "Hinzufügen" in page
+
+    page = page.click('Hinzufügen')
+    page.form['title'] = 'Super Thema'
+    page = page.form.submit().follow()
+    assert page.status_code == 200
+    assert 'Das neue Thema wurde hinzugefügt' in page
+    assert page.pyquery('.callout')
+    assert page.pyquery('.success')
+
+    page = client.get('/topics/super-thema')
+    assert page.status_code == 200
+    assert 'Super Thema' in page

@@ -63,7 +63,11 @@ def view_election_list_by_entity(self, request):
         'options': options,
         'map_type': 'entities',
         'data_url': data_url,
-        'embed_source': request.link(self, name='list-by-entity-chart')
+        'embed_source': request.link(
+            self,
+            name='list-by-entity-chart',
+            query_params={'locale': request.locale}
+        )
     }
 
 

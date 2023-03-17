@@ -2,8 +2,10 @@ import time
 import json
 import pytest
 
+from datetime import timedelta
 from psycopg2.extras import NumericRange
 from pytest import mark
+from sedate import as_datetime, replace_timezone
 
 
 @mark.flaky(reruns=3)
@@ -334,9 +336,10 @@ def test_volunteers_export(browser, scenario, to_volunteer_state):
 
     volunteer_export = json.loads(browser.find_by_tag('pre').text)[0]
 
-    occasion_date = scenario.date_offset(10)
-    start_time = occasion_date.strftime('%Y-%m-%dT00:00:00+01:00')
-    end_time = occasion_date.strftime('%Y-%m-%dT01:00:00+01:00')
+    occasion_date = as_datetime(scenario.date_offset(10))
+    occasion_date = replace_timezone(occasion_date, 'Europe/Zurich')
+    start_time = occasion_date.isoformat()
+    end_time = (occasion_date + timedelta(hours=1)).isoformat()
 
     def get_number_of_confirmed_volunteers(state):
         if state == 'Bestätigt':

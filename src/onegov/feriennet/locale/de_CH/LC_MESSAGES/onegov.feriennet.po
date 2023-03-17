@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-22 15:50+0100\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -326,7 +326,7 @@ msgstr "Rechnungsposition Text"
 msgid "Invoice Item Paid"
 msgstr "Rechnungsposition Bezahlt"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Zahlungsdatum"
 
 msgid "Invoice Item Transaction ID"
@@ -484,6 +484,12 @@ msgstr "Veranstalter"
 
 msgid "Member"
 msgstr "Mitglied"
+
+msgid "Contacted"
+msgstr "Kontaktiert"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
 
 msgid "Invoice Items"
 msgstr "Rechnungspositionen"
@@ -802,6 +808,9 @@ msgstr "Für einen spezifischen Benutzer"
 
 msgid "For users with tags"
 msgstr "Für Benutzer einer bestimmten Kategorie"
+
+msgid "Payment date"
+msgstr "Bezahldatum"
 
 msgid "My donation"
 msgstr "Meine Spende"
@@ -1459,6 +1468,9 @@ msgid "Manual bookings can only be added once the billing has been confirmed."
 msgstr ""
 "Manuelle Buchungen können erst nach Bestätigung der Fakturierung erstellt "
 "werden."
+
+msgid "Payment with date"
+msgstr "Bezahlung mit Datum"
 
 msgid "Donation"
 msgstr "Spende"
@@ -2364,12 +2376,6 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Contacted"
-msgstr "Kontaktiert"
-
-msgid "Confirmed"
-msgstr "Bestätigt"
-
 msgid "Contact by e-mail"
 msgstr "Via E-Mail kontaktieren"
 
@@ -2556,6 +2562,9 @@ msgstr ""
 msgid "Add manual booking"
 msgstr "Manuelle Buchung hinzufügen"
 
+msgid "Mark paid with specific date"
+msgstr "Als bezahlt markieren mit bestimmten Datum"
+
 msgid "Show invoice"
 msgstr "Rechnung anzeigen"
 
@@ -2662,6 +2671,10 @@ msgstr "Es wurden keine manuellen Buchungen erstellt."
 #, python-format
 msgid "Created ${count} manual bookings"
 msgstr "${count} manuelle Buchungen wurden erstellt"
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Für ${user} auf bezahlt setzen"
 
 msgid "Invite a companion"
 msgstr "Gspänli einladen"
@@ -3110,6 +3123,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Mark paid for "
+#~ msgstr "Auf bezahlt setzen für"
 
 #, python-format
 #~ msgid "${count} of which are overfull"
