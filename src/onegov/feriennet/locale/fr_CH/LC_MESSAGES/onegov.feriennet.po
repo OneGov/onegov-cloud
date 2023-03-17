@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-22 15:50+0100\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -327,7 +327,7 @@ msgstr "Article facture"
 msgid "Invoice Item Paid"
 msgstr "Facture payée"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Date de paiement"
 
 msgid "Invoice Item Transaction ID"
@@ -486,6 +486,12 @@ msgstr "Prestataire"
 
 msgid "Member"
 msgstr "Membre"
+
+msgid "Contacted"
+msgstr "Contacté"
+
+msgid "Confirmed"
+msgstr "Confirmé"
 
 msgid "Invoice Items"
 msgstr "Éléments de la facture"
@@ -808,6 +814,9 @@ msgstr "Pour un·e utilisateur·trice spécifique"
 
 msgid "For users with tags"
 msgstr "Pour les utilisateurs·trices d'une catégorie définie"
+
+msgid "Payment date"
+msgstr "Date de paiement"
 
 msgid "My donation"
 msgstr "Mon don"
@@ -1467,6 +1476,9 @@ msgid "Manual bookings can only be added once the billing has been confirmed."
 msgstr ""
 "Des réservations manuelles peuvent être ajoutées uniquement lorsque la "
 "facturation a été confirmée."
+
+msgid "Payment with date"
+msgstr "Paiement avec date"
 
 msgid "Donation"
 msgstr "Don"
@@ -2377,12 +2389,6 @@ msgstr "Prénom"
 msgid "Last name"
 msgstr "Nom de famille"
 
-msgid "Contacted"
-msgstr "Contacté"
-
-msgid "Confirmed"
-msgstr "Confirmé"
-
 msgid "Contact by e-mail"
 msgstr "Contacter par e-mail"
 
@@ -2568,6 +2574,9 @@ msgstr ""
 msgid "Add manual booking"
 msgstr "Ajouter une remise ou un supplément"
 
+msgid "Mark paid with specific date"
+msgstr "Marquer les paiements d'une date précise"
+
 msgid "Show invoice"
 msgstr "Afficher la facture"
 
@@ -2672,6 +2681,10 @@ msgstr "Aucune réservation manuelle n'a été créée."
 #, python-format
 msgid "Created ${count} manual bookings"
 msgstr "${count} réservation(s) manuelles créées"
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Mark a payé pour ${user}"
 
 msgid "Invite a companion"
 msgstr "Inviter un·e amie·e"

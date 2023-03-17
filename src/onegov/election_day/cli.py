@@ -1,6 +1,4 @@
 """ Provides commands used to initialize election day websites. """
-import click
-import os
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
@@ -14,6 +12,9 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
+import click
+import os
+
 
 cli = command_group()
 

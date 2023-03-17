@@ -1,10 +1,11 @@
 from onegov.ballot import Candidate
+from onegov.ballot import CandidatePanachageResult
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import ListPanachageResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
@@ -121,7 +122,7 @@ def parse_list_result(line, errors, counted):
         )
 
 
-def parse_panachage_headers(csv):
+def parse_list_panachage_headers(csv):
     headers = {}
     prefix = 'list_panachage_votes_from_list_'
     for header in csv.headers:
@@ -139,18 +140,18 @@ def parse_panachage_headers(csv):
     return headers
 
 
-def parse_panachage_results(line, errors, panachage, panachage_headers):
+def parse_list_panachage_results(line, errors, values, headers):
     try:
         target = validate_list_id(
             line, 'list_id', treat_empty_as_default=False)
-        if target not in panachage:
-            panachage[target] = {}
-            for col_name, source in panachage_headers.items():
+        if target not in values:
+            values[target] = {}
+            for col_name, source in headers.items():
                 if source == target:
                     continue
                 votes = validate_integer(line, col_name, default=None)
                 if votes is not None:
-                    panachage[target][source] = votes
+                    values[target][source] = votes
 
     except ValueError as e:
         errors.append(e.args[0])
@@ -201,6 +202,41 @@ def parse_candidate_result(line, errors, counted):
             id=uuid4(),
             votes=votes if counted else 0,
         )
+
+
+def parse_candidate_panachage_headers(csv):
+    headers = {}
+    prefix = 'candidate_panachage_votes_from_list_'
+    for header in csv.headers:
+        if not header.startswith(prefix):
+            continue
+        parts = header.split(prefix)
+        if len(parts) > 1:
+            try:
+                source_list_id = parts[1]
+                headers[csv.as_valid_identifier(header)] = source_list_id
+            except ValueError:
+                pass
+    return headers
+
+
+def parse_candidate_panachage_results(line, errors, values, headers):
+    try:
+        entity_id = validate_integer(line, 'entity_id')
+        candidate_id = line.candidate_id
+        for col_name, source in headers.items():
+            votes = validate_integer(line, col_name, default=None)
+            if votes is not None:
+                values.append({
+                    'entity_id': entity_id,
+                    'candidate_id': candidate_id,
+                    'list_id': source,
+                    'votes': votes
+                })
+    except ValueError as e:
+        errors.append(e.args[0])
+    except Exception:
+        errors.append(_("Invalid candidate results"))
 
 
 def prefix_connection_id(connection_id, parent_connection_id):
@@ -271,8 +307,10 @@ def import_election_internal_proporz(
     connections = {}
     subconnections = {}
     results = {}
-    panachage = {}
-    panachage_headers = parse_panachage_headers(csv)
+    list_panachage = {}
+    list_panachage_headers = parse_list_panachage_headers(csv)
+    candidate_panachage = []
+    candidate_panachage_headers = parse_candidate_panachage_headers(csv)
     entities = principal.entities[election.date.year]
     election_id = election.id
     colors = election.colors.copy()
@@ -297,8 +335,11 @@ def import_election_internal_proporz(
         connection, subconnection = parse_connection(
             line, line_errors, election_id
         )
-        parse_panachage_results(
-            line, line_errors, panachage, panachage_headers
+        parse_list_panachage_results(
+            line, line_errors, list_panachage, list_panachage_headers
+        )
+        parse_candidate_panachage_results(
+            line, line_errors, candidate_panachage, candidate_panachage_headers
         )
 
         # Skip expats if not enabled
@@ -346,15 +387,32 @@ def import_election_internal_proporz(
 
         candidate['list_id'] = list_['id']
 
+    # Additional checks
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
-    for values in panachage.values():
+    for values in list_panachage.values():
         for list_id in values:
             if list_id != '999' and list_id not in lists:
-                errors.append(FileImportError(
-                    _("Panachage results id ${id} not in list_id's",
-                      mapping={'id': list_id})))
+                errors.append(
+                    FileImportError(
+                        _(
+                            "Panachage results id ${id} not in list_id's",
+                            mapping={'id': list_id}
+                        )
+                    )
+                )
+
+    for values in candidate_panachage:
+        if values['list_id'] != '999' and values['list_id'] not in lists:
+            errors.append(
+                FileImportError(
+                    _(
+                        "Panachage results id ${id} not in list_id's",
+                        mapping={'id': values['list_id']}
+                    )
+                )
+            )
 
     if errors:
         return errors
@@ -387,6 +445,17 @@ def import_election_internal_proporz(
             counted=False
         )
 
+    # Aggregate candidate panachage to list panachage if missing
+    if candidate_panachage and not any(list_panachage.values()):
+        list_ids = {r['id']: r['list_id'] for r in lists.values()}
+        for result in candidate_panachage:
+            source = result['list_id']
+            target = list_ids[candidates[result['candidate_id']]['list_id']]
+            if source == target:
+                continue
+            list_panachage[target].setdefault(source, 0)
+            list_panachage[target][source] += result['votes'] or 0
+
     # Add the results to the DB
     election.clear_results()
     election.last_result_change = election.timestamp()
@@ -398,21 +467,23 @@ def import_election_internal_proporz(
         )
 
     result_uids = {r['entity_id']: r['id'] for r in results.values()}
+    candidate_uids = {r['candidate_id']: r['id'] for r in candidates.values()}
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
+    list_uids['999'] = None
     session = object_session(election)
     # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())
-    session.bulk_insert_mappings(PanachageResult, (
+    session.bulk_insert_mappings(ListPanachageResult, (
         dict(
             id=uuid4(),
-            source=source,
-            target=str(list_uids[list_id]),
+            source_id=list_uids[source],
+            target_id=list_uids[list_id],
             votes=votes,
         )
-        for list_id in panachage
-        for source, votes in panachage[list_id].items()
+        for list_id in list_panachage
+        for source, votes in list_panachage[list_id].items()
     ))
     session.bulk_insert_mappings(Candidate, candidates.values())
     session.bulk_insert_mappings(ElectionResult, results.values())
@@ -422,5 +493,15 @@ def import_election_internal_proporz(
         for list_result in values.values()
     ))
     session.bulk_insert_mappings(CandidateResult, candidate_results)
+    session.bulk_insert_mappings(CandidatePanachageResult, (
+        dict(
+            id=uuid4(),
+            election_result_id=result_uids[panachage_result['entity_id']],
+            source_id=list_uids[panachage_result['list_id']],
+            target_id=candidate_uids[panachage_result['candidate_id']],
+            votes=panachage_result['votes'],
+        )
+        for panachage_result in candidate_panachage
+    ))
 
     return []

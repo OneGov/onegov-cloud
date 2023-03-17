@@ -7701,7 +7701,11 @@
 						node = node[0] || node;
 
 						var range = document.createRange();
-						range.selectNodeContents(node);
+						try {
+							range.selectNodeContents(node);
+						} catch (e) {
+							console.error("Catched Error: " + e.message);
+						}
 					}
 					else
 					{

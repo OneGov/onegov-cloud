@@ -145,9 +145,22 @@ footer {
     z-index: 9999;
 }
 
-.large-12.columns:has(.colorPicker-picker) {
-    margin-top: 1em;
+label {
+    margin-bottom: 3ex;
+
+    // Align checkbox label if the text wraps to next line
+    input[type="checkbox"] {
+        vertical-align: sub;
+        margin-right: 0.75em;
+    }
+
+    span.label-text {
+        display: inline-block;
+        max-width: 90%;
+        vertical-align: text-top;
+    }
 }
+
 
 .colorPicker_hexWrap {
     float: left;

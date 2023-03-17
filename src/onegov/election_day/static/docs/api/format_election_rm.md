@@ -7,37 +7,37 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Cuntegn](#cuntegn)   
-- 2. [Remartgas preliminaras](#remartgas-preliminaras)   
-   - 2.1. [Unitads](#unitads)   
-   - 2.2. [Elecziun taciturnas](#elecziun-taciturnas)   
-   - 2.3. [Elecziuns regiunalas](#elecziuns-regiunalas)   
-- 3. [Formats](#formats)   
-   - 3.1. [Onegov](#onegov)   
-      - 3.1.1. [Colonnas](#colonnas)   
-      - 3.1.2. [Resultats pon cuntegnair datas panaschadas da glistas](#resultats-pon-cuntegnair-datas-panaschadas-da-glistas)   
-      - 3.1.3. [Resultats temporars](#resultats-temporars)   
-      - 3.1.4. [Elecziuns colliadas](#elecziuns-colliadas)   
-      - 3.1.5. [Project](#project)   
-   - 3.2. [Wabsti Maiorz](#wabsti-maiorz)   
-      - 3.2.1. [Colonnas "Export da datas"](#colonnas-export-da-datas)   
-      - 3.2.2. [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)   
-      - 3.2.3. [Resultats temporars](#resultats-temporars)   
-      - 3.2.4. [Projects](#projects)   
-   - 3.3. [Wabsti Proporz](#wabsti-proporz)   
-      - 3.3.1. [Colonnas "Export da datas dals resultats"](#colonnas-export-da-datas-dals-resultats)   
-      - 3.3.2. [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)   
-      - 3.3.3. [Colonnas "Export da datas da la statistica"](#colonnas-export-da-datas-da-la-statistica)   
-      - 3.3.4. [Colonnas "Colliaziuns da glistas"](#colonnas-colliaziuns-da-glistas)   
-      - 3.3.5. [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)   
-      - 3.3.6. [Resultats temporars](#resultats-temporars)   
-      - 3.3.7. [Projects](#projects)   
-   - 3.4. [WabstiCExport Maiorz](#wabsticexport-maiorz)   
-   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)   
-   - 3.6. [Resultats da la(s) partida(s)](#resultats-da-las-partidas)   
-      - 3.6.1. [Champ d'influenza](#champ-dinfluenza)   
-      - 3.6.2. [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)   
-      - 3.6.3. [Projects](#projects)   
+- 1. [Cuntegn](#cuntegn)
+- 2. [Remartgas preliminaras](#remartgas-preliminaras)
+   - 2.1. [Unitads](#unitads)
+   - 2.2. [Elecziun taciturnas](#elecziun-taciturnas)
+   - 2.3. [Elecziuns regiunalas](#elecziuns-regiunalas)
+- 3. [Formats](#formats)
+   - 3.1. [Onegov](#onegov)
+      - 3.1.1. [Colonnas](#colonnas)
+      - 3.1.2. [Resultats pon cuntegnair datas panaschadas da glistas](#resultats-pon-cuntegnair-datas-panaschadas-da-glistas)
+      - 3.1.3. [Resultats temporars](#resultats-temporars)
+      - 3.1.4. [Elecziuns colliadas](#elecziuns-colliadas)
+      - 3.1.5. [Project](#project)
+   - 3.2. [Wabsti Maiorz](#wabsti-maiorz)
+      - 3.2.1. [Colonnas "Export da datas"](#colonnas-export-da-datas)
+      - 3.2.2. [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)
+      - 3.2.3. [Resultats temporars](#resultats-temporars)
+      - 3.2.4. [Projects](#projects)
+   - 3.3. [Wabsti Proporz](#wabsti-proporz)
+      - 3.3.1. [Colonnas "Export da datas dals resultats"](#colonnas-export-da-datas-dals-resultats)
+      - 3.3.2. [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)
+      - 3.3.3. [Colonnas "Export da datas da la statistica"](#colonnas-export-da-datas-da-la-statistica)
+      - 3.3.4. [Colonnas "Colliaziuns da glistas"](#colonnas-colliaziuns-da-glistas)
+      - 3.3.5. [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)
+      - 3.3.6. [Resultats temporars](#resultats-temporars)
+      - 3.3.7. [Projects](#projects)
+   - 3.4. [WabstiCExport Maiorz](#wabsticexport-maiorz)
+   - 3.5. [WabstiCExport Proporz](#wabsticexport-proporz)
+   - 3.6. [Resultats da la(s) partida(s)](#resultats-da-las-partidas)
+      - 3.6.1. [Champ d'influenza](#champ-dinfluenza)
+      - 3.6.2. [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)
+      - 3.6.3. [Projects](#projects)
 
 <!-- /MDTOC -->
 
@@ -101,7 +101,15 @@ Ils resultats pon cuntegnair datas panaschadas da glistas, tras quai ch'i vegn a
 
 Num|Descripziun
 ---|---
-`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
+`list_panachage_votes_from_list_{XX}` / `panachage_votes_from_list_{XX}`|Il dumber da vuschs da la glista cun `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida. Stimmen aus der eigenen Liste werden ignoriert.
+
+#### Kandidierendenpanaschierdaten
+
+Die Resultate können Kandidierendenpanaschierdaten enthalten, indem pro Liste eine Spalte hinzugefügt wird:
+
+Num|Descripziun
+---|---
+`candidate_panachage_votes_from_list_{XX}`|ie Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. La `list_id` cun la valur `999` stat per la glista vida.
 
 #### Resultats temporars
 

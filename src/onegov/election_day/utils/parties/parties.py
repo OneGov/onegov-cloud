@@ -264,7 +264,7 @@ def get_parties_panachage_data(item, request=None):
     if not getattr(item, 'has_party_panachage_results', False):
         return {}
 
-    results = item.panachage_results.all()
+    results = item.party_panachage_results.all()
     party_results = item.party_results.filter_by(year=item.date.year).all()
     if not results:
         return {}

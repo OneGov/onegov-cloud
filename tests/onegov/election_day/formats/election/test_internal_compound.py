@@ -115,7 +115,7 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     list_ = election.lists.filter_by(name='FDP').one()
     candidate = election.candidates.filter_by(family_name='Crameri').one()
     assert list_.votes == 360
-    assert list_.panachage_results.filter_by(source='999').one().votes == 61
+    assert list_.panachage_results.filter_by(source_id=None).one().votes == 61
     assert candidate.votes == 659
 
     # roundtrip
@@ -139,7 +139,7 @@ def test_import_internal_compound_regional_gr(session, import_test_datasets):
     list_ = election.lists.filter_by(name='FDP').one()
     candidate = election.candidates.filter_by(family_name='Crameri').one()
     assert list_.votes == 360
-    assert list_.panachage_results.filter_by(source='999').one().votes == 61
+    assert list_.panachage_results.filter_by(source_id=None).one().votes == 61
     assert candidate.votes == 659
 
 

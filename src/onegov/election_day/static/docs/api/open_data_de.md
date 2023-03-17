@@ -115,7 +115,7 @@ Name|Beschreibung
 `list_votes`|Die Anzahl der Listenstimmen. Nur bei Proporzwahlen.
 `list_connection`|Die ID der Listenverbindung. Nur bei Proporzwahlen.
 `list_connection_parent`|Die ID der übergeordneten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
-`list_panachage_votes_from_list_XX`|Die Anzahl Listenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`list_panachage_votes_from_list_XX`|Die Anzahl Listenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste. Enthält keine Stimmen aus der eigenen Liste.
 `candidate_family_name`|Der Nachnahme des Kandidierenden.
 `candidate_first_name`|Der Vorname des Kandidierenden.
 `candidate_id`|Die ID des Kandidierenden.
@@ -125,6 +125,8 @@ Name|Beschreibung
 `candidate_gender`|Das Geschlecht des Kandidierenden: `female` (weiblich), `male` (männlich) oder `undetermined` (unbestimmt).
 `candidate_year_of_birth`|Der Jahrgang des Kandidierenden.
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
+`candidate_panachage_votes_from_list_XX`|Die Anzahl Kandidierendenstimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 

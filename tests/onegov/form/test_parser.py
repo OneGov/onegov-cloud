@@ -4,9 +4,11 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form.errors import InvalidIndentSyntax
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
+from onegov.form.validators import LaxDataRequired
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -15,7 +17,6 @@ from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import FileField
 from wtforms.fields import URLField
-from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
@@ -56,7 +57,7 @@ def test_parse_text():
     assert form.first_name.label.text == 'First name'
     assert form.first_name.description == 'Fill in all in UPPER case'
     assert len(form.first_name.validators) == 1
-    assert isinstance(form.first_name.validators[0], DataRequired)
+    assert isinstance(form.first_name.validators[0], LaxDataRequired)
 
     assert form.last_name.label.text == 'Last name'
     assert len(form.last_name.validators) == 1
@@ -832,9 +833,10 @@ def test_integer_range():
     form.validate()
     assert form.errors
 
-    form_class = parse_form("Age *= 21..150")
+    # 0 should validate on a required field
+    form_class = parse_form("Items *= 0..10")
     form = form_class(MultiDict([
-        ('age', '21')
+        ('items', '0')
     ]))
 
     form.validate()
@@ -920,9 +922,10 @@ def test_decimal_range():
     form.validate()
     assert form.errors
 
+    # 0 should validate on a decimal field
     form_class = parse_form("Percentage = 0.00..100.00")
     form = form_class(MultiDict([
-        ('percentage', '33.33')
+        ('percentage', '0.0')
     ]))
 
     form.validate()
@@ -1035,3 +1038,33 @@ def test_normalization():
     label = "Ich möchte die Bestellung mittels Post erhalten (200.00 CHF)"
     norm = normalize_label_for_dependency(label)
     assert norm == "Ich möchte die Bestellung mittels Post erhalten"
+
+
+@pytest.mark.parametrize('indent,shall_raise', [
+    ('', False),
+    (' ', True),
+    ('  ', True),
+    ('   ', True),
+])
+def test_indentation_error(indent, shall_raise):
+    # wrong indent see 'Telefonnummer'
+    text = dedent(
+        """
+        # Kiosk
+        Name des Kiosks = ___
+        # Kontaktangaben
+        Kontaktperson = ___
+        {}Telefonnummer = ___
+        """.format(indent)
+    )
+
+    if shall_raise:
+        with pytest.raises(InvalidIndentSyntax) as excinfo:
+            parse_formcode(text)
+
+        assert excinfo.value.line == 6
+    else:
+        try:
+            parse_formcode(text)
+        except InvalidIndentSyntax as e:
+            pytest.fail('Unexpected exception {}'.format(type(e).__name__))

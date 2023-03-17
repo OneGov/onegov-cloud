@@ -4,6 +4,7 @@ import transaction
 from datetime import date
 from freezegun import freeze_time
 from onegov.form import FormCollection, as_internal_id
+from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from tests.shared.utils import create_image
@@ -45,11 +46,11 @@ def test_render_form(client):
         Field('Textfield long', '*= ___', long_field_help),
         Field('Email long', '* = @@@', long_field_help),
         Field('Checkbox', """*=
-                [ ] 4051
-                [ ] 4052""", long_field_help),
+    [ ] 4051
+    [ ] 4052""", long_field_help),
         Field('Select', """=
-                (x) A
-                ( ) B""", long_field_help),
+    (x) A
+    ( ) B""", long_field_help),
         Field('Alter', '= 0..150', long_field_help),
         Field('Percentage', '= 0.00..100.00', long_field_help),
         Field('IBAN', '= # iban', long_field_help),
@@ -62,11 +63,11 @@ def test_render_form(client):
     # Those should render description externally, checked visually
     not_rendering_placeholder = [
         Field('Checkbox2', """*=
-                   [ ] 4051
-                   [ ] 4052""", short_comment),
+    [ ] 4051
+    [ ] 4052""", short_comment),
         Field('Select2', """=
-                    (x) A
-                    ( ) B""", short_comment),
+    (x) A
+    ( ) B""", short_comment),
         Field('Image2', '= *.jpg|*.png|*.gif', short_comment),
         Field('Dokument2', '= *.pdf', short_comment)
     ]
@@ -1030,3 +1031,35 @@ def test_honeypotted_forms(client):
     assert 'lazy-wolves' not in preview_page
     assert 'honeypot' not in preview_page
     assert 'Das Formular enthält Fehler' not in preview_page
+
+
+def test_edit_page_people_function_is_displayed(client, session):
+
+    client.login_admin()
+
+    people = client.get('/people')
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Berry'
+    new_person.form['last_name'] = 'Boolean'
+    new_person.form.submit()
+    person = client.app.session().query(Person)\
+        .filter(Person.first_name == 'Berry')\
+        .one()
+
+    new_page = client.get('/editor/new/page/1')
+    default_function = new_page.form['people_' + person.id.hex + '_function']
+    assert default_function.value == ""
+
+    people = client.get('/people')
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'John'
+    new_person.form['last_name'] = 'Doe'
+    new_person.form['function'] = 'President'
+    new_person.form.submit()
+    person = client.app.session().query(Person)\
+        .filter(Person.first_name == 'John')\
+        .one()
+
+    new_page = client.get('/editor/new/page/1')
+    default_function = new_page.form['people_' + person.id.hex + '_function']
+    assert default_function.value == 'President'
