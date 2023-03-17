@@ -2944,6 +2944,7 @@ def test_view_qrbill(client, scenario):
     assert '<img class="qr-bill" src="data:image/svg+xml;base64,' in page
 
 
+@freeze_time("2022-05-01 18:00")
 def test_activities_json(client, scenario):
     scenario.add_period(title="Ferienpass 2022", confirmed=True)
     activity = scenario.add_activity(
