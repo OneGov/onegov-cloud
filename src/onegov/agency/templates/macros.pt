@@ -118,6 +118,11 @@
                             <dd tal:content="structure person.address_html"></dd>
                         </tal:block>
 
+                        <tal:block tal:condition="person.postal_code_city and 'postal_code_city' not in exclude">
+                            <dt i18n:translate>Postal code and city</dt>
+                            <dd tal:content="structure person.postal_code_city"></dd>
+                        </tal:block>
+
                         <tal:block tal:condition="person.email and 'email' not in exclude">
                             <dt i18n:translate>Email</dt>
                             <dd><a href="mailto:${person.email}">${person.email}</a></dd>
