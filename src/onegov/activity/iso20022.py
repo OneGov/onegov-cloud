@@ -28,7 +28,7 @@ class Transaction:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        self.username = None
+        self.username = ''  # Has to be str for comparison used in sort
         self.confidence = 0
         self.duplicate = False
         self.paid = False
@@ -38,11 +38,11 @@ class Transaction:
 
     @cached_property
     def references(self):
+        if self.reference:
+            return {self.reference}
         return set(self.extract_references())
 
     def extract_references(self):
-        if self.reference:
-            yield self.reference
 
         # currently only one schema supports text extraction, the others are
         # stored in the designated reference field
