@@ -6,7 +6,6 @@ from onegov.ballot import Vote
 from onegov.election_day.layouts import VoteLayout
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
-import pytest
 
 
 def test_vote_layout(session):
@@ -290,20 +289,18 @@ def test_vote_layout_menu_complex(session):
     ]
 
 
-@pytest.mark.parametrize('tab,expected', [
-    ('entities', 'Vote/proposal-by-entities-table'),
-    ('proposal-entities', 'Vote/proposal-by-entities-table'),
-    ('proposal-districts', 'Vote/proposal-by-districts-table'),
-    ('counter-proposal-entities', 'Vote/proposal-by-entities-table'),
-    ('counter-proposal-districts', 'Vote/proposal-by-districts-table'),
-    ('tie-breaker-entities', 'Vote/proposal-by-entities-table'),
-    ('tie-breaker-districts', 'Vote/proposal-by-districts-table'),
-    ('data', None)
-])
-def test_vote_layout_table_links(tab, expected):
-    # Check if test contains all tabs
-    # Test link depending on tab
+def test_vote_layout_table_links():
     vote = Vote(date=date(2000, 1, 1), domain='federation')
     assert vote.ballot
-    layout = VoteLayout(vote, DummyRequest(), tab=tab)
-    assert expected == layout.table_link()
+    for tab, expected in (
+        ('entities', 'Vote/proposal-by-entities-table'),
+        ('proposal-entities', 'Vote/proposal-by-entities-table'),
+        ('proposal-districts', 'Vote/proposal-by-districts-table'),
+        ('counter-proposal-entities', 'Vote/proposal-by-entities-table'),
+        ('counter-proposal-districts', 'Vote/proposal-by-districts-table'),
+        ('tie-breaker-entities', 'Vote/proposal-by-entities-table'),
+        ('tie-breaker-districts', 'Vote/proposal-by-districts-table'),
+        ('data', None)
+    ):
+        layout = VoteLayout(vote, DummyRequest(), tab=tab)
+        assert not expected or f'{expected}?locale=de' == layout.table_link()

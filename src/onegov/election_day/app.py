@@ -230,8 +230,25 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
     return enable_iframes_and_analytics_tween
 
 
+@ElectionDayApp.tween_factory(over=current_language_tween_factory)
+def override_language_tween_factory(app, handler):
+    def override_language_tween(request):
+        """ Also allows the current language to be overwritten using a query
+        parameter.
+
+        """
+
+        locale = request.params.get('locale')
+        if locale in app.locales:
+            request.locale = locale
+
+        return handler(request)
+
+    return override_language_tween
+
+
 @ElectionDayApp.tween_factory(
-    under=current_language_tween_factory,
+    under=override_language_tween_factory,
     over=transaction_tween_factory
 )
 def cache_control_tween_factory(app, handler):
@@ -262,7 +279,7 @@ def cache_control_tween_factory(app, handler):
 
 
 @ElectionDayApp.tween_factory(
-    under=current_language_tween_factory,
+    under=override_language_tween_factory,
     over=transaction_tween_factory
 )
 def micro_cache_anonymous_pages_tween_factory(app, handler):

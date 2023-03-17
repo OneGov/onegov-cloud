@@ -1259,14 +1259,7 @@ def current_language_tween_factory(app, handler):
         """ Set the current language on the session manager for each request,
         for translatable database columns.
 
-        Also allows the current language to be overwritten using a query
-        parameter.
-
         """
-
-        locale = request.params.get('locale')
-        if locale in app.locales:
-            request.locale = locale
 
         if app.has_database_connection:
             app.session_manager.set_locale(
