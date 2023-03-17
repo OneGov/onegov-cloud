@@ -226,7 +226,7 @@ def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
 
     for t in transactions:
 
-        # credit transactions are completely irrelevant for us
+        # debit transactions are completely irrelevant for us
         if not t.credit:
             continue
 
