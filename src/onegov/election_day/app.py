@@ -233,7 +233,7 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
 @ElectionDayApp.tween_factory(over=current_language_tween_factory)
 def override_language_tween_factory(app, handler):
     def override_language_tween(request):
-        """ Also allows the current language to be overwritten using a query
+        """ Allows the current language to be overwritten using a query
         parameter.
 
         """
