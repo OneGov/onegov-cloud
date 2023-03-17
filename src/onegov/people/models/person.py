@@ -105,8 +105,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: the website related to the person
     website = Column(Text, nullable=True)
 
-    #: the address of the person
+    #: the address (street name and number) of the person
     address = Column(Text, nullable=True)
+
+    #: postal code and city of the person
+    postal_code_city = Column(Text, nullable=True)
 
     #: some remarks about the person
     notes = Column(Text, nullable=True)
@@ -170,6 +173,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         if 'address' not in exclude and self.address:
             line = result.add('adr')
             line.value = Address(street=self.address)
+            line.charset_param = 'utf-8'
+
+        if 'postal_code_city' not in exclude and self.postal_code_city:
+            line = result.add('postal_code_city')
+            line.value = Address(city=self.postal_code_city)
             line.charset_param = 'utf-8'
 
         if 'notes' not in exclude and self.notes:

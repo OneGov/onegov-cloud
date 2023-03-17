@@ -68,6 +68,7 @@ class ExtendedAgencyForm(Form):
             ('person.academic_title', _("Person: Academic Title")),
             ('person.profession', _("Person: Profession")),
             ('person.address', _("Person: Address")),
+            ('person.postal_code_city', _("Person: Postal Code / City")),
             ('person.political_party', _("Person: Political Party")),
             ('person.parliamentary_group', _("Person: Parliamentary Group")),
             ('person.phone', _("Person: Phone")),

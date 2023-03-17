@@ -265,7 +265,8 @@ def test_membership_form_choices(session):
     people.add(first_name="Nick", last_name="Rivera", phone="1234")
     people.add(first_name="Nick", last_name="Rivera", phone="5555", email="x")
     people.add(first_name="Nick", last_name="Rivera", phone_direct="4")
-    people.add(first_name="Nick", last_name="Rivera", address="Street")
+    people.add(first_name="Nick", last_name="Rivera", address="Street",
+               postal_code_city="9876 Telltown")
     people.add(first_name="Nick", last_name="Rivera", email="n@h.com")
 
     agencies = ExtendedAgencyCollection(session)
@@ -340,8 +341,8 @@ def test_person_mutation_form():
     assert set(form.proposal_fields.keys()) == {
         'function', 'website', 'political_party', 'salutation', 'email',
         'notes', 'first_name', 'last_name', 'born', 'phone',
-        'parliamentary_group', 'address', 'profession', 'phone_direct',
-        'academic_title'
+        'parliamentary_group', 'address', 'postal_code_city', 'profession',
+        'phone_direct', 'academic_title'
     }
     assert form.first_name.description == 'Nick'
     assert form.last_name.description == 'Riviera'
@@ -366,6 +367,7 @@ def test_person_mutation_form():
         'parliamentary_group': None,
         'website': None,
         'address': None,
+        'postal_code_city': None,
         'notes': None
     }
     assert form.validate()

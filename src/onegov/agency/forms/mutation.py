@@ -148,6 +148,11 @@ class PersonMutationForm(MutationForm):
         render_kw={'rows': 5}
     )
 
+    postal_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal Code and City"),
+    )
+
     notes = TextAreaField(
         fieldset=_("Proposed changes"),
         label=_("Notes"),

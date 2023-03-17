@@ -79,5 +79,6 @@ class PersonMutation(Mutation):
             'parliamentary_group': _("Parliamentary Group"),
             'website': _("Website"),
             'address': _("Address"),
+            'postal_code_city': _("Postal Code / City"),
             'notes': _("Notes"),
         }

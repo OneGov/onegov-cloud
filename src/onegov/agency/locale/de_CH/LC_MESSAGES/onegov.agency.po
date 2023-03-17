@@ -529,6 +529,9 @@ msgstr "Ebene ${lvl}"
 #~ msgid "City"
 #~ msgstr "Ort"
 
+msgid "Postal Code and City"
+msgstr "Postleitzahl und Ort"
+
 #~ msgid ""
 #~ "Search for the exact address to set a marker. The address fields beneath "
 #~ "are filled out automatically."

@@ -29,8 +29,10 @@ class PersonForm(Form):
 
     address = TextAreaField(
         label=_("Address"),
-        render_kw={'rows': 5}
+        render_kw={'rows': 2}
     )
+
+    postal_code_city = StringField(_("Postal Code and City"))
 
     picture_url = StringField(
         label=_("Picture"),
