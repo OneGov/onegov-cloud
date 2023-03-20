@@ -168,6 +168,9 @@ msgstr "Telefon"
 msgid "Direct Phone Number / Mobile"
 msgstr "Direktnummer / Mobil"
 
+msgid "Alternate Phone Number / Fax"
+msgstr "Weitere Telefonnummer / Fax"
+
 msgid "Born"
 msgstr "Jahrgang"
 
@@ -185,6 +188,9 @@ msgstr "Webseite"
 
 msgid "Address"
 msgstr "Adresse"
+
+msgid "Opening hours"
+msgstr "Öffnungszeiten"
 
 msgid "Notes"
 msgstr "Bemerkungen"

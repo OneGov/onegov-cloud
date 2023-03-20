@@ -51,6 +51,13 @@ class AgencyMutation(Mutation):
     def labels(self):
         return {
             'title': _("Title"),
+            'address': _("Address"),
+            'postal_code_city': _("Postal Code / City"),
+            'phone': _("Phone"),
+            'phone_direct': _("Alternate Phone Number / Fax"),
+            'email': _("E-Mail"),
+            'website': _("Website"),
+            'opening_hours': _("Opening hours"),
         }
 
 

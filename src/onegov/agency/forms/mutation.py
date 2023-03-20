@@ -72,6 +72,44 @@ class AgencyMutationForm(MutationForm):
         label=_("Title"),
     )
 
+    address = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Address"),
+        render_kw={'rows': 2}
+    )
+
+    postal_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal Code and City"),
+    )
+
+    phone = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Phone")
+    )
+
+    phone_direct = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Direct Phone Number / Mobile")
+    )
+
+    email = EmailField(
+        fieldset=_("Proposed changes"),
+        label=_("E-Mail")
+    )
+
+    website = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Website"),
+        filters=(ensure_scheme, )
+    )
+
+    opening_hours = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Opening hours"),
+        render_kw={'rows': 3}
+    )
+
 
 class PersonMutationForm(MutationForm):
     """ Form to report a mutation of a person. """
@@ -145,7 +183,7 @@ class PersonMutationForm(MutationForm):
     address = TextAreaField(
         fieldset=_("Proposed changes"),
         label=_("Address"),
-        render_kw={'rows': 5}
+        render_kw={'rows': 2}
     )
 
     postal_code_city = StringField(

@@ -1,11 +1,15 @@
 from cgi import FieldStorage
 from io import BytesIO
+
+from wtforms import EmailField, TextAreaField
+from wtforms.widgets import TextArea
+
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.security import Private
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, ensure_scheme
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, HtmlField
 from onegov.form.fields import MultiCheckboxField
@@ -31,6 +35,24 @@ class ExtendedAgencyForm(Form):
     portrait = HtmlField(
         label=_("Portrait"),
         render_kw={'rows': 10}
+    )
+
+    address = TextAreaField(
+        label=_("Address"),
+        render_kw={'rows': 2},
+    )
+
+    postal_code_city = StringField(_("Postal Code and City"))
+
+    phone = StringField(_("Phone"))
+    phone_direct = StringField(_("Alternate Phone Number / Fax"))
+    email = EmailField(_("E-Mail"))
+    website = StringField(_("Website"), filters=(ensure_scheme, ))
+
+    opening_hours = StringField(
+        label=_("Opening hours"),
+        render_kw={'rows': 3},
+        widget=TextArea()
     )
 
     organigram = UploadField(
@@ -96,6 +118,13 @@ class ExtendedAgencyForm(Form):
         model.portrait = handle_empty_p_tags(
             linkify(self.portrait.data, escape=False)
         )
+        model.address = self.address.data
+        model.postal_code_city = self.postal_code_city.data
+        model.phone = self.phone.data
+        model.phone_direct = self.phone_direct.data
+        model.email = self.email.data
+        model.website = self.website.data
+        model.opening_hours = self.opening_hours.data
         model.export_fields = self.export_fields.data
         if self.organigram.action == 'delete':
             del model.organigram
@@ -122,6 +151,13 @@ class ExtendedAgencyForm(Form):
     def apply_model(self, model):
         self.title.data = model.title
         self.portrait.data = model.portrait
+        self.address.data = model.address
+        self.postal_code_city.data = model.postal_code_city
+        self.phone.data = model.phone
+        self.phone_direct.data = model.phone_direct
+        self.email.data = model.email
+        self.website.data = model.website
+        self.opening_hours.data = model.opening_hours
         self.export_fields.data = model.export_fields
         if model.organigram_file:
             fs = FieldStorage()
