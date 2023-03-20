@@ -1762,8 +1762,8 @@ class OccurrenceLayout(EventBaseLayout):
                         attrs={'class': 'edit-link'},
                         traits=(
                             Block(
-                                _("This event can't be editet."),
-                                _("Imported events can not be editet."),
+                                _("This event can't be edited."),
+                                _("Imported events can not be edited."),
                                 _("Cancel")
                             )
                         )
@@ -1859,8 +1859,8 @@ class EventLayout(EventBaseLayout):
                     attrs={'class': 'edit-link'},
                     traits=(
                         Block(
-                            _("This event can't be editet."),
-                            _("Imported events can not be editet."),
+                            _("This event can't be edited."),
+                            _("Imported events can not be edited."),
                             _("Cancel")
                         )
                     )

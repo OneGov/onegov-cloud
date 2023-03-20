@@ -111,6 +111,9 @@ msgstr "zurück"
 msgid "Press ${shortcut} to open Search"
 msgstr "Benutze ${shortcut} um die Suche zu öffnen"
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -159,6 +162,9 @@ msgstr "Formular löschen"
 
 msgid "Export"
 msgstr "Export"
+
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Change URL"
 msgstr "URL ändern"
@@ -218,6 +224,12 @@ msgstr "Neue Notiz"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Destination"
+msgstr "Ziel"
+
+msgid "- Root -"
+msgstr "- oberste Ebene -"
 
 msgid "Upload to Gever"
 msgstr "Hochladen auf Gever"
@@ -353,10 +365,10 @@ msgstr "Import"
 msgid "Event"
 msgstr "Veranstaltung"
 
-msgid "This event can't be editet."
+msgid "This event can't be edited."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
 
-msgid "Imported events can not be editet."
+msgid "Imported events can not be edited."
 msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
 
 msgid "Do you really want to delete this event?"

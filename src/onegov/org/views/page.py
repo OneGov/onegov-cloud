@@ -51,6 +51,14 @@ def view_topic(self, request, layout=None):
                 classes=('sort-link', )
             )
         )
+        layout.editbar_links.insert(
+            len(layout.editbar_links) - 1,
+            Link(
+                _("Move"),
+                request.link(Editor('move', self)),
+                classes=('move-link', )
+            )
+        )
         children = self.children
     else:
         children = request.exclude_invisible(

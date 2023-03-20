@@ -5,8 +5,8 @@ from webob.exc import HTTPForbidden
 
 from onegov.core.security import Private
 from onegov.org import _, OrgApp
-from onegov.org.forms.page import PageUrlForm, PageForm
-from onegov.org.layout import EditorLayout
+from onegov.org.forms.page import MovePageForm, PageUrlForm, PageForm
+from onegov.org.layout import EditorLayout, PageLayout
 from onegov.org.management import PageNameChange
 from onegov.org.models import Clipboard, Editor
 from onegov.page import PageCollection
@@ -22,6 +22,8 @@ def get_form_class(editor, request):
                 src.trait, editor.action, request)
     if editor.action == 'change-url':
         return PageUrlForm
+    if editor.action == 'move':
+        return MovePageForm
     if editor.action == 'new-root':
         # this is the case when adding a new 'root' page (parent = None)
         return PageForm
@@ -46,6 +48,8 @@ def handle_page_form(self, request, form, layout=None):
         return handle_new_page(self, request, form, src, layout)
     elif self.action == 'sort':
         return morepath.redirect(request.link(self, 'sort'))
+    elif self.action == 'move':
+        return handle_move_page(self, request, form, layout=layout)
     else:
         raise NotImplementedError
 
@@ -135,6 +139,25 @@ def handle_edit_page(self, request, form, layout=None):
         'title': site_title,
         'form': form,
         'form_width': 'large'
+    }
+
+
+def handle_move_page(self, request, form, layout=None):
+    layout = layout or PageLayout(self.page, request)
+    layout.site_title = self.page.trait_messages[self.trait]['move_page_title']
+
+    if form.submitted(request):
+        form.update_model(self.page)
+        request.success(_("Your changes were saved"))
+
+        return morepath.redirect(request.link(self.page))
+
+    return {
+        'layout': layout,
+        'title': layout.site_title,
+        'helptext': _("Moves the topic and all its sub topics to the "
+                      "given destination."),
+        'form': form,
     }
 
 
