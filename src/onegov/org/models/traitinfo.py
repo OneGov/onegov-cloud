@@ -21,6 +21,7 @@ TRAIT_MESSAGES = {
         new_page_title=_("New Topic"),
         new_page_added=_("Added a new topic"),
         edit_page_title=_("Edit Topic"),
+        move_page_title=_("Move Topic"),
         delete_message=_("The topic was deleted"),
         delete_button=_("Delete topic"),
         delete_question=_(

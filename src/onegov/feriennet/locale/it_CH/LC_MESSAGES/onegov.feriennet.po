@@ -1489,7 +1489,10 @@ msgid "Register as Volunteer"
 msgstr "Registrazione come aiutante"
 
 msgid "Sort"
-msgstr ""
+msgstr "Tipo"
+
+msgid "Move"
+msgstr "Spostare"
 
 msgid "Half day"
 msgstr "Mezza giornata"

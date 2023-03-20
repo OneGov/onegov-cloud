@@ -436,6 +436,9 @@ msgstr ""
 "Verschiebt die gesamte Organisation mit allen Personen und "
 "Unterorganisationen an den entsprechenden Ort."
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
 msgid "PDF created"
 msgstr "PDF erstellt"
 
@@ -537,9 +540,15 @@ msgstr "Benutzer können Mutationen melden"
 msgid "Data"
 msgstr "Daten"
 
+msgid "Agency moved"
+msgstr "Organisation verschoben"
+
 #, python-format
 msgid "Level ${lvl}"
 msgstr "Ebene ${lvl}"
+
+msgid "Invalid destination selected"
+msgstr "Ungültiger Zielort gewählt"
 
 #~ msgid "Street and house number"
 #~ msgstr "Strasse und Hausnummer"

@@ -213,17 +213,34 @@ class MoveAgencyForm(Form):
                 0, ('root', self.request.translate(_("- Root -")))
             )
 
+    def ensure_valid_parent(self):
+        """
+        As a new destination (parent page) every menu item is valid except
+        yourself. You cannot assign yourself as the new destination
+        :return: bool
+        """
+        if self.parent_id.data and self.parent_id.data.isdigit():
+            new_parent_id = int(self.parent_id.data)
+            # prevent selecting yourself as new parent
+            if self.model.id == new_parent_id:
+                self.parent_id.errors.append(
+                    _("Invalid destination selected"))
+                return False
+
+        return True
+
     def update_model(self, model):
         session = self.request.session
         agencies = ExtendedAgencyCollection(session)
 
-        parent_id = None
-        parent = None
+        new_parent_id = None
+        new_parent = None
         if self.parent_id.data and self.parent_id.data.isdigit():
-            parent_id = int(self.parent_id.data)
-            parent = agencies.by_id(parent_id)
-        model.name = agencies.get_unique_child_name(model.title, parent)
-        model.parent_id = parent_id
+            new_parent_id = int(self.parent_id.data)
+            new_parent = agencies.by_id(new_parent_id)
+
+        model.name = agencies.get_unique_child_name(model.title, new_parent)
+        model.parent_id = new_parent_id
 
     def apply_model(self, model):
         def remove(item):
