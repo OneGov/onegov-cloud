@@ -80,17 +80,36 @@ def test_extended_agency_form(agency_app):
     form = ExtendedAgencyForm(DummyPostData({
         'title': 'Springfield Hospital',
         'portrait': 'Springfield Hospital is hospital.',
+        'location_address': 'Springfield Lane\n12345 Springfield',
+        'postal_address': 'Hospital Blvd\nPostbox',
+        'postal_code_city': '12345 Hospital City',
+        'phone': '+1 23456789',
+        'phone_direct': '+1 98765432',
+        'email': 'emc@springfieldhospital.com',
+        'website': 'springfieldhospital.com',
+        'opening_hours': 'Mo bis Mittwoch\n8.00 - 8.01',
         'coordinates': encode_map_value({'lat': 1, 'lon': 2, 'zoom': 12}),
         'export_fields': ['person.first_name', 'person.last_name'],
-        'organigram': create_file('image/png', 'org.png', b'PNG')
+        'organigram': create_file('image/png', 'org.png', b'PNG',),
     }))
     data = form.get_useful_data()
     assert list(data.keys()) == [
-        'title', 'portrait', 'coordinates', 'export_fields', 'organigram_file'
+        'title', 'portrait', 'location_address', 'location_code_city',
+        'postal_address', 'postal_code_city', 'phone', 'phone_direct',
+        'email', 'website', 'opening_hours', 'coordinates', 'export_fields',
+        'organigram_file'
     ]
     assert data['organigram_file'].read() == b'PNG'
     assert data['title'] == 'Springfield Hospital'
     assert data['portrait'] == 'Springfield Hospital is hospital.'
+    assert data['location_address'] == 'Springfield Lane\n12345 Springfield'
+    assert data['postal_address'] == 'Hospital Blvd\nPostbox'
+    assert data['postal_code_city'] == '12345 Hospital City'
+    assert data['phone'] == '+1 23456789'
+    assert data['phone_direct'] == '+1 98765432'
+    assert data['email'] == 'emc@springfieldhospital.com'
+    assert data['website'] == 'http://springfieldhospital.com'
+    assert data['opening_hours'] == 'Mo bis Mittwoch\n8.00 - 8.01'
     coordinates = data['coordinates']
     assert coordinates.lat == 1
     assert coordinates.lon == 2
@@ -265,7 +284,7 @@ def test_membership_form_choices(session):
     people.add(first_name="Nick", last_name="Rivera", phone="1234")
     people.add(first_name="Nick", last_name="Rivera", phone="5555", email="x")
     people.add(first_name="Nick", last_name="Rivera", phone_direct="4")
-    people.add(first_name="Nick", last_name="Rivera", address="Street",
+    people.add(first_name="Nick", last_name="Rivera", postal_address="Street",
                postal_code_city="9876 Telltown")
     people.add(first_name="Nick", last_name="Rivera", email="n@h.com")
 
@@ -294,19 +313,45 @@ def test_agency_mutation_form():
     form = AgencyMutationForm(DummyPostData({
         'submitter_email': 'info@hospital-springfield.org',
         'submitter_message': 'There is a typo in the name!',
-        'title': 'Hospital Springfield'
+        'title': 'Hospital Springfield',
+        # 'location_address': 'Basefield Rd',
+        # 'location_code_city': '13245 Springfield Town',
+        # 'postal_address': 'Springfield Ln',
+        # 'postal_code_city': '13245 Springfield City',
+        'location_address': '',
+        'location_code_city': '',
+        'postal_address': '',
+        'postal_code_city': '',
+        'phone': '',
+        'phone_direct': '',
+        'email': '',
+        'website': '',
+        'opening_hours': '',
     }))
-    form.model = ExtendedAgency(title='Hopital Springfield')
+    form.model = ExtendedAgency(title='Hopital Springfield',
+                                email='info@abc.com')
     form.request = DummyRequest(None)
     form.on_request()
 
-    assert set(form.proposal_fields.keys()) == {'title'}
+    assert set(form.proposal_fields.keys()) == {
+        'title', 'location_address', 'location_code_city', 'postal_address',
+        'postal_code_city', 'phone', 'phone_direct', 'email', 'website',
+        'opening_hours'}
     assert form.title.description == 'Hopital Springfield'
     assert form.proposed_changes == {'title': 'Hospital Springfield'}
     assert form.get_useful_data() == {
         'submitter_email': 'info@hospital-springfield.org',
         'submitter_message': 'There is a typo in the name!',
-        'title': 'Hospital Springfield'
+        'title': 'Hospital Springfield',
+        'location_address': '',
+        'location_code_city': '',
+        'postal_address': '',
+        'postal_code_city': '',
+        'phone': '',
+        'phone_direct': '',
+        'email': '',
+        'website': '',
+        'opening_hours': '',
     }
     assert form.validate()
 
@@ -341,8 +386,9 @@ def test_person_mutation_form():
     assert set(form.proposal_fields.keys()) == {
         'function', 'website', 'political_party', 'salutation', 'email',
         'notes', 'first_name', 'last_name', 'born', 'phone',
-        'parliamentary_group', 'address', 'postal_code_city', 'profession',
-        'phone_direct', 'academic_title'
+        'parliamentary_group', 'location_address',
+        'location_code_city', 'postal_address', 'postal_code_city',
+        'profession', 'phone_direct', 'academic_title'
     }
     assert form.first_name.description == 'Nick'
     assert form.last_name.description == 'Riviera'
@@ -366,7 +412,9 @@ def test_person_mutation_form():
         'political_party': None,
         'parliamentary_group': None,
         'website': None,
-        'address': None,
+        'location_address': None,
+        'location_code_city': None,
+        'postal_address': None,
         'postal_code_city': None,
         'notes': None
     }
