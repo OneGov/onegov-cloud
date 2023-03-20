@@ -997,8 +997,8 @@ msgstr "Nachname"
 msgid "Function"
 msgstr "Funktion"
 
-msgid "Direct Phone Number / Mobile"
-msgstr "Direktnummer / Mobil"
+msgid "Direct Phone Number or Mobile"
+msgstr "Direktnummer oder Mobil"
 
 msgid "Born"
 msgstr "Geboren"

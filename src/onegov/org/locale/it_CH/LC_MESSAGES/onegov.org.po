@@ -1001,8 +1001,8 @@ msgstr "Cognome"
 msgid "Function"
 msgstr "Funzione"
 
-msgid "Direct Phone Number / Mobile"
-msgstr "Numero di telefono diretto / cellulare"
+msgid "Direct Phone Number or Mobile"
+msgstr "Numero di telefono diretto o cellulare"
 
 msgid "Born"
 msgstr "Cognome da nubile"

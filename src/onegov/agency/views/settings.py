@@ -83,8 +83,7 @@ class AgencySettingsForm(Form):
         label=_('Field used for internal phone numbers'),
         fieldset=_('Customize search results'),
         choices=[
-            ('phone_direct', _('Direct Phone Number / Mobile')),
-            ('phone', _('Phone')),
+            ('phone_direct', _('Direct Phone Number or Mobile')),
         ],
     )
 

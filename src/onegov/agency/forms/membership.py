@@ -75,7 +75,7 @@ class MembershipForm(Form):
                     person.phone_direct
                     or person.phone
                     or person.email
-                    or person.address
+                    or person.postal_address
                 )
                 if info:
                     return f"{person.title} ({info})"

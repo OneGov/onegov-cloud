@@ -51,8 +51,14 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: describes the agency
     portrait = Column(Text, nullable=True)
 
-    #: address (street name and number) of agency
-    address = Column(Text, nullable=True)
+    #: location address (street name and number) of agency
+    location_address = Column(Text, nullable=True)
+
+    #: location code and city of agency
+    location_code_city = Column(Text, nullable=True)
+
+    #: postal address (street name and number) of agency
+    postal_address = Column(Text, nullable=True)
 
     #: postal code and city of agency
     postal_code_city = Column(Text, nullable=True)

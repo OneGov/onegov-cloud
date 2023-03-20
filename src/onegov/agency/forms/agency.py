@@ -2,7 +2,6 @@ from cgi import FieldStorage
 from io import BytesIO
 
 from wtforms import EmailField, TextAreaField
-from wtforms.widgets import TextArea
 
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -37,11 +36,16 @@ class ExtendedAgencyForm(Form):
         render_kw={'rows': 10}
     )
 
-    address = TextAreaField(
-        label=_("Address"),
+    location_address = TextAreaField(
+        label=_("Location address"),
+        render_kw={'rows': 1},
+    )
+    location_code_city = StringField(_("Location Code and City"))
+
+    postal_address = TextAreaField(
+        label=_("Postal address"),
         render_kw={'rows': 2},
     )
-
     postal_code_city = StringField(_("Postal Code and City"))
 
     phone = StringField(_("Phone"))
@@ -49,10 +53,9 @@ class ExtendedAgencyForm(Form):
     email = EmailField(_("E-Mail"))
     website = StringField(_("Website"), filters=(ensure_scheme, ))
 
-    opening_hours = StringField(
+    opening_hours = TextAreaField(
         label=_("Opening hours"),
-        render_kw={'rows': 3},
-        widget=TextArea()
+        render_kw={'rows': 5},
     )
 
     organigram = UploadField(
@@ -89,8 +92,10 @@ class ExtendedAgencyForm(Form):
             ('person.born', _("Person: Born")),
             ('person.academic_title', _("Person: Academic Title")),
             ('person.profession', _("Person: Profession")),
-            ('person.address', _("Person: Address")),
-            ('person.postal_code_city', _("Person: Postal Code / City")),
+            ('person.location_address', _("Person: Location Address")),
+            ('person.location_code_city', _("Person: Location Code and City")),
+            ('person.postal_address', _("Person: Postal Address")),
+            ('person.postal_code_city', _("Person: Postal Code and City")),
             ('person.political_party', _("Person: Political Party")),
             ('person.parliamentary_group', _("Person: Parliamentary Group")),
             ('person.phone', _("Person: Phone")),
@@ -118,7 +123,9 @@ class ExtendedAgencyForm(Form):
         model.portrait = handle_empty_p_tags(
             linkify(self.portrait.data, escape=False)
         )
-        model.address = self.address.data
+        model.location_address = self.location_address.data
+        model.location_code_city = self.location_code_city.data
+        model.postal_address = self.postal_address.data
         model.postal_code_city = self.postal_code_city.data
         model.phone = self.phone.data
         model.phone_direct = self.phone_direct.data
@@ -151,7 +158,9 @@ class ExtendedAgencyForm(Form):
     def apply_model(self, model):
         self.title.data = model.title
         self.portrait.data = model.portrait
-        self.address.data = model.address
+        self.location_address.data = model.location_address
+        self.location_code_city.data = model.location_code_city
+        self.postal_address.data = model.postal_address
         self.postal_code_city.data = model.postal_code_city
         self.phone.data = model.phone
         self.phone_direct.data = model.phone_direct

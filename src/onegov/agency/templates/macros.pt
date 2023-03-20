@@ -18,9 +18,19 @@
                     <h3 i18n:translate>Agency</h3>
                 </tal:block>
 
-                <tal:block tal:condition="agency.address">
-                    <dt i18n:translate>Address</dt>
-                    <dd>${agency.address}</dd>
+                <tal:block tal:condition="agency.location_address">
+                    <dt i18n:translate>Location address</dt>
+                    <dd tal:content="structure agency.location_address_html"></dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.location_code_city">
+                    <dt i18n:translate>Location Code and City</dt>
+                    <dd>${agency.location_code_city}</dd>
+                </tal:block>
+
+                <tal:block tal:condition="agency.postal_address">
+                    <dt i18n:translate>Postal address</dt>
+                    <dd tal:content="structure agency.postal_address_html"></dd>
                 </tal:block>
 
                 <tal:block tal:condition="agency.postal_code_city">
@@ -34,7 +44,7 @@
                 </tal:block>
 
                 <tal:block tal:condition="agency.phone_direct">
-                    <dt i18n:translate>Alternate Phone Number / Fax</dt>
+                    <dt i18n:translate>Alternate Phone Number or Fax</dt>
                     <dd><a href="tel: ${agency.phone_direct}">${agency.phone_direct}</a></dd>
                 </tal:block>
 
@@ -50,7 +60,8 @@
 
                 <tal:block tal:condition="agency.opening_hours">
                     <dt i18n:translate>Opening hours</dt>
-                    <dd>${agency.opening_hours}</dd>
+                    <dd tal:content="structure agency.opening_hours_html"></dd>
+<!--?                    <dd>${agency.opening_hours}</dd>-->
                 </tal:block>
 
                 <tal:block tal:condition="agency.organigram_file">
@@ -154,9 +165,19 @@
                             <dd>${person.born}</dd>
                         </tal:block>
 
-                        <tal:block tal:condition="person.address and 'address' not in exclude">
-                            <dt i18n:translate>Address</dt>
-                            <dd>${person.address}</dd>
+                        <tal:block tal:condition="person.location_address and 'location_address' not in exclude">
+                            <dt i18n:translate>Location address</dt>
+                            <dd tal:content="structure person.location_address_html"></dd>
+                        </tal:block>
+
+                        <tal:block tal:condition="person.location_code_city and 'location_code_city' not in exclude">
+                            <dt i18n:translate>Location Code and City</dt>
+                            <dd>${person.location_code_city}</dd>
+                        </tal:block>
+
+                        <tal:block tal:condition="person.postal_address and 'postal_address' not in exclude">
+                            <dt i18n:translate>Postal address</dt>
+                            <dd tal:content="structure person.postal_address_html"></dd>
                         </tal:block>
 
                         <tal:block tal:condition="person.postal_code_city and 'postal_code_city' not in exclude">

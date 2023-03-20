@@ -20,18 +20,23 @@ class PersonForm(Form):
 
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))
-    phone_direct = StringField(_("Direct Phone Number / Mobile"))
+    phone_direct = StringField(_("Direct Phone Number or Mobile"))
     born = StringField(_("Born"))
     profession = StringField(_("Profession"))
     political_party = StringField(_("Political Party"))
     parliamentary_group = StringField(_("Parliamentary Group"))
     website = StringField(_("Website"), filters=(ensure_scheme, ))
 
-    address = TextAreaField(
-        label=_("Address"),
+    location_address = TextAreaField(
+        label=_("Location address"),
+        render_kw={'rows': 1}
+    )
+    location_code_city = StringField(_("Location Code and City"))
+
+    postal_address = TextAreaField(
+        label=_("Postal address"),
         render_kw={'rows': 2}
     )
-
     postal_code_city = StringField(_("Postal Code and City"))
 
     picture_url = StringField(

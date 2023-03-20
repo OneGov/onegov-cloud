@@ -72,9 +72,20 @@ class AgencyMutationForm(MutationForm):
         label=_("Title"),
     )
 
-    address = TextAreaField(
+    location_address = TextAreaField(
         fieldset=_("Proposed changes"),
-        label=_("Address"),
+        label=_("Location address"),
+        render_kw={'rows': 2}
+    )
+
+    location_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Location Code and City"),
+    )
+
+    postal_address = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal address"),
         render_kw={'rows': 2}
     )
 
@@ -90,7 +101,7 @@ class AgencyMutationForm(MutationForm):
 
     phone_direct = StringField(
         fieldset=_("Proposed changes"),
-        label=_("Direct Phone Number / Mobile")
+        label=_("Direct Phone Number or Mobile")
     )
 
     email = EmailField(
@@ -151,7 +162,7 @@ class PersonMutationForm(MutationForm):
 
     phone_direct = StringField(
         fieldset=_("Proposed changes"),
-        label=_("Direct Phone Number / Mobile")
+        label=_("Direct Phone Number or Mobile")
     )
 
     born = StringField(
@@ -180,9 +191,20 @@ class PersonMutationForm(MutationForm):
         filters=(ensure_scheme, )
     )
 
-    address = TextAreaField(
+    location_address = TextAreaField(
         fieldset=_("Proposed changes"),
-        label=_("Address"),
+        label=_("Location address"),
+        render_kw={'rows': 2}
+    )
+
+    location_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Location Code and City"),
+    )
+
+    postal_address = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal address"),
         render_kw={'rows': 2}
     )
 

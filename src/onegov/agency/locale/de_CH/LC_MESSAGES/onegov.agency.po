@@ -77,8 +77,17 @@ msgstr "Person: akademischer Titel"
 msgid "Person: Profession"
 msgstr "Person: Beruf"
 
-msgid "Person: Address"
-msgstr "Person: Adresse"
+msgid "Person: Location Address"
+msgstr "Person: Standortadresse"
+
+msgid "Person: Location Code and City"
+msgstr "Person: Standort Postleitzahl und Ort"
+
+msgid "Person: Postal Address"
+msgstr "Person: Postadresse"
+
+msgid "Person: Postal Code and City"
+msgstr "Person: Postleitzahl und Ort"
 
 msgid "Person: Political Party"
 msgstr "Person: politische Partei"
@@ -165,11 +174,11 @@ msgstr "Funktion"
 msgid "Phone"
 msgstr "Telefon"
 
-msgid "Direct Phone Number / Mobile"
-msgstr "Direktnummer / Mobil"
+msgid "Direct Phone Number or Mobile"
+msgstr "Direktnummer oder Mobil"
 
-msgid "Alternate Phone Number / Fax"
-msgstr "Weitere Telefonnummer / Fax"
+msgid "Alternate Phone Number or Fax"
+msgstr "Weitere Telefonnummer oder Fax"
 
 msgid "Born"
 msgstr "Jahrgang"
@@ -188,6 +197,12 @@ msgstr "Webseite"
 
 msgid "Address"
 msgstr "Adresse"
+
+msgid "Location address"
+msgstr "Standortadresse"
+
+msgid "Postal address"
+msgstr "Postadresse"
 
 msgid "Opening hours"
 msgstr "Öffnungszeiten"
@@ -534,6 +549,9 @@ msgstr "Ebene ${lvl}"
 
 #~ msgid "City"
 #~ msgstr "Ort"
+
+msgid "Location Code and City"
+msgstr "Standort Postleitzahl und Ort"
 
 msgid "Postal Code and City"
 msgstr "Postleitzahl und Ort"

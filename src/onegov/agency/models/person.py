@@ -53,17 +53,27 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
                 result.append('0' + number[-9:])
         return [r for r in result if r]
 
-    @property
-    def address_html(self):
+    @staticmethod
+    def _get_html_paragraph_with_line_breaks(prop):
         return '<p>{}</p>'.format(
-            '<br>'.join((self.address or '').splitlines())
+            '<br>'.join((prop or '').splitlines())
         )
 
     @property
+    def location_address_html(self):
+        return self._get_html_paragraph_with_line_breaks(self.location_address)
+
+    @property
+    def postal_address_html(self):
+        return self._get_html_paragraph_with_line_breaks(self.postal_address)
+
+    @property
+    def opening_hours_html(self):
+        return self._get_html_paragraph_with_line_breaks(self.opening_hours)
+
+    @property
     def notes_html(self):
-        return '<p>{}</p>'.format(
-            '<br>'.join((self.notes or '').splitlines())
-        )
+        return self._get_html_paragraph_with_line_breaks(self.notes)
 
     def deletable(self, request):
         if request.is_admin:

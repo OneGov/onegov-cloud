@@ -86,6 +86,24 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
         return self.portrait
 
+    @staticmethod
+    def _get_html_paragraph_with_line_breaks(prop):
+        return '<p>{}</p>'.format(
+            '<br>'.join((prop or '').splitlines())
+        )
+
+    @property
+    def location_address_html(self):
+        return self._get_html_paragraph_with_line_breaks(self.location_address)
+
+    @property
+    def postal_address_html(self):
+        return self._get_html_paragraph_with_line_breaks(self.postal_address)
+
+    @property
+    def opening_hours_html(self):
+        return self._get_html_paragraph_with_line_breaks(self.opening_hours)
+
     def proxy(self):
         """ Returns a proxy object to this agency allowing alternative linking
         paths. """
