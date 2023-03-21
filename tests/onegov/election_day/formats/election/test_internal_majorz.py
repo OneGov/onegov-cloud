@@ -566,6 +566,13 @@ def test_import_internal_majorz_temporary_results(session):
 
     # 1 Counted, 1 Uncounted, 10 Missing
     assert election.progress == (1, 11)
+    assert election.eligible_voters == 111
+    assert election.expats == 0
+    assert election.received_ballots == 11
+    assert election.blank_ballots == 1
+    assert election.invalid_ballots == 1
+    assert election.accounted_votes == 52
+    assert election.candidates.one().votes == 1
 
 
 def test_import_internal_majorz_regional(session):

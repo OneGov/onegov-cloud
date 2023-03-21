@@ -426,8 +426,8 @@ def paragraphify(text):
     ))
 
 
-def to_html_ul(value, convert_dashes=True):
-    """ Linkify and convert to text to one or multiple ul's.
+def to_html_ul(value, convert_dashes=True, with_title=False):
+    """ Linkify and convert to text to one or multiple ul's or paragraphs.
     """
     if not value:
         return ''
@@ -464,14 +464,19 @@ def to_html_ul(value, convert_dashes=True):
 
         line = line.lstrip('-').strip()
 
-        if new_p_or_ul or (was_list != is_list and i > 0):
-            elements.append(
-                ul(''.join(temp)) if was_list else p('<br>'.join(temp))
-            )
-            temp = []
-            was_list = False
+        if with_title:
+            elements.append(p(f'<span class="title">{line}</span>'))
+            with_title = False
+        else:
+            if new_p_or_ul or (was_list != is_list and i > 0):
+                elements.append(
+                    ul(''.join(temp)) if was_list else p('<br>'.join(temp))
+                )
+                temp = []
+                was_list = False
 
-        temp.append((li(line) if is_list else line)) if not new_p_or_ul else ''
+            if not new_p_or_ul:
+                temp.append((li(line) if is_list else line))
 
         new_p_or_ul = False
         was_list = is_list

@@ -29,6 +29,7 @@ from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
+from wtforms.validators import InputRequired
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 
@@ -49,6 +50,9 @@ def get_directory_entry_form_class(model, request):
             if not model.directory.enable_publication and not request.is_admin:
                 self.delete_field('publication_start')
                 self.delete_field('publication_end')
+            elif model.directory.required_publication:
+                self.publication_start.validators[0] = InputRequired()
+                self.publication_end.validators[0] = InputRequired()
 
     return OptionalMapPublicationForm
 
@@ -453,6 +457,7 @@ def handle_submit_directory_entry(self, request, form, layout=None):
             form=form,
             state='pending',
             payment_method=self.directory.payment_method,
+            minimum_price_total=self.directory.minimum_price_total,
             email=form.submitter.data,
             meta={
                 'handler_code': 'DIR',

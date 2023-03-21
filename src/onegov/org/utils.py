@@ -456,7 +456,7 @@ class AllocationEventInfo:
             Resource,
             {
                 'name': self.resource.name,
-                'date': self.allocation.start,
+                'date': self.allocation.display_start(),
                 'view': 'agendaDay'
             },
             name='occupancy'
@@ -884,6 +884,8 @@ def group_by_column(request, query, group_column, sort_column,
 
     transform = transform or (lambda v: v)
 
+    # groupby expects the input iterable (records) to already be sorted
+    records = sorted(records, key=group_key)
     for group, items in groupby(records, group_key):
         grouped[group] = sorted([i for i in items], key=sort_key)
         grouped[group] = [transform(i) for i in grouped[group]]

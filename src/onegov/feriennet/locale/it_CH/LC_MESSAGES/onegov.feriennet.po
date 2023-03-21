@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-10-18 13:30+0200\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -37,6 +37,30 @@ msgid "${count} Occasions"
 msgstr "${count} eventi"
 
 #, python-format
+msgid "${count} overfull"
+msgstr "${count} con troppi partecipanti"
+
+#, python-format
+msgid "${count} full"
+msgstr "${count} completo"
+
+#, python-format
+msgid "${count} operable"
+msgstr "${count} con abbastanza partecipanti"
+
+#, python-format
+msgid "${count} unoperable"
+msgstr "${count} con non abbastanza partecipanti"
+
+#, python-format
+msgid "${count} empty"
+msgstr "${count} con nessun partecipante"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} annullato"
+
+#, python-format
 msgid "${count} Wishes"
 msgstr "${count} Desideri"
 
@@ -53,8 +77,8 @@ msgid "${count} accepted"
 msgstr "${count} accettato"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} annullato"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} annullati o cancellati"
 
 #, python-format
 msgid "${count} denied"
@@ -79,6 +103,10 @@ msgstr "${count} femmina"
 #, python-format
 msgid "${count} Boys"
 msgstr "${count} maschio"
+
+#, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} dei quali senza prenotazioni accettate"
 
 #, python-format
 msgid "${amount}% Happiness"
@@ -298,7 +326,7 @@ msgstr "Voce di fattura testo"
 msgid "Invoice Item Paid"
 msgstr "Voce di fattura pagata"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Data di pagamento"
 
 msgid "Invoice Item Transaction ID"
@@ -357,6 +385,36 @@ msgstr "Conto bancario organizzatore"
 
 msgid "Organiser Beneficiary"
 msgstr "Beneficiario organizzazione"
+
+msgid "Confirmed Volunteers"
+msgstr "Aiutanti confermati"
+
+msgid "Volunteer State"
+msgstr "Stato dell'aiutante"
+
+msgid "First Name"
+msgstr "Nome"
+
+msgid "Last Name"
+msgstr "Cognome"
+
+msgid "Birth Date"
+msgstr "Data di nascita"
+
+msgid "Organisation"
+msgstr "Organizzazione"
+
+msgid "Place"
+msgstr "Località utente"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Telefono"
+
+msgid "Address"
+msgstr "Indirizzo"
 
 msgid "Wishlist / Bookings"
 msgstr "Lista desideri / Prenotazioni"
@@ -428,6 +486,12 @@ msgstr "Organizzatore"
 msgid "Member"
 msgstr "Membro"
 
+msgid "Contacted"
+msgstr "Contatto"
+
+msgid "Confirmed"
+msgstr "Confermato"
+
 msgid "Invoice Items"
 msgstr "Voci fattura"
 
@@ -457,6 +521,9 @@ msgstr "Utente"
 
 msgid "Exports user accounts."
 msgstr "Esportare gli account utente."
+
+msgid "Exports volunteers in the given period."
+msgstr "Esportazioni volontarie nel periodo indicato."
 
 msgid "Accessible"
 msgstr "Adatta a persone con disabilità"
@@ -560,6 +627,12 @@ msgstr "Formazione continua"
 msgid "Healthy Snacks"
 msgstr "Merende equilibrate"
 
+msgid "Just for Boys"
+msgstr "Solo ragazzi"
+
+msgid "Just for Girls"
+msgstr "Solo ragazze"
+
 msgid "Title"
 msgstr "Titolo"
 
@@ -593,12 +666,6 @@ msgstr "Mappa"
 msgid "You already entered a child with this name"
 msgstr "Ha già inserito un bambino con questo nome"
 
-msgid "First Name"
-msgstr "Nome"
-
-msgid "Last Name"
-msgstr "Cognome"
-
 msgid "Birthdate"
 msgstr "Data di nascita"
 
@@ -623,8 +690,8 @@ msgstr "Ignorare restrizioni di età"
 msgid "Accept TOS"
 msgstr "Accettare CG"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "CG"
 
@@ -747,6 +814,9 @@ msgstr "Per un utente specifico"
 
 msgid "For users with tags"
 msgstr "Per gli utenti di una categoria specifica"
+
+msgid "Payment date"
+msgstr "Data di pagamento"
 
 msgid "My donation"
 msgstr "La mia donazionoe"
@@ -1216,17 +1286,8 @@ msgstr "Appellativo"
 msgid "Personal"
 msgstr "Personale"
 
-msgid "Organisation"
-msgstr "Organizzazione"
-
-msgid "Address"
-msgstr "Indirizzo"
-
 msgid "Zip Code"
 msgstr "CAP"
-
-msgid "Place"
-msgstr "Località utente"
 
 msgid "Political Municipality"
 msgstr "Comune politico"
@@ -1236,9 +1297,6 @@ msgstr "Indirizzo e-mail"
 
 msgid "If different than username"
 msgstr "Se diverso dal nome utente"
-
-msgid "Phone"
-msgstr "Telefono"
 
 msgid "Emergency Contact"
 msgstr "Contatto in caso di emergenza"
@@ -1412,6 +1470,9 @@ msgstr ""
 "Le prenotazioni manuali possono essere create solo dopo la conferma della "
 "fatturazione."
 
+msgid "Payment with date"
+msgstr "Pagamento con data"
+
 msgid "Donation"
 msgstr "Donazione"
 
@@ -1428,7 +1489,10 @@ msgid "Register as Volunteer"
 msgstr "Registrazione come aiutante"
 
 msgid "Sort"
-msgstr ""
+msgstr "Tipo"
+
+msgid "Move"
+msgstr "Spostare"
 
 msgid "Half day"
 msgstr "Mezza giornata"
@@ -2085,9 +2149,6 @@ msgstr "La sua richiesta è stata completata con successo."
 msgid "I have read the ${tos} and accept them."
 msgstr "Ho letto e sono d'accordo con i ${tos}."
 
-msgid "E-Mail"
-msgstr "E-mail"
-
 msgid "Manage user"
 msgstr "Gestione utente"
 
@@ -2312,12 +2373,6 @@ msgstr "Nome"
 msgid "Last name"
 msgstr "Cognome"
 
-msgid "Contacted"
-msgstr "Contatto"
-
-msgid "Confirmed"
-msgstr "Confermato"
-
 msgid "Contact by e-mail"
 msgstr "Contattare per e-mail"
 
@@ -2503,6 +2558,9 @@ msgstr ""
 msgid "Add manual booking"
 msgstr "Aggiungere prenotazione manuale"
 
+msgid "Mark paid with specific date"
+msgstr "Contrassegnare il pagamento con una data specifica"
+
 msgid "Show invoice"
 msgstr "Mostra fattura"
 
@@ -2609,6 +2667,10 @@ msgstr "Non sono state create prenotazioni manualmente."
 #, python-format
 msgid "Created ${count} manual bookings"
 msgstr "${count} sono state create prenotazioni manualmente"
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Mark ha pagato per ${user}"
 
 msgid "Invite a companion"
 msgstr "Invitare gli amici"
@@ -3057,3 +3119,7 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} partecipanti registrati"

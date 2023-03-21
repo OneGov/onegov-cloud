@@ -80,7 +80,7 @@ configuration: &global-config
   # Some browsers send a special header when a user clicks on refresh while
   # holding down shift. The following setting will recompile themes whenever
   # that happens.
-  allow_shift_f5_compile: false
+  allow_shift_f5_compile: true
 
   # OneGov keeps track of queries run against postgres and reports the
   # redundant ones when 'redundant' is selected. Other possible values are
@@ -124,6 +124,13 @@ configuration: &global-config
   # api_rate_limit:
   # requests: 100
   # expiration: 900
+
+  # Websocket server configuration.
+  websockets:
+    client_url: ws://localhost:8765
+    client_csp: ws://localhost:8765
+    manage_url: ws://localhost:8765
+    manage_token: super-secret-token
 
   # Install https://github.com/seantis/d3-renderer
   # d3_renderer: 'http://localhost:1337'

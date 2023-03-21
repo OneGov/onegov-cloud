@@ -1,5 +1,3 @@
-import random
-
 from cached_property import cached_property
 from onegov.activity import Period, PeriodCollection, InvoiceCollection
 from onegov.activity.models.invoice_reference import Schema
@@ -25,14 +23,14 @@ BANNER_TEMPLATE = """
             <p class="banner-info">{info}</p>
         </a>
         <img src="{tracker}"
-                 border="0"
-                 height="1"
-                 width="1"
-                 onerror="
-                    this.getAttribute('src').length != 0
-                    && this.parentNode.parentNode.remove()
-                 "
-                 alt="Advertisement">
+                border="0"
+                height="1"
+                width="1"
+                onerror="
+                this.getAttribute('src').length != 0
+                && this.parentNode.parentNode.remove()
+                "
+                alt="Advertisement">
     </div>
 </div>
 """
@@ -76,11 +74,17 @@ class FeriennetApp(OrgApp):
     def sponsors(self):
         return load_sponsors(utils.module_path('onegov.feriennet', 'sponsors'))
 
-    def mail_sponsors(self, request):
-        return [
+    def mail_sponsor(self, request):
+        sponsors = [
             sponsor.compiled(request) for sponsor in self.sponsors
             if getattr(sponsor, 'mail_url', None)
         ]
+
+        if sponsors:
+            sponsors[0].banners['src'] = sponsors[0].url_for(
+                request, sponsors[0].banners['src'])
+
+        return sponsors
 
     @property
     def default_period(self):
@@ -90,37 +94,39 @@ class FeriennetApp(OrgApp):
     def public_organiser_data(self):
         return self.org.meta.get('public_organiser_data', ('name', 'website'))
 
-    def banner(self, request, id):
-        """ Randomly returns the html to one of the available booking banners.
-
-        """
+    def get_sponsors(self, request):
         language = request.locale[:2]
-        candidates = [
+        sponsors = [
             sponsor for sponsor in self.sponsors
             if (
                 getattr(sponsor, 'banners', None)
-                and id in sponsor.banners
-                and sponsor.banners.get('bookings', {}).get('src', {}).get(
-                    language, None
-                )
+                and sponsor.banners.get('src', {}).get(language, None)
             )
         ]
 
-        if not candidates:
+        if not sponsors:
             return None
+        else:
+            return sponsors
 
-        winner = random.choice(candidates)
-        winner = winner.compiled(request)
+    def banners(self, request):
+        sponsors = self.get_sponsors(request)
+        banners = []
 
-        info = winner.banners[id].get('info', None)
+        for sponsor in sponsors:
+            sponsor = sponsor.compiled(request)
+            info = sponsor.banners.get('info', None)
+            banners.append(
+                BANNER_TEMPLATE.format(
+                    id=id,
+                    src=sponsor.url_for(request, sponsor.banners['src']),
+                    url=sponsor.banners['url'],
+                    tracker=sponsor.banners.get('tracker', ''),
+                    info=info if info else ""
+                )
+            )
 
-        return BANNER_TEMPLATE.format(
-            id=id,
-            src=winner.url_for(request, winner.banners[id]['src']),
-            url=winner.banners[id]['url'],
-            tracker=winner.banners[id].get('tracker', ''),
-            info=info if info else ""
-        )
+        return banners
 
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', True)

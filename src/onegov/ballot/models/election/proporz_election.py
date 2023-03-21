@@ -1,20 +1,24 @@
 from collections import OrderedDict
 from itertools import groupby
 from onegov.ballot.models.election.candidate import Candidate
+from onegov.ballot.models.election.candidate_panachage_result import \
+    CandidatePanachageResult
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
 from onegov.ballot.models.election.election_result import ElectionResult
 from onegov.ballot.models.election.list import List
 from onegov.ballot.models.election.list_connection import ListConnection
+from onegov.ballot.models.election.list_panachage_result import \
+    ListPanachageResult
 from onegov.ballot.models.election.list_result import ListResult
-from onegov.ballot.models.election.panachage_result import PanachageResult
+from onegov.ballot.models.party_result.party_panachage_result import \
+    PartyPanachageResult
 from onegov.ballot.models.party_result.party_result import PartyResult
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
 from onegov.ballot.models.party_result.mixins import \
     HistoricalPartyResultsMixin
-from sqlalchemy import cast, func
-from sqlalchemy import String
+from sqlalchemy import func
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
@@ -54,9 +58,9 @@ class ProporzElection(
         lazy='dynamic',
     )
 
-    #: An election may contains n (party) panachage results
-    panachage_results = relationship(
-        'PanachageResult',
+    #: An election may contains n party panachage results
+    party_panachage_results = relationship(
+        'PartyPanachageResult',
         cascade='all, delete-orphan',
         backref=backref('election'),
         lazy='dynamic',
@@ -134,11 +138,31 @@ class ProporzElection(
 
         session = object_session(self)
 
-        ids = session.query(cast(List.id, String))
+        ids = session.query(List.id)
         ids = ids.filter(List.election_id == self.id)
 
-        results = session.query(PanachageResult)
-        results = results.filter(PanachageResult.target.in_(ids))
+        results = session.query(ListPanachageResult)
+        results = results.filter(
+            ListPanachageResult.target_id.in_(ids),
+            ListPanachageResult.votes > 0
+        )
+
+        return results.first() is not None
+
+    @property
+    def has_candidate_panachage_data(self):
+        """ Checks if there are candidate panachage data available. """
+
+        session = object_session(self)
+
+        ids = session.query(Candidate.id)
+        ids = ids.filter(Candidate.election_id == self.id)
+
+        results = session.query(CandidatePanachageResult)
+        results = results.filter(
+            CandidatePanachageResult.target_id.in_(ids),
+            CandidatePanachageResult.votes > 0
+        )
 
         return results.first() is not None
 
@@ -159,8 +183,8 @@ class ProporzElection(
         session.query(PartyResult).filter(
             PartyResult.election_id == self.id
         ).delete()
-        session.query(PanachageResult).filter(
-            PanachageResult.election_id == self.id
+        session.query(PartyPanachageResult).filter(
+            PartyPanachageResult.election_id == self.id
         ).delete()
 
     def export(self, locales):
@@ -255,36 +279,43 @@ class ProporzElection(
         # We need to collect the panachage results per list
         list_ids = session.query(List.id, List.list_id)
         list_ids = list_ids.filter(List.election_id == self.id)
+        list_ids = dict(list_ids)
+        list_ids[None] = '999'
+        list_panachage_results = session.query(ListPanachageResult)
+        list_panachage_results = list_panachage_results.filter(
+            ListPanachageResult.target_id.in_(list_ids)
+        )
+        list_panachage = {}
+        for result in list_panachage_results:
+            target = list_ids[result.target_id]
+            source = list_ids[result.source_id]
+            list_panachage.setdefault(target, {})
+            list_panachage[target][source] = result.votes
 
-        panachage_lists = []
-        # FIXME: in db, PanachageResult.source is either list.name,
-        #  list.list_id, and list.id, this is very inconsistent
-
-        # Sesam uses list.list_id for this
-        # SG Wabstic uses
-
-        panachage = {}
-        if self.has_lists_panachage_data:
-            panachage_results = session.query(PanachageResult)
-            panachage_results = panachage_results.filter(
-                PanachageResult.target.in_((str(id[0]) for id in list_ids))
-            )
-
-            panachage_lists = session.query(List.list_id)
-            panachage_lists = panachage_lists.filter(
-                List.election_id == self.id
-            )
-            panachage_lists = [t[0] for t in panachage_lists]
-            panachage_lists = sorted(
-                set(panachage_lists)
-                | set([r.source for r in panachage_results])
-            )
-
-            list_lookup = {str(id[0]): id[1] for id in list_ids}
-            panachage = {id: {} for id in panachage_lists}
-            for result in panachage_results:
-                key = list_lookup.get(result.target)
-                panachage[key][result.source] = result.votes
+        # We need to collect the panchage results per candidate
+        candidate_ids = session.query(Candidate.id, Candidate.candidate_id)
+        candidate_ids = candidate_ids.filter(Candidate.election_id == self.id)
+        candidate_ids = dict(candidate_ids)
+        candidate_panachage_results = session.query(
+            CandidatePanachageResult.target_id,
+            CandidatePanachageResult.source_id,
+            CandidatePanachageResult.votes,
+            ElectionResult.entity_id
+        )
+        candidate_panachage_results = candidate_panachage_results.outerjoin(
+            ElectionResult
+        )
+        candidate_panachage_results = candidate_panachage_results.filter(
+            CandidatePanachageResult.target_id.in_(candidate_ids)
+        )
+        candidate_panachage = {}
+        for result in candidate_panachage_results:
+            target = candidate_ids[result.target_id]
+            source = list_ids[result.source_id]
+            entity = result.entity_id
+            candidate_panachage.setdefault(entity, {})
+            candidate_panachage[entity].setdefault(target, {})
+            candidate_panachage[entity][target][source] = result.votes
 
         rows = []
         for result in results:
@@ -332,9 +363,16 @@ class ProporzElection(
             row['candidate_gender'] = result.gender or ''
             row['candidate_year_of_birth'] = result.year_of_birth or ''
             row['candidate_votes'] = result.votes
-            for target_id in panachage_lists:
-                key = f'list_panachage_votes_from_list_{target_id}'
-                row[key] = panachage.get(result.list_id, {}).get(target_id)
+            if list_panachage:
+                for id_ in sorted(list_ids.values()):
+                    key = f'list_panachage_votes_from_list_{id_}'
+                    row[key] = list_panachage.get(result.list_id, {}).get(id_)
+            if candidate_panachage:
+                for id_ in sorted(list_ids.values()):
+                    key = f'candidate_panachage_votes_from_list_{id_}'
+                    row[key] = candidate_panachage.get(
+                        result.entity_id, {}
+                    ).get(result.candidate_id, {}).get(id_)
             rows.append(row)
 
         return rows

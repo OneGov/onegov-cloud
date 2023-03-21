@@ -234,12 +234,11 @@ def handle_password_reset_request(self, request, form, layout=None):
 
     if form.submitted(request):
 
-        user = UserCollection(request.session)\
-            .by_username(form.email.data)
+        user = UserCollection(request.session).by_username(form.email.data)
 
         url = layout.password_reset_url(user)
 
-        if url:
+        if url and user.active:
             send_transactional_html_mail(
                 request=request,
                 template='mail_password_reset.pt',
@@ -257,7 +256,7 @@ def handle_password_reset_request(self, request, form, layout=None):
         response = morepath.redirect(request.link(self, name='login'))
         request.success(
             _(('A password reset link has been sent to ${email}, provided an '
-               'account exists for this email address.'),
+               'active account exists for this email address.'),
               mapping={'email': form.email.data})
         )
         return response

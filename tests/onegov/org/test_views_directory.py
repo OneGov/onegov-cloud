@@ -44,9 +44,9 @@ def strip_s(dt, timezone=None):
     return standardize_date(dt, timezone)
 
 
-def create_directory(client, publication=True, change_reqs=True,
-                     submission=True, extended_submitter=False,
-                     title='Meetings', lead=None
+def create_directory(client, publication=True, required_publication=False,
+                     change_reqs=True, submission=True,
+                     extended_submitter=False, title='Meetings', lead=None
                      ):
     client.login_admin()
     page = client.get('/directories').click('Verzeichnis')
@@ -63,6 +63,7 @@ def create_directory(client, publication=True, change_reqs=True,
     page.form['enable_map'] = 'entry'
     page.form['thumbnail'] = 'Pic'
     page.form['enable_publication'] = publication
+    page.form['required_publication'] = required_publication
     page.form['enable_change_requests'] = change_reqs
     if submission:
         page.form['enable_submissions'] = True
@@ -134,6 +135,29 @@ def test_publication_added_by_admin(client):
     # check new submission
     page = meetings.click('Eintrag', index=1)
     assert 'publication_start' not in page.form.fields
+
+
+def test_required_publication(client):
+    utc_now = utcnow()
+    now = to_timezone(utc_now, 'Europe/Zurich')
+
+    meetings = create_directory(client, required_publication=True)
+
+    # These url should be available for people who know it
+    client.get('/directories/meetings/+submit')
+
+    # create one entry as admin, publications is still available for admin
+    page = meetings.click('Eintrag', index=0)
+    page.form['name'] = 'Annual'
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    page.form['publication_start'] = dt_for_form(now)
+    page = page.form.submit()
+    assert 'Dieses Feld wird benötigt' in page
+    # we have to submit the file again, can't evade that
+    page.form['pic'] = Upload('annual.jpg', create_image().read())
+    annual_end = now + timedelta(days=1)
+    page.form['publication_end'] = dt_for_form(annual_end)
+    page.form.submit().follow()
 
 
 def test_publication_with_submission(client):
@@ -324,7 +348,6 @@ def test_directory_submissions(client, postgres):
     page.form['price_per_submission'] = 100
     page.form['payment_method'] = 'manual'
     page = page.form.submit().follow()
-    assert "Eintrag vorschlagen" in page
     anon = client.spawn()
     assert "Eintrag vorschlagen" not in anon.get(page.request.url)
 

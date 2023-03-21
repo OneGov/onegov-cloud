@@ -3,7 +3,7 @@ from freezegun import freeze_time
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundRelationship
 from onegov.ballot import ElectionResult
-from onegov.ballot import PanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionCompoundLayout
@@ -190,7 +190,7 @@ def test_election_compound_layout_general(session):
         ('data', None)
     ):
         layout = ElectionCompoundLayout(compound, DummyRequest(), tab=tab)
-        assert expected == layout.table_link()
+        assert not expected or f'{expected}?locale=de' == layout.table_link()
 
 
 def test_election_compound_layout_menu(session):
@@ -247,8 +247,8 @@ def test_election_compound_layout_menu(session):
             party_id='1'
         )
     )
-    compound.panachage_results.append(
-        PanachageResult(target='t', source='t ', votes=0)
+    compound.party_panachage_results.append(
+        PartyPanachageResult(target='t', source='t ', votes=10)
     )
     assert ElectionCompoundLayout(compound, request).menu == [
         ('__districts', 'ElectionCompound/districts', False, []),

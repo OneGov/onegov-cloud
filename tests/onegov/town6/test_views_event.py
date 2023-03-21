@@ -5,9 +5,13 @@ import transaction
 from datetime import date, timedelta
 from onegov.event import Event
 from tests.onegov.town6.common import step_class
+from unittest.mock import patch
 
 
-def test_event_steps(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_event_steps(broadcast, authenticate, connect, client):
 
     form_page = client.get('/events').click("Veranstaltung vorschlagen")
     start_date = date.today() + timedelta(days=1)
@@ -87,6 +91,13 @@ def test_event_steps(client):
     message = client.get_email(0)
     assert message['To'] == "test@example.org"
     assert ticket_nr in message['TextBody']
+
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
     # Make corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
@@ -195,6 +206,41 @@ def test_event_steps(client):
     assert "Bearbeiten Sie diese Veranstaltung." not in confirmation_page
     assert client.get(form_page.request.url, expect_errors=True).status_code \
         == 403
+
+
+def test_create_events_directly(client):
+    client.login_admin()
+    form_page = client.get('/events').click("^Veranstaltung$")
+    # As admin or editor, the progress indicator should not be displayed.
+    # This only makes sense in the publishing process for visitors.
+    assert 'progress-indicator' not in form_page
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+
+    # Fill out event
+    form_page.form['email'] = "test@example.org"
+    form_page.form['title'] = "My Event"
+    form_page.form['description'] = "My event is an event."
+    form_page.form['location'] = "Location"
+    form_page.form['organizer'] = "The Organizer"
+    form_page.form.set('tags', True, index=0)
+    form_page.form.set('tags', True, index=1)
+    form_page.form['start_date'] = start_date.isoformat()
+    form_page.form['start_time'] = "18:00"
+    form_page.form['end_time'] = "22:00"
+    form_page.form['end_date'] = end_date.isoformat()
+    form_page.form['repeat'] = 'weekly'
+    form_page.form.set('weekly', True, index=0)
+    form_page.form.set('weekly', True, index=1)
+    form_page.form.set('weekly', True, index=2)
+    form_page.form.set('weekly', True, index=3)
+    form_page.form.set('weekly', True, index=4)
+    form_page.form.set('weekly', True, index=5)
+    form_page.form.set('weekly', True, index=6)
+
+    events_redirect = form_page.form.submit().follow().follow()
+    assert "Event 'My Event' erfolgreich erstellt" in events_redirect
 
 
 def test_hide_event_submission_option(client):

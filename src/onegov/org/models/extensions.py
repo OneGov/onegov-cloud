@@ -154,7 +154,8 @@ class ContactExtension(ContentExtension):
     @contact.setter
     def contact(self, value):
         self.content['contact'] = value
-        self.content['contact_html'] = to_html_ul(value, convert_dashes=True)
+        self.content['contact_html'] = to_html_ul(
+            value, convert_dashes=True, with_title=True)
 
     @property
     def contact_html(self):
@@ -399,7 +400,6 @@ class PersonLinkExtension(ContentExtension):
 
         for person in self.get_selectable_people(request):
             field_id = fieldset_id + '_' + person.id.hex
-
             builder.add_field(
                 field_class=BooleanField,
                 field_id=field_id,
@@ -413,6 +413,7 @@ class PersonLinkExtension(ContentExtension):
                 label=request.translate(_("Function")),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
+                default=getattr(person, 'function', None),
             )
 
         return builder.form_class

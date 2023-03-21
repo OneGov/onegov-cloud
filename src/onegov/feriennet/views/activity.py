@@ -1,4 +1,5 @@
 import sedate
+import random
 
 from datetime import date, timedelta
 from itertools import groupby
@@ -409,8 +410,17 @@ def view_activities(self, request):
 
     filters = {k: v for k, v in filters.items() if v}
 
+    all_sponsors = layout.app.banners(request)
+    main_sponsor = all_sponsors[0]
+    sponsors = all_sponsors[1:len(all_sponsors)]
+
+    activities = list(self.batch) if show_activities else []
+
     return {
-        'activities': self.batch if show_activities else None,
+        'activities': activities,
+        'main_sponsor': main_sponsor,
+        'sponsors': sponsors,
+        'random': random,
         'layout': layout,
         'title': _("Activities"),
         'filters': filters,
@@ -853,7 +863,8 @@ def propose_activity(self, request):
             request.app.active_period)
 
         ticket = TicketCollection(session).open_ticket(
-            handler_code='FER', handler_id=publication_request.id.hex
+            handler_code='FER',
+            handler_id=publication_request.id.hex
         )
         TicketMessage.create(ticket, request, 'opened')
 
@@ -879,6 +890,15 @@ def propose_activity(self, request):
                 'model': ticket
             }
         )
+
+    request.app.send_websocket(
+        channel=request.app.websockets_private_channel,
+        message={
+            'event': 'browser-notification',
+            'title': request.translate(_('New ticket')),
+            'created': ticket.created.isoformat()
+        }
+    )
 
     request.success(_("Thank you for your proposal!"))
 

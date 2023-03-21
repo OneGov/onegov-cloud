@@ -146,7 +146,7 @@ def get_lists_data(
 ):
     """" View the lists as JSON. Used to for the lists bar chart. """
 
-    completed = election.completed
+    allocated_mandates = election.allocated_mandates
     colors = election.colors
 
     if election.type == 'majorz':
@@ -161,9 +161,10 @@ def get_lists_data(
             {
                 'text': list_.name,
                 'value': list_.votes,
-                'value2': list_.number_of_mandates if completed else None,
+                'value2': list_.number_of_mandates,
                 'class': (
-                    'active' if completed and list_.number_of_mandates
+                    'active'
+                    if list_.number_of_mandates or not allocated_mandates
                     else 'inactive'
                 ),
                 'color': colors.get(list_.name)
@@ -208,17 +209,18 @@ def get_lists_panachage_data(election, request):
     node_keys = list(nodes.keys())
 
     links = []
+    list_ids = {list.id: list.list_id for list in election.lists}
+    list_ids[None] = '999'
     for list_target in election.lists:
         target_index = node_keys.index(f'right.{list_target.list_id}')
-        remaining = list_target.votes - sum(
-            [r.votes for r in list_target.panachage_results]
-        )
         for result in list_target.panachage_results:
-            source_item = nodes.get(f'left.{result.source}', {})
-            source_index = node_keys.index(f'left.{result.source}')
+            source_list_id = list_ids[result.source_id]
+            source_key = f'left.{source_list_id}'
+            source_item = nodes.get(source_key, {})
+            source_index = node_keys.index(source_key)
             votes = result.votes
-            if list_target.list_id == result.source:
-                votes += remaining
+            if list_target.list_id == source_list_id:
+                continue
             links.append({
                 'source': source_index,
                 'target': target_index,

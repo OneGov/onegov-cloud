@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-01-17 14:32+0100\n"
+"POT-Creation-Date: 2023-02-10 17:08+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -111,6 +111,9 @@ msgstr "zurück"
 msgid "Press ${shortcut} to open Search"
 msgstr "Benutze ${shortcut} um die Suche zu öffnen"
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -159,6 +162,9 @@ msgstr "Formular löschen"
 
 msgid "Export"
 msgstr "Export"
+
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Change URL"
 msgstr "URL ändern"
@@ -218,6 +224,26 @@ msgstr "Neue Notiz"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Destination"
+msgstr "Ziel"
+
+msgid "- Root -"
+msgstr "- oberste Ebene -"
+
+msgid "Upload to Gever"
+msgstr "Hochladen auf Gever"
+
+msgid "Do you really want to upload this ticket?"
+msgstr "Wollen Sie dieses Ticket wirklich hochladen?"
+
+msgid "This will upload this ticket to the Gever instance, if configured."
+msgstr ""
+"Dadurch wird dieses Ticket auf die Gever-Instanz hochgeladen, sofern "
+"konfiguriert."
+
+msgid "Upload Ticket"
+msgstr "Ticket hochladen"
 
 msgid "Confirmation"
 msgstr "Bestätigung"
@@ -334,10 +360,15 @@ msgstr "Jeden ${days} bis zum ${end}."
 msgid "Import"
 msgstr "Import"
 
-msgid "This event can't be editet."
+#.
+#. Used in sentence: "${event} published."
+msgid "Event"
+msgstr "Veranstaltung"
+
+msgid "This event can't be edited."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
 
-msgid "Imported events can not be editet."
+msgid "Imported events can not be edited."
 msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
 
 msgid "Do you really want to delete this event?"
@@ -779,6 +810,9 @@ msgstr "Änderungsvorschlag"
 msgid "New Entry"
 msgstr "Neuer Eintrag"
 
+msgid "Functions:"
+msgstr "Funktionen:"
+
 msgid "Open"
 msgstr "Offen"
 
@@ -819,7 +853,7 @@ msgid ""
 "Persons living outside the following zipcodes may only reserve this "
 "allocation on the ${date}: ${zipcodes}"
 msgstr ""
-"Personen die ausserhalb der folgenden Postleitzahlen leben können diese "
+"Personen, die ausserhalb der folgenden Postleitzahlen leben, können diese "
 "Reservation erst am ${date} tätigen: ${zipcodes}"
 
 msgid "Quota"
@@ -882,8 +916,14 @@ msgstr "Alle Termine"
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
 
+msgid "Past events"
+msgstr "Vergangene Veranstaltungen"
+
 msgid "Learn more"
 msgstr "Mehr erfahren"
+
+msgid "From"
+msgstr "Von"
 
 msgid "To"
 msgstr "Bis"
@@ -1018,10 +1058,10 @@ msgid "Reset"
 msgstr "Zurücksetzen"
 
 msgid "Will be published until:"
-msgstr ""
+msgstr "Wird publiziert bis:"
 
 msgid "Publication end date:"
-msgstr ""
+msgstr "Enddatum der Publikation:"
 
 msgid "Not a publication"
 msgstr "keine Publikation"
@@ -1426,10 +1466,6 @@ msgstr "Veranstaltung bearbeitet."
 msgid "${event} published."
 msgstr "${event} veröffentlicht."
 
-#. Used in sentence: "${event} published."
-msgid "Event"
-msgstr "Veranstaltung"
-
 msgid "Event deleted."
 msgstr "Veranstaltung gelöscht."
 
@@ -1501,6 +1537,9 @@ msgstr "Ticket archiviert."
 
 msgid "Ticket recovered from archive."
 msgstr "Ticket aus dem Archiv geholt."
+
+msgid "Ticket uploaded to Gever."
+msgstr "Ticket zu Gever hochgeladen."
 
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden."
@@ -1586,14 +1625,14 @@ msgstr "Schlagwort"
 msgid "Date"
 msgstr "Datum"
 
+msgid "Actions"
+msgstr "Aktionen"
+
 msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
-
-msgid "Submit your own event"
-msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
 msgid "No payment providers defined."
 msgstr "Keine Zahlungsanbieter definiert."
@@ -1912,6 +1951,13 @@ msgstr "Dann fügen Sie der Anfrage eine Nachricht hinzu."
 msgid "New messages have been disabled because the ticket has been closed."
 msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
 
+msgid ""
+"Enable notifications about new tickets. Only works when being logged in and "
+"having the browser with the site open."
+msgstr ""
+"Benachrichtigungen über neue Tickets aktivieren. Funktioniert nur falls "
+"eingeloggt und solange der Browser mit der Website geöffnet ist."
+
 msgid "Archive all selected tickets?"
 msgstr "Alle ausgewählten Tickets archivieren?"
 
@@ -2060,18 +2106,3 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
-
-msgid "Functions"
-msgstr "Funktionen"
-
-#~ msgid "From"
-#~ msgstr "Von"
-
-#~ msgid "Partner"
-#~ msgstr "Partner"
-
-#~ msgid "Ticket Settings"
-#~ msgstr "Ticket-Einstellungen"
-
-#~ msgid "Newsletter Settings"
-#~ msgstr "Newsletter Einstellungen"

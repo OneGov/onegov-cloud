@@ -529,6 +529,15 @@ def report_agency_change(self, request, form):
                 }
             )
 
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket')),
+                'created': ticket.created.isoformat()
+            }
+        )
+
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))
 

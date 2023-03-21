@@ -457,6 +457,9 @@ class WsgiServer(FileSystemEventHandler):
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """
 
+        if getattr(event, 'event_type', None) == 'opened':
+            return
+
         src_path = event.src_path
 
         if 'tests/' in src_path:
@@ -472,6 +475,9 @@ class WsgiServer(FileSystemEventHandler):
             return
 
         if src_path.endswith('pt'):
+            return
+
+        if src_path.endswith('.rdb'):
             return
 
         if '/.testmondata' in src_path:

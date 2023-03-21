@@ -83,8 +83,8 @@ $person-email-icon: '\f0e0';
             margin-bottom: 0;
             margin-left: 0;
 
-            li::before {
-                margin-right: .5ex;
+            li {
+                margin-left: 1em;
             }
         }
     }

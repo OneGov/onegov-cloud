@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-18 13:30+0200\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -37,6 +37,30 @@ msgid "${count} Occasions"
 msgstr "${count} Durchführungen"
 
 #, python-format
+msgid "${count} overfull"
+msgstr "${count} überbelegt"
+
+#, python-format
+msgid "${count} full"
+msgstr "${count} belegt"
+
+#, python-format
+msgid "${count} operable"
+msgstr "${count} durchführbar"
+
+#, python-format
+msgid "${count} unoperable"
+msgstr "${count} unterbelegt"
+
+#, python-format
+msgid "${count} empty"
+msgstr "${count} unbelegt"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} abgesagt"
+
+#, python-format
 msgid "${count} Wishes"
 msgstr "${count} Wünsche"
 
@@ -53,8 +77,8 @@ msgid "${count} accepted"
 msgstr "${count} angenommen"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} abgesagt"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} abgesagt oder storniert"
 
 #, python-format
 msgid "${count} denied"
@@ -81,12 +105,16 @@ msgid "${count} Boys"
 msgstr "${count} Männlich"
 
 #, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} davon ohne akzeptierte Buchungen"
+
+#, python-format
 msgid "${amount}% Happiness"
 msgstr "${amount}% Zufriedenheit"
 
 #, python-format
 msgid "${count} Attendees Without Occasion"
-msgstr "${count} Teilnehmende ohne Durchführung"
+msgstr "${count} Person(en) ohne Durchführung"
 
 #, python-format
 msgid "${amount} CHF outstanding"
@@ -170,22 +198,22 @@ msgid "Booking Date"
 msgstr "Buchungsdatum"
 
 msgid "Attendee First Name"
-msgstr "Teilnehmer Vorname"
+msgstr "Teilnehmende Vorname"
 
 msgid "Attendee Last Name"
-msgstr "Teilnehmer Nachname"
+msgstr "Teilnehmende Nachname"
 
 msgid "Attendee Birth Date"
-msgstr "Teilnehmer Geburtsdatum"
+msgstr "Teilnehmende Geburtsdatum"
 
 msgid "Attendee Gender"
-msgstr "Teilnehmer Geschlecht"
+msgstr "Teilnehmende Geschlecht"
 
 msgid "Attendee Notes"
-msgstr "Teilnehmer Bemerkungen"
+msgstr "Teilnehmende Bemerkungen"
 
 msgid "Attendee Booking-Limit"
-msgstr "Teilnehmer Buchungslimite"
+msgstr "Teilnehmende Buchungslimite"
 
 msgid "Occasion Rescinded"
 msgstr "Durchführung Abgesagt"
@@ -298,7 +326,7 @@ msgstr "Rechnungsposition Text"
 msgid "Invoice Item Paid"
 msgstr "Rechnungsposition Bezahlt"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Zahlungsdatum"
 
 msgid "Invoice Item Transaction ID"
@@ -357,6 +385,36 @@ msgstr "Veranstalter Bankkonto"
 
 msgid "Organiser Beneficiary"
 msgstr "Veranstalter Begünstigter"
+
+msgid "Confirmed Volunteers"
+msgstr "Bestätigte Helfer"
+
+msgid "Volunteer State"
+msgstr "Helfer Status"
+
+msgid "First Name"
+msgstr "Vorname"
+
+msgid "Last Name"
+msgstr "Nachname"
+
+msgid "Birth Date"
+msgstr "Geburtsdatum"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Place"
+msgstr "Ort"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Wishlist / Bookings"
 msgstr "Wunschliste / Buchungen"
@@ -427,6 +485,12 @@ msgstr "Veranstalter"
 msgid "Member"
 msgstr "Mitglied"
 
+msgid "Contacted"
+msgstr "Kontaktiert"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
 msgid "Invoice Items"
 msgstr "Rechnungspositionen"
 
@@ -456,6 +520,9 @@ msgstr "Benutzer"
 
 msgid "Exports user accounts."
 msgstr "Exportiert Benutzerkonten."
+
+msgid "Exports volunteers in the given period."
+msgstr "Exportiert Helfer im gewählten Zeitraum."
 
 msgid "Accessible"
 msgstr "Behindertenfreundlich"
@@ -559,6 +626,12 @@ msgstr "Weiterbildung"
 msgid "Healthy Snacks"
 msgstr "Gesunde Snacks"
 
+msgid "Just for Boys"
+msgstr "Nur Jungen"
+
+msgid "Just for Girls"
+msgstr "Nur Mädchen"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -592,12 +665,6 @@ msgstr "Karte"
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits eine Person mit diesem Namen erfasst"
 
-msgid "First Name"
-msgstr "Vorname"
-
-msgid "Last Name"
-msgstr "Nachname"
-
 msgid "Birthdate"
 msgstr "Geburtsdatum"
 
@@ -611,7 +678,7 @@ msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
 msgid "Attendee"
-msgstr "Teilnehmer"
+msgstr "Teilnehmende"
 
 msgid "Note"
 msgstr "Bemerkung"
@@ -622,8 +689,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "AGB"
 
@@ -742,6 +809,9 @@ msgstr "Für einen spezifischen Benutzer"
 msgid "For users with tags"
 msgstr "Für Benutzer einer bestimmten Kategorie"
 
+msgid "Payment date"
+msgstr "Bezahldatum"
+
 msgid "My donation"
 msgstr "Meine Spende"
 
@@ -835,11 +905,11 @@ msgstr ""
 
 #, python-format
 msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
-msgstr "${title} (abgesagt) <small>${dates}, ${count} Teilnehmer</small>"
+msgstr "${title} (abgesagt) <small>${dates}, ${count} Teilnehmende</small>"
 
 #, python-format
 msgid "${title} <small>${dates}, ${count} Attendees</small>"
-msgstr "${title} <small>${dates}, ${count} Teilnehmer</small>"
+msgstr "${title} <small>${dates}, ${count} Teilnehmende</small>"
 
 msgid "Dates"
 msgstr "Daten"
@@ -857,7 +927,7 @@ msgid "Minimum Number of Participants"
 msgstr "Mindestzahl Teilnehmende"
 
 msgid "Participants"
-msgstr "Teilnehmer"
+msgstr "Teilnehmende"
 
 msgid "Maximum Number of Participants"
 msgstr "Anzahl Plätze"
@@ -928,7 +998,8 @@ msgid ""
 "The minium number of participants cannot be higher than the maximum number "
 "of participants"
 msgstr ""
-"The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
+"The Mindestzahl der Teilnehmenden darf nicht grösser als die Anzahl Plätze "
+"sein"
 
 msgid ""
 "The maximum number of spots is lower than the number of already accepted "
@@ -1213,17 +1284,8 @@ msgstr "Anrede"
 msgid "Personal"
 msgstr "Persönlich"
 
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "Address"
-msgstr "Adresse"
-
 msgid "Zip Code"
 msgstr "PLZ"
-
-msgid "Place"
-msgstr "Ort"
 
 msgid "Political Municipality"
 msgstr "Politische Gemeinde"
@@ -1233,9 +1295,6 @@ msgstr "Öffentliche E-Mail Adresse"
 
 msgid "If different than username"
 msgstr "Falls anders als Benutzername"
-
-msgid "Phone"
-msgstr "Telefon"
 
 msgid "Emergency Contact"
 msgstr "Kontakt im Notfall"
@@ -1354,7 +1413,7 @@ msgstr ""
 "bestehen bevor Durchführungen erfasst werden können."
 
 msgid "Attendees"
-msgstr "Teilnehmer"
+msgstr "Teilnehmende"
 
 msgid "Show Ticket"
 msgstr "Zum Ticket"
@@ -1410,6 +1469,9 @@ msgstr ""
 "Manuelle Buchungen können erst nach Bestätigung der Fakturierung erstellt "
 "werden."
 
+msgid "Payment with date"
+msgstr "Bezahlung mit Datum"
+
 msgid "Donation"
 msgstr "Spende"
 
@@ -1426,7 +1488,10 @@ msgid "Register as Volunteer"
 msgstr "Registration als Hilfsperson"
 
 msgid "Sort"
-msgstr ""
+msgstr "Sortieren"
+
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Half day"
 msgstr "Halbtägig"
@@ -2087,9 +2152,6 @@ msgstr "Ihr Anliegen wurde erfolgreich abgeschlossen."
 msgid "I have read the ${tos} and accept them."
 msgstr "Ich habe die ${tos} gelesen und stimme diesen zu."
 
-msgid "E-Mail"
-msgstr "E-Mail"
-
 msgid "Manage user"
 msgstr "Benutzende verwalten"
 
@@ -2314,12 +2376,6 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Contacted"
-msgstr "Kontaktiert"
-
-msgid "Confirmed"
-msgstr "Bestätigt"
-
 msgid "Contact by e-mail"
 msgstr "Via E-Mail kontaktieren"
 
@@ -2492,7 +2548,7 @@ msgid "Your activity has been archived"
 msgstr "Ihr Angebot wurde archiviert"
 
 msgid "Edit Attendee"
-msgstr "Teilnehmer bearbeiten"
+msgstr "Teilnehmende bearbeiten"
 
 #, python-format
 msgid "Booking Limit of ${name}"
@@ -2505,6 +2561,9 @@ msgstr ""
 
 msgid "Add manual booking"
 msgstr "Manuelle Buchung hinzufügen"
+
+msgid "Mark paid with specific date"
+msgstr "Als bezahlt markieren mit bestimmten Datum"
 
 msgid "Show invoice"
 msgstr "Rechnung anzeigen"
@@ -2612,6 +2671,10 @@ msgstr "Es wurden keine manuellen Buchungen erstellt."
 #, python-format
 msgid "Created ${count} manual bookings"
 msgstr "${count} manuelle Buchungen wurden erstellt"
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Für ${user} auf bezahlt setzen"
 
 msgid "Invite a companion"
 msgstr "Gspänli einladen"
@@ -2855,7 +2918,7 @@ msgstr "Bedarf bearbeiten"
 
 #, python-format
 msgid "Attendees for ${period}"
-msgstr "Teilnehmer ${period}"
+msgstr "Teilnehmende ${period}"
 
 msgid "Deactivate"
 msgstr "Deaktivieren"
@@ -3060,3 +3123,34 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Mark paid for "
+#~ msgstr "Auf bezahlt setzen für"
+
+#, python-format
+#~ msgid "${count} of which are overfull"
+#~ msgstr "${count} davon sind überbelegt"
+
+#, python-format
+#~ msgid "${count} of which are full"
+#~ msgstr "${count} davon sind belegt"
+
+#, python-format
+#~ msgid "${count} of which are operable"
+#~ msgstr "${count} davon sind durchführbar"
+
+#, python-format
+#~ msgid "${count} of which are unoperable"
+#~ msgstr "${count} davon sind unterbelegt"
+
+#, python-format
+#~ msgid "${count} of which are empty"
+#~ msgstr "${count} davon sind unbelegt"
+
+#, python-format
+#~ msgid "${count} of which are cancelled"
+#~ msgstr "${count} davon sind abgesagt"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} registierte Teilnehmende"

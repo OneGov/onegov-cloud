@@ -34,9 +34,15 @@ GENDERS = {
     'female': _("Girl")
 }
 
-
 ROLES = {
     'admin': _("Administrator"),
     'editor': _("Editor"),
     'member': _("Member"),
+}
+
+# Refer to states used in /onegov-cloud/src/onegov/activity/models/volunteer.py
+STATES = {
+    'open': _("Open"),
+    'contacted': _("Contacted"),
+    'confirmed': _("Confirmed")
 }

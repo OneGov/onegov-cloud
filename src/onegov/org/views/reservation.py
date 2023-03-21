@@ -263,7 +263,8 @@ def handle_reservation_form(self, request, form, layout=None):
                 form=self.form_class(),
                 state='pending',
                 id=token,
-                payment_method=self.payment_method
+                payment_method=self.payment_method,
+                minimum_price_total=self.minimum_price_total,
             )
 
         # update the data on the submission
@@ -532,6 +533,15 @@ def finalize_reservation(self, request):
                     'model': ticket
                 }
             )
+
+        request.app.send_websocket(
+            channel=request.app.websockets_private_channel,
+            message={
+                'event': 'browser-notification',
+                'title': request.translate(_('New ticket')),
+                'created': ticket.created.isoformat()
+            }
+        )
 
         if request.auto_accept(ticket):
             try:

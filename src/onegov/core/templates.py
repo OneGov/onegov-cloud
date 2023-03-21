@@ -42,7 +42,7 @@ from chameleon import PageTemplateLoader
 from chameleon import PageTextTemplateFile
 from chameleon.astutil import Builtin
 from chameleon.tal import RepeatDict
-from chameleon.utils import Scope, decode_string
+from chameleon.utils import Scope
 from onegov.core.framework import Framework
 
 
@@ -240,7 +240,7 @@ def render_macro(macro, request, content, suppress_global_variables=True):
 
         variables.setdefault('__translate', variables['translate'])
         variables.setdefault('__convert', variables['translate'])
-        variables.setdefault('__decode', decode_string)
+        variables.setdefault('__decode', bytes.decode)
         variables.setdefault('__on_error_handler', Builtin('str'))
         variables.setdefault('target_language', None)
         request._macro_variables = variables

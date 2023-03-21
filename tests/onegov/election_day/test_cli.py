@@ -37,6 +37,11 @@ def write_config(path, postgres_dsn, temporary_directory, redis_url):
                     ),
                     'lockfile_path': temporary_directory,
                     'd3_renderer': 'http://localhost:1337',
+                    'websockets': {
+                        'client_url': 'ws://localhost:8766',
+                        'manage_url': 'ws://localhost:8766',
+                        'manage_token': 'super-super-secret-token'
+                    }
                 },
             }
         ]

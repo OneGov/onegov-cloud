@@ -198,8 +198,6 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: the total eligible voters
     eligible_voters = summarized_property('eligible_voters')
 
-    counted_eligible_voters = summarized_property('counted_eligible_voters')
-
     #: the total expats
     expats = summarized_property('expats')
 

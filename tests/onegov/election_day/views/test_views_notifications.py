@@ -23,8 +23,8 @@ def test_view_notifications_votes(election_day_app_zg):
     new.form.submit()
 
     # Test retrigger messages
-    assert "Benachrichtigungen auslösen" not in client.get('/manage/votes')
-    assert "Benachrichtigungen auszulösen" not in upload_vote(client, False)
+    assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
+    assert "Benachrichtigungen auszulösen" in upload_vote(client, False)
 
     principal = election_day_app_zg.principal
     principal.webhooks = {'http://example.com/1': None}
@@ -91,8 +91,8 @@ def test_view_notifications_elections(election_day_app_gr):
     new.form.submit()
 
     # Test retrigger messages
-    assert "Benachrichtigungen auslösen" not in client.get('/manage/elections')
-    assert "Benachrichtigungen ausupload_election_compoundzulösen" not in \
+    assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
+    assert "Benachrichtigungen auszulösen" in \
         upload_majorz_election(client, False)
 
     principal = election_day_app_gr.principal
@@ -163,10 +163,10 @@ def test_view_notifications_election_compouds(election_day_app_gr):
     create_election_compound(client)
 
     # Test retrigger messages
-    assert "Benachrichtigungen auslösen" not in client.get(
+    assert "Benachrichtigungen auslösen" in client.get(
         '/manage/election-compounds'
     )
-    assert "Benachrichtigungen auszulösen" not in upload_election_compound(
+    assert "Benachrichtigungen auszulösen" in upload_election_compound(
         client, False
     )
 

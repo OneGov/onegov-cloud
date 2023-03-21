@@ -330,15 +330,15 @@
                 ${field()}
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:b>
-            <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField')">
-                <label tal:attributes="class field.errors and 'error' or field.type" tal:condition="not checkbox_fields and not radio_field">
+            <tal:b condition="input_type != 'hidden'" define="radio_field field.type == 'RadioField'; checkbox_fields (field.type == 'MultiCheckboxField' or field.type == 'OrderedMultiCheckboxField'); field_list field.type == 'UploadMultipleField'">
+                <label tal:attributes="class field.errors and not field_list and 'error' or field.type" tal:condition="not checkbox_fields and not radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </label>
 
                 <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="checkbox_fields or radio_field">
                     <metal:b use-macro="layout.macros['field']" />
                 </div>
-                <small class="error" tal:repeat="error field.errors">${error}</small>
+                <small class="error" tal:condition="not field_list" tal:repeat="error field.errors">${error}</small>
             </tal:b>
         </tal:b>
     </div></div>
@@ -589,24 +589,47 @@
     <dl class="field-display" tal:repeat="(field, rendered) rendered_fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
         <dt tal:condition="layout.show_label(field)">${field.label.text}</dt>
         <dd>
-            <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
-                <tal:b define="url layout.field_download_link(field)">
-                    <a href="${url}" tal:condition="not allow_views or not field.is_image">
-                        <tal:b replace="structure rendered" />
-                    </a>
-                    <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
-                        <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
-                        <div class="photoswipe" tal:define="image layout.field_file(field)" tal:condition="image and as_thumbnail">
-                            <p class="has-img thumbnail">
-                                <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
-                            </p>
+            <tal:b tal:switch="field.type" tal:condition="allow_downloads or allow_views">
+                <tal:b tal:case="'UploadField'">
+                        <tal:b tal:define="url layout.field_download_link(field)">
+                        <a href="${url}" tal:condition="not allow_views or not field.is_image">
+                            <tal:b replace="structure rendered" />
+                        </a>
+                        <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
+                            <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
+                            <div class="photoswipe" tal:define="image layout.field_file(field)" tal:condition="image and as_thumbnail">
+                                <p class="has-img thumbnail">
+                                    <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                                </p>
+                            </div>
+                            <tal:b metal:use-macro="layout.macros.photoswipe" />
                         </div>
-                        <tal:b metal:use-macro="layout.macros.photoswipe" />
-                    </div>
 
+                    </tal:b>
+                </tal:b>
+                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter zip(field, rendered.split('<br>'))">
+                    <tal:b tal:define="subfield iter[0];
+                                       rendered iter[1];
+                                       url layout.field_download_link(subfield);
+                                       show_image allow_views and subfield.is_image">
+                        <a href="${url}" tal:condition="not show_image">
+                            <tal:b replace="structure rendered" />
+                        </a>
+                        <br tal:condition="not show_image and not repeat.iter.end" />
+                        <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="show_image">
+                            <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
+                            <div class="photoswipe" tal:define="image layout.field_file(subfield)" tal:condition="image and as_thumbnail">
+                                <p class="has-img thumbnail">
+                                    <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
+                                </p>
+                            </div>
+                            <tal:b metal:use-macro="layout.macros.photoswipe" />
+                        </div>
+
+                    </tal:b>
                 </tal:b>
             </tal:b>
-            <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'" >
+            <tal:b condition="not (allow_downloads or allow_views) or field.type not in ('UploadField', 'UploadMultipleField')" >
                 <tal:b tal:switch="linkify_display|False">
                     <tal:b tal:case="True" replace="structure layout.linkify_field(field, rendered)" />
                     <tal:b tal:case="False" replace="structure rendered" />
@@ -1026,8 +1049,10 @@
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
         </div>
     </tal:b>
-
-    <div tal:condition="not occurrences" i18n:translate>No events found.</div>
+    <tal:b condition="not occurrences" >
+        <p i18n:translate>No events found.</p>
+        <br><a tal:condition="'range=' not in request.url" href="${layout.events_url}&amp;range=past" i18n:translate>Past events</a>
+    </tal:b>
 </metal:occurrences>
 
 <metal:occurrence_list_view define-macro="occurrence_list_view">
@@ -1280,6 +1305,15 @@
     <p tal:condition="result.function|nothing">${result.function}</p>
     <p tal:condition="not:result.function|nothing" i18n:translate>People</p>
 </metal:search_result_people>
+
+
+<metal:search_result_external_links define-macro="search_result_external_links" i18n:domain="onegov.org">
+    <a href="${result.url}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
+    <a class="edit-link" href="${request.link(result, name='edit')}" tal:condition="request.is_manager"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+    <tal:b condition="result.lead">
+        ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
+    </tal:b>
+</metal:search_result_external_links>
 
 
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.org">

@@ -1193,12 +1193,6 @@ def test_election_utils_parties(import_test_datasets, session):
     assert_link(False, '#aeca00', 4, 13, 44)
     assert_link(False, '#db3c27', 5, 13, 54)
     assert_link(False, None, 0, 13, 75)
-    assert_link(True, '#3f841a', 6, 13, 35298)
-    assert_link(True, '#ff6300', 2, 9, 30591)
-    assert_link(False, '#a74c97', 1, 8, 8082)
-    assert_link(False, '#aeca00', 4, 11, 3923)
-    assert_link(False, '#db3c27', 5, 12, 15798)
-    assert_link(True, '#4068c8', 3, 10, 20324)
 
     def assert_node(active, color, id_, name):
         assert {

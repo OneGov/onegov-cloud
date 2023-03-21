@@ -5,13 +5,12 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionRelationship
 from onegov.ballot import ElectionResult
 from onegov.ballot import ListConnection
-from onegov.ballot import PanachageResult
+from onegov.ballot import PartyPanachageResult
 from onegov.ballot import PartyResult
 from onegov.ballot import ProporzElection
 from onegov.election_day.layouts import ElectionLayout
 from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
-import pytest
 
 
 def test_election_layout_general(session):
@@ -351,8 +350,8 @@ def test_election_layout_menu_proporz(session):
         ('Downloads', 'ProporzElection/data', False, [])
     ]
 
-    election.panachage_results.append(
-        PanachageResult(target='t', source='t ', votes=0)
+    election.party_panachage_results.append(
+        PartyPanachageResult(target='t', source='t ', votes=10)
     )
     election.show_party_panachage = True
     assert ElectionLayout(election, request).menu == [
@@ -416,22 +415,21 @@ def test_election_layout_menu_proporz(session):
     ]
 
 
-@pytest.mark.parametrize('tab,expected', [
-    ('lists', 'Election/lists-table'),
-    ('list-by-entity', None),
-    ('list-by-district', None),
-    ('connections', 'Election/connections-table'),
-    ('lists-panachage', None),
-    ('candidates', 'Election/candidates-table'),
-    ('candidate-by-entity', None),
-    ('candidate-by-district', None),
-    ('party-strengths', 'Election/party-strengths-table'),
-    ('parties-panachage', None),
-    ('statistics', 'Election/statistics-table'),
-    ('data', None)
-])
-def test_election_layout_table_links(tab, expected):
-    # Test link depending on tab
+def test_election_layout_table_links():
     election = Election(date=date(2100, 1, 1), domain='federation')
-    layout = ElectionLayout(election, DummyRequest(), tab=tab)
-    assert expected == layout.table_link()
+    for tab, expected in (
+        ('lists', 'Election/lists-table'),
+        ('list-by-entity', None),
+        ('list-by-district', None),
+        ('connections', 'Election/connections-table'),
+        ('lists-panachage', None),
+        ('candidates', 'Election/candidates-table'),
+        ('candidate-by-entity', None),
+        ('candidate-by-district', None),
+        ('party-strengths', 'Election/party-strengths-table'),
+        ('parties-panachage', None),
+        ('statistics', 'Election/statistics-table'),
+        ('data', None)
+    ):
+        layout = ElectionLayout(election, DummyRequest(), tab=tab)
+        assert not expected or f'{expected}?locale=de' == layout.table_link()

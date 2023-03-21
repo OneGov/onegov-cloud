@@ -87,7 +87,7 @@ def column_names_with_comments(statement, query):
         elif isinstance(target.val, pglast.ast.ColumnRef):
             string = target.val.fields[-1]
             assert isinstance(string, pglast.ast.String)
-            column = string.val
+            column = string.sval
         else:
             raise NotImplementedError
 

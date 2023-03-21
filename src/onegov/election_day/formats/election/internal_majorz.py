@@ -78,13 +78,13 @@ def parse_election_result(line, errors, entities, election, principal):
                     superregion=superregion,
                     entity_id=entity_id,
                     counted=counted,
-                    eligible_voters=eligible_voters,
-                    expats=expats,
-                    received_ballots=received_ballots,
-                    blank_ballots=blank_ballots,
-                    invalid_ballots=invalid_ballots,
-                    blank_votes=blank_votes,
-                    invalid_votes=invalid_votes,
+                    eligible_voters=eligible_voters if counted else 0,
+                    expats=expats if counted else 0,
+                    received_ballots=received_ballots if counted else 0,
+                    blank_ballots=blank_ballots if counted else 0,
+                    invalid_ballots=invalid_ballots if counted else 0,
+                    blank_votes=blank_votes if counted else 0,
+                    invalid_votes=invalid_votes if counted else 0,
                 )
 
 
@@ -120,7 +120,7 @@ def parse_candidate(line, errors, election_id, colors):
         )
 
 
-def parse_candidate_result(line, errors):
+def parse_candidate_result(line, errors, counted):
     try:
         votes = validate_integer(line, 'candidate_votes')
     except ValueError as e:
@@ -128,7 +128,7 @@ def parse_candidate_result(line, errors):
     else:
         return dict(
             id=uuid4(),
-            votes=votes,
+            votes=votes if counted else 0,
         )
 
 
@@ -172,14 +172,15 @@ def import_election_internal_majorz(election, principal, file, mimetype):
         result = parse_election_result(
             line, line_errors, entities, election, principal
         )
+        counted = (result or {}).get('counted', False)
         candidate = parse_candidate(line, line_errors, election_id, colors)
-        candidate_result = parse_candidate_result(line, line_errors)
+        candidate_result = parse_candidate_result(line, line_errors, counted)
 
         # Skip expats if not enabled
         if result and result['entity_id'] == 0 and not election.has_expats:
             continue
 
-        # Pass the errors and continue to next line
+        # Pass the errors and continue to the next line
         if line_errors:
             errors.extend(
                 FileImportError(

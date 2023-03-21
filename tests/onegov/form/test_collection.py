@@ -330,6 +330,66 @@ def test_file_submissions_update(session):
     assert len(submission.files) == 0
 
 
+def test_multiple_file_submissions_update(session):
+    collection = FormCollection(session)
+
+    # upload a new file
+    definition = collection.definitions.add(
+        'File', definition="File = *.txt (multiple)"
+    )
+
+    data = FileMultiDict()
+    data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
+
+    submission = collection.submissions.add(
+        'file', definition.form_class(data), state='pending')
+
+    assert len(submission.files) == 1
+    assert submission.files[0].note.endswith(':0')
+    assert submission.files[0].checksum == '3858f62230ac3c915f300c664312c63f'
+
+    # replace the existing file and add a new one
+    previous_file = submission.files[0]
+    session.refresh(submission)
+
+    data = FileMultiDict()
+    data.add('file-0', 'replace')
+    data.add_file('file-0', BytesIO(b'barfoo'), filename='foobar.txt')
+    data.add_file('file', BytesIO(b'baz'), filename='baz.txt')
+
+    collection.submissions.update(submission, definition.form_class(data))
+    session.flush()
+    session.refresh(submission)
+
+    assert len(submission.files) == 2
+    assert previous_file.id != submission.files[0].id
+    assert previous_file.checksum != submission.files[0].checksum
+    assert submission.files[0].note.endswith(':0')
+    assert submission.files[1].note.endswith(':1')
+    assert submission.files[1].checksum == '73feffa4b7f6bb68e44cf984c85f6e88'
+
+    # delete the first and keep the second file
+    previous_file2 = submission.files[1]
+    session.refresh(submission)
+
+    data = FileMultiDict()
+    data.add('file-0', 'delete')
+    data.add('file-0', '')
+    data.add('file-1', 'keep')
+    data.add_file('file-1', BytesIO(b''), filename='baz.txt')
+    data.add('file', '')
+
+    collection.submissions.update(submission, definition.form_class(data))
+    session.flush()
+    session.refresh(submission)
+
+    assert len(submission.files) == 1
+    assert previous_file2.id == submission.files[0].id
+    assert previous_file2.checksum == submission.files[0].checksum
+    # the note should have been updated with the new index
+    assert submission.files[0].note.endswith(':0')
+
+
 def test_file_submissions_cascade(session):
 
     collection = FormCollection(session)

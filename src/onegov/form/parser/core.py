@@ -173,14 +173,29 @@ A date (without time) is defined by this exact string: ``YYYY.MM.DD``::
 
 Note that this doesn't mean that the date format can be influenced.
 
+A date field optionally can be limited to a relative or absolute date range.
+Note that the edges of the interval are inclusive. The list of possible
+grains for relative dates are ``years``, ``months``, ``weeks`` and ``days``
+as well as the special value ``today``.
+
+    I'm a future date field = YYYY.MM.DD (+1 days..)
+    I'm on today or in the future = YYYY.MM.DD (today..)
+    At least two weeks ago = YYYY.MM.DD (..-2 weeks)
+    Between 2010 and 2020 = YYYY.MM.DD (2010.01.01..2020.12.31)
+
 Datetime
 ~~~~~~~~
 
 A date (with time) is defined by this exact string: ``YYYY.MM.DD HH:MM``::
 
     I'm a datetime field = YYYY.MM.DD HH:MM
+    I'm a futue datetime field = YYYY.MM.DD HH:MM (today..)
 
 Again, this doesn't mean that the datetime format can be influenced.
+
+The same range validation that can be applied to date fields can also be
+applied to datetime. Note however that the Validation will be applied to
+to the date portion. The time portion is ignored completely.
 
 Time
 ~~~~
@@ -201,6 +216,11 @@ There are two types of number fields. An integer and a float field::
 
     I'm a float field = 0.00..99.00
     I'm an float field of a different range = -100.00..100.00
+
+Integer fields optionally can have a price attached to them which will be
+multiplied by the supplied integer.
+
+    Number of stamps to include = 0..30 (0.85 CHF)
 
 Code
 ~~~~
@@ -391,6 +411,7 @@ def create_parser_elements():
     elements.date = date()
     elements.time = time()
     elements.fileinput = fileinput()
+    elements.multiplefileinput = fileinput()
     elements.radio = radio()
     elements.checkbox = checkbox()
     elements.integer_range = integer_range_field()
@@ -512,6 +533,11 @@ def construct_fileinput(loader, node):
     return ELEMENTS.fileinput.parseString(node.value)
 
 
+@constructor('!multiplefileinput')
+def construct_multiplefileinput(loader, node):
+    return ELEMENTS.multiplefileinput.parseString(node.value)
+
+
 @constructor('!password')
 def construct_password(loader, node):
     return ELEMENTS.password.parseString(node.value)
@@ -596,9 +622,10 @@ class Field:
     """ Represents a parsed field. """
 
     def __init__(self, label, required, parent=None, fieldset=None,
-                 field_help=None, **kwargs):
+                 field_help=None, human_id=None, **kwargs):
 
         self.label = label
+        self._human_id = human_id or label
         self.required = required
         self.parent = parent
         self.fieldset = fieldset
@@ -616,16 +643,16 @@ class Field:
         if self.parent:
             return '/'.join((
                 self.parent.human_id,
-                self.label
+                self._human_id
             ))
 
         if self.fieldset.human_id:
             return '/'.join((
                 self.fieldset.human_id,
-                self.label
+                self._human_id
             ))
 
-        return self.label
+        return self._human_id
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,
@@ -658,6 +685,19 @@ class UrlField(Field):
 class DateField(Field):
     type = 'date'
 
+    @classmethod
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            field_help=field_help,
+            valid_date_range=field.valid_date_range
+        )
+
     def parse(self, value):
         # the first int in an ambiguous date is assumed to be a day
         # (since our software runs in europe first and foremost)
@@ -666,6 +706,19 @@ class DateField(Field):
 
 class DatetimeField(Field):
     type = 'datetime'
+
+    @classmethod
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
+        return cls(
+            label=identifier.label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            field_help=field_help,
+            valid_date_range=field.valid_date_range
+        )
 
     def parse(self, value):
         # the first int in an ambiguous date is assumed to be a day
@@ -747,7 +800,41 @@ class StdnumField(Field):
         )
 
 
-class RangeField:
+class IntegerRangeField(Field):
+    type = 'integer_range'
+
+    @classmethod
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
+        if field.pricing:
+            label = identifier.label + format_pricing(field.pricing)
+            # map one price to the whole range, the price will be
+            # multiplied by the selected value from the range
+            pricing = {field[0]: field.pricing}
+        else:
+            label = identifier.label
+            pricing = None
+
+        return cls(
+            # only modify the label visually, we don't want to
+            # affect the field id
+            human_id=identifier.label,
+            label=label,
+            required=identifier.required,
+            parent=parent,
+            fieldset=fieldset,
+            range=field[0],
+            pricing=pricing,
+            field_help=field_help
+        )
+
+    def parse(self, value):
+        return int(float(value))  # automatically truncates dots
+
+
+class DecimalRangeField(Field):
+    type = 'decimal_range'
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,
@@ -762,23 +849,11 @@ class RangeField:
 
         )
 
-
-class IntegerRangeField(RangeField, Field):
-    type = 'integer_range'
-
-    def parse(self, value):
-        return int(float(value))  # automatically truncates dots
-
-
-class DecimalRangeField(RangeField, Field):
-    type = 'decimal_range'
-
     def parse(self, value):
         return Decimal(value)
 
 
-class FileinputField(Field):
-    type = 'fileinput'
+class FileinputBase:
 
     @classmethod
     def create(cls, field, identifier, parent=None, fieldset=None,
@@ -791,6 +866,14 @@ class FileinputField(Field):
             extensions=field.extensions,
             field_help=field_help
         )
+
+
+class FileinputField(FileinputBase, Field):
+    type = 'fileinput'
+
+
+class MultipleFileinputField(FileinputBase, Field):
+    type = 'multiplefileinput'
 
 
 class OptionsField:
@@ -934,7 +1017,7 @@ def match(expr, text):
     """ Returns true if the given parser expression matches the given text. """
     try:
         expr.parseString(text)
-    except pp.ParseException:
+    except pp.ParseBaseException:
         return False
     else:
         return True
@@ -946,7 +1029,7 @@ def try_parse(expr, text):
     """
     try:
         return expr.parseString(text)
-    except pp.ParseException:
+    except pp.ParseBaseException:
         return None
 
 
@@ -985,6 +1068,15 @@ def ensure_a_fieldset(lines):
             yield ix, line
 
 
+def validate_indent(indent):
+    """
+    Returns `False` if indent is other than a multiple of 4, else True
+    """
+    if len(indent) % 4 != 0:
+        return False
+    return True
+
+
 def translate_to_yaml(text):
     """ Takes the given form text and constructs an easier to parse yaml
     string.
@@ -1005,6 +1097,8 @@ def translate_to_yaml(text):
     for ix, line in lines:
 
         indent = ' ' * (4 + (len(line) - len(line.lstrip())))
+        if not validate_indent(indent):
+            raise errors.InvalidIndentSyntax(line=ix + 1)
 
         # the top level are the fieldsets
         if match(ELEMENTS.fieldset_title, line):

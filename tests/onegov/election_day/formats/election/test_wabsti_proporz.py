@@ -46,7 +46,7 @@ def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
     assert election.allocated_mandates == 0
 
     # Test panachage results
-    assert election.panachage_results.all() == []
+    assert election.party_panachage_results.all() == []
 
     # Test panachage results for ALG list
     list_ = election.lists.filter_by(list_id='01').one()
@@ -324,7 +324,7 @@ def test_import_wabsti_proporz_invalid_values(session):
                     'xxx',
                     'xxx',
                     'xxx',
-                    'xxx',
+                    'x x x',
                     'xxx',
                     'xxx',
                     'xxx',
@@ -349,7 +349,7 @@ def test_import_wabsti_proporz_invalid_values(session):
                     'LUV',
                 )),
                 ','.join((
-                    'xxx',
+                    'x x x',
                     'xxx',
                     'xxx',
                 )),

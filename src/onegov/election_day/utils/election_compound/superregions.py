@@ -25,9 +25,8 @@ def get_superregions(compound, principal):
         if election.domain_supersegment in result:
             key = election.domain_supersegment
             keys.add(key)
-            progress = election.progress
-            result[key]['progress']['counted'] += progress[0]
-            result[key]['progress']['total'] += progress[1]
+            result[key]['progress']['counted'] += 1 if election.counted else 0
+            result[key]['progress']['total'] += 1
             result[key]['mandates']['allocated'] += election.allocated_mandates
             result[key]['mandates']['total'] += election.number_of_mandates
 

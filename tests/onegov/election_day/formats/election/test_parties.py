@@ -55,8 +55,8 @@ def test_import_party_results_fixtures(session):
         ('07', {'de_CH': 'VERDA'}, total_votes, 0, 300),
     ]
 
-    assert election.panachage_results
-    for pana_r in election.panachage_results:
+    assert election.party_panachage_results
+    for pana_r in election.party_panachage_results:
         assert pana_r.votes == 0
 
 
@@ -160,13 +160,52 @@ def test_import_party_results(session):
         'P2': '#aabbee',
     }
     results = sorted([
-        (r.target, r.source, r.votes) for r in election.panachage_results
+        (r.target, r.source, r.votes) for r in election.party_panachage_results
     ])
     assert results == [
         ('1', '', 12),
         ('1', '2', 11),
         ('2', '', 22),
         ('2', '1', 20),
+    ]
+
+    # with alphanumeric panachage results
+    errors = import_party_results(
+        election,
+        principal,
+        BytesIO((
+            '\n'.join((
+                ','.join((
+                    'year',
+                    'total_votes',
+                    'id',
+                    'name',
+                    'color',
+                    'mandates',
+                    'votes',
+                    'panachage_votes_from_eins.zwei',
+                    'panachage_votes_from_drei_vier',
+                    'panachage_votes_from_999'
+                )),
+                '2015,10000,eins.zwei,P1,#123456,1,5000,10,11,12',
+                '2015,10000,drei_vier,P2,#aabbcc,0,5000,20,21,22',
+            ))
+        ).encode('utf-8')), 'text/plain',
+        ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
+    )
+
+    assert not errors
+    assert sorted([r.party_id for r in election.party_results]) == [
+        'drei_vier', 'eins.zwei'
+    ]
+    results = sorted([
+        (r.target, r.source, r.votes) for r in election.party_panachage_results
+    ])
+    assert results == [
+        ('drei_vier', '', 22),
+        ('drei_vier', 'eins.zwei', 20),
+        ('eins.zwei', '', 12),
+        ('eins.zwei', 'drei_vier', 11),
     ]
 
     # with voters count
@@ -348,7 +387,7 @@ def test_import_party_results_invalid_values(session):
                 ','.join((
                     'xxx',
                     'xxx',
-                    'xxx',
+                    'x x x',
                     'xxx',
                     'xxx',
                     'xxx',
@@ -495,7 +534,7 @@ def test_import_party_results_domains(session):
         ('district', 'ABC', {'No party results for year 2022'}, {}, 0),
     ):
         election.party_results.delete()
-        election.panachage_results.delete()
+        election.party_panachage_results.delete()
         errors = import_party_results(
             election,
             principal,
@@ -525,7 +564,7 @@ def test_import_party_results_domains(session):
         assert parties == {
             pr.domain: pr.domain_segment for pr in election.party_results
         }
-        assert election.panachage_results.count() == panachage
+        assert election.party_panachage_results.count() == panachage
 
     # Compound
     for domain, segment, result, parties, panachage in (
@@ -539,7 +578,7 @@ def test_import_party_results_domains(session):
         ('superregion', 'ABC', {'Invalid domain_segment: ABC'}, {}, 0),
     ):
         compound.party_results.delete()
-        compound.panachage_results.delete()
+        compound.party_panachage_results.delete()
         errors = import_party_results(
             compound,
             principal,
@@ -569,4 +608,4 @@ def test_import_party_results_domains(session):
         assert parties == {
             pr.domain: pr.domain_segment for pr in compound.party_results
         }
-        assert compound.panachage_results.count() == panachage
+        assert compound.party_panachage_results.count() == panachage

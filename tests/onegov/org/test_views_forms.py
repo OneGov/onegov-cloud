@@ -1,14 +1,15 @@
 import textwrap
-from datetime import date
-
 import transaction
-from freezegun import freeze_time
-from webtest import Upload
 
+from datetime import date
+from freezegun import freeze_time
 from onegov.form import FormCollection, as_internal_id
+from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import UserCollection
 from tests.shared.utils import create_image
+from unittest.mock import patch
+from webtest import Upload
 
 
 def test_view_form_alert(client):
@@ -45,11 +46,11 @@ def test_render_form(client):
         Field('Textfield long', '*= ___', long_field_help),
         Field('Email long', '* = @@@', long_field_help),
         Field('Checkbox', """*=
-                [ ] 4051
-                [ ] 4052""", long_field_help),
+    [ ] 4051
+    [ ] 4052""", long_field_help),
         Field('Select', """=
-                (x) A
-                ( ) B""", long_field_help),
+    (x) A
+    ( ) B""", long_field_help),
         Field('Alter', '= 0..150', long_field_help),
         Field('Percentage', '= 0.00..100.00', long_field_help),
         Field('IBAN', '= # iban', long_field_help),
@@ -62,11 +63,11 @@ def test_render_form(client):
     # Those should render description externally, checked visually
     not_rendering_placeholder = [
         Field('Checkbox2', """*=
-                   [ ] 4051
-                   [ ] 4052""", short_comment),
+    [ ] 4051
+    [ ] 4052""", short_comment),
         Field('Select2', """=
-                    (x) A
-                    ( ) B""", short_comment),
+    (x) A
+    ( ) B""", short_comment),
         Field('Image2', '= *.jpg|*.png|*.gif', short_comment),
         Field('Dokument2', '= *.pdf', short_comment)
     ]
@@ -89,7 +90,10 @@ def test_render_form(client):
             f'Description not captured by field {field.type}'
 
 
-def test_submit_form(client):
+@patch('onegov.websockets.integration.connect')
+@patch('onegov.websockets.integration.authenticate')
+@patch('onegov.websockets.integration.broadcast')
+def test_submit_form(broadcast, authenticate, connect, client):
     collection = FormCollection(client.app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         # Your Details
@@ -140,6 +144,13 @@ def test_submit_form(client):
     message = client.get_email(-1)['TextBody']
     assert 'Fury' in message
 
+    assert connect.call_count == 1
+    assert authenticate.call_count == 1
+    assert broadcast.call_count == 1
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
+
     # unless he opts out of it
     form_page = client.get('/forms').click('Profile')
     form_page = form_page.form.submit().follow()
@@ -153,6 +164,13 @@ def test_submit_form(client):
 
     message = client.get_email(-1)['TextBody']
     assert 'Fury' not in message
+
+    assert connect.call_count == 2
+    assert authenticate.call_count == 2
+    assert broadcast.call_count == 2
+    assert broadcast.call_args[0][3]['event'] == 'browser-notification'
+    assert broadcast.call_args[0][3]['title'] == 'Neues Ticket'
+    assert broadcast.call_args[0][3]['created']
 
 
 def test_pending_submission_error_file_upload(client):
@@ -232,6 +250,40 @@ def test_add_custom_form(client):
     form_page.form.submit().follow()
 
 
+def test_add_custom_form_minimum_price_validation(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Stamp A = 0..20 (1.10 CHF)
+        Stamp B = 0..20 (0.85 CHF)
+
+        Discount *=
+            (x) First four B stamps free (-3.40 CHF)
+    """)
+    form_page.form['minimum_price_total'] = '5.00'
+    form_page = form_page.form.submit().follow()
+
+    form_page.form['e_mail'] = 'my@name.com'
+    form_page.form['stamp_b'] = '6'
+    # the validation happens on the next page
+    form_page = form_page.form.submit().follow()
+
+    assert "Der Totalbetrag für Ihre Eingaben" in form_page
+    assert "beläuft sich auf 1.70 CHF" in form_page
+    assert "allerdings ist der Minimalbetrag 5.00 CHF" in form_page
+
+    # now that we reached the minimum price we should succeed
+    form_page.form['stamp_a'] = '3'
+    form_page = form_page.form.submit()
+    assert "Totalbetrag" in form_page
+    assert "5.00 CHF" in form_page
+    assert "Minimalbetrag" not in form_page
+
+
 def test_add_custom_form_payment_metod_validation_error(client):
     client.login_editor()
 
@@ -253,6 +305,29 @@ def test_add_custom_form_payment_metod_validation_error(client):
     form_page.form['payment_method'] = 'free'
     form_page = form_page.form.submit()
     assert "benötigen Sie einen Standard-Zahlungsanbieter" in form_page
+
+
+def test_add_custom_form_payment_validation_error(client):
+    client.login_editor()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = 'E-Mail *= @@@'
+    form_page.form['minimum_price_total'] = '5.00'
+    form_page = form_page.form.submit()
+    # this should fail because we're setting a minimum price, but there
+    # are no form fields that have pricing assigned to them
+    assert "Ein Minimalpreis kann nur gesetzt werden" in form_page.text
+
+    # now it should succeed
+    form_page.form['definition'] = textwrap.dedent("""
+        E-Mail *= @@@
+
+        Delivery *=
+            ( ) Pickup (0 CHF)
+            ( ) Delivery (5 CHF)
+    """)
+    form_page = form_page.form.submit().follow()
 
 
 def test_add_duplicate_form(client):
@@ -956,3 +1031,35 @@ def test_honeypotted_forms(client):
     assert 'lazy-wolves' not in preview_page
     assert 'honeypot' not in preview_page
     assert 'Das Formular enthält Fehler' not in preview_page
+
+
+def test_edit_page_people_function_is_displayed(client, session):
+
+    client.login_admin()
+
+    people = client.get('/people')
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Berry'
+    new_person.form['last_name'] = 'Boolean'
+    new_person.form.submit()
+    person = client.app.session().query(Person)\
+        .filter(Person.first_name == 'Berry')\
+        .one()
+
+    new_page = client.get('/editor/new/page/1')
+    default_function = new_page.form['people_' + person.id.hex + '_function']
+    assert default_function.value == ""
+
+    people = client.get('/people')
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'John'
+    new_person.form['last_name'] = 'Doe'
+    new_person.form['function'] = 'President'
+    new_person.form.submit()
+    person = client.app.session().query(Person)\
+        .filter(Person.first_name == 'John')\
+        .one()
+
+    new_page = client.get('/editor/new/page/1')
+    default_function = new_page.form['people_' + person.id.hex + '_function']
+    assert default_function.value == 'President'

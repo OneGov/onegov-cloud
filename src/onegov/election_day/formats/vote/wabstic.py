@@ -79,11 +79,17 @@ def import_vote_wabstic(vote, principal, number, district,
 
         remaining_entities = None
         try:
-            remaining_entities = validate_integer(
-                line, 'anzgdependent', default=None)
+            if 'anzpendentgde' in line:
+                remaining_entities = validate_integer(
+                    line, 'anzpendentgde', default=None
+                )
+            else:
+                remaining_entities = validate_integer(
+                    line, 'anzgdependent', default=None
+                )
         except Exception as e:
             line_errors.append(
-                _("Error in anzgdependent: ${msg}",
+                _("Error in anzpendentgde/anzgdependent: ${msg}",
                   mapping={'msg': e.args[0]}))
 
         if line_errors:

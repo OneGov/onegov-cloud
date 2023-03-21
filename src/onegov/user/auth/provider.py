@@ -81,6 +81,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
     # stores the 'to' attribute for the integration app
     # :class:`~onegov.user.integration.UserApp`.
     to: Optional[str] = attrib(init=False)
+    primary: bool = attrib(init=False, default=False)
 
     @property
     def name(self):
@@ -118,10 +119,15 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         return cls()
 
+    def is_primary(self, app):
+        """ Returns whether the authentication provider is intended to be
+        the primary provider for this app."""
+        return self.primary if self.available(app) else False
+
     def available(self, app):
-        """Returns the the authentication provider is available for the current
-        app. Since there are tenant specific connections, we might want to
-        check, if for the tenant of the app, there is an available client."""
+        """Returns whether the authentication provider is available for the
+        current app. Since there are tenant specific connections, we want to
+        tcheck, if for the tenant of the app, there is an available client."""
         return True
 
 
@@ -539,7 +545,7 @@ class LDAPKerberosProvider(
             hostname=cfg.get('kerberos_hostname', None),
             service=cfg.get('kerberos_service', None))
 
-        return cls(
+        provider = cls(
             ldap=ldap,
             kerberos=kerberos,
             attributes=LDAPAttributes.from_cfg(cfg),
@@ -552,6 +558,9 @@ class LDAPKerberosProvider(
                 }
             }))
         )
+        if cfg.get('primary', False):
+            provider.primary = True
+        return provider
 
     def button_text(self, request):
         """ Returns the request tailored to each OS (users won't understand
@@ -929,6 +938,12 @@ class AzureADProvider(
             'user': user.username
         }))
 
+    def is_primary(self, app):
+        client = self.tenants.client(app)
+        if client:
+            return client.primary
+        return False
+
     def available(self, app):
         return self.tenants.client(app) and True or False
 
@@ -1158,6 +1173,12 @@ class SAML2Provider(
         return Success(user, _("Successfully logged in as «${user}»", mapping={
             'user': user.username
         }))
+
+    def is_primary(self, app):
+        client = self.tenants.client(app)
+        if client:
+            return client.primary
+        return False
 
     def available(self, app):
         return self.tenants.client(app) and True or False

@@ -26,7 +26,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
-from onegov.org.models import ExportCollection
+from onegov.org.models import ExportCollection, Editor
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
@@ -427,21 +427,40 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     def include_code_editor(self):
         self.request.include('code_editor')
 
-    def field_download_link(self, field):
-        if not field.type == 'UploadField':
+    def file_data_download_link(self, file_data):
+        if file_data is None:
             return None
 
-        if field.data.get('data', '').startswith('@'):
+        if (ref := file_data.get('data', '')).startswith('@'):
             return self.request.class_link(File, {
-                'id': field.data['data'].lstrip('@')
+                'id': ref.lstrip('@')
             })
 
-    def field_file(self, field):
-        if not field.type == 'UploadField':
+    def file_data_file(self, file_data):
+        if file_data is None:
             return None
-        if field.data.get('data', '').startswith('@'):
+
+        if (ref := file_data.get('data', '')).startswith('@'):
             return self.request.session.query(File).filter_by(
-                id=field.data['data'].lstrip('@')).first()
+                id=ref.lstrip('@')).first()
+
+    def field_download_link(self, field):
+        if field.type == 'UploadField':
+            return self.file_data_download_link(field.data)
+        elif field.type == 'UploadMultipleField':
+            return [
+                self.file_data_download_link(file_data)
+                for file_data in (field.data or [])
+            ]
+
+    def field_file(self, field):
+        if field.type == 'UploadField':
+            return self.file_data_file(field.data)
+        elif field.type == 'UploadMultipleField':
+            return [
+                self.file_data_file(file_data)
+                for file_data in (field.data or [])
+            ]
 
     @cached_property
     def move_person_url_template(self):
@@ -582,6 +601,13 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
         if self.request.is_manager:
             self.request.include('sortable')
+            self.request.include('websockets')
+            self.custom_body_attributes['data-websocket-endpoint'] = \
+                self.app.websockets_client_url(request)
+            self.custom_body_attributes['data-websocket-schema'] = \
+                self.app.schema
+            self.custom_body_attributes['data-websocket-channel'] = \
+                self.app.websockets_private_channel
 
         if self.org.open_files_target_blank:
             self.request.include('all_blank')
@@ -656,7 +682,7 @@ class DefaultMailLayout(Layout, DefaultMailLayoutMixin):
 
 
 class AdjacencyListMixin:
-    """ Provides layouts for for models inheriting from
+    """ Provides layouts for models inheriting from
         :class:`onegov.core.orm.abstract.AdjacencyList`
     """
 
@@ -668,13 +694,13 @@ class AdjacencyListMixin:
 
     def get_breadcrumbs(self, item):
         """ Yields the breadcrumbs for the given adjacency list item. """
-
         yield Link(_("Homepage"), self.homepage_url)
 
-        for ancestor in item.ancestors:
-            yield Link(ancestor.title, self.request.link(ancestor))
+        if item:
+            for ancestor in item.ancestors:
+                yield Link(ancestor.title, self.request.link(ancestor))
 
-        yield Link(item.title, self.request.link(item))
+            yield Link(item.title, self.request.link(item))
 
     def get_sidebar(self, type=None):
         """ Yields the sidebar for the given adjacency list item. """
@@ -1736,8 +1762,8 @@ class OccurrenceLayout(EventBaseLayout):
                         attrs={'class': 'edit-link'},
                         traits=(
                             Block(
-                                _("This event can't be editet."),
-                                _("Imported events can not be editet."),
+                                _("This event can't be edited."),
+                                _("Imported events can not be edited."),
                                 _("Cancel")
                             )
                         )
@@ -1833,8 +1859,8 @@ class EventLayout(EventBaseLayout):
                     attrs={'class': 'edit-link'},
                     traits=(
                         Block(
-                            _("This event can't be editet."),
-                            _("Imported events can not be editet."),
+                            _("This event can't be edited."),
+                            _("Imported events can not be edited."),
                             _("Cancel")
                         )
                     )
@@ -2768,7 +2794,16 @@ class HomepageLayout(DefaultLayout):
                     _("Sort"),
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
-                )
+                ),
+                Link(
+                    _("Add"),
+                    self.request.link(Editor('new-root', self.model, 'page')),
+                    attrs={'class': ('new-page')},
+                    classes=(
+                        'new-page',
+                        'show-new-content-placeholder'
+                    ),
+                ),
             ]
 
     @cached_property

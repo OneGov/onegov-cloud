@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from onegov.ballot.models.party_result.party_panachage_result import \
+    PartyPanachageResult
 from onegov.ballot.models.party_result.party_result import PartyResult
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy import or_
@@ -45,7 +47,9 @@ class PartyResultsCheckMixin:
 
     @property
     def has_party_panachage_results(self):
-        return self.panachage_results.first() is not None
+        return self.party_panachage_results.filter(
+            PartyPanachageResult.votes > 0
+        ).first() is not None
 
 
 class HistoricalPartyResultsMixin:
@@ -63,9 +67,9 @@ class HistoricalPartyResultsMixin:
         """
 
         relationships = self.relationships_for_historical_party_results
+        relationships = relationships.filter_by(type='historical').all()
         if not relationships:
             return self.party_results
-        relationships = relationships.filter_by(type='historical').all()
         target = sorted(
             (
                 related.target for related in relationships
@@ -80,6 +84,18 @@ class HistoricalPartyResultsMixin:
         return self.party_results.union(
             target[0].party_results.filter_by(year=target[0].date.year)
         )
+
+    @property
+    def historical_colors(self):
+        result = getattr(self, 'colors', {}).copy()
+        if not result:
+            return result
+        relationships = self.relationships_for_historical_party_results
+        relationships = relationships.filter_by(type='historical')
+        for relation in relationships:
+            for key, value in getattr(relation.target, 'colors', {}).items():
+                result.setdefault(key, value)
+        return result
 
 
 class PartyResultsExportMixin:
@@ -164,7 +180,7 @@ class PartyResultsExportMixin:
 
         # get the panachage results
         if domain == self.domain:
-            for result in self.panachage_results:
+            for result in self.party_panachage_results:
                 year = results.setdefault(self.date.year, {})
                 target = year.setdefault(result.target, {})
                 target[result.source] = result.votes
@@ -205,7 +221,7 @@ class PartyResultsExportMixin:
                 )
 
                 # add the panachage results
-                if self.panachage_results.count():
+                if self.party_panachage_results.count():
                     for source in parties:
                         column = f'panachage_votes_from_{source}'
                         row[column] = result.get(source, None)

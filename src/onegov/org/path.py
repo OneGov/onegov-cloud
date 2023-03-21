@@ -246,7 +246,13 @@ def get_editor(app, action, trait, page_id=0):
     if not Editor.is_supported_action(action):
         return None
 
-    page = PageCollection(app.session()).by_id(page_id)
+    if page_id:
+        page = PageCollection(app.session()).by_id(page_id)
+    else:
+        # adding root element with no parent (page=None)
+        return Editor(action=action,
+                      page=None,
+                      trait=trait)
 
     if not page:
         return None

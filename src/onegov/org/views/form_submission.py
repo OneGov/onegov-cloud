@@ -81,6 +81,42 @@ def handle_pending_submission(self, request, layout=None):
         collection.submissions.update(self, form)
 
     completable = not form.errors and 'edit' not in request.GET
+    price = get_price(request, form, self)
+
+    # check minimum price total if set
+    current_total_amount = price and price.amount or 0.0
+    minimum_total_amount = self.minimum_price_total or 0.0
+    if current_total_amount < minimum_total_amount:
+        if price is not None:
+            currency = price.currency
+        else:
+            # We just pick the first currency from any pricing rule we can find
+            # if we can't find any, then we fall back to 'CHF'. Although that
+            # should be an invalid form definition.
+            currency = 'CHF'
+            for field in form._fields.values():
+                if not hasattr(field, 'pricing'):
+                    continue
+
+                rules = field.pricing.rules
+                if not rules:
+                    continue
+
+                currency = next(iter(rules.values())).currency
+                break
+
+        completable = False
+        request.alert(
+            _(
+                "The total amount for the currently entered data "
+                "is ${total} but has to be at least ${minimum}. "
+                "Please adjust your inputs.",
+                mapping={
+                    'total': Price(current_total_amount, currency),
+                    'minimum': Price(minimum_total_amount, currency)
+                }
+            )
+        )
 
     if completable and 'return-to' in request.GET:
 
@@ -94,8 +130,6 @@ def handle_pending_submission(self, request, layout=None):
         title = request.GET['title']
     else:
         title = self.form.title
-
-    price = get_price(request, form, self)
 
     # retain some parameters in links (the rest throw away)
     form.action = copy_query(
@@ -214,6 +248,15 @@ def handle_complete_submission(self, request):
                         'model': ticket
                     }
                 )
+
+            request.app.send_websocket(
+                channel=request.app.websockets_private_channel,
+                message={
+                    'event': 'browser-notification',
+                    'title': request.translate(_('New ticket')),
+                    'created': ticket.created.isoformat()
+                }
+            )
 
             if request.auto_accept(ticket):
                 try:

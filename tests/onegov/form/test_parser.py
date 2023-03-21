@@ -1,11 +1,14 @@
 import pytest
 
+from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form.errors import InvalidIndentSyntax
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
+from onegov.form.validators import LaxDataRequired
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -14,7 +17,6 @@ from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import FileField
 from wtforms.fields import URLField
-from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
@@ -55,7 +57,7 @@ def test_parse_text():
     assert form.first_name.label.text == 'First name'
     assert form.first_name.description == 'Fill in all in UPPER case'
     assert len(form.first_name.validators) == 1
-    assert isinstance(form.first_name.validators[0], DataRequired)
+    assert isinstance(form.first_name.validators[0], LaxDataRequired)
 
     assert form.last_name.label.text == 'Last name'
     assert len(form.last_name.validators) == 1
@@ -262,6 +264,21 @@ def test_parse_date():
 
     assert form.date.label.text == 'Date'
     assert isinstance(form.date, DateField)
+    assert not hasattr(form.date.widget, 'min')
+    assert not hasattr(form.date.widget, 'max')
+    assert len(form.date.validators) == 1
+
+
+def test_parse_date_valid_date_range():
+    form = parse_form("Date = YYYY.MM.DD (today..)")()
+
+    assert form.date.label.text == 'Date'
+    assert isinstance(form.date, DateField)
+    assert form.date.widget.min == relativedelta()
+    assert form.date.widget.max is None
+    assert len(form.date.validators) == 2
+    assert form.date.validators[1].min == relativedelta()
+    assert form.date.validators[1].max is None
 
 
 def test_parse_datetime():
@@ -269,6 +286,21 @@ def test_parse_datetime():
 
     assert form.datetime.label.text == 'Datetime'
     assert isinstance(form.datetime, DateTimeLocalField)
+    assert not hasattr(form.datetime.widget, 'min')
+    assert not hasattr(form.datetime.widget, 'max')
+    assert len(form.datetime.validators) == 1
+
+
+def test_parse_datetime_valid_date_range():
+    form = parse_form("Datetime = YYYY.MM.DD HH:MM (..today)")()
+
+    assert form.datetime.label.text == 'Datetime'
+    assert isinstance(form.datetime, DateTimeLocalField)
+    assert form.datetime.widget.min is None
+    assert form.datetime.widget.max == relativedelta()
+    assert len(form.datetime.validators) == 2
+    assert form.datetime.validators[1].min is None
+    assert form.datetime.validators[1].max == relativedelta()
 
 
 def test_parse_time():
@@ -283,6 +315,15 @@ def test_parse_fileinput():
 
     assert form.file.label.text == 'File'
     assert isinstance(form.file, FileField)
+    assert form.file.widget.multiple is False
+
+
+def test_parse_multiplefileinput():
+    form = parse_form("Files = *.pdf|*.doc (multiple)")()
+
+    assert form.files.label.text == 'Files'
+    assert isinstance(form.files, FileField)
+    assert form.files.widget.multiple is True
 
 
 def test_parse_radio():
@@ -537,6 +578,75 @@ def test_optional_date():
     assert not form.errors
 
 
+def test_date_valid_range_validation():
+
+    text = "Date *= YYYY.MM.DD (2015.03.30..)"
+
+    form_class = parse_form(text)
+
+    form = form_class(MultiDict([
+        ('date', '2015-03-29')
+    ]))
+
+    form.validate()
+    assert form.errors == {
+        'date': ['Needs to be on or after 30.03.2015.']
+    }
+
+    form = form_class(MultiDict([
+        ('date', '2015-03-30')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+
+def test_date_valid_range_validation_between():
+
+    text = "Date *= YYYY.MM.DD (2015.03.30..2016.03.30)"
+
+    form_class = parse_form(text)
+
+    form = form_class(MultiDict([
+        ('date', '2015-03-29')
+    ]))
+
+    form.validate()
+    assert form.errors == {
+        'date': ['Needs to be between 30.03.2015 and 30.03.2016.']
+    }
+
+    form = form_class(MultiDict([
+        ('date', '2016-03-30')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+
+def test_datetime_valid_range_validation():
+
+    text = "Datetime *= YYYY.MM.DD HH:MM (..2015.03.30)"
+
+    form_class = parse_form(text)
+
+    form = form_class(MultiDict([
+        ('datetime', '2015-03-31T00:00')
+    ]))
+
+    form.validate()
+    assert form.errors == {
+        'datetime': ['Needs to be on or before 30.03.2015.']
+    }
+
+    form = form_class(MultiDict([
+        ('datetime', '2015-03-30T23:59')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+
 def test_invalid_syntax():
     with pytest.raises(errors.InvalidFormSyntax) as e:
         parse_form(".")
@@ -723,13 +833,59 @@ def test_integer_range():
     form.validate()
     assert form.errors
 
-    form_class = parse_form("Age *= 21..150")
+    # 0 should validate on a required field
+    form_class = parse_form("Items *= 0..10")
     form = form_class(MultiDict([
-        ('age', '21')
+        ('items', '0')
     ]))
 
     form.validate()
     assert not form.errors
+
+
+def test_integer_range_with_pricing():
+
+    form_class = parse_form("Stamps = 0..20 (0.85 CHF)")
+    form = form_class(MultiDict([
+        ('stamps', '')
+    ]))
+    form.validate()
+    assert not form.errors
+    assert form.stamps.pricing.rules == {
+        range(0, 20): Price(Decimal('0.85'), 'CHF'),
+    }
+    assert not form.stamps.pricing.has_payment_rule
+    assert form.stamps.pricing.price(form.stamps) is None
+
+    form = form_class(MultiDict([
+        ('stamps', '0')
+    ]))
+    form.validate()
+    assert not form.errors
+    # special case: we don't want `Price(0, 'CHF')` since the
+    # price might be flagged, which we don't want
+    assert form.stamps.pricing.price(form.stamps) is None
+
+    form = form_class(MultiDict([
+        ('stamps', '10')
+    ]))
+    form.validate()
+    assert not form.errors
+    assert form.stamps.pricing.price(form.stamps) == Price(8.5, 'CHF')
+
+    form_class = parse_form("Stamps *= 0..20 (0.85 CHF!)")
+    form = form_class(MultiDict([
+        ('stamps', '20')
+    ]))
+    form.validate()
+    assert not form.errors
+    assert form.stamps.pricing.rules == {
+        range(0, 20): Price(Decimal('0.85'), 'CHF', credit_card_payment=True),
+    }
+    assert form.stamps.pricing.has_payment_rule
+    assert form.stamps.pricing.price(form.stamps) == Price(
+        17, 'CHF', credit_card_payment=True
+    )
 
 
 def test_decimal_range():
@@ -766,9 +922,10 @@ def test_decimal_range():
     form.validate()
     assert form.errors
 
+    # 0 should validate on a decimal field
     form_class = parse_form("Percentage = 0.00..100.00")
     form = form_class(MultiDict([
-        ('percentage', '33.33')
+        ('percentage', '0.0')
     ]))
 
     form.validate()
@@ -881,3 +1038,33 @@ def test_normalization():
     label = "Ich möchte die Bestellung mittels Post erhalten (200.00 CHF)"
     norm = normalize_label_for_dependency(label)
     assert norm == "Ich möchte die Bestellung mittels Post erhalten"
+
+
+@pytest.mark.parametrize('indent,shall_raise', [
+    ('', False),
+    (' ', True),
+    ('  ', True),
+    ('   ', True),
+])
+def test_indentation_error(indent, shall_raise):
+    # wrong indent see 'Telefonnummer'
+    text = dedent(
+        """
+        # Kiosk
+        Name des Kiosks = ___
+        # Kontaktangaben
+        Kontaktperson = ___
+        {}Telefonnummer = ___
+        """.format(indent)
+    )
+
+    if shall_raise:
+        with pytest.raises(InvalidIndentSyntax) as excinfo:
+            parse_formcode(text)
+
+        assert excinfo.value.line == 6
+    else:
+        try:
+            parse_formcode(text)
+        except InvalidIndentSyntax as e:
+            pytest.fail('Unexpected exception {}'.format(type(e).__name__))

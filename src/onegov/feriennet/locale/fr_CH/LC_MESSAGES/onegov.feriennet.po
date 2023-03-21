@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-18 13:30+0200\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -38,12 +38,36 @@ msgid "${count} Occasions"
 msgstr "${count} événement(s)"
 
 #, python-format
+msgid "${count} overfull"
+msgstr "${count} avec trop de participants"
+
+#, python-format
+msgid "${count} full"
+msgstr "${count} complet"
+
+#, python-format
+msgid "${count} operable"
+msgstr "{count} avec suffisamment de participants"
+
+#, python-format
+msgid "${count} unoperable"
+msgstr "{count} avec trop peu de participants"
+
+#, python-format
+msgid "${count} empty"
+msgstr "${count} pas de participants"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} annulés"
+
+#, python-format
 msgid "${count} Wishes"
 msgstr "${count} souhaits"
 
 #, python-format
 msgid "${count} Bookings"
-msgstr "${count} réservations"
+msgstr "${count} réservation(s)"
 
 #, python-format
 msgid "${count} Wishes per Attendee"
@@ -54,8 +78,8 @@ msgid "${count} accepted"
 msgstr "${count} acceptés"
 
 #, python-format
-msgid "${count} cancelled"
-msgstr "${count} annulés"
+msgid "${count} not carried out or cancelled"
+msgstr "${count} annulé(e) ou déprogrammé(e)"
 
 #, python-format
 msgid "${count} denied"
@@ -67,7 +91,7 @@ msgstr "${count} bloqués"
 
 #, python-format
 msgid "${count} Bookings per Attendee"
-msgstr "${count} réservations par participant·e"
+msgstr "${count} réservation(s) par participant·e"
 
 #, python-format
 msgid "${count} Attendees"
@@ -80,6 +104,10 @@ msgstr "${count} filles"
 #, python-format
 msgid "${count} Boys"
 msgstr "${count} garçons"
+
+#, python-format
+msgid "${count} of which without accepted bookings"
+msgstr "${count} dont sans réservations acceptées"
 
 #, python-format
 msgid "${amount}% Happiness"
@@ -299,7 +327,7 @@ msgstr "Article facture"
 msgid "Invoice Item Paid"
 msgstr "Facture payée"
 
-msgid "Invoice Item Payment Date"
+msgid "Invoice Item Payment date"
 msgstr "Date de paiement"
 
 msgid "Invoice Item Transaction ID"
@@ -358,6 +386,36 @@ msgstr "Compte bancaire prestataire"
 
 msgid "Organiser Beneficiary"
 msgstr "Bénéficiaire prestataire"
+
+msgid "Confirmed Volunteers"
+msgstr "Bénévoles confirmés"
+
+msgid "Volunteer State"
+msgstr "État des bénévoles"
+
+msgid "First Name"
+msgstr "Prénom"
+
+msgid "Last Name"
+msgstr "Nom"
+
+msgid "Birth Date"
+msgstr "Date de naissance"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Place"
+msgstr "Lieu"
+
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Wishlist / Bookings"
 msgstr "Liste des souhaits / Réservations"
@@ -429,6 +487,12 @@ msgstr "Prestataire"
 msgid "Member"
 msgstr "Membre"
 
+msgid "Contacted"
+msgstr "Contacté"
+
+msgid "Confirmed"
+msgstr "Confirmé"
+
 msgid "Invoice Items"
 msgstr "Éléments de la facture"
 
@@ -458,6 +522,9 @@ msgstr "Utilisateurs·trices "
 
 msgid "Exports user accounts."
 msgstr "Exporter les comptes utilisateurs·trices"
+
+msgid "Exports volunteers in the given period."
+msgstr "Exporter les volontaires avec la période donnée."
 
 msgid "Accessible"
 msgstr "Accessible à tous"
@@ -561,6 +628,12 @@ msgstr "Formation continue"
 msgid "Healthy Snacks"
 msgstr "Encas sains"
 
+msgid "Just for Boys"
+msgstr "Seulement garçons"
+
+msgid "Just for Girls"
+msgstr "Seulement filles"
+
 msgid "Title"
 msgstr "Titre"
 
@@ -594,12 +667,6 @@ msgstr "Carte"
 msgid "You already entered a child with this name"
 msgstr "Vous avec déjà saisi un enfant avec ce nom"
 
-msgid "First Name"
-msgstr "Prénom"
-
-msgid "Last Name"
-msgstr "Nom"
-
 msgid "Birthdate"
 msgstr "Date de naissance"
 
@@ -624,8 +691,8 @@ msgstr "Ignorer la restriction d'âge"
 msgid "Accept TOS"
 msgstr "Accepter les conditions de participation"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "Conditions de participation"
 
@@ -747,6 +814,9 @@ msgstr "Pour un·e utilisateur·trice spécifique"
 
 msgid "For users with tags"
 msgstr "Pour les utilisateurs·trices d'une catégorie définie"
+
+msgid "Payment date"
+msgstr "Date de paiement"
 
 msgid "My donation"
 msgstr "Mon don"
@@ -1224,17 +1294,8 @@ msgstr "Civilité"
 msgid "Personal"
 msgstr "Personnel"
 
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "Address"
-msgstr "Adresse"
-
 msgid "Zip Code"
 msgstr "Code postal"
-
-msgid "Place"
-msgstr "Lieu"
 
 msgid "Political Municipality"
 msgstr "Commune politique"
@@ -1244,9 +1305,6 @@ msgstr "Adresse e-mail"
 
 msgid "If different than username"
 msgstr "Si différent du nom d'utilisateur"
-
-msgid "Phone"
-msgstr "Téléphone"
 
 msgid "Emergency Contact"
 msgstr "Contact en cas d'urgence"
@@ -1400,7 +1458,7 @@ msgstr "${count} les réservations seront supprimées"
 
 #, python-format
 msgid "Remove ${count} bookings"
-msgstr "Supprimer ${count} réservations"
+msgstr "Supprimer ${count} réservation(s)"
 
 msgid "Import Bank Statement"
 msgstr "Importer un relevé bancaire"
@@ -1419,6 +1477,9 @@ msgstr ""
 "Des réservations manuelles peuvent être ajoutées uniquement lorsque la "
 "facturation a été confirmée."
 
+msgid "Payment with date"
+msgstr "Paiement avec date"
+
 msgid "Donation"
 msgstr "Don"
 
@@ -1435,7 +1496,10 @@ msgid "Register as Volunteer"
 msgstr "Inscrivez-vous comme bénévole"
 
 msgid "Sort"
-msgstr ""
+msgstr "Trier"
+
+msgid "Move"
+msgstr "Déplacer"
 
 msgid "Half day"
 msgstr "Demi-journée"
@@ -1766,7 +1830,7 @@ msgid "Add to calendar"
 msgstr "Ajouter au calendrier"
 
 msgid "Limited to ${number} bookings"
-msgstr "Limité à ${number} réservations"
+msgstr "Limité à ${number} réservation(s)"
 
 msgid "Unlimited bookings"
 msgstr "Réservations illimitées"
@@ -2103,9 +2167,6 @@ msgstr "Votre demande a été traitée."
 msgid "I have read the ${tos} and accept them."
 msgstr "J'ai lu les ${tos} et je les accepte."
 
-msgid "E-Mail"
-msgstr "E-mail"
-
 msgid "Manage user"
 msgstr "Gérer les utilisateurs·trices"
 
@@ -2295,10 +2356,10 @@ msgid "Booking"
 msgstr "Réservation"
 
 msgid "${cost} for ${count} bookings"
-msgstr "${cost} pour ${count} réservations"
+msgstr "${cost} pour ${count} réservation(s)"
 
 msgid "Free of charge for ${count} bookings"
-msgstr "Gratuit pour ${count} réservations"
+msgstr "Gratuit pour ${count} réservation(s)"
 
 msgid "${cost} per booking"
 msgstr "${cost} par réservation"
@@ -2330,12 +2391,6 @@ msgstr "Prénom"
 
 msgid "Last name"
 msgstr "Nom de famille"
-
-msgid "Contacted"
-msgstr "Contacté"
-
-msgid "Confirmed"
-msgstr "Confirmé"
 
 msgid "Contact by e-mail"
 msgstr "Contacter par e-mail"
@@ -2520,7 +2575,10 @@ msgstr ""
 "de référence majeure."
 
 msgid "Add manual booking"
-msgstr "Ajouter une réservation manuelle"
+msgstr "Ajouter une remise ou un supplément"
+
+msgid "Mark paid with specific date"
+msgstr "Marquer les paiements d'une date précise"
 
 msgid "Show invoice"
 msgstr "Afficher la facture"
@@ -2569,7 +2627,7 @@ msgid "Mark as paid"
 msgstr "Signalé la réservation comme payée"
 
 msgid "Remove manual booking"
-msgstr "Supprimer la réservation manuelle"
+msgstr "Supprimer une remise ou un supplément"
 
 #, python-format
 msgid "Billing for ${title}"
@@ -2625,7 +2683,11 @@ msgstr "Aucune réservation manuelle n'a été créée."
 
 #, python-format
 msgid "Created ${count} manual bookings"
-msgstr "${count} réservations manuelles créées"
+msgstr "${count} réservation(s) manuelles créées"
+
+#, python-format
+msgid "Mark paid for ${user}"
+msgstr "Mark a payé pour ${user}"
 
 msgid "Invite a companion"
 msgstr "Inviter un·e amie·e"
@@ -2975,7 +3037,7 @@ msgid "ESR (Raiffeisen)"
 msgstr "BVR (Raiffeisen)"
 
 msgid "ESR participant number / QR-IBAN"
-msgstr "Numéro de participant·e BVR / QR-IBAN"
+msgstr "Numéro de client BVR / QR-IBAN"
 
 msgid "ESR identification number"
 msgstr "Numéro de référence BVR"
@@ -3074,3 +3136,7 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#, python-format
+#~ msgid "${count} registered Attendees"
+#~ msgstr "${count} participants inscrits"

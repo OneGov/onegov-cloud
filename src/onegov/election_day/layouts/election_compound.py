@@ -29,6 +29,7 @@ class ElectionCompoundLayout(DetailLayout):
     def table_link(self, query_params={}):
         if self.tab not in self.tabs_with_embedded_tables:
             return None
+        query_params['locale'] = self.request.locale
         return self.request.link(
             self.model, f'{self.tab}-table', query_params=query_params
         )
@@ -55,6 +56,10 @@ class ElectionCompoundLayout(DetailLayout):
     @cached_property
     def results(self):
         return self.model.results
+
+    @cached_property
+    def totals(self):
+        return self.model.totals
 
     @cached_property
     def has_districts(self):

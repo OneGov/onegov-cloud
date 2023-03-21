@@ -15,7 +15,7 @@ from onegov.org.elements import QrCodeLink
 from onegov.org.exports.base import OrgExport
 from onegov.org.models import (
     ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
-    ExportCollection, PublicationCollection, PageMove, News
+    ExportCollection, PublicationCollection, PageMove, News, Editor
 )
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection
@@ -124,6 +124,13 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
 
         if self.request.is_manager:
             self.request.include('sortable')
+            self.request.include('websockets')
+            self.custom_body_attributes['data-websocket-endpoint'] = \
+                self.app.websockets_client_url(request)
+            self.custom_body_attributes['data-websocket-schema'] = \
+                self.app.schema
+            self.custom_body_attributes['data-websocket-channel'] = \
+                self.app.websockets_private_channel
 
         if self.org.open_files_target_blank:
             self.request.include('all_blank')
@@ -337,7 +344,7 @@ class FormEditorLayout(DefaultLayout):
     cls_before='DirectoryEntryLayout',
     cls_after='TicketChatMessageLayout'
 )
-class FormSubmissionLayout(DefaultLayout, StepsLayoutExtension):
+class FormSubmissionLayout(StepsLayoutExtension, DefaultLayout):
 
     def __init__(self, model, request, title=None):
         super().__init__(model, request)
@@ -719,23 +726,23 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-            links.append(
-                Link(
-                    text=_("Upload to Gever"),
-                    url=self.request.link(self.model, 'send-to-gever'),
-                    attrs={'class': 'upload'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to upload this ticket?"),
-                            _("This will upload this ticket to the "
-                              "Gever instance, if configured."),
-                            _("Upload Ticket"),
-                            _("Cancel")
+            if self.request.app.org.gever_endpoint:
+                links.append(
+                    Link(
+                        text=_("Upload to Gever"),
+                        url=self.request.link(self.model, 'send-to-gever'),
+                        attrs={'class': 'upload'},
+                        traits=(
+                            Confirm(
+                                _("Do you really want to upload this ticket?"),
+                                _("This will upload this ticket to the "
+                                  "Gever instance, if configured."),
+                                _("Upload Ticket"),
+                                _("Cancel")
+                            )
                         )
                     )
                 )
-            )
-
             return links
 
 
@@ -767,7 +774,7 @@ class TicketNoteLayout(DefaultLayout):
 @step_sequences.registered_step(
     3, _('Confirmation'),
     cls_before='ReservationLayout')
-class TicketChatMessageLayout(DefaultLayout, StepsLayoutExtension):
+class TicketChatMessageLayout(StepsLayoutExtension, DefaultLayout):
 
     def __init__(self, model, request, internal=False):
         super().__init__(model, request)
@@ -1141,7 +1148,7 @@ class ResourceLayout(DefaultLayout):
 @step_sequences.registered_step(
     2, _("Check"),
     cls_before='ReservationLayout', cls_after='TicketChatMessageLayout')
-class ReservationLayout(ResourceLayout, StepsLayoutExtension):
+class ReservationLayout(StepsLayoutExtension, ResourceLayout):
     editbar_links = None
 
     @property
@@ -1300,6 +1307,16 @@ class OccurrencesLayout(EventBaseLayout):
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
                 ),
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Event"),
+                            url=self.request.link(self.model, 'enter-event'),
+                            attrs={'class': 'new-form'}
+                        ),
+                    ]
+                ),
             )
 
 
@@ -1418,7 +1435,7 @@ class OccurrenceLayout(EventBaseLayout):
     cls_before='EventLayout',
     cls_after='TicketChatMessageLayout'
 )
-class EventLayout(EventBaseLayout, StepsLayoutExtension):
+class EventLayout(StepsLayoutExtension, EventBaseLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -2067,8 +2084,8 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 @step_sequences.registered_step(
     1, _('Form'), cls_after='FormSubmissionLayout'
 )
-class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
-                                     StepsLayoutExtension):
+class DirectoryEntryCollectionLayout(StepsLayoutExtension,
+                                     DirectoryEntryBaseLayout):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2223,7 +2240,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout,
 
 
 @step_sequences.registered_step(1, _('Form'), cls_after='FormSubmissionLayout')
-class DirectoryEntryLayout(DirectoryEntryBaseLayout, StepsLayoutExtension):
+class DirectoryEntryLayout(StepsLayoutExtension, DirectoryEntryBaseLayout):
 
     @property
     def step_position(self):
@@ -2393,5 +2410,14 @@ class HomepageLayout(DefaultLayout):
                     _("Sort"),
                     self.request.link(self.model, 'sort'),
                     attrs={'class': ('sort-link')}
-                )
+                ),
+                Link(
+                    _("Add"),
+                    self.request.link(Editor('new-root', self.model, 'page')),
+                    attrs={'class': ('new-page')},
+                    classes=(
+                        'new-page',
+                        'show-new-content-placeholder'
+                    ),
+                ),
             ]

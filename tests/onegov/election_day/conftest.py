@@ -61,7 +61,14 @@ def create_election_day(
 
     tmp = request.getfixturevalue('temporary_directory')
 
-    app = create_app(ElectionDayApp, request, use_maildir=True)
+    websockets = {
+        'client_url': 'ws://localhost:8766',
+        'manage_url': 'ws://localhost:8766',
+        'manage_token': 'super-super-secret-token'
+    }
+    app = create_app(
+        ElectionDayApp, request, use_maildir=True, websockets=websockets
+    )
     app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')

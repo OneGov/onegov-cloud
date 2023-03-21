@@ -57,6 +57,14 @@ msgid ""
 "administrator"
 msgstr ""
 
+msgid "SAML2"
+msgstr ""
+
+msgid ""
+"Can't login because your user has no groups. Contact your SAML2 system "
+"administrator"
+msgstr ""
+
 msgid "Name"
 msgstr ""
 
