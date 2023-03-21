@@ -40,7 +40,7 @@ def detect(img, cascade):
         img,
         scaleFactor=1.1,
         minNeighbors=5,
-        minSize=(30, 30),
+        minSize=(100, 100),
         flags=cv.CASCADE_SCALE_IMAGE,
     )
     if len(rects) == 0:

@@ -124,13 +124,12 @@ def create_quadratic_profile_image(person, picture_url, request):
         quadratic_image_bytes = crop_to_portrait_with_face_detection(
             actual_profile_image._file_path
         )
-        if not quadratic_image_bytes:
-            print("no crops found")
-        quadratic_image = ImageFileCollection(request.session).add(
-            filename=f"quadratic_{actual_profile_image.filename}",
-            content=quadratic_image_bytes
-        )
-        person.quadratic_picture_url = request.link(quadratic_image)
+        if quadratic_image_bytes:
+            quadratic_image = ImageFileCollection(request.session).add(
+                filename=f"quadratic_{actual_profile_image.filename}",
+                content=quadratic_image_bytes
+            )
+            person.quadratic_picture_url = request.link(quadratic_image)
     except Exception:
         pass
 

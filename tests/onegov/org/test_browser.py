@@ -495,13 +495,31 @@ def test_quadratic_crop_on_image_upload(browser, client):
         .filter(Person.last_name == 'Bach')\
         .one()
 
-    assert person.first_name == 'Johann'
-    assert person.last_name == 'Bach'
+    assert person.quadratic_picture_url is not None
 
-    # With uploaded pictures for person, a quadratic version is generated
     r = requests.get(person.quadratic_picture_url)
     assert r.status_code == 200
 
     pic_id = person.quadratic_picture_url.rsplit('/', 1)[-1]
     crop_file = ImageFileCollection(client.app.session()).by_id(pic_id)
     assert crop_file is not None
+
+    browser.visit('/people/new')
+    browser.find_by_value("Person")
+    browser.fill_form({
+        'first_name': 'Random',
+        'last_name': 'Random',
+    })
+    # upload the file
+    browser.find_by_css('.button.secondary.postfix').click()
+    path = module_path('tests.onegov.org', 'fixtures/random.jpg')
+    browser.drop_file('#redactor-droparea', path)
+    browser.find_by_value("Absenden").click()
+    browser.find_by_text("Eine neue Person wurde hinzugefügt")
+
+    person = client.app.session().query(Person)\
+        .filter(Person.last_name == 'Random')\
+        .one()
+
+    # No valid image, nothing will be generated
+    assert person.quadratic_picture_url is None
