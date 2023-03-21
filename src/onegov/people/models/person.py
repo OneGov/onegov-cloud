@@ -78,7 +78,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: when the person was born
     born = Column(Text, nullable=True)
 
-    #: the professsion of the person
+    #: the profession of the person
     profession = Column(Text, nullable=True)
 
     #: the function of the person
@@ -104,6 +104,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: the website related to the person
     website = Column(Text, nullable=True)
+
+    # deprecated: please use one of the following 4 items
+    #: the address of the person
+    address = Column(Text, nullable=True)
 
     #: the location address (street name and number) of the person
     location_address = Column(Text, nullable=True)
