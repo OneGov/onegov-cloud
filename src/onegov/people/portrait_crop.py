@@ -9,7 +9,7 @@ def crop_to_portrait_with_face_detection(image):
     crops the image to focus on the face(s), and expands the image by 20%
     in each dimension. Finally, resizes the image to 1:1 aspect ratio.
 
-    Returns: The png-ecoded image as bytes, or None
+    Returns: The png-encoded image as bytes, or None
         Quadratic crop of the input image, or None if no faces are detected.
     """
     img = cv.imread(str(image))
@@ -20,14 +20,17 @@ def crop_to_portrait_with_face_detection(image):
     gray = cv.equalizeHist(gray)
     rects = detect(gray, cascade)
     snippets = crop_rects(rects, img)
+
     if snippets:
         img = crop_with_padding(img, rects, snippets, scale=1.2)
-        # Resize the image to 1:1 aspect ratio
-        side = min(img.shape[:2])
-        img = resize(img, width=side, height=side)
+        w, h = img.shape[:2]
+        if not w == h:
+            # Resize the image to 1:1 aspect ratio
+            side = min(w, h)
+            img = crop_square(img, side)
         # Encode the image as PNG and get the bytes in memory
         retval, buffer = cv.imencode('.png', img)
-        return np.array(buffer).tobytes()
+        return np.array(buffer).tobytes() if retval else None
     else:
         return None
 
@@ -145,33 +148,13 @@ def crop_with_padding(img, rects, snippets, scale=1.2):
     return img
 
 
-def resize(image, width=None, height=None, inter=cv.INTER_AREA):
-    # initialize the dimensions of the image to be resized and
-    # grab the image size
-    dim = None
-    (h, w) = image.shape[:2]
+def crop_square(img, size, interpolation=cv.INTER_AREA):
+    h, w = img.shape[:2]
+    min_size = np.amin([h, w])
 
-    # if both the width and height are None, then return the
-    # original image
-    if width is None and height is None:
-        return image
-
-    # check to see if the width is None
-    if width is None:
-        # calculate the ratio of the height and construct the
-        # dimensions
-        r = height / float(h)
-        dim = (int(w * r), height)
-
-    # otherwise, the height is None
-    else:
-        # calculate the ratio of the width and construct the
-        # dimensions
-        r = width / float(w)
-        dim = (width, int(h * r))
-
-    # resize the image
-    resized = cv.resize(image, dim, interpolation=inter)
-
-    # return the resized image
-    return resized
+    # Centralize and crop
+    crop_img = img[
+        int(h / 2 - min_size / 2):int(h / 2 + min_size / 2),
+        int(w / 2 - min_size / 2):int(w / 2 + min_size / 2),
+    ]
+    return cv.resize(crop_img, (size, size), interpolation=interpolation)
