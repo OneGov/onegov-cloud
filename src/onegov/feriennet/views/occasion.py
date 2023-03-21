@@ -182,7 +182,12 @@ def book_occasion(self, request, form):
                 name=form.name,
                 birth_date=form.birth_date.data,
                 gender=form.gender.data,
-                notes=form.notes.data
+                notes=form.notes.data,
+                differing_address=form.differing_address.data,
+                address=form.address.data,
+                zip_code=form.zip_code.data,
+                place=form.place.data,
+                political_municipality=form.political_municipality.data
             )
         else:
             attendee = attendees.by_id(form.attendee.data)
