@@ -57,10 +57,6 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: location code and city of agency
     location_code_city = Column(Text, nullable=True)
 
-    # deprecated: please use one of the following 4 items
-    #: the address of the person
-    address = Column(Text, nullable=True)
-
     #: postal address (street name and number) of agency
     postal_address = Column(Text, nullable=True)
 
