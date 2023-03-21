@@ -23,7 +23,10 @@ def test_excel_export(session):
         political_party='PDS',
         parliamentary_group='Parlamentarische Gruppe',
         website='a.com',
-        address='Funktionärstrasse 5',
+        location_address='',
+        location_code_city='',
+        postal_address='Funktionärstrasse 5',
+        postal_code_city='4321 Rüsslikon',
         notes='Notizen',
     )
 
@@ -50,7 +53,10 @@ def test_excel_export(session):
         political_party='PDS',
         parliamentary_group='Parlamentarische Gruppe',
         website='a.com',
-        address='Funktionärstrasse 5',
+        location_address='',
+        location_code_city='',
+        postal_address='Funktionärstrasse 5',
+        postal_code_city='4321 Rüsslikon',
         notes='Notizen',
     )
 
