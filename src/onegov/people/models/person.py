@@ -186,17 +186,17 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line.charset_param = 'utf-8'
 
         if 'location_code_city' not in exclude and self.location_code_city:
-            line = result.add('location_code_city')
+            line = result.add('adr')
             line.value = Address(city=self.location_code_city)
             line.charset_param = 'utf-8'
 
         if 'postal_address' not in exclude and self.postal_address:
             line = result.add('adr')
-            line.value = Address(street=self.address)
+            line.value = Address(street=self.postal_address)
             line.charset_param = 'utf-8'
 
         if 'postal_code_city' not in exclude and self.postal_code_city:
-            line = result.add('postal_code_city')
+            line = result.add('adr')
             line.value = Address(city=self.postal_code_city)
             line.charset_param = 'utf-8'
 
