@@ -1,17 +1,19 @@
+from datetime import datetime, timedelta
+from tempfile import NamedTemporaryFile
+from time import sleep
+
 import pytest
 import requests
 import transaction
+from pytz import UTC
+from sedate import utcnow
 
-from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
 from onegov.file import FileCollection
+from onegov.org.models import ImageFileCollection
 from onegov.people import Person
 from tests.shared.utils import create_image
-from pytz import UTC
-from sedate import utcnow
-from tempfile import NamedTemporaryFile
-from time import sleep
 from tests.shared.utils import encode_map_value
 
 
@@ -496,5 +498,10 @@ def test_quadratic_crop_on_image_upload(browser, client):
     assert person.first_name == 'Johann'
     assert person.last_name == 'Bach'
 
-    # this kind of gets implicitly set after the form has been submitted:
-    assert person.quadratic_picture_url is not None
+    # With uploaded pictures for person, a quadratic version is generated
+    r = requests.get(person.quadratic_picture_url)
+    assert r.status_code == 200
+
+    pic_id = person.quadratic_picture_url.rsplit('/', 1)[-1]
+    crop_file = ImageFileCollection(client.app.session()).by_id(pic_id)
+    assert crop_file is not None

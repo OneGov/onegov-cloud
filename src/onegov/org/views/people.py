@@ -97,24 +97,9 @@ def handle_new_person(self, request, form, layout=None):
         person = self.add(**form.get_useful_data())
         picture_url = form_data['picture_url']
         if picture_url:
-            picture_id = picture_url.rsplit('/', 1)[-1]
-            f = get_file_for_org(request, request.app, picture_id)
-            actual_profile_image = request.app.bound_depot.get(
-                f.reference.file_id
-            )
-            quadratic_image: bytes = crop_to_portrait_with_face_detection(
-                actual_profile_image._file_path
-            )
-            try:
-                file = ImageFileCollection(request.session).add(
-                    filename=f"quadratic_{actual_profile_image.filename}",
-                    content=quadratic_image
-                )
-                person.quadratic_picture_url = request.link(file)
-                form.populate_obj(person)
-            except FileExistsError:
-                form.populate_obj(person)
+            create_quadratic_profile_image(person, picture_url, request)
 
+        form.populate_obj(person)
         request.success(_("Added a new person"))
         return morepath.redirect(request.link(person))
 
@@ -127,6 +112,27 @@ def handle_new_person(self, request, form, layout=None):
         'title': _("New person"),
         'form': form
     }
+
+
+def create_quadratic_profile_image(person, picture_url, request):
+    try:
+        picture_id = picture_url.rsplit('/', 1)[-1]
+        f = get_file_for_org(request, request.app, picture_id)
+        actual_profile_image = request.app.bound_depot.get(
+            f.reference.file_id
+        )
+        quadratic_image_bytes = crop_to_portrait_with_face_detection(
+            actual_profile_image._file_path
+        )
+        if not quadratic_image_bytes:
+            print("no crops found")
+        quadratic_image = ImageFileCollection(request.session).add(
+            filename=f"quadratic_{actual_profile_image.filename}",
+            content=quadratic_image_bytes
+        )
+        person.quadratic_picture_url = request.link(quadratic_image)
+    except Exception:
+        pass
 
 
 @OrgApp.form(model=Person, name='edit', template='form.pt',
