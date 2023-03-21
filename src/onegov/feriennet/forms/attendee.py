@@ -117,7 +117,7 @@ class AttendeeForm(AttendeeBase):
     )
 
     political_municipality = StringField(
-        label=_("Political Municipality"),
+        label=_("Political municipality"),
         validators=[InputRequired()],
         depends_on=('differing_address', 'y')
     )
