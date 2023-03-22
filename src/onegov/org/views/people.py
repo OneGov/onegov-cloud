@@ -115,6 +115,10 @@ def handle_new_person(self, request, form, layout=None):
 
 
 def create_quadratic_profile_image(person, picture_url, request):
+    """ Additionally creates a quadratic portrait image. By default, this is
+    not set as the profile image, but it will appear in the image picker.
+
+    This way, it can be selected manually."""
     try:
         picture_id = picture_url.rsplit('/', 1)[-1]
         f = get_file_for_org(request, request.app, picture_id)
@@ -138,6 +142,10 @@ def create_quadratic_profile_image(person, picture_url, request):
              permission=Private, form=PersonForm)
 def handle_edit_person(self, request, form, layout=None):
     if form.submitted(request):
+        form_data = form.get_useful_data()
+        picture_url = form_data['picture_url']
+        if picture_url:
+            create_quadratic_profile_image(self, picture_url, request)
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
 
