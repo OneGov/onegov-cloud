@@ -67,7 +67,7 @@
                     </div>
                 </div>
 
-                <div class="submit-yours" tal:condition="directory.enable_submissions or request.is_manager">
+                <div class="submit-yours" tal:condition="directory.enable_submissions">
                     <dl>
                         <dt>
                             <a href="${submit}">

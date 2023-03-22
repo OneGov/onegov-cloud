@@ -1,11 +1,7 @@
 """ Provides commands used to initialize election day websites. """
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
-from onegov.ballot import List
-from onegov.ballot import ListPanachageResult
-from onegov.ballot import PartyPanachageResult
 from onegov.ballot import Vote
-from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.election_day.collections import ArchivedResultCollection
@@ -16,8 +12,6 @@ from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
-from transaction import abort
-from uuid import UUID
 import click
 import os
 
@@ -216,116 +210,3 @@ def update_last_result_change():
         click.secho(f'Updated {count} items', fg='green')
 
     return update
-
-
-@cli.command('migrate-panachage-results')
-@click.option('--clear', is_flag=True, default=False)
-@click.option('--cleanup', is_flag=True, default=False)
-@click.option('--dry-run', is_flag=True, default=False)
-@click.option('--verbose', is_flag=True, default=False)
-def migrate_panachage_results(clear, cleanup, dry_run, verbose):
-
-    def migrate(request, app):
-        click.secho(f'Migrating {app.schema}', fg='yellow')
-
-        migrated = 0
-        ignored = 0
-        ignored_items = set()
-
-        session = request.app.session()
-
-        if clear:
-            session.query(ListPanachageResult).delete()
-            session.query(PartyPanachageResult).delete()
-
-        # Lookup tables for ListPanachageResult
-        lists = session.query(List.election_id, List.list_id, List.id).all()
-        election_by_list_ids = {list.id: list.election_id for list in lists}
-        list_id_by_list = {}
-        for election_id, list_id, id_ in lists:
-            list_id_by_list.setdefault(election_id, {'999': None})
-            list_id_by_list[election_id][list_id] = id_
-
-        # Lookup tables for PartyPanachageResult
-        election_ids = {result.id for result in session.query(Election.id)}
-        election_compound_ids = {
-            result.id for result in session.query(ElectionCompound.id)
-        }
-
-        for item in session.query(PanachageResult):
-            type_ = 'list'
-            try:
-                UUID(item.target)
-            except ValueError:
-                type_ = 'party'
-
-            try:
-                if type_ == 'list':
-                    # list
-                    target_id = UUID(item.target)
-                    assert item.votes >= 0
-                    assert not item.election_id
-                    assert not item.election_compound_id
-                    assert target_id in election_by_list_ids
-                    election_id = election_by_list_ids[target_id]
-                    assert item.source in list_id_by_list[election_id]
-                    source_id = list_id_by_list[election_id][item.source]
-                    if not dry_run:
-                        session.add(
-                            ListPanachageResult(
-                                votes=item.votes,
-                                target_id=target_id,
-                                source_id=source_id
-                            )
-                        )
-                else:
-                    # party
-                    assert item.votes >= 0
-                    assert item.election_id or item.election_compound_id
-                    assert (
-                        not item.election_id
-                        or item.election_id in election_ids
-                    )
-                    assert (
-                        not item.election_compound_id
-                        or item.election_compound_id in election_compound_ids
-                    )
-                    assert item.source != '999'  # blank list is ''
-                    assert item.target
-                    if not dry_run:
-                        session.add(
-                            PartyPanachageResult(
-                                votes=item.votes,
-                                source=item.source,
-                                target=item.target,
-                                election_id=item.election_id,
-                                election_compound_id=item.election_compound_id
-                            )
-                        )
-                migrated += 1
-            except AssertionError:
-                ignored += 1
-                ignored_items.add(
-                    item.election_id or item.election_compound_id
-                )
-                if verbose:
-                    click.secho(
-                        f'Ignoring {type_} '
-                        f'{item.source}->{item.target}: {item.votes} '
-                        f'[e: {item.election_id}] '
-                        f'[c:{item.election_compound_id}]',
-                        fg='red'
-                    )
-
-        if cleanup:
-            session.query(PanachageResult).delete()
-
-        click.secho(f'{migrated} migrated, {ignored} ignored', fg='green')
-        if ignored_items and ignored_items != {None}:
-            click.secho(f'Ignored: {ignored_items}', fg='yellow')
-
-        if dry_run:
-            click.secho('Dry run, aborting', fg='green')
-            abort()
-
-    return migrate

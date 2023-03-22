@@ -378,8 +378,10 @@ def view_execute_import(self, request):
 
     invoice = cache['invoice']
 
+    schema, __ = request.app.invoice_schema_config()
     transactions = list(
-        match_iso_20022_to_usernames(xml, request.session, period_id=invoice))
+        match_iso_20022_to_usernames(xml, request.session,
+                                     period_id=invoice, schema=schema))
 
     users = dict(
         request.session.query(User).with_entities(User.username, User.id))
@@ -443,10 +445,12 @@ def view_billing_import(self, request, form):
             request.alert(_("The submitted xml data could not be decoded"))
             return request.redirect(request.link(self))
 
+        schema, __ = request.app.invoice_schema_config()
         try:
             transactions = list(
                 match_iso_20022_to_usernames(
-                    xml, request.session, period_id=cache['invoice']))
+                    xml, request.session, period_id=cache['invoice'],
+                    schema=schema))
         except LxmlError:
             request.alert(_('The submitted xml data could not be parsed. '
                             'Please check the file integrity'))

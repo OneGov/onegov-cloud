@@ -190,7 +190,7 @@ def test_election_compound_layout_general(session):
         ('data', None)
     ):
         layout = ElectionCompoundLayout(compound, DummyRequest(), tab=tab)
-        assert expected == layout.table_link()
+        assert not expected or f'{expected}?locale=de' == layout.table_link()
 
 
 def test_election_compound_layout_menu(session):

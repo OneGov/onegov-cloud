@@ -480,7 +480,7 @@
                 data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
                 data-dataurl="${request.link(election_compound, name='by-district')}"
                 data-embed-link="Embed map"
-                data-embed-source="${request.link(election_compound, name='districts-map')}"
+                data-embed-source="${request.link(election_compound, name='districts-map', query_params={'locale': request.locale})}"
                 data-thumbs="false"
                 data-color-scale="b"
                 data-label-left-hand=""
@@ -544,7 +544,7 @@
             data-mapurl="${layout.get_topojson_link(layout.principal.id, election_compound.date.year)}"
             data-dataurl="${request.link(election_compound, name='by-superregion')}"
             data-embed-link="Embed map"
-            data-embed-source="${request.link(election_compound, name='superregions-map')}"
+            data-embed-source="${request.link(election_compound, name='superregions-map', query_params={'locale': request.locale})}"
             data-thumbs="false"
             data-color-scale="b"
             data-label-left-hand=""
@@ -887,7 +887,7 @@
                 i18n:attributes="data-embed-link"
                 data-dataurl="${request.link(model, name='candidates-data', query_params={'limit': limit, 'lists': lists, 'elected': elected, 'sort_by_lists': sort_by_lists, 'entity': entity})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='candidates-chart', query_params={'entity': entity})}">
+                data-embed-source="${request.link(model, name='candidates-chart', query_params={'entity': entity, 'locale': request.locale})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
@@ -905,7 +905,7 @@
                 i18n:attributes="data-embed-link"
                 data-dataurl="${request.link(model, name='lists-data', query_params={'limit': limit, 'names': names, 'sort_by_names': sort_by_names, 'entity': entity})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='lists-chart', query_params={'entity': entity})}">
+                data-embed-source="${request.link(model, name='lists-chart', query_params={'entity': entity, 'locale': request.locale})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
@@ -922,7 +922,7 @@
             i18n:attributes="data-embed-link"
             data-dataurl="${request.link(model, name='list-groups-data')}"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='list-groups-chart')}">
+            data-embed-source="${request.link(model, name='list-groups-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -939,7 +939,7 @@
             data-dataurl="${request.link(model, name='seat-allocation-data')}"
             data-show-back="false"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='seat-allocation-chart')}">
+            data-embed-source="${request.link(model, name='seat-allocation-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -958,7 +958,7 @@
                 data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
                 data-show-back="true"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='party-strengths-chart')}">
+                data-embed-source="${request.link(model, name='party-strengths-chart', query_params={'locale': request.locale})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
@@ -974,7 +974,7 @@
                 i18n:attributes="data-embed-link"
                 data-dataurl="${request.link(model, name='party-strengths-data', query_params={'horizontal': horizontal})}"
                 data-embed-link="Embed diagram"
-                data-embed-source="${request.link(model, name='party-strengths-chart')}">
+                data-embed-source="${request.link(model, name='party-strengths-chart', query_params={'locale': request.locale})}">
             </div>
         </tal:block>
         <tal:block tal:condition="not: embed">
@@ -992,7 +992,7 @@
             data-dataurl="${request.link(model, name='connections-data')}"
             data-inverse="true"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='connections-chart')}">
+            data-embed-source="${request.link(model, name='connections-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -1011,7 +1011,7 @@
             data-dataurl="${request.link(model, name='lists-panachage-data')}"
             data-inverse="false"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='lists-panachage-chart')}">
+            data-embed-source="${request.link(model, name='lists-panachage-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -1029,7 +1029,7 @@
             data-dataurl="${request.link(model, name='parties-panachage-data')}"
             data-inverse="false"
             data-embed-link="Embed diagram"
-            data-embed-source="${request.link(model, name='parties-panachage-chart')}">
+            data-embed-source="${request.link(model, name='parties-panachage-chart', query_params={'locale': request.locale})}">
         </div>
     </tal:block>
     <tal:block tal:condition="not: embed">
@@ -1041,6 +1041,7 @@
 </metal:parties-panachage-chart i18n:domain="onegov.election_day">
 
 <metal:embedded_widget define-macro="embedded_widget" i18n:domain="onegov.election_day">
+    <!-- todo: -->
     <div tal:condition="embed_link" class="embedded-widget"
         data-embed-link="Embed table"
         data-embed-source="${embed_link}"
