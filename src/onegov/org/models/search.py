@@ -5,6 +5,7 @@ from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from onegov.core.collection import Pagination
+from onegov.event.models import Event
 
 
 class Search(Pagination):
@@ -63,6 +64,21 @@ class Search(Pagination):
             search = self.generic_search(search, query)
 
         return search[self.offset:self.offset + self.batch_size].execute()
+
+    @cached_property
+    def load_batch_results(self):
+        """ Wrapper around self.batch.load() with thee ability to sort or
+        otherwise slightly modify the search result.
+
+        Sorts Events chronologically.
+        """
+        batch = self.batch.load()
+        events = {e for e in batch if isinstance(e, Event)}
+        if not events:
+            return batch
+        sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
+        non_events = [e for e in batch if e not in events]
+        return sorted_events + non_events
 
     def generic_search(self, search, query):
 
