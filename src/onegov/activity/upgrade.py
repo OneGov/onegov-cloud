@@ -848,7 +848,6 @@ def cleanup_activity_aggregates(context):
     """)
 
 
-
 @upgrade_task('Add differing attendee address')
 def add__differing_attendee_address(context):
     if not context.has_column('attendees', 'differing_address'):
