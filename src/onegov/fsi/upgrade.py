@@ -240,7 +240,7 @@ def parse_and_split_address_field(address):
     return location_addr, location_pcc, postal_addr, postal_pcc
 
 
-@upgrade_task('ogc-966 extend agency and person tables with more fields 1')
+@upgrade_task('ogc-966 extend agency and person tables with more fields')
 def extend_agency_and_person_with_more_fields(context):
     ################################################################
     # add columns to table 'agencies'
@@ -268,7 +268,7 @@ def extend_agency_and_person_with_more_fields(context):
     ################################################################
     # add columns to table 'people'
     people_columns = ['location_address', 'location_code_city',
-                      'postal_address', 'postal_code_city']
+                      'postal_address', 'postal_code_city', 'website_2']
     table = 'people'
 
     for column in people_columns:

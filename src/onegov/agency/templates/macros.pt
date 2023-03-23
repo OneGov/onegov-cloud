@@ -205,6 +205,11 @@
                             <dd><a href="${person.website}">${person.website}</a></dd>
                         </tal:block>
 
+                        <tal:block tal:condition="person.website_2 and 'website_2' not in exclude">
+                            <dt i18n:translate>Website 2</dt>
+                            <dd><a href="${person.website_2}">${person .website_2}</a></dd>
+                        </tal:block>
+
                         <tal:block tal:condition="person.notes and 'notes' not in exclude">
                             <dt i18n:translate>Notes</dt>
                             <dd tal:content="structure person.notes_html"></dd>

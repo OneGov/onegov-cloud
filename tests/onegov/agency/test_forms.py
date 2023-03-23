@@ -384,8 +384,8 @@ def test_person_mutation_form():
     form.on_request()
 
     assert set(form.proposal_fields.keys()) == {
-        'function', 'website', 'political_party', 'salutation', 'email',
-        'notes', 'first_name', 'last_name', 'born', 'phone',
+        'function', 'website', 'website_2', 'political_party', 'salutation',
+        'email', 'notes', 'first_name', 'last_name', 'born', 'phone',
         'parliamentary_group', 'location_address',
         'location_code_city', 'postal_address', 'postal_code_city',
         'profession', 'phone_direct', 'academic_title'
@@ -412,6 +412,7 @@ def test_person_mutation_form():
         'political_party': None,
         'parliamentary_group': None,
         'website': None,
+        'website_2': None,
         'location_address': None,
         'location_code_city': None,
         'postal_address': None,

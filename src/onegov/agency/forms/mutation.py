@@ -191,6 +191,12 @@ class PersonMutationForm(MutationForm):
         filters=(ensure_scheme, )
     )
 
+    website_2 = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Website 2"),
+        filters=(ensure_scheme, )
+    )
+
     location_address = TextAreaField(
         fieldset=_("Proposed changes"),
         label=_("Location address"),

@@ -195,6 +195,9 @@ msgstr "Fraktion"
 msgid "Website"
 msgstr "Webseite"
 
+msgid "Website 2"
+msgstr "Webseite 2"
+
 msgid "Address"
 msgstr "Adresse"
 
