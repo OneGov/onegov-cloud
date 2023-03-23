@@ -108,8 +108,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: a second website related to the person
     website_2 = Column(Text, nullable=True)
 
-    # deprecated: please use one of the following 4 items instead where the
-    # address gets split up. The address field is only being used in town6
+    # agency does not use 'address' anymore. Instead, the 4 following items
+    # are being used. The 'address' field is still used in org, town6,
+    # volunteers and others
     #: the address of the person
     address = Column(Text, nullable=True)
 

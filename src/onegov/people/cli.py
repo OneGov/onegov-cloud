@@ -60,7 +60,11 @@ EXPORT_FIELDS = OrderedDict((
     ('Politische Partei', 'political_party'),
     ('Fraktion', 'parliamentary_group'),
     ('Webseite', 'website'),
-    ('Adresse', 'address'),
+    ('Webseite 2', 'website_2'),
+    ('Standort Adresse', 'location_address'),
+    ('Standort Postleitzahl und Ort', 'location_code_city'),
+    ('Postadresse', 'postal_address'),
+    ('Postleitzahl und Ort', 'postal_code_city'),
     ('Link zum Bild', 'picture_url'),
     ('Notizen', 'notes'),
 ))

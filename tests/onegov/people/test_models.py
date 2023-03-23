@@ -23,7 +23,8 @@ def test_person(session):
             phone="11122334455",
             phone_direct="11122334456",
             website="https://thats.me/hans-maulwurf",
-            address="Fakestreet 1, Springfield",
+            postal_address="Fakestreet 1",
+            postal_code_city="4242 Springfield",
             notes="Has bad vision.",
         )
     )
@@ -44,7 +45,8 @@ def test_person(session):
     assert person.phone == "11122334455"
     assert person.phone_direct == "11122334456"
     assert person.website == "https://thats.me/hans-maulwurf"
-    assert person.address == "Fakestreet 1, Springfield"
+    assert person.postal_address == "Fakestreet 1"
+    assert person.postal_code_city == "4242 Springfield"
     assert person.notes == "Has bad vision."
 
     assert person.spoken_title == "Dr. Hans Maulwurf"
