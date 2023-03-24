@@ -185,24 +185,21 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line = result.add('url')
             line.value = self.website
 
-        if 'location_address' not in exclude and self.location_address:
+        if 'postal_address' not in exclude and self.postal_address and \
+                'postal_code_city' not in exclude and self.postal_code_city:
             line = result.add('adr')
-            line.value = Address(street=self.location_address)
+            line.value = Address(street=self.postal_address,
+                                 code=self.postal_code_city.split(' ')[0],
+                                 city=self.postal_code_city.split(' ')[1])
             line.charset_param = 'utf-8'
 
-        if 'location_code_city' not in exclude and self.location_code_city:
+        if 'location_address' not in exclude and self.location_address and \
+                'location_code_city' not in exclude and \
+                self.location_code_city:
             line = result.add('adr')
-            line.value = Address(city=self.location_code_city)
-            line.charset_param = 'utf-8'
-
-        if 'postal_address' not in exclude and self.postal_address:
-            line = result.add('adr')
-            line.value = Address(street=self.postal_address)
-            line.charset_param = 'utf-8'
-
-        if 'postal_code_city' not in exclude and self.postal_code_city:
-            line = result.add('adr')
-            line.value = Address(city=self.postal_code_city)
+            line.value = Address(street=self.location_address,
+                                 code=self.location_code_city.split(' ')[0],
+                                 city=self.location_code_city.split(' ')[1])
             line.charset_param = 'utf-8'
 
         if 'notes' not in exclude and self.notes:
