@@ -1,4 +1,5 @@
 import click
+import re
 import transaction
 
 from collections import OrderedDict
@@ -7,7 +8,6 @@ from onegov.core.cli import abort
 from onegov.people.models import Person
 from openpyxl import load_workbook
 from openpyxl import Workbook
-
 
 cli = command_group()
 
@@ -140,3 +140,116 @@ def import_xlsx(file):
         click.secho(f'Imported {count} person(s)', fg='green')
 
     return _import
+
+
+p2 = re.compile(r'(.*), (.*)Postadresse: (.*), (.*)')
+p3 = re.compile(r'(.*), (Postfach), (.*)')
+p4 = re.compile(r'(.*), (.*), (.*)')
+p1 = re.compile(r'(.*), (.*)')
+p5 = re.compile(r'([A-Za-z ]*) ?(\d+[a-z]?)?')  # street name and optional
+
+
+# building number
+
+
+def parse_and_split_address_field(address):
+    """
+    Parsing the `address` field to split into location address and code/city
+    as well as postal address and code/city.
+
+    :param address:str
+    :return: tuple: (location_address, location_code_city,
+                     postal_address, postal_code_city)
+    """
+    location_addr = ''
+    location_pcc = ''
+    postal_addr = ''
+    postal_pcc = ''
+
+    # sanitize address
+    if ';' in address:
+        address = address.replace('; ', '')
+        address = address.replace(';', '')
+
+    if not address:
+        return location_addr, location_pcc, postal_addr, postal_pcc
+
+    if m := p2.match(address):
+        location_addr = m.group(1)
+        location_pcc = m.group(2)
+        postal_addr = m.group(3)
+        postal_pcc = m.group(4)
+        return location_addr, location_pcc, postal_addr, postal_pcc
+
+    if m := p3.match(address):
+        postal_addr = m.group(1) + '\n' + m.group(2)
+        postal_pcc = m.group(3)
+        return location_addr, location_pcc, postal_addr, postal_pcc
+
+    if m := p4.match(address):
+        postal_addr = m.group(1) + '\n' + m.group(2)
+        postal_pcc = m.group(3)
+        return location_addr, location_pcc, postal_addr, postal_pcc
+
+    if m := p1.match(address):
+        postal_addr = m.group(1)
+        postal_pcc = m.group(2)
+        return location_addr, location_pcc, postal_addr, postal_pcc
+
+    if m := p5.match(address):
+        postal_addr = m.group(1)
+        if m.group(2):
+            postal_addr += f'{m.group(2)}'
+        return location_addr, location_pcc, postal_addr, postal_pcc
+
+    # default no match found
+    return location_addr, location_pcc, postal_addr, postal_pcc
+
+
+@cli.command('migrate-people-address-field')
+@click.option('--dry-run/--no-dry-run', default=False)
+def migrate_people_address_field(dry_run):
+    """ Migrates onegov_agency people address field.
+
+    Migrate data from onegov_agency table 'people' column 'address' field to
+    'location_address', 'location_code_city', 'postal_address' and
+    'postal_code_city' fields.
+
+
+    Example:
+
+        onegov-people --select /onegov_agency/bs migrate-people-address-field
+
+        onegov-people --select /onegov_agency/bs migrate-people-address-field
+        --dry-run
+
+    """
+
+    def _migrate(request, app):
+        session = app.session()
+        click.secho("Migrate data from table 'people' column 'address' "
+                    "field to 'location_address', 'location_code_city', "
+                    "'postal_address' and 'postal_code_city ..",
+                    fg='yellow')
+        migration_count = 0
+        total_count = 0
+        for person in session.query(Person):
+            total_count += 1
+
+            if not person.address:
+                continue
+
+            person.location_address, person.location_code_city, \
+                person.postal_address, person.postal_code_city = \
+                parse_and_split_address_field(person.address)
+
+            migration_count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(f'Migrated all {migration_count} address(es) of totally '
+                    f'{total_count} people', fg='green')
+
+    return _migrate

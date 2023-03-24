@@ -3,8 +3,6 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 import itertools
-import re
-
 import click
 
 from onegov.core.orm.types import JSON
@@ -12,7 +10,6 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.people import Agency
 from onegov.people import AgencyMembership
-from onegov.people import Person
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import String
@@ -211,68 +208,6 @@ def remove_address_columns_from_agency(context):
         context.operations.drop_column('agencies', 'address')
 
 
-p2 = re.compile(r'(.*), (.*)Postadresse: (.*), (.*)')
-p3 = re.compile(r'(.*), (Postfach), (.*)')
-p4 = re.compile(r'(.*), (.*), (.*)')
-p1 = re.compile(r'(.*), (.*)')
-p5 = re.compile(r'([A-Za-z ]*) ?(\d+[a-z]?)?')  # street name and optional
-# building number
-
-
-def parse_and_split_address_field(address):
-    """
-    Parsing the `address` field to split into location address and code/city
-    as well as postal address and code/city.
-
-    :param address:str
-    :return: tuple: (location_address, location_code_city,
-                     postal_address, postal_code_city)
-    """
-    location_addr = ''
-    location_pcc = ''
-    postal_addr = ''
-    postal_pcc = ''
-
-    # sanitize address
-    if ';' in address:
-        address = address.replace('; ', '')
-        address = address.replace(';', '')
-
-    if not address:
-        return (location_addr, location_pcc, postal_addr, postal_pcc)
-
-    if m := p2.match(address):
-        location_addr = m.group(1)
-        location_pcc = m.group(2)
-        postal_addr = m.group(3)
-        postal_pcc = m.group(4)
-        return (location_addr, location_pcc, postal_addr, postal_pcc)
-
-    if m := p3.match(address):
-        postal_addr = m.group(1) + '\n' + m.group(2)
-        postal_pcc = m.group(3)
-        return (location_addr, location_pcc, postal_addr, postal_pcc)
-
-    if m := p4.match(address):
-        postal_addr = m.group(1) + '\n' + m.group(2)
-        postal_pcc = m.group(3)
-        return (location_addr, location_pcc, postal_addr, postal_pcc)
-
-    if m := p1.match(address):
-        postal_addr = m.group(1)
-        postal_pcc = m.group(2)
-        return (location_addr, location_pcc, postal_addr, postal_pcc)
-
-    if m := p5.match(address):
-        postal_addr = m.group(1)
-        if m.group(2):
-            postal_addr += f'{m.group(2)}'
-        return (location_addr, location_pcc, postal_addr, postal_pcc)
-
-    # default no match found
-    return location_addr, location_pcc, postal_addr, postal_pcc
-
-
 @upgrade_task('ogc-966 extend agency and person tables with more fields')
 def extend_agency_and_person_with_more_fields(context):
     # add columns to table 'agencies'
@@ -306,16 +241,3 @@ def extend_agency_and_person_with_more_fields(context):
                 Column(column, Text, nullable=True),
                 default=lambda x: ''
             )
-
-    click.secho(f"Migrate data from table {table} column 'address' field to "
-                f"'location_address', 'location_code_city', 'postal_address' "
-                f"and 'postal_code_city'")
-    for person in context.session.query(Person):
-        if not person.address:
-            continue
-
-        person.location_address, person.location_code_city, \
-            person.postal_address, person.postal_code_city = \
-            parse_and_split_address_field(person.address)
-
-    context.session.flush()
