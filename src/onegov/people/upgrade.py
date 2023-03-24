@@ -5,6 +5,8 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 import itertools
 import re
 
+import click
+
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
@@ -281,7 +283,7 @@ def extend_agency_and_person_with_more_fields(context):
     table = 'agencies'
 
     for column in agencies_columns:
-        # Checking table for column
+        click.secho(f"Checking table '{table}' for column '{column}' .. ")
         if not context.has_column(table, column):
             context.add_column_with_defaults(
                 'agencies',
@@ -297,7 +299,7 @@ def extend_agency_and_person_with_more_fields(context):
     table = 'people'
 
     for column in people_columns:
-        # Checking table for column
+        click.secho(f"Checking table '{table}' for column '{column}' .. ")
         if not context.has_column(table, column):
             context.add_column_with_defaults(
                 'people',
@@ -305,8 +307,9 @@ def extend_agency_and_person_with_more_fields(context):
                 default=lambda x: ''
             )
 
-    # Migrate data from table column 'address' field to 'location_address',
-    # 'location_code_city', 'postal_address' and 'postal_code_city
+    click.secho(f"Migrate data from table {table} column 'address' field to "
+                f"'location_address', 'location_code_city', 'postal_address' "
+                f"and 'postal_code_city'")
     for person in context.session.query(Person):
         if not person.address:
             continue
