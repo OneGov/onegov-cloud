@@ -1,6 +1,6 @@
 import pytest
 
-from onegov.fsi.upgrade import parse_and_split_address_field
+from onegov.people.upgrade import parse_and_split_address_field
 
 
 @pytest.mark.parametrize('address,expected', [
