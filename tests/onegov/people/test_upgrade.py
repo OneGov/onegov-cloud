@@ -1,4 +1,4 @@
-from onegov.people.upgrade import parse_and_split_address_field
+from onegov.people.cli import parse_and_split_address_field
 
 
 def test_parse_person_address_field_2():
