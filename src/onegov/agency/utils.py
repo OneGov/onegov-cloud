@@ -78,3 +78,9 @@ def emails_for_new_ticket(model, request):
                 except ValueError:
                     # if it's not a valid address then skip it
                     pass
+
+
+def get_html_paragraph_with_line_breaks(text):
+    return '<p>{}</p>'.format(
+        '<br>'.join((text or '').splitlines())
+    )

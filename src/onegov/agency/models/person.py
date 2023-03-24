@@ -1,3 +1,4 @@
+from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.org.models import Organisation
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
@@ -53,27 +54,21 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
                 result.append('0' + number[-9:])
         return [r for r in result if r]
 
-    @staticmethod
-    def _get_html_paragraph_with_line_breaks(prop):
-        return '<p>{}</p>'.format(
-            '<br>'.join((prop or '').splitlines())
-        )
-
     @property
     def location_address_html(self):
-        return self._get_html_paragraph_with_line_breaks(self.location_address)
+        return get_html_paragraph_with_line_breaks(self.location_address)
 
     @property
     def postal_address_html(self):
-        return self._get_html_paragraph_with_line_breaks(self.postal_address)
+        return get_html_paragraph_with_line_breaks(self.postal_address)
 
     @property
     def opening_hours_html(self):
-        return self._get_html_paragraph_with_line_breaks(self.opening_hours)
+        return get_html_paragraph_with_line_breaks(self.opening_hours)
 
     @property
     def notes_html(self):
-        return self._get_html_paragraph_with_line_breaks(self.notes)
+        return get_html_paragraph_with_line_breaks(self.notes)
 
     def deletable(self, request):
         if request.is_admin:
