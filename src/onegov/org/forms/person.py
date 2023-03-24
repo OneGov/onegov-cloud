@@ -32,13 +32,13 @@ class PersonForm(Form):
         label=_("Location address"),
         render_kw={'rows': 1}
     )
-    location_code_city = StringField(_("Location Code and City"))
+    location_code_city = StringField(label=_("Location Code and City"))
 
     postal_address = TextAreaField(
         label=_("Postal address"),
         render_kw={'rows': 2}
     )
-    postal_code_city = StringField(_("Postal Code and City"))
+    postal_code_city = StringField(label=_("Postal Code and City"))
 
     picture_url = StringField(
         label=_("Picture"),
