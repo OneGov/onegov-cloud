@@ -1,4 +1,5 @@
 from email.headerregistry import Address
+from markupsafe import escape, Markup
 from onegov.core.mail import coerce_address
 from onegov.people.models import Agency, Person
 
@@ -81,6 +82,8 @@ def emails_for_new_ticket(model, request):
 
 
 def get_html_paragraph_with_line_breaks(text):
-    return '<p>{}</p>'.format(
-        '<br>'.join((text or '').splitlines())
-    )
+    if not text:
+        return ''
+    return Markup('<p>{}</p>'.format(
+        '<br>'.join(escape(line) for line in str(text).splitlines())
+    ))
