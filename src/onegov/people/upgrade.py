@@ -3,7 +3,6 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 import itertools
-import click
 
 from onegov.core.orm.types import JSON
 from onegov.core.orm.types import UTCDateTime
@@ -218,10 +217,9 @@ def extend_agency_and_person_with_more_fields(context):
     table = 'agencies'
 
     for column in agencies_columns:
-        click.secho(f"Checking table '{table}' for column '{column}' .. ")
         if not context.has_column(table, column):
             context.add_column_with_defaults(
-                'agencies',
+                table,
                 Column(column, Text, nullable=True),
                 default=lambda x: ''
             )
@@ -234,10 +232,9 @@ def extend_agency_and_person_with_more_fields(context):
     table = 'people'
 
     for column in people_columns:
-        click.secho(f"Checking table '{table}' for column '{column}' .. ")
         if not context.has_column(table, column):
             context.add_column_with_defaults(
-                'people',
+                table,
                 Column(column, Text, nullable=True),
                 default=lambda x: ''
             )
