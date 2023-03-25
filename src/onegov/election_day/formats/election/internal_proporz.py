@@ -150,7 +150,7 @@ def parse_list_panachage_results(line, errors, values, headers):
                 if source == target:
                     continue
                 votes = validate_integer(line, col_name, default=None)
-                if votes is not None:
+                if votes:
                     values[target][source] = votes
 
     except ValueError as e:
@@ -226,7 +226,7 @@ def parse_candidate_panachage_results(line, errors, values, headers):
         candidate_id = line.candidate_id
         for col_name, source in headers.items():
             votes = validate_integer(line, col_name, default=None)
-            if votes is not None:
+            if votes:
                 values.append({
                     'entity_id': entity_id,
                     'candidate_id': candidate_id,

@@ -28,7 +28,7 @@ class Transaction:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        self.username = None
+        self.username = ''  # Has to be str for comparison used in sort
         self.confidence = 0
         self.duplicate = False
         self.paid = False
@@ -38,7 +38,10 @@ class Transaction:
 
     @cached_property
     def references(self):
-        return set(self.extract_references())
+        if self.invoice_schema == 'feriennet-v1' or not self.reference:
+            return set(self.extract_references())
+        # if possible, don't rely on manual extraction of the reference number.
+        return {self.reference}
 
     def extract_references(self):
         if self.reference:
@@ -112,7 +115,7 @@ def transaction_entries(root):
         yield entry
 
 
-def extract_transactions(xml):
+def extract_transactions(xml, invoice_schema):
     root = etree.fromstring(normalize_xml(xml).encode('utf-8'))
 
     def first(element, xpath):
@@ -148,10 +151,12 @@ def extract_transactions(xml):
                 credit=first(d, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(d, 'RltdPties/Dbtr/Nm/text()'),
                 debitor_account=first(d, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
+                invoice_schema=invoice_schema
             )
 
 
-def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
+def match_iso_20022_to_usernames(xml, session, period_id, schema,
+                                 currency='CHF'):
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
     items in the database.
 
@@ -212,7 +217,7 @@ def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
             last_username = record.username
 
     # go through the transactions, comparing amount and code for a match
-    transactions = tuple(extract_transactions(xml))
+    transactions = tuple(extract_transactions(xml, schema))
 
     # mark duplicate transactions
     seen = {}
@@ -226,7 +231,7 @@ def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
 
     for t in transactions:
 
-        # credit transactions are completely irrelevant for us
+        # debit transactions are completely irrelevant for us
         if not t.credit:
             continue
 
