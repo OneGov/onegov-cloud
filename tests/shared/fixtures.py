@@ -24,6 +24,7 @@ from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from pathlib import Path
 from pytest_redis import factories
+from pytest_localserver.smtp import Server as SmtpServer
 from redis import Redis
 from selenium.webdriver.chrome.options import Options
 from splinter import Browser
@@ -364,9 +365,12 @@ def es_client(es_url):
 
 
 @pytest.fixture(scope="function")
-def smtp(smtpserver):
-    yield smtpserver
-    del smtpserver.outbox[:]
+def smtp(request):
+    server = SmtpServer(host='127.0.0.1')
+    server.start()
+    request.addfinalizer(server.stop)
+    yield server
+    del server.outbox[:]
 
 
 @pytest.fixture(scope="session")
