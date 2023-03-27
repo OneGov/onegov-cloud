@@ -128,16 +128,18 @@ def get_parameter(request, name, type_, default):
 
 
 def get_entity_filter(request, item, view, selected):
-    entities = [None] + [result.name for result in item.results]
-    return sorted((
+    result = [result.name for result in item.results]
+    result = sorted((
         (
-            entity if entity else _('All'),
+            entity,
             entity == selected,
             request.link(
                 item,
                 view,
-                query_params={'entity': entity} if entity else {}
+                query_params={'entity': entity}
             )
         )
-        for entity in entities
+        for entity in result
     ))
+    result.insert(0, (_('All'), not selected, request.link(item, view)))
+    return result

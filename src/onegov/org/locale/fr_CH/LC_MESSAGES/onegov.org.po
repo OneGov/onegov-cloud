@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-28 12:02+0100\n"
+"POT-Creation-Date: 2023-03-13 12:46+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -994,8 +994,8 @@ msgstr "Prénom"
 msgid "Last name"
 msgstr "Nom de famille"
 
-msgid "Functions:"
-msgstr "Fonctions:"
+msgid "Function"
+msgstr "Fonction"
 
 msgid "Direct Phone Number"
 msgstr "Numéro de téléphone direct"
@@ -1677,13 +1677,6 @@ msgstr "Mensuel (le premier lundi du mois)"
 msgid "Never"
 msgstr "Jamais"
 
-msgid "1 entry"
-msgstr "1 entrée"
-
-#, python-format
-msgid "${count} entries"
-msgstr "${count} entrées"
-
 msgid "All directories"
 msgstr "Tous les dossiers"
 
@@ -1779,6 +1772,9 @@ msgstr "Supprimer le formulaire"
 msgid "Export"
 msgstr "Exporter"
 
+msgid "Move"
+msgstr "Déplacer"
+
 msgid "Change URL"
 msgstr "Changer URL"
 
@@ -1832,6 +1828,12 @@ msgstr "Nouveau commentaire"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Destination"
+msgstr "Destination"
+
+msgid "- Root -"
+msgstr "- Page de base-"
 
 msgid "New Message"
 msgstr "Nouveau message"
@@ -1915,10 +1917,10 @@ msgstr "Supprimer l'allocation"
 msgid "Every ${days} until ${end}"
 msgstr "Tous les ${days} jusqu'à ${end}"
 
-msgid "This event can't be editet."
+msgid "This event can't be edited."
 msgstr "Cet événement ne peut pas être édité."
 
-msgid "Imported events can not be editet."
+msgid "Imported events can not be edited."
 msgstr "Les événements importés ne peuvent pas être édités."
 
 msgid "Do you really want to delete this event?"
@@ -2443,6 +2445,12 @@ msgstr "A ajouté un nouveau sujet"
 msgid "Edit Topic"
 msgstr "Modifier le sujet"
 
+msgid "Move Topic"
+msgstr "Déplacer le sujet"
+
+msgid "Invalid destination selected"
+msgstr "Destination non valide sélectionnée"
+
 msgid "The topic was deleted"
 msgstr "Le sujet a été supprimé"
 
@@ -2741,6 +2749,9 @@ msgstr "Erreurs"
 msgid "Duration [s]"
 msgstr "Durée [s]"
 
+msgid "Alternatives"
+msgstr "Alternatives"
+
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
 
@@ -2752,9 +2763,6 @@ msgstr "Avez-vous oublié votre mot de passe ?"
 
 msgid "Reset password"
 msgstr "Réinitialisez le mot de passe"
-
-msgid "Alternatives"
-msgstr "Alternatives"
 
 msgid "You are here"
 msgstr "Vous êtes ici"
@@ -4118,8 +4126,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, "
-"pour peu qu'un compte actif existe pour cette adresse e-mail."
+"Un lien de réinitialisation de mot de passe a été envoyé à ${number}, pour "
+"peu qu'un compte actif existe pour cette adresse e-mail."
 
 msgid "Password changed."
 msgstr "Mot de passe modifié."
@@ -5107,6 +5115,9 @@ msgstr ""
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
+
 msgid "My"
 msgstr "Mes"
 
@@ -5145,3 +5156,11 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+
+#~ msgid "1 entry"
+#~ msgstr "1 entrée"
+
+#, python-format
+#~ msgid "${count} entries"
+#~ msgstr "${count} entrées"

@@ -1,6 +1,7 @@
 from freezegun import freeze_time
 
 from tests.onegov.org.common import edit_bar_links
+from tests.onegov.town6.test_views_topics import get_select_option_id_by_text
 from tests.shared.utils import get_meta, create_image
 from webtest import Upload
 
@@ -31,7 +32,7 @@ def test_pages_cache(client):
     root_page = client.get(root_url)
     links = edit_bar_links(root_page, 'text')
     assert 'URL ändern' in links
-    assert len(links) == 6
+    assert len(links) == 7
 
     # Test changing the url of the root page organisation
     assert 'URL ändern' not in editor.get(root_page.request.url)
@@ -185,6 +186,103 @@ def test_hide_page(client):
 
     # Test the links in the page
     assert 'Test' not in page
+
+
+def setup_main_and_subpage(client):
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+    client.login_admin()
+    root_page = client.get(root_url)
+    page_1 = root_page.click('Thema')
+    page_1.form['title'] = "Mainpage"
+    page_1.form['text'] = (
+        "## Living in Govikon is Really Great\n"
+        "*Experts say it's a fact that Govikon does not really exist.*"
+    )
+    assert page_1.form.submit().follow().status_code == 200
+    # create subpage
+    page_1 = client.get('/topics/organisation/mainpage')
+    page_2 = page_1.click('Thema')
+    page_2.form['title'] = "Subpage"
+    page_2.form['text'] = (
+        "## Govikon and its lake view\n"
+        "*It is terrific!*"
+    )
+    assert page_2.form.submit().follow().status_code == 200
+
+    assert client.get('/topics/organisation/mainpage')
+    assert client.get('/topics/organisation/mainpage/subpage')
+
+
+def test_move_page_to_root(client):
+    setup_main_and_subpage(client)
+
+    # move subpage to top level (as mainpage)
+    page = client.get('/topics/organisation/mainpage/subpage')
+    move_page = page.click('Verschieben')
+    assert 'move' in move_page.form.action
+    move_page.form['parent_id'].select('root')
+    move_page = move_page.form.submit().follow()
+    assert move_page.status_code == 200
+
+    # verify main page remains but subpage is on the root level now
+    mainpage = client.get('/topics/organisation/mainpage')
+    assert mainpage.status_code == 200
+    assert mainpage.pyquery('.main-title').text() == 'Mainpage'
+
+    subpage = client.get('/topics/subpage')
+    assert subpage.status_code == 200
+    assert subpage.pyquery('.main-title').text() == 'Subpage'
+
+
+def test_move_page_with_child_to_root(client):
+    setup_main_and_subpage(client)
+
+    # move main page to top level
+    mainpage = client.get('/topics/organisation/mainpage')
+    move_page = mainpage.click('Verschieben')
+    assert 'move' in move_page.form.action
+    move_page.form['parent_id'].select('root')
+    move_page = move_page.form.submit().follow()
+    assert move_page.status_code == 200
+
+    # verify main page on root level, subpage is still the sub-page of
+    # the main page
+    mainpage = client.get('/topics/mainpage')
+    assert mainpage.status_code == 200
+    assert mainpage.pyquery('.main-title').text() == 'Mainpage'
+
+    subpage = client.get('/topics/mainpage/subpage')
+    assert subpage.status_code == 200
+    assert subpage.pyquery('.main-title').text() == 'Subpage'
+
+
+def test_move_page_assign_yourself_as_parent(client):
+    setup_main_and_subpage(client)
+
+    mainpage = client.get('/topics/organisation/mainpage')
+    move_page = mainpage.click('Verschieben')
+    assert 'move' in move_page.form.action
+    parent_id = get_select_option_id_by_text(move_page.form['parent_id'],
+                                             'Mainpage')
+    move_page.form['parent_id'].select(parent_id)
+    move_page = move_page.form.submit()
+    assert move_page.pyquery('.alert')
+    assert move_page.pyquery('.error')
+    assert 'Ungültiger Zielort gewählt' in move_page
+
+
+def test_move_page_assigning_a_child_as_parent(client):
+    setup_main_and_subpage(client)
+    mainpage = client.get('/topics/organisation/mainpage')
+    move_page = mainpage.click('Verschieben')
+    assert 'move' in move_page.form.action
+    parent_id = get_select_option_id_by_text(move_page.form['parent_id'],
+                                             'Subpage')
+    move_page.form['parent_id'].select(parent_id)
+    move_page = move_page.form.submit()
+    assert move_page.pyquery('.alert')
+    assert move_page.pyquery('.error')
+    assert 'Ungültiger Zielort gewählt' in move_page
 
 
 def test_links(client):

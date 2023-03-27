@@ -9,6 +9,7 @@ from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.user import Auth
+from fs.errors import ResourceNotFound
 
 
 class DefaultLayout(ChameleonLayout):
@@ -163,3 +164,13 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def archive_download(self):
         return self.request.link(self.principal, name="archive-download")
+
+    @property
+    def last_archive_modification(self):
+        try:
+            filestorage_info = self.request.app.filestorage.getinfo(
+                "archive/zip/archive.zip", namespaces="details"
+            )
+            return filestorage_info.modified
+        except ResourceNotFound:
+            return ''

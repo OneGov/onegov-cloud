@@ -122,12 +122,15 @@ def test_view_vote_json(election_day_app_zg):
     assert data['domain'] == 'federation'
     assert data['embed'] == {
         'entities': [
-            'http://localhost/vote/vote/proposal-by-entities-map',
+            'http://localhost/vote/vote/proposal-by-entities-map?locale=de_CH',
             'http://localhost/vote/vote/vote-header-widget',
-            'http://localhost/vote/vote/proposal-by-entities-table'
+            (
+                'http://localhost/vote/vote/proposal-by-entities-table'
+                '?locale=de_CH'
+            )
         ],
         'statistics': [
-            'http://localhost/vote/vote/proposal-statistics-table'
+            'http://localhost/vote/vote/proposal-statistics-table?locale=de_CH'
         ]
     }
     assert data['media'] == {'maps': {}}

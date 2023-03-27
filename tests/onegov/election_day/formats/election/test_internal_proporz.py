@@ -1,6 +1,9 @@
 from datetime import date
 from io import BytesIO
+from onegov.ballot import Candidate
+from onegov.ballot import CandidatePanachageResult
 from onegov.ballot import Election
+from onegov.ballot import ElectionResult
 from onegov.ballot import List
 from onegov.ballot import ListPanachageResult
 from onegov.ballot import ProporzElection
@@ -11,75 +14,145 @@ from tests.onegov.election_day.common import create_principal
 from tests.onegov.election_day.common import print_errors
 
 
-def test_import_internal_proporz_cantonal(session, import_test_datasets):
+def test_import_internal_proporz_cantonal_zg(session, import_test_datasets):
+    for roundtrip in (False, True):
+        if not roundtrip:
+            election, errors = import_test_datasets(
+                api_format='internal',
+                model='election',
+                principal='zg',
+                domain='canton',
+                election_type='proporz',
+                number_of_mandates=3,
+                date_=date(2015, 10, 18),
+                dataset_name='nationalratswahlen-2015',
+                has_expats=False
+            )
+        else:
+            csv = convert_list_of_dicts_to_csv(
+                election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+            ).encode('utf-8')
+            principal = create_principal('zg')
+            errors = import_election_internal_proporz(
+                election, principal, BytesIO(csv), 'text/plain'
+            )
 
-    election, errors = import_test_datasets(
-        api_format='internal',
-        model='election',
-        principal='zg',
-        domain='canton',
-        election_type='proporz',
-        number_of_mandates=3,
-        date_=date(2015, 10, 18),
-        dataset_name='nationalratswahlen-2015',
-        has_expats=False
-    )
-    assert not errors
-    assert election.last_result_change
-    assert election.completed
-    assert election.progress == (11, 11)
-    assert election.absolute_majority is None
-    assert election.eligible_voters == 74803
-    assert election.accounted_ballots == 39067
-    assert election.accounted_votes == 116689
-    assert election.blank_ballots == 118
-    assert election.invalid_ballots == 1015
-    assert round(election.turnout, 2) == 53.74
-    assert election.allocated_mandates == 3
-    assert sorted(election.elected_candidates) == [
-        ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
-    ]
-    assert sorted([list.votes for list in election.lists]) == [
-        347, 575, 807, 1128, 1333, 1701, 2186, 3314, 4178, 4299, 4436, 5844,
-        6521, 8868, 16285, 24335, 30532
-    ]
-    assert sorted([list.votes for list in election.list_connections]) == [
-        0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
-    ]
+        assert not errors
+        assert election.last_result_change
+        assert election.completed
+        assert election.progress == (11, 11)
+        assert election.absolute_majority is None
+        assert election.eligible_voters == 74803
+        assert election.accounted_ballots == 39067
+        assert election.accounted_votes == 116689
+        assert election.blank_ballots == 118
+        assert election.invalid_ballots == 1015
+        assert round(election.turnout, 2) == 53.74
+        assert election.allocated_mandates == 3
+        assert sorted(election.elected_candidates) == [
+            ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
+        ]
+        assert sorted([list.votes for list in election.lists]) == [
+            347, 575, 807, 1128, 1333, 1701, 2186, 3314, 4178, 4299, 4436,
+            5844, 6521, 8868, 16285, 24335, 30532
+        ]
+        assert sorted([list.votes for list in election.list_connections]) == [
+            0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
+        ]
 
-    # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(
-        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
-    ).encode('utf-8')
 
-    principal = create_principal('zg')
+def test_import_internal_proporz_cantonal_bl(session, import_test_datasets):
+    for roundtrip in (False, True):
+        if not roundtrip:
+            election, errors = import_test_datasets(
+                api_format='internal',
+                model='election',
+                principal='bl',
+                domain='canton',
+                election_type='proporz',
+                number_of_mandates=3,
+                date_=date(2019, 10, 20),
+                dataset_name='nationalratswahlen-2019',
+                has_expats=False
+            )
+        else:
+            csv = convert_list_of_dicts_to_csv(
+                election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+            ).encode('utf-8')
+            principal = create_principal('bl')
+            errors = import_election_internal_proporz(
+                election, principal, BytesIO(csv), 'text/plain'
+            )
 
-    errors = import_election_internal_proporz(
-        election, principal, BytesIO(csv), 'text/plain'
-    )
-
-    assert not errors
-    assert election.last_result_change
-    assert election.completed
-    assert election.progress == (11, 11)
-    assert election.absolute_majority is None
-    assert election.eligible_voters == 74803
-    assert election.accounted_ballots == 39067
-    assert election.accounted_votes == 116689
-    assert election.blank_ballots == 118
-    assert election.invalid_ballots == 1015
-    assert round(election.turnout, 2) == 53.74
-    assert election.allocated_mandates == 3
-    assert sorted(election.elected_candidates) == [
-        ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
-    ]
-    assert sorted([list.votes for list in election.lists]) == [
-        347, 575, 807, 1128, 1333, 1701, 2186, 3314, 4178, 4299, 4436, 5844,
-        6521, 8868, 16285, 24335, 30532
-    ]
-    assert sorted([list.votes for list in election.list_connections]) == [
-        0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
-    ]
+        assert not errors
+        assert election.last_result_change
+        assert election.completed
+        assert election.progress == (86, 86)
+        assert election.absolute_majority is None
+        assert election.accounted_ballots == 79241
+        assert election.received_ballots == 80843
+        assert election.blank_ballots == 94
+        assert election.invalid_ballots == 1508
+        assert election.allocated_mandates == 7
+        assert sorted(election.elected_candidates) == [
+            ('Daniela', 'Schneeberger'), ('Elisabeth', 'Schneider-Schneiter'),
+            ('Eric', 'Nussbaumer'), ('Maya', 'Graf'), ('Samira', 'Marti'),
+            ('Sandra', 'Sollberger'), ('Thomas', 'de Courten')
+        ]
+        assert sorted([list.votes for list in election.lists]) == [
+            634, 1467, 2058, 2658, 2862, 3051, 3922, 4111, 4341, 4690, 5419,
+            6158, 6470, 16074, 23337, 37974, 87578, 88885, 113689, 131564
+        ]
+        assert sorted([list.votes for list in election.list_connections]) == [
+            0, 0, 6470, 19125, 28756, 46426, 90352, 98426, 119209, 137544
+        ]
+        lists = {list_.id: list_ for list_ in election.lists}
+        list_ = election.lists.filter_by(list_id='01').one()
+        assert {
+            lists[r.source_id].list_id if r.source_id else '00': r.votes
+            for r in list_.panachage_results
+        } == {
+            '02': 1148,
+            '03': 4751,
+            '04': 225,
+            '05': 1381,
+            '06': 42,
+            '07': 912,
+            '08': 222,
+            '11': 775,
+            '12': 31,
+            '13': 19,
+            # '22': 0
+            '23': 2,
+            '33': 14,
+            '34': 10,
+            '44': 4,
+            '55': 25,
+            '56': 29,
+            '70': 35,
+            '77': 7,
+            '00': 16051
+        }
+        candidate = election.candidates.filter_by(candidate_id='0101').one()
+        result_id = election.results.filter_by(entity_id='2761').one().id
+        assert {
+            lists[r.source_id].list_id if r.source_id else '00': r.votes
+            for r in candidate.panachage_results.filter_by(
+                election_result_id=result_id
+            )
+        } == {
+            '01': 340,
+            '02': 10,
+            '03': 38,
+            '04': 4,
+            '05': 36,
+            '07': 4,
+            '08': 1,
+            '11': 2,
+            '33': 2,
+            '00': 140
+            # others are zero
+        }
 
 
 def test_import_internal_proporz_regional_zg(session, import_test_datasets):
@@ -366,6 +439,7 @@ def test_import_internal_proporz_invalid_values(session):
     errors = sorted([(e.line, e.error.interpolate()) for e in errors])
     assert errors == [
         (2, 'Invalid integer: candidate_votes'),
+        (2, 'Invalid integer: entity_id'),
         (2, 'Invalid integer: entity_id'),
         (2, 'Invalid integer: list_votes'),
         (2, 'Invalid status'),
@@ -733,35 +807,39 @@ def test_import_internal_proporz_regional(session):
 
 def test_import_internal_proporz_panachage(session):
 
-    def create_csv(headers, results):
+    def create_csv(lheaders, cheaders, results):
         lines = []
-        lines.append([
-            'election_status',
-            'entity_id',
-            'entity_counted',
-            'entity_eligible_voters',
-            'entity_received_ballots',
-            'entity_blank_ballots',
-            'entity_invalid_ballots',
-            'entity_blank_votes',
-            'entity_invalid_votes',
-            'list_name',
-            'list_id',
-            'list_number_of_mandates',
-            'list_votes',
-            'list_connection',
-            'list_connection_parent',
-            'candidate_family_name',
-            'candidate_first_name',
-            'candidate_id',
-            'candidate_elected',
-            'candidate_votes',
-            'candidate_party',
-        ] + [f'list_panachage_votes_from_list_{h}' for h in headers])
-        for list_id, panachage in results:
+        lines.append(
+            [
+                'election_status',
+                'entity_id',
+                'entity_counted',
+                'entity_eligible_voters',
+                'entity_received_ballots',
+                'entity_blank_ballots',
+                'entity_invalid_ballots',
+                'entity_blank_votes',
+                'entity_invalid_votes',
+                'list_name',
+                'list_id',
+                'list_number_of_mandates',
+                'list_votes',
+                'list_connection',
+                'list_connection_parent',
+                'candidate_family_name',
+                'candidate_first_name',
+                'candidate_id',
+                'candidate_elected',
+                'candidate_votes',
+                'candidate_party',
+            ]
+            + [f'list_panachage_votes_from_list_{h}' for h in lheaders]
+            + [f'candidate_panachage_votes_from_list_{h}' for h in cheaders]
+        )
+        for candidate_id, entity_id, panachage in results:
             lines.append([
                 'unknown',  # election_status
-                '3271',  # entity_id
+                entity_id,  # entity_id
                 'True',  # entity_counted
                 '111',  # entity_eligible_voters
                 '11',  # entity_received_ballots
@@ -769,15 +847,15 @@ def test_import_internal_proporz_panachage(session):
                 '1',  # entity_invalid_ballots
                 '1',  # entity_blank_votes
                 '1',  # entity_invalid_votes
-                '',  # list_name
-                list_id,  # list_id
+                candidate_id,  # list_name
+                candidate_id,  # list_id
                 '',  # list_number_of_mandates
                 '',  # list_votes
                 '',  # list_connection
                 '',  # list_connection_parent
-                list_id,  # candidate_family_name
+                candidate_id,  # candidate_family_name
                 'xxx',  # candidate_first_name
-                list_id,  # candidate_id
+                candidate_id,  # candidate_id
                 'false',  # candidate_elected
                 '1',  # candidate_votes
                 '',  # candidate_party
@@ -800,54 +878,158 @@ def test_import_internal_proporz_panachage(session):
     session.flush()
     election = session.query(Election).one()
     principal = Canton(canton='sg')
-    query = session.query(ListPanachageResult)
+    lquery = session.query(ListPanachageResult)
+    cquery = session.query(CandidatePanachageResult)
 
     # No panachage results
     errors = import_election_internal_proporz(
         election, principal,
-        *create_csv([], [('1', [])])
+        *create_csv(
+            [], [],
+            [('1', '3271', [])]
+        )
     )
     assert not errors
-    assert query.count() == 0
+    assert lquery.count() == 0
+    assert cquery.count() == 0
 
     # Irrelevant panchage headers are ignored
     errors = import_election_internal_proporz(
         election, principal,
-        *create_csv(['10', '11'], [('1', ['', ''])])
+        *create_csv(
+            ['10', '11'], ['10', '11'],
+            [
+                ('1', '3271', ['', '', '', ''])
+            ]
+        )
     )
+    print_errors(errors)
     assert not errors
-    assert query.count() == 0
+    assert lquery.count() == 0
+    assert cquery.count() == 0
 
-    # Missing data and data with source == target is ignored, all other data
-    # is parsed correctly
+    # Missing list data and data with source == target is ignored, all other
+    # data is parsed correctly
     errors = import_election_internal_proporz(
         election, principal,
         *create_csv(
-            ['1', '2', '3', '999'],
+            ['1', '2', '3', '999'], [],
             [
-                ('1', ['1', '', '3', '']),
-                ('2', ['4', '5', '', '']),
-                ('3', ['', '8', '9', '999']),
+                ('1', '3271', ['1', '', '3', '']),
+                ('2', '3271', ['4', '5', '', '']),
+                ('3', '3271', ['', '8', '9', '999']),
             ]
         )
     )
     list_ids = dict(session.query(List.list_id, List.id))
     list_ids['999'] = None
     assert not errors
-    assert query.count() == 4
-    assert query.filter_by(source_id=list_ids['1']).one().votes == 4
-    assert query.filter_by(source_id=list_ids['2']).one().votes == 8
-    assert query.filter_by(source_id=list_ids['3']).one().votes == 3
-    assert query.filter_by(source_id=list_ids['999']).one().votes == 999
+    assert lquery.count() == 4
+    assert lquery.filter_by(source_id=list_ids['1']).one().votes == 4
+    assert lquery.filter_by(source_id=list_ids['2']).one().votes == 8
+    assert lquery.filter_by(source_id=list_ids['3']).one().votes == 3
+    assert lquery.filter_by(source_id=list_ids['999']).one().votes == 999
+    assert cquery.count() == 0
 
-    # Panachage data with missing lists throws an error
+    # Later diverging list panachage results are ignored
     errors = import_election_internal_proporz(
         election, principal,
         *create_csv(
-            ['1', '2', '3', '999'],
+            ['1', '2', '3', '999'], [],
             [
-                ('1', ['1', '2', '3', '999']),
-                ('2', ['4', '5', '6', '999']),
+                ('1', '3271', ['1', '', '3', '']),
+                ('2', '3271', ['4', '5', '', '']),
+                ('3', '3271', ['', '8', '9', '999']),
+                ('1', '3272', ['10', '', '30', '']),
+                ('2', '3272', ['40', '50', '', '']),
+                ('3', '3272', ['', '80', '90', '9990']),
+            ]
+        )
+    )
+    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids['999'] = None
+    assert not errors
+    assert lquery.count() == 4
+    assert lquery.filter_by(source_id=list_ids['1']).one().votes == 4
+    assert lquery.filter_by(source_id=list_ids['2']).one().votes == 8
+    assert lquery.filter_by(source_id=list_ids['3']).one().votes == 3
+    assert lquery.filter_by(source_id=list_ids['999']).one().votes == 999
+    assert cquery.count() == 0
+
+    # Missing candidate data is ignored, all other data is parsed correctly and
+    # missing list data is aggregated
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv(
+            [], ['1', '2', '3', '999'],
+            [
+                ('1', '3271', ['1', '', '3', '']),
+                ('2', '3271', ['4', '5', '', '']),
+                ('3', '3271', ['', '8', '9', '999']),
+                ('1', '3272', ['10', '', '30', '']),
+                ('2', '3272', ['40', '50', '', '']),
+                ('3', '3272', ['', '80', '90', '9990']),
+            ]
+        )
+    )
+    result_ids = dict(
+        session.query(ElectionResult.entity_id, ElectionResult.id)
+    )
+    list_ids = dict(session.query(List.list_id, List.id))
+    list_ids['999'] = None
+    candidate_ids = dict(session.query(Candidate.candidate_id, Candidate.id))
+    assert not errors
+    assert cquery.count() == 14
+    for candidate_id, result_id, list_id, votes in (
+        ('1', 3271, '1', 1),
+        ('1', 3271, '3', 3),
+        ('1', 3272, '1', 10),
+        ('1', 3272, '3', 30),
+        ('2', 3271, '1', 4),
+        ('2', 3271, '2', 5),
+        ('2', 3272, '1', 40),
+        ('2', 3272, '2', 50),
+        ('3', 3271, '2', 8),
+        ('3', 3271, '3', 9),
+        ('3', 3271, '999', 999),
+        ('3', 3272, '2', 80),
+        ('3', 3272, '3', 90),
+        ('3', 3272, '999', 9990),
+    ):
+        assert cquery.filter_by(
+            target_id=candidate_ids[candidate_id],
+            election_result_id=result_ids[result_id],
+            source_id=list_ids[list_id]
+        ).one().votes == votes
+    assert lquery.count() == 4
+    assert lquery.filter_by(source_id=list_ids['1']).one().votes == 44
+    assert lquery.filter_by(source_id=list_ids['2']).one().votes == 88
+    assert lquery.filter_by(source_id=list_ids['3']).one().votes == 33
+    assert lquery.filter_by(source_id=list_ids['999']).one().votes == 10989
+
+    # List panachage data with missing lists throws an error
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv(
+            ['1', '2', '3', '999'], [],
+            [
+                ('1', '3271', ['1', '2', '3', '999']),
+                ('2', '3271', ['4', '5', '6', '999']),
+            ]
+        )
+    )
+    assert set([e.error.interpolate() for e in errors]) == {
+        "Panachage results id 3 not in list_id's"
+    }
+
+    # Candidate panachage data with missing lists throws an error
+    errors = import_election_internal_proporz(
+        election, principal,
+        *create_csv(
+            [], ['1', '2', '3', '999'],
+            [
+                ('1', '3271', ['1', '2', '3', '999']),
+                ('2', '3271', ['4', '5', '6', '999']),
             ]
         )
     )
@@ -859,20 +1041,22 @@ def test_import_internal_proporz_panachage(session):
     errors = import_election_internal_proporz(
         election, principal,
         *create_csv(
-            ['eins', 'zwei.drei', 'vier_fuenf', '999'],
+            ['eins', 'zwei.drei', 'vier_fuenf', '999'], [],
             [
-                ('eins', ['1', '', '3', '']),
-                ('zwei.drei', ['4', '5', '', '']),
-                ('vier_fuenf', ['', '8', '9', '999']),
+                ('eins', '3271', ['1', '', '3', '']),
+                ('zwei.drei', '3271', ['4', '5', '', '']),
+                ('vier_fuenf', '3271', ['', '8', '9', '999']),
             ]
         )
     )
     list_ids = dict(session.query(List.list_id, List.id))
     list_ids['999'] = None
     assert not errors
-    assert query.filter_by(source_id=list_ids['eins']).one().votes == 4
-    assert query.filter_by(source_id=list_ids['zwei.drei']).one().votes == 8
-    assert query.filter_by(source_id=list_ids['vier_fuenf']).one().votes == 3
+    assert lquery.count() == 4
+    assert lquery.filter_by(source_id=list_ids['eins']).one().votes == 4
+    assert lquery.filter_by(source_id=list_ids['zwei.drei']).one().votes == 8
+    assert lquery.filter_by(source_id=list_ids['vier_fuenf']).one().votes == 3
+    assert cquery.count() == 0
 
 
 def test_import_internal_proproz_optional_columns(session):

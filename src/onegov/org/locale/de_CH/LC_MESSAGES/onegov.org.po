@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-02-28 12:02+0100\n"
+"POT-Creation-Date: 2023-03-13 12:46+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -994,8 +994,8 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
-msgid "Functions:"
-msgstr "Funktionen:"
+msgid "Function"
+msgstr "Funktion"
 
 msgid "Direct Phone Number"
 msgstr "Direktnummer"
@@ -1672,13 +1672,6 @@ msgstr "Monatlich (am ersten Montag des Monats)"
 msgid "Never"
 msgstr "Nie"
 
-msgid "1 entry"
-msgstr "1 Eintrag"
-
-#, python-format
-msgid "${count} entries"
-msgstr "${count} Einträge"
-
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
 
@@ -1774,6 +1767,9 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
+msgid "Move"
+msgstr "Verschieben"
+
 msgid "Change URL"
 msgstr "URL ändern"
 
@@ -1829,6 +1825,12 @@ msgstr "Neue Notiz"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Destination"
+msgstr "Ziel"
+
+msgid "- Root -"
+msgstr "- Oberste Ebene -"
 
 msgid "New Message"
 msgstr "Neue Nachricht"
@@ -1912,10 +1914,10 @@ msgstr "Einteilung löschen"
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
 
-msgid "This event can't be editet."
+msgid "This event can't be edited."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
 
-msgid "Imported events can not be editet."
+msgid "Imported events can not be edited."
 msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
 
 msgid "Do you really want to delete this event?"
@@ -2442,6 +2444,12 @@ msgstr "Das neue Thema wurde hinzugefügt"
 msgid "Edit Topic"
 msgstr "Thema Bearbeiten"
 
+msgid "Move Topic"
+msgstr "Thema Verschieben"
+
+msgid "Invalid destination selected"
+msgstr "Ungültiger Zielort gewählt"
+
 msgid "The topic was deleted"
 msgstr "Das Thema wurde gelöscht"
 
@@ -2736,6 +2744,9 @@ msgstr "Fehler"
 msgid "Duration [s]"
 msgstr "Abfragedauer [s]"
 
+msgid "Alternatives"
+msgstr "Alternativen"
+
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
 
@@ -2747,9 +2758,6 @@ msgstr "Sie haben Ihr Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
-
-msgid "Alternatives"
-msgstr "Alternativen"
 
 msgid "You are here"
 msgstr "Sie sind hier"
@@ -4100,8 +4108,8 @@ msgid ""
 "A password reset link has been sent to ${email}, provided an active account "
 "exists for this email address."
 msgstr ""
-"Eine E-Mail wurde an ${email} gesendet (sofern ein aktives Konto mit "
-"dieser E-Mail Adresse existiert)."
+"Eine E-Mail wurde an ${email} gesendet (sofern ein aktives Konto mit dieser "
+"E-Mail Adresse existiert)."
 
 msgid "Password changed."
 msgstr "Passwort geändert."
@@ -5083,6 +5091,9 @@ msgstr ""
 "Beim Hochladen auf Gever ist ein Fehler aufgetreten. Der Statuscode der "
 "Antwort lautet ${status}."
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Das PDF dieses Tickets wurde erfolgreich hochgeladen zu Gever."
 
@@ -5124,3 +5135,11 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+
+#~ msgid "1 entry"
+#~ msgstr "1 Eintrag"
+
+#, python-format
+#~ msgid "${count} entries"
+#~ msgstr "${count} Einträge"

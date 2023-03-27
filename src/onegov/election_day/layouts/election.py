@@ -23,6 +23,7 @@ class ElectionLayout(DetailLayout):
     def table_link(self, query_params={}):
         if self.tab not in self.tabs_with_embedded_tables:
             return None
+        query_params['locale'] = self.request.locale
         return self.request.link(
             self.model, f'{self.tab}-table', query_params=query_params
         )
