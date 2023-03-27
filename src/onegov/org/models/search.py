@@ -67,17 +67,22 @@ class Search(Pagination):
 
     @cached_property
     def load_batch_results(self):
-        """ Wrapper around self.batch.load() with thee ability to sort or
+        """ Wrapper around self.batch.load() with the ability to sort or
         otherwise slightly modify the search result.
 
         Sorts Events chronologically.
         """
         batch = self.batch.load()
-        events = {e for e in batch if isinstance(e, Event)}
+        events = []
+        non_events = []
+        for e in batch:
+            if isinstance(e, Event):
+                events.append(e)
+            else:
+                non_events.append(e)
         if not events:
             return batch
         sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
-        non_events = [e for e in batch if e not in events]
         return sorted_events + non_events
 
     def generic_search(self, search, query):
