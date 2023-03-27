@@ -67,7 +67,11 @@ class Search(Pagination):
 
     @cached_property
     def load_batch_results(self):
-        """Load search results and sort events by latest occurrence."""
+        """Load search results and sort events by latest occurrence.
+
+        This methods is a wrapper around `batch.load()`, which returns the
+        actual search results form the query. """
+
         batch = self.batch.load()
         events = []
         non_events = []
