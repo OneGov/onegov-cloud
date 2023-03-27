@@ -36,6 +36,8 @@ def crop_to_portrait_with_face_detection(image):
 
 
 def detect(img, cascade):
+    """ Returns a list of rectangles of possible faces. If not faces are
+    detected, returns an empty list."""
     rects = cascade.detectMultiScale(
         img,
         scaleFactor=1.1,
@@ -106,7 +108,7 @@ def crop_with_padding(img, rects, snippets, scale=1.2):
     if len(snippets) == 1:
         rect = rects[0]
 
-    # if multiple detections are found, select the largest
+    # if multiple detections are found, find the largest.
     elif len(snippets) > 1:
         rect = find_biggest_rectangle(rects)
     else:
@@ -114,20 +116,16 @@ def crop_with_padding(img, rects, snippets, scale=1.2):
 
     x1, y1, x2, y2 = rect
     width = x2 - x1
-    # Heuristically make the rectangle larger by some constant factor
-    enlarge_by = int((width / 3) * scale)
-
-    # Secure against numbers that are outside the coordinate system
-    scaled_x1 = max(x1 - enlarge_by, 0)
-    scaled_y1 = max(y1 - enlarge_by, 0)
-
-    # todo: take the min here to prevent overflow of the cropped area
-    # _, _, ix2, iy2 = img
-    # scaled_x2 = min(x2 + enlarge_by , ix2)
-    # scaled_y2 = min(y2 + enlarge_by, iy2)
-
-    scaled_x2 = x2 + enlarge_by
-    scaled_y2 = y2 + enlarge_by
+    # Heuristically expand rectangle by some constant factor
+    margin = int((width / 3) * scale)
+    # But catch any overflow on the edges:
+    # prevent possible  overflow on top left
+    scaled_x1 = max(x1 - margin, 0)
+    scaled_y1 = max(y1 - margin, 0)
+    # prevent possible overflow on bottom right
+    img_width, img_height = img.shape[:2]
+    scaled_x2 = min(x2 + margin, img_width)
+    scaled_y2 = min(y2 + margin, img_height)
 
     img = crop_rect_from_image(scaled_x1, scaled_y1, scaled_x2, scaled_y2, img)
     return img
