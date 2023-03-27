@@ -72,7 +72,11 @@ def delete(group_context):
             engine.raw_connection().invalidate()
             engine.dispose()
 
-        click.echo("Instance was deleted successfully")
+        click.echo(
+            "Instance was deleted successfully. Please flush redis and "
+            "restart the service(s) to make sure that there are no stale "
+            "database definitions used in running instances."
+        )
 
     return delete_instance
 
@@ -439,6 +443,6 @@ def shell():
     """ Enters the shell """
 
     def _shell(request, app):
-        breakpoint()
+        breakpoint()  # nocheckin
 
     return _shell
