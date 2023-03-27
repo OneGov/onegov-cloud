@@ -1,17 +1,6 @@
 import numpy as np
 
-from onegov.people.portrait_crop import (
-    is_quadratic,
-    find_biggest_rectangle,
-)
-
-
-def test_is_quadratic():
-    quadratic_rectangles = np.array(
-        [[0, 0, 1, 1], [0, 0, 2, 2], [10, 10, 20, 20]]
-    )
-    for rectangle in quadratic_rectangles:
-        assert is_quadratic(rectangle)
+from onegov.people.portrait_crop import find_biggest_rectangle
 
 
 def test_find_biggest_rectangle():

@@ -49,11 +49,6 @@ def detect(img, cascade):
     return rects
 
 
-def draw_rectangles(img, rects, color):
-    for x1, y1, x2, y2 in rects:
-        cv.rectangle(img, (x1, y1), (x2, y2), color, 2)
-
-
 def crop_rects(rects, img):
     """
     Cuts mutiple rectangles from the image.
@@ -82,16 +77,6 @@ def crop_rects(rects, img):
 def crop_rect_from_image(x1, y1, x2, y2, im):
     roi = im[y1:y2, x1:x2]
     return roi
-
-
-def is_quadratic(rect):
-    try:
-        x1, y1, x2, y2 = rect
-        width = x2 - x1
-        height = y2 - y1
-        return width == height
-    except (TypeError, ValueError):
-        return False
 
 
 def find_biggest_rectangle(rects):
