@@ -3,6 +3,18 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p>Yay, you did it</p>
+        <p>
+            Vielen Dank!
+        </p> <br>
+        <p>
+            Wir haben Ihre Buchung für "${model.activity.title}" erhalten.
+        </p>
+        <p>
+            Eine Übersicht Ihrer aktuellen Buchungen finden Sie hier:<br>
+            <tal:b tal:content="structure bookings_link"></tal:b>
+        </p>
+        <br>
+        <p>Freundliche Grüsse</p>                    
+        <metal:b use-macro="layout.macros['sender']|nothing" />
     </tal:b>
 </div>

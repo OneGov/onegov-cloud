@@ -256,7 +256,15 @@ def book_occasion(self, request, form):
                     'name': attendee.name
                 }))
 
-        subject = _("Your booking was accepted")
+        subject = _("Booking Confirmation")
+
+        def bookings_link(self):
+            return '<a href="{}">{}</a>'.format(
+                request.class_link(BookingCollection, {
+                    'period_id': self.period.id
+                }),
+                request.translate(_("Bookings"))
+            )
 
         request.app.send_transactional_email(
             subject=subject,
@@ -264,6 +272,8 @@ def book_occasion(self, request, form):
             content=render_template('mail_booking_accepted.pt', request, {
                 'layout': DefaultMailLayout(self, request),
                 'title': subject,
+                'model': self,
+                'bookings_link': bookings_link(self)
             })
         )
 
