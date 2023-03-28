@@ -99,7 +99,6 @@ def handle_new_person(self, request, form, layout=None):
         if picture_url:
             create_quadratic_profile_image(person, picture_url, request)
 
-        form.populate_obj(person)
         request.success(_("Added a new person"))
         return morepath.redirect(request.link(person))
 
