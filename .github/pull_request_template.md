@@ -8,12 +8,14 @@ Please fill in the commit message below and work through the checklist. You can 
 
 TYPE: <Feature|Bugfix>
 LINK: <Ticket-Number>
+HINT: <Optional upgrade hint>
 
 ## Checklist
 
 - [ ] I made changes/features for both org and town6
 - [ ] I have performed a self-review of my code
 - [ ] I considered adding a reviewer
+- [ ] I have added an upgrade hints such as data migration commands to be run
 - [ ] I have tested my code thoroughly by hand
     - [ ] I have tested styling changes/features on different browsers
     - [ ] I have tested javascript changes/features on different browsers
