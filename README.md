@@ -62,7 +62,7 @@ For example:
 
     TYPE: Feature
     LINK: OGC-101
-    HINT: Run `ongegov-election migrate` after upgrade
+    HINT: Run `ongegov-election --select /onegov_election_day/* migrate` after upgrade
 
 > Commits that do not follow this schema are not included in the changelog.
 

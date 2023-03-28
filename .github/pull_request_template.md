@@ -15,7 +15,7 @@ HINT: <Optional upgrade hint>
 - [ ] I made changes/features for both org and town6
 - [ ] I have performed a self-review of my code
 - [ ] I considered adding a reviewer
-- [ ] I have added an upgrade hints such as data migration commands to be run
+- [ ] I have added an upgrade hint such as data migration commands to be run
 - [ ] I have tested my code thoroughly by hand
     - [ ] I have tested styling changes/features on different browsers
     - [ ] I have tested javascript changes/features on different browsers
