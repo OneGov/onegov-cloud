@@ -4,23 +4,21 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-        <div class="grid-x" tal:condition="directory.enable_map == 'everywhere'">
-            <div class="cell medium-12">
-                <div class="geojson-map directories-map"
-                    data-geojson="${geojson}"
-                    data-lat="${layout.default_map_view.lat}"
-                    data-lon="${layout.default_map_view.lon}"
-                    data-zoom="${layout.default_map_view.zoom}"
-                    data-map-height="333px"
-                ></div>
-            </div>
-        </div>
 
-        <p tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
-        <br>
 
         <div class="grid-x grid-padding-x reverse-on-mobile">
             <div class="cell medium-8 large-7">
+                <div tal:condition="directory.enable_map == 'everywhere'">
+                    <div class="geojson-map directories-map"
+                        data-geojson="${geojson}"
+                        data-lat="${layout.default_map_view.lat}"
+                        data-lon="${layout.default_map_view.lon}"
+                        data-zoom="${layout.default_map_view.zoom}"
+                        data-map-height="333px"
+                    ></div>
+                </div>
+
+                <p id="directory-lead" tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 
                 <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="entries">
