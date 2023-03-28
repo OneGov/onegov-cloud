@@ -14,75 +14,145 @@ from tests.onegov.election_day.common import create_principal
 from tests.onegov.election_day.common import print_errors
 
 
-def test_import_internal_proporz_cantonal(session, import_test_datasets):
+def test_import_internal_proporz_cantonal_zg(session, import_test_datasets):
+    for roundtrip in (False, True):
+        if not roundtrip:
+            election, errors = import_test_datasets(
+                api_format='internal',
+                model='election',
+                principal='zg',
+                domain='canton',
+                election_type='proporz',
+                number_of_mandates=3,
+                date_=date(2015, 10, 18),
+                dataset_name='nationalratswahlen-2015',
+                has_expats=False
+            )
+        else:
+            csv = convert_list_of_dicts_to_csv(
+                election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+            ).encode('utf-8')
+            principal = create_principal('zg')
+            errors = import_election_internal_proporz(
+                election, principal, BytesIO(csv), 'text/plain'
+            )
 
-    election, errors = import_test_datasets(
-        api_format='internal',
-        model='election',
-        principal='zg',
-        domain='canton',
-        election_type='proporz',
-        number_of_mandates=3,
-        date_=date(2015, 10, 18),
-        dataset_name='nationalratswahlen-2015',
-        has_expats=False
-    )
-    assert not errors
-    assert election.last_result_change
-    assert election.completed
-    assert election.progress == (11, 11)
-    assert election.absolute_majority is None
-    assert election.eligible_voters == 74803
-    assert election.accounted_ballots == 39067
-    assert election.accounted_votes == 116689
-    assert election.blank_ballots == 118
-    assert election.invalid_ballots == 1015
-    assert round(election.turnout, 2) == 53.74
-    assert election.allocated_mandates == 3
-    assert sorted(election.elected_candidates) == [
-        ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
-    ]
-    assert sorted([list.votes for list in election.lists]) == [
-        347, 575, 807, 1128, 1333, 1701, 2186, 3314, 4178, 4299, 4436, 5844,
-        6521, 8868, 16285, 24335, 30532
-    ]
-    assert sorted([list.votes for list in election.list_connections]) == [
-        0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
-    ]
+        assert not errors
+        assert election.last_result_change
+        assert election.completed
+        assert election.progress == (11, 11)
+        assert election.absolute_majority is None
+        assert election.eligible_voters == 74803
+        assert election.accounted_ballots == 39067
+        assert election.accounted_votes == 116689
+        assert election.blank_ballots == 118
+        assert election.invalid_ballots == 1015
+        assert round(election.turnout, 2) == 53.74
+        assert election.allocated_mandates == 3
+        assert sorted(election.elected_candidates) == [
+            ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
+        ]
+        assert sorted([list.votes for list in election.lists]) == [
+            347, 575, 807, 1128, 1333, 1701, 2186, 3314, 4178, 4299, 4436,
+            5844, 6521, 8868, 16285, 24335, 30532
+        ]
+        assert sorted([list.votes for list in election.list_connections]) == [
+            0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
+        ]
 
-    # ... roundtrip
-    csv = convert_list_of_dicts_to_csv(
-        election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
-    ).encode('utf-8')
 
-    principal = create_principal('zg')
+def test_import_internal_proporz_cantonal_bl(session, import_test_datasets):
+    for roundtrip in (False, True):
+        if not roundtrip:
+            election, errors = import_test_datasets(
+                api_format='internal',
+                model='election',
+                principal='bl',
+                domain='canton',
+                election_type='proporz',
+                number_of_mandates=3,
+                date_=date(2019, 10, 20),
+                dataset_name='nationalratswahlen-2019',
+                has_expats=False
+            )
+        else:
+            csv = convert_list_of_dicts_to_csv(
+                election.export(['de_CH', 'fr_CH', 'it_CH', 'rm_CH'])
+            ).encode('utf-8')
+            principal = create_principal('bl')
+            errors = import_election_internal_proporz(
+                election, principal, BytesIO(csv), 'text/plain'
+            )
 
-    errors = import_election_internal_proporz(
-        election, principal, BytesIO(csv), 'text/plain'
-    )
-
-    assert not errors
-    assert election.last_result_change
-    assert election.completed
-    assert election.progress == (11, 11)
-    assert election.absolute_majority is None
-    assert election.eligible_voters == 74803
-    assert election.accounted_ballots == 39067
-    assert election.accounted_votes == 116689
-    assert election.blank_ballots == 118
-    assert election.invalid_ballots == 1015
-    assert round(election.turnout, 2) == 53.74
-    assert election.allocated_mandates == 3
-    assert sorted(election.elected_candidates) == [
-        ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
-    ]
-    assert sorted([list.votes for list in election.lists]) == [
-        347, 575, 807, 1128, 1333, 1701, 2186, 3314, 4178, 4299, 4436, 5844,
-        6521, 8868, 16285, 24335, 30532
-    ]
-    assert sorted([list.votes for list in election.list_connections]) == [
-        0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
-    ]
+        assert not errors
+        assert election.last_result_change
+        assert election.completed
+        assert election.progress == (86, 86)
+        assert election.absolute_majority is None
+        assert election.accounted_ballots == 79241
+        assert election.received_ballots == 80843
+        assert election.blank_ballots == 94
+        assert election.invalid_ballots == 1508
+        assert election.allocated_mandates == 7
+        assert sorted(election.elected_candidates) == [
+            ('Daniela', 'Schneeberger'), ('Elisabeth', 'Schneider-Schneiter'),
+            ('Eric', 'Nussbaumer'), ('Maya', 'Graf'), ('Samira', 'Marti'),
+            ('Sandra', 'Sollberger'), ('Thomas', 'de Courten')
+        ]
+        assert sorted([list.votes for list in election.lists]) == [
+            634, 1467, 2058, 2658, 2862, 3051, 3922, 4111, 4341, 4690, 5419,
+            6158, 6470, 16074, 23337, 37974, 87578, 88885, 113689, 131564
+        ]
+        assert sorted([list.votes for list in election.list_connections]) == [
+            0, 0, 6470, 19125, 28756, 46426, 90352, 98426, 119209, 137544
+        ]
+        lists = {list_.id: list_ for list_ in election.lists}
+        list_ = election.lists.filter_by(list_id='01').one()
+        assert {
+            lists[r.source_id].list_id if r.source_id else '00': r.votes
+            for r in list_.panachage_results
+        } == {
+            '02': 1148,
+            '03': 4751,
+            '04': 225,
+            '05': 1381,
+            '06': 42,
+            '07': 912,
+            '08': 222,
+            '11': 775,
+            '12': 31,
+            '13': 19,
+            # '22': 0
+            '23': 2,
+            '33': 14,
+            '34': 10,
+            '44': 4,
+            '55': 25,
+            '56': 29,
+            '70': 35,
+            '77': 7,
+            '00': 16051
+        }
+        candidate = election.candidates.filter_by(candidate_id='0101').one()
+        result_id = election.results.filter_by(entity_id='2761').one().id
+        assert {
+            lists[r.source_id].list_id if r.source_id else '00': r.votes
+            for r in candidate.panachage_results.filter_by(
+                election_result_id=result_id
+            )
+        } == {
+            '01': 340,
+            '02': 10,
+            '03': 38,
+            '04': 4,
+            '05': 36,
+            '07': 4,
+            '08': 1,
+            '11': 2,
+            '33': 2,
+            '00': 140
+            # others are zero
+        }
 
 
 def test_import_internal_proporz_regional_zg(session, import_test_datasets):
