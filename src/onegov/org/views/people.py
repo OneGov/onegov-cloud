@@ -120,11 +120,12 @@ def create_quadratic_profile_image(person, picture_url, request):
     This way, it can be selected manually."""
     try:
         picture_id = picture_url.rsplit('/', 1)[-1]
-        f = get_file(request.app, picture_id).reference.file.read()
-        quadratic_image_bytes = crop_to_portrait_with_face_detection(f)
+        f = get_file(request.app, picture_id)
+        img_bytes = f.reference.file.read()
+        quadratic_image_bytes = crop_to_portrait_with_face_detection(img_bytes)
         if quadratic_image_bytes:
             quadratic_image = ImageFileCollection(request.session).add(
-                filename=f"quadratic_{f.filename}",
+                filename=f"quadratic_{f.reference.file.filename}",
                 content=quadratic_image_bytes
             )
             person.quadratic_picture_url = request.link(quadratic_image)
