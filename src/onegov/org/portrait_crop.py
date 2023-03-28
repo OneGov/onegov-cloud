@@ -15,7 +15,7 @@ def crop_to_portrait_with_face_detection(img_bytes):
     img_bytes = np.frombuffer(img_bytes, np.uint8)
     img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
     path = "haarcascade_frontalface_alt.xml"
-    path = module_path("onegov.people", f"static/cascades/{path}")
+    path = module_path("onegov.org", f"static/cascades/{path}")
     cascade = cv.CascadeClassifier(path)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     gray = cv.equalizeHist(gray)

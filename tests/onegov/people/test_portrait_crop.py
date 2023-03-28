@@ -1,6 +1,6 @@
 import numpy as np
 
-from onegov.people.portrait_crop import find_biggest_rectangle
+from onegov.org.portrait_crop import find_biggest_rectangle
 
 
 def test_find_biggest_rectangle():

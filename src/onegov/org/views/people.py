@@ -10,7 +10,7 @@ from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic, ImageFileCollection
 from onegov.people import Person, PersonCollection
 from markupsafe import Markup
-from onegov.people.portrait_crop import crop_to_portrait_with_face_detection
+from onegov.org.portrait_crop import crop_to_portrait_with_face_detection
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
