@@ -4,6 +4,7 @@ from onegov.activity import InvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
 from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
+from onegov.core.templates import render_template
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections.billing import BookingInvoiceBridge
@@ -12,6 +13,7 @@ from onegov.feriennet.forms import OccasionForm
 from onegov.feriennet.forms import OccasionNeedForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
+from onegov.org.layout import DefaultMailLayout
 from onegov.user import User, UserCollection
 
 
@@ -253,6 +255,17 @@ def book_occasion(self, request, form):
                 _("The occasion was added to ${name}'s wishlist", mapping={
                     'name': attendee.name
                 }))
+
+        subject = _("Your booking was accepted")
+
+        request.app.send_transactional_email(
+            subject=subject,
+            receivers=(user.username, ),
+            content=render_template('mail_booking_accepted.pt', request, {
+                'layout': DefaultMailLayout(self, request),
+                'title': subject,
+            })
+        )
 
         if self.period.finalized:
             return request.redirect(request.class_link(InvoiceCollection))
