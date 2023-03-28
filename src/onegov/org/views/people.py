@@ -2,12 +2,12 @@ import morepath
 
 from morepath.request import Response
 from onegov.core.security import Public, Private
+from onegov.file.integration import get_file
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic, ImageFileCollection
-from onegov.org.path import get_file_for_org
 from onegov.people import Person, PersonCollection
 from markupsafe import Markup
 from onegov.people.portrait_crop import crop_to_portrait_with_face_detection
@@ -120,16 +120,11 @@ def create_quadratic_profile_image(person, picture_url, request):
     This way, it can be selected manually."""
     try:
         picture_id = picture_url.rsplit('/', 1)[-1]
-        f = get_file_for_org(request, request.app, picture_id)
-        actual_profile_image = request.app.bound_depot.get(
-            f.reference.file_id
-        )
-        quadratic_image_bytes = crop_to_portrait_with_face_detection(
-            actual_profile_image._file_path
-        )
+        f = get_file(request.app, picture_id).reference.file.read()
+        quadratic_image_bytes = crop_to_portrait_with_face_detection(f)
         if quadratic_image_bytes:
             quadratic_image = ImageFileCollection(request.session).add(
-                filename=f"quadratic_{actual_profile_image.filename}",
+                filename=f"quadratic_{f.filename}",
                 content=quadratic_image_bytes
             )
             person.quadratic_picture_url = request.link(quadratic_image)

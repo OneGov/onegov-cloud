@@ -499,6 +499,11 @@ def test_quadratic_crop_on_image_upload(browser, client):
 
     r = requests.get(person.quadratic_picture_url)
     assert r.status_code == 200
+    path = module_path('tests.onegov.org', 'fixtures/expected_crop_bach.jpg')
+
+    # Compare against hardcoded cropped result
+    with open(path, 'rb') as f:
+        assert f.read() == r.content
 
     pic_id = person.quadratic_picture_url.rsplit('/', 1)[-1]
     crop_file = ImageFileCollection(client.app.session()).by_id(pic_id)

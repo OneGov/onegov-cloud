@@ -3,7 +3,7 @@ import numpy as np
 from onegov.core.utils import module_path
 
 
-def crop_to_portrait_with_face_detection(image):
+def crop_to_portrait_with_face_detection(img_bytes):
     """Detects faces in the input image using OpenCV's Haar cascade
     classifier,
     crops the image to focus on the face(s), and expands the image by 20%
@@ -12,7 +12,8 @@ def crop_to_portrait_with_face_detection(image):
     Returns: The png-encoded image as bytes, or None
         Quadratic crop of the input image, or None if no faces are detected.
     """
-    img = cv.imread(str(image))
+    img_bytes = np.frombuffer(img_bytes, np.uint8)
+    img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
     path = "haarcascade_frontalface_alt.xml"
     path = module_path("onegov.people", f"static/cascades/{path}")
     cascade = cv.CascadeClassifier(path)
@@ -28,8 +29,8 @@ def crop_to_portrait_with_face_detection(image):
             # Resize the image to 1:1 aspect ratio
             side = min(w, h)
             img = crop_square(img, side)
-        # Encode the image as PNG and get the bytes in memory
-        retval, buffer = cv.imencode('.png', img)
+        # Encode the image as JPG and get the bytes in memory
+        retval, buffer = cv.imencode('.jpg', img)
         return np.array(buffer).tobytes() if retval else None
     else:
         return None
