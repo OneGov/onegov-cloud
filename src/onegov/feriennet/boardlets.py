@@ -3,7 +3,6 @@ from onegov.activity import Activity, Attendee, Booking, Occasion
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection, MatchCollection
-from onegov.activity import OccasionCollection
 from onegov.feriennet.exports.unlucky import UnluckyExport
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.models import Boardlet, BoardletFact
