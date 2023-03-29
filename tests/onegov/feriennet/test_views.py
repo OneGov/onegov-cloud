@@ -3044,3 +3044,47 @@ def test_billing_widh_date(client, scenario):
     json_data = form.form.submit().json
     assert json_data[0]['Rechnungsposition Bezahlt'] == True
     assert json_data[0]['Zahlungsdatum'] == date
+
+
+def test_mails_on_registration_and_cancellation(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False,
+                        phase="booking")
+    scenario.add_activity(title="Drawing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/userprofile')
+    page.form['salutation'] = 'mr'
+    page.form['first_name'] = 'foo'
+    page.form['last_name'] = 'bar'
+    page.form['zip_code'] = '123'
+    page.form['place'] = 'abc'
+    page.form['address'] = 'abc'
+    page.form['emergency'] = '123456789 Admin'
+    page.form.submit()
+
+    page = client.get('/activities')
+    page = page.click('Drawing')
+    form = page.click('Anmelden')
+    form.form['attendee'] = 'other'
+    form.form['first_name'] = 'Susan'
+    form.form['last_name'] = 'Golding'
+    form.form['birth_date'] = date.today() - timedelta(weeks=-12 * 52)
+    form.form['gender'] = 'female'
+    form.form['ignore_age'] = 'y'
+    page = form.form.submit().follow()
+    assert "war erfolgreich" in page
+
+    page = client.get('/my-bookings')
+    page = page.click('Buchung stornieren')
+
+    mails = [client.get_email(i) for i in range(2)]
+    confirmation = mails[0]
+    text = "Vielen Dank!\n\nWir haben Ihre Buchung für Susan Golding erhalten."
+    assert text in confirmation['TextBody']
+
+    cancelation = mails[1]
+    text = "Wir haben Ihre Abmeldung für Susan Golding erhalten."
+    assert text in cancelation['TextBody']
