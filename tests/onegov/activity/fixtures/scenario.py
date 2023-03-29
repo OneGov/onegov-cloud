@@ -148,7 +148,7 @@ class Scenario(BaseScenario):
     @property
     def latest_username(self):
         return self.users and self.users[-1].username or None
-    
+
     @property
     def default_username(self):
         return self.latest_username or 'admin@example.org'
