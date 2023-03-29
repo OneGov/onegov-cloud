@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-03-29 10:52+0200\n"
+"POT-Creation-Date: 2023-03-29 11:38+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2186,19 +2186,19 @@ msgid "Your activity has been archived:"
 msgstr "Votre activité a été archivée:"
 
 msgid "Thanks a lot!"
-msgstr ""
+msgstr "Merci beaucoup!"
 
 msgid "We received your booking for ${name}."
-msgstr ""
+msgstr "Nous avons reçu votre réservation pour ${name}"
 
 msgid "You can find an overview of all bookings here:"
-msgstr ""
+msgstr "Vous trouverez ici un aperçu de toutes les réservations:"
 
 msgid "Best regards"
-msgstr ""
+msgstr "Meilleures salutations"
 
 msgid "We have received your deregistration for ${name}."
-msgstr ""
+msgstr "Nous avons reçu votre désinscription pour ${name}."
 
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Réseau vacances de Pro Juventute est soutenu par :"
@@ -2741,7 +2741,7 @@ msgid "The booking was cancelled successfully"
 msgstr "La réservation a été annulée avec succès"
 
 #, python-format
-msgid "Confirmation degregistration of ${attendee} for ${title}"
+msgid "Degregistration of ${attendee} for \"${title}\""
 msgstr ""
 
 msgid "Cannot select more than three favorites per child"
@@ -2934,8 +2934,8 @@ msgid "The booking for ${name} was succesfull"
 msgstr "La réservation pour ${name} est enregistrée"
 
 #, python-format
-msgid "Booking Confirmation of ${attendee} for ${title}"
-msgstr ""
+msgid "Booking of ${attendee} for \"${title}\""
+msgstr "Réservation de ${attendee} pour \"${title}\""
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"
@@ -3156,6 +3156,14 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#, python-format
+#~ msgid "Degregistration of ${attendee} for ${title}"
+#~ msgstr "Désinscription de ${attendee} pour  \"${title}\""
+
+#, python-format
+#~ msgid "Booking of ${attendee} for ${title}"
+#~ msgstr "Réservation de ${attendee} pour ${title}"
 
 #~ msgid "Move"
 #~ msgstr "Déplacer"

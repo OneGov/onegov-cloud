@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-03-29 10:52+0200\n"
+"POT-Creation-Date: 2023-03-29 11:38+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2728,8 +2728,8 @@ msgid "The booking was cancelled successfully"
 msgstr "Die Buchung wurde erfolgreich abgesagt"
 
 #, python-format
-msgid "Confirmation degregistration of ${attendee} for \"${title}\""
-msgstr "Bestätigung Abmeldung von ${attendee} für \"${title}\""
+msgid "Degregistration of ${attendee} for \"${title}\""
+msgstr "Abmeldung von ${attendee} für \"${title}\""
 
 msgid "Cannot select more than three favorites per child"
 msgstr "Pro Person können maximal drei Favoriten gewählt werden"
@@ -2920,8 +2920,8 @@ msgid "The booking for ${name} was succesfull"
 msgstr "Die Buchung für ${name} war erfolgreich"
 
 #, python-format
-msgid "Booking Confirmation of ${attendee} for \"${title}\""
-msgstr "Bestätigung Buchung  von ${attendee} für \"${title}\""
+msgid "Booking of ${attendee} for \"${title}\""
+msgstr "Buchung von ${attendee} für \"${title}\""
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"

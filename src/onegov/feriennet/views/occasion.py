@@ -261,7 +261,7 @@ def book_occasion(self, request, form):
             dates = (self.dates[0].localized_start,
                      self.dates[0].localized_end)
             subject = request.translate(
-                _('Booking Confirmation of ${attendee} for "${title}"',
+                _('Booking of ${attendee} for "${title}"',
                     mapping={
                         'title': self.activity.title,
                         'attendee': attendee.name

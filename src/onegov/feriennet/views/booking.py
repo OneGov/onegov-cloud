@@ -436,7 +436,7 @@ def cancel_booking(self, request):
     dates = (self.dates[0].localized_start,
              self.dates[0].localized_end)
     subject = request.translate(_(
-        'Confirmation degregistration of ${attendee} for "${title}"',
+        'Degregistration of ${attendee} for "${title}"',
         mapping={
             'title': self.occasion.activity.title,
             'attendee': self.attendee.name
