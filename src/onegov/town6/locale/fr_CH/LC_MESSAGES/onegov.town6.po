@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-03-29 10:03+0200\n"
+"POT-Creation-Date: 2023-03-29 10:09+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1433,7 +1433,8 @@ msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
 
 msgid "You can see the current status of your ticket at any time here:"
-msgstr "Vous pouvez consulter le statut actuel de votre billet à tout moment ici:"
+msgstr ""
+"Vous pouvez consulter le statut actuel de votre billet à tout moment ici:"
 
 msgid "Directory entry adopted."
 msgstr "L'entrée de répertoire a été adoptée."
@@ -2100,18 +2101,3 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
-
-#~ msgid "Move"
-#~ msgstr "Déplacer"
-
-#~ msgid "Destination"
-#~ msgstr "Destination"
-
-#~ msgid "- Root -"
-#~ msgstr "- Page de base-"
-
-#~ msgid "This event can't be edited."
-#~ msgstr "Cet événement ne peut pas être édité."
-
-#~ msgid "Imported events can not be edited."
-#~ msgstr "Les événements importés ne peuvent pas être édités."

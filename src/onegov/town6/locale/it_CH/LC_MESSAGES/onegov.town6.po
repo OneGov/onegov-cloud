@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-03-29 10:03+0200\n"
+"POT-Creation-Date: 2023-03-29 10:09+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1424,7 +1424,8 @@ msgid "Your request has been reopened"
 msgstr "La tua richiesta è stata riaperta"
 
 msgid "You can see the current status of your ticket at any time here:"
-msgstr "Qui potete vedere lo stato attuale del vostro biglietto in qualsiasi momento:"
+msgstr ""
+"Qui potete vedere lo stato attuale del vostro biglietto in qualsiasi momento:"
 
 msgid "Directory entry adopted."
 msgstr "Elemento della cartella adottato."
@@ -2092,18 +2093,3 @@ msgstr "Festività"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
-
-#~ msgid "Move"
-#~ msgstr "Spostare"
-
-#~ msgid "Destination"
-#~ msgstr "Destinazione"
-
-#~ msgid "- Root -"
-#~ msgstr "- Principale -"
-
-#~ msgid "This event can't be edited."
-#~ msgstr "Questo evento non può essere modificato."
-
-#~ msgid "Imported events can not be edited."
-#~ msgstr "Gli eventi importati non possono essere modificati."

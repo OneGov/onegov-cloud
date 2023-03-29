@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-03-29 10:03+0200\n"
+"POT-Creation-Date: 2023-03-29 10:09+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2097,21 +2097,3 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
-
-#~ msgid "Moves the topic and all its sub topics to the given destination."
-#~ msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
-
-#~ msgid "Move"
-#~ msgstr "Verschieben"
-
-#~ msgid "Destination"
-#~ msgstr "Ziel"
-
-#~ msgid "- Root -"
-#~ msgstr "- oberste Ebene -"
-
-#~ msgid "This event can't be edited."
-#~ msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
-
-#~ msgid "Imported events can not be edited."
-#~ msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
