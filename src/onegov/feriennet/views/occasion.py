@@ -250,32 +250,35 @@ def book_occasion(self, request, form):
                     'name': attendee.name
                 })
             )
-        else:
-            request.success(
-                _("The occasion was added to ${name}'s wishlist", mapping={
-                    'name': attendee.name
-                }))
 
-        subject = _("Booking Confirmation")
-
-        def bookings_link(self):
-            return '<a href="{}">{}</a>'.format(
+            bookings_link = '<a href="{}">{}</a>'.format(
                 request.class_link(BookingCollection, {
                     'period_id': self.period.id
                 }),
                 request.translate(_("Bookings"))
             )
 
-        request.app.send_transactional_email(
-            subject=subject,
-            receivers=(user.username, ),
-            content=render_template('mail_booking_accepted.pt', request, {
-                'layout': DefaultMailLayout(self, request),
-                'title': subject,
-                'model': self,
-                'bookings_link': bookings_link(self)
-            })
-        )
+            dates = (self.dates[0].localized_start,
+                     self.dates[0].localized_end)
+            subject = _("Booking Confirmation")
+
+            request.app.send_transactional_email(
+                subject=subject,
+                receivers=(user.username, ),
+                content=render_template('mail_booking_accepted.pt', request, {
+                    'layout': DefaultMailLayout(self, request),
+                    'title': subject,
+                    'model': self,
+                    'bookings_link': bookings_link,
+                    'name': attendee.name,
+                    'dates': dates
+                })
+            )
+        else:
+            request.success(
+                _("The occasion was added to ${name}'s wishlist", mapping={
+                    'name': attendee.name
+                }))
 
         if self.period.finalized:
             return request.redirect(request.class_link(InvoiceCollection))
