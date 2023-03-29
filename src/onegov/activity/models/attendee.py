@@ -64,7 +64,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     notes = Column(Text, nullable=True)
 
     #: if the address of the attendee differs from the user address
-    differing_address = Column(Boolean, nullable=True)
+    differing_address = Column(Boolean, default=False, nullable=False)
 
     #: address of the attendee (street and number)
     address = Column(Text, nullable=True)
