@@ -260,7 +260,12 @@ def book_occasion(self, request, form):
 
             dates = (self.dates[0].localized_start,
                      self.dates[0].localized_end)
-            subject = _("Booking Confirmation")
+            subject = request.translate(
+                _('Booking Confirmation of ${attendee} for "${title}"',
+                    mapping={
+                        'title': self.activity.title,
+                        'attendee': attendee.name
+                    }))
 
             request.app.send_transactional_email(
                 subject=subject,

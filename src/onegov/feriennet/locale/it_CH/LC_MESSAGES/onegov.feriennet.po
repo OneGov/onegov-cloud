@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-03-13 15:55+0100\n"
+"POT-Creation-Date: 2023-03-29 10:52+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1491,9 +1491,6 @@ msgstr "Registrazione come aiutante"
 msgid "Sort"
 msgstr "Tipo"
 
-msgid "Move"
-msgstr "Spostare"
-
 msgid "Half day"
 msgstr "Mezza giornata"
 
@@ -2170,6 +2167,21 @@ msgstr "Mostra lo stato del biglietto"
 msgid "Your activity has been archived:"
 msgstr "La sua attività è stata archiviata:"
 
+msgid "Thanks a lot!"
+msgstr ""
+
+msgid "We received your booking for ${name}."
+msgstr ""
+
+msgid "You can find an overview of all bookings here:"
+msgstr ""
+
+msgid "Best regards"
+msgstr ""
+
+msgid "We have received your deregistration for ${name}."
+msgstr ""
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET è sostenuta da:"
 
@@ -2712,6 +2724,10 @@ msgstr ""
 msgid "The booking was cancelled successfully"
 msgstr "La prenotazione è stata cancellata con successo"
 
+#, python-format
+msgid "Confirmation degregistration of ${attendee} for ${title}"
+msgstr ""
+
 msgid "Cannot select more than three favorites per child"
 msgstr "Si possono scegliere un massimo di tre preferenze per bambino"
 
@@ -2900,6 +2916,10 @@ msgstr "Modificare evento"
 #, python-format
 msgid "The booking for ${name} was succesfull"
 msgstr "La prenotazione per ${name} ha funzionato correttamente"
+
+#, python-format
+msgid "Booking Confirmation of ${attendee} for ${title}"
+msgstr ""
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"
@@ -3119,6 +3139,9 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "Move"
+#~ msgstr "Spostare"
 
 #, python-format
 #~ msgid "${count} registered Attendees"

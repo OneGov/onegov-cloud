@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>We have received your deregistration for ${name}.</p>
+        <p i18n:translate>We have received your deregistration for <tal:b i18n:name="name">${name}</tal:b>.</p>
         <p>
             <b i18n:translate>${model.occasion.activity.title}</b><br>
             ${layout.format_datetime_range(dates[0], dates[1])}
