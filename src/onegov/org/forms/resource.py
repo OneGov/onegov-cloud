@@ -1,7 +1,9 @@
 from onegov.form import Form, merge_forms, parse_formcode
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.filters import as_float
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
+from onegov.org.forms.allocation import WEEKDAYS
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
@@ -304,6 +306,16 @@ class ResourceForm(merge_forms(ResourceBaseForm, PaymentForm)):
 
 class ResourceCleanupForm(DateRangeForm):
     """ Defines the form to remove multiple allocations. """
+
+    weekdays = MultiCheckboxField(
+        label=_("Weekdays"),
+        choices=WEEKDAYS,
+        coerce=int,
+        validators=[InputRequired()],
+        render_kw={
+            'prefix_label': False,
+            'class_': 'oneline-checkboxes'
+        })
 
 
 class ResourceExportForm(merge_forms(DateRangeForm, ExportForm)):
