@@ -52,6 +52,7 @@ up in the release history, it needs to be written as follows:
 
     TYPE: <Feature|Bugfix>
     LINK: <Ticket-Number>
+    HINT: <Optional upgrade hint>
 
 For example:
 
@@ -61,6 +62,7 @@ For example:
 
     TYPE: Feature
     LINK: OGC-101
+    HINT: Run `ongegov-election --select /onegov_election_day/* migrate` after upgrade
 
 > Commits that do not follow this schema are not included in the changelog.
 

@@ -3099,3 +3099,27 @@ def test_add_child_with_differing_address(client, scenario):
     assert json_data[0]['Teilnehmer PLZ'] == '1212'
     assert json_data[0]['Teilnehmer Ort'] == 'Exeter'
     assert json_data[0]['Teilnehmer Politische Gemeinde'] == 'London'
+
+
+def test_view_dashboard(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Pet Zoo", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_occasion(cost=200)
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted')
+
+    # Activities and occasions with state 'preview' will not appear
+    # on the dashboard
+    scenario.add_activity(title="Cooking", state='preview')
+    scenario.add_occasion(cost=50)
+    scenario.add_occasion(cost=60)
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/dashboard')
+    assert "1 Angebote" in page
+    assert "2 Durchführungen" in page
+    assert "1 unbelegt" in page
+    assert "1 durchführbar" in page
