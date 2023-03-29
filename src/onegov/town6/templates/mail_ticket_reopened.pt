@@ -6,9 +6,7 @@
         <p i18n:translate>Hello!</p>
         <p i18n:translate>Your request has been reopened</p>
 
-        <p i18n:translate>We will send another e-mail once your ticket has
-        been completed. In the meantime you can check the status of your
-        ticket at any time:</p>
+        <p i18n:translate>You can see the current status of your ticket at any time here:</p>
         <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
     </tal:b>
 </div>

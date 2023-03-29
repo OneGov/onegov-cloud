@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-02-10 17:08+0100\n"
+"POT-Creation-Date: 2023-03-29 10:03+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -111,9 +111,6 @@ msgstr "zurück"
 msgid "Press ${shortcut} to open Search"
 msgstr "Benutze ${shortcut} um die Suche zu öffnen"
 
-msgid "Moves the topic and all its sub topics to the given destination."
-msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
-
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -162,9 +159,6 @@ msgstr "Formular löschen"
 
 msgid "Export"
 msgstr "Export"
-
-msgid "Move"
-msgstr "Verschieben"
 
 msgid "Change URL"
 msgstr "URL ändern"
@@ -224,12 +218,6 @@ msgstr "Neue Notiz"
 
 msgid "PDF"
 msgstr "PDF"
-
-msgid "Destination"
-msgstr "Ziel"
-
-msgid "- Root -"
-msgstr "- oberste Ebene -"
 
 msgid "Upload to Gever"
 msgstr "Hochladen auf Gever"
@@ -365,11 +353,11 @@ msgstr "Import"
 msgid "Event"
 msgstr "Veranstaltung"
 
-msgid "This event can't be edited."
-msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
+msgid "This event can't be editet."
+msgstr ""
 
-msgid "Imported events can not be edited."
-msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
+msgid "Imported events can not be editet."
+msgstr ""
 
 msgid "Do you really want to delete this event?"
 msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
@@ -718,6 +706,9 @@ msgstr ""
 msgid "Copied to Clipboard!"
 msgstr "In die Zwischenablage kopiert!"
 
+msgid "Alternatives"
+msgstr "Alternativen"
+
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
 
@@ -729,9 +720,6 @@ msgstr "Sie haben Ihr Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
-
-msgid "Alternatives"
-msgstr "Alternativen"
 
 msgid "You are here"
 msgstr "Sie sind hier"
@@ -1450,6 +1438,9 @@ msgstr "Ticket ansehen"
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
 
+msgid "You can see the current status of your ticket at any time here:"
+msgstr "Sie sehen den aktuellen Status Ihrer Anfrage jederzeit hier:"
+
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
@@ -2106,3 +2097,21 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "Moves the topic and all its sub topics to the given destination."
+#~ msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
+#~ msgid "Move"
+#~ msgstr "Verschieben"
+
+#~ msgid "Destination"
+#~ msgstr "Ziel"
+
+#~ msgid "- Root -"
+#~ msgstr "- oberste Ebene -"
+
+#~ msgid "This event can't be edited."
+#~ msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
+
+#~ msgid "Imported events can not be edited."
+#~ msgstr "Importierte Veranstaltungen können nicht bearbeitet werden."
