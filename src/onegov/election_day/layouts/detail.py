@@ -53,7 +53,10 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
                 'data-websocket-endpoint': self.app.websockets_client_url(
                     request
                 ),
-                'data-websocket-schema': self.app.schema
+                'data-websocket-schema': self.app.schema,
+                'data-websocket-fallback': request.link(
+                    self.model, 'last-notified'
+                )
             }
 
     @cached_property

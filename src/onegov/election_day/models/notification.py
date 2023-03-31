@@ -1,6 +1,7 @@
 from email.headerregistry import Address
 from onegov.ballot.models import Election
 from onegov.ballot.models import ElectionCompound
+from onegov.ballot.models import ElectionCompoundPart
 from onegov.ballot.models import Vote
 from onegov.core.html import html_to_text
 from onegov.core.custom import json
@@ -47,30 +48,44 @@ class Notification(Base, TimestampMixin):
 
     #: The corresponding election id
     election_id = Column(
-        Text, ForeignKey(Election.id, onupdate='CASCADE'), nullable=True
+        Text,
+        ForeignKey(Election.id, onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
     )
 
     #: The corresponding election
-    election = relationship('Election', backref=backref('notifications'))
+    election = relationship(
+        'Election',
+        backref=backref('notifications', lazy='dynamic')
+    )
 
     #: The corresponding election compound id
     election_compound_id = Column(
-        Text, ForeignKey(ElectionCompound.id, onupdate='CASCADE'),
+        Text,
+        ForeignKey(
+            ElectionCompound.id, onupdate='CASCADE', ondelete='CASCADE'
+        ),
         nullable=True
     )
 
     #: The corresponding election compound
     election_compound = relationship(
-        'ElectionCompound', backref=backref('notifications')
+        'ElectionCompound',
+        backref=backref('notifications', lazy='dynamic')
     )
 
     #: The corresponding vote id
     vote_id = Column(
-        Text, ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
+        Text,
+        ForeignKey(Vote.id, onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
     )
 
     #: The corresponding vote
-    vote = relationship('Vote', backref=backref('notifications'))
+    vote = relationship(
+        'Vote',
+        backref=backref('notifications', lazy='dynamic')
+    )
 
     def update_from_model(self, model):
         """ Copy """
@@ -102,6 +117,15 @@ class WebsocketNotification(Notification):
             'event': 'refresh',
             'path': request.link(model)
         })
+
+        if isinstance(model, ElectionCompound):
+            segments = request.app.principal.get_superregions(model.date.year)
+            for segment in segments:
+                part = ElectionCompoundPart(model, 'superregion', segment)
+                request.app.send_websocket({
+                    'event': 'refresh',
+                    'path': request.link(part)
+                })
 
 
 class WebhookNotification(Notification):

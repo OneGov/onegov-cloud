@@ -1,13 +1,15 @@
-var onWebsocketNotification = function(message, _websocket) {
-    if (message.event === 'browser-notification' && message.title && "Notification" in window) {
-        if (Notification.permission === "granted") {
-            // eslint-disable-next-line no-new
-            new Notification(message.title, {tag: message.created});
+$(document).ready(function() {
+    function onWebsocketNotification(message, _websocket) {
+        if (message.event === 'browser-notification' && message.title && "Notification" in window) {
+            if (Notification.permission === "granted") {
+                // eslint-disable-next-line no-new
+                new Notification(message.title, {tag: message.created});
+            }
         }
     }
-};
 
-$(document).ready(function() {
+    function onWebsocketError(_event, _websocket) {}
+
     if ("Notification" in window) {
         if (Notification.permission === "granted") {
             $('.ticket-notifications').addClass("granted");
@@ -17,7 +19,7 @@ $(document).ready(function() {
             const schema = $('body').data('websocket-schema');
             const channel = $('body').data('websocket-channel');
             if (endpoint && schema && channel) {
-                openWebsocket(endpoint, schema, channel, onWebsocketNotification);
+                openWebsocket(endpoint, schema, channel, onWebsocketNotification, onWebsocketError);
             }
         } else {
             $('.ticket-notifications').click(function() {
