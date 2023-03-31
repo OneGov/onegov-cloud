@@ -7,6 +7,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_last_notified
 from onegov.election_day.utils import get_vote_summary
 
 
@@ -174,6 +175,23 @@ def view_vote_summary(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return get_vote_summary(self, request)
+
+
+@ElectionDayApp.json(
+    model=Vote,
+    name='last-notified',
+    permission=Public
+)
+def view_vote_last_notified(self, request):
+
+    """ View the timestamp of the last notification. """
+
+    @request.after
+    def add_headers(response):
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
+
+    return {'last-notified': get_last_notified(self)}
 
 
 @ElectionDayApp.pdf_file(model=Vote, name='pdf')

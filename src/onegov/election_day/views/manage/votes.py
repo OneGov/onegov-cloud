@@ -249,6 +249,7 @@ def trigger_vote(self, request, form):
     if form.submitted(request):
         notifications.trigger(request, self, form.notifications.data)
         request.message(_("Notifications triggered."), 'success')
+        request.app.pages_cache.flush()
         return redirect(layout.manage_model_link)
 
     callout = None
