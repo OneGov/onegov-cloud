@@ -549,9 +549,9 @@ def view_paid_date_form(self, request, form):
             item.paid = True
 
         if self.request.params['item-id'] != 'all':
-            request.success(_("Inovice marked as paid"))
+            request.success(_("Invoice marked as paid"))
         else:
-            request.success(_("Invoice items marked as paid"))
+            request.success(_("Invoice item(s) marked as paid"))
 
         return request.redirect(request.link(self))
 
