@@ -12,7 +12,7 @@
         <div class="panel">
             <p i18n:translate>This will trigger the following notifications:</p>
             <ul>
-                <li>
+                <li i18n:translate>
                     Browser: A notice in browsers which have opened any affected pages.
                 </li>
                 <li tal:condition="request.app.principal.email_notification">
