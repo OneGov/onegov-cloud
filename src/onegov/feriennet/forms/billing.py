@@ -177,7 +177,14 @@ class PaymentWithDateForm(Form):
         self.items.choices = [
             (i.id.hex,
              f'{i.group} - {i.text} ({round(i.amount, 2)})')
-            for i in self.invoice.items]
+            for i in self.invoice.items if not i.paid]
+
+        if self.request.params['item-id'] != 'all':
+            self.target.data = 'specific'
+            self.items.data = [self.request.params['item-id']]
+        else:
+            self.items.data = [i.id.hex for i in self.invoice.items
+                               if not i.paid]
 
     @property
     def invoice(self):
