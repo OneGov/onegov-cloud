@@ -84,8 +84,9 @@ configuration: &global-config
 
   # OneGov keeps track of queries run against postgres and reports the
   # redundant ones when 'redundant' is selected. Other possible values are
-  # 'all' and 'none', to either get a print of all queries or none.
-  sql_query_report: redundant
+  # 'all' and 'summary', to either get a print of all queries or just the
+  # number of queries. Either comment out or set to False to disable reporting.
+  sql_query_report: summary
 
   # If this is set to true, each request will create a cprofile in the
   # profiles folder. This slows down requests significantly.

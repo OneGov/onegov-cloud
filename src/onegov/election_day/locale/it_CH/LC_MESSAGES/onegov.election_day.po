@@ -130,6 +130,9 @@ msgstr "Nessun dato trovato"
 msgid "Invalid list results"
 msgstr "Risultati della lista non validi"
 
+msgid "Invalid candidate results"
+msgstr "Risultati del candidato non validi"
+
 msgid "Invalid list connection values"
 msgstr "Valori della lista delle connessioni non validi"
 
@@ -170,9 +173,6 @@ msgstr "Statistiche delle elezioni"
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr ""
-
-msgid "Invalid candidate results"
-msgstr "Risultati del candidato non validi"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -697,9 +697,6 @@ msgstr "Email iscritti"
 msgid "Trigger notifications"
 msgstr "Attivazione delle notifiche"
 
-msgid "Subscribers"
-msgstr "Iscritti"
-
 msgid "Screens"
 msgstr "Schermi"
 
@@ -714,6 +711,9 @@ msgstr "Admin"
 
 msgid "Manage"
 msgstr "Amministrare"
+
+msgid "Subscribers"
+msgstr "Iscritti"
 
 msgid "Mappings"
 msgstr "Mapping"
@@ -1579,8 +1579,8 @@ msgid "${count} files deleted."
 msgstr "${count} file eliminati."
 
 msgid ""
-"Deletes all SVGs and PDFs. They are regenerated in the background and are "
-"available again in a few minutes."
+"Deletes all automatically generated media items (PDFs and SVG images). They "
+"are regenerated in the background and are available again in a few minutes."
 msgstr ""
 "Cancella tutti gli SVG e i PDF. Vengono rigenerati in background e sono di "
 "nuovo disponibili in pochi minuti."

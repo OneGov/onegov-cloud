@@ -2,6 +2,7 @@ from collections import OrderedDict
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day import _
+from sqlalchemy import desc
 
 
 def sublist_name_from_connection_id(conn_name, subconn_name):
@@ -100,6 +101,14 @@ def add_local_results(source, target, principal, session):
                 target.local_answer = answer
                 target.local_yeas_percentage = yeas
                 target.local_nays_percentage = 100 - yeas
+
+
+def get_last_notified(model):
+    from onegov.election_day.models.notification import Notification
+
+    result = model.notifications.filter(Notification.type == 'websocket')
+    result = result.order_by(desc(Notification.created)).first()
+    return result.created.isoformat() if result else None
 
 
 def get_parameter(request, name, type_, default):

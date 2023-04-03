@@ -29,7 +29,7 @@ from unittest.mock import patch
 from unittest.mock import PropertyMock
 
 
-def test_notification(session):
+def test_notification_generic(session):
     notification = Notification()
     notification.last_modified = datetime(
         2007, 1, 1, 0, 0, tzinfo=timezone.utc
@@ -60,6 +60,8 @@ def test_notification(session):
 
         notification = Notification()
         notification.update_from_model(election)
+        session.add(notification)
+        session.flush()
         assert notification.election_id == election.id
         assert notification.vote_id is None
         assert notification.last_modified == datetime(
@@ -79,6 +81,8 @@ def test_notification(session):
 
         notification = Notification()
         notification.update_from_model(election_compound)
+        session.add(notification)
+        session.flush()
         assert notification.election_compound_id == election_compound.id
         assert notification.vote_id is None
         assert notification.last_modified == datetime(
@@ -98,6 +102,8 @@ def test_notification(session):
 
         notification = Notification()
         notification.update_from_model(vote)
+        session.add(notification)
+        session.flush()
         assert notification.election_id is None
         assert notification.vote_id == vote.id
         assert notification.last_modified == datetime(
@@ -111,9 +117,16 @@ def test_notification(session):
     with raises(NotImplementedError):
         notification.trigger(DummyRequest(), vote)
 
+    assert session.query(Notification).count() == 4
+    session.query(Vote).delete()
+    session.query(Election).delete()
+    session.query(ElectionCompound).delete()
+    assert session.query(Notification).count() == 1
+
 
 def test_websocket_notification(session):
     request = DummyRequest()
+    request.app.principal.superregions = ['Region 1']
 
     with freeze_time("2008-01-01 00:00"):
         # Election
@@ -156,8 +169,11 @@ def test_websocket_notification(session):
         assert notification.last_modified == datetime(
             2008, 1, 1, 0, 0, tzinfo=timezone.utc
         )
-        assert request.app.websocket_data[-1] == {
+        assert request.app.websocket_data[-2] == {
             'event': 'refresh', 'path': 'ElectionCompound/elections'
+        }
+        assert request.app.websocket_data[-1] == {
+            'event': 'refresh', 'path': 'ElectionCompoundPart/region-1'
         }
 
         # Vote

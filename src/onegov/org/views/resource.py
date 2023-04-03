@@ -436,8 +436,8 @@ def handle_cleanup_allocations(self, request, form, layout=None):
     """ Removes all unused allocations between the given dates. """
 
     if form.submitted(request):
-        start, end = form.data['start'], form.data['end']
-        count = self.scheduler.remove_unused_allocations(start, end)
+        start, end, days = form.start.data, form.end.data, form.weekdays.data
+        count = self.scheduler.remove_unused_allocations(start, end, days=days)
 
         request.success(
             _("Successfully removed ${count} unused allocations", mapping={

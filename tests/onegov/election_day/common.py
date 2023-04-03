@@ -159,6 +159,7 @@ class DummyPrincipal:
         self.has_superregions = False
         self._is_year_available = True
         self.reply_to = None
+        self.superregions = []
 
     @property
     def notifications(self):
@@ -178,6 +179,9 @@ class DummyPrincipal:
 
     def get_superregion(self, region, year):
         return ''
+
+    def get_superregions(self, year):
+        return self.superregions
 
 
 class DummyApp:

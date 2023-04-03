@@ -1908,7 +1908,8 @@ def test_cleanup_allocations(client):
     allocations = scheduler.allocate(
         dates=(
             datetime(2015, 8, 28), datetime(2015, 8, 28),
-            datetime(2015, 8, 29), datetime(2015, 8, 29)
+            datetime(2015, 8, 29), datetime(2015, 8, 29),
+            datetime(2015, 8, 30), datetime(2015, 8, 30),
         ),
         whole_day=True
     )
@@ -1929,9 +1930,18 @@ def test_cleanup_allocations(client):
 
     cleanup.form['start'] = date(2015, 8, 1)
     cleanup.form['end'] = date(2015, 8, 31)
+    # only remove fridays and sundays, which excludes the middle allocation
+    cleanup.form['weekdays'] = [4, 6]
     resource = cleanup.form.submit().follow()
 
     assert "1 Einteilungen wurden erfolgreich entfernt" in resource
+
+    allocations = scheduler.managed_allocations().order_by('id').all()
+    assert len(allocations) == 2
+    # not removed due to existing reservation
+    assert allocations[0].display_start().date() == date(2015, 8, 28)
+    # not removed due to not being on a friday or sunday
+    assert allocations[1].display_start().date() == date(2015, 8, 29)
 
 
 @freeze_time("2017-07-09", tick=True)

@@ -24,6 +24,7 @@ class ChangelogCommit:
 
     commit: git.Commit
     link: Optional[str] = None
+    hint: Optional[str] = None
     note: Optional[str] = None
 
     @property
@@ -51,6 +52,7 @@ class ChangelogCommit:
         note = []
         type = 'Other'
         link = None
+        hint = None
 
         for line in lines[1:]:
 
@@ -60,6 +62,10 @@ class ChangelogCommit:
 
             if line.lower().startswith('link'):
                 link = line.split(':', 1)[-1].strip()
+                continue
+
+            if line.lower().startswith('hint'):
+                hint = line.split(':', 1)[-1].strip()
                 continue
 
             note.append(line)
@@ -80,6 +86,7 @@ class ChangelogCommit:
             type=type,
             commit=commit,
             link=link,
+            hint=hint,
             note=note
         )
 
@@ -252,6 +259,12 @@ def changelog_commits(release, repository, newer, older, release_date):
         ChangelogCommit.parse(c) for c in commits
         if ChangelogCommit.is_match(c)
     ]
+
+    hints = [commit.hint for commit in commits if commit.hint]
+    if hints:
+        print("**Upgrade hints**")
+        for hint in hints:
+            print(f"- {hint}")
 
     # sort the result by name and type
     commits.sort(key=lambda k: (k.module, k.type_order))
