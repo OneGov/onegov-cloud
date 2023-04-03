@@ -131,6 +131,9 @@ msgstr "Chattà naginas datas"
 msgid "Invalid list results"
 msgstr "Resultats da glistas nunvalaivels"
 
+msgid "Invalid candidate results"
+msgstr "Resultats da candidat nunvalaivels"
+
 msgid "Invalid list connection values"
 msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 
@@ -171,9 +174,6 @@ msgstr "Statistica electorala"
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr ""
-
-msgid "Invalid candidate results"
-msgstr "Resultats da candidat nunvalaivels"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -704,9 +704,6 @@ msgstr "E-mail abunents"
 msgid "Trigger notifications"
 msgstr "Trametter communicaziuns als abunents"
 
-msgid "Subscribers"
-msgstr "Abunents"
-
 msgid "Screens"
 msgstr "Screens"
 
@@ -721,6 +718,9 @@ msgstr "Admin"
 
 msgid "Manage"
 msgstr "Administrar"
+
+msgid "Subscribers"
+msgstr "Abunents"
 
 msgid "Mappings"
 msgstr "Attribuziuns"
@@ -1595,8 +1595,8 @@ msgid "${count} files deleted."
 msgstr "Stizzà ${count} datotecas."
 
 msgid ""
-"Deletes all SVGs and PDFs. They are regenerated in the background and are "
-"available again in a few minutes."
+"Deletes all automatically generated media items (PDFs and SVG images). They "
+"are regenerated in the background and are available again in a few minutes."
 msgstr ""
 "Stizza tut ils SVGs e PDFs. Questas datotecas vegnan regeneradas davosvart e "
 "stattan puspè a disposiziun en paucas minutas."
