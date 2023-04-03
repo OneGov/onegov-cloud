@@ -532,10 +532,12 @@ def view_manual_booking_form(self, request, form):
 def view_paid_date_form(self, request, form):
     if form.submitted(request):
 
-        invoice_item = self.session.query(
+        invoice = self.session.query(
             Invoice).filter_by(id=request.params['invoice-id']).first()
 
-        items = invoice_item.items
+        items = invoice.items
+        if form.target.data == 'specific':
+            items = [i for i in items if i.id.hex in form.items.data]
 
         for item in items:
             item.payment_date = form.payment_date.data
