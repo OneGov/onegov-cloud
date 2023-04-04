@@ -23,9 +23,9 @@
     fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=logo-fn1hj23-2023-0-pjweb-fr'
     it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=logo-fn1hj23-2023-0-pjweb-it'
   mail_url:
-    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail-fn1hj23-2023-0-pjweb-de'
-    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=mail-fn1hj23-2023-0-pjweb-fr'
-    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=mail-fn1hj23-2023-0-pjweb-it'
+    de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=mail-pjallg-0-0-fnet-de'
+    fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=mail-pjallg-0-0-fnet-fr'
+    it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=mail-pjallg-0-0-fnet-it'
   logo: sponsors/concordia.svg
   background: '#fff'
   width: 200px
