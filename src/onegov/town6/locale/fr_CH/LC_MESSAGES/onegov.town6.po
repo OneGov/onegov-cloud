@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-02-10 17:08+0100\n"
+"POT-Creation-Date: 2023-03-29 10:27+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -160,9 +160,6 @@ msgstr "Supprimer le formulaire"
 msgid "Export"
 msgstr "Exporter"
 
-msgid "Move"
-msgstr "Déplacer"
-
 msgid "Change URL"
 msgstr "Changer URL"
 
@@ -219,12 +216,6 @@ msgstr "Nouveau commentaire"
 
 msgid "PDF"
 msgstr "PDF"
-
-msgid "Destination"
-msgstr "Destination"
-
-msgid "- Root -"
-msgstr "- Page de base-"
 
 msgid "Upload to Gever"
 msgstr "Télécharger à Gever"
@@ -713,6 +704,9 @@ msgstr ""
 msgid "Copied to Clipboard!"
 msgstr "Copié dans le presse-papiers!"
 
+msgid "Alternatives"
+msgstr "Alternatives"
+
 msgid "Don't have an account yet?"
 msgstr "Vous n'avez pas encore de compte ?"
 
@@ -724,9 +718,6 @@ msgstr "Avez-vous oublié votre mot de passe ?"
 
 msgid "Reset password"
 msgstr "Réinitialisez le mot de passe"
-
-msgid "Alternatives"
-msgstr "Alternatives"
 
 msgid "You are here"
 msgstr "Vous êtes ici"
@@ -1441,6 +1432,10 @@ msgstr "Voir le billet"
 msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
 
+msgid "You can see the current status of your ticket at any time here:"
+msgstr ""
+"Vous pouvez consulter le statut actuel de votre billet à tout moment ici:"
+
 msgid "Directory entry adopted."
 msgstr "L'entrée de répertoire a été adoptée."
 
@@ -2106,4 +2101,3 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
-
