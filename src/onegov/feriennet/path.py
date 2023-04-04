@@ -175,7 +175,7 @@ def get_invoice_action(request, app, id, action, extend_to=None):
 def get_my_invoices(request, app, username=None, invoice=None):
     # only admins can actually specify the username/invoice
     if not request.is_admin:
-        username, invoice = None, None
+        username, period = None, None
 
     # the default username is the current user
     if not username:
@@ -183,19 +183,18 @@ def get_my_invoices(request, app, username=None, invoice=None):
 
     # the default period is the active period
     if not invoice:
-        invoice = request.app.default_period and request.app.default_period.id
+        period = request.app.default_period and request.app.default_period.id
 
-    # at this point the username has to exist...
     user_id = request.app.user_ids_by_name.get(username)
 
-    # ...as well as the invoice
-    if not user_id or not invoice:
+    # there are no invoices without a period
+    if not period:
         return None
 
-    # XXX username should be user_id, invoice should be period_id
+    # XXX username should be user_id
     # this should be changed, but needs to be changed by replacing
     # the username everywhere
-    return app.invoice_collection(period_id=invoice, user_id=user_id)
+    return app.invoice_collection(period_id=period, user_id=user_id)
 
 
 @FeriennetApp.path(
