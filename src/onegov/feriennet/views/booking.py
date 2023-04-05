@@ -358,10 +358,20 @@ def view_my_bookings(self, request):
             'period_id': period and period.id or None
         })
 
+    def occasion_attendees(request, username, occasion_id):
+        children = attendees_by_username(request, username)
+        attendees = []
+        for c in children:
+            occasions = [b.occasion_id for b in c.bookings]
+            if occasion_id in occasions:
+                attendees.append(c)
+
+        return attendees
+
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
-        'attendees_by_username': attendees_by_username,
+        'occasion_attendees': occasion_attendees,
         'subscribe_link': subscribe_link,
         'grouped_bookings': grouped_bookings,
         'total_by_attendee': get_total,
