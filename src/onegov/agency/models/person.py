@@ -63,10 +63,6 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         return get_html_paragraph_with_line_breaks(self.postal_address)
 
     @property
-    def opening_hours_html(self):
-        return get_html_paragraph_with_line_breaks(self.opening_hours)
-
-    @property
     def notes_html(self):
         return get_html_paragraph_with_line_breaks(self.notes)
 
