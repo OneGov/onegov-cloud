@@ -38,7 +38,7 @@ class ExtendedAgencyForm(Form):
 
     location_address = TextAreaField(
         label=_("Location address"),
-        render_kw={'rows': 1},
+        render_kw={'rows': 2},
     )
     location_code_city = StringField(
         label=_("Location Code and City")
