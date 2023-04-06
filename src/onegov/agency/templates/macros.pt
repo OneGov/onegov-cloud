@@ -61,7 +61,6 @@
                 <tal:block tal:condition="agency.opening_hours">
                     <dt i18n:translate>Opening hours</dt>
                     <dd tal:content="structure agency.opening_hours_html"></dd>
-<!--?                    <dd>${agency.opening_hours}</dd>-->
                 </tal:block>
 
                 <tal:block tal:condition="agency.organigram_file">
