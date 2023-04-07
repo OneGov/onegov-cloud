@@ -142,8 +142,9 @@ class CSVFile:
             )
         )
 
+    @staticmethod
     @lru_cache(maxsize=128)
-    def as_valid_identifier(self, value):
+    def as_valid_identifier(value):
         result = normalize_header(value)
         for invalid in '- .%/,;':
             result = result.replace(invalid, '_')
@@ -541,7 +542,7 @@ def convert_list_of_list_of_dicts_to_xlsx(row_list, titles_list,
             # keep track of the maximum character width
             column_widths = [estimate_width(field) for field in fields]
 
-            def values(row):
+            def values(row, fields=fields, column_widths=column_widths):
                 for ix, field in enumerate(fields):
                     value = row.get(field, '')
                     column_widths[ix] = max(

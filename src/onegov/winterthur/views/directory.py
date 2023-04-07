@@ -27,9 +27,9 @@ def get_directory_form_class(model, request):
 
             obj.searchwidget_config = {}
 
-            for name, fields in fields.items():
+            for name, fields_ in fields.items():
                 obj.searchwidget_config[name] = {
-                    f: self.data[f] for f in fields
+                    f: self.data[f] for f in fields_
                 }
 
         def process_obj(self, obj):
@@ -40,11 +40,11 @@ def get_directory_form_class(model, request):
             if not obj.searchwidget_config:
                 return
 
-            for name, fields in fields.items():
+            for name, fields_ in fields.items():
                 if name not in obj.searchwidget_config:
                     continue
 
-                for f in fields:
+                for f in fields_:
                     getattr(self, f).data\
                         = obj.searchwidget_config[name].get(f)
 

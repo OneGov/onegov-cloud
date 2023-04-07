@@ -83,8 +83,8 @@ def iter_subclasses(baseclass):
     for subclass in baseclass.__subclasses__():
         yield subclass
 
-        for subclass in subclass.__subclasses__():
-            yield subclass
+        for subsubclass in subclass.__subclasses__():
+            yield subsubclass
 
 
 def related_types(model):

@@ -20,7 +20,7 @@ def emails_for_new_ticket(model, request):
         agencies = (membership.agency for membership in model.memberships)
         handler_code = 'PER'
     else:
-        assert False, 'Invalid model'
+        raise NotImplementedError()
 
     seen = set()
     if request.email_for_new_tickets:

@@ -179,7 +179,9 @@ class ManageLayout(DefaultLayout):
             (_("Manage"), super().manage_link, 'unavailable'),
         ]
 
-    def clear_media(self, tabs=[], additional=[]):
+    def clear_media(self, tabs=None, additional=None):
+        tabs = tabs or []
+        additional = additional or []
         app = self.request.app
         filestorage = app.filestorage
         paths = additional.copy()
