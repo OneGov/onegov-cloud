@@ -559,11 +559,11 @@ def test_form_registration_window_form_existing(start, end):
     ])
 
     assert not form.validate()
-    form.errors['start'][0].interpolate() == (
+    assert form.errors['start'][0].interpolate() == (
         'The date range overlaps with an existing registration window '
         '(10.01.2000 - 20.01.2000).'
     )
-    form.errors['end'][0].interpolate() == (
+    assert form.errors['end'][0].interpolate() == (
         'The date range overlaps with an existing registration window '
         '(10.01.2000 - 20.01.2000).'
     )

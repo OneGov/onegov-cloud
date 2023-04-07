@@ -105,8 +105,8 @@ def test_independent_managers(postgres_dsn):
     assert two.session().query(Document).count() == 0
 
     one.set_current_schema('bar')
-    one.session().info == {'schema': 'bar'}
-    two.session().info == {'schema': 'foo'}
+    assert one.session().info == {'schema': 'bar'}
+    assert two.session().info == {'schema': 'foo'}
 
     one.dispose()
     two.dispose()
@@ -650,8 +650,8 @@ def test_content_mixin(postgres_dsn):
     session.flush()
     transaction.commit()
 
-    session.query(Test).one().meta == {'filename': 'rtfm'}
-    session.query(Test).one().content == {'text': 'RTFM'}
+    assert session.query(Test).one().meta == {'filename': 'rtfm'}
+    assert session.query(Test).one().content == {'text': 'RTFM'}
 
     mgr.dispose()
 

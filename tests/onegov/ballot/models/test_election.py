@@ -848,14 +848,14 @@ def test_election_rename(session):
     session.add(election)
     session.flush()
 
-    session.query(Candidate).one().election_id == 'election'
-    session.query(ElectionResult).one().election_id == 'election'
+    assert session.query(Candidate).one().election_id == 'election'
+    assert session.query(ElectionResult).one().election_id == 'election'
 
     election.id = 'elerction'
     session.flush()
 
-    session.query(Candidate).one().election_id == 'elerction'
-    session.query(ElectionResult).one().election_id == 'elerction'
+    assert session.query(Candidate).one().election_id == 'elerction'
+    assert session.query(ElectionResult).one().election_id == 'elerction'
 
 
 def test_election_attachments(test_app, explanations_pdf):

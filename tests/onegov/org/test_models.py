@@ -93,30 +93,30 @@ def test_news(session):
 
     news.filter_years = []
     news.filter_tags = []
-    news.news_query(limit=None, published_only=False).count() == 4
-    news.news_query(limit=None, published_only=True).count() == 3
-    news.news_query(limit=0, published_only=True).count() == 1
-    news.news_query(limit=1, published_only=True).count() == 2
-    news.news_query(limit=2, published_only=True).count() == 2
-    news.news_query(limit=3, published_only=True).count() == 3
+    assert news.news_query(limit=None, published_only=False).count() == 4
+    assert news.news_query(limit=None, published_only=True).count() == 3
+    assert news.news_query(limit=0, published_only=True).count() == 1
+    assert news.news_query(limit=1, published_only=True).count() == 2
+    assert news.news_query(limit=2, published_only=True).count() == 2
+    assert news.news_query(limit=3, published_only=True).count() == 3
 
     news.filter_years = [2016]
-    news.news_query(limit=None, published_only=False).count() == 1
+    assert news.news_query(limit=None, published_only=False).count() == 1
     news.filter_years = [2015]
-    news.news_query(limit=None, published_only=False).count() == 3
+    assert news.news_query(limit=None, published_only=False).count() == 3
     news.filter_years = [2015, 2016]
-    news.news_query(limit=None, published_only=False).count() == 4
+    assert news.news_query(limit=None, published_only=False).count() == 4
 
     news.filter_tags = ['one']
-    news.news_query(limit=None, published_only=False).count() == 1
+    assert news.news_query(limit=None, published_only=False).count() == 1
     news.filter_tags = ['both']
-    news.news_query(limit=None, published_only=False).count() == 2
+    assert news.news_query(limit=None, published_only=False).count() == 2
     news.filter_tags = ['both', 'three']
-    news.news_query(limit=None, published_only=False).count() == 3
+    assert news.news_query(limit=None, published_only=False).count() == 3
 
     news.filter_years = [2015]
     news.filter_tags = ['both']
-    news.news_query(limit=None, published_only=False).one() == two
+    assert news.news_query(limit=None, published_only=False).one() == two
 
 
 def test_group_intervals():

@@ -2680,7 +2680,7 @@ def test_activity_period_filter(scenario):
 
     # free spots should now depend on the selected period
     a = scenario.c.activities
-    a.query().count() == 2
+    assert a.query().count() == 2
 
     assert a.for_filter(period_id=scenario.periods[0].id).query().count() == 1
     assert a.for_filter(period_id=scenario.periods[1].id).query().count() == 1

@@ -57,7 +57,7 @@ def test_sms_queue_processor(election_day_app_zg, temporary_directory):
 
     assert qp.send.called
 
-    sorted([t[0][0] for t in qp.send.call_args_list]) == [
+    assert sorted([t[0][0] for t in qp.send.call_args_list]) == [
         ('+41791112233'),
         ('+41791112233'),
         ('+41791112233'),
