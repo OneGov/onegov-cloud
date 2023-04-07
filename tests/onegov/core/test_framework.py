@@ -754,7 +754,7 @@ def test_send_email_transaction(tmpdir, redis_url):
             content="This e-mäil is just a test",
             category='transactional'
         )
-        assert False
+        raise AssertionError()
 
     @App.view(model=Root, name='send-ok')
     def success_send(self, request):

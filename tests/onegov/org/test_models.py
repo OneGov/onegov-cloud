@@ -97,7 +97,7 @@ def test_news(session):
     assert news.news_query(limit=None, published_only=True).count() == 3
     assert news.news_query(limit=0, published_only=True).count() == 1
     assert news.news_query(limit=1, published_only=True).count() == 2
-    assert news.news_query(limit=2, published_only=True).count() == 2
+    assert news.news_query(limit=2, published_only=True).count() == 3
     assert news.news_query(limit=3, published_only=True).count() == 3
 
     news.filter_years = [2016]

@@ -722,7 +722,7 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
         _legal_form=1
     )
     model.session_manager.current_locale = 'de_CH'
-    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])
+    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])  # noqa
 
     session = swissvotes_app.session()
     session.add(model)

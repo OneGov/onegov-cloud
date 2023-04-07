@@ -92,7 +92,7 @@ def test_stripe_capture_evil_charge(capturelog):
 
     class EvilCharge:
         def capture(self):
-            assert False
+            raise AssertionError()
 
     charge = EvilCharge()
 

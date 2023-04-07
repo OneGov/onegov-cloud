@@ -88,12 +88,13 @@ def proporz_election(
         id='proporz',
         shortcode='1',
         domain='federation',
-        date=date(2015, 6, 14),
+        date_=None,
         number_of_mandates=1,
         absolute_majority=144,
         status=None,
         domain_supersegment=''
 ):
+    date_ = date_ or date(2015, 6, 14)
 
     # election
     election = ProporzElection(
@@ -101,7 +102,7 @@ def proporz_election(
         id=id,
         shortcode=shortcode,
         domain=domain,
-        date=date,
+        date=date_,
         number_of_mandates=number_of_mandates,
         absolute_majority=absolute_majority,
         status=status,
@@ -1337,7 +1338,7 @@ def test_election_compound_manual_completion(session):
         id='1',
         shortcode='P1',
         domain='region',
-        date=date(2020, 3, 22),
+        date_=date(2020, 3, 22),
         number_of_mandates=1,
         status='interim'
     )
@@ -1346,7 +1347,7 @@ def test_election_compound_manual_completion(session):
         id='2',
         shortcode='P2',
         domain='region',
-        date=date(2020, 3, 22),
+        date_=date(2020, 3, 22),
         number_of_mandates=1,
         status='final'
     )
@@ -1410,7 +1411,7 @@ def test_election_compound_supersegment_progress(session):
             id='1',
             shortcode='P1',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='interim',
             domain_supersegment='A'
@@ -1420,7 +1421,7 @@ def test_election_compound_supersegment_progress(session):
             id='2',
             shortcode='P2',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='final',
             domain_supersegment='A'
@@ -1430,7 +1431,7 @@ def test_election_compound_supersegment_progress(session):
             id='3',
             shortcode='P3',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='final',
             domain_supersegment='B'
@@ -1440,7 +1441,7 @@ def test_election_compound_supersegment_progress(session):
             id='4',
             shortcode='P4',
             domain='region',
-            date=date(2020, 3, 22),
+            date_=date(2020, 3, 22),
             number_of_mandates=1,
             status='interim',
             domain_supersegment=''
