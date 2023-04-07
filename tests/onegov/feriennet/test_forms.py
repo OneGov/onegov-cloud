@@ -18,7 +18,8 @@ from onegov.feriennet.forms import VacationActivityForm
 from onegov.user import UserCollection
 
 
-def create_form(session, confirmable, start, delta=timedelta(days=10)):
+def create_form(session, confirmable, start, delta=None):
+    delta = delta or timedelta(days=10)
     fmt = "%Y-%m-%d"
     start_ = start
 

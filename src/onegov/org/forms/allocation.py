@@ -119,7 +119,7 @@ class AllocationRuleForm(Form):
 
     @cached_property
     def last_run(self):
-        None
+        return None
 
     @property
     def rule(self):

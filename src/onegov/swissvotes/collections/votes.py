@@ -319,7 +319,8 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query(SwissVote)
 
-        def in_or_none(column, values, extra={}):
+        def in_or_none(column, values, extra=None):
+            extra = extra or {}
             values = values + [x for y, x in extra.items() if y in values]
             statement = column.in_(values)
             if -1 in values:

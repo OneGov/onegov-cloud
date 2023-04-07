@@ -49,6 +49,7 @@ class MatchableBooking(metaclass=ABCMeta):
 
     """
 
+    @abstractmethod
     def __eq__(self, other):
         """ The class must be comparable to other classes. """
 

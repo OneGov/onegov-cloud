@@ -72,7 +72,7 @@ def allowed_imports(levels, module):
         if module in modules:
             return allowed
 
-    assert False, f"unknown module: {module}"
+    raise AssertionError(f"unknown module: {module}")
 
 
 def sources():

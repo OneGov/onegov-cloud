@@ -608,7 +608,7 @@ def test_ticket_chat(client):
 
     # we should no longer be able to send messages
     page = client.get(status_url)
-    len(page.forms) == 1
+    assert len(page.forms) == 1
 
     status_before.form['text'] = 'Foo'
     page = status_before.form.submit()

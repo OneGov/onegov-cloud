@@ -699,7 +699,7 @@ def import_reservations(dsn, map, start_date):
                 quota=row['quota'],
                 quota_limit=getattr(
                     row, 'quota_limit',
-                    getattr(row, 'reservation_quota_limit')),
+                    getattr(row, 'reservation_quota_limit')),  # noqa
                 partly_available=row['partly_available'],
                 approve_manually=row['approve_manually'],
 
@@ -1132,7 +1132,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                         ])
                     )
 
-                def remote_events():
+                def remote_events(query=query, key=key):
                     for event_ in query:
                         event_._es_skip = True
                         yield EventImportItem(
@@ -1184,7 +1184,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                 if create_tickets and not local_admin:
                     abort("Can not create tickets, no admin is registered")
 
-                def ticket_for_event(event_id):
+                def ticket_for_event(event_id, local_session=local_session):
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 

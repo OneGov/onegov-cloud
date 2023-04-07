@@ -131,7 +131,7 @@ class SAML2Client():
         elif request.method == 'POST':
             return BINDING_HTTP_POST
         else:
-            assert False, "binding not implemented"
+            raise NotImplementedError()
 
     def get_sessions(self, app):
         # this can use our short-lived cache, it will likely

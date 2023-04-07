@@ -25,7 +25,7 @@ def test_view_notice_edit(gazette_app):
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
         manage.form['author_date'] = '2019-01-01'
-        manage.form['phone_number'].value == '+41415112281'
+        manage.form['phone_number'].value = '+41415112281'
         manage.form.submit()
 
         edit_notice(
@@ -184,7 +184,7 @@ def test_view_notice_edit_unrestricted(gazette_app):
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
         manage.form['author_date'] = '2019-01-01'
-        manage.form['phone_number'].value == '+41415112281'
+        manage.form['phone_number'].value = '+41415112281'
         manage.form.submit()
 
     # drafted

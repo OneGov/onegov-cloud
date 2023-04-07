@@ -10,9 +10,9 @@ class CachedApplication:
 
     """
 
-    def __init__(self, application_class, namespace, configuration={}):
+    def __init__(self, application_class, namespace, configuration=None):
         self.application_class = application_class
-        self.configuration = configuration
+        self.configuration = configuration or {}
         self.namespace = namespace
         self.instance = None
 
@@ -38,7 +38,7 @@ class ApplicationCollection:
             self.register(
                 a.root, a.application_class, a.namespace, a.configuration)
 
-    def register(self, root, application_class, namespace, configuration={}):
+    def register(self, root, application_class, namespace, configuration=None):
         """ Registers the given path for the given application_class and
         configuration.
 

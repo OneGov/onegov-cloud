@@ -549,7 +549,7 @@ def chunks(iterable, n, fillvalue=None):
     """
 
     args = [iter(iterable)] * n
-    return zip_longest(fillvalue=fillvalue, *args)
+    return zip_longest(*args, fillvalue=fillvalue)
 
 
 def relative_url(absolute_url):
@@ -759,7 +759,7 @@ def dictionary_to_binary(dictionary):
         return f.read()
 
 
-def safe_format(format, dictionary, types={int, str, float}, adapt=None,
+def safe_format(format, dictionary, types=None, adapt=None,
                 raise_on_missing=False):
     """ Takes a user-supplied string with format blocks and returns a string
     where those blocks are replaced by values in a dictionary.
@@ -799,6 +799,7 @@ def safe_format(format, dictionary, types={int, str, float}, adapt=None,
 
     """
 
+    types = types or {int, str, float}
     output = StringIO()
     buffer = StringIO()
     opened = 0
