@@ -242,7 +242,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
                 raise RuntimeError(f"The frequency of '{r}' is not WEEKLY")
 
             # we require a definite end
-            if not getattr(rule, '_until'):
+            if not hasattr(rule, '_until'):
                 raise RuntimeError(f"'{r}' has no UNTIL")
 
             # we also want the end date to be timezone-aware

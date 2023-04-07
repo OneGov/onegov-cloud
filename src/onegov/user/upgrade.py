@@ -96,19 +96,19 @@ def force_lowercase_usernames(context):
         role='member',
     )
 
-    for username, users in users.items():
+    for username, users_ in users.items():
 
         # simply change usernames that don't conflict with others
-        if len(users) == 1:
+        if len(users_) == 1:
             with context.session.no_autoflush:
                 change_ownership_by_name(
-                    context, users[0].username, 'temp')
+                    context, users_[0].username, 'temp')
 
-                users[0].username = users[0].username.lower()
+                users_[0].username = users_[0].username.lower()
                 context.session.flush()
 
                 change_ownership_by_name(
-                    context, 'temp', users[0].username)
+                    context, 'temp', users_[0].username)
 
             continue
 
@@ -125,7 +125,7 @@ def force_lowercase_usernames(context):
             'admin'
         ]
 
-        def sort_key(user):
+        def sort_key(user, role_hierarchy=role_hierarchy):
             return (
                 user.active,
                 role_hierarchy.index(user.role),

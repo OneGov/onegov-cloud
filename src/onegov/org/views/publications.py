@@ -78,19 +78,19 @@ def view_publications(self, request, layout=None):
 
         return tuple()
 
-    for ix, publications in enumerate(reversed(publications)):
+    for ix, publications_ in enumerate(reversed(publications)):
         month = 12 - ix
 
         # exclude current year's months if they are in the future
         if self.year == today.year and month > today.month:
             continue
 
-        if not publications:
+        if not publications_:
             spool = (*spool, request.translate(MONTHS[month - 1]))
             continue
 
         spool = apply_spool(spool)
-        grouped[request.translate(MONTHS[month - 1])] = publications
+        grouped[request.translate(MONTHS[month - 1])] = publications_
 
     apply_spool(spool)
 

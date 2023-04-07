@@ -392,8 +392,9 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     def fields(self):
         return self.fields_from_structure(self.structure)
 
+    @staticmethod
     @lru_cache(maxsize=1)
-    def fields_from_structure(self, structure):
+    def fields_from_structure(structure):
         return tuple(flatten_fieldsets(parse_formcode(structure)))
 
     @property

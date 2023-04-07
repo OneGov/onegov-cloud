@@ -67,7 +67,7 @@ def export_person_xlsx(session):
             elif isinstance(value, int) or isinstance(value, Decimal):
                 worksheet.write_number(row, col_ix, value)
             else:
-                assert False
+                raise NotImplementedError()
 
     workbook.close()
     file.seek(0)

@@ -134,7 +134,7 @@ class CourseForm(Form):
         default=False,
     )
 
-    def get_useful_data(self, exclude={'csrf_token'}):
+    def get_useful_data(self, exclude=None):
         result = super().get_useful_data(exclude)
         if self.description.data:
             result['description'] = linkify(
@@ -175,6 +175,6 @@ class InviteCourseForm(Form):
         render_kw={'rows': 20},
     )
 
-    def get_useful_data(self, exclude={'csrf_token'}):
+    def get_useful_data(self, exclude=None):
         string = self.attendees.data
         return tuple(t[0] for t in _email_regex.findall(string))
