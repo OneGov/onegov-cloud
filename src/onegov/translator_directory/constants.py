@@ -133,4 +133,6 @@ INTERPRETING_TYPES = {
     'whisper': _('Whisper interpreting'),
 }
 
-EMAIL_OR_MAIL = (_("Send E-Mail"), _("Letter B-post"))
+EMAIL_OR_MAIL = [_('Send E-Mail'), _('Letter B-post')]
+
+INVALID_WORD_TEMPLATE_CHARS = ('<', '>', '&')

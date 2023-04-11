@@ -40,11 +40,6 @@ class TranslatorDirectoryApp(OrgApp):
 
     @cached_property
     def mail_templates(self):
-        # todo: query for content type seems like the better solution.
-        # query = GeneralFileCollection(self.session()).query().filter(
-        #     cast(GeneralFile.reference, JSON)['content_type'] ==
-        #     'application/vnd.ms-office'
-        # )
         query = GeneralFileCollection(self.session()).query().filter(
             GeneralFile.name.endswith('.docx')
         )

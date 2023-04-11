@@ -1,12 +1,9 @@
 from datetime import datetime
 from io import BytesIO
-from os import PathLike
 from onegov.file import File
-from typing import Union
 from morepath import redirect
 from docxtpl import DocxTemplate
 from morepath.request import Response
-from typing.io import IO
 
 from onegov.core.custom import json
 from onegov.core.security import Secret, Personal, Private
@@ -421,24 +418,34 @@ def report_translator_change(self, request, form):
 def view_mail_templates(self, request, form):
 
     if form.submitted(request):
-        fs = request.app.filestorage
         template_name = form.templates.data
         docx_templates = request.app.mail_templates
 
-        if not (template_name in docx_templates or fs.isfile(template_name)):
+        if template_name not in docx_templates:
             request.error(_("This file does not seem to exist."))
             return request.redirect(request.link(self))
 
         file_id = GeneralFileCollection(request.session).query().filter(
-            File.name == template_name).with_entities(File.id).one()
-
-        if not file_id:
-            request.error(_("This file does not seem to exist."))
-            return request.redirect(request.link(self))
-
+            File.name == template_name).with_entities(File.id).first()
         f = get_file(request.app, file_id)
         template_bytes = f.reference.file.read()
-        generated_file = generate_mail_template(BytesIO(template_bytes), self)
+
+        user = request.current_user
+        if not getattr(user, 'phone_number', 'realname'):
+            request.error("Unfortunately, this account does not have real "
+                          "name and phone number defined, which is required "
+                          "for mail templates")
+            return request.redirect(request.link(self))
+
+        first_name, last_name = user.realname.lower().split(" ")
+        additional_variables = {
+            'sender_email_prefix': f"{first_name}.{last_name}",
+            'sender_phone_number': user.phone_number
+        }
+
+        generated_file = generate_word_template(
+            BytesIO(template_bytes), self, **additional_variables
+        )
         return Response(
             generated_file,
             content_type='application/vnd.ms-office',
@@ -456,29 +463,31 @@ def view_mail_templates(self, request, form):
     }
 
 
-def generate_mail_template(p: Union[IO[bytes], str, PathLike],
-                           translator, **kwargs):
+def generate_word_template(original_docx, translator, **kwargs):
     """ Generate letters with mostly static text where some variables
      are substituted.
 
     """
     in_memory_docx = BytesIO()
-    docx_template = DocxTemplate(p)
-    # TODO: Change variables to not be hard-coded
+    docx_template = DocxTemplate(original_docx)
+
     substituted_variables = {
+        'email_or_letter': 'Brief B-Post',
         'sender_initials': 'GIFR',
-        'sender_email_prefix': 'firstname.lastname',
         'translator_last_name': translator.last_name,
         'translator_first_name': translator.first_name,
         'translator_address': translator.address,
         'translator_city': translator.city,
         'translator_zip_code': translator.zip_code,
         'greeting': gendered_greeting(translator),
-        'sender_phone_number': '999 99 99',
-        'current_date': '20. April 2023'
+        'current_date': '11. April 2023'
     }
+
     for key, value in kwargs.items():
         substituted_variables[key] = value
+
+    num = substituted_variables['sender_phone_number']
+    substituted_variables['sender_phone_number'] = num.replace("041", "")
     docx_template.render(substituted_variables)
     docx_template.save(in_memory_docx)
 

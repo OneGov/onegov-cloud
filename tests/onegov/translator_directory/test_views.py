@@ -1,13 +1,18 @@
 import copy
 import re
+import docx
 import transaction
-
 from io import BytesIO
+from onegov.core.utils import module_path
+from onegov.translator_directory.models.translator import Translator
+from os.path import basename
+from onegov.file import FileCollection
+from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.user import UserCollection
+from onegov.user import UserCollection, User
 from openpyxl import load_workbook
 from pdftotext import PDF
 from tests.onegov.translator_directory.shared import translator_data, \
@@ -43,6 +48,14 @@ def check_pdf(page, filename, link):
     assert filename in headers['Content-Disposition']
     assert headers['Content-Type'] == 'application/pdf'
     assert filename in ''.join(PDF(BytesIO(response.body)))
+
+
+def upload_word(filename, client):
+    with open(filename, 'rb') as f:
+        page = client.get('/files')
+        content_type = 'application/vnd.ms-office'
+        page.form['file'] = Upload(basename(filename), f.read(), content_type)
+        page.form.submit()
 
 
 def test_view_translator(client):
@@ -1565,3 +1578,49 @@ def test_view_accreditation_errors(directions, client):
     check_pdf(page, '9.pdf',
               'Aktueller Auszug aus dem Zentralstrafregister.pdf')
     check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+
+
+def test_view_mail_template(client):
+    session = client.app.session()
+    translator = Translator(**translator_data)
+    translators = TranslatorCollection(client.app)
+    trs_id = translators.add(**translator_data).id
+    transaction.commit()
+
+    path = module_path(
+        "tests.onegov.translator_directory", "fixtures/template.docx"
+    )
+    client.login_admin()
+
+    upload_word(path, client)
+    assert FileCollection(session).query().first().id
+
+    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
+    page.form['templates'] = basename(path)
+    resp = page.form.submit()
+
+    user: User = UserCollection(session).by_username('admin@example.org')
+    first_name, last_name = user.realname.split(" ")
+    assert first_name == 'John'
+    assert last_name == 'Doe'
+
+    found_variables_in_docx = set()
+    expected_variables_in_docx = (
+        'Sehr geehrter Herr',
+        translator.address,
+        translator.zip_code,
+        translator.city,
+        translator.first_name,
+        translator.last_name,
+        user.phone_number.replace("041", ""),
+        f"{first_name.lower()}.{last_name.lower()}"
+    )
+
+    doc = docx.Document(BytesIO(resp.body))
+    for target in expected_variables_in_docx:
+        for block in iter_block_items(doc):
+            if target in block.text:
+                assert '041 041' not in block.text  # 041 is static
+                found_variables_in_docx.add(target)
+
+    assert set(expected_variables_in_docx) == found_variables_in_docx
