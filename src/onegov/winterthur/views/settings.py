@@ -126,8 +126,10 @@ class WinterthurDaycareSettingsForm(Form):
     def validate_services(self, field):
         try:
             tuple(Services.parse_definition(field.data))
-        except (YAMLError, TypeError, KeyError):
-            raise ValidationError(_("Invalid services configuration"))
+        except (YAMLError, TypeError, KeyError) as exception:
+            raise ValidationError(
+                _("Invalid services configuration")
+            ) from exception
 
     def directory_choices(self):
         dirs = DirectoryCollection(self.request.session, type='extended')

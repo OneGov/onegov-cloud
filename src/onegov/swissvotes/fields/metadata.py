@@ -52,8 +52,8 @@ class SwissvoteMetadataField(UploadField):
 
         try:
             workbook = load_workbook(self.file, data_only=True)
-        except Exception:
-            raise ValidationError(_("Not a valid XLSX file."))
+        except Exception as exception:
+            raise ValidationError(_("Not a valid XLSX file.")) from exception
 
         if len(workbook.worksheets) < 1:
             raise ValidationError(_("No data."))

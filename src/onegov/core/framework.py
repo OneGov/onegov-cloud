@@ -572,9 +572,10 @@ class Framework(
 
         try:
             action, handler = next(query(self.__class__))
-        except (StopIteration, RuntimeError):
+        except (StopIteration, RuntimeError) as exception:
             raise KeyError(
-                "{!r} has no view named {}".format(model, view_name))
+                "{!r} has no view named {}".format(model, view_name)
+            ) from exception
 
         return action.permission
 

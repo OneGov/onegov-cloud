@@ -202,9 +202,10 @@ class SAML2Client():
                     state_cache=state_cache
                 )
                 self._connections[request.app.application_id] = conn
-            except Exception as e:
+            except Exception as exception:
                 raise ValueError(
-                    f'SAML2 config error: {str(e)}')
+                    f'SAML2 config error: {str(exception)}'
+                ) from exception
         return conn
 
     def get_name_id(self, user):
