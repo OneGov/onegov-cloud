@@ -6,7 +6,11 @@ from sqlalchemy import inspect
 
 
 def hash_primary_key(text):
-    return hashlib.sha1(text.encode('utf-8')).hexdigest()
+    return hashlib.new(
+        'sha1',
+        text.encode('utf-8'),
+        usedforsecurity=False
+    ).hexdigest()
 
 
 class PayableBase:

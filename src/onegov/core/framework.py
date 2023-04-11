@@ -515,7 +515,11 @@ class Framework(
         # sha-1 should be enough, because even if somebody was able to get
         # the cleartext value I honestly couldn't tell you what it could be
         # used for...
-        return hashlib.sha1(self.application_id.encode('utf-8')).hexdigest()
+        return hashlib.new(
+            'sha1',
+            self.application_id.encode('utf-8'),
+            # todo: should we use usedforsecurity=False or switch algorithm?
+        ).hexdigest()
 
     def object_by_path(self, path, with_view_name=False):
         """ Takes a path and returns the object associated with it. If a
