@@ -17,7 +17,7 @@ import types
 
 from decimal import Decimal
 from itertools import chain
-from onegov.core.cache import lru_cache
+from onegov.core.cache import instance_lru_cache
 
 
 class Serializer:
@@ -166,7 +166,7 @@ class Serializers:
 
         return self.by_keys.get(frozenset(dictionary.keys()))
 
-    @lru_cache(maxsize=16)
+    @instance_lru_cache(maxsize=16)
     def serializer_for_class(self, cls):
         matches = (s for s in self.registered if issubclass(cls, s.target))
         return next(matches, None)

@@ -3,7 +3,7 @@ import morepath
 
 from cached_property import cached_property
 from datetime import timedelta
-from onegov.core.cache import lru_cache
+from onegov.core.cache import instance_lru_cache
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -64,7 +64,7 @@ class ReturnToMixin:
     def redirect_signer(self):
         return URLSafeSerializer(self.identity_secret, 'return-to')
 
-    @lru_cache(maxsize=16)
+    @instance_lru_cache(maxsize=16)
     def sign_url_for_redirect(self, url):
         return self.redirect_signer.dumps(url)
 
