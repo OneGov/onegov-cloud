@@ -2,6 +2,7 @@ from cached_property import cached_property
 
 from onegov.core.collection import Pagination
 from onegov.user import User
+from onegov.event.models import Event
 
 
 class Search(Pagination):
@@ -45,25 +46,46 @@ class Search(Pagination):
         if not self.query:
             return None
 
+        # if self.query.startswith('#'):
+        #     search = self.hashtag_search(search, self.query)
+        # else:
+        #     search = self.generic_search(search, self.query)
+        #
+        # return search[self.offset:self.offset + self.batch_size].execute()
+
         return self.postgres_search()
 
+    @cached_property
+    def load_batch_results(self):
+        """Load search results and sort events by latest occurrence.
+
+        This methods is a wrapper around `batch.load()`, which returns the
+        actual search results form the query. """
+
+        batch = self.batch.load()
+        events = []
+        non_events = []
+        for search_result in batch:
+            if isinstance(search_result, Event):
+                events.append(search_result)
+            else:
+                non_events.append(search_result)
+        if not events:
+            return batch
+        sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
+        return sorted_events + non_events
+
     # def generic_search(self, search, query):
-    #     print('*** tschupre search generic_search')
     #
+    #     # make sure the title matches with a higher priority, otherwise the
     #     # "get lucky" functionality is not so lucky after all
     #     match_title = MatchPhrase(title={"query": query, "boost": 3})
     #
     #     # we *could* use Match here and include '_all' fields, but that
     #     # yields us less exact results, probably because '_all' includes some
     #     # metadata fields we have no use for
-    #     print('*** registered fields:')
-    #     for field in self.request.app.orm_mappings.registered_fields:
-    #         if not field.startswith('es_'):
-    #             # print(f' * field: {field}')
-    #             pass
     #     match_rest = MultiMatch(query=query, fields=[
-    #         field for field in self.request.app.orm_mappings.
-    #         registered_fields
+    #         field for field in self.request.app.es_mappings.registered_fields
     #         if not field.startswith('es_')
     #     ], fuzziness='1', prefix_length=3)
     #
@@ -81,7 +103,6 @@ class Search(Pagination):
     #     return search
 
     # def hashtag_search(self, search, query):
-    #     print('*** tschupre search hastag_search')
     #     return search.query(Match(es_tags=query.lstrip('#')))
 
     def feeling_lucky(self):
