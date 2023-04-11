@@ -132,3 +132,5 @@ INTERPRETING_TYPES = {
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
 }
+
+EMAIL_OR_MAIL = (_("Send E-Mail"), _("Letter B-post"))

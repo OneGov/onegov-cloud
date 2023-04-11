@@ -1,13 +1,20 @@
 from datetime import datetime
 from io import BytesIO
+from os import PathLike
+from onegov.file import File
+from typing import Union
 from morepath import redirect
+from docxtpl import DocxTemplate
 from morepath.request import Response
+from typing.io import IO
+
 from onegov.core.custom import json
 from onegov.core.security import Secret, Personal, Private
 from onegov.core.templates import render_template
+from onegov.file.integration import get_file
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import TicketMessage
+from onegov.org.models import TicketMessage, GeneralFileCollection
 from onegov.ticket import TicketCollection
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
@@ -15,12 +22,13 @@ from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
     INTERPRETING_TYPES, ADMISSIONS, GENDERS
+from onegov.translator_directory.forms.mail_templates import MailTemplatesForm
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
-from onegov.translator_directory.layout import AddTranslatorLayout, \
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout, \
-    ReportTranslatorChangesLayout
+from onegov.translator_directory.layout import AddTranslatorLayout,\
+    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
+    ReportTranslatorChangesLayout, MailTemplatesLayout
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook
@@ -401,3 +409,87 @@ def report_translator_change(self, request, form):
         'title': layout.title,
         'form': form
     }
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    template='mail_templates.pt',
+    name='mail-templates',
+    form=MailTemplatesForm,
+    permission=Personal
+)
+def view_mail_templates(self, request, form):
+
+    if form.submitted(request):
+        fs = request.app.filestorage
+        template_name = form.templates.data
+        docx_templates = request.app.mail_templates
+
+        if not (template_name in docx_templates or fs.isfile(template_name)):
+            request.error(_("This file does not seem to exist."))
+            return request.redirect(request.link(self))
+
+        file_id = GeneralFileCollection(request.session).query().filter(
+            File.name == template_name).with_entities(File.id).one()
+
+        if not file_id:
+            request.error(_("This file does not seem to exist."))
+            return request.redirect(request.link(self))
+
+        f = get_file(request.app, file_id)
+        template_bytes = f.reference.file.read()
+        generated_file = generate_mail_template(BytesIO(template_bytes), self)
+        return Response(
+            generated_file,
+            content_type='application/vnd.ms-office',
+            content_disposition=f'inline; filename={template_name}'
+        )
+
+    layout = MailTemplatesLayout(self, request)
+
+    return {
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'title': _("Mail templates"),
+        'button_text': _('Download')
+    }
+
+
+def generate_mail_template(p: Union[IO[bytes], str, PathLike],
+                           translator, **kwargs):
+    """ Generate letters with mostly static text where some variables
+     are substituted.
+
+    """
+    in_memory_docx = BytesIO()
+    docx_template = DocxTemplate(p)
+    # TODO: Change variables to not be hard-coded
+    substituted_variables = {
+        'sender_initials': 'GIFR',
+        'sender_email_prefix': 'firstname.lastname',
+        'translator_last_name': translator.last_name,
+        'translator_first_name': translator.first_name,
+        'translator_address': translator.address,
+        'translator_city': translator.city,
+        'translator_zip_code': translator.zip_code,
+        'greeting': gendered_greeting(translator),
+        'sender_phone_number': '999 99 99',
+        'current_date': '20. April 2023'
+    }
+    for key, value in kwargs.items():
+        substituted_variables[key] = value
+    docx_template.render(substituted_variables)
+    docx_template.save(in_memory_docx)
+
+    in_memory_docx.seek(0)
+    return in_memory_docx.read()
+
+
+def gendered_greeting(translator):
+    if translator.gender == 'M':
+        return 'Sehr geehrter Herr'
+    elif translator.gender == 'F':
+        return 'Sehr geehrte Frau'
+    else:
+        return 'Sehr geehrte*r Herr/Frau'

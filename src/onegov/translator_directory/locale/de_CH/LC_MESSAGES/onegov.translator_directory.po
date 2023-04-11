@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-24 08:49+0200\n"
+"POT-Creation-Date: 2023-04-05 15:29+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -78,6 +78,12 @@ msgstr "Verhandlungsdolmetschen"
 
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
+
+msgid "Send E-Mail"
+msgstr "Per eMail senden"
+
+msgid "Letter B-post"
+msgstr "Brief B-Post"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -423,6 +429,9 @@ msgstr "Dieses Feld wird benötigt."
 msgid "${language} already exists"
 msgstr "${language} existiert bereits"
 
+msgid "Chose a mail template to generate:"
+msgstr "Wählen Sie die Briefvorlage-Kategorie aus zum Herunterladen:"
+
 msgid ""
 "Home location is not configured. Please complete location settings first"
 msgstr ""
@@ -620,6 +629,9 @@ msgstr "Übersetzer/in löschen"
 
 msgid "Cancel"
 msgstr "Abbrechen"
+
+msgid "Mail templates"
+msgstr "Briefvorlagen"
 
 msgid "Report change"
 msgstr "Mutation melden"
@@ -829,3 +841,9 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Adresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+msgid "This file does not seem to exist."
+msgstr "Diese Datei scheint nicht zu existieren."
+
+msgid "Download"
+msgstr "Herunterladen"

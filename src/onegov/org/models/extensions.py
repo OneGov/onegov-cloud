@@ -18,7 +18,7 @@ from wtforms.validators import ValidationError
 
 
 class ContentExtension:
-    """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
+    """ Extends classes based on :class:`onegov.core.orm.mixins.ontentMixin`
     with custom data that is stored in either 'meta' or 'content'.
 
     """

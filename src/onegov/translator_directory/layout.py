@@ -133,6 +133,13 @@ class TranslatorLayout(DefaultLayout):
                     self.request.link(self.file_collection),
                     attrs={'class': 'documents'}
                 ),
+                Link(
+                    _('Mail templates'),
+                    url=self.request.link(
+                        self.model, name='mail-templates'
+                    ),
+                    attrs={'class': ''}
+                ),
             ]
         elif self.request.is_editor:
             return [
@@ -493,3 +500,26 @@ class RefuseAccreditationLayout(DefaultLayout):
         )
         links.append(Link(_('Refuse admission')))
         return links
+
+
+class MailTemplatesLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        return super().breadcrumbs + [
+            Link(
+                text=_('Translators'),
+                url=self.request.class_link(TranslatorCollection)
+            ),
+            Link(
+                text=self.model.title,
+                url=self.request.link(self.model)
+            ),
+            Link(
+                text=_('Mail templates'),
+                url=self.request.link(
+                    self.model, name='mail-templates'
+                ),
+                attrs={'class': ''}
+            )
+        ]

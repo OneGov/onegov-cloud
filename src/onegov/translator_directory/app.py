@@ -1,10 +1,11 @@
 from onegov.core import utils
+from cached_property import cached_property
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.org.models import Organisation
+from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
 from purl import URL
@@ -36,6 +37,18 @@ class TranslatorDirectoryApp(OrgApp):
         if default != '/' and '/auth/login' not in str(default):
             return None
         return URL(request.class_link(Organisation)).path()
+
+    @cached_property
+    def mail_templates(self):
+        # todo: query for content type seems like the better solution.
+        # query = GeneralFileCollection(self.session()).query().filter(
+        #     cast(GeneralFile.reference, JSON)['content_type'] ==
+        #     'application/vnd.ms-office'
+        # )
+        query = GeneralFileCollection(self.session()).query().filter(
+            GeneralFile.name.endswith('.docx')
+        )
+        return [f.name for f in query.all()]
 
 
 @TranslatorDirectoryApp.template_directory()
