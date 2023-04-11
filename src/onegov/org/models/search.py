@@ -5,6 +5,7 @@ from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
 from onegov.core.collection import Pagination
+from onegov.event.models import Event
 
 
 class Search(Pagination):
@@ -63,6 +64,26 @@ class Search(Pagination):
             search = self.generic_search(search, query)
 
         return search[self.offset:self.offset + self.batch_size].execute()
+
+    @cached_property
+    def load_batch_results(self):
+        """Load search results and sort events by latest occurrence.
+
+        This methods is a wrapper around `batch.load()`, which returns the
+        actual search results form the query. """
+
+        batch = self.batch.load()
+        events = []
+        non_events = []
+        for search_result in batch:
+            if isinstance(search_result, Event):
+                events.append(search_result)
+            else:
+                non_events.append(search_result)
+        if not events:
+            return batch
+        sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
+        return sorted_events + non_events
 
     def generic_search(self, search, query):
 
