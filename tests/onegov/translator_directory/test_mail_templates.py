@@ -3,7 +3,7 @@ import docx
 from onegov.core.utils import module_path
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.views.translator import\
-    generate_word_template, gendered_greeting
+    fill_variables_in_docx, gendered_greeting
 from tests.onegov.translator_directory.shared import translator_data,\
     iter_block_items
 
@@ -26,7 +26,7 @@ def test_read_write_cycle():
                                 'fixtures/template.docx')
 
     with open(template_name, 'rb') as f:
-        filled_template = generate_word_template(
+        filled_template = fill_variables_in_docx(
             BytesIO(f.read()), translator, **variables_to_fill
         )
         variables_to_fill['sender_phone_number'] = '229 99 99'

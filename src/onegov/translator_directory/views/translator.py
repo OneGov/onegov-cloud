@@ -443,7 +443,7 @@ def view_mail_templates(self, request, form):
             'sender_phone_number': user.phone_number
         }
 
-        docx = generate_word_template(BytesIO(template), self, **user_info)
+        docx = fill_variables_in_docx(BytesIO(template), self, **user_info)
         return Response(
             docx,
             content_type='application/vnd.ms-office',
@@ -461,14 +461,10 @@ def view_mail_templates(self, request, form):
     }
 
 
-def generate_word_template(original_docx, translator, **kwargs):
-    """ Generate letters with mostly static text where some variables
-     are substituted.
-
-    """
-    in_memory_docx = BytesIO()
+def fill_variables_in_docx(original_docx, translator, **kwargs):
     docx_template = DocxTemplate(original_docx)
 
+    # Variables to find and replace in final word file
     substituted_variables = {
         'email_or_letter': 'Brief B-Post',
         'sender_initials': 'GIFR',
@@ -487,6 +483,7 @@ def generate_word_template(original_docx, translator, **kwargs):
     num = substituted_variables['sender_phone_number']
     substituted_variables['sender_phone_number'] = num.replace("041", "")
     docx_template.render(substituted_variables)
+    in_memory_docx = BytesIO()
     docx_template.save(in_memory_docx)
 
     in_memory_docx.seek(0)
