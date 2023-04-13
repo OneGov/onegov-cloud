@@ -422,32 +422,30 @@ def view_mail_templates(self, request, form):
         docx_templates = request.app.mail_templates
 
         if template_name not in docx_templates:
-            request.error(_("This file does not seem to exist."))
-            return request.redirect(request.link(self))
+            request.alert("This file does not seem to exist.")
+            return redirect(request.link(self))
+
+        user = request.current_user
+        if not getattr(user, 'phone_number', 'realname'):
+            request.alert("Unfortunately, this account does not have real name"
+                          " and phone number defined, which is required for "
+                          "mail templates")
+            return redirect(request.link(self))
 
         file_id = GeneralFileCollection(request.session).query().filter(
             File.name == template_name).with_entities(File.id).first()
         f = get_file(request.app, file_id)
-        template_bytes = f.reference.file.read()
-
-        user = request.current_user
-        if not getattr(user, 'phone_number', 'realname'):
-            request.error("Unfortunately, this account does not have real "
-                          "name and phone number defined, which is required "
-                          "for mail templates")
-            return request.redirect(request.link(self))
+        template = f.reference.file.read()
 
         first_name, last_name = user.realname.lower().split(" ")
-        additional_variables = {
+        user_info = {
             'sender_email_prefix': f"{first_name}.{last_name}",
             'sender_phone_number': user.phone_number
         }
 
-        generated_file = generate_word_template(
-            BytesIO(template_bytes), self, **additional_variables
-        )
+        docx = generate_word_template(BytesIO(template), self, **user_info)
         return Response(
-            generated_file,
+            docx,
             content_type='application/vnd.ms-office',
             content_disposition=f'inline; filename={template_name}'
         )
