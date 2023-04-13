@@ -95,8 +95,8 @@ def local_lock(namespace, key):
             fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
             yield
             fcntl.flock(f, fcntl.LOCK_UN)
-        except BlockingIOError:
-            raise AlreadyLockedError
+        except BlockingIOError as exception:
+            raise AlreadyLockedError from exception
 
 
 def normalize_for_url(text):

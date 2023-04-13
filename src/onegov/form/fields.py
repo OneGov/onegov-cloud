@@ -357,8 +357,8 @@ class CssField(TextAreaField):
         if self.data:
             try:
                 CSSStyleSheet().cssText = self.data
-            except Exception as e:
-                raise ValidationError(str(e))
+            except Exception as exception:
+                raise ValidationError(str(exception)) from exception
 
 
 class TagsField(StringField):

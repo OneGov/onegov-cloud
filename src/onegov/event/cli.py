@@ -249,10 +249,12 @@ def import_json(group_context, url, tagmap, clear):
             # list of rdates
             try:
                 event.validate_recurrence('recurrence', recurrence)
-            except RuntimeError:
+            except RuntimeError as exception:
                 event.recurrence = as_rdates(recurrence, start)
                 if not event.recurrence:
-                    raise RuntimeError(f"Could not convert '{recurrence}'")
+                    raise RuntimeError(
+                        f"Could not convert '{recurrence}'"
+                    ) from exception
             else:
                 event.recurrence = recurrence
 

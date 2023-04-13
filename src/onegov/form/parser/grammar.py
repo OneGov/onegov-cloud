@@ -97,8 +97,8 @@ def as_date(instring, loc, tokens):
         return
     try:
         return dateobj(int(tokens[0]), int(tokens[1]), int(tokens[2]))
-    except ValueError:
-        raise ParseFatalException(instring, loc, "Invalid date")
+    except ValueError as exception:
+        raise ParseFatalException(instring, loc, "Invalid date") from exception
 
 
 def approximate_total_days(delta):

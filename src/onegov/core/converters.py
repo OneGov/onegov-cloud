@@ -18,8 +18,8 @@ def extended_date_decode(s):
 
     try:
         return date.fromtimestamp(mktime(strptime(s, '%Y-%m-%d')))
-    except OverflowError:
-        raise ValueError()
+    except OverflowError as exception:
+        raise ValueError() from exception
 
 
 def extended_date_encode(d):
