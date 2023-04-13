@@ -1509,7 +1509,7 @@ ul.panel-links {
         }
 
         > ul:not(.bulleted) {
-           padding: 0 0 .25rem;
+            padding: 0 0 .25rem;
 
             li {
                 min-height: .5rem;
@@ -1587,6 +1587,7 @@ $upload-icon: '\f0ee';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
 $qr-code-icon: '\f029';
+$envelope-icon: '\f0e0';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1717,8 +1718,8 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
+    .envelope::before { @include icon($envelope-icon); }
 }
-
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
 .mark-as-unpaid::before { @include icon($mark-as-unpaid); }

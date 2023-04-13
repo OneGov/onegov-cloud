@@ -4,7 +4,7 @@ from onegov.file import File
 from morepath import redirect
 from docxtpl import DocxTemplate
 from morepath.request import Response
-
+from sedate import utcnow
 from onegov.core.custom import json
 from onegov.core.security import Secret, Personal, Private
 from onegov.core.templates import render_template
@@ -25,7 +25,7 @@ from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout,\
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
-    ReportTranslatorChangesLayout, MailTemplatesLayout
+    ReportTranslatorChangesLayout
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook
@@ -416,12 +416,13 @@ def report_translator_change(self, request, form):
     permission=Personal
 )
 def view_mail_templates(self, request, form):
+    """ View for pressing the download button. The docx file is generated """
 
+    layout = TranslatorLayout(self, request)
     if form.submitted(request):
         template_name = form.templates.data
-        docx_templates = request.app.mail_templates
 
-        if template_name not in docx_templates:
+        if template_name not in request.app.mail_templates:
             request.alert("This file does not seem to exist.")
             return redirect(request.link(self))
 
@@ -432,25 +433,34 @@ def view_mail_templates(self, request, form):
                           "mail templates")
             return redirect(request.link(self))
 
+        first_name, last_name = user.realname.lower().split(" ")
+        additional_fields = {
+            'sender_email_prefix': f"{first_name}.{last_name}",
+            'sender_phone_number': user.phone_number,
+            'current_date': layout.format_date(utcnow(), 'date'),
+            'translator_date_of_birth': layout.format_date(
+                self.date_of_birth, 'date'
+            ),
+            'translator_date_of_decision': layout.format_date(
+                self.date_of_decision, 'date'
+            ),
+            'translator_admission': request.translate(self.admission),
+            'sender_initials': get_initials(first_name, last_name),
+        }
+
         file_id = GeneralFileCollection(request.session).query().filter(
             File.name == template_name).with_entities(File.id).first()
         f = get_file(request.app, file_id)
         template = f.reference.file.read()
 
-        first_name, last_name = user.realname.lower().split(" ")
-        user_info = {
-            'sender_email_prefix': f"{first_name}.{last_name}",
-            'sender_phone_number': user.phone_number
-        }
+        docx = fill_variables_in_docx(BytesIO(template),
+                                      self, **additional_fields)
 
-        docx = fill_variables_in_docx(BytesIO(template), self, **user_info)
         return Response(
             docx,
             content_type='application/vnd.ms-office',
             content_disposition=f'inline; filename={template_name}'
         )
-
-    layout = MailTemplatesLayout(self, request)
 
     return {
         'layout': layout,
@@ -461,21 +471,32 @@ def view_mail_templates(self, request, form):
     }
 
 
-def fill_variables_in_docx(original_docx, translator, **kwargs):
+def get_initials(first_name, last_name):
+    first_initials = first_name[:2].upper()
+    last_initials = last_name[:2].upper()
+    return last_initials + first_initials
+
+
+def fill_variables_in_docx(original_docx, t, **kwargs):
     docx_template = DocxTemplate(original_docx)
 
     # Variables to find and replace in final word file
     substituted_variables = {
         'email_or_letter': 'Brief B-Post',
-        'sender_initials': 'GIFR',
-        'translator_last_name': translator.last_name,
-        'translator_first_name': translator.first_name,
-        'translator_address': translator.address,
-        'translator_city': translator.city,
-        'translator_zip_code': translator.zip_code,
-        'greeting': gendered_greeting(translator),
-        'current_date': '11. April 2023'
+        'translator_last_name': t.last_name,
+        'translator_first_name': t.first_name,
+        'translator_address': t.address,
+        'translator_city': t.city,
+        'translator_zip_code': t.zip_code,
+        'greeting': gendered_greeting(t),
+        'sender_function': 'Stv Dienstchef',
     }
+
+    # Values below are also required for one template. where to get?
+
+    # translator_decision = ('definitiv provisorisch).
+    # translator_function = ('Dolmetschen', 'Übsersetzen', '
+    # 'Kommunikationsüberwachung')
 
     for key, value in kwargs.items():
         substituted_variables[key] = value
