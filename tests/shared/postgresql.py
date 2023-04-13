@@ -26,13 +26,13 @@ class Snapshot:
                 check=True,
                 timeout=10
             )
-        except TimeoutExpired:
+        except TimeoutExpired as exception:
             raise RuntimeError("""
                 pg_restore has stalled, probably due to an idle transaction
 
                 be sure to close all connections through either
                 transaction.abort() or transaction.commit()
-            """)
+            """) from exception
 
 
 class Postgresql(Base):

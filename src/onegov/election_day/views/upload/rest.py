@@ -30,8 +30,8 @@ def authenticate(request):
         ).decode('utf-8').split(':')[1]
 
         request.session.query(UploadToken).filter_by(token=token).one()
-    except Exception:
-        raise HTTPUnauthorized()
+    except Exception as exception:
+        raise HTTPUnauthorized() from exception
 
 
 @ElectionDayApp.json(

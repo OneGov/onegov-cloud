@@ -28,8 +28,8 @@ def authenticated_source(request):
         query = request.session.query(DataSource)
         query = query.filter(DataSource.token == token)
         return query.one()
-    except Exception:
-        raise HTTPForbidden()
+    except Exception as exception:
+        raise HTTPForbidden() from exception
 
 
 @ElectionDayApp.json(
