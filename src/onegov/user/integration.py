@@ -1,7 +1,7 @@
 import morepath
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
-from onegov.core.cache import lru_cache
+from onegov.core.cache import instance_lru_cache
 from onegov.core.security import Public
 from onegov.user.auth.core import Auth
 from onegov.user.auth.provider import AUTHENTICATION_PROVIDERS, AzureADProvider
@@ -34,7 +34,7 @@ class UserApp(WebassetsApp):
 
         return getattr(self, 'available_providers', ())
 
-    @lru_cache(maxsize=8)
+    @instance_lru_cache(maxsize=8)
     def provider(self, name):
         return provider_by_name(self.providers, name)
 

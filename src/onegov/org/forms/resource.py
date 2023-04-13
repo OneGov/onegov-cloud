@@ -217,12 +217,13 @@ class ResourceBaseForm(Form):
 
         try:
             self.zipcodes
-        except ValueError:
+        except ValueError as exception:
             raise ValidationError(
                 _(
                     "Please enter one zip-code per line, "
                     "without spaces or commas"
-                ))
+                )
+            ) from exception
 
     def ensure_valid_price(self):
         if self.pricing_method.data == 'per_item':

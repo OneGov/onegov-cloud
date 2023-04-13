@@ -151,9 +151,10 @@ class RoadworkClient:
         def refresh():
             try:
                 status, body = self.get_uncached(path)
-            except pycurl.error:
+            except pycurl.error as exception:
                 raise RoadworkConnectionError(
-                    f"Could not connect to {self.hostname}")
+                    f"Could not connect to {self.hostname}"
+                ) from exception
 
             if status == 200:
                 self.cache.set(path, {

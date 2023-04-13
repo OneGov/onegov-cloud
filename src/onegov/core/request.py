@@ -3,7 +3,7 @@ import morepath
 
 from cached_property import cached_property
 from datetime import timedelta
-from onegov.core.cache import lru_cache
+from onegov.core.cache import instance_lru_cache
 from onegov.core.utils import append_query_param
 from itsdangerous import (
     BadSignature,
@@ -64,7 +64,7 @@ class ReturnToMixin:
     def redirect_signer(self):
         return URLSafeSerializer(self.identity_secret, 'return-to')
 
-    @lru_cache(maxsize=16)
+    @instance_lru_cache(maxsize=16)
     def sign_url_for_redirect(self, url):
         return self.redirect_signer.dumps(url)
 
@@ -625,8 +625,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         signer = TimestampSigner(self.identity_secret, salt=salt)
         try:
             signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
-        except (SignatureExpired, BadSignature):
-            raise HTTPForbidden()
+        except (SignatureExpired, BadSignature) as exception:
+            raise HTTPForbidden() from exception
 
     def new_url_safe_token(self, data, salt=None):
         """ Returns a new URL safe token. A token can be deserialized
