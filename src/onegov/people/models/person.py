@@ -105,8 +105,26 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: the website related to the person
     website = Column(Text, nullable=True)
 
+    #: a second website related to the person
+    website_2 = Column(Text, nullable=True)
+
+    # agency does not use 'address' anymore. Instead, the 4 following items
+    # are being used. The 'address' field is still used in org, town6,
+    # volunteers and others
     #: the address of the person
     address = Column(Text, nullable=True)
+
+    #: the location address (street name and number) of the person
+    location_address = Column(Text, nullable=True)
+
+    #: postal code of location and city of the person
+    location_code_city = Column(Text, nullable=True)
+
+    #: the postal address (street name and number) of the person
+    postal_address = Column(Text, nullable=True)
+
+    #: postal code and city of the person
+    postal_code_city = Column(Text, nullable=True)
 
     #: some remarks about the person
     notes = Column(Text, nullable=True)
@@ -167,9 +185,21 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             line = result.add('url')
             line.value = self.website
 
-        if 'address' not in exclude and self.address:
+        if 'postal_address' not in exclude and self.postal_address and \
+                'postal_code_city' not in exclude and self.postal_code_city:
             line = result.add('adr')
-            line.value = Address(street=self.address)
+            line.value = Address(street=self.postal_address,
+                                 code=self.postal_code_city.split(' ')[0],
+                                 city=self.postal_code_city.split(' ')[1])
+            line.charset_param = 'utf-8'
+
+        if 'location_address' not in exclude and self.location_address and \
+                'location_code_city' not in exclude and \
+                self.location_code_city:
+            line = result.add('adr')
+            line.value = Address(street=self.location_address,
+                                 code=self.location_code_city.split(' ')[0],
+                                 city=self.location_code_city.split(' ')[1])
             line.charset_param = 'utf-8'
 
         if 'notes' not in exclude and self.notes:

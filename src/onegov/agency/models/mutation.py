@@ -51,6 +51,15 @@ class AgencyMutation(Mutation):
     def labels(self):
         return {
             'title': _("Title"),
+            'location_address': _("Location address"),
+            'location_code_city': _("Location Code and City"),
+            'postal_address': _("Postal address"),
+            'postal_code_city': _("Postal Code and City"),
+            'phone': _("Phone"),
+            'phone_direct': _("Alternate Phone Number or Fax"),
+            'email': _("E-Mail"),
+            'website': _("Website"),
+            'opening_hours': _("Opening hours"),
         }
 
 
@@ -72,12 +81,15 @@ class PersonMutation(Mutation):
             'function': _("Function"),
             'email': _("E-Mail"),
             'phone': _("Phone"),
-            'phone_direct': _("Direct Phone Number"),
+            'phone_direct': _("Direct Phone Number or Mobile"),
             'born': _("Born"),
             'profession': _("Profession"),
             'political_party': _("Political Party"),
             'parliamentary_group': _("Parliamentary Group"),
             'website': _("Website"),
-            'address': _("Address"),
+            'location_address': _("Location address"),
+            'location_code_city': _("Location Code and City"),
+            'postal_address': _("Postal address"),
+            'postal_code_city': _("Postal Code and City"),
             'notes': _("Notes"),
         }

@@ -72,7 +72,19 @@ def test_view_api(client):
     assert set(agencies) == {'Hospital', 'School', 'School Board'}
 
     hospital = collection(agencies['Hospital']).items[0]
-    assert data(hospital) == {'title': 'Hospital', 'portrait': ''}
+    assert data(hospital) == {
+        'email': '',
+        'location_address': '',
+        'location_code_city': '',
+        'opening_hours': '',
+        'phone': '',
+        'phone_direct': '',
+        'portrait': '',
+        'postal_address': '',
+        'postal_code_city': '',
+        'title': 'Hospital',
+        'website': '',
+    }
     assert not links(hospital)['organigram']
     assert not links(hospital)['parent']
     assert not collection(links(hospital)['children']).items
@@ -81,7 +93,19 @@ def test_view_api(client):
     }
 
     school = collection(agencies['School']).items[0]
-    assert data(school) == {'title': 'School', 'portrait': ''}
+    assert data(school) == {
+        'email': '',
+        'location_address': '',
+        'location_code_city': '',
+        'opening_hours': '',
+        'phone': '',
+        'phone_direct': '',
+        'portrait': '',
+        'postal_address': '',
+        'postal_code_city': '',
+        'title': 'School',
+        'website': '',
+    }
     assert not links(school)['organigram']
     assert not links(school)['parent']
     assert data(collection(links(school)['children']).items[0])['title'] == \
@@ -91,7 +115,19 @@ def test_view_api(client):
     }
 
     board = collection(agencies['School Board']).items[0]
-    assert data(board) == {'title': 'School Board', 'portrait': ''}
+    assert data(board) == {
+        'email': '',
+        'location_address': '',
+        'location_code_city': '',
+        'opening_hours': '',
+        'phone': '',
+        'phone_direct': '',
+        'portrait': '',
+        'postal_address': '',
+        'postal_code_city': '',
+        'title': 'School Board',
+        'website': '',
+    }
     assert not links(board)['organigram']
     assert data(collection(links(board)['parent']).items[0])['title'] == \
         'School'
@@ -108,20 +144,24 @@ def test_view_api(client):
     edna = collection(people['Krabappel Edna']).items[0]
     assert data(edna) == {
         'academic_title': '',
-        'address': '',
         'born': '',
         'email': '',
         'first_name': 'Edna',
         'function': '',
         'last_name': 'Krabappel',
+        'location_address': '',
+        'location_code_city': '',
         'notes': '',
         'parliamentary_group': '',
-        'phone_direct': '',
         'phone': '',
+        'phone_direct': '',
         'political_party': '',
+        'postal_address': '',
+        'postal_code_city': '',
         'profession': '',
         'salutation': '',
-        'title': 'Krabappel Edna'
+        'title': 'Krabappel Edna',
+        'website': '',
     }
     assert not links(edna)['picture_url']
     assert not links(edna)['website']
@@ -132,7 +172,10 @@ def test_view_api(client):
     nick = collection(people['Rivera Nick']).items[0]
     assert data(nick) == {
         'academic_title': 'Dr.',
-        'address': '',
+        'location_address': '',
+        'location_code_city': '',
+        'postal_address': '',
+        'postal_code_city': '',
         'born': '',
         'email': '',
         'first_name': 'Nick',
@@ -145,7 +188,8 @@ def test_view_api(client):
         'political_party': '',
         'profession': '',
         'salutation': '',
-        'title': 'Rivera Nick'
+        'title': 'Rivera Nick',
+        'website': '',
     }
     assert not links(nick)['picture_url']
     assert not links(nick)['website']
