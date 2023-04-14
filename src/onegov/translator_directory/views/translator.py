@@ -25,7 +25,7 @@ from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm, EditorTranslatorForm
 from onegov.translator_directory.layout import AddTranslatorLayout,\
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
-    ReportTranslatorChangesLayout
+    ReportTranslatorChangesLayout, MailTemplatesLayout
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook
@@ -418,7 +418,7 @@ def report_translator_change(self, request, form):
 def view_mail_templates(self, request, form):
     """ View for pressing the download button. The docx file is generated """
 
-    layout = TranslatorLayout(self, request)
+    layout = MailTemplatesLayout(self, request)
     if form.submitted(request):
         template_name = form.templates.data
 
