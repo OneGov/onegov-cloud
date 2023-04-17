@@ -244,19 +244,19 @@ def test_permission_by_view(redis_url):
 
     @App.view(model=Root, name='public', permission=Public)
     def public_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='personal', permission=Personal)
     def personal_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='private', permission=Private)
     def private_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='secret', permission=Secret)
     def secret_view(self, request):
-        assert False  # we don't want this view to be called
+        raise AssertionError()  # we don't want this view to be called
 
     @App.view(model=Root, name='login', permission=Public)
     def login(self, request):

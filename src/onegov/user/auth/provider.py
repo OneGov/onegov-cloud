@@ -224,8 +224,8 @@ def spawn_ldap_client(**cfg):
 
     try:
         client.try_configuration()
-    except Exception as e:
-        raise ValueError(f"LDAP config error: {e}")
+    except Exception as exception:
+        raise ValueError(f"LDAP config error: {exception}") from exception
 
     return client
 

@@ -40,7 +40,7 @@ class Link(AccessMixin):
     ]
 
     def __init__(self, text, url, classes=None, request_method='GET',
-                 attributes={}, active=False, model=None, subtitle=None):
+                 attributes=None, active=False, model=None, subtitle=None):
 
         #: The text of the link
         self.text = text
@@ -57,7 +57,7 @@ class Link(AccessMixin):
 
         #: HTML attributes (may override other attributes set by this class).
         #: Attributes which are translatable, are transalted before rendering.
-        self.attributes = attributes
+        self.attributes = attributes or {}
 
         #: Indicate if this link is active or not (not used for rendering)
         self.active = active

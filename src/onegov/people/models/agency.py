@@ -51,6 +51,33 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: describes the agency
     portrait = Column(Text, nullable=True)
 
+    #: location address (street name and number) of agency
+    location_address = Column(Text, nullable=True)
+
+    #: location code and city of agency
+    location_code_city = Column(Text, nullable=True)
+
+    #: postal address (street name and number) of agency
+    postal_address = Column(Text, nullable=True)
+
+    #: postal code and city of agency
+    postal_code_city = Column(Text, nullable=True)
+
+    #: the phone number of agency
+    phone = Column(Text, nullable=True)
+
+    #: the direct phone number of agency
+    phone_direct = Column(Text, nullable=True)
+
+    #: the email of agency
+    email = Column(Text, nullable=True)
+
+    #: the website related to agency
+    website = Column(Text, nullable=True)
+
+    #: opening hours of agency
+    opening_hours = Column(Text, nullable=True)
+
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 

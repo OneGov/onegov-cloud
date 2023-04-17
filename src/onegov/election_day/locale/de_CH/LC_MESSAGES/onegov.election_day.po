@@ -968,6 +968,12 @@ msgstr "männlich"
 msgid "undetermined"
 msgstr "unbestimmt"
 
+msgid "browser"
+msgstr "Browser"
+
+msgid "email"
+msgstr "E-Mail"
+
 msgid "Actions"
 msgstr "Aktionen"
 
@@ -1400,6 +1406,10 @@ msgstr "Letzte Benachrichtigungen:"
 
 msgid "No notifications yet."
 msgstr "Noch keine Beanchrichtigungen."
+
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
 
 msgid ""
 "Email: One email containing all the results of the selected elections and "

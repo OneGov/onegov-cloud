@@ -40,21 +40,24 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             attribute: getattr(item, attribute, None)
             for attribute in (
                 'academic_title',
-                'address',
                 'born',
                 'email',
                 'first_name',
                 'function',
                 'last_name',
+                'location_address',
+                'location_code_city',
                 'notes',
                 'parliamentary_group',
-                'phone_direct',
                 'phone',
+                'phone_direct',
                 'political_party',
+                'postal_address',
+                'postal_code_city',
                 'profession',
                 'salutation',
-                'salutation',
                 'title',
+                'website',
             )
             if attribute not in self.app.org.hidden_people_fields
         }
@@ -93,7 +96,16 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
     def item_data(self, item):
         return {
             'title': item.title,
-            'portrait': item.portrait
+            'portrait': item.portrait,
+            'location_address': item.location_address,
+            'location_code_city': item.location_code_city,
+            'postal_address': item.postal_address,
+            'postal_code_city': item.postal_code_city,
+            'website': item.website,
+            'email': item.email,
+            'phone': item.phone,
+            'phone_direct': item.phone_direct,
+            'opening_hours': item.opening_hours,
         }
 
     def item_links(self, item):

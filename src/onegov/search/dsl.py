@@ -138,7 +138,8 @@ class Response(BaseResponse):
                         )
                     }
 
-                results[ix] = result
+                if ix < len(results):
+                    results[ix] = result
 
         return results
 

@@ -50,5 +50,5 @@ def search(self, request, layout=None):
 def suggestions(self, request):
     try:
         return tuple(self.suggestions())
-    except SearchOfflineError:
-        raise exc.HTTPNotFound()
+    except SearchOfflineError as exception:
+        raise exc.HTTPNotFound() from exception

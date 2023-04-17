@@ -120,13 +120,17 @@ def test_d3_renderer_get_chart(election_day_app_zg):
                return_value=MagicMock(text=b64encode('PDF'.encode()))) as post:
         data = {'key': 'value'}
 
-        d3.get_chart('bar', 'pdf', data).read().decode() == 'PDF'
-        d3.get_chart('grouped', 'pdf', data).read().decode() == 'PDF'
-        d3.get_chart('sankey', 'pdf', data).read().decode() == 'PDF'
-        d3.get_chart('entities-map', 'pdf', data).read().decode() == 'PDF'
-        d3.get_chart('districts-map', 'pdf', data).read().decode() == 'PDF'
-        d3.get_map('entities', 'pdf', data, 2015).read().decode() == 'PDF'
-        d3.get_map('districts', 'pdf', data, 2015).read().decode() == 'PDF'
+        assert d3.get_chart('bar', 'pdf', data).read().decode() == 'PDF'
+        assert d3.get_chart('grouped', 'pdf', data).read().decode() == 'PDF'
+        assert d3.get_chart('sankey', 'pdf', data).read().decode() == 'PDF'
+        assert d3.get_chart('entities-map', 'pdf', data).read().decode() \
+            == 'PDF'
+        assert d3.get_chart('districts-map', 'pdf', data).read().decode() \
+            == 'PDF'
+        assert d3.get_map('entities', 'pdf', data, 2015).read().decode() \
+            == 'PDF'
+        assert d3.get_map('districts', 'pdf', data, 2015).read().decode() \
+            == 'PDF'
         assert post.call_args[0] == ('http://localhost:1337/d3/pdf',)
 
 

@@ -347,6 +347,18 @@ msgstr "Rechnungsposition Betrag"
 msgid "Invoice Item References"
 msgstr "Rechnungsposition Referenzen"
 
+msgid "Attendee Address"
+msgstr "Teilnehmeradresse"
+
+msgid "Attendee Zipcode"
+msgstr "Teilnehmer PLZ"
+
+msgid "Attendee Place"
+msgstr "Teilnehmer Ort"
+
+msgid "Attendee Political Municipality"
+msgstr "Teilnehmer Politische Gemeinde"
+
 msgid "Organiser Last Name"
 msgstr "Veranstalter Nachname"
 
@@ -677,11 +689,27 @@ msgstr "Gesundheitsangaben"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
+msgid "The address of the attendee differs from the users address"
+msgstr ""
+"Die Adresse dieser Person unterscheidet sich von der des Benutzerkontos"
+
+msgid "Check this box if the attendee doesn't live with you"
+msgstr "Anwählen, wenn die Person nicht bei Ihnen wohnt."
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "Political municipality"
+msgstr "Politische Gemeinde"
+
 msgid "Attendee"
 msgstr "Teilnehmende"
 
 msgid "Note"
 msgstr "Bemerkung"
+
+msgid "Political Municipality"
+msgstr "Politische Gemeinde"
 
 msgid "Ignore Age Restriction"
 msgstr "Altersbeschränkung ignorieren"
@@ -1283,12 +1311,6 @@ msgstr "Anrede"
 
 msgid "Personal"
 msgstr "Persönlich"
-
-msgid "Zip Code"
-msgstr "PLZ"
-
-msgid "Political Municipality"
-msgstr "Politische Gemeinde"
 
 msgid "Public E-Mail Address"
 msgstr "Öffentliche E-Mail Adresse"
@@ -3056,8 +3078,8 @@ msgstr "Volljährigkeit bei der Registrierung notwendig"
 msgid "Userprofile"
 msgstr "Benutzerprofil"
 
-msgid "Require the political municipality in the userprofile"
-msgstr "Verlange die politische Gemeinde im Benutzerprofil"
+msgid "Require the political municipality on registration"
+msgstr "Politische Gemeinde bei Registrierung verlangen"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""

@@ -39,7 +39,7 @@ async def fetch(
     :return: response_attr or handled exception return for each url
     """
     try:
-        url_ = url if isinstance(url, str) else getattr(url, 'url')
+        url_ = url if isinstance(url, str) else url.url
         async with session.get(url_) as response:
             response_attr = response_attr or 'json'
             attr = getattr(response, response_attr)

@@ -79,8 +79,8 @@ def find_models(base, is_match):
         if is_match(cls):
             yield cls
 
-        for cls in find_models(cls, is_match):
-            yield cls
+        for subcls in find_models(cls, is_match):
+            yield subcls
 
 
 def configure_listener(cls, key, instance):

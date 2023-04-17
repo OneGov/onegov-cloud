@@ -132,13 +132,13 @@ def test_layout_default(swissvotes_app):
         'TranslatablePageMove/?csrf-token=x'
     )
     assert path([layout.disclaimer_link]) == 'TranslatablePage/disclaimer'
-    layout.disclaimer_link.text == 'disclaimer'
+    assert layout.disclaimer_link.text == 'disclaimer'
     assert path([layout.imprint_link]) == 'TranslatablePage/imprint'
-    layout.imprint_link.text == 'imprint'
+    assert layout.imprint_link.text == 'imprint'
     assert path([layout.data_protection_link]) == (
         'TranslatablePage/data-protection'
     )
-    layout.data_protection_link.text == 'data-protection'
+    assert layout.data_protection_link.text == 'data-protection'
 
     # Login
     request.is_logged_in = True
@@ -722,7 +722,7 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
         _legal_form=1
     )
     model.session_manager.current_locale = 'de_CH'
-    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])
+    setattr(model, 'post_vote_poll', attachments['post_vote_poll'])  # noqa
 
     session = swissvotes_app.session()
     session.add(model)
