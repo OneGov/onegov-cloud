@@ -47,9 +47,24 @@ class DirectoryBaseForm(Form):
         description=_("Describes what this directory is about"),
         render_kw={'rows': 4})
 
+    title_further_information = StringField(
+        label=_("Title"),
+        fieldset=_("Further Information"),
+    )
+
     text = HtmlField(
-        label=_("Further Information"),
-        fieldset=_("General"))
+        label=_("Text"),
+        fieldset=_("Further Information"))
+
+    position = RadioField(
+        label=_("Position"),
+        fieldset=_("Further Information"),
+        choices=[
+            ('above', _("Above the entries")),
+            ('below', _("Below the entries"))
+        ],
+        default='below'
+    )
 
     structure = TextAreaField(
         label=_("Definition"),
@@ -298,6 +313,9 @@ class DirectoryBaseForm(Form):
         ),
         fieldset=_("Submitter")
     )
+
+    def on_request(self):
+        self.title_further_information.default = self.request.translate(_("Further Information"))
 
     @cached_property
     def known_field_ids(self):
