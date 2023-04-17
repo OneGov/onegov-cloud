@@ -50,6 +50,8 @@ class DirectoryBaseForm(Form):
     title_further_information = StringField(
         label=_("Title"),
         fieldset=_("Further Information"),
+        description=_(
+            'If left empty "Further Information" will be used as title')
     )
 
     text = HtmlField(
@@ -313,9 +315,6 @@ class DirectoryBaseForm(Form):
         ),
         fieldset=_("Submitter")
     )
-
-    def on_request(self):
-        self.title_further_information.default = self.request.translate(_("Further Information"))
 
     @cached_property
     def known_field_ids(self):
