@@ -71,7 +71,7 @@
                     </div>
                 </div>
 
-                <div class="occurrence-actions side-panel">
+                <div class="occurrence-actions side-panel" tal:condition="len(occurrences) > 1 or layout.org.meta.get('submit_events_visible', True)">
                     <h3 i18n:translate>Actions</h3>
                     <div class="side-panel-with-bg">
                         <ul class="more-list">
