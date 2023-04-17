@@ -423,22 +423,10 @@ def view_mail_templates(self, request, form):
         template_name = form.templates.data
 
         if template_name not in request.app.mail_templates:
-            request.alert("This file does not seem to exist.")
+            request.alert(_("This file does not seem to exist."))
             return redirect(request.link(self))
 
-        user = request.current_user
-        if (not getattr(user, 'phone_number', None)
-                or not getattr(user, 'realname', None)):
-
-            request.alert(_("Unfortunately, this account does not have real "
-                            "name and phone number defined, which is "
-                            "required for mail templates"))
-            return redirect(request.link(self))
-
-        first_name, last_name = user.realname.lower().split(" ")
         additional_fields = {
-            'sender_email_prefix': f"{first_name}.{last_name}",
-            'sender_phone_number': user.phone_number,
             'current_date': layout.format_date(utcnow(), 'date'),
             'translator_date_of_birth': layout.format_date(
                 self.date_of_birth, 'date'
@@ -447,7 +435,6 @@ def view_mail_templates(self, request, form):
                 self.date_of_decision, 'date'
             ),
             'translator_admission': request.translate(self.admission),
-            'sender_initials': get_initials(first_name, last_name),
         }
 
         file_id = GeneralFileCollection(request.session).query().filter(
@@ -455,8 +442,8 @@ def view_mail_templates(self, request, form):
         f = get_file(request.app, file_id)
         template = f.reference.file.read()
 
-        docx = fill_variables_in_docx(BytesIO(template),
-                                      self, **additional_fields)
+        docx = fill_variables_in_docx(BytesIO(template), self,
+                                      **additional_fields)
 
         return Response(
             docx,
@@ -484,14 +471,12 @@ def fill_variables_in_docx(original_docx, t, **kwargs):
 
     # Variables to find and replace in final word file
     substituted_variables = {
-        'email_or_letter': 'Brief B-Post',
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
         'greeting': gendered_greeting(t),
-        'sender_function': 'Stv Dienstchef',
     }
 
     # Values below are also required for one template. where to get?
@@ -503,8 +488,6 @@ def fill_variables_in_docx(original_docx, t, **kwargs):
     for key, value in kwargs.items():
         substituted_variables[key] = value
 
-    num = substituted_variables['sender_phone_number']
-    substituted_variables['sender_phone_number'] = num.replace("041", "")
     docx_template.render(substituted_variables)
     in_memory_docx = BytesIO()
     docx_template.save(in_memory_docx)

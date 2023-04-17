@@ -66,8 +66,6 @@ def create_translator_app(request, use_elasticsearch):
         username='admin@example.org',
         password_hash=hash_password('hunter2'),
         role='admin',
-        phone_number='041 410 99 99',
-        realname='John Doe',
     ))
     session.add(User(
         username='editor@example.org',

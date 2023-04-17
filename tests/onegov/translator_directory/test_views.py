@@ -12,7 +12,7 @@ from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.user import UserCollection, User
+from onegov.user import UserCollection
 from openpyxl import load_workbook
 from pdftotext import PDF
 from tests.onegov.translator_directory.shared import translator_data, \
@@ -1599,11 +1599,6 @@ def test_view_mail_template(client):
     page.form['templates'] = basename(path)
     resp = page.form.submit()
 
-    user: User = UserCollection(session).by_username('admin@example.org')
-    first_name, last_name = user.realname.split(" ")
-    assert first_name == 'John'
-    assert last_name == 'Doe'
-
     found_variables_in_docx = set()
     expected_variables_in_docx = (
         'Sehr geehrter Herr',
@@ -1612,15 +1607,14 @@ def test_view_mail_template(client):
         translator.city,
         translator.first_name,
         translator.last_name,
-        user.phone_number.replace("041", ""),
-        f"{first_name.lower()}.{last_name.lower()}"
     )
 
     doc = docx.Document(BytesIO(resp.body))
     for target in expected_variables_in_docx:
-        for block in iter_block_items(doc):
-            if target in block.text:
-                assert '041 041' not in block.text  # 041 is static
+        for l in iter_block_items(doc):
+            line = l.text
+            # make sure all variables have been rendered
+            assert '{{' not in line and '}}' not in line
+            if target in line:
                 found_variables_in_docx.add(target)
-
     assert set(expected_variables_in_docx) == found_variables_in_docx

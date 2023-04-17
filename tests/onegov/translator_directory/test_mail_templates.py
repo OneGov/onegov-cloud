@@ -16,8 +16,6 @@ def test_read_write_cycle():
     translator = Translator(**translator_data)
     translator.admission = ADMISSIONS['certified']
 
-    first_name, last_name = 'John', 'Doe'
-
     layout = Layout(model=object(), request=Bunch(locale='en'))
     variables_to_fill = {
         'current_date': layout.format_date(utcnow(), 'date'),
@@ -28,15 +26,12 @@ def test_read_write_cycle():
             translator.date_of_decision, 'date'
         ),
         'translator_admission': _(translator.admission),
-        'sender_initials': get_initials(first_name, last_name),
         'greeting': gendered_greeting(translator),
         'translator_first_name': translator.first_name,
         'translator_last_name': translator.last_name,
         'translator_address': translator.address,
         'translator_zip_code': translator.zip_code,
         'translator_city': translator.city,
-        'sender_email_prefix': 'john.doe',
-        'sender_phone_number': '041 229 99 99',
     }
     template_name = module_path('tests.onegov.translator_directory',
                                 'fixtures/template.docx')
@@ -45,15 +40,16 @@ def test_read_write_cycle():
         filled_template = fill_variables_in_docx(
             BytesIO(f.read()), translator, **variables_to_fill
         )
-        variables_to_fill['sender_phone_number'] = '229 99 99'
         found_variables_in_docx = set()
         expected_variables_in_docx = variables_to_fill.values()
         doc = docx.Document(BytesIO(filled_template))
 
         for target in expected_variables_in_docx:
-            for block in iter_block_items(doc):
-                if target in block.text:
-                    assert '041 041' not in block.text  # 041 is static
+            for l in iter_block_items(doc):
+                line = l.text
+                # make sure all variables have been rendered
+                assert '{{' not in line and '}}' not in line
+                if target in line:
                     found_variables_in_docx.add(target)
 
         assert set(expected_variables_in_docx) == found_variables_in_docx
