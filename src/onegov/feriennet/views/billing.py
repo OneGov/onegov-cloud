@@ -95,9 +95,9 @@ def view_billing(self, request, form):
             url=url
         )
 
-    def mark_paid_with_date_link(username, invoice_id, item_id):
+    def mark_paid_with_date_link(for_user, invoice_id, item_id):
         url = request.link(self, name='paid-date')
-        url = f'{url}&for-user={quote_plus(username)}'
+        url = f'{url}&for-user={quote_plus(for_user)}'
         url = f'{url}&invoice-id={quote_plus(invoice_id)}'
         url = f'{url}&item-id={quote_plus(item_id)}'
 
@@ -553,7 +553,7 @@ def view_paid_date_form(self, request, form):
         else:
             request.success(_("Invoice item(s) marked as paid"))
 
-        return request.redirect(request.link(self))
+        return request.redirect(request.class_link(BillingCollection))
 
     user = request.params['for-user']
 
