@@ -466,13 +466,15 @@ def get_initials(first_name, last_name):
     return last_initials + first_initials
 
 
-def fill_variables_in_docx(original_docx, t, **kwargs):
+def fill_variables_in_docx(original_docx, t: Translator, **kwargs):
     docx_template = DocxTemplate(original_docx)
 
     # Variables to find and replace in final word file
     substituted_variables = {
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
+        'translator_nationality': t.nationality,
+        'translator_gender': t.gender,
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
