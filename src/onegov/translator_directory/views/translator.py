@@ -416,7 +416,7 @@ def report_translator_change(self, request, form):
     permission=Personal
 )
 def view_mail_templates(self, request, form):
-    """ View for pressing the download button. The docx file is generated """
+    """View for pressing the download button. The docx file is generated"""
 
     layout = MailTemplatesLayout(self, request)
     if form.submitted(request):
@@ -427,34 +427,51 @@ def view_mail_templates(self, request, form):
             return redirect(request.link(self))
 
         additional_fields = {
-            'current_date': layout.format_date(utcnow(), 'date'),
-            'translator_date_of_birth': layout.format_date(
-                self.date_of_birth, 'date'
+            "current_date": layout.format_date(utcnow(), "date"),
+            "translator_date_of_birth": layout.format_date(
+                self.date_of_birth, "date"
             ),
-            'translator_date_of_decision': layout.format_date(
-                self.date_of_decision, 'date'
+            "translator_date_of_decision": layout.format_date(
+                self.date_of_decision, "date"
             ),
-            'translator_admission': request.translate(self.admission),
+            "translator_admission": request.translate(self.admission) or "",
         }
 
-        file_id = GeneralFileCollection(request.session).query().filter(
-            File.name == template_name).with_entities(File.id).first()
+        file_id = (
+            GeneralFileCollection(request.session)
+            .query()
+            .filter(File.name == template_name)
+            .with_entities(File.id)
+            .first()
+        )
         f = get_file(request.app, file_id)
         template = f.reference.file.read()
 
-        docx = fill_variables_in_docx(BytesIO(template), self,
-                                      **additional_fields)
+        nulls, docx = fill_variables_in_docx(
+            BytesIO(template), self, **additional_fields
+        )
+        if nulls:
+            request.message(
+                _(
+                    "Not all variables could be replaced. The "
+                    "following values were not found: ${missing_values}",
+                ),
+                "warning",
+                mapping={
+                    "missing_values": ", ".join(nulls.keys()),
+                },
+            )
 
         return Response(
             docx,
-            content_type='application/vnd.ms-office',
-            content_disposition=f'inline; filename={template_name}'
+            content_type="application/vnd.ms-office",
+            content_disposition=f"inline; filename={template_name}",
         )
 
     return {
-        'layout': layout,
-        'model': self,
-        'form': form,
-        'title': _("Mail templates"),
-        'button_text': _('Download')
+        "layout": layout,
+        "model": self,
+        "form": form,
+        "title": _("Mail templates"),
+        "button_text": _("Download"),
     }

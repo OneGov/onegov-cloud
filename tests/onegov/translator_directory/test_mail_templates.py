@@ -2,9 +2,10 @@ from io import BytesIO
 import docx
 from onegov.core.utils import module_path, Bunch
 from onegov.translator_directory.constants import GENDERS, ADMISSIONS
+from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.views.translator import\
-    fill_variables_in_docx, gendered_greeting, get_initials
+    fill_variables_in_docx
 from sedate import utcnow
 from tests.onegov.translator_directory.shared import translator_data,\
     iter_block_items
@@ -25,19 +26,26 @@ def test_read_write_cycle():
         'translator_date_of_decision': layout.format_date(
             translator.date_of_decision, 'date'
         ),
-        'translator_admission': _(translator.admission),
         'greeting': gendered_greeting(translator),
         'translator_first_name': translator.first_name,
         'translator_last_name': translator.last_name,
         'translator_address': translator.address,
         'translator_zip_code': translator.zip_code,
         'translator_city': translator.city,
+        'translator_admission': ''
     }
+
     template_name = module_path('tests.onegov.translator_directory',
                                 'fixtures/template.docx')
 
     with open(template_name, 'rb') as f:
-        filled_template = fill_variables_in_docx(
+        nulls, filled_template = fill_variables_in_docx(
+            BytesIO(f.read()), translator, **variables_to_fill
+        )
+        assert 'translator_admission' in nulls
+        f.seek(0)
+        variables_to_fill['translator_admission']: _(translator.admission)
+        nulls, filled_template = fill_variables_in_docx(
             BytesIO(f.read()), translator, **variables_to_fill
         )
         found_variables_in_docx = set()
@@ -56,7 +64,6 @@ def test_read_write_cycle():
 
 
 def test_helper_methods():
-    assert get_initials(first_name='Jane', last_name='Doe') == 'DOJA'
 
     genders = list(GENDERS.keys())
 

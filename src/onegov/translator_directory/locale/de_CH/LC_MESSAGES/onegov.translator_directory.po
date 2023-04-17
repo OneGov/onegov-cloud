@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-17 12:24+0200\n"
+"POT-Creation-Date: 2023-04-17 15:34+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -844,6 +844,14 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 
 msgid "This file does not seem to exist."
 msgstr "Diese Datei scheint nicht zu existieren."
+
+#, python-format
+msgid ""
+"Not all variables could be replaced. The following values were not found: "
+"${missing_values}"
+msgstr ""
+"Nicht alle Werte konnten gefunden werden. Die folgenden Werte sind nicht eingesetzt worden:"
+"${missing_values}"
 
 msgid "Download"
 msgstr "Herunterladen"
