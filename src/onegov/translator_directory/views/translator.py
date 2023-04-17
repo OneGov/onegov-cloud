@@ -427,10 +427,12 @@ def view_mail_templates(self, request, form):
             return redirect(request.link(self))
 
         user = request.current_user
-        if not getattr(user, 'phone_number', 'realname'):
-            request.alert("Unfortunately, this account does not have real name"
-                          " and phone number defined, which is required for "
-                          "mail templates")
+        if (not getattr(user, 'phone_number', None)
+                or not getattr(user, 'realname', None)):
+
+            request.alert(_("Unfortunately, this account does not have real "
+                            "name and phone number defined, which is "
+                            "required for mail templates"))
             return redirect(request.link(self))
 
         first_name, last_name = user.realname.lower().split(" ")
