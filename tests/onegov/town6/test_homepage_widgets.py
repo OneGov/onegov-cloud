@@ -131,13 +131,12 @@ def test_link_icon_widget(town_app):
     assert 'icon-link' not in result
 
     structure = """
-        <icon_link title='Services' icon='fa-user' color='#000'
+        <icon_link title='Services' icon='fa-user'
         link='https://www.test.ch' text='Whenever you want'
         />
     """
     result = transform_structure(widgets, structure)
     assert "icon \'fa-user\'" in result
-    assert "color \'#000\'" in result
     assert "link \'https://www.test.ch\'" in result
     assert "text \'Whenever you want\'" in result
 
