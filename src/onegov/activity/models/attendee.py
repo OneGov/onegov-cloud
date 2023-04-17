@@ -1,4 +1,5 @@
 from datetime import date
+
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -11,7 +12,6 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
-from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
@@ -175,6 +175,57 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         backref='attendee'
     )
 
-    __table_args__ = (
-        Index('unique_child_name', 'username', 'name', unique=True),
-    )
+    @staticmethod
+    def drop_fts_index(session, schema):
+        """
+        Drops the full text search index. Used for re-indexing
+
+        :param session: db session
+        :param schema: schema on which the fts index shall be dropped
+        :return:
+        """
+        query = f"""
+DROP INDEX IF EXISTS "{schema}".fts_idx_attendees_username_name
+"""
+        print(f'dropping index query: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def create_fts_index(session, schema):
+        """
+        Creates the full text search index based on the separate index
+        column. Used for re-indexing
+
+        :param session: db session
+        :param schema: schema the index shall be created
+        :return:
+        """
+        query = f"""
+CREATE INDEX fts_idx_attendees_username_name ON
+"{schema}".attendees USING GIN (fts_idx_attendees_username_name_col);
+"""
+        print(f'create index query: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def add_fts_column(session, schema):
+        """
+        This function is used as migration step moving to postgressql full
+        text search, OGC-508. It adds a separate column for the tsvector
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        from onegov.search.utils import create_tsvector_string
+
+        s = create_tsvector_string('username', 'name')
+        query = f"""
+ALTER TABLE "{schema}".attendees ADD COLUMN
+fts_idx_attendees_username_name_col tsvector GENERATED ALWAYS AS
+(to_tsvector('german', {s})) STORED;
+"""
+        session.execute(query)
+        session.execute("COMMIT")

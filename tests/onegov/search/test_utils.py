@@ -3,6 +3,8 @@ from onegov.search import utils
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 
+from onegov.search.utils import create_tsvector_string
+
 
 def test_get_searchable_sqlalchemy_models(postgres_dsn):
     Foo = declarative_base()
@@ -101,3 +103,13 @@ def test_related_types_unsearchable_base():
         es_type_name = 'news'
 
     assert utils.related_types(Page) == {'news', 'topic'}
+
+
+def test_create_tsvector_string():
+    assert create_tsvector_string('username') == \
+           "coalesce(username, '')"
+    assert create_tsvector_string('title', 'body') == \
+           "coalesce(title, '') || ' ' || coalesce(body, '')"
+    assert create_tsvector_string('alpha', 'beta', 'gamma') == \
+           "coalesce(alpha, '') || ' ' || coalesce(beta, '') || ' ' || " \
+           "coalesce(gamma, '')"

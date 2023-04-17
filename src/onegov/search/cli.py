@@ -5,6 +5,8 @@ import click
 from onegov.core.cli import command_group, pass_group_context
 from sedate import utcnow
 
+from onegov.core.orm import Base
+from onegov.search.utils import searchable_sqlalchemy_models
 
 cli = command_group()
 
@@ -13,18 +15,26 @@ cli = command_group()
 @click.option('--fail', is_flag=True, default=False, help='Fail on errors')
 @pass_group_context
 def reindex(group_context, fail):
-    """ Reindexes all objects in the elasticsearch database. """
+    """ Reindexes all objects in the postgresql database. """
 
-    def run_reindex(request, app):
-        if not hasattr(request.app, 'es_client'):
-            return
+    def run_reindex_psql(request, app):
+        """
+        Looping over all models in project deleting all full text search (
+        fts) indexes in postgresql and re-creating them
 
-        title = f"Reindexing {request.app.application_id}"
-        print(click.style(title, underline=True))
-
+        :param request: request
+        :param app: application context
+        :return: re-indexing function
+        """
+        session = request.session
         start = utcnow()
-        request.app.es_perform_reindex(fail)
+
+        for model in searchable_sqlalchemy_models(Base):
+            print(f'*** model to reindex: {model}')
+            if model.__tablename__ in ['users', 'attendees']:
+                model.drop_fts_index(session, app.schema)
+                model.create_fts_index(session, app.schema)
 
         print(f"took {utcnow() - start}")
 
-    return run_reindex
+    return run_reindex_psql

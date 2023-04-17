@@ -8,7 +8,6 @@ from langdetect import DetectorFactory, PROFILES_DIRECTORY
 from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
 
-
 # XXX this is doubly defined in onegov.org.utils, maybe move to a common
 # regex module in in onegov.core
 HASHTAG = re.compile(r'#\w{3,}')
@@ -150,3 +149,22 @@ class LanguageDetector:
 
     def probabilities(self, text):
         return self.spawn_detector(text).get_probabilities()
+
+
+def create_tsvector_string(*cols):
+    """
+    Creates tsvector string for columns
+    Doc reference:
+    https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX
+
+    :param cols: columns to be indexed
+    :return: tsvector string for multiple columns
+    """
+    base = "coalesce({}, '')"
+    ext = " || ' ' || coalesce({}, '')"
+
+    s = base
+    for _ in range(len(cols) - 1):
+        s += ext
+
+    return s.format(*cols)
