@@ -850,7 +850,7 @@ msgid ""
 "Not all variables could be replaced. The following values were not found: "
 "${missing_values}"
 msgstr ""
-"Nicht alle Werte konnten gefunden werden. Die folgenden Werte sind nicht eingesetzt worden:"
+"Nicht alle Werte konnten gefunden werden. Die folgenden Werte sind nicht eingesetzt worden: "
 "${missing_values}"
 
 msgid "Download"

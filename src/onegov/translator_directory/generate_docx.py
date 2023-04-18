@@ -13,7 +13,7 @@ def fill_variables_in_docx(original_docx, t: Translator, **kwargs):
         "translator_gender": t.gender or "",
         "translator_address": t.address or "",
         "translator_city": t.city or "",
-        "translator_zip_code": t.zip_code or "",
+        "translator_zip_code": t.zip_code,
         "greeting": gendered_greeting(t) or "",
     }
 

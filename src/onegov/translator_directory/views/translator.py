@@ -447,20 +447,17 @@ def view_mail_templates(self, request, form):
         f = get_file(request.app, file_id)
         template = f.reference.file.read()
 
-        nulls, docx = fill_variables_in_docx(
+        missing_fields, docx = fill_variables_in_docx(
             BytesIO(template), self, **additional_fields
         )
-        if nulls:
-            request.message(
-                _(
-                    "Not all variables could be replaced. The "
+        if missing_fields:
+            msg = _("Not all variables could be replaced. The "
                     "following values were not found: ${missing_values}",
-                ),
-                "warning",
-                mapping={
-                    "missing_values": ", ".join(nulls.keys()),
-                },
-            )
+                    mapping={
+                        "missing_values": ", ".join(missing_fields.keys()),
+                    })
+            request.message(msg, 'warning')
+            return redirect(request.link(self, name='mail-templates'))
 
         return Response(
             docx,
