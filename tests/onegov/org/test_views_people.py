@@ -152,8 +152,8 @@ def test_context_specific_function_substring_removed(session, org_app):
     topic2 = Topic(title=organizations[1], name="topic2")
 
     # Pretend we have ContentMixin:
-    setattr(topic1, 'content', {'people': person_to_function1})
-    setattr(topic2, 'content', {'people': person_to_function2})
+    topic1.content = {'people': person_to_function1}
+    topic2.content = {'people': person_to_function2}
     session.add(topic1)
     session.add(topic2)
     topics = [topic1, topic2]

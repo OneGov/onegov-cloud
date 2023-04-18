@@ -138,7 +138,7 @@ def test_upload_vote_submit(election_day_app_zg):
 
         assert import_.called
         assert import_.call_count == 3
-        set([call[0][2] for call in import_.call_args_list]) == {
+        assert set([call[0][2] for call in import_.call_args_list]) == {
             'proposal', 'counter-proposal', 'tie-breaker'
         }
 

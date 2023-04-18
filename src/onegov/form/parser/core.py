@@ -1109,8 +1109,8 @@ def translate_to_yaml(text):
         # fields are nested lists of dictionaries
         try:
             parse_result = try_parse(ELEMENTS.single_line_fields, line)
-        except re.error:
-            raise errors.InvalidFormSyntax(line=ix + 1)
+        except re.error as exception:
+            raise errors.InvalidFormSyntax(line=ix + 1) from exception
 
         if parse_result is not None:
             yield '{indent}- "{identifier}": !{type} \'{definition}\''.format(

@@ -347,6 +347,18 @@ msgstr "Rechnungsposition Betrag"
 msgid "Invoice Item References"
 msgstr "Rechnungsposition Referenzen"
 
+msgid "Attendee Address"
+msgstr "Teilnehmeradresse"
+
+msgid "Attendee Zipcode"
+msgstr "Teilnehmer PLZ"
+
+msgid "Attendee Place"
+msgstr "Teilnehmer Ort"
+
+msgid "Attendee Political Municipality"
+msgstr "Teilnehmer Politische Gemeinde"
+
 msgid "Organiser Last Name"
 msgstr "Veranstalter Nachname"
 
@@ -677,11 +689,27 @@ msgstr "Gesundheitsangaben"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
+msgid "The address of the attendee differs from the users address"
+msgstr ""
+"Die Adresse dieser Person unterscheidet sich von der des Benutzerkontos"
+
+msgid "Check this box if the attendee doesn't live with you"
+msgstr "Anwählen, wenn die Person nicht bei Ihnen wohnt."
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "Political municipality"
+msgstr "Politische Gemeinde"
+
 msgid "Attendee"
 msgstr "Teilnehmende"
 
 msgid "Note"
 msgstr "Bemerkung"
+
+msgid "Political Municipality"
+msgstr "Politische Gemeinde"
 
 msgid "Ignore Age Restriction"
 msgstr "Altersbeschränkung ignorieren"
@@ -1292,12 +1320,6 @@ msgstr "Anrede"
 
 msgid "Personal"
 msgstr "Persönlich"
-
-msgid "Zip Code"
-msgstr "PLZ"
-
-msgid "Political Municipality"
-msgstr "Politische Gemeinde"
 
 msgid "Public E-Mail Address"
 msgstr "Öffentliche E-Mail Adresse"
@@ -2179,6 +2201,21 @@ msgstr "Ticket Status anzeigen"
 msgid "Your activity has been archived:"
 msgstr "Ihr Angebot wurde archiviert:"
 
+msgid "Thanks a lot!"
+msgstr "Vielen Dank!"
+
+msgid "We received your booking for ${name}."
+msgstr "Wir haben Ihre Buchung für ${name} erhalten."
+
+msgid "You can find an overview of all bookings here:"
+msgstr "Eine Übersicht Ihrer aktuellen Buchungen finden Sie hier:"
+
+msgid "Best regards"
+msgstr "Freundliche Grüsse"
+
+msgid "We have received your deregistration for ${name}."
+msgstr "Wir haben Ihre Abmeldung für ${name} erhalten."
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET wird unterstützt von:"
 
@@ -2727,6 +2764,10 @@ msgstr ""
 msgid "The booking was cancelled successfully"
 msgstr "Die Buchung wurde erfolgreich abgesagt"
 
+#, python-format
+msgid "Degregistration of ${attendee} for \"${title}\""
+msgstr "Abmeldung von ${attendee} für \"${title}\""
+
 msgid "Cannot select more than three favorites per child"
 msgstr "Pro Person können maximal drei Favoriten gewählt werden"
 
@@ -2916,6 +2957,10 @@ msgid "The booking for ${name} was succesfull"
 msgstr "Die Buchung für ${name} war erfolgreich"
 
 #, python-format
+msgid "Booking of ${attendee} for \"${title}\""
+msgstr "Buchung von ${attendee} für \"${title}\""
+
+#, python-format
 msgid "The occasion was added to ${name}'s wishlist"
 msgstr "Die Durchführung wurde zu ${name}s Wunschliste hinzugefügt"
 
@@ -3048,8 +3093,8 @@ msgstr "Volljährigkeit bei der Registrierung notwendig"
 msgid "Userprofile"
 msgstr "Benutzerprofil"
 
-msgid "Require the political municipality in the userprofile"
-msgstr "Verlange die politische Gemeinde im Benutzerprofil"
+msgid "Require the political municipality on registration"
+msgstr "Politische Gemeinde bei Registrierung verlangen"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""

@@ -80,16 +80,16 @@ class Theme:
 
         """
 
-    def compile(self, options={}):
+    def compile(self, options=None):
         """ Returns a single css that represents the theme. """
         raise NotImplementedError
 
 
-def get_filename(theme, options={}):
+def get_filename(theme, options=None):
     """ Returns a unique filename for the given theme and options. """
 
     _options = theme.default_options.copy()
-    _options.update(options)
+    _options.update(options or {})
 
     return '-'.join((
         theme.name,
@@ -98,7 +98,7 @@ def get_filename(theme, options={}):
     )) + '.css'  # needed to get the correct content_type
 
 
-def compile(storage, theme, options={}, force=False):
+def compile(storage, theme, options=None, force=False):
     """ Generates a theme and stores it in the filestorage, returning the
     path to the theme.
 

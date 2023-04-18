@@ -171,23 +171,23 @@ def test_browser_session_request(redis_url):
     c1 = Client(app)
     c2 = Client(app)
 
-    c1.get('/').text == c1.get('/').text
-    c1.get('/').text != c2.get('/').text
-    c2.get('/').text == c2.get('/').text
+    assert c1.get('/').text == c1.get('/').text
+    assert c1.get('/').text != c2.get('/').text
+    assert c2.get('/').text == c2.get('/').text
 
-    c1.get('/status').text == 'logged out'
-    c2.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged out'
+    assert c2.get('/status').text == 'logged out'
 
     c1.get('/login')
 
-    c1.get('/status').text == 'logged in'
-    c2.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged in'
+    assert c2.get('/status').text == 'logged out'
 
     app.application_id = 'tset'
-    c1.get('/status').text == 'logged out'
+    assert c1.get('/status').text == 'logged out'
 
     app.application_id = 'test'
-    c1.get('/status').text == 'logged in'
+    assert c1.get('/status').text == 'logged in'
 
 
 def test_browser_session_dirty(redis_url):
@@ -364,7 +364,7 @@ def test_sign_unsign():
     assert framework.unsign(signed) is None
 
     signed = framework.sign('foo')
-    framework.unsign('bar' + signed) is None
+    assert framework.unsign('bar' + signed) is None
 
 
 def test_custom_signer():
@@ -754,7 +754,7 @@ def test_send_email_transaction(tmpdir, redis_url):
             content="This e-mäil is just a test",
             category='transactional'
         )
-        assert False
+        raise AssertionError()
 
     @App.view(model=Root, name='send-ok')
     def success_send(self, request):

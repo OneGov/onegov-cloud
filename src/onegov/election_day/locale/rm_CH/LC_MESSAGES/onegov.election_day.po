@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 07:02+0100\n"
+"POT-Creation-Date: 2023-04-03 09:17+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -972,6 +972,12 @@ msgstr "masculin"
 msgid "undetermined"
 msgstr "nundeterminà"
 
+msgid "browser"
+msgstr "browser"
+
+msgid "email"
+msgstr "e-mail"
+
 msgid "Actions"
 msgstr "Acziuns"
 
@@ -1407,6 +1413,10 @@ msgstr "Ultimas infurmaziuns:"
 
 msgid "No notifications yet."
 msgstr "Anc naginas communicaziuns."
+
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
 
 msgid ""
 "Email: One email containing all the results of the selected elections and "

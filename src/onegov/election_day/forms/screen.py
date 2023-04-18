@@ -216,8 +216,10 @@ class ScreenForm(Form):
         if field.data:
             try:
                 transform_structure(widgets.values(), field.data)
-            except XMLSyntaxError as e:
-                raise ValidationError(e.msg.split(', line')[0])
+            except XMLSyntaxError as exception:
+                raise ValidationError(
+                    exception.msg.split(', line')[0]
+                ) from exception
 
     def update_model(self, model):
         model.number = self.number.data

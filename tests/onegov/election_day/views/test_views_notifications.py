@@ -399,6 +399,6 @@ def test_view_notifications_summarized(election_day_app_zg):
 
     manage = client.get('/trigger-notifications')
     assert "erneut auslösen" in manage
-    assert ": email (" in manage
-    assert ": sms (" in manage
+    assert ": E-Mail (" in manage
+    assert ": SMS (" in manage
     assert ": webhooks (" in manage

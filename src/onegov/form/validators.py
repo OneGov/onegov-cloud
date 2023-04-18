@@ -42,8 +42,10 @@ class Stdnum:
 
         try:
             self.format.validate(field.data)
-        except StdnumValidationError:
-            raise ValidationError(field.gettext('Invalid input.'))
+        except StdnumValidationError as exception:
+            raise ValidationError(
+                field.gettext('Invalid input.')
+            ) from exception
 
 
 class FileSizeLimit:
@@ -167,23 +169,28 @@ class ValidFormDefinition:
 
             try:
                 parsed_form = parse_form(field.data)()
-            except InvalidFormSyntax as e:
+            except InvalidFormSyntax as exception:
                 field.render_kw = field.render_kw or {}
-                field.render_kw['data-highlight-line'] = e.line
+                field.render_kw['data-highlight-line'] = exception.line
                 raise ValidationError(
-                    field.gettext(self.syntax).format(line=e.line)
-                )
-            except InvalidIndentSyntax as e:
+                    field.gettext(self.syntax).format(line=exception.line)
+                ) from exception
+            except InvalidIndentSyntax as exception:
                 raise ValidationError(
-                    field.gettext(self.indent).format(line=e.line))
-            except DuplicateLabelError as e:
+                    field.gettext(self.indent).format(line=exception.line)
+                ) from exception
+            except DuplicateLabelError as exception:
                 raise ValidationError(
-                    field.gettext(self.duplicate).format(label=e.label)
-                )
-            except (FieldCompileError, MixedTypeError) as e:
-                raise ValidationError(e.field_name)
-            except AttributeError:
-                raise ValidationError(field.gettext(self.message))
+                    field.gettext(self.duplicate).format(label=exception.label)
+                ) from exception
+            except (FieldCompileError, MixedTypeError) as exception:
+                raise ValidationError(
+                    exception.field_name
+                ) from exception
+            except AttributeError as exception:
+                raise ValidationError(
+                    field.gettext(self.message)
+                ) from exception
             else:
                 if self.require_email_field:
                     if not parsed_form.has_required_email_field:
@@ -329,8 +336,8 @@ class ValidPhoneNumber:
         if field.data:
             try:
                 number = phonenumbers.parse(field.data, self.country)
-            except Exception:
-                raise ValidationError(self.message)
+            except Exception as exception:
+                raise ValidationError(self.message) from exception
 
             valid = (
                 phonenumbers.is_valid_number(number)

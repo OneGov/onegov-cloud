@@ -20,7 +20,10 @@ column_mapper = OrderedDict(
     political_party='Partei',
     parliamentary_group='Parlamentarische Gruppe',
     website='Website',
-    address='Adresse',
+    location_address='Standortadresse',
+    location_code_city='Standort Postleitzahl und Ort',
+    postal_address='Postadresse',
+    postal_code_city='Postleitzahl und Ort',
     notes='Notizen',
     memberships='Mitgliedschaften'
 )
@@ -67,7 +70,7 @@ def export_person_xlsx(session):
             elif isinstance(value, int) or isinstance(value, Decimal):
                 worksheet.write_number(row, col_ix, value)
             else:
-                assert False
+                raise NotImplementedError()
 
     workbook.close()
     file.seek(0)

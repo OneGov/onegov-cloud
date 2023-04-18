@@ -846,3 +846,32 @@ def cleanup_activity_aggregates(context):
     context.operations.execute(f"""
         DROP AGGREGATE IF EXISTS "{context.schema}".array_cat_agg(anyarray);
     """)
+
+
+@upgrade_task('Add differing attendee address')
+def add__differing_attendee_address(context):
+    if not context.has_column('attendees', 'differing_address'):
+        context.operations.add_column(
+            'attendees',
+            column=Column('differing_address', Boolean, nullable=True)
+        )
+    if not context.has_column('attendees', 'address'):
+        context.operations.add_column(
+            'attendees',
+            column=Column('address', Text, nullable=True)
+        )
+    if not context.has_column('attendees', 'zip_code'):
+        context.operations.add_column(
+            'attendees',
+            column=Column('zip_code', Text, nullable=True)
+        )
+    if not context.has_column('attendees', 'place'):
+        context.operations.add_column(
+            'attendees',
+            column=Column('place', Text, nullable=True)
+        )
+    if not context.has_column('attendees', 'political_municipality'):
+        context.operations.add_column(
+            'attendees',
+            column=Column('political_municipality', Text, nullable=True)
+        )

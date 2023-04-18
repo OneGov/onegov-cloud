@@ -312,8 +312,10 @@ class ElectionCompoundForm(Form):
     def validate_colors(self, field):
         try:
             self.parse_colors(field.data)
-        except Exception:
-            raise ValidationError(_('Invalid color definitions'))
+        except Exception as exception:
+            raise ValidationError(
+                _('Invalid color definitions')
+            ) from exception
 
     def on_request(self):
         principal = self.request.app.principal

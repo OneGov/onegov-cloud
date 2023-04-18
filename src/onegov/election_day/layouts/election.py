@@ -20,7 +20,8 @@ class ElectionLayout(DetailLayout):
         'connections'
     )
 
-    def table_link(self, query_params={}):
+    def table_link(self, query_params=None):
+        query_params = query_params or {}
         if self.tab not in self.tabs_with_embedded_tables:
             return None
         query_params['locale'] = self.request.locale

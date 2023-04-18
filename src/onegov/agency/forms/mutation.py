@@ -72,6 +72,55 @@ class AgencyMutationForm(MutationForm):
         label=_("Title"),
     )
 
+    location_address = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Location address"),
+        render_kw={'rows': 2}
+    )
+
+    location_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Location Code and City"),
+    )
+
+    postal_address = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal address"),
+        render_kw={'rows': 2}
+    )
+
+    postal_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal Code and City"),
+    )
+
+    phone = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Phone")
+    )
+
+    phone_direct = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Direct Phone Number or Mobile")
+    )
+
+    email = EmailField(
+        fieldset=_("Proposed changes"),
+        label=_("E-Mail")
+    )
+
+    website = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Website"),
+        filters=(ensure_scheme, )
+    )
+
+    opening_hours = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Opening hours"),
+        render_kw={'rows': 3}
+    )
+
 
 class PersonMutationForm(MutationForm):
     """ Form to report a mutation of a person. """
@@ -113,7 +162,7 @@ class PersonMutationForm(MutationForm):
 
     phone_direct = StringField(
         fieldset=_("Proposed changes"),
-        label=_("Direct Phone Number")
+        label=_("Direct Phone Number or Mobile")
     )
 
     born = StringField(
@@ -142,10 +191,32 @@ class PersonMutationForm(MutationForm):
         filters=(ensure_scheme, )
     )
 
-    address = TextAreaField(
+    website_2 = StringField(
         fieldset=_("Proposed changes"),
-        label=_("Address"),
-        render_kw={'rows': 5}
+        label=_("Website 2"),
+        filters=(ensure_scheme, )
+    )
+
+    location_address = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Location address"),
+        render_kw={'rows': 2}
+    )
+
+    location_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Location Code and City"),
+    )
+
+    postal_address = TextAreaField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal address"),
+        render_kw={'rows': 2}
+    )
+
+    postal_code_city = StringField(
+        fieldset=_("Proposed changes"),
+        label=_("Postal Code and City"),
     )
 
     notes = TextAreaField(

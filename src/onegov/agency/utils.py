@@ -1,4 +1,5 @@
 from email.headerregistry import Address
+from markupsafe import escape, Markup
 from onegov.core.mail import coerce_address
 from onegov.people.models import Agency, Person
 
@@ -20,7 +21,7 @@ def emails_for_new_ticket(model, request):
         agencies = (membership.agency for membership in model.memberships)
         handler_code = 'PER'
     else:
-        assert False, 'Invalid model'
+        raise NotImplementedError()
 
     seen = set()
     if request.email_for_new_tickets:
@@ -78,3 +79,11 @@ def emails_for_new_ticket(model, request):
                 except ValueError:
                     # if it's not a valid address then skip it
                     pass
+
+
+def get_html_paragraph_with_line_breaks(text):
+    if not text:
+        return ''
+    return Markup('<p>{}</p>'.format(
+        '<br>'.join(escape(line) for line in str(text).splitlines())
+    ))

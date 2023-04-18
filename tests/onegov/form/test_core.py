@@ -384,7 +384,7 @@ def test_ensurances():
 
         @property
         def ensure_not_triggered(self):
-            assert False
+            raise AssertionError()
 
         def ensure_foo_and_bar(self):
             self.ensure_foo_and_bar_called += 1

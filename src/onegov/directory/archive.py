@@ -157,8 +157,10 @@ class DirectoryArchiveReader:
                 existing.add(name)
             try:
                 entry = directory.add(values)
-            except KeyError as e:
-                raise MissingColumnError(column=e.args[0])
+            except KeyError as exception:
+                raise MissingColumnError(
+                    column=exception.args[0]
+                ) from exception
 
             names = (
                 ('latitude', 'longitude'),
@@ -205,8 +207,8 @@ class DirectoryArchiveReader:
         try:
             with (self.path / 'metadata.json').open('r') as f:
                 return json.loads(f.read())
-        except FileNotFoundError:
-            raise MissingFileError('metadata.json')
+        except FileNotFoundError as exception:
+            raise MissingFileError('metadata.json') from exception
 
     def read_data(self):
         """ Returns the entries as a list of dictionaries. """
@@ -354,11 +356,11 @@ class DirectoryArchiveWriter:
                         tempfiles.append(tmp)
                         src = tmp.name
 
-                except IOError:
+                except IOError as exception:
                     raise DirectoryFileNotFound(
                         file_id=f.id, entry_name=fid_to_entry[f.id],
                         filename=name
-                    )
+                    ) from exception
 
                 dst = str(folder / name)
 

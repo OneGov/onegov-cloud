@@ -21,19 +21,19 @@ class ResourceCollection:
     def query(self):
         return self.session.query(Resource)
 
-    def add(self, title, timezone, type=None, name=None, meta={}, content={},
-            definition=None, group=None):
+    def add(self, title, timezone, type=None, name=None, meta=None,
+            content=None, definition=None, group=None):
 
         # look up the right class depending on the type (we need to do
         # this a bit akwardly here, because Resource does not use the
         # ModelBase as declarative base)
         resource = Resource.get_polymorphic_class(type, Resource)()
-        resource.id == uuid4()
+        resource.id = uuid4()
         resource.name = name or normalize_for_url(title)
         resource.title = title
         resource.timezone = timezone
-        resource.meta = meta
-        resource.content = content
+        resource.meta = meta or {}
+        resource.content = content or {}
         resource.definition = definition
         resource.group = group
         resource.renew_access_token()
