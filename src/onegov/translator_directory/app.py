@@ -1,5 +1,4 @@
 from onegov.core import utils
-from cached_property import cached_property
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.org import OrgApp
@@ -38,7 +37,7 @@ class TranslatorDirectoryApp(OrgApp):
             return None
         return URL(request.class_link(Organisation)).path()
 
-    @cached_property
+    @property
     def mail_templates(self):
         query = GeneralFileCollection(self.session()).query().filter(
             GeneralFile.name.endswith('.docx')
