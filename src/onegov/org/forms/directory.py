@@ -47,9 +47,26 @@ class DirectoryBaseForm(Form):
         description=_("Describes what this directory is about"),
         render_kw={'rows': 4})
 
+    title_further_information = StringField(
+        label=_("Title"),
+        fieldset=_("Further Information"),
+        description=_(
+            'If left empty "Further Information" will be used as title')
+    )
+
     text = HtmlField(
-        label=_("Further Information"),
-        fieldset=_("General"))
+        label=_("Text"),
+        fieldset=_("Further Information"))
+
+    position = RadioField(
+        label=_("Position"),
+        fieldset=_("Further Information"),
+        choices=[
+            ('above', _("Above the entries")),
+            ('below', _("Below the entries"))
+        ],
+        default='below'
+    )
 
     structure = TextAreaField(
         label=_("Definition"),
