@@ -1578,6 +1578,9 @@ msgstr ""
 "controllare l'URL per eventuali errori o utilizza la casella di ricerca in "
 "alto."
 
+msgid "Link to organizers page"
+msgstr "Link alla pagina dell'organizzatore"
+
 msgid "Export this event"
 msgstr "Esporta questo evento"
 

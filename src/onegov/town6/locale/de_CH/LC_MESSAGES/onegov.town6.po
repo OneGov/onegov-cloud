@@ -1592,6 +1592,9 @@ msgstr ""
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
 
+msgid "Link to organizers page"
+msgstr "Link zur Veranstalterseite"
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
