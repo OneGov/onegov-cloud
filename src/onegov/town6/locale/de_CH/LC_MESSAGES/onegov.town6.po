@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-03-29 10:27+0200\n"
+"POT-Creation-Date: 2023-04-18 14:01+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -530,11 +530,11 @@ msgstr "Noch keine Verzeichnisse definiert."
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
 
-msgid "More"
-msgstr "Mehr"
-
 msgid "Further Information"
 msgstr "Weitere Informationen"
+
+msgid "More"
+msgstr "Mehr"
 
 msgid "Propose entry"
 msgstr "Eintrag vorschlagen"
@@ -1594,6 +1594,9 @@ msgstr ""
 "Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden "
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
+
+msgid "Link to organizers page"
+msgstr "Link zur Veranstalterseite"
 
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
