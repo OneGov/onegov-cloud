@@ -106,6 +106,14 @@ class FormChoicesMixin:
         result.extend([(k, k) for k in self.available_additional_guilds])
         return sorted(result, key=lambda x: x[1].upper())
 
+    @cached_property
+    def admission_choices(self):
+        admissions = tuple(
+            (k, self.request.translate(v))
+            for k, v in ADMISSIONS.items()
+        )
+        return sorted(admissions, key=lambda x: x[1].upper())
+
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
 
@@ -519,6 +527,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
+    admission = ChosenSelectMultipleField(
+        label=_('Admission'),
+        choices=[]
+    )
+
     order_by = RadioField(
         label=_('Order by'),
         choices=(
@@ -554,6 +567,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.search.data = model.search
         self.interpret_types.data = model.interpret_types or []
         self.guilds.data = model.guilds or []
+        self.admission.data = model.admissions or []
 
     def update_model(self, model):
         model.spoken_langs = self.spoken_langs.data
@@ -563,9 +577,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.search = self.search.data
         model.interpret_types = self.interpret_types.data
         model.guilds = self.guilds.data
+        model.admissions = self.admission.data
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
         self.written_langs.choices = self.language_choices
         self.guilds.choices = self.guilds_choices
         self.interpret_types.choices = self.interpret_types_choices
+        self.admission.choices = self.admission_choices

@@ -132,6 +132,12 @@ def test_translator_collection(translator_app):
     collection.order_desc = True
     assert collection.query().all() == [james, bob]
 
+    # Test search by admission
+    collection.admissions = ['certified']
+    james.admission = 'certified'
+    bob.admission = 'in_progress'
+    assert collection.query().all() == [james]
+
 
 def test_translator_collection_coordinates(translator_app):
     translators = TranslatorCollection(translator_app)
