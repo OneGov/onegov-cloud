@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-03-21 14:39+0100\n"
+"POT-Creation-Date: 2023-03-29 11:38+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1512,9 +1512,6 @@ msgstr "Registration als Hilfsperson"
 msgid "Sort"
 msgstr "Sortieren"
 
-msgid "Move"
-msgstr "Verschieben"
-
 msgid "Half day"
 msgstr "Halbtägig"
 
@@ -2195,6 +2192,21 @@ msgstr "Ticket Status anzeigen"
 msgid "Your activity has been archived:"
 msgstr "Ihr Angebot wurde archiviert:"
 
+msgid "Thanks a lot!"
+msgstr "Vielen Dank!"
+
+msgid "We received your booking for ${name}."
+msgstr "Wir haben Ihre Buchung für ${name} erhalten."
+
+msgid "You can find an overview of all bookings here:"
+msgstr "Eine Übersicht Ihrer aktuellen Buchungen finden Sie hier:"
+
+msgid "Best regards"
+msgstr "Freundliche Grüsse"
+
+msgid "We have received your deregistration for ${name}."
+msgstr "Wir haben Ihre Abmeldung für ${name} erhalten."
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET wird unterstützt von:"
 
@@ -2737,6 +2749,10 @@ msgstr ""
 msgid "The booking was cancelled successfully"
 msgstr "Die Buchung wurde erfolgreich abgesagt"
 
+#, python-format
+msgid "Degregistration of ${attendee} for \"${title}\""
+msgstr "Abmeldung von ${attendee} für \"${title}\""
+
 msgid "Cannot select more than three favorites per child"
 msgstr "Pro Person können maximal drei Favoriten gewählt werden"
 
@@ -2924,6 +2940,10 @@ msgstr "Durchführung bearbeiten"
 #, python-format
 msgid "The booking for ${name} was succesfull"
 msgstr "Die Buchung für ${name} war erfolgreich"
+
+#, python-format
+msgid "Booking of ${attendee} for \"${title}\""
+msgstr "Buchung von ${attendee} für \"${title}\""
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"
@@ -3146,8 +3166,14 @@ msgstr "Buchungen ${period}"
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
 
-#~ msgid "Require the political municipality in the userprofile"
-#~ msgstr "Verlange die politische Gemeinde im Benutzerprofil"
+#~ msgid "Confirmation deregistration"
+#~ msgstr "Bestätigung Abmeldung"
+
+#~ msgid "Booking Confirmation"
+#~ msgstr "Bestätigung Buchung"
+
+#~ msgid "Move"
+#~ msgstr "Verschieben"
 
 #~ msgid "Mark paid for "
 #~ msgstr "Auf bezahlt setzen für"
