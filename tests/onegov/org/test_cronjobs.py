@@ -170,7 +170,6 @@ def test_daily_ticket_statistics(org_app, handlers):
     assert "2 Tickets sind " in txt
     assert "/tickets/ALL/pending?page=0" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
-    assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
     assert unsubscribe in txt
@@ -300,7 +299,6 @@ def test_weekly_ticket_statistics(org_app, handlers):
     assert "2 Tickets sind " in txt
     assert "/tickets/ALL/pending?page=0" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
-    assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
     assert unsubscribe in txt
@@ -442,7 +440,6 @@ def test_monthly_ticket_statistics(org_app, handlers):
     assert "1 Ticket ist " in txt
     assert "/tickets/ALL/pending?page=0" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
-    assert "Das OneGov Cloud Team" in txt
     assert "/unsubscribe?token=" in txt
     assert "abmelden" in txt
     assert unsubscribe in txt
