@@ -195,7 +195,7 @@ def view_billing(self, request, form):
 
         yield from (as_link(a, traits) for a in item_actions(item))
         if not item.paid:
-            yield mark_paid_with_date_link(item.realname,
+            yield mark_paid_with_date_link(item.realname or item.username,
                                            item.invoice_id.hex,
                                            item.id.hex)
 
