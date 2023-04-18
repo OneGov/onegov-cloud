@@ -380,6 +380,12 @@ dl.field-display > dt {
             padding-right: .75ex;
         }
     }
+
+    .button:hover {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1rem 1.5rem !important;
+    }
 }
 
 /*
