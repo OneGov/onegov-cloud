@@ -534,8 +534,9 @@ def test_organiser_info(client, scenario):
 
     # by default no information is shown
     for id in ('play-with-legos', 'play-with-playmobil'):
-        assert not editor.get(f'/activity/{id}').pyquery('.organiser li')
-        assert not admin.get(f'/activity/{id}').pyquery('.organiser li')
+        # except the name, which is already set in the test scenario
+        assert len(editor.get(f'/activity/{id}').pyquery('.organiser li')) == 1
+        assert len(admin.get(f'/activity/{id}').pyquery('.organiser li')) == 1
 
     # owner changes are reflected on the activity
     contact = editor.get('/userprofile')
