@@ -1,8 +1,48 @@
 # Changes
 
+## 2023.16
+
+`2023-04-19` | [5a8e9c14f8...3081f7bdc1](https://github.com/OneGov/onegov-cloud/compare/5a8e9c14f8^...3081f7bdc1)
+
+### Feriennet
+
+##### New banners and logo
+
+`Feature` | [PRO-1173](https://linear.app/projuventute/issue/PRO-1173) | [fac9d2d77a](https://github.com/onegov/onegov-cloud/commit/fac9d2d77a6a8f518bce8a0767b603ef966f5653)
+
+##### E-mail notifications on registration for activity
+
+The attendee receives a notification on registration or cancellation of their participation.
+
+`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [c8e1e47d58](https://github.com/onegov/onegov-cloud/commit/c8e1e47d58efd0f2d1f45249865bc58bd1dabc70)
+
+##### Invoice Items payment with dates
+
+`Feature` | [PRO-1167](https://linear.app/projuventute/issue/PRO-1167) | [3081f7bdc1](https://github.com/onegov/onegov-cloud/commit/3081f7bdc1c4d4ad442b0c65ba50d775df03a92a)
+
+### Org
+
+##### Add more options to "further information" on directories
+
+`Feature` | [OGC-928](https://linear.app/onegovcloud/issue/OGC-928) | [b34fabd9bb](https://github.com/onegov/onegov-cloud/commit/b34fabd9bb5189b3ba359963a6486c0bc9cb3b86)
+
+### Town6
+
+##### Make color inversion on icon links possible
+
+`Feature` | [OGC-764](https://linear.app/onegovcloud/issue/OGC-764) | [9d77ea9d20](https://github.com/onegov/onegov-cloud/commit/9d77ea9d20c3514c65811a3a3be8dcd6a6e9726f)
+
+##### External event url
+
+`Feature` | [OGC-746](https://linear.app/onegovcloud/issue/OGC-746) | [a2f858c15e](https://github.com/onegov/onegov-cloud/commit/a2f858c15edd12c7002170724e44b1321c8dd883)
+
+##### Small Fixes
+
+`Bugfix` | [5a8e9c14f8](https://github.com/onegov/onegov-cloud/commit/5a8e9c14f87e838bbaf188ad5ed784db04312f07)
+
 ## 2023.15
 
-`2023-04-14` | [d83694ed38...34b219c6ea](https://github.com/OneGov/onegov-cloud/compare/d83694ed38^...34b219c6ea)
+`2023-04-14` | [d83694ed38...54d349b1ba](https://github.com/OneGov/onegov-cloud/compare/d83694ed38^...54d349b1ba)
 
 ### Core
 
@@ -2954,14 +2994,4 @@ This does not play well with caches.
 ##### Add compatibility with bleach 5.
 
 `Bugfix` | [374ce1a2ae](https://github.com/onegov/onegov-cloud/commit/374ce1a2aec5aeb1b73f10e48647f727c3ed06de)
-
-## 2022.23
-
-`2022-04-07` | [f0848d421d...ee0b0ad5c5](https://github.com/OneGov/onegov-cloud/compare/f0848d421d^...ee0b0ad5c5)
-
-### Election Day
-
-##### Fixes flaky test.
-
-`Bugfix` | [f0848d421d](https://github.com/onegov/onegov-cloud/commit/f0848d421d99cac7e50d6ac0c9eb256c5b3acad7)
 
