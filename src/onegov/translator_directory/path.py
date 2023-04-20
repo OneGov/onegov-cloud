@@ -23,11 +23,11 @@ def get_translator(request, id):
     model=TranslatorCollection, path='/translators',
     converters=dict(page=int, written_langs=[str], spoken_langs=[str],
                     order_desc=bool, guilds=[str], interpret_types=[str],
-                    admissions=[str])
+                    admissions=[str], gender=str)
 )
 def get_translators(request, page=None, written_langs=None, spoken_langs=None,
                     order_by=None, order_desc=None, search=None, guilds=None,
-                    interpret_types=None, admissions=None):
+                    interpret_types=None, admissions=None, gender=None):
     user = request.current_user
     return TranslatorCollection(
         request.app, page or 0,
@@ -39,7 +39,8 @@ def get_translators(request, page=None, written_langs=None, spoken_langs=None,
         search=search,
         guilds=guilds,
         interpret_types=interpret_types,
-        admissions=admissions
+        admissions=admissions,
+        gender=gender
     )
 
 

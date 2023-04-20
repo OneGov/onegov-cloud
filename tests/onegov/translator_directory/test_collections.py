@@ -82,7 +82,7 @@ def test_translator_collection(translator_app):
     langs = create_languages(session)
     collection = TranslatorCollection(translator_app)
     james = create_translator(
-        translator_app, email='james@memo.com', last_name='Z'
+        translator_app, email='james@memo.com', last_name='Z', gender='M'
     )
 
     translator = session.query(collection.model_class).one()
@@ -91,7 +91,7 @@ def test_translator_collection(translator_app):
 
     # Adds second translator
     bob = create_translator(
-        translator_app, email='bob@memo.com', last_name='X'
+        translator_app, email='bob@memo.com', last_name='X', gender='M'
     )
 
     # Test filter spoken language
@@ -137,6 +137,16 @@ def test_translator_collection(translator_app):
     james.admission = 'certified'
     bob.admission = 'in_progress'
     assert collection.query().all() == [james]
+
+    # Test search by gender
+    collection.admissions = []
+    lisa = create_translator(
+        translator_app, email='lisa@memo.com', gender='F', last_name='L'
+    )
+    collection.gender = 'F'
+    assert collection.query().all() == [lisa]
+    collection.gender = 'M'
+    assert collection.query().all() == [james, bob]
 
 
 def test_translator_collection_coordinates(translator_app):

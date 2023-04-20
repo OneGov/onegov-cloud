@@ -30,7 +30,8 @@ class TranslatorCollection(GenericCollection, Pagination):
             guilds=None,
             interpret_types=None,
             state='published',
-            admissions=None
+            admissions=None,
+            gender=None
     ):
         super().__init__(app.session())
         self.app = app
@@ -41,6 +42,7 @@ class TranslatorCollection(GenericCollection, Pagination):
         self.interpret_types = interpret_types or []
         self.state = state
         self.admissions = admissions or []
+        self.gender = gender
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
@@ -68,7 +70,8 @@ class TranslatorCollection(GenericCollection, Pagination):
             self.search == other.search,
             self.guilds == other.guilds,
             self.interpret_types == other.interpret_types,
-            self.admissions == other.admissions
+            self.admissions == other.admissions,
+            self.gender == other.gender
         ))
 
     def add(self, update_user=True, **kwargs):
@@ -269,6 +272,10 @@ class TranslatorCollection(GenericCollection, Pagination):
         if self.admissions:
             query = query.filter(or_(*self.by_admission))
 
+        if self.gender:
+            query = query.filter(Translator.gender == self.gender)
+
+        query = query.order_by(self.order_expression)
         query = query.order_by(self.order_expression)
         return query
 
