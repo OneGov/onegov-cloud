@@ -78,8 +78,8 @@ class FormChoicesMixin:
         )
 
     @cached_property
-    def gender_choices(self):
-        return tuple(
+    def gender_choices_search_form(self):
+        return (("", _("All")),) + tuple(
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         )
@@ -534,7 +534,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 
     gender = RadioField(
         label=_('Gender'),
-        choices=[],
+        choices=[]
     )
 
     order_by = RadioField(
@@ -594,4 +594,4 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.guilds.choices = self.guilds_choices
         self.interpret_types.choices = self.interpret_types_choices
         self.admission.choices = self.admission_choices
-        self.gender.choices = self.gender_choices
+        self.gender.choices = self.gender_choices_search_form
