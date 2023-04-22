@@ -78,8 +78,8 @@ class FormChoicesMixin:
         )
 
     @cached_property
-    def gender_choices_search_form(self):
-        return (("", _("All")),) + tuple(
+    def gender_choices(self):
+        return tuple(
             (id_, self.request.translate(choice))
             for id_, choice in GENDERS.items()
         )
@@ -477,8 +477,8 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.tel_mobile = self.tel_mobile.data or None
         model.tel_private = self.tel_private.data or None
         model.tel_office = self.tel_office.data or None
-        model.availability = self.availability.data or None
         model.confirm_name_reveal = self.confirm_name_reveal.data
+        model.availability = self.availability.data or None
         model.date_of_application = self.date_of_application.data or None
         model.date_of_decision = self.date_of_decision.data or None
         model.proof_of_preconditions = self.proof_of_preconditions.data or None
@@ -534,7 +534,8 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 
     gender = RadioField(
         label=_('Gender'),
-        choices=[]
+        choices=[],
+        default=''
     )
 
     order_by = RadioField(
@@ -594,4 +595,4 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.guilds.choices = self.guilds_choices
         self.interpret_types.choices = self.interpret_types_choices
         self.admission.choices = self.admission_choices
-        self.gender.choices = self.gender_choices_search_form
+        self.gender.choices = (("", _("All")),) + self.gender_choices
