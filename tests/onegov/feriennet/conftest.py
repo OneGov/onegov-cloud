@@ -25,6 +25,9 @@ class Client(BaseClient):
         profile.form['zip_code'] = '1234'
         profile.form['place'] = 'Duckburg'
         profile.form['emergency'] = f'0123 456 789 ({first_name} {last_name})'
+        if 'political_municipality' in profile.form.fields:
+            profile.form['political_municipality'] = 'Bruckerburg'
+
         profile.form.submit()
 
 
