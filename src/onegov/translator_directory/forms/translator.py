@@ -532,10 +532,9 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
-    gender = RadioField(
+    genders = ChosenSelectMultipleField(
         label=_('Gender'),
         choices=[],
-        default=''
     )
 
     order_by = RadioField(
@@ -566,8 +565,8 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         if model.spoken_langs:
             self.spoken_langs.data = model.spoken_langs
 
-        if model.gender:
-            self.gender.data = model.gender
+        if model.genders:
+            self.genders.data = model.genders
 
         if model.written_langs:
             self.written_langs.data = model.written_langs
@@ -587,7 +586,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.interpret_types = self.interpret_types.data
         model.guilds = self.guilds.data
         model.admissions = self.admission.data
-        model.gender = self.gender.data
+        model.genders = self.genders.data
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
@@ -595,4 +594,4 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.guilds.choices = self.guilds_choices
         self.interpret_types.choices = self.interpret_types_choices
         self.admission.choices = self.admission_choices
-        self.gender.choices = (("", _("All")),) + self.gender_choices
+        self.genders.choices = self.gender_choices
