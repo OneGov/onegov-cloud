@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-03 16:03+0200\n"
+"POT-Creation-Date: 2023-04-24 08:43+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2228,7 +2228,7 @@ msgid "Best regards"
 msgstr "Meilleures salutations"
 
 msgid "We have received your deregistration for ${name}."
-msgstr "Nous avons reçu votre désinscription pour ${name}."
+msgstr "Nous avons reçu votre annulation pour ${name}."
 
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Réseau vacances de Pro Juventute est soutenu par :"
@@ -2730,8 +2730,8 @@ msgstr "${count} réservation(s) manuelles créées"
 msgid "Invoice marked as paid"
 msgstr "Facture marquée comme payée"
 
-msgid "Invoice items marked as paid"
-msgstr "Éléments de la facture marqués comme payés"
+msgid "Invoice item(s) marked as paid"
+msgstr ""
 
 #, python-format
 msgid "Mark paid for ${user}"
@@ -3193,8 +3193,8 @@ msgstr "Réservations pour ${period}"
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
 
-#~ msgid "Move"
-#~ msgstr "Déplacer"
+#~ msgid "Invoice items marked as paid"
+#~ msgstr "Éléments de la facture marqués comme payés"
 
 #, python-format
 #~ msgid "Degregistration of ${attendee} for ${title}"
