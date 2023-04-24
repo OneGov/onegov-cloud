@@ -234,9 +234,9 @@ def validate_integer(line, col, treat_none_as_default=True, default=0,
         raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
     try:
         return int(result)
-    except ValueError:
+    except ValueError as exception:
         raise ValueError(_('Invalid integer: ${col}',
-                           mapping={'col': col}))
+                           mapping={'col': col})) from exception
 
 
 def validate_float(line, col, treat_none_as_default=True, default=0):
@@ -257,9 +257,9 @@ def validate_float(line, col, treat_none_as_default=True, default=0):
         raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
     try:
         return float(result)
-    except ValueError:
+    except ValueError as exception:
         raise ValueError(_('Invalid float number: ${col}',
-                           mapping={'col': col}))
+                           mapping={'col': col})) from exception
 
 
 def validate_numeric(line, col, precision, scale, treat_none_as_default=True,
@@ -289,9 +289,9 @@ def validate_numeric(line, col, precision, scale, treat_none_as_default=True,
     try:
         value = Decimal(result)
         return Decimal(format(value, f'{precision}.{scale}f'))
-    except Exception:
+    except Exception as exception:
         raise ValueError(_('Invalid decimal number: ${col}',
-                           mapping={'col': col}))
+                           mapping={'col': col})) from exception
 
 
 def validate_list_id(line, col, treat_empty_as_default=True, default='0'):

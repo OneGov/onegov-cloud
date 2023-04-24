@@ -1,6 +1,8 @@
-from onegov.core.templates import PageTemplate
+import gc
+
 from onegov.core import cache
 from onegov.core.framework import Framework
+from onegov.core.templates import PageTemplate
 from onegov.core.utils import Bunch
 
 
@@ -15,6 +17,54 @@ class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+
+def test_lru_cache():
+    count = 0
+
+    @cache.lru_cache(maxsize=1)
+    def add(x, y):
+        nonlocal count
+        count += 1
+        return x + y
+
+    assert add(1, 2) == 3
+    assert add(1, 3) == 4
+    assert add(1, 2) == 3
+    assert add(1, 2) == 3
+    assert count == 3
+
+
+def test_instance_lru_cache():
+    count = 0
+
+    class Adder:
+        @cache.instance_lru_cache(maxsize=1)
+        def add(self, x, y):
+            nonlocal count
+            count += 1
+            return x + y
+
+    def function():
+        a = Adder()
+        assert a.add(1, 2) == 3
+        assert a.add(1, 3) == 4
+        assert a.add(1, 2) == 3
+        assert a.add(1, 2) == 3
+        assert count == 3
+
+        b = Adder()
+        assert b.add(1, 2) == 3
+        assert b.add(1, 3) == 4
+        assert b.add(1, 2) == 3
+        assert b.add(1, 2) == 3
+        assert count == 6
+
+    function()
+
+    gc.collect()
+    objects = len([obj for obj in gc.get_objects() if isinstance(obj, Adder)])
+    assert objects == 0
 
 
 def test_cache_key(redis_url):

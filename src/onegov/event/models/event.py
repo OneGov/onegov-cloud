@@ -76,6 +76,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     #: the event organizer's public e-mail address
     organizer_email = content_property()
 
+    #: an external url for the event
+    external_event_url = content_property()
+
     #: the price of the event (a text field, not an amount)
     price = content_property()
 
@@ -242,7 +245,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
                 raise RuntimeError(f"The frequency of '{r}' is not WEEKLY")
 
             # we require a definite end
-            if not getattr(rule, '_until'):
+            if not hasattr(rule, '_until'):
                 raise RuntimeError(f"'{r}' has no UNTIL")
 
             # we also want the end date to be timezone-aware

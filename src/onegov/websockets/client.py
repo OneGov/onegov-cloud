@@ -9,10 +9,10 @@ async def acknowledged(websocket):
     message = await websocket.recv()
     try:
         assert loads(message)['type'] == 'acknowledged'
-    except Exception:
+    except Exception as exception:
         log.error(f'Unexpected response: {message}')
         await websocket.close()
-        raise IOError(message)
+        raise IOError(message) from exception
 
 
 async def register(websocket, schema, channel):

@@ -115,7 +115,7 @@ def render_metadata(self, request):
             response = morepath.Response(dict_path(data, self.path))
             response.content_type = 'text/plain'
             return response
-        except KeyError:
-            raise exc.HTTPNotFoundError()
+        except KeyError as exception:
+            raise exc.HTTPNotFoundError() from exception
 
     return morepath.render_json(data, request)

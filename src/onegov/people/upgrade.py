@@ -205,3 +205,36 @@ def remove_address_columns_from_agency(context):
         context.operations.drop_column('agencies', 'city')
     if context.has_column('agencies', 'address'):
         context.operations.drop_column('agencies', 'address')
+
+
+@upgrade_task('ogc-966 extend agency and person tables with more fields')
+def extend_agency_and_person_with_more_fields(context):
+    # add columns to table 'agencies'
+    agencies_columns = ['email', 'phone', 'phone_direct', 'website',
+                        'location_address', 'location_code_city',
+                        'postal_address', 'postal_code_city',
+                        'opening_hours']
+    table = 'agencies'
+
+    for column in agencies_columns:
+        if not context.has_column(table, column):
+            context.add_column_with_defaults(
+                table,
+                Column(column, Text, nullable=True),
+                default=lambda x: ''
+            )
+
+    context.session.flush()
+
+    # add columns to table 'people'
+    people_columns = ['location_address', 'location_code_city',
+                      'postal_address', 'postal_code_city', 'website_2']
+    table = 'people'
+
+    for column in people_columns:
+        if not context.has_column(table, column):
+            context.add_column_with_defaults(
+                table,
+                Column(column, Text, nullable=True),
+                default=lambda x: ''
+            )

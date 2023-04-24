@@ -159,6 +159,7 @@ class DummyPrincipal:
         self.has_superregions = False
         self._is_year_available = True
         self.reply_to = None
+        self.superregions = []
 
     @property
     def notifications(self):
@@ -178,6 +179,9 @@ class DummyPrincipal:
 
     def get_superregion(self, region, year):
         return ''
+
+    def get_superregions(self, year):
+        return self.superregions
 
 
 class DummyApp:
@@ -216,10 +220,12 @@ class DummyRequest:
         self.is_secret = lambda x: is_secret
         self.url = url
 
-    def class_link(self, cls, name='', variables={}):
-        return f'{cls.__name__}/{name}/{variables}'
+    def class_link(self, cls, name='', variables=None):
+        variables = variables or {}
+        return f'{cls.__name__}/{name}/{variables or {}}'
 
-    def link(self, model, name='', query_params={}):
+    def link(self, model, name='', query_params=None):
+        query_params = query_params or {}
         class_name = model.__class__.__name__
         if class_name == 'Canton' or class_name == 'Municipality':
             class_name = 'Principal'

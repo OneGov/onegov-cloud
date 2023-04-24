@@ -185,11 +185,10 @@ def get_my_invoices(request, app, username=None, invoice=None):
     if not invoice:
         invoice = request.app.default_period and request.app.default_period.id
 
-    # at this point the username has to exist...
     user_id = request.app.user_ids_by_name.get(username)
 
-    # ...as well as the invoice
-    if not user_id or not invoice:
+    # the invoice has to exist
+    if not invoice:
         return None
 
     # XXX username should be user_id, invoice should be period_id

@@ -22,7 +22,8 @@ async def test_browser_integration(browser):
                             "two",
                             function(message, websocket) {{
                                 messageReceived = true;
-                            }}
+                            }},
+                            function(error) {{}}
                         );
                     }});
                 </script>

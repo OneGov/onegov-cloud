@@ -325,7 +325,7 @@ def test_volunteers_export(browser, scenario, to_volunteer_state):
         assert browser.is_text_present("Foo")
     else:
         # invalid case
-        assert False
+        raise AssertionError()
 
     browser.visit('/export/helfer')
     browser.fill_form({

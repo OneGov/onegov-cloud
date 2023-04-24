@@ -57,7 +57,9 @@ def has_model_permission(app, identity, model, permission):
                 RoleMapping.role == 'editor',
                 RoleMapping.group_id == identity.groupid
             ).first()
-            if role and permission in getattr(app.settings.roles, 'editor'):
+            if role and permission in getattr(
+                app.settings.roles, 'editor', []
+            ):
                 return True
 
     # Check if the role mappings of the parent

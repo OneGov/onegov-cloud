@@ -142,8 +142,9 @@ class CSVFile:
             )
         )
 
+    @staticmethod
     @lru_cache(maxsize=128)
-    def as_valid_identifier(self, value):
+    def as_valid_identifier(value):
         result = normalize_header(value)
         for invalid in '- .%/,;':
             result = result.replace(invalid, '_')
@@ -214,14 +215,14 @@ def sniff_dialect(csv):
 
     try:
         dialect = Sniffer().sniff(csv, VALID_CSV_DELIMITERS)
-    except CsvError:
+    except CsvError as exception:
 
         # sometimes we can get away with an extra pass just over the first line
         # (the header tends to contain fewer special cases)
         if '\n' in csv:
             return sniff_dialect(csv[:csv.find('\n')])
 
-        raise errors.InvalidFormatError()
+        raise errors.InvalidFormatError() from exception
 
     return dialect
 
@@ -254,16 +255,16 @@ def convert_xlsx_to_csv(xlsx, sheet_name=None):
 
     try:
         excel = openpyxl.load_workbook(xlsx, data_only=True)
-    except Exception:
-        raise IOError("Could not read XLSX file")
+    except Exception as exception:
+        raise IOError("Could not read XLSX file") from exception
 
     if sheet_name:
         try:
             sheet = excel[sheet_name]
-        except KeyError:
+        except KeyError as exception:
             raise KeyError(
                 "Could not find the given sheet in this excel file!"
-            )
+            ) from exception
     else:
         sheet = excel.worksheets[0]
 
@@ -316,16 +317,16 @@ def convert_xls_to_csv(xls, sheet_name=None):
 
     try:
         excel = xlrd.open_workbook(file_contents=xls.read())
-    except Exception:
-        raise IOError("Could not read XLS file")
+    except Exception as exception:
+        raise IOError("Could not read XLS file") from exception
 
     if sheet_name:
         try:
             sheet = excel.sheet_by_name(sheet_name)
-        except xlrd.XLRDError:
+        except xlrd.XLRDError as exception:
             raise KeyError(
                 "Could not find the given sheet in this excel file!"
-            )
+            ) from exception
     else:
         sheet = excel.sheet_by_index(0)
 
@@ -541,7 +542,7 @@ def convert_list_of_list_of_dicts_to_xlsx(row_list, titles_list,
             # keep track of the maximum character width
             column_widths = [estimate_width(field) for field in fields]
 
-            def values(row):
+            def values(row, fields=fields, column_widths=column_widths):
                 for ix, field in enumerate(fields):
                     value = row.get(field, '')
                     column_widths[ix] = max(

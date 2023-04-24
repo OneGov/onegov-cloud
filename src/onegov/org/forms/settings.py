@@ -596,16 +596,16 @@ class HomepageSettingsForm(Form):
                 registry = self.request.app.config.homepage_widget_registry
                 widgets = registry.values()
                 transform_structure(widgets, field.data)
-            except etree.XMLSyntaxError as e:
-                correct_line = e.position[0] - XML_LINE_OFFSET
+            except etree.XMLSyntaxError as exception:
+                correct_line = exception.position[0] - XML_LINE_OFFSET
 
                 correct_msg = 'line {}'.format(correct_line)
-                correct_msg = ERROR_LINE_RE.sub(correct_msg, e.msg)
+                correct_msg = ERROR_LINE_RE.sub(correct_msg, exception.msg)
 
                 field.render_kw = field.render_kw or {}
                 field.render_kw['data-highlight-line'] = correct_line
 
-                raise ValidationError(correct_msg)
+                raise ValidationError(correct_msg) from exception
 
 
 class ModuleSettingsForm(Form):
@@ -622,7 +622,7 @@ class ModuleSettingsForm(Form):
             ('parliamentary_group', _("Parliamentary Group")),
             ('email', _("E-Mail")),
             ('phone', _("Phone")),
-            ('phone_direct', _("Direct Phone Number")),
+            ('phone_direct', _("Direct Phone Number or Mobile")),
             ('website', _("Website")),
             ('address', _("Address")),
             ('notes', _("Notes")),
@@ -739,11 +739,11 @@ class HolidaySettingsForm(Form):
         day, month, year = date.split('.')
         try:
             return datetime.date(int(year), int(month), int(day))
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as exception:
             raise ValidationError(_(
                 "${date} is not a valid date",
                 mapping={'date': date}
-            ))
+            )) from exception
 
     def validate_school_holidays(self, field):
         if not field.data:

@@ -704,9 +704,9 @@ class ORMEventTranslator:
             'properties': {}
         }
 
-        mapping = self.mappings[obj.es_type_name].for_language(language)
+        mapping_ = self.mappings[obj.es_type_name].for_language(language)
 
-        for prop, mapping in mapping.items():
+        for prop, mapping in mapping_.items():
 
             if prop == 'es_suggestion':
                 continue

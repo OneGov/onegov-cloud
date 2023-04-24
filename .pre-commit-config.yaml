@@ -17,8 +17,17 @@ repos:
     hooks:
       - id: flake8
         files: '^(src|tests).*\.py'
+        additional_dependencies:
+        - flake8-bugbear
   - repo: https://github.com/elidupuis/mirrors-sass-lint
     rev: '5cc45653263b423398e4af2561fae362903dd45d'
     hooks:
     - id: sass-lint
       files: '^src/.*\.scss'
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.37.0
+    hooks:
+    - id: eslint
+      files: '^src/.*\.jsx?$'
+      additional_dependencies:
+      - eslint-react

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 07:02+0100\n"
+"POT-Creation-Date: 2023-04-03 09:17+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -131,6 +131,9 @@ msgstr "Pas de données trouvées"
 msgid "Invalid list results"
 msgstr "Résultats de la liste non valides"
 
+msgid "Invalid candidate results"
+msgstr "Résultats des candidats non valides"
+
 msgid "Invalid list connection values"
 msgstr "Valeurs de connexion de liste non valides"
 
@@ -171,9 +174,6 @@ msgstr "Statistiques des élections"
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr ""
-
-msgid "Invalid candidate results"
-msgstr "Résultats des candidats non valides"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -702,9 +702,6 @@ msgstr "Abonnés e-mail"
 msgid "Trigger notifications"
 msgstr "Activer les notifications"
 
-msgid "Subscribers"
-msgstr "Abonnés"
-
 msgid "Screens"
 msgstr "Écrans"
 
@@ -719,6 +716,9 @@ msgstr "Admin"
 
 msgid "Manage"
 msgstr "Gérer"
+
+msgid "Subscribers"
+msgstr "Abonnés"
 
 msgid "Mappings"
 msgstr "Cartographie"
@@ -968,6 +968,12 @@ msgstr "homme"
 
 msgid "undetermined"
 msgstr "indéterminé"
+
+msgid "browser"
+msgstr "navigateur"
+
+msgid "email"
+msgstr "email"
 
 msgid "Actions"
 msgstr "Actions"
@@ -1407,6 +1413,11 @@ msgstr "Les dernières notifications :"
 msgid "No notifications yet."
 msgstr "Pas encore de notification."
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser : Zne indication dans les navigateurs des pages concernées qui ont "
+"été ouvertes."
+
 msgid ""
 "Email: One email containing all the results of the selected elections and "
 "votes. The subject depends on whether all selected elections and votes are "
@@ -1594,11 +1605,12 @@ msgid "${count} files deleted."
 msgstr "${count} fichiers supprimés."
 
 msgid ""
-"Deletes all SVGs and PDFs. They are regenerated in the background and are "
-"available again in a few minutes."
+"Deletes all automatically generated media items (PDFs and SVG images). They "
+"are regenerated in the background and are available again in a few minutes."
 msgstr ""
-"Supprime tous les SVGs et PDFs. Ils sont régénérés en arrière-plan et sont à "
-"nouveau disponibles en quelques minutes."
+"Supprime tous les éléments multimédias générés automatiquement (PDF et "
+"images SVG). Ils sont régénérés en arrière-plan et sont à nouveau "
+"disponibles en quelques minutes."
 
 #, python-format
 msgid "Do you really want to clear all media of \"${item}\"?"

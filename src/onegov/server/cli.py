@@ -331,8 +331,9 @@ class WsgiProcess(multiprocessing.Process):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080, env={},
+    def __init__(self, app_factory, host='127.0.0.1', port=8080, env=None,
                  enable_tracemalloc=False):
+        env = env or {}
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
         self.host = host

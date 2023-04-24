@@ -422,7 +422,9 @@ class Period(Base, TimestampMixin):
         if now > end:
             return True
 
-        return start <= now and not self.booking_phase
+        return start <= now and not (
+            self.booking_phase
+            or self.book_finalized)
 
     @property
     def is_execution_in_past(self):

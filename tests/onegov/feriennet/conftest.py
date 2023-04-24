@@ -103,11 +103,13 @@ def create_feriennet_app(request, use_elasticsearch):
 
     session.add(User(
         username='admin@example.org',
+        realname='Foo Bar',
         password_hash=test_password,
         role='admin'
     ))
     session.add(User(
         username='editor@example.org',
+        realname='Boo Far',
         password_hash=test_password,
         role='editor'
     ))

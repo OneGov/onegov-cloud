@@ -4,6 +4,7 @@ from onegov.activity import InvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
 from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
+from onegov.core.templates import render_template
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections.billing import BookingInvoiceBridge
@@ -12,6 +13,7 @@ from onegov.feriennet.forms import OccasionForm
 from onegov.feriennet.forms import OccasionNeedForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
+from onegov.org.layout import DefaultMailLayout
 from onegov.user import User, UserCollection
 
 
@@ -255,6 +257,35 @@ def book_occasion(self, request, form):
             request.success(
                 _("The booking for ${name} was succesfull", mapping={
                     'name': attendee.name
+                })
+            )
+
+            bookings_link = '<a href="{}">{}</a>'.format(
+                request.class_link(BookingCollection, {
+                    'period_id': self.period.id
+                }),
+                request.translate(_("Bookings"))
+            )
+
+            dates = (self.dates[0].localized_start,
+                     self.dates[0].localized_end)
+            subject = request.translate(
+                _('Booking of ${attendee} for "${title}"',
+                    mapping={
+                        'title': self.activity.title,
+                        'attendee': attendee.name
+                    }))
+
+            request.app.send_transactional_email(
+                subject=subject,
+                receivers=(user.username, ),
+                content=render_template('mail_booking_accepted.pt', request, {
+                    'layout': DefaultMailLayout(self, request),
+                    'title': subject,
+                    'model': self,
+                    'bookings_link': bookings_link,
+                    'name': attendee.name,
+                    'dates': dates
                 })
             )
         else:

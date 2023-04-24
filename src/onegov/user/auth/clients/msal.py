@@ -78,9 +78,11 @@ class MSALClient():
                 token_cache=None,
                 validate_authority=self.validate_authority
             )
-        except Exception as e:
+        except Exception as exception:
             raise ValueError(
-                f'MSAL config error in tenant {self.tenant_id}: {str(e)}')
+                f'MSAL config error in tenant {self.tenant_id}: '
+                '{str(exception)}'
+            ) from exception
         return client
 
     @property

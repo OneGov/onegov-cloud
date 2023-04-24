@@ -132,6 +132,9 @@ msgstr "Keine Daten gefunden"
 msgid "Invalid list results"
 msgstr "Ungültige Listenresultate"
 
+msgid "Invalid candidate results"
+msgstr "Ungültige Kandidierendenresultate"
+
 msgid "Invalid list connection values"
 msgstr "Ungültige Listenverbindungsdaten"
 
@@ -172,9 +175,6 @@ msgstr "Wahlstatistik"
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr ""
-
-msgid "Invalid candidate results"
-msgstr "Ungültige Kandidierendenresultate"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -702,9 +702,6 @@ msgstr "E-Mail-Abonnenten"
 msgid "Trigger notifications"
 msgstr "Benachrichtigungen auslösen"
 
-msgid "Subscribers"
-msgstr "Abonnenten"
-
 msgid "Screens"
 msgstr "Screens"
 
@@ -719,6 +716,9 @@ msgstr "Admin"
 
 msgid "Manage"
 msgstr "Verwalten"
+
+msgid "Subscribers"
+msgstr "Abonnenten"
 
 msgid "Mappings"
 msgstr "Zuordnungen"
@@ -967,6 +967,12 @@ msgstr "männlich"
 
 msgid "undetermined"
 msgstr "unbestimmt"
+
+msgid "browser"
+msgstr "Browser"
+
+msgid "email"
+msgstr "E-Mail"
 
 msgid "Actions"
 msgstr "Aktionen"
@@ -1401,6 +1407,10 @@ msgstr "Letzte Benachrichtigungen:"
 msgid "No notifications yet."
 msgstr "Noch keine Beanchrichtigungen."
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
+
 msgid ""
 "Email: One email containing all the results of the selected elections and "
 "votes. The subject depends on whether all selected elections and votes are "
@@ -1586,11 +1596,12 @@ msgid "${count} files deleted."
 msgstr "${count} Dateien gelöscht."
 
 msgid ""
-"Deletes all SVGs and PDFs. They are regenerated in the background and are "
-"available again in a few minutes."
+"Deletes all automatically generated media items (PDFs and SVG images). They "
+"are regenerated in the background and are available again in a few minutes."
 msgstr ""
-"Löscht alle SVGs und PDFs. Sie werden im Hintergrund regeneriert und stehen "
-"in wenigen Minuten wieder zur Verfügung."
+"Löscht alle automatisch erzeugten Medienelemente (PDFs und SVG-Bilder). Sie "
+"werden im Hintergrund regeneriert und stehen in wenigen Minuten wieder zur "
+"Verfügung."
 
 #, python-format
 msgid "Do you really want to clear all media of \"${item}\"?"

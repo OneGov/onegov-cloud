@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 07:02+0100\n"
+"POT-Creation-Date: 2023-04-03 09:17+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -131,6 +131,9 @@ msgstr "Chattà naginas datas"
 msgid "Invalid list results"
 msgstr "Resultats da glistas nunvalaivels"
 
+msgid "Invalid candidate results"
+msgstr "Resultats da candidat nunvalaivels"
+
 msgid "Invalid list connection values"
 msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 
@@ -171,9 +174,6 @@ msgstr "Statistica electorala"
 #, python-format
 msgid "Error in anzpendentgde: ${msg}"
 msgstr ""
-
-msgid "Invalid candidate results"
-msgstr "Resultats da candidat nunvalaivels"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -704,9 +704,6 @@ msgstr "E-mail abunents"
 msgid "Trigger notifications"
 msgstr "Trametter communicaziuns als abunents"
 
-msgid "Subscribers"
-msgstr "Abunents"
-
 msgid "Screens"
 msgstr "Screens"
 
@@ -721,6 +718,9 @@ msgstr "Admin"
 
 msgid "Manage"
 msgstr "Administrar"
+
+msgid "Subscribers"
+msgstr "Abunents"
 
 msgid "Mappings"
 msgstr "Attribuziuns"
@@ -971,6 +971,12 @@ msgstr "masculin"
 
 msgid "undetermined"
 msgstr "nundeterminà"
+
+msgid "browser"
+msgstr "browser"
+
+msgid "email"
+msgstr "e-mail"
 
 msgid "Actions"
 msgstr "Acziuns"
@@ -1408,6 +1414,10 @@ msgstr "Ultimas infurmaziuns:"
 msgid "No notifications yet."
 msgstr "Anc naginas communicaziuns."
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
+
 msgid ""
 "Email: One email containing all the results of the selected elections and "
 "votes. The subject depends on whether all selected elections and votes are "
@@ -1595,8 +1605,8 @@ msgid "${count} files deleted."
 msgstr "Stizzà ${count} datotecas."
 
 msgid ""
-"Deletes all SVGs and PDFs. They are regenerated in the background and are "
-"available again in a few minutes."
+"Deletes all automatically generated media items (PDFs and SVG images). They "
+"are regenerated in the background and are available again in a few minutes."
 msgstr ""
 "Stizza tut ils SVGs e PDFs. Questas datotecas vegnan regeneradas davosvart e "
 "stattan puspè a disposiziun en paucas minutas."

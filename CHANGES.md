@@ -1,8 +1,198 @@
 # Changes
 
+## 2023.16
+
+`2023-04-19` | [5a8e9c14f8...3081f7bdc1](https://github.com/OneGov/onegov-cloud/compare/5a8e9c14f8^...3081f7bdc1)
+
+### Feriennet
+
+##### New banners and logo
+
+`Feature` | [PRO-1173](https://linear.app/projuventute/issue/PRO-1173) | [fac9d2d77a](https://github.com/onegov/onegov-cloud/commit/fac9d2d77a6a8f518bce8a0767b603ef966f5653)
+
+##### E-mail notifications on registration for activity
+
+The attendee receives a notification on registration or cancellation of their participation.
+
+`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [c8e1e47d58](https://github.com/onegov/onegov-cloud/commit/c8e1e47d58efd0f2d1f45249865bc58bd1dabc70)
+
+##### Invoice Items payment with dates
+
+`Feature` | [PRO-1167](https://linear.app/projuventute/issue/PRO-1167) | [3081f7bdc1](https://github.com/onegov/onegov-cloud/commit/3081f7bdc1c4d4ad442b0c65ba50d775df03a92a)
+
+### Org
+
+##### Add more options to "further information" on directories
+
+`Feature` | [OGC-928](https://linear.app/onegovcloud/issue/OGC-928) | [b34fabd9bb](https://github.com/onegov/onegov-cloud/commit/b34fabd9bb5189b3ba359963a6486c0bc9cb3b86)
+
+### Town6
+
+##### Make color inversion on icon links possible
+
+`Feature` | [OGC-764](https://linear.app/onegovcloud/issue/OGC-764) | [9d77ea9d20](https://github.com/onegov/onegov-cloud/commit/9d77ea9d20c3514c65811a3a3be8dcd6a6e9726f)
+
+##### External event url
+
+`Feature` | [OGC-746](https://linear.app/onegovcloud/issue/OGC-746) | [a2f858c15e](https://github.com/onegov/onegov-cloud/commit/a2f858c15edd12c7002170724e44b1321c8dd883)
+
+##### Small Fixes
+
+`Bugfix` | [5a8e9c14f8](https://github.com/onegov/onegov-cloud/commit/5a8e9c14f87e838bbaf188ad5ed784db04312f07)
+
+## 2023.15
+
+`2023-04-14` | [d83694ed38...54d349b1ba](https://github.com/OneGov/onegov-cloud/compare/d83694ed38^...54d349b1ba)
+
+### Core
+
+##### Fix a lot bugbear warnings.
+
+`Feature` | [ed22bb2831](https://github.com/onegov/onegov-cloud/commit/ed22bb2831c4358f8363bada4203ea83b5c11fae)
+
+##### Enable flake8 bugbear.
+
+Enables bugbear in pre-commit and CI linting, also introduces a garbage collector friendly LRU cache variant.
+
+`Feature` | [OGC-1052](https://linear.app/onegovcloud/issue/OGC-1052) | [e0e6a99d35](https://github.com/onegov/onegov-cloud/commit/e0e6a99d35bf9558fb08d91e9a57d4a874f1ed90)
+
+### Election Day
+
+##### Make clear media callout more specific.
+
+`Feature` | [d83694ed38](https://github.com/onegov/onegov-cloud/commit/d83694ed388b1dba07f22a71ff227d6e47115b6b)
+
+##### Add browser notification hint.
+
+`Feature` | [74e039b610](https://github.com/onegov/onegov-cloud/commit/74e039b610533af64760bbc7c89568345ca0686c)
+
+##### Fixes missing translation.
+
+`Bugfix` | [c64b7ab263](https://github.com/onegov/onegov-cloud/commit/c64b7ab263f880d5d8b984b80e4bd1981bae8484)
+
+### Feriennet
+
+##### Add option to add a differing address for an attendee
+
+`Feature` | [PRO-1116](https://linear.app/projuventute/issue/PRO-1116) | [c5fd8149d3](https://github.com/onegov/onegov-cloud/commit/c5fd8149d3469c992662c493f3871aba5f93cfb5)
+
+##### Update Banners
+
+`Feature` | [PRO-1170](https://linear.app/projuventute/issue/PRO-1170) | [00485719b0](https://github.com/onegov/onegov-cloud/commit/00485719b04e43e5dfb723645f83ef747f16b790)
+
+##### Display free spots until booking phase has ended
+
+If "Allow bookings after the bills have been created." is checked in the phase settings the booking phase will only end once the actual end date of the booking phase is reached.
+
+`Feature` | [PRO-909](https://linear.app/projuventute/issue/PRO-909) | [c582039985](https://github.com/onegov/onegov-cloud/commit/c582039985bcbb4b875fcf831e17d480806b727b)
+
+##### Invoice Link access denied
+
+Displays "access denied" instead of "page not found" if Invoice exists.
+
+`Bugfix` | [PRO-1149](https://linear.app/projuventute/issue/PRO-1149) | [bbb5393d3f](https://github.com/onegov/onegov-cloud/commit/bbb5393d3f2040da22252bd38e855010a98a0efa)
+
+##### Only show attendees with booking for occasion
+
+`Bugfix` | [PRO-1159](https://linear.app/projuventute/issue/PRO-1159) | [623fffecf7](https://github.com/onegov/onegov-cloud/commit/623fffecf70fc84102bcd03e1fee2080ecd8ab90)
+
+### Org
+
+##### Prioritize Events in search, and sort chronologically.
+
+`Feature` | [OGC-908](https://linear.app/onegovcloud/issue/OGC-908) | [d65229c4e6](https://github.com/onegov/onegov-cloud/commit/d65229c4e671fe249d20acad9931d8907141029a)
+
+### Search
+
+##### Make model loading more robust to corrupt search indexes.
+
+`Bugfix` | [f799ac39fa](https://github.com/onegov/onegov-cloud/commit/f799ac39fad2a22c5b780dd7d316742d7082cdd8)
+
+### Town6
+
+##### Improve mail text for ticket.
+
+`Bugfix` | [OGC-1028](https://linear.app/onegovcloud/issue/OGC-1028) | [39b56314db](https://github.com/onegov/onegov-cloud/commit/39b56314db219ada9f70b22398e2288e7416af65)
+
+## 2023.14
+
+`2023-03-31` | [29986838ad...a5d780608d](https://github.com/OneGov/onegov-cloud/compare/29986838ad^...a5d780608d)
+
+### Ballot
+
+##### Speed up import of proporz elections.
+
+`Bugfix` | [9feda8c6ca](https://github.com/onegov/onegov-cloud/commit/9feda8c6ca62d9d8d17c111c1fe6700b6cef5b4e)
+
+### Core
+
+##### Use latest pytest-localserver.
+
+`Other` | [OGC-444](https://linear.app/onegovcloud/issue/OGC-444) | [9c3ba6a301](https://github.com/onegov/onegov-cloud/commit/9c3ba6a3011b402d90c694e0a8cc5516281d3ab4)
+
+##### Don't use deferral on timestamp columns.
+
+Timestamps don't add a lot of data to queries but accessing them will 
+lead to a lot of additional queries. Also, nobody expects these 
+timestamps to be deferred in the first place.
+
+`Bugfix` | [6288609773](https://github.com/onegov/onegov-cloud/commit/6288609773ffc7cc447db2dd267e7dd433c00ff1)
+
+### Election Day
+
+##### Show timestamp of when the last archive was generated.
+
+`Feature` | [OGC-885](https://linear.app/onegovcloud/issue/OGC-885) | [60a155a619](https://github.com/onegov/onegov-cloud/commit/60a155a61997a522bd48788d4937badb1f0bc3db)
+
+##### Add fixture for candidate panachage results.
+
+`Feature` | [33bf6b6be9](https://github.com/onegov/onegov-cloud/commit/33bf6b6be9b5a10acc7dbd243eac5716dbf31c90)
+
+##### Add websocket notification fallback.
+
+Falls back to short polling using a cached endpoint, in case the websocket server is unreachable or out of workers.
+
+`Feature` | [OGC-991](https://linear.app/onegovcloud/issue/OGC-991) | [ca68ec36ce](https://github.com/onegov/onegov-cloud/commit/ca68ec36cef0612c2a62e3fcfb38c089cc3687b0)
+
+##### Fix entity filter sorting.
+
+`Bugfix` | [1e2b8b65e6](https://github.com/onegov/onegov-cloud/commit/1e2b8b65e68a412d15d8ff00cebab1bba3d8a9ce)
+
+### Ferienet
+
+##### Update banners
+
+`Feature` | [PRO-1163](https://linear.app/projuventute/issue/PRO-1163) | [a367bc346c](https://github.com/onegov/onegov-cloud/commit/a367bc346c0bea35bfb0105135aee4eb13bff397)
+
+### Feriennet
+
+##### Make sure importing transaction files works again.
+
+`Bugfix` | [PRO-1156](https://linear.app/projuventute/issue/PRO-1156) | [93c4d96653](https://github.com/onegov/onegov-cloud/commit/93c4d96653219c706549e9aef97d9fcac05664f0)
+
+##### Dashboard Occasions
+
+Only counts occasions of accepted activities
+
+`Bugfix` | [PRO-1161](https://linear.app/projuventute/issue/PRO-1161) | [58a2a4f497](https://github.com/onegov/onegov-cloud/commit/58a2a4f4971afc51d2257672a4ce6edcc0df767f)
+
+### Org
+
+##### Extends allocation cleanup view with a weekday filter
+
+`Feature` | [OGC-1032](https://linear.app/onegovcloud/issue/OGC-1032) | [b0ad130ed7](https://github.com/onegov/onegov-cloud/commit/b0ad130ed701f51b2c414b0249e43144022c9b98)
+
+### Town6
+
+##### Map view
+
+Reposition map on directory overview.
+
+`Feature` | [OGC-996](https://linear.app/onegovcloud/issue/OGC-996) | [8ea9293963](https://github.com/onegov/onegov-cloud/commit/8ea9293963cfd88001b4c8c694ee0b013caad46d)
+
 ## 2023.13
 
-`2023-03-17` | [0edf69e38c...3d432dc702](https://github.com/OneGov/onegov-cloud/compare/0edf69e38c^...3d432dc702)
+`2023-03-17` | [0edf69e38c...d788d97796](https://github.com/OneGov/onegov-cloud/compare/0edf69e38c^...d788d97796)
 
 ### Ballot
 
@@ -2804,70 +2994,4 @@ This does not play well with caches.
 ##### Add compatibility with bleach 5.
 
 `Bugfix` | [374ce1a2ae](https://github.com/onegov/onegov-cloud/commit/374ce1a2aec5aeb1b73f10e48647f727c3ed06de)
-
-## 2022.23
-
-`2022-04-07` | [f0848d421d...ee0b0ad5c5](https://github.com/OneGov/onegov-cloud/compare/f0848d421d^...ee0b0ad5c5)
-
-### Election Day
-
-##### Fixes flaky test.
-
-`Bugfix` | [f0848d421d](https://github.com/onegov/onegov-cloud/commit/f0848d421d99cac7e50d6ac0c9eb256c5b3acad7)
-
-## 2022.22
-
-`2022-04-06` | [54afaaa8bb...8b0903010b](https://github.com/OneGov/onegov-cloud/compare/54afaaa8bb^...8b0903010b)
-
-### Core
-
-##### Adds back the ability to send mails through SMTP.
-
-`Feature` | [OGC-307](https://linear.app/onegovcloud/issue/OGC-307) | [54afaaa8bb](https://github.com/onegov/onegov-cloud/commit/54afaaa8bb09d76fe72a6e68b7f2783d40197f91)
-
-##### Adds back smtp4dev for local development.
-
-`Feature` | [OGC-307](https://linear.app/onegovcloud/issue/OGC-307) | [5c1ff9054f](https://github.com/onegov/onegov-cloud/commit/5c1ff9054f87c849cdd6cbd8183e5de616f09a3e)
-
-### Winterthur
-
-##### Add last updated timestamp and status to streets.
-
-`Feature` | [FW-96](https://stadt-winterthur.atlassian.net/browse/FW-96) | [18ee0a32ea](https://github.com/onegov/onegov-cloud/commit/18ee0a32eaa64ec09bf49363125cd2f8c5fb577d)
-
-## 2022.21
-
-`2022-04-06` | [aab7cbddca...5ab05b5da9](https://github.com/OneGov/onegov-cloud/compare/aab7cbddca^...5ab05b5da9)
-
-### Election Day
-
-##### Add statistics view for votes.
-
-`Feature` | [OGC-311](https://linear.app/onegovcloud/issue/OGC-311) | [75c7b74e97](https://github.com/onegov/onegov-cloud/commit/75c7b74e97518a135a721cb647fb3bb88bc1a4d2)
-
-##### Add sort option to candidates and lists widgets.
-
-`Feature` | [OGC-171](https://linear.app/onegovcloud/issue/OGC-171) | [846d81fb9a](https://github.com/onegov/onegov-cloud/commit/846d81fb9a9b6b2c21f165ce6c7916fd20d08314)
-
-##### Add explanations PDF.
-
-`Feature` | [OGC-72](https://linear.app/onegovcloud/issue/OGC-72) | [309dfa54bb](https://github.com/onegov/onegov-cloud/commit/309dfa54bb84ec7f89b96c80380c9f5e3b922024)
-
-### Feriennet
-
-##### Removes edit button from homepage
-
-`Bugfix` | [PRO-1010](https://linear.app/projuventute/issue/PRO-1010) | [1579c442dd](https://github.com/onegov/onegov-cloud/commit/1579c442dd46a9444e856fc42c314014deb9e46d)
-
-### Fsi
-
-##### Restricts LDAP import to @gibz.ch users.
-
-`Feature` | [OGC-325](https://linear.app/onegovcloud/issue/OGC-325) | [aab7cbddca](https://github.com/onegov/onegov-cloud/commit/aab7cbddca9bb83f77ca2812c76711041d897571)
-
-### Town6
-
-##### Add missing unsubscribe link.
-
-`Bugfix` | [OGC-392](https://linear.app/onegovcloud/issue/OGC-392) | [73a250e567](https://github.com/onegov/onegov-cloud/commit/73a250e567c11b8c4b611ce1b671031fb8a9412f)
 

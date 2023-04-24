@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-03-13 12:46+0100\n"
+"POT-Creation-Date: 2023-04-18 15:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -320,6 +320,21 @@ msgstr "Descrive il contenuto di questa cartella"
 
 msgid "Further Information"
 msgstr "Ulteriori informazioni"
+
+msgid "If left empty \"Further Information\" will be used as title"
+msgstr "Se lasciato vuoto, il titolo sarà \"Ulteriori informazioni\"."
+
+msgid "Text"
+msgstr "Testo"
+
+msgid "Position"
+msgstr "Posizione"
+
+msgid "Above the entries"
+msgstr "Sopra le entrate"
+
+msgid "Below the entries"
+msgstr "Sotto le entrate"
 
 msgid "Definition"
 msgstr "Definizione"
@@ -762,9 +777,6 @@ msgstr ""
 msgid "Describes what this form is about"
 msgstr "Descrive il contenuto di questo modulo"
 
-msgid "Text"
-msgstr "Testo"
-
 msgid "Used to group the form in the overview"
 msgstr "Utilizzato per raggruppare il modulo nella panoramica"
 
@@ -986,6 +998,15 @@ msgstr "Mostra l'estratto se accedi alla pagina principale"
 msgid "(Redesign only)"
 msgstr "(Solo riprogettazione)"
 
+msgid "Destination"
+msgstr "Destinazione"
+
+msgid "- Root -"
+msgstr "- Principale -"
+
+msgid "Invalid destination selected"
+msgstr "Destinazione non valida selezionata"
+
 msgid "Salutation"
 msgstr "Formula di saluto"
 
@@ -1001,8 +1022,8 @@ msgstr "Cognome"
 msgid "Function"
 msgstr "Funzione"
 
-msgid "Direct Phone Number"
-msgstr "Numero di telefono diretto"
+msgid "Direct Phone Number or Mobile"
+msgstr "Numero di telefono diretto o cellulare"
 
 msgid "Born"
 msgstr "Cognome da nubile"
@@ -1018,6 +1039,21 @@ msgstr "Gruppo parlamentare"
 
 msgid "Website"
 msgstr "Sito web"
+
+msgid "Website 2"
+msgstr ""
+
+msgid "Location address"
+msgstr ""
+
+msgid "Location Code and City"
+msgstr ""
+
+msgid "Postal address"
+msgstr ""
+
+msgid "Postal Code and City"
+msgstr ""
 
 msgid "Picture"
 msgstr "Immagine"
@@ -1780,9 +1816,6 @@ msgstr "Elimina modulo"
 msgid "Export"
 msgstr "Esporta"
 
-msgid "Move"
-msgstr "Spostare"
-
 msgid "Change URL"
 msgstr "Modifica URL"
 
@@ -1838,12 +1871,6 @@ msgstr "Nuova nota"
 
 msgid "PDF"
 msgstr "PDF"
-
-msgid "Destination"
-msgstr "Destinazione"
-
-msgid "- Root -"
-msgstr "- Principale -"
 
 msgid "New Message"
 msgstr "Nuovo messaggio"
@@ -2457,9 +2484,6 @@ msgstr "Modifica argomento"
 
 msgid "Move Topic"
 msgstr "Spostare argomento"
-
-msgid "Invalid destination selected"
-msgstr "Destinazione non valida selezionata"
 
 msgid "The topic was deleted"
 msgstr "L'argomento è stato eliminato"
@@ -3222,9 +3246,6 @@ msgstr "L'evento è stato accettato:"
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Purtroppo l'evento è stato rifiutato:"
-
-msgid "The OneGov Cloud Team"
-msgstr "Il team di OneGov Cloud"
 
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
@@ -4247,6 +4268,10 @@ msgstr ""
 "esportazione. Tieni presente che vengono importati solo 100 elementi alla "
 "volta. Per importare più elementi, ripeti l'importazione finché necessario."
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr ""
+"Sposta l'argomento e tutti i suoi sottoargomenti nella destinazione indicata."
+
 msgid ""
 "Stable URLs are important. Here you can change the path to your site "
 "independently from the title."
@@ -4611,6 +4636,9 @@ msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
 "Lo stesso formato dell'esportazione (XLSX) può essere usato per "
 "l'importazione."
+
+msgid "Move"
+msgstr "Spostare"
 
 msgid "Your payment has been received"
 msgstr "Abbiamo ricevuto il tuo pagamento"
@@ -5110,9 +5138,6 @@ msgstr ""
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Il PDF di questo biglietto è stato caricato con successo su Gever."
 
-msgid "Moves the topic and all its sub topics to the given destination."
-msgstr "Sposta l'argomento e tutti i suoi sottoargomenti nella destinazione indicata."
-
 msgid "My"
 msgstr "Il mio"
 
@@ -5152,6 +5177,8 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
+#~ msgid "The OneGov Cloud Team"
+#~ msgstr "Il team di OneGov Cloud"
 
 #~ msgid "1 entry"
 #~ msgstr "1 elemento"

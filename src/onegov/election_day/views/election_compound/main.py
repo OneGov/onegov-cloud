@@ -8,6 +8,7 @@ from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
+from onegov.election_day.utils import get_last_notified
 from onegov.election_day.utils.election_compound import \
     get_candidate_statistics
 from onegov.election_day.utils.election_compound import get_elected_candidates
@@ -162,6 +163,23 @@ def view_election_compound_summary(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return get_election_compound_summary(self, request)
+
+
+@ElectionDayApp.json(
+    model=ElectionCompound,
+    name='last-notified',
+    permission=Public
+)
+def view_election_compound_last_notified(self, request):
+
+    """ View the timestamp of the last notification. """
+
+    @request.after
+    def add_headers(response):
+        add_cors_header(response)
+        add_last_modified_header(response, self.last_modified)
+
+    return {'last-notified': get_last_notified(self)}
 
 
 @ElectionDayApp.pdf_file(model=ElectionCompound, name='pdf')

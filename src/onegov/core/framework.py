@@ -572,9 +572,10 @@ class Framework(
 
         try:
             action, handler = next(query(self.__class__))
-        except (StopIteration, RuntimeError):
+        except (StopIteration, RuntimeError) as exception:
             raise KeyError(
-                "{!r} has no view named {}".format(model, view_name))
+                "{!r} has no view named {}".format(model, view_name)
+            ) from exception
 
         return action.permission
 
@@ -663,12 +664,13 @@ class Framework(
 
     def prepare_email(self, reply_to, category='marketing',
                       receivers=(), cc=(), bcc=(), subject=None, content=None,
-                      attachments=(), headers={}, plaintext=None):
+                      attachments=(), headers=None, plaintext=None):
         """ Common path for batch and single mail sending. Use this the same
          way you would use send_email then pass the prepared emails in a list
          or another iterable to the batch send method.
         """
 
+        headers = headers or {}
         assert reply_to
         assert category in ('transactional', 'marketing')
         sender = self.mail[category]['sender']
@@ -705,7 +707,7 @@ class Framework(
 
     def send_email(self, reply_to=None, category='marketing',
                    receivers=(), cc=(), bcc=(), subject=None, content=None,
-                   attachments=(), headers={}, plaintext=None):
+                   attachments=(), headers=None, plaintext=None):
         """ Sends a plain-text e-mail to the given recipients. A reply to
         address is used to enable people to answer to the e-mail which is
         usually sent by a noreply kind of e-mail address.
@@ -717,6 +719,7 @@ class Framework(
         are automatically commited at the end.
 
         """
+        headers = headers or {}
         directory = self.mail[category]['directory']
         assert directory
 

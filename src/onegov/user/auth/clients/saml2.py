@@ -131,7 +131,7 @@ class SAML2Client():
         elif request.method == 'POST':
             return BINDING_HTTP_POST
         else:
-            assert False, "binding not implemented"
+            raise NotImplementedError()
 
     def get_sessions(self, app):
         # this can use our short-lived cache, it will likely
@@ -202,9 +202,10 @@ class SAML2Client():
                     state_cache=state_cache
                 )
                 self._connections[request.app.application_id] = conn
-            except Exception as e:
+            except Exception as exception:
                 raise ValueError(
-                    f'SAML2 config error: {str(e)}')
+                    f'SAML2 config error: {str(exception)}'
+                ) from exception
         return conn
 
     def get_name_id(self, user):

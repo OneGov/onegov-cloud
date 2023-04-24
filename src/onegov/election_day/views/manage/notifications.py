@@ -30,6 +30,7 @@ def view_trigger_notficiations(self, request, form):
             form.notifications.data
         )
         request.message(_("Notifications triggered."), 'success')
+        request.app.pages_cache.flush()
         return redirect(layout.manage_link)
 
     latest_date = form.latest_date(session)

@@ -1,3 +1,4 @@
+from onegov.activity import Invoice
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -154,3 +155,38 @@ class PaymentWithDateForm(Form):
         label=_("Payment date"),
         validators=(InputRequired(), ),
     )
+
+    target = RadioField(
+        validators=(InputRequired(), ),
+        label=_("Target"),
+        choices=(
+            ('all', _("Whole invoice")),
+            ('specific', _("Only for specific items"))
+        ),
+        default='all',
+    )
+
+    items = MultiCheckboxField(
+        label=_("Items"),
+        validators=(InputRequired(), ),
+        depends_on=('target', 'specific'),
+        choices=tuple()
+    )
+
+    def on_request(self):
+        self.items.choices = [
+            (i.id.hex,
+             f'{i.group} - {i.text} ({round(i.amount, 2)})')
+            for i in self.invoice.items if not i.paid]
+
+        if self.request.params['item-id'] != 'all':
+            self.target.data = 'specific'
+            self.items.data = [self.request.params['item-id']]
+        else:
+            self.items.data = [i.id.hex for i in self.invoice.items
+                               if not i.paid]
+
+    @property
+    def invoice(self):
+        return self.request.session.query(
+            Invoice).filter_by(id=self.request.params['invoice-id']).first()
