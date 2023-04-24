@@ -789,9 +789,6 @@ msgstr "Karte"
 msgid "More news"
 msgstr "Weitere News"
 
-msgid "More Entries"
-msgstr "Weitere Einträge"
-
 msgid "Previous Entry"
 msgstr "Vorheriger Eintrag"
 

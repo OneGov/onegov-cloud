@@ -653,7 +653,6 @@
         </div>
 
         <div class="more-entries side-panel" tal:condition="prev_entry or next_entry">
-            <h3 i18n:translate="">More Entries</h3>
             <ul class="more-list">
                 <li tal:condition="prev_entry">
                     <a href="${request.link(prev_entry)}" class="list-link">

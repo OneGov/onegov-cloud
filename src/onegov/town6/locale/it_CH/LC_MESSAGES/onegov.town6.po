@@ -779,9 +779,6 @@ msgstr "Mappa"
 msgid "More news"
 msgstr "Altre notizie"
 
-msgid "More Entries"
-msgstr "Altre voci"
-
 msgid "Previous Entry"
 msgstr "Voce precedente"
 
