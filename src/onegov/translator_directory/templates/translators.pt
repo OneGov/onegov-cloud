@@ -24,6 +24,7 @@
                                     <th i18n:translate="">Gender</th>
                                     <th i18n:translate="">Written languages</th>
                                     <th i18n:translate="">Spoken languages</th>
+                                    <th i18n:translate="">Monitoring languages</th>
                                     <th i18n:translate="">Drive distance</th>
                                     <th i18n:translate="">Phone numbers</th>
                                     <th i18n:translate="">Email</th>
@@ -54,6 +55,13 @@
                                         </td>
                                         <td>
                                             <tal:b tal:repeat="language translator.spoken_languages">
+                                                <span tal:attributes="class layout.color_class(language.writers_count)">
+                                                ${language.name} (${language.speakers_count})
+                                                </span>
+                                            </tal:b>
+                                        </td>
+                                        <td>
+                                            <tal:b tal:repeat="language translator.monitoring_languages">
                                                 <span tal:attributes="class layout.color_class(language.writers_count)">
                                                 ${language.name} (${language.speakers_count})
                                                 </span>
