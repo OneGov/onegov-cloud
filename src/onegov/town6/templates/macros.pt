@@ -657,7 +657,7 @@
             <ul class="more-list">
                 <li tal:condition="prev_entry">
                     <a href="${request.link(prev_entry)}" class="list-link">
-                        <i class="fa fa-chevron-left"></i><span class="list-title">Previous Entry</span>
+                        <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate="">Previous Entry</span>
                     </a>
                     <a href="${request.link(prev_entry)}">
                         <p class="list-lead preview">
@@ -667,7 +667,7 @@
                 </li>
                 <li tal:condition="next_entry">
                     <a href="${request.link(next_entry)}" class="list-link">
-                        <i class="fa fa-chevron-right"></i><span class="list-title">Next Entry</span>
+                        <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate="">Next Entry</span>
                     </a>
                     <a href="${request.link(next_entry)}">
                         <p class="list-lead preview">
