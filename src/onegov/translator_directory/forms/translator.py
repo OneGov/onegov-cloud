@@ -114,6 +114,10 @@ class FormChoicesMixin:
         )
         return sorted(admissions, key=lambda x: x[1].upper())
 
+    @property
+    def lang_collection(self):
+        return LanguageCollection(self.request.session)
+
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
 
@@ -366,10 +370,6 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     )
 
     @property
-    def lang_collection(self):
-        return LanguageCollection(self.request.session)
-
-    @property
     def cert_collection(self):
         return LanguageCertificateCollection(self.request.session)
 
@@ -564,10 +564,6 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         label=_('Search in first and last name'),
         validators=[Optional(), Length(max=full_text_max_chars)]
     )
-
-    @property
-    def lang_collection(self):
-        return LanguageCollection(self.request.session)
 
     @property
     def monitoring_languages(self):
