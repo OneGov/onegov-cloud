@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-04-18 09:07+0200\n"
+"POT-Creation-Date: 2023-04-18 15:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3247,9 +3247,6 @@ msgstr "L'evento è stato accettato:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Purtroppo l'evento è stato rifiutato:"
 
-msgid "The OneGov Cloud Team"
-msgstr "Il team di OneGov Cloud"
-
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
 
@@ -5179,6 +5176,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "The OneGov Cloud Team"
+#~ msgstr "Il team di OneGov Cloud"
 
 #~ msgid "1 entry"
 #~ msgstr "1 elemento"

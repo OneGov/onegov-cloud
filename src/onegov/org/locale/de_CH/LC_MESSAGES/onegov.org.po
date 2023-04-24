@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-18 09:07+0200\n"
+"POT-Creation-Date: 2023-04-18 15:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3246,9 +3246,6 @@ msgstr "Ihre Veranstaltung wurde angenommen:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
-msgid "The OneGov Cloud Team"
-msgstr "Das OneGov Cloud Team"
-
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
@@ -5163,6 +5160,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "The OneGov Cloud Team"
+#~ msgstr "Das OneGov Cloud Team"
 
 #~ msgid "1 entry"
 #~ msgstr "1 Eintrag"
