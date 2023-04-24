@@ -519,7 +519,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 
     monitoring_languages_ids = ChosenSelectMultipleField(
         label=_('Monitoring languages'),
-        choices=[],
+        choices=[]
     )
 
     interpret_types = ChosenSelectMultipleField(
@@ -532,14 +532,14 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
-    admission = ChosenSelectMultipleField(
-        label=_('Admission'),
-        choices=[]
-    )
-
     genders = ChosenSelectMultipleField(
         label=_('Gender'),
         choices=[],
+    )
+
+    admission = ChosenSelectMultipleField(
+        label=_('Admission'),
+        choices=[]
     )
 
     order_by = RadioField(
