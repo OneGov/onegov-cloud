@@ -22,17 +22,19 @@ def get_translator(request, id):
 @TranslatorDirectoryApp.path(
     model=TranslatorCollection, path='/translators',
     converters=dict(page=int, written_langs=[str], spoken_langs=[str],
-                    order_desc=bool, guilds=[str], interpret_types=[str],
-                    admissions=[str], genders=[str])
+                    monitor_langs=[str], order_desc=bool, guilds=[str],
+                    interpret_types=[str], admissions=[str], genders=[str])
 )
 def get_translators(request, page=None, written_langs=None, spoken_langs=None,
-                    order_by=None, order_desc=None, search=None, guilds=None,
-                    interpret_types=None, admissions=None, genders=None):
+                    monitor_langs=None, order_by=None, order_desc=None,
+                    search=None, guilds=None, interpret_types=None,
+                    admissions=None, genders=None):
     user = request.current_user
     return TranslatorCollection(
         request.app, page or 0,
         written_langs=written_langs,
         spoken_langs=spoken_langs,
+        monitor_langs=monitor_langs,
         order_by=order_by,
         order_desc=order_desc,
         user_role=user and user.role or None,

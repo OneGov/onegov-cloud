@@ -537,6 +537,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[],
     )
 
+    monitoring_languages_ids = ChosenSelectMultipleField(
+        label=_('Monitoring languages'),
+        choices=[],
+    )
+
     order_by = RadioField(
         label=_('Order by'),
         choices=(
@@ -560,6 +565,14 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         validators=[Optional(), Length(max=full_text_max_chars)]
     )
 
+    @property
+    def lang_collection(self):
+        return LanguageCollection(self.request.session)
+
+    @property
+    def monitoring_languages(self):
+        return self.lang_collection.by_ids(self.monitoring_languages_ids.data)
+
     def apply_model(self, model):
 
         if model.spoken_langs:
@@ -570,6 +583,10 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 
         if model.written_langs:
             self.written_langs.data = model.written_langs
+
+        if model.monitor_langs:
+            self.monitoring_languages_ids.data = model.monitoring_languages
+
         self.order_by.data = model.order_by
         self.order_desc.data = model.order_desc and '1' or '0'
         self.search.data = model.search
@@ -587,6 +604,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.guilds = self.guilds.data
         model.admissions = self.admission.data
         model.genders = self.genders.data
+        model.monitoring_languages = self.monitoring_languages_ids.data
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
@@ -595,3 +613,4 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.interpret_types.choices = self.interpret_types_choices
         self.admission.choices = self.admission_choices
         self.genders.choices = self.gender_choices
+        self.monitoring_languages_ids.choices = self.language_choices

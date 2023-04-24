@@ -23,6 +23,7 @@ class TranslatorCollection(GenericCollection, Pagination):
             page=0,
             written_langs=None,
             spoken_langs=None,
+            monitor_langs=None,
             order_by=None,
             order_desc=False,
             user_role=None,
@@ -48,9 +49,12 @@ class TranslatorCollection(GenericCollection, Pagination):
             assert isinstance(spoken_langs, list)
         if written_langs:
             assert isinstance(written_langs, list)
+        if monitor_langs:
+            assert isinstance(monitor_langs, list)
 
         self.written_langs = written_langs
         self.spoken_langs = spoken_langs
+        self.monitor_langs = monitor_langs
 
         if not order_by or order_by not in order_cols:
             order_by = order_cols[0]
@@ -65,6 +69,7 @@ class TranslatorCollection(GenericCollection, Pagination):
             self.page == other.page,
             self.written_langs == other.written_langs,
             self.spoken_langs == other.spoken_langs,
+            self.monitor_langs == other.monitor_langs,
             self.order_by == other.order_by,
             self.order_desc == other.order_desc,
             self.search == other.search,
@@ -195,6 +200,13 @@ class TranslatorCollection(GenericCollection, Pagination):
         )
 
     @property
+    def by_monitor_lang_expression(self):
+        return tuple(
+            Translator.monitoring_languages.any(id=lang_id)
+            for lang_id in self.monitor_langs
+        )
+
+    @property
     def by_search_term_expression(self):
         """Search for any word in any field of the search columns"""
         words = self.search.split(' ')
@@ -261,6 +273,9 @@ class TranslatorCollection(GenericCollection, Pagination):
         if self.written_langs:
             query = query.filter(and_(*self.by_written_lang_expression))
 
+        if self.monitor_langs:
+            query = query.filter(and_(*self.by_monitor_lang_expression))
+
         if self.user_role != 'admin':
             query = query.filter(Translator.for_admins_only == False)
 
@@ -280,9 +295,8 @@ class TranslatorCollection(GenericCollection, Pagination):
             query = query.filter(or_(*self.by_admission))
 
         if self.genders:
-            query = query.filter(or_(*self.genders))
+            query = query.filter(or_(*self.by_gender))
 
-        query = query.order_by(self.order_expression)
         query = query.order_by(self.order_expression)
         return query
 

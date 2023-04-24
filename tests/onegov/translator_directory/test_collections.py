@@ -140,13 +140,21 @@ def test_translator_collection(translator_app):
 
     # Test search by gender
     collection.admissions = []
+    collection.spoken_langs = None
+    collection.written_langs = None
+
     lisa = create_translator(
         translator_app, email='lisa@memo.com', gender='F', last_name='L'
     )
-    collection.gender = 'F'
+    collection.genders = ['F']
     assert collection.query().all() == [lisa]
-    collection.gender = 'M'
+    collection.genders = ['M']
     assert collection.query().all() == [james, bob]
+
+    collection.genders = []
+    lisa.monitoring_languages.append(langs[2])
+    collection.monitor_langs = [langs[2].id]
+    assert collection.query().all() == [lisa]
 
 
 def test_translator_collection_coordinates(translator_app):
