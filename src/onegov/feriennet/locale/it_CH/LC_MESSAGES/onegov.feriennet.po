@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-04-03 16:03+0200\n"
+"POT-Creation-Date: 2023-04-24 08:43+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -2713,8 +2713,8 @@ msgstr "${count} sono state create prenotazioni manualmente"
 msgid "Invoice marked as paid"
 msgstr "Fattura contrassegnata come pagata"
 
-msgid "Invoice items marked as paid"
-msgstr "Voci di fattura contrassegnate come pagate"
+msgid "Invoice item(s) marked as paid"
+msgstr ""
 
 #, python-format
 msgid "Mark paid for ${user}"
@@ -2762,7 +2762,7 @@ msgstr "La prenotazione è stata cancellata con successo"
 
 #, python-format
 msgid "Degregistration of ${attendee} for \"${title}\""
-msgstr "Degistrazione di ${attendee} per \"${title}\""
+msgstr "Cancellazione di ${attendee} per \"${title}\""
 
 msgid "Cannot select more than three favorites per child"
 msgstr "Si possono scegliere un massimo di tre preferenze per bambino"
@@ -3175,6 +3175,9 @@ msgstr "Prenotazioni ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
+
+#~ msgid "Invoice items marked as paid"
+#~ msgstr "Voci di fattura contrassegnate come pagate"
 
 #~ msgid "Move"
 #~ msgstr "Spostare"
