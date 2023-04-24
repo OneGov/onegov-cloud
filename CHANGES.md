@@ -1,8 +1,31 @@
 # Changes
 
+## 2023.17
+
+`2023-04-24` | [dc42c72bf3...00a56fcdf7](https://github.com/OneGov/onegov-cloud/compare/dc42c72bf3^...00a56fcdf7)
+
+### Feriennet
+
+##### Edit email text
+
+`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [00a56fcdf7](https://github.com/onegov/onegov-cloud/commit/00a56fcdf779d548ba7fd1ad803679d63a951fbd)
+
+### Town6
+
+##### Remove "Onegov Cloud Team" in mail-footer
+
+`Feature` | [OGC-1167](https://linear.app/onegovcloud/issue/OGC-1167) | [5f9dce3952](https://github.com/onegov/onegov-cloud/commit/5f9dce3952b4096e48ef3d1946686843ca73ce12)
+
+##### Fixes news not being displayed if it's the first item.
+
+Fix root-level page interpretation bug for news, 
+which was mistakenly being treated as falsy (index 0).
+
+`Bugfix` | [OGC-863](https://linear.app/onegovcloud/issue/OGC-863) | [dc42c72bf3](https://github.com/onegov/onegov-cloud/commit/dc42c72bf3229270ff262b2c38a58d61cb41cfcb)
+
 ## 2023.16
 
-`2023-04-19` | [5a8e9c14f8...3081f7bdc1](https://github.com/OneGov/onegov-cloud/compare/5a8e9c14f8^...3081f7bdc1)
+`2023-04-19` | [5a8e9c14f8...53985572c5](https://github.com/OneGov/onegov-cloud/compare/5a8e9c14f8^...53985572c5)
 
 ### Feriennet
 
@@ -2972,26 +2995,4 @@ This does not play well with caches.
 ##### Allows tenants to specify custom tags
 
 `Feature` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [d5a2f507b2](https://github.com/onegov/onegov-cloud/commit/d5a2f507b21288b529a1e9faf35da9cc590ee441)
-
-## 2022.24
-
-`2022-04-12` | [52883745a4...fa02e35953](https://github.com/OneGov/onegov-cloud/compare/52883745a4^...fa02e35953)
-
-### Event
-
-##### Add compatibility with bleach 5.
-
-`Bugfix` | [03d7cd4776](https://github.com/onegov/onegov-cloud/commit/03d7cd4776bac5601470279425d0d034a2b2d739)
-
-### File
-
-##### Switches to AIS2.py
-
-`Feature` | [OGC-144](https://linear.app/onegovcloud/issue/OGC-144) | [ca4eb0c3fb](https://github.com/onegov/onegov-cloud/commit/ca4eb0c3fb5c83d841499e7a70403865eacdb6dd)
-
-### Pdf
-
-##### Add compatibility with bleach 5.
-
-`Bugfix` | [374ce1a2ae](https://github.com/onegov/onegov-cloud/commit/374ce1a2aec5aeb1b73f10e48647f727c3ed06de)
 
