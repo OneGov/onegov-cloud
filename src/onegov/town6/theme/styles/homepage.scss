@@ -77,6 +77,17 @@
         flex: 0 0 auto;
         height: calc(100% - 2rem);
 
+        &.inverted-true {
+            background: $primary-color;
+
+            p, span {color: $white;}
+
+            .icon {
+                background: $white;
+                color: $primary-color;
+            }
+        }
+
         a {
             display: block;
             height: 100%;
@@ -95,7 +106,7 @@
 
         .icon {
             background: $primary-color;
-            color: #fff;
+            color: $white;
             height: 3rem;
             margin-right: 1rem;
             padding: .9rem;

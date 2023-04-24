@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-03-13 12:46+0100\n"
+"POT-Creation-Date: 2023-04-18 09:07+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -320,6 +320,22 @@ msgstr "Beschreibt worum es bei diesem Verzeichnis geht"
 
 msgid "Further Information"
 msgstr "Weitere Informationen"
+
+msgid "If left empty \"Further Information\" will be used as title"
+msgstr ""
+"Wenn leer gelassen, wird \"Weitere Informationen\" als Titel verwendet."
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Position"
+msgstr "Position"
+
+msgid "Above the entries"
+msgstr "Oberhalb der Einträge"
+
+msgid "Below the entries"
+msgstr "Unterhalb der Einträge"
 
 msgid "Definition"
 msgstr "Definition"
@@ -758,9 +774,6 @@ msgstr "Name der Ansicht, wo dieser Eintrag erscheinen soll"
 msgid "Describes what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
 
-msgid "Text"
-msgstr "Text"
-
 msgid "Used to group the form in the overview"
 msgstr "Dient zur Gruppierung in der Übersicht"
 
@@ -982,6 +995,15 @@ msgstr "Zeige Einleitung auf übergeordneter Seite"
 msgid "(Redesign only)"
 msgstr "(verfügbar im Redesign)"
 
+msgid "Destination"
+msgstr "Ziel"
+
+msgid "- Root -"
+msgstr "- Oberste Ebene -"
+
+msgid "Invalid destination selected"
+msgstr "Ungültiger Zielort gewählt"
+
 msgid "Salutation"
 msgstr "Anrede"
 
@@ -1014,6 +1036,21 @@ msgstr "Fraktion"
 
 msgid "Website"
 msgstr "Webseite"
+
+msgid "Website 2"
+msgstr ""
+
+msgid "Location address"
+msgstr ""
+
+msgid "Location Code and City"
+msgstr ""
+
+msgid "Postal address"
+msgstr ""
+
+msgid "Postal Code and City"
+msgstr ""
 
 msgid "Picture"
 msgstr "Bild"
@@ -1767,9 +1804,6 @@ msgstr "Formular löschen"
 msgid "Export"
 msgstr "Export"
 
-msgid "Move"
-msgstr "Verschieben"
-
 msgid "Change URL"
 msgstr "URL ändern"
 
@@ -1825,12 +1859,6 @@ msgstr "Neue Notiz"
 
 msgid "PDF"
 msgstr "PDF"
-
-msgid "Destination"
-msgstr "Ziel"
-
-msgid "- Root -"
-msgstr "- Oberste Ebene -"
 
 msgid "New Message"
 msgstr "Neue Nachricht"
@@ -2446,9 +2474,6 @@ msgstr "Thema Bearbeiten"
 
 msgid "Move Topic"
 msgstr "Thema Verschieben"
-
-msgid "Invalid destination selected"
-msgstr "Ungültiger Zielort gewählt"
 
 msgid "The topic was deleted"
 msgstr "Das Thema wurde gelöscht"
@@ -4237,6 +4262,9 @@ msgstr ""
 "berücksichtigt werden. Um mehr Einträge zu importieren muss der Import "
 "wiederholt werden."
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
+
 msgid ""
 "Stable URLs are important. Here you can change the path to your site "
 "independently from the title."
@@ -4593,6 +4621,9 @@ msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
 "Für den Import kann das gleiche Format wie für den Export (XLSX) verwendet "
 "werden."
+
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Your payment has been received"
 msgstr "Ihre Zahlung ist eingegangen"
@@ -5091,9 +5122,6 @@ msgstr ""
 "Beim Hochladen auf Gever ist ein Fehler aufgetreten. Der Statuscode der "
 "Antwort lautet ${status}."
 
-msgid "Moves the topic and all its sub topics to the given destination."
-msgstr "Verschiebt das Thema mit allen Unterthemen an den gewählten Ort."
-
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Das PDF dieses Tickets wurde erfolgreich hochgeladen zu Gever."
 
@@ -5135,7 +5163,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
 
 #~ msgid "1 entry"
 #~ msgstr "1 Eintrag"

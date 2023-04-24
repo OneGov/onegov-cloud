@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-03-29 11:38+0200\n"
+"POT-Creation-Date: 2023-04-03 16:03+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -844,6 +844,15 @@ msgstr "Per gli utenti di una categoria specifica"
 
 msgid "Payment date"
 msgstr "Data di pagamento"
+
+msgid "Whole invoice"
+msgstr "Fattura intera"
+
+msgid "Only for specific items"
+msgstr "Solo per articoli specifici"
+
+msgid "Items"
+msgstr "Voci della fattura"
 
 msgid "My donation"
 msgstr "La mia donazionoe"
@@ -2700,6 +2709,12 @@ msgstr "Non sono state create prenotazioni manualmente."
 #, python-format
 msgid "Created ${count} manual bookings"
 msgstr "${count} sono state create prenotazioni manualmente"
+
+msgid "Invoice marked as paid"
+msgstr "Fattura contrassegnata come pagata"
+
+msgid "Invoice items marked as paid"
+msgstr "Voci di fattura contrassegnate come pagate"
 
 #, python-format
 msgid "Mark paid for ${user}"

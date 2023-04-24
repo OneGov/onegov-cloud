@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-03-29 10:27+0200\n"
+"POT-Creation-Date: 2023-04-18 14:01+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -521,11 +521,11 @@ msgstr "Nessuna cartella ancora definita."
 msgid "No entries found."
 msgstr "Non è stato trovato nessun risultato."
 
-msgid "More"
-msgstr "Più"
-
 msgid "Further Information"
 msgstr "Ulteriori informazioni"
+
+msgid "More"
+msgstr "Più"
 
 msgid "Propose entry"
 msgstr "Proponi un elemento"
@@ -1580,6 +1580,9 @@ msgstr ""
 "Spiacenti, la pagina che stai cercando non è stata trovata. Prova a "
 "controllare l'URL per eventuali errori o utilizza la casella di ricerca in "
 "alto."
+
+msgid "Link to organizers page"
+msgstr "Link alla pagina dell'organizzatore"
 
 msgid "Export this event"
 msgstr "Esporta questo evento"
