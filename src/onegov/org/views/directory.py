@@ -565,10 +565,25 @@ def handle_change_request(self, request, form, layout=None):
     template='directory_entry.pt')
 def view_directory_entry(self, request, layout=None):
 
+    directory = self.directory
+
+    siblings = request.exclude_invisible(ExtendedDirectoryEntryCollection(
+        directory,
+        published_only=not request.is_manager
+    ).query())
+
+    entry_index = siblings.index(self)
+
+    prev_entry = siblings[entry_index - 1] if entry_index != 0 else None
+    next_entry = siblings[
+        entry_index + 1] if entry_index != len(siblings) - 1 else None
+
     return {
         'layout': layout or DirectoryEntryLayout(self, request),
         'title': self.title,
-        'entry': self
+        'entry': self,
+        'prev_entry': prev_entry,
+        'next_entry': next_entry
     }
 
 

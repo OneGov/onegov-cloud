@@ -651,6 +651,34 @@
                 </li>
             </ul>
         </div>
+
+        <div class="more-entries side-panel" tal:condition="prev_entry or next_entry">
+            <h3 i18n:translate="">More Entries</h3>
+            <ul class="more-list">
+                <li tal:condition="prev_entry">
+                    <a href="${request.link(prev_entry)}" class="list-link">
+                        <i class="fa fa-chevron-left"></i><span class="list-title">Previous Entry</span>
+                    </a>
+                    <a href="${request.link(prev_entry)}">
+                        <p class="list-lead preview">
+                            ${prev_entry.title}
+                        </p>
+                    </a>
+                </li>
+                <li tal:condition="next_entry">
+                    <a href="${request.link(next_entry)}" class="list-link">
+                        <i class="fa fa-chevron-right"></i><span class="list-title">Next Entry</span>
+                    </a>
+                    <a href="${request.link(next_entry)}">
+                        <p class="list-lead preview">
+                            ${next_entry.title}
+                        </p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
     </div>
 </metal:page_content>
 
