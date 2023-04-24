@@ -517,6 +517,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
+    monitoring_languages_ids = ChosenSelectMultipleField(
+        label=_('Monitoring languages'),
+        choices=[],
+    )
+
     interpret_types = ChosenSelectMultipleField(
         label=_('Expertise by interpreting type'),
         choices=[]
@@ -534,11 +539,6 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 
     genders = ChosenSelectMultipleField(
         label=_('Gender'),
-        choices=[],
-    )
-
-    monitoring_languages_ids = ChosenSelectMultipleField(
-        label=_('Monitoring languages'),
         choices=[],
     )
 
