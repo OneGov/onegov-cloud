@@ -24,7 +24,7 @@
                                     <th i18n:translate="">Gender</th>
                                     <th i18n:translate="">Written languages</th>
                                     <th i18n:translate="">Spoken languages</th>
-                                    <th i18n:translate="">Monitoring languages</th>
+                                    <th><span class="nowrap-word" i18n:translate="">Working language</span><span class="wrap-word" i18n:translate="">Monitoring</span></th>
                                     <th i18n:translate="">Drive distance</th>
                                     <th i18n:translate="">Phone numbers</th>
                                     <th i18n:translate="">Email</th>
