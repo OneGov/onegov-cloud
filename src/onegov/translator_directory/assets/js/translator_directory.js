@@ -3,13 +3,13 @@ function updateUploadUrl(protected_url) {
     $('form.upload').attr("action", protected_url);
 }
 
-
 const bulk_email_button = document.querySelectorAll('a.button.envelope.tiny')[0];
-bulk_email_button.addEventListener('click', function (event) {
+bulk_email_button.addEventListener('click', function(event) {
     event.preventDefault();
     const href = event.currentTarget.getAttribute('href');
     // could even show the number of recipients in the message
-    showAlertMessage(locale("Opened mail client with all emails in BCC"), 'success');
+    const message = locale("The circular to translators has been opened in your e-mail software.");
+    showAlertMessage(message, 'success');
     window.location.href = href;
 });
 

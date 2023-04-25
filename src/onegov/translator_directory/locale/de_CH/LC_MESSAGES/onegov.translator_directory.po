@@ -832,6 +832,3 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Adresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
-
-msgid "Opened mail client with all emails in BCC"
-msgstr "Das Rundschreiben wurde in Ihrem E-Mail Programm geöffnet"
