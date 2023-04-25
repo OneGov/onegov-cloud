@@ -574,14 +574,16 @@ def view_directory_entry(self, request, layout=None):
 
     entry_index = siblings.index(self)
 
-    prev_entry = siblings[entry_index - 1] if entry_index != 0 else None
+    prev_entry = siblings[entry_index - 1] if entry_index != 0 else False
     next_entry = siblings[
-        entry_index + 1] if entry_index != len(siblings) - 1 else None
+        entry_index + 1] if entry_index != len(siblings) - 1 else False
+    more_entries = bool(prev_entry or next_entry)
 
     return {
         'layout': layout or DirectoryEntryLayout(self, request),
         'title': self.title,
         'entry': self,
+        'more_entries': more_entries,
         'prev_entry': prev_entry,
         'next_entry': next_entry
     }
