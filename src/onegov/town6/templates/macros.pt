@@ -609,7 +609,7 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div class="small-12 medium-4 cell page-content-sidebar medium-offset-1 sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
+    <div class="small-12 medium-4 cell page-content-sidebar medium-offset-1 sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or show_side_panel or more_entries|False" tal:define="highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
         <div metal:define-slot="before-panels"></div>
         <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="contact or coordinates or location">
             <div tal:condition="contact and not hide">
@@ -683,7 +683,7 @@
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
     <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image | None;">
-        <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
+        <tal:b condition="not: people or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
@@ -696,7 +696,7 @@
                 <div metal:define-slot="after-text"></div>
             </div>
         </tal:b>
-        <tal:b condition="people or contact or coordinates or show_side_panel">
+        <tal:b condition="people or contact or coordinates or show_side_panel or more_entries|False">
             <div class="small-12 medium-7 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
                 <div class="limit-line-width">
