@@ -191,8 +191,9 @@ def book_occasion(self, request, form):
                 zip_code=form.zip_code.data
                 if form.differing_address.data else None,
                 place=form.place.data if form.differing_address.data else None,
-                political_municipality=form.political_municipality.data
-                if form.differing_address.data else None
+                political_municipality=form.political_municipality.data if
+                form.political_municipality and form.differing_address.data
+                else None
             )
         else:
             attendee = attendees.by_id(form.attendee.data)
