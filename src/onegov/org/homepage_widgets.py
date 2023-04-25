@@ -175,7 +175,7 @@ class NewsWidget:
                 news_index = index
                 break
 
-        if not news_index:
+        if news_index is False:
             return {'news': ()}
 
         # request more than the required amount of news to account for hidden

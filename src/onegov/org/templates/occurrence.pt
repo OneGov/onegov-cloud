@@ -17,6 +17,10 @@
                     <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate="">${tag}</span>
                 </div>
 
+                <div class="occurence-link" tal:define="event_link occurrence.event.content.get('external_event_url')">
+                    <a tal:condition="event_link" class="button" href="${event_link}" i18n:translate="">Link to organizers page</a>
+                </div>
+
                 <div class="occurrence-description">
                     <p tal:content="structure description"></p>
                 </div>

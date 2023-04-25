@@ -228,6 +228,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     change_requests_guideline = content_property()
 
     text = content_property()
+    title_further_information = content_property()
+    position = content_property(default='below')
     price = content_property()
     price_per_submission = content_property()
     currency = content_property()
