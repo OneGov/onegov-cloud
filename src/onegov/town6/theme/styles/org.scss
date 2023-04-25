@@ -216,7 +216,6 @@ footer {
 */
 
 .page-text {
-    font-size: 1.1rem;
     margin-bottom: 2rem;
 
     blockquote {
@@ -593,10 +592,6 @@ $pageref-color-hover: $iron;
     display: block;
     font-weight: bold !important;
     margin-bottom: 30px;
-
-    @media #{$small-only} {
-        font-size: 1.2rem;
-    }
 }
 
 .subheader {
