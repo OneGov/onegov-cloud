@@ -593,6 +593,10 @@ $pageref-color-hover: $iron;
     display: block;
     font-weight: bold !important;
     margin-bottom: 30px;
+
+    @media #{$small-only} {
+        font-size: 1.2rem;
+    }
 }
 
 .subheader {
