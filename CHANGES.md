@@ -1,8 +1,24 @@
 # Changes
 
+## 2023.18
+
+`2023-04-25` | [d1acf02b0b...64139c70db](https://github.com/OneGov/onegov-cloud/compare/d1acf02b0b^...64139c70db)
+
+### Feriennet
+
+##### Make form more robust if field is missing
+
+`Bugfix` | [pro-1116](#pro-1116) | [64139c70db](https://github.com/onegov/onegov-cloud/commit/64139c70dbe1f82c1a8351f61ff247a02acbe327)
+
+### Town6
+
+##### Make image preview visible
+
+`Feature` | [d1acf02b0b](https://github.com/onegov/onegov-cloud/commit/d1acf02b0b64579b6789bd8b29dc5259ffbf6aa4)
+
 ## 2023.17
 
-`2023-04-24` | [dc42c72bf3...00a56fcdf7](https://github.com/OneGov/onegov-cloud/compare/dc42c72bf3^...00a56fcdf7)
+`2023-04-24` | [dc42c72bf3...0d924d70fc](https://github.com/OneGov/onegov-cloud/compare/dc42c72bf3^...0d924d70fc)
 
 ### Feriennet
 
@@ -2985,14 +3001,4 @@ This does not play well with caches.
 ##### Fix external links.
 
 `Bugfix` | [OGC-373](https://linear.app/onegovcloud/issue/OGC-373) | [e8a70b7d26](https://github.com/onegov/onegov-cloud/commit/e8a70b7d26d5d1b89547c244a41942bbec40aa18)
-
-## 2022.25
-
-`2022-04-14` | [d5a2f507b2...0011026036](https://github.com/OneGov/onegov-cloud/compare/d5a2f507b2^...0011026036)
-
-### Org
-
-##### Allows tenants to specify custom tags
-
-`Feature` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [d5a2f507b2](https://github.com/onegov/onegov-cloud/commit/d5a2f507b21288b529a1e9faf35da9cc590ee441)
 
