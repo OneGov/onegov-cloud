@@ -10,7 +10,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.user import UserCollection
 from openpyxl import load_workbook
 from pdftotext import PDF
-from tests.onegov.translator_directory.shared import translator_data, \
+from tests.onegov.translator_directory.shared import translator_data,\
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
 from unittest.mock import patch
@@ -1565,3 +1565,13 @@ def test_view_accreditation_errors(directions, client):
     check_pdf(page, '9.pdf',
               'Aktueller Auszug aus dem Zentralstrafregister.pdf')
     check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+
+
+def test_view_bulk_email(client, translator_app):
+
+    client.login_admin()
+
+    page = client.get('/translators')
+    assert 'Rundschreiben an alle Übersetzer' in page
+    page = client.get('/translators/bulk-email/')
+    assert 'mailto:?bcc' in page
