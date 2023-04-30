@@ -1,10 +1,10 @@
 from onegov.ballot.models.file import File
 from onegov.core.crypto import random_token
+from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
-from onegov.file import AssociatedFiles
 from onegov.file.utils import as_fileintent
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -194,6 +194,8 @@ class named_file:
                     instance.files.remove(file)
 
 
-class ExplanationsPdfMixin(AssociatedFiles):
+class ExplanationsPdfMixin:
+
+    files = associated(File, 'files', 'one-to-many', onupdate='CASCADE')
 
     explanations_pdf = named_file()
