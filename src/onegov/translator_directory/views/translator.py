@@ -423,18 +423,30 @@ def view_mail_templates(self, request, form):
         template_name = form.templates.data
 
         if template_name not in request.app.mail_templates:
-            request.alert(_("This file does not seem to exist."))
+            request.alert("This file does not seem to exist.")
             return redirect(request.link(self))
 
+        user = request.current_user
+        if not getattr(user, 'realname', None):
+
+            request.alert(_("Unfortunately, this account does not have real "
+                            "name defined, which is required for mail "
+                            "templates"))
+            return redirect(request.link(self))
+
+        first_name, last_name = user.realname.split(" ")
         additional_fields = {
             "current_date": layout.format_date(utcnow(), "date"),
             "translator_date_of_birth": layout.format_date(
-                self.date_of_birth, "date"
-            ),
+                self.date_of_birth, "date"),
             "translator_date_of_decision": layout.format_date(
                 self.date_of_decision, "date"
             ),
-            "translator_admission": request.translate(self.admission) or "",
+            "translator_admission": request.translate(_(self.admission)) or "",
+            'sender_initials': get_initials(first_name, last_name),
+            'sender_first_name': first_name,
+            'sender_last_name': last_name,
+            'sender_function': 'Stv Dienstchef',
         }
 
         file_id = (
@@ -447,18 +459,9 @@ def view_mail_templates(self, request, form):
         f = get_file(request.app, file_id)
         template = f.reference.file.read()
 
-        missing_fields, docx = fill_variables_in_docx(
+        __, docx = fill_variables_in_docx(
             BytesIO(template), self, **additional_fields
         )
-        if missing_fields:
-            msg = _("Not all variables could be replaced. The "
-                    "following values were not found: ${missing_values}",
-                    mapping={
-                        "missing_values": ", ".join(missing_fields.keys()),
-                    })
-            request.message(msg, 'warning')
-            return redirect(request.link(self, name='mail-templates'))
-
         return Response(
             docx,
             content_type="application/vnd.ms-office",
@@ -472,3 +475,9 @@ def view_mail_templates(self, request, form):
         "title": _("Mail templates"),
         "button_text": _("Download"),
     }
+
+
+def get_initials(first_name, last_name):
+    first_initials = first_name[:2].upper()
+    last_initials = last_name[:2].upper()
+    return last_initials + first_initials

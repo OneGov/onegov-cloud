@@ -1599,6 +1599,11 @@ def test_view_mail_template(client):
     page.form['templates'] = basename(path)
     resp = page.form.submit()
 
+    user = UserCollection(session).by_username('admin@example.org')
+    first_name, last_name = user.realname.split(" ")
+    assert first_name == 'John'
+    assert last_name == 'Doe'
+
     found_variables_in_docx = set()
     expected_variables_in_docx = (
         'Sehr geehrter Herr',
@@ -1607,14 +1612,17 @@ def test_view_mail_template(client):
         translator.city,
         translator.first_name,
         translator.last_name,
+        first_name,
+        last_name
     )
 
     doc = docx.Document(BytesIO(resp.body))
     for target in expected_variables_in_docx:
-        for l in iter_block_items(doc):
-            line = l.text
+        for block in iter_block_items(doc):
+            line = block.text
             # make sure all variables have been rendered
-            assert '{{' not in line and '}}' not in line
+            assert '{{' not in line and '}}' not in line, line
             if target in line:
                 found_variables_in_docx.add(target)
+
     assert set(expected_variables_in_docx) == found_variables_in_docx

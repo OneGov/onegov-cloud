@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-17 15:34+0200\n"
+"POT-Creation-Date: 2023-05-01 13:43+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -78,12 +78,6 @@ msgstr "Verhandlungsdolmetschen"
 
 msgid "Whisper interpreting"
 msgstr "Flüsterdolmetschen"
-
-msgid "Send E-Mail"
-msgstr "Per E-Mail senden"
-
-msgid "Letter B-post"
-msgstr "Brief B-Post"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -842,16 +836,10 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Adresse."
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
 
-msgid "This file does not seem to exist."
-msgstr "Diese Datei scheint nicht zu existieren."
-
-#, python-format
 msgid ""
-"Not all variables could be replaced. The following values were not found: "
-"${missing_values}"
-msgstr ""
-"Nicht alle Werte konnten gefunden werden. Die folgenden Werte sind nicht eingesetzt worden: "
-"${missing_values}"
+"Unfortunately, this account does not have real name defined, which is "
+"required for mail templates"
+msgstr "Für dieses Konto ist kein Name und Vorname definiert, welcher für Briefvorlagen erforderlich ist. Fügen Sie einen Namen hinzu und versuchen Sie es noch einmal. Fügen Sie einen Namen hinzu und versuchen Sie es noch einmal."
 
 msgid "Download"
 msgstr "Herunterladen"

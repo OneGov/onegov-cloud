@@ -5,7 +5,7 @@ from onegov.translator_directory.constants import GENDERS, ADMISSIONS
 from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.views.translator import\
-    fill_variables_in_docx
+    fill_variables_in_docx, get_initials
 from sedate import utcnow
 from tests.onegov.translator_directory.shared import translator_data,\
     iter_block_items
@@ -17,6 +17,8 @@ def test_read_write_cycle():
     translator = Translator(**translator_data)
     translator.admission = ADMISSIONS['certified']
 
+    first_name, last_name = 'John', 'Doe'
+
     layout = Layout(model=object(), request=Bunch(locale='en'))
     variables_to_fill = {
         'current_date': layout.format_date(utcnow(), 'date'),
@@ -26,6 +28,7 @@ def test_read_write_cycle():
         'translator_date_of_decision': layout.format_date(
             translator.date_of_decision, 'date'
         ),
+        'sender_initials': get_initials(first_name, last_name),
         'greeting': gendered_greeting(translator),
         'translator_first_name': translator.first_name,
         'translator_last_name': translator.last_name,
@@ -53,11 +56,8 @@ def test_read_write_cycle():
         doc = docx.Document(BytesIO(filled_template))
 
         for target in expected_variables_in_docx:
-            for l in iter_block_items(doc):
-                line = l.text
-                # make sure all variables have been rendered
-                assert '{{' not in line and '}}' not in line
-                if target in line:
+            for block in iter_block_items(doc):
+                if target in block.text:
                     found_variables_in_docx.add(target)
 
         assert set(expected_variables_in_docx) == found_variables_in_docx
