@@ -1,3 +1,5 @@
+from sqlalchemy import and_
+
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
@@ -40,7 +42,10 @@ class TranslatorDirectoryApp(OrgApp):
     @property
     def mail_templates(self):
         query = GeneralFileCollection(self.session()).query().filter(
-            GeneralFile.name.endswith('.docx')
+            and_(
+                GeneralFile.name.like('Vorlage%'),
+                GeneralFile.name.like('%.docx')
+            )
         )
         return [f.name for f in query.all()]
 
