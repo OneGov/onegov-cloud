@@ -1588,7 +1588,7 @@ def test_view_mail_template(client):
     transaction.commit()
 
     path = module_path(
-        "tests.onegov.translator_directory", "fixtures/template.docx"
+        "tests.onegov.translator_directory", "fixtures/Vorlage.docx"
     )
     client.login_admin()
 

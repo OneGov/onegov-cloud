@@ -39,7 +39,7 @@ def test_read_write_cycle():
     }
 
     template_name = module_path('tests.onegov.translator_directory',
-                                'fixtures/template.docx')
+                                'fixtures/Vorlage.docx')
 
     with open(template_name, 'rb') as f:
         nulls, filled_template = fill_variables_in_docx(
