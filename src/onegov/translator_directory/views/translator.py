@@ -18,10 +18,9 @@ from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
     INTERPRETING_TYPES, ADMISSIONS, GENDERS
-from onegov.translator_directory.forms.mail_templates import MailTemplatesForm
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
-from onegov.translator_directory.forms.translator import TranslatorForm, \
-    TranslatorSearchForm, EditorTranslatorForm
+from onegov.translator_directory.forms.translator import TranslatorForm,\
+    TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
 from onegov.translator_directory.generate_docx import fill_variables_in_docx
 from onegov.translator_directory.layout import AddTranslatorLayout,\
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
