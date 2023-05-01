@@ -83,7 +83,7 @@ def test_audit_for_course(client, scenario):
 
     # Test pagination
     assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
-    page = page.click('2', index=-1)
+    page = page.click('2', index=-2)
     assert page.pyquery('ul.pagination > li.current > a')[0].text == "2"
     assert page.form['organisations'].value is None
 
