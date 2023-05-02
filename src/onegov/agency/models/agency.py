@@ -1,4 +1,5 @@
 from onegov.agency.models.membership import ExtendedAgencyMembership
+from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import meta_property
@@ -85,6 +86,18 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
          plugin. """
 
         return self.portrait
+
+    @property
+    def location_address_html(self):
+        return get_html_paragraph_with_line_breaks(self.location_address)
+
+    @property
+    def postal_address_html(self):
+        return get_html_paragraph_with_line_breaks(self.postal_address)
+
+    @property
+    def opening_hours_html(self):
+        return get_html_paragraph_with_line_breaks(self.opening_hours)
 
     def proxy(self):
         """ Returns a proxy object to this agency allowing alternative linking

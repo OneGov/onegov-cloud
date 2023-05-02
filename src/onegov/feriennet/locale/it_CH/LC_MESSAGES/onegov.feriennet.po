@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-03-21 14:39+0100\n"
+"POT-Creation-Date: 2023-04-24 08:43+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -845,6 +845,15 @@ msgstr "Per gli utenti di una categoria specifica"
 msgid "Payment date"
 msgstr "Data di pagamento"
 
+msgid "Whole invoice"
+msgstr "Fattura intera"
+
+msgid "Only for specific items"
+msgstr "Solo per articoli specifici"
+
+msgid "Items"
+msgstr "Voci della fattura"
+
 msgid "My donation"
 msgstr "La mia donazionoe"
 
@@ -1511,9 +1520,6 @@ msgstr "Registrazione come aiutante"
 
 msgid "Sort"
 msgstr "Tipo"
-
-msgid "Move"
-msgstr "Spostare"
 
 msgid "Half day"
 msgstr "Mezza giornata"
@@ -2191,6 +2197,21 @@ msgstr "Mostra lo stato del biglietto"
 msgid "Your activity has been archived:"
 msgstr "La sua attività è stata archiviata:"
 
+msgid "Thanks a lot!"
+msgstr "Grazie mille!"
+
+msgid "We received your booking for ${name}."
+msgstr "Abbiamo ricevuto la sua prenotazione per ${name}."
+
+msgid "You can find an overview of all bookings here:"
+msgstr "Potete trovare una panoramica di tutte le prenotazioni qui:"
+
+msgid "Best regards"
+msgstr "Cordiali saluti"
+
+msgid "We have received your deregistration for ${name}."
+msgstr "Abbiamo ricevuto la sua cancellazione per ${name}."
+
 msgid "Pro Juventute FERIENNET is supported by:"
 msgstr "Pro Juventute FERIENNET è sostenuta da:"
 
@@ -2689,6 +2710,12 @@ msgstr "Non sono state create prenotazioni manualmente."
 msgid "Created ${count} manual bookings"
 msgstr "${count} sono state create prenotazioni manualmente"
 
+msgid "Invoice marked as paid"
+msgstr "Fattura contrassegnata come pagata"
+
+msgid "Invoice item(s) marked as paid"
+msgstr ""
+
 #, python-format
 msgid "Mark paid for ${user}"
 msgstr "Mark ha pagato per ${user}"
@@ -2732,6 +2759,10 @@ msgstr ""
 
 msgid "The booking was cancelled successfully"
 msgstr "La prenotazione è stata cancellata con successo"
+
+#, python-format
+msgid "Degregistration of ${attendee} for \"${title}\""
+msgstr "Cancellazione di ${attendee} per \"${title}\""
 
 msgid "Cannot select more than three favorites per child"
 msgstr "Si possono scegliere un massimo di tre preferenze per bambino"
@@ -2921,6 +2952,10 @@ msgstr "Modificare evento"
 #, python-format
 msgid "The booking for ${name} was succesfull"
 msgstr "La prenotazione per ${name} ha funzionato correttamente"
+
+#, python-format
+msgid "Booking of ${attendee} for \"${title}\""
+msgstr "Prenotazione di ${attendee} per \"${title}\""
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"
@@ -3141,8 +3176,11 @@ msgstr "Prenotazioni ${period}"
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
 
-#~ msgid "Require the political municipality in the userprofile"
-#~ msgstr "Richiedere il comune  nel profilo dell'utente"
+#~ msgid "Invoice items marked as paid"
+#~ msgstr "Voci di fattura contrassegnate come pagate"
+
+#~ msgid "Move"
+#~ msgstr "Spostare"
 
 #, python-format
 #~ msgid "${count} registered Attendees"

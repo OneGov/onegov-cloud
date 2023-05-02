@@ -25,6 +25,9 @@ class Client(BaseClient):
         profile.form['zip_code'] = '1234'
         profile.form['place'] = 'Duckburg'
         profile.form['emergency'] = f'0123 456 789 ({first_name} {last_name})'
+        if 'political_municipality' in profile.form.fields:
+            profile.form['political_municipality'] = 'Bruckerburg'
+
         profile.form.submit()
 
 
@@ -100,11 +103,13 @@ def create_feriennet_app(request, use_elasticsearch):
 
     session.add(User(
         username='admin@example.org',
+        realname='Foo Bar',
         password_hash=test_password,
         role='admin'
     ))
     session.add(User(
         username='editor@example.org',
+        realname='Boo Far',
         password_hash=test_password,
         role='editor'
     ))

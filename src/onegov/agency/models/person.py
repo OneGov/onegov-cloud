@@ -1,3 +1,4 @@
+from onegov.agency.utils import get_html_paragraph_with_line_breaks
 from onegov.org.models import Organisation
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PublicationExtension
@@ -54,16 +55,16 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         return [r for r in result if r]
 
     @property
-    def address_html(self):
-        return '<p>{}</p>'.format(
-            '<br>'.join((self.address or '').splitlines())
-        )
+    def location_address_html(self):
+        return get_html_paragraph_with_line_breaks(self.location_address)
+
+    @property
+    def postal_address_html(self):
+        return get_html_paragraph_with_line_breaks(self.postal_address)
 
     @property
     def notes_html(self):
-        return '<p>{}</p>'.format(
-            '<br>'.join((self.notes or '').splitlines())
-        )
+        return get_html_paragraph_with_line_breaks(self.notes)
 
     def deletable(self, request):
         if request.is_admin:

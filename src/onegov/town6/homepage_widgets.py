@@ -94,7 +94,7 @@ class IconLinksWidget:
         <xsl:template match="icon_link">
             <div metal:use-macro="layout.macros.icon_link"
             tal:define="
-                title '{@title}'; color '{@color}'; icon '{@icon}';
+                title '{@title}'; invert '{@invert}'; icon '{@icon}';
                 text '{@text}'; link '{@link}';
             "
             />
