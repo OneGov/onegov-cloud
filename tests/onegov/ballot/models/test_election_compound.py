@@ -1262,7 +1262,9 @@ def test_related_election_compounds(session):
     assert session.query(ElectionCompoundRelationship).all() == []
 
 
-def test_election_compound_rename(session):
+def test_election_compound_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     # Add data
     session.add(majorz_election())
     session.add(proporz_election())
@@ -1296,6 +1298,8 @@ def test_election_compound_rename(session):
         )
     )
     session.flush()
+
+    election_compound.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     # Check IDs
     assert session.query(

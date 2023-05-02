@@ -1386,11 +1386,15 @@ def test_proporz_election_clear_results(session):
     assert session.query(PartyResult).first() is None
 
 
-def test_proporz_election_rename(session):
+def test_proporz_election_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     election = proporz_election()
     election.id = 'x'
     session.add(election)
     session.flush()
+
+    election.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     assert session.query(Candidate.election_id).distinct().scalar() == 'x'
     assert session.query(ElectionResult.election_id).distinct().scalar() == 'x'
