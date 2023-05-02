@@ -518,7 +518,7 @@ class Framework(
         return hashlib.new(
             'sha1',
             self.application_id.encode('utf-8'),
-            # todo: should we use usedforsecurity=False or switch algorithm?
+            usedforsecurity=False
         ).hexdigest()
 
     def object_by_path(self, path, with_view_name=False):

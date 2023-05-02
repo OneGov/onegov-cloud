@@ -1,4 +1,5 @@
 import click
+import hashlib
 import pycurl
 
 from csv import reader as csvreader
@@ -6,7 +7,6 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from dateutil.parser import parse
-from hashlib import new
 from icalendar import Calendar as vCalendar
 from io import BytesIO
 from lxml import etree
@@ -339,7 +339,7 @@ def import_guidle(group_context, url, tagmap, clear):
 
             unknown_tags = set()
             prefix = 'guidle-{}'.format(
-                new(
+                hashlib.new(
                     'sha1',
                     url.encode(),
                     usedforsecurity=False
