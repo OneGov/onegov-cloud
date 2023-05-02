@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from cached_property import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
@@ -21,7 +23,6 @@ class ApisMixin:
 
 
 class PersonApiEndpoint(ApiEndpoint, ApisMixin):
-
     endpoint = 'people'
     filters = []
 
@@ -62,8 +63,9 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             if attribute not in self.app.org.hidden_people_fields
         }
 
-        modified = getattr(item, 'modified', '')
-        data['modified'] = modified.isoformat()
+        # modified has priority over created but modified may not set
+        data['modified'] = item.modified.isoformat() if isinstance(
+            item.modified, datetime) else item.created.isoformat()
         return data
 
     def item_links(self, item):
@@ -82,7 +84,6 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
 
 
 class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
-
     endpoint = 'agencies'
     filters = ['parent']
 
@@ -98,12 +99,16 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
         return result
 
     def item_data(self, item):
+        # modified has priority over created but modified may not set
+        modified = item.modified.isoformat() if isinstance(
+            item.modified, datetime) else item.created.isoformat()
+
         return {
             'title': item.title,
             'portrait': item.portrait,
             'location_address': item.location_address,
             'location_code_city': item.location_code_city,
-            'modified': item.modified.isoformat(),
+            'modified': modified,
             'postal_address': item.postal_address,
             'postal_code_city': item.postal_code_city,
             'website': item.website,
@@ -125,7 +130,6 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
 
 
 class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
-
     endpoint = 'memberships'
     filters = ['agency', 'person']
 
@@ -143,7 +147,6 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
     def item_data(self, item):
         return {
             'title': item.title,
-            'modified': item.modified.isoformat(),
         }
 
     def item_links(self, item):
