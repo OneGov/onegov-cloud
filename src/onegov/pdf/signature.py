@@ -26,7 +26,11 @@ class LexworkSigner:
     def signing_reasons(self):
         """ List all possible signing reasons for the given credentials."""
 
-        response = get(self.url('pdf_signature_reasons'), headers=self.headers)
+        response = get(
+            self.url('pdf_signature_reasons'),
+            headers=self.headers,
+            timeout=60
+        )
         response.raise_for_status()
         return response.json().get('result')
 
@@ -45,7 +49,8 @@ class LexworkSigner:
                     'data': data,
                     'reason_for_signature': reason
                 }
-            }
+            },
+            timeout=60
         )
         response.raise_for_status()
         return b64decode(response.json()['result']['signed_data'])
