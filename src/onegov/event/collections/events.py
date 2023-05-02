@@ -1,9 +1,10 @@
+import hashlib
+
 from uuid import uuid4
 from collections import namedtuple
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-from hashlib import md5
 from icalendar import Calendar as vCalendar
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
@@ -224,7 +225,11 @@ class EventCollection(Pagination):
                     if existing.image and item.image:
                         image_changed = (
                             existing.image.checksum
-                            != md5(item.image.read()).hexdigest()
+                            != hashlib.new(
+                                'md5',
+                                item.image.read(),
+                                usedforsecurity=False
+                            ).hexdigest()
                         )
                         item.image.seek(0)
                     changed = (

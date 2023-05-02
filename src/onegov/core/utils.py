@@ -287,7 +287,11 @@ def render_file(file_path, request):
     """
 
     def hash_path(path):
-        return hashlib.sha1(path.encode('utf-8')).hexdigest()
+        return hashlib.new(
+            'sha1',
+            path.encode('utf-8'),
+            usedforsecurity=False
+        ).hexdigest()
 
     # this is a very cachable result - though it's possible that a file
     # changes it's content type, it should usually not, especially since
@@ -316,7 +320,11 @@ def hash_dictionary(dictionary):
 
     """
     dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
-    return hashlib.sha1(dict_as_string).hexdigest()
+    return hashlib.new(
+        'sha1',
+        dict_as_string,
+        usedforsecurity=False
+    ).hexdigest()
 
 
 def groupbylist(*args, **kwargs):
