@@ -95,3 +95,6 @@ class Language(Base):
             + self.native_speakers_count
             + self.monitors_count
         ) == 0
+
+    def __repr__(self):
+        return self.name

@@ -21,7 +21,7 @@ from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.forms.translator import TranslatorForm,\
     TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
-from onegov.translator_directory.generate_docx import fill_variables_in_docx
+from onegov.translator_directory.generate_docx import fill_docx_with_variables
 from onegov.translator_directory.layout import AddTranslatorLayout,\
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
     ReportTranslatorChangesLayout, MailTemplatesLayout
@@ -415,33 +415,32 @@ def report_translator_change(self, request, form):
     permission=Personal
 )
 def view_mail_templates(self, request, form):
-    """View for pressing the download button. The docx file is generated"""
 
     layout = MailTemplatesLayout(self, request)
     if form.submitted(request):
         template_name = form.templates.data
 
         if template_name not in request.app.mail_templates:
-            request.alert("This file does not seem to exist.")
+            request.alert('This file does not seem to exist.')
             return redirect(request.link(self))
 
         user = request.current_user
         if not getattr(user, 'realname', None):
 
-            request.alert(_("Unfortunately, this account does not have real "
-                            "name defined, which is required for mail "
-                            "templates"))
+            request.alert(_('Unfortunately, this account does not have real '
+                            'name defined, which is required for mail '
+                            'templates'))
             return redirect(request.link(self))
 
-        first_name, last_name = user.realname.split(" ")
+        first_name, last_name = user.realname.split(' ')
         additional_fields = {
-            "current_date": layout.format_date(utcnow(), "date"),
-            "translator_date_of_birth": layout.format_date(
-                self.date_of_birth, "date"),
-            "translator_date_of_decision": layout.format_date(
-                self.date_of_decision, "date"
+            'current_date': layout.format_date(utcnow(), 'date'),
+            'translator_date_of_birth': layout.format_date(
+                self.date_of_birth, 'date'),
+            'translator_date_of_decision': layout.format_date(
+                self.date_of_decision, 'date'
             ),
-            "translator_admission": request.translate(_(self.admission)) or "",
+            'translator_admission': request.translate(_(self.admission)) or '',
             'sender_initials': get_initials(first_name, last_name),
             'sender_first_name': first_name,
             'sender_last_name': last_name,
@@ -458,21 +457,21 @@ def view_mail_templates(self, request, form):
         f = get_file(request.app, file_id)
         template = f.reference.file.read()
 
-        __, docx = fill_variables_in_docx(
-            BytesIO(template), self, **additional_fields
+        __, docx = fill_docx_with_variables(
+            BytesIO(template), self, request, **additional_fields
         )
         return Response(
             docx,
-            content_type="application/vnd.ms-office",
-            content_disposition=f"inline; filename={template_name}",
+            content_type='application/vnd.ms-office',
+            content_disposition=f'inline; filename={template_name}',
         )
 
     return {
-        "layout": layout,
-        "model": self,
-        "form": form,
-        "title": _("Mail templates"),
-        "button_text": _("Download"),
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'title': _('Mail templates'),
+        'button_text': _('Download'),
     }
 
 

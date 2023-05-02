@@ -5,7 +5,7 @@ from onegov.translator_directory.constants import GENDERS, ADMISSIONS
 from onegov.translator_directory.generate_docx import gendered_greeting
 from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.views.translator import\
-    fill_variables_in_docx, get_initials
+    fill_docx_with_variables, get_initials
 from sedate import utcnow
 from tests.onegov.translator_directory.shared import translator_data,\
     iter_block_items
@@ -18,8 +18,9 @@ def test_read_write_cycle():
     translator.admission = ADMISSIONS['certified']
 
     first_name, last_name = 'John', 'Doe'
+    request = Bunch(locale='en')
 
-    layout = Layout(model=object(), request=Bunch(locale='en'))
+    layout = Layout(model=object(), request=request)
     variables_to_fill = {
         'current_date': layout.format_date(utcnow(), 'date'),
         'translator_date_of_birth': layout.format_date(
@@ -42,14 +43,14 @@ def test_read_write_cycle():
                                 'fixtures/Vorlage.docx')
 
     with open(template_name, 'rb') as f:
-        nulls, filled_template = fill_variables_in_docx(
-            BytesIO(f.read()), translator, **variables_to_fill
+        nulls, filled_template = fill_docx_with_variables(
+            BytesIO(f.read()), translator, request, **variables_to_fill
         )
         assert 'translator_admission' in nulls
         f.seek(0)
         variables_to_fill['translator_admission']: _(translator.admission)
-        nulls, filled_template = fill_variables_in_docx(
-            BytesIO(f.read()), translator, **variables_to_fill
+        nulls, filled_template = fill_docx_with_variables(
+            BytesIO(f.read()), translator, request, **variables_to_fill
         )
         found_variables_in_docx = set()
         expected_variables_in_docx = variables_to_fill.values()
