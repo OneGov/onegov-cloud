@@ -928,7 +928,11 @@ def parse_formcode(formcode):
     that can be used to generate forms or do other things.
 
     """
-    parsed = yaml.load('\n'.join(translate_to_yaml(formcode)), CustomLoader)
+    # CustomLoader is inherited from SafeLoader so no security issue here
+    parsed = yaml.load(  # nosec B506
+        '\n'.join(translate_to_yaml(formcode)),
+        CustomLoader
+    )
 
     fieldsets = []
     field_classes = {cls.type: cls for cls in Field.__subclasses__()}
