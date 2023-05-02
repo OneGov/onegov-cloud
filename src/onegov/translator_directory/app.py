@@ -1,5 +1,3 @@
-from sqlalchemy import and_
-
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
@@ -10,6 +8,8 @@ from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
 from purl import URL
+from sqlalchemy import and_
+from cached_property import cached_property
 
 
 class TranslatorDirectoryApp(OrgApp):
@@ -39,7 +39,7 @@ class TranslatorDirectoryApp(OrgApp):
             return None
         return URL(request.class_link(Organisation)).path()
 
-    @property
+    @cached_property
     def mail_templates(self):
         query = GeneralFileCollection(self.session()).query().filter(
             and_(
