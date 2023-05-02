@@ -2778,7 +2778,7 @@ msgstr "La réservation a été annulée avec succès"
 
 #, python-format
 msgid "Degregistration of ${attendee} for \"${title}\""
-msgstr ""
+msgstr "Annulation de ${attendee} pour \"${title}\""
 
 msgid "Cannot select more than three favorites per child"
 msgstr "Maximum trois favoris peuvent être choisis par enfant"
