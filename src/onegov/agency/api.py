@@ -36,7 +36,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
         return result
 
     def item_data(self, item):
-        return {
+        data = {
             attribute: getattr(item, attribute, None)
             for attribute in (
                 'academic_title',
@@ -61,6 +61,10 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             )
             if attribute not in self.app.org.hidden_people_fields
         }
+
+        modified = getattr(item, 'modified', '')
+        data['modified'] = modified.isoformat()
+        return data
 
     def item_links(self, item):
         result = {
@@ -99,6 +103,7 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             'portrait': item.portrait,
             'location_address': item.location_address,
             'location_code_city': item.location_code_city,
+            'modified': item.modified.isoformat(),
             'postal_address': item.postal_address,
             'postal_code_city': item.postal_code_city,
             'website': item.website,
@@ -137,7 +142,8 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
 
     def item_data(self, item):
         return {
-            'title': item.title
+            'title': item.title,
+            'modified': item.modified.isoformat(),
         }
 
     def item_links(self, item):
