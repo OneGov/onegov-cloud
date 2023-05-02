@@ -107,7 +107,10 @@ def get_event_dates(url, timezone):
 
     """
 
-    response = get(urlparse(url)._replace(query='type=ical').geturl())
+    response = get(
+        urlparse(url)._replace(query='type=ical').geturl(),
+        timeout=60
+    )
     response.raise_for_status()
 
     for event in vCalendar.from_ical(response.text).walk('vevent'):
@@ -155,7 +158,7 @@ def import_json(group_context, url, tagmap, clear):
     def _import_json(request, app):
         unknown_tags = set()
 
-        response = get(url)
+        response = get(url, timeout=60)
         response.raise_for_status()
         response = response.json()
 
@@ -334,7 +337,7 @@ def import_guidle(group_context, url, tagmap, clear):
 
     def _import_guidle(request, app):
         try:
-            response = get(url)
+            response = get(url, timeout=300)
             response.raise_for_status()
 
             unknown_tags = set()

@@ -41,7 +41,11 @@ class Posters():
                 continue
             meta_data_url = self.meta_data_url(url)
             try:
-                response = get(meta_data_url, headers=self.headers)
+                response = get(
+                    meta_data_url,
+                    headers=self.headers,
+                    timeout=60
+                )
                 response.raise_for_status()
                 image_url = self.parse_xml(response)
                 image_url = image_url.replace('http:', 'https:')
