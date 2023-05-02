@@ -67,7 +67,7 @@ class MapboxRequests():
             url = url.query_param('language', locale)
         if as_url:
             return url
-        return requests.get(url.as_string())
+        return requests.get(url.as_string(), timeout=60)
 
     def directions(self, coordinates, as_url=False):
         """
@@ -78,7 +78,7 @@ class MapboxRequests():
         )
         if as_url:
             return url
-        return requests.get(url.as_string())
+        return requests.get(url.as_string(), timeout=60)
 
 
 def outside_bbox(coordinate, bbox):
