@@ -702,10 +702,17 @@ class PostThread(Thread):
 
     def run(self):
         try:
+            # Validate URL protocol before opening it, since it's possible to
+            # open ftp:// and file:// as well.
+            if not self.url.lower().startswith('http'):
+                raise ValueError from None
+
             request = urllib.request.Request(self.url)
             for header in self.headers:
                 request.add_header(header[0], header[1])
-            urllib.request.urlopen(request, self.data, self.timeout)
+            urllib.request.urlopen(  # nosec B310
+                request, self.data, self.timeout
+            )
         except Exception as e:
             log.error(
                 'Error while sending a POST request to {}: {}'.format(
