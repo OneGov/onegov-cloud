@@ -188,11 +188,15 @@ def add_code_field_to_invoice_items(context):
 
     for i in context.session.query(InvoiceItem):
         i.code = 'q' + ''.join((
-            hashlib.sha1((
-                i.invoice + i.username).encode('utf-8')
+            hashlib.new(
+                'sha1',
+                (i.invoice + i.username).encode('utf-8'),
+                usedforsecurity=False
             ).hexdigest()[:5],
-            hashlib.sha1(
-                i.username.encode('utf-8')
+            hashlib.new(
+                'sha1',
+                i.username.encode('utf-8'),
+                usedforsecurity=False
             ).hexdigest()[:5]
         ))
 
