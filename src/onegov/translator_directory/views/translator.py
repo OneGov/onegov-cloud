@@ -447,16 +447,15 @@ def view_mail_templates(self, request, form):
             'sender_function': 'Stv Dienstchef',
         }
 
-        file_id = (
+        template_file_id_by_name = (
             GeneralFileCollection(request.session)
             .query()
             .filter(File.name == template_name)
             .with_entities(File.id)
             .first()
         )
-        f = get_file(request.app, file_id)
+        f = get_file(request.app, template_file_id_by_name)
         template = f.reference.file.read()
-
         __, docx = fill_docx_with_variables(
             BytesIO(template), self, request, **additional_fields
         )
