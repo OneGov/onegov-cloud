@@ -22,6 +22,17 @@ class ApisMixin:
         return MembershipApiEndpoint(self.app)
 
 
+def get_modified_iso_format(item):
+    """
+    Returns the iso format of the modified or created field of item.
+
+    :param item: db item e.g. agency, people, membership
+    :return: str iso representation of item last modification
+    """
+    return item.modified.isoformat() if isinstance(
+        item.modified, datetime) else item.created.isoformat()
+
+
 class PersonApiEndpoint(ApiEndpoint, ApisMixin):
     endpoint = 'people'
     filters = []
@@ -63,9 +74,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             if attribute not in self.app.org.hidden_people_fields
         }
 
-        # modified has priority over created but modified may not set
-        data['modified'] = item.modified.isoformat() if isinstance(
-            item.modified, datetime) else item.created.isoformat()
+        data['modified'] = get_modified_iso_format(item)
         return data
 
     def item_links(self, item):
@@ -99,16 +108,12 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
         return result
 
     def item_data(self, item):
-        # modified has priority over created but modified may not set
-        modified = item.modified.isoformat() if isinstance(
-            item.modified, datetime) else item.created.isoformat()
-
         return {
             'title': item.title,
             'portrait': item.portrait,
             'location_address': item.location_address,
             'location_code_city': item.location_code_city,
-            'modified': modified,
+            'modified': get_modified_iso_format(item),
             'postal_address': item.postal_address,
             'postal_code_city': item.postal_code_city,
             'website': item.website,
@@ -147,6 +152,7 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
     def item_data(self, item):
         return {
             'title': item.title,
+            'modified': get_modified_iso_format(item),
         }
 
     def item_links(self, item):
