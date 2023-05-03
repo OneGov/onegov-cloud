@@ -92,6 +92,7 @@ def test_view_api(client):
         assert not links(hospital)['parent']
         assert not collection(links(hospital)['children']).items
         assert data(collection(links(hospital)['memberships']).items[0]) == {
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'title': 'Doctor',
         }
 
@@ -115,7 +116,10 @@ def test_view_api(client):
         assert data(collection(links(school)['children'])
                     .items[0])['title'] == 'School Board'
         assert data(collection(links(school)['memberships'])
-                    .items[0]) == {'title': 'Teacher'}
+                    .items[0]) == {
+            'modified': '2023-05-02T14:05:53.473045+00:00',
+            'title': 'Teacher'
+        }
 
         board = collection(agencies['School Board']).items[0]
         assert data(board) == {
@@ -171,6 +175,7 @@ def test_view_api(client):
         assert not links(edna)['picture_url']
         assert not links(edna)['website']
         assert data(collection(links(edna)['memberships']).items[0]) == {
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'title': 'Teacher',
         }
 
@@ -200,6 +205,7 @@ def test_view_api(client):
         assert not links(nick)['picture_url']
         assert not links(nick)['website']
         assert data(collection(links(nick)['memberships']).items[0]) == {
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'title': 'Doctor',
         }
 
@@ -211,14 +217,20 @@ def test_view_api(client):
         assert set(memberships) == {'Doctor', 'Teacher'}
 
         doctor = collection(memberships['Doctor']).items[0]
-        assert data(doctor) == {'title': 'Doctor'}
+        assert data(doctor) == {
+            'title': 'Doctor',
+            'modified': '2023-05-02T14:05:53.473045+00:00'
+        }
         assert data(collection(links(doctor)['agency']).items[0])['title'] == \
                'Hospital'
         assert data(collection(links(doctor)['person']).items[0])['title'] == \
                'Rivera Nick'
 
         teacher = collection(memberships['Teacher']).items[0]
-        assert data(teacher) == {'title': 'Teacher'}
+        assert data(teacher) == {
+            'title': 'Teacher',
+            'modified': '2023-05-02T14:05:53.473045+00:00'
+        }
         assert data(collection(links(teacher)['agency'])
                     .items[0])['title'] == 'School'
         assert data(collection(links(teacher)['person'])
