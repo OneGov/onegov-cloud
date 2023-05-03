@@ -97,6 +97,7 @@ def create_translators(translator_app, count=1):
 
 def iter_block_items(parent):
     """ Recursively iterates over the elements of the .docx document.
+        Only use this for testing.
 
     See `https://github.com/python-openxml/python-docx/issues/40`
     """

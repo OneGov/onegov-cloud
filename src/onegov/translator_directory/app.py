@@ -41,6 +41,8 @@ class TranslatorDirectoryApp(OrgApp):
 
     @cached_property
     def mail_templates(self):
+        """ Templates are special docx files which are filled with
+        variables. These files are manually uploaded. """
         query = GeneralFileCollection(self.session()).query().filter(
             and_(
                 GeneralFile.name.like('Vorlage%'),

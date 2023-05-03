@@ -1,17 +1,24 @@
+from collections import namedtuple
 from io import BytesIO
+from os.path import splitext, basename
+from docx.shared import Mm
+from sqlalchemy import and_
+from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.translator_directory import _
-from docxtpl import DocxTemplate
+from docxtpl import DocxTemplate, InlineImage
 
 
-def fill_docx_with_variables(original_docx, t, request, **kwargs):
-    """ Fills the variables in a docx file with the given key-value pairs.
-        The original_docx template contains Jinja-Variables that map to keys
-        in the template_variables dictionary.
+def fill_docx_with_variables(
+    original_docx, t, request, signature_img_path=None, **kwargs
+):
+    """Fills the variables in a docx file with the given key-value pairs.
+      The original_docx template contains Jinja-Variables that map to keys
+      in the template_variables dictionary.
 
-      Returns A tuple containing two elements:
-          - Variables that were found to be None or empty.
-          - The rendered docx file.
-      """
+    Returns A tuple containing two elements:
+        - Variables that were found to be None or empty.
+        - The rendered docx file (bytes).
+    """
 
     docx_template = DocxTemplate(original_docx)
     template_variables = {
@@ -47,10 +54,17 @@ def fill_docx_with_variables(original_docx, t, request, **kwargs):
     for key, value in kwargs.items():
         template_variables[key] = value or ''
 
+    if signature_img_path:
+        with open(signature_img_path, 'rb') as image:
+            template_variables['sender_signature'] =  InlineImage(
+                docx_template, BytesIO(image.read())
+            )
+
     found_nulls = {k: v for k, v in template_variables.items() if not v}
     if found_nulls:
         non_null_values = {
-            k: v for k, v in template_variables.items() if k not in found_nulls
+            k: v for k, v in template_variables.items() if
+            k not in found_nulls
         }
         return found_nulls, render_docx(docx_template, non_null_values)
 
@@ -87,3 +101,38 @@ def gendered_greeting(translator):
         return "Sehr geehrte Frau"
     else:
         return "Sehr geehrte*r Herr/Frau"
+
+
+def parse_from_filename(abs_signature_filename):
+    """ Parses information from the filename. The delimiter is '__'.
+
+     This is kind of implicit here, information about the user is stored in
+     the filename of the signature image of the user.
+    """
+    filename, _ = splitext(basename(abs_signature_filename))
+    filename = filename.replace('Unterschrift__', '')
+    parts = filename.split('__')
+    Signature = namedtuple(
+        'Signature',
+        ['abbrev', 'sender_full_name', 'sender_function'],
+    )
+    return Signature(
+        abbrev=parts[0],
+        sender_full_name=parts[1],
+        sender_function=parts[2],
+    )
+
+@property
+def signature_for_mail_templates(request):
+    """ The signature of the current user. It's an image that is manually
+    uploaded. """
+    first_name, last_name = request.current_user.realname.split(' ')
+    query = GeneralFileCollection(request.session()).query().filter(
+        and_(
+            GeneralFile.name.like('Unterschrift%'),
+            GeneralFile.name.like(f'%{first_name}%'),
+            GeneralFile.name.like(f'%{last_name}%'),
+        )
+    )
+    breakpoint()
+

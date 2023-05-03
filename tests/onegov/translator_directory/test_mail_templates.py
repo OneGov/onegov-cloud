@@ -1,16 +1,25 @@
 from io import BytesIO
+from os.path import basename
 import docx
-from onegov.core.utils import module_path, Bunch
-from onegov.translator_directory.constants import GENDERS, ADMISSIONS
-from onegov.translator_directory.generate_docx import gendered_greeting
-from onegov.translator_directory.models.translator import Translator
-from onegov.translator_directory.views.translator import\
-    fill_docx_with_variables, get_initials
+from docxtpl import DocxTemplate
 from sedate import utcnow
-from tests.onegov.translator_directory.shared import translator_data,\
-    iter_block_items
-from onegov.translator_directory import _
 from onegov.core.layout import Layout
+from onegov.core.utils import module_path, Bunch
+from onegov.translator_directory import _
+from onegov.translator_directory.constants import GENDERS, ADMISSIONS
+from onegov.translator_directory.generate_docx import (
+    gendered_greeting,
+    parse_from_filename,
+)
+from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.views.translator import (
+    fill_docx_with_variables,
+    get_initials,
+)
+from tests.onegov.translator_directory.shared import (
+    translator_data,
+    iter_block_items,
+)
 
 
 def test_read_write_cycle():
@@ -36,11 +45,12 @@ def test_read_write_cycle():
         'translator_address': translator.address,
         'translator_zip_code': translator.zip_code,
         'translator_city': translator.city,
-        'translator_admission': ''
+        'translator_admission': '',
     }
 
-    template_name = module_path('tests.onegov.translator_directory',
-                                'fixtures/Vorlage.docx')
+    template_name = module_path(
+        'tests.onegov.translator_directory', 'fixtures/Vorlage.docx'
+    )
 
     with open(template_name, 'rb') as f:
         nulls, filled_template = fill_docx_with_variables(
@@ -65,7 +75,6 @@ def test_read_write_cycle():
 
 
 def test_helper_methods():
-
     genders = list(GENDERS.keys())
 
     translator = Translator(**translator_data)
@@ -74,3 +83,37 @@ def test_helper_methods():
     assert gendered_greeting(translator) == 'Sehr geehrte Frau'
     translator.gender = genders[2]
     assert gendered_greeting(translator) == 'Sehr geehrte*r Herr/Frau'
+
+
+def test_signature_image_parse_from_filename():
+    signature = module_path(
+        'tests.onegov.translator_directory',
+        'fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Dienstchef.jpg',
+    )
+    signature_values = parse_from_filename(basename(signature))
+
+    assert signature_values.abbrev == 'DOJO'
+    assert signature_values.sender_full_name == 'Adj_mV_John_Doe'
+    assert signature_values.sender_function == 'Dienstchef'
+
+    template_name = module_path(
+        'tests.onegov.translator_directory',
+        'fixtures/Vorlage_mit_Unterschrift_als_Bild.docx'
+    )
+    variables_to_fill = {
+        'sender_full_name': signature_values.sender_full_name,
+        'sender_function': signature_values.sender_full_name,
+    }
+
+    with open(template_name, 'rb') as f:
+        nulls, filled_template = fill_docx_with_variables(
+            BytesIO(f.read()),
+            Translator(**translator_data),
+            request=Bunch(locale='en'),
+            signature_img_path=template_name,
+            **variables_to_fill
+        )
+        with open('/home/cyrill/Desktop/output/out.docx', 'wb') as f:
+            f.write(filled_template)
+            # d = DocxTemplate(BytesIO(filled_template))
+

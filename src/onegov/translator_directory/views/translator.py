@@ -21,7 +21,8 @@ from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.forms.translator import TranslatorForm,\
     TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
-from onegov.translator_directory.generate_docx import fill_docx_with_variables
+from onegov.translator_directory.generate_docx import fill_docx_with_variables,\
+    signature_for_mail_templates
 from onegov.translator_directory.layout import AddTranslatorLayout,\
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
     ReportTranslatorChangesLayout, MailTemplatesLayout
@@ -432,6 +433,7 @@ def view_mail_templates(self, request, form):
                             'templates'))
             return redirect(request.link(self))
 
+        signature_for_mail_templates(request)
         first_name, last_name = user.realname.split(' ')
         additional_fields = {
             'current_date': layout.format_date(utcnow(), 'date'),
