@@ -26,6 +26,11 @@ def get_geo_location(item):
     return dict(lon=geo.lon, lat=geo.lat, zoom=geo.zoom)
 
 
+def get_geo_location(item):
+    geo = item.content.get('coordinates', Coordinates())
+    return dict(lon=geo.lon, lat=geo.lat, zoom=geo.zoom)
+
+
 class PersonApiEndpoint(ApiEndpoint, ApisMixin):
 
     endpoint = 'people'
