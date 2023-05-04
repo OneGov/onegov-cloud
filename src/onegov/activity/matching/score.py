@@ -223,7 +223,11 @@ class PreferGroups:
         group_scores = None
 
         def unique_score_modifier(group_code):
-            digest = hashlib.sha1(group_code.encode('utf-8')).hexdigest()[:8]
+            digest = hashlib.new(
+                'sha1',
+                group_code.encode('utf-8'),
+                usedforsecurity=False
+            ).hexdigest()[:8]
             number = int(digest, 16)
 
             return float('0.0' + str(number)[:8])

@@ -931,8 +931,11 @@ def parse_formcode(formcode, enable_indent_check=False):
     :param enable_indent_check: bool to activate indent check while parsing.
     Should only be active originating from forms.validators.py
     """
-    parsed = yaml.load('\n'.join(
-        translate_to_yaml(formcode, enable_indent_check)), CustomLoader)
+    # CustomLoader is inherited from SafeLoader so no security issue here
+    parsed = yaml.load(  # nosec B506
+        '\n'.join(translate_to_yaml(formcode, enable_indent_check)),
+        CustomLoader
+    )
 
     fieldsets = []
     field_classes = {cls.type: cls for cls in Field.__subclasses__()}

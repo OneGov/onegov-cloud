@@ -264,6 +264,7 @@ $transition-duration: .1s;
 
         button {
             border-radius: 0;
+            cursor: pointer !important;
         }
 
         .cell {
@@ -548,5 +549,11 @@ $editbar-fg-color-active: $white;
 }
 
 .navigation-button {
-    color: #000000;
+    color: $charcoal;
+    transition: color 2ms linear;
+}
+
+.navigation button:hover .navigation-button {
+    color: $primary-color;
+    transition: color 2ms linear;
 }
