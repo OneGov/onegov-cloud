@@ -51,9 +51,9 @@ def test_view_api(client):
 
         page = client.get('/organizations').click('Organisation', href='new')
         page.form['title'] = 'Hospital'
-        coordiantes = get_base64_encoded_json_string(
+        coordinates = get_base64_encoded_json_string(
             dict(lon=1.1, lat=-2.2, zoom=3))
-        page.form['coordinates'] = coordiantes
+        page.form['coordinates'] = coordinates
         page = page.form.submit().follow()
 
         page = page.click('Mitgliedschaft', href='new')
@@ -78,6 +78,10 @@ def test_view_api(client):
         page = agency.click('Organisation', href='new')
         page.form['title'] = 'School Board'
         page.form.submit().follow()
+
+        # assert collection('/api/agencies').items
+        # assert collection('/api/people').items
+        # assert collection('/api/memberships').items
 
         # Agencies
         agencies = {

@@ -22,7 +22,7 @@ class ApisMixin:
 
 
 def get_geo_location(item):
-    geo = item.content.get('coordinates', Coordinates())
+    geo = item.content.get('coordinates', Coordinates()) or Coordinates()
     return dict(lon=geo.lon, lat=geo.lat, zoom=geo.zoom)
 
 
