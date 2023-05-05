@@ -1,5 +1,15 @@
+import json
+from base64 import b64encode
+
 from collection_json import Collection
 from freezegun import freeze_time
+
+
+def get_base64_encoded_json_string(data):
+    data = json.dumps(data)
+    data = b64encode(data.encode('ascii'))
+    data = data.decode('ascii')
+    return data
 
 
 def test_view_api(client):
@@ -41,6 +51,9 @@ def test_view_api(client):
 
         page = client.get('/organizations').click('Organisation', href='new')
         page.form['title'] = 'Hospital'
+        coordiantes = get_base64_encoded_json_string(
+            dict(lon=1.1, lat=-2.2, zoom=3))
+        page.form['coordinates'] = coordiantes
         page = page.form.submit().follow()
 
         page = page.click('Mitgliedschaft', href='new')
@@ -86,7 +99,7 @@ def test_view_api(client):
             'postal_code_city': '',
             'title': 'Hospital',
             'website': '',
-            'geo_location': dict(lon=None, lat=None, zoom=None),
+            'geo_location': dict(lon=1.1, lat=-2.2, zoom=3),
         }
         assert not links(hospital)['organigram']
         assert not links(hospital)['parent']
