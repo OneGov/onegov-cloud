@@ -124,7 +124,7 @@ def test_parse_different_base_class():
     class Test(Form):
         foo = 'bar'
 
-    form_class = parse_form('x = ___', Test)
+    form_class = parse_form('x = ___', base_class=Test)
     assert form_class.foo == 'bar'
     assert isinstance(form_class(), Test)
 
@@ -1040,13 +1040,16 @@ def test_normalization():
     assert norm == "Ich möchte die Bestellung mittels Post erhalten"
 
 
-@pytest.mark.parametrize('indent,shall_raise', [
-    ('', False),
-    (' ', True),
-    ('  ', True),
-    ('   ', True),
+@pytest.mark.parametrize('indent,indent_check,shall_raise', [
+    # indent check active while parsing
+    ('', True, False),
+    (' ', True, True),
+    ('  ', True, True),
+    ('   ', True, True),
+    # no indent check while parsing
+    ('', False, False),
 ])
-def test_indentation_error(indent, shall_raise):
+def test_indentation_error_while_parsing(indent, indent_check, shall_raise):
     # wrong indent see 'Telefonnummer'
     text = dedent(
         """
@@ -1060,11 +1063,11 @@ def test_indentation_error(indent, shall_raise):
 
     if shall_raise:
         with pytest.raises(InvalidIndentSyntax) as excinfo:
-            parse_formcode(text)
+            parse_formcode(text, enable_indent_check=indent_check)
 
         assert excinfo.value.line == 6
     else:
         try:
-            parse_formcode(text)
+            parse_formcode(text, enable_indent_check=indent_check)
         except InvalidIndentSyntax as e:
             pytest.fail('Unexpected exception {}'.format(type(e).__name__))

@@ -923,14 +923,17 @@ class CheckboxField(OptionsField, Field):
 
 
 @lru_cache(maxsize=1)
-def parse_formcode(formcode):
+def parse_formcode(formcode, enable_indent_check=False):
     """ Takes the given formcode and returns an intermediate representation
     that can be used to generate forms or do other things.
 
+    :param formcode: string representing formcode to be parsed
+    :param enable_indent_check: bool to activate indent check while parsing.
+    Should only be active originating from forms.validators.py
     """
     # CustomLoader is inherited from SafeLoader so no security issue here
     parsed = yaml.load(  # nosec B506
-        '\n'.join(translate_to_yaml(formcode)),
+        '\n'.join(translate_to_yaml(formcode, enable_indent_check)),
         CustomLoader
     )
 
@@ -1081,10 +1084,13 @@ def validate_indent(indent):
     return True
 
 
-def translate_to_yaml(text):
+def translate_to_yaml(text, enable_indent_check=False):
     """ Takes the given form text and constructs an easier to parse yaml
     string.
 
+    :param text: string to be parsed
+    :param enable_indent_check: bool to activate indent check while parsing.
+    Should only be active originating from forms.validators.py
     """
 
     lines = ((ix, l) for ix, l in prepare(text))
@@ -1101,7 +1107,7 @@ def translate_to_yaml(text):
     for ix, line in lines:
 
         indent = ' ' * (4 + (len(line) - len(line.lstrip())))
-        if not validate_indent(indent):
+        if enable_indent_check and not validate_indent(indent):
             raise errors.InvalidIndentSyntax(line=ix + 1)
 
         # the top level are the fieldsets
