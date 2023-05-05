@@ -124,7 +124,7 @@ def test_parse_different_base_class():
     class Test(Form):
         foo = 'bar'
 
-    form_class = parse_form('x = ___', Test)
+    form_class = parse_form('x = ___', base_class=Test)
     assert form_class.foo == 'bar'
     assert isinstance(form_class(), Test)
 
