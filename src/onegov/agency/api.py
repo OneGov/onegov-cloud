@@ -31,6 +31,15 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             self.session,
             page=self.page or 0
         )
+
+        if self.extra_parameters:
+            if 'first_name' in self.extra_parameters.keys():
+                firstname = self.extra_parameters.get('first_name')
+                result = result.for_filter(first_name=firstname)
+            if 'last_name' in self.extra_parameters.keys():
+                lastname = self.extra_parameters.get('last_name')
+                result = result.for_filter(last_name=lastname)
+
         result.exclude_hidden = True
         result.batch_size = self.batch_size
         return result

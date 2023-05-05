@@ -1,7 +1,7 @@
 from cached_property import cached_property
 from onegov.agency.models import ExtendedPerson
 from onegov.core.collection import Pagination
-from onegov.people import Agency
+from onegov.people import Agency, Person
 from onegov.people import AgencyMembership
 from onegov.people import PersonCollection
 from sqlalchemy import func
@@ -10,7 +10,8 @@ from sqlalchemy import or_
 
 class ExtendedPersonCollection(PersonCollection, Pagination):
     """ Extends the common person collection by the ability to filter by
-    the first letter of the last name and by the organization. Adds pagination.
+    the first letter of the last name, by the organization, by first or last
+    name. Adds pagination.
 
     """
 
@@ -21,11 +22,18 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
         return ExtendedPerson
 
     def __init__(self, session, page=0, letter=None, agency=None,
+                 first_name=None, last_name=None,
                  xlsx_modified=None):
         self.session = session
         self.page = page
+
+        # filter keywords
         self.letter = letter.upper() if letter else None
         self.agency = agency
+        self.first_name = first_name
+        self.last_name = last_name
+        # end filter keywords
+
         self.exclude_hidden = False
         # Usage for link generation of people excel based on timestamp
         self.xlsx_modified = xlsx_modified
@@ -38,6 +46,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             self.page == other.page
             and self.letter == other.letter
             and self.agency == other.agency
+            and self.first_name == other.first_name
+            and self.last_name == other.last_name
         )
 
     def page_by_index(self, page):
@@ -45,14 +55,18 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             self.session,
             page=page,
             letter=self.letter,
-            agency=self.agency
+            agency=self.agency,
+            first_name=self.first_name,
+            last_name=self.last_name,
         )
 
     def for_filter(self, **kwargs):
         return self.__class__(
             session=self.session,
             letter=kwargs.get('letter', self.letter),
-            agency=kwargs.get('agency', self.agency)
+            agency=kwargs.get('agency', self.agency),
+            first_name=kwargs.get('first_name', self.first_name),
+            last_name=kwargs.get('last_name', self.last_name),
         )
 
     def query(self):
@@ -79,6 +93,10 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             func.upper(func.unaccent(ExtendedPerson.last_name)),
             func.upper(func.unaccent(ExtendedPerson.first_name))
         )
+        if self.first_name:
+            query = query.filter(Person.first_name == self.first_name)
+        if self.last_name:
+            query = query.filter(Person.last_name == self.last_name)
         return query
 
     @cached_property
