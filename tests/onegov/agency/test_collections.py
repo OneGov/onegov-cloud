@@ -50,6 +50,8 @@ def test_extended_people_filter(session):
     people.add(first_name="Lenny", last_name="leonard")
     people.add(first_name="Carl", last_name="Çarlson")
     ned = people.add(first_name="Ned", last_name="Flanders")
+    people.add(first_name="Anna", last_name="Quinn")
+    people.add(first_name="Anna", last_name="Bourqui")
 
     agencies = ExtendedAgencyCollection(session)
     agencies.add_root(title="Police").add_person(ned.id, "Snitch")
@@ -57,9 +59,11 @@ def test_extended_people_filter(session):
     agencies.add_root(title="Moe's Tavern")
 
     assert [p.last_name for p in people.query()] == [
-        "Çarlson", "Flanders", "leonard", "Maulwurf", "Śmithers"
+        "Bourqui", "Çarlson", "Flanders", "leonard",
+        "Maulwurf", "Quinn", "Śmithers"
     ]
 
+    # first character of last name
     people = people.for_filter(letter="C")
     assert [p.last_name for p in people.query()] == ['Çarlson']
 
@@ -74,6 +78,29 @@ def test_extended_people_filter(session):
 
     people = people.for_filter(letter=None)
     assert [p.last_name for p in people.query()] == ['Flanders']
+
+    # first name
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(first_name='Max')
+    assert [p.first_name for p in people.query()] == []
+
+    people = people.for_filter(first_name='anna')
+    assert [(p.first_name, p.last_name) for p in people.query()] == \
+           [('Anna', 'Bourqui'), ('Anna', 'Quinn')]
+
+    # last name
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(last_name='Flan')
+    assert [p.first_name for p in people.query()] == []
+
+    people = people.for_filter(last_name='Flanders')
+    assert [p.last_name for p in people.query()] == ['Flanders']
+
+    # first and lastname
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(first_name='anna', last_name='Quinn')
+    assert [(p.first_name, p.last_name) for p in people.query()] == \
+           [('Anna', 'Quinn')]
 
 
 def test_extended_people_used_letters(session):
