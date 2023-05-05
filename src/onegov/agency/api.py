@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from dateutil.parser import isoparse
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
@@ -24,6 +25,8 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
 
     endpoint = 'people'
     filters = []
+    UPDATE_FILTER_PARAMS = ['updated.gt', 'updated.lt', 'updated.eq',
+                            'updated.ge', 'updated.le', 'updated']
 
     @property
     def collection(self):
@@ -39,6 +42,24 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             if 'last_name' in self.extra_parameters.keys():
                 lastname = self.extra_parameters.get('last_name')
                 result = result.for_filter(last_name=lastname)
+
+            filters = dict()
+            for operator, ts in self.extra_parameters.items():
+                if not operator.startswith('updated'):
+                    continue
+                if operator not in self.UPDATE_FILTER_PARAMS:
+                    print(f'Error Invalid filter operator {operator} - '
+                          f'ignoring')
+                    continue
+                try:
+                    ts = isoparse(ts[:16])  # only until hours and minutes
+                except Exception as ex:
+                    print(f'Error while parsing timestamp {ts}: {ex}')
+                    continue
+                filters[operator] = ts
+
+            if filters:
+                result = result.for_filter(**filters)
 
         result.exclude_hidden = True
         result.batch_size = self.batch_size

@@ -22,7 +22,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
         return ExtendedPerson
 
     def __init__(self, session, page=0, letter=None, agency=None,
-                 first_name=None, last_name=None,
+                 first_name=None, last_name=None, updated_gt=None,
                  xlsx_modified=None):
         self.session = session
         self.page = page
@@ -32,6 +32,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
         self.agency = agency
         self.first_name = first_name
         self.last_name = last_name
+        self.updated_gt = updated_gt
         # end filter keywords
 
         self.exclude_hidden = False
@@ -48,6 +49,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             and self.agency == other.agency
             and self.first_name == other.first_name
             and self.last_name == other.last_name
+            and self.updated_gt == other.updated_gt
         )
 
     def page_by_index(self, page):
@@ -58,6 +60,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             agency=self.agency,
             first_name=self.first_name,
             last_name=self.last_name,
+            updated_gt=self.updated_gt,
         )
 
     def for_filter(self, **kwargs):
@@ -67,6 +70,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             agency=kwargs.get('agency', self.agency),
             first_name=kwargs.get('first_name', self.first_name),
             last_name=kwargs.get('last_name', self.last_name),
+            updated_gt=kwargs.get('updated.gt', self.updated_gt),
         )
 
     def query(self):
@@ -101,6 +105,9 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
                     func.unaccent(ExtendedPerson.last_name)
                 ) == self.last_name.lower()
             )
+        if self.updated_gt:
+            query = query.filter(func.date_trunc(
+                'minute', ExtendedPerson.modified) > self.updated_gt)
         query = query.order_by(
             func.upper(func.unaccent(ExtendedPerson.last_name)),
             func.upper(func.unaccent(ExtendedPerson.first_name))
