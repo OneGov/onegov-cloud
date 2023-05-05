@@ -89,24 +89,22 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             query = query.join(ExtendedPerson.memberships)
             query = query.join(AgencyMembership.agency)
             query = query.filter(Agency.title == self.agency)
-        query = query.order_by(
-            func.upper(func.unaccent(ExtendedPerson.last_name)),
-            func.upper(func.unaccent(ExtendedPerson.first_name))
-        )
         if self.first_name:
             query = query.filter(
                 func.lower(
                     func.unaccent(ExtendedPerson.first_name)
-
                 ) == self.first_name.lower()
             )
         if self.last_name:
             query = query.filter(
                 func.lower(
                     func.unaccent(ExtendedPerson.last_name)
-
                 ) == self.last_name.lower()
             )
+        query = query.order_by(
+            func.upper(func.unaccent(ExtendedPerson.last_name)),
+            func.upper(func.unaccent(ExtendedPerson.first_name))
+        )
         return query
 
     @cached_property
