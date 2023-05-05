@@ -1,7 +1,7 @@
 from cached_property import cached_property
 from onegov.agency.models import ExtendedPerson
 from onegov.core.collection import Pagination
-from onegov.people import Agency, Person
+from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import PersonCollection
 from sqlalchemy import func
@@ -94,9 +94,19 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             func.upper(func.unaccent(ExtendedPerson.first_name))
         )
         if self.first_name:
-            query = query.filter(Person.first_name == self.first_name)
+            query = query.filter(
+                func.lower(
+                    func.unaccent(ExtendedPerson.first_name)
+
+                ) == self.first_name.lower()
+            )
         if self.last_name:
-            query = query.filter(Person.last_name == self.last_name)
+            query = query.filter(
+                func.lower(
+                    func.unaccent(ExtendedPerson.last_name)
+
+                ) == self.last_name.lower()
+            )
         return query
 
     @cached_property
