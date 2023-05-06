@@ -21,8 +21,9 @@ from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.forms.translator import TranslatorForm,\
     TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
-from onegov.translator_directory.generate_docx import fill_docx_with_variables,\
-    signature_for_mail_templates
+from onegov.translator_directory.generate_docx import (
+    fill_docx_with_variables, signature_for_mail_templates,
+    parse_from_filename)
 from onegov.translator_directory.layout import AddTranslatorLayout,\
     TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
     ReportTranslatorChangesLayout, MailTemplatesLayout
@@ -422,18 +423,18 @@ def view_mail_templates(self, request, form):
         template_name = form.templates.data
 
         if template_name not in request.app.mail_templates:
-            request.alert('This file does not seem to exist.')
+            request.alert(_('This file does not seem to exist.'))
             return redirect(request.link(self))
 
         user = request.current_user
         if not getattr(user, 'realname', None):
-
             request.alert(_('Unfortunately, this account does not have real '
                             'name defined, which is required for mail '
                             'templates'))
             return redirect(request.link(self))
 
-        signature_for_mail_templates(request)
+        signature_file = signature_for_mail_templates(request)
+        signature_file_name = parse_from_filename(signature_file.name)
         first_name, last_name = user.realname.split(' ')
         additional_fields = {
             'current_date': layout.format_date(utcnow(), 'date'),
@@ -443,23 +444,28 @@ def view_mail_templates(self, request, form):
                 self.date_of_decision, 'date'
             ),
             'translator_admission': request.translate(_(self.admission)) or '',
-            'sender_initials': get_initials(first_name, last_name),
             'sender_first_name': first_name,
             'sender_last_name': last_name,
-            'sender_function': 'Stv Dienstchef',
+            'sender_full_name': signature_file_name.sender_full_name,
+            'sender_function': signature_file_name.sender_function,
+            'sender_abbrev': signature_file_name.sender_abbrev,
         }
 
-        template_file_id_by_name = (
+        docx_template_id = (
             GeneralFileCollection(request.session)
             .query()
             .filter(File.name == template_name)
             .with_entities(File.id)
             .first()
         )
-        f = get_file(request.app, template_file_id_by_name)
-        template = f.reference.file.read()
+        docx_f = get_file(request.app, docx_template_id)
+        template = docx_f.reference.file.read()
+        signature_f = get_file(request.app, signature_file.id)
+        signature_bytes = signature_f.reference.file.read()
+
         __, docx = fill_docx_with_variables(
-            BytesIO(template), self, request, **additional_fields
+            BytesIO(template), self, request, signature_bytes,
+            **additional_fields
         )
         return Response(
             docx,
@@ -474,9 +480,3 @@ def view_mail_templates(self, request, form):
         'title': _('Mail templates'),
         'button_text': _('Download'),
     }
-
-
-def get_initials(first_name, last_name):
-    first_initials = first_name[:2].upper()
-    last_initials = last_name[:2].upper()
-    return last_initials + first_initials

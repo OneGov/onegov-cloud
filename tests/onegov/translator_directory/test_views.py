@@ -50,10 +50,9 @@ def check_pdf(page, filename, link):
     assert filename in ''.join(PDF(BytesIO(response.body)))
 
 
-def upload_word(filename, client):
+def upload_file(filename, client, content_type=None):
     with open(filename, 'rb') as f:
         page = client.get('/files')
-        content_type = 'application/vnd.ms-office'
         page.form['file'] = Upload(basename(filename), f.read(), content_type)
         page.form.submit()
 
@@ -1587,22 +1586,32 @@ def test_view_mail_template(client):
     trs_id = translators.add(**translator_data).id
     transaction.commit()
 
-    path = module_path(
+    docx_path = module_path(
         "tests.onegov.translator_directory", "fixtures/Vorlage.docx"
+    )
+    signature_path = module_path(
+        "tests.onegov.translator_directory",
+        "fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Dienstchef.jpg",
     )
     client.login_admin()
 
-    upload_word(path, client)
-    assert FileCollection(session).query().first().id
+    upload_file(docx_path, client, content_type='application/vnd.ms-office')
+    upload_file(signature_path, client)
+    files = FileCollection(session).query().all()
 
-    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
-    page.form['templates'] = basename(path)
-    resp = page.form.submit()
+    assert files[0].name == basename(docx_path)
+    assert files[1].name == basename(signature_path)
 
+    # User.realname has to exist since this is required by mail_templates
     user = UserCollection(session).by_username('admin@example.org')
     first_name, last_name = user.realname.split(" ")
     assert first_name == 'John'
     assert last_name == 'Doe'
+
+    # Now we have everything set up, go to the mail templates and generate one
+    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
+    page.form['templates'] = basename(docx_path)
+    resp = page.form.submit()
 
     found_variables_in_docx = set()
     expected_variables_in_docx = (

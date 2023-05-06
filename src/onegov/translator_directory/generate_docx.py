@@ -1,7 +1,6 @@
 from collections import namedtuple
 from io import BytesIO
 from os.path import splitext, basename
-from docx.shared import Mm
 from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.translator_directory import _
@@ -9,9 +8,9 @@ from docxtpl import DocxTemplate, InlineImage
 
 
 def fill_docx_with_variables(
-    original_docx, t, request, signature_img_path=None, **kwargs
+    original_docx, t, request, signature_file=None, **kwargs
 ):
-    """Fills the variables in a docx file with the given key-value pairs.
+    """ Fills the variables in a docx file with the given key-value pairs.
       The original_docx template contains Jinja-Variables that map to keys
       in the template_variables dictionary.
 
@@ -54,11 +53,10 @@ def fill_docx_with_variables(
     for key, value in kwargs.items():
         template_variables[key] = value or ''
 
-    if signature_img_path:
-        with open(signature_img_path, 'rb') as image:
-            template_variables['sender_signature'] =  InlineImage(
-                docx_template, BytesIO(image.read())
-            )
+    if signature_file:
+        template_variables['sender_signature'] = InlineImage(
+            docx_template, signature_file
+        )
 
     found_nulls = {k: v for k, v in template_variables.items() if not v}
     if found_nulls:
@@ -73,7 +71,7 @@ def fill_docx_with_variables(
 
 
 def render_docx(docx_template, template_variables):
-    """Creates the word file.
+    """ Creates the word file.
 
     substituted_variables: dictionary of values to find and replace in final
     word file. Values not present are simply ignored.
@@ -114,25 +112,26 @@ def parse_from_filename(abs_signature_filename):
     parts = filename.split('__')
     Signature = namedtuple(
         'Signature',
-        ['abbrev', 'sender_full_name', 'sender_function'],
+        ['sender_abbrev', 'sender_full_name', 'sender_function'],
     )
     return Signature(
-        abbrev=parts[0],
-        sender_full_name=parts[1],
+        sender_abbrev=parts[0],
+        sender_full_name=parts[1].replace('_', ' '),
         sender_function=parts[2],
     )
 
-@property
+
 def signature_for_mail_templates(request):
-    """ The signature of the current user. It's an image that is manually
-    uploaded. """
+    """ The signature of the current user. It is an image that is manually
+    uploaded. It should contain the string 'Unterschrift', as well as the
+    first and last name of the user. """
+
     first_name, last_name = request.current_user.realname.split(' ')
-    query = GeneralFileCollection(request.session()).query().filter(
+    query = GeneralFileCollection(request.session).query().filter(
         and_(
             GeneralFile.name.like('Unterschrift%'),
             GeneralFile.name.like(f'%{first_name}%'),
             GeneralFile.name.like(f'%{last_name}%'),
         )
     )
-    breakpoint()
-
+    return query.first()
