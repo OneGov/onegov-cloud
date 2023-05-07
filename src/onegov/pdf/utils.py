@@ -1,4 +1,5 @@
 from pdftotext import PDF
+from onegov.pdf import log
 
 
 def extract_pdf_info(content, remove='\0'):
@@ -9,7 +10,7 @@ def extract_pdf_info(content, remove='\0'):
     try:
         content.seek(0)
     except Exception:
-        pass
+        log.warning('Invalid PDF for extraction')
 
     pages = PDF(content)
 
