@@ -14,9 +14,10 @@ from onegov.translator_directory.models.translator import Translator
 from onegov.translator_directory.views.translator import (
     fill_docx_with_variables,
 )
+from docxtpl import DocxTemplate
 from tests.onegov.translator_directory.shared import (
     translator_data,
-    iter_block_items,
+    iter_block_items
 )
 
 
@@ -85,14 +86,14 @@ def test_helper_methods():
 def test_signature_image_parse_from_filename():
     signature = module_path(
         'tests.onegov.translator_directory',
-        'fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Dienstchef.jpg',
+        'fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Stv_Dienstchef.jpg',
     )
 
     signature_values = parse_from_filename(basename(signature))
 
     assert signature_values.sender_abbrev == 'DOJO'
     assert signature_values.sender_full_name == 'Adj mV John Doe'
-    assert signature_values.sender_function == 'Dienstchef'
+    assert signature_values.sender_function == 'Stv Dienstchef'
 
     template_name = module_path(
         'tests.onegov.translator_directory',
@@ -111,5 +112,5 @@ def test_signature_image_parse_from_filename():
             signature_file=BytesIO(f2.read()),
             **additional_variables
         )
-        with open('/home/cyrill/Desktop/output/out.docx', 'wb') as v:
-            v.write(filled_template)
+    doc = DocxTemplate(BytesIO(filled_template))
+    assert doc.get_undeclared_template_variables() == set()

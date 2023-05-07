@@ -464,7 +464,7 @@ def view_mail_templates(self, request, form):
         signature_bytes = signature_f.reference.file.read()
 
         __, docx = fill_docx_with_variables(
-            BytesIO(template), self, request, signature_bytes,
+            BytesIO(template), self, request, BytesIO(signature_bytes),
             **additional_fields
         )
         return Response(

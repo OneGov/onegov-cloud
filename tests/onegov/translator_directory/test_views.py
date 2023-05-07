@@ -1591,7 +1591,7 @@ def test_view_mail_template(client):
     )
     signature_path = module_path(
         "tests.onegov.translator_directory",
-        "fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Dienstchef.jpg",
+        "fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Stv_Dienstchef.jpg",
     )
     client.login_admin()
 

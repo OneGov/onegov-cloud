@@ -54,7 +54,7 @@ def fill_docx_with_variables(
         template_variables[key] = value or ''
 
     if signature_file:
-        template_variables['sender_signature'] = InlineImage(
+        template_variables['sender_signature'] = FixedInplaceInlineImage(
             docx_template, signature_file
         )
 
@@ -68,6 +68,32 @@ def fill_docx_with_variables(
 
     else:
         return {}, render_docx(docx_template, template_variables)
+
+
+class FixedInplaceInlineImage(InlineImage):
+
+    def _insert_image(self):
+        pic = self.tpl.current_rendering_part.new_pic_inline(
+            self.image_descriptor, self.width, self.height
+        ).xml
+        pic = self.fix_inline_image_alignment(pic)
+        return (
+            '</w:t></w:r><w:r><w:drawing>%s</w:drawing></w:r><w:r>'
+            '<w:t xml:space="default">' % pic
+        )
+
+    def fix_inline_image_alignment(self, orig_xml):
+        """ Fixes the position of the image by setting the `distL` to zero."""
+        fix_pos = ' distT=\"0\" distB=\"0\" distL=\"0\" distR=\"0\"'
+        index = orig_xml.find('wp:inline')
+        if index != -1:
+            return (
+                orig_xml[: index + len('wp:inline')]
+                + fix_pos
+                + orig_xml[index + len('wp:inline'):]
+            )
+        else:
+            return orig_xml
 
 
 def render_docx(docx_template, template_variables):
@@ -117,7 +143,7 @@ def parse_from_filename(abs_signature_filename):
     return Signature(
         sender_abbrev=parts[0],
         sender_full_name=parts[1].replace('_', ' '),
-        sender_function=parts[2],
+        sender_function=parts[2].replace('_', ' ')
     )
 
 
