@@ -1056,7 +1056,7 @@ class GeverSettingsForm(Form):
             model.gever_password = encrypted or ""
         except Exception:
             model.gever_username = ""
-            model.gever_password = ""
+            model.gever_password = ""  # nosec: B105
 
     def process_obj(self, model):
         super().process_obj(model)
