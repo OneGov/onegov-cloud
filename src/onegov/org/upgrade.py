@@ -185,7 +185,7 @@ def cache_news_hashtags_in_meta(context):
     try:
         for news in context.session.query(News):
             news.hashtags = news.es_tags or []
-    except Exception:
+    except Exception:  # nosec B110
         pass
 
 
