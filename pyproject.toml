@@ -20,3 +20,9 @@ python_version = "3.10"
 follow_imports = "silent"
 namespace_packages = true
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
+
+[tool.bandit]
+exclude_dirs = ["*/tests/*"]
+skips = [
+    "B101",  # ignore asserts
+]
