@@ -7,7 +7,7 @@ from websockets import serve
 
 
 CONNECTIONS = {}
-TOKEN = ''
+TOKEN = ''  # nosec: B105
 
 
 def get_payload(message, expected):
