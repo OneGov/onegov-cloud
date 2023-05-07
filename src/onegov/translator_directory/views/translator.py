@@ -434,6 +434,10 @@ def view_mail_templates(self, request, form):
             return redirect(request.link(self))
 
         signature_file = signature_for_mail_templates(request)
+        if not signature_file:
+            request.alert(_('Did not find a signature in /files.'))
+            return redirect(request.link(self))
+
         signature_file_name = parse_from_filename(signature_file.name)
         first_name, last_name = user.realname.split(' ')
         additional_fields = {
