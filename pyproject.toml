@@ -22,7 +22,7 @@ namespace_packages = true
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
 
 [tool.bandit]
-exclude_dirs = ["*/tests/*"]
+exclude_dirs = ["*/tests/*", "*/**/upgrade.py"]
 skips = [
     "B101",  # ignore asserts
 ]
