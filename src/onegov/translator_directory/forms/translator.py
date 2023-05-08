@@ -542,6 +542,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
+    search = StringField(
+        label=_('Search in first and last name'),
+        validators=[Optional(), Length(max=full_text_max_chars)]
+    )
+
     order_by = RadioField(
         label=_('Order by'),
         choices=(
@@ -558,11 +563,6 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
             ('1', _("Descending"))
         ),
         default='0'
-    )
-
-    search = StringField(
-        label=_('Search in first and last name'),
-        validators=[Optional(), Length(max=full_text_max_chars)]
     )
 
     @property
