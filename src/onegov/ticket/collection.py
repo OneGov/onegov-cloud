@@ -218,6 +218,10 @@ class TicketCollection(TicketCollectionPagination):
 
         return TicketCount(**count)
 
+    def by_handler_data_id(self, handler_data_id):
+        return self.query().filter(
+            Ticket.handler_data['handler_data']['id'] == str(handler_data_id))
+
 
 class ArchivedTicketsCollection(TicketCollectionPagination):
     def query(self):

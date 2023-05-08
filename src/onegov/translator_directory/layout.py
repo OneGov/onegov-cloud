@@ -297,7 +297,13 @@ class TranslatorCollectionLayout(DefaultLayout):
                     url=self.request.class_link(
                         TranslatorCollection, name='export'
                     ),
-                    attrs={'class': 'export-link'}
+                    attrs={'class': 'export-link'},
+                ),
+                Link(
+                    _("Mail to all translators"),
+                    url=self.request.class_link(TranslatorCollection,
+                                                name='bulk-email'),
+                    attrs={'class': 'envelope'},
                 )
             ]
         elif self.request.is_editor or self.request.is_member:

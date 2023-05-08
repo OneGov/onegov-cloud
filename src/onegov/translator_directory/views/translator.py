@@ -10,8 +10,9 @@ from onegov.core.templates import render_template
 from onegov.file.integration import get_file
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
-from onegov.org.models import TicketMessage, GeneralFileCollection
-from onegov.ticket import TicketCollection
+from onegov.org.models import GeneralFileCollection
+from onegov.org.models import TicketMessage
+from onegov.ticket import TicketCollection, Ticket
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
@@ -102,6 +103,20 @@ def view_translators(self, request, form):
         'results': self.batch,
         'button_text': _('Submit Search')
     }
+
+
+@TranslatorDirectoryApp.view(
+    model=TranslatorCollection,
+    permission=Secret,
+    template='translators.pt',
+    name='bulk-email'
+)
+def render_bulk_email_link(self, request):
+
+    q = self.query().with_entities(Translator.email).all()
+    bcc_addresses = ';'.join(str(email) for (email,) in q if email)
+    mailto_link = f"mailto:?bcc={bcc_addresses[:-1]}"
+    return request.redirect(mailto_link)
 
 
 @TranslatorDirectoryApp.view(
@@ -264,10 +279,19 @@ def export_translator_directory(self, request):
 )
 def view_translator(self, request):
     layout = TranslatorLayout(self, request)
+    translator_handler_data = (
+        TicketCollection(request.session).by_handler_data_id(self.id)
+    )
+    hometown_query = translator_handler_data.with_entities(
+        Ticket.handler_data['handler_data']['hometown']
+    )
+    hometown = hometown_query.first()
+
     return {
         'layout': layout,
         'model': self,
-        'title': self.title
+        'title': self.title,
+        'hometown': hometown
     }
 
 

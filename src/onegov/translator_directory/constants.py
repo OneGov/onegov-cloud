@@ -15,6 +15,7 @@ member_can_see = (
     'address',
     'zip_code',
     'city',
+    'hometown',  # stored on ticket
     'drive_distance',
     'email',
     'tel_mobile',

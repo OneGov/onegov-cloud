@@ -1674,6 +1674,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
     .export-link::before { @include icon($export-link-icon); }
+    .envelope::before { @include icon($envelope-icon); }
     .move-link::before { @include icon($move-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
