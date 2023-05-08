@@ -51,7 +51,7 @@
                                 <dt i18n:translate>City</dt>
                                 <dd>${model.city}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.drive_distance and layout.show('drive_distance')">
+                            <dl class="drive-distance field-display" tal:condition="model.drive_distance and layout.show('drive_distance')">
                                 <dt i18n:translate>Drive distance</dt>
                                 <dd>${layout.format_drive_distance(model.drive_distance)}</dd>
                             </dl>
