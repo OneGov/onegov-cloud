@@ -3,6 +3,7 @@ import sys
 
 from onegov.core.cli import command_group
 from onegov.activity.models import Period
+from sqlalchemy import text
 
 
 cli = command_group()
@@ -36,74 +37,96 @@ def delete_period(title):
             print(f"Could not find period «{title}»")
             sys.exit(1)
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM payments WHERE payments.id IN (
                 SELECT payment_id FROM payments_for_invoice_items_payments
                 WHERE invoice_items_id IN (
                     SELECT id FROM invoice_items
                     WHERE invoice_id IN (
-                        SELECT id FROM invoices WHERE period_id = '{period.id}'
+                        SELECT id FROM invoices WHERE period_id = :period
                     )
                 )
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM payments_for_invoice_items_payments
             WHERE invoice_items_id IN (
                 SELECT id FROM invoice_items
                 WHERE invoice_id IN (
-                    SELECT id FROM invoices WHERE period_id = '{period.id}'
+                    SELECT id FROM invoices WHERE period_id = :period
                 )
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM invoice_items where invoice_id IN (
-                SELECT id FROM invoices WHERE period_id = '{period.id}'
+                SELECT id FROM invoices WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM invoice_references where invoice_id IN (
-                SELECT id FROM invoices WHERE period_id = '{period.id}'
+                SELECT id FROM invoices WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM invoices WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM invoices WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM tickets WHERE handler_id::uuid IN (
                 SELECT id FROM publication_requests
-                WHERE period_id = '{period.id}'
+                WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM publication_requests WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM publication_requests WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM bookings WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM bookings WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM occasion_dates WHERE occasion_id IN (
-                SELECT id FROM occasions WHERE period_id = '{period.id}'
+                SELECT id FROM occasions WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
+        request.session.execute(text("""
             DELETE FROM occasion_needs WHERE occasion_id IN (
-                SELECT id FROM occasions WHERE period_id = '{period.id}'
+                SELECT id FROM occasions WHERE period_id = :period
             )
-        """)
+        """), {
+            'period': period.id
+        })
 
-        request.session.execute(f"""
-            DELETE FROM occasions WHERE period_id = '{period.id}'
-        """)
+        request.session.execute(text("""
+            DELETE FROM occasions WHERE period_id = :period
+        """), {
+            'period': period.id
+        })
 
         # triggers a cache update
         request.session.delete(period)
