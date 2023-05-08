@@ -156,6 +156,39 @@ def test_extended_people_filter_updated_ge(session):
     assert [p.last_name for p in people.query()] == []
 
 
+def test_extended_people_filter_updated_eq(session):
+    people = ExtendedPersonCollection(session)
+
+    with freeze_time('2023-05-08 01:00'):
+        people.add(first_name="Hans", last_name="Maulwurf")
+    with freeze_time('2023-05-08 01:05'):
+        people.add(first_name="Franz", last_name="Müller")
+
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 0, 59, 0)
+    )
+    assert [p.last_name for p in people.query()] == []
+
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 1, 0, 0)
+    )
+    assert [p.last_name for p in people.query()] == ['Maulwurf']
+
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 1, 5, 0)
+    )
+    assert [p.last_name for p in people.query()] == ['Müller']
+
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 1, 6, 0)
+    )
+    assert [p.last_name for p in people.query()] == []
+
+
 def test_extended_people_used_letters(session):
     assert ExtendedPersonCollection(session).used_letters == []
 

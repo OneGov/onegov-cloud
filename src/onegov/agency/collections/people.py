@@ -24,7 +24,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
 
     def __init__(self, session, page=0, letter=None, agency=None,
                  first_name=None, last_name=None, updated_gt=None,
-                 updated_ge=None,
+                 updated_ge=None, updated_eq=None,
                  xlsx_modified=None):
         self.session = session
         self.page = page
@@ -36,6 +36,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
         self.last_name = last_name
         self.updated_gt = updated_gt
         self.updated_ge = updated_ge
+        self.updated_eq = updated_eq
         # end filter keywords
 
         self.exclude_hidden = False
@@ -54,6 +55,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             and self.last_name == other.last_name
             and self.updated_gt == other.updated_gt
             and self.updated_ge == other.updated_ge
+            and self.updated_eq == other.updated_eq
         )
 
     def page_by_index(self, page):
@@ -66,6 +68,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             last_name=self.last_name,
             updated_gt=self.updated_gt,
             updated_ge=self.updated_ge,
+            updated_eq=self.updated_eq,
         )
 
     def for_filter(self, **kwargs):
@@ -77,6 +80,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             last_name=kwargs.get('last_name', self.last_name),
             updated_gt=kwargs.get('updated_gt', self.updated_gt),
             updated_ge=kwargs.get('updated_ge', self.updated_ge),
+            updated_eq=kwargs.get('updated_eq', self.updated_eq),
         )
 
     def query(self):
@@ -122,7 +126,6 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
                 ) > self.updated_gt
             )
         if self.updated_ge:
-            # if 'modified' is not set comparison is done against 'created'
             query = query.filter(
                 func.coalesce(
                     func.date_trunc('minute',
@@ -130,6 +133,15 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
                     func.date_trunc('minute',
                                     ExtendedPerson.created),
                 ) >= self.updated_ge
+            )
+        if self.updated_eq:
+            query = query.filter(
+                func.coalesce(
+                    func.date_trunc('minute',
+                                    ExtendedPerson.modified),
+                    func.date_trunc('minute',
+                                    ExtendedPerson.created),
+                ) == self.updated_eq
             )
         query = query.order_by(
             func.upper(func.unaccent(ExtendedPerson.last_name)),
