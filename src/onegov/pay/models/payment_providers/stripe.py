@@ -355,7 +355,7 @@ class StripeConnect(PaymentProvider):
             'error_url': error_url
         }
 
-        response = requests.post(register, json=payload)
+        response = requests.post(register, json=payload, timeout=60)
         assert response.status_code == 200
 
         return self.oauth_url(

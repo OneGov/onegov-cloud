@@ -106,6 +106,18 @@ class FormChoicesMixin:
         result.extend([(k, k) for k in self.available_additional_guilds])
         return sorted(result, key=lambda x: x[1].upper())
 
+    @cached_property
+    def admission_choices(self):
+        admissions = tuple(
+            (k, self.request.translate(v))
+            for k, v in ADMISSIONS.items()
+        )
+        return sorted(admissions, key=lambda x: x[1].upper())
+
+    @property
+    def lang_collection(self):
+        return LanguageCollection(self.request.session)
+
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
 
@@ -358,10 +370,6 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
     )
 
     @property
-    def lang_collection(self):
-        return LanguageCollection(self.request.session)
-
-    @property
     def cert_collection(self):
         return LanguageCertificateCollection(self.request.session)
 
@@ -469,8 +477,8 @@ class TranslatorForm(Form, FormChoicesMixin, DrivingDistanceMixin):
         model.tel_mobile = self.tel_mobile.data or None
         model.tel_private = self.tel_private.data or None
         model.tel_office = self.tel_office.data or None
-        model.availability = self.availability.data or None
         model.confirm_name_reveal = self.confirm_name_reveal.data
+        model.availability = self.availability.data or None
         model.date_of_application = self.date_of_application.data or None
         model.date_of_decision = self.date_of_decision.data or None
         model.proof_of_preconditions = self.proof_of_preconditions.data or None
@@ -509,6 +517,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
+    monitoring_languages_ids = ChosenSelectMultipleField(
+        label=_('Monitoring languages'),
+        choices=[]
+    )
+
     interpret_types = ChosenSelectMultipleField(
         label=_('Expertise by interpreting type'),
         choices=[]
@@ -517,6 +530,21 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
     guilds = ChosenSelectMultipleField(
         label=_('Expertise by professional guild'),
         choices=[]
+    )
+
+    genders = ChosenSelectMultipleField(
+        label=_('Gender'),
+        choices=[],
+    )
+
+    admission = ChosenSelectMultipleField(
+        label=_('Admission'),
+        choices=[]
+    )
+
+    search = StringField(
+        label=_('Search in first and last name'),
+        validators=[Optional(), Length(max=full_text_max_chars)]
     )
 
     order_by = RadioField(
@@ -537,35 +565,48 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         default='0'
     )
 
-    search = StringField(
-        label=_('Search in first and last name'),
-        validators=[Optional(), Length(max=full_text_max_chars)]
-    )
+    @property
+    def monitoring_languages(self):
+        return self.lang_collection.by_ids(self.monitoring_languages_ids.data)
 
     def apply_model(self, model):
 
         if model.spoken_langs:
             self.spoken_langs.data = model.spoken_langs
 
+        if model.genders:
+            self.genders.data = model.genders
+
         if model.written_langs:
             self.written_langs.data = model.written_langs
+
+        if model.monitor_langs:
+            self.monitoring_languages_ids.data = model.monitor_langs
+
         self.order_by.data = model.order_by
         self.order_desc.data = model.order_desc and '1' or '0'
         self.search.data = model.search
         self.interpret_types.data = model.interpret_types or []
         self.guilds.data = model.guilds or []
+        self.admission.data = model.admissions or []
 
     def update_model(self, model):
         model.spoken_langs = self.spoken_langs.data
         model.written_langs = self.written_langs.data
+        model.monitor_langs = self.monitoring_languages_ids.data
         model.order_by = self.order_by.data
         model.order_desc = self.order_desc.data == '1' and True or False
         model.search = self.search.data
         model.interpret_types = self.interpret_types.data
         model.guilds = self.guilds.data
+        model.admissions = self.admission.data
+        model.genders = self.genders.data
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
         self.written_langs.choices = self.language_choices
+        self.monitoring_languages_ids.choices = self.language_choices
         self.guilds.choices = self.guilds_choices
         self.interpret_types.choices = self.interpret_types_choices
+        self.admission.choices = self.admission_choices
+        self.genders.choices = self.gender_choices

@@ -2,6 +2,7 @@ from morepath.request import Response
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
+from onegov.election_day import log
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.forms import EmailSubscriptionForm
@@ -65,7 +66,7 @@ def optin_email(self, request, form):
         assert address
         assert locale
     except Exception:
-        pass
+        log.warning('Invalid email optin')
     else:
         subscribers = EmailSubscriberCollection(request.session)
         if subscribers.confirm_subscription(address, locale):
@@ -134,7 +135,7 @@ def optout_email(self, request, form):
         address = data['address']
         assert address
     except Exception:
-        pass
+        log.warning('Invalid email optout')
     else:
         subscribers = EmailSubscriberCollection(request.session)
         result = subscribers.confirm_unsubscription(address)

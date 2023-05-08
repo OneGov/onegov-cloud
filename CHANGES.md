@@ -1,8 +1,34 @@
 # Changes
 
+## 2023.19
+
+`2023-04-30` | [2c4fdd7c74...2c4fdd7c74](https://github.com/OneGov/onegov-cloud/compare/2c4fdd7c74^...2c4fdd7c74)
+
+### Ballot
+
+##### Fixes file constraints.
+
+`Bugfix` | [OGC-1073](https://linear.app/onegovcloud/issue/OGC-1073) | [2c4fdd7c74](https://github.com/onegov/onegov-cloud/commit/2c4fdd7c743ae3279edf8c973e3fcc750442c0b6)
+
+## 2023.18
+
+`2023-04-25` | [d1acf02b0b...e5efb9ca24](https://github.com/OneGov/onegov-cloud/compare/d1acf02b0b^...e5efb9ca24)
+
+### Feriennet
+
+##### Make form more robust if field is missing
+
+`Bugfix` | [pro-1116](#pro-1116) | [64139c70db](https://github.com/onegov/onegov-cloud/commit/64139c70dbe1f82c1a8351f61ff247a02acbe327)
+
+### Town6
+
+##### Make image preview visible
+
+`Feature` | [d1acf02b0b](https://github.com/onegov/onegov-cloud/commit/d1acf02b0b64579b6789bd8b29dc5259ffbf6aa4)
+
 ## 2023.17
 
-`2023-04-24` | [dc42c72bf3...00a56fcdf7](https://github.com/OneGov/onegov-cloud/compare/dc42c72bf3^...00a56fcdf7)
+`2023-04-24` | [dc42c72bf3...0d924d70fc](https://github.com/OneGov/onegov-cloud/compare/dc42c72bf3^...0d924d70fc)
 
 ### Feriennet
 
@@ -2922,77 +2948,4 @@ Topics, people, etc. can now be assigned the access level "member"
 ## 2022.27
 
 `2022-04-27` | [aebf7f9623...1eec46ba9d](https://github.com/OneGov/onegov-cloud/compare/aebf7f9623^...1eec46ba9d)
-
-## 2022.26
-
-`2022-04-26` | [1a1867726e...a00696ed84](https://github.com/OneGov/onegov-cloud/compare/1a1867726e^...a00696ed84)
-
-### Activity
-
-##### Fixes calculation of available weeks.
-
-`Bugfix` | [PRO-997](https://linear.app/projuventute/issue/PRO-997) | [6cc708de97](https://github.com/onegov/onegov-cloud/commit/6cc708de97788d3df5dc2e1e016f49d16d56ec9e)
-
-### Core
-
-##### Removes deprecated mailer argument.
-
-`Other` | [OGC-307](https://linear.app/onegovcloud/issue/OGC-307) | [44159aa6db](https://github.com/onegov/onegov-cloud/commit/44159aa6dbafb0ddd0828e28b9c7e99b2b35f3eb)
-
-##### Disable docs build step for now.
-
-`Other` | [OGC-418](https://linear.app/onegovcloud/issue/OGC-418) | [2ace66d8de](https://github.com/onegov/onegov-cloud/commit/2ace66d8dea38d14aedc51c64924b6d6fb4141ae)
-
-### Election Day
-
-##### Add cache control tween.
-
-`Feature` | [OGC-406](https://linear.app/onegovcloud/issue/OGC-406) | [3f69497348](https://github.com/onegov/onegov-cloud/commit/3f694973482928e0888ca73735b317971c30f96f)
-
-##### Make mandates translation configurable by principal.
-
-`Feature` | [OGC-404](https://linear.app/onegovcloud/issue/OGC-404) | [47b77d7800](https://github.com/onegov/onegov-cloud/commit/47b77d7800aed6b4792ba252aac661e7b93437fe)
-
-##### Hide load test data in open data catalog.
-
-`Other` | [OGC-417](https://linear.app/onegovcloud/issue/OGC-417) | [468b92f6a2](https://github.com/onegov/onegov-cloud/commit/468b92f6a2a1cbec159b12190f0069a63f64ed80)
-
-##### Fixes pages cache not distinquishing query parameters.
-
-Some cached (data) views used for the screen widgets may have query 
-parameters such as limit or other filters.
-
-`Bugfix` | [d8d29f07a6](https://github.com/onegov/onegov-cloud/commit/d8d29f07a67162416f4e4fcdfc2781ce3b2ef859)
-
-##### Avoid showing relative timestamps.
-
-This does not play well with caches.
-
-`Bugfix` | [edee466f93](https://github.com/onegov/onegov-cloud/commit/edee466f9325d8b68ab0c49fa79cca46dba7cf47)
-
-##### Clear all related election results when clearing an election compound result.
-
-`Bugfix` | [OGC-403](https://linear.app/onegovcloud/issue/OGC-403) | [f2dac55868](https://github.com/onegov/onegov-cloud/commit/f2dac558680e456595084e2a9e37b468b8c3530b)
-
-### File
-
-##### Improve AIS2.py efficiency.
-
-`Feature` | [3de2b4fa00](https://github.com/onegov/onegov-cloud/commit/3de2b4fa00b1c5ba86265232191bb46001898b5b)
-
-### Org
-
-##### Fix external links.
-
-`Bugfix` | [OGC-373](https://linear.app/onegovcloud/issue/OGC-373) | [e8a70b7d26](https://github.com/onegov/onegov-cloud/commit/e8a70b7d26d5d1b89547c244a41942bbec40aa18)
-
-## 2022.25
-
-`2022-04-14` | [d5a2f507b2...0011026036](https://github.com/OneGov/onegov-cloud/compare/d5a2f507b2^...0011026036)
-
-### Org
-
-##### Allows tenants to specify custom tags
-
-`Feature` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [d5a2f507b2](https://github.com/onegov/onegov-cloud/commit/d5a2f507b21288b529a1e9faf35da9cc590ee441)
 
