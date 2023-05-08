@@ -55,6 +55,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
                 except Exception as ex:
                     print(f'Error while parsing timestamp {ts}: {ex}')
                     continue
+                operator = operator.replace('.', '_')
                 filters[operator] = ts
             if filters:
                 result = result.for_filter(**filters)

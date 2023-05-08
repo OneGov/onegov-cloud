@@ -241,7 +241,7 @@ def test_view_api(client):
     }
     assert set(people) == {'Krabappel Edna'}
 
-    # test updated.gt filter
+    # test updated greater than filter
     people = {
         data(item)['title']: item.href
         for item in collection(
@@ -260,6 +260,28 @@ def test_view_api(client):
         data(item)['title']: item.href
         for item in collection(
             '/api/people?updated.gt=2023-05-08T01:06:00').items
+    }
+    assert set(people) == set()
+
+    # test updated greater equal filter
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.ge=2023-05-08T00:01:00').items
+    }
+    assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.ge=2023-05-08T01:05:00').items
+    }
+    assert set(people) == {'Krabappel Edna'}
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.ge=2023-05-08T01:06:00').items
     }
     assert set(people) == set()
 
