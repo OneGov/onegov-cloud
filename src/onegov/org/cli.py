@@ -456,7 +456,12 @@ def import_reservations(dsn, map, start_date):
 
         @cached_property
         def old_uuid(self):
-            return UUID(requests.get(f'{self.old_url}/@@uuid').text.strip())
+            return UUID(
+                requests.get(
+                    f'{self.old_url}/@@uuid',
+                    timeout=60
+                ).text.strip()
+            )
 
         @property
         def new_uuid(self):

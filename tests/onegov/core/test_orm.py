@@ -1711,8 +1711,12 @@ def test_associable_multiple(postgres_dsn):
         id = Column(Integer, primary_key=True)
         name = Column(Text, nullable=False)
 
-        address = associated(Address, 'address', 'one-to-one')
-        employee = associated(Person, 'employee', 'one-to-many')
+        address = associated(
+            Address, 'address', 'one-to-one', onupdate='CASCADE'
+        )
+        employee = associated(
+            Person, 'employee', 'one-to-many', onupdate='CASCADE'
+        )
 
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
@@ -1720,6 +1724,7 @@ def test_associable_multiple(postgres_dsn):
     session = mgr.session()
 
     session.add(Company(
+        id=1,
         name='Engulf & Devour',
         address=Address(town='Ember'),
         employee=[
@@ -1761,6 +1766,13 @@ def test_associable_multiple(postgres_dsn):
     assert addresses[2].links.first().name == "Bob"
     assert len(addresses[2].linked_companies) == 0
     assert len(addresses[2].linked_people) == 1
+
+    company.id = 2
+    session.flush()
+
+    assert alice.linked_companies[0].id == 2
+    assert bob.linked_companies[0].id == 2
+    assert company.address.linked_companies[0].id == 2
 
     session.delete(alice)
     session.flush()

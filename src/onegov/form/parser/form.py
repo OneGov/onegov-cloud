@@ -41,15 +41,18 @@ MEGABYTE = 1000 ** 2
 DEFAULT_UPLOAD_LIMIT = 15 * MEGABYTE
 
 
-def parse_form(text, base_class=Form):
+def parse_form(text, enable_indent_check=False, base_class=Form):
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
+    :type text: string form text to be parsed
+    :param enable_indent_check: bool to activate indent check while parsing.
+    :param base_class: Form base class
     """
 
     builder = WTFormsClassBuilder(base_class)
 
-    for fieldset in parse_formcode(text):
+    for fieldset in parse_formcode(text, enable_indent_check):
         builder.set_current_fieldset(fieldset.label)
 
         for field in fieldset.fields:

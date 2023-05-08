@@ -1136,7 +1136,9 @@ def test_vote_has_results(session):
     assert vote.has_results is True
 
 
-def test_vote_rename(session):
+def test_vote_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     vote = Vote(
         title='Vote',
         id='vorte',
@@ -1145,8 +1147,11 @@ def test_vote_rename(session):
     )
     vote.ballots.append(Ballot(type='proposal'))
     vote.ballots.append(Ballot(type='counter-proposal'))
+
     session.add(vote)
     session.flush()
+
+    vote.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     assert session.query(Ballot.vote_id.distinct()).one()[0] == 'vorte'
 

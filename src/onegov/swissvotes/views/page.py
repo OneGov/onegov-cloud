@@ -162,7 +162,8 @@ def add_page(self, request, form):
 
     return {
         'layout': AddPageLayout(self, request),
-        'form': form
+        'form': form,
+        'button_text': _('Add')
     }
 
 

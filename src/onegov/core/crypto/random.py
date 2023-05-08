@@ -12,7 +12,7 @@
 
 import string
 import itertools
-import random
+import secrets
 
 from collections import defaultdict
 from onegov.core.utils import pairwise
@@ -124,7 +124,7 @@ class MarkovChain:
         """
         nexts = self.counts[state].items()
         # Like random.choice() but with a different weight for each element
-        rand = random.randrange(0, self.totals[state])
+        rand = secrets.randbelow(self.totals[state])
         # Using bisection here could be faster, but simplicity prevailed.
         # (Also it’s not that slow with 26 states or so.)
         for next_state, weight in nexts:
@@ -136,7 +136,7 @@ class MarkovChain:
         """
         Return an infinite iterator of states.
         """
-        state = random.choice(tuple(k for k in self.counts.keys()))
+        state = secrets.choice(tuple(k for k in self.counts.keys()))
         while True:
             state = self.next(state)
             yield state

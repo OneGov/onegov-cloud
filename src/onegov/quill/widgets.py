@@ -23,7 +23,7 @@ class QuillInput(HiddenInput):
 
         super(QuillInput, self).__init__(**kwargs)
 
-        self.id = ''.join(choice('abcdefghi') for i in range(8))
+        self.id = ''.join(choice('abcdefghi') for i in range(8))  # nosec B311
 
         self.formats = []
         if 'strong' in tags:
