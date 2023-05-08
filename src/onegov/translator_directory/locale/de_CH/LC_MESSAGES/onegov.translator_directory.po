@@ -764,12 +764,6 @@ msgstr "Zertifikate"
 msgid "User"
 msgstr "Benutzer"
 
-msgid "Working language"
-msgstr "Arbeitssprache"
-
-msgid "Monitoring"
-msgstr "Kommunikationsüberwachung"
-
 msgid "Phone numbers"
 msgstr "Telefonischer Kontakt"
 

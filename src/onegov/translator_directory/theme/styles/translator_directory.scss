@@ -9,12 +9,6 @@ $dark-orange:  #be860e;
     // bump default width globally
     max-width: 77.0rem;
 }
-.wrap-word {
-    line-break: anywhere;
-}
-.nowrap-word {
-    word-break: keep-all;
-}
 
 .edit-bar {
     .create-excel::before { @include icon('\f1c3'); }
