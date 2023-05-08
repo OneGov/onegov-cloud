@@ -56,7 +56,7 @@ def test_read_write_cycle():
         )
         assert 'translator_admission' in nulls
         f.seek(0)
-        variables_to_fill['translator_admission']: _(translator.admission)
+        variables_to_fill['translator_admission'] = _(translator.admission)
         nulls, filled_template = fill_docx_with_variables(
             BytesIO(f.read()), translator, request, **variables_to_fill
         )
