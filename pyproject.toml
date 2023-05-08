@@ -23,7 +23,7 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
 
 [tool.bandit]
 exclude_dirs = [
-    "tests",
+    "*/tests/*",
     "*/**/upgrade.py",
     "*/**/upgrades.py"
 ]
