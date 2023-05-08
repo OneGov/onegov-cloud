@@ -123,11 +123,15 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         backref='mother_tongues'
     )
 
+    # Arbeitssprache - Wort
     spoken_languages = relationship(
         "Language", secondary=spoken_association_table, backref="speakers"
     )
+    # Arbeitssprache - Schrift
     written_languages = relationship(
         "Language", secondary=written_association_table, backref='writers')
+
+    # Arbeitssprache - Kommunikationsüberwachung
     monitoring_languages = relationship(
         "Language", secondary=monitoring_association_table, backref='monitors')
 

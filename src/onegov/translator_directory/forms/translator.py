@@ -2,7 +2,7 @@ import re
 
 from cached_property import cached_property
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TagsField
 from onegov.form.validators import Stdnum
@@ -605,8 +605,20 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
         self.written_langs.choices = self.language_choices
-        self.monitoring_languages_ids.choices = self.language_choices
         self.guilds.choices = self.guilds_choices
         self.interpret_types.choices = self.interpret_types_choices
+        self.monitoring_languages_ids.choices = self.language_choices
         self.admission.choices = self.admission_choices
         self.genders.choices = self.gender_choices
+
+
+class MailTemplatesForm(Form):
+    """ Defines the form for generating mail templates. """
+
+    templates = ChosenSelectField(
+        label=_('Chose a mail template to generate:'),
+        choices=[]
+    )
+
+    def on_request(self):
+        self.templates.choices = self.request.app.mail_templates

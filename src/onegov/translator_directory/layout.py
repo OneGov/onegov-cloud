@@ -133,6 +133,13 @@ class TranslatorLayout(DefaultLayout):
                     self.request.link(self.file_collection),
                     attrs={'class': 'documents'}
                 ),
+                Link(
+                    _('Mail templates'),
+                    url=self.request.link(
+                        self.model, name='mail-templates'
+                    ),
+                    attrs={'class': 'envelope'}
+                ),
             ]
         elif self.request.is_editor:
             return [
@@ -189,7 +196,6 @@ class TranslatorLayout(DefaultLayout):
                     url=self.request.link(self.model)
                 )
             )
-
         return links
 
 
@@ -239,6 +245,20 @@ class ApplyTranslatorChangesLayout(TranslatorLayout):
         links = super().breadcrumbs
         links.append(Link(_('Apply proposed changes')))
         return links
+
+
+class MailTemplatesLayout(TranslatorLayout):
+
+    @property
+    def breadcrumbs(self):
+        return super().breadcrumbs + [
+            Link(
+                text=_('Mail templates'),
+                url=self.request.link(
+                    self.model, name='mail-templates'
+                )
+            )
+        ]
 
 
 class TranslatorCollectionLayout(DefaultLayout):

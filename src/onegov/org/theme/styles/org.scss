@@ -1719,8 +1719,8 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
     .cancel::before { @include icon($disabled-icon); }
+    .envelope::before { @include icon($envelope-icon); }
 }
-
 
 .mark-as-paid::before { @include icon($mark-as-paid); }
 .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
