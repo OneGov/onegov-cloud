@@ -179,7 +179,6 @@ class TicketCollection(TicketCollectionPagination):
         # add it to the session before invoking the handler, who expects
         # each ticket to belong to a session already
         self.session.add(ticket)
-
         ticket.handler_id = handler_id
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data

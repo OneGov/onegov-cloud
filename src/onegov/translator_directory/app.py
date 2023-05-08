@@ -4,10 +4,12 @@ from onegov.translator_directory.initial_content import create_new_organisation
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.org.models import Organisation
+from onegov.org.models import Organisation, GeneralFile, GeneralFileCollection
 from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
 from purl import URL
+from sqlalchemy import and_
+from cached_property import cached_property
 
 
 class TranslatorDirectoryApp(OrgApp):
@@ -36,6 +38,18 @@ class TranslatorDirectoryApp(OrgApp):
         if default != '/' and '/auth/login' not in str(default):
             return None
         return URL(request.class_link(Organisation)).path()
+
+    @cached_property
+    def mail_templates(self):
+        """ Templates are special docx files which are filled with
+        variables. These files are manually uploaded. """
+        query = GeneralFileCollection(self.session()).query().filter(
+            and_(
+                GeneralFile.name.like('Vorlage%'),
+                GeneralFile.name.like('%.docx')
+            )
+        )
+        return [f.name for f in query.all()]
 
 
 @TranslatorDirectoryApp.template_directory()

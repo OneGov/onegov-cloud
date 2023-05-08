@@ -133,3 +133,5 @@ INTERPRETING_TYPES = {
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
 }
+
+INVALID_WORD_TEMPLATE_CHARS = ('<', '>', '&')
