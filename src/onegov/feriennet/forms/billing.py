@@ -181,7 +181,8 @@ class PaymentWithDateForm(Form):
 
         if self.request.params['item-id'] != 'all':
             self.target.data = 'specific'
-            self.items.data = [self.request.params['item-id']]
+            if not self.items.data:
+                self.items.data = [self.request.params['item-id']]
         else:
             self.items.data = [i.id.hex for i in self.invoice.items
                                if not i.paid]
