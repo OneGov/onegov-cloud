@@ -26,7 +26,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
     endpoint = 'people'
     filters = []
     UPDATE_FILTER_PARAMS = ['updated.gt', 'updated.lt', 'updated.eq',
-                            'updated.ge', 'updated.le', 'updated']
+                            'updated.ge', 'updated.le']
 
     @property
     def collection(self):
