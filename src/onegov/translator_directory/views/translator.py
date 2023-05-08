@@ -8,7 +8,7 @@ from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, Ticket
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
@@ -258,10 +258,19 @@ def export_translator_directory(self, request):
 )
 def view_translator(self, request):
     layout = TranslatorLayout(self, request)
+    translator_handler_data = (
+        TicketCollection(request.session).by_handler_data_id(self.id)
+    )
+    hometown_query = translator_handler_data.with_entities(
+        Ticket.handler_data['handler_data']['hometown']
+    )
+    hometown = hometown_query.first()
+
     return {
         'layout': layout,
         'model': self,
-        'title': self.title
+        'title': self.title,
+        'hometown': hometown
     }
 
 

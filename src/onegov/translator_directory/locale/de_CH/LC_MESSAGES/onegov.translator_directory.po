@@ -147,7 +147,7 @@ msgid "Date of birth"
 msgstr "Geburtsdatum"
 
 msgid "Hometown"
-msgstr "Heimartort"
+msgstr "Heimatort"
 
 msgid "Nationality"
 msgstr "Nationalität"
