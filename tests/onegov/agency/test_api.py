@@ -314,6 +314,50 @@ def test_view_api(client):
     }
     assert set(people) == set()
 
+    # test updated lower equal filter
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.le=2023-05-08T00:59:00').items
+    }
+    assert set(people) == set()
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.le=2023-05-08T01:00:00').items
+    }
+    assert set(people) == {'Rivera Nick'}
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.le=2023-05-08T01:05:00').items
+    }
+    assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
+
+    # test updated lower than filter
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.lt=2023-05-08T01:00:00').items
+    }
+    assert set(people) == set()
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.lt=2023-05-08T01:01:00').items
+    }
+    assert set(people) == {'Rivera Nick'}
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.lt=2023-05-08T01:06:00').items
+    }
+    assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
+
     # Memberships
     memberships = {
         item.data[0].value: item.href

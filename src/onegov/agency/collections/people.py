@@ -24,8 +24,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
 
     def __init__(self, session, page=0, letter=None, agency=None,
                  first_name=None, last_name=None, updated_gt=None,
-                 updated_ge=None, updated_eq=None,
-                 xlsx_modified=None):
+                 updated_ge=None, updated_eq=None, updated_le=None,
+                 updated_lt=None, xlsx_modified=None):
         self.session = session
         self.page = page
 
@@ -37,6 +37,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
         self.updated_gt = updated_gt
         self.updated_ge = updated_ge
         self.updated_eq = updated_eq
+        self.updated_le = updated_le
+        self.updated_lt = updated_lt
         # end filter keywords
 
         self.exclude_hidden = False
@@ -56,6 +58,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             and self.updated_gt == other.updated_gt
             and self.updated_ge == other.updated_ge
             and self.updated_eq == other.updated_eq
+            and self.updated_le == other.updated_le
+            and self.updated_lt == other.updated_lt
         )
 
     def page_by_index(self, page):
@@ -69,6 +73,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             updated_gt=self.updated_gt,
             updated_ge=self.updated_ge,
             updated_eq=self.updated_eq,
+            updated_le=self.updated_le,
+            updated_lt=self.updated_lt,
         )
 
     def for_filter(self, **kwargs):
@@ -81,6 +87,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             updated_gt=kwargs.get('updated_gt', self.updated_gt),
             updated_ge=kwargs.get('updated_ge', self.updated_ge),
             updated_eq=kwargs.get('updated_eq', self.updated_eq),
+            updated_le=kwargs.get('updated_le', self.updated_le),
+            updated_lt=kwargs.get('updated_lt', self.updated_lt),
         )
 
     def query(self):
@@ -142,6 +150,24 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
                     func.date_trunc('minute',
                                     ExtendedPerson.created),
                 ) == self.updated_eq
+            )
+        if self.updated_le:
+            query = query.filter(
+                func.coalesce(
+                    func.date_trunc('minute',
+                                    ExtendedPerson.modified),
+                    func.date_trunc('minute',
+                                    ExtendedPerson.created),
+                ) <= self.updated_le
+            )
+        if self.updated_lt:
+            query = query.filter(
+                func.coalesce(
+                    func.date_trunc('minute',
+                                    ExtendedPerson.modified),
+                    func.date_trunc('minute',
+                                    ExtendedPerson.created),
+                ) < self.updated_lt
             )
         query = query.order_by(
             func.upper(func.unaccent(ExtendedPerson.last_name)),
