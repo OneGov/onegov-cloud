@@ -1,8 +1,104 @@
 # Changes
 
+## 2023.20
+
+`2023-05-08` | [611c884776...f05e9a7723](https://github.com/OneGov/onegov-cloud/compare/611c884776^...f05e9a7723)
+
+### Core
+
+##### Indicate hash useage.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [9fbe826fae](https://github.com/onegov/onegov-cloud/commit/9fbe826faecf92036adb11f06d2c2fbd72dbf766)
+
+##### Validate URL used in PostThread.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [f35ecef9c3](https://github.com/onegov/onegov-cloud/commit/f35ecef9c3b23f429b0ae67a5d064dfb00b90137)
+
+##### Add requests timeouts.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [bdbd70c2de](https://github.com/onegov/onegov-cloud/commit/bdbd70c2de5391526b5edf1169d43963c438fbd8)
+
+##### Log execeptions instead of silenty ignoring them.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [36f512b925](https://github.com/onegov/onegov-cloud/commit/36f512b92538d92f4aeb69c80c216acc63f5f8e8)
+
+##### Use either secrets for random or indicate non-cryptographic usage.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [cafe3f3f03](https://github.com/onegov/onegov-cloud/commit/cafe3f3f03d4e12d1d56363592e2910fa4c136db)
+
+##### Indicate safe hardcoded password values.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [c4fea59798](https://github.com/onegov/onegov-cloud/commit/c4fea5979891877c983ecadf83ca407e2fa4f10f)
+
+##### Harden SQL code.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [919d41a0a9](https://github.com/onegov/onegov-cloud/commit/919d41a0a9f7e4aa7071222b89c7c8d67fc4d493)
+
+##### Enable bandit.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [0fa7509577](https://github.com/onegov/onegov-cloud/commit/0fa750957734b94bbaee0c204d603a915649e1b1)
+
+##### Pin reportlab.
+
+`Other` | [OGC-1088](https://linear.app/onegovcloud/issue/OGC-1088) | [1e1996752e](https://github.com/onegov/onegov-cloud/commit/1e1996752e3d3a6a32d80699f0dc9ebfbcf38b85)
+
+### Feriennet
+
+##### Edit email text
+
+`Feature` | [PRO-1126](https://linear.app/projuventute/issue/PRO-1126) | [34a97c1c2c](https://github.com/onegov/onegov-cloud/commit/34a97c1c2c2b76f2f4ca690bfd4b752431cfdfd1)
+
+### Form
+
+##### Add security hint for yaml loading.
+
+`Feature` | [SEA-1010](https://linear.app/seantis/issue/SEA-1010) | [05d69feec0](https://github.com/onegov/onegov-cloud/commit/05d69feec09974ccabe995e250a133e4c145a639)
+
+### Org
+
+##### Small Adjustments
+
+Slightly larger page text
+Version number in footer
+Hover effect on Navigation
+
+`Feature` | [611c884776](https://github.com/onegov/onegov-cloud/commit/611c884776d048ff7d5f104ccf7c7e40c092e471)
+
+##### Minor code improvement
+
+`Improvement` | [OGC-1076](https://linear.app/onegovcloud/issue/OGC-1076) | [7278d680a8](https://github.com/onegov/onegov-cloud/commit/7278d680a871b4f03cf3d8afd66aa0f5eca32714)
+
+##### Indent check only activated for new and edit forms but not for displaying.
+
+Activate indent check while parsing form code only if originating from core validators which means there is either a new or an edited form code to be parsed.
+
+`Bugfix` | [ogc-1027](#ogc-1027) | [dedde69fef](https://github.com/onegov/onegov-cloud/commit/dedde69fef1a6f306aaaeb26c5526bfa435d0666)
+
+### Swissvotes
+
+##### Fixes button text for adding pages.
+
+`Bugfix` | [32c5a26dcf](https://github.com/onegov/onegov-cloud/commit/32c5a26dcf4c9537edd1b3d20348f1c761410d29)
+
+### Town6
+
+##### Add option for a testimonial slider
+
+`Feature` | [OGC-761](https://linear.app/onegovcloud/issue/OGC-761) | [623e0a4a83](https://github.com/onegov/onegov-cloud/commit/623e0a4a8339a790da19f92989d6c07a50ecf0e2)
+
+##### Display previous and next entries
+
+`Feature` | [OGC-740](https://linear.app/onegovcloud/issue/OGC-740) | [d2ef277915](https://github.com/onegov/onegov-cloud/commit/d2ef277915d43bcaec08c5a89651a4ac39ded6c9)
+
+##### Fixes E-mail template
+
+Removes reference to deleted 'sender' mail macro from mail template.
+
+`Bugfix` | [OGC-1090](https://linear.app/onegovcloud/issue/OGC-1090) | [c10d67a954](https://github.com/onegov/onegov-cloud/commit/c10d67a95465091bb23ea3c4fdd3b48b51498535)
+
 ## 2023.19
 
-`2023-04-30` | [2c4fdd7c74...2c4fdd7c74](https://github.com/OneGov/onegov-cloud/compare/2c4fdd7c74^...2c4fdd7c74)
+`2023-04-30` | [2c4fdd7c74...c49813dfd5](https://github.com/OneGov/onegov-cloud/compare/2c4fdd7c74^...c49813dfd5)
 
 ### Ballot
 
@@ -2944,8 +3040,4 @@ Topics, people, etc. can now be assigned the access level "member"
 ##### Fix topic children links.
 
 `Bugfix` | [OGC-426](https://linear.app/onegovcloud/issue/OGC-426) | [f4b36d4c4e](https://github.com/onegov/onegov-cloud/commit/f4b36d4c4ecacece5c8bf6c71c1cb49155c54e2d)
-
-## 2022.27
-
-`2022-04-27` | [aebf7f9623...1eec46ba9d](https://github.com/OneGov/onegov-cloud/compare/aebf7f9623^...1eec46ba9d)
 
