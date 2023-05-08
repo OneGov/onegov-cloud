@@ -53,6 +53,7 @@ def test_extended_people_filter_first_last_name(session):
     people.add(first_name="Waylon", last_name="Śmithers")
     people.add(first_name="Lenny", last_name="leonard")
     people.add(first_name="Carl", last_name="Çarlson")
+    people.add(first_name="Ned", last_name="Flanders")
     people.add(first_name="Anna", last_name="Quinn")
     people.add(first_name="Anna", last_name="Bourqui")
 
