@@ -35,7 +35,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             page=self.page or 0
         )
 
-        if self.extra_parameters:
+        if self.extra_parameters:  # look for url params to filter
             if 'first_name' in self.extra_parameters.keys():
                 firstname = self.extra_parameters.get('first_name')
                 result = result.for_filter(first_name=firstname)
@@ -45,19 +45,17 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
 
             filters = dict()
             for operator, ts in self.extra_parameters.items():
-                if not operator.startswith('updated'):
-                    continue
                 if operator not in self.UPDATE_FILTER_PARAMS:
                     print(f'Error Invalid filter operator {operator} - '
                           f'ignoring')
                     continue
                 try:
-                    ts = isoparse(ts[:16])  # only until hours and minutes
+                    ts = isoparse(ts[:16])  # only parse including hours and
+                    # minutes
                 except Exception as ex:
                     print(f'Error while parsing timestamp {ts}: {ex}')
                     continue
                 filters[operator] = ts
-
             if filters:
                 result = result.for_filter(**filters)
 

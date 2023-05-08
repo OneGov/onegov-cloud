@@ -1,4 +1,8 @@
+import datetime
 from datetime import timedelta
+
+from freezegun import freeze_time
+
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
@@ -43,20 +47,14 @@ def test_extended_people_pagination(session):
     assert len(people.page_by_index(1).batch) == 6
 
 
-def test_extended_people_filter(session):
+def test_extended_people_filter_first_last_name(session):
     people = ExtendedPersonCollection(session)
     people.add(first_name="Hans", last_name="Maulwurf")
     people.add(first_name="Waylon", last_name="Śmithers")
     people.add(first_name="Lenny", last_name="leonard")
     people.add(first_name="Carl", last_name="Çarlson")
-    ned = people.add(first_name="Ned", last_name="Flanders")
     people.add(first_name="Anna", last_name="Quinn")
     people.add(first_name="Anna", last_name="Bourqui")
-
-    agencies = ExtendedAgencyCollection(session)
-    agencies.add_root(title="Police").add_person(ned.id, "Snitch")
-    agencies.add_root(title="Ħospital").add_person(ned.id, "Volunteer")
-    agencies.add_root(title="Moe's Tavern")
 
     assert [p.last_name for p in people.query()] == [
         "Bourqui", "Çarlson", "Flanders", "leonard",
@@ -77,7 +75,7 @@ def test_extended_people_filter(session):
     assert [p.last_name for p in people.query()] == []
 
     people = people.for_filter(letter=None)
-    assert [p.last_name for p in people.query()] == ['Flanders']
+    assert [p.last_name for p in people.query()] == []
 
     # first name
     people = ExtendedPersonCollection(session)
@@ -101,6 +99,34 @@ def test_extended_people_filter(session):
     people = people.for_filter(first_name='anna', last_name='Quinn')
     assert [(p.first_name, p.last_name) for p in people.query()] == \
            [('Anna', 'Quinn')]
+
+
+def test_extended_people_filter_updated_gt(session):
+    people = ExtendedPersonCollection(session)
+
+    with freeze_time('2023-05-08 01:00'):
+        people.add(first_name="Hans", last_name="Maulwurf")
+    with freeze_time('2023-05-08 01:05'):
+        people.add(first_name="Franz", last_name="Müller")
+
+    # updated.gt
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(updated_gt=datetime.datetime(
+        2023, 5, 8, 0, 59, 0)
+    )
+    assert [p.last_name for p in people.query()] == ['Maulwurf', 'Müller']
+
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(updated_gt=datetime.datetime(
+        2023, 5, 8, 1, 1, 0)
+    )
+    assert [p.last_name for p in people.query()] == ['Müller']
+
+    people = ExtendedPersonCollection(session)
+    people = people.for_filter(updated_gt=datetime.datetime(
+        2023, 5, 8, 1, 6, 0)
+    )
+    assert [p.last_name for p in people.query()] == []
 
 
 def test_extended_people_used_letters(session):

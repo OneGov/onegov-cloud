@@ -1,4 +1,5 @@
 from collection_json import Collection
+from freezegun import freeze_time
 
 
 def test_view_api(client):
@@ -31,11 +32,12 @@ def test_view_api(client):
     assert not collection('/api/memberships').items
 
     # Add data
-    page = client.get('/people').click('Person', href='new')
-    page.form['academic_title'] = 'Dr.'
-    page.form['first_name'] = 'Nick'
-    page.form['last_name'] = 'Rivera'
-    page.form.submit().follow()
+    with freeze_time('2023-05-08 01:00'):
+        page = client.get('/people').click('Person', href='new')
+        page.form['academic_title'] = 'Dr.'
+        page.form['first_name'] = 'Nick'
+        page.form['last_name'] = 'Rivera'
+        page.form.submit().follow()
 
     page = client.get('/organizations').click('Organisation', href='new')
     page.form['title'] = 'Hospital'
@@ -46,10 +48,11 @@ def test_view_api(client):
     page.form['person_id'].select(text='Rivera Nick')
     page.form.submit().follow()
 
-    page = client.get('/people').click('Person', href='new')
-    page.form['first_name'] = 'Edna'
-    page.form['last_name'] = 'Krabappel'
-    page.form.submit().follow()
+    with freeze_time('2023-05-08 01:05'):
+        page = client.get('/people').click('Person', href='new')
+        page.form['first_name'] = 'Edna'
+        page.form['last_name'] = 'Krabappel'
+        page.form.submit().follow()
 
     page = client.get('/organizations').click('Organisation', href='new')
     page.form['title'] = 'School'
@@ -196,6 +199,69 @@ def test_view_api(client):
     assert data(collection(links(nick)['memberships']).items[0]) == {
         'title': 'Doctor'
     }
+
+    # test 'first_name' url filter
+    people = {
+        data(item)['title']: item.href
+        for item in collection('/api/people?first_name=Max').items
+    }
+    assert set(people) == set()
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection('/api/people?first_name=nick').items
+    }
+    assert set(people) == {'Rivera Nick'}
+
+    # test 'last_name' url filter
+    people = {
+        data(item)['title']: item.href
+        for item in collection('/api/people?last_name=Hugentobler').items
+    }
+    assert set(people) == set()
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection('/api/people?last_name=Krabappel').items
+    }
+    assert set(people) == {'Krabappel Edna'}
+
+    # test first and lastname filter
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?first_name=nick&last_name=Krabappel').items
+    }
+    assert set(people) == set()
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?first_name=edna&last_name=Krabappel').items
+    }
+    assert set(people) == {'Krabappel Edna'}
+
+    # test updated.gt filter
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.gt=2023-05-08T00:59:00').items
+    }
+    assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.gt=2023-05-08T01:01:00').items
+    }
+    assert set(people) == {'Krabappel Edna'}
+
+    people = {
+        data(item)['title']: item.href
+        for item in collection(
+            '/api/people?updated.gt=2023-05-08T01:06:00').items
+    }
+    assert set(people) == set()
 
     # Memberships
     memberships = {

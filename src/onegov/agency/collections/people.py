@@ -1,4 +1,5 @@
 from cached_property import cached_property
+
 from onegov.agency.models import ExtendedPerson
 from onegov.core.collection import Pagination
 from onegov.people import Agency
@@ -70,7 +71,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             agency=kwargs.get('agency', self.agency),
             first_name=kwargs.get('first_name', self.first_name),
             last_name=kwargs.get('last_name', self.last_name),
-            updated_gt=kwargs.get('updated.gt', self.updated_gt),
+            updated_gt=kwargs.get('updated_gt', self.updated_gt),
         )
 
     def query(self):
@@ -106,8 +107,15 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
                 ) == self.last_name.lower()
             )
         if self.updated_gt:
-            query = query.filter(func.date_trunc(
-                'minute', ExtendedPerson.modified) > self.updated_gt)
+            # if 'modified' is not set comparison is done against 'created'
+            query = query.filter(
+                func.coalesce(
+                    func.date_trunc('minute',
+                                    ExtendedPerson.modified),
+                    func.date_trunc('minute',
+                                    ExtendedPerson.created),
+                ) > self.updated_gt
+            )
         query = query.order_by(
             func.upper(func.unaccent(ExtendedPerson.last_name)),
             func.upper(func.unaccent(ExtendedPerson.first_name))
