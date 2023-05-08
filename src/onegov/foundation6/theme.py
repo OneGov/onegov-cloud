@@ -242,12 +242,12 @@ class BaseTheme(CoreTheme):
             (f"@include {i};" for i in self.foundation_motion_ui)
         )
 
-    def compile(self, options={}):
+    def compile(self, options=None):
         """ Compiles the theme with the given options. """
 
         # copy, because the dict may be static if it's a basic property
         _options = self.default_options.copy()
-        _options.update(options)
+        _options.update(options or {})
 
         theme = StringIO()
 

@@ -179,8 +179,9 @@ def clear_election_compound_media(self, request, form):
 
     return {
         'callout': _(
-            'Deletes all SVGs and PDFs. They are regenerated in the '
-            'background and are available again in a few minutes.'
+            'Deletes all automatically generated media items (PDFs and SVG '
+            'images). They are regenerated in the background and are '
+            'available again in a few minutes.'
         ),
         'message': _(
             'Do you really want to clear all media of "${item}"?',

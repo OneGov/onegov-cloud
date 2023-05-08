@@ -177,20 +177,20 @@
       <div class="small-12 columns">
         <span>&copy; Pro Juventute ${layout.today().year}</span>
         <span>
+            <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">Feriennet ${layout.app.version}</a>
+        </span>
+        <span>
             <tal:b condition="request.locale.startswith('de')">
             <a href="https://www.projuventute.ch/de/datenschutz" i18n:translate>
-                Privacy Protection
-            </a>
+                Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('fr')">
             <a href="https://www.projuventute.ch/fr/protection-des-donnees" i18n:translate>
-                Privacy Protection
-            </a>
+                Privacy Protection</a>
             </tal:b>
             <tal:b condition="request.locale.startswith('it')">
             <a href="https://www.projuventute.ch/it/protezione-dei-dati" i18n:translate>
-                Privacy Protection
-            </a>
+                Privacy Protection</a>
             </tal:b>
         </span>
       </div>
@@ -425,7 +425,7 @@
         period occasion.period;
         wrap_occasion_link wrap_occasion_link|lambda url: url">
 
-        <div class="state" tal:condition="period.phase not in ('inactive', 'wishlist')">
+        <div class="state" tal:condition="period.phase not in ('inactive', 'wishlist')">    
             <div class="full" tal:condition="not occasion.cancelled and occasion.full">
                 <span i18n:translate>Fully booked</span>
             </div>
@@ -434,11 +434,11 @@
                 <span i18n:translate>Rescinded</span>
             </div>
 
-            <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.finalized">
+            <div class="available-spots" tal:condition="not occasion.cancelled and not occasion.full and not period.is_booking_in_past">
                 <span i18n:translate><tal:b i18n:name="count" replace="occasion.available_spots" /> spots available</span>
             </div>
 
-            <div class="spots" tal:condition="not occasion.cancelled and period.finalized">
+            <div class="spots" tal:condition="not occasion.cancelled and period.is_booking_in_past">
                 <span i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
             </div>
         </div>

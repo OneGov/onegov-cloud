@@ -7,8 +7,8 @@ import sedate
 
 from cached_property import cached_property
 from datetime import datetime
-from functools import lru_cache
 from onegov.core import utils
+from onegov.core.cache import lru_cache
 from onegov.core.templates import PageTemplate
 from pytz import timezone
 
@@ -148,8 +148,9 @@ class Layout:
         """ Returns the given ISO 8601 string as datetime. """
         return isodate.parse_datetime(string)
 
+    @staticmethod
     @lru_cache(maxsize=8)
-    def number_symbols(self, locale):
+    def number_symbols(locale):
         """ Returns the locale specific number symbols. """
 
         return (

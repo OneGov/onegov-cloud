@@ -14,7 +14,7 @@ class GazetteTheme(BaseTheme):
         # Leave this empty, see below
         return {}
 
-    def compile(self, options={}):
+    def compile(self, options=None):
         # We cannot use the default_options attribute since we need to know
         # the primary color which happens to be in the options argument.
         # We merge the options and default options ourselve and call the
@@ -41,7 +41,7 @@ class GazetteTheme(BaseTheme):
             'topbar-menu-link-color': '#999',
             'topbar-menu-icon-color': '#999',
         }
-        _options.update(options)
+        _options.update(options or {})
 
         return super(GazetteTheme, self).compile(_options)
 

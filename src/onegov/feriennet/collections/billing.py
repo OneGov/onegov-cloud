@@ -78,8 +78,8 @@ class BillingCollection:
         bills = OrderedDict()
         invoices = self.invoices_by_period
 
-        for username, items in groupby(invoices, lambda i: i.username):
-            items = tuple(items)
+        for username, items_ in groupby(invoices, lambda i: i.username):
+            items = tuple(items_)
             first = items[0]
 
             bills[username] = Bunch(

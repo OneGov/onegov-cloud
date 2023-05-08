@@ -540,7 +540,7 @@ def test_view_notice_copy(gazette_app):
             assert "Erneuerungswahlen" in user.get('/dashboard')
             assert "Erneuerungswahlen" in user.get('/notices/drafted')
 
-        "NOTE!" in publisher.get('/notice/erneuerungswahlen-1')
-        "NOTE!" in publisher.get('/notice/erneuerungswahlen-2')
-        "NOTE!" in publisher.get('/notice/erneuerungswahlen-3')
-        "NOTE!" in publisher.get('/notice/erneuerungswahlen-4')
+        assert "NOTE!" in publisher.get('/notice/erneuerungswahlen-1')
+        assert "NOTE!" in publisher.get('/notice/erneuerungswahlen-2')
+        assert "NOTE!" in publisher.get('/notice/erneuerungswahlen-3')
+        assert "NOTE!" in publisher.get('/notice/erneuerungswahlen-4')

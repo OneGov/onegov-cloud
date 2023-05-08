@@ -131,13 +131,12 @@ def test_link_icon_widget(town_app):
     assert 'icon-link' not in result
 
     structure = """
-        <icon_link title='Services' icon='fa-user' color='#000'
+        <icon_link title='Services' icon='fa-user'
         link='https://www.test.ch' text='Whenever you want'
         />
     """
     result = transform_structure(widgets, structure)
     assert "icon \'fa-user\'" in result
-    assert "color \'#000\'" in result
     assert "link \'https://www.test.ch\'" in result
     assert "text \'Whenever you want\'" in result
 
@@ -162,3 +161,29 @@ def test_testimonial_widget(town_app):
     assert "image \'/files/image.jpg\'" in result
     assert "description \'Doctor\'" in result
     assert "quote \'very good hospital\'" in result
+
+
+def test_testimonial_slider_widget(town_app):
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+
+    structure = """
+        <testimonial_slider image_1='/files/image.jpg' description_1='Doctor'
+        quote_1='very good hospital' image_2='/files/image_2.jpg'
+        description_2='Nurse' quote_2='so much space'
+    />
+    """
+
+    result = transform_structure(widgets, structure)
+    assert 'use-macro="layout.macros.testimonial_slider"' in result
+    assert "image_1 \'/files/image.jpg\'" in result
+    assert "description_1 \'Doctor\'" in result
+    assert "quote_1 \'very good hospital\'" in result
+    assert "image_2 \'/files/image_2.jpg\'" in result
+    assert "description_2 \'Nurse\'" in result
+    assert "quote_2 \'so much space\'" in result

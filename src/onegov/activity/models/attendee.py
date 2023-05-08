@@ -6,6 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.core.crypto import random_token
 from onegov.search import ORMSearchable
 from sqlalchemy import case, cast, func, select, and_, type_coerce
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Float
@@ -61,6 +62,21 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
     #: notes about the attendee by the parents (e.g. allergies)
     notes = Column(Text, nullable=True)
+
+    #: if the address of the attendee differs from the user address
+    differing_address = Column(Boolean, default=False, nullable=False)
+
+    #: address of the attendee (street and number)
+    address = Column(Text, nullable=True)
+
+    #: zip code of the attendee
+    zip_code = Column(Text, nullable=True)
+
+    #: place of the attendee
+    place = Column(Text, nullable=True)
+
+    #: political municipality, only if activated in settings
+    political_municipality = Column(Text, nullable=True)
 
     #: the maximum number of bookings the attendee wishes to get in each period
     limit = Column(Integer, nullable=True)

@@ -43,8 +43,8 @@ def view_sitemap_xml(self, request):
             for date_, domains in results.items():
                 yield request.link(layout.archive.for_date(date_))
                 for items in domains.values():
-                    for items in items.values():
-                        for result in items:
+                    for value in items.values():
+                        for result in value:
                             yield result.url
 
     return {'urls': sorted(urls())}

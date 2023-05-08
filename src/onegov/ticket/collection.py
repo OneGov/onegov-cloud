@@ -124,7 +124,7 @@ class TicketCollection(TicketCollectionPagination):
         range_start = 10 ** (length - 1)
         range_end = 10 ** length - 1
 
-        return random.randint(range_start, range_end)
+        return random.randint(range_start, range_end)  # nosec B311
 
     def random_ticket_number(self, handler_code):
         number = str(self.random_number(length=8))

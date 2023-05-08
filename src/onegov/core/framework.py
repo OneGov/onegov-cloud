@@ -383,10 +383,14 @@ class Framework(
         assert self.unsafe_identity_secret != self.unsafe_csrf_secret
 
         # you don't want to use the keys given in the example file
-        assert self.unsafe_identity_secret != 'very-secret-key'
+        assert (
+            self.unsafe_identity_secret != 'very-secret-key'  # nosec: B105
+        )
 
         # you don't want to use the keys given in the example file
-        assert self.unsafe_csrf_secret != 'another-very-secret-key'
+        assert (
+            self.unsafe_csrf_secret != 'another-very-secret-key'  # nosec: B105
+        )
 
     def configure_yubikey(self, **cfg):
         self.yubikey_client_id = cfg.get('yubikey_client_id', None)
@@ -515,7 +519,11 @@ class Framework(
         # sha-1 should be enough, because even if somebody was able to get
         # the cleartext value I honestly couldn't tell you what it could be
         # used for...
-        return hashlib.sha1(self.application_id.encode('utf-8')).hexdigest()
+        return hashlib.new(
+            'sha1',
+            self.application_id.encode('utf-8'),
+            usedforsecurity=False
+        ).hexdigest()
 
     def object_by_path(self, path, with_view_name=False):
         """ Takes a path and returns the object associated with it. If a
@@ -572,9 +580,10 @@ class Framework(
 
         try:
             action, handler = next(query(self.__class__))
-        except (StopIteration, RuntimeError):
+        except (StopIteration, RuntimeError) as exception:
             raise KeyError(
-                "{!r} has no view named {}".format(model, view_name))
+                "{!r} has no view named {}".format(model, view_name)
+            ) from exception
 
         return action.permission
 
@@ -663,12 +672,13 @@ class Framework(
 
     def prepare_email(self, reply_to, category='marketing',
                       receivers=(), cc=(), bcc=(), subject=None, content=None,
-                      attachments=(), headers={}, plaintext=None):
+                      attachments=(), headers=None, plaintext=None):
         """ Common path for batch and single mail sending. Use this the same
          way you would use send_email then pass the prepared emails in a list
          or another iterable to the batch send method.
         """
 
+        headers = headers or {}
         assert reply_to
         assert category in ('transactional', 'marketing')
         sender = self.mail[category]['sender']
@@ -705,7 +715,7 @@ class Framework(
 
     def send_email(self, reply_to=None, category='marketing',
                    receivers=(), cc=(), bcc=(), subject=None, content=None,
-                   attachments=(), headers={}, plaintext=None):
+                   attachments=(), headers=None, plaintext=None):
         """ Sends a plain-text e-mail to the given recipients. A reply to
         address is used to enable people to answer to the e-mail which is
         usually sent by a noreply kind of e-mail address.
@@ -717,6 +727,7 @@ class Framework(
         are automatically commited at the end.
 
         """
+        headers = headers or {}
         directory = self.mail[category]['directory']
         assert directory
 
@@ -1181,7 +1192,7 @@ def default_policy_apply_factory():
         sample_rate = request.app.content_security_policy_report_sample_rate
         report_only = request.app.content_security_policy_report_only
 
-        if random.uniform(0, 1) <= sample_rate:
+        if random.uniform(0, 1) <= sample_rate:  # nosec B311
             report_uri = request.app.content_security_policy_report_uri
         else:
             report_uri = None

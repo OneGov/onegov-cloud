@@ -2,6 +2,7 @@ import inspect
 
 from sedate import to_timezone
 
+from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
@@ -392,8 +393,9 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     def fields(self):
         return self.fields_from_structure(self.structure)
 
+    @staticmethod
     @lru_cache(maxsize=1)
-    def fields_from_structure(self, structure):
+    def fields_from_structure(structure):
         return tuple(flatten_fieldsets(parse_formcode(structure)))
 
     @property
@@ -422,11 +424,11 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     def form_class(self):
         return self.form_class_from_structure(self.structure)
 
-    @lru_cache(maxsize=1)
+    @instance_lru_cache(maxsize=1)
     def form_obj_from_structure(self, structure):
         return self.form_class_from_structure(structure)()
 
-    @lru_cache(maxsize=1)
+    @instance_lru_cache(maxsize=1)
     def form_class_from_structure(self, structure):
         directory = self
 

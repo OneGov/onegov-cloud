@@ -38,9 +38,40 @@ import dill
 
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
-from fastcache import clru_cache as lru_cache  # noqa
+from fastcache import clru_cache
+from functools import cached_property
+from functools import lru_cache as lru_cache_base
+from functools import partial
+from functools import update_wrapper
 from redis import ConnectionPool
 from types import MethodType
+
+
+lru_cache = clru_cache
+
+
+def instance_lru_cache(method=None, *, maxsize=128):
+    """ Least-recently-used cache decorator for class methods.
+
+    The cache follows the lifetime of an object (it is stored on the object,
+    not on the class) and can be used on unhashable objects.
+
+    This is a wrapper around functools.lru_cache which prevents memory leaks
+    when using LRU cache within classes.
+
+    https://stackoverflow.com/a/71663059
+
+    """
+
+    def decorator(wrapped):
+        def wrapper(self):
+            return lru_cache_base(maxsize=maxsize)(
+                update_wrapper(partial(wrapped, self), wrapped)
+            )
+
+        return cached_property(wrapper)
+
+    return decorator if method is None else decorator(method)
 
 
 def dill_serialize(value):

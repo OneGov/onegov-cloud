@@ -40,7 +40,7 @@ class Link(AccessMixin):
     ]
 
     def __init__(self, text, url, classes=None, request_method='GET',
-                 attributes={}, active=False, model=None, subtitle=None):
+                 attributes=None, active=False, model=None, subtitle=None):
 
         #: The text of the link
         self.text = text
@@ -57,7 +57,7 @@ class Link(AccessMixin):
 
         #: HTML attributes (may override other attributes set by this class).
         #: Attributes which are translatable, are transalted before rendering.
-        self.attributes = attributes
+        self.attributes = attributes or {}
 
         #: Indicate if this link is active or not (not used for rendering)
         self.active = active
@@ -151,7 +151,8 @@ class QrCodeLink(Element, AccessMixin):
         attrs['href'] = '#'
         attrs['data-payload'] = url
         attrs['data-reveal-id'] = ''.join(
-            choice('abcdefghi') for i in range(8))
+            choice('abcdefghi') for i in range(8)  # nosec B311
+        )
         # Foundation 6 Compatibility
         attrs['data-open'] = attrs['data-reveal-id']
         attrs['data-image-parent'] = f"qr-{attrs['data-reveal-id']}"

@@ -469,13 +469,14 @@ class Form(BaseForm):
                 return True
         return False
 
-    def get_useful_data(self, exclude={'csrf_token'}):
+    def get_useful_data(self, exclude=None):
         """ Returns the form data in a dictionary, by default excluding data
         that should not be stored in the db backend.
 
         """
 
         honeypots = {f.name for f in self if isinstance(f, HoneyPotField)}
+        exclude = exclude or {'csrf_token'}
         exclude = set(exclude) | honeypots
 
         return {k: v for k, v in self.data.items() if k not in exclude}

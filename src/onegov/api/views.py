@@ -159,7 +159,7 @@ def view_api_endpoint(self, request):
         }
 
     except Exception as exception:
-        raise ApiExcpetion(exception=exception, headers=headers)
+        raise ApiExcpetion(exception=exception, headers=headers) from exception
 
 
 @ApiApp.json(
@@ -205,4 +205,4 @@ def view_api_endpoint_item(self, request):
         }
 
     except Exception as exception:
-        raise ApiExcpetion(exception=exception, headers=headers)
+        raise ApiExcpetion(exception=exception, headers=headers) from exception

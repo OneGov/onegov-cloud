@@ -289,7 +289,7 @@ input.has-field-help {
     margin-bottom: 1em;
 
     .thumbnail {
-        border-radius: 5px;
+        border-radius: .7rem;
         flex: 2;
         margin-right: 1rem;
         overflow: hidden;
@@ -300,11 +300,29 @@ input.has-field-help {
         }
 
         img {
-            border-radius: 5px;
+            border-radius: .7rem;
             max-height: 150px;
             object-fit: cover;
             vertical-align: top;
             width: 100%;
+        }
+    }
+}
+
+.directory-fields .field-display p.thumbnail {
+    border: 0;
+    border-radius: .7rem;
+    cursor: zoom-in;
+    
+    img {
+        border: 0;
+        border-radius: .7rem;
+        margin: 0;
+        transition: filter .25s ease-in-out;
+
+        &:hover {
+            filter: brightness(.9);
+            transition: filter .25s ease-in-out;
         }
     }
 }
@@ -379,6 +397,12 @@ dl.field-display > dt {
             display: inline-block;
             padding-right: .75ex;
         }
+    }
+
+    .button:hover {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 1rem 1.5rem !important;
     }
 }
 

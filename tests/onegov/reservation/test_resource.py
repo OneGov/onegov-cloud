@@ -21,7 +21,7 @@ def test_resource_scheduler(libres_context):
     resource.timezone = 'Europe/Zurich'
 
     scheduler = resource.get_scheduler(libres_context)
-    scheduler.managed_allocations().count() == 0
+    assert scheduler.managed_allocations().count() == 0
 
     assert scheduler.resource == resource.id
 

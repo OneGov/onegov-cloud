@@ -95,8 +95,8 @@ def local_lock(namespace, key):
             fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
             yield
             fcntl.flock(f, fcntl.LOCK_UN)
-        except BlockingIOError:
-            raise AlreadyLockedError
+        except BlockingIOError as exception:
+            raise AlreadyLockedError from exception
 
 
 def normalize_for_url(text):
@@ -287,7 +287,11 @@ def render_file(file_path, request):
     """
 
     def hash_path(path):
-        return hashlib.sha1(path.encode('utf-8')).hexdigest()
+        return hashlib.new(
+            'sha1',
+            path.encode('utf-8'),
+            usedforsecurity=False
+        ).hexdigest()
 
     # this is a very cachable result - though it's possible that a file
     # changes it's content type, it should usually not, especially since
@@ -316,7 +320,11 @@ def hash_dictionary(dictionary):
 
     """
     dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
-    return hashlib.sha1(dict_as_string).hexdigest()
+    return hashlib.new(
+        'sha1',
+        dict_as_string,
+        usedforsecurity=False
+    ).hexdigest()
 
 
 def groupbylist(*args, **kwargs):
@@ -549,7 +557,7 @@ def chunks(iterable, n, fillvalue=None):
     """
 
     args = [iter(iterable)] * n
-    return zip_longest(fillvalue=fillvalue, *args)
+    return zip_longest(*args, fillvalue=fillvalue)
 
 
 def relative_url(absolute_url):
@@ -694,10 +702,17 @@ class PostThread(Thread):
 
     def run(self):
         try:
+            # Validate URL protocol before opening it, since it's possible to
+            # open ftp:// and file:// as well.
+            if not self.url.lower().startswith('http'):
+                raise ValueError from None
+
             request = urllib.request.Request(self.url)
             for header in self.headers:
                 request.add_header(header[0], header[1])
-            urllib.request.urlopen(request, self.data, self.timeout)
+            urllib.request.urlopen(  # nosec B310
+                request, self.data, self.timeout
+            )
         except Exception as e:
             log.error(
                 'Error while sending a POST request to {}: {}'.format(
@@ -759,7 +774,7 @@ def dictionary_to_binary(dictionary):
         return f.read()
 
 
-def safe_format(format, dictionary, types={int, str, float}, adapt=None,
+def safe_format(format, dictionary, types=None, adapt=None,
                 raise_on_missing=False):
     """ Takes a user-supplied string with format blocks and returns a string
     where those blocks are replaced by values in a dictionary.
@@ -799,6 +814,7 @@ def safe_format(format, dictionary, types={int, str, float}, adapt=None,
 
     """
 
+    types = types or {int, str, float}
     output = StringIO()
     buffer = StringIO()
     opened = 0

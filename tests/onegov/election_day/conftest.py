@@ -546,7 +546,9 @@ def import_elections_wabsti(
             assert files, f'No files found in {folder}'
             mimetype = get_mimetype(files[0])
 
-            def find_and_read(files, keyword=None, no_keywords=None):
+            def find_and_read(
+                files, keyword=None, no_keywords=None, folder=folder
+            ):
                 no_kw_results = []
                 assert keyword or no_keywords
                 for file in files:

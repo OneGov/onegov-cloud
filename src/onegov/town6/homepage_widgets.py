@@ -94,7 +94,7 @@ class IconLinksWidget:
         <xsl:template match="icon_link">
             <div metal:use-macro="layout.macros.icon_link"
             tal:define="
-                title '{@title}'; color '{@color}'; icon '{@icon}';
+                title '{@title}'; invert '{@invert}'; icon '{@icon}';
                 text '{@text}'; link '{@link}';
             "
             />
@@ -519,6 +519,24 @@ class TestimonialsWidget:
             <div metal:use-macro="layout.macros.testimonial"
              tal:define="description '{@description}'; quote '{@quote}';
              image '{@image}';
+             "
+            />
+        </xsl:template>
+    """
+
+
+@TownApp.homepage_widget(tag='testimonial_slider')
+class TestimonialSliderWidget:
+    template = """
+        <xsl:template match="testimonial_slider">
+            <div metal:use-macro="layout.macros.testimonial_slider"
+             tal:define="color '{@color}';
+             description_1 '{@description_1}';
+             quote_1 '{@quote_1}'; image_1 '{@image_1}';
+             description_2 '{@description_2}';
+             quote_2 '{@quote_2}'; image_2 '{@image_2}';
+             description_3 '{@description_3}';
+             quote_3 '{@quote_3}'; image_3 '{@image_3}';
              "
             />
         </xsl:template>

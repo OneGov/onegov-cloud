@@ -82,7 +82,7 @@ class RegisteredLink(namedtuple("RegisteredLink", (
 
 
 def associated(associated_cls, attribute_name, cardinality='one-to-many',
-               uselist='auto', backref_suffix='__tablename__'):
+               uselist='auto', backref_suffix='__tablename__', onupdate=None):
     """ Creates an associated attribute. This attribute is supposed to be
     defined on the mixin class that will establish the generic association
     if inherited by a model.
@@ -101,6 +101,12 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
     :param uselist:
         True if the attribute on the inheriting model is a list. Use 'auto'
         if this should be automatically decided depending on the cardinality.
+
+    :param backref_suffix:
+        Individual suffix used for the backref.
+
+    :param onupdate:
+        The 'onupdate' constraint of the foreign key column.
 
     Example::
 
@@ -148,7 +154,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
 
         association = Table(
             name, cls.metadata,
-            Column(key, ForeignKey(target), nullable=False),
+            Column(key, ForeignKey(target, onupdate=onupdate), nullable=False),
             Column(association_key, ForeignKey(association_id), nullable=False)
         )
 

@@ -5,7 +5,10 @@ set -euo pipefail
 trap 'echo "^^^ +++"' ERR
 
 echo "--- Installing prerequisites"
-pip install flake8
+pip install flake8 flake8-bugbear bandit[toml]
 
 echo "--- Linting"
 flake8 src/ tests/
+
+echo "--- Check security issues"
+bandit --recursive --configfile pyproject.toml src/

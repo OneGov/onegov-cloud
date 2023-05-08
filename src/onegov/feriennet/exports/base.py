@@ -185,6 +185,13 @@ class FeriennetExport(Export):
             r.readable for r in item.invoice.references
         )
 
+    def invoice_attendee_fields(self, attendee):
+        yield _("Attendee Address"), attendee.address
+        yield _("Attendee Zipcode"), attendee.zip_code
+        yield _("Attendee Place"), attendee.place
+        yield _("Attendee Political Municipality"
+                ), attendee.political_municipality
+
     def organiser_fields(self, organiser):
         user_data = organiser.data or {}
         first_name, last_name = decode_name(organiser.realname)

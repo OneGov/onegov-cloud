@@ -64,6 +64,7 @@ import tracemalloc
 from datetime import datetime
 from functools import partial
 from onegov.server import Config
+from onegov.server import log
 from onegov.server import Server
 from onegov.server.tracker import ResourceTracker
 from sentry_sdk import push_scope, capture_exception
@@ -331,8 +332,9 @@ class WsgiProcess(multiprocessing.Process):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080, env={},
+    def __init__(self, app_factory, host='127.0.0.1', port=8080, env=None,
                  enable_tracemalloc=False):
+        env = env or {}
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
         self.host = host
@@ -439,7 +441,7 @@ class WsgiServer(FileSystemEventHandler):
         except Exception:
             # ignore errors such as not yet started, process already finished
             # or already closed process objects - it's used for debug anyway
-            pass
+            log.warning('Could not join')
 
     def start(self):
         self.process = self.spawn()

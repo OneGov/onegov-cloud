@@ -196,7 +196,7 @@ class IntercoolerClickExtension:
         try:
             return super().click(
                 description, linkid, href, index, verbose, extra_environ)
-        except IndexError:
+        except IndexError as exception:
             result = self.find_ic_url(
                 description, linkid, href, index, verbose)
 
@@ -212,7 +212,7 @@ class IntercoolerClickExtension:
             elif method == 'delete':
                 return self.test_app.delete(url, extra_environ=extra_environ)
             else:
-                raise NotImplementedError
+                raise NotImplementedError from exception
 
     def find_ic_url(self, description, linkid, href, index, verbose):
 

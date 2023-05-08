@@ -43,12 +43,14 @@
         }
 
         .description {
-            color: $primary-color;
             margin-bottom: 0;
+            color: inherit !important;
         }
 
         .quote {
+            color: $primary-color;
             font-size: 1.2rem;
+            font-weight: bold;
             margin-bottom: 0;
         }
 
@@ -69,6 +71,42 @@
         }
     }
 
+    .primary .testimonial-slider  {
+        .description,
+        .quote {
+            color: $white;
+        }
+
+        .orbit-controls button {
+            color: $white !important;
+        }
+    }
+
+    .testimonial-slider {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        @media #{$medium-up} {
+            padding-bottom: 0;
+        }
+
+        .orbit-container {
+            align-items: center !important;
+            display: flex;
+        }
+
+        .orbit-controls {
+            display: flex;
+            justify-content: center;
+
+            button {
+                color: $body-font-color;
+                opacity: .4;
+                position: inherit;
+                transform: none;
+            }
+        }
+    }
+
     .icon-link {
         background: $white;
         border: 2px solid transparent !important;
@@ -76,6 +114,17 @@
         display: flex;
         flex: 0 0 auto;
         height: calc(100% - 2rem);
+
+        &.inverted-true {
+            background: $primary-color;
+
+            p, span {color: $white;}
+
+            .icon {
+                background: $white;
+                color: $primary-color;
+            }
+        }
 
         a {
             display: block;
@@ -95,7 +144,7 @@
 
         .icon {
             background: $primary-color;
-            color: #fff;
+            color: $white;
             height: 3rem;
             margin-right: 1rem;
             padding: .9rem;

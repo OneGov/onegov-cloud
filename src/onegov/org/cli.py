@@ -3,39 +3,29 @@ import click
 import html
 import isodate
 import re
-import requests
 import shutil
 import sys
 import textwrap
 
-from cached_property import cached_property
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from io import BytesIO
-from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.chat import MessageCollection
-from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.crypto import random_token
-from onegov.core.csv import CSVFile
-from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event, Occurrence, EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.file import File
-from onegov.form import as_internal_id, parse_form
 from onegov.form import FormCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
-from onegov.org.forms import ReservationForm
 from onegov.org.forms.event import TAGS
 from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation, TicketNote, TicketMessage
-from onegov.pay.models import ManualPayment
-from onegov.reservation import Allocation, Reservation
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town6.upgrade import migrate_homepage_structure_for_town6
@@ -43,14 +33,9 @@ from onegov.town6.upgrade import migrate_theme_options
 from onegov.user import UserCollection, User
 from operator import add as add_op
 from pathlib import Path
-from purl import URL
-from sedate import replace_timezone, utcnow
-from sqlalchemy import create_engine, event, text, or_
+from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
-from sqlalchemy.orm import Session
-from tqdm import tqdm
-from uuid import UUID, uuid4
-from wtforms.validators import Email
+from uuid import uuid4
 
 cli = command_group()
 
@@ -395,543 +380,6 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
     return run_import
 
 
-@cli.command(name='import-reservations', context_settings={'singular': True})
-@click.option('--dsn', required=True, help="DSN to the source database")
-@click.option('--map', required=True, help="CSV map between resources")
-@click.option('--start-date', help="Only import entries after (Y-M-D)",
-              default='2000-01-01', show_default=True)
-def import_reservations(dsn, map, start_date):
-    """ Imports reservations from a legacy seantis.reservation system.
-
-    WARNING: Existing reservations and all associated tickets/submissions
-    are deleted during the migration.
-
-    Pending reservations are ignored. The expectation is that the old system
-    is stopped, then migrated, then never started again.
-
-    Also note that search reindexing is disabled during import. A manual
-    reindex is necessary afterwards.
-
-    Example:
-
-    onegov-org --select '/orgs/govikon' import-reservations\
-        --dsn postgresql://localhost:5432/legacy\
-        --map ressource-map.csv
-
-    The ressource map is a simple CSV file with the following columns:
-
-    * Legacy URL (the URL pointing to the legacy ressource/room)
-    * OGC URL (the URL pointing to the associated ressource in the OGC)
-    * Type ('daypass' or 'room')
-
-    The first row is expected to be the header row.
-
-    """
-
-    print("Connecting to remote")
-    engine = create_engine(dsn).connect()
-
-    @event.listens_for(engine, 'begin')
-    def receive_begin(conn):
-        conn.execute('SET TRANSACTION READ ONLY')
-
-    remote = Session(bind=engine)
-
-    # define the mapping between old/new resources
-    class Mapping:
-
-        def __init__(self, libres_context, old_url, new_url, type):
-            self.resources = ResourceCollection(libres_context)
-            self.old_url = old_url
-            self.new_url = new_url
-            self.type = type
-
-        @property
-        def name(self):
-            return URL(self.new_url).path().rstrip('/').split('/')[-1]
-
-        @cached_property
-        def resource(self):
-            return self.resources.by_name(name=self.name)
-
-        @cached_property
-        def old_uuid(self):
-            return UUID(requests.get(f'{self.old_url}/@@uuid').text.strip())
-
-        @property
-        def new_uuid(self):
-            return self.resource.id
-
-    # run the given query returning the query and a count (if possible)
-    def select_with_count(session, query, **params):
-        query = query.strip(' \n')
-        assert query.startswith("SELECT *")
-
-        count = text(
-            query
-            .replace("SELECT *", "SELECT COUNT(*)", 1)
-            .split('ORDER BY')[0]
-        )
-        count = session.execute(count, params).scalar()
-
-        return count, session.execute(text(query), params)
-
-    # takes a reservation data json and guesses if it was paid
-    def was_paid(data):
-        data = json.loads(data)
-
-        for definition in data.values():
-            for value in definition['values']:
-                if is_payment_key(value['key']):
-                    return value['value'] == True
-
-        return False
-
-    def is_payment_key(key):
-        return key == 'bezahlt'
-
-    print("Reading map")
-    records = CSVFile(open(map, 'rb'), ('Old URL', 'New URL', 'Type')).lines
-    records = tuple(records)
-
-    # generate forms from the form-data found in the external system
-    def get_form_class_and_data(data):
-
-        if not data:
-            return ReservationForm, {}
-
-        def exclude(value):
-            if as_internal_id(value['desc']) == 'email':
-                return True
-
-            if is_payment_key(value['key']):
-                return True
-
-        @lru_cache()
-        def generate_form_class(formcode):
-            return parse_form(formcode, ReservationForm)
-
-        def separate_code_from_data(data):
-            fields = []
-            values = {}
-
-            for form in sorted(data.values(), key=lambda f: f['desc']):
-                fieldset = form['desc']
-                fields.append(f"# {fieldset}")
-
-                for v in sorted(form['values'], key=lambda r: r['sortkey']):
-                    label = v['desc']
-                    id = as_internal_id(f"{fieldset} {label}")
-
-                    # defined on the reservation form
-                    if id == 'email':
-                        continue
-
-                    if isinstance(v['value'], bool):
-                        fields.append(f"{label} = ___")
-                        values[id] = v['value'] and "Ja" or "Nein"
-                    elif isinstance(v['value'], str):
-                        fields.append(f"{label} = ___")
-                        values[id] = v['value']
-                    elif isinstance(v['value'], datetime):
-                        fields.append(f"{label} = YYYY.MM.DD HH:MM")
-                        values[id] = v['value']
-                    elif isinstance(v['value'], date):
-                        fields.append(f"{label} = YYYY.MM.DD")
-                        values[id] = v['value']
-                    elif isinstance(v['value'], int):
-                        fields.append(f"{label} = ___")
-                        values[id] = str(v['value'])
-                    elif isinstance(v['value'], list):
-                        fields.append(f"{label} = ___")
-                        values[id] = ', '.join(v['value'])
-                    else:
-                        raise NotImplementedError((
-                            f"No conversion for {v['value']} "
-                            f" ({type(v['value'])}"
-                        ))
-
-            return '\n'.join(fields), values
-
-        formcode, formdata = separate_code_from_data(data)
-        return generate_form_class(formcode), formdata
-
-    def handle_import(request, app):
-        session = app.session()
-
-        # disable search indexing during import
-        if hasattr(app, 'es_orm_events'):
-            app.es_orm_events.stopped = True
-
-        # map the old UUIDs to the resources
-        print("Mapping resources")
-        mapping = {m.old_uuid: m for m in (
-            Mapping(request.app.libres_context, r.old_url, r.new_url, r.type)
-            for r in tqdm(records, unit=' resources')
-        )}
-
-        print("Clearing existing submissions")
-        session.execute(text("""
-            DELETE FROM submissions
-             WHERE submissions.meta->>'origin' IN :resources
-        """), {
-            'resources': tuple(m.old_uuid.hex for m in mapping.values())
-        })
-
-        print("Clearing existing ticket messages")
-        session.execute(text("""
-            DELETE from messages
-             WHERE channel_id IN (
-                SELECT number
-                  FROM tickets
-                 WHERE tickets.handler_data->>'origin' IN :resources
-             )
-        """), {
-            'resources': tuple(m.old_uuid.hex for m in mapping.values())
-        })
-
-        print("Clearing existing tickets")
-        session.execute(text("""
-            DELETE FROM tickets
-             WHERE tickets.handler_data->>'origin' IN :resources
-        """), {
-            'resources': tuple(m.old_uuid.hex for m in mapping.values())
-        })
-
-        payment_ids = tuple(r[0] for r in session.execute(text("""
-            SELECT payment_id
-            FROM payments_for_reservations_payment
-            WHERE reservations_id IN (
-                SELECT id
-                FROM reservations
-                WHERE resource IN :resources
-            )
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        }))
-
-        if payment_ids:
-            print("Clearing existing payments")
-            session.execute(text("""
-                DELETE FROM payments_for_reservations_payment
-                WHERE payment_id IN :payments
-            """), {
-                'payments': payment_ids
-            })
-
-            session.execute(text("""
-                DELETE FROM payments
-                WHERE id IN :payments
-            """), {
-                'payments': payment_ids
-            })
-
-        print("Clearing existing reservations")
-        session.execute(text("""
-            DELETE FROM reservations
-            WHERE resource IN :resources
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        })
-
-        print("Clearing existing reserved slots")
-        session.execute(text("""
-            DELETE FROM reserved_slots
-             WHERE allocation_id IN (
-                SELECT id FROM allocations
-                 WHERE allocations.mirror_of IN :resources
-             )
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        })
-
-        print("Clearing existing allocations")
-        session.execute(text("""
-            DELETE FROM allocations
-             WHERE allocations.mirror_of IN :resources
-        """), {
-            'resources': tuple(m.resource.id for m in mapping.values())
-        })
-
-        session.flush()
-
-        print(f'Resources: {mapping.keys()}')
-
-        print(f"Fetching remote allocations after {start_date}")
-        count, rows = select_with_count(remote, f"""
-            SELECT * FROM allocations
-            WHERE mirror_of IN :resources
-            AND _end >= '{start_date}'::date
-            ORDER BY allocations.resource
-        """, resources=tuple(mapping.keys()))
-
-        # we use a separate id space, so we need to keep track
-        allocation_ids = {}
-
-        # the resource might be mapped, but it is not a given
-        def row_resource(row):
-            if row['resource'] not in mapping:
-                return row['resource']
-
-            return mapping[row['resource']].new_uuid
-
-        # create the new allocations
-        print("Writing allocations")
-        for row in tqdm(rows, unit=' allocations', total=count):
-            resource_type = mapping[row['mirror_of']].type
-
-            if row['partly_available'] and resource_type != 'room':
-                raise RuntimeError((
-                    f"Cannot migrate partly_available allocation "
-                    f"to a {resource_type} resource"
-                ))
-
-            if row['approve_manually']:
-                raise RuntimeError((
-                    f"Manually approved allocation found (id: {row['id']}), "
-                    f"manually approved allocations are not supported"
-                ))
-
-            allocation = Allocation(
-                resource=row_resource(row),
-                mirror_of=mapping[row['mirror_of']].new_uuid,
-                group=row['group'],
-                quota=row['quota'],
-                quota_limit=getattr(
-                    row, 'quota_limit',
-                    getattr(row, 'reservation_quota_limit')),
-                partly_available=row['partly_available'],
-                approve_manually=row['approve_manually'],
-
-                # the timezone was ignored in seantis.reservation
-                timezone='Europe/Zurich',
-                _start=replace_timezone(row['_start'], 'Europe/Zurich'),
-                _end=replace_timezone(row['_end'], 'Europe/Zurich'),
-
-                data=json.loads(getattr(row, 'data', "{}")),
-                _raster=row['_raster'],
-                created=replace_timezone(row['created'], 'UTC'),
-                modified=utcnow(),
-                type='custom',
-            )
-
-            session.add(allocation)
-            session.flush()
-
-            allocation_ids[row['id']] = allocation.id
-
-        # fetch the reserved slots that should be migrated
-        count, rows = select_with_count(
-            remote, """
-            SELECT * FROM reserved_slots WHERE allocation_id IN (
-                SELECT id FROM allocations WHERE mirror_of IN :resources
-                AND id in :parsed
-            )
-            """,
-            resources=tuple(mapping.keys()),
-            parsed=tuple(allocation_ids.keys())
-        )
-
-        # create the reserved slots with the mapped values
-        print("Writing reserved slots")
-        known = set()
-        for row in tqdm(rows, unit=" slots", total=count):
-            r = row_resource(row)
-            s = replace_timezone(row['start'], 'Europe/Zurich')
-            e = replace_timezone(row['end'], 'Europe/Zurich')
-
-            # it's possible for rows to become duplicated after replacing
-            # the timezone, if the reserved slot passes over daylight
-            # savings time changes
-            if (r, s) in known:
-                continue
-
-            known.add((r, s))
-
-            session.add(ReservedSlot(
-                resource=r,
-                start=s,
-                end=e,
-                allocation_id=allocation_ids[row['allocation_id']],
-                reservation_token=row['reservation_token']
-            ))
-
-        session.flush()
-
-        # fetch the reservations that should be migrated
-        count, rows = select_with_count(
-            remote, f"""
-            SELECT * FROM reservations re
-            WHERE resource IN :resources
-              AND re.status = 'approved'
-              AND re.end >= '{start_date}'::date
-            ORDER BY re.resource
-            """,
-            resources=tuple(mapping.keys()),
-        )
-
-        def targeted_allocations(group):
-            return session.query(Allocation).filter_by(group=group)
-
-        # keep track of custom reservation data, for the creation of tickets
-        reservation_data = {}
-        payment_states = {}
-
-        print(f"Writing reservations after {start_date}")
-        for row in tqdm(rows, unit=' reservations', total=count):
-
-            reservation_data[row['token']] = {
-                'data': json.loads(row['data']),
-                'email': row['email'],
-                'origin': row['resource'],
-                'origin_url': mapping[row['resource']].old_url,
-                'created': replace_timezone(row['created'], 'UTC'),
-                'modified': replace_timezone(row['modified'], 'UTC'),
-            }
-
-            if row['quota'] > 1:
-                type_ = mapping[row.resource].type
-                if type_ not in ('daypass', 'daily-item'):
-                    raise RuntimeError(
-                        "Reservations with multiple quotas for "
-                        f"type {type_} cannot be migrated"
-                    )
-
-            # onegov.reservation does not support group targets, so we
-            # translate those into normal allocations and create multiple
-            # reservations with a shared token
-            shared = dict(
-                token=row['token'],
-                target_type='allocation',
-                resource=mapping[row['resource']].new_uuid,
-                timezone='Europe/Zurich',
-                status=row['status'],
-                data={"accepted": True, "migrated": True},
-                email=row['email'],
-                quota=row['quota'],
-                created=replace_timezone(row['created'], 'UTC'),
-                modified=replace_timezone(row['modified'], 'UTC'),
-                type='custom',
-            )
-
-            r = mapping[row['resource']].resource
-
-            if r.pricing_method == 'per_item':
-                payment = ManualPayment(
-                    amount=r.price_per_item * row['quota'], currency='CHF')
-            elif r.pricing_method == 'per_hour':
-                raise NotImplementedError()
-            else:
-                payment = None
-
-            if row['target_type'] == 'group':
-                targets = tuple(targeted_allocations(group=row['target']))
-
-                if not targets:
-                    raise RuntimeError(f"No rows for target {row['target']}")
-
-                for allocation in targets:
-                    allocation.group = uuid4()
-
-                    reservation = Reservation(
-                        target=allocation.group,
-                        start=allocation.start,
-                        end=allocation.end,
-                        **shared
-                    )
-
-                    if payment:
-                        reservation.payment = payment
-
-                    session.add(reservation)
-
-            else:
-                reservation = Reservation(
-                    target=row['target'],
-                    start=replace_timezone(row['start'], 'Europe/Zurich'),
-                    end=replace_timezone(row['end'], 'Europe/Zurich'),
-                    **shared
-                )
-
-                if payment:
-                    reservation.payment = payment
-
-                session.add(reservation)
-
-            if reservation.payment:
-                if was_paid(row['data']):
-                    reservation.payment.state = 'paid'
-                    payment_states[row['token']] = 'paid'
-                else:
-                    payment_states[row['token']] = 'unpaid'
-
-        session.flush()
-
-        # tie reservations to tickets/submissions
-        tickets = TicketCollection(session)
-        forms = FormCollection(session)
-
-        # the responsible user is the first admin that was added
-        user = session.query(User)\
-            .filter_by(role='admin')\
-            .order_by(User.created).first()
-
-        print("Writing tickets")
-        email_validator = Email('Invalid Email')
-        for token, data in tqdm(reservation_data.items(), unit=" tickets"):
-            form_class, form_data = get_form_class_and_data(data['data'])
-
-            if form_data:
-
-                # fix common form errors
-                if data['email']:
-                    if data['email'].endswith('.c'):
-                        data['email'] = data['email'] + 'h'
-                    try:
-                        email_validator(None, Bunch(data=data['email']))
-                    except Exception as e:
-                        e.message = f'Email {data["email"]} not valid'
-                        raise e
-
-                form_data['email'] = data['email']
-                form = form_class(data=form_data)
-
-                # wtforms requires raw_data for some validators
-                for key, value in form_data.items():
-                    getattr(form, key).raw_data = [value]
-
-                submission = forms.submissions.add_external(
-                    form=form,
-                    state='complete',
-                    id=token
-                )
-
-                submission.meta['migrated'] = True
-                submission.meta['origin'] = data['origin'].hex
-
-            with session.no_autoflush:
-                ticket = tickets.open_ticket(
-                    handler_code='RSV', handler_id=token.hex)
-
-                ticket.handler_data['migrated'] = True
-                ticket.handler_data['origin'] = data['origin'].hex
-                ticket.handler_data['origin_url'] = data['origin_url']
-                ticket.muted = True
-                ticket.state = 'closed'
-                ticket.last_state_change = ticket.timestamp()
-                ticket.reaction_time = 0
-                ticket.user = user
-                ticket.created = data['created']
-                ticket.modified = data['modified']
-
-                TicketNote.create(ticket, request, (
-                    f"Migriert von {data['origin_url']}"
-                    f"/reservations?token={token}",
-                ), owner=user.username)
-
-    return handle_import
-
-
 @cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
               help="Do not write any changes into the database.")
@@ -1132,7 +580,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                         ])
                     )
 
-                def remote_events():
+                def remote_events(query=query, key=key):
                     for event_ in query:
                         event_._es_skip = True
                         yield EventImportItem(
@@ -1184,7 +632,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                 if create_tickets and not local_admin:
                     abort("Can not create tickets, no admin is registered")
 
-                def ticket_for_event(event_id):
+                def ticket_for_event(event_id, local_session=local_session):
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 

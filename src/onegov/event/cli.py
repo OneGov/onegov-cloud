@@ -1,4 +1,5 @@
 import click
+import hashlib
 import pycurl
 
 from csv import reader as csvreader
@@ -6,7 +7,6 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from dateutil.parser import parse
-from hashlib import sha1
 from icalendar import Calendar as vCalendar
 from io import BytesIO
 from lxml import etree
@@ -107,7 +107,10 @@ def get_event_dates(url, timezone):
 
     """
 
-    response = get(urlparse(url)._replace(query='type=ical').geturl())
+    response = get(
+        urlparse(url)._replace(query='type=ical').geturl(),
+        timeout=60
+    )
     response.raise_for_status()
 
     for event in vCalendar.from_ical(response.text).walk('vevent'):
@@ -155,7 +158,7 @@ def import_json(group_context, url, tagmap, clear):
     def _import_json(request, app):
         unknown_tags = set()
 
-        response = get(url)
+        response = get(url, timeout=60)
         response.raise_for_status()
         response = response.json()
 
@@ -249,10 +252,12 @@ def import_json(group_context, url, tagmap, clear):
             # list of rdates
             try:
                 event.validate_recurrence('recurrence', recurrence)
-            except RuntimeError:
+            except RuntimeError as exception:
                 event.recurrence = as_rdates(recurrence, start)
                 if not event.recurrence:
-                    raise RuntimeError(f"Could not convert '{recurrence}'")
+                    raise RuntimeError(
+                        f"Could not convert '{recurrence}'"
+                    ) from exception
             else:
                 event.recurrence = recurrence
 
@@ -332,11 +337,17 @@ def import_guidle(group_context, url, tagmap, clear):
 
     def _import_guidle(request, app):
         try:
-            response = get(url)
+            response = get(url, timeout=300)
             response.raise_for_status()
 
             unknown_tags = set()
-            prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
+            prefix = 'guidle-{}'.format(
+                hashlib.new(
+                    'sha1',
+                    url.encode(),
+                    usedforsecurity=False
+                ).hexdigest()[:10]
+            )
             collection = EventCollection(app.session())
 
             if clear:

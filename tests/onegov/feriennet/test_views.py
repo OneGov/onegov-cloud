@@ -534,8 +534,9 @@ def test_organiser_info(client, scenario):
 
     # by default no information is shown
     for id in ('play-with-legos', 'play-with-playmobil'):
-        assert not editor.get(f'/activity/{id}').pyquery('.organiser li')
-        assert not admin.get(f'/activity/{id}').pyquery('.organiser li')
+        # except the name, which is already set in the test scenario
+        assert len(editor.get(f'/activity/{id}').pyquery('.organiser li')) == 1
+        assert len(admin.get(f'/activity/{id}').pyquery('.organiser li')) == 1
 
     # owner changes are reflected on the activity
     contact = editor.get('/userprofile')
@@ -3007,7 +3008,7 @@ def test_activities_json(client, scenario):
     }
 
 
-def test_billing_widh_date(client, scenario):
+def test_billing_with_date(client, scenario):
     scenario.add_period(title="2019", confirmed=True, finalized=False)
     scenario.add_activity(title="Fishing", state='accepted')
     scenario.add_occasion(cost=100)
@@ -3044,6 +3045,135 @@ def test_billing_widh_date(client, scenario):
     json_data = form.form.submit().json
     assert json_data[0]['Rechnungsposition Bezahlt'] == True
     assert json_data[0]['Zahlungsdatum'] == date
+
+
+def test_mails_on_registration_and_cancellation(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False,
+                        phase="booking")
+    scenario.add_activity(title="Drawing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/userprofile')
+    page.form['salutation'] = 'mr'
+    page.form['first_name'] = 'foo'
+    page.form['last_name'] = 'bar'
+    page.form['zip_code'] = '123'
+    page.form['place'] = 'abc'
+    page.form['address'] = 'abc'
+    page.form['emergency'] = '123456789 Admin'
+    page.form.submit()
+
+    page = client.get('/activities')
+    page = page.click('Drawing')
+    form = page.click('Anmelden')
+    form.form['attendee'] = 'other'
+    form.form['first_name'] = 'Susan'
+    form.form['last_name'] = 'Golding'
+    form.form['birth_date'] = date.today() - timedelta(weeks=-12 * 52)
+    form.form['gender'] = 'female'
+    form.form['ignore_age'] = 'y'
+    page = form.form.submit().follow()
+    assert "war erfolgreich" in page
+
+    page = client.get('/my-bookings')
+    page = page.click('Buchung stornieren')
+
+    mails = [client.get_email(i) for i in range(2)]
+    confirmation = mails[0]
+    text = "Vielen Dank!\n\nWir haben Ihre Buchung für Susan Golding erhalten."
+    assert text in confirmation['TextBody']
+
+    cancelation = mails[1]
+    text = "Wir haben Ihre Abmeldung für Susan Golding erhalten."
+    assert text in cancelation['TextBody']
+
+
+def test_add_child_with_differing_address(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False,
+                        phase="booking")
+    scenario.add_activity(title="Drawing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    settings = client.get('/feriennet-settings')
+    settings.form['show_political_municipality'] = 'y'
+    settings.form.submit()
+
+    client.fill_out_profile()
+
+    page = client.get('/activities')
+    page = page.click('Drawing')
+    form = page.click('Anmelden')
+    form.form['attendee'] = 'other'
+    form.form['first_name'] = 'Susan'
+    form.form['last_name'] = 'Golding'
+    form.form['birth_date'] = date.today() - timedelta(weeks=-12 * 52)
+    form.form['gender'] = 'female'
+    form.form['differing_address'] = 'y'
+    form.form['address'] = '31 St. Davids Hill'
+    form.form['zip_code'] = '1212'
+    form.form['place'] = 'Exeter'
+    form.form['political_municipality'] = 'London'
+    form.form['ignore_age'] = 'y'
+    page = form.form.submit().follow()
+    assert "war erfolgreich" in page
+
+    page = client.get('/billing')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    form = client.get('/export/rechnungspositionen')
+    form.form['file_format'] = 'json'
+    json_data = form.form.submit().json
+    assert json_data[0]['Teilnehmeradresse'] == '31 St. Davids Hill'
+    assert json_data[0]['Teilnehmer PLZ'] == '1212'
+    assert json_data[0]['Teilnehmer Ort'] == 'Exeter'
+    assert json_data[0]['Teilnehmer Politische Gemeinde'] == 'London'
+
+
+def test_add_child_without_political_municipality(client, scenario):
+    scenario.add_period(title="2023", confirmed=True, finalized=False,
+                        phase='booking')
+    scenario.add_activity(title="Skating", state='accepted')
+    scenario.add_occasion(cost=1)
+    scenario.commit()
+
+    client.login_admin()
+    client.fill_out_profile()
+    page = client.get('/feriennet-settings')
+    page.form['show_political_municipality'] = False
+    page.form.submit()
+
+    page = client.get('/activity/skating').click('Anmelden')
+    # with differing address
+    page.form['first_name'] = "Tom"
+    page.form['last_name'] = "Sawyer"
+    page.form['birth_date'] = "2017-01-01"
+    page.form['gender'] = 'male'
+    page.form['differing_address'] = True
+    page.form['address'] = 'Somestreet'
+    page.form['zip_code'] = '4052'
+    page.form['place'] = 'Somecity'
+    page = page.form.submit().follow()
+    assert 'war erfolgreich' in page
+
+    # without differing address
+    page = client.get('/activity/skating').click('Anmelden')
+    page.form['attendee'] = 'other'  # Neue Person erfassen
+    page.form['first_name'] = "Lisa"
+    page.form['last_name'] = "Sawyer"
+    page.form['birth_date'] = "2019-01-01"
+    page.form['gender'] = 'female'
+    page.form['differing_address'] = False
+    page.form['ignore_age'] = True
+    page = page.form.submit().follow()
+    assert 'war erfolgreich' in page
 
 
 def test_view_dashboard(client, scenario):

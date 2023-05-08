@@ -59,7 +59,8 @@ class SogcImporter:
                     'subRubrics': self.subrubrics,
                     'pageRequest.page': page,
                     'pageRequest.size': 2000,
-                }
+                },
+                timeout=300
             )
             response.raise_for_status()
 
@@ -86,7 +87,10 @@ class SogcImporter:
         """
         session = self.session
 
-        response = get(f'{self.endpoint}/publications/{identifier}/xml')
+        response = get(
+            f'{self.endpoint}/publications/{identifier}/xml',
+            timeout=300
+        )
         response.raise_for_status()
         response.encoding = 'utf-8'
 

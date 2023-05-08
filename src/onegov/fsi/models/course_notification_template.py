@@ -43,11 +43,13 @@ def get_template_default(context, type=None):
 def template_name(type, request=None):
     try:
         text = NOTIFICATION_TYPE_TRANSLATIONS[NOTIFICATION_TYPES.index(type)]
-    except ValueError:
+    except ValueError as exception:
         if type == 'invitation':
             text = _('Course Subscription Invitation')
         else:
-            raise AssertionError('There are 5 notifications types allowed')
+            raise AssertionError(
+                'There are 5 notifications types allowed'
+            ) from exception
     return request.translate(text) if request else text
 
 
