@@ -20,3 +20,30 @@ python_version = "3.10"
 follow_imports = "silent"
 namespace_packages = true
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
+
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    "*/**/upgrade.py",
+    "*/**/upgrades.py"
+]
+skips = [
+    # ignore asserts
+    "B101",
+    # ignore pickle (SEA-1030)
+    "B301",
+    "B403",
+    # ignore XML (SEA-1031)
+    "B314",
+    "B320",
+    "B405",
+    "B410",
+    # ignore subprocesses (SEA-1032)
+    "B404",
+    "B602",
+    "B603",
+    "B605",
+    "B607",
+    # ignore temp directory (SEA-1033)
+    "B108"
+]

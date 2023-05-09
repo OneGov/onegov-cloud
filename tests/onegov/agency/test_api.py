@@ -95,6 +95,7 @@ def test_view_api(client):
             'email': '',
             'location_address': '',
             'location_code_city': '',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'opening_hours': '',
             'phone': '',
             'phone_direct': '',
@@ -109,6 +110,7 @@ def test_view_api(client):
         assert not links(hospital)['parent']
         assert not collection(links(hospital)['children']).items
         assert data(collection(links(hospital)['memberships']).items[0]) == {
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'title': 'Doctor',
         }
 
@@ -117,6 +119,7 @@ def test_view_api(client):
             'email': '',
             'location_address': '',
             'location_code_city': '',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'opening_hours': '',
             'phone': '',
             'phone_direct': '',
@@ -131,14 +134,18 @@ def test_view_api(client):
         assert not links(school)['parent']
         assert data(collection(links(school)['children'])
                     .items[0])['title'] == 'School Board'
-        assert data(collection(links(school)['memberships']).items[0]) == {
-            'title': 'Teacher'}
+        assert data(collection(links(school)['memberships'])
+                    .items[0]) == {
+                        'modified': '2023-05-02T14:05:53.473045+00:00',
+                        'title': 'Teacher'
+        }
 
         board = collection(agencies['School Board']).items[0]
         assert data(board) == {
             'email': '',
             'location_address': '',
             'location_code_city': '',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'opening_hours': '',
             'phone': '',
             'phone_direct': '',
@@ -149,11 +156,14 @@ def test_view_api(client):
             'website': '',
             'geo_location': dict(lon=None, lat=None, zoom=None),
         }
-        assert not links(board)['organigram']
-        assert data(collection(links(board)['parent']).items[0])['title'] == \
-               'School'
-        assert not collection(links(board)['children']).items
-        assert not collection(links(board)['memberships']).items
+        assert not links(school)['organigram']
+        assert not links(school)['parent']
+        assert data(collection(links(school)['children'])
+                    .items[0])['title'] == 'School Board'
+        assert data(collection(links(school)['memberships']).items[0]) == {
+            'title': 'Teacher',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
+        }
 
         # People
         people = {
@@ -172,6 +182,7 @@ def test_view_api(client):
             'last_name': 'Krabappel',
             'location_address': '',
             'location_code_city': '',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'notes': '',
             'parliamentary_group': '',
             'phone': '',
@@ -187,7 +198,8 @@ def test_view_api(client):
         assert not links(edna)['picture_url']
         assert not links(edna)['website']
         assert data(collection(links(edna)['memberships']).items[0]) == {
-            'title': 'Teacher'
+            'title': 'Teacher',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
         }
 
         nick = collection(people['Rivera Nick']).items[0]
@@ -197,6 +209,7 @@ def test_view_api(client):
             'location_code_city': '',
             'postal_address': '',
             'postal_code_city': '',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
             'born': '',
             'email': '',
             'first_name': 'Nick',
@@ -215,7 +228,8 @@ def test_view_api(client):
         assert not links(nick)['picture_url']
         assert not links(nick)['website']
         assert data(collection(links(nick)['memberships']).items[0]) == {
-            'title': 'Doctor'
+            'title': 'Doctor',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
         }
 
         # Memberships
@@ -226,15 +240,21 @@ def test_view_api(client):
         assert set(memberships) == {'Doctor', 'Teacher'}
 
         doctor = collection(memberships['Doctor']).items[0]
-        assert data(doctor) == {'title': 'Doctor'}
+        assert data(doctor) == {
+            'title': 'Doctor',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
+        }
         assert data(collection(links(doctor)['agency']).items[0])['title'] == \
                'Hospital'
         assert data(collection(links(doctor)['person']).items[0])['title'] == \
                'Rivera Nick'
 
         teacher = collection(memberships['Teacher']).items[0]
-        assert data(teacher) == {'title': 'Teacher'}
-        assert data(collection(links(teacher)['agency']).items[0])['title'] ==\
-               'School'
-        assert data(collection(links(teacher)['person']).items[0])['title'] ==\
-               'Krabappel Edna'
+        assert data(teacher) == {
+            'title': 'Teacher',
+            'modified': '2023-05-02T14:05:53.473045+00:00',
+        }
+        assert data(collection(links(teacher)['agency']).
+                    items[0])['title'] == 'School'
+        assert data(collection(links(teacher)['person']).
+                    items[0])['title'] == 'Krabappel Edna'

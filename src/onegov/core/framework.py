@@ -383,10 +383,14 @@ class Framework(
         assert self.unsafe_identity_secret != self.unsafe_csrf_secret
 
         # you don't want to use the keys given in the example file
-        assert self.unsafe_identity_secret != 'very-secret-key'
+        assert (
+            self.unsafe_identity_secret != 'very-secret-key'  # nosec: B105
+        )
 
         # you don't want to use the keys given in the example file
-        assert self.unsafe_csrf_secret != 'another-very-secret-key'
+        assert (
+            self.unsafe_csrf_secret != 'another-very-secret-key'  # nosec: B105
+        )
 
     def configure_yubikey(self, **cfg):
         self.yubikey_client_id = cfg.get('yubikey_client_id', None)
@@ -1188,7 +1192,7 @@ def default_policy_apply_factory():
         sample_rate = request.app.content_security_policy_report_sample_rate
         report_only = request.app.content_security_policy_report_only
 
-        if random.uniform(0, 1) <= sample_rate:
+        if random.uniform(0, 1) <= sample_rate:  # nosec B311
             report_uri = request.app.content_security_policy_report_uri
         else:
             report_uri = None

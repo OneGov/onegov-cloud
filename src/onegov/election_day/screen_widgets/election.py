@@ -275,3 +275,35 @@ class AbsoluteMajorityWidget(ModelBoundWidget):
         </xsl:template>
     """
     usage = '<absolute-majority class=""/>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='if-absolute-majority',
+    category='majorz_election'
+)
+class IfAbsoluteMajorityWidget(ModelBoundWidget):
+    tag = 'if-absolute-majority'
+    template = """
+        <xsl:template match="if-absolute-majority">
+            <tal:block tal:condition="model.majority_type == 'absolute'">
+                <xsl:apply-templates select="node()"/>
+            </tal:block>
+        </xsl:template>
+    """
+    usage = '<if-absolute-majority></if-absolute-majority>'
+
+
+@ElectionDayApp.screen_widget(
+    tag='if-relative-majority',
+    category='majorz_election'
+)
+class IfRelateMajorityWidget(ModelBoundWidget):
+    tag = 'if-relative-majority'
+    template = """
+        <xsl:template match="if-relative-majority">
+            <tal:block tal:condition="model.majority_type == 'relative'">
+                <xsl:apply-templates select="node()"/>
+            </tal:block>
+        </xsl:template>
+    """
+    usage = '<if-relative-majority></if-relative-majority>'
