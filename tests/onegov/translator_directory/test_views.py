@@ -1,8 +1,13 @@
 import copy
 import re
+import docx
 import transaction
-
 from io import BytesIO
+from onegov.core.utils import module_path
+from onegov.translator_directory.models.translator import Translator
+from os.path import basename
+from onegov.file import FileCollection
+from tests.onegov.translator_directory.shared import iter_block_items
 from onegov.gis import Coordinates
 from onegov.pdf import Pdf
 from onegov.translator_directory.collections.translator import \
@@ -10,7 +15,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.user import UserCollection
 from openpyxl import load_workbook
 from pdftotext import PDF
-from tests.onegov.translator_directory.shared import translator_data, \
+from tests.onegov.translator_directory.shared import translator_data,\
     create_languages, create_certificates
 from tests.shared.utils import decode_map_value, encode_map_value
 from unittest.mock import patch
@@ -43,6 +48,13 @@ def check_pdf(page, filename, link):
     assert filename in headers['Content-Disposition']
     assert headers['Content-Type'] == 'application/pdf'
     assert filename in ''.join(PDF(BytesIO(response.body)))
+
+
+def upload_file(filename, client, content_type=None):
+    with open(filename, 'rb') as f:
+        page = client.get('/files')
+        page.form['file'] = Upload(basename(filename), f.read(), content_type)
+        page.form.submit()
 
 
 def test_view_translator(client):
@@ -1565,3 +1577,71 @@ def test_view_accreditation_errors(directions, client):
     check_pdf(page, '9.pdf',
               'Aktueller Auszug aus dem Zentralstrafregister.pdf')
     check_pdf(page, 'A.pdf', 'Handlungsfähigkeitszeugnis.pdf')
+
+
+def test_view_mail_template(client):
+    session = client.app.session()
+    translator = Translator(**translator_data)
+    translators = TranslatorCollection(client.app)
+    trs_id = translators.add(**translator_data).id
+    transaction.commit()
+
+    docx_path = module_path(
+        "tests.onegov.translator_directory", "fixtures/Vorlage.docx"
+    )
+    signature_path = module_path(
+        "tests.onegov.translator_directory",
+        "fixtures/Unterschrift__DOJO__Adj_mV_John_Doe__Stv_Dienstchef.jpg",
+    )
+    client.login_admin()
+
+    upload_file(docx_path, client, content_type='application/vnd.ms-office')
+    upload_file(signature_path, client)
+    files = FileCollection(session).query().all()
+
+    assert files[0].name == basename(docx_path)
+    assert files[1].name == basename(signature_path)
+
+    # User.realname has to exist since this is required by mail_templates
+    user = UserCollection(session).by_username('admin@example.org')
+    first_name, last_name = user.realname.split(" ")
+    assert first_name == 'John'
+    assert last_name == 'Doe'
+
+    # Now we have everything set up, go to the mail templates and generate one
+    page = client.get(f'/translator/{trs_id}').click('Briefvorlagen')
+    page.form['templates'] = basename(docx_path)
+    resp = page.form.submit()
+
+    found_variables_in_docx = set()
+    expected_variables_in_docx = (
+        'Sehr geehrter Herr',
+        translator.address,
+        translator.zip_code,
+        translator.city,
+        translator.first_name,
+        translator.last_name,
+        first_name,
+        last_name
+    )
+
+    doc = docx.Document(BytesIO(resp.body))
+    for target in expected_variables_in_docx:
+        for block in iter_block_items(doc):
+            line = block.text
+            # make sure all variables have been rendered
+            assert '{{' not in line and '}}' not in line, line
+            if target in line:
+                found_variables_in_docx.add(target)
+
+    assert set(expected_variables_in_docx) == found_variables_in_docx
+
+
+def test_view_bulk_email(client, translator_app):
+
+    client.login_admin()
+
+    page = client.get('/translators')
+    assert 'Rundschreiben an alle Übersetzer' in page
+    page = client.get('/translators/bulk-email/')
+    assert 'mailto:?bcc' in page

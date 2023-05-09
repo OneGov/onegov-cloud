@@ -609,7 +609,7 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content_sidebar" i18n:domain="onegov.town6">
-    <div class="small-12 medium-4 cell page-content-sidebar medium-offset-1 sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
+    <div class="small-12 medium-4 cell page-content-sidebar medium-offset-1 sidebar ${'filter-panel' if filter_panel else ''}" tal:condition="people or contact or coordinates or show_side_panel or more_entries|False" tal:define="highlight_contacts highlight_contacts|True; filter_panel filter_panel|False">
         <div metal:define-slot="before-panels"></div>
         <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="contact or coordinates or location">
             <div tal:condition="contact and not hide">
@@ -651,12 +651,39 @@
                 </li>
             </ul>
         </div>
+
+        <div class="more-entries side-panel" tal:condition="more_entries|False">
+            <ul class="more-list">
+                <li tal:condition="prev_entry">
+                    <a href="${request.link(prev_entry)}" class="list-link">
+                        <i class="fa fa-chevron-left"></i><span class="list-title" i18n:translate="">Previous Entry</span>
+                    </a>
+                    <a href="${request.link(prev_entry)}">
+                        <p class="list-lead preview">
+                            ${prev_entry.title}
+                        </p>
+                    </a>
+                </li>
+                <li tal:condition="next_entry">
+                    <a href="${request.link(next_entry)}" class="list-link">
+                        <i class="fa fa-chevron-right"></i><span class="list-title" i18n:translate="">Next Entry</span>
+                    </a>
+                    <a href="${request.link(next_entry)}">
+                        <p class="list-lead preview">
+                            ${next_entry.title}
+                        </p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
     </div>
 </metal:page_content>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town6">
     <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image | None;">
-        <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
+        <tal:b condition="not: people or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
@@ -669,7 +696,7 @@
                 <div metal:define-slot="after-text"></div>
             </div>
         </tal:b>
-        <tal:b condition="people or contact or coordinates or show_side_panel">
+        <tal:b condition="people or contact or coordinates or show_side_panel or more_entries|False">
             <div class="small-12 medium-7 cell page-content-main">
                 <img class="page-image" tal:condition="show_page_image" src="${page.page_image}">
                 <div class="limit-line-width">
@@ -1432,6 +1459,73 @@
         </tal:b>
     </div>
 </metal:slider>
+
+
+<metal:testimonial_slider define-macro="testimonial_slider" i18n:domain="onegov.town6">
+<div class="grid-container full ${color}" tal:condition="description_1 and image_1 and quote_1"><div class="grid-x"><div class="small-12 medium-12 cell">
+    <div class="grid-container"><div class="grid-x grid-padding-x">
+        <div class="small-12 medium-12 cell">
+            <div class="orbit slider testimonial-slider" role="region" aria-label="Homepage Testimonal Slider" data-orbit data-timer-delay="7200">
+                <div class="orbit-wrapper">
+                    <ul class="orbit-container">
+                        <li class="orbit-slide">
+                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                                <div class="small-4 medium-2 cell"><div class="square-container">
+                                    <img src="${image_1}"/>
+                                </div></div>
+                                <div class="small-8 medium-10 cell"><div class="text">
+                                    <p class="description">${description_1}</p>
+                                    <p class="quote">
+                                    <i class="fas fa-angle-double-left"></i>
+                                    ${quote_1}
+                                    <i class="fas fa-angle-double-right"></i>
+                                    </p>
+                                </div></div>
+                            </div>
+                        </li>
+                        <li class="orbit-slide" tal:condition="description_2 and image_2 and quote_2">
+                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                                <div class="small-4 medium-2 cell"><div class="square-container">
+                                    <img src="${image_2}"/>
+                                </div></div>
+                                <div class="small-8 medium-10 cell"><div class="text">
+                                    <p class="description">${description_2}</p>
+                                    <p class="quote">
+                                    <i class="fas fa-angle-double-left"></i>
+                                    ${quote_2}
+                                    <i class="fas fa-angle-double-right"></i>
+                                    </p>
+                                </div></div>
+                            </div>
+                        </li>
+                        <li class="orbit-slide" tal:condition="description_3 and image_3 and quote_3">
+                            <div class="testimonial grid-x grid-padding-x" data-aos="fade">
+                                <div class="small-4 medium-2 cell"><div class="square-container">
+                                    <img src="${image_3}"/>
+                                </div></div>
+                                <div class="small-8 medium-10 cell"><div class="text">
+                                    <p class="description">${description_3}</p>
+                                    <p class="quote">
+                                    <i class="fas fa-angle-double-left"></i>
+                                    ${quote_3}
+                                    <i class="fas fa-angle-double-right"></i>
+                                    </p>
+                                </div></div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="orbit-controls" tal:condition="image_2 and image_2 and quote_2">
+                        <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                        <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div></div>
+</div></div></div>
+</metal:testimonial_slider>
+
+
 
 <metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.town6">
     <nav class="orbit-bullets">

@@ -7,7 +7,7 @@ from websockets import serve
 
 
 CONNECTIONS = {}
-TOKEN = ''
+TOKEN = ''  # nosec: B105
 
 
 def get_payload(message, expected):
@@ -18,7 +18,7 @@ def get_payload(message, expected):
         assert payload['type'] in expected
         return payload
     except Exception:
-        pass
+        log.warning('Invalid payload received')
 
 
 async def error(websocket, message, close=True):

@@ -15,6 +15,7 @@ member_can_see = (
     'address',
     'zip_code',
     'city',
+    'hometown',  # stored on ticket
     'drive_distance',
     'email',
     'tel_mobile',
@@ -132,3 +133,5 @@ INTERPRETING_TYPES = {
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
 }
+
+INVALID_WORD_TEMPLATE_CHARS = ('<', '>', '&')

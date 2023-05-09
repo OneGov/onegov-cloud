@@ -17,9 +17,13 @@ cli = command_group()
               help="Password to give the user")
 @click.option('--yubikey', default=None,
               help="The yubikey code to use for 2fa")
+@click.option('--realname', default=None,
+              help="First name and last name, for example 'Jane Doe'")
+@click.option('--phone_number', default=None,
+              help="Sets the phone number")
 @click.option('--no-prompt', default=False,
               help="If no questions should be asked", is_flag=True)
-def add(role, username, password, yubikey, no_prompt):
+def add(role, username, password, yubikey, no_prompt, realname, phone_number):
     """ Adds a user with the given name to the database. """
 
     def add_user(request, app):
@@ -54,7 +58,8 @@ def add(role, username, password, yubikey, no_prompt):
         else:
             second_factor = None
 
-        users.add(username, password, role, second_factor=second_factor)
+        users.add(username, password, role, second_factor=second_factor,
+                  phone_number=phone_number, realname=realname)
         click.secho("{} was added".format(username), fg='green')
 
     return add_user

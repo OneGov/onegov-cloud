@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-03-29 10:27+0200\n"
+"POT-Creation-Date: 2023-04-24 11:54+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -530,11 +530,11 @@ msgstr "Noch keine Verzeichnisse definiert."
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
 
-msgid "More"
-msgstr "Mehr"
-
 msgid "Further Information"
 msgstr "Weitere Informationen"
+
+msgid "More"
+msgstr "Mehr"
 
 msgid "Propose entry"
 msgstr "Eintrag vorschlagen"
@@ -788,6 +788,12 @@ msgstr "Karte"
 
 msgid "More news"
 msgstr "Weitere News"
+
+msgid "Previous Entry"
+msgstr "Vorheriger Eintrag"
+
+msgid "Next Entry"
+msgstr "Nächster Eintrag"
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
@@ -1289,9 +1295,6 @@ msgstr "Ihre Veranstaltung wurde angenommen:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
-msgid "The OneGov Cloud Team"
-msgstr "Das OneGov Cloud Team"
-
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
 
@@ -1594,6 +1597,9 @@ msgstr ""
 "Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden "
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
+
+msgid "Link to organizers page"
+msgstr "Link zur Veranstalterseite"
 
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
@@ -2097,3 +2103,6 @@ msgstr "Feiertage"
 
 msgid "Link Migration"
 msgstr "Migration Links"
+
+#~ msgid "The OneGov Cloud Team"
+#~ msgstr "Das OneGov Cloud Team"

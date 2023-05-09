@@ -24,7 +24,8 @@ var locales = {
         "The server responded with an error. We have been informed and will investigate the problem.": "Auf dem Server ist ein Fehler aufgetreten. Wir wurden informiert und werden das Problem analysieren.",
         "The server could not be reached. Please try again.": "Der Server konnte nicht erreicht werden. Bitte probieren Sie es noch einmal.",
         "The site could not be found.": "Die Seite wurde nicht gefunden.",
-        "Access denied. Please log in before continuing.": "Zugriff verweigert. Bitte melden Sie sich an bevor Sie weiterfahren."
+        "Access denied. Please log in before continuing.": "Zugriff verweigert. Bitte melden Sie sich an bevor Sie weiterfahren.",
+        "The circular to translators has been opened in your e-mail software.": "Das Rundschreiben an alle Übersetzer wurde in Ihrem E-Mail Programm geöffnet"
     },
     fr: {
         "Allocation": "Allocation",

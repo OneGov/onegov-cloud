@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-03-13 12:46+0100\n"
+"POT-Creation-Date: 2023-04-18 15:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -321,6 +321,21 @@ msgstr "Décrit le contenu de votre dossier"
 
 msgid "Further Information"
 msgstr "Plus d'informations"
+
+msgid "If left empty \"Further Information\" will be used as title"
+msgstr "S'il n'est pas renseigné, le titre sera \"Plus d'informations\"."
+
+msgid "Text"
+msgstr "Texte"
+
+msgid "Position"
+msgstr "Position"
+
+msgid "Above the entries"
+msgstr "Au-dessus des entrées"
+
+msgid "Below the entries"
+msgstr "Sous les entrées"
 
 msgid "Definition"
 msgstr "Définition"
@@ -760,9 +775,6 @@ msgstr "Nom de la vue d'ensemble où ce lien apparaît"
 msgid "Describes what this form is about"
 msgstr "Décrit le contenu de ce formulaire"
 
-msgid "Text"
-msgstr "Texte"
-
 msgid "Used to group the form in the overview"
 msgstr "Utilisé pour grouper la formulaire dans la vue d'ensemble"
 
@@ -982,6 +994,15 @@ msgstr "Afficher l'introduction sur la page parent"
 msgid "(Redesign only)"
 msgstr "(Redesign uniquement)"
 
+msgid "Destination"
+msgstr "Destination"
+
+msgid "- Root -"
+msgstr "- Page de base-"
+
+msgid "Invalid destination selected"
+msgstr "Destination non valide sélectionnée"
+
 msgid "Salutation"
 msgstr "Civilité"
 
@@ -1014,6 +1035,21 @@ msgstr "Groupe parlementaire"
 
 msgid "Website"
 msgstr "Site Web"
+
+msgid "Website 2"
+msgstr ""
+
+msgid "Location address"
+msgstr ""
+
+msgid "Location Code and City"
+msgstr ""
+
+msgid "Postal address"
+msgstr ""
+
+msgid "Postal Code and City"
+msgstr ""
 
 msgid "Picture"
 msgstr "Photo"
@@ -1772,9 +1808,6 @@ msgstr "Supprimer le formulaire"
 msgid "Export"
 msgstr "Exporter"
 
-msgid "Move"
-msgstr "Déplacer"
-
 msgid "Change URL"
 msgstr "Changer URL"
 
@@ -1828,12 +1861,6 @@ msgstr "Nouveau commentaire"
 
 msgid "PDF"
 msgstr "PDF"
-
-msgid "Destination"
-msgstr "Destination"
-
-msgid "- Root -"
-msgstr "- Page de base-"
 
 msgid "New Message"
 msgstr "Nouveau message"
@@ -2447,9 +2474,6 @@ msgstr "Modifier le sujet"
 
 msgid "Move Topic"
 msgstr "Déplacer le sujet"
-
-msgid "Invalid destination selected"
-msgstr "Destination non valide sélectionnée"
 
 msgid "The topic was deleted"
 msgstr "Le sujet a été supprimé"
@@ -3223,9 +3247,6 @@ msgstr "Votre événement a été accepté :"
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté :"
-
-msgid "The OneGov Cloud Team"
-msgstr "L'équipe de OneGov Cloud"
 
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
@@ -4257,6 +4278,9 @@ msgstr ""
 "fois. Pour importer davantage d'éléments, veuillez faire plusieurs "
 "importations."
 
+msgid "Moves the topic and all its sub topics to the given destination."
+msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
+
 msgid ""
 "Stable URLs are important. Here you can change the path to your site "
 "independently from the title."
@@ -4615,6 +4639,9 @@ msgstr "${count} événements ont été importés"
 msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
 "Le même format que l'exportation (XLSX) peut être utilisé pour l'importation."
+
+msgid "Move"
+msgstr "Déplacer"
 
 msgid "Your payment has been received"
 msgstr "Votre paiement a été reçu"
@@ -5115,9 +5142,6 @@ msgstr ""
 msgid "Successfully uploaded the PDF of this ticket to Gever"
 msgstr "Le PDF de ce billet a été téléchargé avec succès vers Gever."
 
-msgid "Moves the topic and all its sub topics to the given destination."
-msgstr "Déplace le sujet et tous ses sous-sujets vers la destination donnée."
-
 msgid "My"
 msgstr "Mes"
 
@@ -5157,6 +5181,8 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
+#~ msgid "The OneGov Cloud Team"
+#~ msgstr "L'équipe de OneGov Cloud"
 
 #~ msgid "1 entry"
 #~ msgstr "1 entrée"

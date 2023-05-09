@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-10-24 08:49+0200\n"
+"POT-Creation-Date: 2023-04-25 16:22+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -147,7 +147,7 @@ msgid "Date of birth"
 msgstr "Geburtsdatum"
 
 msgid "Hometown"
-msgstr "Heimartort"
+msgstr "Heimatort"
 
 msgid "Nationality"
 msgstr "Nationalität"
@@ -585,6 +585,9 @@ msgstr "Absteigend"
 msgid "Search in first and last name"
 msgstr "Suche in Vor- und Nachname"
 
+msgid "Chose a mail template to generate:"
+msgstr "Wählen Sie die Briefvorlage-Kategorie aus zum Herunterladen:"
+
 msgid "Admin"
 msgstr "Administrator"
 
@@ -621,6 +624,9 @@ msgstr "Übersetzer/in löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+msgid "Mail templates"
+msgstr "Briefvorlagen"
+
 msgid "Report change"
 msgstr "Mutation melden"
 
@@ -635,6 +641,9 @@ msgstr "Suche nach Übersetzer/in"
 
 msgid "Export Excel"
 msgstr "Export Excel"
+
+msgid "Mail to all translators"
+msgstr "Rundschreiben an alle Übersetzer"
 
 msgid "Add language"
 msgstr "Sprache hinzufügen"
@@ -829,3 +838,21 @@ msgstr "Übersetzer/in hat keinen Standort / keine gültige Adresse."
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+msgid "This file does not seem to exist."
+msgstr "Diese Datei wurde nicht gefunden."
+
+msgid ""
+"Unfortunately, this account does not have real name defined, which is "
+"required for mail templates"
+msgstr ""
+"Für dieses Konto ist kein Name und Vorname definiert, welcher für "
+"Briefvorlagen erforderlich ist. Fügen Sie einen Namen hinzu und versuchen "
+"Sie es noch einmal. Fügen Sie einen Namen hinzu und versuchen Sie es noch "
+"einmal."
+
+msgid "Did not find a signature in /files."
+msgstr "Es wurde keine Unterschrift in /dateien gefunden."
+
+msgid "Download"
+msgstr "Herunterladen"

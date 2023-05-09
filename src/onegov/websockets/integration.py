@@ -34,9 +34,10 @@ class WebsocketsApp(WebassetsApp):
             self.websockets_manage_url,
             self.websockets_manage_token,
         )), "Missing websockets configuration"
-        assert self.websockets_manage_token != 'super-secret-token', (
-            "Do not use the default websockets token"
+        not_default = (
+            self.websockets_manage_token != 'super-secret-token'  # nosec: B105
         )
+        assert not_default, "Do not use the default websockets token"
 
     def websockets_client_url(self, request):
         """ Returns the public websocket endpoint that can be used with JS.

@@ -87,11 +87,15 @@ class D3Renderer():
             'viewport_width': width  # only used for PDF and PNG
         })
 
-        response = post('{}/d3/{}'.format(self.renderer, fmt), json={
-            'scripts': self.scripts[chart],
-            'main': self.supported_charts[chart]['main'],
-            'params': params
-        })
+        response = post(
+            '{}/d3/{}'.format(self.renderer, fmt),
+            json={
+                'scripts': self.scripts[chart],
+                'main': self.supported_charts[chart]['main'],
+                'params': params
+            },
+            timeout=60
+        )
 
         response.raise_for_status()
 

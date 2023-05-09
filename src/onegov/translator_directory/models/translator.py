@@ -7,8 +7,8 @@ from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
-
 from onegov.core.orm import Base
+
 from onegov.core.orm.types import UUID
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
 from onegov.translator_directory.models.certificate import \
@@ -123,11 +123,15 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
         backref='mother_tongues'
     )
 
+    # Arbeitssprache - Wort
     spoken_languages = relationship(
         "Language", secondary=spoken_association_table, backref="speakers"
     )
+    # Arbeitssprache - Schrift
     written_languages = relationship(
         "Language", secondary=written_association_table, backref='writers')
+
+    # Arbeitssprache - Kommunikationsüberwachung
     monitoring_languages = relationship(
         "Language", secondary=monitoring_association_table, backref='monitors')
 

@@ -91,7 +91,7 @@ def force_lowercase_usernames(context):
 
     temp_user = UserCollection(context.session).add(
         username='temp',
-        password='temp',
+        password='temp',  # nosec: B106
         active=False,
         role='member',
     )
