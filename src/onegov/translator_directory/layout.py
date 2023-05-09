@@ -301,8 +301,7 @@ class TranslatorCollectionLayout(DefaultLayout):
                 ),
                 Link(
                     _("Mail to all translators"),
-                    url=self.request.class_link(TranslatorCollection,
-                                                name='bulk-email'),
+                    url=self.request.app.mailto_link,
                     attrs={'class': 'envelope'},
                 )
             ]

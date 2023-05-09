@@ -51,6 +51,16 @@ class TranslatorDirectoryApp(OrgApp):
         )
         return [f.name for f in query.all()]
 
+    @cached_property
+    def mailto_link(self):
+        from onegov.translator_directory.models.translator import Translator
+        q = self.session().query(Translator).with_entities(
+            Translator.email)
+        emails = q.all()
+        bcc_addresses = ';'.join(str(email) for (email,) in emails if email)
+        mailto_link = f"mailto:?bcc={bcc_addresses[:-1]}"
+        return mailto_link
+
 
 @TranslatorDirectoryApp.template_directory()
 def get_template_directory():
