@@ -163,7 +163,6 @@ class PaymentWithDateForm(Form):
             ('all', _("Whole invoice")),
             ('specific', _("Only for specific items"))
         ),
-        default='all',
     )
 
     items = MultiCheckboxField(
@@ -180,12 +179,27 @@ class PaymentWithDateForm(Form):
             for i in self.invoice.items if not i.paid]
 
         if self.request.params['item-id'] != 'all':
-            self.target.data = 'specific'
+            # Set defaults according to parameters
+            if not self.target.data:
+                self.target.data = 'specific'
             if not self.items.data:
                 self.items.data = [self.request.params['item-id']]
+
+            # Check all unpaid items if 'all' is selected
+            if self.target.data == 'all':
+                self.items.data = [i.id.hex for i in self.invoice.items
+                                   if not i.paid]
         else:
-            self.items.data = [i.id.hex for i in self.invoice.items
-                               if not i.paid]
+            # Set defaults according to parameters
+            if not self.target.data:
+                self.target.data = 'all'
+            if not self.items.data:
+                self.items.data = [i.id.hex for i in self.invoice.items
+                                   if not i.paid]
+
+            # Check all unpaid items if 'all' is selected
+            if self.target.data == 'all':
+                self.items.data = [i.id.hex for i in self.invoice.items]
 
     @property
     def invoice(self):
