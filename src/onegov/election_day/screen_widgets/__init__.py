@@ -12,8 +12,8 @@ from onegov.election_day.screen_widgets.election_compound import (
     ElectionCompoundSuperregionsTableWidget
 )
 from onegov.election_day.screen_widgets.election import (
-    AllocatedMandatesWidget,
     AbsoluteMajorityWidget,
+    AllocatedMandatesWidget,
     ElectionCandidatesByEntityTableWidget,
     ElectionCandidatesChartWidget,
     ElectionCandidatesTableWidget,
@@ -21,9 +21,11 @@ from onegov.election_day.screen_widgets.election import (
     ElectionListsTableWidget,
     ElectionPartyStrengthsChartWidget,
     ElectionPartyStrengthsTableWidget,
+    ElectionTurnoutWidget,
+    IfAbsoluteMajorityWidget,
+    IfRelateMajorityWidget,
     MandatesWidget,
     NumberOfMandatesWidget,
-    ElectionTurnoutWidget
 )
 from onegov.election_day.screen_widgets.generic import (
     ColumnWidget,
@@ -93,8 +95,10 @@ __all__ = (
     'H2Widget',
     'H3Widget',
     'HRWidget',
+    'IfAbsoluteMajorityWidget',
     'IfCompletedWidget',
     'IfNotCompletedWidget',
+    'IfRelateMajorityWidget',
     'LastResultChangeWidget',
     'LogoWidget',
     'MandatesWidget',
