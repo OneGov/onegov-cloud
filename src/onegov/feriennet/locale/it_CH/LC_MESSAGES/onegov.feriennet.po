@@ -2713,8 +2713,8 @@ msgstr "${count} sono state create prenotazioni manualmente"
 msgid "Invoice marked as paid"
 msgstr "Fattura contrassegnata come pagata"
 
-msgid "Invoice item(s) marked as paid"
-msgstr ""
+msgid "Invoice items marked as paid"
+msgstr "Voci di fattura contrassegnate come pagate"
 
 #, python-format
 msgid "Mark paid for ${user}"
