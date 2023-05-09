@@ -53,13 +53,6 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             self.page == other.page
             and self.letter == other.letter
             and self.agency == other.agency
-            and self.first_name == other.first_name
-            and self.last_name == other.last_name
-            and self.updated_gt == other.updated_gt
-            and self.updated_ge == other.updated_ge
-            and self.updated_eq == other.updated_eq
-            and self.updated_le == other.updated_le
-            and self.updated_lt == other.updated_lt
         )
 
     def page_by_index(self, page):
@@ -127,46 +120,36 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             # if 'modified' is not set comparison is done against 'created'
             query = query.filter(
                 func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedPerson.modified),
-                    func.date_trunc('minute',
-                                    ExtendedPerson.created),
+                    func.date_trunc('minute', ExtendedPerson.modified),
+                    func.date_trunc('minute', ExtendedPerson.created),
                 ) > self.updated_gt
             )
         if self.updated_ge:
             query = query.filter(
                 func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedPerson.modified),
-                    func.date_trunc('minute',
-                                    ExtendedPerson.created),
+                    func.date_trunc('minute', ExtendedPerson.modified),
+                    func.date_trunc('minute', ExtendedPerson.created),
                 ) >= self.updated_ge
             )
         if self.updated_eq:
             query = query.filter(
                 func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedPerson.modified),
-                    func.date_trunc('minute',
-                                    ExtendedPerson.created),
+                    func.date_trunc('minute', ExtendedPerson.modified),
+                    func.date_trunc('minute', ExtendedPerson.created),
                 ) == self.updated_eq
             )
         if self.updated_le:
             query = query.filter(
                 func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedPerson.modified),
-                    func.date_trunc('minute',
-                                    ExtendedPerson.created),
+                    func.date_trunc('minute', ExtendedPerson.modified),
+                    func.date_trunc('minute', ExtendedPerson.created),
                 ) <= self.updated_le
             )
         if self.updated_lt:
             query = query.filter(
                 func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedPerson.modified),
-                    func.date_trunc('minute',
-                                    ExtendedPerson.created),
+                    func.date_trunc('minute', ExtendedPerson.modified),
+                    func.date_trunc('minute', ExtendedPerson.created),
                 ) < self.updated_lt
             )
         query = query.order_by(
