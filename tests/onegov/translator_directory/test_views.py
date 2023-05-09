@@ -1635,13 +1635,3 @@ def test_view_mail_template(client):
                 found_variables_in_docx.add(target)
 
     assert set(expected_variables_in_docx) == found_variables_in_docx
-
-
-def test_view_bulk_email(client, translator_app):
-
-    client.login_admin()
-
-    page = client.get('/translators')
-    assert 'Rundschreiben an alle Übersetzer' in page
-    page = client.get('/translators/bulk-email/')
-    assert 'mailto:?bcc' in page

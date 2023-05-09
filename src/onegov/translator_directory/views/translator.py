@@ -108,20 +108,6 @@ def view_translators(self, request, form):
 @TranslatorDirectoryApp.view(
     model=TranslatorCollection,
     permission=Secret,
-    template='translators.pt',
-    name='bulk-email'
-)
-def render_bulk_email_link(self, request):
-
-    q = self.query().with_entities(Translator.email).all()
-    bcc_addresses = ';'.join(str(email) for (email,) in q if email)
-    mailto_link = f"mailto:?bcc={bcc_addresses[:-1]}"
-    return request.redirect(mailto_link)
-
-
-@TranslatorDirectoryApp.view(
-    model=TranslatorCollection,
-    permission=Secret,
     name='export'
 )
 def export_translator_directory(self, request):
