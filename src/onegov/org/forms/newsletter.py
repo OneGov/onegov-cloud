@@ -1,11 +1,16 @@
 from datetime import timedelta
+from wtforms.validators import DataRequired
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
+from wtforms.fields import BooleanField
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.fields import MultiCheckboxField
-from onegov.newsletter import Recipient
+from onegov.newsletter import Recipient, RecipientCollection
 from onegov.org import _
 from sedate import replace_timezone, to_timezone, utcnow
 from wtforms.fields import RadioField
@@ -212,3 +217,66 @@ class NewsletterTestForm(Form):
                     .one()
 
         return NewsletterSendFormWithRecipients
+
+
+class NewsletterImportForm(Form):
+
+    clear = BooleanField(
+        label=_("Clear"),
+        description=_(
+            "Delete imported newsletters before importing. This does not "
+            "delete otherwise imported newsletters and submitted events."
+        ),
+        default=False
+    )
+
+    dry_run = BooleanField(
+        label=_("Dry Run"),
+        description=_("Do not actually want to import the newsletters."),
+        default=False
+    )
+
+    file = UploadField(
+        label=_("Import"),
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType({
+                'application/excel',
+                'application/vnd.ms-excel',
+                (
+                    'application/'
+                    'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                ),
+                'application/vnd.ms-office',
+                'application/octet-stream',
+                'application/zip',
+                'text/csv',
+                'text/plain',
+            }),
+            FileSizeLimit(10 * 1024 * 1024)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    @property
+    def headers(self):
+        return {
+            'address': self.request.translate(_("Address")),
+        }
+
+    def run_export(self):
+        recipients = RecipientCollection(self.request.session)
+        headers = self.headers
+
+        def get(recipient, attribute):
+            result = (getattr(recipient, attribute, None))
+            result = result.strip()
+            return result
+
+        result = []
+        for recipient in recipients.query():
+            result.append({
+                v: get(recipient, k)
+                for k, v in headers.items()
+            })
+        return result

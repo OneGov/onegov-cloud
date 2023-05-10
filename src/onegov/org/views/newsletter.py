@@ -4,6 +4,8 @@ import morepath
 
 from collections import OrderedDict
 from itertools import groupby
+
+from onegov.core.elements import Link
 from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
@@ -16,10 +18,11 @@ from onegov.newsletter import Recipient
 from onegov.newsletter import RecipientCollection
 from onegov.newsletter.errors import AlreadyExistsError
 from onegov.org import _, OrgApp
-from onegov.org.forms import NewsletterForm
+from onegov.org.forms import NewsletterForm, ExportForm
 from onegov.org.forms import NewsletterSendForm
 from onegov.org.forms import NewsletterTestForm
 from onegov.org.forms import SignupForm
+from onegov.org.forms.newsletter import NewsletterImportForm
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
@@ -413,4 +416,28 @@ def handle_preview_newsletter(self, request, layout=None):
         'occurrences': occurrences_by_newsletter(self, request),
         'publications': publications_by_newsletter(self, request),
         'name_without_extension': name_without_extension
+    }
+
+
+@OrgApp.form(model=RecipientCollection, name='export', permission=Public,
+             form=ExportForm, template='export.pt')
+def export_newsletter_recipients(self, request, form, layout=None):
+
+    layout = layout or RecipientLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Export"), '#'))
+
+    if form.submitted(request):
+        import_form = NewsletterImportForm()
+        import_form.request = request
+        results = import_form.run_export()
+
+        return form.as_export_response(results, title=request.translate(_(
+            "Newsletter Recipients"
+        )))
+
+    return {
+        'layout': layout,
+        'title': _("Newsletter recipient Export"),
+        'form': form,
+        'explanation': _("Exports all newsletter recipients.")
     }
