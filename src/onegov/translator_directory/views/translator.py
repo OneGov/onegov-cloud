@@ -17,8 +17,8 @@ from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
-    INTERPRETING_TYPES, ADMISSIONS, GENDERS
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS,\
+    INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
 from onegov.translator_directory.forms.translator import TranslatorForm,\
     TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
@@ -457,6 +457,8 @@ def view_mail_templates(self, request, form):
             'translator_date_of_decision': layout.format_date(
                 self.date_of_decision, 'date'
             ),
+            'translator_gender': request.translate(GENDER_MAP.get(
+                self.gender)),
             'translator_admission': request.translate(_(self.admission)) or '',
             'sender_first_name': first_name,
             'sender_last_name': last_name,

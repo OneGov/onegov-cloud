@@ -57,8 +57,8 @@ class TranslatorDirectoryApp(OrgApp):
         q = self.session().query(Translator).with_entities(
             Translator.email)
         emails = q.all()
-        bcc_addresses = ';'.join(str(email) for (email,) in emails if email)
-        mailto_link = f"mailto:?bcc={bcc_addresses[:-1]}"
+        bcc_addresses = ','.join(str(email) for (email,) in emails if email)
+        mailto_link = f"mailto:?bcc={bcc_addresses}"
         return mailto_link
 
 
