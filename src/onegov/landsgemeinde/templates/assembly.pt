@@ -1,0 +1,24 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.landsgemeinde">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell">
+                <div tal:content="structure assembly.overview"></div>
+                <!--
+                todo: ?
+                <ul class="accordion" data-accordion data-multi-expand="true" data-allow-all-closed="true">
+                    <li class="accordion-item is-active" data-accordion-item>
+                        <a href="#" class="accordion-title" i18n:translate>Overview</a>
+                        <div class="accordion-content" data-tab-content tal:content="structure assembly.overview"></div>
+                    </li>
+                </ul> -->
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+            </div>
+        </div>
+
+    </tal:b>
+</div>
