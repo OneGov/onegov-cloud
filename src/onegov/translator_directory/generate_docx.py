@@ -5,7 +5,6 @@ from sqlalchemy import and_
 from onegov.org.models import GeneralFileCollection, GeneralFile
 from onegov.translator_directory import _
 from docxtpl import DocxTemplate, InlineImage
-from onegov.translator_directory.constants import GENDER_MAP
 
 
 def fill_docx_with_variables(
@@ -25,7 +24,6 @@ def fill_docx_with_variables(
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
         'translator_nationality': t.nationality,
-        'translator_gender': request.translate(GENDER_MAP.get(t.gender)),
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
