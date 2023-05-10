@@ -263,7 +263,7 @@ applications:
 
   - path: /onegov_fsi/*
     application: onegov.fsi.FsiApp
-    namespace: onegov_fsi
+    namespace: fsi
     configuration:
       <<: *global-config
 
