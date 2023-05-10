@@ -41,12 +41,6 @@ def fill_docx_with_variables(
             if langs
         ),
         'greeting': gendered_greeting(t),
-        'translator_decision': 'definitiv'
-        if t.admission == 'certified'
-        else 'provisorisch',
-        'translator_full_or_part': 'vollumfänglicher'
-        if t.admission == 'certified'
-        else 'teilweiser',
         'translator_functions': ', '.join(list(translator_functions(t))),
     }
     for key, value in kwargs.items():
