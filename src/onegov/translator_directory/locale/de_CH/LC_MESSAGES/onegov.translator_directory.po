@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-25 16:22+0200\n"
+"POT-Creation-Date: 2023-05-09 15:26+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -30,6 +30,12 @@ msgstr "Weiblich"
 
 msgid "neutral"
 msgstr "Neutral"
+
+msgid "male"
+msgstr "männlich"
+
+msgid "female"
+msgstr "weiblich"
 
 msgid "Nutrition and agriculture"
 msgstr "Ernährung und Landwirtschaft"
@@ -567,6 +573,9 @@ msgstr "Sprachausbildung und Expertise"
 msgid "Hidden"
 msgstr "Versteckt"
 
+msgid "Search in first and last name"
+msgstr "Suche in Vor- und Nachname"
+
 msgid "Order by"
 msgstr "Sortiere nach"
 
@@ -581,9 +590,6 @@ msgstr "Aufsteigend"
 
 msgid "Descending"
 msgstr "Absteigend"
-
-msgid "Search in first and last name"
-msgstr "Suche in Vor- und Nachname"
 
 msgid "Chose a mail template to generate:"
 msgstr "Wählen Sie die Briefvorlage-Kategorie aus zum Herunterladen:"
@@ -847,9 +853,7 @@ msgid ""
 "required for mail templates"
 msgstr ""
 "Für dieses Konto ist kein Name und Vorname definiert, welcher für "
-"Briefvorlagen erforderlich ist. Fügen Sie einen Namen hinzu und versuchen "
-"Sie es noch einmal. Fügen Sie einen Namen hinzu und versuchen Sie es noch "
-"einmal."
+"Briefvorlagen erforderlich ist."
 
 msgid "Did not find a signature in /files."
 msgstr "Es wurde keine Unterschrift in /dateien gefunden."

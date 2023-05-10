@@ -109,6 +109,11 @@ ADMISSIONS = {
 }
 
 GENDERS = {'M': _('masculin'), 'F': _('feminin'), 'N': _('neutral')}
+GENDER_MAP = {
+    'M': _('male'),
+    'F': _('female'),
+}
+
 CERTIFICATES = ('ZHAW', 'OGZH')
 
 # Static form choices, we don't know how the app will be further developed
