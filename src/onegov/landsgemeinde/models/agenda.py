@@ -3,6 +3,7 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -13,7 +14,7 @@ from sqlalchemy import Time
 from uuid import uuid4
 
 
-class AgendaItem(Base, ContentMixin, TimestampMixin):
+class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     __tablename__ = 'landsgemeinde_agenda_items'
 
