@@ -4,8 +4,9 @@ set -euo pipefail
 # automatically open the log output group if there's an error
 trap 'echo "^^^ +++"' ERR
 
-echo "--- Installing requirements"
 # we need these because mypy needs to install onegov[mypy]
+# shellcheck disable=SC2086
+echo "--- Installing requirements"
 rm /etc/apt/preferences
 install-packages \
     wget \
@@ -32,8 +33,18 @@ install-packages \
     libxss1 \
     xdg-utils
 
+echo "--- Creating virtual environment"
+
+# switch to virtual environment
+cd /app
+
+# shellcheck disable=SC1091
+source bin/activate
+
 echo "--- Installing prerequisites"
-pip install flake8 flake8-bugbear flake8-pyi bandit[toml] .[mypy]
+echo "$(python --version)"
+cd /app/src
+pip install '.[mypy]' flake8 flake8-bugbear flake8-pyi bandit[toml] --quiet
 
 echo "--- Linting"
 flake8 src/ tests/ stubs/
