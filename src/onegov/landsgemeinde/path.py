@@ -26,17 +26,17 @@ def get_assembly(app, date):
 
 @LandsgemeindeApp.path(
     model=AgendaItemCollection,
-    path='/agenda-items/{assembly_id}',
-    converters=dict(assembly_id=UUID)
+    path='/traktanden/{date}',
+    converters=dict(date=extended_date_converter)
 )
-def get_agenda_items(app, assembly_id):
-    return AgendaItemCollection(app.session(), assembly_id)
+def get_agenda_items(app, date):
+    return AgendaItemCollection(app.session(), date)
 
 
 @LandsgemeindeApp.path(
     model=AgendaItem,
-    path='/agenda-item/{id}',
+    path='/traktandum/{date}/{number}',
     converters=dict(id=UUID)
 )
-def get_agenda_item(app, id):
-    return AgendaItemCollection(app.session()).by_id(id)
+def get_agenda_item(app, date, number):
+    return AgendaItemCollection(app.session(), date).by_number(number)

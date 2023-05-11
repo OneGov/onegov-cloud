@@ -20,7 +20,7 @@ class Assembly(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The date of the assembly
-    date = Column(Date, nullable=False)
+    date = Column(Date, nullable=False, unique=True)
 
     #: The overview (text) over the assembly
     overview = content_property()

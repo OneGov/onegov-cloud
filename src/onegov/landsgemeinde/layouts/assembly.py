@@ -63,7 +63,7 @@ class AssemblyLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
-            items = AgendaItemCollection(self.app.session(), self.model.id)
+            items = AgendaItemCollection(self.app.session(), self.model.date)
             return (
                 Link(
                     text=_('Edit'),

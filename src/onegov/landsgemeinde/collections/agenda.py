@@ -1,3 +1,4 @@
+from cached_property import cached_property
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
@@ -5,9 +6,9 @@ from onegov.landsgemeinde.models import Assembly
 
 class AgendaItemCollection(GenericCollection):
 
-    def __init__(self, session, assembly_id=None):
+    def __init__(self, session, date=None):
         self.session = session
-        self.assembly_id = assembly_id
+        self.date = date
 
     @property
     def model_class(self):
@@ -15,17 +16,20 @@ class AgendaItemCollection(GenericCollection):
 
     def query(self):
         query = super().query()
-        if self.assembly_id is not None:
-            query = query.filter(AgendaItem.assembly_id == self.assembly_id)
+        if self.assembly:
+            query = query.filter(AgendaItem.assembly_id == self.assembly.id)
         query = query.order_by(AgendaItem.number)
         return query
 
     def by_id(self, id):
         return self.query().filter(AgendaItem.id == id).first()
 
-    @property
+    def by_number(self, number):
+        return self.query().filter(AgendaItem.number == number).first()
+
+    @cached_property
     def assembly(self):
-        if self.assembly_id is not None:
+        if self.date is not None:
             query = self.session.query(Assembly)
-            query = query.filter(Assembly.id == self.assembly_id)
-            return query.one()
+            query = query.filter(Assembly.date == self.date)
+            return query.first()

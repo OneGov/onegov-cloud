@@ -60,6 +60,10 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     resolution_tags = content_property()
 
     @property
+    def date(self):
+        return self.assembly.date
+
+    @property
     def title_parts(self):
         lines = (self.title or '').splitlines()
         lines = [line.strip() for line in lines]

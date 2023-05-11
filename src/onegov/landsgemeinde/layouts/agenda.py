@@ -15,7 +15,7 @@ class AgendaItemCollectionLayout(DefaultLayout):
         return _(
             'Agenda items of assembly from ${date}',
             mapping={
-                'date': self.format_date(self.model.assembly.date, 'date_long')
+                'date': self.format_date(self.model.date, 'date_long')
             }
         )
 
@@ -87,9 +87,7 @@ class AgendaItemLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
-            parent = AgendaItemCollection(
-                self.app.session(), self.model.assembly_id
-            )
+            parent = AgendaItemCollection(self.app.session(), self.model.date)
             return (
                 Link(
                     text=_('Edit'),

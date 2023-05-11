@@ -5,7 +5,7 @@ from onegov.form import Form
 
 class NamedFileForm(Form):
 
-    # todo: description
+    # todo: description and example
 
     @cached_property
     def file_fields(self):

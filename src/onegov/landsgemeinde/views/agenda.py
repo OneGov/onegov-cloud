@@ -1,6 +1,7 @@
 from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
+from onegov.core.security import Public
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
@@ -13,7 +14,7 @@ from onegov.landsgemeinde.models import AgendaItem
 @LandsgemeindeApp.html(
     model=AgendaItemCollection,
     template='agenda_items.pt',
-    permission=Private
+    permission=Public
 )
 def view_agenda_items(self, request):
 
@@ -56,7 +57,7 @@ def add_agenda_item(self, request, form):
 @LandsgemeindeApp.html(
     model=AgendaItem,
     template='agenda_item.pt',
-    permission=Private
+    permission=Public
 )
 def view_agenda_item(self, request):
 

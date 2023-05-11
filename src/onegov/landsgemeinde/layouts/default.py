@@ -22,5 +22,5 @@ class DefaultLayout(BaseDefaultLayout):
     def assembly_collection(self):
         return AssemblyCollection(self.request.session)
 
-    def agenda_item_collection(self, agenda):
-        return AgendaItemCollection(self.request.session, agenda.id)
+    def agenda_item_collection(self, assembly):
+        return AgendaItemCollection(self.request.session, assembly.date)
