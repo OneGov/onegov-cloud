@@ -1,9 +1,8 @@
 import logging
-log = logging.getLogger('onegov.onboarding')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.onboarding')
+log.addHandler(logging.NullHandler())
 
-from translationstring import TranslationStringFactory
-_ = TranslationStringFactory('onegov.onboarding')  # noqa
+from onegov.onboarding.i18n import _
 
 from onegov.onboarding.app import OnboardingApp
 

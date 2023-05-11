@@ -7,6 +7,7 @@ repos:
       - id: check-merge-conflict
       - id: check-ast
       - id: debug-statements
+        exclude: '^src/onegov/server/core.py$'
   - repo: https://github.com/seantis/pre-commit-hooks
     rev: v1.0.1
     hooks:
@@ -16,9 +17,10 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-        files: '^(src|tests).*\.py'
+        files: '^(src|stubs|tests).*\.py'
         additional_dependencies:
         - flake8-bugbear
+        - flake8-pyi
   - repo: https://github.com/elidupuis/mirrors-sass-lint
     rev: '5cc45653263b423398e4af2561fae362903dd45d'
     hooks:
@@ -35,5 +37,16 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
-        args: ["-c", "pyproject.toml"]
+        args: ["-c", "pyproject.toml", "--quiet"]
         additional_dependencies: [ "bandit[toml]" ]
+  - repo: local
+    hooks:
+      - id: system
+        name: mypy
+        entry: ./mypy.sh
+        language: system
+        # NOTE: We want this hook to always run, but exactly once
+        #       instead of for every file. So we exclude all files
+        exclude: '.*'
+        always_run: true
+        pass_filenames: false

@@ -13,7 +13,12 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import backref, relationship, validates
 
 
-KNOWN_SCHEMAS = {}
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .invoice import Invoice
+
+
+KNOWN_SCHEMAS: dict[str, type['Schema']] = {}
 
 INVALID_REFERENCE_CHARS_EX = re.compile(r'[^Q0-9A-F]+')
 REFERENCE_EX = re.compile(r'Q{1}[A-F0-9]{10}')
@@ -54,7 +59,7 @@ class InvoiceReference(Base, TimestampMixin):
 
     #: the referenced invoice
     invoice_id = Column(UUID, ForeignKey('invoices.id'), nullable=False)
-    invoice = relationship(
+    invoice: 'relationship[Invoice]' = relationship(
         'Invoice', backref=backref(
             "references", cascade="all, delete-orphan"))
 

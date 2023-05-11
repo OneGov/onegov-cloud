@@ -6,7 +6,7 @@ from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast
 from urllib.parse import ParseResult
 from urllib.parse import urlparse
-from websockets import connect
+from websockets.legacy.client import connect
 
 
 class WebsocketsApp(WebassetsApp):

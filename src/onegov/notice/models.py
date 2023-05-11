@@ -91,7 +91,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     note = Column(Text, nullable=True)
 
     #: The issues this notice appears in.
-    _issues = Column(
+    _issues = Column(  # type:ignore[call-overload]
         MutableDict.as_mutable(HSTORE), name='issues', nullable=True
     )
 
@@ -121,7 +121,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
         return False
 
     #: The categories of this notice.
-    _categories = Column(
+    _categories = Column(  # type:ignore[call-overload]
         MutableDict.as_mutable(HSTORE), name='categories', nullable=True
     )
 
@@ -143,7 +143,7 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     organization = Column(Text, nullable=True)
 
     #: The categories of this notice.
-    _organizations = Column(
+    _organizations = Column(  # type:ignore[call-overload]
         MutableDict.as_mutable(HSTORE), name='organizations', nullable=True
     )
 

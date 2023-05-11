@@ -49,7 +49,9 @@ class PeriodSelectForm(Form):
             self.period.data = self.active_period.id.hex
 
 
-class PeriodExportForm(merge_forms(PeriodSelectForm, ExportForm)):
+class PeriodExportForm(
+    merge_forms(PeriodSelectForm, ExportForm)  # type:ignore[misc]
+):
     pass
 
 

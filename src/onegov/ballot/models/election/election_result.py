@@ -15,6 +15,12 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .candidate_result import CandidateResult
+    from .list_result import ListResult
+
+
 class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     """ The election result in a single political entity. """
 
@@ -77,7 +83,7 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
             - self.invalid_votes
         )
 
-    @accounted_votes.expression
+    @accounted_votes.expression  # type:ignore[no-redef]
     def accounted_votes(cls):
         """ The number of accounted votes. """
         from onegov.ballot.models.election import Election  # circular
@@ -94,7 +100,7 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         )
 
     #: an election result may contain n list results
-    list_results = relationship(
+    list_results: 'relationship[list[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
         backref=backref('election_result'),
@@ -102,7 +108,7 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     )
 
     #: an election result contains n candidate results
-    candidate_results = relationship(
+    candidate_results: 'relationship[list[CandidateResult]]' = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
         backref=backref('election_result'),

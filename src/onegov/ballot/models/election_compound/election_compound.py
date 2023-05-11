@@ -28,6 +28,14 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..party_result.party_result import PartyResult
+    from ..party_result.party_panachage_result import PartyPanachageResult
+
+    rel = relationship
+
+
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
@@ -69,7 +77,7 @@ class ElectionCompound(
     manually_completed = Column(Boolean, nullable=False, default=False)
 
     #: An election compound may contains n party results
-    party_results = relationship(
+    party_results: 'rel[list[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
         backref=backref('election_compound'),
@@ -77,7 +85,7 @@ class ElectionCompound(
     )
 
     #: An election compound may contains n party panachage results
-    party_panachage_results = relationship(
+    party_panachage_results: 'rel[list[PartyPanachageResult]]' = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
         backref=backref('election_compound'),

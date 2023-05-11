@@ -82,7 +82,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
 
 class ActivityTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FER'}
+    __mapper_args__ = {'polymorphic_identity': 'FER'}  # type:ignore
     es_type_name = 'activity_tickets'
 
     def reference_group(self, request):

@@ -12,6 +12,11 @@ from sqlalchemy.dialects.postgresql import INT4RANGE
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .volunteer import Volunteer
+
+
 class OccasionNeed(Base, TimestampMixin):
     """ Defines a required resource on an occasion. """
 
@@ -35,7 +40,7 @@ class OccasionNeed(Base, TimestampMixin):
     #: The associated occasion
     occasion_id = Column(UUID, ForeignKey('occasions.id'), nullable=False)
 
-    volunteers = relationship(
+    volunteers: 'relationship[list[Volunteer]]' = relationship(
         'Volunteer', backref='need', cascade='all, delete-orphan')
 
     __table_args__ = (

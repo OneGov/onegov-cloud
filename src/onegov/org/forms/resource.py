@@ -1,15 +1,3 @@
-from onegov.form import Form, merge_forms, parse_formcode
-from onegov.form.fields import MultiCheckboxField
-from onegov.form.filters import as_float
-from onegov.form.validators import ValidFormDefinition
-from onegov.org import _
-from onegov.org.forms.allocation import WEEKDAYS
-from onegov.org.forms.fields import HtmlField
-from onegov.org.forms.generic import DateRangeForm
-from onegov.org.forms.generic import ExportForm
-from onegov.org.forms.generic import PaymentForm
-from onegov.org.forms.reservation import RESERVED_FIELDS,\
-    ExportToExcelWorksheets
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import IntegerField
@@ -20,6 +8,19 @@ from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
+
+from onegov.form import Form, merge_forms, parse_formcode
+from onegov.form.fields import MultiCheckboxField
+from onegov.form.filters import as_float
+from onegov.form.validators import ValidFormDefinition
+from onegov.org import _
+from onegov.org.forms.fields import HtmlField
+from onegov.org.forms.generic import DateRangeForm
+from onegov.org.forms.generic import ExportForm
+from onegov.org.forms.generic import PaymentForm
+from onegov.org.forms.reservation import (
+    RESERVED_FIELDS, ExportToExcelWorksheets)
+from onegov.org.forms.util import WEEKDAYS
 
 
 class ResourceBaseForm(Form):
@@ -301,7 +302,9 @@ class ResourceBaseForm(Form):
         self.zipcode_block = obj.zipcode_block
 
 
-class ResourceForm(merge_forms(ResourceBaseForm, PaymentForm)):
+class ResourceForm(
+    merge_forms(ResourceBaseForm, PaymentForm)  # type:ignore[misc]
+):
     pass
 
 
@@ -319,10 +322,13 @@ class ResourceCleanupForm(DateRangeForm):
         })
 
 
-class ResourceExportForm(merge_forms(DateRangeForm, ExportForm)):
+class ResourceExportForm(
+    merge_forms(DateRangeForm, ExportForm)  # type:ignore[misc]
+):
     """ Resource export form with start/end date. """
 
 
-class AllResourcesExportForm(merge_forms(DateRangeForm,
-                                         ExportToExcelWorksheets)):
+class AllResourcesExportForm(
+    merge_forms(DateRangeForm, ExportToExcelWorksheets)  # type:ignore[misc]
+):
     """ Resource export all resources, with start/end date. """

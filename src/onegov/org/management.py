@@ -1,6 +1,6 @@
 import re
 import time
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 
 import transaction
 from aiohttp import ClientTimeout
@@ -11,6 +11,9 @@ from onegov.async_http.fetch import async_aiohttp_get_all
 from onegov.core.utils import normalize_for_url
 from onegov.org.models import SiteCollection
 from onegov.people import AgencyCollection
+
+
+from typing import NamedTuple
 
 
 class ModelsWithLinksMixin:
@@ -184,8 +187,12 @@ class LinkHealthCheck(ModelsWithLinksMixin):
     Check either internal or external urls for status 200.
     """
 
-    Statistic = namedtuple(
-        'UnhealthyStats', ['total', 'ok', 'nok', 'error', 'duration'])
+    class Statistic(NamedTuple):
+        total: int
+        ok: int
+        nok: int
+        error: int
+        duration: float
 
     def __init__(
             self,
