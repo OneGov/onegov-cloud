@@ -69,9 +69,6 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     #: Start of the agenda item (localized to Europe/Zurich)
     start = Column(Time, nullable=True)
 
-    #: True if the item has been only scheduled
-    scheduled = Column(Boolean, nullable=False, default=True)
-
     #: Decision tags
     # _decision_tags = Column(
     #     MutableDict.as_mutable(HSTORE),

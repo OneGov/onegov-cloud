@@ -2,9 +2,9 @@ from onegov.election_day import _
 from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
+from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
-from onegov.landsgemeinde.forms.file import NamedFileForm
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.org.forms.fields import HtmlField
@@ -52,11 +52,6 @@ class AgendaItemForm(NamedFileForm):
         validators=[
             Optional()
         ],
-    )
-
-    scheduled = BooleanField(
-        label=_('Scheduled'),
-        fieldset=_('Progress'),
     )
 
     counted = BooleanField(

@@ -78,23 +78,19 @@ class Assembly(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     )
 
     # todo: ???
-#
-#     @cached_property
-#     def cached_items(self):
-#         return self.agenda_items.options(
-#             undefer(AssemblyAgendaItem.content)
-#         ).order_by(AssemblyAgendaItem.number).all()
-#
-#     @property
-#     def active_item(self):
-#         result = None
-#         if not self.completed:
-#             for agenda_item in self.cached_items:
-#                 result = agenda_item
-#                 if not agenda_item.counted:
-#                     break
-#         return result
-#
-#     #: may be used to store a link related to this assembly
-#     related_link = meta_property('related_link')
-#     related_link_label = meta_property('related_link_label')
+    #
+    # @cached_property
+    # def cached_items(self):
+    #     return self.agenda_items.options(
+    #         undefer(AssemblyAgendaItem.content)
+    #     ).order_by(AssemblyAgendaItem.number).all()
+    #
+    # @property
+    # def active_item(self):
+    #     result = None
+    #     if not self.completed:
+    #         for agenda_item in self.cached_items:
+    #             result = agenda_item
+    #             if not agenda_item.counted:
+    #                 break
+    #     return result
