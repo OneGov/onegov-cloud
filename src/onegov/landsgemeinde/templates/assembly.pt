@@ -17,6 +17,29 @@
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.protocol_pdf">
+                    <h3 i18n:translate="">Downloads</h3>
+                    <p tal:condition="assembly.memorial_pdf">
+                        <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Memorial (PDF)</span>
+                        </a>
+                    </p>
+                    <p tal:condition="assembly.protocol_pdf">
+                        <a href="${request.link(assembly.protocol_pdf)}" class="protocol-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Protocol (PDF)</span>
+                        </a>
+                    </p>
+                </div>
+
+                <div class="side-panel audio" tal:condition="assembly.audio_mp3">
+                    <h3 i18n:translate="">Audio</h3>
+                    <audio controls="">
+                        <source type="audio/mpeg" src="${request.link(assembly.audio_mp3)}" />
+                        <p><a href="${request.link(assembly.audio_mp3)}" i18n:translate="">Download audio</a></p>
+                    </audio>
+                </div>
             </div>
         </div>
 

@@ -3,6 +3,7 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file import NamedFile
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -42,9 +43,20 @@ class AgendaItem(Base, ContentMixin, TimestampMixin):
     #: Title of the agenda item (not translated)
     title = Column(Text, nullable=False, default=lambda: '')
 
+    #: The memorial of the assembly
+    memorial_pdf = NamedFile()
+
+    #: The overview (text) over the agenda item
     overview = content_property()
 
+    #: The main content (text) of the agenda item
     text = content_property()
+
+    #: The resolution (text) of the agenda item
+    resolution = content_property()
+
+    #: The resolution (tags) of the agenda item
+    resolution_tags = content_property()
 
     @property
     def title_parts(self):

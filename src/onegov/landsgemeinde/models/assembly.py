@@ -3,6 +3,8 @@ from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file import AssociatedFiles
+from onegov.file import NamedFile
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy.orm import backref
@@ -10,7 +12,7 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class Assembly(Base, ContentMixin, TimestampMixin):
+class Assembly(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     __tablename__ = 'landsgemeinde_assemblies'
 
@@ -20,14 +22,17 @@ class Assembly(Base, ContentMixin, TimestampMixin):
     #: The date of the assembly
     date = Column(Date, nullable=False)
 
+    #: The overview (text) over the assembly
     overview = content_property()
 
-    # todo:
-    # #: The protocol of the assembly
-    # protocol_pdf = NamedFile()
-    #
-    # #: The audio of the assembly
-    # audio_mp3 = NamedFile()
+    #: The memorial of the assembly
+    memorial_pdf = NamedFile()
+
+    #: The protocol of the assembly
+    protocol_pdf = NamedFile()
+
+    #: The audio of the assembly
+    audio_mp3 = NamedFile()
 
     # todo: ?
     # @hybrid_property

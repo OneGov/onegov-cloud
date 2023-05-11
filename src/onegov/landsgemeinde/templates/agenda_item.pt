@@ -6,9 +6,6 @@
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell">
                 <!-- todo: define macro -->
-                <div tal:content="structure agenda_item.overview"></div>
-                <hr>
-                <div tal:content="structure agenda_item.text"></div>
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">

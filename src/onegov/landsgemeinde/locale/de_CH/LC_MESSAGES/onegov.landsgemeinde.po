@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-05-10 14:30+0200\n"
+"POT-Creation-Date: 2023-05-11 08:18+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -38,8 +38,14 @@ msgstr "Archiv"
 msgid "Number"
 msgstr "Nummer"
 
+msgid "General"
+msgstr "Allgemein"
+
 msgid "Title"
 msgstr "Titel"
+
+msgid "Memorial (PDF)"
+msgstr "Memorial (PDF)"
 
 msgid "Irrelevant"
 msgstr "Unerheblich"
@@ -47,11 +53,17 @@ msgstr "Unerheblich"
 msgid "Start time"
 msgstr "Startzeit"
 
+msgid "Progress"
+msgstr "Ablauf"
+
 msgid "Scheduled"
 msgstr "Geplant"
 
 msgid "Completed"
 msgstr "Abgeschlossen"
+
+msgid "Text"
+msgstr "Text"
 
 msgid "Overview"
 msgstr "Übersicht"
@@ -59,11 +71,26 @@ msgstr "Übersicht"
 msgid "Content"
 msgstr "Inhalt"
 
+msgid "Resolution"
+msgstr "Beschluss"
+
+msgid "Tags"
+msgstr "Schlagworte"
+
+msgid "Number already used."
+msgstr "Nummer wird bereits verwendet."
+
 msgid "Date"
 msgstr "Datum"
 
-msgid "Text"
-msgstr "Text"
+msgid "Protocol (PDF)"
+msgstr "Protokoll (PDF)"
+
+msgid "Audio (MP3)"
+msgstr "Audio (MP3)"
+
+msgid "Date already used."
+msgstr "Datum wird bereits verwendet."
 
 #, python-format
 msgid "Agenda items of assembly from ${date}"
@@ -118,6 +145,15 @@ msgstr "Noch keine Traktanden erfasst."
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
+msgid "Downloads"
+msgstr "Downloads"
+
+msgid "Audio"
+msgstr "Audio"
+
+msgid "Download audio"
+msgstr "Audio herunterladen"
+
 msgid "Added a new agenda item"
 msgstr "Neues Traktandum hinzugefügt"
 
@@ -127,11 +163,11 @@ msgstr "Neu"
 msgid "New agenda item"
 msgstr "Neues Traktandum"
 
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
 msgid "Added a new assembly"
 msgstr "Neue Landsgemeinde hinzugefügt"
 
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
-
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
