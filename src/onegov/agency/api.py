@@ -9,6 +9,38 @@ from onegov.api import ApiEndpoint
 from onegov.gis import Coordinates
 
 
+UPDATE_FILTER_PARAMS = ['updated.gt', 'updated.lt', 'updated.eq',
+                        'updated.ge', 'updated.le']
+
+
+def filter_for_updated(extra_params, result):
+    """
+    Applies filters for several 'updated' comparisons.
+    Refer to UPDATE_FILTER_PARAMS for all filter keywords.
+
+    :param extra_params: url params as dict
+    :param result: the results to apply the filters
+    :return: filter results
+    """
+    filters = dict()
+    for operator, ts in extra_params.items():
+        if operator not in UPDATE_FILTER_PARAMS:
+            print(f'Error Invalid filter operator {operator} - '
+                  f'ignoring')
+            continue
+        try:
+            ts = isoparse(ts[:16])  # only parse including hours and
+            # minutes
+        except Exception as ex:
+            print(f'Error while parsing timestamp {ts}: {ex}')
+            continue
+        operator = operator.replace('.', '_')
+        filters[operator] = ts
+    if filters:
+        result = result.for_filter(**filters)
+    return result
+
+
 class ApisMixin:
 
     @cached_property
@@ -43,8 +75,6 @@ def get_modified_iso_format(item):
 class PersonApiEndpoint(ApiEndpoint, ApisMixin):
     endpoint = 'people'
     filters = []
-    UPDATE_FILTER_PARAMS = ['updated.gt', 'updated.lt', 'updated.eq',
-                            'updated.ge', 'updated.le']
 
     @property
     def collection(self):
@@ -61,22 +91,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
                 lastname = self.extra_parameters.get('last_name')
                 result = result.for_filter(last_name=lastname)
 
-            filters = dict()
-            for operator, ts in self.extra_parameters.items():
-                if operator not in self.UPDATE_FILTER_PARAMS:
-                    print(f'Error Invalid filter operator {operator} - '
-                          f'ignoring')
-                    continue
-                try:
-                    ts = isoparse(ts[:16])  # only parse including hours and
-                    # minutes
-                except Exception as ex:
-                    print(f'Error while parsing timestamp {ts}: {ex}')
-                    continue
-                operator = operator.replace('.', '_')
-                filters[operator] = ts
-            if filters:
-                result = result.for_filter(**filters)
+            result = filter_for_updated(self.extra_parameters, result)
 
         result.exclude_hidden = True
         result.batch_size = self.batch_size
@@ -139,6 +154,14 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             parent=self.get_filter('parent', None, False),
             joinedload=['organigram']
         )
+
+        if self.extra_parameters:  # look for url params to filter
+            if 'name' in self.extra_parameters.keys():
+                name = self.extra_parameters.get('name')
+                result = result.for_filter(name=name)
+
+            result = filter_for_updated(self.extra_parameters, result)
+
         result.batch_size = self.batch_size
         return result
 
