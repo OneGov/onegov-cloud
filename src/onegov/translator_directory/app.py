@@ -39,7 +39,7 @@ class TranslatorDirectoryApp(OrgApp):
             return None
         return URL(request.class_link(Organisation)).path()
 
-    @cached_property
+    @property
     def mail_templates(self):
         """ Templates are special docx files which are filled with
         variables. These files are manually uploaded. """
