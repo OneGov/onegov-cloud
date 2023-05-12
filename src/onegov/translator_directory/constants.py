@@ -112,6 +112,7 @@ GENDERS = {'M': _('masculin'), 'F': _('feminin'), 'N': _('neutral')}
 GENDER_MAP = {
     'M': _('male'),
     'F': _('female'),
+    'N': _('neutral')
 }
 
 CERTIFICATES = ('ZHAW', 'OGZH')
@@ -138,5 +139,3 @@ INTERPRETING_TYPES = {
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
 }
-
-INVALID_WORD_TEMPLATE_CHARS = ('<', '>', '&')
