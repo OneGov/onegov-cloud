@@ -5,7 +5,35 @@ from onegov.form import Form
 
 class NamedFileForm(Form):
 
-    # todo: description and example
+    """ Base class for handling database models using named files with forms.
+
+    Example:
+
+        class MyModel(AssociatedFiles):
+            pdf = NamedFile()
+
+        class MyForm(NamedFileForm):
+            pdf = UploadField('PDF')
+
+        @MyApp.form(model=MyCollection, form=MyForm, ...)
+        def add(self, request, form):
+
+            if form.submitted(request):
+                self.add(**form.get_useful_data())
+                ...
+            ...
+
+        @MyApp.form(model=MyModel, form=MyForm, ...)
+        def edit(self, request, form):
+
+            if form.submitted(request):
+                form.populate_obj(self)
+                ...
+
+            form.process(obj=self)
+            ...
+
+    """
 
     @cached_property
     def file_fields(self):
@@ -33,7 +61,7 @@ class NamedFileForm(Form):
             if action == 'delete':
                 delattr(obj, name)
             if action == 'replace' and field.data:
-                setattr(obj, name, (field.file, field.filename,))
+                setattr(obj, name, (field.file, field.filename))
 
     def process_obj(self, obj):
         super().process_obj(obj)

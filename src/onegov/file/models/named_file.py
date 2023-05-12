@@ -5,6 +5,26 @@ from onegov.file.utils import as_fileintent
 
 class NamedFile:
 
+    """ Helper for managing files using static names together with
+    AssociatedFiles.
+
+    A named file can be added by assigning a tuple of a file-like content and
+    a filename. Reading the named file will return a File object. Finally,
+    named files can be deleted using the del-Operator.
+
+    Example:
+
+        class MyClass(AssociatedFiles):
+            pdf = NamedFile()
+
+        obj = MyClass()
+        with open('some.pdf', 'rb') as file:
+            obj.pdf = (file.read(), 'some.pdf')
+        obj.pdf.reference.file.read()
+        del obj.pdf
+
+    """
+
     # todo: description and example
 
     def __set_name__(self, owner, name):
