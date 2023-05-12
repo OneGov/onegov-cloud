@@ -23,13 +23,16 @@ class TranslatorCollection(GenericCollection, Pagination):
             page=0,
             written_langs=None,
             spoken_langs=None,
+            monitor_langs=None,
             order_by=None,
             order_desc=False,
             user_role=None,
             search=None,
             guilds=None,
             interpret_types=None,
-            state='published'
+            state='published',
+            admissions=None,
+            genders=None
     ):
         super().__init__(app.session())
         self.app = app
@@ -39,14 +42,19 @@ class TranslatorCollection(GenericCollection, Pagination):
         self.guilds = guilds or []
         self.interpret_types = interpret_types or []
         self.state = state
+        self.admissions = admissions or []
+        self.genders = genders or []
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
         if written_langs:
             assert isinstance(written_langs, list)
+        if monitor_langs:
+            assert isinstance(monitor_langs, list)
 
         self.written_langs = written_langs
         self.spoken_langs = spoken_langs
+        self.monitor_langs = monitor_langs
 
         if not order_by or order_by not in order_cols:
             order_by = order_cols[0]
@@ -61,11 +69,14 @@ class TranslatorCollection(GenericCollection, Pagination):
             self.page == other.page,
             self.written_langs == other.written_langs,
             self.spoken_langs == other.spoken_langs,
+            self.monitor_langs == other.monitor_langs,
             self.order_by == other.order_by,
             self.order_desc == other.order_desc,
             self.search == other.search,
             self.guilds == other.guilds,
-            self.interpret_types == other.interpret_types
+            self.interpret_types == other.interpret_types,
+            self.admissions == other.admissions,
+            self.genders == other.genders
         ))
 
     def add(self, update_user=True, **kwargs):
@@ -189,6 +200,13 @@ class TranslatorCollection(GenericCollection, Pagination):
         )
 
     @property
+    def by_monitor_lang_expression(self):
+        return tuple(
+            Translator.monitoring_languages.any(id=lang_id)
+            for lang_id in self.monitor_langs
+        )
+
+    @property
     def by_search_term_expression(self):
         """Search for any word in any field of the search columns"""
         words = self.search.split(' ')
@@ -211,6 +229,20 @@ class TranslatorCollection(GenericCollection, Pagination):
         return tuple(
             Translator.meta['expertise_interpreting_types'].contains((v,))
             for v in self.interpret_types
+        )
+
+    @property
+    def by_admission(self):
+        return tuple(
+            Translator.admission == admission
+            for admission in self.admissions
+        )
+
+    @property
+    def by_gender(self):
+        return tuple(
+            Translator.gender == gender
+            for gender in self.genders
         )
 
     def page_by_index(self, index):
@@ -241,6 +273,9 @@ class TranslatorCollection(GenericCollection, Pagination):
         if self.written_langs:
             query = query.filter(and_(*self.by_written_lang_expression))
 
+        if self.monitor_langs:
+            query = query.filter(and_(*self.by_monitor_lang_expression))
+
         if self.user_role != 'admin':
             query = query.filter(Translator.for_admins_only == False)
 
@@ -255,6 +290,12 @@ class TranslatorCollection(GenericCollection, Pagination):
 
         if self.state:
             query = query.filter(Translator.state == self.state)
+
+        if self.admissions:
+            query = query.filter(or_(*self.by_admission))
+
+        if self.genders:
+            query = query.filter(or_(*self.by_gender))
 
         query = query.order_by(self.order_expression)
         return query

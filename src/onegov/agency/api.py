@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from cached_property import cached_property
 from dateutil.parser import isoparse
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.api import ApiEndpoint
+from onegov.gis import Coordinates
 
 
 class ApisMixin:
@@ -21,8 +24,23 @@ class ApisMixin:
         return MembershipApiEndpoint(self.app)
 
 
-class PersonApiEndpoint(ApiEndpoint, ApisMixin):
+def get_geo_location(item):
+    geo = item.content.get('coordinates', Coordinates()) or Coordinates()
+    return dict(lon=geo.lon, lat=geo.lat, zoom=geo.zoom)
 
+
+def get_modified_iso_format(item):
+    """
+    Returns the iso format of the modified or created field of item.
+
+    :param item: db item e.g. agency, people, membership
+    :return: str iso representation of item last modification
+    """
+    return item.modified.isoformat() if isinstance(
+        item.modified, datetime) else item.created.isoformat()
+
+
+class PersonApiEndpoint(ApiEndpoint, ApisMixin):
     endpoint = 'people'
     filters = []
     UPDATE_FILTER_PARAMS = ['updated.gt', 'updated.lt', 'updated.eq',
@@ -65,7 +83,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
         return result
 
     def item_data(self, item):
-        return {
+        data = {
             attribute: getattr(item, attribute, None)
             for attribute in (
                 'academic_title',
@@ -91,6 +109,9 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             if attribute not in self.app.org.hidden_people_fields
         }
 
+        data['modified'] = get_modified_iso_format(item)
+        return data
+
     def item_links(self, item):
         result = {
             attribute: getattr(item, attribute, None)
@@ -107,7 +128,6 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
 
 
 class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
-
     endpoint = 'agencies'
     filters = ['parent']
 
@@ -128,6 +148,7 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             'portrait': item.portrait,
             'location_address': item.location_address,
             'location_code_city': item.location_code_city,
+            'modified': get_modified_iso_format(item),
             'postal_address': item.postal_address,
             'postal_code_city': item.postal_code_city,
             'website': item.website,
@@ -135,6 +156,7 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             'phone': item.phone,
             'phone_direct': item.phone_direct,
             'opening_hours': item.opening_hours,
+            'geo_location': get_geo_location(item),
         }
 
     def item_links(self, item):
@@ -149,7 +171,6 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
 
 
 class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
-
     endpoint = 'memberships'
     filters = ['agency', 'person']
 
@@ -166,7 +187,8 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
 
     def item_data(self, item):
         return {
-            'title': item.title
+            'title': item.title,
+            'modified': get_modified_iso_format(item),
         }
 
     def item_links(self, item):

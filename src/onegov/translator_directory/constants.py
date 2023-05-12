@@ -15,6 +15,7 @@ member_can_see = (
     'address',
     'zip_code',
     'city',
+    'hometown',  # stored on ticket
     'drive_distance',
     'email',
     'tel_mobile',
@@ -108,6 +109,11 @@ ADMISSIONS = {
 }
 
 GENDERS = {'M': _('masculin'), 'F': _('feminin'), 'N': _('neutral')}
+GENDER_MAP = {
+    'M': _('male'),
+    'F': _('female'),
+}
+
 CERTIFICATES = ('ZHAW', 'OGZH')
 
 # Static form choices, we don't know how the app will be further developed
@@ -132,3 +138,5 @@ INTERPRETING_TYPES = {
     'negotiation': _('Negotiation interpreting'),
     'whisper': _('Whisper interpreting'),
 }
+
+INVALID_WORD_TEMPLATE_CHARS = ('<', '>', '&')

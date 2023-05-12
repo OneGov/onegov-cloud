@@ -1,26 +1,33 @@
 from datetime import datetime
 from io import BytesIO
+from onegov.file import File
 from morepath import redirect
 from morepath.request import Response
+from sedate import utcnow
 from onegov.core.custom import json
 from onegov.core.security import Secret, Personal, Private
 from onegov.core.templates import render_template
+from onegov.file.integration import get_file
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
+from onegov.org.models import GeneralFileCollection
 from onegov.org.models import TicketMessage
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, Ticket
 from onegov.translator_directory import _
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.constants import PROFESSIONAL_GUILDS, \
-    INTERPRETING_TYPES, ADMISSIONS, GENDERS
+from onegov.translator_directory.constants import PROFESSIONAL_GUILDS,\
+    INTERPRETING_TYPES, ADMISSIONS, GENDERS, GENDER_MAP
 from onegov.translator_directory.forms.mutation import TranslatorMutationForm
-from onegov.translator_directory.forms.translator import TranslatorForm, \
-    TranslatorSearchForm, EditorTranslatorForm
-from onegov.translator_directory.layout import AddTranslatorLayout, \
-    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout, \
-    ReportTranslatorChangesLayout
+from onegov.translator_directory.forms.translator import TranslatorForm,\
+    TranslatorSearchForm, EditorTranslatorForm, MailTemplatesForm
+from onegov.translator_directory.generate_docx import (
+    fill_docx_with_variables, signature_for_mail_templates,
+    parse_from_filename)
+from onegov.translator_directory.layout import AddTranslatorLayout,\
+    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout,\
+    ReportTranslatorChangesLayout, MailTemplatesLayout
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook
@@ -258,10 +265,19 @@ def export_translator_directory(self, request):
 )
 def view_translator(self, request):
     layout = TranslatorLayout(self, request)
+    translator_handler_data = (
+        TicketCollection(request.session).by_handler_data_id(self.id)
+    )
+    hometown_query = translator_handler_data.with_entities(
+        Ticket.handler_data['handler_data']['hometown']
+    )
+    hometown = hometown_query.first()
+
     return {
         'layout': layout,
         'model': self,
-        'title': self.title
+        'title': self.title,
+        'hometown': hometown
     }
 
 
@@ -400,4 +416,83 @@ def report_translator_change(self, request, form):
         'layout': layout,
         'title': layout.title,
         'form': form
+    }
+
+
+@TranslatorDirectoryApp.form(
+    model=Translator,
+    template='mail_templates.pt',
+    name='mail-templates',
+    form=MailTemplatesForm,
+    permission=Personal
+)
+def view_mail_templates(self, request, form):
+
+    layout = MailTemplatesLayout(self, request)
+    if form.submitted(request):
+        template_name = form.templates.data
+
+        if template_name not in request.app.mail_templates:
+            request.alert(_('This file does not seem to exist.'))
+            return redirect(request.link(self))
+
+        user = request.current_user
+        if not getattr(user, 'realname', None):
+            request.alert(_('Unfortunately, this account does not have real '
+                            'name defined, which is required for mail '
+                            'templates'))
+            return redirect(request.link(self))
+
+        signature_file = signature_for_mail_templates(request)
+        if not signature_file:
+            request.alert(_('Did not find a signature in /files.'))
+            return redirect(request.link(self))
+
+        signature_file_name = parse_from_filename(signature_file.name)
+        first_name, last_name = user.realname.split(' ')
+        additional_fields = {
+            'current_date': layout.format_date(utcnow(), 'date'),
+            'translator_date_of_birth': layout.format_date(
+                self.date_of_birth, 'date'),
+            'translator_date_of_decision': layout.format_date(
+                self.date_of_decision, 'date'
+            ),
+            'translator_gender': request.translate(GENDER_MAP.get(
+                self.gender)),
+            'translator_admission': request.translate(_(self.admission)) or '',
+            'sender_first_name': first_name,
+            'sender_last_name': last_name,
+            'sender_full_name': signature_file_name.sender_full_name,
+            'sender_function': signature_file_name.sender_function,
+            'sender_abbrev': signature_file_name.sender_abbrev,
+        }
+
+        docx_template_id = (
+            GeneralFileCollection(request.session)
+            .query()
+            .filter(File.name == template_name)
+            .with_entities(File.id)
+            .first()
+        )
+        docx_f = get_file(request.app, docx_template_id)
+        template = docx_f.reference.file.read()
+        signature_f = get_file(request.app, signature_file.id)
+        signature_bytes = signature_f.reference.file.read()
+
+        __, docx = fill_docx_with_variables(
+            BytesIO(template), self, request, BytesIO(signature_bytes),
+            **additional_fields
+        )
+        return Response(
+            docx,
+            content_type='application/vnd.ms-office',
+            content_disposition=f'inline; filename={template_name}',
+        )
+
+    return {
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'title': _('Mail templates'),
+        'button_text': _('Download'),
     }

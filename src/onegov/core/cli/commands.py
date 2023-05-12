@@ -7,6 +7,7 @@ import ssl
 import subprocess
 import sys
 
+from code import InteractiveConsole
 from fnmatch import fnmatch
 from onegov.core.cache import lru_cache
 from onegov.core.cli.core import command_group, pass_group_context, abort
@@ -317,11 +318,11 @@ def transfer(group_context,
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
         return transfer_database(remote_db, local_db, schema_glob=schema_glob)
 
-    def add_admins(local_cfg, schemas):
+    def add_admins(local_cfg, schema):
         id_ = str(uuid4())
         password_hash = hash_password('test').replace('$', '\\$')
         query = (
-            f'INSERT INTO \\"{schema}\\".users '
+            f'INSERT INTO \\"{schema}\\".users '  # nosec: B608
             f"(type, id, username, password_hash, role, active) "
             f"VALUES ('generic', '{id_}', 'admin@example.org', "
             f"'{password_hash}', 'admin', true);"
@@ -362,7 +363,7 @@ def transfer(group_context,
     if add_admins:
         for schema in schemas:
             click.echo(f"Adding admin@example:test to {schema}")
-            add_admins(local_cfg, schemas)
+            add_admins(local_cfg, schema)
 
 
 @cli.command(context_settings={'default_selector': '*'})
@@ -440,9 +441,31 @@ def upgrade(group_context, dry_run):
 
 @cli.command()
 def shell():
-    """ Enters the shell """
+    """ Enters an interactive shell. """
 
     def _shell(request, app):
-        breakpoint()  # nocheckin
+        import readline  # noqa
+        shell = InteractiveConsole({
+            'app': app,
+            'request': request,
+            'session': app.session(),
+        })
+        shell.interact(banner="""
+        Onegov Cloud Shell
+        ==================
+
+        Exit the console using exit() or quit().
+
+        Available variables: app, request, session.
+
+        Example:
+           from onegov.user import User
+           from transaction import commit
+           query = session.query(User).filter_by(username='admin@example.org')
+           user = query.one()
+           user.username = 'info@example.org'
+           commit()
+           exit()
+        """)
 
     return _shell

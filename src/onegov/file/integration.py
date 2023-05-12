@@ -202,7 +202,9 @@ class DepotApp(App):
 
         subprocess.Popen(cmd, close_fds=True, shell=True)
 
-    def sign_file(self, file, signee, token, token_type='yubikey'):
+    def sign_file(  # nosec: B105,B107
+        self, file, signee, token, token_type='yubikey'
+    ):
         """ Signs the given file and stores metadata about that process.
 
         During signing the stored file is replaced with the signed version.
@@ -235,7 +237,7 @@ class DepotApp(App):
         if file.signed:
             raise AlreadySignedError(file)
 
-        if token_type == 'yubikey':
+        if token_type == 'yubikey':  # nosec: B105
             def is_valid_token(token):
                 if not getattr(self, 'yubikey_client_id', None):
                     raise TokenConfigurationError(token_type)
