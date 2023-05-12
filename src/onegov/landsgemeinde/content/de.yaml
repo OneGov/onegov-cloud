@@ -1,0 +1,30 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+        ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+        aliquip ex ea commodo consequat.
+    </p>
+
+pages:
+  - title: Impressum
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird beschrieben wie die Organisation zu
+        erreichen ist.
+
+organisation:
+  theme_options:
+    primary-color-ui: '#006fba'
+  meta:
+    homepage_structure: |
+      <row-wide>
+          <column span="12">
+              <slider />
+          </column>
+      </row-wide>
