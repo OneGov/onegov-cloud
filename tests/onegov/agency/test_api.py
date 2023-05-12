@@ -171,6 +171,137 @@ def test_view_api(client):
         'modified': '2023-05-08T01:07:00+00:00',
     }
 
+    # test updated greater than filter
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.gt=2023-05-08T01:00:00').items
+    }
+    assert set(agencies) == {'Hospital', 'School', 'School Board'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.gt=2023-05-08T01:01:00').items
+    }
+    assert set(agencies) == {'School', 'School Board'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.gt=2023-05-08T01:06:00').items
+    }
+    assert set(agencies) == {'School Board'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.gt=2023-05-08T01:10:00').items
+    }
+    assert set(agencies) == set()
+
+    # test updated greater equal filter
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.ge=2023-05-08T01:01:00').items
+    }
+    assert set(agencies) == {'Hospital', 'School', 'School Board'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.ge=2023-05-08T01:06:00').items
+    }
+    assert set(agencies) == {'School', 'School Board'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.ge=2023-05-08T01:10:00').items
+    }
+    assert set(agencies) == {'School Board'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.ge=2023-05-08T01:11:00').items
+    }
+    assert set(agencies) == set()
+
+    # test updated equal filter
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.eq=2023-05-08T01:01:00').items
+    }
+    assert set(agencies) == {'Hospital'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.eq=2023-05-08T01:02:00').items
+    }
+    assert set(agencies) == set()
+
+    # test updated lower equal filter
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.le=2023-05-08T01:00:00').items
+    }
+    assert set(agencies) == set()
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.le=2023-05-08T01:01:00').items
+    }
+    assert set(agencies) == {'Hospital'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.le=2023-05-08T01:06:00').items
+    }
+    assert set(agencies) == {'Hospital', 'School'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.le=2023-05-08T01:10:00').items
+    }
+    assert set(agencies) == {'Hospital', 'School', 'School Board'}
+
+    # test updated lower than filter
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.lt=2023-05-08T01:01:00').items
+    }
+    assert set(agencies) == set()
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.lt=2023-05-08T01:06:00').items
+    }
+    assert set(agencies) == {'Hospital'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.lt=2023-05-08T01:10:00').items
+    }
+    assert set(agencies) == {'Hospital', 'School'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/agencies?updated.lt=2023-05-08T01:11:00').items
+    }
+    assert set(agencies) == {'Hospital', 'School', 'School Board'}
+
     # People
     people = {
         data(item)['title']: item.href
