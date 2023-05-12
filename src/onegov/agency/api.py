@@ -5,6 +5,7 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
 from onegov.api import ApiEndpoint
+from onegov.gis import Coordinates
 
 
 class ApisMixin:
@@ -20,6 +21,11 @@ class ApisMixin:
     @cached_property
     def membership_api(self):
         return MembershipApiEndpoint(self.app)
+
+
+def get_geo_location(item):
+    geo = item.content.get('coordinates', Coordinates()) or Coordinates()
+    return dict(lon=geo.lon, lat=geo.lat, zoom=geo.zoom)
 
 
 def get_modified_iso_format(item):
@@ -121,6 +127,7 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             'phone': item.phone,
             'phone_direct': item.phone_direct,
             'opening_hours': item.opening_hours,
+            'geo_location': get_geo_location(item),
         }
 
     def item_links(self, item):

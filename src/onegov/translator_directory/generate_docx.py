@@ -24,10 +24,10 @@ def fill_docx_with_variables(
         'translator_last_name': t.last_name,
         'translator_first_name': t.first_name,
         'translator_nationality': t.nationality,
-        'translator_gender': t.gender,
         'translator_address': t.address,
         'translator_city': t.city,
         'translator_zip_code': t.zip_code,
+        'translator_occupation': t.occupation,
         'translator_languages': '\n'.join(
             ''.join(
                 [request.translate(lang_type) + ': ']
@@ -41,15 +41,8 @@ def fill_docx_with_variables(
             if langs
         ),
         'greeting': gendered_greeting(t),
-        'translator_decision': 'definitiv'
-        if t.admission == 'certified'
-        else 'provisorisch',
-        'translator_full_or_part': 'vollumfänglicher'
-        if t.admission == 'certified'
-        else 'teilweiser',
         'translator_functions': ', '.join(list(translator_functions(t))),
     }
-
     for key, value in kwargs.items():
         template_variables[key] = value or ''
 
