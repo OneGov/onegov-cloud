@@ -7,12 +7,19 @@ from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 class DefaultLayout(BaseDefaultLayout):
 
     def assembly_title(self, assembly):
+        if assembly.extraordinary:
+            return _(
+                'Extraodinary ssembly from ${date}',
+                mapping={'date': self.format_date(assembly.date, 'date_long')}
+            )
         return _(
             'Assembly from ${date}',
             mapping={'date': self.format_date(assembly.date, 'date_long')}
         )
 
     def agenda_item_title(self, agenda_item):
+        if agenda_item.irrelevant:
+            return agenda_item.title
         return '{} {}: {}'.format(
             self.request.translate(_('Agenda item')),
             agenda_item.number,

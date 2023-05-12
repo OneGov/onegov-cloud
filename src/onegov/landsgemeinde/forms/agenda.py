@@ -10,10 +10,12 @@ from onegov.landsgemeinde.models import AgendaItem
 from onegov.org.forms.fields import HtmlField
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
+from wtforms.fields import RadioField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
+from onegov.landsgemeinde.models.agenda import STATES
 
 
 class AgendaItemForm(NamedFileForm):
@@ -26,24 +28,34 @@ class AgendaItemForm(NamedFileForm):
         ],
     )
 
+    state = RadioField(
+        _('State'),
+        fieldset=_('General'),
+        choices=list(STATES.items()),
+        validators=[
+            InputRequired()
+        ],
+        default=list(STATES.keys())[0]
+    )
+
     title = TextAreaField(
         label=_('Title'),
         fieldset=_('General'),
         render_kw={'rows': 5}
     )
 
+    irrelevant = BooleanField(
+        label=_('Irrelevant'),
+        fieldset=_('General'),
+    )
+
     memorial_pdf = UploadField(
         label=_('Memorial (PDF)'),
-        fieldset=_('General'),
+        fieldset=_('Downloads'),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
         ]
-    )
-
-    irrelevant = BooleanField(
-        label=_('Irrelevant'),
-        fieldset=_('General'),
     )
 
     start = TimeField(
@@ -52,11 +64,6 @@ class AgendaItemForm(NamedFileForm):
         validators=[
             Optional()
         ],
-    )
-
-    counted = BooleanField(
-        label=_('Completed'),
-        fieldset=_('Progress'),
     )
 
     overview = HtmlField(
@@ -71,6 +78,11 @@ class AgendaItemForm(NamedFileForm):
 
     resolution = HtmlField(
         label=_('Text'),
+        fieldset=_('Resolution'),
+    )
+
+    tacitly_accepted = BooleanField(
+        label=_('Tacitly accepted'),
         fieldset=_('Resolution'),
     )
 

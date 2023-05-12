@@ -1,6 +1,5 @@
 $checklist-icon: "\f0ae";
 
 .edit-bar {
-    // todo: not working
     .checklist-link::before { @include icon-bold(checklist-icon); }
 }

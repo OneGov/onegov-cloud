@@ -25,8 +25,6 @@ class NamedFile:
 
     """
 
-    # todo: description and example
-
     def __set_name__(self, owner, name):
         self.name = name
 

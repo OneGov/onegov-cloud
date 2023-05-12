@@ -43,5 +43,4 @@ def get_i18n_localedirs():
 
 @LandsgemeindeApp.setting(section='core', name='theme')
 def get_theme():
-    # todo: wrong font?
     return LandsgemeindeTheme()

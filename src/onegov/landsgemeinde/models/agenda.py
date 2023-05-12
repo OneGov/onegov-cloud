@@ -5,13 +5,22 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
+from onegov.landsgemeinde import _
 from sqlalchemy import Boolean
 from sqlalchemy import Column
+from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
 from uuid import uuid4
+
+
+STATES = {
+    'scheduled': _('scheduled'),
+    'ongoing': _('ongoing'),
+    'completed': _('completed')
+}
 
 
 class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
@@ -24,11 +33,17 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     #: the external id of the agenda item
     number = Column(Integer, nullable=False)
 
-    #: True if the item has been counted and no changes will be made anymore.
-    counted = Column(Boolean, nullable=False, default=False)
+    #: the state of the agenda item
+    state = Column(
+        Enum(*STATES.keys(), name='agenda_item_state'),
+        nullable=False
+    )
 
     #: True if the item has been declared irrelevant
     irrelevant = Column(Boolean, nullable=False, default=False)
+
+    #: True if the item has been tacitly accepted
+    tacitly_accepted = Column(Boolean, nullable=False, default=False)
 
     #: the assembly this agenda item belongs to
     assembly_id = Column(
@@ -72,21 +87,3 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     #: Start of the agenda item (localized to Europe/Zurich)
     start = Column(Time, nullable=True)
-
-    #: Decision tags
-    # _decision_tags = Column(
-    #     MutableDict.as_mutable(HSTORE),
-    #     nullable=True,
-    #     name='decision_tags'
-    # )
-
-    # @property
-    # def decision_tags(self):
-    #     if not self._decision_tags:
-    #         return []
-    #     return list(self._decision_tags.keys())
-    #
-    #
-    # @decision_tags.setter
-    # def decision_tags(self, value):
-    #     self._decision_tags = dict(((key.strip(), '') for key in value))
