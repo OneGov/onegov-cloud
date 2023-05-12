@@ -386,7 +386,6 @@ class AdjacencyListCollection:
         child = child_class(parent=parent, title=title, name=name, **kwargs)
 
         self.session.add(child)
-        self.session.flush()
 
         # impose an order, unless one is given
         if kwargs.get('order') is not None:
@@ -396,6 +395,8 @@ class AdjacencyListCollection:
 
         if is_sorted((s for s in siblings if s != child), key=self.sort_key):
             sort_siblings(siblings, key=self.sort_key)
+
+        self.session.flush()
 
         return child
 
