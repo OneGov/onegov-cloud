@@ -61,6 +61,7 @@ LEVELS = (
         'onegov.fsi',
         'onegov.gazette',
         'onegov.intranet',
+        'onegov.landsgemeinde',
         'onegov.onboarding',
         'onegov.org',
         'onegov.swissvotes',

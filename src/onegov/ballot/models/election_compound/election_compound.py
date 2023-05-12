@@ -6,7 +6,6 @@ from onegov.ballot.models.election_compound.mixins import \
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
-from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.party_result.mixins import \
     HistoricalPartyResultsMixin
@@ -19,6 +18,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.utils import groupbylist
+from onegov.file import NamedFile
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import Text
@@ -168,10 +168,10 @@ class ElectionCompound(
     related_link_label = meta_property('related_link_label')
 
     #: additional file in case of Doppelter Pukelsheim
-    upper_apportionment_pdf = named_file()
+    upper_apportionment_pdf = NamedFile()
 
     #: additional file in case of Doppelter Pukelsheim
-    lower_apportionment_pdf = named_file()
+    lower_apportionment_pdf = NamedFile()
 
     @property
     def relationships_for_historical_party_results(self):
