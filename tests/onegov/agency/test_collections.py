@@ -20,6 +20,155 @@ def test_extended_agencies(session):
     assert isinstance(agencies.query().one(), ExtendedAgency)
 
 
+def test_extended_agencies_filter_title(session):
+    agency_titles = [
+        'Amt für Jagd und Fischerei',
+        'Amt für Umwelt und Energie',
+        'Amt für Verkehr und Infrastruktur',
+    ]
+
+    agencies = ExtendedAgencyCollection(session)
+    for title in agency_titles:
+        agencies.add_root(title=title)
+
+    agencies = PaginatedAgencyCollection(session)
+    agencies = agencies.for_filter(title='Amt')
+    assert [a.title for a in agencies.query()] == agency_titles
+    agencies = agencies.for_filter(title='Jagd')
+    assert [a.title for a in agencies.query()] == [agency_titles[0]]
+    agencies = agencies.for_filter(title='umwelt')
+    assert [a.title for a in agencies.query()] == [agency_titles[1]]
+    agencies = agencies.for_filter(title='energie verkehr')
+    assert [a.title for a in agencies.query()] == [agency_titles[1],
+                                                   agency_titles[2]]
+
+
+def test_extended_agencies_filter_gt(session):
+    agencies = ExtendedAgencyCollection(session)
+
+    with freeze_time('2023-05-08 09:00'):
+        agencies.add_root(title='Büro früh')
+    with freeze_time('2023-05-08 10:00'):
+        agencies.add_root(title='Büro spät')
+
+        agencies = PaginatedAgencyCollection(session)
+        agencies = agencies.for_filter(updated_gt=datetime.datetime(
+            2023, 5, 8, 8, 59, 0)
+        )
+        assert [a.title for a in agencies.query()] == \
+               ['Büro früh', 'Büro spät']
+
+        agencies = agencies.for_filter(updated_gt=datetime.datetime(
+            2023, 5, 8, 9, 59, 0)
+        )
+        assert [a.title for a in agencies.query()] == ['Büro spät']
+
+        agencies = agencies.for_filter(updated_gt=datetime.datetime(
+            2023, 5, 8, 10, 0, 0)
+        )
+        assert [a.title for a in agencies.query()] == list()
+
+
+def test_extended_agencies_filter_ge(session):
+    agencies = ExtendedAgencyCollection(session)
+
+    with freeze_time('2023-05-08 09:00'):
+        agencies.add_root(title='Büro früh')
+    with freeze_time('2023-05-08 10:00'):
+        agencies.add_root(title='Büro spät')
+
+    agencies = PaginatedAgencyCollection(session)
+    agencies = agencies.for_filter(updated_ge=datetime.datetime(
+        2023, 5, 8, 9, 0, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro früh', 'Büro spät']
+
+    agencies = agencies.for_filter(updated_ge=datetime.datetime(
+        2023, 5, 8, 10, 0, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro spät']
+
+    agencies = agencies.for_filter(updated_ge=datetime.datetime(
+        2023, 5, 8, 10, 1, 0)
+    )
+    assert [a.title for a in agencies.query()] == list()
+
+
+def test_extended_agencies_filter_eq(session):
+    agencies = ExtendedAgencyCollection(session)
+
+    with freeze_time('2023-05-08 09:00'):
+        agencies.add_root(title='Büro früh')
+    with freeze_time('2023-05-08 10:00'):
+        agencies.add_root(title='Büro spät')
+
+    agencies = PaginatedAgencyCollection(session)
+    agencies = agencies.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 9, 0, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro früh']
+
+    agencies = agencies.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 10, 0, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro spät']
+
+    agencies = agencies.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 10, 1, 0)
+    )
+    assert [a.title for a in agencies.query()] == list()
+
+
+def test_extended_agencies_filter_le(session):
+    agencies = ExtendedAgencyCollection(session)
+
+    with freeze_time('2023-05-08 09:00'):
+        agencies.add_root(title='Büro früh')
+    with freeze_time('2023-05-08 10:00'):
+        agencies.add_root(title='Büro spät')
+
+    agencies = PaginatedAgencyCollection(session)
+    agencies = agencies.for_filter(updated_le=datetime.datetime(
+        2023, 5, 8, 8, 59, 0)
+    )
+    assert [a.title for a in agencies.query()] == list()
+
+    agencies = agencies.for_filter(updated_le=datetime.datetime(
+        2023, 5, 8, 9, 0, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro früh']
+
+    agencies = agencies.for_filter(updated_le=datetime.datetime(
+        2023, 5, 8, 10, 0, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro früh', 'Büro spät']
+
+
+def test_extended_agencies_filter_lt(session):
+    agencies = ExtendedAgencyCollection(session)
+
+    with freeze_time('2023-05-08 09:00'):
+        agencies.add_root(title='Büro früh')
+    with freeze_time('2023-05-08 10:00'):
+        agencies.add_root(title='Büro spät')
+
+    agencies = PaginatedAgencyCollection(session)
+    agencies = agencies.for_filter(updated_lt=datetime.datetime(
+        2023, 5, 8, 9, 0, 0)
+    )
+    assert [a.title for a in agencies.query()] == list()
+
+    agencies = agencies.for_filter(updated_lt=datetime.datetime(
+        2023, 5, 8, 9, 1, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro früh']
+
+    agencies = agencies.for_filter(updated_lt=datetime.datetime(
+        2023, 5, 8, 10, 1, 0)
+    )
+    assert [a.title for a in agencies.query()] == ['Büro früh', 'Büro spät']
+
+
 def test_extended_people(session):
     people = ExtendedPersonCollection(session)
     person = people.add(first_name="Hans", last_name="Maulwurf")
@@ -110,19 +259,16 @@ def test_extended_people_filter_updated_gt(session):
     with freeze_time('2023-05-08 01:05'):
         people.add(first_name="Franz", last_name="Müller")
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_gt=datetime.datetime(
         2023, 5, 8, 0, 59, 0)
     )
     assert [p.last_name for p in people.query()] == ['Maulwurf', 'Müller']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_gt=datetime.datetime(
         2023, 5, 8, 1, 1, 0)
     )
     assert [p.last_name for p in people.query()] == ['Müller']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_gt=datetime.datetime(
         2023, 5, 8, 1, 6, 0)
     )
@@ -137,19 +283,16 @@ def test_extended_people_filter_updated_ge(session):
     with freeze_time('2023-05-08 01:05'):
         people.add(first_name="Franz", last_name="Müller")
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_ge=datetime.datetime(
         2023, 5, 8, 1, 0, 0)
     )
     assert [p.last_name for p in people.query()] == ['Maulwurf', 'Müller']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_ge=datetime.datetime(
         2023, 5, 8, 1, 5, 0)
     )
     assert [p.last_name for p in people.query()] == ['Müller']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_ge=datetime.datetime(
         2023, 5, 8, 1, 6, 0)
     )
@@ -164,25 +307,21 @@ def test_extended_people_filter_updated_eq(session):
     with freeze_time('2023-05-08 01:05'):
         people.add(first_name="Franz", last_name="Müller")
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_eq=datetime.datetime(
         2023, 5, 8, 0, 59, 0)
     )
     assert [p.last_name for p in people.query()] == []
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_eq=datetime.datetime(
         2023, 5, 8, 1, 0, 0)
     )
     assert [p.last_name for p in people.query()] == ['Maulwurf']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_eq=datetime.datetime(
         2023, 5, 8, 1, 5, 0)
     )
     assert [p.last_name for p in people.query()] == ['Müller']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_eq=datetime.datetime(
         2023, 5, 8, 1, 6, 0)
     )
@@ -197,19 +336,16 @@ def test_extended_people_filter_updated_le(session):
     with freeze_time('2023-05-08 01:05'):
         people.add(first_name="Franz", last_name="Müller")
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_le=datetime.datetime(
         2023, 5, 8, 0, 59, 0)
     )
     assert [p.last_name for p in people.query()] == []
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_le=datetime.datetime(
         2023, 5, 8, 1, 0, 0)
     )
     assert [p.last_name for p in people.query()] == ['Maulwurf']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_le=datetime.datetime(
         2023, 5, 8, 1, 5, 0)
     )
@@ -224,19 +360,16 @@ def test_extended_people_filter_updated_lt(session):
     with freeze_time('2023-05-08 01:05'):
         people.add(first_name="Franz", last_name="Müller")
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_lt=datetime.datetime(
         2023, 5, 8, 1, 0, 0)
     )
     assert [p.last_name for p in people.query()] == []
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_lt=datetime.datetime(
         2023, 5, 8, 1, 1, 0)
     )
     assert [p.last_name for p in people.query()] == ['Maulwurf']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(updated_lt=datetime.datetime(
         2023, 5, 8, 1, 6, 0)
     )
@@ -251,21 +384,18 @@ def test_extended_people_filter_updated_multiple(session):
     with freeze_time('2023-05-08 01:05'):
         people.add(first_name="Franz", last_name="Müller")
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(
         updated_ge=datetime.datetime(2023, 5, 8, 1, 0, 0),
         updated_le=datetime.datetime(2023, 5, 8, 1, 5, 0),
     )
     assert [p.last_name for p in people.query()] == ['Maulwurf', 'Müller']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(
         updated_lt=datetime.datetime(2023, 5, 8, 1, 6, 0),
         updated_gt=datetime.datetime(2023, 5, 8, 0, 59, 0)
     )
     assert [p.last_name for p in people.query()] == ['Maulwurf', 'Müller']
 
-    people = ExtendedPersonCollection(session)
     people = people.for_filter(
         updated_eq=datetime.datetime(2023, 5, 8, 1, 0, 0),
         first_name='Hans'
