@@ -389,6 +389,7 @@ class AdjacencyListCollection:
 
         # impose an order, unless one is given
         if kwargs.get('order') is not None:
+            self.session.flush()
             return child
 
         siblings = child.siblings.all()
@@ -397,7 +398,6 @@ class AdjacencyListCollection:
             sort_siblings(siblings, key=self.sort_key)
 
         self.session.flush()
-
         return child
 
     def add_root(self, title, name=None, **kwargs):
