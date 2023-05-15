@@ -24,8 +24,8 @@ def filter_for_updated(extra_params, result):
     """
     filters = dict()
     for operator, ts in extra_params.items():
-        if operator not in UPDATE_FILTER_PARAMS:
-            print(f'Error Invalid filter operator {operator} - '
+        if not operator.startswith('updated'):
+            print(f'Error Invalid updated filter operator \'{operator}\' - '
                   f'ignoring')
             continue
         try:
@@ -90,8 +90,9 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             if 'last_name' in self.extra_parameters.keys():
                 lastname = self.extra_parameters.get('last_name')
                 result = result.for_filter(last_name=lastname)
-
-            result = filter_for_updated(self.extra_parameters, result)
+            if any(key in UPDATE_FILTER_PARAMS for key in
+                   self.extra_parameters.keys()):
+                result = filter_for_updated(self.extra_parameters, result)
 
         result.exclude_hidden = True
         result.batch_size = self.batch_size
@@ -156,9 +157,9 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
         )
 
         if self.extra_parameters:  # look for url params to filter
-            if 'name' in self.extra_parameters.keys():
-                name = self.extra_parameters.get('name')
-                result = result.for_filter(name=name)
+            if 'title' in self.extra_parameters.keys():
+                title = self.extra_parameters.get('title')
+                result = result.for_filter(title=title)
 
             result = filter_for_updated(self.extra_parameters, result)
 

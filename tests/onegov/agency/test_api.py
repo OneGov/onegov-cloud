@@ -171,6 +171,19 @@ def test_view_api(client):
         'modified': '2023-05-08T01:07:00+00:00',
     }
 
+    # test agency title filter
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection('/api/agencies?title=spital').items
+    }
+    assert set(agencies) == {'Hospital'}
+
+    agencies = {
+        item.data[0].value: item.href
+        for item in collection('/api/agencies?title=School').items
+    }
+    assert set(agencies) == {'School', 'School Board'}
+
     # test updated greater than filter
     agencies = {
         item.data[0].value: item.href
