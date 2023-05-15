@@ -105,7 +105,7 @@ def test_edit_reservation(client_with_db):
     # Returns event.possible_subscribers, tested elsewhere
     # Planner (admin) and attendee have subscription, not editor_attendee (PE)
     # L, F is the normal attendee
-    assert options == ['L, F', 'PE, PE']
+    assert options == ['L, F, ORG', 'PE, PE']
 
     # course must be fixed
     options = [opt[2] for opt in edit.form['course_event_id'].options]
@@ -168,7 +168,7 @@ def test_create_delete_reservation(client_with_db):
     new = client.get(view).click('Anmeldung')
 
     assert new.form['attendee_id'].options[0] == (
-        str(attendee.id), False, str(attendee))
+        str(attendee.id), False, f'{str(attendee)}, ORG')
 
     # the fixture also provides a past event which should not be an option
     options = [opt[2] for opt in new.form['course_event_id'].options]
