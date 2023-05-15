@@ -17,6 +17,7 @@ from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.enums import TA_RIGHT
+from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.platypus import Frame
 from reportlab.platypus import Image
@@ -67,6 +68,11 @@ class Pdf(PDFDocument):
             italic=f'{path}/Helvetica-Oblique.ttf',
             bold=f'{path}/Helvetica-Bold.ttf',
             bolditalic=f'{path}/Helvetica-BoldOblique.ttf',
+        )
+
+        register_fonts_from_paths(
+            font_name='ZapfDingbatsRegular',
+            regular=f'{path}/ZapfDingbatsRegular.ttf',
         )
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
@@ -164,6 +170,11 @@ class Pdf(PDFDocument):
 
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.2 * self.style.paragraph.fontSize
+
+        # Use for symbols. See https://shorturl.at/dY129 to see what character
+        # turns into which symbol
+        self.style.symbols = ParagraphStyle(name="Symbols",
+                                            fontName="ZapfDingbatsRegular")
 
         self.style.ol = Empty()
         self.style.ol.bullet = '1'
