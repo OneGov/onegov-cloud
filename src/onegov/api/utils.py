@@ -1,6 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
-from onegov.api.models import ApiExcpetion
+from onegov.api.models import ApiException
 
 
 def check_rate_limit(request):
@@ -43,7 +43,7 @@ def check_rate_limit(request):
 
     if requests > limit:
         headers['Retry-After'] = headers['X-RateLimit-Reset']
-        raise ApiExcpetion(
+        raise ApiException(
             'Rate limit exceeded', status_code=429, headers=headers
         )
 

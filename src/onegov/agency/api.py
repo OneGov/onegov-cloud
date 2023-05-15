@@ -5,40 +5,31 @@ from dateutil.parser import isoparse
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
-from onegov.api import ApiEndpoint
+from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.gis import Coordinates
 
+UPDATE_FILTER_PARAMS = ['updated_gt', 'updated_lt', 'updated_eq',
+                        'updated_ge', 'updated_le']
 
-UPDATE_FILTER_PARAMS = ['updated.gt', 'updated.lt', 'updated.eq',
-                        'updated.ge', 'updated.le']
 
-
-def filter_for_updated(extra_params, result):
+def filter_for_updated(filter_operation, filter_value, result):
     """
     Applies filters for several 'updated' comparisons.
     Refer to UPDATE_FILTER_PARAMS for all filter keywords.
 
-    :param extra_params: url params as dict
-    :param result: the results to apply the filters
-    :return: filter results
+    :param filter_operation: the updated filter operation to be applied. For
+    allowed filters refer to UPDATE_FILTER_PARAMS
+    :param filter_value: the updated filter value to filter for
+    :param result: the results to apply the filters on
+    :return: filter result
     """
-    filters = dict()
-    for operator, ts in extra_params.items():
-        if not operator.startswith('updated'):
-            print(f'Error Invalid updated filter operator \'{operator}\' - '
-                  f'ignoring')
-            continue
-        try:
-            ts = isoparse(ts[:16])  # only parse including hours and
-            # minutes
-        except Exception as ex:
-            print(f'Error while parsing timestamp {ts}: {ex}')
-            continue
-        operator = operator.replace('.', '_')
-        filters[operator] = ts
-    if filters:
-        result = result.for_filter(**filters)
-    return result
+    try:
+        # only parse including hours and minutes
+        ts = isoparse(filter_value[:16])
+    except Exception as ex:
+        raise ApiInvalidParamException(f'Invalid iso timestamp for parameter'
+                                       f'\'{filter_operation}\': {ex}') from ex
+    return result.for_filter(**{filter_operation: ts})
 
 
 class ApisMixin:
@@ -83,16 +74,23 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             page=self.page or 0
         )
 
-        if self.extra_parameters:  # look for url params to filter
-            if 'first_name' in self.extra_parameters.keys():
-                firstname = self.extra_parameters.get('first_name')
-                result = result.for_filter(first_name=firstname)
-            if 'last_name' in self.extra_parameters.keys():
-                lastname = self.extra_parameters.get('last_name')
-                result = result.for_filter(last_name=lastname)
-            if any(key in UPDATE_FILTER_PARAMS for key in
-                   self.extra_parameters.keys()):
-                result = filter_for_updated(self.extra_parameters, result)
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + ['first_name',
+                                           'last_name'] + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are: '
+                    f'{valid_params}')
+
+            # apply different filters
+            if key == 'first_name':
+                result = result.for_filter(first_name=value)
+            if key == 'last_name':
+                result = result.for_filter(last_name=value)
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
 
         result.exclude_hidden = True
         result.batch_size = self.batch_size
@@ -156,12 +154,21 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             joinedload=['organigram']
         )
 
-        if self.extra_parameters:  # look for url params to filter
-            if 'title' in self.extra_parameters.keys():
-                title = self.extra_parameters.get('title')
-                result = result.for_filter(title=title)
+        for key, value in self.extra_parameters.items():
+            # TODO check if elements 'title' + shall be added to self.filters
+            valid_params = self.filters + ['title'] + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are:'
+                    f' {valid_params}')
 
-            result = filter_for_updated(self.extra_parameters, result)
+            # apply different filters
+            if key == 'title':
+                result = result.for_filter(title=value)
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
 
         result.batch_size = self.batch_size
         return result

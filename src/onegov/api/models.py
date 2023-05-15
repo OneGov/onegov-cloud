@@ -8,7 +8,7 @@ log = getLogger('onegov.api')
 log.addHandler(NullHandler())
 
 
-class ApiExcpetion(Exception):
+class ApiException(Exception):
 
     """ Base class for all API exceptions.
 
@@ -16,16 +16,23 @@ class ApiExcpetion(Exception):
     with the correct content type.
 
     """
-
     def __init__(self, message='', exception=None, status_code=400,
                  headers=None):
         self.message = message
         self.status_code = status_code
         self.headers = headers or {}
+
         if exception:
             log.exception(exception)
             self.status_code = 500
             self.message = 'Internal Server Error'
+
+
+class ApiInvalidParamException(ApiException):
+    def __init__(self, message='', status_code=400):
+        self.message = message
+        self.status_code = status_code
+        super().__init__(self.message)
 
 
 class ApiEndpointCollection:

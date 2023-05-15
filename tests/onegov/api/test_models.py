@@ -1,12 +1,12 @@
 from onegov.api.models import ApiEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
-from onegov.api.models import ApiExcpetion
+from onegov.api.models import ApiException
 from onegov.core.utils import Bunch
 
 
 def test_api_exception():
-    exception = ApiExcpetion(exception=ValueError('foo'))
+    exception = ApiException(exception=ValueError('foo'))
     assert exception.message == 'Internal Server Error'
     assert exception.status_code == 500
 

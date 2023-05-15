@@ -188,28 +188,28 @@ def test_view_api(client):
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.gt=2023-05-08T01:00:00').items
+            '/api/agencies?updated_gt=2023-05-08T01:00:00').items
     }
     assert set(agencies) == {'Hospital', 'School', 'School Board'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.gt=2023-05-08T01:01:00').items
+            '/api/agencies?updated_gt=2023-05-08T01:01:00').items
     }
     assert set(agencies) == {'School', 'School Board'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.gt=2023-05-08T01:06:00').items
+            '/api/agencies?updated_gt=2023-05-08T01:06:00').items
     }
     assert set(agencies) == {'School Board'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.gt=2023-05-08T01:10:00').items
+            '/api/agencies?updated_gt=2023-05-08T01:10:00').items
     }
     assert set(agencies) == set()
 
@@ -217,28 +217,28 @@ def test_view_api(client):
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.ge=2023-05-08T01:01:00').items
+            '/api/agencies?updated_ge=2023-05-08T01:01:00').items
     }
     assert set(agencies) == {'Hospital', 'School', 'School Board'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.ge=2023-05-08T01:06:00').items
+            '/api/agencies?updated_ge=2023-05-08T01:06:00').items
     }
     assert set(agencies) == {'School', 'School Board'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.ge=2023-05-08T01:10:00').items
+            '/api/agencies?updated_ge=2023-05-08T01:10:00').items
     }
     assert set(agencies) == {'School Board'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.ge=2023-05-08T01:11:00').items
+            '/api/agencies?updated_ge=2023-05-08T01:11:00').items
     }
     assert set(agencies) == set()
 
@@ -246,14 +246,14 @@ def test_view_api(client):
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.eq=2023-05-08T01:01:00').items
+            '/api/agencies?updated_eq=2023-05-08T01:01:00').items
     }
     assert set(agencies) == {'Hospital'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.eq=2023-05-08T01:02:00').items
+            '/api/agencies?updated_eq=2023-05-08T01:02:00').items
     }
     assert set(agencies) == set()
 
@@ -261,28 +261,28 @@ def test_view_api(client):
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.le=2023-05-08T01:00:00').items
+            '/api/agencies?updated_le=2023-05-08T01:00:00').items
     }
     assert set(agencies) == set()
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.le=2023-05-08T01:01:00').items
+            '/api/agencies?updated_le=2023-05-08T01:01:00').items
     }
     assert set(agencies) == {'Hospital'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.le=2023-05-08T01:06:00').items
+            '/api/agencies?updated_le=2023-05-08T01:06:00').items
     }
     assert set(agencies) == {'Hospital', 'School'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.le=2023-05-08T01:10:00').items
+            '/api/agencies?updated_le=2023-05-08T01:10:00').items
     }
     assert set(agencies) == {'Hospital', 'School', 'School Board'}
 
@@ -290,28 +290,28 @@ def test_view_api(client):
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.lt=2023-05-08T01:01:00').items
+            '/api/agencies?updated_lt=2023-05-08T01:01:00').items
     }
     assert set(agencies) == set()
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.lt=2023-05-08T01:06:00').items
+            '/api/agencies?updated_lt=2023-05-08T01:06:00').items
     }
     assert set(agencies) == {'Hospital'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.lt=2023-05-08T01:10:00').items
+            '/api/agencies?updated_lt=2023-05-08T01:10:00').items
     }
     assert set(agencies) == {'Hospital', 'School'}
 
     agencies = {
         item.data[0].value: item.href
         for item in collection(
-            '/api/agencies?updated.lt=2023-05-08T01:11:00').items
+            '/api/agencies?updated_lt=2023-05-08T01:11:00').items
     }
     assert set(agencies) == {'Hospital', 'School', 'School Board'}
 
@@ -433,21 +433,21 @@ def test_view_api(client):
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.gt=2023-05-08T00:59:00').items
+            '/api/people?updated_gt=2023-05-08T00:59:00').items
     }
     assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.gt=2023-05-08T01:01:00').items
+            '/api/people?updated_gt=2023-05-08T01:01:00').items
     }
     assert set(people) == {'Krabappel Edna'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.gt=2023-05-08T01:06:00').items
+            '/api/people?updated_gt=2023-05-08T01:06:00').items
     }
     assert set(people) == set()
 
@@ -455,21 +455,21 @@ def test_view_api(client):
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.ge=2023-05-08T00:01:00').items
+            '/api/people?updated_ge=2023-05-08T00:01:00').items
     }
     assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.ge=2023-05-08T01:05:00').items
+            '/api/people?updated_ge=2023-05-08T01:05:00').items
     }
     assert set(people) == {'Krabappel Edna'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.ge=2023-05-08T01:06:00').items
+            '/api/people?updated_ge=2023-05-08T01:06:00').items
     }
     assert set(people) == set()
 
@@ -477,28 +477,28 @@ def test_view_api(client):
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.eq=2023-05-08T00:59:00').items
+            '/api/people?updated_eq=2023-05-08T00:59:00').items
     }
     assert set(people) == set()
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.eq=2023-05-08T01:00:00').items
+            '/api/people?updated_eq=2023-05-08T01:00:00').items
     }
     assert set(people) == {'Rivera Nick'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.eq=2023-05-08T01:05:00').items
+            '/api/people?updated_eq=2023-05-08T01:05:00').items
     }
     assert set(people) == {'Krabappel Edna'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.eq=2023-05-08T01:06:00').items
+            '/api/people?updated_eq=2023-05-08T01:06:00').items
     }
     assert set(people) == set()
 
@@ -506,21 +506,21 @@ def test_view_api(client):
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.le=2023-05-08T00:59:00').items
+            '/api/people?updated_le=2023-05-08T00:59:00').items
     }
     assert set(people) == set()
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.le=2023-05-08T01:00:00').items
+            '/api/people?updated_le=2023-05-08T01:00:00').items
     }
     assert set(people) == {'Rivera Nick'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.le=2023-05-08T01:05:00').items
+            '/api/people?updated_le=2023-05-08T01:05:00').items
     }
     assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
 
@@ -528,21 +528,21 @@ def test_view_api(client):
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.lt=2023-05-08T01:00:00').items
+            '/api/people?updated_lt=2023-05-08T01:00:00').items
     }
     assert set(people) == set()
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.lt=2023-05-08T01:01:00').items
+            '/api/people?updated_lt=2023-05-08T01:01:00').items
     }
     assert set(people) == {'Rivera Nick'}
 
     people = {
         data(item)['title']: item.href
         for item in collection(
-            '/api/people?updated.lt=2023-05-08T01:06:00').items
+            '/api/people?updated_lt=2023-05-08T01:06:00').items
     }
     assert set(people) == {'Rivera Nick', 'Krabappel Edna'}
 
