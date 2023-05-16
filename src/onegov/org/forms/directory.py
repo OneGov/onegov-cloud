@@ -588,7 +588,9 @@ class DirectoryBaseForm(Form):
             self.marker_color = self.default_marker_color
 
 
-class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentForm)):
+class DirectoryForm(
+    merge_forms(DirectoryBaseForm, PaymentForm)  # type:ignore[misc]
+):
 
     minimum_price_args = PaymentForm.minimum_price_total.kwargs.copy()
     minimum_price_args['fieldset'] = _("New entries")
@@ -603,7 +605,7 @@ class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentForm)):
     payment_method = RadioField(**payment_method_args)
 
 
-DirectoryForm = move_fields(
+DirectoryForm = move_fields(  # type:ignore[misc]
     DirectoryForm,
     ('minimum_price_total', 'payment_method'),
     after='currency')

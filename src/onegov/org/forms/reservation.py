@@ -1,19 +1,20 @@
 from datetime import date, time, timedelta
 from functools import cached_property
-from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField, TimeField
-from onegov.org import _
 from uuid import UUID
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import RadioField
 from wtforms.validators import DataRequired, Email, InputRequired
+
 from onegov.core.csv import convert_list_of_list_of_dicts_to_xlsx
-from onegov.org.forms.allocation import WEEKDAYS
+from onegov.form import Form
+from onegov.form.fields import MultiCheckboxField, TimeField
+from onegov.org import _
+from onegov.org.forms.util import WEEKDAYS
 
 # include all fields used below so we can filter them out
 # when we merge this form with the custom form definition
-RESERVED_FIELDS = ['email']
+RESERVED_FIELDS: list[str] = ['email']
 
 
 class ReservationForm(Form):

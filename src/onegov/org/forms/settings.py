@@ -110,6 +110,12 @@ class GeneralSettingsForm(Form):
 
         return options
 
+    @theme_options.setter
+    def theme_options(self, options):
+        self.primary_color.data = options.get('primary-color')
+        self.font_family_sans_serif.data = options.get(
+            'font-family-sans-serif') or self.default_font_family
+
     @cached_property
     def theme(self):
         return self.request.app.settings.core.theme
@@ -117,12 +123,6 @@ class GeneralSettingsForm(Form):
     @property
     def default_font_family(self):
         return self.theme.default_options.get('font-family-sans-serif')
-
-    @theme_options.setter
-    def theme_options(self, options):
-        self.primary_color.data = options.get('primary-color')
-        self.font_family_sans_serif.data = options.get(
-            'font-family-sans-serif') or self.default_font_family
 
     def populate_obj(self, model):
         super().populate_obj(model)

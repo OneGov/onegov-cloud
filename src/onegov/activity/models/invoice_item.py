@@ -63,7 +63,7 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     def amount(self):
         return round(self.unit, SCALE) * round(self.quantity, SCALE)
 
-    @amount.expression
+    @amount.expression  # type:ignore[no-redef]
     def amount(cls):
         return cls.unit * cls.quantity
 

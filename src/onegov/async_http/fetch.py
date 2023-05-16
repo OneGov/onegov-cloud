@@ -1,15 +1,20 @@
-from typing import Union, Callable, Tuple, List, Any, Sequence, Optional
-
-import aiohttp
 import asyncio
+from aiohttp import ClientSession, ClientTimeout
 
-from aiohttp import ClientTimeout
 
-UrlType = Union[str, object]
-UrlsType = Union[Sequence[UrlType]]
-ErrFunc = Callable[[UrlType, Any], Any]
-HandleExceptionType = Union[ErrFunc, Tuple[ErrFunc], List[ErrFunc]]
-FetchCallback = Callable[[UrlType, Any], Any]
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
+    from typing import Protocol
+    from typing_extensions import TypeAlias
+
+    class HasUrl(Protocol):
+        url: str
+
+    UrlType: TypeAlias = str | HasUrl
+    ErrFunc: TypeAlias = Callable[[UrlType, Exception], Any]
+    HandleExceptionType: TypeAlias = ErrFunc | Sequence[ErrFunc]
+    FetchCallback: TypeAlias = Callable[[UrlType, Any], Any]
 
 
 def raise_by_default(url, exception):
@@ -21,11 +26,11 @@ def default_callback(url, response):
 
 
 async def fetch(
-        url: UrlType,
-        session,
-        response_attr: str = 'json',
-        callback: FetchCallback = default_callback,
-        handle_exceptions: HandleExceptionType = raise_by_default
+    url: 'UrlType',
+    session: ClientSession,
+    response_attr: str = 'json',
+    callback: 'FetchCallback' = default_callback,
+    handle_exceptions: 'ErrFunc | None' = raise_by_default
 ):
     """
     Asynchronous get request. Pass handle_exceptions in order to get your
@@ -35,7 +40,7 @@ async def fetch(
     :param url: object that has an attribute url or a string
     :param session: instance of aiohttp.ClientSession()
     :param response_attr: valid, (awaitable) attribute for response object
-    :param handle_exceptions: list of callables of same length than urls
+    :param handle_exceptions: optional callback for handling exceptions
     :return: response_attr or handled exception return for each url
     """
     try:
@@ -56,17 +61,17 @@ async def fetch(
 
 
 async def fetch_many(
-        urls: UrlsType,
-        response_attr: str = 'json',
-        fetch_func: Callable = fetch,
-        callback: FetchCallback = default_callback,
-        handle_exceptions: HandleExceptionType = raise_by_default,
-        timeout: Optional[ClientTimeout] = None
+    urls: 'Sequence[UrlType]',
+    response_attr: str = 'json',
+    fetch_func: 'Callable' = fetch,
+    callback: 'FetchCallback' = default_callback,
+    handle_exceptions: 'HandleExceptionType' = raise_by_default,
+    timeout: 'ClientTimeout | None' = None
 ):
     """ Registers a task per url using the coroutine fetch_func with correct
         signature. """
     timeout = timeout or ClientTimeout()
-    async with aiohttp.ClientSession(timeout=timeout) as session:
+    async with ClientSession(timeout=timeout) as session:
 
         def exception_handler(ix):
             if callable(handle_exceptions):
@@ -85,11 +90,11 @@ async def fetch_many(
 
 
 def async_aiohttp_get_all(
-        urls: UrlsType,
-        response_attr: str = 'json',
-        callback: FetchCallback = default_callback,
-        handle_exceptions: HandleExceptionType = raise_by_default,
-        timeout: Optional[ClientTimeout] = None
+    urls: 'Sequence[UrlType]',
+    response_attr: str = 'json',
+    callback: 'FetchCallback' = default_callback,
+    handle_exceptions: 'HandleExceptionType' = raise_by_default,
+    timeout: 'ClientTimeout | None' = None
 ):
     """ Performs asynchronous get requests.
 

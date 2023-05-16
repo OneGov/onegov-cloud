@@ -5,6 +5,11 @@ from sqlalchemy import Column, ForeignKey, Table, Text
 from sqlalchemy.orm import relationship
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .file import File
+
+
 # many to many relationship between File and FileSets
 file_to_set_associations = Table(
     'file_to_set_associations', Base.metadata,
@@ -42,7 +47,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     #: attribute on the :class:`~onegov.file.models.File`.
     type = Column(Text, nullable=False, default=lambda: 'generic')
 
-    files = relationship(
+    files: 'relationship[list[File]]' = relationship(
         'File',
         secondary=file_to_set_associations,
         backref='filesets',

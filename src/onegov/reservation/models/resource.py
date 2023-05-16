@@ -136,7 +136,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     highlights_max = None
 
     #: the view to open in the calendar (fullCalendar view name)
-    view = 'month'
+    view: str | None = 'month'
 
     @deadline.setter
     def set_deadline(self, value):

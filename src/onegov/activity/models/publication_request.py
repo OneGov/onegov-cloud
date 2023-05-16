@@ -6,6 +6,12 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .activity import Activity
+    from .period import Period
+
+
 class PublicationRequest(Base, TimestampMixin):
     """ Describes a request for publication. As users create new activities
     they need to ask for publication, where the activity is reviewed before
@@ -24,10 +30,10 @@ class PublicationRequest(Base, TimestampMixin):
 
     #: The activity linked to this request
     activity_id = Column(UUID, ForeignKey('activities.id'), nullable=False)
-    activity = relationship(
+    activity: 'relationship[Activity]' = relationship(
         'Activity', backref='publication_requests', lazy='joined')
 
     #: The period linked to this request
     period_id = Column(UUID, ForeignKey("periods.id"), nullable=False)
-    period = relationship(
+    period: 'relationship[Period]' = relationship(
         'Period', backref='publication_requests', lazy='joined')

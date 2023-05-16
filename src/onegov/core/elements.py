@@ -44,7 +44,7 @@ class Element:
     """
 
     # The link refers to the id of the macro written in elements.pt
-    id = None
+    id: str | None = None
 
     __slots__ = ('text', 'attrs', 'props')
 

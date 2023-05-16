@@ -20,6 +20,5 @@ class Export:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    @property
     def run(self, form, session):
         raise NotImplementedError

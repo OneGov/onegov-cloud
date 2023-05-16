@@ -133,7 +133,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
                 setattr(self, blob, None)
 
     #: Occurences of the event
-    occurrences = relationship(
+    occurrences: 'relationship[list[Occurrence]]' = relationship(
         "Occurrence",
         cascade="all, delete-orphan",
         backref=backref("event"),
