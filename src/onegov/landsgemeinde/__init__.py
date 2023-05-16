@@ -1,10 +1,9 @@
 import logging
 
-from translationstring import TranslationStringFactory
-
 log = logging.getLogger('onegov.landsgemeinde')
 log.addHandler(logging.NullHandler())
-_ = TranslationStringFactory('onegov.landsgemeinde')
+
+from onegov.landsgemeinde.i18n import _
 
 from onegov.landsgemeinde.app import LandsgemeindeApp
 

@@ -16,6 +16,11 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .agenda import AgendaItem
+
+
 STATES = {
     'scheduled': _('scheduled'),
     'ongoing': _('ongoing'),
@@ -61,7 +66,7 @@ class Assembly(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     overview = content_property()
 
     #: An assembly contains n agenda items
-    agenda_items = relationship(
+    agenda_items: 'relationship[list[AgendaItem]]' = relationship(
         'AgendaItem',
         cascade='all, delete-orphan',
         backref=backref('assembly'),
