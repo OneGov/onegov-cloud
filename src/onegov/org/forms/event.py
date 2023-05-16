@@ -154,7 +154,7 @@ class EventForm(Form):
 
     external_event_url = StringField(
         label=_("External event URL"),
-        description=_("https://www.example.ch"),
+        description="https://www.example.ch",
     )
 
     coordinates = CoordinatesField(

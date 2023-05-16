@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-18 15:20+0200\n"
+"POT-Creation-Date: 2023-05-16 09:19+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -668,6 +668,9 @@ msgstr "Courriel de l'organisateur"
 msgid "Shown as contact address"
 msgstr "Affichée comme adresse de contact"
 
+msgid "External event URL"
+msgstr "URL de l'événement externe"
+
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Le curseur peut être déplacé avec la souris"
 
@@ -981,6 +984,14 @@ msgstr ""
 
 msgid "Recipient"
 msgstr "Destinataire"
+
+msgid ""
+"Delete imported newsletters before importing. This does not delete otherwise "
+"imported newsletters and submitted events."
+msgstr ""
+
+msgid "Do not actually want to import the newsletters."
+msgstr ""
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
@@ -3563,6 +3574,9 @@ msgstr ""
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
 
+msgid "Link to organizers page"
+msgstr "Lien vers la page de l'organisateur"
+
 msgid "Export this event"
 msgstr "Exporter cet événement"
 
@@ -4604,6 +4618,15 @@ msgstr "Envoyé \"${title}\" à ${recipient}"
 
 msgid "Sends a test newsletter to the given address"
 msgstr "Envoi d'une newsletter de test à l'adresse indiquée"
+
+msgid "Newsletter Recipients"
+msgstr "Lettre d'information Recipients"
+
+msgid "Newsletter recipient Export"
+msgstr "Exportation des destinataires de la lettre d'information"
+
+msgid "Exports all newsletter recipients."
+msgstr "Exporte tous les destinataires de la newsletter."
 
 msgid "Today"
 msgstr "Aujourd’hui"
