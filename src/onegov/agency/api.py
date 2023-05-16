@@ -78,6 +78,7 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             valid_params = self.filters + ['first_name',
                                            'last_name'] + UPDATE_FILTER_PARAMS
             if key not in valid_params:
+                # raise Exception()
                 raise ApiInvalidParamException(
                     f'Invalid url parameter \'{key}\'. Valid params are: '
                     f'{valid_params}')
