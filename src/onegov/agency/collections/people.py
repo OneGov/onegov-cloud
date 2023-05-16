@@ -1,5 +1,7 @@
 from cached_property import cached_property
 
+from onegov.agency.collections.collection_utils import \
+    filter_modified_or_created
 from onegov.agency.models import ExtendedPerson
 from onegov.core.collection import Pagination
 from onegov.people import Agency
@@ -117,41 +119,20 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
                 ) == self.last_name.lower()
             )
         if self.updated_gt:
-            # if 'modified' is not set comparison is done against 'created'
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedPerson.modified),
-                    func.date_trunc('minute', ExtendedPerson.created),
-                ) > self.updated_gt
-            )
+            query = filter_modified_or_created(query, '>', self.updated_gt,
+                                               ExtendedPerson)
         if self.updated_ge:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedPerson.modified),
-                    func.date_trunc('minute', ExtendedPerson.created),
-                ) >= self.updated_ge
-            )
+            query = filter_modified_or_created(query, '>=', self.updated_ge,
+                                               ExtendedPerson)
         if self.updated_eq:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedPerson.modified),
-                    func.date_trunc('minute', ExtendedPerson.created),
-                ) == self.updated_eq
-            )
+            query = filter_modified_or_created(query, '==', self.updated_eq,
+                                               ExtendedPerson)
         if self.updated_le:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedPerson.modified),
-                    func.date_trunc('minute', ExtendedPerson.created),
-                ) <= self.updated_le
-            )
+            query = filter_modified_or_created(query, '<=', self.updated_le,
+                                               ExtendedPerson)
         if self.updated_lt:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedPerson.modified),
-                    func.date_trunc('minute', ExtendedPerson.created),
-                ) < self.updated_lt
-            )
+            query = filter_modified_or_created(query, '<', self.updated_lt,
+                                               ExtendedPerson)
         query = query.order_by(
             func.upper(func.unaccent(ExtendedPerson.last_name)),
             func.upper(func.unaccent(ExtendedPerson.first_name))

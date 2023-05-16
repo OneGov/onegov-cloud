@@ -1,6 +1,8 @@
+from onegov.agency.collections.collection_utils import \
+    filter_modified_or_created
 from onegov.agency.models import ExtendedAgency
 from onegov.core.collection import GenericCollection, Pagination
-from onegov.people import AgencyCollection, Agency
+from onegov.people import AgencyCollection
 from sqlalchemy import or_, func
 from sqlalchemy.orm import joinedload
 
@@ -107,39 +109,18 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
                 ).ilike(f'%{element}%') for element in self.title.split()
             ))
         if self.updated_gt:
-            # if 'modified' is not set comparison is done against 'created'
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedAgency.modified),
-                    func.date_trunc('minute', ExtendedAgency.created),
-                ) > self.updated_gt
-            )
+            query = filter_modified_or_created(query, '>', self.updated_gt,
+                                               ExtendedAgency)
         if self.updated_ge:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', Agency.modified),
-                    func.date_trunc('minute', Agency.created),
-                ) >= self.updated_ge
-            )
+            query = filter_modified_or_created(query, '>=', self.updated_ge,
+                                               ExtendedAgency)
         if self.updated_eq:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedAgency.modified),
-                    func.date_trunc('minute', ExtendedAgency.created),
-                ) == self.updated_eq
-            )
+            query = filter_modified_or_created(query, '==', self.updated_eq,
+                                               ExtendedAgency)
         if self.updated_le:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedAgency.modified),
-                    func.date_trunc('minute', ExtendedAgency.created),
-                ) <= self.updated_le
-            )
+            query = filter_modified_or_created(query, '<=', self.updated_le,
+                                               ExtendedAgency)
         if self.updated_lt:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute', ExtendedAgency.modified),
-                    func.date_trunc('minute', ExtendedAgency.created),
-                ) < self.updated_lt
-            )
+            query = filter_modified_or_created(query, '<', self.updated_lt,
+                                               ExtendedAgency)
         return query

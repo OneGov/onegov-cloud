@@ -607,7 +607,7 @@ def test_paginated_memberships(session):
     assert count(agency=d.id, person=z.id, exclude_hidden=False) == 0
 
 
-def test_membership_filters(session):
+def setup_membership_filter_test(session):
     agencies = ExtendedAgencyCollection(session)
     a = agencies.add_root(title="The Agency")
 
@@ -619,6 +619,10 @@ def test_membership_filters(session):
         a.add_person(p1.id, 'Hänsu')
     with freeze_time('2023-05-08 01:05'):
         a.add_person(p2.id, 'Fränz')
+
+
+def test_membership_filters_gt(session):
+    setup_membership_filter_test(session)
 
     # filter greater than
     memberships = PaginatedMembershipCollection(session)
@@ -637,6 +641,10 @@ def test_membership_filters(session):
     )
     assert [p.title for p in memberships.query()] == list()
 
+
+def test_membership_filters_ge(session):
+    setup_membership_filter_test(session)
+
     # filter greater equal
     memberships = PaginatedMembershipCollection(session)
     memberships = memberships.for_filter(updated_ge=datetime.datetime(
@@ -653,6 +661,10 @@ def test_membership_filters(session):
         2023, 5, 8, 1, 6, 0)
     )
     assert [p.title for p in memberships.query()] == list()
+
+
+def test_membership_filters_eq(session):
+    setup_membership_filter_test(session)
 
     # filter equal
     memberships = PaginatedMembershipCollection(session)
@@ -671,6 +683,10 @@ def test_membership_filters(session):
     )
     assert [p.title for p in memberships.query()] == ['Fränz']
 
+
+def test_membership_filters_le(session):
+    setup_membership_filter_test(session)
+
     # filter lower equal
     memberships = PaginatedMembershipCollection(session)
     memberships = memberships.for_filter(updated_le=datetime.datetime(
@@ -687,6 +703,10 @@ def test_membership_filters(session):
         2023, 5, 8, 0, 0, 0)
     )
     assert [p.title for p in memberships.query()] == list()
+
+
+def test_membership_filters_lt(session):
+    setup_membership_filter_test(session)
 
     # filter lower than
     memberships = PaginatedMembershipCollection(session)

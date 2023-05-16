@@ -1,9 +1,11 @@
+from onegov.agency.collections.collection_utils import \
+    filter_modified_or_created
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
 from onegov.core.collection import GenericCollection
 from onegov.core.collection import Pagination
-from sqlalchemy import or_, func
+from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 
@@ -114,49 +116,21 @@ class PaginatedMembershipCollection(GenericCollection, Pagination):
             )
 
         if self.updated_gt:
-            # if 'modified' is not set comparison is done against 'created'
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.modified),
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.created),
-                ) > self.updated_gt
-            )
+            query = filter_modified_or_created(query, '>', self.updated_gt,
+                                               ExtendedAgencyMembership)
         if self.updated_ge:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.modified),
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.created),
-                ) >= self.updated_ge
-            )
+            query = filter_modified_or_created(query, '>=', self.updated_ge,
+                                               ExtendedAgencyMembership)
         if self.updated_eq:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.modified),
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.created),
-                ) == self.updated_eq
-            )
+            query = filter_modified_or_created(query, '==', self.updated_eq,
+                                               ExtendedAgencyMembership)
         if self.updated_le:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.modified),
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.created),
-                ) <= self.updated_le
-            )
+            query = filter_modified_or_created(query, '<=', self.updated_le,
+                                               ExtendedAgencyMembership)
         if self.updated_lt:
-            query = query.filter(
-                func.coalesce(
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.modified),
-                    func.date_trunc('minute',
-                                    ExtendedAgencyMembership.created),
-                ) < self.updated_lt
-            )
+            query = filter_modified_or_created(query, '<', self.updated_lt,
+                                               ExtendedAgencyMembership)
+        if self.updated_lt:
+            query = filter_modified_or_created(query, '<', self.updated_lt,
+                                               ExtendedAgencyMembership)
         return query
