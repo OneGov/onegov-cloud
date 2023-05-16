@@ -115,14 +115,15 @@ class ArchiveGenerator:
             groups[entity.date.year].append(entity)
         return list(groups.values())
 
-    def zip_dir(self, base_dir: SubFS) -> str:
+    def zip_dir(self, base_dir: SubFS) -> str | None:
         """Recursively zips a directory (base_dir).
 
         :param base_dir: is a directory in a temporary file system.
         Contains subdirectories 'votes' and 'elections', as well as various
         other files to include.
 
-        :returns path to the zipfile
+        :returns path to the zipfile or None if base_dir doesn't exist
+        or is empty.
         """
         self.archive_dir.makedir(self.archive_parent_dir, recreate=True)
         zip_path = f"{self.archive_parent_dir}/archive.zip"
@@ -148,7 +149,8 @@ class ArchiveGenerator:
                                     dst_fs=zip_filesystem,
                                     dst_path=entity,
                                 )
-        return zip_path
+                        return zip_path
+        return None
 
     def all_counted_votes_with_results(self):
         all_votes = self.session.query(Vote).order_by(desc(Vote.date)).all()
