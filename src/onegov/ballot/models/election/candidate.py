@@ -17,6 +17,13 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .candidate_panachage_result import CandidatePanachageResult
+
+    rel = relationship
+
+
 class Candidate(Base, TimestampMixin):
     """ A candidate. """
 
@@ -64,7 +71,7 @@ class Candidate(Base, TimestampMixin):
     party = Column(Text, nullable=True)
 
     #: a candidate contains n results
-    results = relationship(
+    results: 'rel[list[CandidateResult]]' = relationship(
         'CandidateResult',
         cascade='all, delete-orphan',
         backref=backref('candidate'),
@@ -72,7 +79,7 @@ class Candidate(Base, TimestampMixin):
     )
 
     #: a (proporz) candidate contains votes from other other lists
-    panachage_results = relationship(
+    panachage_results: 'rel[list[CandidatePanachageResult]]' = relationship(
         'CandidatePanachageResult',
         cascade='all, delete-orphan',
         lazy='dynamic'

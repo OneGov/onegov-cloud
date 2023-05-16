@@ -142,7 +142,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         elif self.claimed < self.spots:
             return 'partial'
 
-    @registration_state.expression
+    @registration_state.expression  # type:ignore[no-redef]
     def registration_state(cls):
         return case((
             (cls.spots == 0, None),

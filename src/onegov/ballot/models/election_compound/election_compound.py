@@ -6,7 +6,6 @@ from onegov.ballot.models.election_compound.mixins import \
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
-from onegov.ballot.models.mixins import named_file
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.party_result.mixins import \
     HistoricalPartyResultsMixin
@@ -19,6 +18,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.utils import groupbylist
+from onegov.file import NamedFile
 from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import Text
@@ -26,6 +26,14 @@ from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..party_result.party_result import PartyResult
+    from ..party_result.party_panachage_result import PartyPanachageResult
+
+    rel = relationship
 
 
 class ElectionCompound(
@@ -69,7 +77,7 @@ class ElectionCompound(
     manually_completed = Column(Boolean, nullable=False, default=False)
 
     #: An election compound may contains n party results
-    party_results = relationship(
+    party_results: 'rel[list[PartyResult]]' = relationship(
         'PartyResult',
         cascade='all, delete-orphan',
         backref=backref('election_compound'),
@@ -77,7 +85,7 @@ class ElectionCompound(
     )
 
     #: An election compound may contains n party panachage results
-    party_panachage_results = relationship(
+    party_panachage_results: 'rel[list[PartyPanachageResult]]' = relationship(
         'PartyPanachageResult',
         cascade='all, delete-orphan',
         backref=backref('election_compound'),
@@ -168,10 +176,10 @@ class ElectionCompound(
     related_link_label = meta_property('related_link_label')
 
     #: additional file in case of Doppelter Pukelsheim
-    upper_apportionment_pdf = named_file()
+    upper_apportionment_pdf = NamedFile()
 
     #: additional file in case of Doppelter Pukelsheim
-    lower_apportionment_pdf = named_file()
+    lower_apportionment_pdf = NamedFile()
 
     @property
     def relationships_for_historical_party_results(self):

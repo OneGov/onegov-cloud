@@ -123,7 +123,7 @@ class SAML2Client():
 
     primary: bool = attrib()
 
-    _connections = {}
+    _connections: dict[str, Connection] = {}
 
     def get_binding(self, request):
         if request.method == 'GET':

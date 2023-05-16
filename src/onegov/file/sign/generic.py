@@ -8,7 +8,7 @@ from io import UnsupportedOperation
 class SigningService:
     """ A generic interface for various file signing services. """
 
-    registry = {}
+    registry: dict[str, type['SigningService']] = {}
 
     def __init_subclass__(cls, service_name, **kwargs):
         SigningService.registry[service_name] = cls

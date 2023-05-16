@@ -39,7 +39,7 @@ class TranslatorDirectoryApp(OrgApp):
             return None
         return URL(request.class_link(Organisation)).path()
 
-    @cached_property
+    @property
     def mail_templates(self):
         """ Templates are special docx files which are filled with
         variables. These files are manually uploaded. """
@@ -56,8 +56,8 @@ class TranslatorDirectoryApp(OrgApp):
         from onegov.translator_directory.models.translator import Translator
         q = self.session().query(Translator).with_entities(
             Translator.email)
-        emails = q.all()
-        bcc_addresses = ','.join(str(email) for (email,) in emails if email)
+        emails = q.distinct().all()
+        bcc_addresses = ', '.join(str(email) for (email,) in emails if email)
         mailto_link = f"mailto:?bcc={bcc_addresses}"
         return mailto_link
 

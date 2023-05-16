@@ -96,7 +96,7 @@ class ApiEndpoint:
     """
 
     name = ''
-    filters = []
+    filters: list[str] = []
 
     def __init__(self, app, extra_parameters=None, page=None):
         self.app = app

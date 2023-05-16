@@ -20,7 +20,8 @@ from sqlalchemy.sql.elements import quoted_name
 from uuid import uuid4
 
 
-daterange = Column(quoted_name('DATERANGE("start", "end")', quote=False))
+daterange = Column(  # type:ignore[call-overload]
+    quoted_name('DATERANGE("start", "end")', quote=False))
 
 
 class FormRegistrationWindow(Base, TimestampMixin):

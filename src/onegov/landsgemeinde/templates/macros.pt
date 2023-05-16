@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.landsgemeinde">
+  <body>
+
+    <metal:tags define-macro="tags">
+        <ul class="tags">
+            <li tal:repeat="tag tags" class="click-through">
+                <span tal:content="structure tag" class="blank-label"/>
+            </li>
+        </ul>
+    </metal:tags>
+
+    <metal:assembly define-macro="assembly" i18n:domain="onegov.landsgemeinde">
+      <div tal:content="structure assembly.overview"></div>
+    </metal:assembly>
+
+    <metal:agenda-item define-macro="agenda-item" i18n:domain="onegov.landsgemeinde">
+      ${layout.format_date(agenda_item.start, 'time')}
+      <div tal:content="structure agenda_item.overview"></div>
+      <div tal:content="structure agenda_item.text"></div>
+      <div tal:content="structure agenda_item.resolution"></div>
+      <tal:block metal:use-macro="layout.macros['tags']" tal:define="tags agenda_item.resolution_tags"></tal:block>
+      <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
+    </metal:agenda-item>
+
+  </body>
+<html>

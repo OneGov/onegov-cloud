@@ -16,7 +16,7 @@ class UTCPublicationMixin:
             return True
         return self.publication_start <= utcnow()
 
-    @publication_started.expression
+    @publication_started.expression  # type:ignore[no-redef]
     def publication_started(cls):
         return case((
             (
@@ -31,7 +31,7 @@ class UTCPublicationMixin:
             return False
         return self.publication_end < utcnow()
 
-    @publication_ended.expression
+    @publication_ended.expression  # type:ignore[no-redef]
     def publication_ended(cls):
         return case((
             (
@@ -44,6 +44,6 @@ class UTCPublicationMixin:
     def published(self):
         return self.publication_started and not self.publication_ended
 
-    @published.expression
+    @published.expression  # type:ignore[no-redef]
     def published(cls):
         return and_(cls.publication_started, not_(cls.publication_ended))

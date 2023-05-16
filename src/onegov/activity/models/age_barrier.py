@@ -6,7 +6,7 @@ from dateutil import relativedelta
 class AgeBarrier:
     """ Holds various age barrier approaches available to the period. """
 
-    registry = {}
+    registry: dict[str, type['AgeBarrier']] = {}
 
     def __init_subclass__(cls, name, **kwargs):
         assert name not in cls.registry

@@ -40,14 +40,15 @@ class Invoice(Base, TimestampMixin):
 
     #: the period to which this invoice belongs to
     period_id = Column(UUID, ForeignKey('periods.id'), nullable=False)
-    period = relationship(Period, backref='invoices')
+    period: 'relationship[Period]' = relationship(Period, backref='invoices')
 
     #: the user to which the invoice belongs
     user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
-    user = relationship(User, backref='invoices')
+    user: 'relationship[User]' = relationship(User, backref='invoices')
 
     #: the specific items linked with this invoice
-    items = relationship(InvoiceItem, backref='invoice')
+    items: 'relationship[list[InvoiceItem]]' = relationship(
+        InvoiceItem, backref='invoice')
 
     @property
     def price(self):
@@ -140,7 +141,7 @@ class Invoice(Base, TimestampMixin):
     def total_amount(self):
         return self.outstanding_amount + self.paid_amount
 
-    @total_amount.expression
+    @total_amount.expression  # type:ignore[no-redef]
     def total_amount(cls):
         return select([func.sum(InvoiceItem.amount)]).\
             where(InvoiceItem.invoice_id == cls.id).\
@@ -154,7 +155,7 @@ class Invoice(Base, TimestampMixin):
             SCALE
         )
 
-    @outstanding_amount.expression
+    @outstanding_amount.expression  # type:ignore[no-redef]
     def outstanding_amount(cls):
         return select([func.sum(InvoiceItem.amount)]).\
             where(and_(
@@ -170,7 +171,7 @@ class Invoice(Base, TimestampMixin):
             SCALE
         )
 
-    @paid_amount.expression
+    @paid_amount.expression  # type:ignore[no-redef]
     def paid_amount(cls):
         return select([func.sum(InvoiceItem.amount)]).\
             where(and_(

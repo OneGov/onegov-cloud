@@ -1,8 +1,48 @@
 # Changes
 
+## 2023.21
+
+`2023-05-12` | [5a75b7c0ec...1fde757608](https://github.com/OneGov/onegov-cloud/compare/5a75b7c0ec^...1fde757608)
+
+### Election Day
+
+##### Add conditional widgets for majority types.
+
+`Feature` | [OGC-1097](https://linear.app/onegovcloud/issue/OGC-1097) | [5a75b7c0ec](https://github.com/onegov/onegov-cloud/commit/5a75b7c0ec6beb2d7b7c949783ac373f0b8c639e)
+
+### Feriennet
+
+##### Invoice item dates bug
+
+Fixed bug where the initial selection never got overwritten
+
+`Bugfix` | [PRO-1167](https://linear.app/projuventute/issue/PRO-1167) | [7dbbf98ba3](https://github.com/onegov/onegov-cloud/commit/7dbbf98ba3af8317a3f2b850929f99ec27108544)
+
+##### Fix number of unlucky atteendees on dashboard
+
+`Bugfix` | [PRO-1118](https://linear.app/projuventute/issue/PRO-1118) | [96a8fd4efc](https://github.com/onegov/onegov-cloud/commit/96a8fd4efca780170b8f4558123d4033c616202c)
+
+### Landsgemeinde
+
+##### Add landsgemeinde app.
+
+`Feature` | [OGC-639](https://linear.app/onegovcloud/issue/OGC-639) | [1fde757608](https://github.com/onegov/onegov-cloud/commit/1fde7576084713bdc9c531c7b73bf31f17d17d58)
+
+### Translator Direcory
+
+##### Use distinct adresses in mailto link.
+
+`Bugfix` | [OGC-1015](https://linear.app/onegovcloud/issue/OGC-1015) | [9fab08c131](https://github.com/onegov/onegov-cloud/commit/9fab08c1314fea2b4a021b0212b4d5016783ccc9)
+
+### Winterthur
+
+##### Include events in iframe resizing
+
+`Feature` | [OGC-1047](https://linear.app/onegovcloud/issue/OGC-1047) | [30e3a0ec17](https://github.com/onegov/onegov-cloud/commit/30e3a0ec1772c980e21ec528576bc89b95973546)
+
 ## 2023.20
 
-`2023-05-08` | [611c884776...f05e9a7723](https://github.com/OneGov/onegov-cloud/compare/611c884776^...f05e9a7723)
+`2023-05-08` | [611c884776...4de63d80f1](https://github.com/OneGov/onegov-cloud/compare/611c884776^...4de63d80f1)
 
 ### Core
 
@@ -3002,42 +3042,4 @@ Option for external-links in new tabs removed, only external form links will be 
 ##### Fix styling
 
 `Bugfix` | [FW-96](https://stadt-winterthur.atlassian.net/browse/FW-96) | [627cd4e914](https://github.com/onegov/onegov-cloud/commit/627cd4e914ce6b7efa3f2f12473a343d62fe8770)
-
-## 2022.28
-
-`2022-04-29` | [e44871e509...f07e6fabb0](https://github.com/OneGov/onegov-cloud/compare/e44871e509^...f07e6fabb0)
-
-### Election Day
-
-##### Hide empty candidates tables and figures. (#322)
-
-`Feature` | [OGC-427](https://linear.app/onegovcloud/issue/OGC-427) | [3147e96447](https://github.com/onegov/onegov-cloud/commit/3147e9644759236d13c3e5702f5846c82b94b838)
-
-##### Add notifications for election compounds.
-
-`Feature` | [OGC-424](https://linear.app/onegovcloud/issue/OGC-424) | [cc096ff1b0](https://github.com/onegov/onegov-cloud/commit/cc096ff1b09e8782b580de71518835f307c677c3)
-
-##### Use cached layout property instead of model properties in various views.
-
-`Bugfix` | [4faea51ad6](https://github.com/onegov/onegov-cloud/commit/4faea51ad6bce9c2500b3792388396089da74fce)
-
-### Org
-
-##### Add access level "member"
-
-Topics, people, etc. can now be assigned the access level "member"
-
-`Feature` | [393](https://github.com/onegov/onegov-cloud/issues/393) | [e44871e509](https://github.com/onegov/onegov-cloud/commit/e44871e5097cdafe7529132e28a440e28e189c7f)
-
-##### Fix typo
-
-`Bugfix` | [OGC-409](https://linear.app/onegovcloud/issue/OGC-409) | [87768bd84f](https://github.com/onegov/onegov-cloud/commit/87768bd84f5d9825b9da54688ef921435f57b70a)
-
-##### Fix custom_event_tags getting cached globally.
-
-`Bugfix` | [OGC-368](https://linear.app/onegovcloud/issue/OGC-368) | [2835da5064](https://github.com/onegov/onegov-cloud/commit/2835da5064177cd4fa8bca1965a7cbc66a41e6a0)
-
-##### Fix topic children links.
-
-`Bugfix` | [OGC-426](https://linear.app/onegovcloud/issue/OGC-426) | [f4b36d4c4e](https://github.com/onegov/onegov-cloud/commit/f4b36d4c4ecacece5c8bf6c71c1cb49155c54e2d)
 

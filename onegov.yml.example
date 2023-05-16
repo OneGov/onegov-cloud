@@ -286,6 +286,12 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /onegov_landsgemeinde/*
+    application: onegov.landsgemeinde.LandsgemeindeApp
+    namespace: onegov_landsgemeinde
+    configuration:
+      <<: *global-config
+
   - path: /onegov_winterthur/*
     application: onegov.winterthur.WinterthurApp
     namespace: onegov_winterthur
