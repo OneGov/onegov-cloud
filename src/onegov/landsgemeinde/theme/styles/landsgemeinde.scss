@@ -1,0 +1,5 @@
+$checklist-icon: "\f0ae";
+
+.edit-bar {
+    .checklist-link::before { @include icon-bold(checklist-icon); }
+}
