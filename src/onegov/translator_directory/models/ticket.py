@@ -19,7 +19,7 @@ from onegov.translator_directory.models.translator import Translator
 
 
 class TranslatorMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'TRN'}
+    __mapper_args__ = {'polymorphic_identity': 'TRN'}  # type:ignore
     es_type_name = 'translator_tickets'
 
     def reference_group(self, request):
@@ -120,7 +120,7 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
 
 
 class AccreditationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'AKK'}
+    __mapper_args__ = {'polymorphic_identity': 'AKK'}  # type:ignore
     es_type_name = 'translator_accreditations'
 
     def reference_group(self, request):

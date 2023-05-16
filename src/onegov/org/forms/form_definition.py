@@ -39,7 +39,7 @@ class FormDefinitionBaseForm(Form):
     )
 
 
-class FormDefinitionForm(merge_forms(
+class FormDefinitionForm(merge_forms(  # type:ignore[misc]
     FormDefinitionBaseForm,
     PaymentForm
 )):

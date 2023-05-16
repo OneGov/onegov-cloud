@@ -1,8 +1,8 @@
 import logging.config
 
 from onegov.server.collection import ApplicationCollection
-from webob import BaseRequest
 from webob.exc import HTTPNotFound, HTTPForbidden
+from webob.request import BaseRequest
 from urllib.parse import urlparse
 
 

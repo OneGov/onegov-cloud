@@ -104,7 +104,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         return (sum(1 for r in self.results if r.counted) == count)
 
-    @counted.expression
+    @counted.expression  # type:ignore[no-redef]
     def counted(cls):
         expr = select([
             func.coalesce(func.bool_and(ElectionResult.counted), False)

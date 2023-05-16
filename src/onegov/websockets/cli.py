@@ -11,7 +11,7 @@ from onegov.websockets.client import status as get_status
 from onegov.websockets.server import main
 from sentry_sdk import init as init_sentry
 from urllib.parse import urlparse
-from websockets import connect
+from websockets.legacy.client import connect
 
 
 cli = command_group()

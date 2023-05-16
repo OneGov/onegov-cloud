@@ -120,7 +120,7 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         result = result.first()
         return result[0] if result else False
 
-    @counted.expression
+    @counted.expression  # type:ignore[no-redef]
     def counted(cls):
         expr = select([
             func.coalesce(func.bool_and(BallotResult.counted), False)

@@ -19,10 +19,10 @@ from onegov.core.security import Public
 
 
 class Redirect:
-    to = None
+    to: str
 
     def __init__(self, absorb=None):
-        assert self.to and not self.to.endswith('/')
+        assert hasattr(self, 'to') and not self.to.endswith('/')
 
         if absorb:
             self.to = self.to + '/' + absorb

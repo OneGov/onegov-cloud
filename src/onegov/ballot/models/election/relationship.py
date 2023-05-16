@@ -8,6 +8,11 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .election import Election
+
+
 class ElectionRelationship(Base):
     """ A relationship between elections. """
 
@@ -16,6 +21,7 @@ class ElectionRelationship(Base):
     #: Identifies the relationship.
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    # FIXME: should source_id and target_id be nullable=False?
     #: The source election ID.
     source_id = Column(
         Text,
@@ -30,7 +36,7 @@ class ElectionRelationship(Base):
     )
 
     #: The source election.
-    source = relationship(
+    source: 'relationship[Election]' = relationship(
         'Election',
         foreign_keys=[source_id],
         backref=backref(
@@ -41,7 +47,7 @@ class ElectionRelationship(Base):
     )
 
     #: The target election.
-    target = relationship(
+    target: 'relationship[Election]' = relationship(
         'Election',
         foreign_keys=[target_id],
         backref=backref(

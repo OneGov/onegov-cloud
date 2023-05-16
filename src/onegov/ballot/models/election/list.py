@@ -15,6 +15,14 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .candidate import Candidate
+    from .list_panachage_result import ListPanachageResult
+
+    rel = relationship
+
+
 class List(Base, TimestampMixin):
     """ A list. """
 
@@ -47,7 +55,7 @@ class List(Base, TimestampMixin):
     )
 
     #: a list contains n candidates
-    candidates = relationship(
+    candidates: 'rel[list[Candidate]]' = relationship(
         'Candidate',
         cascade='all, delete-orphan',
         backref=backref('list'),
@@ -55,7 +63,7 @@ class List(Base, TimestampMixin):
     )
 
     #: a list contains n results
-    results = relationship(
+    results: 'rel[list[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
         backref=backref('list'),
@@ -63,7 +71,7 @@ class List(Base, TimestampMixin):
     )
 
     #: a (proporz) list contains votes from other other lists
-    panachage_results = relationship(
+    panachage_results: 'rel[list[ListPanachageResult]]' = relationship(
         'ListPanachageResult',
         foreign_keys='ListPanachageResult.target_id',
         cascade='all, delete-orphan',

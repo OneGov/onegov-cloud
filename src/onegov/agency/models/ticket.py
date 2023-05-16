@@ -17,7 +17,7 @@ from onegov.ticket import Ticket
 
 
 class AgencyMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'AGN'}
+    __mapper_args__ = {'polymorphic_identity': 'AGN'}  # type:ignore
     es_type_name = 'agency_tickets'
 
     def reference_group(self, request):
@@ -25,7 +25,7 @@ class AgencyMutationTicket(OrgTicketMixin, Ticket):
 
 
 class PersonMutationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'PER'}
+    __mapper_args__ = {'polymorphic_identity': 'PER'}  # type:ignore
     es_type_name = 'person_tickets'
 
     def reference_group(self, request):

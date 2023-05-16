@@ -3,6 +3,11 @@ from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Hashable
+
+
 def overlaps(booking, other, minutes_between=0, alignment=None,
              with_anti_affinity_check=False):
     """ Returns true if the given booking overlaps with the given booking
@@ -70,17 +75,15 @@ class LoopBudget:
         self.ticks += 1
 
 
-def hashable(attribute):
+class HashableID:
 
-    class Hashable:
+    id: 'Hashable'
 
-        def __hash__(self):
-            return hash(getattr(self, attribute))
+    def __hash__(self):
+        return hash(self.id)
 
-        def __eq__(self, other):
-            return getattr(self, attribute) == getattr(other, attribute)
-
-    return Hashable
+    def __eq__(self, other):
+        return self.id == other.id
 
 
 def booking_order(booking):
