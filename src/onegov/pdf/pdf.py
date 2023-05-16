@@ -12,13 +12,14 @@ from onegov.pdf.templates import Template
 from pdfdocument.document import Empty
 from pdfdocument.document import MarkupParagraph
 from pdfdocument.document import PDFDocument
-from pdfdocument.document import register_fonts_from_paths
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
+from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Frame
 from reportlab.platypus import Image
 from reportlab.platypus import ListFlowable
@@ -62,18 +63,9 @@ class Pdf(PDFDocument):
         self.underline_width = underline_width
 
         path = module_path('onegov.pdf', 'fonts')
-        register_fonts_from_paths(
-            font_name='Helvetica',
-            regular=f'{path}/Helvetica.ttf',
-            italic=f'{path}/Helvetica-Oblique.ttf',
-            bold=f'{path}/Helvetica-Bold.ttf',
-            bolditalic=f'{path}/Helvetica-BoldOblique.ttf',
-        )
+        font = TTFont('NotoSansJP', f'{path}/NotoSansSymbols2-Regular.ttf')
 
-        register_fonts_from_paths(
-            font_name='ZapfDingbatsRegular',
-            regular=f'{path}/ZapfDingbatsRegular.ttf',
-        )
+        registerFont(font)
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
                          **kwargs):
@@ -171,10 +163,8 @@ class Pdf(PDFDocument):
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.2 * self.style.paragraph.fontSize
 
-        # Use for symbols. See https://shorturl.at/dY129 to see what character
-        # turns into which symbol
         self.style.symbols = ParagraphStyle(name="Symbols",
-                                            fontName="ZapfDingbatsRegular")
+                                            fontName="NotoSansJP")
 
         self.style.ol = Empty()
         self.style.ol.bullet = '1'

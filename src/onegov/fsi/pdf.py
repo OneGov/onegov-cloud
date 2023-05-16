@@ -167,7 +167,7 @@ class FsiPdf(Pdf):
             data_line = (
                 f"{e.last_name}, {e.first_name}",
                 e.source_id, layout.format_date(e.start, 'datetime'),
-                (Paragraph(u"3", style=pdf.style.symbols)
+                (Paragraph(u"✓", style=pdf.style.symbols)
                  if next_subscriptions.get(e[0], None) else "-"),
                 next_event_hint
             )
