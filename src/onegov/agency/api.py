@@ -155,7 +155,6 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
         )
 
         for key, value in self.extra_parameters.items():
-            # TODO check if elements 'title' + shall be added to self.filters
             valid_params = self.filters + ['title'] + UPDATE_FILTER_PARAMS
             if key not in valid_params:
                 raise ApiInvalidParamException(
@@ -213,6 +212,21 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
             agency=self.get_filter('agency'),
             person=self.get_filter('person'),
         )
+        # TODO try to use self.get_filter() here and for people and agencies
+
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are:'
+                    f' {valid_params}')
+
+            # apply different filters
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
+
         result.batch_size = self.batch_size
         return result
 
