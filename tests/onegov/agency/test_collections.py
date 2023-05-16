@@ -1,6 +1,5 @@
 import datetime
 from datetime import timedelta
-
 from freezegun import freeze_time
 
 from onegov.agency.collections import ExtendedAgencyCollection
@@ -606,3 +605,102 @@ def test_paginated_memberships(session):
     assert count(agency=b.id, person=z.id, exclude_hidden=False) == 0
     assert count(agency=c.id, person=z.id, exclude_hidden=False) == 0
     assert count(agency=d.id, person=z.id, exclude_hidden=False) == 0
+
+
+def test_membership_filters(session):
+    agencies = ExtendedAgencyCollection(session)
+    a = agencies.add_root(title="The Agency")
+
+    people = ExtendedPersonCollection(session)
+    p1 = people.add(first_name="Hans", last_name="Maulwurf")
+    p2 = people.add(first_name="Franz", last_name="Müller")
+
+    with freeze_time('2023-05-08 01:00'):
+        a.add_person(p1.id, 'Hänsu')
+    with freeze_time('2023-05-08 01:05'):
+        a.add_person(p2.id, 'Fränz')
+
+    # filter greater than
+    memberships = PaginatedMembershipCollection(session)
+    memberships = memberships.for_filter(updated_gt=datetime.datetime(
+        2023, 5, 8, 0, 59, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Hänsu', 'Fränz']
+
+    memberships = memberships.for_filter(updated_gt=datetime.datetime(
+        2023, 5, 8, 1, 0, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Fränz']
+
+    memberships = memberships.for_filter(updated_gt=datetime.datetime(
+        2023, 5, 8, 1, 5, 0)
+    )
+    assert [p.title for p in memberships.query()] == list()
+
+    # filter greater equal
+    memberships = PaginatedMembershipCollection(session)
+    memberships = memberships.for_filter(updated_ge=datetime.datetime(
+        2023, 5, 8, 1, 0, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Hänsu', 'Fränz']
+
+    memberships = memberships.for_filter(updated_ge=datetime.datetime(
+        2023, 5, 8, 1, 5, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Fränz']
+
+    memberships = memberships.for_filter(updated_ge=datetime.datetime(
+        2023, 5, 8, 1, 6, 0)
+    )
+    assert [p.title for p in memberships.query()] == list()
+
+    # filter equal
+    memberships = PaginatedMembershipCollection(session)
+    memberships = memberships.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 0, 0, 0)
+    )
+    assert [p.title for p in memberships.query()] == list()
+
+    memberships = memberships.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 1, 0, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Hänsu']
+
+    memberships = memberships.for_filter(updated_eq=datetime.datetime(
+        2023, 5, 8, 1, 5, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Fränz']
+
+    # filter lower equal
+    memberships = PaginatedMembershipCollection(session)
+    memberships = memberships.for_filter(updated_le=datetime.datetime(
+        2023, 5, 8, 1, 5, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Hänsu', 'Fränz']
+
+    memberships = memberships.for_filter(updated_le=datetime.datetime(
+        2023, 5, 8, 1, 0, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Hänsu']
+
+    memberships = memberships.for_filter(updated_le=datetime.datetime(
+        2023, 5, 8, 0, 0, 0)
+    )
+    assert [p.title for p in memberships.query()] == list()
+
+    # filter lower than
+    memberships = PaginatedMembershipCollection(session)
+    memberships = memberships.for_filter(updated_lt=datetime.datetime(
+        2023, 5, 8, 1, 6, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Hänsu', 'Fränz']
+
+    memberships = memberships.for_filter(updated_lt=datetime.datetime(
+        2023, 5, 8, 1, 5, 0)
+    )
+    assert [p.title for p in memberships.query()] == ['Hänsu']
+
+    memberships = memberships.for_filter(updated_lt=datetime.datetime(
+        2023, 5, 8, 0, 0, 0)
+    )
+    assert [p.title for p in memberships.query()] == list()

@@ -42,12 +42,15 @@ def test_view_api(client):
     assert not collection('/api/memberships').items
 
     # Add data
+    nick_hash = None
+    edna_hash = None
     with freeze_time('2023-05-08T01:00:00'):
         page = client.get('/people').click('Person', href='new')
         page.form['academic_title'] = 'Dr.'
         page.form['first_name'] = 'Nick'
         page.form['last_name'] = 'Rivera'
-        page.form.submit().follow()
+        response = page.form.submit().follow()
+        nick_hash = response.request.path_url.split('/')[-1]
 
     with freeze_time('2023-05-08T01:01:00'):
         page = client.get('/organizations').click('Organisation', href='new')
@@ -67,7 +70,8 @@ def test_view_api(client):
         page = client.get('/people').click('Person', href='new')
         page.form['first_name'] = 'Edna'
         page.form['last_name'] = 'Krabappel'
-        page.form.submit().follow()
+        response = page.form.submit().follow()
+        edna_hash = response.request.path_url.split('/')[-1]
 
     with freeze_time('2023-05-08T01:06:00'):
         page = client.get('/organizations').click('Organisation', href='new')
@@ -572,3 +576,65 @@ def test_view_api(client):
                 items[0])['title'] == 'School'
     assert data(collection(links(teacher)['person']).
                 items[0])['title'] == 'Krabappel Edna'
+
+    membership_1 = {
+        item.data[0].value: item.href
+        for item in collection('/api/memberships?agency=1').items
+    }
+    membership_2 = {
+        item.data[0].value: item.href
+        for item in collection('/api/memberships?agency=2').items
+    }
+    assert set(membership_1) == {'Doctor'}
+    assert set(membership_2) == {'Teacher'}
+
+    membership_1 = {
+        item.data[0].value: item.href
+        for item in collection(f'/api/memberships?person={nick_hash}').items
+    }
+    membership_2 = {
+        item.data[0].value: item.href
+        for item in collection(f'/api/memberships?person={edna_hash}').items
+    }
+    assert set(membership_1) == {'Doctor'}
+    assert set(membership_2) == {'Teacher'}
+
+    # test membership filter updated_lt
+    memberships = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/memberships?updated_lt=2023-05-08T01:02').items
+    }
+    assert set(memberships) == set()
+
+    # test membership filter updated_le
+    memberships = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/memberships?updated_le=2023-05-08T01:02').items
+    }
+    assert set(memberships) == {'Doctor'}
+
+    # test membership filter updated_eq
+    memberships = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/memberships?updated_eq=2023-05-08T01:02').items
+    }
+    assert set(memberships) == {'Doctor'}
+
+    # test membership filter updated_ge
+    memberships = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/memberships?updated_ge=2023-05-08T01:02').items
+    }
+    assert set(memberships) == {'Doctor', 'Teacher'}
+
+    # test membership filter updated_gt
+    memberships = {
+        item.data[0].value: item.href
+        for item in collection(
+            '/api/memberships?updated_gt=2023-05-08T01:02').items
+    }
+    assert set(memberships) == {'Teacher'}
