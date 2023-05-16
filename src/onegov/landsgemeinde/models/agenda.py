@@ -13,6 +13,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -87,3 +89,12 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     #: Start of the agenda item (localized to Europe/Zurich)
     start = Column(Time, nullable=True)
+
+    #: An agenda item contains n vota
+    vota = relationship(
+        'Votum',
+        cascade='all, delete-orphan',
+        backref=backref('agenda_item'),
+        lazy='dynamic',
+        order_by='Votum.number',
+    )

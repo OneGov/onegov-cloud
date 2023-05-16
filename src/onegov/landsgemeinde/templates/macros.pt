@@ -27,5 +27,9 @@
       <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
     </metal:agenda-item>
 
+    <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
+      <!-- todo: -->
+    </metal:votum>
+
   </body>
 <html>

@@ -4,18 +4,18 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.landsgemeinde import _
-from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.landsgemeinde.layouts.default import DefaultLayout
 
 
-class AgendaItemCollectionLayout(DefaultLayout):
+class VotumCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self):
         return _(
-            'Agenda items of assembly from ${date}',
+            'Vota of agenda items ${number} of assembly from ${date}',
             mapping={
+                'number': self.model.agenda_item_number,
                 'date': self.format_date(self.model.date, 'date_long')
             }
         )
@@ -33,7 +33,11 @@ class AgendaItemCollectionLayout(DefaultLayout):
                 self.assembly_title(self.model.assembly),
                 self.request.link(self.model.assembly)
             ),
-            Link(_('Agenda items'), self.request.link(self.model))
+            Link(
+                self.agenda_item_title(self.model.agenda_item),
+                self.request.link(self.model.agenda_item)
+            ),
+            Link(_('Vota'), self.request.link(self.model))
         ]
 
     @cached_property
@@ -44,7 +48,7 @@ class AgendaItemCollectionLayout(DefaultLayout):
                     title=_('Add'),
                     links=[
                         Link(
-                            text=_('Agenda item'),
+                            text=_('Votum'),
                             url=self.request.link(self.model, 'new'),
                             attrs={'class': 'new-form'}
                         ),
@@ -53,11 +57,11 @@ class AgendaItemCollectionLayout(DefaultLayout):
             )
 
 
-class AgendaItemLayout(DefaultLayout):
+class VotumLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return self.agenda_item_title(self.model)
+        return self.votum_title(self.model)
 
     @cached_property
     def og_description(self):
@@ -69,13 +73,25 @@ class AgendaItemLayout(DefaultLayout):
             Link(_('Homepage'), self.homepage_url),
             Link(_('Archive'), self.request.link(self.assembly_collection())),
             Link(
-                self.assembly_title(self.model.assembly),
-                self.request.link(self.model.assembly)
+                self.assembly_title(self.model.agenda_item.assembly),
+                self.request.link(self.model.agenda_item.assembly)
             ),
             Link(
                 _('Agenda items'),
                 self.request.link(
-                    self.agenda_item_collection(self.model.assembly)
+                    self.agenda_item_collection(
+                        self.model.agenda_item.assembly
+                    )
+                )
+            ),
+            Link(
+                self.agenda_item_title(self.model.agenda_item),
+                self.request.link(self.model.agenda_item)
+            ),
+            Link(
+                _('Vota'),
+                self.request.link(
+                    self.votum_collection(self.model.agenda_item)
                 )
             ),
             Link(self.title, self.request.link(self.model))
@@ -84,9 +100,10 @@ class AgendaItemLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
-            parent = AgendaItemCollection(self.app.session(), self.model.date)
-            vota = VotumCollection(
-                self.app.session(), self.model.date, self.model.number
+            parent = VotumCollection(
+                self.app.session(),
+                self.model.date,
+                self.model.agenda_item_number
             )
             return (
                 Link(
@@ -113,10 +130,5 @@ class AgendaItemLayout(DefaultLayout):
                             redirect_after=self.request.link(parent)
                         )
                     )
-                ),
-                Link(
-                    text=_('Vota'),
-                    url=self.request.link(vota),
-                    attrs={'class': 'checklist-link'}
                 )
             )
