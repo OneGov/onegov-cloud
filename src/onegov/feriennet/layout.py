@@ -662,7 +662,7 @@ class BillingCollectionManualBookingLayout(DefaultLayout):
         )
 
 
-class BillingCollectionPaymentWithDate(DefaultLayout):
+class BillingCollectionPaymentWithDateLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
