@@ -79,7 +79,8 @@ class FsiPdf(Pdf):
                 translate(layout.format_status(
                     chosen_event.status if chosen_event else event.status))
             )
-            row.append(subscription.event_completed and "✔" or "-")
+            row.append((Paragraph(u"✓", style=pdf.style.symbols)
+                        if subscription.event_completed else "-"))
             row.append(sent and layout.format_date(sent, 'date') or '')
             return row
 
