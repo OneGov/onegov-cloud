@@ -6,14 +6,15 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import Votum
+from onegov.landsgemeinde.models.votum import STATES
 from onegov.org.forms.fields import HtmlField
+from sqlalchemy import desc
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
-from onegov.landsgemeinde.models.votum import STATES
 
 
 class VotumForm(NamedFileForm):
@@ -89,6 +90,16 @@ class VotumForm(NamedFileForm):
         label=_('Text'),
         fieldset=_('Statement of reasons'),
     )
+
+    @property
+    def next_number(self):
+        query = self.request.session.query(Votum.number)
+        query = query.filter(
+            Votum.agenda_item_id == self.model.agenda_item.id
+        )
+        query = query.order_by(desc(Votum.number))
+        query = query.limit(1)
+        return (query.scalar() or 0) + 1
 
     def on_request(self):
         DefaultLayout(self.model, self.request)

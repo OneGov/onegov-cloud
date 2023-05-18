@@ -18,16 +18,16 @@ class DefaultLayout(BaseDefaultLayout):
             mapping={'date': self.format_date(assembly.date, 'date_long')}
         )
 
-    def agenda_item_title(self, agenda_item, html=False):
+    def agenda_item_title(self, agenda_item, html=False, short=False):
         if agenda_item.irrelevant:
             return agenda_item.title
-        if not agenda_item.title:
+        if not agenda_item.title or short:
             return '{} {}'.format(
                 self.request.translate(_('Agenda item')),
                 agenda_item.number
             )
         if html:
-            return '{} {}: {}'.format(
+            return '{} {}<br><small>{}</small>'.format(
                 self.request.translate(_('Agenda item')),
                 agenda_item.number,
                 '<br>'.join(agenda_item.title_parts)

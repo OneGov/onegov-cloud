@@ -91,9 +91,14 @@ class AssemblyLayout(DefaultLayout):
                         )
                     )
                 ),
-                Link(
-                    text=_('Agenda items'),
-                    url=self.request.link(items),
-                    attrs={'class': 'check-list-link'}
-                ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Agenda item'),
+                            url=self.request.link(items, 'new'),
+                            attrs={'class': 'check-list-link'}
+                        ),
+                    ]
+                )
             )

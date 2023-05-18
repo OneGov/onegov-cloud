@@ -11,23 +11,6 @@ from onegov.landsgemeinde.layouts import AgendaItemLayout
 from onegov.landsgemeinde.models import AgendaItem
 
 
-@LandsgemeindeApp.html(
-    model=AgendaItemCollection,
-    template='agenda_items.pt',
-    permission=Public
-)
-def view_agenda_items(self, request):
-
-    layout = AgendaItemCollectionLayout(self, request)
-
-    return {
-        'add_link': request.link(self, name='new'),
-        'layout': layout,
-        'agenda_items': self.query().all(),
-        'title': layout.title,
-    }
-
-
 @LandsgemeindeApp.form(
     model=AgendaItemCollection,
     name='new',
@@ -42,6 +25,8 @@ def add_agenda_item(self, request, form):
         request.success(_("Added a new agenda item"))
 
         return redirect(request.link(agenda_item))
+
+    form.number.data = form.next_number
 
     layout = AgendaItemCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))

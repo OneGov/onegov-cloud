@@ -43,6 +43,8 @@ def add_votum(self, request, form):
 
         return redirect(request.link(votum))
 
+    form.number.data = form.next_number
+
     layout = VotumCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()

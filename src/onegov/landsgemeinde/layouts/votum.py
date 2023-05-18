@@ -34,7 +34,7 @@ class VotumCollectionLayout(DefaultLayout):
                 self.request.link(self.model.assembly)
             ),
             Link(
-                self.agenda_item_title(self.model.agenda_item),
+                self.agenda_item_title(self.model.agenda_item, short=True),
                 self.request.link(self.model.agenda_item)
             ),
             Link(_('Vota'), self.request.link(self.model))
@@ -77,15 +77,7 @@ class VotumLayout(DefaultLayout):
                 self.request.link(self.model.agenda_item.assembly)
             ),
             Link(
-                _('Agenda items'),
-                self.request.link(
-                    self.agenda_item_collection(
-                        self.model.agenda_item.assembly
-                    )
-                )
-            ),
-            Link(
-                self.agenda_item_title(self.model.agenda_item),
+                self.agenda_item_title(self.model.agenda_item, short=True),
                 self.request.link(self.model.agenda_item)
             ),
             Link(

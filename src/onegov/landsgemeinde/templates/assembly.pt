@@ -5,10 +5,21 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell">
-                <div metal:use-macro="layout.macros['assembly']" />
+                <tal:block tal:content="structure assembly.overview"></tal:block>
+                <tal:block tal:condition="assembly.agenda_items">
+                    <h2 i18n:translate="">Agenda items</h2>
+                    <ul class="more-list agneda-item-list">
+                        <li tal:repeat="agenda_item assembly.agenda_items">
+                            <a class="list-link" tal:attributes="href request.link(agenda_item)">
+                                <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h5>
+                            </a>
+                        </li>
+                    </ul>
+                </tal:block>
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+
                 <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
                     <h2 i18n:translate="">Downloads</h2>
                     <p tal:condition="assembly.memorial_pdf">

@@ -4,7 +4,6 @@ from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.landsgemeinde import _
-from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.landsgemeinde.layouts.default import DefaultLayout
 
@@ -33,7 +32,7 @@ class AgendaItemCollectionLayout(DefaultLayout):
                 self.assembly_title(self.model.assembly),
                 self.request.link(self.model.assembly)
             ),
-            Link(_('Agenda items'), self.request.link(self.model))
+            Link(_('Agenda items'), '#')
         ]
 
     @cached_property
@@ -73,18 +72,14 @@ class AgendaItemLayout(DefaultLayout):
                 self.request.link(self.model.assembly)
             ),
             Link(
-                _('Agenda items'),
-                self.request.link(
-                    self.agenda_item_collection(self.model.assembly)
-                )
-            ),
-            Link(self.title, self.request.link(self.model))
+                self.agenda_item_title(self.model, short=True),
+                self.request.link(self.model)
+            )
         ]
 
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
-            parent = AgendaItemCollection(self.app.session(), self.model.date)
             vota = VotumCollection(
                 self.app.session(), self.model.date, self.model.number
             )
@@ -110,9 +105,21 @@ class AgendaItemLayout(DefaultLayout):
                         ),
                         Intercooler(
                             request_method='DELETE',
-                            redirect_after=self.request.link(parent)
+                            redirect_after=self.request.link(
+                                self.model.assembly
+                            )
                         )
                     )
+                ),
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_('Votum'),
+                            url=self.request.link(vota, 'new'),
+                            attrs={'class': 'new-form'}
+                        ),
+                    ]
                 ),
                 Link(
                     text=_('Vota'),
