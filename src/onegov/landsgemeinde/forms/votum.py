@@ -62,7 +62,7 @@ class VotumForm(NamedFileForm):
 
     person_picture = UploadField(
         label=_('Picture'),
-        fieldset=_('Downloads'),
+        fieldset=_('Person'),
         validators=[
             WhitelistedMimeType({
                 'image/jpeg',

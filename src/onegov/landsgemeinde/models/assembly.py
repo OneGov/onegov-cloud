@@ -6,6 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde.models.agenda import AgendaItem
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -14,11 +15,6 @@ from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
-
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from .agenda import AgendaItem
 
 
 STATES = {
@@ -66,8 +62,8 @@ class Assembly(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     overview = content_property()
 
     #: An assembly contains n agenda items
-    agenda_items: 'relationship[list[AgendaItem]]' = relationship(
-        'AgendaItem',
+    agenda_items = relationship(
+        AgendaItem,
         cascade='all, delete-orphan',
         backref=backref('assembly'),
         lazy='dynamic',

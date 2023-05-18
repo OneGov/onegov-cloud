@@ -50,7 +50,7 @@ class AgendaItemForm(NamedFileForm):
     )
 
     memorial_pdf = UploadField(
-        label=_('Memorial (PDF)'),
+        label=_('Excerpt from the Memorial (PDF)'),
         fieldset=_('Downloads'),
         validators=[
             WhitelistedMimeType({'application/pdf'}),

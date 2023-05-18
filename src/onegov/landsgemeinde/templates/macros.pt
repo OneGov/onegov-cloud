@@ -14,22 +14,37 @@
         </ul>
     </metal:tags>
 
+    <metal:agenda-item-title define-macro="agenda-item-title">
+        <tal:block tal:content="structure layout.agenda_item_title(agenda_item, True)" />
+    </metal:agenda-item-title>
+
     <metal:assembly define-macro="assembly" i18n:domain="onegov.landsgemeinde">
       <div tal:content="structure assembly.overview"></div>
     </metal:assembly>
 
+    <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
+      <!-- todo: -->
+
+      <img tal:condition="votum.person_picture" src="${request.link(votum.person_picture)}" />
+      <tal:block tal:content="structure votum.motion" />
+    </metal:votum>
+
     <metal:agenda-item define-macro="agenda-item" i18n:domain="onegov.landsgemeinde">
       ${layout.format_date(agenda_item.start, 'time')}
+      <h2 i18n:translate="">Overview</h2>
       <div tal:content="structure agenda_item.overview"></div>
+
+      <h2 i18n:translate="">Content</h2>
       <div tal:content="structure agenda_item.text"></div>
+      <tal:block tal:repeat="votum agenda_item.vota">
+        <tal:block metal:use-macro="layout.macros['votum']" />
+      </tal:block>
+
+      <h2 i18n:translate="">Resolution</h2>
       <div tal:content="structure agenda_item.resolution"></div>
       <tal:block metal:use-macro="layout.macros['tags']" tal:define="tags agenda_item.resolution_tags"></tal:block>
       <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
     </metal:agenda-item>
-
-    <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
-      <!-- todo: -->
-    </metal:votum>
 
   </body>
 <html>

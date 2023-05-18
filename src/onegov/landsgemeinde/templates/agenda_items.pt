@@ -9,7 +9,7 @@
                 <ul tal:condition="agenda_items" class="more-list agenda-item-list">
                     <li tal:repeat="agenda_item agenda_items">
                         <a class="list-link" tal:attributes="href request.link(agenda_item)">
-                            <h5 class="list-title">${layout.agenda_item_title(agenda_item)}</h5>
+                            <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h5>
                         </a>
                     </li>
                 </ul>

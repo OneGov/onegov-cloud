@@ -6,6 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde.models.votum import Votum
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -92,7 +93,7 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     #: An agenda item contains n vota
     vota = relationship(
-        'Votum',
+        Votum,
         cascade='all, delete-orphan',
         backref=backref('agenda_item'),
         lazy='dynamic',
