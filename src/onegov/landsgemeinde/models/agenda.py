@@ -7,6 +7,7 @@ from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.votum import Votum
+from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -26,9 +27,19 @@ STATES = {
 }
 
 
-class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
+class AgendaItem(
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+):
 
     __tablename__ = 'landsgemeinde_agenda_items'
+
+    es_public = True
+    es_properties = {
+        'title': {'type': 'text'},
+        'overview': {'type': 'localized_html'},
+        'text': {'type': 'localized_html'},
+        'resolution': {'type': 'localized_html'},
+    }
 
     #: the internal id of the agenda item
     id = Column(UUID, primary_key=True, default=uuid4)

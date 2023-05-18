@@ -10,7 +10,7 @@ class DefaultLayout(BaseDefaultLayout):
     def assembly_title(self, assembly):
         if assembly.extraordinary:
             return _(
-                'Extraodinary ssembly from ${date}',
+                'Extraodinary assembly from ${date}',
                 mapping={'date': self.format_date(assembly.date, 'date_long')}
             )
         return _(

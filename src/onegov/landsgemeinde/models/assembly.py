@@ -7,6 +7,7 @@ from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
+from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -24,9 +25,23 @@ STATES = {
 }
 
 
-class Assembly(Base, ContentMixin, TimestampMixin, AssociatedFiles):
+class Assembly(
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+):
 
     __tablename__ = 'landsgemeinde_assemblies'
+
+    es_public = True
+    es_properties = {
+        'overview': {'type': 'localized_html'},
+    }
+
+    @property
+    def es_suggestion(self):
+        return (
+            str(self.date.year),
+            f'Landsgemeinde {self.date.year}',
+        )
 
     #: Internal number of the event
     id = Column(UUID, primary_key=True, default=uuid4)

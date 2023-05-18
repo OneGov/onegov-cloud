@@ -14,6 +14,10 @@
         </ul>
     </metal:tags>
 
+    <metal:assembly-title define-macro="assembly-title">
+        <tal:block tal:content="structure layout.assembly_title(assembly)" />
+    </metal:assembly-title>
+
     <metal:agenda-item-title define-macro="agenda-item-title">
         <tal:block tal:content="structure layout.agenda_item_title(agenda_item, True)" />
     </metal:agenda-item-title>
@@ -45,6 +49,34 @@
       <tal:block metal:use-macro="layout.macros['tags']" tal:define="tags agenda_item.resolution_tags"></tal:block>
       <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
     </metal:agenda-item>
+
+    <metal:search_result_landsgemeinde_assemblies define-macro="search_result_landsgemeinde_assemblies" i18n:domain="onegov.landsgemeinde">
+      <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title"><tal:block metal:use-macro="layout.macros['assembly-title']" tal:define="assembly result"/></h5>
+      </a>
+    </metal:search_result_landsgemeinde_assemblies>
+
+    <metal:search_result_landsgemeinde_agenda_items define-macro="search_result_landsgemeinde_agenda_items" i18n:domain="onegov.agency">
+      <a href="${request.link(result)}" class="list-link">
+        <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" tal:define="agenda_item result"/></h5>
+      </a>
+      <a href="${request.link(result)}">
+        <p class="list-lead preview">
+          <tal:block metal:use-macro="layout.macros['assembly-title']" tal:define="assembly result.assembly"/>
+        </p>
+      </a>
+    </metal:search_result_landsgemeinde_agenda_items>
+
+    <metal:search_result_landsgemeinde_vota define-macro="search_result_landsgemeinde_vota" i18n:domain="onegov.agency">
+      <a href="${request.link(result.agenda_item)}" class="list-link">
+        <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" tal:define="agenda_item result.agenda_item"/></h5>
+      </a>
+      <a href="${request.link(result.agenda_item)}">
+        <p class="list-lead preview">
+          <tal:block metal:use-macro="layout.macros['assembly-title']" tal:define="assembly result.agenda_item.assembly"/>
+        </p>
+      </a>
+    </metal:search_result_landsgemeinde_vota>
 
   </body>
 <html>

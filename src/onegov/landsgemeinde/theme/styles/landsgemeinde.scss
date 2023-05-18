@@ -1,5 +1,7 @@
-$checklist-icon: "\f0ae";
+$check-list-icon: "\f0ae";
+$ordered-list-icon: "\f03a";
 
 .edit-bar {
-    .checklist-link::before { @include icon-bold(checklist-icon); }
+    .check-list-link::before { @include icon-bold($check-list-icon); }
+    .ordered-list-link::before { @include icon-bold($ordered-list-icon); }
 }

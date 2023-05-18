@@ -94,6 +94,6 @@ class AssemblyLayout(DefaultLayout):
                 Link(
                     text=_('Agenda items'),
                     url=self.request.link(items),
-                    attrs={'class': 'checklist-link'}
+                    attrs={'class': 'check-list-link'}
                 ),
             )

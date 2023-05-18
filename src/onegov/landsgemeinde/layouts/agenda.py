@@ -117,6 +117,6 @@ class AgendaItemLayout(DefaultLayout):
                 Link(
                     text=_('Vota'),
                     url=self.request.link(vota),
-                    attrs={'class': 'checklist-link'}
+                    attrs={'class': 'ordered-list-link'}
                 )
             )

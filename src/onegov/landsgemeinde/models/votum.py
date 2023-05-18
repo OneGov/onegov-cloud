@@ -6,6 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
+from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -22,9 +23,25 @@ STATES = {
 }
 
 
-class Votum(Base, ContentMixin, TimestampMixin, AssociatedFiles):
+class Votum(
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+):
 
     __tablename__ = 'landsgemeinde_vota'
+
+    es_public = True
+    es_properties = {
+        'motion': {'type': 'localized_html'},
+        'statement_of_reasons': {'type': 'localized_html'},
+        'person_name': {'type': 'text'},
+        'person_function': {'type': 'text'},
+        'person_place': {'type': 'text'},
+        'person_political_affiliation': {'type': 'text'},
+    }
+
+    @property
+    def es_suggestion(self):
+        return tuple()
 
     #: the internal id of the votum
     id = Column(UUID, primary_key=True, default=uuid4)
