@@ -3,6 +3,7 @@ from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
+from sqlalchemy.orm import undefer
 
 
 class VotumCollection(GenericCollection):
@@ -27,7 +28,9 @@ class VotumCollection(GenericCollection):
         return self.query().filter(Votum.id == id).first()
 
     def by_number(self, number):
-        return self.query().filter(Votum.number == number).first()
+        query = self.query().filter(Votum.number == number)
+        query = query.options(undefer(Votum.content))
+        return query.first()
 
     @cached_property
     def assembly(self):
