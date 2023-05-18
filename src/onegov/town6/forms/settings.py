@@ -56,14 +56,6 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
         return options
 
-    @property
-    def default_font_family(self):
-        return self.theme.default_options.get('body-font-family-ui')
-
-    @property
-    def header_font_family(self):
-        return self.theme.default_options.get('header-font-family-ui')
-
     @theme_options.setter
     def theme_options(self, options):
         self.primary_color.data = options.get('primary-color-ui')
@@ -71,6 +63,14 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
             'body-font-family-ui') or self.default_font_family
         self.header_font_family_ui.data = options.get(
             'header-font-family-ui') or self.default_font_family
+
+    @property
+    def default_font_family(self):
+        return self.theme.default_options.get('body-font-family-ui')
+
+    @property
+    def header_font_family(self):
+        return self.theme.default_options.get('header-font-family-ui')
 
     def populate_font_families(self):
         self.body_font_family_ui.choices = tuple(

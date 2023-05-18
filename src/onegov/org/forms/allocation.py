@@ -3,11 +3,7 @@ import sedate
 from cached_property import cached_property
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
-from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField
-from onegov.form.fields import TimeField
-from onegov.org import _
+from dateutil.rrule import rrule, DAILY
 from uuid import uuid4
 from wtforms.fields import DateField
 from wtforms.fields import IntegerField
@@ -15,16 +11,11 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
 
-
-WEEKDAYS = (
-    (MO.weekday, _("Mo")),
-    (TU.weekday, _("Tu")),
-    (WE.weekday, _("We")),
-    (TH.weekday, _("Th")),
-    (FR.weekday, _("Fr")),
-    (SA.weekday, _("Sa")),
-    (SU.weekday, _("Su")),
-)
+from onegov.form import Form
+from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import TimeField
+from onegov.org import _
+from onegov.org.forms.util import WEEKDAYS
 
 
 def choices_as_integer(choices):

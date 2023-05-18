@@ -27,7 +27,8 @@ class OccurrenceMixin:
     location = Column(Text, nullable=True)
 
     #: Tags/Categories of the event
-    _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
+    _tags = Column(  # type:ignore[call-overload]
+        MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
 
     @property
     def tags(self):

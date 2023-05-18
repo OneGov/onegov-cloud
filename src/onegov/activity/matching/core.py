@@ -7,7 +7,7 @@ quadratic runtime.
 
 from onegov.activity import Attendee, Booking, Occasion, Period
 from onegov.activity.matching.score import Scoring
-from onegov.activity.matching.utils import overlaps, LoopBudget, hashable
+from onegov.activity.matching.utils import overlaps, LoopBudget, HashableID
 from onegov.activity.matching.utils import booking_order, unblockable
 from onegov.core.utils import Bunch
 from itertools import groupby, product
@@ -15,7 +15,7 @@ from sortedcontainers import SortedSet
 from sqlalchemy.orm import joinedload, defer
 
 
-class AttendeeAgent(hashable('id')):
+class AttendeeAgent(HashableID):
     """ Acts on behalf of the attendee with the goal to get a stable booking
     with an occasion.
 
@@ -87,7 +87,7 @@ class AttendeeAgent(hashable('id')):
         return True
 
 
-class OccasionAgent(hashable('id')):
+class OccasionAgent(HashableID):
     """ Represents the other side of the Attendee/Occasion pair.
 
     While the attende agent will try to get the best possible occasion

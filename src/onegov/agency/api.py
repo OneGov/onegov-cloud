@@ -41,7 +41,7 @@ def get_modified_iso_format(item):
 
 class PersonApiEndpoint(ApiEndpoint, ApisMixin):
     endpoint = 'people'
-    filters = []
+    filters: list[str] = []
 
     @property
     def collection(self):

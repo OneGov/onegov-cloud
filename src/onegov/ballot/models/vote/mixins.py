@@ -14,7 +14,7 @@ class DerivedAttributesMixin:
 
         return self.yeas / ((self.yeas + self.nays) or 1) * 100
 
-    @yeas_percentage.expression
+    @yeas_percentage.expression  # type:ignore[no-redef]
     def yeas_percentage(self):
         # coalesce will pick the first non-null result
         # nullif will return null if division by zero
@@ -37,7 +37,7 @@ class DerivedAttributesMixin:
     def accepted(self):
         return self.yeas > self.nays if self.counted else None
 
-    @accepted.expression
+    @accepted.expression  # type:ignore[no-redef]
     def accepted(cls):
         return case({True: cls.yeas > cls.nays}, cls.counted)
 

@@ -161,7 +161,7 @@ class LastModifiedMixin(TimestampMixin):
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
-    @last_modified.expression
+    @last_modified.expression  # type:ignore[no-redef]
     def last_modified(cls):
         return func.greatest(cls.last_change, cls.last_result_change)
 

@@ -7,7 +7,9 @@ from wtforms.validators import InputRequired
 from wtforms.fields import DateField
 
 
-class FormSubmissionsExport(merge_forms(DateRangeForm, ExportForm)):
+class FormSubmissionsExport(
+    merge_forms(DateRangeForm, ExportForm)  # type:ignore[misc]
+):
 
     selection = RadioField(
         label=_("Selection"),

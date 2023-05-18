@@ -212,12 +212,12 @@ class Organisation(Base, TimestampMixin):
         for y1, m1, d1, y2, m2, d2 in self.holiday_settings.get('school', ()):
             yield date(y1, m1, d1), date(y2, m2, d2)
 
-    @contact.setter
+    @contact.setter  # type:ignore[no-redef]
     def contact(self, value):
         self.meta['contact'] = value
         self.meta['contact_html'] = paragraphify(linkify(value))
 
-    @opening_hours.setter
+    @opening_hours.setter  # type:ignore[no-redef]
     def opening_hours(self, value):
         self.meta['opening_hours'] = value
         self.meta['opening_hours_html'] = paragraphify(linkify(value))

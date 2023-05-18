@@ -22,7 +22,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     def published_or_created(self):
         return self.publication_start or self.created
 
-    @published_or_created.expression
+    @published_or_created.expression  # type:ignore[no-redef]
     def published_or_created(self):
         return func.coalesce(Page.publication_start, Page.created)
 

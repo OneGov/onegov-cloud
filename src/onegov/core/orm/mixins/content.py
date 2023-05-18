@@ -4,6 +4,22 @@ from sqlalchemy.orm import deferred
 from sqlalchemy.schema import Column
 
 
+from typing import Any, Generic, Protocol, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from typing_extensions import Self
+
+    class _bound_dict_property(Protocol['_T']):
+        def __call__(
+            self,
+            key: str | None = ...,
+            default: '_T | None' = ...
+        ) -> 'dict_property[_T]': ...
+
+
+_T = TypeVar('_T')
+
+
 IMMUTABLE_TYPES = (int, float, complex, str, tuple, frozenset, bytes)
 
 
@@ -14,18 +30,22 @@ class ContentMixin:
 
     """
 
+    if TYPE_CHECKING:
+        meta: Column[dict[str, Any]]
+        content: Column[dict[str, Any]]
+
     #: metadata associated with the form, for storing small amounts of data
-    @declared_attr
-    def meta(cls):
+    @declared_attr  # type:ignore[no-redef]
+    def meta(cls) -> 'Column[dict[str, Any]]':
         return Column(JSON, nullable=False, default=dict)
 
     #: content associated with the form, for storing things like long texts
-    @declared_attr
-    def content(cls):
+    @declared_attr  # type:ignore[no-redef]
+    def content(cls) -> 'Column[dict[str, Any]]':
         return deferred(Column(JSON, nullable=False, default=dict))
 
 
-def is_valid_default(default):
+def is_valid_default(default: object | None) -> bool:
     if default is None:
         return True
 
@@ -38,7 +58,7 @@ def is_valid_default(default):
     return False
 
 
-class dict_property:
+class dict_property(Generic[_T]):
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -102,7 +122,16 @@ class dict_property:
 
     """
 
-    def __init__(self, attribute, key=None, default=None):
+    custom_getter: 'Callable[[Any], _T | None] | None'
+    custom_setter: 'Callable[[Any, _T | None], None] | None'
+    custom_deleter: 'Callable[[Any], None] | None'
+
+    def __init__(
+        self,
+        attribute: str,
+        key: str | None = None,
+        default: '_T | Callable[[], _T] | None' = None
+    ):
         assert is_valid_default(default)
         self.attribute = attribute
         self.key = key
@@ -112,41 +141,45 @@ class dict_property:
         self.custom_setter = None
         self.custom_deleter = None
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner: type[Any], name: str) -> None:
         """ Sets the dictionary key, if none is provided. """
 
         if self.key is None:
             self.key = name
 
     @property
-    def getter(self):
-        def wrapper(fn):
+    def getter(self) -> 'Callable[[Callable[[Any], _T | None]], Self]':
+        def wrapper(fn: 'Callable[[Any], _T | None]') -> Any:
             self.custom_getter = fn
             return self
 
         return wrapper
 
     @property
-    def setter(self):
-        def wrapper(fn):
+    def setter(self) -> 'Callable[[Callable[[Any, _T | None], None]], Self]':
+        def wrapper(fn: 'Callable[[Any, _T | None], None]') -> Any:
             self.custom_setter = fn
             return self
 
         return wrapper
 
     @property
-    def deleter(self):
-        def wrapper(fn):
+    def deleter(self) -> 'Callable[[Callable[[Any], None]], Self]':
+        def wrapper(fn: 'Callable[[Any], None]') -> Any:
             self.custom_deleter = fn
             return self
 
         return wrapper
 
-    def __get__(self, instance, owner):
+    def __get__(
+        self,
+        instance: object | None,
+        owner: type[Any]
+    ) -> _T | None:
 
         # do not implement class-only behaviour
         if instance is None:
-            return
+            return None
 
         # pass control wholly to the custom getter if available
         if self.custom_getter:
@@ -161,7 +194,7 @@ class dict_property:
         # fallback to the default
         return self.default() if callable(self.default) else self.default
 
-    def __set__(self, instance, value):
+    def __set__(self, instance: object, value: _T | None) -> None:
 
         # create the dictionary if it does not exist yet
         if getattr(instance, self.attribute) is None:
@@ -174,7 +207,7 @@ class dict_property:
         # fallback to just setting the value
         getattr(instance, self.attribute)[self.key] = value
 
-    def __delete__(self, instance):
+    def __delete__(self, instance: object) -> None:
 
         # pass control to the custom deleter if available
         if self.custom_deleter:
@@ -184,9 +217,12 @@ class dict_property:
         del getattr(instance, self.attribute)[self.key]
 
 
-def dict_property_factory(attribute):
-    def factory(*args, **kwargs):
-        return dict_property(attribute, *args, **kwargs)
+def dict_property_factory(attribute: str) -> '_bound_dict_property[Any]':
+    def factory(
+        key: str | None = None,
+        default: Any | None = None
+    ) -> dict_property[Any]:
+        return dict_property(attribute, key=key, default=default)
 
     return factory
 

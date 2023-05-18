@@ -64,7 +64,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             + (self.dispatch_tax_forms_older or 0)
         ) or None
 
-    @dispatch_tax_forms.expression
+    @dispatch_tax_forms.expression  # type:ignore[no-redef]
     def dispatch_tax_forms(cls):
         return (
             func.coalesce(cls.dispatch_tax_forms_current_year, 0)
@@ -92,7 +92,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             + (self.return_tax_forms_older or 0)
         ) or None
 
-    @return_tax_forms.expression
+    @return_tax_forms.expression  # type:ignore[no-redef]
     def return_tax_forms(cls):
         return (
             func.coalesce(cls.return_tax_forms_current_year, 0)
@@ -114,7 +114,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             + (self.return_unscanned_tax_forms_older or 0)
         ) or None
 
-    @return_unscanned_tax_forms.expression
+    @return_unscanned_tax_forms.expression  # type:ignore[no-redef]
     def return_unscanned_tax_forms(cls):
         return (
             func.coalesce(cls.return_unscanned_tax_forms_current_year, 0)
@@ -131,7 +131,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             - (self.return_unscanned_tax_forms_current_year or 0)
         ) or None
 
-    @return_scanned_tax_forms_current_year.expression
+    @return_scanned_tax_forms_current_year.expression  # type:ignore[no-redef]
     def return_scanned_tax_forms_current_year(cls):
         return (
             func.coalesce(cls.return_tax_forms_current_year, 0)
@@ -145,7 +145,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             - (self.return_unscanned_tax_forms_last_year or 0)
         ) or None
 
-    @return_scanned_tax_forms_last_year.expression
+    @return_scanned_tax_forms_last_year.expression  # type:ignore[no-redef]
     def return_scanned_tax_forms_last_year(cls):
         return (
             func.coalesce(cls.return_tax_forms_last_year, 0)
@@ -159,7 +159,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             - (self.return_unscanned_tax_forms_older or 0)
         ) or None
 
-    @return_scanned_tax_forms_older.expression
+    @return_scanned_tax_forms_older.expression  # type:ignore[no-redef]
     def return_scanned_tax_forms_older(cls):
         return (
             func.coalesce(cls.return_tax_forms_older, 0)
@@ -173,7 +173,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             - (self.return_unscanned_tax_forms or 0)
         ) or None
 
-    @return_scanned_tax_forms.expression
+    @return_scanned_tax_forms.expression  # type:ignore[no-redef]
     def return_scanned_tax_forms(cls):
         return (
             func.coalesce(cls.return_tax_forms, 0)
@@ -187,7 +187,7 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
             - (self.return_unscanned_single_documents or 0)
         ) or None
 
-    @return_scanned_single_documents.expression
+    @return_scanned_single_documents.expression  # type:ignore[no-redef]
     def return_scanned_single_documents(cls):
         return (
             func.coalesce(cls.return_single_documents, 0)

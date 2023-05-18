@@ -111,8 +111,8 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     text = content_property()
     url = content_property()
 
-    filter_years = []
-    filter_tags = []
+    filter_years: list[int] = []
+    filter_tags: list[str] = []
 
     hashtags = meta_property(default=list)
 
