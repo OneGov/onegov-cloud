@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-05-18 10:24+0200\n"
+"POT-Creation-Date: 2023-05-18 17:04+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -116,11 +116,11 @@ msgstr "Person"
 msgid "Function"
 msgstr "Funktion"
 
-msgid "Place"
-msgstr "Ort"
-
 msgid "Party or parliamentary group"
 msgstr "Partei oder Fraktion"
+
+msgid "Place"
+msgstr "Ort"
 
 msgid "Picture"
 msgstr "Bild"
@@ -165,8 +165,14 @@ msgstr "Traktandum löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "Vota"
-msgstr "Vota"
+msgid "Votum"
+msgstr "Wortmeldung"
+
+msgid "Do you really want to delete this votum?"
+msgstr "Möchten Sie diese Wortmeldung wirklich löschen?"
+
+msgid "Delete votum"
+msgstr "Wortmeldung löschen"
 
 msgid "Assembly"
 msgstr "Landsgemeinde"
@@ -185,12 +191,12 @@ msgstr "Ausserordentliche Landsgemeinde vom ${date}"
 msgid "Assembly from ${date}"
 msgstr "Landsgemeinde vom ${date}"
 
-msgid "Votum"
-msgstr "Votum"
-
 #, python-format
 msgid "Vota of agenda items ${number} of assembly from ${date}"
-msgstr "Vota des Traktandum ${number} der Landsgemeinde vom ${date}"
+msgstr "Wortmeldungen des Traktandum ${number} der Landsgemeinde vom ${date}"
+
+msgid "Vota"
+msgstr "Wortmeldungen"
 
 msgid "scheduled"
 msgstr "geplant"
@@ -201,9 +207,6 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
-msgid "No agenda items defined yet."
-msgstr "Noch keine Traktanden erfasst."
-
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
@@ -212,9 +215,6 @@ msgstr "Audio"
 
 msgid "Download audio"
 msgstr "Audio herunterladen"
-
-msgid "No vota defined yet."
-msgstr "Noch keine Vota erfasst."
 
 msgid "Added a new agenda item"
 msgstr "Neues Traktandum hinzugefügt"
@@ -235,7 +235,7 @@ msgid "New assembly"
 msgstr "Neue Landsgemeinde"
 
 msgid "Added a new votum"
-msgstr "Neues Votum hinzugefügt"
+msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
-msgstr "Neues Votum"
+msgstr "Neue Wortmeldung"

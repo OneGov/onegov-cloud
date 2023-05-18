@@ -120,10 +120,36 @@ class AgendaItemLayout(DefaultLayout):
                             attrs={'class': 'new-form'}
                         ),
                     ]
+                )
+            )
+
+    def editbar_links_for_votum(self, votum):
+        if self.request.is_manager:
+            return (
+                Link(
+                    text=_('Edit'),
+                    url=self.request.link(votum, 'edit'),
+                    attrs={'class': 'edit-link'}
                 ),
                 Link(
-                    text=_('Vota'),
-                    url=self.request.link(vota),
-                    attrs={'class': 'ordered-list-link'}
+                    text=_('Delete'),
+                    url=self.csrf_protected_url(
+                        self.request.link(votum)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _('Do you really want to delete this votum?'),
+                            _('This cannot be undone.'),
+                            _('Delete votum'),
+                            _('Cancel')
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(
+                                self.model
+                            )
+                        )
+                    )
                 )
             )

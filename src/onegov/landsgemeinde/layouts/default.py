@@ -1,7 +1,5 @@
 from onegov.landsgemeinde import _
-from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.collections import AssemblyCollection
-from onegov.landsgemeinde.collections import VotumCollection
 from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 
 
@@ -46,13 +44,3 @@ class DefaultLayout(BaseDefaultLayout):
 
     def assembly_collection(self):
         return AssemblyCollection(self.request.session)
-
-    def agenda_item_collection(self, assembly):
-        return AgendaItemCollection(self.request.session, assembly.date)
-
-    def votum_collection(self, agenda_item):
-        return VotumCollection(
-            self.request.session,
-            agenda_item.date,
-            agenda_item.number
-        )

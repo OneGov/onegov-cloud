@@ -1,7 +1,6 @@
 from morepath import redirect
 from onegov.core.elements import Link
 from onegov.core.security import Private
-from onegov.core.security import Public
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.collections import VotumCollection
@@ -9,23 +8,6 @@ from onegov.landsgemeinde.forms import VotumForm
 from onegov.landsgemeinde.layouts import VotumCollectionLayout
 from onegov.landsgemeinde.layouts import VotumLayout
 from onegov.landsgemeinde.models import Votum
-
-
-@LandsgemeindeApp.html(
-    model=VotumCollection,
-    template='vota.pt',
-    permission=Public
-)
-def view_vota(self, request):
-
-    layout = VotumCollectionLayout(self, request)
-
-    return {
-        'add_link': request.link(self, name='new'),
-        'layout': layout,
-        'vota': self.query().all(),
-        'title': layout.title,
-    }
 
 
 @LandsgemeindeApp.form(
@@ -41,7 +23,7 @@ def add_votum(self, request, form):
         votum = self.add(**form.get_useful_data())
         request.success(_("Added a new votum"))
 
-        return redirect(request.link(votum))
+        return redirect(request.link(votum.agenda_item))
 
     form.number.data = form.next_number
 
@@ -53,22 +35,6 @@ def add_votum(self, request, form):
         'layout': layout,
         'title': _("New votum"),
         'form': form,
-    }
-
-
-@LandsgemeindeApp.html(
-    model=Votum,
-    template='votum.pt',
-    permission=Public
-)
-def view_votum(self, request):
-
-    layout = VotumLayout(self, request)
-
-    return {
-        'layout': layout,
-        'votum': self,
-        'title': layout.title,
     }
 
 
@@ -84,7 +50,7 @@ def edit_votum(self, request, form):
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self))
+        return request.redirect(request.link(self.agenda_item))
 
     form.process(obj=self)
 

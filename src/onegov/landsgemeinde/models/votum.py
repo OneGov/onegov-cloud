@@ -55,6 +55,9 @@ class Votum(
     #: the external id of the agenda item
     number = Column(Integer, nullable=False)
 
+    #: The main text of the votum
+    text = content_property()
+
     #: Motion of the votum
     motion = content_property()
 

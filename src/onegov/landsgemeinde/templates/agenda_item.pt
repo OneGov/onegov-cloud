@@ -8,30 +8,39 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell">
-                ${layout.format_date(agenda_item.start, 'time')}
-                <div tal:content="structure agenda_item.overview"></div>
+
+                <p tal:condition="agenda_item.start" class="subheader">${layout.format_date(agenda_item.start, 'datetime')}</p>
+
+                <div class="callout secondary" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
+                    <tal:block tal:content="structure agenda_item.resolution">
+                    <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
+                </div>
+
+                <tal:block tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></tal:block>
                 <hr>
 
-                <div tal:content="structure agenda_item.text"></div>
-                <tal:block tal:repeat="votum agenda_item.vota">
+                <div tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
+                <div tal:repeat="votum agenda_item.vota" class="vota">
                     <tal:block metal:use-macro="layout.macros['votum']" />
-                </tal:block>
-                <hr>
+                </div>
 
-                <div tal:content="structure agenda_item.resolution"></div>
-                <tal:block metal:use-macro="layout.macros['tags']" tal:define="tags agenda_item.resolution_tags"></tal:block>
-                <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
+                <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
+
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
                 <div class="side-panel downloads" tal:condition="agenda_item.memorial_pdf">
-                    <h2 i18n:translate="">Downloads</h2>
-                    <p tal:condition="agenda_item.memorial_pdf">
-                        <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
-                            <i class="fa fa-download" aria-hidden="true"></i>
-                            <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
-                        </a>
-                    </p>
+
+                    <tal:block tal:condition="agenda_item.memorial_pdf">
+                        <h2 i18n:translate="">Downloads</h2>
+                        <p tal:condition="agenda_item.memorial_pdf">
+                            <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
+                                <i class="fa fa-download" aria-hidden="true"></i>
+                                <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
+                            </a>
+                        </p>
+                    </tal:block>
+
                 </div>
             </div>
         </div>
