@@ -101,8 +101,8 @@ class PaginatedAgencyCollection(GenericCollection, Pagination):
             query = query.filter(ExtendedAgency.parent_id == self.parent)
 
         if self.title:
-            # for multiple words in search filter for title we 'or' link the
-            # filters them using ilike
+            # if multiple words in search filter for title we 'or' link
+            # them using ilike
             query = query.filter(or_(
                 func.lower(
                     func.unaccent(ExtendedAgency.title)

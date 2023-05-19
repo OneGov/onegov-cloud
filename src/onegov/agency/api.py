@@ -78,7 +78,6 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             valid_params = self.filters + ['first_name',
                                            'last_name'] + UPDATE_FILTER_PARAMS
             if key not in valid_params:
-                # raise Exception()
                 raise ApiInvalidParamException(
                     f'Invalid url parameter \'{key}\'. Valid params are: '
                     f'{valid_params}')
@@ -213,7 +212,6 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
             agency=self.get_filter('agency'),
             person=self.get_filter('person'),
         )
-        # TODO try to use self.get_filter() here and for people and agencies
 
         for key, value in self.extra_parameters.items():
             valid_params = self.filters + UPDATE_FILTER_PARAMS
