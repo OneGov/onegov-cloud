@@ -31,6 +31,7 @@ class Votum(
 
     es_public = True
     es_properties = {
+        'text': {'type': 'localized_html'},
         'motion': {'type': 'localized_html'},
         'statement_of_reasons': {'type': 'localized_html'},
         'person_name': {'type': 'text'},
