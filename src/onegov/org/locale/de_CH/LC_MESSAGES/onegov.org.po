@@ -1038,19 +1038,19 @@ msgid "Website"
 msgstr "Webseite"
 
 msgid "Website 2"
-msgstr "Webseite 2"
+msgstr ""
 
 msgid "Location address"
-msgstr "Standortadresse"
+msgstr ""
 
 msgid "Location Code and City"
-msgstr "Standort Postleitzahl und Ort"
+msgstr ""
 
 msgid "Postal address"
-msgstr "Postadresse"
+msgstr ""
 
 msgid "Postal Code and City"
-msgstr "Postleitzahl und Ort"
+msgstr ""
 
 msgid "Picture"
 msgstr "Bild"
