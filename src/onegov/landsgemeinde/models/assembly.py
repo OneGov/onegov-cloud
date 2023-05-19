@@ -64,6 +64,9 @@ class Assembly(
     #: The memorial of the assembly
     memorial_pdf = NamedFile()
 
+    #: The supplement to the memorial of the assembly
+    memorial_supplement_pdf = NamedFile()
+
     #: The protocol of the assembly
     protocol_pdf = NamedFile()
 

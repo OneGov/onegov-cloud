@@ -58,6 +58,15 @@ class AssemblyForm(NamedFileForm):
         ]
     )
 
+    memorial_supplement_pdf = UploadField(
+        label=_('Supplement to the memorial (PDF)'),
+        fieldset=_('Downloads'),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(100 * 1024 * 1024)
+        ]
+    )
+
     protocol_pdf = UploadField(
         label=_('Protocol (PDF)'),
         fieldset=_('Downloads'),

@@ -20,12 +20,18 @@
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
 
-                <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
+                <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.memorial_supplement_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
                     <h2 i18n:translate="">Downloads</h2>
                     <p tal:condition="assembly.memorial_pdf">
                         <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
                             <i class="fa fa-download" aria-hidden="true"></i>
                             <span i18n:translate="">Memorial (PDF)</span>
+                        </a>
+                    </p>
+                    <p tal:condition="assembly.memorial_supplement_pdf">
+                        <a href="${request.link(assembly.memorial_supplement_pdf)}" class="memorial-supplement-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Supplement to the memorial (PDF)</span>
                         </a>
                     </p>
                     <p tal:condition="assembly.protocol_pdf">
