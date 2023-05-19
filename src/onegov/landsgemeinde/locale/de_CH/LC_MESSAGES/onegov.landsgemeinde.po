@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-05-19 09:11+0200\n"
+"POT-Creation-Date: 2023-05-19 10:08+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -92,8 +92,11 @@ msgstr "Ausserordentlich"
 msgid "Video URL"
 msgstr "Video URL"
 
-msgid "Memorial (PDF)"
-msgstr "Memorial (PDF)"
+msgid "Memorial part 1 (PDF)"
+msgstr "Memorial Teil 1 (PDF)"
+
+msgid "Memorial part 2 (PDF)"
+msgstr "Memorial Teil 2 (PDF)"
 
 msgid "Supplement to the memorial (PDF)"
 msgstr "Nachtrag zum Memorial (PDF)"
@@ -212,6 +215,9 @@ msgstr "abgeschlossen"
 
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
+
+msgid "Memorial (PDF)"
+msgstr "Memorial (PDF)"
 
 msgid "Audio"
 msgstr "Audio"
