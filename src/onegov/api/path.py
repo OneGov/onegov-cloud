@@ -2,7 +2,7 @@ from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
-from onegov.api.models import ApiExcpetion
+from onegov.api.models import ApiException
 
 
 @ApiApp.path(
@@ -21,7 +21,7 @@ def get_api_endpoints(app):
 def get_api_endpoint(app, endpoint, page=0, extra_parameters=None):
     cls = ApiEndpointCollection(app).endpoints.get(endpoint)
     if not cls:
-        raise ApiExcpetion('Not found', status_code=404)
+        raise ApiException('Not found', status_code=404)
     return cls(app, extra_parameters=extra_parameters, page=page)
 
 
@@ -32,5 +32,5 @@ def get_api_endpoint(app, endpoint, page=0, extra_parameters=None):
 def get_api_endpoint_item(app, endpoint, id):
     item = ApiEndpointItem(app, endpoint, id)
     if not item.api_endpoint or not item.item:
-        raise ApiExcpetion('Not found', status_code=404)
+        raise ApiException('Not found', status_code=404)
     return item
