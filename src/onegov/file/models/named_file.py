@@ -25,6 +25,9 @@ class NamedFile:
 
     """
 
+    def __init__(self, cls=None):
+        self.cls = cls or File
+
     def __set_name__(self, owner, name):
         self.name = name
 
@@ -38,7 +41,7 @@ class NamedFile:
         if instance:
             content, filename = value
             self.__delete__(instance)
-            file = File(id=random_token())
+            file = self.cls(id=random_token())
             file.name = self.name
             file.reference = as_fileintent(content, filename)
             instance.files.append(file)

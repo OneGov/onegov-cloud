@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
+from sqlalchemy.orm import undefer
 
 
 class AgendaItemCollection(GenericCollection):
@@ -25,7 +26,9 @@ class AgendaItemCollection(GenericCollection):
         return self.query().filter(AgendaItem.id == id).first()
 
     def by_number(self, number):
-        return self.query().filter(AgendaItem.number == number).first()
+        query = self.query().filter(AgendaItem.number == number)
+        query = query.options(undefer(AgendaItem.content))
+        return query.first()
 
     @cached_property
     def assembly(self):

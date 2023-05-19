@@ -1,29 +1,30 @@
 from onegov.election_day import _
-from onegov.form.fields import TagsField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde.layouts import DefaultLayout
-from onegov.landsgemeinde.models import AgendaItem
-from onegov.landsgemeinde.models.agenda import STATES
+from onegov.landsgemeinde.models import Votum
+from onegov.landsgemeinde.models.votum import STATES
 from onegov.org.forms.fields import HtmlField
 from sqlalchemy import desc
-from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
-from wtforms.fields import TextAreaField
+from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
-class AgendaItemForm(NamedFileForm):
+class VotumForm(NamedFileForm):
 
     number = IntegerField(
         label=_('Number'),
         fieldset=_('General'),
+        validators=[
+            InputRequired()
+        ],
     )
 
     state = RadioField(
@@ -36,23 +37,39 @@ class AgendaItemForm(NamedFileForm):
         default=list(STATES.keys())[0]
     )
 
-    title = TextAreaField(
-        label=_('Title'),
-        fieldset=_('General'),
+    person_name = StringField(
+        label=_('Name'),
+        fieldset=_('Person'),
         render_kw={'rows': 5}
     )
 
-    irrelevant = BooleanField(
-        label=_('Irrelevant'),
-        fieldset=_('General'),
+    person_function = StringField(
+        label=_('Function'),
+        fieldset=_('Person'),
+        render_kw={'rows': 5}
     )
 
-    memorial_pdf = UploadField(
-        label=_('Excerpt from the Memorial (PDF)'),
-        fieldset=_('Downloads'),
+    person_political_affiliation = StringField(
+        label=_('Party or parliamentary group'),
+        fieldset=_('Person'),
+        render_kw={'rows': 5}
+    )
+
+    person_place = StringField(
+        label=_('Place'),
+        fieldset=_('Person'),
+        render_kw={'rows': 5}
+    )
+
+    person_picture = UploadField(
+        label=_('Picture'),
+        fieldset=_('Person'),
         validators=[
-            WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(100 * 1024 * 1024)
+            WhitelistedMimeType({
+                'image/jpeg',
+                'image/png',
+            }),
+            FileSizeLimit(1 * 1024 * 1024)
         ]
     )
 
@@ -64,37 +81,28 @@ class AgendaItemForm(NamedFileForm):
         ],
     )
 
-    overview = HtmlField(
-        label=_('Text'),
-        fieldset=_('Overview'),
-    )
-
     text = HtmlField(
         label=_('Text'),
         fieldset=_('Content'),
     )
 
-    resolution = HtmlField(
+    motion = HtmlField(
         label=_('Text'),
-        fieldset=_('Resolution'),
+        fieldset=_('Motion'),
     )
 
-    tacitly_accepted = BooleanField(
-        label=_('Tacitly accepted'),
-        fieldset=_('Resolution'),
-    )
-
-    # todo: provide defaults
-    resolution_tags = TagsField(
-        label=_('Tags'),
-        fieldset=_('Resolution')
+    statement_of_reasons = HtmlField(
+        label=_('Text'),
+        fieldset=_('Statement of reasons'),
     )
 
     @property
     def next_number(self):
-        query = self.request.session.query(AgendaItem.number)
-        query = query.filter(AgendaItem.assembly_id == self.model.assembly.id)
-        query = query.order_by(desc(AgendaItem.number))
+        query = self.request.session.query(Votum.number)
+        query = query.filter(
+            Votum.agenda_item_id == self.model.agenda_item.id
+        )
+        query = query.order_by(desc(Votum.number))
         query = query.limit(1)
         return (query.scalar() or 0) + 1
 
@@ -102,21 +110,20 @@ class AgendaItemForm(NamedFileForm):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
-        self.request.include('tags-input')
 
     def get_useful_data(self):
         data = super().get_useful_data()
-        data['assembly_id'] = self.model.assembly.id
+        data['agenda_item_id'] = self.model.agenda_item.id
         return data
 
     def validate_number(self, field):
         if field.data:
-            query = self.request.session.query(AgendaItem)
+            query = self.request.session.query(Votum)
             query = query.filter(
-                AgendaItem.assembly_id == self.model.assembly.id,
-                AgendaItem.number == field.data
+                Votum.agenda_item_id == self.model.agenda_item.id,
+                Votum.number == field.data
             )
-            if isinstance(self.model, AgendaItem):
-                query = query.filter(AgendaItem.id != self.model.id)
+            if isinstance(self.model, Votum):
+                query = query.filter(Votum.id != self.model.id)
             if query.first():
                 raise ValidationError(_('Number already used.'))
