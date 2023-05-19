@@ -430,10 +430,10 @@ class AdjacencyListCollection(Generic[_L]):
         child = child_class(parent=parent, title=title, name=name, **kwargs)
 
         self.session.add(child)
-        self.session.flush()
 
         # impose an order, unless one is given
         if kwargs.get('order') is not None:
+            self.session.flush()
             return child
 
         siblings = child.siblings.all()
@@ -441,6 +441,7 @@ class AdjacencyListCollection(Generic[_L]):
         if is_sorted((s for s in siblings if s != child), key=self.sort_key):
             sort_siblings(siblings, key=self.sort_key)
 
+        self.session.flush()
         return child
 
     def add_root(

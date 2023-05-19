@@ -138,6 +138,8 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         for order, membership in enumerate(self.memberships):
             membership.order_within_agency = order
 
+        session.flush()
+
         return membership
 
     def deletable(self, request):
