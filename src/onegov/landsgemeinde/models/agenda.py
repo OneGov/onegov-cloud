@@ -6,6 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
@@ -74,7 +75,7 @@ class AgendaItem(
     title = Column(Text, nullable=False, default=lambda: '')
 
     #: The memorial of the assembly
-    memorial_pdf = NamedFile()
+    memorial_pdf = NamedFile(cls=LandsgemeindeFile)
 
     #: The overview (text) over the agenda item
     overview = content_property()

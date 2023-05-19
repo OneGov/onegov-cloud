@@ -7,6 +7,7 @@ from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
+from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -62,22 +63,22 @@ class Assembly(
     video_url = Column(Text, nullable=True)
 
     #: The memorial of the assembly
-    memorial_pdf = NamedFile()
+    memorial_pdf = NamedFile(cls=LandsgemeindeFile)
 
     #: An optional second part of the memorial of the assembly
-    memorial_2_pdf = NamedFile()
+    memorial_2_pdf = NamedFile(cls=LandsgemeindeFile)
 
     #: The supplement to the memorial of the assembly
-    memorial_supplement_pdf = NamedFile()
+    memorial_supplement_pdf = NamedFile(cls=LandsgemeindeFile)
 
     #: The protocol of the assembly
-    protocol_pdf = NamedFile()
+    protocol_pdf = NamedFile(cls=LandsgemeindeFile)
 
     #: The audio of the assembly as MP3
-    audio_mp3 = NamedFile()
+    audio_mp3 = NamedFile(cls=LandsgemeindeFile)
 
     #: The audio of the assembly as ZIP
-    audio_zip = NamedFile()
+    audio_zip = NamedFile(cls=LandsgemeindeFile)
 
     #: The overview (text) over the assembly
     overview = content_property()

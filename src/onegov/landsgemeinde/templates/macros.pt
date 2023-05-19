@@ -56,7 +56,7 @@
     </a>
 </metal:search_result_landsgemeinde_assemblies>
 
-<metal:search_result_landsgemeinde_agenda_items define-macro="search_result_landsgemeinde_agenda_items" i18n:domain="onegov.agency">
+<metal:search_result_landsgemeinde_agenda_items define-macro="search_result_landsgemeinde_agenda_items" i18n:domain="onegov.landsgemeinde">
     <a href="${request.link(result)}" class="list-link">
         <h5 class="list-title">
             <tal:block metal:use-macro="layout.macros['agenda-item-title']" tal:define="agenda_item result"/>
@@ -69,7 +69,7 @@
     </a>
 </metal:search_result_landsgemeinde_agenda_items>
 
-<metal:search_result_landsgemeinde_vota define-macro="search_result_landsgemeinde_vota" i18n:domain="onegov.agency">
+<metal:search_result_landsgemeinde_vota define-macro="search_result_landsgemeinde_vota" i18n:domain="onegov.landsgemeinde">
     <a href="${request.link(result.agenda_item)}" class="list-link">
         <h5 class="list-title">
             <tal:block metal:use-macro="layout.macros['agenda-item-title']" tal:define="agenda_item result.agenda_item"/>
@@ -81,6 +81,27 @@
         </p>
     </a>
 </metal:search_result_landsgemeinde_vota>
+
+<metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.landsgemeinde">
+    <a href="${request.return_here(request.link(result))}" class="list-link">
+        <tal:block tal:switch="result.name">
+            <tal:block tal:case="'protocol_pdf'" i18n:translate="">Protocol (PDF)</tal:block>
+            <tal:block tal:case="'memorial_pdf'" i18n:translate="">Memorial (PDF)</tal:block>
+            <tal:block tal:case="'memorial_2_pdf'" i18n:translate="">Memorial part 2 (PDF)</tal:block>
+            <tal:block tal:case="'memorial_supplement_pdf'" i18n:translate="">Supplement to the memorial (PDF)</tal:block>
+            <tal:block tal:case="default">${result.name}</tal:block>
+        </tal:block>
+    </a>
+    <a href="${request.link(result)}">
+        <p tal:repeat="assembly result.linked_landsgemeinde_assemblies" class="list-lead preview">
+            <tal:block metal:use-macro="layout.macros['assembly-title']"/>
+        </p>
+        <p tal:repeat="agenda_item result.linked_landsgemeinde_agenda_items" class="list-lead preview">
+            <tal:block metal:use-macro="layout.macros['assembly-title']" tal:define="assembly agenda_item.assembly"/>
+            <tal:block metal:use-macro="layout.macros['agenda-item-title']"/>
+        </p>
+    </a>
+</metal:search_result_files>
 
 </body>
 <html>

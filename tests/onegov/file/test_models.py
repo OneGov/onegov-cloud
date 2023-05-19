@@ -444,8 +444,11 @@ def test_1n1_associated_file_cleanup(session):
 
 def test_named_file():
 
+    class MyFile(File):
+        pass
+
     class CustomBlogPost(Blogpost):
-        x = NamedFile()
+        x = NamedFile(cls=MyFile)
         y = NamedFile()
 
     post = CustomBlogPost(text="My interview at <company>")
@@ -465,10 +468,13 @@ def test_named_file():
     assert len(post.files) == 2
     assert post.x.name == 'x'
     assert post.x.reference.filename == 'x.png'
+    assert post.x.reference.file.read() == x.read()
+    assert isinstance(post.x, MyFile)
     assert post.y.name == 'y'
     assert post.y.reference.filename == 'y.png'
-    assert post.x.reference.file.read() == x.read()
     assert post.y.reference.file.read() == y.read()
+    assert isinstance(post.y, File)
+    assert not isinstance(post.y, MyFile)
 
     del post.x
     assert len(post.files) == 1
