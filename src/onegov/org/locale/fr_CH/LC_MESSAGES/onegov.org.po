@@ -1037,19 +1037,19 @@ msgid "Website"
 msgstr "Site Web"
 
 msgid "Website 2"
-msgstr "Site Web 2"
+msgstr ""
 
 msgid "Location address"
-msgstr "Adress du lieu"
+msgstr ""
 
 msgid "Location Code and City"
-msgstr "Code de localisation et ville"
+msgstr ""
 
 msgid "Postal address"
-msgstr "Adresse postale"
+msgstr ""
 
 msgid "Postal Code and City"
-msgstr "Code postal et ville"
+msgstr ""
 
 msgid "Picture"
 msgstr "Photo"
