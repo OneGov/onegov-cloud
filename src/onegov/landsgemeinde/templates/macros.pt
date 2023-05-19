@@ -18,7 +18,7 @@
 </metal:agenda-item-title>
 
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
-    <div class="votum">
+    <div id="votum-${votum.number}" class="votum">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
         <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture)|None">
             <a href="#" aria-hidden="true">
@@ -42,9 +42,9 @@
                 </li>
             </ul>
         </div>
-        <blockquote tal:condition="votum.text" tal:content="structure votum.text">
-        <blockquote tal:condition="votum.motion" tal:content="structure votum.motion" />
-        <blockquote tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
+        <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
+        <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
+        <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
     </div>
 </metal:votum>
 

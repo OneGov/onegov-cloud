@@ -50,7 +50,9 @@ def edit_votum(self, request, form):
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self.agenda_item))
+        return request.redirect(
+            request.link(self.agenda_item) + f'#votum-{self.number}'
+        )
 
     form.process(obj=self)
 

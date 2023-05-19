@@ -7,24 +7,27 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="medium-7 cell">
+            <div class="medium-7 cell main-content">
 
-                <p tal:condition="agenda_item.start" class="subheader">${layout.format_date(agenda_item.start, 'datetime')}</p>
+                <p tal:condition="agenda_item.start" class="subheader agenda-item-timestamp">${layout.format_date(agenda_item.start, 'datetime')}</p>
 
-                <div class="callout secondary" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
+                <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
                     <tal:block tal:content="structure agenda_item.resolution">
                     <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
                 </div>
 
-                <tal:block tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></tal:block>
+                <div class="agenda-item-overview" tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></div>
                 <hr>
 
-                <div tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
-                <div tal:repeat="votum agenda_item.vota" class="vota">
-                    <tal:block metal:use-macro="layout.macros['votum']" />
+                <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
+
+                <div class="agenda-item-vota">
+                    <tal:block tal:repeat="votum agenda_item.vota" metal:use-macro="layout.macros['votum']" />
                 </div>
 
-                <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
+                <div class="agenda-item-tags">
+                    <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
+                </div>
 
             </div>
 
