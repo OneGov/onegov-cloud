@@ -22,6 +22,7 @@ from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
+from transaction import commit
 from uuid import uuid4
 
 
@@ -444,11 +445,11 @@ def shell():
     """ Enters an interactive shell. """
 
     def _shell(request, app):
-        import readline  # noqa
         shell = InteractiveConsole({
             'app': app,
             'request': request,
             'session': app.session(),
+            'commit': commit
         })
         shell.interact(banner="""
         Onegov Cloud Shell
@@ -457,10 +458,10 @@ def shell():
         Exit the console using exit() or quit().
 
         Available variables: app, request, session.
+        Available functions: commit
 
         Example:
            from onegov.user import User
-           from transaction import commit
            query = session.query(User).filter_by(username='admin@example.org')
            user = query.one()
            user.username = 'info@example.org'
