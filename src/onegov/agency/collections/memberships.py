@@ -1,8 +1,7 @@
-from onegov.agency.collections.collection_utils import \
-    filter_modified_or_created
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
+from onegov.agency.utils import filter_modified_or_created
 from onegov.core.collection import GenericCollection
 from onegov.core.collection import Pagination
 from sqlalchemy import or_

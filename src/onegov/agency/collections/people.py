@@ -1,8 +1,7 @@
 from cached_property import cached_property
 
-from onegov.agency.collections.collection_utils import \
-    filter_modified_or_created
 from onegov.agency.models import ExtendedPerson
+from onegov.agency.utils import filter_modified_or_created
 from onegov.core.collection import Pagination
 from onegov.people import Agency
 from onegov.people import AgencyMembership
