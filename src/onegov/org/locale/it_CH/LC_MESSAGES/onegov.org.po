@@ -1041,19 +1041,19 @@ msgid "Website"
 msgstr "Sito web"
 
 msgid "Website 2"
-msgstr ""
+msgstr "Sito web 2"
 
 msgid "Location address"
-msgstr ""
+msgstr "indirizzo della sede"
 
 msgid "Location Code and City"
-msgstr ""
+msgstr "Codice della località e città"
 
 msgid "Postal address"
-msgstr ""
+msgstr "Indirizzo postale"
 
 msgid "Postal Code and City"
-msgstr ""
+msgstr "Codice postale e città"
 
 msgid "Picture"
 msgstr "Immagine"
