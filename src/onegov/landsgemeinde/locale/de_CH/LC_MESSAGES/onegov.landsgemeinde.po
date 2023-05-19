@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-05-12 13:11+0200\n"
+"POT-Creation-Date: 2023-05-19 10:08+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -50,8 +50,8 @@ msgstr "Titel"
 msgid "Irrelevant"
 msgstr "Unerheblich"
 
-msgid "Memorial (PDF)"
-msgstr "Memorial (PDF)"
+msgid "Excerpt from the Memorial (PDF)"
+msgstr "Auszug aus dem Memorial (PDF)"
 
 msgid "Downloads"
 msgstr "Downloads"
@@ -92,6 +92,15 @@ msgstr "Ausserordentlich"
 msgid "Video URL"
 msgstr "Video URL"
 
+msgid "Memorial part 1 (PDF)"
+msgstr "Memorial Teil 1 (PDF)"
+
+msgid "Memorial part 2 (PDF)"
+msgstr "Memorial Teil 2 (PDF)"
+
+msgid "Supplement to the memorial (PDF)"
+msgstr "Nachtrag zum Memorial (PDF)"
+
 msgid "Protocol (PDF)"
 msgstr "Protokoll (PDF)"
 
@@ -103,6 +112,30 @@ msgstr "Audio (ZIP)"
 
 msgid "Date already used."
 msgstr "Datum wird bereits verwendet."
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Person"
+msgstr "Person"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Party or parliamentary group"
+msgstr "Partei oder Fraktion"
+
+msgid "Place"
+msgstr "Ort"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "Motion"
+msgstr "Antrag"
+
+msgid "Statement of reasons"
+msgstr "Begründung"
 
 #, python-format
 msgid "Agenda items of assembly from ${date}"
@@ -138,6 +171,15 @@ msgstr "Traktandum löschen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
+msgid "Votum"
+msgstr "Wortmeldung"
+
+msgid "Do you really want to delete this votum?"
+msgstr "Möchten Sie diese Wortmeldung wirklich löschen?"
+
+msgid "Delete votum"
+msgstr "Wortmeldung löschen"
+
 msgid "Assembly"
 msgstr "Landsgemeinde"
 
@@ -148,12 +190,19 @@ msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
 
 #, python-format
-msgid "Extraodinary ssembly from ${date}"
+msgid "Extraodinary assembly from ${date}"
 msgstr "Ausserordentliche Landsgemeinde vom ${date}"
 
 #, python-format
 msgid "Assembly from ${date}"
 msgstr "Landsgemeinde vom ${date}"
+
+#, python-format
+msgid "Vota of agenda items ${number} of assembly from ${date}"
+msgstr "Wortmeldungen des Traktandum ${number} der Landsgemeinde vom ${date}"
+
+msgid "Vota"
+msgstr "Wortmeldungen"
 
 msgid "scheduled"
 msgstr "geplant"
@@ -164,17 +213,20 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
-msgid "No agenda items defined yet."
-msgstr "Noch keine Traktanden erfasst."
-
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
+
+msgid "Memorial (PDF)"
+msgstr "Memorial (PDF)"
 
 msgid "Audio"
 msgstr "Audio"
 
 msgid "Download audio"
 msgstr "Audio herunterladen"
+
+msgid "Video"
+msgstr "Video"
 
 msgid "Added a new agenda item"
 msgstr "Neues Traktandum hinzugefügt"
@@ -193,3 +245,9 @@ msgstr "Neue Landsgemeinde hinzugefügt"
 
 msgid "New assembly"
 msgstr "Neue Landsgemeinde"
+
+msgid "Added a new votum"
+msgstr "Neue Wortmeldung hinzugefügt"
+
+msgid "New votum"
+msgstr "Neue Wortmeldung"

@@ -1,5 +1,36 @@
-$checklist-icon: "\f0ae";
+$check-list-icon: "\f0ae";
+$ordered-list-icon: "\f03a";
 
 .edit-bar {
-    .checklist-link::before { @include icon-bold(checklist-icon); }
+    .check-list-link::before { @include icon-bold($check-list-icon); }
+    .ordered-list-link::before { @include icon-bold($ordered-list-icon); }
+}
+
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small,
+.h1 small,
+.h2 small,
+.h3 small,
+.h4 small,
+.h5 small,
+.h6 small {
+    color: inherit !important;
+}
+
+.assembly-agenda-items {
+    margin-top: 2rem;
+}
+
+.agenda-item-vota {
+    .votum {
+        margin-bottom: 2em;
+    }
+
+    .edit-bar {
+        margin-bottom: .5em;
+    }
 }

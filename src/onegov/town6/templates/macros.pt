@@ -86,8 +86,8 @@
 
 
 <metal:editbar define-macro="dropdown-editbar">
-    <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="layout.editbar_links">
-        <li tal:repeat="group layout.editbar_links">
+    <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links|layout.editbar_links">
+        <li tal:repeat="group editbar_links|layout.editbar_links">
             <tal:b condition="group.links|nothing">
                 <a href="#">${group.title}</a>
                 <ul class="menu">

@@ -6,6 +6,9 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
+from onegov.landsgemeinde.models.file import LandsgemeindeFile
+from onegov.landsgemeinde.models.votum import Votum
+from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -13,6 +16,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -23,9 +28,19 @@ STATES = {
 }
 
 
-class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
+class AgendaItem(
+    Base, ContentMixin, TimestampMixin, AssociatedFiles, ORMSearchable
+):
 
     __tablename__ = 'landsgemeinde_agenda_items'
+
+    es_public = True
+    es_properties = {
+        'title': {'type': 'text'},
+        'overview': {'type': 'localized_html'},
+        'text': {'type': 'localized_html'},
+        'resolution': {'type': 'localized_html'},
+    }
 
     #: the internal id of the agenda item
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -60,7 +75,7 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
     title = Column(Text, nullable=False, default=lambda: '')
 
     #: The memorial of the assembly
-    memorial_pdf = NamedFile()
+    memorial_pdf = NamedFile(cls=LandsgemeindeFile)
 
     #: The overview (text) over the agenda item
     overview = content_property()
@@ -87,3 +102,12 @@ class AgendaItem(Base, ContentMixin, TimestampMixin, AssociatedFiles):
 
     #: Start of the agenda item (localized to Europe/Zurich)
     start = Column(Time, nullable=True)
+
+    #: An agenda item contains n vota
+    vota = relationship(
+        Votum,
+        cascade='all, delete-orphan',
+        backref=backref('agenda_item'),
+        lazy='dynamic',
+        order_by='Votum.number',
+    )
