@@ -1,7 +1,7 @@
 from passlib.hash import bcrypt_sha256
 
 
-def hash_password(password):
+def hash_password(password: str) -> str:
     """ The default password hashing algorithm used by onegov.
 
     Over time the underlying algorithm may change, at which point
@@ -25,7 +25,7 @@ def hash_password(password):
     return bcrypt_sha256.hash(password)
 
 
-def verify_password(password, hash):
+def verify_password(password: str, hash: str) -> bool:
     """ Compares a password to a hash and returns true if they match according
     to the hashing algorithm used.
 
