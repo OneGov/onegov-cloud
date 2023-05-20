@@ -18,9 +18,15 @@ from collections import defaultdict
 from onegov.core.utils import pairwise
 
 
-def random_password(length=16):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
+
+def random_password(length: int = 16) -> str:
     """ Returns a random password using the markov chain below. """
 
+    # FIXME: We only really need to initialize the markov chain once
     chain = MarkovChain(
         c for c in japanese.lower() if c in string.ascii_lowercase
     )
@@ -94,6 +100,9 @@ tamaha su. Sono urami masite yara m kata nasi.
 
 
 class MarkovChain:
+    counts: dict[str, dict[str, int]]
+    totals: dict[str, int]
+
     """
     If a system transits from a state to another and the next state depends
     only on the current state and not the past, it is said to be a Markov
@@ -107,8 +116,8 @@ class MarkovChain:
     The probabilities are built from the frequencies in the `sample` chain.
     Elements of the sample that are not a valid state are ignored.
     """
-    def __init__(self, sample):
-        self.counts = counts = defaultdict(lambda: defaultdict(int))
+    def __init__(self, sample: 'Iterable[str]'):
+        counts = self.counts = defaultdict(lambda: defaultdict(int))
         for current, next in pairwise(sample):
             counts[current][next] += 1
 
@@ -117,7 +126,7 @@ class MarkovChain:
             for current, next_counts in counts.items()
         )
 
-    def next(self, state):
+    def next(self, state: str) -> str:
         """
         Choose at random and return a next state from a current state,
         according to the probabilities for this chain
@@ -131,8 +140,9 @@ class MarkovChain:
             if rand < weight:
                 return next_state
             rand -= weight
+        raise AssertionError('unreachable')
 
-    def __iter__(self):
+    def __iter__(self) -> 'Iterator[str]':
         """
         Return an infinite iterator of states.
         """
