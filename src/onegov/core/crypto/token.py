@@ -1,14 +1,13 @@
 import hashlib
+import os
 import secrets
-
-from pathlib import Path
 
 
 # for external reference, update if the hashing function ever changes
 RANDOM_TOKEN_LENGTH = 64
 
 
-def random_token(nbytes=512):
+def random_token(nbytes: int = 512) -> str:
     """ Generates an unguessable token. Generates a random string with
     the given number of bytes (may not be lower than 512) and hashes
     the result to get a token with a consistent length of 64.
@@ -41,7 +40,7 @@ def random_token(nbytes=512):
     return hashlib.sha256(secrets.token_bytes(nbytes)).hexdigest()
 
 
-def stored_random_token(namespace, name):
+def stored_random_token(namespace: str, name: str) -> str:
     """ A random token that is only created once per boot of the host
     (assuming the host deletes all files in the /tmp folder).
 
@@ -49,23 +48,18 @@ def stored_random_token(namespace, name):
     general use!
 
     """
-    container = Path('/tmp/onegov-secrets')
-    container.mkdir(mode=0o700, exist_ok=True)
+    namespace_dir = os.path.join('/tmp/onegov-secrets', namespace)
+    os.makedirs(namespace_dir, mode=0o700, exist_ok=True)
 
-    namespace = container / namespace
-    namespace.mkdir(mode=0o700, exist_ok=True)
-
-    path = container / namespace / name
-
-    if path.exists():
-        with path.open('r') as f:
+    path = os.path.join(namespace_dir, name)
+    if os.path.isfile(path):
+        with open(path, mode='r') as f:
             return f.read()
 
     token = random_token()
 
-    with path.open('w') as f:
+    with open(path, mode='w') as f:
         f.write(token)
 
-    path.chmod(0o400)
-
+    os.chmod(path, 0o400)
     return token
