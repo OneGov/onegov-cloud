@@ -581,11 +581,11 @@ msgstr "Rot"
 msgid "Attendee should have attended the course already, but didn't."
 msgstr "Der nächste Kursbesuch ist ausstehend."
 
-msgid "Dear ${first_name} ${last_name},"
-msgstr "Sehr geehrte(r) ${first_name} ${last_name},"
+msgid "Dear ${first_name} ${last_name}"
+msgstr "Sehr geehrte(r) ${first_name} ${last_name}"
 
-msgid "Dear [first_name] [last_name],"
-msgstr "Sehr geehrte(r) [first_name] [last_name],"
+msgid "Dear [first_name] [last_name]"
+msgstr "Sehr geehrte(r) [first_name] [last_name]"
 
 msgid "Please take notice about the information below."
 msgstr "Bitte beachten sie die untenstehenden Informationen."
