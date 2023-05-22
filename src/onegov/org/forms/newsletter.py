@@ -221,18 +221,10 @@ class NewsletterTestForm(Form):
 
 class NewsletterImportForm(Form):
 
-    clear = BooleanField(
-        label=_("Clear"),
-        description=_(
-            "Delete imported newsletters before importing. This does not "
-            "delete otherwise imported newsletters and submitted events."
-        ),
-        default=False
-    )
-
     dry_run = BooleanField(
         label=_("Dry Run"),
-        description=_("Do not actually want to import the newsletters."),
+        description=_("Do not actually want to import the newsletter "
+                      "recipients?"),
         default=False
     )
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-16 09:19+0200\n"
+"POT-Creation-Date: 2023-05-22 15:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -985,14 +985,6 @@ msgstr ""
 msgid "Recipient"
 msgstr "Destinataire"
 
-msgid ""
-"Delete imported newsletters before importing. This does not delete otherwise "
-"imported newsletters and submitted events."
-msgstr ""
-
-msgid "Do not actually want to import the newsletters."
-msgstr ""
-
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
 
@@ -1048,19 +1040,19 @@ msgid "Website"
 msgstr "Site Web"
 
 msgid "Website 2"
-msgstr ""
+msgstr "Site Web 2"
 
 msgid "Location address"
-msgstr ""
+msgstr "Adress du lieu"
 
 msgid "Location Code and City"
-msgstr ""
+msgstr "Code de localisation et ville"
 
 msgid "Postal address"
-msgstr ""
+msgstr "Adresse postale"
 
 msgid "Postal Code and City"
-msgstr ""
+msgstr "Code postal et ville"
 
 msgid "Picture"
 msgstr "Photo"
@@ -5203,6 +5195,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Do not actually want to import the newsletters."
+#~ msgstr "Vous ne souhaitez pas importer les destinataires des newsletters ?"
 
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "L'équipe de OneGov Cloud"

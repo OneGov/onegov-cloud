@@ -419,7 +419,7 @@ def handle_preview_newsletter(self, request, layout=None):
     }
 
 
-@OrgApp.form(model=RecipientCollection, name='export', permission=Public,
+@OrgApp.form(model=RecipientCollection, name='export', permission=Private,
              form=ExportForm, template='export.pt')
 def export_newsletter_recipients(self, request, form, layout=None):
 

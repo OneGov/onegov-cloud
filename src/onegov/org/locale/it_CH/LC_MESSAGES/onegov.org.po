@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-05-16 09:19+0200\n"
+"POT-Creation-Date: 2023-05-22 15:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -672,9 +672,6 @@ msgstr "Indicato come indirizzo di contatto"
 msgid "External event URL"
 msgstr ""
 
-msgid "https://www.example.ch"
-msgstr ""
-
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "L'indicatore può essere spostato trascinandolo con il mouse"
 
@@ -990,14 +987,6 @@ msgstr ""
 msgid "Recipient"
 msgstr "Destinatario"
 
-msgid ""
-"Delete imported newsletters before importing. This does not delete otherwise "
-"imported newsletters and submitted events."
-msgstr ""
-
-msgid "Do not actually want to import the newsletters."
-msgstr ""
-
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
 "Verrà utilizzato come immagine nella panoramica della pagina sulla pagina "
@@ -1055,19 +1044,19 @@ msgid "Website"
 msgstr "Sito web"
 
 msgid "Website 2"
-msgstr ""
+msgstr "Sito web 2"
 
 msgid "Location address"
-msgstr ""
+msgstr "indirizzo della sede"
 
 msgid "Location Code and City"
-msgstr ""
+msgstr "Codice della località e città"
 
 msgid "Postal address"
-msgstr ""
+msgstr "Indirizzo postale"
 
 msgid "Postal Code and City"
-msgstr ""
+msgstr "Codice postale e città"
 
 msgid "Picture"
 msgstr "Immagine"
@@ -5202,6 +5191,9 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Do not actually want to import the newsletters recipients?"
+#~ msgstr "Non volete importare i destinatari delle newsletter?"
 
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "Il team di OneGov Cloud"

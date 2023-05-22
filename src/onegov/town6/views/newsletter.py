@@ -74,7 +74,7 @@ def town_handle_preview_newsletter(self, request):
         self, request, DefaultMailLayout(self, request))
 
 
-@TownApp.form(model=RecipientCollection, name='export', permission=Public,
+@TownApp.form(model=RecipientCollection, name='export', permission=Private,
               form=ExportForm, template='export.pt')
 def town_export_newsletter_recipients(self, request, form):
     return export_newsletter_recipients(

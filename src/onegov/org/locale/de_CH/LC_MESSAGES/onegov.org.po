@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-16 09:19+0200\n"
+"POT-Creation-Date: 2023-05-22 15:10+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -985,14 +985,6 @@ msgstr ""
 msgid "Recipient"
 msgstr "Empfänger"
 
-msgid ""
-"Delete imported newsletters before importing. This does not delete otherwise "
-"imported newsletters and submitted events."
-msgstr ""
-
-msgid "Do not actually want to import the newsletters."
-msgstr ""
-
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
 "Wird als Bild in der Seitenübersicht auf der übergeordneten Seite verwendet."
@@ -1049,19 +1041,19 @@ msgid "Website"
 msgstr "Webseite"
 
 msgid "Website 2"
-msgstr ""
+msgstr "Webseite 2"
 
 msgid "Location address"
-msgstr ""
+msgstr "Standortadresse"
 
 msgid "Location Code and City"
-msgstr ""
+msgstr "Standort Postleitzahl und Ort"
 
 msgid "Postal address"
-msgstr ""
+msgstr "Postadresse"
 
 msgid "Postal Code and City"
-msgstr ""
+msgstr "Postleitzahl und Ort"
 
 msgid "Picture"
 msgstr "Bild"
