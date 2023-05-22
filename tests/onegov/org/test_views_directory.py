@@ -729,7 +729,6 @@ def test_directory_export(client):
 
     resp = export_view.follow()
     filename = extract_filename_from_response(resp)
-    # file extension should be zip
     assert '.zip' in filename
 
     archive = DirectoryZipArchive.from_buffer(BytesIO(resp.body))
