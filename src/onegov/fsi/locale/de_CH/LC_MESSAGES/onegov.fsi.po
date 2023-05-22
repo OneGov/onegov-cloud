@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2022-09-19 06:59+0200\n"
+"POT-Creation-Date: 2023-05-22 11:08+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -365,6 +365,9 @@ msgstr "Email-Templates verwalten"
 msgid "Notification Template ${type}"
 msgstr "Email-Vorlage ${type}"
 
+msgid "Add or edit additional Information"
+msgstr "Zusatzinformationen hinzufügen oder bearbeiten"
+
 msgid "Send"
 msgstr "Senden"
 
@@ -590,6 +593,9 @@ msgstr "Sehr geehrte(r) [first_name] [last_name]"
 msgid "Please take notice about the information below."
 msgstr "Bitte beachten sie die untenstehenden Informationen."
 
+msgid "Event Details"
+msgstr "Details Durchführung"
+
 msgid "You have successfully subscribed to the following course event:"
 msgstr "Sie haben sich erfolgreich für folgenden Kurs angemeldet:"
 
@@ -633,9 +639,6 @@ msgstr ""
 
 msgid "Your subscription for the following event has been deleted:"
 msgstr "Ihre Anmeldung für den folgenden Kurs wurde gelöscht:"
-
-msgid "Event Details"
-msgstr "Details Durchführung"
 
 msgid "Your's sincerily"
 msgstr "Freundliche Grüsse"
