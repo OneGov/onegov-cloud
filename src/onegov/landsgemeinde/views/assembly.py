@@ -39,6 +39,7 @@ def add_assembly(self, request, form):
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
+        assembly.stamp()
         request.success(_("Added a new assembly"))
 
         return redirect(request.link(assembly))
@@ -52,6 +53,23 @@ def add_assembly(self, request, form):
         'title': _("New assembly"),
         'form': form,
     }
+
+
+@LandsgemeindeApp.view(
+    model=Assembly,
+    request_method='HEAD',
+    permission=Public
+)
+def head_assembly(self, request):
+
+    @request.after
+    def add_headers(response):
+        last_modified = self.last_modified or self.modified or self.created
+        if last_modified:
+            response.headers.add(
+                'Last-Modified',
+                last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
 
 
 @LandsgemeindeApp.html(
@@ -82,6 +100,7 @@ def edit_assembly(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+        self.stamp()
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
