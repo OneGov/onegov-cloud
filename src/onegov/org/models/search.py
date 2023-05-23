@@ -3,6 +3,7 @@ from cached_property import cached_property
 from onegov.core.collection import Pagination
 from onegov.user import User
 from onegov.event.models import Event
+from onegov.user import User
 
 
 class Search(Pagination):
@@ -55,6 +56,43 @@ class Search(Pagination):
 
         return self.postgres_search()
 
+    # def generic_search(self, search, query):
+    #     print('*** tschupre search generic_search')
+    #
+    #     # "get lucky" functionality is not so lucky after all
+    #     match_title = MatchPhrase(title={"query": query, "boost": 3})
+    #
+    #     # we *could* use Match here and include '_all' fields, but that
+    #     # yields us less exact results, probably because '_all' includes some
+    #     # metadata fields we have no use for
+    #     print('*** registered fields:')
+    #     for field in self.request.app.orm_mappings.registered_fields:
+    #         if not field.startswith('es_'):
+    #             # print(f' * field: {field}')
+    #             pass
+    #     match_rest = MultiMatch(query=query, fields=[
+    #         field for field in self.request.app.orm_mappings.
+    #         registered_fields
+    #         if not field.startswith('es_')
+    #     ], fuzziness='1', prefix_length=3)
+    #
+    #     search = search.query(match_title | match_rest)
+    #
+    #     # favour documents with recent changes, over documents without
+    #     search.query = FunctionScore(query=search.query, functions=[
+    #         SF('gauss', es_last_change={
+    #             'offset': '7d',
+    #             'scale': '90d',
+    #             'decay': '0.99'
+    #         })
+    #     ])
+    #
+    #     return search
+
+    # def hashtag_search(self, search, query):
+    #     print('*** tschupre search hastag_search')
+    #     return search.query(Match(es_tags=query.lstrip('#')))
+
     @cached_property
     def load_batch_results(self):
         """Load search results and sort events by latest occurrence.
@@ -74,36 +112,6 @@ class Search(Pagination):
             return batch
         sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
         return sorted_events + non_events
-
-    # def generic_search(self, search, query):
-    #
-    #     # make sure the title matches with a higher priority, otherwise the
-    #     # "get lucky" functionality is not so lucky after all
-    #     match_title = MatchPhrase(title={"query": query, "boost": 3})
-    #
-    #     # we *could* use Match here and include '_all' fields, but that
-    #     # yields us less exact results, probably because '_all' includes some
-    #     # metadata fields we have no use for
-    #     match_rest = MultiMatch(query=query, fields=[
-    #         field for field in self.request.app.es_mappings.registered_fields
-    #         if not field.startswith('es_')
-    #     ], fuzziness='1', prefix_length=3)
-    #
-    #     search = search.query(match_title | match_rest)
-    #
-    #     # favour documents with recent changes, over documents without
-    #     search.query = FunctionScore(query=search.query, functions=[
-    #         SF('gauss', es_last_change={
-    #             'offset': '7d',
-    #             'scale': '90d',
-    #             'decay': '0.99'
-    #         })
-    #     ])
-    #
-    #     return search
-
-    # def hashtag_search(self, search, query):
-    #     return search.query(Match(es_tags=query.lstrip('#')))
 
     def feeling_lucky(self):
         print('*** tschupre search feeling_lucky')
