@@ -44,7 +44,7 @@ echo "$(python --version)"
 
 # only switch to container src directory if we want to test
 # the container, rather than just the source tree
-if [["$CONTAINER_TEST_ARG" -eq "container"]]; then
+if [[ "${CONTAINER_TEST_ARG:-}" = "container" ]]; then
     cd /app/src
 fi
 
