@@ -202,7 +202,7 @@ class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
         else:
             order = self.file_list.c.upload_date
 
-        direction = self.direction == 'ascending' and asc or desc
+        direction = asc if self.direction == 'ascending' else desc
 
         return stmt.order_by(direction(order))
 

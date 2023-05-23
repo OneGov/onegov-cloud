@@ -29,6 +29,11 @@ from uuid import uuid4
 from wtforms import FieldList
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .directory_entry import DirectoryEntry
+
+
 INHERIT = object()
 
 
@@ -92,7 +97,7 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         'polymorphic_identity': 'generic'
     }
 
-    entries = relationship(
+    entries: 'relationship[list[DirectoryEntry]]' = relationship(
         'DirectoryEntry',
         order_by='DirectoryEntry.order',
         backref='directory'

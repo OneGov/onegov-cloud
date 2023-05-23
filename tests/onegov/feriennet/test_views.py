@@ -534,8 +534,9 @@ def test_organiser_info(client, scenario):
 
     # by default no information is shown
     for id in ('play-with-legos', 'play-with-playmobil'):
-        assert not editor.get(f'/activity/{id}').pyquery('.organiser li')
-        assert not admin.get(f'/activity/{id}').pyquery('.organiser li')
+        # except the name, which is already set in the test scenario
+        assert len(editor.get(f'/activity/{id}').pyquery('.organiser li')) == 1
+        assert len(admin.get(f'/activity/{id}').pyquery('.organiser li')) == 1
 
     # owner changes are reflected on the activity
     contact = editor.get('/userprofile')
@@ -3103,16 +3104,7 @@ def test_add_child_with_differing_address(client, scenario):
     settings.form['show_political_municipality'] = 'y'
     settings.form.submit()
 
-    page = client.get('/userprofile')
-    page.form['salutation'] = 'mr'
-    page.form['first_name'] = 'foo'
-    page.form['last_name'] = 'bar'
-    page.form['zip_code'] = '123'
-    page.form['place'] = 'abc'
-    page.form['political_municipality'] = 'def'
-    page.form['address'] = 'abc'
-    page.form['emergency'] = '123456789 Admin'
-    page.form.submit()
+    client.fill_out_profile()
 
     page = client.get('/activities')
     page = page.click('Drawing')
@@ -3143,6 +3135,45 @@ def test_add_child_with_differing_address(client, scenario):
     assert json_data[0]['Teilnehmer PLZ'] == '1212'
     assert json_data[0]['Teilnehmer Ort'] == 'Exeter'
     assert json_data[0]['Teilnehmer Politische Gemeinde'] == 'London'
+
+
+def test_add_child_without_political_municipality(client, scenario):
+    scenario.add_period(title="2023", confirmed=True, finalized=False,
+                        phase='booking')
+    scenario.add_activity(title="Skating", state='accepted')
+    scenario.add_occasion(cost=1)
+    scenario.commit()
+
+    client.login_admin()
+    client.fill_out_profile()
+    page = client.get('/feriennet-settings')
+    page.form['show_political_municipality'] = False
+    page.form.submit()
+
+    page = client.get('/activity/skating').click('Anmelden')
+    # with differing address
+    page.form['first_name'] = "Tom"
+    page.form['last_name'] = "Sawyer"
+    page.form['birth_date'] = "2017-01-01"
+    page.form['gender'] = 'male'
+    page.form['differing_address'] = True
+    page.form['address'] = 'Somestreet'
+    page.form['zip_code'] = '4052'
+    page.form['place'] = 'Somecity'
+    page = page.form.submit().follow()
+    assert 'war erfolgreich' in page
+
+    # without differing address
+    page = client.get('/activity/skating').click('Anmelden')
+    page.form['attendee'] = 'other'  # Neue Person erfassen
+    page.form['first_name'] = "Lisa"
+    page.form['last_name'] = "Sawyer"
+    page.form['birth_date'] = "2019-01-01"
+    page.form['gender'] = 'female'
+    page.form['differing_address'] = False
+    page.form['ignore_age'] = True
+    page = page.form.submit().follow()
+    assert 'war erfolgreich' in page
 
 
 def test_view_dashboard(client, scenario):

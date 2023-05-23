@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-04-18 14:01+0200\n"
+"POT-Creation-Date: 2023-04-24 11:54+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -785,6 +785,12 @@ msgstr "Carte"
 msgid "More news"
 msgstr "Plus de nouvelles"
 
+msgid "Previous Entry"
+msgstr "Entrée précédente"
+
+msgid "Next Entry"
+msgstr "Entrée suivante"
+
 msgid "Total Amount"
 msgstr "Montant total"
 
@@ -1280,9 +1286,6 @@ msgstr "Votre événement a été accepté:"
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté:"
-
-msgid "The OneGov Cloud Team"
-msgstr "L'équipe de OneGov Cloud"
 
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées:"
@@ -2104,3 +2107,6 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+#~ msgid "The OneGov Cloud Team"
+#~ msgstr "L'équipe de OneGov Cloud"

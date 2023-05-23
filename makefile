@@ -3,7 +3,7 @@ install: in_virtual_env
 	pip install --upgrade pip
 
 	# install requirements
-	pip install -e '.[test,dev,docs]' \
+	pip install -e '.[test,dev,docs,mypy]' \
 	--config-settings editable_mode=compat --upgrade-strategy=eager
 
 	# enable pre-commit

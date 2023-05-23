@@ -1,8 +1,35 @@
+from datetime import datetime
+
 from cached_property import cached_property
+from dateutil.parser import isoparse
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
-from onegov.api import ApiEndpoint
+from onegov.api import ApiEndpoint, ApiInvalidParamException
+from onegov.gis import Coordinates
+
+UPDATE_FILTER_PARAMS = ['updated_gt', 'updated_lt', 'updated_eq',
+                        'updated_ge', 'updated_le']
+
+
+def filter_for_updated(filter_operation, filter_value, result):
+    """
+    Applies filters for several 'updated' comparisons.
+    Refer to UPDATE_FILTER_PARAMS for all filter keywords.
+
+    :param filter_operation: the updated filter operation to be applied. For
+    allowed filters refer to UPDATE_FILTER_PARAMS
+    :param filter_value: the updated filter value to filter for
+    :param result: the results to apply the filters on
+    :return: filter result
+    """
+    try:
+        # only parse including hours and minutes
+        ts = isoparse(filter_value[:16])
+    except Exception as ex:
+        raise ApiInvalidParamException(f'Invalid iso timestamp for parameter'
+                                       f'\'{filter_operation}\': {ex}') from ex
+    return result.for_filter(**{filter_operation: ts})
 
 
 class ApisMixin:
@@ -20,10 +47,25 @@ class ApisMixin:
         return MembershipApiEndpoint(self.app)
 
 
-class PersonApiEndpoint(ApiEndpoint, ApisMixin):
+def get_geo_location(item):
+    geo = item.content.get('coordinates', Coordinates()) or Coordinates()
+    return dict(lon=geo.lon, lat=geo.lat, zoom=geo.zoom)
 
+
+def get_modified_iso_format(item):
+    """
+    Returns the iso format of the modified or created field of item.
+
+    :param item: db item e.g. agency, people, membership
+    :return: str iso representation of item last modification
+    """
+    return item.modified.isoformat() if isinstance(
+        item.modified, datetime) else item.created.isoformat()
+
+
+class PersonApiEndpoint(ApiEndpoint, ApisMixin):
     endpoint = 'people'
-    filters = []
+    filters: list[str] = []
 
     @property
     def collection(self):
@@ -31,12 +73,31 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             self.session,
             page=self.page or 0
         )
+
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + ['first_name',
+                                           'last_name'] + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are: '
+                    f'{valid_params}')
+
+            # apply different filters
+            if key == 'first_name':
+                result = result.for_filter(first_name=value)
+            if key == 'last_name':
+                result = result.for_filter(last_name=value)
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
+
         result.exclude_hidden = True
         result.batch_size = self.batch_size
         return result
 
     def item_data(self, item):
-        return {
+        data = {
             attribute: getattr(item, attribute, None)
             for attribute in (
                 'academic_title',
@@ -62,6 +123,9 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             if attribute not in self.app.org.hidden_people_fields
         }
 
+        data['modified'] = get_modified_iso_format(item)
+        return data
+
     def item_links(self, item):
         result = {
             attribute: getattr(item, attribute, None)
@@ -78,7 +142,6 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
 
 
 class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
-
     endpoint = 'agencies'
     filters = ['parent']
 
@@ -90,6 +153,22 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             parent=self.get_filter('parent', None, False),
             joinedload=['organigram']
         )
+
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + ['title'] + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are:'
+                    f' {valid_params}')
+
+            # apply different filters
+            if key == 'title':
+                result = result.for_filter(title=value)
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
+
         result.batch_size = self.batch_size
         return result
 
@@ -99,6 +178,7 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             'portrait': item.portrait,
             'location_address': item.location_address,
             'location_code_city': item.location_code_city,
+            'modified': get_modified_iso_format(item),
             'postal_address': item.postal_address,
             'postal_code_city': item.postal_code_city,
             'website': item.website,
@@ -106,6 +186,7 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             'phone': item.phone,
             'phone_direct': item.phone_direct,
             'opening_hours': item.opening_hours,
+            'geo_location': get_geo_location(item),
         }
 
     def item_links(self, item):
@@ -120,7 +201,6 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
 
 
 class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
-
     endpoint = 'memberships'
     filters = ['agency', 'person']
 
@@ -132,12 +212,27 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
             agency=self.get_filter('agency'),
             person=self.get_filter('person'),
         )
+
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are:'
+                    f' {valid_params}')
+
+            # apply different filters
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
+
         result.batch_size = self.batch_size
         return result
 
     def item_data(self, item):
         return {
-            'title': item.title
+            'title': item.title,
+            'modified': get_modified_iso_format(item),
         }
 
     def item_links(self, item):

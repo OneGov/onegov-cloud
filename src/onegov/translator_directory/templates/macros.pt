@@ -89,8 +89,8 @@
             <dt i18n:translate>City</dt>
             <dd>${translator.city}</dd>
 
-            <dt i18n:translate>Drive distance</dt>
-            <dd>${layout.format_drive_distance(translator.drive_distance)}</dd>
+            <dt class="drive-distance" i18n:translate>Drive distance</dt>
+            <dd class="drive-distance">${layout.format_drive_distance(translator.drive_distance)}</dd>
 
             <dt i18n:translate>Withholding tax</dt>
             <dd class="withholding-tax">${layout.format_boolean(translator.withholding_tax)}</dd>

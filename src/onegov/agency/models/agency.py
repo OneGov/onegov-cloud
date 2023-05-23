@@ -40,7 +40,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
 
-    role_mappings = relationship(
+    role_mappings: 'relationship[list[RoleMapping]]' = relationship(
         RoleMapping,
         primaryjoin=(
             "and_("
@@ -52,7 +52,7 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
         sync_backref=False,
         viewonly=True,
         lazy='dynamic'
-    )
+    )  # type:ignore[call-arg]
 
     trait = 'agency'
 
@@ -137,6 +137,8 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
         for order, membership in enumerate(self.memberships):
             membership.order_within_agency = order
+
+        session.flush()
 
         return membership
 

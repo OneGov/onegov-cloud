@@ -7,6 +7,13 @@ from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
 from uuid import uuid4
 
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
+    from .course_subscription import CourseSubscription
+
+
 external_attendee_org = "Externe Kursteilnehmer"
 
 
@@ -44,7 +51,8 @@ class CourseAttendee(Base, ORMSearchable):
 
     # is null if its an external attendee
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
-    user = relationship("User", backref=backref("attendee", uselist=False))
+    user: 'relationship[User | None]' = relationship(
+        "User", backref=backref("attendee", uselist=False))
 
     # mirrors user active property
     active = Column(Boolean, nullable=False, default=True)
@@ -92,11 +100,12 @@ class CourseAttendee(Base, ORMSearchable):
 
     meta = Column(JSON, nullable=True, default=dict)
 
-    subscriptions = relationship(
+    subscriptions: 'relationship[list[CourseSubscription]]' = relationship(
         'CourseSubscription',
         backref='attendee',
         lazy='dynamic',
-        cascade='all, delete-orphan')
+        cascade='all, delete-orphan'
+    )
 
     @property
     def title(self):

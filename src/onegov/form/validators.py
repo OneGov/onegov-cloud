@@ -168,7 +168,8 @@ class ValidFormDefinition:
             from onegov.form import parse_form
 
             try:
-                parsed_form = parse_form(field.data)()
+                parsed_form = parse_form(field.data,
+                                         enable_indent_check=True)()
             except InvalidFormSyntax as exception:
                 field.render_kw = field.render_kw or {}
                 field.render_kw['data-highlight-line'] = exception.line

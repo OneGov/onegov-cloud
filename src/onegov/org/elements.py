@@ -151,7 +151,8 @@ class QrCodeLink(Element, AccessMixin):
         attrs['href'] = '#'
         attrs['data-payload'] = url
         attrs['data-reveal-id'] = ''.join(
-            choice('abcdefghi') for i in range(8))
+            choice('abcdefghi') for i in range(8)  # nosec B311
+        )
         # Foundation 6 Compatibility
         attrs['data-open'] = attrs['data-reveal-id']
         attrs['data-image-parent'] = f"qr-{attrs['data-reveal-id']}"

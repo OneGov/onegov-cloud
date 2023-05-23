@@ -72,6 +72,7 @@ autoapi_dirs = [
     "../src/onegov/gazette",
     "../src/onegov/gis",
     "../src/onegov/intranet",
+    "../src/onegov/landsgemeinde",
     "../src/onegov/newsletter",
     "../src/onegov/notice",
     "../src/onegov/onboarding",

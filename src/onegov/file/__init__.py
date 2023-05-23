@@ -1,9 +1,10 @@
 from onegov.file.collection import FileCollection, FileSetCollection
 from onegov.file.integration import DepotApp
 from onegov.file.models import (
+    AssociatedFiles,
     File,
     FileSet,
-    AssociatedFiles,
+    NamedFile,
     SearchableFile
 )
 
@@ -14,5 +15,6 @@ __all__ = (
     'FileCollection',
     'FileSet',
     'FileSetCollection',
-    'SearchableFile',
+    'NamedFile',
+    'SearchableFile'
 )

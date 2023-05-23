@@ -1,6 +1,11 @@
 from copy import deepcopy
 from datetime import date, timedelta
 
+from docx.document import Document
+from docx.oxml import CT_P, CT_Tbl
+from docx.table import _Cell, Table
+from docx.text.paragraph import Paragraph
+
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
@@ -88,3 +93,27 @@ def create_translators(translator_app, count=1):
         results.append(translators.add(**data))
 
     return results
+
+
+def iter_block_items(parent):
+    """ Recursively iterates over the elements of the .docx document.
+        Only use this for testing.
+
+    See `https://github.com/python-openxml/python-docx/issues/40`
+    """
+
+    if isinstance(parent, Document):
+        parent_elm = parent.element.body
+    elif isinstance(parent, _Cell):
+        parent_elm = parent._tc
+    else:
+        raise ValueError("Error parsing word file. ")
+
+    for child in parent_elm.iterchildren():
+        if isinstance(child, CT_P):
+            yield Paragraph(child, parent)
+        elif isinstance(child, CT_Tbl):
+            table = Table(child, parent)
+            for row in table.rows:
+                for cell in row.cells:
+                    yield from iter_block_items(cell)

@@ -733,7 +733,7 @@ def view_ticket_status(self, request, form, layout=None):
 @OrgApp.view(model=Ticket, name='send-to-gever', permission=Private)
 def view_send_to_gever(self, request):
     query = request.session.query(Organisation)
-    org: Organisation = query.first()
+    org = query.first()
     username = org.gever_username
     password = org.gever_password
     endpoint = org.gever_endpoint

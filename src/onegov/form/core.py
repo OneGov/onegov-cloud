@@ -765,7 +765,9 @@ class Pricing:
             )
 
 
-def merge_forms(*forms):
+# TODO: We should create a mypy plugin that properly infers the return-type
+#       this will also take care of dynamic base class errors.
+def merge_forms(*forms: type[Form]) -> type[Form]:
     """ Takes a list of forms and merges them.
 
     In doing so, a new class is created which inherits from all the forms in
@@ -786,7 +788,7 @@ def merge_forms(*forms):
 
     """
 
-    class MergedForm(*forms):
+    class MergedForm(*forms):  # type:ignore[misc]
         pass
 
     fields_in_order = (

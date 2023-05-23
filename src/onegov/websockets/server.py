@@ -2,12 +2,17 @@ from asyncio import Future
 from json import dumps
 from json import loads
 from onegov.websockets import log
-from websockets import broadcast
-from websockets import serve
+from websockets.legacy.protocol import broadcast
+from websockets.legacy.server import serve
 
 
-CONNECTIONS = {}
-TOKEN = ''
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from websockets.legacy.server import WebSocketServerProtocol
+
+
+CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
+TOKEN = ''  # nosec: B105
 
 
 def get_payload(message, expected):
@@ -18,7 +23,7 @@ def get_payload(message, expected):
         assert payload['type'] in expected
         return payload
     except Exception:
-        pass
+        log.warning('Invalid payload received')
 
 
 async def error(websocket, message, close=True):

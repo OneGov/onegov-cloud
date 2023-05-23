@@ -57,7 +57,6 @@ table. The link between the two is established in the automatically created
 
 """
 
-from collections import namedtuple
 from onegov.core.orm.utils import QueryChain
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -68,21 +67,87 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import backref, relationship
 
 
-class RegisteredLink(namedtuple("RegisteredLink", (
-    'cls',
-    'table',
-    'key',
-    'attribute',
-    'cardinality',
-))):
+from typing import overload, Any, ClassVar, Literal, NamedTuple, TypeVar
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm.query import Query
+    from .. import Base
+
+    Cardinality = Literal['one-to-many', 'one-to-one', 'many-to-many']
+    rel = relationship
+
+
+_M = TypeVar('_M', bound='Associable')
+
+
+class RegisteredLink(NamedTuple):
+    cls: type['Base']
+    table: Table
+    key: str
+    attribute: str
+    cardinality: 'Cardinality'
 
     @property
-    def class_attribute(self):
+    def class_attribute(self) -> Any:
         return getattr(self.cls, self.attribute)
 
 
-def associated(associated_cls, attribute_name, cardinality='one-to-many',
-               uselist='auto', backref_suffix='__tablename__'):
+@overload
+def associated(
+    associated_cls: type[_M],
+    attribute_name: str,
+    cardinality: Literal['one-to-many', 'many-to-many'] = ...,
+    *,
+    uselist: Literal['auto'] = ...,
+    backref_suffix: str = ...,
+    onupdate: str | None = ...
+) -> 'rel[list[_M]]': ...
+
+
+@overload
+def associated(
+    associated_cls: type[_M],
+    attribute_name: str,
+    cardinality: Literal['one-to-one'],
+    *,
+    uselist: Literal['auto'] = ...,
+    backref_suffix: str = ...,
+    onupdate: str | None = ...
+) -> 'rel[_M | None]': ...
+
+
+@overload
+def associated(
+    associated_cls: type[_M],
+    attribute_name: str,
+    cardinality: 'Cardinality' = ...,
+    *,
+    uselist: Literal[True],
+    backref_suffix: str = ...,
+    onupdate: str | None = ...
+) -> 'rel[list[_M]]': ...
+
+
+@overload
+def associated(
+    associated_cls: type[_M],
+    attribute_name: str,
+    cardinality: 'Cardinality' = ...,
+    *,
+    uselist: Literal[False],
+    backref_suffix: str = ...,
+    onupdate: str | None = ...
+) -> 'rel[_M | None]': ...
+
+
+def associated(
+    associated_cls: type[_M],
+    attribute_name: str,
+    cardinality: 'Cardinality' = 'one-to-many',
+    uselist: Literal['auto'] | bool = 'auto',
+    backref_suffix: str = '__tablename__',
+    onupdate: str | None = None
+) -> 'rel[list[_M]] | rel[_M | None]':
     """ Creates an associated attribute. This attribute is supposed to be
     defined on the mixin class that will establish the generic association
     if inherited by a model.
@@ -102,6 +167,12 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
         True if the attribute on the inheriting model is a list. Use 'auto'
         if this should be automatically decided depending on the cardinality.
 
+    :param backref_suffix:
+        Individual suffix used for the backref.
+
+    :param onupdate:
+        The 'onupdate' constraint of the foreign key column.
+
     Example::
 
         class Adress(Base, Associable):
@@ -117,6 +188,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
 
     assert cardinality in ('one-to-one', 'one-to-many', 'many-to-many')
 
+    cascade: str | bool
     if cardinality in ('one-to-one', 'one-to-many'):
         cascade = 'all, delete-orphan'
         single_parent = True
@@ -129,7 +201,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
     if uselist == 'auto':
         uselist = not cardinality.endswith('to-one')
 
-    def descriptor(cls):
+    def descriptor(cls: type['Base']) -> 'rel[list[_M]] | rel[_M | None]':
         name = '{}_for_{}_{}'.format(
             associated_cls.__tablename__,
             cls.__tablename__,
@@ -148,7 +220,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
 
         association = Table(
             name, cls.metadata,
-            Column(key, ForeignKey(target), nullable=False),
+            Column(key, ForeignKey(target, onupdate=onupdate), nullable=False),
             Column(association_key, ForeignKey(association_id), nullable=False)
         )
 
@@ -184,7 +256,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
             passive_deletes=passive_deletes
         )
 
-    return declared_attr(descriptor)
+    return declared_attr(descriptor)  # type:ignore[return-value]
 
 
 class Associable:
@@ -193,10 +265,19 @@ class Associable:
 
     """
 
-    registered_links = None
+    registered_links: dict[str, RegisteredLink] | None = None
+
+    if TYPE_CHECKING:
+        # FIXME: This should probably be abstract in some way so that
+        #        we can enforce that the class that is Associable has
+        #        an id column...
+        id: Column[Any]
+
+        # HACK: let mypy know that this will have a __tablename__ set
+        __tablename__: ClassVar[str]
 
     @classmethod
-    def association_base(cls):
+    def association_base(cls) -> type['Associable']:
         """ Returns the model which directly inherits from Associable. """
 
         for parent in cls.__bases__:
@@ -208,8 +289,15 @@ class Associable:
         return cls
 
     @classmethod
-    def register_link(cls, link_name, linked_class, table, key,
-                      attribute, cardinality):
+    def register_link(
+        cls,
+        link_name: str,
+        linked_class: type['Base'],
+        table: Table,
+        key: str,
+        attribute: str,
+        cardinality: 'Cardinality'
+    ) -> None:
         """ All associated classes are registered through this method. This
         yields the following benefits:
 
@@ -237,15 +325,16 @@ class Associable:
         )
 
     @property
-    def links(self):
+    def links(self) -> QueryChain:
         """ Returns a query chain with all records of all models which attach
         to the associable model.
 
         """
+        assert self.registered_links is not None, "No links registered"
 
         session = object_session(self)
 
-        def query(link):
+        def query(link: RegisteredLink) -> 'Query[Base]':
             column = getattr(link.cls, link.attribute)
 
             q = session.query(link.cls)

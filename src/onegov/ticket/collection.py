@@ -124,7 +124,7 @@ class TicketCollection(TicketCollectionPagination):
         range_start = 10 ** (length - 1)
         range_end = 10 ** length - 1
 
-        return random.randint(range_start, range_end)
+        return random.randint(range_start, range_end)  # nosec B311
 
     def random_ticket_number(self, handler_code):
         number = str(self.random_number(length=8))
@@ -179,7 +179,6 @@ class TicketCollection(TicketCollectionPagination):
         # add it to the session before invoking the handler, who expects
         # each ticket to belong to a session already
         self.session.add(ticket)
-
         ticket.handler_id = handler_id
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data
@@ -218,6 +217,10 @@ class TicketCollection(TicketCollectionPagination):
         count.setdefault('closed', 0)
 
         return TicketCount(**count)
+
+    def by_handler_data_id(self, handler_data_id):
+        return self.query().filter(
+            Ticket.handler_data['handler_data']['id'] == str(handler_data_id))
 
 
 class ArchivedTicketsCollection(TicketCollectionPagination):

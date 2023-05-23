@@ -8,6 +8,12 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .course_event import CourseEvent
+
+
 NOTIFICATION_TYPES = ('info', 'reservation', 'reminder', 'cancellation')
 NOTIFICATION_TYPE_TRANSLATIONS = (
     _('Info Mail'), _('Subscription Confirmation'),
@@ -90,8 +96,10 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     course_event_id = Column(
         UUID, ForeignKey('fsi_course_events.id'), nullable=False)
 
-    course_event = relationship('CourseEvent',
-                                back_populates='notification_templates')
+    course_event: 'relationship[CourseEvent]' = relationship(
+        'CourseEvent',
+        back_populates='notification_templates'
+    )
 
     #: The public id of the notification template
     id = Column(UUID, primary_key=True, default=uuid4)

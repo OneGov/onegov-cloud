@@ -133,6 +133,13 @@ class TranslatorLayout(DefaultLayout):
                     self.request.link(self.file_collection),
                     attrs={'class': 'documents'}
                 ),
+                Link(
+                    _('Mail templates'),
+                    url=self.request.link(
+                        self.model, name='mail-templates'
+                    ),
+                    attrs={'class': 'envelope'}
+                ),
             ]
         elif self.request.is_editor:
             return [
@@ -189,7 +196,6 @@ class TranslatorLayout(DefaultLayout):
                     url=self.request.link(self.model)
                 )
             )
-
         return links
 
 
@@ -241,6 +247,20 @@ class ApplyTranslatorChangesLayout(TranslatorLayout):
         return links
 
 
+class MailTemplatesLayout(TranslatorLayout):
+
+    @property
+    def breadcrumbs(self):
+        return super().breadcrumbs + [
+            Link(
+                text=_('Mail templates'),
+                url=self.request.link(
+                    self.model, name='mail-templates'
+                )
+            )
+        ]
+
+
 class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
@@ -277,7 +297,12 @@ class TranslatorCollectionLayout(DefaultLayout):
                     url=self.request.class_link(
                         TranslatorCollection, name='export'
                     ),
-                    attrs={'class': 'export-link'}
+                    attrs={'class': 'export-link'},
+                ),
+                Link(
+                    _("Mail to all translators"),
+                    url=self.request.app.mailto_link,
+                    attrs={'class': 'envelope'},
                 )
             ]
         elif self.request.is_editor or self.request.is_member:

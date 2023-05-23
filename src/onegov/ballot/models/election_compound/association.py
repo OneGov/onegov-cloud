@@ -8,6 +8,12 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .election_compound import ElectionCompound
+    from ..election.election import Election
+
+
 class ElectionCompoundAssociation(Base):
 
     __tablename__ = 'election_compound_associations'
@@ -15,6 +21,7 @@ class ElectionCompoundAssociation(Base):
     #: identifies the candidate result
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    # FIXME: should election_compount_id and election_id be nullable=False?
     #: The election compound ID
     election_compound_id = Column(
         Text,
@@ -28,7 +35,7 @@ class ElectionCompoundAssociation(Base):
         primary_key=True
     )
 
-    election_compound = relationship(
+    election_compound: 'relationship[ElectionCompound]' = relationship(
         'ElectionCompound', backref=backref(
             'associations',
             cascade='all, delete-orphan',
@@ -36,7 +43,7 @@ class ElectionCompoundAssociation(Base):
         )
     )
 
-    election = relationship(
+    election: 'relationship[Election]' = relationship(
         'Election', backref=backref(
             'associations',
             cascade='all, delete-orphan',

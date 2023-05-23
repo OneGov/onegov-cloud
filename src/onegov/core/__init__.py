@@ -5,7 +5,7 @@
 # version is to create release-dependent urls, artifacts and caches. During
 # development these dependencies do not need to be updated in lock-step.
 #
-__version__ = '2023.15'
+__version__ = '2023.22'
 
 # The module levels used for dependency tests and to have a well defined
 # onegov core upgrade order.
@@ -61,6 +61,7 @@ LEVELS = (
         'onegov.fsi',
         'onegov.gazette',
         'onegov.intranet',
+        'onegov.landsgemeinde',
         'onegov.onboarding',
         'onegov.org',
         'onegov.swissvotes',

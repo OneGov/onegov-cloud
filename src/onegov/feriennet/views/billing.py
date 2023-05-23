@@ -18,7 +18,7 @@ from onegov.feriennet.forms import ManualBookingForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.layout import BillingCollectionManualBookingLayout
-from onegov.feriennet.layout import BillingCollectionPaymentWithDate
+from onegov.feriennet.layout import BillingCollectionPaymentWithDateLayout
 from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
 from onegov.pay import Payment
@@ -95,10 +95,11 @@ def view_billing(self, request, form):
             url=url
         )
 
-    def mark_paid_with_date_link(username, invoice_id):
+    def mark_paid_with_date_link(for_user, invoice_id, item_id):
         url = request.link(self, name='paid-date')
-        url = f'{url}&for-user={quote_plus(username)}'
+        url = f'{url}&for-user={quote_plus(for_user)}'
         url = f'{url}&invoice-id={quote_plus(invoice_id)}'
+        url = f'{url}&item-id={quote_plus(item_id)}'
 
         return Link(
             _("Mark paid with specific date"),
@@ -134,7 +135,8 @@ def view_billing(self, request, form):
         yield manual_booking_link(details.first.username)
         if not details.paid:
             yield mark_paid_with_date_link(details.title,
-                                           details.invoice_id.hex)
+                                           details.invoice_id.hex,
+                                           'all')
 
         if details.disable_changes:
             traits = (
@@ -192,6 +194,10 @@ def view_billing(self, request, form):
             traits = None
 
         yield from (as_link(a, traits) for a in item_actions(item))
+        if not item.paid:
+            yield mark_paid_with_date_link(item.realname,
+                                           item.invoice_id.hex,
+                                           item.id.hex)
 
     def invoice_actions(details):
         if details.paid:
@@ -532,21 +538,27 @@ def view_manual_booking_form(self, request, form):
 def view_paid_date_form(self, request, form):
     if form.submitted(request):
 
-        invoice_item = self.session.query(
+        invoice = self.session.query(
             Invoice).filter_by(id=request.params['invoice-id']).first()
 
-        items = invoice_item.items
+        items = invoice.items
+        items = [i for i in items if i.id.hex in form.items.data]
 
         for item in items:
             item.payment_date = form.payment_date.data
             item.paid = True
 
-        return request.redirect(request.link(self))
+        if self.request.params['item-id'] != 'all':
+            request.success(_("Invoice marked as paid"))
+        else:
+            request.success(_("Invoice item(s) marked as paid"))
+
+        return request.redirect(request.class_link(BillingCollection))
 
     user = request.params['for-user']
 
     return {
-        'layout': BillingCollectionPaymentWithDate(
+        'layout': BillingCollectionPaymentWithDateLayout(
             self, request),
         'title': _("Mark paid with specific date"),
         'lead': _("Mark paid for ${user}", mapping={'user': user}),

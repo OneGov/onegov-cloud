@@ -357,7 +357,8 @@ class AttendeesBoardlet(FeriennetBoardlet):
 
         accepted_attendees = self.session.query(Booking.attendee_id).filter(
             Booking.attendee_id.in_(attendee_ids),
-            Booking.state == 'accepted'
+            Booking.state == 'accepted',
+            Booking.period_id == self.period.id
         ).distinct()
 
         return {

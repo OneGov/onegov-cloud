@@ -13,7 +13,7 @@ from uuid import uuid4
 
 
 MISSING = object()
-TOKEN = '[{}]'
+TOKEN = '[{}]'  # nosec: B105
 
 
 class NotificationTemplate(Base, ContentMixin, TimestampMixin):

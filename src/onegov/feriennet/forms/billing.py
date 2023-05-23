@@ -1,3 +1,4 @@
+from onegov.activity import Invoice
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -130,9 +131,11 @@ class ManualBookingForm(Form):
             self.target.choices.append(
                 ('for-users-with-tags', _("For users with tags")))
 
-        if self.request.params.get('for-user'):
+        if (self.request.params.get('for-user')
+                and not self.target.data):
             self.target.data = 'for-user'
-            self.username.data = self.request.params['for-user']
+            if not self.username.data:
+                self.username.data = self.request.params['for-user']
 
     @property
     def usercollection(self):
@@ -154,3 +157,53 @@ class PaymentWithDateForm(Form):
         label=_("Payment date"),
         validators=(InputRequired(), ),
     )
+
+    target = RadioField(
+        validators=(InputRequired(), ),
+        label=_("Target"),
+        choices=(
+            ('all', _("Whole invoice")),
+            ('specific', _("Only for specific items"))
+        ),
+    )
+
+    items = MultiCheckboxField(
+        label=_("Items"),
+        validators=(InputRequired(), ),
+        depends_on=('target', 'specific'),
+        choices=tuple()
+    )
+
+    def on_request(self):
+        self.items.choices = [
+            (i.id.hex,
+             f'{i.group} - {i.text} ({round(i.amount, 2)})')
+            for i in self.invoice.items if not i.paid]
+
+        if self.request.params['item-id'] != 'all':
+            # Set defaults according to parameters
+            if not self.target.data:
+                self.target.data = 'specific'
+            if not self.items.data:
+                self.items.data = [self.request.params['item-id']]
+
+            # Check all unpaid items if 'all' is selected
+            if self.target.data == 'all':
+                self.items.data = [i.id.hex for i in self.invoice.items
+                                   if not i.paid]
+        else:
+            # Set defaults according to parameters
+            if not self.target.data:
+                self.target.data = 'all'
+            if not self.items.data:
+                self.items.data = [i.id.hex for i in self.invoice.items
+                                   if not i.paid]
+
+            # Check all unpaid items if 'all' is selected
+            if self.target.data == 'all':
+                self.items.data = [i.id.hex for i in self.invoice.items]
+
+    @property
+    def invoice(self):
+        return self.request.session.query(
+            Invoice).filter_by(id=self.request.params['invoice-id']).first()

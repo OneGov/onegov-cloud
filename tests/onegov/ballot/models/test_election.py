@@ -843,10 +843,14 @@ def test_related_elections(session):
     assert session.query(ElectionRelationship).all() == []
 
 
-def test_election_rename(session):
+def test_election_rename(test_app, explanations_pdf):
+    session = test_app.session()
+
     election = majorz_election()
     session.add(election)
     session.flush()
+
+    election.explanations_pdf = (explanations_pdf, 'explanations.pdf')
 
     assert session.query(Candidate).one().election_id == 'election'
     assert session.query(ElectionResult).one().election_id == 'election'

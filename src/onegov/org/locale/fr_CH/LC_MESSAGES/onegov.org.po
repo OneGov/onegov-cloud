@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-18 09:07+0200\n"
+"POT-Creation-Date: 2023-04-18 15:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1037,19 +1037,19 @@ msgid "Website"
 msgstr "Site Web"
 
 msgid "Website 2"
-msgstr ""
+msgstr "Site Web 2"
 
 msgid "Location address"
-msgstr ""
+msgstr "Adress du lieu"
 
 msgid "Location Code and City"
-msgstr ""
+msgstr "Code de localisation et ville"
 
 msgid "Postal address"
-msgstr ""
+msgstr "Adresse postale"
 
 msgid "Postal Code and City"
-msgstr ""
+msgstr "Code postal et ville"
 
 msgid "Picture"
 msgstr "Photo"
@@ -3248,9 +3248,6 @@ msgstr "Votre événement a été accepté :"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté :"
 
-msgid "The OneGov Cloud Team"
-msgstr "L'équipe de OneGov Cloud"
-
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Voici ce qui s'est passé la semaine dernière sur le site web de ${org} :"
@@ -5183,6 +5180,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "The OneGov Cloud Team"
+#~ msgstr "L'équipe de OneGov Cloud"
 
 #~ msgid "1 entry"
 #~ msgstr "1 entrée"

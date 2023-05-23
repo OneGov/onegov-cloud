@@ -808,3 +808,19 @@ def add_type_election_relationships(context):
 def remove_old_panachage_results(context):
     if context.has_table('panachage_results'):
         context.operations.drop_table('panachage_results')
+
+
+@upgrade_task('Fix file constraints')
+def fix_file_constraints(context):
+
+    for table, ref in (
+        ('files_for_elections_files', 'elections'),
+        ('files_for_election_compounds_files', 'election_compounds'),
+        ('files_for_votes_files', 'votes'),
+    ):
+        context.operations.execute(
+            f'ALTER TABLE {table} '
+            f'DROP CONSTRAINT {table}_{ref}_id_fkey, '
+            f'ADD CONSTRAINT {table}_{ref}_id_fkey'
+            f' FOREIGN KEY ({ref}_id) REFERENCES {ref} (id) ON UPDATE CASCADE'
+        )
