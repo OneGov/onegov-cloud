@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-05-19 10:08+0200\n"
+"POT-Creation-Date: 2023-05-23 09:16+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -188,6 +188,9 @@ msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
 
 msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
+
+msgid "Ticker"
+msgstr "Ticker"
 
 #, python-format
 msgid "Extraodinary assembly from ${date}"
