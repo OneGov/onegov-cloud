@@ -20,6 +20,11 @@ from sqlalchemy.orm import relationship, validates
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
+
+
 class Attendee(Base, TimestampMixin, ORMSearchable):
     """ Attendees are linked to zero to many bookings. Each booking
     has an attendee.
@@ -82,7 +87,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     limit = Column(Integer, nullable=True)
 
     #: access the user linked to this booking
-    user = relationship('User')
+    user: 'relationship[User]' = relationship('User')
 
     #: a secondary id used for subscriptions only - subscriptions are ical urls
     #: with public permission, by using a separate id we mitigate the risk of
@@ -108,7 +113,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
         return today.year - birth.year - extra
 
-    @age.expression
+    @age.expression  # type:ignore[no-redef]
     def age(self):
         return func.extract('year', func.age(self.birth_date))
 
@@ -148,7 +153,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
 
         return score / score_max
 
-    @happiness.expression
+    @happiness.expression  # type:ignore[no-redef]
     def happiness(cls, period_id):
         return select([
             # force the result to be a float instead of a decimal
@@ -169,7 +174,7 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         )).label("happiness")
 
     #: The bookings linked to this attendee
-    bookings = relationship(
+    bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
         order_by='Booking.created',
         backref='attendee'

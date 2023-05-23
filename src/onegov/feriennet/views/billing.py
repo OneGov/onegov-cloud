@@ -18,7 +18,7 @@ from onegov.feriennet.forms import ManualBookingForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.layout import BillingCollectionManualBookingLayout
-from onegov.feriennet.layout import BillingCollectionPaymentWithDate
+from onegov.feriennet.layout import BillingCollectionPaymentWithDateLayout
 from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
 from onegov.pay import Payment
@@ -558,7 +558,7 @@ def view_paid_date_form(self, request, form):
     user = request.params['for-user']
 
     return {
-        'layout': BillingCollectionPaymentWithDate(
+        'layout': BillingCollectionPaymentWithDateLayout(
             self, request),
         'title': _("Mark paid with specific date"),
         'lead': _("Mark paid for ${user}", mapping={'user': user}),

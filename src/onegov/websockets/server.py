@@ -2,11 +2,16 @@ from asyncio import Future
 from json import dumps
 from json import loads
 from onegov.websockets import log
-from websockets import broadcast
-from websockets import serve
+from websockets.legacy.protocol import broadcast
+from websockets.legacy.server import serve
 
 
-CONNECTIONS = {}
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from websockets.legacy.server import WebSocketServerProtocol
+
+
+CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
 TOKEN = ''  # nosec: B105
 
 

@@ -20,7 +20,7 @@ from onegov.reservation import Resource
 from onegov.ticket import TicketCollection
 from operator import attrgetter
 from purl import URL
-from sqlalchemy import nullsfirst
+from sqlalchemy import nullsfirst  # type:ignore[attr-defined]
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser

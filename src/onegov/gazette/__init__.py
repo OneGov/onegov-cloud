@@ -1,9 +1,8 @@
 import logging
-log = logging.getLogger('onegov.gazette')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.gazette')
+log.addHandler(logging.NullHandler())
 
-from translationstring import TranslationStringFactory
-_ = TranslationStringFactory('onegov.gazette')  # noqa
+from onegov.gazette.i18n import _
 
 from onegov.gazette.app import GazetteApp
 

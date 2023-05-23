@@ -34,6 +34,11 @@ from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+
 TAGS = [
     _("Art"),
     _("Cinema"),
@@ -80,7 +85,7 @@ WEEKDAYS = (
 class EventForm(Form):
     """ Defines the form for all events. """
 
-    on_request_include = ('common', 'many')
+    on_request_include: 'Sequence[str]' = ('common', 'many')
 
     timezone = 'Europe/Zurich'
 

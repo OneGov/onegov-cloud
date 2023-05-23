@@ -8,6 +8,11 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .election_compound import ElectionCompound
+
+
 class ElectionCompoundRelationship(Base):
     """ A relationship between election compounds. """
 
@@ -16,6 +21,7 @@ class ElectionCompoundRelationship(Base):
     #: Identifies the relationship.
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    # FIXME: should source_id and target_id be nullable=False?
     #: The source election compound ID.
     source_id = Column(
         Text,
@@ -30,7 +36,7 @@ class ElectionCompoundRelationship(Base):
     )
 
     #: The source election compound.
-    source = relationship(
+    source: 'relationship[ElectionCompound]' = relationship(
         'ElectionCompound',
         foreign_keys=[source_id],
         backref=backref(
@@ -41,7 +47,7 @@ class ElectionCompoundRelationship(Base):
     )
 
     #: The target election compound.
-    target = relationship(
+    target: 'relationship[ElectionCompound]' = relationship(
         'ElectionCompound',
         foreign_keys=[target_id],
         backref=backref(

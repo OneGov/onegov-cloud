@@ -92,17 +92,17 @@ class OrgTicketMixin:
 
 
 class FormSubmissionTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FRM'}
+    __mapper_args__ = {'polymorphic_identity': 'FRM'}  # type:ignore
     es_type_name = 'submission_tickets'
 
 
 class ReservationTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'RSV'}
+    __mapper_args__ = {'polymorphic_identity': 'RSV'}  # type:ignore
     es_type_name = 'reservation_tickets'
 
 
 class EventSubmissionTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EVN'}
+    __mapper_args__ = {'polymorphic_identity': 'EVN'}  # type:ignore
     es_type_name = 'event_tickets'
 
     def reference_group(self, request):
@@ -126,7 +126,7 @@ class EventSubmissionTicket(OrgTicketMixin, Ticket):
 
 
 class DirectoryEntryTicket(OrgTicketMixin, Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'DIR'}
+    __mapper_args__ = {'polymorphic_identity': 'DIR'}  # type:ignore
     es_type_name = 'directory_tickets'
 
 

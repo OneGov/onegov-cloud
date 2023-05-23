@@ -229,7 +229,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
-    @last_ballot_change.expression
+    @last_ballot_change.expression  # type:ignore[no-redef]
     def last_ballot_change(cls):
         expr = select([func.max(Ballot.last_change)])
         expr = expr.where(Ballot.vote_id == cls.id)
@@ -247,7 +247,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         changes = [change for change in changes if change]
         return max(changes) if changes else None
 
-    @last_modified.expression
+    @last_modified.expression  # type:ignore[no-redef]
     def last_modified(cls):
         return func.greatest(
             cls.last_change, cls.last_result_change, cls.last_ballot_change

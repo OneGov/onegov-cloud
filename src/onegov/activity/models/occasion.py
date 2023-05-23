@@ -22,6 +22,13 @@ from sqlalchemy_utils import aggregated, observes
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .booking import Booking
+    from .occasion_date import OccasionDate
+    from .occasion_need import OccasionNeed
+
+
 class Occasion(Base, TimestampMixin):
     """ Describes a single occurrence of an Activity. "Occurence" would have
     been a good word for it too, but that's used by onegov.event.
@@ -102,14 +109,14 @@ class Occasion(Base, TimestampMixin):
         return func.count('1')
 
     #: The bookings linked to this occasion
-    bookings = relationship(
+    bookings: 'relationship[list[Booking]]' = relationship(
         'Booking',
         order_by='Booking.created',
         backref='occasion'
     )
 
     #: The dates associated with this occasion (loaded eagerly)
-    dates = relationship(
+    dates: 'relationship[list[OccasionDate]]' = relationship(
         'OccasionDate',
         cascade='all,delete',
         order_by='OccasionDate.start',
@@ -117,7 +124,7 @@ class Occasion(Base, TimestampMixin):
         lazy='joined',
     )
 
-    accepted = relationship(
+    accepted: 'relationship[list[Booking]]' = relationship(
         'Booking',
         primaryjoin=("""and_(
             Booking.occasion_id == Occasion.id,
@@ -127,7 +134,7 @@ class Occasion(Base, TimestampMixin):
     )
 
     #: The needs associated with this occasion
-    needs = relationship(
+    needs: 'relationship[list[OccasionNeed]]' = relationship(
         'OccasionNeed',
         cascade='all,delete',
         order_by='OccasionNeed.name',
@@ -178,7 +185,7 @@ class Occasion(Base, TimestampMixin):
 
         return base
 
-    @total_cost.expression
+    @total_cost.expression  # type:ignore[no-redef]
     def total_cost(self):
         from onegov.activity.models.period import Period
 
@@ -256,7 +263,7 @@ class Occasion(Base, TimestampMixin):
             return 0
         return self.spots.upper - 1 - self.attendee_count
 
-    @available_spots.expression
+    @available_spots.expression  # type:ignore[no-redef]
     def available_spots(cls):
         return case((
             (
