@@ -1,11 +1,12 @@
 $(document).ready(function() {
-    const endpoint = $('body').data('websocket-endpoint');
-    const schema = $('body').data('websocket-schema');
+    const endpoint = document.body.dataset.websocketEndpoint;
+    const schema = document.body.dataset.websocketSchema;
 
     function onWebsocketNotification(message, _websocket) {
-        if (message.event === 'refresh' && window.location.href.search(message.path) !== -1) {
+        if (message.event === 'refresh' && document.body.id.search(message.assembly) !== -1) {
             window.location.reload();
         }
+        // todo: update
     }
 
     var lastModified;

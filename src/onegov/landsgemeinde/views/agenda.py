@@ -22,7 +22,7 @@ def add_agenda_item(self, request, form):
 
     if form.submitted(request):
         agenda_item = self.add(**form.get_useful_data())
-        agenda_item.assembly.stamp()
+        request.app.update_ticker(agenda_item.assembly)
         request.success(_("Added a new agenda item"))
 
         return redirect(request.link(agenda_item))
@@ -67,7 +67,7 @@ def edit_agenda_item(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
-        self.assembly.stamp()
+        request.app.update_ticker(self.assembly)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
@@ -94,7 +94,7 @@ def delete_agenda_item(self, request):
 
     request.assert_valid_csrf_token()
 
-    self.assembly.stamp()
+    request.app.update_ticker(self.assembly)
 
     collection = AgendaItemCollection(request.session)
     collection.delete(self)

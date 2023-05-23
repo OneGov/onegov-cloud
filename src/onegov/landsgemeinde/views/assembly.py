@@ -41,7 +41,7 @@ def add_assembly(self, request, form):
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
-        assembly.stamp()
+        request.app.update_ticker(assembly)
         request.success(_("Added a new assembly"))
 
         return redirect(request.link(assembly))
@@ -124,7 +124,7 @@ def edit_assembly(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
-        self.stamp()
+        request.app.update_ticker(self)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 

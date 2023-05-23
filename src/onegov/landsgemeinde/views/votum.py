@@ -21,7 +21,7 @@ def add_votum(self, request, form):
 
     if form.submitted(request):
         votum = self.add(**form.get_useful_data())
-        votum.agenda_item.assembly.stamp()
+        request.app.update_ticker(votum.agenda_item.assembly)
         request.success(_("Added a new votum"))
 
         return redirect(
@@ -52,7 +52,7 @@ def edit_votum(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
-        self.agenda_item.assembly.stamp()
+        request.app.update_ticker(self.agenda_item.assembly)
         request.success(_("Your changes were saved"))
         return request.redirect(
             request.link(self.agenda_item, fragment=f'votum-{self.number}')
@@ -81,7 +81,7 @@ def delete_votum(self, request):
 
     request.assert_valid_csrf_token()
 
-    self.agenda_item.assembly.stamp()
+    request.app.update_ticker(self.agenda_item.assembly)
 
     collection = VotumCollection(request.session)
     collection.delete(self)
