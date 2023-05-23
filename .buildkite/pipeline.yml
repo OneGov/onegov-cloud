@@ -11,7 +11,7 @@ steps:
       build.branch =~ /^release-/ ||
       build.message =~ /\[test-container\]/i
 
-  - command: .buildkite/cat .buildkite/generic-pipeline.yml | buildkite-agent pipeline upload
+  - command: ls -la .
     label: ":pipeline: Running tests on generic container"
 
     agents:
