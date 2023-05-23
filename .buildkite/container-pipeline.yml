@@ -68,16 +68,3 @@ steps:
       CONTAINER_TEST_SCRIPT: ".buildkite/docs 1"
 
     branches: "master"
-
-  - wait
-
-  # if this is a release, publish the container
-  - command: "publish-container"
-    label: "Publishing"
-    branches: "release-*"
-
-    agents:
-      - queue=builder
-
-    env:
-      CONTAINER: "onegov-cloud:head"

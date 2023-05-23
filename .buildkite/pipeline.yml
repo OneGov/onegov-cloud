@@ -4,18 +4,12 @@ steps:
   - command: "cat buildkite/container-pipeline.yml | buildkite-agent pipeline upload"
     label: ":pipeline: Running tests on built container"
 
-    agents:
-      - queue=generic
-
     if: |
       build.branch =~ /^release-/ ||
       build.message =~ /\[test-container\]/i
 
   - command: "cat buildkite/generic-pipeline.yml | buildkite-agent pipeline upload"
     label: ":pipeline: Running tests on generic container"
-
-    agents:
-      - queue=generic
 
     if: |
       build.branch !~ /^release-/ &&
