@@ -11,7 +11,15 @@ node=$(nodeenv --list 2>&1 | tr '\t' '\n' | grep -E '^12' | tail -n 1)
 nodeenv --node="$node" /tmp/node
 
 echo "--- Installing dependencies"
-cd /app/src/tests/js
+
+# only switch to container src directory if we want to test
+# the container, rather than just the source tree
+if [$1 -eq 1]; then
+    cd /app/src/tests/js
+else
+    cd tests/js
+fi
+
 /tmp/node/bin/npm install
 
 echo "--- Running Jest"

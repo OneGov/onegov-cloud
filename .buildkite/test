@@ -52,15 +52,19 @@ echo "$(java --version)"
 echo "--- Creating virtual environment"
 
 # switch to virtual environment
-cd /app
-
 # shellcheck disable=SC1091
-source bin/activate
+source /app/bin/activate
 
 # install testing dependencies
 echo "--- Installing dependencies :python:"
 echo "$(python --version)"
-cd /app/src
+
+# only switch to container src directory if we want to test
+# the container, rather than just the source tree
+if [$1 -eq 1]; then
+    cd /app/src
+fi
+
 pip install '.[test]' \
     pytest-test-groups \
     pytest-cov \
@@ -69,7 +73,7 @@ pip install '.[test]' \
 
 # reset the build assets again (like in the upstream container script),
 # because pip install will undo that change
-find ../lib -type d -iname assets -print0 | xargs -0 chmod a+w
+find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w
 
 # run the tests as a separate user
 export LC_ALL="C.UTF-8"
