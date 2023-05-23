@@ -241,6 +241,61 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             if data:
                 self.snapshot[f'submitter_{info}'] = data
 
+    @staticmethod
+    def drop_fts_index(session, schema):
+        """
+        Drops the full text search index. Used for re-indexing
+
+        :param session: db session
+        :param schema: schema on which the fts index shall be dropped
+        :return:
+        """
+        query = f"""
+DROP INDEX IF EXISTS "{schema}".fts_idx_ticket_number
+"""
+        print(f'dropping index query: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def create_fts_index(session, schema):
+        """
+        Creates the full text search index based on the separate index
+        column. Used for re-indexing
+
+        :param session: db session
+        :param schema: schema the index shall be created
+        :return:
+        """
+        query = f"""
+CREATE INDEX fts_idx_ticket_number ON "{schema}".tickets USING
+GIN (fts_idx_ticket_number_col);
+"""
+        print(f'create index query: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def add_fts_column(session, schema):
+        """
+        This function is used as migration step moving to postgressql full
+        text search, OGC-508. It adds a separate column for the tsvector
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        from onegov.search.utils import create_tsvector_string
+
+        s = create_tsvector_string('number')
+        query = f"""
+ALTER TABLE "{schema}".users ADD COLUMN
+fts_idx_ticket_number_col tsvector GENERATED ALWAYS AS
+(to_tsvector('german', {s})) STORED;
+"""
+        session.execute(query)
+        session.execute("COMMIT")
+
 
 class TicketPermission(Base, TimestampMixin):
     """ Defines a custom ticket permission.
