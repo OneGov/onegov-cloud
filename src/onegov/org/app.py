@@ -26,7 +26,7 @@ from onegov.org.theme import OrgTheme
 from onegov.page import Page, PageCollection
 from onegov.pay import PayApp
 from onegov.reservation import LibresIntegration
-from onegov.search import ElasticsearchApp
+from onegov.search import PostgresqlSearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
@@ -34,7 +34,7 @@ from onegov.websockets import WebsocketsApp
 from purl import URL
 
 
-class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
+class OrgApp(Framework, LibresIntegration, PostgresqlSearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
     serve_static_files = True
