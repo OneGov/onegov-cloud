@@ -1,18 +1,24 @@
 steps:
 
   # choose the pipeline we want to use…
-  - command: .buildkite/cat .buildkite/container-pipeline.yml | buildkite-agent pipeline upload
+  - command: start-pipeline
     label: ":pipeline: Running tests on built container"
 
     agents:
       - queue=builder
 
+    env:
+      PIPELINE_CONFIG: ".buildkite/container-pipeline.yml"
+
     if: |
       build.branch =~ /^release-/ ||
       build.message =~ /\[test-container\]/i
 
-  - command: ls -la .
+  - command: start-pipeline
     label: ":pipeline: Running tests on generic container"
+
+    env:
+      PIPELINE_CONFIG: ".buildkite/generic-pipeline.yml"
 
     agents:
       - queue=builder
