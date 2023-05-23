@@ -23,7 +23,9 @@ def add_votum(self, request, form):
         votum = self.add(**form.get_useful_data())
         request.success(_("Added a new votum"))
 
-        return redirect(request.link(votum.agenda_item))
+        return redirect(
+            request.link(votum.agenda_item, fragment=f'votum-{votum.number}'),
+        )
 
     form.number.data = form.next_number
 
@@ -51,7 +53,7 @@ def edit_votum(self, request, form):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
         return request.redirect(
-            request.link(self.agenda_item) + f'#votum-{self.number}'
+            request.link(self.agenda_item, fragment=f'votum-{self.number}')
         )
 
     form.process(obj=self)
