@@ -1,7 +1,7 @@
 steps:
 
   # choose the pipeline we want to use…
-  - command: ".buildkite/container-pipeline.sh"
+  - command: cat .buildkite/container-pipeline.yml | buildkite-agent pipeline upload
     label: ":pipeline: Running tests on built container"
 
     agents:
@@ -11,7 +11,7 @@ steps:
       build.branch =~ /^release-/ ||
       build.message =~ /\[test-container\]/i
 
-  - command: "ls -la . && ls -la / && .buildkite/generic-pipeline.sh"
+  - command: cat .buildkite/generic-pipeline.yml | buildkite-agent pipeline upload
     label: ":pipeline: Running tests on generic container"
 
     agents:
