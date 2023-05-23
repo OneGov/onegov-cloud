@@ -94,7 +94,7 @@ def delete_agenda_item(self, request):
 
     request.assert_valid_csrf_token()
 
-    self.agenda_item.assembly.stamp()
+    self.assembly.stamp()
 
     collection = AgendaItemCollection(request.session)
     collection.delete(self)
