@@ -277,7 +277,7 @@ def parse_agency_portrait_field_for_address(portrait):
     Parsing the `portrait` field of agencies and extract address and
     code/city as well as location address and city if present.
 
-    :param portrait:str
+    :param portrait: html str
     :return: tuple: (location_addr, location_pcc ,postal_address,
     postal_code_city)
     """
@@ -289,6 +289,7 @@ def parse_agency_portrait_field_for_address(portrait):
     plz_city_found_idx = -1
 
     soup = BeautifulSoup(portrait)
+    # convert from html to text using soup
     portrait_text = soup.get_text('\n')
     lines = portrait_text.split('\n')
     for line, idx in zip(lines, range(len(lines))):
