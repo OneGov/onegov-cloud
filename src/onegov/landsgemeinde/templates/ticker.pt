@@ -1,0 +1,132 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.landsgemeinde">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell main-content">
+                <tal:block tal:repeat="agenda_item agenda_items">
+                    <div class="ticker-item ticker-item-agenda-item" data-agenda-item="${agenda_item.number}">
+                        <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
+                        <p tal:condition="agenda_item.start" class="subheader agenda-item-timestamp">${layout.format_date(agenda_item.start, 'datetime')}</p>
+
+                        <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
+                            <tal:block tal:content="structure agenda_item.resolution">
+                            <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
+                        </div>
+
+                        <div class="agenda-item-tags">
+                            <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
+                        </div>
+
+                        <div class="agenda-item-vota">
+                            <tal:block tal:repeat="votum reversed(agenda_item.vota)">
+                                <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture)|None">
+                                    <a href="#" aria-hidden="true">
+                                        <div class="person-card-portrait">
+                                            <i class="fa fa-user" tal:condition="not:url"></i>
+                                            <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                                        </div>
+                                    </a>
+                                    <ul>
+                                        <li class="person-card-title" tal:condition="votum.person_name">
+                                            <span>${votum.person_name}</span>
+                                        </li>
+                                        <li tal:condition="votum.person_function" class="person-card-function">
+                                            ${votum.person_function}
+                                        </li>
+                                        <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
+                                            ${votum.person_political_affiliation}
+                                        </li>
+                                        <li tal:condition="votum.person_place" class="person-card-place">
+                                            ${votum.person_place}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
+                                <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
+                                <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
+                            </tal:block>
+                        </div>
+
+                        <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
+
+                        <div class="agenda-item-overview" tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></div>
+
+                        <tal:block tal:condition="agenda_item.memorial_pdf">
+                            <p tal:condition="agenda_item.memorial_pdf">
+                                <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
+                                    <i class="fa fa-download" aria-hidden="true"></i>
+                                    <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
+                                </a>
+                            </p>
+                        </tal:block>
+                    </div>
+                </tal:block>
+
+                <div class="ticker-item ticker-item-assembly-overview">
+                    <h2 i18n:translate="">Overview</h2>
+                    <tal:block tal:content="structure assembly.overview.replace('h2', 'h3')"></tal:block>
+                </div>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+
+                <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.memorial_2_pdf or assembly.memorial_supplement_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
+                    <h2 i18n:translate="">Downloads</h2>
+                    <p tal:condition="assembly.memorial_pdf">
+                        <a href="${request.link(assembly.memorial_pdf)}" class="memorial-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span tal:condition="not: assembly.memorial_2_pdf" i18n:translate="">Memorial (PDF)</span>
+                            <span tal:condition="assembly.memorial_2_pdf" i18n:translate="">Memorial part 1 (PDF)</span>
+                        </a>
+                    </p>
+                    <p tal:condition="assembly.memorial_2_pdf">
+                        <a href="${request.link(assembly.memorial_2_pdf)}" class="memorial-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Memorial part 2 (PDF)</span>
+                        </a>
+                    </p>
+                    <p tal:condition="assembly.memorial_supplement_pdf">
+                        <a href="${request.link(assembly.memorial_supplement_pdf)}" class="memorial-supplement-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Supplement to the memorial (PDF)</span>
+                        </a>
+                    </p>
+                    <p tal:condition="assembly.protocol_pdf">
+                        <a href="${request.link(assembly.protocol_pdf)}" class="protocol-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Protocol (PDF)</span>
+                        </a>
+                    </p>
+                    <p tal:condition="assembly.audio_mp3">
+                        <a href="${request.link(assembly.audio_mp3)}" class="audio-mp3-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Audio (MP3)</span>
+                        </a>
+                    </p>
+                    <p tal:condition="assembly.audio_zip">
+                        <a href="${request.link(assembly.audio_zip)}" class="audio-zip-link">
+                            <i class="fa fa-download" aria-hidden="true"></i>
+                            <span i18n:translate="">Audio (ZIP)</span>
+                        </a>
+                    </p>
+                </div>
+
+                <div class="side-panel audio" tal:condition="assembly.audio_mp3">
+                    <h2 i18n:translate="">Audio</h2>
+                    <audio controls="">
+                        <source type="audio/mpeg" src="${request.link(assembly.audio_mp3)}" />
+                        <p><a href="${request.link(assembly.audio_mp3)}" i18n:translate="">Download audio</a></p>
+                    </audio>
+                </div>
+
+                <div class="side-panel video" tal:condition="assembly.video_url">
+                    <h2 i18n:translate="">Video</h2>
+                    <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
+                </div>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

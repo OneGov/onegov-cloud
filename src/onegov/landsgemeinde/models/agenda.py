@@ -108,6 +108,5 @@ class AgendaItem(
         Votum,
         cascade='all, delete-orphan',
         backref=backref('agenda_item'),
-        lazy='dynamic',
         order_by='Votum.number',
     )

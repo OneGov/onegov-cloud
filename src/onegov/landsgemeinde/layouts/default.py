@@ -5,6 +5,13 @@ from onegov.town6.layout import DefaultLayout as BaseDefaultLayout
 
 class DefaultLayout(BaseDefaultLayout):
 
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        self.custom_body_attributes['data-websocket-endpoint'] = ''
+        self.custom_body_attributes['data-websocket-schema'] = ''
+        self.custom_body_attributes['data-websocket-channel'] = ''
+
     def assembly_title(self, assembly):
         if assembly.extraordinary:
             return _(

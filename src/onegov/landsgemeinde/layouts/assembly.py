@@ -102,3 +102,32 @@ class AssemblyLayout(DefaultLayout):
                     ]
                 )
             )
+
+
+class AssemblyTickerLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return self.assembly_title(self.model)
+
+    @cached_property
+    def og_description(self):
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Ticker'), self.request.link(self.model))
+        ]
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        self.request.include('websockets')
+        self.request.include('ticker')
+
+        self.custom_body_attributes['data-websocket-endpoint'] = \
+            self.app.websockets_client_url(request)
+        self.custom_body_attributes['data-websocket-schema'] = \
+            self.app.schema

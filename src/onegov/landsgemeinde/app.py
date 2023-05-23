@@ -35,6 +35,11 @@ def get_template_directory():
     return 'templates'
 
 
+@LandsgemeindeApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
 @LandsgemeindeApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
     mine = module_path('onegov.landsgemeinde', 'locale')
@@ -44,3 +49,8 @@ def get_i18n_localedirs():
 @LandsgemeindeApp.setting(section='core', name='theme')
 def get_theme():
     return LandsgemeindeTheme()
+
+
+@LandsgemeindeApp.webasset('ticker')
+def get_backend_common_asset():
+    yield 'ticker.js'

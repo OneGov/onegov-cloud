@@ -89,7 +89,6 @@ class Assembly(
         AgendaItem,
         cascade='all, delete-orphan',
         backref=backref('assembly'),
-        lazy='dynamic',
         order_by='AgendaItem.number',
     )
 

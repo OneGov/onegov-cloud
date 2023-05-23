@@ -2,6 +2,10 @@ from cached_property import cached_property
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models import Votum
+from sqlalchemy import desc
+from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
 
 
@@ -36,3 +40,18 @@ class AgendaItemCollection(GenericCollection):
             query = self.session.query(Assembly)
             query = query.filter(Assembly.date == self.date)
             return query.first()
+
+    def items_by_assembly(self, assembly):
+        query = self.session.query(AgendaItem)
+        query = query.outerjoin(AgendaItem.vota)
+        query = query.filter(AgendaItem.assembly_id == assembly.id)
+        query = query.order_by(desc(AgendaItem.number))
+        query = query.options(
+            contains_eager(AgendaItem.vota),
+            joinedload(AgendaItem.vota),
+            joinedload(AgendaItem.files),
+            joinedload(AgendaItem.vota, Votum.files),
+            undefer(AgendaItem.content),
+            undefer(AgendaItem.vota, Votum.content)
+        )
+        return query

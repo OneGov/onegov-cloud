@@ -4,10 +4,12 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
+from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.collections import AssemblyCollection
 from onegov.landsgemeinde.forms import AssemblyForm
 from onegov.landsgemeinde.layouts import AssemblyCollectionLayout
 from onegov.landsgemeinde.layouts import AssemblyLayout
+from onegov.landsgemeinde.layouts import AssemblyTickerLayout
 from onegov.landsgemeinde.models import Assembly
 
 
@@ -55,23 +57,6 @@ def add_assembly(self, request, form):
     }
 
 
-@LandsgemeindeApp.view(
-    model=Assembly,
-    request_method='HEAD',
-    permission=Public
-)
-def head_assembly(self, request):
-
-    @request.after
-    def add_headers(response):
-        last_modified = self.last_modified or self.modified or self.created
-        if last_modified:
-            response.headers.add(
-                'Last-Modified',
-                last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
-
-
 @LandsgemeindeApp.html(
     model=Assembly,
     template='assembly.pt',
@@ -84,9 +69,48 @@ def view_assembly(self, request):
     return {
         'layout': layout,
         'assembly': self,
-        'agenda_items': self.agenda_items.all(),
+        'agenda_items': self.agenda_items,
         'title': layout.title,
     }
+
+
+@LandsgemeindeApp.html(
+    model=Assembly,
+    name='ticker',
+    template='ticker.pt',
+    permission=Public
+)
+def view_assembly_ticker(self, request):
+
+    layout = AssemblyTickerLayout(self, request)
+
+    agenda_items = AgendaItemCollection(request.session)
+    agenda_items = agenda_items.items_by_assembly(self).all()
+
+    return {
+        'layout': layout,
+        'assembly': self,
+        'agenda_items': agenda_items,
+        'title': layout.title,
+    }
+
+
+@LandsgemeindeApp.view(
+    model=Assembly,
+    name='ticker',
+    request_method='HEAD',
+    permission=Public
+)
+def view_assembly_ticker_head(self, request):
+
+    @request.after
+    def add_headers(response):
+        last_modified = self.last_modified or self.modified or self.created
+        if last_modified:
+            response.headers.add(
+                'Last-Modified',
+                last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
 
 
 @LandsgemeindeApp.form(
