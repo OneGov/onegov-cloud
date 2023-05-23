@@ -14,7 +14,7 @@ echo "--- Installing dependencies"
 
 # only switch to container src directory if we want to test
 # the container, rather than just the source tree
-if [$1 -eq 1]; then
+if [["$CONTAINER_TEST_ARG" -eq "container"]]; then
     cd /app/src/tests/js
 else
     cd tests/js

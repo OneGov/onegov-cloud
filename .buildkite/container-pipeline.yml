@@ -23,6 +23,7 @@ steps:
     env:
       CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
       CONTAINER_TEST_SCRIPT: ".buildkite/lint"
+      CONTAINER_TEST_ARG: "container"
 
   # run the javascript tests
   - command: "test-container"
@@ -36,6 +37,7 @@ steps:
     env:
       CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
       CONTAINER_TEST_SCRIPT: ".buildkite/jest 1"
+      CONTAINER_TEST_ARG: "container"
 
   # run the python tests
   - command: "test-container"
@@ -51,6 +53,7 @@ steps:
     env:
       CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
       CONTAINER_TEST_SCRIPT: ".buildkite/test 1"
+      CONTAINER_TEST_ARG: "container"
 
   # build the docs if possible (fails are ignored, only on master)
   - command: "test-container"
@@ -65,6 +68,6 @@ steps:
 
     env:
       CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
-      CONTAINER_TEST_SCRIPT: ".buildkite/docs 1"
+      CONTAINER_TEST_SCRIPT: ".buildkite/docs"
 
     branches: "master"
