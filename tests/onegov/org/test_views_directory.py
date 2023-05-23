@@ -17,7 +17,8 @@ from onegov.directory.models.directory import DirectoryFile
 from onegov.form import FormFile, FormSubmission
 from onegov.form.display import TimezoneDateTimeFieldRenderer
 from onegov.org.models import ExtendedDirectoryEntry
-from tests.shared.utils import create_image, get_meta
+from tests.shared.utils import create_image, get_meta,\
+    extract_filename_from_response
 
 
 def dt_for_form(dt):
@@ -727,6 +728,8 @@ def test_directory_export(client):
            (URL(export_view_url).query_param('keywords') or None)
 
     resp = export_view.follow()
+    filename = extract_filename_from_response(resp)
+    assert '.zip' in filename
 
     archive = DirectoryZipArchive.from_buffer(BytesIO(resp.body))
 
