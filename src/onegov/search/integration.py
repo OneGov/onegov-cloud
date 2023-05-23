@@ -10,6 +10,8 @@ from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
+
+from onegov.core.orm import Base
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer
@@ -90,6 +92,136 @@ def is_5xx_error(error):
     return error.status_code and str(error.status_code).startswith('5')
 
 
+class PostgresqlSearchApp(morepath.App):
+    """
+    Allows to register events: insert, update, remove row
+    Allows to index a table
+    Allows to search for a term
+    """
+
+    def configure_search(self, **cfg):
+        self.orm_mappings = TypeMappingRegistry()
+
+        for base in self.session_manager.bases:
+            self.orm_mappings.register_orm_base(base)
+
+        self.session_manager.on_insert.connect(self._on_insert)
+        self.session_manager.on_update.connect(self._on_update)
+        self.session_manager.on_delete.connect(self._on_delete)
+
+    def psql_search_by_request(self, request, types='*', explain=False,
+                               limit_to_request_language=False):
+        """ Takes the current :class:`~onegov.core.request.CoreRequest` and
+        returns an elastic search scoped to the current application, the
+        requests language and it's access rights.
+
+        """
+
+        # if limit_to_request_language:
+        #     languages = [request.locale.split('_')[0]]
+        # else:
+        #     languages = '*'
+
+        # return self.psql_search(
+        #     languages=languages,
+        #     types=types,
+        #     include_private=self.may_use_private_search(request),
+        #     explain=explain
+        # )
+
+        return None
+
+    def may_use_private_search(self, request):
+        """ Returns True if the given request is allowed to access private
+        search results. By default every logged in user has access to those.
+
+        This method may be overwritten if this is not desired.
+
+        """
+        return request.is_logged_in
+
+    def _on_insert(self, schema, obj):
+        print(f'*** tschupre _on_insert {schema} {obj}')
+        # if not self.stopped:
+        # if isinstance(obj, Searchable):
+        #     self.session_manager.session.index(schema, obj)
+        #     self.index(schema, obj)
+
+    def _on_update(self, schema, obj):
+        print(f'*** tschupre _on_update {schema} {obj}')
+        # if not self.stopped:
+        # if isinstance(obj, Searchable):
+        #     self.delete(schema, obj)
+        #     self.index(schema, obj)
+
+    def _on_delete(self, schema, obj):
+        print(f'*** tschupre _on_delete {schema} {obj}')
+        # if not self.stopped:
+        # if isinstance(obj, Searchable):
+        #     self.update(schema, obj)
+
+    def psql_perform_reindex(self, session):
+        for model in searchable_sqlalchemy_models(Base):
+            print(f'*** model to reindex: {model}')
+
+    # TODO: move to ticket.py
+    @staticmethod
+    def drop_fts_index(session, schema):
+        """
+        Drops the full text search index. Used for re-indexing
+
+        :param session: db session
+        :param schema: schema on which the fts index shall be dropped
+        :return:
+        """
+        query = f"""
+DROP INDEX IF EXISTS "{schema}".fts_idx_tickets_number
+"""
+        print(f'dropping index query: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def create_fts_index(session, schema):
+        """
+        Creates the full text search index based on the separate index
+        column. Used for re-indexing
+
+        :param session: db session
+        :param schema: schema the index shall be created
+        :return:
+        """
+        query = f"""
+CREATE INDEX fts_idx_tickets_number ON "{schema}".tickets USING
+GIN (fts_idx_tickets_number_col);
+"""
+        print(f'create index query: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def add_fts_column(session, schema):
+        """
+        This function is used as migration step moving to postgressql full
+        text search, OGC-508. It adds a separate column for the tsvector
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        from onegov.search.utils import create_tsvector_string
+
+        s = create_tsvector_string('username')
+        query = f"""
+ALTER TABLE "{schema}".users ADD COLUMN
+fts_idx_tickets_number_col tsvector GENERATED ALWAYS AS
+(to_tsvector('german', {s})) STORED;
+"""
+        session.execute(query)
+        session.execute("COMMIT")
+
+
+# TODO: REMOVE
 class ElasticsearchApp(morepath.App):
     """ Provides elasticsearch integration for
     :class:`onegov.core.framework.Framework` based applications.
@@ -226,6 +358,7 @@ class ElasticsearchApp(morepath.App):
 
         """
 
+        print(f'*** tschupre es_search mappings: {self.es_mappings}')
         search = Search(
             session=self.session(),
             mappings=self.es_mappings,
@@ -326,6 +459,7 @@ class ElasticsearchApp(morepath.App):
         else:
             languages = '*'
 
+        print(f'es_suggestion_by_request language: {languages}')
         return self.es_suggestions(
             query,
             languages=languages,
