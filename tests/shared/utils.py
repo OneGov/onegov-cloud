@@ -1,6 +1,7 @@
 from onegov.core.custom import json
 import os
 import shutil
+import re
 
 import dectate
 import morepath
@@ -187,3 +188,12 @@ def create_app(app_class, request, use_elasticsearch=False,
         app.maildir = maildir
 
     return app
+
+
+def extract_filename_from_response(response):
+    content_disposition = response.headers.get("content-disposition")
+    if content_disposition:
+        filename = re.findall('filename="([^"]+)"', content_disposition)
+        if filename:
+            return filename[0]
+    return None
