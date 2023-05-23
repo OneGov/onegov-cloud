@@ -193,6 +193,20 @@
                 Privacy Protection</a>
             </tal:b>
         </span>
+        <span>
+            <tal:b condition="request.locale.startswith('de')">
+            <a href="https://www.projuventute.ch/de/nutzungsbestimmungen">
+                Nutzungsbestimmungen</a>
+            </tal:b>
+            <tal:b condition="request.locale.startswith('fr')">
+            <a href="https://www.projuventute.ch/fr/conditions-dutilisation">
+                Conditions d'utilisation</a>
+            </tal:b>
+            <tal:b condition="request.locale.startswith('it')">
+            <a href="https://www.projuventute.ch/it/condizioni-di-utilizzo">
+                Condizioni di utilizzo</a>
+            </tal:b>
+        </span>
       </div>
     </div>
 </metal:footer_links>
