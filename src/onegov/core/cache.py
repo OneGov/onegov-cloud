@@ -143,6 +143,8 @@ class RedisCacheRegion(CacheRegion):
     def keys(self) -> list[str]:
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
+        # FIXME: Switch to self.namespace + ':' once we make sure there are
+        #        no deprecayed dependencies on key_mangler
         prefix = self.key_mangler('').decode()
         return self.backend.reader_client.eval(
             "return redis.pcall('keys', ARGV[1])", 0, f'{prefix}*'
@@ -151,6 +153,8 @@ class RedisCacheRegion(CacheRegion):
     def flush(self) -> list[str]:
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
+        # FIXME: Switch to self.namespace + ':' once we make sure there are
+        #        no deprecayed dependencies on key_mangler
         prefix = self.key_mangler('').decode()
         return self.backend.reader_client.eval("""
             local keys = redis.call('keys', ARGV[1])
@@ -162,6 +166,7 @@ class RedisCacheRegion(CacheRegion):
 
 
 # TODO: Remove these deprecated aliases
+key_mangler = RedisCacheRegion.key_mangler
 keys = RedisCacheRegion.keys
 flush = RedisCacheRegion.flush
 
