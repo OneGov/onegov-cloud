@@ -136,6 +136,9 @@ class RedisCacheRegion(CacheRegion):
                 'connection_pool': get_pool(redis_url)
             }
         )
+        # remove instance level key_mangler
+        if 'key_mangler' in self.__dict__:
+            del self.__dict__['key_mangler']
 
     def key_mangler(self, key: str) -> bytes:  # type:ignore[override]
         return f'{self.namespace}:{key}'.encode('utf-8')
