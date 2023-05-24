@@ -6,7 +6,6 @@ $(document).ready(function() {
         if (message.event === 'refresh' && document.body.id.search(message.assembly) !== -1) {
             window.location.reload();
         }
-        // todo: update
     }
 
     var lastModified;
@@ -20,12 +19,12 @@ $(document).ready(function() {
                 lastModified = modified;
             })
             .catch((_error) => {});
-
     }
 
     function onWebsocketError(_event, websocket) {
         websocket.close();
-        setInterval(poll, 60000);
+        poll();
+        setInterval(poll, 30 * 1000);
     }
 
     if (endpoint && schema) {
