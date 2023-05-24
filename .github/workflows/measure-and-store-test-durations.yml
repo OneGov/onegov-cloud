@@ -13,7 +13,14 @@ jobs:
       run: |
         sudo apt update
         sudo apt install \
-          curl \
+          build-essential \
+          git \
+          gcc \
+          g++ \
+          libc-dev \
+          libcurl-openssl-dev \
+          libffi-dev \
+          libssl-dev \
           wget \
           apparmor \
           curl \
