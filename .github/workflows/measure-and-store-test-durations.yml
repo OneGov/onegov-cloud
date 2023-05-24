@@ -34,6 +34,10 @@ jobs:
           libssl-dev \
           xmlsec1 \
           libxmlsec1-openssl \
+          ghostscript \
+          zip \
+          libev4 \
+          libmagic \
           wget \
           apparmor \
           curl \
