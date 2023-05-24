@@ -63,10 +63,10 @@ class Pdf(PDFDocument):
         path = module_path('onegov.pdf', 'fonts')
         register_fonts_from_paths(
             font_name='Helvetica',
-            regular=f'{path}/Helvetica.ttf',
-            italic=f'{path}/Helvetica-Oblique.ttf',
-            bold=f'{path}/Helvetica-Bold.ttf',
-            bolditalic=f'{path}/Helvetica-BoldOblique.ttf',
+            regular=f'{path}/SourceSansPro-Regular.ttf',
+            italic=f'{path}/SourceSansPro-Italic.ttf',
+            bold=f'{path}/SourceSansPro-Bold.ttf',
+            bolditalic=f'{path}/SourceSansPro-BoldItalic.ttf',
         )
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
