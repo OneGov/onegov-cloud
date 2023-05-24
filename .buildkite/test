@@ -66,7 +66,7 @@ if [[ "${CONTAINER_TEST_ARG:-}" = "container" ]]; then
 fi
 
 pip install '.[test]' \
-    pytest-test-groups \
+    pytest-split \
     pytest-cov \
     pytest-codecov \
     --quiet
@@ -91,8 +91,8 @@ export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
-    --test-group "$GROUP" \
-    --test-group-count "$GROUP_COUNT" \
+    --splits "$GROUP_COUNT" \
+    --group "$GROUP" \
     --cov \
     --cov-config=pyproject.toml \
     --codecov \
