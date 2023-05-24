@@ -11,6 +11,7 @@ from onegov.landsgemeinde.layouts import AssemblyCollectionLayout
 from onegov.landsgemeinde.layouts import AssemblyLayout
 from onegov.landsgemeinde.layouts import AssemblyTickerLayout
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.utils import update_ticker
 
 
 @LandsgemeindeApp.html(
@@ -41,7 +42,7 @@ def add_assembly(self, request, form):
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
-        request.app.update_ticker(assembly)
+        update_ticker(request, assembly)
         request.success(_("Added a new assembly"))
 
         return redirect(request.link(assembly))
@@ -124,7 +125,7 @@ def edit_assembly(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
-        request.app.update_ticker(self)
+        update_ticker(request, self)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 

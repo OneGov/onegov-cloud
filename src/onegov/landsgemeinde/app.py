@@ -9,12 +9,7 @@ from onegov.town6.app import get_i18n_localedirs as get_i18n_localedirs_base
 
 class LandsgemeindeApp(TownApp):
 
-    def update_ticker(self, assembly):
-        assembly.stamp()
-        self.send_websocket({
-            'event': 'refresh',
-            'assembly': assembly.date.isoformat(),
-        })
+    pass
 
 
 @LandsgemeindeApp.setting(section='org', name='create_new_organisation')

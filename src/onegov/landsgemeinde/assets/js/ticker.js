@@ -1,10 +1,20 @@
-$(document).ready(function() {
+document.addEventListener("DOMContentLoaded", function() {
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
 
     function onWebsocketNotification(message, _websocket) {
-        if (message.event === 'refresh' && document.body.id.search(message.assembly) !== -1) {
-            window.location.reload();
+        if (document.body.id.search(message.assembly) !== -1) {
+            if (message.event === 'refresh') {
+                window.location.reload();
+            }
+            if (message.event === 'update') {
+                const node = document.getElementById(message.node);
+                if (node && message.content) {
+                    const content = document.createElement('div');
+                    content.innerHTML = message.content;
+                    node.replaceWith(content.firstChild);
+                }
+            }
         }
     }
 
