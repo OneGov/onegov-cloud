@@ -37,7 +37,7 @@ jobs:
           ghostscript \
           zip \
           libev4 \
-          libmagic \
+          libmagic1 \
           wget \
           apparmor \
           curl \
