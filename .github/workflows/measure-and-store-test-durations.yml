@@ -7,10 +7,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: Install packages
       run: |
+        sudo apt update
         sudo apt install \
           wget \
           apparmor \
@@ -34,7 +35,8 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
-          xdg-utils
+          xdg-utils \
+          --fix-missing
 
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         sudo dpkg -i google-chrome-stable_current_amd64.deb
