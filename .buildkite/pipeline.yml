@@ -15,7 +15,7 @@ steps:
       build.message =~ /\[test-container\]/i
 
   - command: start-pipeline
-    label: ":pipeline: Running tests on generic container"
+    label: "Running tests on generic container"
 
     env:
       PIPELINE_CONFIG: ".buildkite/generic-pipeline.yml"
