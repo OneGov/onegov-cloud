@@ -60,13 +60,15 @@ class Pdf(PDFDocument):
         self.underline_links = underline_links
         self.underline_width = underline_width
 
+        # Use Source Sans 3 instead of Helvetica to support more special
+        # characters; https://github.com/adobe-fonts/source-sans
         path = module_path('onegov.pdf', 'fonts')
         register_fonts_from_paths(
             font_name='Helvetica',
-            regular=f'{path}/Helvetica.ttf',
-            italic=f'{path}/Helvetica-Oblique.ttf',
-            bold=f'{path}/Helvetica-Bold.ttf',
-            bolditalic=f'{path}/Helvetica-BoldOblique.ttf',
+            regular=f'{path}/SourceSans3-Regular.ttf',
+            italic=f'{path}/SourceSans3-It.ttf',
+            bold=f'{path}/SourceSans3-Bold.ttf',
+            bolditalic=f'{path}/SourceSans3-BoldIt.ttf',
         )
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None,
