@@ -2,7 +2,7 @@ steps:
 
   # choose the pipeline we want to use…
   - command: start-pipeline
-    label: ":pipeline: Running tests on built container"
+    label: "Running tests on built container"
 
     agents:
       - queue=builder
