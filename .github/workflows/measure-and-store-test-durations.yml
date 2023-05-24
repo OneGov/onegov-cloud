@@ -87,7 +87,6 @@ jobs:
 
     - name: Measure test durations
       run: pytest --store-durations tests
-      continue-on-error: true
 
     - uses: EndBug/add-and-commit@v9
       with:
