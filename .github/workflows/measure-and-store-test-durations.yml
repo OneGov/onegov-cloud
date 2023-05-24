@@ -1,0 +1,4 @@
+name: Measure and store test durations for pytest-split
+
+on:
+  workflow_dispatch:  # allow to run manually
