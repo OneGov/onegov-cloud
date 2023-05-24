@@ -49,7 +49,7 @@
 </metal:votum>
 
 <metal:ticker-agenda-item define-macro="ticker-agenda-item" i18n:domain="onegov.landsgemeinde">
-    <div tal:condition="agenda_item.state != 'scheduled'" class="ticker-item ticker-item-agenda-item" id="agenda-item-${agenda_item.number}">
+    <div class="ticker-item ticker-item-agenda-item ${agenda_item.state}" id="agenda-item-${agenda_item.number}">
         <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
         <p tal:condition="agenda_item.start" class="subheader agenda-item-timestamp">${layout.format_date(agenda_item.start, 'datetime')}</p>
 
