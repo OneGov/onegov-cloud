@@ -17,7 +17,9 @@ echo "--- Installing dependencies"
 if [[ "${CONTAINER_TEST_ARG:-}" = "container" ]]; then
     cd /app/src/tests/js
 else
-    cd tests/js
+    # node has reduced privileges so we need to copy the tests
+    cp tests/js /tmp/node/tests
+    cd /tmp/node/tests
 fi
 
 /tmp/node/bin/npm install
