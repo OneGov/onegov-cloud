@@ -12,9 +12,9 @@ from sqlalchemy.orm import object_session
 
 
 def parse_domain(domain):
-    if domain == 'Eidg':
+    if domain in ('Eidg', 'CH'):
         return 'federation'
-    if domain == 'Kant':
+    if domain in ('Kant', 'CT'):
         return 'canton'
     if domain == 'Gde':
         return 'municipality'
@@ -79,7 +79,7 @@ def import_vote_wabstic(vote, principal, number, district,
 
         remaining_entities = None
         try:
-            if 'anzpendentgde' in line:
+            if hasattr(line, 'anzpendentgde'):
                 remaining_entities = validate_integer(
                     line, 'anzpendentgde', default=None
                 )
