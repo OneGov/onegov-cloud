@@ -89,4 +89,4 @@ jobs:
       with:
         add: .test_durations
         default_author: github_actions
-        message: Updates test durations
+        message: Updates test durations [skip-ci]
