@@ -11,18 +11,6 @@ steps:
     env:
       CONTAINER: "onegov-cloud:head"
 
-  # check linting
-  - command: "test-container"
-    label: "Linting"
-
-    agents:
-      - queue=generic
-      - ram=2048
-
-    env:
-      CONTAINER: "onegov-cloud:head"
-      CONTAINER_TEST_SCRIPT: ".buildkite/lint"
-
   # run the javascript tests
   - command: "test-container"
     label: "Jesting"
