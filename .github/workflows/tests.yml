@@ -14,18 +14,83 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: eu.gcr.io/seantis-containers/onegov-cloud:head
-      credentials:
-        username: ${{ secrets.GCR_USERNAME }}
-        password: ${{ secrets.GCR_PASSWORD }}
+      # FIXME: Switch to onegov-cloud:head
+      image: ubuntu:22.04
       volumes:
-        - src:/src
-      options: --workdir /src
+        - ${{ github.workspace }}:/src
+
+    defaults:
+      run:
+        working-directory: /src
 
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     name: Test group ${{ matrix.group }}
 
     steps:
+    # FIXME: this will not be necessary anymore once can use onegov-cloud:head
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install \
+          build-essential \
+          git \
+          gcc \
+          g++ \
+          libcurl4-openssl-dev \
+          libffi-dev \
+          libjpeg-dev \
+          libpq-dev \
+          libxml2-dev \
+          libxslt1-dev \
+          zlib1g-dev \
+          libev-dev \
+          libgnutls28-dev \
+          libkrb5-dev \
+          libpoppler-cpp-dev \
+          pv \
+          libzbar0 \
+          openssl \
+          libssl-dev \
+          xmlsec1 \
+          libxmlsec1-openssl \
+          ghostscript \
+          zip \
+          libev4 \
+          libmagic1 \
+          wget \
+          apparmor \
+          curl \
+          git-core \
+          postgresql \
+          redis \
+          openjdk-8-jre-headless \
+          gcc \
+          libc-dev \
+          fonts-liberation \
+          libappindicator3-1 \
+          libasound2 \
+          libdrm2 \
+          libgbm1 \
+          libnspr4 \
+          libnss3 \
+          libu2f-udev \
+          libvulkan1 \
+          libx11-xcb1 \
+          libxcb-dri3-0 \
+          libxshmfence1 \
+          libxss1 \
+          xdg-utils \
+          --fix-missing
+
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+        export LC_ALL="C.UTF-8"
+        export LANG="C.UTF-8"
+
+        redis-server --daemonize yes
+
     - name: Checkout repo
       uses: actions/checkout@v3
 
