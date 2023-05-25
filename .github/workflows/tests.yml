@@ -105,7 +105,7 @@ jobs:
       run: bandit --recursive --configfile pyproject.toml src/
 
     - name: Static type checking
-       run: mypy -p onegov
+      run: mypy -p onegov
 
   test:
     strategy:
