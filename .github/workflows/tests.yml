@@ -115,7 +115,7 @@ jobs:
       # FIXME: Remove the functions once we switch to onegov-cloud:head
       run: |
         install-packages() { apt install -y -q --no-install-recommends $@; }
-        run-as() { uid="$(echo $1 | -d ':' -f 2)"; shift; su-exec "$uid:$uid" "$@"; }
+        run-as() { uid="$(echo $1 | cut -d ':' -f 1)"; shift; su-exec "$uid:$uid" "$@"; }
         export -f install-packages
         export -f run-as
         export BUILDKITE_PARALLEL_JOB="$(($MATRIX_GROUP-1))"
