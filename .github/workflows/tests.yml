@@ -31,7 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt update
-        apt install \
+        apt install -y --no-install-recommends \
           build-essential \
           git \
           gcc \
