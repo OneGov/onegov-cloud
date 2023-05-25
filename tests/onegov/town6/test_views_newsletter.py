@@ -512,7 +512,7 @@ def test_import_export_subscribers(client):
     page.form['file_format'] = 'xlsx'
 
     response = page.form.submit()
-    # csv_strings = response.body.decode() # only for csv
+
     wb = load_workbook(BytesIO(response.body), data_only=True)
     sheet = tuple(wb[wb.sheetnames[0]].rows)
     assert sheet[0][0].value == 'Adresse'
@@ -543,12 +543,12 @@ def test_import_export_subscribers(client):
     page.form['dry_run'] = True
     page.form['file'] = file
     page = page.form.submit()
-    assert "2 newsletter subscribers will be imported" in page
+    assert "2 Abonnenten werden importiert" in page
 
     # Import
     page = client.get('/subscribers/import-newsletter-recipients')
     page.form['dry_run'] = False
     page.form['file'] = file
-    page.form.submit()
-    assert "2 newsletter subscribers imported" in page
+    page = page.form.submit().follow()
+    assert "2 Abonnenten importiert" in page
     assert recipients.query().count() == 4
