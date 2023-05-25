@@ -5196,9 +5196,6 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-#~ msgid "Do not actually want to import the newsletters."
-#~ msgstr "Vous ne souhaitez pas importer les destinataires des newsletters ?"
-
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "L'équipe de OneGov Cloud"
 

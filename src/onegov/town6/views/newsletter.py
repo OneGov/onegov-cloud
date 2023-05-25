@@ -2,11 +2,12 @@ from onegov.core.security import Public, Private
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
+from onegov.org.forms.newsletter import NewsletterSubscriberImportForm
 from onegov.org.views.newsletter import handle_newsletters, view_newsletter,\
     view_subscribers, handle_new_newsletter, get_newsletter_form,\
     edit_newsletter, handle_send_newsletter,\
     handle_test_newsletter, handle_preview_newsletter,\
-    export_newsletter_recipients
+    export_newsletter_recipients, import_newsletter_recipients
 from onegov.town6 import TownApp
 from onegov.org.forms import NewsletterSendForm, ExportForm
 from onegov.org.forms import NewsletterTestForm
@@ -74,8 +75,18 @@ def town_handle_preview_newsletter(self, request):
         self, request, DefaultMailLayout(self, request))
 
 
-@TownApp.form(model=RecipientCollection, name='export', permission=Private,
-              form=ExportForm, template='export.pt')
+@TownApp.form(model=RecipientCollection, name='export-newsletter-recipients',
+              permission=Private, form=ExportForm, template='export.pt')
 def town_export_newsletter_recipients(self, request, form):
     return export_newsletter_recipients(
+        self, request, form, RecipientLayout(self, request))
+
+
+@TownApp.form(
+    model=RecipientCollection, name='import-newsletter-recipients',
+    permission=Private, form=NewsletterSubscriberImportForm,
+    template='form.pt',
+)
+def town_import_newsletter_recipients(self, request, form):
+    return import_newsletter_recipients(
         self, request, form, RecipientLayout(self, request))

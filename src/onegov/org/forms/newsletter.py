@@ -1,5 +1,7 @@
 from datetime import timedelta
+import transaction
 from wtforms.validators import DataRequired
+from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
@@ -219,12 +221,11 @@ class NewsletterTestForm(Form):
         return NewsletterSendFormWithRecipients
 
 
-class NewsletterImportForm(Form):
+class NewsletterSubscriberImportForm(Form):
 
     dry_run = BooleanField(
         label=_("Dry Run"),
-        description=_("Do not actually want to import the newsletter "
-                      "recipients?"),
+        description=_("Do not actually import the newsletter subscribers"),
         default=False
     )
 
@@ -272,3 +273,45 @@ class NewsletterImportForm(Form):
                 for k, v in headers.items()
             })
         return result
+
+    def run_import(self):
+        headers = self.headers
+        session = self.request.session
+        recipients = RecipientCollection(session)
+        csvfile = convert_excel_to_csv(self.file.file)
+
+        try:
+            # dialect needs to be set, else error
+            csv = CSVFile(csvfile, dialect='excel')
+        except Exception:
+            return 0, ['0']
+
+        lines = list(csv.lines)
+        columns = {
+            key: csv.as_valid_identifier(value)
+            for key, value in headers.items()
+        }
+
+        def get(line, column):
+            return getattr(line, column)
+
+        count = 0
+        errors = []
+        for number, line in enumerate(lines, start=1):
+            try:
+                kwargs = {
+                    attribute: get(line, column)
+                    for attribute, column in columns.items()
+                }
+                kwargs['confirmed'] = True
+                recipients.add(**kwargs)
+                user = self.request.current_username
+                recipients.meta['submitter_email'] = user
+                count += 1
+            except Exception:
+                errors.append(str(number))
+
+        if self.dry_run.data or errors:
+            transaction.abort()
+
+        return count, errors

@@ -1666,14 +1666,16 @@ class RecipientLayout(DefaultLayout):
             return [
                 Link(
                     text=_("Import"),
-                    url=self.request.link(self.model, 'import'),
-                    attrs={'class': 'import-link'}
+                    url=self.request.link(self.model,
+                                          'import-newsletter-recipients'),
+                    attrs={'class': 'import-link'},
                 ),
                 Link(
                     text=_("Export"),
-                    url=self.request.link(self.model, 'export'),
-                    attrs={'class': 'export-link'}
-                )
+                    url=self.request.link(self.model,
+                                          'export-newsletter-recipients'),
+                    attrs={'class': 'export-link'},
+                ),
             ]
 
 

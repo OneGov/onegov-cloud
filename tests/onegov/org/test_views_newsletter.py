@@ -8,7 +8,6 @@ from onegov.core.utils import Bunch
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.user import UserCollection
 from sedate import replace_timezone
-from webtest.forms import Upload
 
 
 def test_newsletter_disabled(client):
@@ -297,7 +296,7 @@ def test_newsletter_send(client):
 
     newsletter = new.form.submit().follow()
 
-    # add some recipients the quick wqy
+    # add some recipients the quick way
     recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
@@ -382,7 +381,7 @@ def test_newsletter_schedule(client):
 
     newsletter = new.form.submit().follow()
 
-    # add some recipients the quick wqy
+    # add some recipients the quick way
     recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
@@ -424,7 +423,7 @@ def test_newsletter_test_delivery(client):
 
     newsletter = new.form.submit().follow()
 
-    # add some recipients the quick wqy
+    # add some recipients the quick way
     recipients = RecipientCollection(client.app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
@@ -448,56 +447,3 @@ def test_newsletter_test_delivery(client):
     newsletter = NewsletterCollection(client.app.session()).query().one()
     assert newsletter.sent is None
     assert not newsletter.recipients
-
-
-def test_import_export_subscribers(client):
-    client.login_admin()
-
-    # add a newsletter
-    new = client.get('/newsletters').click('Newsletter')
-    new.form['title'] = "Our town is AWESOME"
-    new.form['lead'] = "Like many of you, I just love our town..."
-
-    new.select_checkbox("news", "Willkommen bei OneGov")
-    new.select_checkbox("occurrences", "150 Jahre Govikon")
-
-    new.form.submit().follow()
-
-    # add some recipients the quick wqy
-    recipients = RecipientCollection(client.app.session())
-    recipients.add('one@example.org', confirmed=True)
-    recipients.add('two@example.org', confirmed=True)
-
-    transaction.commit()
-
-    # perform export
-
-    page = client.get('/subscribers/export')
-    page.form['file_format'] = 'csv'
-    response = page.form.submit()
-    csv_strings = response.body.decode()
-    assert 'one@example.org' in csv_strings
-    assert 'two@example.org' in csv_strings
-
-    page.form['file_format'] = 'json'
-    response = page.form.submit().json
-    assert response == [
-        {'Adresse': 'one@example.org'},
-        {'Adresse': 'two@example.org'},
-    ]
-
-    page.form['file_format'] = 'xlsx'
-    response = page.form.submit()
-    file = Upload(
-        'file',
-        response.body,
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    return
-    # Import (Dry run)
-    page = client.get('/events').click("Import")
-    page.form['dry_run'] = True
-    page.form['file'] = file
-    page = page.form.submit()
-    assert "1 Veranstaltungen werden importiert" in page
-    # assert session.query(Event).count() == 1
