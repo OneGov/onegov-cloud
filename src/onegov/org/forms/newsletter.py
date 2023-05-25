@@ -1,5 +1,6 @@
 from datetime import timedelta
 import transaction
+from sqlalchemy.exc import IntegrityError
 from wtforms.validators import DataRequired
 from onegov.core.csv import convert_excel_to_csv, CSVFile
 from onegov.form.fields import UploadField
@@ -306,6 +307,11 @@ class NewsletterSubscriberImportForm(Form):
                 kwargs['confirmed'] = True
                 recipients.add(**kwargs)
                 count += 1
+            except IntegrityError:
+                message = str(number) + self.request.translate(
+                    _(': (Address already exists)')
+                )
+                errors.append(message)
             except Exception:
                 errors.append(str(number))
 

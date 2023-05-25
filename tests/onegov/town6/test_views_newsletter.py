@@ -6,6 +6,8 @@ import transaction
 from datetime import datetime
 from freezegun import freeze_time
 from openpyxl import load_workbook
+
+from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import Bunch
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.user import UserCollection
@@ -485,6 +487,7 @@ def test_newsletter_test_delivery(client):
 
 
 def test_import_export_subscribers(client):
+    session = client.app.session()
     client.login_admin()
 
     # add a newsletter
@@ -498,7 +501,7 @@ def test_import_export_subscribers(client):
     new.form.submit().follow()
 
     # add some recipients the quick way
-    recipients = RecipientCollection(client.app.session())
+    recipients = RecipientCollection(session)
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
 
@@ -524,20 +527,28 @@ def test_import_export_subscribers(client):
     ]
 
     page.form['file_format'] = 'xlsx'
-    response = page.form.submit()
+
+    more_recipients = [
+        {'Adresse': 'three@example.org'},
+        {'Adresse': 'four@example.org'},
+    ]
     file = Upload(
         'file',
-        response.body,
-        'application/vnd.openxmlformats-'
-        'officedocument.spreadsheetml.sheet'
+        convert_list_of_dicts_to_xlsx(more_recipients),
+        'application/vnd.openxmlformats-' 'officedocument.spreadsheetml.sheet',
     )
 
     # Import (Dry run)
     page = client.get('/subscribers/import-newsletter-recipients')
-
     page.form['dry_run'] = True
     page.form['file'] = file
-
     page = page.form.submit()
-    # assert page.pyquery('.alert-box .success')[0].text == \
-    # "1 newsletter subscribers will be imported"
+    assert "2 newsletter subscribers will be imported" in page
+
+    # Import
+    page = client.get('/subscribers/import-newsletter-recipients')
+    page.form['dry_run'] = False
+    page.form['file'] = file
+    page.form.submit()
+    assert "2 newsletter subscribers imported" in page
+    assert recipients.query().count() == 4
