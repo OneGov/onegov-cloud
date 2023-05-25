@@ -30,8 +30,9 @@ jobs:
     # FIXME: this will not be necessary anymore once can use onegov-cloud:head
     - name: Install dependencies
       run: |
+        echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
         apt update
-        apt install -y --no-install-recommends \
+        apt install -y -q --no-install-recommends \
           build-essential \
           git \
           gcc \
