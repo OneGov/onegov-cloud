@@ -38,10 +38,12 @@ jobs:
       run: sudo apt-get install docker
 
     - name: Create container onegov-cloud:head
+      env:
+        MATRIX_GROUP: ${{matrix.group}}
       run: |
         docker pull eu.gcr.io/seantis-containers/onegov-cloud:head
         docker create --rm --i --name test \
-          --env BUILDKITE_PARALLEL_JOB="${{ matrix.group - 1 }}" \
+          --env BUILDKITE_PARALLEL_JOB="$(($MATRIX_GROUP-1))" \
           --env BUILDKITE_PARALLEL_JOB_COUNT="6" \
           --env BUILDKITE_COMMIT="$GITHUB_SHA" \
           --env BUILDKITE_BRANCH="$CODECOV_BRANCH" \
