@@ -341,8 +341,6 @@ def extract_address_from_portrait_field(dry_run):
             agency.location_address, agency.location_code_city, \
                 agency.postal_address, agency.postal_code_city = \
                 parse_agency_portrait_field_for_address(agency.portrait)
-            print(f'Agency: {agency.title} - Address: '
-                  f'{agency.postal_address}, {agency.postal_code_city}')
 
             extraction_count += 1
 
