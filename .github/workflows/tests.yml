@@ -105,6 +105,7 @@ jobs:
     - name: Run tests
       env:
         MATRIX_GROUP: ${{matrix.group}}
+      shell: bash
       # FIXME: Remove the function once we switch to onegov-cloud:head
       run: |
         install-packages() {apt install -y -q --no-install-recommends $@}
