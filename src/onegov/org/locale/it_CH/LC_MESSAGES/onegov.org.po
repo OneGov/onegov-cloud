@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-05-22 15:10+0200\n"
+"POT-Creation-Date: 2023-05-25 11:48+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -185,27 +185,6 @@ msgstr "Pagamenti carta di credito"
 
 msgid "Exports payments and tickets"
 msgstr "Esporta pagamenti e biglietti"
-
-msgid "Mo"
-msgstr "Lu"
-
-msgid "Tu"
-msgstr "Ma"
-
-msgid "We"
-msgstr "Me"
-
-msgid "Th"
-msgstr "Gi"
-
-msgid "Fr"
-msgstr "Ve"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "Do"
 
 msgid "Title"
 msgstr "Titolo"
@@ -636,6 +615,27 @@ msgstr "Giovane"
 msgid "Elderly"
 msgstr "Anziani"
 
+msgid "Mo"
+msgstr "Lu"
+
+msgid "Tu"
+msgstr "Ma"
+
+msgid "We"
+msgstr "Me"
+
+msgid "Th"
+msgstr "Gi"
+
+msgid "Fr"
+msgstr "Ve"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "Do"
+
 msgid "Concerto in the castle garden"
 msgstr "Concerto nel giardino del castello"
 
@@ -986,6 +986,12 @@ msgstr ""
 
 msgid "Recipient"
 msgstr "Destinatario"
+
+msgid "Do not actually import the newsletter subscribers"
+msgstr ""
+
+msgid ": (Address already exists)"
+msgstr ": (L'indirizzo esiste già)"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
@@ -4609,13 +4615,30 @@ msgid "Sends a test newsletter to the given address"
 msgstr "Invia una newsletter di prova all'indirizzo indicato"
 
 msgid "Newsletter Recipients"
-msgstr ""
+msgstr "Destinatari della newsletter"
 
 msgid "Newsletter recipient Export"
-msgstr ""
+msgstr "Destinatario della newsletter Esportazione"
 
 msgid "Exports all newsletter recipients."
+msgstr "Esporta tutti i destinatari della newsletter."
+
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr "La seguente riga (o righe) contiene dati non validi: ${lines}"
+
+#, python-format
+msgid "${count} newsletter subscribers will be imported"
+msgstr "Gli iscritti alla newsletter di ${count} verranno importati"
+
+#, python-format
+msgid "${count} newsletter subscribers imported"
+msgstr "${count} iscritti alla newsletter importati"
+
+msgid "The same format as the export (XLSX) can be used for the import."
 msgstr ""
+"Lo stesso formato dell'esportazione (XLSX) può essere usato per "
+"l'importazione."
 
 msgid "Today"
 msgstr "Oggi"
@@ -4636,21 +4659,12 @@ msgid "Exports all future events."
 msgstr "Esporta tutti gli eventi futuri."
 
 #, python-format
-msgid "The following line(s) contain invalid data: ${lines}"
-msgstr "La seguente riga (o righe) contiene dati non validi: ${lines}"
-
-#, python-format
 msgid "${count} events will be imported"
 msgstr "Gli eventi ${count} saranno importati"
 
 #, python-format
 msgid "${count} events imported"
 msgstr "${conteggio} eventi sono stati importati"
-
-msgid "The same format as the export (XLSX) can be used for the import."
-msgstr ""
-"Lo stesso formato dell'esportazione (XLSX) può essere usato per "
-"l'importazione."
 
 msgid "Move"
 msgstr "Spostare"
@@ -5191,16 +5205,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-#~ msgid "Do not actually want to import the newsletters recipients?"
-#~ msgstr "Non volete importare i destinatari delle newsletter?"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Il team di OneGov Cloud"
-
-#~ msgid "1 entry"
-#~ msgstr "1 elemento"
-
-#, python-format
-#~ msgid "${count} entries"
-#~ msgstr "${count} elementi"

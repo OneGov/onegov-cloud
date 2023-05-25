@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-22 15:10+0200\n"
+"POT-Creation-Date: 2023-05-25 11:48+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -186,27 +186,6 @@ msgstr "Paiements carte de crédit"
 
 msgid "Exports payments and tickets"
 msgstr "Exporte les paiements et les tickets"
-
-msgid "Mo"
-msgstr "Lu"
-
-msgid "Tu"
-msgstr "Ma"
-
-msgid "We"
-msgstr "Me"
-
-msgid "Th"
-msgstr "Je"
-
-msgid "Fr"
-msgstr "Ve"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "Di"
 
 msgid "Title"
 msgstr "Titre"
@@ -635,6 +614,27 @@ msgstr "Jeunesse"
 msgid "Elderly"
 msgstr "Âgées"
 
+msgid "Mo"
+msgstr "Lu"
+
+msgid "Tu"
+msgstr "Ma"
+
+msgid "We"
+msgstr "Me"
+
+msgid "Th"
+msgstr "Je"
+
+msgid "Fr"
+msgstr "Ve"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "Di"
+
 msgid "Concerto in the castle garden"
 msgstr "Concerto dans le jardin du château"
 
@@ -984,6 +984,12 @@ msgstr ""
 
 msgid "Recipient"
 msgstr "Destinataire"
+
+msgid "Do not actually import the newsletter subscribers"
+msgstr "Ne pas importer les abonnés à la newsletter"
+
+msgid ": (Address already exists)"
+msgstr ": (L'adresse existe déjà)"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr "Sera utilisé comme image dans la vue d'ensemble de la page parent"
@@ -4620,6 +4626,23 @@ msgstr "Exportation des destinataires de la lettre d'information"
 msgid "Exports all newsletter recipients."
 msgstr "Exporte tous les destinataires de la newsletter."
 
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr ""
+"La ou les lignes suivantes contiennent des données invalides : ${lines}"
+
+#, python-format
+msgid "${count} newsletter subscribers will be imported"
+msgstr "Les abonnés à la newsletter de ${count} seront importés"
+
+#, python-format
+msgid "${count} newsletter subscribers imported"
+msgstr "${count} abonnés à la lettre d'information importés"
+
+msgid "The same format as the export (XLSX) can be used for the import."
+msgstr ""
+"Le même format que l'exportation (XLSX) peut être utilisé pour l'importation."
+
 msgid "Today"
 msgstr "Aujourd’hui"
 
@@ -4639,21 +4662,12 @@ msgid "Exports all future events."
 msgstr "Exporte tous les événements futurs."
 
 #, python-format
-msgid "The following line(s) contain invalid data: ${lines}"
-msgstr ""
-"La ou les lignes suivantes contiennent des données invalides : ${lines}"
-
-#, python-format
 msgid "${count} events will be imported"
 msgstr "${count} événements seront importés"
 
 #, python-format
 msgid "${count} events imported"
 msgstr "${count} événements ont été importés"
-
-msgid "The same format as the export (XLSX) can be used for the import."
-msgstr ""
-"Le même format que l'exportation (XLSX) peut être utilisé pour l'importation."
 
 msgid "Move"
 msgstr "Déplacer"
@@ -5195,13 +5209,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "L'équipe de OneGov Cloud"
-
-#~ msgid "1 entry"
-#~ msgstr "1 entrée"
-
-#, python-format
-#~ msgid "${count} entries"
-#~ msgstr "${count} entrées"
