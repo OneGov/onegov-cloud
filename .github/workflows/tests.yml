@@ -31,8 +31,9 @@ jobs:
     - name: Install dependencies
       run: |
         echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+        alias install-packages='apt install -y -q --no-install-recommends'
         apt update
-        apt install -y -q --no-install-recommends \
+        install-packages \
           build-essential \
           git \
           gcc \
