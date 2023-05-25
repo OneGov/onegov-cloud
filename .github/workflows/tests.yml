@@ -81,17 +81,8 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
-          xdg-utils \
-          --fix-missing
+          xdg-utils
 
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        dpkg -i google-chrome-stable_current_amd64.deb
-
-        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-        export LC_ALL="C.UTF-8"
-        export LANG="C.UTF-8"
-
-        redis-server --daemonize yes
         # HACK: our test script tries to remove this
         touch /etc/apt/preferences
 
