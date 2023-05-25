@@ -1,0 +1,4 @@
+name: Tests
+
+on:
+  workflow_dispatch:  # allow to run manually
