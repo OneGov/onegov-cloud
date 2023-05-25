@@ -112,10 +112,12 @@ jobs:
       env:
         MATRIX_GROUP: ${{matrix.group}}
       shell: bash
-      # FIXME: Remove the function once we switch to onegov-cloud:head
+      # FIXME: Remove the functions once we switch to onegov-cloud:head
       run: |
         install-packages() { apt install -y -q --no-install-recommends $@; }
+        run-as() { identity="$1"; shift; su $identiy -c "$@"; }
         export -f install-packages
+        export -f run-as
         export BUILDKITE_PARALLEL_JOB="$(($MATRIX_GROUP-1))"
         export BUILDKITE_PARALLEL_JOB_COUNT="6"
         export BUILDKITE_COMMIT="$GITHUB_SHA"
