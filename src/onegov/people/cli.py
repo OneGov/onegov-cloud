@@ -278,7 +278,7 @@ def parse_agency_portrait_field_for_address(portrait):
     postal_pcc = ''
     plz_city_found_idx = -1
 
-    soup = BeautifulSoup(portrait)
+    soup = BeautifulSoup(portrait, "html.parser")
     # convert from html to text using soup
     portrait_text = soup.get_text('\n')
     lines = portrait_text.split('\n')
