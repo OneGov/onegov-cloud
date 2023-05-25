@@ -13,26 +13,15 @@ jobs:
         group: [1, 2, 3, 4, 5, 6]
 
     runs-on: ubuntu-latest
-    container:
-      # FIXME: Switch to onegov-cloud:head
-      image: ubuntu:22.04
-      volumes:
-        - ${{ github.workspace }}:/src
-
-    defaults:
-      run:
-        working-directory: /src
 
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     name: Test group ${{ matrix.group }}
 
     steps:
-    # FIXME: this will not be necessary anymore once can use onegov-cloud:head
-    - name: Install dependencies
+    - name: Install packages
       run: |
-        echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-        apt update
-        apt install -y -q --no-install-recommends \
+        sudo apt update
+        sudo apt install \
           build-essential \
           git \
           gcc \
@@ -81,15 +70,16 @@ jobs:
           libxshmfence1 \
           libxss1 \
           xdg-utils \
-          python3.10 \
-          python3.10-dev \
-          python3.10-venv \
+          --fix-missing
 
-        # HACK: setup some of the environment that would be present
-        #       on onegov-cloud:head
-        touch /etc/apt/preferences
-        mkdir /app
-        python3.10 -m venv /app
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome-stable_current_amd64.deb
+
+        export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+        export LC_ALL="C.UTF-8"
+        export LANG="C.UTF-8"
+
+        redis-server --daemonize yes
 
     - name: Checkout repo
       uses: actions/checkout@v3
@@ -108,20 +98,27 @@ jobs:
         echo "BUILDKITE_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
              >> $GITHUB_ENV
 
-    - name: Run tests
-      env:
-        MATRIX_GROUP: ${{matrix.group}}
-      shell: bash
-      # FIXME: Remove the functions once we switch to onegov-cloud:head
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
       run: |
-        install-packages() { apt install -y -q --no-install-recommends $@; }
-        run-as() { su "$(echo $1 | cut -d ':' -f 2)"; cd /src; source /app/bin/activate; shift; exec "$@"; exit; }
-        export -f install-packages
-        export -f run-as
-        export BUILDKITE_PARALLEL_JOB="$(($MATRIX_GROUP-1))"
-        export BUILDKITE_PARALLEL_JOB_COUNT="6"
-        export BUILDKITE_COMMIT="$GITHUB_SHA"
-        export CODECOV_ONEGOV_TOKEN="${{ secrets.CODECOV_TOKEN }}"
-        export CONTAINER_TEST_ARG=""
-        ./.buildkite/test
+        python -m pip install --upgrade pip
+        pip install .[test] pytest-split
+
+    - name: Run tests
+      run: |
+        py.test \
+          --splits "6" \
+          --group "${{matrix.group}}" \
+          --cov \
+          --cov-config=pyproject.toml \
+          --codecov \
+          --codecov-branch="$BUILDKITE_BRANCH" \
+          --codecov-commit="$GITHUB_SHA" \
+          --codecov-slug=OneGov/onegov-cloud \
+          --codecov-token="${{ secrets.CODECOV_TOKEN }}"
+          tests
 
