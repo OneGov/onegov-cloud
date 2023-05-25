@@ -16,7 +16,7 @@ def parse_domain(domain):
         return 'federation'
     if domain in ('Kant', 'CT'):
         return 'canton'
-    if domain == 'Gde':
+    if domain in ('Gde', 'MU'):
         return 'municipality'
     return None
 
