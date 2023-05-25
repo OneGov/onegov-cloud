@@ -11,7 +11,7 @@ The headless Agency API offers the following views:
 Currently, three cantons offer an api for their agencies.
 
 - [Canton Appenzell Ausserrhoden](https://staatskalender.ar.ch/api/)
-- [Canton Basel-Stadt](https://staatskalender.bs.ch/api/)
+- [Canton Basel Stadt](https://staatskalender.bs.ch/api/)
 - [Canton Zug](https://staka.zug.ch/api)
 
 ## Agencies View
@@ -24,27 +24,27 @@ memberships if given.
 
 `curl https://[base_url]/agencies`
 
-### Agency Filters
+### Agency Query Fields
 
-The agencies api support the following filters:
+The agencies api support the following query fields:
 
-| Supported Filter | Description                                                         |
-|------------------|---------------------------------------------------------------------|
-| title            | filters for an agency title (name)                                  |
-| updated_lt       | filters agencies updated before date specified (lower than)         |
-| updated_le       | filters agencies updated before or at date specified (lower equal)  |
-| updated_eq       | filters agencies updated at date specified (equal)                  |
-| updated_ge       | filters agencies updated after or at date specified (greater equal) |
-| updated_gt       | filters agencies updated after date specified (greater than)        |
+| Query Fields | Description                                                    |
+|--------------|--------------------------------------------------------------------|
+| title        | queries for an agency title (name)                                 |
+| updated_lt   | queries agencies updated before date specified (lower than)        |
+| updated_le   | queries agencies updated before or at date specified (lower equal) |
+| updated_eq   | queries agencies updated at date specified (equal)                 |
+| updated_ge   | queries agencies updated after or date specified (greater equal)   |
+| updated_gt   | queries agencies updated after date specified (greater than)       |
 
 `curl https://[base_url]/agencies?name=datenschutzbeauftragter`
 `curl https://[base_url]/agencies?updated.ge=2023-05-12T11:04:00`
 
-> NOTE: Multiple filters can be combined using the '&'
+> NOTE: Multiple query fields can be combined using the '&'
 
-### Filter Example
+### Example
 
-Here an example for the office 'Datenschutzbeautragter' where we filter for
+Here an example for the office 'Datenschutzbeautragter' where we query for
 the agencies title (or part of the title)
 
 Request:
@@ -164,29 +164,29 @@ a picture, website and memberships to agencies memberships if given.
 
 `curl https://[base_url]/people`
 
-### People Filters
+### People Query Fields
 
-The people api support the following filters that can be combined:
+The people api supports the following query fields that can be combined:
 
-| Supported Filter | Description                                                       |
-|------------------|-------------------------------------------------------------------|
-| first_name       | filters for people with specific firstname                        |
-| last_name        | filters for people with specific lastname                         |
-| updated_lt       | filters people updated before date specified (lower than)         |
-| updated_le       | filters people updated before or at date specified (lower equal)  |
-| updated_eq       | filters people updated at date specified (equal)                  |
-| updated_ge       | filters people updated after or at date specified (greater equal) |
-| updated_gt       | filters people updated after date specified (greater than)        |
+| Query Fields | Description                                                    |
+|--------------|----------------------------------------------------------------|
+| first_name   | queries for people with specific firstname                     |
+| last_name    | queries for people with specific lastname                      |
+| updated_lt   | queries people updated before date specified (lower than)      |
+| updated_le   | queries people updated before or date specified (lower equal)  |
+| updated_eq   | queries people updated at date specified (equal)               |
+| updated_ge   | queries people updated after or date specified (greater equal) |
+| updated_gt   | queries people updated after date specified (greater than)     |
 
 `curl https://[base_url]/people?first_name=moritz`
 `curl https://[base_url]/people?updated.gt=2023-05-12T11:04:00`
 
-> NOTE: Multiple filters can be applied using the '&'
+> NOTE: Multiple query fields can be applied using the '&'
 
-### Filter Example
+### Example
 
 Here an example for a person with first name Ursula and last name Meier a
-really common name in switzerland.
+really common name last name in switzerland.
 
 Request:
 
@@ -312,84 +312,6 @@ A collection+JSON of items if found including paging
                 ]
             },
             ...
-        ]
-    }
-}
-```
-
-## Membership View
-
-The membership view holds information about memberships between people and
-agencies. Also the links to related agencies and persons are provided.
-
-`curl https://[base_url]/memberships`
-
-### Memberships Filters
-
-The memberships api support the following filters that can be combined:
-
-| Supported Filter | Description                                                            |
-|------------------|------------------------------------------------------------------------|
-| updated_lt       | filters memberships updated before date specified (lower than)         |
-| updated_le       | filters memberships updated before or at date specified (lower equal)  |
-| updated_eq       | filters memberships updated at date specified (equal)                  |
-| updated_ge       | filters memberships updated after or at date specified (greater equal) |
-| updated_gt       | filters memberships updated after date specified (greater than)        |
-
-`curl https://[base_url]/memberships?updated.gt=2023-05-12T11:04:00`
-
-> NOTE: Multiple filters can be applied using the '&'
-
-### Filter Example
-
-Here an example for a membership filter.
-
-Request:
-
-`curl https://[base_url]/memberships?updated_gt=2023-05-08T01:02`
-
-Result:
-A collection+JSON of items if found including paging
-
-```
-{
-    "collection": {
-        "version": "1.0",
-        "href": "http://localhost:8080/onegov_agency/bs/api/memberships",
-        "links": [
-            {
-                "rel": "prev",
-                "href": null
-            },
-            {
-                "rel": "next",
-                "href": null
-            }
-        ],
-        "items": [
-            {
-                "href": "http://localhost:8080/onegov_agency/bs/api/memberships/fcbf64b2c9f248af8b490c2220b470e6",
-                "data": [
-                    {
-                        "name": "title",
-                        "value": "Ingenieur"
-                    },
-                    {
-                        "name": "modified",
-                        "value": "2023-05-12T11:10:00.420051+00:00"
-                    }
-                ],
-                "links": [
-                    {
-                        "rel": "agency",
-                        "href": "http://localhost:8080/onegov_agency/bs/api/agencies/2112"
-                    },
-                    {
-                        "rel": "person",
-                        "href": "http://localhost:8080/onegov_agency/bs/api/people/34c9833fc4524f10ad54efbe5fc6da93"
-                    }
-                ]
-            },
         ]
     }
 }
