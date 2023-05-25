@@ -242,16 +242,6 @@ def migrate_people_address_field(dry_run):
             if not person.address:
                 continue
 
-            # skip auto migration for complex multiline addresses for BS
-            # just take it over
-            if '\r\n' in person.address:
-                # Example:
-                # 'Bau- und Verkehrsdepartement Basel-Stadt\r\nGrundbuch- und
-                # Vermessungsamt\r\nDufourstrasse 40/50\r\nPostfach,
-                # 4001 Basel'
-                person.postal_address = person.address
-                continue
-
             person.location_address, person.location_code_city, \
                 person.postal_address, person.postal_code_city = \
                 parse_and_split_address_field(person.address)
