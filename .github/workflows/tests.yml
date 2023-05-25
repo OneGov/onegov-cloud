@@ -30,8 +30,8 @@ jobs:
     # FIXME: this will not be necessary anymore once can use onegov-cloud:head
     - name: Install dependencies
       run: |
-        sudo apt update
-        sudo apt install \
+        apt update
+        apt install \
           build-essential \
           git \
           gcc \
@@ -83,7 +83,7 @@ jobs:
           --fix-missing
 
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome-stable_current_amd64.deb
+        dpkg -i google-chrome-stable_current_amd64.deb
 
         export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
         export LC_ALL="C.UTF-8"
