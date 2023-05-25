@@ -220,6 +220,6 @@ jobs:
           --codecov-branch="$BUILDKITE_BRANCH" \
           --codecov-commit="$GITHUB_SHA" \
           --codecov-slug=OneGov/onegov-cloud \
-          --codecov-token="${{ secrets.CODECOV_TOKEN }}"
+          --codecov-token="${{ secrets.CODECOV_TOKEN }}" \
           tests
 
