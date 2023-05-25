@@ -1,73 +1,31 @@
 steps:
 
-  # build the container…
-  - command: "build-container"
-    label: "Building"
+  # choose the pipeline we want to use…
+  - command: start-pipeline
+    label: "Running tests on built container"
 
     agents:
       - queue=builder
 
     env:
-      CONTAINER: "onegov-cloud:head"
+      PIPELINE_CONFIG: ".buildkite/container-pipeline.yml"
 
-  - wait
+    if: |
+      build.branch =~ /^release-/ ||
+      build.message =~ /\[test-container\]/i
 
-  # check linting
-  - command: "test-container"
-    label: "Linting"
-
-    agents:
-      - queue=generic
-      - ram=2048
+  - command: start-pipeline
+    label: "Running tests on generic container"
 
     env:
-      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
-      CONTAINER_TEST_SCRIPT: ".buildkite/lint"
-
-  # run the javascript tests
-  - command: "test-container"
-    label: "Jesting"
+      PIPELINE_CONFIG: ".buildkite/generic-pipeline.yml"
 
     agents:
-      - queue=generic
+      - queue=builder
 
-    if: build.message =~ /jest/
-
-    env:
-      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
-      CONTAINER_TEST_SCRIPT: ".buildkite/jest"
-
-  # run the python tests
-  - command: "test-container"
-    label: "Testing"
-
-    parallelism: 4
-
-    agents:
-      - queue=generic
-      - cpu=2
-      - ram=4096
-
-    env:
-      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
-      CONTAINER_TEST_SCRIPT: ".buildkite/test"
-
-  # build the docs if possible (fails are ignored, only on master)
-  - command: "test-container"
-    label: "Publishing docs"
-
-    agents:
-      - queue=generic
-      - ram=4096
-
-    soft_fail:
-      - exit_status: 1
-
-    env:
-      CONTAINER: "onegov-cloud:head-${BUILDKITE_COMMIT:0:10}"
-      CONTAINER_TEST_SCRIPT: ".buildkite/docs"
-
-    branches: "master"
+    if: |
+      build.branch !~ /^release-/ &&
+      build.message !~ /\[test-container\]/i
 
   - wait
 
