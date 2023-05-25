@@ -305,8 +305,6 @@ class NewsletterSubscriberImportForm(Form):
                 }
                 kwargs['confirmed'] = True
                 recipients.add(**kwargs)
-                user = self.request.current_username
-                recipients.meta['submitter_email'] = user
                 count += 1
             except Exception:
                 errors.append(str(number))
