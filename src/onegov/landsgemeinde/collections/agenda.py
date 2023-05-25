@@ -21,15 +21,18 @@ class AgendaItemCollection(GenericCollection):
 
     def query(self):
         query = super().query()
-        if self.assembly:
-            query = query.filter(AgendaItem.assembly_id == self.assembly.id)
+        if self.date:
+            query = query.join(AgendaItem.assembly)
+            query = query.filter(Assembly.date == self.date)
         query = query.order_by(AgendaItem.number)
         return query
 
     def by_id(self, id):
-        return self.query().filter(AgendaItem.id == id).first()
+        return super().query().filter(AgendaItem.id == id).first()
 
     def by_number(self, number):
+        if not self.date:
+            return None
         query = self.query().filter(AgendaItem.number == number)
         query = query.options(undefer(AgendaItem.content))
         return query.first()

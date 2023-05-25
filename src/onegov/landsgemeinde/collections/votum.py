@@ -19,15 +19,22 @@ class VotumCollection(GenericCollection):
 
     def query(self):
         query = super().query()
-        if self.agenda_item:
-            query = query.filter(Votum.agenda_item_id == self.agenda_item.id)
+        if self.date or self.agenda_item_number:
+            query = query.join(Votum.agenda_item)
+        if self.date:
+            query = query.join(AgendaItem.assembly)
+            query = query.filter(Assembly.date == self.date)
+        if self.agenda_item_number:
+            query = query.filter(AgendaItem.number == self.agenda_item_number)
         query = query.order_by(Votum.number)
         return query
 
     def by_id(self, id):
-        return self.query().filter(Votum.id == id).first()
+        return super().query().filter(Votum.id == id).first()
 
     def by_number(self, number):
+        if not self.date or not self.agenda_item_number:
+            return None
         query = self.query().filter(Votum.number == number)
         query = query.options(undefer(Votum.content))
         return query.first()
