@@ -670,7 +670,7 @@ msgid "Shown as contact address"
 msgstr "Indicato come indirizzo di contatto"
 
 msgid "External event URL"
-msgstr ""
+msgstr "URL evento esterno"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "L'indicatore può essere spostato trascinandolo con il mouse"
@@ -988,7 +988,7 @@ msgid "Recipient"
 msgstr "Destinatario"
 
 msgid "Do not actually import the newsletter subscribers"
-msgstr ""
+msgstr "Non importare effettivamente gli iscritti alla newsletter"
 
 msgid ": (Address already exists)"
 msgstr ": (L'indirizzo esiste già)"
