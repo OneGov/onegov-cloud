@@ -2,3 +2,56 @@ name: Tests
 
 on:
   workflow_dispatch:  # allow to run manually
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2, 3, 4, 5, 6]
+
+    runs_on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    name: Test group ${{ matrix.group }}
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Get branch name (merge)
+      if: github.event_name != 'pull_request'
+      shell: bash
+      run: |
+        echo "CODECOV_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
+             >> $GITHUB_ENV
+
+    - name: Get branch name (pull request)
+      if: github.event_name == 'pull_request'
+      shell: bash
+      run: |
+        echo "CODECOV_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
+             >> $GITHUB_ENV
+
+    - name: Install docker
+      run: sudo apt-get install docker
+
+    - name: Create container onegov-cloud:head
+      run: |
+        docker pull eu.gcr.io/seantis-containers/onegov-cloud:head
+        docker create --rm --i --name test \
+          --env BUILDKITE_PARALLEL_JOB="${{ matrix.group - 1 }}" \
+          --env BUILDKITE_PARALLEL_JOB_COUNT="6" \
+          --env BUILDKITE_COMMIT="$GITHUB_SHA" \
+          --env BUILDKITE_BRANCH="$CODECOV_BRANCH" \
+          --env CONTAINER_TEST_ARG="" \
+          --env CODECOV_ONEGOV_TOKEN="${{ secrets.CODECOV_TOKEN }}" \
+          --volume "$PWD":/src \
+          --workdir /src \
+          "eu.gcr.io/seantis-containers/onegov-cloud:head" \
+          /bin/bash ".buildkite/test" > /dev/null
+
+    - name: Run tests
+      run: docker start --interactive --attach test
+
