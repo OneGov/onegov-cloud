@@ -80,10 +80,16 @@ jobs:
           libxcb-dri3-0 \
           libxshmfence1 \
           libxss1 \
-          xdg-utils
+          xdg-utils \
+          python3.10 \
+          python3.10-dev \
+          python3.10-venv \
 
-        # HACK: our test script tries to remove this
+        # HACK: setup some of the environment that would be present
+        #       on onegov-cloud:head
         touch /etc/apt/preferences
+        mkdir /app
+        python3.10 -m venv /app
 
     - name: Checkout repo
       uses: actions/checkout@v3
