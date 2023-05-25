@@ -113,7 +113,7 @@ jobs:
       env:
         MATRIX_GROUP: ${{matrix.group}}
       run: |
-        export BUILDKITE_PARALLEL_JOB="$(($MATRIX_GROUP-1))""
+        export BUILDKITE_PARALLEL_JOB="$(($MATRIX_GROUP-1))"
         export BUILDKITE_PARALLEL_JOB_COUNT="6"
         export BUILDKITE_COMMIT="$GITHUB_SHA"
         export CODECOV_ONEGOV_TOKEN="${{ secrets.CODECOV_TOKEN }}"
