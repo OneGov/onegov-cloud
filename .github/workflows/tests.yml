@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: eu.gcr.io/seantis-containers/onegov-cloud:head
+      credentials:
+        username: ${{ secrets.GCR_USERNAME }}
+        password: ${{ secrets.GCR_PASSWORD }}
       volumes:
         - src:/src
       options: --workdir /src

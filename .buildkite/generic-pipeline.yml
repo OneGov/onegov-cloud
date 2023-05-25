@@ -36,21 +36,6 @@ steps:
       CONTAINER: "onegov-cloud:head"
       CONTAINER_TEST_SCRIPT: ".buildkite/jest"
 
-  # run the python tests
-  - command: "test-container"
-    label: "Testing"
-
-    parallelism: 4
-
-    agents:
-      - queue=generic
-      - cpu=2
-      - ram=4096
-
-    env:
-      CONTAINER: "onegov-cloud:head"
-      CONTAINER_TEST_SCRIPT: ".buildkite/test"
-
   # build the docs if possible (fails are ignored, only on master)
   - command: "test-container"
     label: "Publishing docs"
