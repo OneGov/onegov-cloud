@@ -91,6 +91,8 @@ jobs:
         export LANG="C.UTF-8"
 
         redis-server --daemonize yes
+        # HACK: our test script tries to remove this
+        touch /etc/apt/preferences
 
     - name: Checkout repo
       uses: actions/checkout@v3
