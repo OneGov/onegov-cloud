@@ -31,9 +31,8 @@ jobs:
     - name: Install dependencies
       run: |
         echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-        alias install-packages='apt install -y -q --no-install-recommends'
         apt update
-        install-packages \
+        apt install -y -q --no-install-recommends \
           build-essential \
           git \
           gcc \
@@ -106,7 +105,10 @@ jobs:
     - name: Run tests
       env:
         MATRIX_GROUP: ${{matrix.group}}
+      # FIXME: Remove the function once we switch to onegov-cloud:head
       run: |
+        install-packages() {apt install -y -q --no-install-recommends $@}
+        export -f install-packages
         export BUILDKITE_PARALLEL_JOB="$(($MATRIX_GROUP-1))"
         export BUILDKITE_PARALLEL_JOB_COUNT="6"
         export BUILDKITE_COMMIT="$GITHUB_SHA"
