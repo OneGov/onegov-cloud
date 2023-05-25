@@ -17,7 +17,7 @@ jobs:
       image: eu.gcr.io/seantis-containers/onegov-cloud:head
       volumes:
         - src:/src
-      workdir: /src
+      options: --workdir /src
 
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     name: Test group ${{ matrix.group }}
