@@ -63,3 +63,9 @@ def test_models(session, assembly):
     assert assembly.agenda_items[0].title_parts == []
     assembly.agenda_items[0].title = '   \n Lorem\r   ipsum\r\n '
     assert assembly.agenda_items[0].title_parts == ['Lorem', 'ipsum']
+
+    # delete
+    session.delete(assembly)
+    assert session.query(AgendaItem).count() == 0
+    assert session.query(Assembly).count() == 0
+    assert session.query(Votum).count() == 0
