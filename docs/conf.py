@@ -43,6 +43,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "alabaster",
     "autoapi.extension",
+    "myst_parser",
 ]
 
 intersphinx_mapping = {
@@ -103,7 +104,11 @@ autoapi_dirs = [
 templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = ".rst"
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
