@@ -1,11 +1,35 @@
 from datetime import datetime
 
 from cached_property import cached_property
+from dateutil.parser import isoparse
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection
-from onegov.api import ApiEndpoint
+from onegov.api import ApiEndpoint, ApiInvalidParamException
 from onegov.gis import Coordinates
+
+UPDATE_FILTER_PARAMS = ['updated_gt', 'updated_lt', 'updated_eq',
+                        'updated_ge', 'updated_le']
+
+
+def filter_for_updated(filter_operation, filter_value, result):
+    """
+    Applies filters for several 'updated' comparisons.
+    Refer to UPDATE_FILTER_PARAMS for all filter keywords.
+
+    :param filter_operation: the updated filter operation to be applied. For
+    allowed filters refer to UPDATE_FILTER_PARAMS
+    :param filter_value: the updated filter value to filter for
+    :param result: the results to apply the filters on
+    :return: filter result
+    """
+    try:
+        # only parse including hours and minutes
+        ts = isoparse(filter_value[:16])
+    except Exception as ex:
+        raise ApiInvalidParamException(f'Invalid iso timestamp for parameter'
+                                       f'\'{filter_operation}\': {ex}') from ex
+    return result.for_filter(**{filter_operation: ts})
 
 
 class ApisMixin:
@@ -49,6 +73,25 @@ class PersonApiEndpoint(ApiEndpoint, ApisMixin):
             self.session,
             page=self.page or 0
         )
+
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + ['first_name',
+                                           'last_name'] + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are: '
+                    f'{valid_params}')
+
+            # apply different filters
+            if key == 'first_name':
+                result = result.for_filter(first_name=value)
+            if key == 'last_name':
+                result = result.for_filter(last_name=value)
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
+
         result.exclude_hidden = True
         result.batch_size = self.batch_size
         return result
@@ -110,6 +153,22 @@ class AgencyApiEndpoint(ApiEndpoint, ApisMixin):
             parent=self.get_filter('parent', None, False),
             joinedload=['organigram']
         )
+
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + ['title'] + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are:'
+                    f' {valid_params}')
+
+            # apply different filters
+            if key == 'title':
+                result = result.for_filter(title=value)
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
+
         result.batch_size = self.batch_size
         return result
 
@@ -153,6 +212,20 @@ class MembershipApiEndpoint(ApiEndpoint, ApisMixin):
             agency=self.get_filter('agency'),
             person=self.get_filter('person'),
         )
+
+        for key, value in self.extra_parameters.items():
+            valid_params = self.filters + UPDATE_FILTER_PARAMS
+            if key not in valid_params:
+                raise ApiInvalidParamException(
+                    f'Invalid url parameter \'{key}\'. Valid params are:'
+                    f' {valid_params}')
+
+            # apply different filters
+            if key in UPDATE_FILTER_PARAMS:
+                result = filter_for_updated(filter_operation=key,
+                                            filter_value=value,
+                                            result=result)
+
         result.batch_size = self.batch_size
         return result
 

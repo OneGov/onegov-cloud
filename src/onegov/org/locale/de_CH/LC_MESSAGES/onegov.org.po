@@ -4218,7 +4218,7 @@ msgstr "Der Eintrag wurde gelöscht"
 msgid ""
 "On the right side, you can filter the entries of this directory to export."
 msgstr ""
-"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für de "
+"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den Export "
 "filtern."
 
 msgid "Exports all entries of this directory."

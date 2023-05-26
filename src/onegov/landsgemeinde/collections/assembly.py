@@ -1,6 +1,7 @@
 from onegov.core.collection import GenericCollection
 from onegov.landsgemeinde.models import Assembly
 from sqlalchemy import desc
+from sqlalchemy.orm import undefer
 
 
 class AssemblyCollection(GenericCollection):
@@ -16,4 +17,6 @@ class AssemblyCollection(GenericCollection):
         return self.query().filter(Assembly.id == id).first()
 
     def by_date(self, date_):
-        return self.query().filter(Assembly.date == date_).first()
+        query = self.query().filter(Assembly.date == date_)
+        query = query.options(undefer(Assembly.content))
+        return query.first()

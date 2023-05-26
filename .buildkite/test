@@ -52,24 +52,28 @@ echo "$(java --version)"
 echo "--- Creating virtual environment"
 
 # switch to virtual environment
-cd /app
-
 # shellcheck disable=SC1091
-source bin/activate
+source /app/bin/activate
 
 # install testing dependencies
 echo "--- Installing dependencies :python:"
 echo "$(python --version)"
-cd /app/src
+
+# only switch to container src directory if we want to test
+# the container, rather than just the source tree
+if [[ "${CONTAINER_TEST_ARG:-}" = "container" ]]; then
+    cd /app/src
+fi
+
 pip install '.[test]' \
-    pytest-test-groups \
+    pytest-split \
     pytest-cov \
     pytest-codecov \
     --quiet
 
 # reset the build assets again (like in the upstream container script),
 # because pip install will undo that change
-find ../lib -type d -iname assets -print0 | xargs -0 chmod a+w
+find /app/lib -type d -iname assets -print0 | xargs -0 chmod a+w
 
 # run the tests as a separate user
 export LC_ALL="C.UTF-8"
@@ -87,8 +91,8 @@ export CODECOV_TOKEN="$CODECOV_ONEGOV_TOKEN"
 
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
-    --test-group "$GROUP" \
-    --test-group-count "$GROUP_COUNT" \
+    --splits "$GROUP_COUNT" \
+    --group "$GROUP" \
     --cov \
     --cov-config=pyproject.toml \
     --codecov \

@@ -7,7 +7,9 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde.layouts import DefaultLayout
 from onegov.landsgemeinde.models import AgendaItem
+from onegov.landsgemeinde.models.agenda import STATES
 from onegov.org.forms.fields import HtmlField
+from sqlalchemy import desc
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
@@ -15,7 +17,6 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
-from onegov.landsgemeinde.models.agenda import STATES
 
 
 class AgendaItemForm(NamedFileForm):
@@ -23,9 +24,6 @@ class AgendaItemForm(NamedFileForm):
     number = IntegerField(
         label=_('Number'),
         fieldset=_('General'),
-        validators=[
-            InputRequired()
-        ],
     )
 
     state = RadioField(
@@ -50,7 +48,7 @@ class AgendaItemForm(NamedFileForm):
     )
 
     memorial_pdf = UploadField(
-        label=_('Memorial (PDF)'),
+        label=_('Excerpt from the Memorial (PDF)'),
         fieldset=_('Downloads'),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
@@ -91,6 +89,14 @@ class AgendaItemForm(NamedFileForm):
         label=_('Tags'),
         fieldset=_('Resolution')
     )
+
+    @property
+    def next_number(self):
+        query = self.request.session.query(AgendaItem.number)
+        query = query.filter(AgendaItem.assembly_id == self.model.assembly.id)
+        query = query.order_by(desc(AgendaItem.number))
+        query = query.limit(1)
+        return (query.scalar() or 0) + 1
 
     def on_request(self):
         DefaultLayout(self.model, self.request)

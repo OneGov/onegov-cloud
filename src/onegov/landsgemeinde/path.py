@@ -2,9 +2,10 @@ from onegov.core.converters import extended_date_converter
 from onegov.landsgemeinde.app import LandsgemeindeApp
 from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.collections import AssemblyCollection
+from onegov.landsgemeinde.collections import VotumCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
-from uuid import UUID
+from onegov.landsgemeinde.models import Votum
 
 
 @LandsgemeindeApp.path(
@@ -36,7 +37,34 @@ def get_agenda_items(app, date):
 @LandsgemeindeApp.path(
     model=AgendaItem,
     path='/traktandum/{date}/{number}',
-    converters=dict(id=UUID)
+    converters=dict(date=extended_date_converter, number=int)
 )
 def get_agenda_item(app, date, number):
     return AgendaItemCollection(app.session(), date).by_number(number)
+
+
+@LandsgemeindeApp.path(
+    model=VotumCollection,
+    path='/vota/{date}/{agenda_item_number}',
+    converters=dict(
+        date=extended_date_converter,
+        agenda_item_number=int
+    )
+)
+def get_vota(app, date, agenda_item_number):
+    return VotumCollection(app.session(), date, agenda_item_number)
+
+
+@LandsgemeindeApp.path(
+    model=Votum,
+    path='/votum/{date}/{agenda_item_number}/{number}',
+    converters=dict(
+        date=extended_date_converter,
+        agenda_item_number=int,
+        number=int
+    )
+)
+def get_votum(app, date, agenda_item_number, number):
+    return VotumCollection(
+        app.session(), date, agenda_item_number
+    ).by_number(number)

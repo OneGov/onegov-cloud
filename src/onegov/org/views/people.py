@@ -60,12 +60,6 @@ def person_functions_by_organization(subject, pages, request):
 
     organization_to_function = []
 
-    def remove_duplicated_text(function, topic):
-        if topic.title in function and not topic.title == function:
-            function = function.replace(topic.title, "")
-            function = function.rstrip()
-        return function
-
     for topic in pages:
         people = topic.people
         if people is None:
@@ -77,7 +71,6 @@ def person_functions_by_organization(subject, pages, request):
                 except AttributeError:
                     continue
                 if func:
-                    func = remove_duplicated_text(func, topic)
                     org_with_link = f"<a href=\"{request.link(topic)}\">" \
                                     f"{topic.title}</a>"
                     organization_to_function.append(

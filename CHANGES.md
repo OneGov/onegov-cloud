@@ -1,8 +1,53 @@
 # Changes
 
+## 2023.22
+
+`2023-05-19` | [29f672dfc6...842e9ef5b3](https://github.com/OneGov/onegov-cloud/compare/29f672dfc6^...842e9ef5b3)
+
+### Feriennet
+
+##### Add political municipality fields to wishlist bookings export
+
+`Feature` | [PRO-1181](https://linear.app/projuventute/issue/PRO-1181) | [c86a3836a7](https://github.com/onegov/onegov-cloud/commit/c86a3836a76ff54448e549d40612965d33d458c8)
+
+### Fsi
+
+##### Add Organisation name to choice field
+
+`Feature` | [OGC-1035](https://linear.app/onegovcloud/issue/OGC-1035) | [29f672dfc6](https://github.com/onegov/onegov-cloud/commit/29f672dfc6e59800909f2520a9fd4237d43d684f)
+
+### Landsgemeinde
+
+##### Add vota.
+
+Also make content searchable, simplify UI and add some basic styling.
+
+`Feature` | [OGC-638](https://linear.app/onegovcloud/issue/OGC-638) | [842e9ef5b3](https://github.com/onegov/onegov-cloud/commit/842e9ef5b3d9f055b41e12b1dbee7d45412056bd)
+
+### Mypy
+
+##### Adds static type checking to CI/pre-commit (#828)
+
+mypy: Enables static type checking
+
+This is a very lax base config and does not add any annotations beyond
+the bare minimum to make mypy happy. But this allows us to get started
+on adding type annotations to our code and gradually make the config
+more strict for the parts of the code that is annotated.
+
+`Other` | [f12698bf96](https://github.com/onegov/onegov-cloud/commit/f12698bf9641e8c9c3753879189d221fb8c12a06)
+
+### Org
+
+##### Fix exception in hidden directory entries for logged out users
+
+This fixes ONEGOV-CLOUD-48W
+
+`Bugfix` | [OGC-1124](https://linear.app/onegovcloud/issue/OGC-1124) | [5cbf551856](https://github.com/onegov/onegov-cloud/commit/5cbf551856cb1d4b62a71216cfb697e256b5d69e)
+
 ## 2023.21
 
-`2023-05-12` | [5a75b7c0ec...1fde757608](https://github.com/OneGov/onegov-cloud/compare/5a75b7c0ec^...1fde757608)
+`2023-05-12` | [5a75b7c0ec...274e92ba87](https://github.com/OneGov/onegov-cloud/compare/5a75b7c0ec^...274e92ba87)
 
 ### Election Day
 
@@ -2986,60 +3031,4 @@ Add field for standard new ticket notification email
 ##### Improve compatibility with SQLAlchemy 1.4.
 
 `Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [542e174dc8](https://github.com/onegov/onegov-cloud/commit/542e174dc8ec8db8b1783bbeba34c7db4b9ebc06)
-
-## 2022.29
-
-`2022-05-04` | [545369b9e1...984c251bdf](https://github.com/OneGov/onegov-cloud/compare/545369b9e1^...984c251bdf)
-
-### Core
-
-##### Unpin pytest.
-
-`Other` | [OGC-293](https://linear.app/onegovcloud/issue/OGC-293) | [5a6a758dce](https://github.com/onegov/onegov-cloud/commit/5a6a758dce87b75a97eabc2622053bfa4b6c94ae)
-
-### Election Day
-
-##### Fix Italian translation.
-
-`Bugfix` | [545369b9e1](https://github.com/onegov/onegov-cloud/commit/545369b9e1237e3b26be397eeebb493561e8c972)
-
-##### Fixes embed and download link texts.
-
-`Bugfix` | [OGC-274](https://linear.app/onegovcloud/issue/OGC-274) | [9a943ae864](https://github.com/onegov/onegov-cloud/commit/9a943ae864e58ef4951e12f399776e33a1d2b3de)
-
-##### Fixes another embed link text.
-
-`Bugfix` | [OGC-274](https://linear.app/onegovcloud/issue/OGC-274) | [de701c9324](https://github.com/onegov/onegov-cloud/commit/de701c9324df9d1cb668e8c8f107991a76c87e36)
-
-##### Update Open Data Swiss metadata format.
-
-`Other` | [OGC-416](https://linear.app/onegovcloud/issue/OGC-416) | [b229e4bde9](https://github.com/onegov/onegov-cloud/commit/b229e4bde959b43674a67041c6f0ea0b2ddb3987)
-
-##### Avoid publishing intermediate results on Open Data Swiss.
-
-`Bugfix` | [OGC-414](https://linear.app/onegovcloud/issue/OGC-414) | [d2e7dd1424](https://github.com/onegov/onegov-cloud/commit/d2e7dd1424d0e2b42ec800eb6166725f6e805680)
-
-### Form
-
-##### Adds compatibility with pyparsing 3.
-
-`Other` | [OGC-117](https://linear.app/onegovcloud/issue/OGC-117) | [3ab76c7ae1](https://github.com/onegov/onegov-cloud/commit/3ab76c7ae1cf9ffc13e325eec403622740a66399)
-
-### Org
-
-##### Allows setting of access for individual allocations and rules
-
-`Feature` | [OGC-420](https://linear.app/onegovcloud/issue/OGC-420) | [91ad52e1df](https://github.com/onegov/onegov-cloud/commit/91ad52e1df3aa1f6b20cd654131a74597e58f206)
-
-##### Open only external forms in new tabs
-
-Option for external-links in new tabs removed, only external form links will be opened in new tabs
-
-`Bugfix` | [OGC-373](https://linear.app/onegovcloud/issue/OGC-373) | [0642270f30](https://github.com/onegov/onegov-cloud/commit/0642270f30f2a799fa390739f29bb2a51d0389ab)
-
-### Winterthur
-
-##### Fix styling
-
-`Bugfix` | [FW-96](https://stadt-winterthur.atlassian.net/browse/FW-96) | [627cd4e914](https://github.com/onegov/onegov-cloud/commit/627cd4e914ce6b7efa3f2f12473a343d62fe8770)
 

@@ -66,6 +66,7 @@ def view_assembly(self, request):
     return {
         'layout': layout,
         'assembly': self,
+        'agenda_items': self.agenda_items.all(),
         'title': layout.title,
     }
 
