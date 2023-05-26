@@ -1,14 +1,41 @@
+from datetime import date
 from onegov.landsgemeinde import LandsgemeindeApp
 from onegov.landsgemeinde.content import create_new_organisation
+from onegov.landsgemeinde.models import AgendaItem
+from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models import Votum
 from onegov.user import User
 from pytest import fixture
 from sqlalchemy.orm.session import close_all_sessions
 from tests.onegov.town6.conftest import Client
 from tests.shared.utils import create_app
 from transaction import commit
+from unittest.mock import Mock
 
 
-def create_landsgemeinde_app(request, use_elasticsearch=False):
+@fixture(scope='function')
+def assembly():
+    assembly = Assembly(state='scheduled', date=date(2023, 5, 7))
+    agenda_item_1 = AgendaItem(state='scheduled', number=1)
+    agenda_item_2 = AgendaItem(state='scheduled', number=2)
+    votum_1_1 = Votum(state='scheduled', number=1)
+    votum_1_2 = Votum(state='scheduled', number=2)
+    votum_2_1 = Votum(state='scheduled', number=1)
+    votum_2_2 = Votum(state='scheduled', number=2)
+    votum_2_3 = Votum(state='scheduled', number=3)
+    agenda_item_1.vota.append(votum_1_2)
+    agenda_item_1.vota.append(votum_1_1)
+    agenda_item_2.vota.append(votum_2_2)
+    agenda_item_2.vota.append(votum_2_3)
+    agenda_item_2.vota.append(votum_2_1)
+    assembly.agenda_items.append(agenda_item_2)
+    assembly.agenda_items.append(agenda_item_1)
+    yield assembly
+
+
+def create_landsgemeinde_app(
+    request, use_elasticsearch=False, mock_websocket=True
+):
     app = create_app(
         LandsgemeindeApp,
         request,
@@ -19,6 +46,8 @@ def create_landsgemeinde_app(request, use_elasticsearch=False):
             'manage_token': 'super-super-secret-token'
         }
     )
+    if mock_websocket:
+        app.send_websocket = Mock()
     session = app.session()
 
     create_new_organisation(

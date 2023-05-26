@@ -1,7 +1,7 @@
-def test_views(client):
-    client.login('admin@example.org', 'hunter2')
+def test_views(client_with_es):
+    client_with_es.login('admin@example.org', 'hunter2')
 
-    page = client.get('/').click('Archiv')
+    page = client_with_es.get('/').click('Archiv')
     assert 'Noch keine Landsgemeinden erfasst.' in page
 
     # add assembly
@@ -71,6 +71,23 @@ def test_views(client):
     page.form['person_name'] = 'Joe Quimby'
     page = page.form.submit().follow()
     assert 'Joe Quimby' in page
+
+    # search
+    client_with_es.app.es_client.indices.refresh(index='_all')
+    client = client_with_es.spawn()
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=ipsum')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=adipiscing')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliqua')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=magna')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=veniam')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=nostrud')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=quimby')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=mayor')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=liberals')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=springfield')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=laboris')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliquip')
+    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=consequat')
 
     # delete votum
     page.click('Löschen', href='votum')
