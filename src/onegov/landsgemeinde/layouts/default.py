@@ -25,7 +25,9 @@ class DefaultLayout(BaseDefaultLayout):
 
     def agenda_item_title(self, agenda_item, html=False, short=False):
         if agenda_item.irrelevant:
-            return agenda_item.title
+            if agenda_item.title:
+                return agenda_item.title
+            return self.request.translate(_('Irrelevant motion'))
         if not agenda_item.title or short:
             return '{} {}'.format(
                 self.request.translate(_('Agenda item')),
