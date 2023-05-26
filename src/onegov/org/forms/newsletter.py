@@ -1,11 +1,19 @@
 from datetime import timedelta
+import transaction
+from sqlalchemy.exc import IntegrityError
+from wtforms.validators import DataRequired
+from onegov.core.csv import convert_excel_to_csv, CSVFile
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
+from wtforms.fields import BooleanField
 from onegov.core.layout import Layout
 from onegov.file.utils import name_without_extension
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import DateTimeLocalField
 from onegov.form.fields import MultiCheckboxField
-from onegov.newsletter import Recipient
+from onegov.newsletter import Recipient, RecipientCollection
 from onegov.org import _
 from sedate import replace_timezone, to_timezone, utcnow
 from wtforms.fields import RadioField
@@ -212,3 +220,102 @@ class NewsletterTestForm(Form):
                     .one()
 
         return NewsletterSendFormWithRecipients
+
+
+class NewsletterSubscriberImportForm(Form):
+
+    dry_run = BooleanField(
+        label=_("Dry Run"),
+        description=_("Do not actually import the newsletter subscribers"),
+        default=False
+    )
+
+    file = UploadField(
+        label=_("Import"),
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType({
+                'application/excel',
+                'application/vnd.ms-excel',
+                (
+                    'application/'
+                    'vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                ),
+                'application/vnd.ms-office',
+                'application/octet-stream',
+                'application/zip',
+                'text/csv',
+                'text/plain',
+            }),
+            FileSizeLimit(10 * 1024 * 1024)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
+    @property
+    def headers(self):
+        return {
+            'address': self.request.translate(_("Address")),
+        }
+
+    def run_export(self):
+        recipients = RecipientCollection(self.request.session)
+        headers = self.headers
+
+        def get(recipient, attribute):
+            result = (getattr(recipient, attribute, None))
+            result = result.strip()
+            return result
+
+        result = []
+        for recipient in recipients.query():
+            result.append({
+                v: get(recipient, k)
+                for k, v in headers.items()
+            })
+        return result
+
+    def run_import(self):
+        headers = self.headers
+        session = self.request.session
+        recipients = RecipientCollection(session)
+        csvfile = convert_excel_to_csv(self.file.file)
+
+        try:
+            # dialect needs to be set, else error
+            csv = CSVFile(csvfile, dialect='excel')
+        except Exception:
+            return 0, ['0']
+
+        lines = list(csv.lines)
+        columns = {
+            key: csv.as_valid_identifier(value)
+            for key, value in headers.items()
+        }
+
+        def get(line, column):
+            return getattr(line, column)
+
+        count = 0
+        errors = []
+        for number, line in enumerate(lines, start=1):
+            try:
+                kwargs = {
+                    attribute: get(line, column)
+                    for attribute, column in columns.items()
+                }
+                kwargs['confirmed'] = True
+                recipients.add(**kwargs)
+                count += 1
+            except IntegrityError:
+                message = str(number) + self.request.translate(
+                    _(': (Address already exists)')
+                )
+                errors.append(message)
+            except Exception:
+                errors.append(str(number))
+
+        if self.dry_run.data or errors:
+            transaction.abort()
+
+        return count, errors
