@@ -1,6 +1,6 @@
 # OneGov Cloud API
 
-## Agency
+## Agency API
 
 The headless Agency API offers the following views:
 
@@ -14,7 +14,7 @@ Currently, three cantons offer an api for their agencies.
 - [Canton Basel Stadt](https://staatskalender.bs.ch/api/)
 - [Canton Zug](https://staka.zug.ch/api)
 
-## Agencies View
+### Agencies View
 
 The agencies view provides information about all the existing agencies
 within the organisation. Each agency offers several data fields like title,
@@ -24,7 +24,7 @@ memberships if given.
 
 `curl https://[base_url]/agencies`
 
-### Agency Query Fields
+#### Agency Query Fields
 
 The agencies api support the following query fields:
 
@@ -37,12 +37,14 @@ The agencies api support the following query fields:
 | updated_ge   | queries agencies updated after or date specified (greater equal)   |
 | updated_gt   | queries agencies updated after date specified (greater than)       |
 
+
+#### cURL Example
+
 `curl https://[base_url]/agencies?name=datenschutzbeauftragter`
+
 `curl https://[base_url]/agencies?updated.ge=2023-05-12T11:04:00`
 
 > NOTE: Multiple query fields can be combined using the '&'
-
-### Example
 
 Here an example for the office 'Datenschutzbeautragter' where we query for
 the agencies title (or part of the title)
@@ -51,7 +53,7 @@ Request:
 
 `curl https://[base_url]/agencies?title=datenschutzbeauftragter`
 
-Result:
+Response:
 A collection+JSON of items if found including paging
 
 ```
@@ -154,7 +156,7 @@ A collection+JSON of items if found including paging
 }
 ```
 
-## People View
+### People View
 
 The people view provides information about all people in relation with agencies
 within the organisation. Each person offers several data fields like
@@ -164,7 +166,7 @@ a picture, website and memberships to agencies memberships if given.
 
 `curl https://[base_url]/people`
 
-### People Query Fields
+#### People Query Fields
 
 The people api supports the following query fields that can be combined:
 
@@ -178,12 +180,13 @@ The people api supports the following query fields that can be combined:
 | updated_ge   | queries people updated after or date specified (greater equal) |
 | updated_gt   | queries people updated after date specified (greater than)     |
 
+#### cURL Example
+
 `curl https://[base_url]/people?first_name=moritz`
+
 `curl https://[base_url]/people?updated.gt=2023-05-12T11:04:00`
 
 > NOTE: Multiple query fields can be applied using the '&'
-
-### Example
 
 Here an example for a person with first name Ursula and last name Meier a
 really common name last name in switzerland.
@@ -192,7 +195,7 @@ Request:
 
 `curl https://[base_url]/people?last_name=meier&first_name=ursula`
 
-Result:
+Response:
 A collection+JSON of items if found including paging
 
 ```
@@ -317,7 +320,7 @@ A collection+JSON of items if found including paging
 }
 ```
 
-## Election Day
+## Election Day API
 
 Please refer to
 [Election Day API](src/onegov/election_day/static/docs/api/README.md)
