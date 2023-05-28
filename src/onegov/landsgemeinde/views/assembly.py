@@ -86,7 +86,7 @@ def view_assembly_ticker(self, request):
     layout = AssemblyTickerLayout(self, request)
 
     agenda_items = AgendaItemCollection(request.session)
-    agenda_items = agenda_items.items_by_assembly(self).all()
+    agenda_items = agenda_items.preloaded_by_assembly(self).all()
 
     return {
         'layout': layout,

@@ -30,7 +30,7 @@ def test_agenda_item_collections(session):
 
     items = AgendaItemCollection(session)
     assert items.query().count() == 0
-    assert items.items_by_assembly(assembly_1).count() == 0
+    assert items.preloaded_by_assembly(assembly_1).count() == 0
     assert items.by_id(None) is None
     assert items.by_number(None) is None
     assert items.by_number(1) is None
@@ -73,17 +73,17 @@ def test_agenda_item_collections(session):
     assert items_2.by_number(1).date.year == 2022
     assert items_3.by_number(1) is None
 
-    assert items.items_by_assembly(assembly_1).count() == 1
-    assert items_0.items_by_assembly(assembly_1).count() == 1
-    assert items_1.items_by_assembly(assembly_1).count() == 1
-    assert items_2.items_by_assembly(assembly_1).count() == 1
-    assert items_3.items_by_assembly(assembly_1).count() == 1
-    assert items.items_by_assembly(assembly_2).count() == 3
-    assert items_0.items_by_assembly(assembly_2).count() == 3
-    assert items_1.items_by_assembly(assembly_2).count() == 3
-    assert items_2.items_by_assembly(assembly_2).count() == 3
-    assert items_3.items_by_assembly(assembly_2).count() == 3
-    assert items_3.items_by_assembly(assembly_2).all()
+    assert items.preloaded_by_assembly(assembly_1).count() == 1
+    assert items_0.preloaded_by_assembly(assembly_1).count() == 1
+    assert items_1.preloaded_by_assembly(assembly_1).count() == 1
+    assert items_2.preloaded_by_assembly(assembly_1).count() == 1
+    assert items_3.preloaded_by_assembly(assembly_1).count() == 1
+    assert items.preloaded_by_assembly(assembly_2).count() == 3
+    assert items_0.preloaded_by_assembly(assembly_2).count() == 3
+    assert items_1.preloaded_by_assembly(assembly_2).count() == 3
+    assert items_2.preloaded_by_assembly(assembly_2).count() == 3
+    assert items_3.preloaded_by_assembly(assembly_2).count() == 3
+    assert items_3.preloaded_by_assembly(assembly_2).all()
 
 
 def test_votum_collection(session):

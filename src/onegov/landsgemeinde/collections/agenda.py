@@ -45,7 +45,7 @@ class AgendaItemCollection(GenericCollection):
             query = query.filter(Assembly.date == self.date)
             return query.first()
 
-    def items_by_assembly(self, assembly):
+    def preloaded_by_assembly(self, assembly):
         query = self.session.query(AgendaItem)
         query = query.outerjoin(AgendaItem.vota)
         query = query.filter(AgendaItem.assembly_id == assembly.id)
