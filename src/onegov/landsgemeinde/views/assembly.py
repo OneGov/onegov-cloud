@@ -4,11 +4,14 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde import LandsgemeindeApp
+from onegov.landsgemeinde.collections import AgendaItemCollection
 from onegov.landsgemeinde.collections import AssemblyCollection
 from onegov.landsgemeinde.forms import AssemblyForm
 from onegov.landsgemeinde.layouts import AssemblyCollectionLayout
 from onegov.landsgemeinde.layouts import AssemblyLayout
+from onegov.landsgemeinde.layouts import AssemblyTickerLayout
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.utils import update_ticker
 
 
 @LandsgemeindeApp.html(
@@ -39,6 +42,7 @@ def add_assembly(self, request, form):
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
+        update_ticker(request, assembly)
         request.success(_("Added a new assembly"))
 
         return redirect(request.link(assembly))
@@ -66,9 +70,48 @@ def view_assembly(self, request):
     return {
         'layout': layout,
         'assembly': self,
-        'agenda_items': self.agenda_items.all(),
+        'agenda_items': self.agenda_items,
         'title': layout.title,
     }
+
+
+@LandsgemeindeApp.html(
+    model=Assembly,
+    name='ticker',
+    template='ticker.pt',
+    permission=Public
+)
+def view_assembly_ticker(self, request):
+
+    layout = AssemblyTickerLayout(self, request)
+
+    agenda_items = AgendaItemCollection(request.session)
+    agenda_items = agenda_items.preloaded_by_assembly(self).all()
+
+    return {
+        'layout': layout,
+        'assembly': self,
+        'agenda_items': agenda_items,
+        'title': layout.title,
+    }
+
+
+@LandsgemeindeApp.view(
+    model=Assembly,
+    name='ticker',
+    request_method='HEAD',
+    permission=Public
+)
+def view_assembly_ticker_head(self, request):
+
+    @request.after
+    def add_headers(response):
+        last_modified = self.last_modified or self.modified or self.created
+        if last_modified:
+            response.headers.add(
+                'Last-Modified',
+                last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
 
 
 @LandsgemeindeApp.form(
@@ -82,6 +125,7 @@ def edit_assembly(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+        update_ticker(request, self)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 

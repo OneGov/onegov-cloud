@@ -9,6 +9,7 @@ from onegov.landsgemeinde.forms import AgendaItemForm
 from onegov.landsgemeinde.layouts import AgendaItemCollectionLayout
 from onegov.landsgemeinde.layouts import AgendaItemLayout
 from onegov.landsgemeinde.models import AgendaItem
+from onegov.landsgemeinde.utils import update_ticker
 
 
 @LandsgemeindeApp.form(
@@ -22,6 +23,11 @@ def add_agenda_item(self, request, form):
 
     if form.submitted(request):
         agenda_item = self.add(**form.get_useful_data())
+        update_ticker(
+            request,
+            agenda_item.assembly,
+            action='refresh'
+        )
         request.success(_("Added a new agenda item"))
 
         return redirect(request.link(agenda_item))
@@ -66,6 +72,12 @@ def edit_agenda_item(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+        update_ticker(
+            request,
+            self.assembly,
+            agenda_item=self,
+            action='update'
+        )
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
@@ -91,6 +103,12 @@ def edit_agenda_item(self, request, form):
 def delete_agenda_item(self, request):
 
     request.assert_valid_csrf_token()
+
+    update_ticker(
+        request,
+        self.assembly,
+        action='refresh'
+    )
 
     collection = AgendaItemCollection(request.session)
     collection.delete(self)
