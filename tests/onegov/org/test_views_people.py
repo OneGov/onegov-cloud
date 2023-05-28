@@ -176,7 +176,10 @@ def test_context_specific_function_substring_removed(session, org_app):
 
     org_link_1 = f'<a href="{link1}">{organizations[0]}</a>'
     org_link_2 = f'<a href="{link2}">{organizations[1]}</a>'
-    first_expected = Markup(f"<span>{org_link_1}: Präsidentin</span>")
-    second_expected = Markup(f"<span>{org_link_2}: Mitglied</span>")
+    first_expected = Markup(f"<span>{org_link_1}: "
+                            f"{context_specific_functions[0]}</span>")
+
+    second_expected = Markup(f"<span>{org_link_2}: "
+                             f"{context_specific_functions[1]}</span>")
     assert organization_to_function[0] == first_expected
     assert organization_to_function[1] == second_expected
