@@ -19,7 +19,7 @@ def update_ticker(request, assembly, agenda_item=None, action='refresh'):
         content = sub(r'\s+', ' ', content)
         content = content.replace('> ', '>').replace(' <', '<')
         request.app.send_websocket({
-            'event': action,
+            'event': 'update',
             'assembly': assembly.date.isoformat(),
             'node': f'agenda-item-{agenda_item.number}',
             'content': content

@@ -5,6 +5,7 @@ from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import defaultload
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import undefer
 
@@ -55,6 +56,6 @@ class AgendaItemCollection(GenericCollection):
             joinedload(AgendaItem.files),
             joinedload(AgendaItem.vota, Votum.files),
             undefer(AgendaItem.content),
-            undefer(AgendaItem.vota, Votum.content)
+            defaultload(AgendaItem.vota).undefer(Votum.content)
         )
         return query

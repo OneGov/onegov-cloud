@@ -6,6 +6,7 @@ from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
 from onegov.user import User
 from pytest import fixture
+from pytest_localserver.http import WSGIServer
 from sqlalchemy.orm.session import close_all_sessions
 from tests.onegov.town6.conftest import Client
 from tests.shared.utils import create_app
@@ -34,20 +35,31 @@ def assembly():
 
 
 def create_landsgemeinde_app(
-    request, use_elasticsearch=False, mock_websocket=True
+    request, use_elasticsearch=False, websocket_config=None
 ):
-    app = create_app(
-        LandsgemeindeApp,
-        request,
-        use_elasticsearch,
-        websockets={
+    if websocket_config:
+        websockets = {
+            'client_url': websocket_config['url'],
+            'client_csp': websocket_config['url'],
+            'manage_url': websocket_config['url'],
+            'manage_token': websocket_config['token']
+        }
+    else:
+        websockets = {
             'client_url': 'ws://localhost:8766',
             'manage_url': 'ws://localhost:8766',
             'manage_token': 'super-super-secret-token'
         }
+
+    app = create_app(
+        LandsgemeindeApp,
+        request,
+        use_elasticsearch,
+        websockets=websockets
     )
-    if mock_websocket:
+    if not websocket_config:
         app.send_websocket = Mock()
+
     session = app.session()
 
     create_new_organisation(
@@ -96,3 +108,22 @@ def client(landsgemeinde_app):
 @fixture(scope='function')
 def client_with_es(landsgemeinde_app_with_es):
     return Client(landsgemeinde_app_with_es)
+
+
+@fixture(scope='function')
+def wsgi_server(request, websocket_config):
+    app = create_landsgemeinde_app(request, False, websocket_config)
+    app.print_exceptions = True
+    server = WSGIServer(application=app)
+    server.start()
+    yield server
+    server.stop()
+
+
+@fixture(scope='function')
+def browser(request, browser, websocket_server, wsgi_server):
+    browser.baseurl = wsgi_server.url
+    browser.websocket_server_url = websocket_server.url
+    browser.websocket_server = websocket_server
+    browser.wsgi_server = wsgi_server
+    yield browser
