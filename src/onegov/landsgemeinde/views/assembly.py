@@ -119,7 +119,7 @@ def view_assembly_ticker_head(self, request):
     model=Assembly,
     name='states',
     template='states.pt',
-    permission=Public
+    permission=Private
 )
 def view_assembly_states(self, request):
 

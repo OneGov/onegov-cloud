@@ -115,4 +115,7 @@ def delete_agenda_item(self, request):
 
     collection = AgendaItemCollection(request.session)
     collection.delete(self)
-    ensure_states(self)
+    ensure_states(
+        self.assembly.agenda_items[-1]
+        if self.assembly.agenda_items else self.assembly
+    )

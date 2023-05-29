@@ -34,3 +34,26 @@ h6 small,
         margin-bottom: .5em;
     }
 }
+
+.states-list {
+    list-style: none;
+    margin-left: 0;
+
+    .label {
+        float: right;
+    }
+
+    .agenda-item {
+        padding-left: 1em;
+    }
+
+    .votum {
+        padding-left: 2em;
+    }
+
+    li {
+        border-top: 1px solid $white-smoke;
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+    }
+}

@@ -97,7 +97,10 @@ def delete_votum(self, request):
 
     collection = VotumCollection(request.session)
     collection.delete(self)
-    ensure_states(self)
+    ensure_states(
+        self.agenda_item.vota[-1]
+        if self.agenda_item.vota else self.agenda_item
+    )
 
     update_ticker(
         request,
