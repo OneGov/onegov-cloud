@@ -11,6 +11,7 @@ from onegov.landsgemeinde.layouts import AssemblyCollectionLayout
 from onegov.landsgemeinde.layouts import AssemblyLayout
 from onegov.landsgemeinde.layouts import AssemblyTickerLayout
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
 
@@ -114,6 +115,29 @@ def view_assembly_ticker_head(self, request):
             )
 
 
+@LandsgemeindeApp.html(
+    model=Assembly,
+    name='states',
+    template='states.pt',
+    permission=Private
+)
+def view_assembly_states(self, request):
+
+    layout = AssemblyLayout(self, request)
+    layout.editbar_links = []
+    layout.breadcrumbs.append(Link(_("States"), '#'))
+
+    agenda_items = AgendaItemCollection(request.session)
+    agenda_items = agenda_items.preloaded_by_assembly(self).all()
+
+    return {
+        'layout': layout,
+        'assembly': self,
+        'agenda_items': agenda_items,
+        'title': layout.title,
+    }
+
+
 @LandsgemeindeApp.form(
     model=Assembly,
     name='edit',
@@ -125,6 +149,7 @@ def edit_assembly(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+        ensure_states(self)
         update_ticker(request, self)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))

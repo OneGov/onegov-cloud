@@ -71,6 +71,11 @@ class AssemblyLayout(DefaultLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    text=_('States'),
+                    url=self.request.link(self.model, 'states'),
+                    attrs={'class': 'check-list-link'}
+                ),
+                Link(
                     text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
