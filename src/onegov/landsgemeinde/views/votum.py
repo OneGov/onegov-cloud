@@ -8,6 +8,7 @@ from onegov.landsgemeinde.forms import VotumForm
 from onegov.landsgemeinde.layouts import VotumCollectionLayout
 from onegov.landsgemeinde.layouts import VotumLayout
 from onegov.landsgemeinde.models import Votum
+from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
 
@@ -22,6 +23,7 @@ def add_votum(self, request, form):
 
     if form.submitted(request):
         votum = self.add(**form.get_useful_data())
+        ensure_states(votum)
         update_ticker(
             request,
             votum.agenda_item.assembly,
@@ -58,6 +60,7 @@ def edit_votum(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+        ensure_states(self)
         update_ticker(
             request,
             self.agenda_item.assembly,
@@ -94,6 +97,7 @@ def delete_votum(self, request):
 
     collection = VotumCollection(request.session)
     collection.delete(self)
+    ensure_states(self)
 
     update_ticker(
         request,

@@ -1,0 +1,33 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.landsgemeinde">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="grid-x grid-padding-x">
+            <div class="medium-7 cell main-content">
+                <ul>
+                    <li>
+                        <a href="${request.link(assembly, 'edit')}">${layout.assembly_title(assembly)}</a>
+                        <tal:block metal:use-macro="layout.macros['state']" tal:define="state assembly.state"/>
+                        <ul>
+                            <li tal:repeat="agenda_item agenda_items">
+                                <a href="${request.link(agenda_item, 'edit')}">${layout.agenda_item_title(agenda_item, short=True)}</a>
+                                <tal:block metal:use-macro="layout.macros['state']" tal:define="state agenda_item.state"/>
+                                <ul>
+                                    <li tal:repeat="votum reversed(agenda_item.vota)">
+                                        <a href="${request.link(votum, 'edit')}">${layout.votum_title(votum)}</a>
+                                        <tal:block metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+            </div>
+        </div>
+
+    </tal:b>
+</div>

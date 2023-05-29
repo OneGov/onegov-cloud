@@ -66,6 +66,11 @@ class AssemblyLayout(DefaultLayout):
             items = AgendaItemCollection(self.app.session(), self.model.date)
             return (
                 Link(
+                    text=_('States'),
+                    url=self.request.link(self.model, 'states'),
+                    attrs={'class': 'check-list-link'}
+                ),
+                Link(
                     text=_('Edit'),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-link'}

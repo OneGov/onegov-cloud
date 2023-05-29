@@ -9,6 +9,7 @@ from onegov.landsgemeinde.forms import AgendaItemForm
 from onegov.landsgemeinde.layouts import AgendaItemCollectionLayout
 from onegov.landsgemeinde.layouts import AgendaItemLayout
 from onegov.landsgemeinde.models import AgendaItem
+from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
 
 
@@ -23,6 +24,7 @@ def add_agenda_item(self, request, form):
 
     if form.submitted(request):
         agenda_item = self.add(**form.get_useful_data())
+        ensure_states(agenda_item)
         update_ticker(
             request,
             agenda_item.assembly,
@@ -72,6 +74,7 @@ def edit_agenda_item(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+        ensure_states(self)
         update_ticker(
             request,
             self.assembly,
@@ -112,3 +115,4 @@ def delete_agenda_item(self, request):
 
     collection = AgendaItemCollection(request.session)
     collection.delete(self)
+    ensure_states(self)

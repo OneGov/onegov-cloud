@@ -17,6 +17,15 @@
     <tal:block tal:content="structure layout.agenda_item_title(agenda_item, True)" />
 </metal:agenda-item-title>
 
+<metal:state define-macro="state">
+    <tal:block tal:switch="state">
+        <span class="label secondary" tal:case="'scheduled'" i18n:translate="">${state}</span>
+        <span class="label warning" tal:case="'ongoing'" i18n:translate="">${state}</span>
+        <span class="label success" tal:case="'completed'" i18n:translate="">${state}</span>
+        <span tal:case="default">${state}</span>
+    </tal:block>
+</metal:state>
+
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
     <div id="votum-${votum.number}" class="votum">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
@@ -64,7 +73,7 @@
 
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
-                <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture)|None">
+                <div class="ticker-item ticker-votum ${votum.state} person-card person-list-card" tal:define="url request.link(votum.person_picture)|None">
                     <a href="#" aria-hidden="true">
                         <div class="person-card-portrait">
                             <i class="fa fa-user" tal:condition="not:url"></i>
