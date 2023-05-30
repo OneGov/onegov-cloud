@@ -686,6 +686,7 @@ def view_zip_file(self, request):
     filename = ' '.join((
         self.directory.name, layout.format_date(layout.now(), 'datetime')))
     filename = re.sub(r'[\.:]+', '-', filename)
+    filename = filename + '.zip'
 
     response.headers['Content-Disposition']\
         = 'attachment; filename="{}"'.format(filename)

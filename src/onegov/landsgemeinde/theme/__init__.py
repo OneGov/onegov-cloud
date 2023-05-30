@@ -8,7 +8,8 @@ class LandsgemeindeTheme(TownTheme):
     @property
     def post_imports(self):
         return super().post_imports + [
-            'landsgemeinde'
+            'landsgemeinde',
+            'ticker'
         ]
 
     @property

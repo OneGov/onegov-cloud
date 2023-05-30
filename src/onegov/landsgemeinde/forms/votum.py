@@ -21,10 +21,7 @@ class VotumForm(NamedFileForm):
 
     number = IntegerField(
         label=_('Number'),
-        fieldset=_('General'),
-        validators=[
-            InputRequired()
-        ],
+        fieldset=_('General')
     )
 
     state = RadioField(

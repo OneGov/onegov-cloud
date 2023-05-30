@@ -47,11 +47,11 @@ msgstr "${count} complet"
 
 #, python-format
 msgid "${count} operable"
-msgstr "{count} avec suffisamment de participants"
+msgstr "${count} avec suffisamment de participants"
 
 #, python-format
 msgid "${count} unoperable"
-msgstr "{count} avec trop peu de participants"
+msgstr "${count} avec trop peu de participants"
 
 #, python-format
 msgid "${count} empty"
