@@ -21,6 +21,9 @@ h6 small,
     color: inherit !important;
 }
 
+/*
+    Manage views
+*/
 .assembly-agenda-items {
     margin-top: 2rem;
 }
@@ -56,4 +59,28 @@ h6 small,
         padding-bottom: .5rem;
         padding-top: .5rem;
     }
+}
+
+/*
+    Person
+*/
+.person-list-card {
+    span {
+        margin-right: 1em;
+    }
+}
+
+.person-reveal {
+    button {
+        background: $white;
+    }
+
+    figcaption {
+        font-style: italic;
+        margin-top: 1em;
+    }
+}
+
+.person-card-title {
+    font-weight: bold;
 }
