@@ -22,7 +22,7 @@ from onegov.org.forms import NewsletterForm, ExportForm
 from onegov.org.forms import NewsletterSendForm
 from onegov.org.forms import NewsletterTestForm
 from onegov.org.forms import SignupForm
-from onegov.org.forms.newsletter import NewsletterSubscriberImportForm
+from onegov.org.forms.newsletter import NewsletterSubscriberImportExportForm
 from onegov.org.homepage_widgets import get_lead
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
@@ -432,7 +432,7 @@ def export_newsletter_recipients(self, request, form, layout=None):
     layout.editbar_links = None
 
     if form.submitted(request):
-        import_form = NewsletterSubscriberImportForm()
+        import_form = NewsletterSubscriberImportExportForm()
         import_form.request = request
         results = import_form.run_export()
 
@@ -452,7 +452,7 @@ def export_newsletter_recipients(self, request, form, layout=None):
     model=RecipientCollection,
     name='import-newsletter-recipients',
     permission=Private,
-    form=NewsletterSubscriberImportForm,
+    form=NewsletterSubscriberImportExportForm,
     template='form.pt',
 )
 def import_newsletter_recipients(self, request, form, layout=None):
