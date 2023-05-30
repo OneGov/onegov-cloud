@@ -44,7 +44,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     name = Column(Text, nullable=False)
 
     #: The directory this entry belongs to
-    directory_id = Column(ForeignKey('directories.id'), nullable=False)
+    directory_id: 'Column[UUID]' = Column(
+        ForeignKey('directories.id'), nullable=False)
 
     #: the polymorphic type of the entry
     type = Column(Text, nullable=False, default=lambda: 'generic')
@@ -59,7 +60,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     lead = Column(Text, nullable=True)
 
     #: All keywords defined for this entry (indexed)
-    _keywords = Column(
+    _keywords = Column(  # type:ignore
         MutableDict.as_mutable(HSTORE), nullable=True, name='keywords'
     )
 

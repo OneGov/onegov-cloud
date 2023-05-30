@@ -1,22 +1,30 @@
 from uuid import uuid4
 
-from onegov.core.orm.mixins import ContentMixin, meta_property
-from onegov.file import AssociatedFiles
-from onegov.gis import CoordinatesMixin
-from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin, meta_property
 from onegov.core.orm.types import UUID
+from onegov.file import AssociatedFiles
+from onegov.gis import CoordinatesMixin
+from onegov.search import ORMSearchable
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
-from onegov.translator_directory.models.certificate import \
+from onegov.translator_directory.models.certificate import (
     certificate_association_table
-
-from onegov.translator_directory.models.language import \
-    mother_tongue_association_table, spoken_association_table, \
+)
+from onegov.translator_directory.models.language import (
+    mother_tongue_association_table, spoken_association_table,
     written_association_table, monitoring_association_table
+)
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
+    from .certificate import LanguageCertificate
+    from .language import Language
 
 
 class ESMixin(ORMSearchable):
@@ -97,7 +105,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     email = Column(Text, unique=True)
 
     # the user account related to this translator
-    user = relationship(
+    user: 'relationship[User]' = relationship(
         'User',
         primaryjoin='foreign(Translator.email) == User.username',
         uselist=False,
@@ -117,18 +125,22 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     date_of_decision = Column(Date)
 
     # Language Information
-    mother_tongues = relationship(
+    mother_tongues: 'relationship[list[Language]]' = relationship(
         "Language",
         secondary=mother_tongue_association_table,
         backref='mother_tongues'
     )
 
-    spoken_languages = relationship(
+    # Arbeitssprache - Wort
+    spoken_languages: 'relationship[list[Language]]' = relationship(
         "Language", secondary=spoken_association_table, backref="speakers"
     )
-    written_languages = relationship(
+    # Arbeitssprache - Schrift
+    written_languages: 'relationship[list[Language]]' = relationship(
         "Language", secondary=written_association_table, backref='writers')
-    monitoring_languages = relationship(
+
+    # Arbeitssprache - Kommunikationsüberwachung
+    monitoring_languages: 'relationship[list[Language]]' = relationship(
         "Language", secondary=monitoring_association_table, backref='monitors')
 
     # Nachweis der Voraussetzungen
@@ -140,7 +152,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     # Ausbildung Dolmetscher
     education_as_interpreter = Column(Boolean, default=False, nullable=False)
 
-    certificates = relationship(
+    certificates: 'relationship[list[LanguageCertificate]]' = relationship(
         'LanguageCertificate',
         secondary=certificate_association_table,
         backref='owners')

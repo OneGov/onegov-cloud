@@ -27,6 +27,11 @@ from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import observes
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from depot.fields.upload import UploadedFile
+
+
 class UploadedFileField(UploadedFileFieldBase):
     """ A customized version of Depot's uploaded file field. This version
     stores its data in a JSONB field, instead of using text.
@@ -140,7 +145,7 @@ class File(Base, Associable, TimestampMixin):
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
-    reference = Column(UploadedFileField(
+    reference: 'Column[UploadedFile]' = Column(UploadedFileField(
         upload_type=ProcessedUploadedFile,
         filters=[
             OnlyIfImage(
@@ -197,7 +202,7 @@ class File(Base, Associable, TimestampMixin):
                 'UTC'
             )
 
-    @signature_timestamp.expression
+    @signature_timestamp.expression  # type:ignore[no-redef]
     def signature_timestamp(self):
         return type_coerce(case(
             [(

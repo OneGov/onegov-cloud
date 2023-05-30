@@ -14,6 +14,12 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .agency import Agency
+    from .person import Person
+
+
 class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
                        UTCPublicationMixin):
     """ A membership to an agency. """
@@ -47,7 +53,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     )
 
     #: the related agency (which may have any number of memberships)
-    agency = relationship(
+    agency: 'relationship[Agency]' = relationship(
         'Agency',
         backref=backref(
             'memberships',
@@ -61,7 +67,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     person_id = Column(UUID, ForeignKey('people.id'), nullable=False)
 
     #: the related person (which may have any number of memberships)
-    person = relationship(
+    person: 'relationship[Person]' = relationship(
         'Person',
         backref=backref(
             'memberships',

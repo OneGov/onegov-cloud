@@ -7,7 +7,7 @@ from io import BytesIO
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.utils import module_path
-from onegov.file import File, FileSet, AssociatedFiles
+from onegov.file import File, FileSet, AssociatedFiles, NamedFile
 from onegov.file.models.fileset import file_to_set_associations
 from tests.shared.utils import create_image
 from pathlib import Path
@@ -440,3 +440,43 @@ def test_1n1_associated_file_cleanup(session):
     assert session.query(File).count() == 1
     assert item.content.reference.file.read() == b'baz'
     assert sum(1 for p in folder.iterdir()) == 1  # 2
+
+
+def test_named_file():
+
+    class MyFile(File):
+        pass
+
+    class CustomBlogPost(Blogpost):
+        x = NamedFile(cls=MyFile)
+        y = NamedFile()
+
+    post = CustomBlogPost(text="My interview at <company>")
+
+    assert post.x is None
+    assert post.y is None
+
+    del post.x
+    del post.y
+
+    x = create_image(2048, 2048)
+    y = create_image(2048, 2048)
+    post.x = (x, 'x.png')
+    post.y = (y, 'y.png')
+    x.seek(0)
+    y.seek(0)
+    assert len(post.files) == 2
+    assert post.x.name == 'x'
+    assert post.x.reference.filename == 'x.png'
+    assert post.x.reference.file.read() == x.read()
+    assert isinstance(post.x, MyFile)
+    assert post.y.name == 'y'
+    assert post.y.reference.filename == 'y.png'
+    assert post.y.reference.file.read() == y.read()
+    assert isinstance(post.y, File)
+    assert not isinstance(post.y, MyFile)
+
+    del post.x
+    assert len(post.files) == 1
+    assert post.x is None
+    assert post.y

@@ -58,7 +58,7 @@ class DirectoryConfigurationStorage(TypeDecorator, ScalarCoercible):
 
 class StoredConfiguration:
 
-    fields = None
+    fields: tuple[str, ...]
 
     def to_dict(self):
         return {

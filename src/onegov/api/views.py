@@ -4,7 +4,7 @@ from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
-from onegov.api.models import ApiExcpetion
+from onegov.api.models import ApiException
 from onegov.core.security import Public
 
 
@@ -48,7 +48,7 @@ def check_rate_limit(request):
 
     if requests > limit:
         headers['Retry-After'] = headers['X-RateLimit-Reset']
-        raise ApiExcpetion(
+        raise ApiException(
             'Rate limit exceeded', status_code=429, headers=headers
         )
 
@@ -56,7 +56,7 @@ def check_rate_limit(request):
 
 
 @ApiApp.json(
-    model=ApiExcpetion,
+    model=ApiException,
     permission=Public
 )
 def handle_exception(self, request):
@@ -159,7 +159,7 @@ def view_api_endpoint(self, request):
         }
 
     except Exception as exception:
-        raise ApiExcpetion(exception=exception, headers=headers) from exception
+        raise ApiException(exception=exception, headers=headers) from exception
 
 
 @ApiApp.json(
@@ -205,4 +205,4 @@ def view_api_endpoint_item(self, request):
         }
 
     except Exception as exception:
-        raise ApiExcpetion(exception=exception, headers=headers) from exception
+        raise ApiException(exception=exception, headers=headers) from exception

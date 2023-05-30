@@ -5,6 +5,11 @@ $new-language-icon: '\f1ab';
 $orange-color: #eda815;
 $dark-orange:  #be860e;
 
+.row {
+    // bump default width globally
+    max-width: 77.0rem;
+}
+
 .edit-bar {
     .create-excel::before { @include icon('\f1c3'); }
     .documents::before { @include icon('\f016')}
@@ -131,4 +136,34 @@ table.translator-documents {
         &::before { content: "-"; }
     }
 
+}
+
+.drive-distance {
+    display: None;
+}
+
+// Make font slightly smaller in translator view
+.adjust-font {
+    dl {
+        line-height: 1.3;
+    }
+
+    dd {
+        margin-bottom: 0.6rem;
+    }
+
+    dt {
+        font-size: .900rem;
+    }
+
+    dd {
+        font-size: .800rem;
+    }
+}
+
+h1.main-title {
+    div.adjust-font {
+        font-size: 1rem;
+        font-weight: bold;
+    }
 }

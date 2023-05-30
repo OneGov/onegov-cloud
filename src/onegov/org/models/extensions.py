@@ -151,7 +151,7 @@ class ContactExtension(ContentExtension):
 
     contact = content_property()
 
-    @contact.setter
+    @contact.setter  # type:ignore[no-redef]
     def contact(self, value):
         self.content['contact'] = value
         self.content['contact_html'] = to_html_ul(

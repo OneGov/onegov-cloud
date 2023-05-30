@@ -263,7 +263,7 @@ applications:
 
   - path: /onegov_fsi/*
     application: onegov.fsi.FsiApp
-    namespace: onegov_fsi
+    namespace: fsi
     configuration:
       <<: *global-config
 
@@ -283,6 +283,12 @@ applications:
   - path: /onegov_intranet/*
     application: onegov.intranet.IntranetApp
     namespace: onegov_intranet
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_landsgemeinde/*
+    application: onegov.landsgemeinde.LandsgemeindeApp
+    namespace: onegov_landsgemeinde
     configuration:
       <<: *global-config
 

@@ -1,7 +1,3 @@
-from onegov.core.utils import module_path
-from onegov.ballot import Vote, Election, ElectionCompound
-from onegov.core.csv import convert_list_of_dicts_to_csv
-from sqlalchemy import desc
 from collections import defaultdict
 from fs import path
 from fs.subfs import SubFS
@@ -11,6 +7,16 @@ from fs.zipfs import WriteZipFS
 from fs.tempfs import TempFS
 from fs.osfs import OSFS
 from fs.errors import NoSysPath
+from sqlalchemy import desc
+
+from onegov.core.csv import convert_list_of_dicts_to_csv
+from onegov.core.utils import module_path
+from onegov.ballot import Vote, Election, ElectionCompound
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day import ElectionDayApp
 
 
 class ArchiveGenerator:
@@ -20,7 +26,7 @@ class ArchiveGenerator:
         This creates a bunch of csv files, which are zipped and the path to
         the zip is returned.
     """
-    def __init__(self, app):
+    def __init__(self, app: 'ElectionDayApp'):
         self.app = app
         self.session = self.app.session()
         self.archive_dir: SubFS = self.app.filestorage.makedir("archive",
@@ -109,21 +115,22 @@ class ArchiveGenerator:
             groups[entity.date.year].append(entity)
         return list(groups.values())
 
-    def zip_dir(self, base_dir: SubFS) -> str:
+    def zip_dir(self, base_dir: SubFS) -> str | None:
         """Recursively zips a directory (base_dir).
 
         :param base_dir: is a directory in a temporary file system.
         Contains subdirectories 'votes' and 'elections', as well as various
         other files to include.
 
-        :returns path to the zipfile
+        :returns path to the zipfile or None if base_dir doesn't exist
+        or is empty.
         """
         self.archive_dir.makedir(self.archive_parent_dir, recreate=True)
         zip_path = f"{self.archive_parent_dir}/archive.zip"
         self.archive_dir.create(zip_path)
 
         with self.archive_dir.open(zip_path, mode="wb") as file:
-            with WriteZipFS(file) as zip_filesystem:
+            with WriteZipFS(file) as zip_filesystem:  # type:ignore[arg-type]
                 counts = base_dir.glob("**/*.csv").count()
                 if counts.files != 0:
                     if len(base_dir.listdir('/')) != 0:
@@ -143,6 +150,7 @@ class ArchiveGenerator:
                                     dst_path=entity,
                                 )
                         return zip_path
+        return None
 
     def all_counted_votes_with_results(self):
         all_votes = self.session.query(Vote).order_by(desc(Vote.date)).all()

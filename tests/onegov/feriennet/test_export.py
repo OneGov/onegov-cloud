@@ -97,6 +97,8 @@ def test_exports(client, scenario):
     )
     data = dict(list(rows)[0])
     assert data['Activity Tags'] == "CAMP\nFamily Camp"
+    assert data['Attendee Place'] == 'Someplace'
+    assert data['Attendee Political Municipality'] == 'Someotherplace'
 
     # Create invoices
     bills = BillingCollection(

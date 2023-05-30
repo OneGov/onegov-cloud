@@ -22,6 +22,15 @@ from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.fsi.models.course_subscription import subscription_table
 from onegov.search import ORMSearchable
 
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .course import Course
+    from .course_notification_template import (
+        CancellationTemplate, CourseNotificationTemplate, InfoTemplate,
+        ReminderTemplate, SubscriptionTemplate
+    )
+
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
 COURSE_EVENT_STATUSES_TRANSLATIONS = (
     _('Created'), _('Confirmed'), _('Canceled'), _('Planned'))
@@ -60,7 +69,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     course_id = Column(UUID, ForeignKey('fsi_courses.id'), nullable=False)
-    course = relationship(
+    course: 'relationship[Course]' = relationship(
         'Course',
         backref=backref('events', lazy='dynamic'),
         lazy='joined'
@@ -119,7 +128,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         ),
         nullable=False, default='created')
 
-    attendees = relationship(
+    attendees: 'relationship[list[CourseAttendee]]' = relationship(
         CourseAttendee,
         secondary=subscription_table,
         primaryjoin=id == subscription_table.c.course_event_id,
@@ -127,7 +136,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         lazy='dynamic'
     )
 
-    subscriptions = relationship(
+    subscriptions: 'relationship[list[CourseSubscription]]' = relationship(
         'CourseSubscription',
         backref=backref(
             'course_event',
@@ -137,16 +146,23 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         cascade='all, delete-orphan',
     )
 
-    notification_templates = relationship('CourseNotificationTemplate',
-                                          back_populates='course_event',
-                                          cascade='all, delete-orphan',
-                                          )
+    notification_templates: 'relationship[list[CourseNotificationTemplate]]'
+    notification_templates = relationship(
+        'CourseNotificationTemplate',
+        back_populates='course_event',
+        cascade='all, delete-orphan',
+    )
 
     # The associated notification templates
-    info_template = relationship("InfoTemplate", uselist=False)
-    reservation_template = relationship("SubscriptionTemplate", uselist=False)
-    cancellation_template = relationship("CancellationTemplate", uselist=False)
-    reminder_template = relationship("ReminderTemplate", uselist=False)
+    # FIXME: Are some of these optional?
+    info_template: 'relationship[InfoTemplate]' = relationship(
+        "InfoTemplate", uselist=False)
+    reservation_template: 'relationship[SubscriptionTemplate]' = relationship(
+        "SubscriptionTemplate", uselist=False)
+    cancellation_template: 'relationship[CancellationTemplate]' = relationship(
+        "CancellationTemplate", uselist=False)
+    reminder_template: 'relationship[ReminderTemplate]' = relationship(
+        "ReminderTemplate", uselist=False)
 
     # hides for members/editors
     hidden_from_public = Column(Boolean, nullable=False, default=False)

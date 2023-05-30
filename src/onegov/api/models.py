@@ -3,13 +3,11 @@ from logging import getLogger
 from logging import NullHandler
 from sqlalchemy.exc import SQLAlchemyError
 
-
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
 
 
-class ApiExcpetion(Exception):
-
+class ApiException(Exception):
     """ Base class for all API exceptions.
 
     Mainly used to ensure that all exceptions regarding the API are rendered
@@ -17,19 +15,26 @@ class ApiExcpetion(Exception):
 
     """
 
-    def __init__(self, message='', exception=None, status_code=400,
-                 headers=None):
-        self.message = message
-        self.status_code = status_code
+    def __init__(self, message='Internal Server Error', exception=None,
+                 status_code=500, headers=None):
+        self.message = exception.message if \
+            exception and hasattr(exception, 'message') else message
+        self.status_code = exception.status_code if \
+            exception and hasattr(exception, 'status_code') else status_code
+
         self.headers = headers or {}
+
         if exception:
             log.exception(exception)
-            self.status_code = 500
-            self.message = 'Internal Server Error'
+
+
+class ApiInvalidParamException(ApiException):
+    def __init__(self, message='Invalid Parameter', status_code=400):
+        self.message = message
+        self.status_code = status_code
 
 
 class ApiEndpointCollection:
-
     """ A collection of all available API endpoints. """
 
     def __init__(self, app):
@@ -44,7 +49,6 @@ class ApiEndpointCollection:
 
 
 class ApiEndpointItem:
-
     """ A single instance of an item of a specific endpoint.
 
     Passes all functionality to the specific API endpoint and is mainly used
@@ -76,7 +80,6 @@ class ApiEndpointItem:
 
 
 class ApiEndpoint:
-
     """ An API endpoint.
 
     API endpoints wrap collection and do some filter mapping.
@@ -89,7 +92,7 @@ class ApiEndpoint:
     """
 
     name = ''
-    filters = []
+    filters: list[str] = []
 
     def __init__(self, app, extra_parameters=None, page=None):
         self.app = app

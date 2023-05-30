@@ -33,6 +33,8 @@ class SubscriptionFormMixin:
         if not attendee:
             return self.none_choice
         text = str(attendee)
+        if attendee.organisation:
+            text = f'{text}, {attendee.organisation}'
         if attendee.user_id and attendee.source_id:
             text += f' | {attendee.source_id}'
         return str(attendee.id), text

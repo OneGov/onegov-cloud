@@ -84,6 +84,6 @@ class BoardletFact:
     text: str
 
     # the font awesome (fa-*) icon to use, if any
-    icon: str = None
+    icon: str | None = None
 
-    css_class: str = None
+    css_class: str | None = None

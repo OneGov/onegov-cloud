@@ -35,6 +35,9 @@ from tests.shared.postgresql import Postgresql
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
 from elasticsearch import Elasticsearch
+from asyncio import run
+from onegov.websockets.server import main
+from threading import Thread
 
 
 redis_path = which('redis-server')
@@ -500,3 +503,39 @@ def maildir(temporary_directory):
     path = os.path.join(temporary_directory, 'mails')
     os.makedirs(path)
     return path
+
+
+@pytest.fixture(scope='function')
+def websocket_config():
+    return {
+        'host': '127.0.0.1',
+        'port': 9876,
+        'token': 'super-super-secret-token',
+        'url': 'ws://127.0.0.1:9876'
+    }
+
+
+_websocket_server = None
+
+
+@pytest.fixture(scope='function')
+def websocket_server(websocket_config):
+
+    def _main():
+        run(
+            main(
+                websocket_config['host'],
+                websocket_config['port'],
+                websocket_config['token']
+            )
+        )
+
+    # Run the socket server in a deamon thread, this way it automatically gets
+    # termined when all tests are finished.
+    global _websocket_server
+    if not _websocket_server:
+        _websocket_server = Thread(target=_main, daemon=True)
+        _websocket_server.url = websocket_config['url']
+        _websocket_server.start()
+
+    yield _websocket_server

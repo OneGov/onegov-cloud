@@ -180,6 +180,22 @@ class AuditCollection(GenericCollection, Pagination):
         )
         return query
 
+    def next_subscriptions(self, request):
+        next_subscriptions = {}
+        if self.course_id:
+            query = request.session.query(CourseEvent)
+            query = query.filter(CourseEvent.course_id == self.course_id)
+            query = query.filter(CourseEvent.start >= utcnow())
+            query = query.order_by(CourseEvent.start)
+            for event in query:
+                attendees = event.attendees.with_entities(CourseAttendee.id)
+                for attendee in attendees:
+                    next_subscriptions.setdefault(
+                        attendee[0],
+                        (request.link(event), event.start)
+                    )
+        return next_subscriptions
+
     @property
     def model_class(self):
         return CourseAttendee

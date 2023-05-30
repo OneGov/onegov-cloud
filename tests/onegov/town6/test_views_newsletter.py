@@ -1,13 +1,18 @@
 import os
 import re
+from io import BytesIO
 import transaction
 
 from datetime import datetime
 from freezegun import freeze_time
+from openpyxl import load_workbook
+
+from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import Bunch
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.user import UserCollection
 from sedate import replace_timezone
+from webtest.forms import Upload
 
 
 def test_show_newsletter(client):
@@ -479,3 +484,71 @@ def test_newsletter_test_delivery(client):
     newsletter = NewsletterCollection(client.app.session()).query().one()
     assert newsletter.sent is None
     assert not newsletter.recipients
+
+
+def test_import_export_subscribers(client):
+    session = client.app.session()
+    client.login_admin()
+
+    # add a newsletter
+    new = client.get('/newsletters').click('Newsletter')
+    new.form['title'] = "Our town is AWESOME"
+    new.form['lead'] = "Like many of you, I just love our town..."
+
+    new.select_checkbox("news", "Willkommen bei OneGov")
+    new.select_checkbox("occurrences", "150 Jahre Govikon")
+
+    new.form.submit().follow()
+
+    # add some recipients the quick way
+    recipients = RecipientCollection(session)
+    recipients.add('one@example.org', confirmed=True)
+    recipients.add('two@example.org', confirmed=True)
+
+    transaction.commit()
+
+    # perform export
+    page = client.get('/subscribers/export-newsletter-recipients')
+    page.form['file_format'] = 'xlsx'
+
+    response = page.form.submit()
+
+    wb = load_workbook(BytesIO(response.body), data_only=True)
+    sheet = tuple(wb[wb.sheetnames[0]].rows)
+    assert sheet[0][0].value == 'Adresse'
+    assert sheet[1][0].value == 'one@example.org'
+    assert sheet[2][0].value == 'two@example.org'
+
+    page.form['file_format'] = 'json'
+    response = page.form.submit().json
+    assert response == [
+        {'Adresse': 'one@example.org'},
+        {'Adresse': 'two@example.org'},
+    ]
+
+    page.form['file_format'] = 'xlsx'
+
+    more_recipients = [
+        {'Adresse': 'three@example.org'},
+        {'Adresse': 'four@example.org'},
+    ]
+    file = Upload(
+        'file',
+        convert_list_of_dicts_to_xlsx(more_recipients),
+        'application/vnd.openxmlformats-' 'officedocument.spreadsheetml.sheet',
+    )
+
+    # Import (Dry run)
+    page = client.get('/subscribers/import-newsletter-recipients')
+    page.form['dry_run'] = True
+    page.form['file'] = file
+    page = page.form.submit()
+    assert "2 Abonnenten werden importiert" in page
+
+    # Import
+    page = client.get('/subscribers/import-newsletter-recipients')
+    page.form['dry_run'] = False
+    page.form['file'] = file
+    page = page.form.submit().follow()
+    assert "2 Abonnenten importiert" in page
+    assert recipients.query().count() == 4

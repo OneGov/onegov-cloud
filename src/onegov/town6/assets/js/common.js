@@ -11,7 +11,6 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
-
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
 var processCommonNodes = function(elements, out_of_band) {
@@ -143,7 +142,7 @@ function showAlertMessage(message, type, target) {
     var alert = $('<div />')
         .attr('data-closable', '')
         .attr('class', 'alert-box callout ' + (type || 'alert'))
-        .text(message)
+        .text(message);
     $(target || '#alert-boxes').append(alert);
 }
 
@@ -176,7 +175,6 @@ $(document).ajaxError(function(_e, xhr, _settings, error) {
         showAlertMessage(error || xhr.statusText);
     }
 });
-
 
 // support some extraordinary styling
 $(document).ready(function() {
@@ -219,7 +217,6 @@ $(document).ready(function() {
     });
 });
 
-
 function autoResize() {
     var newheight;
     var newwidth;
@@ -238,27 +235,27 @@ function autoResize() {
 $(document).ready(function() {
     $('[data-click-target]').each(function() {
         var el = $(this);
-        el.on('click', function () {
-            var parent = el.parent()
-            parent.off('click')
-            window.location = el.data('click-target')
-        })
+        el.on('click', function() {
+            var parent = el.parent();
+            parent.off('click');
+            window.location = el.data('click-target');
+        });
     });
 });
 
 // qr code modals
 function addModalImage(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt +';base64,' + rawData;
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
     parent.append($(`<img class="qr" src="${src}">`));
 }
 
 function addModalDownload(parent, rawData, fmt) {
-    var src = 'data:image/' + fmt +';base64,' + rawData;
+    var src = 'data:image/' + fmt + ';base64,' + rawData;
     var title = window.document.title;
     parent.append($(`<a class="button qr" download="qrcode_${title}.${fmt}" href="${src}">Download</a>`));
 }
 
-$('.qr-code-link').each(function () {
+$('.qr-code-link').each(function() {
     var el = $(this);
     var imageParentID = el.data('image-parent');
     var imageParent = $(`#${imageParentID}`);
@@ -266,32 +263,37 @@ $('.qr-code-link').each(function () {
     var endpoint = el.data('endpoint');
     var fmt = 'png';
 
-    el.on('click', function () {
-        if (imageParent.find('img.qr').length) return
+    el.on('click', function() {
+        if (imageParent.find('img.qr').length) { return; }
         $.ajax({
             type: "GET",
             contentType: "image/" + fmt,
             url: `${endpoint}?encoding=base64&image_fmt=${fmt}&border=2&box_size=8&payload=${payload}`,
-            statusCode : {
-                200: function (resp) {
+            statusCode: {
+                200: function(resp) {
                     addModalImage(imageParent, resp, fmt);
                     addModalDownload(imageParent, resp, fmt);
                 }
             }
-        }).fail(function(jqXHR) {
-            console.log(jqXHR.statusMessage);
-        })
-    })
-})
+        }).fail(function(_jqXHR) {
+            // console.log(_jqXHR.statusMessage);
+        });
+    });
+});
 
 var page_refs = new ClipboardJS('.pageref');
 page_refs.on('success', function(e) {
     // var success_msg = e.trigger.getAttribute('data-on-success');
-    var msgContainer = $('#clipboard-copy')
+    var msgContainer = $('#clipboard-copy');
     msgContainer.toggleClass('hidden');
     setTimeout(
-        function () { msgContainer.toggleClass('hidden'); },
+        function() { msgContainer.toggleClass('hidden'); },
         1500
-    )
+    );
     e.clearSelection();
+});
+
+// Allow custom reveal widths
+$('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
+    this.style.width = this.dataset.revealWidth;
 });

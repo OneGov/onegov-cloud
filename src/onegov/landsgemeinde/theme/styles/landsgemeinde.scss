@@ -1,0 +1,86 @@
+$check-list-icon: "\f0ae";
+$ordered-list-icon: "\f03a";
+
+.edit-bar {
+    .check-list-link::before { @include icon-bold($check-list-icon); }
+    .ordered-list-link::before { @include icon-bold($ordered-list-icon); }
+}
+
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small,
+.h1 small,
+.h2 small,
+.h3 small,
+.h4 small,
+.h5 small,
+.h6 small {
+    color: inherit !important;
+}
+
+/*
+    Manage views
+*/
+.assembly-agenda-items {
+    margin-top: 2rem;
+}
+
+.agenda-item-vota {
+    .votum {
+        margin-bottom: 2em;
+    }
+
+    .edit-bar {
+        margin-bottom: .5em;
+    }
+}
+
+.states-list {
+    list-style: none;
+    margin-left: 0;
+
+    .label {
+        float: right;
+    }
+
+    .agenda-item {
+        padding-left: 1em;
+    }
+
+    .votum {
+        padding-left: 2em;
+    }
+
+    li {
+        border-top: 1px solid $white-smoke;
+        padding-bottom: .5rem;
+        padding-top: .5rem;
+    }
+}
+
+/*
+    Person
+*/
+.person-list-card {
+    span {
+        margin-right: 1em;
+    }
+}
+
+.person-reveal {
+    button {
+        background: $white;
+    }
+
+    figcaption {
+        font-style: italic;
+        margin-top: 1em;
+    }
+}
+
+.person-card-title {
+    font-weight: bold;
+}

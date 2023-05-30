@@ -16,6 +16,11 @@ from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
+
+
 class Booking(Base, TimestampMixin):
     """ Bookings are created by users for occasions.
 
@@ -92,7 +97,7 @@ class Booking(Base, TimestampMixin):
     )
 
     #: access the user linked to this booking
-    user = relationship('User')
+    user: 'relationship[User]' = relationship('User')
 
     def group_code_count(self, states=('open', 'accepted')):
         """ Returns the number of bookings with the same group code. """
@@ -185,7 +190,7 @@ class Booking(Base, TimestampMixin):
     def starred(self):
         return self.priority & 1 << 0 != 0
 
-    @starred.expression
+    @starred.expression  # type:ignore[no-redef]
     def starred(self):
         return self.priority.op('&')(1 << 0) != 0
 
@@ -193,7 +198,7 @@ class Booking(Base, TimestampMixin):
     def nobbled(self):
         return self.priority & 1 << 1 != 0
 
-    @nobbled.expression
+    @nobbled.expression  # type:ignore[no-redef]
     def nobbled(self):
         return self.priority.op('&')(1 << 1) != 0
 
