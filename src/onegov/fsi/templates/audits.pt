@@ -7,19 +7,24 @@
             <div class="columns small-12">
                 <div class="row">
                     <div tal:condition="show_form|True" class="columns small-12 medium-8">
-
                         <div class="filter-panel">
                             <div metal:use-macro="layout.macros['form']" />
-
-                            <h4 class="filter-title" i18n:translate>By last name</h4>
+                        </div>
+                        <div class="filter-panel">
+                            <p class="label-text" i18n:translate>By last name</p>
                             <div metal:use-macro="layout.macros['tags']" tal:define="tags letters" />
                         </div>
-
                     </div>
                     <div class="columns small-12 medium-4">
                         <div class="info-panel hide-for-print">
                             <tal:b metal:use-macro="layout.macros['color_code_snippet']" />
                         </div>
+                    </div>
+                </div>
+                <div class="row hide-for-print">
+                    <div class="columns small-12 medium-8">
+                        <a class="button"><i class="fa fa-envelope"></i> Einnerungsmails</a>
+                        <p>Öffnet eine Leere Nachricht in ihrem Mailprogramm mit den hier sichtbar gefilterten Kursteilnehmern welche den fälligen Kurs weder besucht noch sich angemeldet haben (nächste Teilnahme).</p>
                     </div>
                 </div>
             </div>
