@@ -27,17 +27,26 @@
 </metal:state>
 
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
-    <div id="votum-${votum.number}" class="votum">
+    <div id="votum-${votum.number}" class="votum" tal:define="thumbnail request.link(votum.person_picture, 'thumbnail')|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
-        <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture)|None">
-            <a href="#" aria-hidden="true">
+        <div tal:condition="thumbnail" class="reveal small person-reveal" id="${modal}" data-reveal="" data-reveal-width="${votum.person_picture.reference.size[0]|0}">
+            <button class="close-button" data-close="" i18n:attributes="aria-label" aria-label="Close" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <figure tal:define="description votum.person_name or layout.votum_title(votum)">
+                <img src="${request.link(votum.person_picture)}" alt="${description}">
+                <figcaption>${description}</figcaption>
+            </figure>
+        </div>
+        <div class="person-card person-list-card">
+            <span href="#votum-${votum.number}" tal:attributes="data-open modal if thumbnail else None">
                 <div class="person-card-portrait">
-                    <i class="fa fa-user" tal:condition="not:url"></i>
-                    <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                    <i class="fa fa-user" tal:condition="not:thumbnail"></i>
+                    <div class="cover-image" tal:condition="thumbnail" style='background-image: url("${thumbnail}");'></div>
                 </div>
-            </a>
+            </span>
             <ul>
-                <li class="person-card-title" tal:condition="votum.person_name">
+                <li tal:condition="votum.person_name" class="person-card-title">
                     <span>${votum.person_name}</span>
                 </li>
                 <li tal:condition="votum.person_function" class="person-card-function">
@@ -73,31 +82,37 @@
 
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
-                <div class="ticker-item ticker-votum ${votum.state} person-card person-list-card" tal:define="url request.link(votum.person_picture)|None">
-                    <a href="#" aria-hidden="true">
-                        <div class="person-card-portrait">
-                            <i class="fa fa-user" tal:condition="not:url"></i>
-                            <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                <div class="ticker-item ticker-votum ${votum.state}">
+                    <div class="person-card person-single-item" tal:define="url request.link(votum.person_picture, 'thumbnail')|None">
+                        <div class="grid-x">
+                            <div class="cell small-12 medium-6 large-3">
+                                <div class="person-card-portrait">
+                                    <i class="fa fa-user" tal:condition="not:url"></i>
+                                    <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                                </div>
+                            </div>
+                            <div class="cell small-12 medium-6 large-8 large-offset-1">
+                                <ul>
+                                    <li class="person-card-title" tal:condition="votum.person_name">
+                                        <span>${votum.person_name}</span>
+                                    </li>
+                                    <li tal:condition="votum.person_function" class="person-card-function">
+                                        ${votum.person_function}
+                                    </li>
+                                    <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
+                                        ${votum.person_political_affiliation}
+                                    </li>
+                                    <li tal:condition="votum.person_place" class="person-card-place">
+                                        ${votum.person_place}
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </a>
-                    <ul>
-                        <li class="person-card-title" tal:condition="votum.person_name">
-                            <span>${votum.person_name}</span>
-                        </li>
-                        <li tal:condition="votum.person_function" class="person-card-function">
-                            ${votum.person_function}
-                        </li>
-                        <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
-                            ${votum.person_political_affiliation}
-                        </li>
-                        <li tal:condition="votum.person_place" class="person-card-place">
-                            ${votum.person_place}
-                        </li>
-                    </ul>
+                    </div>
+                    <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
+                    <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
+                    <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
                 </div>
-                <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
-                <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
-                <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
             </tal:block>
         </div>
 
