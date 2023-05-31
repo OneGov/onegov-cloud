@@ -38,7 +38,7 @@ class Prefixed:
     def count(self) -> int:
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
-        return self.cache.backend.reader_client.eval_ro("""
+        return self.cache.backend.reader_client.eval("""
             return #redis.pcall('keys', ARGV[1])
         """, 0, f'{self.cache.namespace}:{self.prefix}:*')
 

@@ -146,7 +146,7 @@ class RedisCacheRegion(CacheRegion):
     def keys(self) -> list[str]:
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
-        return self.backend.reader_client.eval_ro(
+        return self.backend.reader_client.eval(
             "return redis.pcall('keys', ARGV[1])", 0, f'{self.namespace}:*'
         )
 
@@ -163,7 +163,6 @@ class RedisCacheRegion(CacheRegion):
 
 
 # TODO: Remove these deprecated aliases
-key_mangler = RedisCacheRegion.key_mangler
 keys = RedisCacheRegion.keys
 flush = RedisCacheRegion.flush
 
