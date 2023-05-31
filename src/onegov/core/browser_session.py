@@ -38,25 +38,19 @@ class Prefixed:
     def count(self) -> int:
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
-        # FIXME: This would probably be faster if we used eval_ro
-        # FIXME: Why are we using VarArgs? We only supply one argument
-        # FIXME: We should also supply the namespace from the RedisCacheRegion
-        return self.cache.backend.reader_client.eval("""
+        return self.cache.backend.reader_client.eval_ro("""
             return #redis.pcall('keys', ARGV[1])
-        """, 0, f'*:{self.prefix}:*')
+        """, 0, f'{self.cache.namespace}:{self.prefix}:*')
 
     def flush(self) -> int:
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
-        # FIXME: Do we need to return 0 if there was nothing to flush?
-        #        what is the default return? 0, null, false?
-        # FIXME: Why are we using VarArgs? We only supply one argument
-        # FIXME: We should also supply the namespace from the RedisCacheRegion
         return self.cache.backend.reader_client.eval("""
             if #redis.pcall('keys', ARGV[1]) > 0 then
                 return redis.pcall('del', unpack(redis.call('keys', ARGV[1])))
             end
-        """, 0, f'*:{self.prefix}:*')
+            return 0
+        """, 0, f'{self.cache.namespace}:{self.prefix}:*')
 
 
 class BrowserSession:
