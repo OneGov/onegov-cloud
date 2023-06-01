@@ -158,7 +158,7 @@ def increment_name(name: str) -> str:
     if match:
         number_str = match.group(1)
         number = int(number_str) + 1
-        return f'{name[-len(number_str)]}{number}'
+        return f'{name[:-len(number_str)]}{number}'
     else:
         return f'{name}-1'
 
@@ -1121,16 +1121,25 @@ def batched(
 def batched(
     iterable: Iterable[_T],
     batch_size: int,
-    # NOTE: If there were higher order TypeVars, we could infer the
-    #       specific type of the collection returned i.e. _C[_T]
-    container_factory: 'Callable[[_T], Collection[_T]]'
+    container_factory: 'type[list]'  # type:ignore[type-arg]
+) -> 'Iterator[list[_T]]': ...
+
+
+# NOTE: If there were higher order TypeVars, we could properly infer
+#       the type of the Container, for now we just add overloads for
+#       two of the most common container_factories
+@overload
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    container_factory: 'Callable[[Iterator[_T]], Collection[_T]]'
 ) -> 'Iterator[Collection[_T]]': ...
 
 
 def batched(
     iterable: Iterable[_T],
     batch_size: int,
-    container_factory: 'Callable[[Any], Collection[Any]]' = tuple
+    container_factory: 'Callable[[Iterator[_T]], Collection[_T]]' = tuple
 ) -> 'Iterator[Collection[_T]]':
     """ Splits an iterable into batches of batch_size and puts them
     inside a given collection (tuple by default).

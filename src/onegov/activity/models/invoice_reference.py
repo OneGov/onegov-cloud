@@ -276,7 +276,7 @@ class ESRSchema(Schema, name='esr-v1'):
 
         return str((10 - carry) % 10)
 
-    def format(self, reference):
+    def format(self, reference: str) -> str:
         """ Takes an ESR reference and formats it in a human-readable way.
 
         This is mandated as follows by Postfinance:
@@ -290,10 +290,13 @@ class ESRSchema(Schema, name='esr-v1'):
         reference = reference.lstrip('0')
         reference = reference.replace(' ', '')
 
-        blocks = []
-
-        for values in batched(reversed(reference), batch_size=5):
-            blocks.append(''.join(reversed(values)))
+        blocks = [
+            ''.join(reversed(reversed_block))
+            for reversed_block in batched(
+                reversed(reference),
+                batch_size=5
+            )
+        ]
 
         return ' '.join(reversed(blocks))
 
