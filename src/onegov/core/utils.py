@@ -38,6 +38,31 @@ from yubico_client.yubico_exceptions import SignatureVerificationError
 from yubico_client.yubico_exceptions import StatusCodeError
 
 
+from typing import overload, Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRichComparison
+    from collections.abc import Callable, Collection, Iterator
+    from fs.base import FS, SubFS
+    from morepath import Response
+    from re import Match
+    from sqlalchemy import Column
+    from sqlalchemy.orm import Session
+    from types import ModuleType
+    from typing_extensions import TypedDict
+    from .request import CoreRequest
+
+    # FIXME: Move this to onegov.core.types or onegov.file.types
+    class FileDict(TypedDict):
+        data: str
+        filename: str | None
+        mimetype: str
+        size: int
+
+
+_T = TypeVar('_T')
+_KT = TypeVar('_KT')
+
+
 # http://stackoverflow.com/a/13500078
 _unwanted_url_chars = re.compile(r'[\.\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
@@ -60,6 +85,7 @@ _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 _phone_inside_a_tags = r'(\">|href=\"tel:)?'
 
 # matches duplicate whitespace
+# FIXME: this is redundant with _repeated_spaces
 _duplicate_whitespace = re.compile(r'\s{2,}')
 
 # regex pattern for swiss phone numbers
@@ -77,7 +103,7 @@ ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
 
 
 @contextmanager
-def local_lock(namespace, key):
+def local_lock(namespace: str, key: str) -> 'Iterator[None]':
     """ Locks the given namespace/key combination on the current system,
     automatically freeing it after the with statement has been completed or
     once the process is killed.
@@ -99,7 +125,7 @@ def local_lock(namespace, key):
             raise AlreadyLockedError from exception
 
 
-def normalize_for_url(text):
+def normalize_for_url(text: str) -> str:
     """ Takes the given text and makes it fit to be used for an url.
 
     That means replacing spaces and other unwanted characters with '-',
@@ -122,7 +148,7 @@ def normalize_for_url(text):
     return clean
 
 
-def increment_name(name):
+def increment_name(name: str) -> str:
     """ Takes the given name and adds a numbered suffix beginning at 1.
 
     For example::
@@ -136,13 +162,17 @@ def increment_name(name):
     number = (match and int(match.group(1)) or 0) + 1
 
     if match:
+        # FIXME: Doing a sub here is inefficient, we already have a
+        #        match and since it is at the end of the string, that
+        #        makes things even simpler...
         return _number_suffix.sub('-{}'.format(number), name)
     else:
         return name + '-{}'.format(number)
 
 
-def lchop(text, beginning):
+def lchop(text: str, beginning: str) -> str:
     """ Removes the beginning from the text if the text starts with it. """
+    # FIXME: Replace with str.removeprefix
 
     if text.startswith(beginning):
         return text[len(beginning):]
@@ -150,8 +180,9 @@ def lchop(text, beginning):
     return text
 
 
-def rchop(text, end):
+def rchop(text: str, end: str) -> str:
     """ Removes the end from the text if the text ends with it. """
+    # FIXME: Replace with str.removesuffix
 
     if text.endswith(end):
         return text[:-len(end)]
@@ -159,14 +190,14 @@ def rchop(text, end):
     return text
 
 
-def remove_repeated_spaces(text):
+def remove_repeated_spaces(text: str) -> str:
     """ Removes repeated spaces in the text ('a  b' -> 'a b'). """
 
     return _repeated_spaces.sub(' ', text)
 
 
 @contextmanager
-def profile(filename):
+def profile(filename: str) -> 'Iterator[None]':
     """ Profiles the wrapped code and stores the result in the profiles folder
     with the given filename.
 
@@ -182,18 +213,20 @@ def profile(filename):
 
 
 @contextmanager
-def timing(name=None):
+def timing(name: str | None = None) -> 'Iterator[None]':
     """ Runs the wrapped code and prints the time in ms it took to run it.
     The name is printed in front of the time, if given.
 
     """
 
+    # FIXME: We should be using time.perf_counter, datetime has too much
+    #        overhead that we don't even make use of
     start = datetime.utcnow()
 
     yield
 
-    duration = datetime.utcnow() - start
-    duration = int(round(duration.total_seconds() * 1000, 0))
+    delta = datetime.utcnow() - start
+    duration = int(round(delta.total_seconds() * 1000, 0))
 
     if name:
         print('{}: {} ms'.format(name, duration))
@@ -202,7 +235,7 @@ def timing(name=None):
 
 
 @lru_cache(maxsize=32)
-def module_path_root(module):
+def module_path_root(module: 'ModuleType | str') -> str:
     if isinstance(module, str):
         module = importlib.import_module(module)
 
@@ -211,7 +244,7 @@ def module_path_root(module):
     return os.path.dirname(inspect.getfile(module))
 
 
-def module_path(module, subpath):
+def module_path(module: 'ModuleType | str', subpath: str) -> str:
     """ Returns a subdirectory in the given python module.
 
     :mod:
@@ -230,7 +263,7 @@ def module_path(module, subpath):
     return path
 
 
-def touch(file_path):
+def touch(file_path: str) -> None:
     """ Touches the file on the given path. """
     try:
         os.utime(file_path, None)
@@ -259,35 +292,39 @@ class Bunch:
         assert request.app.settings.org.my_setting is True
 
     """
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
         self.__dict__.update({
             key: value for key, value in kwargs.items()
             if '.' not in key
         })
         for key, value in kwargs.items():
             if '.' in key:
+                # FIXME: Use left_partition, it does exactly this
+                #        without redundant splits/joins (Also split
+                #        accepts a second parameter which would also
+                #        give us the same)
                 name = key.split('.')[0]
                 key = '.'.join(key.split('.')[1:])
                 setattr(self, name, Bunch(**{key: value}))
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
             return self.__dict__ == other.__dict__
         return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
 
-def render_file(file_path, request):
+def render_file(file_path: str, request: 'CoreRequest') -> 'Response':
     """ Takes the given file_path (content) and renders it to the browser.
     The file must exist on the local system and be readable by the current
     process.
 
     """
 
-    def hash_path(path):
-        return hashlib.new(
+    def hash_path(path: str) -> str:
+        return hashlib.new(  # nosec:B324
             'sha1',
             path.encode('utf-8'),
             usedforsecurity=False
@@ -297,7 +334,7 @@ def render_file(file_path, request):
     # changes it's content type, it should usually not, especially since
     # we emphasize the use of random filenames
     @request.app.cache.cache_on_arguments(to_str=hash_path)
-    def get_content_type(file_path):
+    def get_content_type(file_path: str) -> str:
         content_type = mimetypes.guess_type(file_path)[0]
 
         if not content_type:
@@ -309,7 +346,7 @@ def render_file(file_path, request):
         static.FileApp(file_path, content_type=get_content_type(file_path)))
 
 
-def hash_dictionary(dictionary):
+def hash_dictionary(dictionary: dict[str, Any]) -> str:
     """ Computes a sha256 hash for the given dictionary. The dictionary
     is expected to only contain values that can be serialized by json.
 
@@ -320,22 +357,39 @@ def hash_dictionary(dictionary):
 
     """
     dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
-    return hashlib.new(
+    return hashlib.new(  # nosec:B324
         'sha1',
         dict_as_string,
         usedforsecurity=False
     ).hexdigest()
 
 
-def groupbylist(*args, **kwargs):
+@overload
+def groupbylist(
+    iterable: Iterable[_T],
+    key: None = ...
+) -> list[tuple[_T, list[_T]]]: ...
+
+
+@overload
+def groupbylist(
+    iterable: Iterable[_T],
+    key: 'Callable[[_T], _KT]'
+) -> list[tuple[_KT, list[_T]]]: ...
+
+
+def groupbylist(
+    iterable: Iterable[_T],
+    key: 'Callable[[_T], Any] | None' = None
+) -> list[tuple[Any, list[_T]]]:
     """ Works just like Python's ``itertools.groupby`` function, but instead
     of returning generators, it returns lists.
 
     """
-    return [(k, list(g)) for k, g in groupby(*args, **kwargs)]
+    return [(k, list(g)) for k, g in groupby(iterable, key=key)]
 
 
-def linkify_phone(text):
+def linkify_phone(text: str) -> str:
     """ Takes a string and replaces valid phone numbers with html links. If a
     phone number is matched, it will be replaced by the result of a callback
     function, that does further checks on the regex match. If these checks do
@@ -343,10 +397,10 @@ def linkify_phone(text):
 
     """
 
-    def strip_whitespace(number):
+    def strip_whitespace(number: str) -> str:
         return re.sub(r'\s', '', number)
 
-    def is_valid_length(number):
+    def is_valid_length(number: str) -> bool:
         if number.startswith('+00'):
             return False
         if number.startswith('00'):
@@ -357,7 +411,7 @@ def linkify_phone(text):
             return len(number) == 12
         return False
 
-    def handle_match(match):
+    def handle_match(match: 'Match[str]') -> str:
         inside_html = match.group(1)
         number = f'{match.group(2)}{match.group(3)}'
         assert not number.endswith('\n')
@@ -372,7 +426,8 @@ def linkify_phone(text):
     return _phone_ch_html_safe.sub(handle_match, text)
 
 
-def linkify(text, escape=True):
+# FIXME: A lot of these methods should be using MarkupSafe
+def linkify(text: str, escape: bool = True) -> str:
     """ Takes plain text and injects html links for urls and email addresses.
 
     By default the text is html escaped before it is linkified. This accounts
@@ -403,17 +458,18 @@ def linkify(text, escape=True):
     )
 
 
-def remove_duplicate_whitespace(text):
+def remove_duplicate_whitespace(text: str) -> str:
     """ Removes whitespace that is duplicated.
 
     For example: 'foo  bar' becomes 'foo bar'.
 
     """
 
+    # FIXME: This is redundant with remove_repeated_spaces
     return _duplicate_whitespace.sub(' ', text)
 
 
-def paragraphify(text):
+def paragraphify(text: str) -> str:
     """ Takes a text with newlines groups them into paragraphs according to the
     following rules:
 
@@ -434,7 +490,11 @@ def paragraphify(text):
     ))
 
 
-def to_html_ul(value, convert_dashes=True, with_title=False):
+def to_html_ul(
+    value: str,
+    convert_dashes: bool = True,
+    with_title: bool = False
+) -> str:
     """ Linkify and convert to text to one or multiple ul's or paragraphs.
     """
     if not value:
@@ -449,15 +509,15 @@ def to_html_ul(value, convert_dashes=True, with_title=False):
         )
 
     elements = []
-    temp = []
+    temp: list[str] = []
 
-    def ul(inner):
+    def ul(inner: str) -> str:
         return f'<ul class="bulleted">{inner}</ul>'
 
-    def li(inner):
+    def li(inner: str) -> str:
         return f'<li>{inner}</li>'
 
-    def p(inner):
+    def p(inner: str) -> str:
         return f'<p>{inner}</p>'
 
     was_list = False
@@ -497,7 +557,7 @@ def to_html_ul(value, convert_dashes=True, with_title=False):
     return ''.join(elements)
 
 
-def ensure_scheme(url, default='http'):
+def ensure_scheme(url: str, default: str = 'http') -> str:
     """ Makes sure that the given url has a scheme in front, if none
     was provided.
 
@@ -520,7 +580,7 @@ def ensure_scheme(url, default='http'):
     return _url.scheme(default).as_string()
 
 
-def is_uuid(value):
+def is_uuid(value: str | UUID) -> bool:
     """ Returns true if the given value is a uuid. The value may be a string
     or of type UUID. If it's a string, the uuid is checked with a regex.
     """
@@ -530,20 +590,41 @@ def is_uuid(value):
     return isinstance(value, UUID)
 
 
-def is_non_string_iterable(obj):
+def is_non_string_iterable(obj: object) -> bool:
     """ Returns true if the given obj is an iterable, but not a string. """
     return not (isinstance(obj, str) or isinstance(obj, bytes))\
         and isinstance(obj, Iterable)
 
 
-def pairwise(iterable):
+def pairwise(iterable: Iterable[_T]) -> 'Iterator[tuple[_T, _T]]':
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    # FIXME: Switch to itertools.pairwise
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
 
 
-def chunks(iterable, n, fillvalue=None):
+@overload
+def chunks(
+    iterable: Iterable[_T],
+    n: int,
+    fillvalue: None = ...
+) -> zip_longest[tuple[_T | None, ...]]: ...
+
+
+@overload
+def chunks(
+    iterable: Iterable[_T],
+    n: int,
+    fillvalue: _T
+) -> zip_longest[tuple[_T, ...]]: ...
+
+
+def chunks(
+    iterable: Iterable[_T],
+    n: int,
+    fillvalue: _T | None = None
+) -> zip_longest[tuple[_T | None, ...]]:
     """ Iterates through an iterable, returning chunks with the given size.
 
     For example::
@@ -555,12 +636,15 @@ def chunks(iterable, n, fillvalue=None):
         ]
 
     """
-
+    # FIXME: We should replace this with batched everywhere and emit a
+    #        DeprecationWarning. chunks is a lot less efficient and ends
+    #        up with a chunk containing None at the end, which is very
+    #        rarely what you actually want...
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
 
-def relative_url(absolute_url):
+def relative_url(absolute_url: str) -> str:
     """ Removes everything in front of the path, including scheme, host,
     username, password and port.
 
@@ -577,7 +661,7 @@ def relative_url(absolute_url):
     return url.as_string()
 
 
-def is_subpath(directory, path):
+def is_subpath(directory: str, path: str) -> bool:
     """ Returns true if the given path is inside the given directory. """
     directory = os.path.join(os.path.realpath(directory), '')
     path = os.path.realpath(path)
@@ -587,19 +671,46 @@ def is_subpath(directory, path):
     return os.path.commonprefix([path, directory]) == directory
 
 
-def is_sorted(iterable, key=lambda i: i, reverse=False):
+@overload
+def is_sorted(
+    iterable: 'Iterable[SupportsRichComparison]',
+    key: 'Callable[[SupportsRichComparison], SupportsRichComparison]' = ...,
+    reverse: bool = ...
+) -> bool: ...
+
+
+@overload
+def is_sorted(
+    iterable: 'Iterable[_T]',
+    key: 'Callable[[_T], SupportsRichComparison]',
+    reverse: bool = ...
+) -> bool: ...
+
+
+# FIXME: Do we really want to allow any Iterable? This seems like a bad
+#        idea to me... Iterators will be consumed and the Iterable might
+#        be infinite. This seems like it should be a Container instead,
+#        then we also don't need to use tee or list to make a copy
+def is_sorted(
+    iterable: 'Iterable[Any]',
+    key: 'Callable[[Any], SupportsRichComparison]' = lambda i: i,
+    reverse: bool = False
+) -> bool:
     """ Returns True if the iterable is sorted. """
 
-    i1, i2 = tee(iterable)
+    # NOTE: we previously used `tee` here, but since `sorted` consumes
+    #       the entire iterator, this is the exact case where tee is
+    #       slower than just pulling the entire sequence into a list
+    seq = list(iterable)
 
-    for a, b in zip(i1, sorted(i2, key=key, reverse=reverse)):
+    for a, b in zip(seq, sorted(seq, key=key, reverse=reverse)):
         if a is not b:
             return False
 
     return True
 
 
-def morepath_modules(cls):
+def morepath_modules(cls: type[morepath.App]) -> 'Iterator[str]':
     """ Returns all morepath modules which should be scanned for the given
     morepath application class.
 
@@ -623,7 +734,7 @@ def morepath_modules(cls):
         yield module
 
 
-def scan_morepath_modules(cls):
+def scan_morepath_modules(cls: type[morepath.App]) -> None:
     """ Tries to scann all the morepath modules required for the given
     application class. This is not guaranteed to stay reliable as there is
     no sure way to discover all modules required by the application class.
@@ -633,13 +744,16 @@ def scan_morepath_modules(cls):
         morepath.scan(import_module(module))
 
 
-def get_unique_hstore_keys(session, column):
+def get_unique_hstore_keys(
+    session: 'Session',
+    column: 'Column[dict[str, Any]]'
+) -> set[str]:
     """ Returns a set of keys found in an hstore column over all records
     of its table.
 
     """
 
-    base = session.query(column.keys()).with_entities(
+    base = session.query(column.keys()).with_entities(  # type:ignore
         sqlalchemy.func.skeys(column).label('keys'))
 
     query = sqlalchemy.select(
@@ -651,7 +765,7 @@ def get_unique_hstore_keys(session, column):
     return set(keys) if keys else set()
 
 
-def makeopendir(fs, directory):
+def makeopendir(fs: 'FS', directory: str) -> 'SubFS[FS]':
     """ Creates and opens the given directory in the given PyFilesystem. """
 
     if not fs.isdir(directory):
@@ -660,7 +774,7 @@ def makeopendir(fs, directory):
     return fs.opendir(directory)
 
 
-def append_query_param(url, key, value):
+def append_query_param(url: str, key: str, value: str) -> str:
     """ Appends a single query parameter to an url. This is faster than
     using Purl, if and only if we only add one query param.
 
@@ -693,14 +807,20 @@ class PostThread(Thread):
 
     """
 
-    def __init__(self, url, data, headers, timeout=30):
+    def __init__(
+        self,
+        url: str,
+        data: bytes,
+        headers: 'Collection[tuple[str, str]]',
+        timeout: float = 30
+    ):
         Thread.__init__(self)
         self.url = url
         self.data = data
         self.headers = headers
         self.timeout = timeout
 
-    def run(self):
+    def run(self) -> None:
         try:
             # Validate URL protocol before opening it, since it's possible to
             # open ftp:// and file:// as well.
@@ -721,19 +841,25 @@ class PostThread(Thread):
             )
 
 
-def toggle(collection, item):
+def toggle(collection: set[_T], item: _T | None) -> set[_T]:
     """ Toggles an item in a set. """
 
     if item is None:
         return collection
 
+    # FIXME: This is kind of slow, we create new sets, why are
+    #        we doing that? we could just use .add/.remove, or
+    #        do we want to use this on a frozenset?
     if item in collection:
         return collection - {item}
     else:
         return collection | {item}
 
 
-def binary_to_dictionary(binary, filename=None):
+def binary_to_dictionary(
+    binary: bytes,
+    filename: str | None = None
+) -> 'FileDict':
     """ Takes raw binary filedata and stores it in a dictionary together
     with metadata information.
 
@@ -763,7 +889,7 @@ def binary_to_dictionary(binary, filename=None):
     }
 
 
-def dictionary_to_binary(dictionary):
+def dictionary_to_binary(dictionary: 'FileDict') -> bytes:
     """ Takes a dictionary created by :func:`binary_to_dictionary` and returns
     the original binary data.
 
@@ -774,8 +900,33 @@ def dictionary_to_binary(dictionary):
         return f.read()
 
 
-def safe_format(format, dictionary, types=None, adapt=None,
-                raise_on_missing=False):
+@overload
+def safe_format(
+    format: str,
+    dictionary: dict[str, str | int | float],
+    types: None = ...,
+    adapt: 'Callable[[str], str] | None' = ...,
+    raise_on_missing: bool = ...
+) -> str: ...
+
+
+@overload
+def safe_format(
+    format: str,
+    dictionary: dict[str, _T],
+    types: set[type[_T]] = ...,
+    adapt: 'Callable[[str], str] | None' = ...,
+    raise_on_missing: bool = ...
+) -> str: ...
+
+
+def safe_format(
+    format: str,
+    dictionary: dict[str, Any],
+    types: set[type[Any]] | None = None,
+    adapt: 'Callable[[str], str] | None' = None,
+    raise_on_missing: bool = False
+) -> str:
     """ Takes a user-supplied string with format blocks and returns a string
     where those blocks are replaced by values in a dictionary.
 
@@ -862,12 +1013,15 @@ def safe_format(format, dictionary, types=None, adapt=None,
     return output.getvalue()
 
 
-def safe_format_keys(format, adapt=None):
+def safe_format_keys(
+    format: str,
+    adapt: 'Callable[[str], str] | None' = None
+) -> list[str]:
     """ Takes a :func:`safe_format` string and returns the found keys. """
 
     keys = []
 
-    def adapt_and_record(key):
+    def adapt_and_record(key: str) -> str:
         key = adapt(key) if adapt else key
         keys.append(key)
 
@@ -878,7 +1032,12 @@ def safe_format_keys(format, adapt=None):
     return keys
 
 
-def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
+def is_valid_yubikey(
+    client_id: str,
+    secret_key: str,
+    expected_yubikey_id: str,
+    yubikey: str
+) -> bool:
     """ Asks the yubico validation servers if the given yubikey OTP is valid.
 
     :client_id:
@@ -905,6 +1064,7 @@ def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
     # if the yubikey doesn't start with the expected yubikey id we do not
     # need to make a roundtrip to the validation server
     if not yubikey.startswith(expected_yubikey_id):
+        # FIXME: Are we leaking information with this early out?
         return False
 
     try:
@@ -918,7 +1078,7 @@ def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
         return False
 
 
-def is_valid_yubikey_format(otp):
+def is_valid_yubikey_format(otp: str) -> bool:
     """ Returns True if the given OTP has the correct format. Does not actually
     contact Yubico, so this function may return true, for some invalid keys.
 
@@ -927,7 +1087,7 @@ def is_valid_yubikey_format(otp):
     return ALPHABET_RE.match(otp) and True or False
 
 
-def yubikey_otp_to_serial(otp):
+def yubikey_otp_to_serial(otp: str) -> int | None:
     """ Takes a Yubikey OTP and calculates the serial number of the key.
 
     The serial key is printed on the yubikey, in decimal and as a QR code.
@@ -981,13 +1141,13 @@ def yubikey_otp_to_serial(otp):
     return value
 
 
-def yubikey_public_id(otp):
+def yubikey_public_id(otp: str) -> str:
     """ Returns the yubikey identity given a token. """
 
     return otp[:12]
 
 
-def dict_path(dictionary, path):
+def dict_path(dictionary: dict[str, _T], path: str) -> _T:
     """ Gets the value of the given dictionary at the given path. For example:
 
         >>> data = {'foo': {'bar': True}}
@@ -999,10 +1159,10 @@ def dict_path(dictionary, path):
     if not dictionary:
         raise KeyError()
 
-    return reduce(operator.getitem, path.split('.'), dictionary)
+    return reduce(operator.getitem, path.split('.'), dictionary)  # type:ignore
 
 
-def safe_move(src, dst):
+def safe_move(src: str, dst: str) -> None:
     """ Rename a file from ``src`` to ``dst``.
 
     * Moves must be atomic.  ``shutil.move()`` is not atomic.
@@ -1039,17 +1199,40 @@ def safe_move(src, dst):
             raise
 
 
-def batched(iterable, batch_size, container_factory=tuple):
-    """ Splits an iterable into container batches of batch_size.
+@overload
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    container_factory: 'type[tuple]' = ...  # type:ignore[type-arg]
+) -> 'Iterator[tuple[_T, ...]]': ...
+
+
+@overload
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    # NOTE: If there were higher order TypeVars, we could infer the
+    #       specific type of the collection returned i.e. _C[_T]
+    container_factory: 'Callable[[_T], Collection[_T]]'
+) -> 'Iterator[Collection[_T]]': ...
+
+
+def batched(
+    iterable: Iterable[_T],
+    batch_size: int,
+    container_factory: 'Callable[[Any], Collection[Any]]' = tuple
+) -> 'Iterator[Collection[_T]]':
+    """ Splits an iterable into batches of batch_size and puts them
+    inside a given collection (tuple by default).
 
     The container_factory is necessary in order to consume the iterator
     returned by islice. Otherwise this function would never return.
 
     """
 
-    iterable = iter(iterable)
+    iterator = iter(iterable)
     while True:
-        batch = container_factory(islice(iterable, batch_size))
+        batch = container_factory(islice(iterator, batch_size))
         if not batch:
             return
 
