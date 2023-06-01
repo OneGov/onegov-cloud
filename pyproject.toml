@@ -31,8 +31,10 @@ module = [
     "onegov.core.browser_session.*",
     "onegov.core.cache.*",
     "onegov.core.crypto.*",
+    "onegov.core.datamanager.*",
     "onegov.core.orm.*",
-    "onegov.core.security.*"
+    "onegov.core.security.*",
+    "onegov.core.utils.*"
 ]
 warn_unreachable = true
 disallow_any_generics = true
