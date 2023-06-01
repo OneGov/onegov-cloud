@@ -34,18 +34,6 @@ def test_normalize_for_url():
     assert utils.normalize_for_url('a...b..c.d') == 'a-b-c-d'
 
 
-def test_lchop():
-    assert utils.lchop('foobar', 'foo') == 'bar'
-    assert utils.lchop('foobar', 'bar') == 'foobar'
-
-
-def test_rchop():
-    assert utils.rchop('foobar', 'foo') == 'foobar'
-    assert utils.rchop('foobar', 'bar') == 'foo'
-    assert utils.rchop('https://www.example.org/ex/amp/le', '/ex/amp/le') \
-        == 'https://www.example.org'
-
-
 def test_touch(temporary_directory):
     path = os.path.join(temporary_directory, 'test.txt')
 
@@ -111,7 +99,7 @@ def test_phone_regex_groups_valid(number):
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
 def test_phone_linkify_valid(number):
     r = linkify_phone(number)
-    number = utils.remove_duplicate_whitespace(number)
+    number = utils.remove_repeated_spaces(number)
     wanted = f'<a href="tel:{number}">{number}</a> '
     assert r == wanted
     # Important !
@@ -179,12 +167,6 @@ def test_ensure_scheme():
         == 'http://google.ch?q=onegov.cloud'
 
     assert utils.ensure_scheme('https://abc.xyz') == 'https://abc.xyz'
-
-
-def test_remove_duplicate_whitespace():
-    assert utils.remove_duplicate_whitespace('foo  bar') == 'foo bar'
-    assert utils.remove_duplicate_whitespace('  foo  bar  ') == ' foo bar '
-    assert utils.remove_duplicate_whitespace('       foo    bar') == ' foo bar'
 
 
 def test_is_uuid():
@@ -269,7 +251,11 @@ def test_remove_repeated_spaces():
     assert utils.remove_repeated_spaces('  ') == ' '
     assert utils.remove_repeated_spaces('a b') == 'a b'
     assert utils.remove_repeated_spaces('a       b') == 'a b'
-    assert utils.remove_repeated_spaces((' x  ')) == ' x '
+    assert utils.remove_repeated_spaces(' x  ') == ' x '
+
+    assert utils.remove_repeated_spaces('foo  bar') == 'foo bar'
+    assert utils.remove_repeated_spaces('  foo  bar  ') == ' foo bar '
+    assert utils.remove_repeated_spaces('       foo    bar') == ' foo bar'
 
 
 def test_post_thread(session):

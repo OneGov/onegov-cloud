@@ -5,7 +5,7 @@ import string
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.core.utils import chunks, hash_dictionary
+from onegov.core.utils import batched, hash_dictionary
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
@@ -292,7 +292,7 @@ class ESRSchema(Schema, name='esr-v1'):
 
         blocks = []
 
-        for values in chunks(reversed(reference), n=5, fillvalue=''):
+        for values in batched(reversed(reference), batch_size=5):
             blocks.append(''.join(reversed(values)))
 
         return ' '.join(reversed(blocks))

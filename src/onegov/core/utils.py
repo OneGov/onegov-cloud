@@ -19,17 +19,17 @@ import urllib.request
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
-from datetime import datetime
 from functools import reduce
 from importlib import import_module
 from io import BytesIO, StringIO
-from itertools import groupby, islice, tee, zip_longest
+from itertools import groupby, islice
 from onegov.core import log
 from onegov.core.cache import lru_cache
 from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from purl import URL
 from threading import Thread
+from time import perf_counter
 from unidecode import unidecode
 from uuid import UUID, uuid4
 from webob import static
@@ -83,10 +83,6 @@ _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 
 # detect starting strings of phone inside a link
 _phone_inside_a_tags = r'(\">|href=\"tel:)?'
-
-# matches duplicate whitespace
-# FIXME: this is redundant with _repeated_spaces
-_duplicate_whitespace = re.compile(r'\s{2,}')
 
 # regex pattern for swiss phone numbers
 _phone_ch_country_code = r"(\+41|0041|0[0-9]{2})"
@@ -159,35 +155,12 @@ def increment_name(name: str) -> str:
     """
 
     match = _number_suffix.search(name)
-    number = (match and int(match.group(1)) or 0) + 1
-
     if match:
-        # FIXME: Doing a sub here is inefficient, we already have a
-        #        match and since it is at the end of the string, that
-        #        makes things even simpler...
-        return _number_suffix.sub('-{}'.format(number), name)
+        number_str = match.group(1)
+        number = int(number_str) + 1
+        return f'{name[-len(number_str)]}{number}'
     else:
-        return name + '-{}'.format(number)
-
-
-def lchop(text: str, beginning: str) -> str:
-    """ Removes the beginning from the text if the text starts with it. """
-    # FIXME: Replace with str.removeprefix
-
-    if text.startswith(beginning):
-        return text[len(beginning):]
-
-    return text
-
-
-def rchop(text: str, end: str) -> str:
-    """ Removes the end from the text if the text ends with it. """
-    # FIXME: Replace with str.removesuffix
-
-    if text.endswith(end):
-        return text[:-len(end)]
-
-    return text
+        return f'{name}-1'
 
 
 def remove_repeated_spaces(text: str) -> str:
@@ -218,20 +191,16 @@ def timing(name: str | None = None) -> 'Iterator[None]':
     The name is printed in front of the time, if given.
 
     """
-
-    # FIXME: We should be using time.perf_counter, datetime has too much
-    #        overhead that we don't even make use of
-    start = datetime.utcnow()
+    start = perf_counter()
 
     yield
 
-    delta = datetime.utcnow() - start
-    duration = int(round(delta.total_seconds() * 1000, 0))
+    duration_ms = 1000.0 * (perf_counter() - start)
 
     if name:
-        print('{}: {} ms'.format(name, duration))
+        print(f'{name}: {duration_ms:.0f} ms')
     else:
-        print('{} ms'.format(duration))
+        print(f'{duration_ms:.0f} ms')
 
 
 @lru_cache(maxsize=32)
@@ -293,19 +262,19 @@ class Bunch:
 
     """
     def __init__(self, **kwargs: Any):
-        self.__dict__.update({
-            key: value for key, value in kwargs.items()
+        self.__dict__.update(
+            (key, value)
+            for key, value in kwargs.items()
             if '.' not in key
-        })
+        )
         for key, value in kwargs.items():
             if '.' in key:
-                # FIXME: Use left_partition, it does exactly this
-                #        without redundant splits/joins (Also split
-                #        accepts a second parameter which would also
-                #        give us the same)
-                name = key.split('.')[0]
-                key = '.'.join(key.split('.')[1:])
+                name, _, key = key.partition('.')
                 setattr(self, name, Bunch(**{key: value}))
+
+    if TYPE_CHECKING:
+        # let mypy know that any attribute access could be valid
+        def __getattr__(self, name: str) -> Any: ...
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
@@ -418,7 +387,7 @@ def linkify_phone(text: str) -> str:
         if inside_html:
             return match.group(0)
         if is_valid_length(strip_whitespace(number)):
-            number = remove_duplicate_whitespace(number).strip()
+            number = remove_repeated_spaces(number).strip()
             return f'<a href="tel:{number}">{number}</a> '
 
         return match.group(0)
@@ -456,17 +425,6 @@ def linkify(text: str, escape: bool = True) -> str:
         attributes={'a': ['href', 'rel']},
         protocols=['http', 'https', 'mailto', 'tel']
     )
-
-
-def remove_duplicate_whitespace(text: str) -> str:
-    """ Removes whitespace that is duplicated.
-
-    For example: 'foo  bar' becomes 'foo bar'.
-
-    """
-
-    # FIXME: This is redundant with remove_repeated_spaces
-    return _duplicate_whitespace.sub(' ', text)
 
 
 def paragraphify(text: str) -> str:
@@ -594,54 +552,6 @@ def is_non_string_iterable(obj: object) -> bool:
     """ Returns true if the given obj is an iterable, but not a string. """
     return not (isinstance(obj, str) or isinstance(obj, bytes))\
         and isinstance(obj, Iterable)
-
-
-def pairwise(iterable: Iterable[_T]) -> 'Iterator[tuple[_T, _T]]':
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    # FIXME: Switch to itertools.pairwise
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
-
-
-@overload
-def chunks(
-    iterable: Iterable[_T],
-    n: int,
-    fillvalue: None = ...
-) -> 'zip_longest[tuple[_T | None, ...]]': ...
-
-
-@overload
-def chunks(
-    iterable: Iterable[_T],
-    n: int,
-    fillvalue: _T
-) -> 'zip_longest[tuple[_T, ...]]': ...
-
-
-def chunks(
-    iterable: Iterable[_T],
-    n: int,
-    fillvalue: _T | None = None
-) -> 'zip_longest[tuple[_T | None, ...]]':
-    """ Iterates through an iterable, returning chunks with the given size.
-
-    For example::
-
-        chunks('ABCDEFG', 3, 'x') --> [
-            ('A', 'B', 'C'),
-            ('D', 'E', 'F'),
-            ('G', 'x', 'x')
-        ]
-
-    """
-    # FIXME: We should replace this with batched everywhere and emit a
-    #        DeprecationWarning. chunks is a lot less efficient and ends
-    #        up with a chunk containing None at the end, which is very
-    #        rarely what you actually want...
-    args = [iter(iterable)] * n
-    return zip_longest(*args, fillvalue=fillvalue)
 
 
 def relative_url(absolute_url: str) -> str:
@@ -1233,7 +1143,7 @@ def batched(
     iterator = iter(iterable)
     while True:
         batch = container_factory(islice(iterator, batch_size))
-        if not batch:
+        if len(batch) == 0:
             return
 
         yield batch
