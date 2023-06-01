@@ -157,8 +157,8 @@ def increment_name(name: str) -> str:
     match = _number_suffix.search(name)
     if match:
         number_str = match.group(1)
-        number = int(number_str) + 1
-        return f'{name[:-len(number_str)]}{number}'
+        next_number = int(number_str) + 1
+        return f'{name[:-len(number_str)]}{next_number}'
     else:
         return f'{name}-1'
 
