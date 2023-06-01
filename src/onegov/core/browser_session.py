@@ -3,7 +3,7 @@ from dogpile.cache.api import NO_VALUE
 from hashlib import blake2b
 
 
-from typing import Any
+from typing import overload, Any, TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from .cache import RedisCacheRegion
 
     OnDirtyCallback = Callable[['BrowserSession', str], None]
+
+_T = TypeVar('_T')
 
 
 class Prefixed:
@@ -121,6 +123,12 @@ class BrowserSession:
         if not self._is_dirty:
             self._on_dirty(self, self._token)
             self._is_dirty = True
+
+    @overload
+    def get(self, name: str) -> Any | None: ...
+
+    @overload
+    def get(self, name: str, default: _T) -> Any | _T: ...
 
     def get(self, name: str, default: Any = None) -> Any:
         result = self._cache.get(name)
