@@ -298,7 +298,7 @@ class EventCollection(Pagination):
 
         return added, updated, purged_event_ids
 
-    def from_ical(self, ical):
+    def from_ical(self, ical, event_image_path=None):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
@@ -381,8 +381,9 @@ class EventCollection(Pagination):
                             tags=tags or [],
                             source=f'ical-{uid}',
                         ),
-                        image=None,
-                        image_filename=None,
+                        image=event_image_path,
+                        image_filename=event_image_path.name if
+                        event_image_path else None,
                         pdf=None,
                         pdf_filename=None,
                     )
