@@ -609,7 +609,7 @@ def chunks(
     iterable: Iterable[_T],
     n: int,
     fillvalue: None = ...
-) -> zip_longest[tuple[_T | None, ...]]: ...
+) -> 'zip_longest[tuple[_T | None, ...]]': ...
 
 
 @overload
@@ -617,14 +617,14 @@ def chunks(
     iterable: Iterable[_T],
     n: int,
     fillvalue: _T
-) -> zip_longest[tuple[_T, ...]]: ...
+) -> 'zip_longest[tuple[_T, ...]]': ...
 
 
 def chunks(
     iterable: Iterable[_T],
     n: int,
     fillvalue: _T | None = None
-) -> zip_longest[tuple[_T | None, ...]]:
+) -> 'zip_longest[tuple[_T | None, ...]]':
     """ Iterates through an iterable, returning chunks with the given size.
 
     For example::
