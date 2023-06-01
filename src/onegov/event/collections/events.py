@@ -2,7 +2,7 @@ import hashlib
 
 from uuid import uuid4
 from collections import namedtuple
-from datetime import date
+from datetime import date, timezone
 from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
@@ -198,6 +198,11 @@ class EventCollection(Pagination):
         valid_state_transfers = valid_state_transfers or {}
 
         for item in items:
+            # skip importing past events
+            if datetime.fromisoformat(str(item.event.end)) < datetime.now(
+                    timezone.utc):
+                continue
+
             if isinstance(item, str):
                 purge = {x for x in purge if not x.startswith(item)}
                 continue
