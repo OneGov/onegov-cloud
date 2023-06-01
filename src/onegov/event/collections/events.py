@@ -198,13 +198,13 @@ class EventCollection(Pagination):
         valid_state_transfers = valid_state_transfers or {}
 
         for item in items:
+            if isinstance(item, str):
+                purge = {x for x in purge if not x.startswith(item)}
+                continue
+
             # skip importing past events
             if datetime.fromisoformat(str(item.event.end)) < datetime.now(
                     timezone.utc):
-                continue
-
-            if isinstance(item, str):
-                purge = {x for x in purge if not x.startswith(item)}
                 continue
 
             event = item.event
