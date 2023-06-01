@@ -752,14 +752,11 @@ class PostThread(Thread):
 
 
 def toggle(collection: set[_T], item: _T | None) -> set[_T]:
-    """ Toggles an item in a set. """
+    """ Returns a new set where the item has been toggled. """
 
     if item is None:
         return collection
 
-    # FIXME: This is kind of slow, we create new sets, why are
-    #        we doing that? we could just use .add/.remove, or
-    #        do we want to use this on a frozenset?
     if item in collection:
         return collection - {item}
     else:
