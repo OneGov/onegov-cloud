@@ -2153,6 +2153,9 @@
             i18n:translate>
             Rename
         </a>
+        <a class="button secondary delete" role="button" href="${request.link(file)}" i18n:translate>
+          Download
+        </a>
     </div>
 </metal:file_details>
 
