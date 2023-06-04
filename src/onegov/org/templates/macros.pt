@@ -1772,9 +1772,9 @@
                 data-confirm-extra="${file.name}"
                 data-confirm-yes="Delete File"
                 data-confirm-no="Cancel"
-                i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
-                i18n:translate>
-                Delete
+                i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
+                <span class="fa fa-trash" aria-hidden="true"></span>
+                <span i18n:translate >Delete</span>
             </a>
             <a class="button secondary rename prompt" role="button"
                 data-prompt="Please provide the new name for the file"
@@ -1796,12 +1796,13 @@
                         actions.find('a.delete').data('confirm-extra', value);
                     });
                 })"
-                i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel"
-                i18n:translate>
-                Rename
+                i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel">
+                <span class="fa fa-edit" aria-hidden="true"></span>
+                <span i18n:translate>Rename</span> </a>
             </a>
-        <a class="button secondary delete" role="button" href="${request.link(file)}" i18n:translate>
-          Download
+        <a class="button secondary delete" role="button" href="${request.link(file)}">
+          <span class="fa fa-download" aria-hidden="true"></span>
+          <span i18n:translate>Download</span>
         </a>
         </div>
     </div>
