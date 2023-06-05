@@ -11,7 +11,6 @@ from onegov.org.elements import Link
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
-from onegov.winterthur import WinterthurApp
 from sedate import as_datetime, replace_timezone
 
 
@@ -99,9 +98,11 @@ def view_occurrence(self, request, layout=None):
     description = linkify(self.event.description).replace('\n', '<br>')
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
+    framed = request.GET.get('framed')
 
     return {
         'description': description,
+        'framed': framed,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
         'external_event_url': self.event.external_event_url,
@@ -111,8 +112,6 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
-        'winti': isinstance(request.app, WinterthurApp)  # condition for back
-        # button within iframe for winterthur but not org
     }
 
 
