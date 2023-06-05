@@ -196,13 +196,11 @@ class EventCollection(Pagination):
             query = query.filter(Event.meta['source'].astext.startswith(purge))
             purge = set((r.source for r in query))
 
-        count = 0
         added = []
         updated = []
         valid_state_transfers = valid_state_transfers or {}
 
         for item in items:
-            count += 1
             if isinstance(item, str):
                 purge = {x for x in purge if not x.startswith(item)}
                 continue
@@ -302,7 +300,7 @@ class EventCollection(Pagination):
 
         self.session.flush()
 
-        return added, updated, purged_event_ids, count
+        return added, updated, purged_event_ids
 
     def from_ical(self, ical, future_events_only=False, event_image_path=None):
         """ Imports the events from an iCalender string.
