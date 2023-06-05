@@ -9,7 +9,6 @@ from attr import attrs, attrib, validators
 from sedate import utcnow
 
 from onegov.core.crypto import random_token
-from onegov.core.utils import rchop
 from onegov.user import _, log, UserCollection
 from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
@@ -603,7 +602,7 @@ class LDAPKerberosProvider(
     def request_authorization(self, request, username):
 
         if self.suffix:
-            username = rchop(username, self.suffix)
+            username = username.removesuffix(self.suffix)
 
         entries = self.ldap.search(
             query=f'({self.attributes.name}={username})',

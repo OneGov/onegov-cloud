@@ -308,6 +308,9 @@ def import_ical(group_context, ical, future_events_only=False,
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
 
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+        --future-events-only
+
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
         --event-image /path/to/image.jpg
 
     """
