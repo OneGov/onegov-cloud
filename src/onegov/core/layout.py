@@ -89,10 +89,10 @@ class Layout:
         """ Returns the application behind the request. """
         return self.request.app
 
-    def chunks(self, *args, **kwargs):
-        """ See :func:`onegov.core.utils.chunks`. """
+    def batched(self, *args, **kwargs):
+        """ See :func:`onegov.core.utils.batched`. """
 
-        return utils.chunks(*args, **kwargs)
+        return utils.batched(*args, **kwargs)
 
     @cached_property
     def csrf_token(self):

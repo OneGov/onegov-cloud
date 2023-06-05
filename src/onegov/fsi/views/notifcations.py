@@ -43,7 +43,7 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
                 content = render_template('mail_notification.pt', request, {
                     'layout': mail_layout,
                     'title': self.subject,
-                    'notification': self.text_html,
+                    'information': self.text_html,
                     'attendee': attendee
                 })
                 plaintext = html_to_text(content)
@@ -110,9 +110,7 @@ def view_edit_notification(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.success(_("Your changes were saved"))
-        collection = CourseNotificationTemplateCollection(
-            request.session, course_event_id=self.course_event.id)
-        return request.redirect(request.link(collection))
+        return request.redirect(request.link(self))
 
     form.apply_model(self)
     layout = EditNotificationTemplateLayout(self, request)
@@ -139,7 +137,7 @@ def view_email_preview(self, request):
         'model': self,
         'layout': layout,
         'title': self.subject,
-        'notification': self.text_html,
+        'information': self.text_html,
         'attendee': request.attendee
     }
 

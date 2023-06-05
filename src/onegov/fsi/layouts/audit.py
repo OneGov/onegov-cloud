@@ -66,7 +66,7 @@ class AuditLayout(DefaultLayout):
             _("Name"),
             _("Shortcode"),
             _("Last Event"),
-            _("Attended"),
+            _("Registered"),
             _("Due by (every ${refresh_interval})", mapping={
                 'refresh_interval': due_in}
               )

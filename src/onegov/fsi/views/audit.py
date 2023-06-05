@@ -66,21 +66,6 @@ def invite_attendees_for_event(self, request, form):
         ) for letter in self.used_letters
     )
 
-    next_subscriptions = self.next_subscriptions(request)
-
-    recipients = self.cached_subset
-    recipients = [r.id for r in recipients if not (
-        next_subscriptions.get(r.id, False) or r.event_completed)]
-
-    all_attendees = self.session.query(CourseAttendee).filter(
-        CourseAttendee.id.in_(recipients)
-    ).all()
-
-    email_recipients = ('; '.join([a.email for a in all_attendees])
-                        if len(all_attendees) < 100 else False)
-
-    subject = request.translate(_('Reminder due course registration'))
-
     return {
         'layout': layout,
         'model': self,
@@ -91,7 +76,7 @@ def invite_attendees_for_event(self, request, form):
         'letters': letters,
         'email_recipients': email_recipients,
         'subject': subject,
-        'next_subscriptions': next_subscriptions
+        'next_subscriptions': self.next_subscriptions(request)
     }
 
 

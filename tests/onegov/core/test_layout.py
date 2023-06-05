@@ -4,12 +4,12 @@ from onegov.core.layout import Layout
 from onegov.core.utils import Bunch
 
 
-def test_chunks():
+def test_batched():
     layout = Layout(model=object(), request=object())
-    assert list(layout.chunks('ABCDEFG', 3, 'x')) == [
+    assert list(layout.batched('ABCDEFG', 3)) == [
         ('A', 'B', 'C'),
         ('D', 'E', 'F'),
-        ('G', 'x', 'x')
+        ('G',)
     ]
 
 

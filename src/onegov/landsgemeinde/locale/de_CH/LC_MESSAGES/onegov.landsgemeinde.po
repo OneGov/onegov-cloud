@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-05-29 14:54+0200\n"
+"POT-Creation-Date: 2023-05-30 07:17+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -236,6 +236,9 @@ msgstr "Audio herunterladen"
 
 msgid "Video"
 msgstr "Video"
+
+msgid "Close"
+msgstr "Schliessen"
 
 msgid ""
 "Shows the status of each element of an assembly. The statuses of each "

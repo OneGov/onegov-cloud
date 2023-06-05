@@ -11,11 +11,10 @@
 """
 
 import string
-import itertools
 import secrets
 
 from collections import defaultdict
-from onegov.core.utils import pairwise
+from itertools import islice, pairwise
 
 
 from typing import TYPE_CHECKING
@@ -30,7 +29,7 @@ def random_password(length: int = 16) -> str:
     chain = MarkovChain(
         c for c in japanese.lower() if c in string.ascii_lowercase
     )
-    return ''.join(itertools.islice(chain, length))
+    return ''.join(islice(chain, length))
 
 
 # This is a romanization of the opening of "Genji Monogatari"
