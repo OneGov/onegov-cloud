@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-24 08:43+0200\n"
+"POT-Creation-Date: 2023-06-05 15:44+0200\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -355,7 +355,7 @@ msgid "Attendee Zipcode"
 msgstr "Code postal du participant"
 
 msgid "Attendee Place"
-msgstr "Place des participants"
+msgstr "Lieu des participants"
 
 msgid "Attendee Political Municipality"
 msgstr "Participant Municipalité politique"
@@ -2730,8 +2730,8 @@ msgstr "${count} réservation(s) manuelles créées"
 msgid "Invoice marked as paid"
 msgstr "Facture marquée comme payée"
 
-msgid "Invoice items marked as paid"
-msgstr "Éléments de la facture marqués comme payés"
+msgid "Invoice item(s) marked as paid"
+msgstr "Élément(s) de facture marqué(s) comme payé(s)"
 
 #, python-format
 msgid "Mark paid for ${user}"
@@ -3192,6 +3192,9 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "Invoice items marked as paid"
+#~ msgstr "Éléments de la facture marqués comme payés"
 
 #~ msgid "Move"
 #~ msgstr "Déplacer"
