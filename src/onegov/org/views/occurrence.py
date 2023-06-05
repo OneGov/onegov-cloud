@@ -11,6 +11,7 @@ from onegov.org.elements import Link
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
+from onegov.winterthur import WinterthurApp
 from sedate import as_datetime, replace_timezone
 
 
@@ -110,6 +111,8 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
+        'winti': isinstance(request.app, WinterthurApp)  # condition for back
+        # button within iframe for winterthur but not org
     }
 
 
