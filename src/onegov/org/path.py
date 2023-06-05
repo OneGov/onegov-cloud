@@ -477,7 +477,6 @@ class tags(etree.ElementBase):
 @OrgApp.view(model=OccurrenceCollection, name='xml')
 def events_export_xml(app, request):
     xml = '<events></events>'
-
     root = objectify.fromstring(xml)
 
     for ev in EventCollection(app.session).query().all():
@@ -497,11 +496,12 @@ def events_export_xml(app, request):
         event.modified = ev.last_change
         root.append(event)
 
-    # remove lxml annotation
-    objectify.deannotate(root)
+    # remove lxml annotations
+    objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
     etree.cleanup_namespaces(root)
 
-    return etree.tostring(root, pretty_print=True, encoding='utf-8')
+    return etree.tostring(root, encoding='utf-8', xml_declaration=True,
+                          pretty_print=True)
 
 
 @OrgApp.path(model=Occurrence, path='/event/{name}')
