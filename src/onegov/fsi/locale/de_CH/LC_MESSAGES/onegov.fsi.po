@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-30 15:20+0200\n"
+"POT-Creation-Date: 2023-06-05 09:14+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -455,6 +455,28 @@ msgstr "Buchstabe"
 msgid "By last name"
 msgstr "Nach Nachname"
 
+msgid "Reminder mails"
+msgstr "Erinnerungsmails"
+
+msgid ""
+"Opens an empty message in your mail program with the course participants "
+"filtered visibly here, who have neither attended the course due nor are "
+"registered (next attendance)."
+msgstr ""
+"Öffnet eine Leere Nachricht in ihrem Mailprogramm mit den hier sichtbar "
+"gefilterten Kursteilnehmern, welche den fälligen Kurs weder besucht haben, "
+"noch angemeldet sind (nächste Teilnahme)."
+
+msgid ""
+"Select one or more organizations. If people in the filtered view have "
+"neither attended the due course nor are registered (next attendance), the "
+"button can be used to send a reminder email to them."
+msgstr ""
+"Wählen Sie eine oder mehrere Organisationen aus. Wenn Personen in der "
+"gefilterten Ansicht den fälligen Kurs weder besucht haben, noch angemeldet "
+"sind (nächste Teilnahme), kann mit dem Button an diese eine Erinnerungsmail "
+"gesendet werden."
+
 msgid "Next Subscription"
 msgstr "Nächste Teilnahme"
 
@@ -700,8 +722,8 @@ msgstr "Es können nur externe Teilnehmer gelöscht werden"
 msgid "Update"
 msgstr "Aktualisieren"
 
-msgid "Reminder to register for course"
-msgstr ""
+msgid "Reminder due course registration"
+msgstr "Erinnerung fällige Kursanmeldung"
 
 #, python-format
 msgid "Audit for ${course_name}"

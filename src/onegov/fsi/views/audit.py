@@ -79,6 +79,8 @@ def invite_attendees_for_event(self, request, form):
     email_recipients = ('; '.join([a.email for a in all_attendees])
                         if len(all_attendees) < 100 else False)
 
+    subject = request.translate(_('Reminder due course registration'))
+
     return {
         'layout': layout,
         'model': self,
@@ -88,7 +90,7 @@ def invite_attendees_for_event(self, request, form):
         'now': now,
         'letters': letters,
         'email_recipients': email_recipients,
-        'subject': _('Reminder to register for course'),
+        'subject': subject,
         'next_subscriptions': next_subscriptions
     }
 
