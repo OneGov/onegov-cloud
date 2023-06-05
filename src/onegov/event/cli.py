@@ -297,8 +297,10 @@ def import_json(group_context, url, tagmap, clear):
 @cli.command('import-ical')
 @pass_group_context
 @click.argument('ical', type=click.File())
+@click.option('--future-events-only', is_flag=True, default=False)
 @click.option('--event-image', type=click.File('rb'))
-def import_ical(group_context, ical, event_image=None):
+def import_ical(group_context, ical, future_events_only=False,
+                event_image=None):
     """ Imports events from an iCalendar file.
 
     Example:
@@ -312,11 +314,12 @@ def import_ical(group_context, ical, event_image=None):
 
     def _import_ical(request, app):
         collection = EventCollection(app.session())
-        added, updated, purged = collection.from_ical(ical.read(), event_image)
+        added, updated, purged, count = \
+            collection.from_ical(ical.read(), future_events_only, event_image)
         click.secho(
             f"Events successfully imported "
             f"({len(added)} added, {len(updated)} updated, "
-            f"{len(purged)} deleted)",
+            f"{len(purged)} deleted of totally {count} events)",
             fg='green')
 
     return _import_ical

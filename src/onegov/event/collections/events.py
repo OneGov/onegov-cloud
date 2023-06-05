@@ -147,7 +147,8 @@ class EventCollection(Pagination):
         return query.first()
 
     def from_import(self, items, purge=None, publish_immediately=True,
-                    valid_state_transfers=None, published_only=False):
+                    valid_state_transfers=None, published_only=False,
+                    future_events_only=False):
         """ Add or updates the given events.
 
         Only updates events which have changed. Uses ``Event.source_updated``
@@ -167,7 +168,7 @@ class EventCollection(Pagination):
         :param publish_immediately:
             Set newly added events to published, else let them be initiated.
 
-        :param allowed_state_transfers:
+        :param valid_state_transfers:
             Dict of existing : remote state should be considered when updating.
 
             Example:
@@ -186,6 +187,8 @@ class EventCollection(Pagination):
             Do not import unpublished events. Still do not ignore state
             like withdrawn.
 
+        :param future_events_only:
+            If set only events in the future will be imported
         """
 
         if purge:
@@ -193,18 +196,21 @@ class EventCollection(Pagination):
             query = query.filter(Event.meta['source'].astext.startswith(purge))
             purge = set((r.source for r in query))
 
+        count = 0
         added = []
         updated = []
         valid_state_transfers = valid_state_transfers or {}
 
         for item in items:
+            count += 1
             if isinstance(item, str):
                 purge = {x for x in purge if not x.startswith(item)}
                 continue
 
-            # skip importing past events
-            if datetime.fromisoformat(str(item.event.end)) < datetime.now(
-                    timezone.utc):
+            # skip past events if option is set
+            if future_events_only and \
+                    datetime.fromisoformat(str(item.event.end)) < \
+                    datetime.now(timezone.utc):
                 continue
 
             event = item.event
@@ -296,12 +302,19 @@ class EventCollection(Pagination):
 
         self.session.flush()
 
-        return added, updated, purged_event_ids
+        return added, updated, purged_event_ids, count
 
-    def from_ical(self, ical, event_image_path=None):
+    def from_ical(self, ical, future_events_only=False, event_image_path=None):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
+        :type future_events_only: str
+        :param ical: ical to be imported
+        :param future_events_only: if set only events in the future will be
+        imported
+        :type future_events_only: bool
+        :param event_image_path: path and filename to image
+        :type event_image_path: str
 
         """
         items = []
@@ -392,6 +405,8 @@ class EventCollection(Pagination):
                 print(f'Error \'{ex}\' importing from ical: Event \'{title}\''
                       f'starting \'{start}\' and ending \'{end}\'. Skip '
                       f'event..')
+
                 continue
 
-        return self.from_import(items, publish_immediately=True)
+        return self.from_import(items, publish_immediately=True,
+                                future_events_only=future_events_only)
