@@ -5,6 +5,8 @@ import transaction
 import yaml
 
 from datetime import datetime, date, timedelta
+from S3.BaseUtils import getListFromXml
+
 from onegov.event.models import Event
 from tests.shared.utils import create_image
 from tests.shared.utils import get_meta
@@ -39,6 +41,10 @@ def test_view_occurrences(client):
 
     def as_json(query=''):
         return client.get(f'/events/json?{query}').json
+
+    def as_xml():
+        response = client.get('/events/xml')
+        return getListFromXml(response.body.decode('utf-8'), 'event')
 
     assert len(events()) == 10
     assert len(events('page=1')) == 2
@@ -127,6 +133,13 @@ def test_view_occurrences(client):
     assert len(as_json('cat2=Turnhalle&cat2=Sportanlage')) == 11
     assert len(as_json('cat1=Politics&cat1=Party')) == 2
     assert len(as_json('max=1&cat1=Politics&cat1=Party')) == 1
+
+    # Test xml
+    assert len(as_xml()) == 4
+    assert list(as_xml()[0].keys()) == ['id', 'title', 'tags', 'description',
+                                        'start', 'end', 'location', 'price',
+                                        'organizer', 'event_url',
+                                        'organizer_email', 'modified']
 
     # Test iCal
     assert client.get('/events/').click('Diese Termine exportieren').\
