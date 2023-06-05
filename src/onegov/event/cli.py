@@ -317,12 +317,12 @@ def import_ical(group_context, ical, future_events_only=False,
 
     def _import_ical(request, app):
         collection = EventCollection(app.session())
-        added, updated, purged, count = \
+        added, updated, purged = \
             collection.from_ical(ical.read(), future_events_only, event_image)
         click.secho(
             f"Events successfully imported "
             f"({len(added)} added, {len(updated)} updated, "
-            f"{len(purged)} deleted of totally {count} events)",
+            f"{len(purged)} deleted)",
             fg='green')
 
     return _import_ical
