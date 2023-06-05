@@ -68,8 +68,8 @@ def invite_attendees_for_event(self, request, form):
 
     next_subscriptions = self.next_subscriptions(request)
 
-    recipients = self.cached_subset
-    recipients = [r for r in recipients if not (
+    recipients = self.cached_subset if self.course_id else []
+    recipients = [r.id for r in recipients if not (
         next_subscriptions.get(r.id, False) or r.event_completed)]
 
     all_attendees = self.session.query(CourseAttendee).filter(
