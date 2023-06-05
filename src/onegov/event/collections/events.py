@@ -360,50 +360,50 @@ class EventCollection(Pagination):
                 recurrence = 'RRULE:{}'.format(recurrence.to_ical().
                                                decode())
 
-                coordinates = vevent.get('geo')
-                if coordinates:
-                    coordinates = Coordinates(
-                        coordinates.latitude, coordinates.longitude
-                    )
-
-                tags = vevent.get('categories')
-                if tags:
-                    # categories may be in lists or they may be single values
-                    # whose 'cats' member contains the texts
-                    if not hasattr(tags, '__iter__'):
-                        tags = [tags]
-
-                    tags = [str(c) for tag in tags for c in tag.cats]
-
-                uid = str(vevent.get('uid', ''))
-                title = str(vevent.get('summary', ''))
-                description = str(vevent.get('description', ''))
-                organizer = str(vevent.get('organizer', ''))
-                location = str(vevent.get('location', ''))
-
-                items.append(
-                    EventImportItem(
-                        event=Event(
-                            state='initiated',
-                            title=title,
-                            start=start,
-                            end=end,
-                            timezone=timezone,
-                            recurrence=recurrence,
-                            description=description,
-                            organizer=organizer,
-                            location=location,
-                            coordinates=coordinates,
-                            tags=tags or [],
-                            source=f'ical-{uid}',
-                        ),
-                        image=event_image_path,
-                        image_filename=event_image_path.name if
-                        event_image_path else None,
-                        pdf=None,
-                        pdf_filename=None,
-                    )
+            coordinates = vevent.get('geo')
+            if coordinates:
+                coordinates = Coordinates(
+                    coordinates.latitude, coordinates.longitude
                 )
+
+            tags = vevent.get('categories')
+            if tags:
+                # categories may be in lists or they may be single values
+                # whose 'cats' member contains the texts
+                if not hasattr(tags, '__iter__'):
+                    tags = [tags]
+
+                tags = [str(c) for tag in tags for c in tag.cats]
+
+            uid = str(vevent.get('uid', ''))
+            title = str(vevent.get('summary', ''))
+            description = str(vevent.get('description', ''))
+            organizer = str(vevent.get('organizer', ''))
+            location = str(vevent.get('location', ''))
+
+            items.append(
+                EventImportItem(
+                    event=Event(
+                        state='initiated',
+                        title=title,
+                        start=start,
+                        end=end,
+                        timezone=timezone,
+                        recurrence=recurrence,
+                        description=description,
+                        organizer=organizer,
+                        location=location,
+                        coordinates=coordinates,
+                        tags=tags or [],
+                        source=f'ical-{uid}',
+                    ),
+                    image=event_image_path,
+                    image_filename=event_image_path.name if
+                    event_image_path else None,
+                    pdf=None,
+                    pdf_filename=None,
+                )
+            )
 
         return self.from_import(items, publish_immediately=True,
                                 future_events_only=future_events_only)
