@@ -23,8 +23,9 @@
                 </div>
                 <div class="row hide-for-print">
                     <div class="columns small-12 medium-8">
-                        <a class="button"><i class="fa fa-envelope"></i> Einnerungsmails</a>
-                        <p>Öffnet eine Leere Nachricht in ihrem Mailprogramm mit den hier sichtbar gefilterten Kursteilnehmern welche den fälligen Kurs weder besucht noch sich angemeldet haben (nächste Teilnahme).</p>
+                        <a class="button ${'' if email_recipients else 'disabled'}" tal:attributes="href python: f'mailto:{email_recipients}?subject={subject}' if email_recipients else ''" ><i class="fa fa-envelope"></i> Einnerungsmails</a>
+                        <p tal:condition="email_recipients">Öffnet eine Leere Nachricht in ihrem Mailprogramm mit den hier sichtbar gefilterten Kursteilnehmern, welche den fälligen Kurs weder besucht haben, noch angemeldet sind (nächste Teilnahme).</p>
+                        <p tal:condition="not email_recipients">Wählen Sie eine oder mehrere Organisationen aus. Wenn Personen in der gefilterten Ansicht den fälligen Kurs weder besucht haben, noch angemeldet sind (nächste Teilnahme), kann mit dem Button an diese eine Erinnerungsmail gesendet werden.</p>
                     </div>
                 </div>
             </div>

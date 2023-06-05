@@ -232,13 +232,16 @@ a.grayed-out {
     }
 
     .label-text {
-        margin-bottom: .5rem;
         color: #575757;
+        display: block;
         font-size: .875rem;
         font-weight: normal;
         line-height: 1.5;
-        display: block;
+        margin-bottom: .5rem;
     }
 
 }
 
+.disabled {
+    cursor: default !important;
+}

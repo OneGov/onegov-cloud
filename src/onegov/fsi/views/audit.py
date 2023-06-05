@@ -7,6 +7,7 @@ from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.forms.audit import AuditForm
 from onegov.fsi.layouts.audit import AuditLayout
 from onegov.fsi.pdf import FsiPdf
+from onegov.fsi.models import CourseAttendee
 from sedate import utcnow
 from webob import Response
 
@@ -65,6 +66,19 @@ def invite_attendees_for_event(self, request, form):
         ) for letter in self.used_letters
     )
 
+    next_subscriptions = self.next_subscriptions(request)
+
+    recipients = self.cached_subset
+    recipients = [r.id for r in recipients if not (
+        next_subscriptions.get(r.id, False) or r.event_completed)]
+
+    all_attendees = self.session.query(CourseAttendee).filter(
+        CourseAttendee.id.in_(recipients)
+    ).all()
+
+    email_recipients = ('; '.join([a.email for a in all_attendees])
+                        if len(all_attendees) < 100 else False)
+
     return {
         'layout': layout,
         'model': self,
@@ -73,7 +87,9 @@ def invite_attendees_for_event(self, request, form):
         'button_text': _('Update'),
         'now': now,
         'letters': letters,
-        'next_subscriptions': self.next_subscriptions(request)
+        'email_recipients': email_recipients,
+        'subject': _('Reminder to register for course'),
+        'next_subscriptions': next_subscriptions
     }
 
 
