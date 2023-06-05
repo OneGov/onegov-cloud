@@ -321,92 +321,89 @@ class EventCollection(Pagination):
 
         cal = vCalendar.from_ical(ical)
         for vevent in cal.walk('vevent'):
-            try:
-                timezone = 'Europe/Zurich'
-                start = vevent.get('dtstart')
-                start = start.dt if start else None
-                if type(start) is date:
-                    start = replace_timezone(as_datetime(start), timezone)
-                elif type(start) is datetime:
-                    if start.tzinfo is None:
-                        start = standardize_date(start, timezone)
-                    else:
-                        start = to_timezone(start, UTC)
+            timezone = 'Europe/Zurich'
+            start = vevent.get('dtstart')
+            start = start.dt if start else None
+            if type(start) is date:
+                start = replace_timezone(as_datetime(start), timezone)
+            elif type(start) is datetime:
+                if start.tzinfo is None:
+                    start = standardize_date(start, timezone)
+                else:
+                    start = to_timezone(start, UTC)
 
-                end = vevent.get('dtend')
-                end = end.dt if end else None
-                if type(end) is date:
-                    end = replace_timezone(as_datetime(end), timezone)
-                    end = end + timedelta(days=1, minutes=-1)
-                elif type(end) is datetime:
-                    if end.tzinfo is None:
-                        end = standardize_date(end, timezone)
-                    else:
-                        end = to_timezone(end, UTC)
+            end = vevent.get('dtend')
+            end = end.dt if end else None
+            if type(end) is date:
+                end = replace_timezone(as_datetime(end), timezone)
+                end = end + timedelta(days=1, minutes=-1)
+            elif type(end) is datetime:
+                if end.tzinfo is None:
+                    end = standardize_date(end, timezone)
+                else:
+                    end = to_timezone(end, UTC)
 
-                duration = vevent.get('duration')
-                duration = duration.dt if duration else None
-                if start and not end and duration:
-                    end = start + duration
+            duration = vevent.get('duration')
+            duration = duration.dt if duration else None
+            if start and not end and duration:
+                end = start + duration
 
-                if not start or not end:
-                    raise (ValueError("Invalid date"))
+            if start and not end:
+                # assume event duration is 1 hour
+                end = start + timedelta(hours=1)
 
-                recurrence = vevent.get('rrule', '')
-                if recurrence:
-                    recurrence = 'RRULE:{}'.format(recurrence.to_ical().
-                                                   decode())
+            if not start or not end:
+                raise (ValueError("Invalid date"))
 
-                coordinates = vevent.get('geo')
-                if coordinates:
-                    coordinates = Coordinates(
-                        coordinates.latitude, coordinates.longitude
-                    )
+            recurrence = vevent.get('rrule', '')
+            if recurrence:
+                recurrence = 'RRULE:{}'.format(recurrence.to_ical().
+                                               decode())
 
-                tags = vevent.get('categories')
-                if tags:
-                    # categories may be in lists or they may be single values
-                    # whose 'cats' member contains the texts
-                    if not hasattr(tags, '__iter__'):
-                        tags = [tags]
-
-                    tags = [str(c) for tag in tags for c in tag.cats]
-
-                uid = str(vevent.get('uid', ''))
-                title = str(vevent.get('summary', ''))
-                description = str(vevent.get('description', ''))
-                organizer = str(vevent.get('organizer', ''))
-                location = str(vevent.get('location', ''))
-
-                items.append(
-                    EventImportItem(
-                        event=Event(
-                            state='initiated',
-                            title=title,
-                            start=start,
-                            end=end,
-                            timezone=timezone,
-                            recurrence=recurrence,
-                            description=description,
-                            organizer=organizer,
-                            location=location,
-                            coordinates=coordinates,
-                            tags=tags or [],
-                            source=f'ical-{uid}',
-                        ),
-                        image=event_image_path,
-                        image_filename=event_image_path.name if
-                        event_image_path else None,
-                        pdf=None,
-                        pdf_filename=None,
-                    )
+            coordinates = vevent.get('geo')
+            if coordinates:
+                coordinates = Coordinates(
+                    coordinates.latitude, coordinates.longitude
                 )
-            except Exception as ex:
-                print(f'Error \'{ex}\' importing from ical: Event \'{title}\''
-                      f'starting \'{start}\' and ending \'{end}\'. Skip '
-                      f'event..')
 
-                continue
+            tags = vevent.get('categories')
+            if tags:
+                # categories may be in lists or they may be single values
+                # whose 'cats' member contains the texts
+                if not hasattr(tags, '__iter__'):
+                    tags = [tags]
+
+                tags = [str(c) for tag in tags for c in tag.cats]
+
+            uid = str(vevent.get('uid', ''))
+            title = str(vevent.get('summary', ''))
+            description = str(vevent.get('description', ''))
+            organizer = str(vevent.get('organizer', ''))
+            location = str(vevent.get('location', ''))
+
+            items.append(
+                EventImportItem(
+                    event=Event(
+                        state='initiated',
+                        title=title,
+                        start=start,
+                        end=end,
+                        timezone=timezone,
+                        recurrence=recurrence,
+                        description=description,
+                        organizer=organizer,
+                        location=location,
+                        coordinates=coordinates,
+                        tags=tags or [],
+                        source=f'ical-{uid}',
+                    ),
+                    image=event_image_path,
+                    image_filename=event_image_path.name if
+                    event_image_path else None,
+                    pdf=None,
+                    pdf_filename=None,
+                )
+            )
 
         return self.from_import(items, publish_immediately=True,
                                 future_events_only=future_events_only)
