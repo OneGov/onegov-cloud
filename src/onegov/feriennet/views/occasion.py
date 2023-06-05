@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceCollection
@@ -275,19 +276,21 @@ def book_occasion(self, request, form):
                         'title': self.activity.title,
                         'attendee': attendee.name
                     }))
-
-            request.app.send_transactional_email(
-                subject=subject,
-                receivers=(user.username, ),
-                content=render_template('mail_booking_accepted.pt', request, {
-                    'layout': DefaultMailLayout(self, request),
-                    'title': subject,
-                    'model': self,
-                    'bookings_link': bookings_link,
-                    'name': attendee.name,
-                    'dates': dates
-                })
-            )
+            if self.period.booking_start <= date.today():
+                request.app.send_transactional_email(
+                    subject=subject,
+                    receivers=(user.username, ),
+                    content=render_template(
+                        'mail_booking_accepted.pt', request, {
+                            'layout': DefaultMailLayout(self, request),
+                            'title': subject,
+                            'model': self,
+                            'bookings_link': bookings_link,
+                            'name': attendee.name,
+                            'dates': dates
+                        }
+                    )
+                )
         else:
             request.success(
                 _("The occasion was added to ${name}'s wishlist", mapping={
