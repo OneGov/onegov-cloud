@@ -3,6 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
+        <a class="button back-button" href="${overview}">Back</a>
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">

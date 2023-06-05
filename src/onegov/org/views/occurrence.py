@@ -107,6 +107,7 @@ def view_occurrence(self, request, layout=None):
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
+        'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
     }
