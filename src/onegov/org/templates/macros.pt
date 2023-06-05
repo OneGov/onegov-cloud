@@ -1798,12 +1798,12 @@
                 })"
                 i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel">
                 <span class="fa fa-edit" aria-hidden="true"></span>
-                <span i18n:translate>Rename</span> </a>
+                <span i18n:translate>Rename</span>
             </a>
-        <a class="button secondary delete" role="button" href="${request.link(file)}">
-          <span class="fa fa-download" aria-hidden="true"></span>
-          <span i18n:translate>Download</span>
-        </a>
+            <a class="button secondary delete" role="button" href="${request.link(file)}">
+                <span class="fa fa-download" aria-hidden="true"></span>
+                <span i18n:translate>Download</span>
+           </a>
         </div>
     </div>
 </metal:file_details>
