@@ -958,6 +958,60 @@ def test_from_import(session):
     ]) == ([], [], [])
     assert events.by_name('title-c').state == 'withdrawn'
 
+    # future only events option
+    a, u, p = events.from_import([
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title D past',
+                location='Location D past',
+                tags=['Tag D.1', 'Tag D.2'],
+                start=tzdatetime(2020, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2020, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description D past',
+                organizer='Organizer D past',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20200616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-D'
+            ),
+            image=None,
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
+        ),
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title D future',
+                location='Location D future',
+                tags=['Tag D.1', 'Tag D.2'],
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description D future',
+                organizer='Organizer D future',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    f'UNTIL={next_year}0616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-D'
+            ),
+            image=None,
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
+        )
+    ], future_events_only=True)
+    # only adding the future event
+    assert (len(a), len(u), len(p)) == (1, 0, 0)
+
 
 def test_from_ical(session):
     events = EventCollection(session)
