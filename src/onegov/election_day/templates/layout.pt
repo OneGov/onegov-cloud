@@ -35,7 +35,6 @@ metal:define-macro="layout">
             environment: '${layout.app.sentry_environment}',
         });
     </script>
-    <script metal:use-macro="layout.macros['tablesaw_translations']" />
 </head>
 <body tal:attributes="layout.body_attributes|{}">
     <div class="alert-box info page-refresh" style="display:none;">

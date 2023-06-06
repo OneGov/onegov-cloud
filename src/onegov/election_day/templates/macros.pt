@@ -1501,19 +1501,6 @@
     </ul>
 </metal:file_import_errors>
 
-<metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.election_day">
-    <script>
-        TablesawConfig = {
-            i18n: {
-                modeStack: '<tal:block i18n:translate>Stack</tal:block>',
-                modeToggle: '<tal:block i18n:translate>Toggle</tal:block>',
-                modeSwitchColumns: '<tal:block i18n:translate>Columns</tal:block>',
-                modeSwitchColumnsAbbreviated: '<tal:block i18n:translate>Columns</tal:block>',
-            }
-        };
-    </script>
-</metal:tablesaw_translations>
-
 <metal:seat_allocation_figure define-macro="seat_allocation_figure" i18n:domain="onegov.election_day">
     <figure>
         <tal:block metal:use-macro="layout.macros['seat-allocation-chart']" tal:define="embed True"/>

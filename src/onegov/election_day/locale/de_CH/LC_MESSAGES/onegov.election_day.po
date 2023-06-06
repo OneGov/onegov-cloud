@@ -1231,15 +1231,6 @@ msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."
 msgid "Line"
 msgstr "Zeile"
 
-msgid "Stack"
-msgstr "Gestapelt"
-
-msgid "Toggle"
-msgstr "Auswahl"
-
-msgid "Columns"
-msgstr "Spalten"
-
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
@@ -1388,6 +1379,10 @@ msgstr "Aktivieren"
 msgid "This will trigger the following notifications:"
 msgstr "Die folgenden Benachrichtigungen werden ausgelöst:"
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
+
 msgid "Email: One email containing all the results. The subject will be"
 msgstr "E-Mail: Eine E-Mail mit allen Ergebnissen. Der Betreff lautet"
 
@@ -1406,10 +1401,6 @@ msgstr "Letzte Benachrichtigungen:"
 
 msgid "No notifications yet."
 msgstr "Noch keine Beanchrichtigungen."
-
-msgid "Browser: A notice in browsers which have opened any affected pages."
-msgstr ""
-"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
 
 msgid ""
 "Email: One email containing all the results of the selected elections and "

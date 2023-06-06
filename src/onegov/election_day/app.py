@@ -388,6 +388,7 @@ def get_common_asset():
     # Tablesaw
     yield 'tablesaw.css'
     yield 'tablesaw.jquery.js'
+    yield 'tablesaw-translations.js'
     yield 'tablesaw-init.js'
 
     # other frameworks

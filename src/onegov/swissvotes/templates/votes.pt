@@ -66,8 +66,6 @@
                     </tbody>
                 </table>
 
-                <script metal:use-macro="layout.macros['tablesaw_translations']" />
-
                 <div class="pagination-centered">
                     <div metal:use-macro="layout.macros['pagination']" tal:define="collection votes; current_page votes;" />
                 </div>
