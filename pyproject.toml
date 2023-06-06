@@ -30,6 +30,7 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 module = [
     "onegov.core.browser_session.*",
     "onegov.core.cache.*",
+    "onegov.core.collection.*",
     "onegov.core.crypto.*",
     "onegov.core.datamanager.*",
     "onegov.core.orm.*",
