@@ -30,7 +30,7 @@
                 <div class="row">
                     <div class="columns small-12">
                         <tal:b condition="results">
-                            <table class="tablesaw hover fullwidth">
+                            <table class="hover fullwidth">
                                 <thead>
                                 <th class="text-left" i18n:translate="">Name</th>
                                 <th class="text-left" i18n:translate="">Shortcode</th>

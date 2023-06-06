@@ -133,6 +133,7 @@ def get_frameworks_asset():
     yield 'tablesaw.css'
     yield 'tablesaw.jquery.js'
     yield 'tablesaw-create.js'
+    yield 'tablesaw-translations.js'
     yield 'tablesaw-init.js'
     yield 'd3.js'
     yield 'd3.chart.bar.js'
