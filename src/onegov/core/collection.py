@@ -226,6 +226,15 @@ class Pagination(Generic[_M]):
     def cached_subset(self) -> 'Query[_M]':
         return self.subset()
 
+    if TYPE_CHECKING:
+        # FIXME: This is dumb, why do we have the some property twice
+        #        and we force one of them to be implemented but actually
+        #        use and implement a different one downstream... clean
+        #        this up.
+        @property
+        @abstractmethod
+        def page(self) -> int: ...
+
     @property
     def page_index(self) -> int:
         """ Returns the current page index (starting at 0). """
@@ -268,7 +277,7 @@ class Pagination(Generic[_M]):
     @property
     def offset(self) -> int:
         """ Returns the offset applied to the current subset. """
-        return self.page_index * self.batch_size
+        return self.page * self.batch_size
 
     @property
     def pages_count(self) -> int:
@@ -286,15 +295,15 @@ class Pagination(Generic[_M]):
     @property
     def previous(self) -> 'Self | None':
         """ Returns the previous page or None. """
-        if self.page_index - 1 >= 0:
-            return self.page_by_index(self.page_index - 1)
+        if self.page - 1 >= 0:
+            return self.page_by_index(self.page - 1)
         return None
 
     @property
     def next(self) -> 'Self | None':
         """ Returns the next page or None. """
         if self.page_index + 1 < self.pages_count:
-            return self.page_by_index(self.page_index + 1)
+            return self.page_by_index(self.page + 1)
         return None
 
 
