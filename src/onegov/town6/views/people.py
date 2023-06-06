@@ -1,6 +1,6 @@
 from onegov.core.security import Public, Private
-from onegov.org.views.people import view_people, view_person,\
-    handle_new_person, handle_edit_person, get_person_form_class
+from onegov.org.views.people import view_people, view_person, \
+    handle_new_person, handle_edit_person
 from onegov.town6 import TownApp
 from onegov.org.forms import PersonForm
 
@@ -26,6 +26,6 @@ def town_handle_new_person(self, request, form):
 
 
 @TownApp.form(model=Person, name='edit', template='form.pt',
-              permission=Private, form=get_person_form_class)
+              permission=Private, form=PersonForm)
 def town_handle_edit_person(self, request, form):
     return handle_edit_person(self, request, form, PersonLayout(self, request))

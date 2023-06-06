@@ -569,6 +569,7 @@ class DirectoryBaseForm(Form):
             'configuration',
             'order',
         })
+
         obj.configuration = self.configuration
 
         if self.marker_color_type.data == 'default':
@@ -578,6 +579,7 @@ class DirectoryBaseForm(Form):
 
     def process_obj(self, obj):
         self.configuration = obj.configuration
+
         if obj.marker_color:
             self.marker_color_type.data = 'custom'
             self.marker_color = obj.marker_color

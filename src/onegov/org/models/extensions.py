@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import normalize_for_url, to_html_ul
-from onegov.form import FieldDependency, WTFormsClassBuilder, as_internal_id
+from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
@@ -397,6 +397,7 @@ class PersonLinkExtension(ContentExtension):
 
         builder = WTFormsClassBuilder(PeoplePageForm)
         builder.set_current_fieldset(fieldset_label)
+
         for person in self.get_selectable_people(request):
             field_id = fieldset_id + '_' + person.id.hex
             builder.add_field(
@@ -484,49 +485,3 @@ class ImageExtension(ContentExtension):
             )
 
         return PageImageForm
-
-
-class ContextSpecificFunctionExtension(ContentExtension):
-
-    def extend_form(self, form_class, request):
-
-        def person_functions():
-            # XXX Circular import
-            from onegov.org.models import Topic
-            all_pages = request.session.query(Topic)
-            all_pages = all_pages.filter(Topic.people is not None).all()
-            for topic in all_pages:
-                people = topic.people
-                if people is None:
-                    continue
-                for person in people:
-                    if person.id == self.id:
-                        try:
-                            yield person.context_specific_function
-                        except AttributeError:
-                            continue
-
-        class TestForm(form_class):
-            pass
-
-        fieldset_id = 'people'
-        builder = WTFormsClassBuilder(TestForm)
-        builder.set_current_fieldset('Test')
-        for function in person_functions():
-            # id should be unique
-            field_id = fieldset_id + '_' + as_internal_id(function)
-            builder.add_field(
-                field_class=BooleanField,
-                field_id=field_id,
-                label=function,
-                required=False,
-            )
-            builder.add_field(
-                field_class=StringField,
-                field_id=field_id + '_function',
-                label=request.translate(_("Function")),
-                required=False,
-                dependency=FieldDependency(field_id, 'y'),
-            )
-
-        return builder.form_class
