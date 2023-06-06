@@ -218,6 +218,9 @@ class PersonLinkExtension(ContentExtension):
         The context specific function is temporarily stored on the
         ``context_specific_function`` attribute on each object in the
         resulting list.
+        Similarly, to indicate if we want to show a particular function in the
+        page of a person, ``display_function_in_person_directory`` is
+        temporarily stored on each object of the resulting list.
 
         """
 
@@ -232,7 +235,9 @@ class PersonLinkExtension(ContentExtension):
         result = []
 
         for person in query.all():
-            person.context_specific_function = people[person.id.hex]
+            function, show_function = people[person.id.hex]
+            person.context_specific_function = function
+            person.display_function_in_person_directory = show_function
             result.append(person)
 
         order = list(people.keys())
@@ -314,8 +319,10 @@ class PersonLinkExtension(ContentExtension):
                     if not selected_only or field.data is True:
                         person_id = field.id.hex
                         function = self._fields[field_id + '_function'].data
+                        show_function = self._fields[field_id + '_is_visible'
+                                                     + '_function'].data
 
-                        yield person_id, function
+                        yield person_id, (function, show_function)
 
             def is_ordered_people(self, existing_people):
                 """ Returns True if the current list of people is ordered
@@ -365,7 +372,7 @@ class PersonLinkExtension(ContentExtension):
                     # existing list and add the new people at the end
                     existing = set()
                     selected = {
-                        key: function for key, function
+                        key: (func, show_fun) for key, (func, show_fun)
                         in self.get_people_and_function()
                     }
 
@@ -379,9 +386,9 @@ class PersonLinkExtension(ContentExtension):
 
                     old_people = list(old_people.items())
 
-                    for id, function in self.get_people_and_function():
+                    for id, (func, show_fun) in self.get_people_and_function():
                         if id not in existing:
-                            new_people.append((id, function))
+                            new_people.append((id, (func, show_fun)))
 
                     model.content['people'] = old_people + new_people
 
@@ -392,8 +399,10 @@ class PersonLinkExtension(ContentExtension):
                 for field_id, field in fields:
                     if field.id.hex in people:
                         self._fields[field_id].data = True
-                        self._fields[field_id + '_function'].data\
-                            = people[field.id.hex]
+                        function, show_function = people[field.id.hex]
+                        self._fields[field_id + '_function'].data = function
+                        self._fields[field_id + '_is_visible' + '_function']\
+                            .data = show_function
 
         builder = WTFormsClassBuilder(PeoplePageForm)
         builder.set_current_fieldset(fieldset_label)
@@ -421,13 +430,13 @@ class PersonLinkExtension(ContentExtension):
                 field_id=field_id + '_is_visible' + '_function',
                 label=request.translate(
                     _(
-                        "List this function in the page of " "${name}",
+                        "List this function in the page of {name}",
                         mapping={'name': person.title},
                     )
                 ),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
-                default=True,
+                default=True if getattr(person, 'function', None) else False,
                 render_kw={'class_': 'indent-context-specific-function'},
             )
 
