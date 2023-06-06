@@ -297,3 +297,10 @@ page_refs.on('success', function(e) {
 $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
     this.style.width = this.dataset.revealWidth;
 });
+
+// Page edit form
+[...document.getElementsByClassName('indent-context-specific-function')].forEach((el) => {
+    // indent nested options
+    let formFieldWrapper = el.parentElement.parentElement;
+    formFieldWrapper.style.marginLeft = '1.55rem';
+});
