@@ -419,12 +419,16 @@ class PersonLinkExtension(ContentExtension):
             builder.add_field(
                 field_class=BooleanField,
                 field_id=field_id + '_is_visible' + '_function',
-                label=_("List this function in the page of ${name}",
-                        mapping={'name': person.title}),
+                label=request.translate(
+                    _(
+                        "List this function in the page of " "${name}",
+                        mapping={'name': person.title},
+                    )
+                ),
                 required=False,
                 dependency=FieldDependency(field_id, 'y'),
                 default=True,
-                render_kw={'class_': 'indent-context-specific-function'}
+                render_kw={'class_': 'indent-context-specific-function'},
             )
 
         return builder.form_class

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-25 11:48+0200\n"
+"POT-Creation-Date: 2023-06-06 15:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2143,6 +2143,10 @@ msgstr "Nascondi le informazioni di contatto nella sidebar"
 
 msgid "Use text instead of lead in the newsletter"
 msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
+
+#, python-format
+msgid "List this function in the page of ${name}"
+msgstr "Afficher cette fonction sur la page de ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Une ressource portant ce nom existe déjà"
