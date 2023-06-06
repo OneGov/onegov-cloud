@@ -431,3 +431,9 @@ def get_backend_common_asset():
     yield 'datetimepicker.js'
     yield 'form_dependencies.js'
     yield 'doubleclick.js'
+
+
+@ElectionDayApp.webasset('screen')
+def get_screen_asset():
+    # Code used for screen update
+    yield 'screen.js'
