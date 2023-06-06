@@ -965,8 +965,11 @@ table.responsive {
 */
 
 .button.back-button {
-    background: transparent;
     border: 1px solid $primary-color;
-    color: $primary-color;
+    color: #ffffff;
     padding: .5rem;
+
+    &:hover {
+        background-color: #b92817;
+    }
 }
