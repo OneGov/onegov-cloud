@@ -2,7 +2,6 @@
 import sedate
 
 from datetime import date
-from lxml import etree, objectify
 
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
@@ -457,51 +456,6 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
         locations=locations,
         only_public=(not request.is_manager)
     )
-
-
-class tags(etree.ElementBase):
-    """
-    Custom class as 'tag' is a member of class Element and cannot be
-    used as tag name.
-    """
-    def __init__(self, tags=()):
-        super().__init__()
-        self.tag = 'tags'
-
-        for t in tags:
-            tag = etree.Element('tag')
-            tag.text = t
-            self.append(tag)
-
-
-@OrgApp.view(model=OccurrenceCollection, name='xml')
-def events_export_xml(app, request):
-    xml = '<events></events>'
-    root = objectify.fromstring(xml)
-
-    for ev in EventCollection(app.session).query().all():
-        event = objectify.Element('event')
-        event.id = ev.id
-        event.title = ev.title
-        txs = tags(ev.tags)
-        event.append(txs)
-        event.description = ev.description
-        event.start = ev.start
-        event.end = ev.end
-        event.location = ev.location
-        event.price = ev.price
-        event.organizer = ev.organizer
-        event.event_url = ev.external_event_url
-        event.organizer_email = ev.organizer_email
-        event.modified = ev.last_change
-        root.append(event)
-
-    # remove lxml annotations
-    objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
-    etree.cleanup_namespaces(root)
-
-    return etree.tostring(root, encoding='utf-8', xml_declaration=True,
-                          pretty_print=True)
 
 
 @OrgApp.path(model=Occurrence, path='/event/{name}')

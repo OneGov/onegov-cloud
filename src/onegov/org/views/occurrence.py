@@ -5,7 +5,7 @@ from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private
 from onegov.core.utils import linkify, normalize_for_url
-from onegov.event import Occurrence, OccurrenceCollection
+from onegov.event import Occurrence, OccurrenceCollection, EventCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import ExportForm, EventImportForm
@@ -188,6 +188,21 @@ def json_export_occurences(self, request):
             'url': request.link(occurrence),
         } for occurrence in query
     ]
+
+
+@OrgApp.view(model=OccurrenceCollection, name='xml', permission=Public)
+def xml_export_events(self, request):
+    """
+    Returns events as xml.
+    Url for xml view: ../events/xml
+    """
+
+    collection = EventCollection(request.session)
+    return Response(
+        collection.as_xml(),
+        content_type='text/xml',
+        content_disposition='inline; filename=occurences.xml'
+    )
 
 
 @OrgApp.form(
