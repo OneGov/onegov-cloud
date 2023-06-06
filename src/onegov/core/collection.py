@@ -302,7 +302,7 @@ class Pagination(Generic[_M]):
     @property
     def next(self) -> 'Self | None':
         """ Returns the next page or None. """
-        if self.page_index + 1 < self.pages_count:
+        if self.page + 1 < self.pages_count:
             return self.page_by_index(self.page + 1)
         return None
 
