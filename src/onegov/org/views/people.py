@@ -1,12 +1,15 @@
 import morepath
 
 from morepath.request import Response
+
+from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic
+from onegov.org.models.extensions import ContextSpecificFunctionExtension
 from onegov.people import Person, PersonCollection
 from markupsafe import Markup
 
@@ -100,16 +103,26 @@ def handle_new_person(self, request, form, layout=None):
     }
 
 
-@OrgApp.form(model=Person, name='edit', template='form.pt',
-             permission=Private, form=PersonForm)
-def handle_edit_person(self, request, form, layout=None):
+def get_person_form_class(model, request):
+    if isinstance(model, ExtendedPerson):
+        return model.with_content_extensions(PersonForm, request)
+    return ExtendedPerson().with_content_extensions(
+        PersonForm, request, extensions=[ContextSpecificFunctionExtension]
+    )
 
+
+@OrgApp.form(model=Person, name='edit', template='form.pt',
+             permission=Private, form=get_person_form_class)
+def handle_edit_person(self, request, form, layout=None):
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
 
         return morepath.redirect(request.link(self))
     else:
+        # add dynamically.....
+        # test_func = ("Org1", "Func1")
+        # form.add_additional_fields(test_func)
         form.process(obj=self)
 
     layout = layout or PersonLayout(self, request)

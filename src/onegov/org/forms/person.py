@@ -51,3 +51,10 @@ class PersonForm(Form):
         description=_("Public extra information about this person"),
         render_kw={'rows': 5}
     )
+
+    # hide_functions = TextAreaField(
+    #     label=_("Hide these labels on the main view"),
+    #     render_kw={'class_': 'formcode-select'})
+    #
+    # def add_additional_fields(self, test_func):
+    #     self.hide_functions.data = '\n'.join(test_func)

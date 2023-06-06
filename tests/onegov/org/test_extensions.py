@@ -6,6 +6,8 @@ from onegov.org.models import (
 )
 from uuid import UUID
 
+from onegov.org.models.extensions import ContextSpecificFunctionExtension
+
 
 def test_disable_extension():
 
@@ -416,3 +418,44 @@ def test_honeypot_extension():
     form.model = submission
     form.on_request()
     assert 'duplicate_of' not in form._fields
+
+
+def test_context_specific_function_extension():
+
+    class Person(ContextSpecificFunctionExtension):
+        content = {}
+
+        # def get_selectable_people(self, request):
+        #     return [
+        #         Bunch(
+        #             id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
+        #             title='Troy Barnes'
+        #         ),
+        #         Bunch(
+        #             id=UUID('aa37e9cc-40ab-402e-a70b-0d2b4d672de3'),
+        #             title='Annie Edison'
+        #         ),
+        #         Bunch(
+        #             id=UUID('adad98ff-74e2-497a-9e1d-fbba0a6bbe96'),
+        #             title='Abed Nadir'
+        #         ),
+        #         Bunch(
+        #             id=UUID('f0281b55-8a5f43f6-ac81-589d79538a87'),
+        #             title='Britta Perry'
+        #         )
+        #     ]
+
+    class PersonForm(Form):
+        pass
+
+    request = Bunch(**{
+        'translate': lambda text: text,
+        'app.settings.org.disabled_extensions': []
+    })
+    person = Person()
+    form_class = person.with_content_extensions(PersonForm, request=request)
+    form_class()
+
+    # form.people_6d120102d90344868eb32614cf3acb1a.data = True
+    # form.people_f0281b558a5f43f6ac81589d79538a87.data = True
+    # form.update_model(person)
