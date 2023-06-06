@@ -5,13 +5,23 @@ import transaction
 import yaml
 
 from datetime import datetime, date, timedelta
-from S3.BaseUtils import getListFromXml
+import xml.etree.ElementTree as ET
 
 from onegov.event.models import Event
 from tests.shared.utils import create_image
 from tests.shared.utils import get_meta
 from unittest.mock import patch
 from webtest.forms import Upload
+
+
+def etree_to_dict(root, node_name=''):
+    nodes = list()
+    for node in root.iter(node_name):
+        d = dict()
+        for item in node:
+            d[item.tag] = item.text
+        nodes.append(d)
+    return nodes
 
 
 def test_view_occurrences(client):
@@ -44,7 +54,9 @@ def test_view_occurrences(client):
 
     def as_xml():
         response = client.get('/events/xml')
-        return getListFromXml(response.body.decode('utf-8'), 'event')
+        xml_string = response.body.decode('utf-8')
+        root = ET.fromstring(xml_string)
+        return etree_to_dict(root, 'event')
 
     assert len(events()) == 10
     assert len(events('page=1')) == 2
