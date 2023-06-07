@@ -256,7 +256,7 @@ class PersonLinkExtension(ContentExtension):
     def get_person_function_by_id(self, id):
         for _id, (function, show_func) in self.content.get('people', []):
             if id == _id:
-                return function
+                return function, show_func
 
     def move_person(self, subject, target, direction):
         """ Moves the subject below or above the target.
@@ -276,8 +276,10 @@ class PersonLinkExtension(ContentExtension):
         assert self.content.get('people')
 
         def new_order():
-            subject_function = self.get_person_function_by_id(subject)
-            target_function = self.get_person_function_by_id(target)
+            subject_function, show_subject_function = \
+                self.get_person_function_by_id(subject)
+            target_function, show_target_function = \
+                self.get_person_function_by_id(target)
 
             for person, (function, show_function) in self.content['people']:
 
@@ -285,13 +287,13 @@ class PersonLinkExtension(ContentExtension):
                     continue
 
                 if person == target and direction == 'above':
-                    yield subject, subject_function
-                    yield target, target_function
+                    yield subject, (subject_function, show_subject_function)
+                    yield target, (target_function, show_target_function)
                     continue
 
                 if person == target and direction == 'below':
-                    yield target, target_function
-                    yield subject, subject_function
+                    yield target, (target_function, show_target_function)
+                    yield subject, (subject_function, show_subject_function)
                     continue
 
                 yield person, (function, show_function)
