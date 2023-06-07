@@ -14,6 +14,9 @@ class DummyPrincipal:
 
 
 class DummyApp:
+    version = '1.0'
+    sentry_dsn = None
+
     def __init__(self, session, principal):
         self._session = session
         self.principal = principal

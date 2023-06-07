@@ -111,33 +111,24 @@ def test_content_security_policy(election_day_app_zg):
     # check content security policy
     response = client.get('/')
     csp = response.headers['Content-Security-Policy']
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
     assert "frame-ancestors" not in csp
-    assert "connect-src 'self'" in csp
-    assert (
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
-        "https: https://scripts.onegov.cloud;"
-    ) in csp
-    assert "connect-src 'self' https://data.onegov.cloud" in csp
+    assert "https://scripts.onegov.cloud" in csp['script-src']
+    assert "https://data.onegov.cloud" in csp['connect-src']
 
     response = client.get('/auth/login')
     csp = response.headers['Content-Security-Policy']
-    assert "frame-ancestors 'none'" in csp
-    assert "connect-src 'self'" in csp
-    assert (
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
-        "https: https://scripts.onegov.cloud;"
-    ) in csp
-    assert "connect-src 'self' https://data.onegov.cloud" in csp
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert "'none'" in csp['frame-ancestors']
+    assert "https://scripts.onegov.cloud" in csp['script-src']
+    assert "https://data.onegov.cloud" in csp['connect-src']
 
     response = client.get('/vote/vote')
     csp = response.headers['Content-Security-Policy']
-    assert "frame-ancestors http://* https://*" in csp
-    assert "connect-src 'self'" in csp
-    assert (
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' "
-        "https: https://scripts.onegov.cloud;"
-    ) in csp
-    assert "connect-src 'self' https://data.onegov.cloud" in csp
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert "http://* https://*" in csp['frame-ancestors']
+    assert "https://scripts.onegov.cloud" in csp['script-src']
+    assert "https://data.onegov.cloud" in csp['connect-src']
 
 
 def test_pages_cache(election_day_app_zg):
