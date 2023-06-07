@@ -25,6 +25,8 @@ class DefaultLayout(ChameleonLayout):
         self.request.include('frameworks')
         self.request.include('chosen')
         self.request.include('common')
+        if 'swissvotes.ch' in request.url:
+            self.request.include('stats')
 
         self.pages = TranslatablePageCollection(self.request.session)
 
