@@ -34,19 +34,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="${layout.static_path}/images/favicon-32x32.png">
     <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
-    <script type="text/javascript" tal:condition="'swissvotes.ch' in request.url">
-      var _paq = window._paq || [];
-      _paq.push(['disableCookies']);
-      _paq.push(['trackPageView']);
-      _paq.push(['enableLinkTracking']);
-      (function() {
-        var u="https://stats.seantis.ch/";
-        _paq.push(['setTrackerUrl', u+'matomo.php']);
-        _paq.push(['setSiteId', '22']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-      })();
-    </script>
 </head>
 <body tal:attributes="layout.custom_body_attributes|{}">
     <header>

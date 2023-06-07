@@ -158,3 +158,8 @@ def get_common_asset():
     yield 'common.js'
     yield 'policy-selector.jsx'
     yield 'image-gallery.js'
+
+
+@SwissvotesApp.webasset('stats')
+def get_stats_asset():
+    yield 'stats.js'
