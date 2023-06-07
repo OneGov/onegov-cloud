@@ -6,6 +6,7 @@ from numbers import Integral
 from onegov.core.elements import Link
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
+from onegov.core.static import StaticFile
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
@@ -56,6 +57,13 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def static_path(self):
         return self.request.link(self.app.principal, 'static')
+
+    @cached_property
+    def sentry_init_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'sentry/js/sentry-init.js'
+        )
+        return self.request.link(static_file)
 
     @cached_property
     def homepage_url(self):
