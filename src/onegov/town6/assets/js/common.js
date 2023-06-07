@@ -298,9 +298,8 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
     this.style.width = this.dataset.revealWidth;
 });
 
-// Page edit form
-[...document.getElementsByClassName('indent-context-specific-function')].forEach((el) => {
-    // indent nested options
-    let formFieldWrapper = el.parentElement.parentElement;
-    formFieldWrapper.style.marginLeft = '1.55rem';
+// Page edit form style adjustments
+[...document.getElementsByClassName('indent-context-specific-function')].forEach((formField) => {
+    let divWrapper = formField.parentElement.parentElement;
+    divWrapper.style.marginLeft = '1.55rem';
 });

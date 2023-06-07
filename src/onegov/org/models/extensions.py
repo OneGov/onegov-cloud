@@ -430,7 +430,7 @@ class PersonLinkExtension(ContentExtension):
                 field_id=field_id + '_is_visible' + '_function',
                 label=request.translate(
                     _(
-                        "List this function in the page of {name}",
+                        "List this function in the page of ${name}",
                         mapping={'name': person.title},
                     )
                 ),
