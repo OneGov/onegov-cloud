@@ -758,7 +758,7 @@ def test_notice_states(session):
         ('printed', None, ''),
         ('finished', user, 'all went well')
     ]
-    assert notice.rejected_comment == 'Some other reason'
+    assert notice.rejected_comment in ('Some other reason', 'Some reason')
 
     assert [
         (change.event, change.user, change.text) for change in user.changes

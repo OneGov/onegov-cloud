@@ -1611,15 +1611,6 @@ msgstr "Search"
 msgid "Reset"
 msgstr "Reset"
 
-msgid "Stack"
-msgstr "Stack"
-
-msgid "Toggle"
-msgstr "Toggle"
-
-msgid "Columns"
-msgstr "Columns"
-
 msgid "Show all"
 msgstr "Show all"
 

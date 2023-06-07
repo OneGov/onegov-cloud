@@ -388,6 +388,7 @@ def get_common_asset():
     # Tablesaw
     yield 'tablesaw.css'
     yield 'tablesaw.jquery.js'
+    yield 'tablesaw-translations.js'
     yield 'tablesaw-init.js'
 
     # other frameworks
@@ -430,3 +431,9 @@ def get_backend_common_asset():
     yield 'datetimepicker.js'
     yield 'form_dependencies.js'
     yield 'doubleclick.js'
+
+
+@ElectionDayApp.webasset('screen')
+def get_screen_asset():
+    # Code used for screen update
+    yield 'screen.js'
