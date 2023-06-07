@@ -25,7 +25,7 @@ def test_read_write_cycle():
     translator = Translator(**translator_data)
     translator.admission = ADMISSIONS['certified']
 
-    request = Bunch(locale='en')
+    request = Bunch(locale='en', app=Bunch(version='1.0', sentry_dsn=None))
 
     layout = Layout(model=object(), request=request)
     variables_to_fill = {

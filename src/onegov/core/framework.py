@@ -1184,7 +1184,7 @@ def default_content_security_policy():
         # disable all mixed content (https -> http)
         block_all_mixed_content=True,
 
-        connect_src={'*.sentry.io'}
+        connect_src={SELF, '*.sentry.io'}
     )
 
 
