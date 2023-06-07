@@ -300,6 +300,9 @@ $('.reveal[data-reveal-width]').on('open.zf.reveal', function() {
 
 // Page edit form style adjustments
 [...document.getElementsByClassName('indent-context-specific-function')].forEach((formField) => {
+    if (formField instanceof HTMLInputElement && formField.type === 'text') {
+       formField.style.width = '90%';
+    }
     let divWrapper = formField.parentElement.parentElement;
     divWrapper.style.marginLeft = '1.55rem';
 });
