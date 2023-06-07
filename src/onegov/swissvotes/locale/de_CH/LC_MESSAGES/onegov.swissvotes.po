@@ -1614,15 +1614,6 @@ msgstr "Suchen"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-msgid "Stack"
-msgstr "Gestapelt"
-
-msgid "Toggle"
-msgstr "Auswahl"
-
-msgid "Columns"
-msgstr "Spalten"
-
 msgid "Show all"
 msgstr "Alle anzeigen"
 
@@ -1981,8 +1972,8 @@ msgid ""
 "number followed by a hyphen, for example, \"501-1.jpg\"."
 msgstr ""
 "Um ein Slider-Bild mit einer Abstimmung zu verknüpfen, muss der Dateinamen "
-"mit der BFS-Nummer beginnen, gefolgt von einem Bindestrich, z. B. \"501-1.jpg"
-"\"."
+"mit der BFS-Nummer beginnen, gefolgt von einem Bindestrich, z. B. \"501-1."
+"jpg\"."
 
 msgid "Attachment deleted."
 msgstr "Anhang gelöscht."

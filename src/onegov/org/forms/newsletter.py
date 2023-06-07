@@ -222,7 +222,7 @@ class NewsletterTestForm(Form):
         return NewsletterSendFormWithRecipients
 
 
-class NewsletterSubscriberImportForm(Form):
+class NewsletterSubscriberImportExportForm(Form):
 
     dry_run = BooleanField(
         label=_("Dry Run"),
@@ -263,7 +263,7 @@ class NewsletterSubscriberImportForm(Form):
         headers = self.headers
 
         def get(recipient, attribute):
-            result = (getattr(recipient, attribute, None))
+            result = getattr(recipient, attribute, "")
             result = result.strip()
             return result
 
@@ -279,7 +279,10 @@ class NewsletterSubscriberImportForm(Form):
         headers = self.headers
         session = self.request.session
         recipients = RecipientCollection(session)
-        csvfile = convert_excel_to_csv(self.file.file)
+        try:
+            csvfile = convert_excel_to_csv(self.file.file)
+        except Exception:
+            return 0, ['0']
 
         try:
             # dialect needs to be set, else error

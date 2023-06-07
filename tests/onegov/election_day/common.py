@@ -185,6 +185,9 @@ class DummyPrincipal:
 
 
 class DummyApp:
+    version = '1.0'
+    sentry_dsn = None
+
     def __init__(self, session=None, application_id='application_id'):
         self._session = session
         self.application_id = application_id
