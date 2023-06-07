@@ -85,12 +85,6 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     event_short_format = 'EE d. MMMM YYYY'
     isodate_format = 'y-M-d'
 
-    def __init__(self, *args, **kwargs):
-        # overrides body attributes set in the layout template
-        self.custom_body_attributes = {}
-
-        super().__init__(*args, **kwargs)
-
     def has_model_permission(self, permission):
         return self.request.has_permission(self.model, permission)
 
@@ -149,6 +143,13 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             'font-awesome/css/font-awesome.min.css',
             version=self.app.version
         ))
+
+    @cached_property
+    def sentry_init_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'sentry/js/sentry-init.js'
+        )
+        return self.request.link(static_file)
 
     def static_file_path(self, path):
         return self.request.link(StaticFile(path, version=self.app.version))

@@ -97,7 +97,6 @@ def org_content_security_policy():
     policy = default_content_security_policy()
 
     policy.connect_src.add(SELF)
-    policy.connect_src.add('https://sentry.io')
     policy.connect_src.add('https://stats.seantis.ch')
 
     policy.img_src.add('https://www.emuseum.ch')

@@ -549,6 +549,8 @@ def test_form_registration_window_form_existing(start, end):
             schema='',
             websockets_private_channel='',
             websockets_client_url=lambda *args: '',
+            version='1.0',
+            sentry_dsn=None
         ),
         is_manager=True,
         locale='de_CH',
