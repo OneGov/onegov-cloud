@@ -254,7 +254,7 @@ class PersonLinkExtension(ContentExtension):
         return query.all()
 
     def get_person_function_by_id(self, id):
-        for _id, function in self.content.get('people', []):
+        for _id, (function, show_func) in self.content.get('people', []):
             if id == _id:
                 return function
 
@@ -279,7 +279,7 @@ class PersonLinkExtension(ContentExtension):
             subject_function = self.get_person_function_by_id(subject)
             target_function = self.get_person_function_by_id(target)
 
-            for person, function in self.content['people']:
+            for person, (function, show_function) in self.content['people']:
 
                 if person == subject:
                     continue
@@ -294,7 +294,7 @@ class PersonLinkExtension(ContentExtension):
                     yield subject, subject_function
                     continue
 
-                yield person, function
+                yield person, (function, show_function)
 
         self.content['people'] = list(new_order())
 
