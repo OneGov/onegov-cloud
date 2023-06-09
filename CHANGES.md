@@ -1,8 +1,12 @@
 # Changes
 
+## 2023.26
+
+No changes since last release
+
 ## 2023.25
 
-`2023-06-09` | [bd22e80eb6...2c65aa180a](https://github.com/OneGov/onegov-cloud/compare/bd22e80eb6^...2c65aa180a)
+`2023-06-09` | [bd22e80eb6...6ba5a3a188](https://github.com/OneGov/onegov-cloud/compare/bd22e80eb6^...6ba5a3a188)
 
 ### Core
 
@@ -2842,16 +2846,4 @@ Also simplify the D3 renderer a bit.
 Leave lead empty if empty event_form_lead exists in .yaml.
 
 `Bugfix` | [OGC-484](https://linear.app/onegovcloud/issue/OGC-484) | [994a5cda69](https://github.com/onegov/onegov-cloud/commit/994a5cda693ce01815b3d54ef9c605a1a805e179)
-
-## 2022.33
-
-`2022-06-13` | [6c05577c73...23af17cf33](https://github.com/OneGov/onegov-cloud/compare/6c05577c73^...23af17cf33)
-
-### Feriennet
-
-##### Improve compatibility with SQLAlchemy 1.4.
-
-Removes the order_by mapper argument from activities and bookings.
-
-`Feature` | [PRO-1028](https://linear.app/projuventute/issue/PRO-1028) | [1bd8bc51a9](https://github.com/onegov/onegov-cloud/commit/1bd8bc51a9762b84544bc1d61a525c9f86f6daef)
 
