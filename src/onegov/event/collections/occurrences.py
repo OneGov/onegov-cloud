@@ -3,6 +3,7 @@ from datetime import date
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
+from lxml import objectify, etree
 from onegov.core.collection import Pagination
 from onegov.core.utils import get_unique_hstore_keys
 from onegov.event.models import Event
@@ -317,3 +318,72 @@ class OccurrenceCollection(Pagination):
                 vcalendar.add_component(vevent)
 
         return vcalendar.to_ical()
+
+    def as_xml(self):
+        """
+        Returns published events of the given occurrences as xml.
+
+        Format:
+        <events>
+            <event>
+                <id></id>
+                <title></title>
+                <tags></tags>
+                    <tag></tag>
+                <description></description>
+                <start></start>
+                <end></end>
+                <location></location>
+                <price></price>
+                ..
+            </event>
+            <event>
+                ..
+            </event>
+            ..
+        </events>
+
+        :return: str
+        """
+        xml = '<events></events>'
+        root = objectify.fromstring(xml)
+
+        query = self.session.query(Event).filter(Event.state == 'published')
+        for e in query:
+            event = objectify.Element('event')
+            event.id = e.id
+            event.title = e.title
+            txs = tags(e.tags)
+            event.append(txs)
+            event.description = e.description
+            event.start = e.start
+            event.end = e.end
+            event.location = e.location
+            event.price = e.price
+            event.organizer = e.organizer
+            event.event_url = e.external_event_url
+            event.organizer_email = e.organizer_email
+            event.modified = e.last_change
+            root.append(event)
+
+        # remove lxml annotations
+        objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
+        etree.cleanup_namespaces(root)
+
+        return etree.tostring(root, encoding='utf-8', xml_declaration=True,
+                              pretty_print=True)
+
+
+class tags(etree.ElementBase):
+    """
+    Custom class as 'tag' is a member of class Element and cannot be
+    used as tag name.
+    """
+    def __init__(self, tags=()):
+        super().__init__()
+        self.tag = 'tags'
+
+        for t in tags:
+            tag = etree.Element('tag')
+            tag.text = t
+            self.append(tag)
