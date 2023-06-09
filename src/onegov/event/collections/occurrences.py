@@ -348,16 +348,20 @@ class OccurrenceCollection(Pagination):
         xml = '<events></events>'
         root = objectify.fromstring(xml)
 
-        query = self.session.query(Event).filter(Event.state == 'published')
-        for e in query:
+        query = self.session.query(Occurrence) \
+            # .filter(Occurrence.state == 'published')
+        for occ in query:
+            e = self.session.query(Event).\
+                filter(Event.id == occ.event_id).first()
+
             event = objectify.Element('event')
             event.id = e.id
             event.title = e.title
             txs = tags(e.tags)
             event.append(txs)
             event.description = e.description
-            event.start = e.start
-            event.end = e.end
+            event.start = occ.start
+            event.end = occ.end
             event.location = e.location
             event.price = e.price
             event.organizer = e.organizer
@@ -379,6 +383,7 @@ class tags(etree.ElementBase):
     Custom class as 'tag' is a member of class Element and cannot be
     used as tag name.
     """
+
     def __init__(self, tags=()):
         super().__init__()
         self.tag = 'tags'
