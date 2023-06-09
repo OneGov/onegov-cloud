@@ -1621,15 +1621,6 @@ msgstr "Rechercher"
 msgid "Reset"
 msgstr "Réinitialiser"
 
-msgid "Stack"
-msgstr "Stack"
-
-msgid "Toggle"
-msgstr "Toggle"
-
-msgid "Columns"
-msgstr "Columns"
-
 msgid "Show all"
 msgstr "Tout afficher"
 

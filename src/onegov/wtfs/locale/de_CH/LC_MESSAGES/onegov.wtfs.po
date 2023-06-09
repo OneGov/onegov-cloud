@@ -120,6 +120,10 @@ msgstr "Alle Sendungen"
 msgid "Start and end must be in the same year"
 msgstr "Start und Ende müssen im gleichen Jahr liegen"
 
+msgid "Sorry, no scans are allowed after this time on the same day."
+msgstr ""
+"Nach dieser Uhrzeit sind am selben Tag leider keine Scans mehr möglich."
+
 msgid "Dispatch date"
 msgstr "Versanddatum"
 
@@ -417,15 +421,6 @@ msgstr "Nächste Seite"
 msgid "Submit"
 msgstr "Absenden"
 
-msgid "Stack"
-msgstr "Gestapelt"
-
-msgid "Toggle"
-msgstr "Auswahl"
-
-msgid "Columns"
-msgstr "Spalten"
-
 msgid "There are no upcoming regular dispatch dates defined!"
 msgstr "Es sind keine kommenden regulären Versanddaten definiert!"
 
@@ -612,7 +607,3 @@ msgstr "Benutzer gelöscht."
 
 msgid "User manual modified."
 msgstr "Benutzerhandbuch geändert."
-
-msgid "Sorry, no scans are allowed after this time on the same day."
-msgstr "Nach dieser Uhrzeit sind am selben Tag leider keine Scans mehr möglich."
-

@@ -363,7 +363,9 @@ def view_my_bookings(self, request):
         children = attendees_by_username(request, username)
         attendees = []
         for c in children:
-            occasions = [b.occasion_id for b in c.bookings]
+            accepted_bookings = [
+                b for b in c.bookings if b.state == 'accepted']
+            occasions = [b.occasion_id for b in accepted_bookings]
             if occasion_id in occasions:
                 attendees.append(c)
 

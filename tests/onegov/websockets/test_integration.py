@@ -35,4 +35,5 @@ def test_integration(broadcast, authenticate, connect, websockets_app):
 
 def test_csp_tween(client):
     csp = client.get('/').headers['content-security-policy']
-    assert 'connect-src ws://127.0.0.1:9876' in csp
+    csp = {v.split(' ')[0]: v.split(' ', 1)[-1] for v in csp.split(';')}
+    assert 'ws://127.0.0.1:9876' in csp['connect-src']

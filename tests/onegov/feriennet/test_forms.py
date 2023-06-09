@@ -260,6 +260,8 @@ def test_notification_template_send_form(session):
                 schema='',
                 websockets_private_channel='',
                 websockets_client_url=lambda *args: '',
+                version='1.0',
+                sentry_dsn=None
             ),
             session=session,
             include=lambda *args: None,

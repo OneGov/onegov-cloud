@@ -97,7 +97,6 @@ def org_content_security_policy():
     policy = default_content_security_policy()
 
     policy.connect_src.add(SELF)
-    policy.connect_src.add('https://sentry.io')
     policy.connect_src.add('https://stats.seantis.ch')
 
     policy.img_src.add('https://www.emuseum.ch')
@@ -133,6 +132,7 @@ def get_frameworks_asset():
     yield 'tablesaw.css'
     yield 'tablesaw.jquery.js'
     yield 'tablesaw-create.js'
+    yield 'tablesaw-translations.js'
     yield 'tablesaw-init.js'
     yield 'd3.js'
     yield 'd3.chart.bar.js'
@@ -158,3 +158,8 @@ def get_common_asset():
     yield 'common.js'
     yield 'policy-selector.jsx'
     yield 'image-gallery.js'
+
+
+@SwissvotesApp.webasset('stats')
+def get_stats_asset():
+    yield 'stats.js'

@@ -1242,15 +1242,6 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
-msgid "Stack"
-msgstr "Mantunà"
-
-msgid "Toggle"
-msgstr "Selecziun"
-
-msgid "Columns"
-msgstr "Colonnas"
-
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
@@ -1396,6 +1387,10 @@ msgstr "Activar"
 msgid "This will trigger the following notifications:"
 msgstr "Las suandantas communicaziuns vegnan activadas:"
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
+
 msgid "Email: One email containing all the results. The subject will be"
 msgstr "E-mail: in e-mail cun tut ils resultats. L'object sa cloma"
 
@@ -1413,10 +1408,6 @@ msgstr "Ultimas infurmaziuns:"
 
 msgid "No notifications yet."
 msgstr "Anc naginas communicaziuns."
-
-msgid "Browser: A notice in browsers which have opened any affected pages."
-msgstr ""
-"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
 
 msgid ""
 "Email: One email containing all the results of the selected elections and "
