@@ -348,11 +348,12 @@ class OccurrenceCollection(Pagination):
         xml = '<events></events>'
         root = objectify.fromstring(xml)
 
-        query = self.session.query(Occurrence) \
-            # .filter(Occurrence.state == 'published')
+        query = self.session.query(Occurrence)
         for occ in query:
             e = self.session.query(Event).\
                 filter(Event.id == occ.event_id).first()
+            if e.state != 'published':
+                continue
 
             event = objectify.Element('event')
             event.id = e.id
