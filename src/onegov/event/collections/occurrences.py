@@ -1,6 +1,5 @@
 from cached_property import cached_property
-from datetime import date
-from datetime import timedelta
+from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
 from lxml import objectify, etree
@@ -319,9 +318,9 @@ class OccurrenceCollection(Pagination):
 
         return vcalendar.to_ical()
 
-    def as_xml(self):
+    def as_xml(self, future_events_only=False):
         """
-        Returns published events of the given occurrences as xml.
+        Returns all published occurrences as xml.
 
         Format:
         <events>
@@ -343,7 +342,10 @@ class OccurrenceCollection(Pagination):
             ..
         </events>
 
-        :return: str
+        :param future_events_only: if set, only future events will be
+        returned, all events otherwise
+        :rtype: str
+        :return: xml string
         """
         xml = '<events></events>'
         root = objectify.fromstring(xml)
@@ -352,7 +354,11 @@ class OccurrenceCollection(Pagination):
         for occ in query:
             e = self.session.query(Event).\
                 filter(Event.id == occ.event_id).first()
+
             if e.state != 'published':
+                continue
+            if future_events_only and datetime.fromisoformat(str(
+                    occ.end)).date() < datetime.today().date():
                 continue
 
             event = objectify.Element('event')

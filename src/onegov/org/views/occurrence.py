@@ -191,7 +191,7 @@ def json_export_occurences(self, request):
 
 
 @OrgApp.view(model=OccurrenceCollection, name='xml', permission=Public)
-def xml_export_occurrences(self, request):
+def xml_export_all_occurrences(self, request):
     """
     Returns events as xml.
     Url for xml view: ../events/xml
