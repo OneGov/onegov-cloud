@@ -98,15 +98,18 @@ def view_occurrence(self, request, layout=None):
     description = linkify(self.event.description).replace('\n', '<br>')
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
+    framed = request.GET.get('framed')
 
     return {
         'description': description,
+        'framed': framed,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
         'external_event_url': self.event.external_event_url,
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
+        'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
     }
