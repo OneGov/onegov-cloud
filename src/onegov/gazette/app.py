@@ -1,5 +1,8 @@
+from more.content_security import UNSAFE_EVAL
+from more.content_security import UNSAFE_INLINE
 from onegov.core import Framework, utils
 from onegov.core.filestorage import FilestorageFile
+from onegov.core.framework import default_content_security_policy
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gazette.models import Principal
@@ -114,6 +117,14 @@ def get_i18n_used_locales():
 @GazetteApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
+
+
+@GazetteApp.setting(section='content_security_policy', name='default')
+def get_content_security_policy():
+    policy = default_content_security_policy()
+    policy.script_src.remove(UNSAFE_EVAL)
+    policy.script_src.remove(UNSAFE_INLINE)
+    return policy
 
 
 @GazetteApp.webasset_path()
