@@ -1,7 +1,5 @@
 from cached_property import cached_property
 from more.content_security import SELF
-from more.content_security import UNSAFE_EVAL
-from more.content_security import UNSAFE_INLINE
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.framework import default_content_security_policy
@@ -100,8 +98,6 @@ def org_content_security_policy():
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://stats.seantis.ch')
     policy.img_src.add('https://www.emuseum.ch')
-    policy.script_src.remove(UNSAFE_EVAL)
-    policy.script_src.remove(UNSAFE_INLINE)
     return policy
 
 
