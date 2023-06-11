@@ -95,9 +95,12 @@ def get_i18n_default_locale():
 @SwissvotesApp.setting(section='content_security_policy', name='default')
 def org_content_security_policy():
     policy = default_content_security_policy()
+
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://stats.seantis.ch')
+
     policy.img_src.add('https://www.emuseum.ch')
+
     return policy
 
 
