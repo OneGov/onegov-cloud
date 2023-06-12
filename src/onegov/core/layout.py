@@ -83,16 +83,23 @@ class Layout:
     def __init__(self, model, request):
         self.model = model
         self.request = request
+        self.custom_body_attributes = {}
+        self.custom_html_attributes = {
+            'data-version': self.request.app.version
+        }
+        if request.app.sentry_dsn:
+            self.custom_html_attributes['data-sentry-dsn'] = \
+                request.app.sentry_dsn
 
     @cached_property
     def app(self):
         """ Returns the application behind the request. """
         return self.request.app
 
-    def chunks(self, *args, **kwargs):
-        """ See :func:`onegov.core.utils.chunks`. """
+    def batched(self, *args, **kwargs):
+        """ See :func:`onegov.core.utils.batched`. """
 
-        return utils.chunks(*args, **kwargs)
+        return utils.batched(*args, **kwargs)
 
     @cached_property
     def csrf_token(self):

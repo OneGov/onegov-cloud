@@ -13,6 +13,10 @@ from sedate import standardize_date
 import transaction
 
 
+# keep dates in the future
+next_year = datetime.today().year + 1
+
+
 class DummyRequest:
 
     def link(self, item):
@@ -788,14 +792,14 @@ def test_from_import(session):
                 title='Title A',
                 location='Location A',
                 tags=['Tag A.1', 'Tag A.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description A',
                 organizer='Organizer A',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -812,14 +816,14 @@ def test_from_import(session):
                 title='Title B',
                 location='Location B',
                 tags=['Tag B.1', 'Tag B.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description B',
                 organizer='Organizer B',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -840,14 +844,14 @@ def test_from_import(session):
                 title='Title C',
                 location='Location C',
                 tags=['Tag C.1', 'Tag C.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description C',
                 organizer='Organizer C',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -870,14 +874,14 @@ def test_from_import(session):
                 title='Title C',
                 location='Location C',
                 tags=['Tag C.1', 'Tag C.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description C',
                 organizer='Organizer C',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -898,14 +902,14 @@ def test_from_import(session):
                 title='Title',
                 location='Location A',
                 tags=['Tag A.1', 'Tag A.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description A',
                 organizer='Organizer A',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -933,14 +937,14 @@ def test_from_import(session):
                 title='Title C',
                 location='Location C',
                 tags=['Tag C.1', 'Tag C.2'],
-                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
                 timezone='US/Eastern',
                 description='Description C',
                 organizer='Organizer C',
                 recurrence=(
                     'RRULE:FREQ=WEEKLY;'
-                    'UNTIL=20150616T220000Z;'
+                    f'UNTIL={next_year}0616T220000Z;'
                     'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
                 coordinates=Coordinates(48.051752750515746, 9.305739625357093),
@@ -953,6 +957,60 @@ def test_from_import(session):
         )
     ]) == ([], [], [])
     assert events.by_name('title-c').state == 'withdrawn'
+
+    # future only events option
+    a, u, p = events.from_import([
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title D past',
+                location='Location D past',
+                tags=['Tag D.1', 'Tag D.2'],
+                start=tzdatetime(2020, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2020, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description D past',
+                organizer='Organizer D past',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20200616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-D'
+            ),
+            image=None,
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
+        ),
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title D future',
+                location='Location D future',
+                tags=['Tag D.1', 'Tag D.2'],
+                start=tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(next_year, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description D future',
+                organizer='Organizer D future',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    f'UNTIL={next_year}0616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-D'
+            ),
+            image=None,
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
+        )
+    ], future_events_only=True)
+    # only adding the future event
+    assert (len(a), len(u), len(p)) == (1, 0, 0)
 
 
 def test_from_ical(session):
@@ -974,12 +1032,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Virsit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133100Z',
-        'DTEND:20150616T220100Z',
+        f'DTSTART:{next_year}0616T133100Z',
+        f'DTEND:{next_year}0616T220100Z',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150619T220000Z;'
+            f'UNTIL={next_year}0619T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furri</em> things will happen!',
@@ -996,14 +1054,14 @@ def test_from_ical(session):
     assert event.title == 'Squirrel Park Virsit'
     assert event.description == '<em>Furri</em> things will happen!'
     assert event.location == 'Squirrel Par'
-    assert event.start == tzdatetime(2015, 6, 16, 9, 31, 'US/Eastern')
+    assert event.start == tzdatetime(next_year, 6, 16, 9, 31, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
-    assert event.end == tzdatetime(2015, 6, 16, 18, 1, 'US/Eastern')
+    assert event.end == tzdatetime(next_year, 6, 16, 18, 1, 'US/Eastern')
     assert str(event.end.tzinfo) == 'UTC'
     assert event.timezone == 'Europe/Zurich'
     assert event.recurrence == (
         'RRULE:FREQ=WEEKLY;'
-        'UNTIL=20150619T220000Z;'
+        f'UNTIL={next_year}0619T220000Z;'
         'BYDAY=MO,TU,WE,TH,FR,SA,SU'
     )
     assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19]
@@ -1019,12 +1077,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Visit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133000Z',
-        'DTEND:20150616T220000Z',
+        f'DTSTART:{next_year}0616T133000Z',
+        f'DTEND:{next_year}0616T220000Z',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150620T220000Z;'
+            f'UNTIL={next_year}0620T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
@@ -1041,14 +1099,14 @@ def test_from_ical(session):
     assert event.title == 'Squirrel Park Visit'
     assert event.description == '<em>Furry</em> things will happen!'
     assert event.location == 'Squirrel Park'
-    assert event.start == tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern')
+    assert event.start == tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
-    assert event.end == tzdatetime(2015, 6, 16, 18, 0, 'US/Eastern')
+    assert event.end == tzdatetime(next_year, 6, 16, 18, 0, 'US/Eastern')
     assert str(event.end.tzinfo) == 'UTC'
     assert event.timezone == 'Europe/Zurich'
     assert event.recurrence == (
         'RRULE:FREQ=WEEKLY;'
-        'UNTIL=20150620T220000Z;'
+        f'UNTIL={next_year}0620T220000Z;'
         'BYDAY=MO,TU,WE,TH,FR,SA,SU'
     )
     assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19, 20]
@@ -1064,12 +1122,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Virsit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART;VALUE=DATE:20150616',
-        'DTEND;VALUE=DATE:20150616',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150616T220000Z;'
+            f'UNTIL={next_year}0616T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furri</em> things will happen!',
@@ -1083,8 +1141,8 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.start == tzdatetime(2015, 6, 16, 0, 0, 'Europe/Zurich')
-    assert event.end == tzdatetime(2015, 6, 16, 23, 59, 'Europe/Zurich')
+    assert event.start == tzdatetime(next_year, 6, 16, 0, 0, 'Europe/Zurich')
+    assert event.end == tzdatetime(next_year, 6, 16, 23, 59, 'Europe/Zurich')
 
     # relative date-time
     events.from_ical('\n'.join([
@@ -1094,12 +1152,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Visit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133000',
-        'DTEND:20150616T220000',
+        f'DTSTART:{next_year}0616T133000',
+        f'DTEND:{next_year}0616T220000',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150616T220000Z;'
+            f'UNTIL={next_year}0616T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
@@ -1113,8 +1171,8 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.start == tzdatetime(2015, 6, 16, 13, 30, 'Europe/Zurich')
-    assert event.end == tzdatetime(2015, 6, 16, 22, 0, 'Europe/Zurich')
+    assert event.start == tzdatetime(next_year, 6, 16, 13, 30, 'Europe/Zurich')
+    assert event.end == tzdatetime(next_year, 6, 16, 22, 0, 'Europe/Zurich')
 
     # start and duration
     events.from_ical('\n'.join([
@@ -1124,12 +1182,12 @@ def test_from_ical(session):
         'BEGIN:VEVENT',
         'SUMMARY:Squirrel Park Visit',
         'UID:squirrel-park-visit@onegov.event',
-        'DTSTART:20150616T133000',
+        f'DTSTART:{next_year}0616T133000',
         'DURATION:PT8H30M',
         'DTSTAMP:20140101T000000Z',
         (
             'RRULE:FREQ=WEEKLY;'
-            'UNTIL=20150616T220000Z;'
+            f'UNTIL={next_year}0616T220000Z;'
             'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
@@ -1143,5 +1201,5 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.start == tzdatetime(2015, 6, 16, 13, 30, 'Europe/Zurich')
-    assert event.end == tzdatetime(2015, 6, 16, 22, 0, 'Europe/Zurich')
+    assert event.start == tzdatetime(next_year, 6, 16, 13, 30, 'Europe/Zurich')
+    assert event.end == tzdatetime(next_year, 6, 16, 22, 0, 'Europe/Zurich')

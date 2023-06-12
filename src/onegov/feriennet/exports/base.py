@@ -1,4 +1,5 @@
 import re
+import sedate
 
 from itertools import chain
 from html import unescape
@@ -100,7 +101,9 @@ class FeriennetExport(Export):
         yield _("Booking State"), BOOKING_STATES[booking.state]
         yield _("Booking Priority"), booking.priority
         yield _("Booking Cost"), booking.cost
-        yield _("Booking Date"), booking.created.date()
+        local_booking_time = sedate.to_timezone(
+            booking.created, booking.period.timezone)
+        yield _("Booking Date"), local_booking_time.date()
 
     def attendee_fields(self, attendee):
         first_name, last_name = decode_name(attendee.name)

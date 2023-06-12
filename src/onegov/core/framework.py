@@ -459,8 +459,6 @@ class Framework(
 
     def configure_sentry(self, **cfg):
         self.sentry_dsn = cfg.get('sentry_dsn')
-        self.sentry_version = cfg.get('sentry_version')
-        self.sentry_environment = cfg.get('sentry_environment')
 
     @property
     def is_sentry_supported(self):
@@ -1171,13 +1169,22 @@ def default_content_security_policy():
         style_src={SELF, "https:", UNSAFE_INLINE},
 
         # enable inline scripts, eval and external scripts
-        script_src={SELF, "https:", UNSAFE_INLINE, UNSAFE_EVAL},
+        script_src={
+            SELF,
+            "https:",
+            "https://browser.sentry-cdn.com",
+            "https://js.sentry-cdn.com",
+            UNSAFE_INLINE,
+            UNSAFE_EVAL
+        },
 
         # by default limit to self (allow pdf viewer etc)
         object_src={SELF},
 
         # disable all mixed content (https -> http)
-        block_all_mixed_content=True
+        block_all_mixed_content=True,
+
+        connect_src={SELF, '*.sentry.io'}
     )
 
 

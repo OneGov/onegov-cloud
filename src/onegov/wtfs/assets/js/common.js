@@ -11,7 +11,6 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
-
 // Make the filters of the search collapsible and store the current
 // state in the browser
 var initSearchFilters = function() {
@@ -27,14 +26,13 @@ var initSearchFilters = function() {
 
     if (key in localStorage) {
         var value = localStorage.getItem(key);
-        if (value == 'hidden') {
+        if (value === 'hidden') {
             fieldsetLegend.click();
         }
     } else {
         fieldsetLegend.click();
     }
 };
-
 
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
@@ -66,8 +64,8 @@ var processCommonNodes = function(elements, out_of_band) {
         targets.find('html').attr('lang').split('-')[0]
     );
 
-    // sort tables wishing to be sorted (when not using tablesaw)
-    targets.find('table:not(.tablesaw).sortable').tablesorter();
+    // sort tables wishing to be sorted
+    targets.find('table.sortable').tablesorter();
 
     // send an event to allow optional scripts to hook themselves up
     // (we only do out of band updates since it's not guaranteed that these
@@ -134,3 +132,7 @@ Intercooler.ready(function(element) {
     processCommonNodes(el, true);
 });
 
+$("a.print-icon").on("click", function(event) {
+    window.print();
+    event.preventDefault();
+});

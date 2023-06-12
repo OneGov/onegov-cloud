@@ -1,8 +1,8 @@
 from cached_property import cached_property
-from datetime import date
-from datetime import timedelta
+from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
+from lxml import objectify, etree
 from onegov.core.collection import Pagination
 from onegov.core.utils import get_unique_hstore_keys
 from onegov.event.models import Event
@@ -317,3 +317,85 @@ class OccurrenceCollection(Pagination):
                 vcalendar.add_component(vevent)
 
         return vcalendar.to_ical()
+
+    def as_xml(self, future_events_only=False):
+        """
+        Returns all published occurrences as xml.
+
+        Format:
+        <events>
+            <event>
+                <id></id>
+                <title></title>
+                <tags></tags>
+                    <tag></tag>
+                <description></description>
+                <start></start>
+                <end></end>
+                <location></location>
+                <price></price>
+                ..
+            </event>
+            <event>
+                ..
+            </event>
+            ..
+        </events>
+
+        :param future_events_only: if set, only future events will be
+        returned, all events otherwise
+        :rtype: str
+        :return: xml string
+        """
+        xml = '<events></events>'
+        root = objectify.fromstring(xml)
+
+        query = self.session.query(Occurrence)
+        for occ in query:
+            e = self.session.query(Event).\
+                filter(Event.id == occ.event_id).first()
+
+            if e.state != 'published':
+                continue
+            if future_events_only and datetime.fromisoformat(str(
+                    occ.end)).date() < datetime.today().date():
+                continue
+
+            event = objectify.Element('event')
+            event.id = e.id
+            event.title = e.title
+            txs = tags(e.tags)
+            event.append(txs)
+            event.description = e.description
+            event.start = occ.start
+            event.end = occ.end
+            event.location = e.location
+            event.price = e.price
+            event.organizer = e.organizer
+            event.event_url = e.external_event_url
+            event.organizer_email = e.organizer_email
+            event.modified = e.last_change
+            root.append(event)
+
+        # remove lxml annotations
+        objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
+        etree.cleanup_namespaces(root)
+
+        return etree.tostring(root, encoding='utf-8', xml_declaration=True,
+                              pretty_print=True)
+
+
+class tags(etree.ElementBase):
+    """
+    Custom class as 'tag' is a member of class Element and cannot be
+    used as tag name.
+    """
+
+    def __init__(self, tags=()):
+        super().__init__()
+        self.tag = 'tags'
+
+        for t in tags:
+            tag = etree.Element('tag')
+            tag.text = t
+            self.append(tag)

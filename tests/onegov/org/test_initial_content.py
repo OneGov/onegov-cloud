@@ -1,7 +1,7 @@
 
 import os
 
-from onegov.core.utils import module_path, rchop
+from onegov.core.utils import module_path
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
@@ -21,14 +21,14 @@ def test_initial_content(org_app):
     }
 
     forms = FormCollection(org_app.session()).definitions.query().all()
-    forms = set(form.name for form in forms)
+    forms = {form.name for form in forms}
 
     builtin_forms_path = module_path('onegov.org', 'forms/builtin/de')
 
     paths = (p for p in os.listdir(builtin_forms_path))
     paths = (p for p in paths if p.endswith('.form'))
     paths = (os.path.basename(p) for p in paths)
-    builtin_forms = set(rchop(p, '.form') for p in paths)
+    builtin_forms = {p.removesuffix('.form') for p in paths}
 
     assert builtin_forms == forms
 

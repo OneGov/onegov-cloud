@@ -297,18 +297,28 @@ def import_json(group_context, url, tagmap, clear):
 @cli.command('import-ical')
 @pass_group_context
 @click.argument('ical', type=click.File())
-def import_ical(group_context, ical):
+@click.option('--future-events-only', is_flag=True, default=False)
+@click.option('--event-image', type=click.File('rb'))
+def import_ical(group_context, ical, future_events_only=False,
+                event_image=None):
     """ Imports events from an iCalendar file.
 
     Example:
 
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
 
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+        --future-events-only
+
+        onegov-event --select '/veranstaltungen/zug' import-ical import.ics
+        --event-image /path/to/image.jpg
+
     """
 
     def _import_ical(request, app):
         collection = EventCollection(app.session())
-        added, updated, purged = collection.from_ical(ical.read())
+        added, updated, purged = \
+            collection.from_ical(ical.read(), future_events_only, event_image)
         click.secho(
             f"Events successfully imported "
             f"({len(added)} added, {len(updated)} updated, "

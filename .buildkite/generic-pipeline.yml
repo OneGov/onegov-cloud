@@ -11,18 +11,6 @@ steps:
     env:
       CONTAINER: "onegov-cloud:head"
 
-  # check linting
-  - command: "test-container"
-    label: "Linting"
-
-    agents:
-      - queue=generic
-      - ram=2048
-
-    env:
-      CONTAINER: "onegov-cloud:head"
-      CONTAINER_TEST_SCRIPT: ".buildkite/lint"
-
   # run the javascript tests
   - command: "test-container"
     label: "Jesting"
@@ -35,21 +23,6 @@ steps:
     env:
       CONTAINER: "onegov-cloud:head"
       CONTAINER_TEST_SCRIPT: ".buildkite/jest"
-
-  # run the python tests
-  - command: "test-container"
-    label: "Testing"
-
-    parallelism: 4
-
-    agents:
-      - queue=generic
-      - cpu=2
-      - ram=4096
-
-    env:
-      CONTAINER: "onegov-cloud:head"
-      CONTAINER_TEST_SCRIPT: ".buildkite/test"
 
   # build the docs if possible (fails are ignored, only on master)
   - command: "test-container"

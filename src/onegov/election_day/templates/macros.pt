@@ -41,10 +41,10 @@
         <div class="small-12 columns">
             <form tal:define="id name.lower()">
                 <label for="filter-${id}">${name}</label>
-                <select id="filter-${id}" name="filter-${id}" onchange="this.options[this.selectedIndex].onclick()">
+                <select id="filter-${id}" name="filter-${id}" class="redirect-dropdown">
                     <tal:block tal:repeat="(name, active, link) options">
                         <option tal:condition="active" selected>${name}</option>
-                        <option tal:condition="not active" onclick="location.href='${link}'">${name}</option>
+                        <option tal:condition="not active" data-redirect="${link}">${name}</option>
                     </tal:block>
                 </select>
             </form>
@@ -1500,19 +1500,6 @@
         </li>
     </ul>
 </metal:file_import_errors>
-
-<metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.election_day">
-    <script>
-        TablesawConfig = {
-            i18n: {
-                modeStack: '<tal:block i18n:translate>Stack</tal:block>',
-                modeToggle: '<tal:block i18n:translate>Toggle</tal:block>',
-                modeSwitchColumns: '<tal:block i18n:translate>Columns</tal:block>',
-                modeSwitchColumnsAbbreviated: '<tal:block i18n:translate>Columns</tal:block>',
-            }
-        };
-    </script>
-</metal:tablesaw_translations>
 
 <metal:seat_allocation_figure define-macro="seat_allocation_figure" i18n:domain="onegov.election_day">
     <figure>

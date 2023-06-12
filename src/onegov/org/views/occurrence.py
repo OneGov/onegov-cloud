@@ -98,15 +98,18 @@ def view_occurrence(self, request, layout=None):
     description = linkify(self.event.description).replace('\n', '<br>')
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
+    framed = request.GET.get('framed')
 
     return {
         'description': description,
+        'framed': framed,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
         'external_event_url': self.event.external_event_url,
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
+        'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
     }
@@ -188,6 +191,21 @@ def json_export_occurences(self, request):
             'url': request.link(occurrence),
         } for occurrence in query
     ]
+
+
+@OrgApp.view(model=OccurrenceCollection, name='xml', permission=Public)
+def xml_export_all_occurrences(self, request):
+    """
+    Returns events as xml.
+    Url for xml view: ../events/xml
+    """
+
+    collection = OccurrenceCollection(request.session)
+    return Response(
+        collection.as_xml(),
+        content_type='text/xml',
+        content_disposition='inline; filename=occurences.xml'
+    )
 
 
 @OrgApp.form(

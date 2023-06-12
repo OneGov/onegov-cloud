@@ -2,10 +2,11 @@ import hashlib
 
 from uuid import uuid4
 from collections import namedtuple
-from datetime import date
+from datetime import date, timezone
 from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
+
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
@@ -147,7 +148,8 @@ class EventCollection(Pagination):
         return query.first()
 
     def from_import(self, items, purge=None, publish_immediately=True,
-                    valid_state_transfers=None, published_only=False):
+                    valid_state_transfers=None, published_only=False,
+                    future_events_only=False):
         """ Add or updates the given events.
 
         Only updates events which have changed. Uses ``Event.source_updated``
@@ -167,7 +169,7 @@ class EventCollection(Pagination):
         :param publish_immediately:
             Set newly added events to published, else let them be initiated.
 
-        :param allowed_state_transfers:
+        :param valid_state_transfers:
             Dict of existing : remote state should be considered when updating.
 
             Example:
@@ -186,6 +188,8 @@ class EventCollection(Pagination):
             Do not import unpublished events. Still do not ignore state
             like withdrawn.
 
+        :param future_events_only:
+            If set only events in the future will be imported
         """
 
         if purge:
@@ -200,6 +204,12 @@ class EventCollection(Pagination):
         for item in items:
             if isinstance(item, str):
                 purge = {x for x in purge if not x.startswith(item)}
+                continue
+
+            # skip past events if option is set
+            if future_events_only and \
+                    datetime.fromisoformat(str(item.event.end)) < \
+                    datetime.now(timezone.utc):
                 continue
 
             event = item.event
@@ -293,10 +303,17 @@ class EventCollection(Pagination):
 
         return added, updated, purged_event_ids
 
-    def from_ical(self, ical):
+    def from_ical(self, ical, future_events_only=False, event_image_path=None):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
+        :type future_events_only: str
+        :param ical: ical to be imported
+        :param future_events_only: if set only events in the future will be
+        imported
+        :type future_events_only: bool
+        :param event_image_path: path and filename to image
+        :type event_image_path: str
 
         """
         items = []
@@ -330,12 +347,17 @@ class EventCollection(Pagination):
             if start and not end and duration:
                 end = start + duration
 
+            if start and not end:
+                # assume event duration is 1 hour
+                end = start + timedelta(hours=1)
+
             if not start or not end:
                 raise (ValueError("Invalid date"))
 
             recurrence = vevent.get('rrule', '')
             if recurrence:
-                recurrence = 'RRULE:{}'.format(recurrence.to_ical().decode())
+                recurrence = 'RRULE:{}'.format(recurrence.to_ical().
+                                               decode())
 
             coordinates = vevent.get('geo')
             if coordinates:
@@ -374,11 +396,13 @@ class EventCollection(Pagination):
                         tags=tags or [],
                         source=f'ical-{uid}',
                     ),
-                    image=None,
-                    image_filename=None,
+                    image=event_image_path,
+                    image_filename=event_image_path.name if
+                    event_image_path else None,
                     pdf=None,
                     pdf_filename=None,
                 )
             )
 
-        return self.from_import(items, publish_immediately=True)
+        return self.from_import(items, publish_immediately=True,
+                                future_events_only=future_events_only)

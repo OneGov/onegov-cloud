@@ -363,7 +363,9 @@ def view_my_bookings(self, request):
         children = attendees_by_username(request, username)
         attendees = []
         for c in children:
-            occasions = [b.occasion_id for b in c.bookings]
+            accepted_bookings = [
+                b for b in c.bookings if b.state == 'accepted']
+            occasions = [b.occasion_id for b in accepted_bookings]
             if occasion_id in occasions:
                 attendees.append(c)
 
@@ -451,18 +453,20 @@ def cancel_booking(self, request):
             'title': self.occasion.activity.title,
             'attendee': self.attendee.name
         }))
-    request.app.send_transactional_email(
-        subject=subject,
-        receivers=(self.user.username, ),
-        content=render_template('mail_booking_canceled.pt', request, {
-            'layout': DefaultMailLayout(self, request),
-            'title': subject,
-            'model': self,
-            'bookings_link': bookings_link,
-            'name': self.attendee.name,
-            'dates': dates
-        })
-    )
+
+    if self.period.booking_start <= date.today():
+        request.app.send_transactional_email(
+            subject=subject,
+            receivers=(self.user.username, ),
+            content=render_template('mail_booking_canceled.pt', request, {
+                'layout': DefaultMailLayout(self, request),
+                'title': subject,
+                'model': self,
+                'bookings_link': bookings_link,
+                'name': self.attendee.name,
+                'dates': dates
+            })
+        )
 
     @request.after
     def update_matching(response):

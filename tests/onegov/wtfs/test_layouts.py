@@ -67,6 +67,8 @@ class DummyPrincipal:
 class DummyApp:
     principal = DummyPrincipal()
     theme_options = {}
+    version = '1.0'
+    sentry_dsn = None
 
 
 class DummyRequest:

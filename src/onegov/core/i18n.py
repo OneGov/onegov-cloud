@@ -42,8 +42,8 @@ import types
 
 from onegov.core.cache import lru_cache
 from io import BytesIO
+from itertools import pairwise
 from onegov.core.framework import Framework, log
-from onegov.core.utils import pairwise
 from translationstring import ChameleonTranslate
 from translationstring import Translator
 from translationstring import TranslationString

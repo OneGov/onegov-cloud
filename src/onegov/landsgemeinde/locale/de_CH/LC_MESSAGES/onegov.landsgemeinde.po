@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-05-19 10:08+0200\n"
+"POT-Creation-Date: 2023-05-30 07:17+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -183,11 +183,17 @@ msgstr "Wortmeldung löschen"
 msgid "Assembly"
 msgstr "Landsgemeinde"
 
+msgid "States"
+msgstr "Status"
+
 msgid "Do you really want to delete this assembly?"
 msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
 
 msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
+
+msgid "Ticker"
+msgstr "Ticker"
 
 #, python-format
 msgid "Extraodinary assembly from ${date}"
@@ -196,6 +202,9 @@ msgstr "Ausserordentliche Landsgemeinde vom ${date}"
 #, python-format
 msgid "Assembly from ${date}"
 msgstr "Landsgemeinde vom ${date}"
+
+msgid "Irrelevant motion"
+msgstr "Unerheblicher Antrag"
 
 #, python-format
 msgid "Vota of agenda items ${number} of assembly from ${date}"
@@ -227,6 +236,17 @@ msgstr "Audio herunterladen"
 
 msgid "Video"
 msgstr "Video"
+
+msgid "Close"
+msgstr "Schliessen"
+
+msgid ""
+"Shows the status of each element of an assembly. The statuses of each "
+"element are automatically adjusted when editing an element, if possible."
+msgstr ""
+"Zeigt den Status jedes Elements einer Landsgemeinde. Die Stati aller "
+"Elemente einer Landsgemeinde werden beim Bearbeiten eines einzelnen "
+"Elementes automatisch angepasst (sofern möglich)."
 
 msgid "Added a new agenda item"
 msgstr "Neues Traktandum hinzugefügt"

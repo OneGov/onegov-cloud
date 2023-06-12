@@ -173,7 +173,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ Applies X_VHM_HOST and X_VHM_ROOT to the given url (which is
         expected to not contain a host yet!). """
         if self.x_vhm_root:
-            url = '/' + utils.lchop(url, self.x_vhm_root).lstrip('/')
+            url = '/' + url.removeprefix(self.x_vhm_root).lstrip('/')
 
         if self.x_vhm_host:
             url = self.x_vhm_host + url
@@ -182,13 +182,14 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return url
 
-    def link(self, *args, query_params=None, **kwargs):
+    def link(self, *args, query_params=None, fragment=None, **kwargs):
         """ Extends the default link generating function of Morepath. """
         query_params = query_params or {}
         result = self.transform(super().link(*args, **kwargs))
         for key, value in query_params.items():
             result = append_query_param(result, key, value)
-            pass
+        if fragment:
+            result += f'#{fragment}'
         return result
 
     def class_link(self, *args, **kwargs):

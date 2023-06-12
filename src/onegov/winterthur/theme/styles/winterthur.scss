@@ -959,3 +959,18 @@ table.responsive {
 .visually-hidden {
     @include element-invisible;
 }
+
+/*
+    Events
+*/
+
+.button.back-button {
+    background: transparent;
+    border: 1px solid $primary-color;
+    color: $primary-color;
+    padding: .5rem;
+    &:hover {
+        color: $black;
+        border: 1px solid $black;
+    }
+}
