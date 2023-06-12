@@ -196,7 +196,7 @@ A collection+JSON of items if found including paging
 {
     "collection": {
         "version": "1.0",
-        "href": "http://localhost:8080/onegov_agency/bs/api/people",
+        "href": "http://[base_url]/api/people",
         "links": [
             {
                 "rel": "prev",
@@ -209,7 +209,7 @@ A collection+JSON of items if found including paging
         ],
         "items": [
             {
-                "href": "http://localhost:8080/onegov_agency/bs/api/people/7ef422f15f394b0fa0b3f337f52bbafb",
+                "href": "http://[base_url]/api/people/7ef422f15f394b0fa0b3f337f52bbafb",
                 "data": [
                     {
                         "name": "academic_title",
