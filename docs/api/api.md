@@ -8,12 +8,6 @@ The headless Agency API offers the following views:
 - People
 - Memberships
 
-Currently, three cantons offer an api for their agencies.
-
-- [Canton Appenzell Ausserrhoden](https://staatskalender.ar.ch/api/)
-- [Canton Basel Stadt](https://staatskalender.bs.ch/api/)
-- [Canton Zug](https://staka.zug.ch/api)
-
 ### Agencies View
 
 The agencies view provides information about all the existing agencies
