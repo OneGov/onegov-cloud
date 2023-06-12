@@ -308,13 +308,13 @@ class EventCollection(Pagination):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
-        :type ical: str
         :param ical: ical to be imported
-        :param event_image: image content
+        :type ical: str
         :param future_events_only: if set only events in the future will be
         imported
         :type future_events_only: bool
-        :param event_image_name: path and filename to image
+        :param event_image: image file
+        :param event_image_name: image name
         :type event_image_name: str
 
         """
