@@ -44,6 +44,8 @@ class DummyApp:
     principal = DummyPrincipal()
     theme_options = {}
     static_content_pages = {'home'}
+    version = '1.0'
+    sentry_dsn = None
 
 
 class DummyRequest:

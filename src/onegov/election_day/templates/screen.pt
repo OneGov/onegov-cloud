@@ -26,7 +26,7 @@
         <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
         <style tal:condition="screen.css">${screen.css}</style>
     </head>
-    <body tal:attributes="body_attributes|{}">
+    <body tal:attributes="layout.custom_body_attributes|{}">
         <tal:b metal:use-macro="template" />
     </body>
 </html>

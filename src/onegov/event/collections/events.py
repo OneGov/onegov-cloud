@@ -6,6 +6,7 @@ from datetime import date, timezone
 from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
+
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
