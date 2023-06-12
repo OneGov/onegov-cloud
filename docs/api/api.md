@@ -8,6 +8,9 @@ The headless Agency API offers the following views:
 - People
 - Memberships
 
+We implement the called Collection+JSON standard established by Mike
+Amundsen. For details please refer to [media types - collection & json](http://amundsen.com/media-types/collection/format/)
+
 ### Agencies View
 
 The agencies view provides information about all the existing agencies
