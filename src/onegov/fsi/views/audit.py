@@ -91,7 +91,7 @@ def invite_attendees_for_event(self, request, form):
         'letters': letters,
         'email_recipients': email_recipients,
         'subject': subject,
-        'next_subscriptions': self.next_subscriptions(request)
+        'next_subscriptions': next_subscriptions
     }
 
 
