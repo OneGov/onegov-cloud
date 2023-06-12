@@ -113,13 +113,26 @@ class ArchivedResultCollection:
 
         return dates
 
-    def latest(self):
-        """ Returns the lastest results. """
+    def current(self):
+        """ Returns the current results.
 
-        latest_date = self.query().with_entities(ArchivedResult.date)
-        latest_date = latest_date.order_by(desc(ArchivedResult.date))
-        latest_date = latest_date.limit(1).scalar()
-        return self.by_date(latest_date) if latest_date else ([], None)
+        The current results are the results from either the next election day
+        relative to today or the last results relative to today, if no next.
+
+        """
+
+        next_date = self.query().with_entities(ArchivedResult.date)
+        next_date = next_date.filter(ArchivedResult.date >= date.today())
+        next_date = next_date.order_by(ArchivedResult.date)
+        next_date = next_date.limit(1).scalar()
+
+        last_date = self.query().with_entities(ArchivedResult.date)
+        last_date = last_date.filter(ArchivedResult.date <= date.today())
+        last_date = last_date.order_by(desc(ArchivedResult.date))
+        last_date = last_date.limit(1).scalar()
+
+        current_date = next_date or last_date
+        return self.by_date(current_date) if current_date else ([], None)
 
     def by_year(self, year):
         """ Returns the results for the given year. """
@@ -153,7 +166,7 @@ class ArchivedResultCollection:
                 try:
                     return self.by_year(int(self.date))
                 except ValueError:
-                    return self.latest()
+                    return self.current()
 
         else:
             query = self.query()
