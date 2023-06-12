@@ -92,7 +92,7 @@
                                                     <tal:b condition="item.group != 'donation'">
                                                         ${item.text}<br>
                                                         <span class="item-organizer" tal:condition="item.organizer">
-                                                            Veranstalter: ${item.organizer}
+                                                            <tal:b i18n:translate>Organizer:</tal:b> ${item.organizer}
                                                         </span>
                                                     </tal:b>
                                                 </td>
