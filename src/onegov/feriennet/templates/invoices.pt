@@ -91,7 +91,9 @@
                                         </span>
                                         <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
                                     </div>
-                                        <span class="item-organizer">Veranstalter: Organisation</span>
+                                        <span class="item-organizer" tal:condition="item.organizer">
+                                            Veranstalter: ${item.organizer}
+                                        </span>
                                         <div class="text-links" style="font-size: .875rem" tal:condition="not item.paid and item.group=='donation'">
                                             <a href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}" i18n:translate>
                                                 Adjust
