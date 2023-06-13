@@ -4,9 +4,9 @@
 
 The headless Agency API offers the following views:
 
-- Agencies
-- People
-- Memberships
+- [Agencies](#agencies-view)
+- [People](#people-view)
+- [Memberships](#membership-view)
 
 We implement the called Collection+JSON standard established by Mike
 Amundsen. For details please refer to [media types - collection & json](http://amundsen.com/media-types/collection/format/)
@@ -25,9 +25,10 @@ memberships if given.
 
 The agencies api support the following query fields:
 
-| Query Fields | Description                                                    |
+| Query Fields | Description                                                        |
 |--------------|--------------------------------------------------------------------|
-| title        | queries for an agency title (name)                                 |
+| title        | queries for an agency with given title                             |
+| parent       | queries for child agencies of agency specified                     |
 | updated_lt   | queries agencies updated before date specified (lower than)        |
 | updated_le   | queries agencies updated before or at date specified (lower equal) |
 | updated_eq   | queries agencies updated at date specified (equal)                 |
@@ -37,7 +38,9 @@ The agencies api support the following query fields:
 
 #### cURL Example
 
-`curl https://[base_url]/agencies?name=datenschutzbeauftragter`
+`curl https://[base_url]/agencies?title=datenschutzbeauftragter`
+
+`curl https://[base_url]/agencies?parent=1`
 
 `curl https://[base_url]/agencies?updated.ge=2023-05-12T11:04:00`
 
@@ -308,6 +311,137 @@ A collection+JSON of items if found including paging
                         "rel": "memberships",
                         "href": "http://[base_url]/api/memberships?
                         person=[hash]"
+                    }
+                ]
+            },
+            ...
+        ]
+    }
+}
+```
+
+### Membership View
+
+The membership view provides information about all the existing memberships
+between people and agencies within the organisation. Each membership has
+data points and links to its person and agency.
+
+`curl https://[base_url]/memberships`
+
+#### Membership Query Fields
+
+The agencies api support the following query fields:
+
+| Query Fields | Description                                                            |
+|--------------|------------------------------------------------------------------------|
+| agency       | queries memberships of agency with given id                            |
+| person       | queries all memberships of person with given uid                       |
+| updated_lt   | queries memberships updated before date specified (lower than)         |
+| updated_le   | queries memberships updated before or at date specified (lower equal)  |
+| updated_eq   | queries memberships updated at date specified (equal)                  |
+| updated_ge   | queries memberships updated after or date specified (greater equal)    |
+| updated_gt   | queries memberships updated after date specified (greater than)        |
+
+
+#### cURL Example
+
+`curl https://staka.zug.ch/api/memberships?agency=1`
+
+`curl https://staka.zug.ch/api/memberships?person=ccfffd1c28ac4e9093c784bc735b1231`
+
+> NOTE: Multiple query fields can be combined using the '&'
+
+Here an example for all memberships of agency with id 4
+
+Request:
+
+`curl https://staka.zug.ch/api/memberships?agency=4`
+
+Response:
+A collection+JSON of items if found
+
+```
+{
+    "collection": {
+        "version": "1.0",
+        "href": "https://[base_url]/api/memberships",
+        "links": [
+            {
+                "rel": "prev",
+                "href": null
+            },
+            {
+                "rel": "next",
+                "href": null
+            }
+        ],
+        "items": [
+            {
+                "href": "https://[base_url]/api/memberships/e049cc9e1cad422a9dc160fe1af69a78",
+                "data": [
+                    {
+                        "name": "title",
+                        "value": "Bundesrätin"
+                    },
+                    {
+                        "name": "modified",
+                        "value": "2023-01-24T14:22:59.624376+00:00"
+                    }
+                ],
+                "links": [
+                    {
+                        "rel": "agency",
+                        "href": "https://[base_url]/api/agencies/4"
+                    },
+                    {
+                        "rel": "person",
+                        "href": "https://[base_url]/api/people/c6bbb982060a4545826c54ab204e4b73"
+                    }
+                ]
+            },
+            {
+                "href": "https://[base_url]/api/memberships/e8c11e7e948146e7ba91478df5be648d",
+                "data": [
+                    {
+                        "name": "title",
+                        "value": "Vizepräsidentin"
+                    },
+                    {
+                        "name": "modified",
+                        "value": "2023-01-24T14:22:52.088620+00:00"
+                    }
+                ],
+                "links": [
+                    {
+                        "rel": "agency",
+                        "href": "https://[base_url]/api/agencies/4"
+                    },
+                    {
+                        "rel": "person",
+                        "href": "https://[base_url]/api/people/26afa54b28924461b3dc8bc4ff4dd063"
+                    }
+                ]
+            },
+            {
+                "href": "https://[base_url]/api/memberships/949bfde4090c4d4c9ec14960ad88a115",
+                "data": [
+                    {
+                        "name": "title",
+                        "value": "Bundesrat"
+                    },
+                    {
+                        "name": "modified",
+                        "value": "2023-01-24T14:23:02.998538+00:00"
+                    }
+                ],
+                "links": [
+                    {
+                        "rel": "agency",
+                        "href": "https://[base_url]/api/agencies/4"
+                    },
+                    {
+                        "rel": "person",
+                        "href": "https://[base_url]/api/people/0d0a38d7e3cb4c008bf8c06bc74bd9b0"
                     }
                 ]
             },
