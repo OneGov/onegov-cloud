@@ -43,12 +43,12 @@ if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator
     from fs.base import FS, SubFS
-    from morepath import Response
     from re import Match
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from types import ModuleType
     from typing_extensions import TypedDict
+    from webob import Response
     from .request import CoreRequest
 
     # FIXME: Move this to onegov.core.types or onegov.file.types

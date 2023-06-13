@@ -34,6 +34,7 @@ module = [
     "onegov.core.crypto.*",
     "onegov.core.datamanager.*",
     "onegov.core.orm.*",
+    "onegov.core.request.*",
     "onegov.core.security.*",
     "onegov.core.utils.*"
 ]
