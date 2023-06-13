@@ -18,6 +18,8 @@ from openpyxl import load_workbook
 from pathlib import Path
 from unittest.mock import patch
 
+from tests.shared.utils import add_reservation
+
 
 def test_resource_slots(client):
     resources = ResourceCollection(client.app.libres_context)
@@ -197,42 +199,6 @@ def test_find_your_spot(client):
     assert '04.01.2020' in result
     assert '05.01.2020' in result
     assert '06.01.2020' in result
-
-
-def add_reservation(
-    resource,
-    client,
-    start,
-    end,
-    email=None,
-    partly_available=True,
-    reserve=True,
-    approve=True,
-    add_ticket=True
-):
-    if not email:
-        email = f'{resource.name}@example.org'
-
-    allocation = resource.scheduler.allocate(
-        (start, end),
-        partly_available=partly_available,
-    )[0]
-
-    if reserve:
-        resource_token = resource.scheduler.reserve(
-            email,
-            (allocation.start, allocation.end),
-        )
-
-    if reserve and approve:
-        resource.scheduler.approve_reservations(resource_token)
-        if add_ticket:
-            with client.app.session().no_autoflush:
-                tickets = TicketCollection(client.app.session())
-                tickets.open_ticket(
-                    handler_code='RSV', handler_id=resource_token.hex
-                )
-    return resource
 
 
 def test_resource_room_deletion(client):
@@ -2487,42 +2453,3 @@ def test_resource_recipient_overview(client):
     assert "Gymnasium" in page
     assert "Dailypass" in page
     assert "Meeting" not in page
-
-
-def test_reservation_ticket_new_note_sends_email(client):
-    resources = ResourceCollection(client.app.libres_context)
-    gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
-    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
-    meeting = resources.add('Meeting', 'Europe/Zurich', type='room')
-
-    recipients = ResourceRecipientCollection(client.app.session())
-    recipients.add(
-        name='John',
-        medium='email',
-        address='john@example.org',
-        internal_notes=True,  # sends email on new internal note
-        resources=[
-            gymnasium.id.hex,
-            dailypass.id.hex,
-            meeting.id.hex
-        ]
-    )
-
-    add_reservation(
-        gymnasium, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
-    transaction.commit()
-
-    with client.app.session().no_autoflush:
-        tickets = TicketCollection(client.app.session())
-        assert tickets.query().count() == 1
-
-    client.login_admin()
-
-    client.get('/tickets/ALL/open')
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-    page = page.click("Neue Notiz")
-    page.form['text'] = "some note"
-    page = page.form.submit().follow()
-
-    assert "some note" in page
-    assert len(os.listdir(client.app.maildir)) == 1

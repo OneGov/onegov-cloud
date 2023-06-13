@@ -4,6 +4,8 @@ import transaction
 from datetime import datetime
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
+from onegov.ticket import TicketCollection
+from tests.shared.utils import add_reservation
 
 
 def test_new_reservation_notification(client):
@@ -72,3 +74,42 @@ def test_new_reservation_notification(client):
             assert "Gymnasium" in mail['TextBody']
             assert "jessie@example.org" in mail['TextBody']
             assert "Foobar" in mail['TextBody']
+
+
+def test_reservation_ticket_new_note_sends_email(client):
+    resources = ResourceCollection(client.app.libres_context)
+    gymnasium = resources.add('Gymnasium', 'Europe/Zurich', type='room')
+    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+    meeting = resources.add('Meeting', 'Europe/Zurich', type='room')
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        internal_notes=True,  # sends email on new internal note
+        resources=[
+            gymnasium.id.hex,
+            dailypass.id.hex,
+            meeting.id.hex
+        ]
+    )
+
+    add_reservation(
+        gymnasium, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+    transaction.commit()
+
+    with client.app.session().no_autoflush:
+        tickets = TicketCollection(client.app.session())
+        assert tickets.query().count() == 1
+
+    client.login_admin()
+
+    client.get('/tickets/ALL/open')
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    page = page.click("Neue Notiz")
+    page.form['text'] = "some note"
+    page = page.form.submit().follow()
+
+    assert "some note" in page
+    assert len(os.listdir(client.app.maildir)) == 1

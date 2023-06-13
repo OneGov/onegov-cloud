@@ -709,7 +709,7 @@ def send_resource_recipient_email_if_enabled(
         # Only send mails for tickets belonging to a resource
         return
 
-    if not self.handler.resource.reservations:
+    if not self.handler.reservations:
         return
 
     q = ResourceRecipientCollection(request.session).query()
