@@ -145,7 +145,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def session(self) -> 'Session':
         return self.app.session()
 
-    def link_prefix(self, app: Framework | None = None) -> str:
+    def link_prefix(self, app: 'Framework | None' = None) -> str:
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
         hostname, which is not useful in our case - we'll add the hostname

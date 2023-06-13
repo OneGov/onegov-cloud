@@ -10,7 +10,7 @@ from .authentication import Identity, NoIdentity
 from .reify import reify
 
 _T = TypeVar('_T')
-_AfterF = TypeVar('_AfterF', bound=Callable[['Response'], Any])
+_AfterF = TypeVar('_AfterF', bound=Callable[[Response], Any])
 
 SAME_APP: Sentinel
 
