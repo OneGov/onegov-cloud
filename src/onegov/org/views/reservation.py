@@ -709,6 +709,9 @@ def send_resource_recipient_email_if_enabled(
         # Only send mails for tickets belonging to a resource
         return
 
+    if not self.handler.resource.reservations:
+        return
+
     q = ResourceRecipientCollection(request.session).query()
     q = q.filter(ResourceRecipient.medium == 'email')
     q = q.order_by(None).order_by(ResourceRecipient.address)
@@ -721,7 +724,7 @@ def send_resource_recipient_email_if_enabled(
         r.address
         for r in q
         if (
-            self.handler.resource in r.content['resources']
+            self.handler.reservations[0].resource.hex in r.content['resources']
             and r.content.get('internal_notes', False)
         )
     ]
@@ -743,7 +746,6 @@ def send_resource_recipient_email_if_enabled(
     }
     content = render_template(template, request, args)
 
-    assert len(recipients) > 0
     for r in recipients:
         request.app.send_transactional_email(
             subject=args['title'],

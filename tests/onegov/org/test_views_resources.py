@@ -2525,6 +2525,4 @@ def test_reservation_ticket_new_note_sends_email(client):
     page = page.form.submit().follow()
 
     assert "some note" in page
-
-    # fixme: Test mail notification on new message
     assert len(os.listdir(client.app.maildir)) == 1
