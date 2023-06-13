@@ -49,6 +49,9 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     #: Identifies the election, may be used in the url
     id = Column(Text, primary_key=True)
 
+    #: external identifier
+    external_id = Column(Text, nullable=True)
+
     #: all translations of the title
     title_translations = Column(HSTORE, nullable=False)
 

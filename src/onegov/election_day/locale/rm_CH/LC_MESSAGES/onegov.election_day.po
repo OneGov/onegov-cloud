@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-03 09:17+0200\n"
+"POT-Creation-Date: 2023-06-13 09:45+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -272,23 +272,6 @@ msgstr "Plaun regiunal"
 msgid "Communal"
 msgstr "Plaun communal"
 
-msgid ""
-"The ID is used in the URL and might be used somewhere. Changing theID might "
-"break links on external sites!"
-msgstr ""
-"La ID vegn duvrada en la URL ed eventualmain er en auters lieus. Sche la ID "
-"vegn midada, èsi pussaivel ch'ils links a paginas externas na funcziunan "
-"betg pli!"
-
-msgid "ID"
-msgstr "ID"
-
-msgid "Invalid ID"
-msgstr "ID nunvalaivla"
-
-msgid "ID already exists"
-msgstr "La ID è gia avant maun"
-
 msgid "Name"
 msgstr "Denominaziun"
 
@@ -300,6 +283,23 @@ msgstr "I n'èn registradas anc naginas votaziuns."
 
 msgid "No elections yet."
 msgstr "I n'èn registradas anc naginas elecziuns."
+
+msgid "Identifier"
+msgstr "ID"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing the ID might "
+"break links on external sites!"
+msgstr ""
+"La ID vegn duvrada en la URL ed eventualmain er en auters lieus. Sche la ID "
+"vegn midada, èsi pussaivel ch'ils links a paginas externas na funcziunan "
+"betg pli!"
+
+msgid "External ID"
+msgstr ""
+
+msgid "Used for import if set."
+msgstr ""
 
 msgid "System"
 msgstr "Sistem"
@@ -401,11 +401,14 @@ msgstr ""
 msgid "Date"
 msgstr "Data"
 
-msgid "Mandates / Seats"
-msgstr "Mandats / Sezs"
-
 msgid "Shortcode"
 msgstr "Scursanida"
+
+msgid "Used for sorting."
+msgstr ""
+
+msgid "Mandates / Seats"
+msgstr "Mandats / Sezs"
 
 msgid "German"
 msgstr "Tudestg"
@@ -460,6 +463,12 @@ msgstr "Colurs"
 
 msgid "Invalid color definitions"
 msgstr "Definiziuns da colurs nunvalaivlas"
+
+msgid "Invalid ID"
+msgstr "ID nunvalaivla"
+
+msgid "ID already exists"
+msgstr "La ID è gia avant maun"
 
 msgid "Domain of the elections"
 msgstr "Plaun da las elecziuns"
@@ -632,9 +641,6 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Resultats da las partidas"
 
-msgid "Identifier"
-msgstr "ID"
-
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
 
@@ -643,6 +649,9 @@ msgstr "Numer dal project"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "Properties"
+msgstr ""
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-03 09:17+0200\n"
+"POT-Creation-Date: 2023-06-13 09:45+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -271,22 +271,6 @@ msgstr "Régional"
 msgid "Communal"
 msgstr "Municipal"
 
-msgid ""
-"The ID is used in the URL and might be used somewhere. Changing theID might "
-"break links on external sites!"
-msgstr ""
-"L'ID est utilisé dans l'URL et peut être utilisé ailleurs. En changeant "
-"l'ID, vous risquez de briser des liens sur des sites externes !"
-
-msgid "ID"
-msgstr "ID"
-
-msgid "Invalid ID"
-msgstr "ID non valide"
-
-msgid "ID already exists"
-msgstr "L'ID existe déjà"
-
 msgid "Name"
 msgstr "Nom"
 
@@ -298,6 +282,22 @@ msgstr "Pas de votations actuellement."
 
 msgid "No elections yet."
 msgstr "Pas de elections actuellement."
+
+msgid "Identifier"
+msgstr "Identifiant"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing the ID might "
+"break links on external sites!"
+msgstr ""
+"L'ID est utilisé dans l'URL et peut être utilisé ailleurs. En changeant "
+"l'ID, vous risquez de briser des liens sur des sites externes !"
+
+msgid "External ID"
+msgstr "ID externe"
+
+msgid "Used for import if set."
+msgstr "Utilisé pour l'importation s'il est défini."
 
 msgid "System"
 msgstr "Système"
@@ -400,11 +400,14 @@ msgstr ""
 msgid "Date"
 msgstr "Date"
 
-msgid "Mandates / Seats"
-msgstr "Mandats / Sièges"
-
 msgid "Shortcode"
 msgstr "Shortcode"
+
+msgid "Used for sorting."
+msgstr "Utilisé pour le tri."
+
+msgid "Mandates / Seats"
+msgstr "Mandats / Sièges"
 
 msgid "German"
 msgstr "Allemand"
@@ -459,6 +462,12 @@ msgstr "Couleurs"
 
 msgid "Invalid color definitions"
 msgstr "Définitions de couleurs non valides"
+
+msgid "Invalid ID"
+msgstr "ID non valide"
+
+msgid "ID already exists"
+msgstr "L'ID existe déjà"
 
 msgid "Domain of the elections"
 msgstr "Echelon des élections"
@@ -630,9 +639,6 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Résultats des partis"
 
-msgid "Identifier"
-msgstr "Identifiant"
-
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
 
@@ -641,6 +647,9 @@ msgstr "Numéro de votation"
 
 msgid "Default"
 msgstr "Défaut"
+
+msgid "Properties"
+msgstr "Propriétés"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"

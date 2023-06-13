@@ -3,6 +3,7 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionCompoundRelationship
 from onegov.core.utils import Bunch
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -25,8 +26,33 @@ from wtforms.validators import ValidationError
 
 class ElectionCompoundForm(Form):
 
+    id_hint = PanelField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        kind='callout',
+        text=_(
+            "The ID is used in the URL and might be used somewhere. "
+            "Changing the ID might break links on external sites!"
+        )
+    )
+
+    id = StringField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        validators=[
+            InputRequired()
+        ],
+    )
+
+    external_id = StringField(
+        label=_("External ID"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+    )
+
     domain = RadioField(
         label=_("Domain"),
+        fieldset=_("Properties"),
         choices=[
             ('canton', _("Cantonal"))
         ],
@@ -38,25 +64,30 @@ class ElectionCompoundForm(Form):
 
     domain_elections = RadioField(
         label=_("Domain of the elections"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ]
     )
 
-    shortcode = StringField(
-        label=_("Shortcode")
-    )
-
     date = DateField(
         label=_("Date"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
         default=date.today
     )
 
+    shortcode = StringField(
+        label=_("Shortcode"),
+        fieldset=_("Properties"),
+        render_kw={'long_description': _("Used for sorting.")}
+    )
+
     region_elections = ChosenSelectMultipleField(
         label=_("Elections"),
+        fieldset=_("Properties"),
         choices=[],
         validators=[
             InputRequired()
@@ -66,6 +97,7 @@ class ElectionCompoundForm(Form):
 
     district_elections = ChosenSelectMultipleField(
         label=_("Elections"),
+        fieldset=_("Properties"),
         choices=[],
         validators=[
             InputRequired()
@@ -75,6 +107,7 @@ class ElectionCompoundForm(Form):
 
     municipality_elections = ChosenSelectMultipleField(
         label=_("Elections"),
+        fieldset=_("Properties"),
         choices=[],
         validators=[
             InputRequired()
@@ -317,6 +350,15 @@ class ElectionCompoundForm(Form):
                 _('Invalid color definitions')
             ) from exception
 
+    def validate_id(self, field):
+        if normalize_for_url(field.data) != field.data:
+            raise ValidationError(_('Invalid ID'))
+        if self.model.id != field.data:
+            query = self.request.session.query(self.model.__class__.id)
+            query = query.filter_by(id=field.data)
+            if query.first():
+                raise ValidationError(_('ID already exists'))
+
     def on_request(self):
         principal = self.request.app.principal
 
@@ -426,6 +468,9 @@ class ElectionCompoundForm(Form):
             )
 
     def update_model(self, model):
+        if self.id:
+            model.id = self.id.data
+        model.external_id = self.external_id.data
         model.domain = self.domain.data
         model.domain_elections = self.domain_elections.data
         model.date = self.date.data
@@ -503,6 +548,9 @@ class ElectionCompoundForm(Form):
             self.update_realtionships(model, 'other')
 
     def apply_model(self, model):
+        self.id.data = model.id
+        self.external_id.data = model.external_id
+
         titles = model.title_translations or {}
         self.election_de.data = titles.get('de_CH')
         self.election_fr.data = titles.get('fr_CH')

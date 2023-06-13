@@ -16,6 +16,7 @@ def create_vote(app):
     client = Client(app)
     login(client)
     new = client.get('/manage/votes/new-vote')
+    new.form['external_id'] = '100'
     new.form['vote_de'] = 'Vote'
     new.form['date'] = '2015-01-01'
     new.form['domain'] = 'federation'
@@ -26,6 +27,7 @@ def create_election(app, type, create_compound=False):
     client = Client(app)
     login(client)
     new = client.get('/manage/elections/new-election')
+    new.form['external_id'] = '200'
     new.form['election_de'] = 'Election'
     new.form['date'] = '2015-01-01'
     new.form['mandates'] = 1
@@ -35,7 +37,8 @@ def create_election(app, type, create_compound=False):
 
     if create_compound:
         new = client.get('/manage/election-compounds/new-election-compound')
-        new.form['election_de'] = "Elections"
+        new.form['external_id'] = '300'
+        new.form['election_de'] = 'Elections'
         new.form['date'] = '2015-01-01'
         new.form['municipality_elections'] = ['election']
         new.form['domain'] = 'canton'
@@ -167,24 +170,24 @@ def test_view_rest_vote(election_day_app_zg):
 
     create_vote(election_day_app_zg)
 
-    params = (
-        ('id', 'vote'),
-        ('type', 'vote'),
-        ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-    )
+    for id_ in ('vote', '100'):
+        params = (
+            ('id', id_),
+            ('type', 'vote'),
+            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+        )
+        with patch(
+            'onegov.election_day.views.upload.rest.import_vote_internal',
+            return_value=[]
+        ) as import_:
+            result = client.post('/upload', params=params)
+            assert result.json['status'] == 'success'
 
-    with patch(
-        'onegov.election_day.views.upload.rest.import_vote_internal',
-        return_value=[]
-    ) as import_:
-        result = client.post('/upload', params=params)
-        assert result.json['status'] == 'success'
-
-        assert import_.called
-        assert isinstance(import_.call_args[0][0], Vote)
-        assert isinstance(import_.call_args[0][1], Canton)
-        assert isinstance(import_.call_args[0][2], BytesIO)
-        assert import_.call_args[0][3] == 'application/octet-stream'
+            assert import_.called
+            assert isinstance(import_.call_args[0][0], Vote)
+            assert isinstance(import_.call_args[0][1], Canton)
+            assert isinstance(import_.call_args[0][2], BytesIO)
+            assert import_.call_args[0][3] == 'application/octet-stream'
 
 
 def test_view_rest_majorz(election_day_app_zg):
@@ -197,27 +200,27 @@ def test_view_rest_majorz(election_day_app_zg):
 
     create_election(election_day_app_zg, 'majorz')
 
-    params = (
-        ('id', 'election'),
-        ('type', 'election'),
-        ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-    )
+    for id_ in ('election', '200'):
+        params = (
+            ('id', id_),
+            ('type', 'election'),
+            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+        )
+        with patch(
+            (
+                'onegov.election_day.views.upload.rest.'
+                'import_election_internal_majorz'
+            ),
+            return_value=[]
+        ) as import_:
+            result = client.post('/upload', params=params)
+            assert result.json['status'] == 'success'
 
-    with patch(
-        (
-            'onegov.election_day.views.upload.rest.'
-            'import_election_internal_majorz'
-        ),
-        return_value=[]
-    ) as import_:
-        result = client.post('/upload', params=params)
-        assert result.json['status'] == 'success'
-
-        assert import_.called
-        assert isinstance(import_.call_args[0][0], Election)
-        assert isinstance(import_.call_args[0][1], Canton)
-        assert isinstance(import_.call_args[0][2], BytesIO)
-        assert import_.call_args[0][3] == 'application/octet-stream'
+            assert import_.called
+            assert isinstance(import_.call_args[0][0], Election)
+            assert isinstance(import_.call_args[0][1], Canton)
+            assert isinstance(import_.call_args[0][2], BytesIO)
+            assert import_.call_args[0][3] == 'application/octet-stream'
 
 
 def test_view_rest_proporz(election_day_app_zg):
@@ -231,48 +234,50 @@ def test_view_rest_proporz(election_day_app_zg):
     create_election(election_day_app_zg, 'proporz', True)
 
     # election
-    with patch(
-        (
-            'onegov.election_day.views.upload.rest.'
-            'import_election_internal_proporz'
-        ),
-        return_value=[]
-    ) as import_:
-        params = (
-            ('id', 'election'),
-            ('type', 'election'),
-            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-        )
-        result = client.post('/upload', params=params)
-        assert result.json['status'] == 'success'
+    for id_ in ('election', '200'):
+        with patch(
+            (
+                'onegov.election_day.views.upload.rest.'
+                'import_election_internal_proporz'
+            ),
+            return_value=[]
+        ) as import_:
+            params = (
+                ('id', id_),
+                ('type', 'election'),
+                ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+            )
+            result = client.post('/upload', params=params)
+            assert result.json['status'] == 'success'
 
-        assert import_.called
-        assert isinstance(import_.call_args[0][0], Election)
-        assert isinstance(import_.call_args[0][1], Canton)
-        assert isinstance(import_.call_args[0][2], BytesIO)
-        assert import_.call_args[0][3] == 'application/octet-stream'
+            assert import_.called
+            assert isinstance(import_.call_args[0][0], Election)
+            assert isinstance(import_.call_args[0][1], Canton)
+            assert isinstance(import_.call_args[0][2], BytesIO)
+            assert import_.call_args[0][3] == 'application/octet-stream'
 
     # compound
-    with patch(
-        (
-            'onegov.election_day.views.upload.rest.'
-            'import_election_compound_internal'
-        ),
-        return_value=[]
-    ) as import_:
-        params = (
-            ('id', 'elections'),
-            ('type', 'election'),
-            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-        )
-        result = client.post('/upload', params=params)
-        assert result.json['status'] == 'success'
+    for id_ in ('elections', '300'):
+        with patch(
+            (
+                'onegov.election_day.views.upload.rest.'
+                'import_election_compound_internal'
+            ),
+            return_value=[]
+        ) as import_:
+            params = (
+                ('id', id_),
+                ('type', 'election'),
+                ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+            )
+            result = client.post('/upload', params=params)
+            assert result.json['status'] == 'success'
 
-        assert import_.called
-        assert isinstance(import_.call_args[0][0], ElectionCompound)
-        assert isinstance(import_.call_args[0][1], Canton)
-        assert isinstance(import_.call_args[0][2], BytesIO)
-        assert import_.call_args[0][3] == 'application/octet-stream'
+            assert import_.called
+            assert isinstance(import_.call_args[0][0], ElectionCompound)
+            assert isinstance(import_.call_args[0][1], Canton)
+            assert isinstance(import_.call_args[0][2], BytesIO)
+            assert import_.call_args[0][3] == 'application/octet-stream'
 
 
 def test_view_rest_parties(election_day_app_zg):
@@ -286,39 +291,41 @@ def test_view_rest_parties(election_day_app_zg):
     create_election(election_day_app_zg, 'proporz', True)
 
     # election
-    with patch(
-        'onegov.election_day.views.upload.rest.import_party_results',
-        return_value=[]
-    ) as import_:
-        params = (
-            ('id', 'election'),
-            ('type', 'parties'),
-            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-        )
-        result = client.post('/upload', params=params)
-        assert result.json['status'] == 'success'
+    for id_ in ('election', '200'):
+        with patch(
+            'onegov.election_day.views.upload.rest.import_party_results',
+            return_value=[]
+        ) as import_:
+            params = (
+                ('id', id_),
+                ('type', 'parties'),
+                ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+            )
+            result = client.post('/upload', params=params)
+            assert result.json['status'] == 'success'
 
-        assert import_.called
-        assert isinstance(import_.call_args[0][0], Election)
-        assert isinstance(import_.call_args[0][1], Canton)
-        assert isinstance(import_.call_args[0][2], BytesIO)
-        assert import_.call_args[0][3] == 'application/octet-stream'
+            assert import_.called
+            assert isinstance(import_.call_args[0][0], Election)
+            assert isinstance(import_.call_args[0][1], Canton)
+            assert isinstance(import_.call_args[0][2], BytesIO)
+            assert import_.call_args[0][3] == 'application/octet-stream'
 
     # compound
-    with patch(
-        'onegov.election_day.views.upload.rest.import_party_results',
-        return_value=[]
-    ) as import_:
-        params = (
-            ('id', 'elections'),
-            ('type', 'parties'),
-            ('results', Upload('results.csv', 'a'.encode('utf-8'))),
-        )
-        result = client.post('/upload', params=params)
-        assert result.json['status'] == 'success'
+    for id_ in ('elections', '300'):
+        with patch(
+            'onegov.election_day.views.upload.rest.import_party_results',
+            return_value=[]
+        ) as import_:
+            params = (
+                ('id', id_),
+                ('type', 'parties'),
+                ('results', Upload('results.csv', 'a'.encode('utf-8'))),
+            )
+            result = client.post('/upload', params=params)
+            assert result.json['status'] == 'success'
 
-        assert import_.called
-        assert isinstance(import_.call_args[0][0], ElectionCompound)
-        assert isinstance(import_.call_args[0][1], Canton)
-        assert isinstance(import_.call_args[0][2], BytesIO)
-        assert import_.call_args[0][3] == 'application/octet-stream'
+            assert import_.called
+            assert isinstance(import_.call_args[0][0], ElectionCompound)
+            assert isinstance(import_.call_args[0][1], Canton)
+            assert isinstance(import_.call_args[0][2], BytesIO)
+            assert import_.call_args[0][3] == 'application/octet-stream'
