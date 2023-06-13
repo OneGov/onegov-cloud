@@ -41,7 +41,7 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     text = Column(Text, nullable=False)
 
     #: organizer (if the item is an activity)
-    organizer = Column(Text, nullable=False)
+    organizer = Column(Text, nullable=True)
 
     #: true if paid
     paid = Column(Boolean, nullable=False, default=False)
