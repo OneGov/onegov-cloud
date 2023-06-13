@@ -189,7 +189,6 @@ class DeliveryNoteLayout(DefaultLayout):
                 url='#',
                 attrs={
                     'class': 'print-icon',
-                    'onclick': 'window.print();return false;'
                 }
             )
         )

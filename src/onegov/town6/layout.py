@@ -60,6 +60,13 @@ class Layout(OrgLayout):
         ))
 
     @cached_property
+    def sentry_init_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'sentry/js/sentry-init.js'
+        )
+        return self.request.link(static_file)
+
+    @cached_property
     def drilldown_back(self):
         back = self.request.translate(_("back"))
         return '<li class="js-drilldown-back">' \

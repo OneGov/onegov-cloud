@@ -5,7 +5,7 @@ $(document).foundation();
 $('.stackable').stacktable();
 
 // Add backend dropdown actions
-$('ul.actions').each(function(index, element) {
+$('ul.actions').each(function(_index, element) {
     $(element).before(
         $('<a></a>')
             .attr('href', '#')
@@ -29,14 +29,14 @@ $('ul[data-limit]').each(function() {
             .attr('class', 'expand')
             .html(
                 $('<a></a>')
-                .attr('href', '#')
-                .attr('class', 'action-expand')
-                .on('click', function() {
-                    ul.children('li:not(.expand)').show();
-                    ul.children('li.expand').hide();
-                    return false;
-                })
-                .html(ul.data('expand-title') || 'Show all')
+                    .attr('href', '#')
+                    .attr('class', 'action-expand')
+                    .on('click', function() {
+                        ul.children('li:not(.expand)').show();
+                        ul.children('li.expand').hide();
+                        return false;
+                    })
+                    .html(ul.data('expand-title') || 'Show all')
             )
     );
     ul.append(
@@ -44,15 +44,15 @@ $('ul[data-limit]').each(function() {
             .attr('class', 'fold')
             .html(
                 $('<a></a>')
-                .attr('href', '#')
-                .attr('class', 'action-fold')
-                .on('click', function() {
-                    ul.children('li:not(.expand)').slice(ul.data('limit')).hide();
-                    ul.children('li.expand').show();
-                    ul.children('li.fold').hide();
-                    return false;
-                })
-                .html(ul.data('fold-title') || 'Show less')
+                    .attr('href', '#')
+                    .attr('class', 'action-fold')
+                    .on('click', function() {
+                        ul.children('li:not(.expand)').slice(ul.data('limit')).hide();
+                        ul.children('li.expand').show();
+                        ul.children('li.fold').hide();
+                        return false;
+                    })
+                    .html(ul.data('fold-title') || 'Show less')
             )
             .hide()
     );
@@ -67,7 +67,7 @@ $('ul[data-hot-issue]').each(function() {
 
 // Set up the chosen select in the subnavs (they have a different width)
 $('.sub-nav-chosen-select').chosen({
-    search_contains: true,
+    search_contains: true
 });
 
 // Submit the whole notice selection/form when clicking on the state links,
@@ -104,7 +104,7 @@ $('.sub-nav.issue select').on('change', function() {
     $(this).parents('form').submit();
 });
 
-// Make the extended filters ncollapsible
+// Make the extended filters collapsible
 var initSearchFilters = function() {
     var fieldsetLegend = $('fieldset#additional-filters legend');
     var key = 'fieldset-additional-filters-hidden';
@@ -117,7 +117,7 @@ var initSearchFilters = function() {
 
     if (key in localStorage) {
         var value = localStorage.getItem(key);
-        if (value == 'hidden') {
+        if (value === 'hidden') {
             fieldsetLegend.click();
         }
     } else {
@@ -125,3 +125,16 @@ var initSearchFilters = function() {
     }
 };
 initSearchFilters();
+
+// preview
+$('.preview-buttons .action-close').on('click', function(event) {
+    var w = window.self;
+    w.open('', '_self', '');
+    w.close();
+    event.preventDefault();
+});
+
+$('.preview-buttons .action-print').on('click', function(event) {
+    window.print();
+    event.preventDefault();
+});

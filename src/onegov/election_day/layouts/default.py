@@ -94,6 +94,13 @@ class DefaultLayout(ChameleonLayout):
 
         return self.request.link(static_file)
 
+    @cached_property
+    def sentry_init_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'sentry/js/sentry-init.js'
+        )
+        return self.request.link(static_file)
+
     def get_topojson_link(self, id, year):
         return self.request.link(
             StaticFile('mapdata/{}/{}.json'.format(year, id))

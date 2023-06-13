@@ -24,5 +24,4 @@ def get_quill_asset():
     yield 'quill.snow.css'
     yield 'custom.css'
     yield 'quill.js'
-    yield 'quill.placeholder.css'
-    yield 'quill.placeholder.js'
+    yield 'quill-init.js'

@@ -98,8 +98,6 @@ configuration: &global-config
   # Configures sentry tracebacks, usually only used in production or if
   # the sentry integration needs to be tested.
   # sentry_dsn: https://foo@sentry.io/bar
-  # sentry_environment: testing
-  # sentry_version: test
 
   # OneGov holds two sorts of mail. Transactional, non-spammy e-mail or
   # marketing e-mail. Though they can both have different configurations

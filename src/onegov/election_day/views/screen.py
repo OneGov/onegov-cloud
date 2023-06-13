@@ -41,16 +41,15 @@ def view_screen(self, request):
 
     request.include('screen')
 
-    body_attributes = {}
     if self.next:
-        body_attributes['data-next'] = request.link(self.next)
-        body_attributes['data-duration'] = (self.duration or 20) * 1000
+        layout.custom_body_attributes['data-next'] = request.link(self.next)
+        layout.custom_body_attributes['data-duration'] = \
+            (self.duration or 20) * 1000
 
     default = {
         'layout': layout,
         'template': template,
         'screen': self,
-        'body_attributes': body_attributes,
     }
 
     return inject_variables(widgets, layout, self.structure, default, False)

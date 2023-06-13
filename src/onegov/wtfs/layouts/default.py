@@ -2,6 +2,7 @@ from cached_property import cached_property
 from datetime import date
 from onegov.core.elements import Link
 from onegov.core.layout import ChameleonLayout
+from onegov.core.static import StaticFile
 from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.wtfs import _
@@ -67,6 +68,13 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def static_path(self):
         return self.request.link(self.app.principal, 'static')
+
+    @cached_property
+    def sentry_init_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'sentry/js/sentry-init.js'
+        )
+        return self.request.link(static_file)
 
     @cached_property
     def homepage_url(self):
