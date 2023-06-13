@@ -200,14 +200,38 @@ class Canton(Principal):
     """ A cantonal instance. """
 
     CANTONS = {
-        'ag', 'ai', 'ar', 'be', 'bl', 'bs', 'fr', 'ge', 'gl', 'gr', 'ju', 'lu',
-        'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur', 'vd', 'vs',
-        'zg', 'zh'
+        'zh': 1,
+        'be': 2,
+        'lu': 3,
+        'ur': 4,
+        'sz': 5,
+        'ow': 6,
+        'nw': 7,
+        'gl': 8,
+        'zg': 9,
+        'fr': 10,
+        'so': 11,
+        'bs': 12,
+        'bl': 13,
+        'sh': 14,
+        'ar': 15,
+        'ai': 16,
+        'sg': 17,
+        'gr': 18,
+        'ag': 19,
+        'tg': 20,
+        'ti': 21,
+        'vd': 22,
+        'vs': 23,
+        'ne': 24,
+        'ge': 25,
+        'ju': 26,
     }
 
     def __init__(self, canton=None, **kwargs):
         assert canton in self.CANTONS
         self.id = canton
+        self.canton_id = self.CANTONS[canton]  # official BFS number
 
         kwargs.pop('use_maps', None)
 
