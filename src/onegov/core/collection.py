@@ -9,22 +9,31 @@ from onegov.core.orm import func
 
 from typing import Any, Generic, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import SupportsItems
     from abc import abstractmethod
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from sqlalchemy import Column
     from sqlalchemy.orm import Query, Session
     from sqlalchemy.sql.elements import ClauseElement
+    from typing import Protocol
     from typing_extensions import Self
     from uuid import UUID
 
     from onegov.core.orm import Base
-    from onegov.form.core import Form
 
     # TODO: Maybe PKType should be generic as well? Or if we always
     #       use the same kind of primary key, then we can reduce
     #       this type union to something more specific
     PKType = UUID | str | int
     TextColumn = Column[str] | Column[str | None]
+
+    # NOTE: To avoid referencing onegov.form from onegov.core and
+    #       introducing a cross-dependency, we use a Protocol to
+    #       forward declare exactly the attributes we require to
+    #       be implemented for a Form class, so it can be used with
+    #       our GenericCollection
+    class _FormThatSupportsGetUsefulData(Protocol):
+        def get_useful_data(self) -> SupportsItems[str, Any]: ...
 
 
 _M = TypeVar('_M', bound='Base')
@@ -69,7 +78,7 @@ class GenericCollection(Generic[_M]):
 
     def add_by_form(
         self,
-        form: 'Form',
+        form: '_FormThatSupportsGetUsefulData',
         properties: 'Iterable[str] | None' = None
     ) -> _M:
 
