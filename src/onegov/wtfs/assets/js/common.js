@@ -131,3 +131,8 @@ Intercooler.ready(function(element) {
 
     processCommonNodes(el, true);
 });
+
+$("a.print-icon").on("click", function(event) {
+    window.print();
+    event.preventDefault();
+});

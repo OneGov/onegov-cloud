@@ -39,6 +39,13 @@ def view_screen(self, request):
 
     template = PageTemplate(transform_structure(widgets, self.structure))
 
+    request.include('screen')
+
+    if self.next:
+        layout.custom_body_attributes['data-next'] = request.link(self.next)
+        layout.custom_body_attributes['data-duration'] = \
+            (self.duration or 20) * 1000
+
     default = {
         'layout': layout,
         'template': template,

@@ -83,12 +83,12 @@ def view_principal(self, request):
 
     layout = DefaultLayout(self, request)
     archive = ArchivedResultCollection(request.session)
-    latest, last_modified = archive.latest()
-    latest = archive.group_items(latest, request)
+    current, last_modified = archive.current()
+    current = archive.group_items(current, request)
 
     return {
         'layout': layout,
-        'archive_items': latest,
+        'archive_items': current,
         'date': None,
     }
 
@@ -106,8 +106,8 @@ def view_principal_json(self, request):
     """
 
     archive = ArchivedResultCollection(request.session)
-    latest, last_modified = archive.latest()
-    latest = get_summaries(latest, request)
+    current, last_modified = archive.current()
+    current = get_summaries(current, request)
 
     @request.after
     def add_headers(response):
@@ -117,7 +117,7 @@ def view_principal_json(self, request):
     return {
         'canton': self.id,
         'name': self.name,
-        'results': latest,
+        'results': current,
         'archive': {
             str(year): request.link(archive.for_date(year))
             for year in archive.get_years()

@@ -6,12 +6,15 @@ from datetime import datetime
 from dectate import directive
 from more.content_security import NONE
 from more.content_security import SELF
+from more.content_security import UNSAFE_EVAL
+from more.content_security import UNSAFE_INLINE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import current_language_tween_factory
+from onegov.core.framework import default_content_security_policy
 from onegov.core.framework import transaction_tween_factory
 from onegov.core.utils import batched
 from onegov.election_day.directives import CsvFileAction
@@ -185,6 +188,14 @@ def get_i18n_used_locales():
 @ElectionDayApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
+
+
+@ElectionDayApp.setting(section='content_security_policy', name='default')
+def org_content_security_policy():
+    policy = default_content_security_policy()
+    policy.script_src.remove(UNSAFE_EVAL)
+    policy.script_src.remove(UNSAFE_INLINE)
+    return policy
 
 
 @ElectionDayApp.tween_factory(
@@ -431,3 +442,9 @@ def get_backend_common_asset():
     yield 'datetimepicker.js'
     yield 'form_dependencies.js'
     yield 'doubleclick.js'
+
+
+@ElectionDayApp.webasset('screen')
+def get_screen_asset():
+    # Code used for screen update
+    yield 'screen.js'

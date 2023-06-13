@@ -29,7 +29,9 @@ class MockRequest:
         org=Bunch(
             geo_provider='geo-mapbox',
             open_files_target_blank=True
-        )
+        ),
+        version='1.0',
+        sentry_dsn=None
     )
 
     def include(self, *args, **kwargs):
