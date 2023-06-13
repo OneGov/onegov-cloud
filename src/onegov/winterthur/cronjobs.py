@@ -3,6 +3,7 @@ import requests
 
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
+from onegov.winterthur import log
 from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.collections import AddressCollection
 
@@ -36,6 +37,6 @@ def import_dws_vk(request):
         collection.from_ical(response.content,
                              future_events_only=True,
                              event_image=file)
-    print(f"Events successfully imported "
-          f"({len(added)} added, {len(updated)} updated, "
-          f"{len(purged)} deleted)")
+    log.info(f"Events successfully imported "
+             f"({len(added)} added, {len(updated)} updated, "
+             f"{len(purged)} deleted)")
