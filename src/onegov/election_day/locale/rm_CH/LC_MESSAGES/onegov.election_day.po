@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-13 09:45+0200\n"
+"POT-Creation-Date: 2023-06-13 15:30+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -304,6 +304,9 @@ msgstr ""
 msgid "System"
 msgstr "Sistem"
 
+msgid "Properties"
+msgstr ""
+
 msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
 
@@ -331,9 +334,6 @@ msgstr "Vischnanca"
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
 
-msgid "View options"
-msgstr "Opziuns da visualisaziun"
-
 msgid "Expats are listed separately"
 msgstr "Las Svizras ed ils Svizzers a l'exteriur figureschan separadamain"
 
@@ -345,8 +345,23 @@ msgstr ""
 "ils resultats sco lingia separada. Sche questa opziun vegn midada, ston las "
 "datas vegnir importadas anc ina giada."
 
+msgid "Date"
+msgstr "Data"
+
+msgid "Shortcode"
+msgstr "Scursanida"
+
+msgid "Used for sorting."
+msgstr ""
+
+msgid "Mandates / Seats"
+msgstr "Mandats / Sezs"
+
 msgid "Voters counts"
 msgstr "Dumber d'electurs"
+
+msgid "View options"
+msgstr "Opziuns da visualisaziun"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
@@ -397,18 +412,6 @@ msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
 "Mussa ina carta da register cun datas panaschadas. Pretenda resultats da "
 "partidas."
-
-msgid "Date"
-msgstr "Data"
-
-msgid "Shortcode"
-msgstr "Scursanida"
-
-msgid "Used for sorting."
-msgstr ""
-
-msgid "Mandates / Seats"
-msgstr "Mandats / Sezs"
 
 msgid "German"
 msgstr "Tudestg"
@@ -649,9 +652,6 @@ msgstr "Numer dal project"
 
 msgid "Default"
 msgstr "Standard"
-
-msgid "Properties"
-msgstr ""
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"

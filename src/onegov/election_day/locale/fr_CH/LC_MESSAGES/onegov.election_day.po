@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-13 09:45+0200\n"
+"POT-Creation-Date: 2023-06-13 15:30+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -302,6 +302,9 @@ msgstr "Utilisé pour l'importation s'il est défini."
 msgid "System"
 msgstr "Système"
 
+msgid "Properties"
+msgstr "Propriétés"
+
 msgid "Election based on the simple majority system"
 msgstr "Election selon le système majoritaire"
 
@@ -329,9 +332,6 @@ msgstr "Commune"
 msgid "Tacit election"
 msgstr "Élection tacite"
 
-msgid "View options"
-msgstr "Options d'affichage"
-
 msgid "Expats are listed separately"
 msgstr "Les Suisses de l'étranger sont spécifiés séparément"
 
@@ -343,8 +343,23 @@ msgstr ""
 "distincte dans les résultats. La modification de cette option nécessite un "
 "nouveau téléchargement des données."
 
+msgid "Date"
+msgstr "Date"
+
+msgid "Shortcode"
+msgstr "Shortcode"
+
+msgid "Used for sorting."
+msgstr "Utilisé pour le tri."
+
+msgid "Mandates / Seats"
+msgstr "Mandats / Sièges"
+
 msgid "Voters counts"
 msgstr "Nombres de votants"
+
+msgid "View options"
+msgstr "Options d'affichage"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
@@ -396,18 +411,6 @@ msgstr "Panachage (partis)"
 msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
 "Affiche un onglet avec le panachage. Requiert les résultats des parties."
-
-msgid "Date"
-msgstr "Date"
-
-msgid "Shortcode"
-msgstr "Shortcode"
-
-msgid "Used for sorting."
-msgstr "Utilisé pour le tri."
-
-msgid "Mandates / Seats"
-msgstr "Mandats / Sièges"
 
 msgid "German"
 msgstr "Allemand"
@@ -647,9 +650,6 @@ msgstr "Numéro de votation"
 
 msgid "Default"
 msgstr "Défaut"
-
-msgid "Properties"
-msgstr "Propriétés"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"

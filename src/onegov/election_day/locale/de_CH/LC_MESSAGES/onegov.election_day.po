@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-13 09:45+0200\n"
+"POT-Creation-Date: 2023-06-13 15:30+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -304,6 +304,9 @@ msgstr "Wird für den Import verwendet, sofern gesetzt."
 msgid "System"
 msgstr "System"
 
+msgid "Properties"
+msgstr "Eigenschaften"
+
 msgid "Election based on the simple majority system"
 msgstr "Majorzwahl"
 
@@ -331,9 +334,6 @@ msgstr "Gemeinde"
 msgid "Tacit election"
 msgstr "Stille Wahl"
 
-msgid "View options"
-msgstr "Ansichtsoptionen"
-
 msgid "Expats are listed separately"
 msgstr "Auslandschweizer werden separat aufgeführt"
 
@@ -345,8 +345,23 @@ msgstr ""
 "und aufgeführt. Ein Verändern dieser Option erfordert ein erneutes Hochladen "
 "der Daten."
 
+msgid "Date"
+msgstr "Datum"
+
+msgid "Shortcode"
+msgstr "Kürzel"
+
+msgid "Used for sorting."
+msgstr "Wird für die Sortierung verwendet."
+
+msgid "Mandates / Seats"
+msgstr "Mandate / Sitze"
+
 msgid "Voters counts"
 msgstr "Wählerzahlen"
+
+msgid "View options"
+msgstr "Ansichtsoptionen"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
@@ -397,18 +412,6 @@ msgstr "Panaschierstatistik (Parteien)"
 msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
 "Zeigt eine Registerkarte mit Panaschierdaten an. Erfordert Parteiergebnisse."
-
-msgid "Date"
-msgstr "Datum"
-
-msgid "Shortcode"
-msgstr "Kürzel"
-
-msgid "Used for sorting."
-msgstr "Wird für die Sortierung verwendet."
-
-msgid "Mandates / Seats"
-msgstr "Mandate / Sitze"
 
 msgid "German"
 msgstr "Deutsch"
@@ -647,9 +650,6 @@ msgstr "Vorlagen-Nummer"
 
 msgid "Default"
 msgstr "Standard"
-
-msgid "Properties"
-msgstr "Eigenschaften"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel der Abstimmung/der Vorlage"
