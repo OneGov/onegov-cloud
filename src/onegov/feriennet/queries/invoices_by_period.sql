@@ -11,6 +11,7 @@ details AS (
         users.username,
         "group",
         "text",
+        "organizer",
         "family",
         paid as paid,
         unit * quantity as amount,
@@ -78,6 +79,7 @@ invoices AS (
         INITCAP(users.realname) as realname,
         details.group,
         details.text,
+        details.organizer,
         details.family,
         details.paid,
         details.amount,
@@ -121,6 +123,7 @@ SELECT
     username,            -- Text
     "group",             -- Text
     "text",              -- Text
+    "organizer",         -- Text
     "family",            -- Text
     paid,                -- Boolean
     has_online_payments, -- Boolean
