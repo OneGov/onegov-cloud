@@ -6,7 +6,9 @@
         <p i18n:translate>We have received your deregistration for <tal:b i18n:name="name">${name}</tal:b>.</p>
         <p>
             <s><b i18n:translate>${model.occasion.activity.title}</b></s><br>
-            <s>${layout.format_datetime_range(dates[0], dates[1])}</s>
+            <tal:b tal:repeat="date dates">
+                <s>${layout.format_datetime_range(date.localized_start, date.localized_end)}</s><br>
+            </tal:b>
         </p>
         <p>
             <tal:b i18n:translate>You can find an overview of all bookings here:</tal:b><br>
