@@ -23,9 +23,16 @@ def import_dws_vk(request):
     """
     ical_url = 'https://www.google.com/calendar/ical/dwskalender%40gmail.com' \
                '/public/basic.ics'
-    response = requests.get(ical_url, timeout=30)
+    try:
+        response = requests.get(ical_url, timeout=30)
+    except (requests.exceptions.RequestException,
+            requests.exceptions.Timeout, Exception) as e:
+        raise Exception(f'Failed to retrieve DWS events from {ical_url}') \
+            from e
+
     if not response.status_code == 200:
-        raise Exception(f'Failed to retrieve DWS events from {ical_url}')
+        raise Exception(f'Failed to retrieve DWS events from {ical_url}. '
+                        f'Status code: {response.status_code}')
 
     icon_name = 'Veranstaltung_breit.jpg'
     icon_path = module_path('onegov.winterthur', 'static') + os.sep + icon_name
