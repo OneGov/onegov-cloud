@@ -49,6 +49,14 @@ class ResourceRecipientForm(Form):
                      "obenstehenden Empfänger gesendet."),
     )
 
+    internal_notes = BooleanField(
+        label=_("Internal Notes"),
+        fieldset=_("Notifications *"),
+        description=("Bei jeder neuen Notiz auf einer Reservation wird eine "
+                     "Benachrichtigung an den obenstehenden Empfänger "
+                     "gesendet."),
+    )
+
     send_on = MultiCheckboxField(
         label=_("Send on"),
         fieldset="Tage und Ressourcen",

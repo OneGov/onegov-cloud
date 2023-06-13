@@ -28,6 +28,8 @@ from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
+from onegov.org.views.reservation import\
+    send_resource_recipient_email_if_enabled
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
@@ -353,8 +355,15 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
 def handle_new_note(self, request, form, layout=None):
 
     if form.submitted(request):
-        TicketNote.create(self, request, form.text.data, form.file.create())
+        message = form.text.data,
+        note = TicketNote.create(self, request, message, form.file.create())
         request.success(_("Your note was added"))
+
+        send_resource_recipient_email_if_enabled(
+            self, request, form,
+            message=note,
+            template='mail_internal_notes_notification.pt')
+
         return request.redirect(request.link(self))
 
     return {

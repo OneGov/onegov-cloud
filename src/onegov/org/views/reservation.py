@@ -23,7 +23,7 @@ from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.reservation import Allocation, Reservation, Resource
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, Ticket
 from purl import URL
 from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
@@ -699,6 +699,54 @@ def accept_reservation(self, request, text=None, notify=False):
         request.warning(_("The reservations have already been accepted"))
 
     return request.redirect(request.link(self))
+
+
+def send_resource_recipient_email_if_enabled(self: Ticket, request, form,
+                                             message, template):
+    if not getattr(self.handler, 'resource', None):
+        return
+
+    q = ResourceRecipientCollection(request.session).query()
+    q = q.filter(ResourceRecipient.medium == 'email')
+    q = q.order_by(None).order_by(ResourceRecipient.address)
+    q = q.with_entities(
+        ResourceRecipient.address,
+        ResourceRecipient.content
+    )
+
+    recipients = [
+        r.address
+        for r in q
+        if (
+            self.handler.resource in r.content['resources']
+            and r.content.get('internal_notes', False)
+        )
+    ]
+
+    # E-mail for notes on reservations
+    args = {
+        'layout': DefaultMailLayout(object(), request),
+        'title': request.translate(
+            _("${org} New internal Note in Reservation(s)", mapping={
+                'org': request.app.org.title
+            })
+        ),
+        'form': form,
+        'model': self,
+        'resource': self.handler.resource,
+        'show_submission': True,
+        'reservations': self.handler.reservations,
+        'message': message
+    }
+
+    content = render_template(template, request, args)
+
+    for r in recipients:
+        request.app.send_transactional_email(
+            subject=args['title'],
+            receivers=(r),
+            content=content,
+        )
 
 
 @OrgApp.form(model=Reservation, name='accept-with-message', permission=Private,
