@@ -20,8 +20,9 @@ from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     TicketMessage, TicketChatMessage, ReservationMessage,
-    ResourceRecipient, ResourceRecipientCollection)
+    ResourceRecipient, ResourceRecipientCollection, TicketNote)
 from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.request import OrgRequest
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection, Ticket
 from purl import URL
@@ -701,9 +702,11 @@ def accept_reservation(self, request, text=None, notify=False):
     return request.redirect(request.link(self))
 
 
-def send_resource_recipient_email_if_enabled(self: Ticket, request, form,
-                                             message, template):
+def send_resource_recipient_email_if_enabled(
+    self: Ticket, request: OrgRequest, form, note: TicketNote, template: str
+):
     if not getattr(self.handler, 'resource', None):
+        # Only send mails for tickets belonging to a resource
         return
 
     q = ResourceRecipientCollection(request.session).query()
@@ -736,11 +739,11 @@ def send_resource_recipient_email_if_enabled(self: Ticket, request, form,
         'resource': self.handler.resource,
         'show_submission': True,
         'reservations': self.handler.reservations,
-        'message': message
+        'message': note
     }
-
     content = render_template(template, request, args)
 
+    assert len(recipients) > 0
     for r in recipients:
         request.app.send_transactional_email(
             subject=args['title'],

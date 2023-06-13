@@ -359,10 +359,14 @@ def handle_new_note(self, request, form, layout=None):
         note = TicketNote.create(self, request, message, form.file.create())
         request.success(_("Your note was added"))
 
-        send_resource_recipient_email_if_enabled(
-            self, request, form,
-            message=note,
-            template='mail_internal_notes_notification.pt')
+        if note.text and note.text[0]:
+            send_resource_recipient_email_if_enabled(
+                self,
+                request,
+                form,
+                note,
+                'mail_internal_notes_notification.pt',
+            )
 
         return request.redirect(request.link(self))
 
