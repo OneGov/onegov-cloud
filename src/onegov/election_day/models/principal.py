@@ -290,6 +290,7 @@ class Canton(Principal):
         domains_vote = OrderedDict()
         domains_vote['federation'] = _("Federal")
         domains_vote['canton'] = _("Cantonal")
+        domains_vote['municipality'] = _("Communal")
 
         super(Canton, self).__init__(
             id_=canton,

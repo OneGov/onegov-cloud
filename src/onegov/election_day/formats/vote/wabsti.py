@@ -8,6 +8,8 @@ from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.mappings import WABSTI_VOTE_HEADERS
 
 
+# todo: municipality
+
 def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 

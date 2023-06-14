@@ -3,6 +3,7 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
 from onegov.election_day.formats.common import validate_integer
@@ -72,6 +73,11 @@ def import_vote_internal(vote, principal, file, mimetype):
                         'name': entity_id
                     }))
             else:
+                # validate domain_segment
+                # todo: store for later usage?
+                name, district, superregion = get_entity_and_district(
+                    entity_id, entities, vote, principal, line_errors
+                )
                 added_entity_ids[ballot_type].add(entity_id)
 
         # Skip expats if not enabled
@@ -169,11 +175,18 @@ def import_vote_internal(vote, principal, file, mimetype):
             remaining.add(0)
         remaining -= added_entity_ids[ballot_type]
         for entity_id in remaining:
-            entity = entities.get(entity_id, {})
+            name, district, superregion = get_entity_and_district(
+                entity_id, entities, vote, principal
+            )
+            if vote.domain == 'municipality':
+                if principal.domain != 'municipality':
+                    if name != vote.domain_segment:
+                        continue
+
             ballot_results[ballot_type].append(
                 dict(
-                    name=entity.get('name', ''),
-                    district=entity.get('district', ''),
+                    name=name,
+                    district=district,
                     counted=False,
                     entity_id=entity_id
                 )

@@ -162,7 +162,7 @@ def load_csv(
 
 
 def get_entity_and_district(
-    entity_id, entities, election, principal, errors=None
+    entity_id, entities, election_or_vote, principal, errors=None
 ):
     """ Returns the entity name and district or region (from our static data,
     depending on the domain of the election). Adds optionally an error, if the
@@ -176,28 +176,28 @@ def get_entity_and_district(
     entity = entities.get(entity_id, {})
     name = entity.get('name', '')
     district = entity.get('district', '')
-    if election.domain == 'region':
+    if election_or_vote.domain == 'region':
         district = entity.get('region', '')
     superregion = entity.get('superregion', '')
 
     if errors is not None:
-        if election.domain == 'municipality':
-            if election.domain_segment != name:
+        if election_or_vote.domain == 'municipality':
+            if election_or_vote.domain_segment != name:
                 if principal.domain != 'municipality':
                     errors.append(_(
-                        "${name} is not part of this election",
+                        "${name} is not part of this item",
                         mapping={
                             'name': entity_id,
-                            'district': election.domain_segment
+                            'district': election_or_vote.domain_segment
                         }
                     ))
-        if election.domain in ('region', 'district'):
-            if election.domain_segment != district:
+        if election_or_vote.domain in ('region', 'district'):
+            if election_or_vote.domain_segment != district:
                 errors.append(_(
                     "${name} is not part of ${district}",
                     mapping={
                         'name': entity_id,
-                        'district': election.domain_segment
+                        'district': election_or_vote.domain_segment
                     }
                 ))
 

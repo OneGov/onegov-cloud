@@ -3,6 +3,7 @@ from onegov.ballot import Vote
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PanelField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
@@ -61,6 +62,15 @@ class VoteForm(Form):
         validators=[
             InputRequired()
         ]
+    )
+
+    municipality = ChosenSelectField(
+        label=_("Municipality"),
+        fieldset=_("Properties"),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain', 'municipality'),
     )
 
     has_expats = BooleanField(
@@ -218,6 +228,18 @@ class VoteForm(Form):
             (key, text) for key, text in principal.domains_vote.items()
         ]
 
+        municipalities = set([
+            entity.get('name', None)
+            for year in principal.entities.values()
+            for entity in year.values()
+            if entity.get('name', None)
+        ])
+        self.municipality.choices = [
+            (item, item) for item in sorted(municipalities)
+        ]
+        if principal.domain == 'municipality':
+            self.municipality.choices = [(principal.name, principal.name)]
+
         self.vote_de.validators = []
         self.vote_fr.validators = []
         self.vote_it.validators = []
@@ -239,6 +261,8 @@ class VoteForm(Form):
         model.external_id = self.external_id.data
         model.date = self.date.data
         model.domain = self.domain.data
+        if model.domain == 'municipality':
+            model.domain_segment = self.municipality.data
         model.has_expats = self.has_expats.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
@@ -315,6 +339,8 @@ class VoteForm(Form):
 
         self.date.data = model.date
         self.domain.data = model.domain
+        if model.domain == 'municipality':
+            self.municipality.data = model.domain_segment
         self.has_expats.data = model.has_expats
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 08:34+0200\n"
+"POT-Creation-Date: 2023-06-14 10:38+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -67,8 +67,8 @@ msgid "The file contains an empty line."
 msgstr "Il file contiene una riga vuota."
 
 #, python-format
-msgid "${name} is not part of this election"
-msgstr "non fa parte di questa elezione"
+msgid "${name} is not part of this item"
+msgstr "${name} non fa parte di questo oggetto"
 
 #, python-format
 msgid "${name} is not part of ${district}"

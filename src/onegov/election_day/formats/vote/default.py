@@ -7,6 +7,8 @@ from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.mappings import DEFAULT_VOTE_HEADER
 
 
+# todo: municipality
+
 def import_vote_default(vote, principal, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.

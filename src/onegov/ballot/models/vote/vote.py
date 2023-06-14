@@ -265,6 +265,10 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: resultas (typically with entity_id = 0)
     has_expats = meta_property('expats', default=False)
 
+    #: The segment of the domain. This might be the municipality, if this is a
+    #: communal vote.
+    domain_segment = meta_property('domain_segment', default='')
+
     def clear_results(self):
         """ Clear all the results. """
 
