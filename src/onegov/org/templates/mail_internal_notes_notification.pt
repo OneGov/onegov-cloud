@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="body">
         <p i18n:translate>Hello!</p>
         <p i18n:translate>
-            New note in Ticket <a href="${request.link(model)}" i18n:name="link" i18n:translate>${ticket_reference}:</a>
+            New note in Ticket <a href="${request.link(model)}" i18n:name="link">${ticket_reference}:</a>
         </p>
 
 

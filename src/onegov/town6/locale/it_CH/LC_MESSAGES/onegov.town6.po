@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-04-24 11:54+0200\n"
+"POT-Creation-Date: 2023-06-14 15:09+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1284,11 +1284,20 @@ msgstr "L'evento è stato accettato:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Purtroppo l'evento è stato rifiutato:"
 
-msgid "The following reservations have been accepted:"
-msgstr "Sono state accettate le seguenti prenotazioni:"
+msgid "New note in Ticket ${link}"
+msgstr ""
 
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+
+msgid "The following reservations have been accepted:"
+msgstr "Sono state accettate le seguenti prenotazioni:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1746,6 +1755,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for internal notes on reservations."
+msgstr ""
 
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."

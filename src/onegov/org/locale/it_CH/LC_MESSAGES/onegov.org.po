@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-05-25 11:48+0200\n"
+"POT-Creation-Date: 2023-06-14 15:28+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -908,6 +908,9 @@ msgstr "File Excel"
 msgid "JSON File"
 msgstr "File JSON"
 
+msgid "XML File"
+msgstr "File XML"
+
 msgid "Minimum price total"
 msgstr "Prezzo minimo totale"
 
@@ -1169,6 +1172,9 @@ msgstr "Notifiche *"
 
 msgid "Daily Reservations"
 msgstr "Prenotazioni giornaliere"
+
+msgid "Internal Notes"
+msgstr "Note interne"
 
 msgid "Send on"
 msgstr "Invia il"
@@ -3256,6 +3262,21 @@ msgstr "L'evento è stato accettato:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Purtroppo l'evento è stato rifiutato:"
 
+msgid "New note in Ticket ${link}"
+msgstr "Nuova nota nel ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} ha scritto"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die Benachrichtigung für Notiz zu Reservierungen für ${request.app."
+"org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
+"Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
 
@@ -3271,9 +3292,6 @@ msgstr "Oppure modificando le impostazioni nel tuo profilo utente."
 
 msgid "The following reservations have been accepted:"
 msgstr "Sono state accettate le seguenti prenotazioni:"
-
-msgid "${author} wrote"
-msgstr "${author} ha scritto"
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -3565,6 +3583,9 @@ msgstr ""
 "controllare l'URL per eventuali errori o utilizza la casella di ricerca in "
 "alto."
 
+msgid "Back"
+msgstr "Indietro"
+
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
 
@@ -3733,6 +3754,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
+
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
 
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."
@@ -4842,6 +4866,10 @@ msgstr "Le prenotazioni sono state accettate"
 
 msgid "The reservations have already been accepted"
 msgstr "Le prenotazioni sono già state accettate"
+
+#, python-format
+msgid "${org} New Note in Reservation for ${resource_title}"
+msgstr "${org} Nuova nota nella prenotazione per ${resource_title}"
 
 msgid "The submitter email is not available"
 msgstr "L'e-mail del mittente non è disponibile"
