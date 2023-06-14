@@ -166,7 +166,7 @@ def get_entity_and_district(
 ):
     """ Returns the entity name and district or region (from our static data,
     depending on the domain of the election). Adds optionally an error, if the
-    district or region is not part of this election.
+    district or region is not part of this election or vote.
 
     """
 
@@ -185,7 +185,7 @@ def get_entity_and_district(
             if election_or_vote.domain_segment != name:
                 if principal.domain != 'municipality':
                     errors.append(_(
-                        "${name} is not part of this item",
+                        "${name} is not part of this business",
                         mapping={
                             'name': entity_id,
                             'district': election_or_vote.domain_segment

@@ -67,7 +67,7 @@ msgid "The file contains an empty line."
 msgstr "Il file contiene una riga vuota."
 
 #, python-format
-msgid "${name} is not part of this item"
+msgid "${name} is not part of this business"
 msgstr "${name} non fa parte di questo oggetto"
 
 #, python-format

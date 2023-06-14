@@ -20,6 +20,7 @@ def test_vote_form_on_request():
     assert form.domain.choices == [
         ('federation', 'Federal'),
         ('canton', 'Cantonal'),
+        ('municipality', 'Communal'),
     ]
     assert isinstance(form.vote_de.validators[0], InputRequired)
     assert form.vote_fr.validators == []

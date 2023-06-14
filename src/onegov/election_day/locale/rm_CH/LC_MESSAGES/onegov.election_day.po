@@ -68,7 +68,7 @@ msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
 #, python-format
-msgid "${name} is not part of this item"
+msgid "${name} is not part of this business"
 msgstr "${name} n'è betg ina part da questa fatschenta"
 
 #, python-format
