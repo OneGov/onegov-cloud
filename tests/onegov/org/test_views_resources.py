@@ -2447,7 +2447,7 @@ def test_resource_recipient_overview(client):
     page = client.get('/resource-recipients')
     assert "John" in page
     assert "john@example.org" in page
-    assert "Erhält Benachtchtigungen für neue Reservationen." in page
+    assert "Erhält Benachrichtigungen für neue Reservationen." in page
     assert "für Reservationen des Tages an folgenden Tagen:" in page
     assert "Fr , So" in page
     assert "Gymnasium" in page
