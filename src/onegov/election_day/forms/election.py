@@ -1,7 +1,9 @@
 from datetime import date
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.ballot import ElectionRelationship
 from onegov.core.utils import Bunch
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
@@ -28,8 +30,33 @@ from wtforms.validators import ValidationError
 
 class ElectionForm(Form):
 
+    id_hint = PanelField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        kind='callout',
+        text=_(
+            "The ID is used in the URL and might be used somewhere. "
+            "Changing the ID might break links on external sites!"
+        )
+    )
+
+    id = StringField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        validators=[
+            InputRequired()
+        ],
+    )
+
+    external_id = StringField(
+        label=_("External ID"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+    )
+
     election_type = RadioField(
         label=_("System"),
+        fieldset=_("Properties"),
         choices=[
             ('majorz', _("Election based on the simple majority system")),
             ('proporz', _("Election based on proportional representation")),
@@ -42,6 +69,7 @@ class ElectionForm(Form):
 
     majority_type = RadioField(
         label=_("Majority Type"),
+        fieldset=_("Properties"),
         choices=[
             ('absolute', _("Absolute")),
             ('relative', _("Relative")),
@@ -55,6 +83,7 @@ class ElectionForm(Form):
 
     absolute_majority = IntegerField(
         label=_("Absolute majority"),
+        fieldset=_("Properties"),
         validators=[
             Optional(),
             NumberRange(min=1)
@@ -64,6 +93,7 @@ class ElectionForm(Form):
 
     domain = RadioField(
         label=_("Domain"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ]
@@ -71,6 +101,7 @@ class ElectionForm(Form):
 
     region = ChosenSelectField(
         label=_("District"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
@@ -79,6 +110,7 @@ class ElectionForm(Form):
 
     district = ChosenSelectField(
         label=_("District"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
@@ -87,6 +119,7 @@ class ElectionForm(Form):
 
     municipality = ChosenSelectField(
         label=_("Municipality"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ],
@@ -95,18 +128,42 @@ class ElectionForm(Form):
 
     tacit = BooleanField(
         label=_("Tacit election"),
-        fieldset=_("View options"),
+        fieldset=_("Properties"),
         render_kw=dict(force_simple=True)
     )
 
     has_expats = BooleanField(
         label=_("Expats are listed separately"),
-        fieldset=_("View options"),
+        fieldset=_("Properties"),
         description=_(
             "Expats are uploaded and listed as a separate row in the results. "
             "Changing this option requires a new upload of the data."
         ),
         render_kw=dict(force_simple=True)
+    )
+
+    date = DateField(
+        label=_("Date"),
+        fieldset=_("Properties"),
+        validators=[
+            InputRequired()
+        ],
+        default=date.today
+    )
+
+    shortcode = StringField(
+        label=_("Shortcode"),
+        fieldset=_("Properties"),
+        render_kw={'long_description': _("Used for sorting.")}
+    )
+
+    mandates = IntegerField(
+        label=_("Mandates / Seats"),
+        fieldset=_("Properties"),
+        validators=[
+            InputRequired(),
+            NumberRange(min=1)
+        ]
     )
 
     voters_counts = BooleanField(
@@ -166,26 +223,6 @@ class ElectionForm(Form):
         ),
         fieldset=_("Views"),
         render_kw=dict(force_simple=True)
-    )
-
-    date = DateField(
-        label=_("Date"),
-        validators=[
-            InputRequired()
-        ],
-        default=date.today
-    )
-
-    mandates = IntegerField(
-        label=_("Mandates / Seats"),
-        validators=[
-            InputRequired(),
-            NumberRange(min=1)
-        ]
-    )
-
-    shortcode = StringField(
-        label=_("Shortcode")
     )
 
     election_de = StringField(
@@ -257,6 +294,7 @@ class ElectionForm(Form):
 
     color_hint = PanelField(
         label=_('Color suggestions'),
+        fieldset=_("Colors"),
         hide_label=False,
         text=(
             'AL #a74c97\n'
@@ -276,6 +314,7 @@ class ElectionForm(Form):
 
     colors = TextAreaField(
         label=_('Colors'),
+        fieldset=_("Colors"),
         render_kw={'rows': 12},
         description=(
 
@@ -300,6 +339,27 @@ class ElectionForm(Form):
             raise ValidationError(
                 _('Invalid color definitions')
             ) from exception
+
+    def validate_id(self, field):
+        if normalize_for_url(field.data) != field.data:
+            raise ValidationError(_('Invalid ID'))
+        if self.model.id != field.data:
+            query = self.request.session.query(Election)
+            query = query.filter_by(id=field.data)
+            if query.first():
+                raise ValidationError(_('ID already exists'))
+
+    def validate_external_id(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'external_id')
+                or self.model.external_id != field.data
+            ):
+                for cls in (Election, ElectionCompound):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
 
     def on_request(self):
         principal = self.request.app.principal
@@ -402,6 +462,9 @@ class ElectionForm(Form):
     def update_model(self, model):
         principal = self.request.app.principal
 
+        if self.id:
+            model.id = self.id.data
+        model.external_id = self.external_id.data
         model.date = self.date.data
         model.domain = self.domain.data
         model.domain_supersegment = ''
@@ -468,6 +531,9 @@ class ElectionForm(Form):
             self.update_realtionships(model, 'other')
 
     def apply_model(self, model):
+        self.id.data = model.id
+        self.external_id.data = model.external_id
+
         titles = model.title_translations or {}
         self.election_de.data = titles.get('de_CH')
         self.election_fr.data = titles.get('fr_CH')

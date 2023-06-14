@@ -1,6 +1,9 @@
 from datetime import date
+from onegov.ballot import Vote
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.form import Form
+from onegov.form.fields import PanelField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
@@ -10,12 +13,38 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import ValidationError
 
 
 class VoteForm(Form):
 
+    id_hint = PanelField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        kind='callout',
+        text=_(
+            "The ID is used in the URL and might be used somewhere. "
+            "Changing the ID might break links on external sites!"
+        )
+    )
+
+    id = StringField(
+        label=_("Identifier"),
+        fieldset=_("Identifier"),
+        validators=[
+            InputRequired()
+        ],
+    )
+
+    external_id = StringField(
+        label=_("External ID"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+    )
+
     vote_type = RadioField(
-        _("Type"),
+        label=_("Type"),
+        fieldset=_("Properties"),
         choices=[
             ('simple', _("Simple Vote")),
             ('complex', _("Vote with Counter-Proposal")),
@@ -28,6 +57,7 @@ class VoteForm(Form):
 
     domain = RadioField(
         label=_("Domain"),
+        fieldset=_("Properties"),
         validators=[
             InputRequired()
         ]
@@ -35,6 +65,7 @@ class VoteForm(Form):
 
     has_expats = BooleanField(
         label=_("Expats are listed separately"),
+        fieldset=_("Properties"),
         description=_(
             "Expats are uploaded and listed as a separate row in the results. "
             "Changing this option requires a new upload of the data."
@@ -44,12 +75,15 @@ class VoteForm(Form):
 
     date = DateField(
         label=_("Date"),
+        fieldset=_("Properties"),
         validators=[InputRequired()],
         default=date.today
     )
 
     shortcode = StringField(
-        label=_("Shortcode")
+        label=_("Shortcode"),
+        fieldset=_("Properties"),
+        render_kw={'long_description': _("Used for sorting.")}
     )
 
     vote_de = StringField(
@@ -157,6 +191,26 @@ class VoteForm(Form):
         fieldset=_("Related link")
     )
 
+    def validate_id(self, field):
+        if normalize_for_url(field.data) != field.data:
+            raise ValidationError(_('Invalid ID'))
+        if self.model.id != field.data:
+            query = self.request.session.query(Vote.id)
+            query = query.filter_by(id=field.data)
+            if query.first():
+                raise ValidationError(_('ID already exists'))
+
+    def validate_external_id(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'external_id')
+                or self.model.external_id != field.data
+            ):
+                query = self.request.session.query(Vote.external_id)
+                query = query.filter_by(external_id=field.data)
+                if query.first():
+                    raise ValidationError(_('ID already exists'))
+
     def on_request(self):
         principal = self.request.app.principal
 
@@ -180,6 +234,9 @@ class VoteForm(Form):
             self.vote_rm.validators.append(InputRequired())
 
     def update_model(self, model):
+        if self.id:
+            model.id = self.id.data
+        model.external_id = self.external_id.data
         model.date = self.date.data
         model.domain = self.domain.data
         model.has_expats = self.has_expats.data
@@ -241,6 +298,9 @@ class VoteForm(Form):
             model.tie_breaker.title_translations = titles
 
     def apply_model(self, model):
+        self.id.data = model.id
+        self.external_id.data = model.external_id
+
         titles = model.title_translations or {}
         self.vote_de.data = titles.get('de_CH')
         self.vote_fr.data = titles.get('fr_CH')

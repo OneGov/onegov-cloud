@@ -50,6 +50,9 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: identifies the vote, may be used in the url, generated from the title
     id = Column(Text, primary_key=True)
 
+    #: external identifier
+    external_id = Column(Text, nullable=True)
+
     #: shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
 

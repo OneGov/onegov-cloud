@@ -20,6 +20,7 @@ from onegov.election_day.models import UploadToken
 from onegov.election_day.views.upload import set_locale
 from onegov.election_day.views.upload import translate_errors
 from onegov.election_day.views.upload import unsupported_year_error
+from sqlalchemy import or_
 from webob.exc import HTTPUnauthorized
 
 
@@ -80,13 +81,26 @@ def view_upload_rest(self, request):
     # Check the ID
     session = request.session
     if form.type.data == 'vote':
-        item = session.query(Vote).filter_by(id=form.id.data).first()
+        item = session.query(Vote).filter(
+            or_(
+                Vote.id == form.id.data,
+                Vote.external_id == form.id.data,
+            )
+        ).first()
     else:
-        item = session.query(ElectionCompound).filter_by(
-            id=form.id.data
+        item = session.query(ElectionCompound).filter(
+            or_(
+                ElectionCompound.id == form.id.data,
+                ElectionCompound.external_id == form.id.data,
+            )
         ).first()
         if not item:
-            item = session.query(Election).filter_by(id=form.id.data).first()
+            item = session.query(Election).filter(
+                or_(
+                    Election.id == form.id.data,
+                    Election.external_id == form.id.data,
+                )
+            ).first()
     if not item:
         errors.setdefault('id', []).append(_("Invalid id"))
 

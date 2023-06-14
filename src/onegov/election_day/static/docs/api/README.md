@@ -59,9 +59,9 @@ The web app allows to upload results in the onegov format using a
 multipart-POST-request to `[base_url]/upload` containing the following fields:
 
 - `type`: The type of upload. This is either `vote`, `election` or `parties`.
-- `id`: The ID of the election compound, election or vote. If `type` is
-  `election` or `parties` an election compound is searched for first, and then
-  an election if none is found.
+- `id`: The ID or external ID of the election compound, election or vote. If
+  `type` is `election` or `parties` an election compound is searched for first,
+  and then an election if none is found.
 - `results`: The results. See the [format_descriptions](format__en.md)
 
 A token must be provided using the passwort part of HTTP basic authentication.
