@@ -89,7 +89,7 @@ def test_reservation_ticket_new_note_sends_email(client):
         name='John',
         medium='email',
         address='john@example.org',
-        internal_notes=True,  # sends email on new internal note
+        internal_notes=True,  # this sends email on new notes on the ticket
         resources=[
             gymnasium.id.hex,
             dailypass.id.hex,

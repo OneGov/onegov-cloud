@@ -52,7 +52,7 @@ class ResourceRecipientForm(Form):
     internal_notes = BooleanField(
         label=_("Internal Notes"),
         fieldset=_("Notifications *"),
-        description=("Bei jeder neuen Notiz auf dem Ticket zu einer"
+        description=("Bei jeder neuen Notiz auf dem Ticket zu einer "
                      "Reservation wird eine Benachrichtigung an den "
                      "obenstehenden Empfänger gesendet."),
     )

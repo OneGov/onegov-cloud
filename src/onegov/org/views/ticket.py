@@ -29,7 +29,7 @@ from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.reservation import\
-    send_resource_recipient_email_if_enabled
+    send_new_note_notification
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
@@ -360,8 +360,7 @@ def handle_new_note(self, request, form, layout=None):
         request.success(_("Your note was added"))
 
         if note.text and note.text[0]:
-            send_resource_recipient_email_if_enabled(
-                self,
+            send_new_note_notification(
                 request,
                 form,
                 note,
