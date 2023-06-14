@@ -52,9 +52,9 @@ class ResourceRecipientForm(Form):
     internal_notes = BooleanField(
         label=_("Internal Notes"),
         fieldset=_("Notifications *"),
-        description=("Bei jeder neuen Notiz auf einer Reservation wird eine "
-                     "Benachrichtigung an den obenstehenden Empfänger "
-                     "gesendet."),
+        description=("Bei jeder neuen Notiz auf dem Ticket zu einer"
+                     "Reservation wird eine Benachrichtigung an den "
+                     "obenstehenden Empfänger gesendet."),
     )
 
     send_on = MultiCheckboxField(
@@ -76,7 +76,8 @@ class ResourceRecipientForm(Form):
 
     def validate(self):
         result = super().validate()
-        if not (self.new_reservations.data or self.daily_reservations.data):
+        if not (self.new_reservations.data or self.daily_reservations.data
+                or self.internal_notes.data):
             self.daily_reservations.errors.append(
                 _("Please add at least one notification.")
             )

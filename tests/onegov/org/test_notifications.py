@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 import transaction
 
 from datetime import datetime
@@ -99,13 +101,11 @@ def test_reservation_ticket_new_note_sends_email(client):
         gymnasium, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
     transaction.commit()
 
-    with client.app.session().no_autoflush:
-        tickets = TicketCollection(client.app.session())
-        assert tickets.query().count() == 1
+    tickets = TicketCollection(client.app.session())
+    assert tickets.query().count() == 1
 
     client.login_admin()
 
-    client.get('/tickets/ALL/open')
     page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     page = page.click("Neue Notiz")
     page.form['text'] = "some note"
@@ -113,3 +113,7 @@ def test_reservation_ticket_new_note_sends_email(client):
 
     assert "some note" in page
     assert len(os.listdir(client.app.maildir)) == 1
+
+    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
+    with open(mail, 'r') as file:
+        assert "some note" in file.read()
