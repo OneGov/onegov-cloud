@@ -1,4 +1,5 @@
 from datetime import date
+from onegov.ballot import Vote
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.form import Form
@@ -194,10 +195,21 @@ class VoteForm(Form):
         if normalize_for_url(field.data) != field.data:
             raise ValidationError(_('Invalid ID'))
         if self.model.id != field.data:
-            query = self.request.session.query(self.model.__class__.id)
+            query = self.request.session.query(Vote.id)
             query = query.filter_by(id=field.data)
             if query.first():
                 raise ValidationError(_('ID already exists'))
+
+    def validate_external_id(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'external_id')
+                or self.model.external_id != field.data
+            ):
+                query = self.request.session.query(Vote.external_id)
+                query = query.filter_by(external_id=field.data)
+                if query.first():
+                    raise ValidationError(_('ID already exists'))
 
     def on_request(self):
         principal = self.request.app.principal

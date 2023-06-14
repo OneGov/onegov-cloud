@@ -153,6 +153,7 @@ def test_vote_form_validate(session):
     session.add(
         Vote(
             id='vote-copy',
+            external_id='ext',
             title=model.title,
             domain=model.domain,
             date=model.date
@@ -185,7 +186,7 @@ def test_vote_form_validate(session):
     assert not form.validate()
     assert form.errors['id'] == ['Invalid ID']
 
-    form = VoteForm(DummyPostData({'id': 'vote-copy'}))
+    form = VoteForm(DummyPostData({'id': 'vote-copy', 'external_id': 'ext'}))
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'de_CH'
     form.request.app.principal = Canton(name='be', canton='be')
@@ -193,11 +194,13 @@ def test_vote_form_validate(session):
     form.model = model
     assert not form.validate()
     assert form.errors['id'] == ['ID already exists']
+    assert form.errors['external_id'] == ['ID already exists']
 
     form = VoteForm(DummyPostData({
         'date': '2020-01-01',
         'domain': 'federation',
         'id': 'vote-new',
+        'external_id': 'external',
         'vote_de': 'Vote',
         'vote_type': 'simple'
     }))

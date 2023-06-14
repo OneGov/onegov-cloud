@@ -2,6 +2,7 @@ from cgi import FieldStorage
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
 from onegov.election_day.forms import ElectionForm
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
@@ -256,7 +257,17 @@ def test_election_form_validate(session):
     session.add(
         Election(
             id='election-copy',
+            external_id='ext-1',
             title=model.title,
+            domain=model.domain,
+            date=model.date
+        )
+    )
+    session.add(
+        ElectionCompound(
+            title='Elections',
+            id='election-copy',
+            external_id='ext-2',
             domain=model.domain,
             date=model.date
         )
@@ -290,7 +301,9 @@ def test_election_form_validate(session):
     assert not form.validate()
     assert form.errors['id'] == ['Invalid ID']
 
-    form = ElectionForm(DummyPostData({'id': 'election-copy'}))
+    form = ElectionForm(
+        DummyPostData({'id': 'election-copy', 'external_id': 'ext-1'})
+    )
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'de_CH'
     form.request.app.principal = Canton(name='be', canton='be')
@@ -298,6 +311,16 @@ def test_election_form_validate(session):
     form.model = model
     assert not form.validate()
     assert form.errors['id'] == ['ID already exists']
+    assert form.errors['external_id'] == ['ID already exists']
+
+    form = ElectionForm(DummyPostData({'external_id': 'ext-2'}))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['external_id'] == ['ID already exists']
 
     form = ElectionForm(DummyPostData({
         'date': '2020-01-01',

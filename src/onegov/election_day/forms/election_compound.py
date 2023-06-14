@@ -354,10 +354,22 @@ class ElectionCompoundForm(Form):
         if normalize_for_url(field.data) != field.data:
             raise ValidationError(_('Invalid ID'))
         if self.model.id != field.data:
-            query = self.request.session.query(self.model.__class__.id)
+            query = self.request.session.query(ElectionCompound.id)
             query = query.filter_by(id=field.data)
             if query.first():
                 raise ValidationError(_('ID already exists'))
+
+    def validate_external_id(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'external_id')
+                or self.model.external_id != field.data
+            ):
+                for cls in (Election, ElectionCompound):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
 
     def on_request(self):
         principal = self.request.app.principal

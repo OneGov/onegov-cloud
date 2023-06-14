@@ -88,6 +88,7 @@ def test_election_compound_form_validate(session):
     session.add(
         ElectionCompound(
             id='elections-copy',
+            external_id='ext-1',
             title='Elections',
             domain='federation',
             date=date(2015, 6, 14)
@@ -96,6 +97,7 @@ def test_election_compound_form_validate(session):
     session.add(
         ProporzElection(
             title='election-1',
+            external_id='ext-2',
             domain='district',
             date=date(2001, 1, 1))
     )
@@ -133,7 +135,9 @@ def test_election_compound_form_validate(session):
     assert not form.validate()
     assert form.errors['id'] == ['Invalid ID']
 
-    form = ElectionCompoundForm(DummyPostData({'id': 'elections-copy'}))
+    form = ElectionCompoundForm(
+        DummyPostData({'id': 'elections-copy', 'external_id': 'ext-1'})
+    )
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'de_CH'
     form.request.app.principal = Canton(name='be', canton='be')
@@ -141,6 +145,16 @@ def test_election_compound_form_validate(session):
     form.model = model
     assert not form.validate()
     assert form.errors['id'] == ['ID already exists']
+    assert form.errors['external_id'] == ['ID already exists']
+
+    form = ElectionCompoundForm(DummyPostData({'external_id': 'ext-2'}))
+    form.request = DummyRequest(session=session)
+    form.request.default_locale = 'de_CH'
+    form.request.app.principal = Canton(name='be', canton='be')
+    form.on_request()
+    form.model = model
+    assert not form.validate()
+    assert form.errors['external_id'] == ['ID already exists']
 
     form = ElectionCompoundForm(DummyPostData({
         'date': '2012-01-01',
