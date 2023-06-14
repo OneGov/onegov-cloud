@@ -442,9 +442,8 @@ ul.tags {
 }
 
 .side-panel {
-    padding: .5rem 1rem 1rem;
-
-    .title {
+    .title,
+    h2 {
         background: $primary-color;
         color: $white;
         display: block;
