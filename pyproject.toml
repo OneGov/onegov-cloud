@@ -33,6 +33,7 @@ module = [
     "onegov.core.collection.*",
     "onegov.core.crypto.*",
     "onegov.core.datamanager.*",
+    "onegov.core.directives.*",
     "onegov.core.orm.*",
     "onegov.core.request.*",
     "onegov.core.security.*",
@@ -94,6 +95,7 @@ module = [
     "qrcode.*",
     "rcssmin.*",
     "reportlab.*",
+    "reg.*",
     "rjsmin.*",
     "sass.*",
     # TODO: Writing stubs for this would probably be really quick
