@@ -3,6 +3,7 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.mappings import DEFAULT_VOTE_HEADER
 
@@ -73,6 +74,8 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
 
         # the id of the municipality or district
         entity_id = None
+        name = ''
+        district = None
         try:
             entity_id = validate_integer(line, 'id')
         except ValueError as e:
@@ -91,6 +94,11 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
                     _("${name} is unknown", mapping={'name': entity_id})
                 )
             else:
+                name, district, superregion = get_entity_and_district(
+                    entity_id, entities, vote, principal, line_errors
+                )
+
+            if not line_errors:
                 added_entity_ids.add(entity_id)
 
         # Skip expats if not enabled
@@ -151,11 +159,10 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
 
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
-            entity = entities.get(entity_id, {})
             ballot_results.append(
                 BallotResult(
-                    name=entity.get('name', ''),
-                    district=entity.get('district', ''),
+                    name=name,
+                    district=district,
                     counted=True,
                     yeas=yeas,
                     nays=nays,
@@ -176,11 +183,17 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
             remaining.add(0)
         remaining -= added_entity_ids
         for entity_id in remaining:
-            entity = entities.get(entity_id, {})
+            name, district, superregion = get_entity_and_district(
+                entity_id, entities, vote, principal
+            )
+            if vote.domain == 'municipality':
+                if principal.domain != 'municipality':
+                    if name != vote.domain_segment:
+                        continue
             ballot_results.append(
                 BallotResult(
-                    name=entity.get('name', ''),
-                    district=entity.get('district', ''),
+                    name=name,
+                    district=district,
                     counted=False,
                     entity_id=entity_id
                 )

@@ -8,7 +8,7 @@ from onegov.election_day.models import Municipality
 
 def test_import_default_vote(session):
     session.add(
-        Vote(title='vote', domain='municipality', date=date(2017, 5, 21))
+        Vote(title='vote', domain='canton', date=date(2017, 5, 21))
     )
     session.flush()
     vote = session.query(Vote).one()

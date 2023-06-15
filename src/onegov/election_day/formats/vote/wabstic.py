@@ -2,6 +2,7 @@ from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.mappings import (
@@ -114,6 +115,8 @@ def import_vote_wabstic(vote, principal, number, district,
 
         # Parse the id of the entity
         entity_id = None
+        entity_name = ''
+        entity_district = None
         try:
             entity_id = validate_integer(line, 'bfsnrgemeinde')
         except ValueError as e:
@@ -130,6 +133,11 @@ def import_vote_wabstic(vote, principal, number, district,
             if entity_id and entity_id not in entities:
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id}))
+            else:
+                entity_name, entity_district, superregion = \
+                    get_entity_and_district(
+                        entity_id, entities, vote, principal, line_errors
+                    )
 
         # Skip expats if not enabled
         if entity_id == 0 and not vote.has_expats:
@@ -200,12 +208,11 @@ def import_vote_wabstic(vote, principal, number, district,
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
             for ballot_type in used_ballot_types:
-                entity = entities.get(entity_id, {})
                 ballot_results[ballot_type].append(
                     dict(
                         entity_id=entity_id,
-                        name=entity.get('name', ''),
-                        district=entity.get('district', ''),
+                        name=entity_name,
+                        district=entity_district,
                         counted=counted,
                         eligible_voters=eligible_voters,
                         invalid=invalid,
@@ -225,12 +232,20 @@ def import_vote_wabstic(vote, principal, number, district,
             remaining.add(0)
         remaining -= set(r['entity_id'] for r in ballot_results[ballot_type])
         for entity_id in remaining:
-            entity = entities.get(entity_id, {})
+            entity_name, entity_district, superregion = \
+                get_entity_and_district(
+                    entity_id, entities, vote, principal
+                )
+            if vote.domain == 'municipality':
+                if principal.domain != 'municipality':
+                    if entity_name != vote.domain_segment:
+                        continue
+
             ballot_results[ballot_type].append(
                 dict(
                     entity_id=entity_id,
-                    name=entity.get('name', ''),
-                    district=entity.get('district', ''),
+                    name=entity_name,
+                    district=entity_district,
                     counted=False,
                 )
             )

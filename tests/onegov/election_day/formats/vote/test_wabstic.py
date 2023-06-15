@@ -279,7 +279,6 @@ def test_import_wabstic_vote_invalid_values(session):
     errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ])
-    print(errors)
     assert errors == [
         ('sg_gemeinden', 2, '100 is unknown'),
         ('sg_gemeinden', 2, 'Could not read the empty votes'),
