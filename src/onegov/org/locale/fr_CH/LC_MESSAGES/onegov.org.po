@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-25 11:48+0200\n"
+"POT-Creation-Date: 2023-06-15 11:42+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -339,6 +339,17 @@ msgstr "Afficher"
 
 msgid "Lead-Format"
 msgstr "Format Principal"
+
+msgid "Empty Directory Notice"
+msgstr "Avis de dossier vide"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Ce texte sera affiché lorsque le dossier ne contient pas d'entrées "
+"(visibles). S'il est laissé vide, un texte générique par défaut sera affiché "
+"à la place."
 
 msgid "Numbering"
 msgstr "Numérotation"
@@ -904,6 +915,9 @@ msgstr "Fichier Excel"
 
 msgid "JSON File"
 msgstr "Fichier JSON"
+
+msgid "XML File"
+msgstr "Fichier XML"
 
 msgid "Minimum price total"
 msgstr "Prix minimum total"
@@ -2409,8 +2423,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3571,6 +3585,9 @@ msgstr ""
 "Désolé, la page que vous cherchez n'a pu être trouvée. Essayez de vérifier "
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
+
+msgid "Back"
+msgstr "Retour"
 
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
