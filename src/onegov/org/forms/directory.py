@@ -110,6 +110,15 @@ class DirectoryBaseForm(Form):
         fieldset=_("Display"),
         render_kw={'class_': 'formcode-format'})
 
+    empty_notice = StringField(
+        label=_("Empty Directory Notice"),
+        fieldset=_("Display"),
+        description=_(
+            "This text will be displayed when the directory "
+            "contains no (visible) entries. When left empty "
+            "a generic default text will be shown instead."
+        ))
+
     numbering = RadioField(
         label=_("Numbering"),
         fieldset=_("Display"),
@@ -508,6 +517,7 @@ class DirectoryBaseForm(Form):
         return DirectoryConfiguration(
             title=self.title_format.data,
             lead=self.lead_format.data,
+            empty_notice=self.empty_notice.data,
             order=safe_format_keys(order_format),
             keywords=keyword_fields,
             searchable=searchable_content_fields + contact_fields,
@@ -539,6 +549,7 @@ class DirectoryBaseForm(Form):
 
         self.title_format.data = cfg.title
         self.lead_format.data = cfg.lead or ''
+        self.empty_notice = cfg.empty_notice
         self.content_fields.data = '\n'.join(cfg.display.get('content', ''))
         self.content_hide_labels.data = '\n'.join(
             cfg.display.get('content_hide_labels', ''))
