@@ -30,7 +30,9 @@ def test_principal_load():
     assert list(principal.domains_election.keys()) == [
         'federation', 'canton', 'none', 'municipality'
     ]
-    assert list(principal.domains_vote.keys()) == ['federation', 'canton']
+    assert list(principal.domains_vote.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
     assert len(principal.entities)
     assert len(list(principal.entities.values())[0])
 
