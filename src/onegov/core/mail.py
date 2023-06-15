@@ -9,38 +9,12 @@ from onegov.core.html import html_to_text
 from string import ascii_letters, digits
 
 
-from typing import overload, TYPE_CHECKING
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrPath, SupportsRead
-    from collections.abc import Iterable, Sequence
-    from typing import TypeVar, Union
-    from typing_extensions import NotRequired, TypedDict
+    from collections.abc import Iterable
 
-    # FIXME: Move these to onegov.core.types
-    class HeaderJsonDict(TypedDict):
-        Name: str
-        Value: str
-
-    class AttachmentJsonDict(TypedDict):
-        Name: str
-        Content: str
-        ContentType: str
-
-    class EmailJsonDict(TypedDict):
-        From: str
-        To: str
-        TextBody: str
-        MessageStream: str
-        ReplyTo: NotRequired[str]
-        Cc: NotRequired[str]
-        Bcc: NotRequired[str]
-        Subject: NotRequired[str]
-        HtmlBody: NotRequired[str]
-        Headers: NotRequired[list[HeaderJsonDict]]
-        Attachments: NotRequired[list[AttachmentJsonDict]]
-
-    _T = TypeVar('_T')
-    SequenceOrScalar = Union[Sequence[_T], _T]
+    from .types import AttachmentJsonDict, EmailJsonDict, SequenceOrScalar
 
 
 specials_regex = re.compile(r'[][\\()<>@,:;.]')
@@ -236,40 +210,6 @@ class Attachment:
         }
 
 
-@overload
-def prepare_email(
-    sender: Address | str,
-    reply_to: Address | str | None = ...,
-    receivers: 'SequenceOrScalar[Address | str]' = ...,
-    cc: 'SequenceOrScalar[Address | str]' = ...,
-    bcc: 'SequenceOrScalar[Address | str]' = ...,
-    subject: str | None = ...,
-    *,
-    content: str,
-    plaintext: str | None = ...,
-    attachments: 'Iterable[Attachment | StrPath]' = ...,
-    headers: dict[str, str] | None = ...,
-    stream: str = ...
-) -> 'EmailJsonDict': ...
-
-
-@overload
-def prepare_email(
-    sender: Address | str,
-    reply_to: Address | str | None = ...,
-    receivers: 'SequenceOrScalar[Address | str]' = ...,
-    cc: 'SequenceOrScalar[Address | str]' = ...,
-    bcc: 'SequenceOrScalar[Address | str]' = ...,
-    subject: str | None = ...,
-    content: str | None = ...,
-    *,
-    plaintext: str,
-    attachments: 'Iterable[Attachment | StrPath]' = ...,
-    headers: dict[str, str] | None = ...,
-    stream: str = ...
-) -> 'EmailJsonDict': ...
-
-
 def prepare_email(
     sender: Address | str,
     reply_to: Address | str | None = None,
@@ -296,6 +236,10 @@ def prepare_email(
 
     if plaintext is None:
         # if no plaintext is given we require content
+        # FIXME: it would be nice to verify this statically, but the
+        #        order of arguments makes this a bit cumbersome, we
+        #        could remedy this by forcing them all to be keyword
+        #        arguments
         assert content is not None
 
         # turn the html email into a plaintext representation

@@ -59,8 +59,13 @@ class GenericCollection(Generic[_M]):
         return self.query().filter(self.primary_key == id).first()
 
     def by_ids(self, ids: 'Collection[PKType]') -> list[_M]:
+        # FIXME: This type error is a bug in the sqlalchemy-stubs
+        #        plugin, it might go away with SQLAlchemy 2.0, since
+        #        Column is being treated like a descriptor, even though
+        #        it is not, and there's a hidden descriptor inserted
+        #        into the DeclarativeBase to wrap the Column.
         return self.query().filter(
-            self.primary_key.in_(ids)
+            self.primary_key.in_(ids)  # type:ignore[union-attr]
         ).all() if ids else []
 
     # NOTE: Subclasses should be more specific, so we get type
