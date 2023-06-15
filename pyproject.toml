@@ -34,10 +34,12 @@ module = [
     "onegov.core.crypto.*",
     "onegov.core.datamanager.*",
     "onegov.core.directives.*",
+    "onegov.core.framework.*",
     "onegov.core.mail.*",
     "onegov.core.orm.*",
     "onegov.core.request.*",
     "onegov.core.security.*",
+    "onegov.core.types.*",
     "onegov.core.utils.*"
 ]
 warn_unreachable = true
