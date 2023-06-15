@@ -377,3 +377,59 @@ def test_import_default_vote_temporary_results(session):
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
     ) == [1702, 1703, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+
+
+def test_import_default_vote_regional(session):
+
+    def create_csv(results):
+        lines = []
+        lines.append((
+            'ID',
+            'Ja Stimmen',
+            'Nein Stimmen',
+            'Ungültige Stimmzettel',
+            'Leere Stimmzettel',
+            'Stimmberechtigte',
+        ))
+        for entity_id in results:
+            lines.append((
+                str(entity_id),  # ID
+                '20',  # Ja Stimmen
+                '10',  # Nein Stimmen
+                '1',  # Ungültige Stimmzettel
+                '1',  # Leere Stimmzettel
+                '100',  # Stimmberechtigte
+            ))
+
+        return BytesIO(
+            '\n'.join(
+                (','.join(column for column in line)) for line in lines
+            ).encode('utf-8')
+        ), 'text/plain'
+
+    session.add(
+        Vote(title='vote', domain='municipality', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+
+    # ZG, municipality, too many municipalitites
+    principal = Canton(canton='zg')
+    vote.domain = 'municipality'
+    vote.domain_segment = 'Baar'
+
+    errors = import_vote_default(
+        vote, principal, 'proposal',
+        *create_csv((1701, 1702))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '1702 is not part of this business'
+    ]
+
+    # ZG, municipality, ok
+    errors = import_vote_default(
+        vote, principal, 'proposal',
+        *create_csv((1701,))
+    )
+    assert not errors
+    assert vote.progress == (1, 1)

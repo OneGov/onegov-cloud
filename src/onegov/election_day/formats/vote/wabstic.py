@@ -12,8 +12,6 @@ from onegov.election_day.formats.mappings import (
 from sqlalchemy.orm import object_session
 
 
-# todo: municipality
-
 def parse_domain(domain):
     if domain in ('Eidg', 'CH'):
         return 'federation'

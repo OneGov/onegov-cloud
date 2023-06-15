@@ -2,13 +2,10 @@ from onegov.ballot import BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
-from onegov.election_day.formats.common import get_entity_and_district
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import validate_integer
 from onegov.election_day.formats.mappings import WABSTIM_VOTE_HEADERS
 
-
-# todo: municipality
 
 def import_vote_wabstim(vote, principal, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
@@ -51,8 +48,6 @@ def import_vote_wabstim(vote, principal, file, mimetype):
 
         # the id of the entity
         entity_id = None
-        name = ''
-        district = None
         try:
             entity_id = validate_integer(line, 'bfs')
         except ValueError as e:
@@ -73,11 +68,6 @@ def import_vote_wabstim(vote, principal, file, mimetype):
                         'name': entity_id
                     }))
             else:
-                name, district, superregion = get_entity_and_district(
-                    entity_id, entities, vote, principal, line_errors
-                )
-
-            if not line_errors:
                 added_entity_ids.add(entity_id)
 
         try:
@@ -143,10 +133,11 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
             for ballot_type in used_ballot_types:
+                entity = entities.get(entity_id, {})
                 ballot_results[ballot_type].append(
                     BallotResult(
-                        name=name,
-                        district=district,
+                        name=entity.get('name', ''),
+                        district=entity.get('district', ''),
                         entity_id=entity_id,
                         counted=counted,
                         yeas=yeas[ballot_type] if counted else 0,
@@ -175,18 +166,11 @@ def import_vote_wabstim(vote, principal, file, mimetype):
             remaining.add(0)
         remaining -= added_entity_ids
         for id in remaining:
-            name, district, superregion = get_entity_and_district(
-                entity_id, entities, vote, principal
-            )
-            if vote.domain == 'municipality':
-                if principal.domain != 'municipality':
-                    if name != vote.domain_segment:
-                        continue
-
+            entity = entities.get(entity_id, {})
             ballot_results[ballot_type].append(
                 BallotResult(
-                    name=name,
-                    district=district,
+                    name=entity.get('name', ''),
+                    district=entity.get('district', ''),
                     counted=False,
                     entity_id=id
                 )
