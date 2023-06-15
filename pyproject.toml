@@ -39,6 +39,7 @@ module = [
     "onegov.core.orm.*",
     "onegov.core.request.*",
     "onegov.core.security.*",
+    "onegov.core.types.*",
     "onegov.core.utils.*"
 ]
 warn_unreachable = true

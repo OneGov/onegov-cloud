@@ -425,6 +425,7 @@ class Framework(
 
     def configure_redis(
         self,
+        *,
         redis_url: str = 'redis://127.0.0.1:6379/0',
         **cfg: Any
     ) -> None:

@@ -1091,7 +1091,7 @@ def test_send_zulip(session):
         assert headers == {
             'Authorization':
             'Basic dGVzdC1ib3RAc2VhbnRpcy56dWxpcGNoYXQuY29tOmFhYmJjYw==',
-            'Content-length': 68,
+            'Content-length': '68',
             'Content-type': 'application/x-www-form-urlencoded'
         }
 
