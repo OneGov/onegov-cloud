@@ -707,7 +707,7 @@ def send_new_note_notification(request: OrgRequest, form: TicketNoteForm,
                                note: TicketNote, template: str):
     """
     Sends an E-mail notification to all resource recipients that have been
-    configured to receive notifications for new notes.
+    configured to receive notifications for new (ticket) notes.
     """
 
     ticket = note.ticket
