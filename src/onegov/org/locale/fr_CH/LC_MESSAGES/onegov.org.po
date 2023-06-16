@@ -1181,6 +1181,9 @@ msgstr "Notifications *"
 msgid "Daily Reservations"
 msgstr "Réservations quotidiennes"
 
+msgid "Internal Notes"
+msgstr "Notes internes"
+
 msgid "Send on"
 msgstr "Envoyer sur"
 
@@ -3133,10 +3136,10 @@ msgid ""
 "newsletter:"
 msgstr ""
 "Vous recevez ce courriel parce que vous vous êtes abonné à la lettre "
-"d'informations suivante :"
+"d'informations suivante:"
 
 msgid "Plese click the following link to confirm your subscription:"
-msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement :"
+msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement:"
 
 msgid "Confirm subscription"
 msgstr "Confirmer l'abonnement"
@@ -3271,6 +3274,22 @@ msgstr "Votre événement a été accepté :"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté :"
 
+msgid "New note in Ticket ${link}"
+msgstr "Nouvelle note dans le billet ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Il s'agit de la notification de notes sur les réservations pour ${request."
+"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
+"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
+"destinataires."
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Voici ce qui s'est passé la semaine dernière sur le site web de ${org} :"
@@ -3287,9 +3306,6 @@ msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées :"
-
-msgid "${author} wrote"
-msgstr "${author} a écrit"
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -3758,6 +3774,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Reçoit des notifications pour les réservations du jour les jours suivants:"
+
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Reçoit des notifications pour les notes internes sur les réservations."
 
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."
@@ -4863,6 +4882,10 @@ msgstr "Les réservations ont été acceptées"
 
 msgid "The reservations have already been accepted"
 msgstr "Les réservations ont déjà été acceptées"
+
+#, python-format
+msgid "${org} New Note in Reservation for ${resource_title}"
+msgstr "${org} Nouvelle note dans la réservation pour ${resource_title}"
 
 msgid "The submitter email is not available"
 msgstr "L'adresse e-mail de l'expéditeur n'est pas disponible"

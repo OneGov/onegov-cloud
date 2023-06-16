@@ -14,6 +14,8 @@ from random import randint
 from uuid import uuid4
 from base64 import b64decode, b64encode
 
+from onegov.ticket import TicketCollection
+
 
 def get_meta(page, property, returns='content', index=0):
     """Searches the page for the meta tag"""
@@ -197,3 +199,39 @@ def extract_filename_from_response(response):
         if filename:
             return filename[0]
     return None
+
+
+def add_reservation(
+    resource,
+    client,
+    start,
+    end,
+    email=None,
+    partly_available=True,
+    reserve=True,
+    approve=True,
+    add_ticket=True
+):
+    if not email:
+        email = f'{resource.name}@example.org'
+
+    allocation = resource.scheduler.allocate(
+        (start, end),
+        partly_available=partly_available,
+    )[0]
+
+    if reserve:
+        resource_token = resource.scheduler.reserve(
+            email,
+            (allocation.start, allocation.end),
+        )
+
+    if reserve and approve:
+        resource.scheduler.approve_reservations(resource_token)
+        if add_ticket:
+            with client.app.session().no_autoflush:
+                tickets = TicketCollection(client.app.session())
+                tickets.open_ticket(
+                    handler_code='RSV', handler_id=resource_token.hex
+                )
+    return resource
