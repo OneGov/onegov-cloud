@@ -14,16 +14,14 @@ from onegov.org import _, OrgApp
 from onegov.org import utils
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
-from onegov.org.forms import ReservationForm, InternalTicketChatMessageForm,\
-    TicketNoteForm
+from onegov.org.forms import ReservationForm, InternalTicketChatMessageForm
 from onegov.org.layout import ReservationLayout, TicketChatMessageLayout
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import (
     TicketMessage, TicketChatMessage, ReservationMessage,
-    ResourceRecipient, ResourceRecipientCollection, TicketNote)
+    ResourceRecipient, ResourceRecipientCollection)
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.org.request import OrgRequest
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
 from purl import URL
@@ -701,62 +699,6 @@ def accept_reservation(self, request, text=None, notify=False):
         request.warning(_("The reservations have already been accepted"))
 
     return request.redirect(request.link(self))
-
-
-def send_new_note_notification(request: OrgRequest, form: TicketNoteForm,
-                               note: TicketNote, template: str):
-    """
-    Sends an E-mail notification to all resource recipients that have been
-    configured to receive notifications for new (ticket) notes.
-    """
-
-    ticket = note.ticket
-    handler = ticket.handler
-
-    if not getattr(handler, 'resource', None) or not handler.reservations:
-        return
-
-    q = ResourceRecipientCollection(request.session).query()
-    q = q.filter(ResourceRecipient.medium == 'email')
-    q = q.order_by(None).order_by(ResourceRecipient.address)
-    q = q.with_entities(
-        ResourceRecipient.address,
-        ResourceRecipient.content
-    )
-
-    internal_notes_recipients = [
-        r.address
-        for r in q
-        if (
-            handler.reservations[0].resource.hex in r.content['resources']
-            and r.content.get('internal_notes', False)
-        )
-    ]
-
-    args = {
-        'layout': DefaultMailLayout(object(), request),
-        'title': request.translate(
-            _("${org} New Note in Reservation for ${resource_title}", mapping={
-                'org': request.app.org.title,
-                'resource_title': handler.resource.title
-            })
-        ),
-        'form': form,
-        'model': ticket,
-        'resource': handler.resource,
-        'show_submission': True,
-        'reservations': handler.reservations,
-        'message': note,
-        'ticket_reference': ticket.reference(request)
-    }
-    content = render_template(template, request, args)
-
-    for r in internal_notes_recipients:
-        request.app.send_transactional_email(
-            subject=args['title'],
-            receivers=(r),
-            content=content,
-        )
 
 
 @OrgApp.form(model=Reservation, name='accept-with-message', permission=Private,
