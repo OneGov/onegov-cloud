@@ -776,11 +776,25 @@ def reject_reservation(self, request, text=None, notify=False):
             notify=notify,
             origin='internal')
 
+    # get all recipients which want to receive e-mail for rejected reservations
+    q = ResourceRecipientCollection(request.session).query()
+    q = q.filter(ResourceRecipient.medium == 'email')
+    q = q.order_by(None).order_by(ResourceRecipient.address)
+    q = q.with_entities(ResourceRecipient.address, ResourceRecipient.content)
+    recipients = [
+        r.address
+        for r in q
+        if (
+            self.resource.hex in r.content['resources']
+            and r.content.get('rejected_reservations', {})
+        )
+    ]
+
     send_ticket_mail(
         request=request,
         template='mail_reservation_rejected.pt',
         subject=_("The following reservations were rejected"),
-        receivers=(self.email, ),
+        receivers=tuple(set(self.email + recipients)),
         ticket=ticket,
         content={
             'model': self,
