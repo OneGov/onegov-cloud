@@ -135,6 +135,26 @@ class CsvFileAction(ViewAction):
         )
 
 
+class XmlFileAction(ViewAction):
+
+    """ View directive for viewing XML data as file. """
+
+    def __init__(self, model, **kwargs):
+        kwargs['permission'] = kwargs.get('permission', Public)
+        kwargs['render'] = self.render
+        super().__init__(model, **kwargs)
+
+    @staticmethod
+    def render(content, request):
+        data = content.get('data', {})
+        name = content.get('name', 'delivery')
+        return Response(
+            data,
+            content_type='application/xml',
+            content_disposition=f'inline; filename={name}.xml'
+        )
+
+
 class ScreenWidgetRegistry(dict):
 
     def by_categories(self, categories):

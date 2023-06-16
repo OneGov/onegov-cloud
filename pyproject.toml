@@ -124,6 +124,7 @@ module = [
     "wtforms_components.*",
     "xlrd.*",
     "xlsxwriter.*",
+    "xsdata_ech.*",
     "xtermcolor.*",
     "yubico_client.*",
     "zope.*"
