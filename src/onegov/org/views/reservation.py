@@ -794,7 +794,7 @@ def reject_reservation(self, request, text=None, notify=False):
         request=request,
         template='mail_reservation_rejected.pt',
         subject=_("The following reservations were rejected"),
-        receivers=tuple(set(self.email + recipients)),
+        receivers=tuple(set([self.email] + recipients)),
         ticket=ticket,
         content={
             'model': self,
