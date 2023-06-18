@@ -30,8 +30,6 @@ from xsdata_ech.e_ch_0252_1_0 import CountingCircleType
 from xsdata_ech.e_ch_0252_1_0 import CountOfVotersInformationType
 from xsdata_ech.e_ch_0252_1_0 import DecisiveMajorityType
 from xsdata_ech.e_ch_0252_1_0 import Delivery
-from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceType
-from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceTypeType
 from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
 from xsdata_ech.e_ch_0252_1_0 import NamedIdType
 from xsdata_ech.e_ch_0252_1_0 import ResultDataType
@@ -341,7 +339,9 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
         return rows
 
-    def export_xml(self, canton_id):
+    def export_xml(self, canton_id, domain_of_influence):
+        """ Returns all data as an eCH-0252 XML. """
+
         polling_day = XmlDate.from_date(self.date)
         identification = self.external_id or self.id
         results = self.proposal.results.all()
@@ -354,14 +354,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
                     id=self.id
                 )
             ],
-            # todo:
-            domain_of_influence=DomainOfInfluenceType(
-                domain_of_influence_type=DomainOfInfluenceTypeType(
-                    DomainOfInfluenceTypeType.CT
-                ),
-                domain_of_influence_identification='GR',
-                domain_of_influence_name='Kanton Graubünden'
-            ),
+            domain_of_influence=domain_of_influence,
             polling_day=polling_day,
             vote_title_information=[
                 VoteTitleInformationType(
@@ -378,8 +371,10 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         counting_circle_info = [
             CountingCircleInfoType(
                 counting_circle=CountingCircleType(
-                    # todo: fix expats!
-                    counting_circle_id=result.entity_id,
+                    counting_circle_id=(
+                        result.entity_id if result.entity_id
+                        else f'19{canton_id:02d}0'
+                    ),
                     counting_circle_name=result.name,
                 ),
                 result_data=ResultDataType(

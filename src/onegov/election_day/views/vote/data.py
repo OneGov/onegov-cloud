@@ -65,7 +65,8 @@ def view_vote_data_as_xlm(self, request):
 
     return {
         'data': self.export_xml(
-            canton_id=request.app.principal.canton_id
+            canton_id=request.app.principal.canton_id,
+            domain_of_influence=request.app.principal.get_ech_domain(self)
         ),
         'name': normalize_for_url(self.title[:60])
     }
