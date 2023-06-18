@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from decimal import Decimal
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
@@ -25,25 +24,11 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
-from xsdata_ech.e_ch_0252_1_0 import CountingCircleInfoType
-from xsdata_ech.e_ch_0252_1_0 import CountingCircleType
-from xsdata_ech.e_ch_0252_1_0 import CountOfVotersInformationType
-from xsdata_ech.e_ch_0252_1_0 import DecisiveMajorityType
 from xsdata_ech.e_ch_0252_1_0 import Delivery
 from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
-from xsdata_ech.e_ch_0252_1_0 import NamedIdType
-from xsdata_ech.e_ch_0252_1_0 import ResultDataType
-from xsdata_ech.e_ch_0252_1_0 import VoteInfoType
-from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
-from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
-from xsdata_ech.e_ch_0252_1_0 import VoteTitleInformationType
-from xsdata_ech.e_ch_0252_1_0 import VoteType
 from xsdata.formats.dataclass.serializers import XmlSerializer
 from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.datatype import XmlDate
-
-
-SubtotalInfo = CountOfVotersInformationType.SubtotalInfo
 
 
 class Vote(Base, ContentMixin, LastModifiedMixin,
@@ -343,71 +328,16 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         """ Returns all data as an eCH-0252 XML. """
 
         polling_day = XmlDate.from_date(self.date)
-        identification = self.external_id or self.id
-        results = self.proposal.results.all()
-        vote = VoteType(
-            vote_identification=identification,  # todo:
-            main_vote_identification=identification,  # todo: (only complex)
-            other_identification=[
-                NamedIdType(
-                    id_name='onegov',
-                    id=self.id
-                )
-            ],
-            domain_of_influence=domain_of_influence,
-            polling_day=polling_day,
-            vote_title_information=[
-                VoteTitleInformationType(
-                    language=locale,
-                    vote_title=title,
-                )
-                for locale, title
-                in self.title_translations.items()  # todo:
-                if title
-            ],
-            decisive_majority=DecisiveMajorityType.VALUE_1,
-            vote_sub_type=VoteSubTypeType.VALUE_1  # todo:
-        )
-        counting_circle_info = [
-            CountingCircleInfoType(
-                counting_circle=CountingCircleType(
-                    counting_circle_id=(
-                        result.entity_id if result.entity_id
-                        else f'19{canton_id:02d}0'
-                    ),
-                    counting_circle_name=result.name,
-                ),
-                result_data=ResultDataType(
-                    count_of_voters_information=CountOfVotersInformationType(
-                        count_of_voters_total=result.eligible_voters,
-                        subtotal_info=[
-                            SubtotalInfo(
-                                count_of_voters=result.expats,
-                                voter_type=VoterTypeType.VALUE_2,
-                            )
-                        ] if result.expats else []
-                    ),
-                    fully_counted_true=result.counted,
-                    voter_turnout=Decimal(format(result.turnout, '5.2f')),
-                    received_invalid_votes=result.invalid,
-                    received_blank_votes=result.empty,
-                    count_of_yes_votes=result.yeas,
-                    count_of_no_votes=result.nays,
-                )
-            )
-            for result in results
-        ]
+        ballots = self.ballots.all()
         delivery = Delivery(
             vote_base_delivery=EventVoteBaseDeliveryType(
                 canton_id=canton_id,
                 polling_day=polling_day,
                 vote_info=[
-                    VoteInfoType(
-                        vote=vote,
-                        counting_circle_info=counting_circle_info
-                    )
+                    ballot.export_xml(canton_id, domain_of_influence)
+                    for ballot in ballots
                 ],
-                number_of_entries=1
+                number_of_entries=len(ballots)
             )
         )
         config = SerializerConfig(pretty_print=True)
