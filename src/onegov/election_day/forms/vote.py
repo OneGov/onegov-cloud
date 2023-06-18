@@ -1,4 +1,5 @@
 from datetime import date
+from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
@@ -41,6 +42,20 @@ class VoteForm(Form):
         label=_("External ID"),
         fieldset=_("Identifier"),
         render_kw={'long_description': _("Used for import if set.")},
+    )
+
+    external_id_counter_proposal = StringField(
+        label=_("External ID of counter proposal"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+        depends_on=('vote_type', 'complex'),
+    )
+
+    external_id_tie_breaker = StringField(
+        label=_("External ID of tie breaker"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+        depends_on=('vote_type', 'complex'),
     )
 
     vote_type = RadioField(
@@ -216,9 +231,40 @@ class VoteForm(Form):
                 not hasattr(self.model, 'external_id')
                 or self.model.external_id != field.data
             ):
-                query = self.request.session.query(Vote.external_id)
-                query = query.filter_by(external_id=field.data)
-                if query.first():
+                for cls in (Vote, Ballot):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+
+    def validate_external_id_counter_proposal(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'counter_proposal')
+                or self.model.counter_proposal.external_id != field.data
+            ):
+                for cls in (Vote, Ballot):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+                if field.data == self.external_id.data:
+                    raise ValidationError(_('ID already exists'))
+
+    def validate_external_id_tie_breaker(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'tie_breaker')
+                or self.model.tie_breaker.external_id != field.data
+            ):
+                for cls in (Vote, Ballot):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+                if field.data == self.external_id.data:
+                    raise ValidationError(_('ID already exists'))
+                if field.data == self.external_id_counter_proposal.data:
                     raise ValidationError(_('ID already exists'))
 
     def on_request(self):
@@ -299,6 +345,10 @@ class VoteForm(Form):
             )
 
         if model.type == 'complex':
+            model.counter_proposal.external_id = \
+                self.external_id_counter_proposal.data
+            model.tie_breaker.external_id = self.external_id_tie_breaker.data
+
             titles = {}
             if self.counter_proposal_de.data:
                 titles['de_CH'] = self.counter_proposal_de.data
@@ -358,6 +408,10 @@ class VoteForm(Form):
                 ('complex', _("Vote with Counter-Proposal"))
             ]
             self.vote_type.data = 'complex'
+
+            self.external_id_counter_proposal.data = \
+                model.counter_proposal.external_id
+            self.external_id_tie_breaker.data = model.tie_breaker.external_id
 
             titles = model.counter_proposal.title_translations or {}
             self.counter_proposal_de.data = titles.get('de_CH')
