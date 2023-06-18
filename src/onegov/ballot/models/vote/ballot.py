@@ -45,6 +45,9 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     #: identifies the ballot, maybe used in the url
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    #: external identifier
+    external_id = Column(Text, nullable=True)
+
     #: the type of the ballot, 'standard' for normal votes, 'counter-proposal'
     #: if there's an alternative to the standard ballot. And 'tie-breaker',
     #: which must exist if there's a counter proposal. The tie breaker is

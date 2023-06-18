@@ -834,3 +834,12 @@ def add_external_ids(context):
                 table,
                 Column('external_id', Text(), nullable=True)
             )
+
+
+@upgrade_task('Add external ballot ids')
+def add_external_ballot_ids(context):
+    if not context.has_column('ballots', 'external_id'):
+        context.operations.add_column(
+            'ballots',
+            Column('external_id', Text(), nullable=True)
+        )
