@@ -346,8 +346,8 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         identification = self.external_id or self.id
         results = self.proposal.results.all()
         vote = VoteType(
-            vote_identification=identification,
-            main_vote_identification=identification,
+            vote_identification=identification,  # todo:
+            main_vote_identification=identification,  # todo: (only complex)
             other_identification=[
                 NamedIdType(
                     id_name='onegov',
@@ -362,11 +362,11 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
                     vote_title=title,
                 )
                 for locale, title
-                in self.title_translations.items()
+                in self.title_translations.items()  # todo:
                 if title
             ],
             decisive_majority=DecisiveMajorityType.VALUE_1,
-            vote_sub_type=VoteSubTypeType.VALUE_1
+            vote_sub_type=VoteSubTypeType.VALUE_1  # todo:
         )
         counting_circle_info = [
             CountingCircleInfoType(

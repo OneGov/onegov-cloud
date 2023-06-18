@@ -30,7 +30,9 @@ def test_vote_form_on_request():
     form = VoteForm()
     form.request = DummyRequest()
     form.request.default_locale = 'fr_CH'
-    form.request.app.principal = Municipality(name='bern', municipality='351')
+    form.request.app.principal = Municipality(
+        name='bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     form.on_request()
     assert form.domain.choices == [
         ('federation', 'Federal'),

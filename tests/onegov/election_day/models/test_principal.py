@@ -144,11 +144,15 @@ def test_principal_load():
     # Municipality with static data
     principal = Principal.from_yaml(dedent("""
         name: Stadt Bern
+        canton: be
+        canton_name: Kanton Bern
         municipality: '351'
     """))
     assert isinstance(principal, Municipality)
     assert principal.name == 'Stadt Bern'
     assert principal.id == '351'
+    assert principal.canton == 'be'
+    assert principal.canton_name == 'Kanton Bern'
     assert principal.domain == 'municipality'
     assert list(principal.domains_election.keys()) == [
         'federation', 'canton', 'municipality'
@@ -178,10 +182,14 @@ def test_principal_load():
     principal = Principal.from_yaml(dedent("""
         name: Kriens
         municipality: '1059'
+        canton: lu
+        canton_name: Kanton Luzern
     """))
     assert isinstance(principal, Municipality)
     assert principal.name == 'Kriens'
     assert principal.id == '1059'
+    assert principal.canton == 'lu'
+    assert principal.canton_name == 'Kanton Luzern'
     assert principal.domain == 'municipality'
     assert list(principal.domains_election.keys()) == [
         'federation', 'canton', 'municipality'
@@ -283,13 +291,18 @@ def test_canton():
 def test_municipality_entities():
     # Municipality without quarters
     with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
-        principal = Municipality(name='Kriens', municipality='1059')
+        principal = Municipality(
+            name='Kriens', municipality='1059', canton='lu',
+            canton_name='Kanton Luzern'
+        )
         assert principal.entities == {
             year: {1059: {'name': 'Kriens'}} for year in SUPPORTED_YEARS
         }
 
     # Municipality with quarters
-    principal = Municipality(name='Bern', municipality='351')
+    principal = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     entities = {
         1: {'name': 'Innere Stadt'},
         2: {'name': 'Länggasse/Felsenau'},
@@ -304,7 +317,10 @@ def test_municipality_entities():
 def test_principal_years_available():
     # Municipality without quarters/map
     with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
-        principal = Municipality(name='Kriens', municipality='1059')
+        principal = Municipality(
+            name='Kriens', municipality='1059', canton='lu',
+            canton_name='Kanton Luzern'
+        )
         assert not principal.is_year_available(2000)
         assert not principal.is_year_available(2000, map_required=False)
         for year in SUPPORTED_YEARS:
@@ -312,7 +328,9 @@ def test_principal_years_available():
             assert principal.is_year_available(year, map_required=False)
 
     # Municipality with quarters/map
-    principal = Municipality(name='Bern', municipality='351')
+    principal = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     assert not principal.is_year_available(2000)
     assert not principal.is_year_available(2000, map_required=False)
     for year in SUPPORTED_YEARS_NO_MAP:
@@ -561,7 +579,9 @@ def test_principal_label(election_day_app_zg):
         assert translate(principal.label(label), locale) == result
 
     # Bern
-    principal = Municipality(name='Be', municipality='351')
+    principal = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     for label, locale, result in (
         ('entity', 'de_CH', 'Stadtteil'),
         ('entities', 'de_CH', 'Stadtteile')

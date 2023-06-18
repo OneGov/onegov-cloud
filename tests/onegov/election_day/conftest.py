@@ -41,24 +41,13 @@ def election_day_password():
 def create_election_day(
     request,
     canton='',
+    canton_name='',
     municipality='',
     use_maps='false',
     hide_candidate_chart_percentages=hide_chart_perc,
     hide_connections_chart=hide_conn_chart,
-    hide_candidates_chart=hide_cand_chart
+    hide_candidates_chart=hide_cand_chart,
 ):
-    """
-
-    :param request:
-    :param canton:
-    :param municipality:
-    :param use_maps:
-    :param hide_candidate_chart_percentages: used by ZG, always
-    :param hide_connections_chart:  for intermediate results
-    :param hide_candidates_chart: for intermediate results
-    :return:
-    """
-
     tmp = request.getfixturevalue('temporary_directory')
 
     websockets = {
@@ -72,13 +61,15 @@ def create_election_day(
     app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')
-    tenan = f'canton: {canton}' if canton else f'municipality: {municipality}'
+    municipality = f'municipality: {municipality}' if municipality else ''
     chart_percentages = bool_as_string(hide_candidate_chart_percentages)
 
     app.filestorage.writetext('principal.yml', textwrap.dedent(f"""
         name: Kanton Govikon
         logo: logo.jpg
-        {tenan}
+        canton: {canton}
+        canton_name: {canton_name}
+        {municipality}
         use_maps: {use_maps}
         color: '#000'
         wabsti_import: true
@@ -109,7 +100,7 @@ def create_election_day(
 
 @pytest.fixture(scope="function")
 def election_day_app_bl(request):
-    app = create_election_day(request, "bl")
+    app = create_election_day(request, canton="bl")
     yield app
     app.session_manager.dispose()
 
@@ -118,7 +109,7 @@ def election_day_app_bl(request):
 def election_day_app_zg(request):
     app = create_election_day(
         request,
-        "zg",
+        canton="zg",
         hide_candidate_chart_percentages=True)
     yield app
     app.session_manager.dispose()
@@ -126,7 +117,7 @@ def election_day_app_zg(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_gr(request):
-    app = create_election_day(request, "gr")
+    app = create_election_day(request, canton="gr")
     yield app
     app.session_manager.dispose()
 
@@ -135,7 +126,7 @@ def election_day_app_gr(request):
 def election_day_app_sg(request):
     app = create_election_day(
         request,
-        "sg",
+        canton="sg",
         hide_candidates_chart=True,
         hide_connections_chart=True
     )
@@ -147,7 +138,7 @@ def election_day_app_sg(request):
 def election_day_app_sz(request):
     app = create_election_day(
         request,
-        "sz",
+        canton="sz",
         hide_candidates_chart=True,
         hide_connections_chart=True
     )
@@ -157,14 +148,26 @@ def election_day_app_sz(request):
 
 @pytest.fixture(scope="function")
 def election_day_app_bern(request):
-    app = create_election_day(request, "", "'351'", "true")
+    app = create_election_day(
+        request,
+        canton="be",
+        canton_name="Kanton Bern",
+        municipality="'351'",
+        use_maps="true"
+    )
     yield app
     app.session_manager.dispose()
 
 
 @pytest.fixture(scope="function")
 def election_day_app_kriens(request):
-    app = create_election_day(request, "", "'1059'", "false")
+    app = create_election_day(
+        request,
+        canton="lu",
+        canton_name="Kanton Luzern",
+        municipality="'1059'",
+        use_maps="false"
+    )
     yield app
     app.session_manager.dispose()
 
