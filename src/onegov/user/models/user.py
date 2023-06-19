@@ -10,10 +10,17 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
-from sqlalchemy import Boolean, Column, Text, func, ForeignKey
+from sqlalchemy import Boolean, Column, Text, func, ForeignKey, Index, types
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
+
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
+
+class TSVector(types.TypeDecorator):
+    impl = TSVECTOR
 
 
 class User(Base, TimestampMixin, ORMSearchable):
@@ -123,6 +130,28 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the signup token used by the user
     signup_token = Column(Text, nullable=True, default=None)
+
+    # may name the column __ts_vector__
+    # builds the index on '<first name> <last name>' based on username (email
+    # address)
+    fts_idx_users_username_col = Column(TSVector(), Computed(
+        "to_tsvector('german', concat("
+        "    split_part(split_part(username, '@', 1), '.', 1), "
+        "    ', "
+        "    split_part(split_part(username, '@', 1), '.', 2)"
+        ")))",
+        persisted=True)
+    )
+
+    __table_args__ = (
+        Index(
+            'fts_idx_users_username',
+            func.to_tsvector(
+                'german',
+                fts_idx_users_username_col),
+            postgresql_using='gin'
+        ),
+    )
 
     @hybrid_property
     def title(self):
@@ -286,56 +315,46 @@ class User(Base, TimestampMixin, ORMSearchable):
         return count
 
     @staticmethod
-    def drop_fts_index(session, schema):
-        """
-        Drops the full text search index. Used for re-indexing
-
-        :param session: db session
-        :param schema: schema on which the fts index shall be dropped
-        :return:
-        """
-        query = f"""
-DROP INDEX IF EXISTS "{schema}".fts_idx_users_username
-"""
-        print(f'dropping index query: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
-
-    @staticmethod
-    def create_fts_index(session, schema):
-        """
-        Creates the full text search index based on the separate index
-        column. Used for re-indexing
-
-        :param session: db session
-        :param schema: schema the index shall be created
-        :return:
-        """
-        query = f"""
-CREATE INDEX fts_idx_users_username ON "{schema}".users USING
-GIN (fts_idx_users_username_col);
-"""
-        print(f'create index query: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
-
-    @staticmethod
     def add_fts_column(session, schema):
         """
-        This function is used as migration step moving to postgressql full
-        text search, OGC-508. It adds a separate column for the tsvector
+        This function is used for re-indexing and as migration step moving to
+        postgresql full text search, OGC-508.
+        It adds a separate column for the tsvector
+
+        The text search is based on username split into first and last name
 
         :param session: db session
         :param schema: schema the full text column shall be added
         :return: None
         """
-        from onegov.search.utils import create_tsvector_string
-
-        s = create_tsvector_string('username')
+        s = "split_part(split_part(username, '@', 1), '.', 1) || ' ' || " \
+            "split_part(split_part(username, '@', 1), '.', 2)"
+        # rename to fts_users_username_idx?
+        col_name = 'fts_idx_users_username_col'
         query = f"""
-ALTER TABLE "{schema}".users ADD COLUMN
-fts_idx_users_username_col tsvector GENERATED ALWAYS AS
-(to_tsvector('german', {s})) STORED;
-"""
+            ALTER TABLE "{schema}".users ADD COLUMN IF NOT EXISTS
+            {col_name} tsvector GENERATED ALWAYS AS
+            (to_tsvector('german', {s})) STORED;
+        """
+        print(f'add fts column: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def drop_fts_column(session, schema):
+        """
+        Drops the full text search column
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        # rename to fts_users_username_idx?
+        col_name = 'fts_idx_users_username_col'
+        query = f"""
+            ALTER TABLE "{schema}".users DROP COLUMN IF EXISTS
+            {col_name};
+        """
+        print(f'drop fts column: {query}')
         session.execute(query)
         session.execute("COMMIT")

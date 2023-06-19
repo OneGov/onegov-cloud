@@ -31,9 +31,10 @@ def reindex(group_context, fail):
 
         for model in searchable_sqlalchemy_models(Base):
             print(f'*** model to reindex: {model}')
-            if model.__tablename__ in ['users', 'attendees']:
-                model.drop_fts_index(session, app.schema)
-                model.create_fts_index(session, app.schema)
+            # if model.__tablename__ in ['users', 'attendees']:
+            if model.__tablename__ in ['users']:
+                model.drop_fts_column(session, app.schema)
+                model.add_fts_column(session, app.schema)
 
         print(f"took {utcnow() - start}")
 

@@ -207,7 +207,7 @@ DROP INDEX IF EXISTS "{schema}".fts_idx_attendees_username_name
         :return:
         """
         query = f"""
-CREATE INDEX fts_idx_attendees_username_name ON
+CREATE INDEX IF NOT EXISTS fts_idx_attendees_username_name ON
 "{schema}".attendees USING GIN (fts_idx_attendees_username_name_col);
 """
         print(f'create index query: {query}')
@@ -227,9 +227,10 @@ CREATE INDEX fts_idx_attendees_username_name ON
         from onegov.search.utils import create_tsvector_string
 
         s = create_tsvector_string('username', 'name')
+        col_name = 'fts_idx_attendees_username_name_col'
         query = f"""
-ALTER TABLE "{schema}".attendees ADD COLUMN
-fts_idx_attendees_username_name_col tsvector GENERATED ALWAYS AS
+ALTER TABLE "{schema}".attendees ADD COLUMN IF NOT EXISTS
+{col_name} tsvector GENERATED ALWAYS AS
 (to_tsvector('german', {s})) STORED;
 """
         session.execute(query)

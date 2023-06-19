@@ -170,13 +170,18 @@ class Search(Pagination):
         results = []
         print('*** tschupre postgresql_search')
 
-        # this works: collecting results not a final 'search'
         query = self.request.session.query(User)
-        query = query.filter(User.username.ilike(f'%{self.query}%'))
+        query = query.filter(User.fts_idx_users_username_col.match(
+            self.query, postgresql_regconfig='german'))
         results += query.all()
-        query = self.request.session.query(User)
-        query = query.filter(User.realname.ilike(f'%{self.query}%'))
-        results += query.all()
+
+        print(f'len results: {len(results)}')
+
+        # # Perform the full-text search by matching the tsquery against
+        # the content field
+        # results = session.query(Article).filter(
+        #     Article.content.match(self.query),
+        #     postgresql_regconfig='german').all()
 
         print(f'*** psql res count: {len(results)}')
         for result in results:

@@ -157,7 +157,7 @@ def create_tsvector_string(*cols):
     Doc reference:
     https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX
 
-    :param cols: columns to be indexed
+    :param cols: column names to be indexed
     :return: tsvector string for multiple columns
     """
     base = "coalesce({}, '')"

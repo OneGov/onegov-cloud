@@ -17,10 +17,10 @@ def search(self, request, layout=None):
 
     try:
         searchlabel = _("Search through ${count} indexed documents", mapping={
-            'count': self.available_documents
+            'count': len(self.batch)
         })
         resultslabel = _("${count} Results", mapping={
-            'count': self.subset_count
+            'count': len(self.batch)
         })
     except SearchOfflineError:
         return {
