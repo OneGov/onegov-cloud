@@ -655,7 +655,7 @@ msgid "External ID of counter proposal"
 msgstr "ID externe du contre-projet"
 
 msgid "External ID of tie breaker"
-msgstr ""ID externe du jeu décisif"
+msgstr "ID externe du jeu décisif"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"
