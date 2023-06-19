@@ -790,18 +790,22 @@ def reject_reservation(self, request, text=None, notify=False):
         )
     ]
 
+    receivers = (
+        tuple(set([self.email] + recipients)) if recipients else (self.email,)
+    )
     send_ticket_mail(
         request=request,
         template='mail_reservation_rejected.pt',
         subject=_("The following reservations were rejected"),
-        receivers=tuple(set([self.email] + recipients)),
+        receivers=receivers,
         ticket=ticket,
         content={
             'model': self,
             'resource': resource,
             'reservations': targeted,
             'message': message
-        }
+        },
+        force=True if recipients else False
     )
 
     # create a snapshot of the ticket to keep the useful information
