@@ -4,6 +4,8 @@ from pathlib import Path
 import transaction
 
 from datetime import datetime
+
+from onegov.core.request import CoreRequest
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -117,3 +119,61 @@ def test_reservation_ticket_new_note_sends_email(client):
     mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
     with open(mail, 'r') as file:
         assert "some note" in file.read()
+
+
+def test_rejected_reservation_sends_email_to_configured_recipients(client,
+                                                                   org_app):
+    resources = ResourceCollection(client.app.libres_context)
+    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        rejected_reservations=True,
+        resources=[
+            dailypass.id.hex,
+        ]
+    )
+
+    add_reservation(
+        dailypass, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+    transaction.commit()
+
+    tickets = TicketCollection(client.app.session())
+    assert tickets.query().count() == 1
+
+    client.login_admin()
+    request = CoreRequest(
+        environ={
+            "wsgi.url_scheme": "https",
+            "PATH_INFO": "/",
+            "SERVER_NAME": "",
+            "SERVER_PORT": "",
+            "SERVER_PROTOCOL": "https",
+            "HTTP_HOST": "localhost",
+        }, app=org_app,
+    )
+    tickets = TicketCollection(client.app.session()).by_handler_code('RSV')
+    assert len(tickets) == 1
+    ticket = tickets[0]
+    # The 'reject reservation' link is somehow not present in page for some
+    # reason this is why we craft the link manually.
+
+    def lchop(text, beginning):
+        if text.startswith(beginning):
+            return text[len(beginning):]
+        return text
+
+    crafted_link = request.link(ticket, 'reject')
+    crafted_link = lchop(crafted_link, 'https://localhost')
+
+    client.get(crafted_link)
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
+    with open(mail, 'r') as file:
+        mail_content = file.read()
+        assert "Die folgenden Reservationen mussten leider abgesagt werden:"\
+               in mail_content

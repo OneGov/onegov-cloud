@@ -776,6 +776,20 @@ def reject_reservation(self, request, text=None, notify=False):
             notify=notify,
             origin='internal')
 
+    send_ticket_mail(
+        request=request,
+        template='mail_reservation_rejected.pt',
+        subject=_("The following reservations were rejected"),
+        receivers=(self.email, ),
+        ticket=ticket,
+        content={
+            'model': self,
+            'resource': resource,
+            'reservations': targeted,
+            'message': message
+        }
+    )
+
     # get all recipients which want to receive e-mail for rejected reservations
     q = ResourceRecipientCollection(request.session).query()
     q = q.filter(ResourceRecipient.medium == 'email')
@@ -790,23 +804,31 @@ def reject_reservation(self, request, text=None, notify=False):
         )
     ]
 
-    receivers = (
-        tuple(set([self.email] + recipients)) if recipients else (self.email,)
+    args = {
+        'layout': DefaultMailLayout(object(), request),
+        'title': request.translate(
+            _("${org} Rejected Reservation", mapping={
+                'org': request.app.org.title
+            })
+        ),
+        'form': ReservationForm,
+        'model': self,
+        'resource': resource,
+        'reservations': targeted,
+        'show_submission': True,
+        'message': message
+    }
+
+    content = render_template(
+        'mail_rejected_reservation_notification', request, args
     )
-    send_ticket_mail(
-        request=request,
-        template='mail_reservation_rejected.pt',
-        subject=_("The following reservations were rejected"),
-        receivers=receivers,
-        ticket=ticket,
-        content={
-            'model': self,
-            'resource': resource,
-            'reservations': targeted,
-            'message': message
-        },
-        force=True if recipients else False
-    )
+
+    for r in recipients:
+        request.app.send_transactional_email(
+            subject=args['title'],
+            receivers=(r),
+            content=content,
+        )
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:
