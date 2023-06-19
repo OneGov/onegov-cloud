@@ -327,8 +327,8 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
 
         """
 
-        # do not cache HEAD, POST, DELETE etc.
-        if request.method != 'GET':
+        # do not cache POST, DELETE etc.
+        if request.method not in ('GET', 'HEAD'):
             return handler(request)
 
         # no cache if the user is logged in
@@ -343,15 +343,19 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         if request.headers.get('cache-control') == 'no-cache':
             return handler(request)
 
-        # each page is cached once per request method, language and
-        # headerless/headerful (and by application id as the pages_cache is
-        # bound to it)
-        key = ':'.join((
-            request.method,
-            request.locale,
-            request.path_qs,
-            'hl' if 'headerless' in request.browser_session else 'hf'
-        ))
+        if request.method == 'HEAD':
+            # HEAD requests are cached with only the path
+            key = ':'.join((request.method, request.path))
+        else:
+            # each page is cached once per request method, language and
+            # headerless/headerful (and by application id as the pages_cache is
+            # bound to it)
+            key = ':'.join((
+                request.method,
+                request.locale,
+                request.path_qs,
+                'hl' if 'headerless' in request.browser_session else 'hf'
+            ))
 
         return app.pages_cache.get_or_create(
             key,
