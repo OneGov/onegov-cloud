@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 10:38+0200\n"
+"POT-Creation-Date: 2023-06-19 10:25+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -652,6 +652,12 @@ msgstr "Numer dal project"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "External ID of counter proposal"
+msgstr ""
+
+msgid "External ID of tie breaker"
+msgstr ""
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"

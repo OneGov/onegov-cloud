@@ -1,3 +1,4 @@
+from decimal import Decimal
 from onegov.ballot.models.mixins import summarized_property
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.vote.ballot_result import BallotResult
@@ -22,6 +23,18 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+from xsdata_ech.e_ch_0252_1_0 import CountingCircleInfoType
+from xsdata_ech.e_ch_0252_1_0 import CountingCircleType
+from xsdata_ech.e_ch_0252_1_0 import CountOfVotersInformationType
+from xsdata_ech.e_ch_0252_1_0 import DecisiveMajorityType
+from xsdata_ech.e_ch_0252_1_0 import NamedIdType
+from xsdata_ech.e_ch_0252_1_0 import ResultDataType
+from xsdata_ech.e_ch_0252_1_0 import VoteInfoType
+from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
+from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
+from xsdata_ech.e_ch_0252_1_0 import VoteTitleInformationType
+from xsdata_ech.e_ch_0252_1_0 import VoteType
+from xsdata.models.datatype import XmlDate
 
 
 class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
@@ -196,3 +209,78 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         session.query(BallotResult).filter(
             BallotResult.ballot_id == self.id
         ).delete()
+
+    def export_xml(self, canton_id, domain_of_influence):
+        """ Returns all data as an eCH-0252 VoteInfoType. """
+
+        SubtotalInfo = CountOfVotersInformationType.SubtotalInfo
+        polling_day = XmlDate.from_date(self.vote.date)
+        main_vote_identification = self.vote.external_id or self.vote.id
+        if self.type == 'proposal':
+            identification = main_vote_identification
+        else:
+            identification = (
+                self.external_id or f'{main_vote_identification}-{self.type}'
+            )
+
+        translations = self.title_translations or self.vote.title_translations
+        vote_sub_type = {
+            'proposal': VoteSubTypeType.VALUE_1,
+            'counter-proposal': VoteSubTypeType.VALUE_2,
+            'tie-breaker': VoteSubTypeType.VALUE_3
+        }.get(self.type)
+
+        vote = VoteType(
+            vote_identification=identification,
+            main_vote_identification=main_vote_identification,
+            other_identification=[
+                NamedIdType(
+                    id_name='onegov',
+                    id=str(self.id)
+                )
+            ],
+            domain_of_influence=domain_of_influence,
+            polling_day=polling_day,
+            vote_title_information=[
+                VoteTitleInformationType(
+                    language=locale,
+                    vote_title=title,
+                )
+                for locale, title in translations.items() if title
+            ],
+            decisive_majority=DecisiveMajorityType.VALUE_1,
+            vote_sub_type=vote_sub_type
+        )
+        counting_circle_info = [
+            CountingCircleInfoType(
+                counting_circle=CountingCircleType(
+                    counting_circle_id=(
+                        result.entity_id if result.entity_id
+                        else f'19{canton_id:02d}0'
+                    ),
+                    counting_circle_name=result.name,
+                ),
+                result_data=ResultDataType(
+                    count_of_voters_information=CountOfVotersInformationType(
+                        count_of_voters_total=result.eligible_voters,
+                        subtotal_info=[
+                            SubtotalInfo(
+                                count_of_voters=result.expats,
+                                voter_type=VoterTypeType.VALUE_2,
+                            )
+                        ] if result.expats else []
+                    ),
+                    fully_counted_true=result.counted,
+                    voter_turnout=Decimal(format(result.turnout, '5.2f')),
+                    received_invalid_votes=result.invalid,
+                    received_blank_votes=result.empty,
+                    count_of_yes_votes=result.yeas,
+                    count_of_no_votes=result.nays,
+                )
+            )
+            for result in self.results
+        ]
+        return VoteInfoType(
+            vote=vote,
+            counting_circle_info=counting_circle_info
+        )

@@ -63,7 +63,10 @@ def test_election_form_on_request(session):
     form = ElectionForm()
     form.request = DummyRequest(session=session)
     form.request.default_locale = 'rm_CH'
-    form.request.app.principal = Municipality(name='bern', municipality='351')
+    form.request.app.principal = Municipality(
+        name='bern', municipality='351',
+        canton='be', canton_name='Kanton Bern'
+    )
     form.on_request()
     assert [x[0] for x in form.domain.choices] == [
         'federation', 'canton', 'municipality'

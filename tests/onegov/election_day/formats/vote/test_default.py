@@ -59,7 +59,9 @@ def test_import_default_vote(session):
     assert round(vote.nays_percentage, 2) == 62.79
 
     # Test communal results without quarters
-    principal = Municipality(municipality='1059')
+    principal = Municipality(
+        municipality='1059', canton='lu', canton_name='Kanton Luzern'
+    )
     errors = import_vote_default(
         vote, principal, 'proposal',
         BytesIO((
@@ -91,7 +93,9 @@ def test_import_default_vote(session):
     assert vote.proposal.invalid == 27
 
     # Test communal results with quarters
-    principal = Municipality(municipality='351')
+    principal = Municipality(
+        municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     errors = import_vote_default(
         vote, principal, 'proposal',
         BytesIO((

@@ -13,7 +13,9 @@ def test_add_local_results_simple(session):
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
@@ -86,7 +88,9 @@ def test_add_local_results_complex(session):
     target = ArchivedResult()
 
     be = Canton(name='BE', canton='be')
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
