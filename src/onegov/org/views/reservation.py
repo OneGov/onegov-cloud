@@ -803,32 +803,36 @@ def reject_reservation(self, request, text=None, notify=False):
             and r.content.get('rejected_reservations', {})
         )
     ]
+    forms = FormCollection(request.session)
+    submission = forms.submissions.by_id(token)
+    if submission:
+        form = submission.form_obj
 
-    args = {
-        'layout': DefaultMailLayout(object(), request),
-        'title': request.translate(
-            _("${org} Rejected Reservation", mapping={
-                'org': request.app.org.title
-            })
-        ),
-        'form': ReservationForm,
-        'model': self,
-        'resource': resource,
-        'reservations': targeted,
-        'show_submission': True,
-        'message': message
-    }
+        args = {
+            'layout': DefaultMailLayout(object(), request),
+            'title': request.translate(
+                _("${org} Rejected Reservation", mapping={
+                    'org': request.app.org.title
+                })
+            ),
+            'form': form,
+            'model': self,
+            'resource': resource,
+            'reservations': targeted,
+            'show_submission': True,
+            'message': message
+        }
 
-    content = render_template(
-        'mail_rejected_reservation_notification', request, args
-    )
-
-    for r in recipients:
-        request.app.send_transactional_email(
-            subject=args['title'],
-            receivers=(r),
-            content=content,
+        content = render_template(
+            'mail_rejected_reservation_notification', request, args
         )
+
+        for r in recipients:
+            request.app.send_transactional_email(
+                subject=args['title'],
+                receivers=(r),
+                content=content,
+            )
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:

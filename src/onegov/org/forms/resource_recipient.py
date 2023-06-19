@@ -58,7 +58,7 @@ class ResourceRecipientForm(Form):
     )
 
     rejected_reservations = BooleanField(
-        label=_("Canceled Reservations"),
+        label=_("Rejected Reservations"),
         fieldset=_("Notifications *"),
         description=("Bei der Stornierung einer Reservation wird eine "
                      "Benachrichtigung an den obenstehenden Empfänger "

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-06-15 11:42+0200\n"
+"POT-Creation-Date: 2023-06-19 15:04+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1183,6 +1183,9 @@ msgstr "Tägliche Reservationen"
 
 msgid "Internal Notes"
 msgstr "Interne Notizen"
+
+msgid "Rejected Reservations"
+msgstr "Abgelehnte Reservationen"
 
 msgid "Send on"
 msgstr "Senden am"
@@ -2426,8 +2429,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3764,6 +3767,9 @@ msgstr ""
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
 
+msgid "Receives notifications for rejected reservations."
+msgstr "Erhält Benachrichtigungen für abgelehnte Reservationen."
+
 msgid "Receives notifications for new reservations."
 msgstr "Erhält Benachrichtigungen für neue Reservationen."
 
@@ -4861,10 +4867,6 @@ msgstr "Die Reservationen wurden angenommen"
 msgid "The reservations have already been accepted"
 msgstr "Die Reservationen wurden bereits angenommen"
 
-#, python-format
-msgid "${org} New Note in Reservation for ${resource_title}"
-msgstr "${org} Neue Notiz in Reservation für ${resource_title}"
-
 msgid "The submitter email is not available"
 msgstr "Die Email des Antragstellers fehlt"
 
@@ -4888,6 +4890,10 @@ msgstr ""
 
 msgid "The following reservations were rejected"
 msgstr "Die folgenden Reservationen wurden abgelehnt"
+
+#, python-format
+msgid "${org} Rejected Reservation"
+msgstr "${org} Abgelehnte Reservation"
 
 msgid "The reservations were rejected"
 msgstr "Die Reservationen wurden abgelehnt"
@@ -5086,6 +5092,10 @@ msgstr "${amount} rückerstatten"
 
 msgid "Your ticket has a new message"
 msgstr "Ihr Ticket hat eine neue Nachricht"
+
+#, python-format
+msgid "${org} New Note in Reservation for ${resource_title}"
+msgstr "${org} Neue Notiz in Reservation für ${resource_title}"
 
 msgid "Your note was added"
 msgstr "Ihre Notiz wurde hinzugefügt"
