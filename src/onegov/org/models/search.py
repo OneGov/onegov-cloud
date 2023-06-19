@@ -1,7 +1,6 @@
 from cached_property import cached_property
 
 from onegov.core.collection import Pagination
-from onegov.user import User
 from onegov.event.models import Event
 from onegov.user import User
 
@@ -170,8 +169,14 @@ class Search(Pagination):
         results = []
         print('*** tschupre postgresql_search')
 
+        # TODO:language from application setting?:w
+        query = self.request.session.query(Event)
+        query = query.filter(Event.fts_events_idx.match(
+            self.query, postgresql_regconfig='german'))
+        results += query.all()
+
         query = self.request.session.query(User)
-        query = query.filter(User.fts_idx_users_username_col.match(
+        query = query.filter(User.fts_users_idx.match(
             self.query, postgresql_regconfig='german'))
         results += query.all()
 
@@ -185,6 +190,6 @@ class Search(Pagination):
 
         print(f'*** psql res count: {len(results)}')
         for result in results:
-            print(f'*** psql res: {result.username}')
+            print(f'*** psql res: {result}')
 
         return results

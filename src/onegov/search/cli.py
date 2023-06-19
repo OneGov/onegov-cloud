@@ -5,9 +5,6 @@ import click
 from onegov.core.cli import command_group, pass_group_context
 from sedate import utcnow
 
-from onegov.core.orm import Base
-from onegov.search.utils import searchable_sqlalchemy_models
-
 cli = command_group()
 
 
@@ -29,12 +26,7 @@ def reindex(group_context, fail):
         session = request.session
         start = utcnow()
 
-        for model in searchable_sqlalchemy_models(Base):
-            print(f'*** model to reindex: {model}')
-            # if model.__tablename__ in ['users', 'attendees']:
-            if model.__tablename__ in ['users']:
-                model.drop_fts_column(session, app.schema)
-                model.add_fts_column(session, app.schema)
+        app.psql_perform_reindex(session)
 
         print(f"took {utcnow() - start}")
 

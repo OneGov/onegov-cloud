@@ -168,3 +168,38 @@ def create_tsvector_string(*cols):
         s += ext
 
     return s.format(*cols)
+
+
+def adds_fts_column(schema, session, table_name, col_name,
+                    tsvector_string):
+    """
+    This function is used for re-indexing and as migration step moving to
+    postgresql full text search (fts), OGC-508.
+
+    It adds a separate column for the tsvector to `schema`.`table`
+
+    :param schema: schema name
+    :param session: session
+    :param table_name: db table name
+    :param col_name: column name of fts index
+    :param tsvector_string: index expression string
+    :return: None
+    """
+    query = f"""
+        ALTER TABLE "{schema}".{table_name} ADD COLUMN IF NOT EXISTS
+        {col_name} tsvector GENERATED ALWAYS AS
+        (to_tsvector('german', {tsvector_string})) STORED;
+    """
+    print(f'add fts column: {query}')
+    session.execute(query)
+    session.execute("COMMIT")
+
+
+def drops_fts_column(schema, session, table_name, col_name):
+    query = f"""
+        ALTER TABLE "{schema}".{table_name} DROP COLUMN IF EXISTS
+        {col_name};
+    """
+    print(f'drop fts column: {query}')
+    session.execute(query)
+    session.execute("COMMIT")

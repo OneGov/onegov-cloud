@@ -6,6 +6,8 @@ from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
@@ -19,11 +21,14 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
+from onegov.search.utils import create_tsvector_string, drops_fts_column, \
+    adds_fts_column
 from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone
-from sqlalchemy import and_
+from sqlalchemy import and_, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
@@ -36,8 +41,22 @@ from sqlalchemy.orm import validates
 from uuid import uuid4
 
 
+FTS_EVENTS_COL_NAME = 'fts_events_idx'
+
+
 class EventFile(File):
     __mapper_args__ = {'polymorphic_identity': 'eventfile'}
+
+
+def event_tsvector_string():
+    """
+    index is built on columns title and location as well as the json
+    fields description and organizer in content column
+    """
+    s = create_tsvector_string('title', 'location')
+    s += " || ' ' || ((content ->> 'description'))" \
+         " || ' ' || ((content ->> 'organizer'))"
+    return s
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
@@ -104,6 +123,19 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     #: The associated PDF
     pdf = associated(
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
+    )
+
+    # column for full text search index
+    fts_events_idx = Column(TSVECTOR, Computed(
+        f"to_tsvector('german', {event_tsvector_string()})",
+        persisted=True))
+
+    __table_args__ = (
+        Index(
+            'fts_events',
+            fts_events_idx,
+            postgresql_using='gin'
+        ),
     )
 
     def set_image(self, content, filename=None):
@@ -442,3 +474,36 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         for vevent in self.get_ical_vevents(url):
             vcalendar.add_component(vevent)
         return vcalendar.to_ical()
+
+    @staticmethod
+    def reindex(session, schema):
+        """
+        Re-indexes the table by dropping and adding the full text search
+        column.
+        """
+        Event.drop_fts_column(session, schema)
+        Event.add_fts_column(session, schema)
+
+    @staticmethod
+    def add_fts_column(session, schema):
+        """
+        Adds full text search column to table `events`
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        adds_fts_column(schema, session, Event.__tablename__,
+                        FTS_EVENTS_COL_NAME, event_tsvector_string())
+
+    @staticmethod
+    def drop_fts_column(session, schema):
+        """
+        Drops the full text search column
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        drops_fts_column(schema, session, Event.__tablename__,
+                         FTS_EVENTS_COL_NAME)

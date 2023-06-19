@@ -9,18 +9,27 @@ from onegov.core.utils import is_valid_yubikey_format
 from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
+from onegov.search.utils import drops_fts_column, adds_fts_column
 from onegov.user.models.group import UserGroup
-from sqlalchemy import Boolean, Column, Text, func, ForeignKey, Index, types
+from sqlalchemy import Boolean, Column, Text, func, ForeignKey, Index
 from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
 
-from sqlalchemy.dialects.postgresql import TSVECTOR
+
+FTS_USERS_COL_NAME = 'fts_users_idx'
 
 
-class TSVector(types.TypeDecorator):
-    impl = TSVECTOR
+def user_tsvector_string():
+    """
+    builds the index on '<first name> <last name>' from username (email
+    address) and realname.
+    """
+    return "split_part(split_part(username, '@', 1), '.', 1) || ' ' || " \
+           "split_part(split_part(username, '@', 1), '.', 2) || ' ' || " \
+           "realname"
 
 
 class User(Base, TimestampMixin, ORMSearchable):
@@ -131,24 +140,16 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the signup token used by the user
     signup_token = Column(Text, nullable=True, default=None)
 
-    # may name the column __ts_vector__
-    # builds the index on '<first name> <last name>' based on username (email
-    # address)
-    fts_idx_users_username_col = Column(TSVector(), Computed(
-        "to_tsvector('german', concat("
-        "    split_part(split_part(username, '@', 1), '.', 1), "
-        "    ', "
-        "    split_part(split_part(username, '@', 1), '.', 2)"
-        ")))",
+    # column for full text search index
+    fts_users_idx = Column(TSVECTOR, Computed(
+        f"to_tsvector('german', {user_tsvector_string()}",
         persisted=True)
     )
 
     __table_args__ = (
         Index(
-            'fts_idx_users_username',
-            func.to_tsvector(
-                'german',
-                fts_idx_users_username_col),
+            'fts_users',
+            fts_users_idx,
             postgresql_using='gin'
         ),
     )
@@ -315,6 +316,15 @@ class User(Base, TimestampMixin, ORMSearchable):
         return count
 
     @staticmethod
+    def reindex(session, schema):
+        """
+        Re-indexes the table by dropping and adding the full text search
+        column.
+        """
+        User.drop_fts_column(session, schema)
+        User.add_fts_column(session, schema)
+
+    @staticmethod
     def add_fts_column(session, schema):
         """
         This function is used for re-indexing and as migration step moving to
@@ -327,21 +337,12 @@ class User(Base, TimestampMixin, ORMSearchable):
         :param schema: schema the full text column shall be added
         :return: None
         """
-        s = "split_part(split_part(username, '@', 1), '.', 1) || ' ' || " \
-            "split_part(split_part(username, '@', 1), '.', 2)"
-        # rename to fts_users_username_idx?
-        col_name = 'fts_idx_users_username_col'
-        query = f"""
-            ALTER TABLE "{schema}".users ADD COLUMN IF NOT EXISTS
-            {col_name} tsvector GENERATED ALWAYS AS
-            (to_tsvector('german', {s})) STORED;
-        """
-        print(f'add fts column: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
+        adds_fts_column(schema, session, User.__tablename__,
+                        FTS_USERS_COL_NAME, user_tsvector_string())
 
     @staticmethod
     def drop_fts_column(session, schema):
+
         """
         Drops the full text search column
 
@@ -349,12 +350,5 @@ class User(Base, TimestampMixin, ORMSearchable):
         :param schema: schema the full text column shall be added
         :return: None
         """
-        # rename to fts_users_username_idx?
-        col_name = 'fts_idx_users_username_col'
-        query = f"""
-            ALTER TABLE "{schema}".users DROP COLUMN IF EXISTS
-            {col_name};
-        """
-        print(f'drop fts column: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
+        drops_fts_column(schema, session, User.__tablename__,
+                         FTS_USERS_COL_NAME)

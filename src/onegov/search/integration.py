@@ -163,6 +163,8 @@ class PostgresqlSearchApp(morepath.App):
     def psql_perform_reindex(self, session):
         for model in searchable_sqlalchemy_models(Base):
             print(f'*** model to reindex: {model}')
+            if model.__tablename__ in ['users', 'events']:
+                model.reindex(session, self.schema)
 
     # TODO: move to ticket.py
     @staticmethod

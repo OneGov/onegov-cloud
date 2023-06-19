@@ -8,8 +8,9 @@ from onegov.core.upgrade import upgrade_task
 from onegov.search.utils import searchable_sqlalchemy_models
 
 
-@upgrade_task('Adding full text search index column to postgres 39')
+@upgrade_task('Adding full text search index column to postgres 40')
 def adding_full_text_search_columns_to_postgres(context):
+    print("*** tschupre upgrading to postgres")
     # need to create all indexes in postgresql on every model in project
     # for full text search. This will make elastic search setup obsolete.
     # Ticket reference: ogc-508
@@ -27,8 +28,7 @@ def adding_full_text_search_columns_to_postgres(context):
 
     for model in searchable_sqlalchemy_models(Base):
         print(f'*** model to migrate: {model}')
-        # if model.__tablename__ in ['users', 'attendees']:
-        if model.__tablename__ in ['users']:
+        if model.__tablename__ in ['users', 'events']:
             model.add_fts_column(session, schema)
 
     # def generate_email():
