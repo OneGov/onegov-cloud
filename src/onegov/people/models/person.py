@@ -1,15 +1,33 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
-from sqlalchemy import Text
+from onegov.search.utils import create_tsvector_string, adds_fts_column, \
+    drops_fts_column
+from sqlalchemy import Column, Text, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
 from vobject.vcard import Name
+
+
+FTS_PEOPLE_COL_NAME = 'fts_people_idx'
+
+
+def people_tsvector_string():
+    """
+    builds the index on '<first name> <last name>' from username (email
+    address) and realname.
+    """
+    s = create_tsvector_string('function')
+    s += " || ' ' || coalesce(last_name, '')"
+    s += " || ' ' || coalesce(first_name, '')"
+    return s
 
 
 class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
@@ -129,6 +147,19 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes = Column(Text, nullable=True)
 
+    # column for full text search index
+    fts_people_idx = Column(TSVECTOR, Computed(
+        f"to_tsvector('german', {people_tsvector_string()})",
+        persisted=True))
+
+    __table_args__ = (
+        Index(
+            'fts_events',
+            fts_people_idx,
+            postgresql_using='gin'
+        ),
+    )
+
     def vcard_object(self, exclude=None, include_memberships=True):
         """ Returns the person as vCard (3.0) object.
 
@@ -238,57 +269,34 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         return sorted(self.memberships, key=sortkey)
 
     @staticmethod
-    def drop_fts_index(session, schema):
+    def reindex(session, schema):
         """
-        Drops the full text search index. Used for re-indexing
-
-        :param session: db session
-        :param schema: schema on which the fts index shall be dropped
-        :return:
+        Re-indexes the table by dropping and adding the full text search
+        column.
         """
-        query = f"""
-DROP INDEX IF EXISTS "{schema}".fts_idx_people_first_last_title
-"""
-        print(f'dropping index query: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
-
-    @staticmethod
-    def create_fts_index(session, schema):
-        """
-        Creates the full text search index based on the separate index
-        column. Used for re-indexing
-
-        :param session: db session
-        :param schema: schema the index shall be created
-        :return:
-        """
-        query = f"""
-CREATE INDEX IF NOT EXISTS fts_idx_people_first_last_title ON
-"{schema}".people USING GIN (fts_idx_people_first_last_title_col);
-"""
-        print(f'create index query: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
+        Person.drop_fts_column(session, schema)
+        Person.add_fts_column(session, schema)
 
     @staticmethod
     def add_fts_column(session, schema):
         """
-        This function is used as migration step moving to postgressql full
-        text search, OGC-508. It adds a separate column for the tsvector
+        Adds full text search column to table `events`
 
         :param session: db session
         :param schema: schema the full text column shall be added
         :return: None
         """
-        from onegov.search.utils import create_tsvector_string
+        adds_fts_column(schema, session, Person.__tablename__,
+                        FTS_PEOPLE_COL_NAME, people_tsvector_string())
 
-        col_name = 'fts_idx_people_first_last_title_col'
-        s = create_tsvector_string('first_name', 'last_name', 'title')
-        query = f"""
-ALTER TABLE "{schema}".people ADD COLUMN IF NOT EXISTS
-{col_name} tsvector GENERATED ALWAYS AS
-(to_tsvector('german', {s})) STORED;
-"""
-        session.execute(query)
-        session.execute("COMMIT")
+    @staticmethod
+    def drop_fts_column(session, schema):
+        """
+        Drops the full text search column
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        drops_fts_column(schema, session, Person.__tablename__,
+                         FTS_PEOPLE_COL_NAME)

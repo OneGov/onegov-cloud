@@ -164,7 +164,7 @@ class PostgresqlSearchApp(morepath.App):
         for model in searchable_sqlalchemy_models(Base):
             print('---------------------------------------------------------')
             print(f'*** model to reindex: {model}')
-            if model.__tablename__ in ['users', 'events', 'pages']:
+            if model.__tablename__ in ['users', 'events', 'pages', 'people']:
                 model.reindex(session, self.schema)
 
     # TODO: move to ticket.py

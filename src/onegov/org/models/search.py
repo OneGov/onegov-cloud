@@ -4,6 +4,7 @@ from onegov.core.collection import Pagination
 from onegov.event.models import Event
 from onegov.page import Page
 from onegov.user import User
+from onegov.people import Person
 
 
 class Search(Pagination):
@@ -176,13 +177,18 @@ class Search(Pagination):
             self.query, postgresql_regconfig='german'))
         results += query.all()
 
-        query = self.request.session.query(User)
-        query = query.filter(User.fts_users_idx.match(
+        query = self.request.session.query(Page)
+        query = query.filter(Page.fts_pages_idx.match(
             self.query, postgresql_regconfig='german'))
         results += query.all()
 
-        query = self.request.session.query(Page)
-        query = query.filter(Page.fts_pages_idx.match(
+        query = self.request.session.query(Person)
+        query = query.filter(Person.fts_people_idx.match(
+            self.query, postgresql_regconfig='german'))
+        results += query.all()
+
+        query = self.request.session.query(User)
+        query = query.filter(User.fts_users_idx.match(
             self.query, postgresql_regconfig='german'))
         results += query.all()
 
