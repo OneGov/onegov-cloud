@@ -54,8 +54,8 @@ def event_tsvector_string():
     fields description and organizer in content column
     """
     s = create_tsvector_string('title', 'location')
-    s += " || ' ' || ((content ->> 'description'))" \
-         " || ' ' || ((content ->> 'organizer'))"
+    s += " || ' ' || coalesce(((content ->> 'description')), '')"
+    s += " || ' ' || coalesce(((content ->> 'organizer')), '')"
     return s
 
 
