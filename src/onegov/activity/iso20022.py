@@ -155,7 +155,9 @@ def extract_transactions(xml, invoice_schema):
             )
 
         # Transactions with no TxDtls
-        if not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf'):
+        if (not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf')
+                and len(booking_text.split()[-1]) == 27):
+
             yield Transaction(
                 booking_date=booking_date,
                 valuta_date=valuta_date,
