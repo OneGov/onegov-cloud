@@ -111,7 +111,7 @@ class JsonFileAction(ViewAction):
         name = content.get('name', 'data.json')
         return Response(
             json.dumps(data, sort_keys=True, indent=2).encode('utf-8'),
-            content_type='application/json',
+            content_type='application/json; charset=utf-8',
             content_disposition=f'inline; filename={name}.json')
 
 

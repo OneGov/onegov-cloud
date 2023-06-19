@@ -231,12 +231,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         }.get(self.type)
 
         vote = VoteType(
-            vote_identification=identification,  # todo:
+            vote_identification=identification,
             main_vote_identification=main_vote_identification,
             other_identification=[
                 NamedIdType(
                     id_name='onegov',
-                    id=self.id
+                    id=str(self.id)
                 )
             ],
             domain_of_influence=domain_of_influence,

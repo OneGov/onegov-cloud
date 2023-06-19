@@ -843,17 +843,29 @@ def test_view_election_data(election_day_app_gr):
     upload_majorz_election(client)
     upload_proporz_election(client)
 
-    export = client.get('/election/majorz-election/data-json')
-    assert all((expected in export for expected in ("3506", "Engler", "20")))
+    data = client.get('/election/majorz-election/data-json')
+    assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=majorz-election.json'
+    assert all((expected in data for expected in ("3506", "Engler", "20")))
 
-    export = client.get('/election/majorz-election/data-csv')
-    assert all((expected in export for expected in ("3506", "Engler", "20")))
+    data = client.get('/election/majorz-election/data-csv')
+    assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=majorz-election.csv'
+    assert all((expected in data for expected in ("3506", "Engler", "20")))
 
-    export = client.get('/election/proporz-election/data-json')
-    assert all((expected in export for expected in ("FDP", "Caluori", "56")))
+    data = client.get('/election/proporz-election/data-json')
+    assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=proporz-election.json'
+    assert all((expected in data for expected in ("FDP", "Caluori", "56")))
 
-    export = client.get('/election/proporz-election/data-csv')
-    assert all((expected in export for expected in ("FDP", "Caluori", "56")))
+    data = client.get('/election/proporz-election/data-csv')
+    assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=proporz-election.csv'
+    assert all((expected in data for expected in ("FDP", "Caluori", "56")))
 
 
 def test_view_election_tacit(election_day_app_gr):

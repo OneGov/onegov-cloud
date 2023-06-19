@@ -358,6 +358,7 @@ class Canton(Principal):
         """
 
         if item is None or item.domain == 'canton':
+            # todo:
             return DomainOfInfluenceType(
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
@@ -499,7 +500,7 @@ class Municipality(Principal):
                 domain_of_influence_type=DomainOfInfluenceTypeType(
                     DomainOfInfluenceTypeType.CT
                 ),
-                domain_of_influence_identification=self.canton,
+                domain_of_influence_identification=self.canton.upper(),
                 domain_of_influence_name=self.canton_name
             )
         if item.domain in ('district'):
