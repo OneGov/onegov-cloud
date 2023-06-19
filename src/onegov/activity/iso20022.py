@@ -154,6 +154,24 @@ def extract_transactions(xml, invoice_schema):
                 invoice_schema=invoice_schema
             )
 
+        # Transactions with no TxDtls
+        if not entry.xpath('NtryDtls/TxDtls') and entry.xpath('AddtlNtryInf'):
+            yield Transaction(
+                booking_date=booking_date,
+                valuta_date=valuta_date,
+                booking_text=booking_text,
+                tid=None,
+                amount=as_decimal(first(entry, 'Amt/text()')),
+                currency=first(entry, 'Amt/@Ccy'),
+                reference=booking_text.split()[-1],
+                note=joined(entry, 'RmtInf/Ustrd/text()'),
+                credit=first(entry, 'CdtDbtInd/text()') == 'CRDT',
+                debitor=first(entry, 'RltdPties/Dbtr/Nm/text()'),
+                debitor_account=first(
+                    entry, 'RltdPties/DbtrAcct/Id/IBAN/text()'),
+                invoice_schema=invoice_schema
+            )
+
 
 def match_iso_20022_to_usernames(xml, session, period_id, schema,
                                  currency='CHF'):
