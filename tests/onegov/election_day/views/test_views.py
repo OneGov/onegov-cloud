@@ -160,13 +160,16 @@ def test_pages_cache(election_day_app_zg):
     assert 'Set-Cookie' in response.headers  # session_id
     assert len(election_day_app_zg.pages_cache.keys()) == 0
 
-    # make sure HEAD requests are not cached
+    # make sure HEAD requests are cached without qs
     anonymous.head('/vote/0xdeadbeef/')
-    assert len(election_day_app_zg.pages_cache.keys()) == 0
+    assert len(election_day_app_zg.pages_cache.keys()) == 1
+
+    anonymous.head('/vote/0xdeadbeef/?127')
+    assert len(election_day_app_zg.pages_cache.keys()) == 1
 
     # Create cache entries
     assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef/entities')
-    assert len(election_day_app_zg.pages_cache.keys()) == 1
+    assert len(election_day_app_zg.pages_cache.keys()) == 2
 
     # Modify without invalidating the cache
     begin()
