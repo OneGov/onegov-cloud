@@ -32,13 +32,27 @@ h6 small,
 
 .agenda-item-vota {
     .votum {
-        margin-bottom: 2em;
+        margin-bottom: 3em;
+
+        blockquote {
+            border-left: 0;
+            box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
+        }
     }
 
     .edit-bar {
         margin-bottom: .5em;
     }
 }
+
+.agenda-item-overview {
+    margin-bottom: 4rem;
+}
+
+.callout.secondary.agenda-item-resolution {
+    margin-top: 1rem;
+    margin-bottom: 2.5rem;
+  }
 
 .states-list {
     list-style: none;
@@ -85,4 +99,17 @@ h6 small,
 
 .person-card-title {
     font-weight: bold;
+}
+
+
+/*
+    Dark Header
+*/
+
+#header .navigation {
+    .accordion.search-header-mobile,
+    [type="search"] {
+        background: transparent;
+        color: $white;
+    }
 }

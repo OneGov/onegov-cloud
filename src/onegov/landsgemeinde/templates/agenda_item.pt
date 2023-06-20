@@ -17,7 +17,6 @@
                 </div>
 
                 <div class="agenda-item-overview" tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></div>
-                <hr>
 
                 <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
 
