@@ -5,29 +5,13 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable
-from onegov.search.utils import create_tsvector_string, adds_fts_column, \
-    drops_fts_column
+from onegov.search import ORMSearchable, Searchable
 from sqlalchemy import Column, Text, Index
 from sqlalchemy import Computed  # type:ignore[attr-defined]
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
 from vobject.vcard import Name
-
-
-FTS_PEOPLE_COL_NAME = 'fts_people_idx'
-
-
-def people_tsvector_string():
-    """
-    builds the index on '<first name> <last name>' from username (email
-    address) and realname.
-    """
-    s = create_tsvector_string('function')
-    s += " || ' ' || coalesce(last_name, '')"
-    s += " || ' ' || coalesce(first_name, '')"
-    return s
 
 
 class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
@@ -147,18 +131,26 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes = Column(Text, nullable=True)
 
-    # column for full text search index
-    fts_people_idx = Column(TSVECTOR, Computed(
-        f"to_tsvector('german', {people_tsvector_string()})",
-        persisted=True))
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
 
     __table_args__ = (
         Index(
-            'fts_events',
-            fts_people_idx,
+            'fts_idx',
+            fts_idx,
             postgresql_using='gin'
         ),
     )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        builds the index on '<first name> <last name>' from username (email
+        address) and realname.
+        """
+        s = Searchable.create_tsvector_string('function')
+        s += " || ' ' || coalesce(last_name, '')"
+        s += " || ' ' || coalesce(first_name, '')"
+        return s
 
     def vcard_object(self, exclude=None, include_memberships=True):
         """ Returns the person as vCard (3.0) object.
@@ -267,36 +259,3 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
             return membership.order_within_person
 
         return sorted(self.memberships, key=sortkey)
-
-    @staticmethod
-    def reindex(session, schema):
-        """
-        Re-indexes the table by dropping and adding the full text search
-        column.
-        """
-        Person.drop_fts_column(session, schema)
-        Person.add_fts_column(session, schema)
-
-    @staticmethod
-    def add_fts_column(session, schema):
-        """
-        Adds full text search column to table `events`
-
-        :param session: db session
-        :param schema: schema the full text column shall be added
-        :return: None
-        """
-        adds_fts_column(schema, session, Person.__tablename__,
-                        FTS_PEOPLE_COL_NAME, people_tsvector_string())
-
-    @staticmethod
-    def drop_fts_column(session, schema):
-        """
-        Drops the full text search column
-
-        :param session: db session
-        :param schema: schema the full text column shall be added
-        :return: None
-        """
-        drops_fts_column(schema, session, Person.__tablename__,
-                         FTS_PEOPLE_COL_NAME)

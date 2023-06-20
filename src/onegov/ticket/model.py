@@ -4,9 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
-from onegov.search import ORMSearchable
-from onegov.search.utils import create_tsvector_string, adds_fts_column, \
-    drops_fts_column
+from onegov.search import ORMSearchable, Searchable
 from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
@@ -18,17 +16,6 @@ from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
-
-FTS_TICKET_COL_NAME = 'fts_ticket_idx'
-
-
-def ticket_tsvector_string():
-    """
-    index is built on columns title and location as well as the json
-    fields description and organizer in content column
-    """
-    s = create_tsvector_string('number')
-    return s
 
 
 class Ticket(Base, TimestampMixin, ORMSearchable):
@@ -90,18 +77,22 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: true if the notifications for this ticket should be muted
     muted = Column(Boolean, nullable=False, default=False)
 
-    # column for full text search index
-    fts_ticket_idx = Column(TSVECTOR, Computed(
-        f"to_tsvector('german', {ticket_tsvector_string()})",
-        persisted=True))
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
 
     __table_args__ = (
         Index(
-            'fts_tickets',
-            fts_ticket_idx,
+            'fts_idx',
+            fts_idx,
             postgresql_using='gin'
         ),
     )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on column ticket number
+        """
+        return Searchable.create_tsvector_string('number')
 
     # override the created attribute from the timestamp mixin - we don't want
     # it to be deferred by default because we usually need it
@@ -270,39 +261,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             data = getattr(self.handler, f'submitter_{info}')
             if data:
                 self.snapshot[f'submitter_{info}'] = data
-
-    @staticmethod
-    def reindex(session, schema):
-        """
-        Re-indexes the table by dropping and adding the full text search
-        column.
-        """
-        Ticket.drop_fts_column(session, schema)
-        Ticket.add_fts_column(session, schema)
-
-    @staticmethod
-    def add_fts_column(session, schema):
-        """
-        Adds full text search column to table `events`
-
-        :param session: db session
-        :param schema: schema the full text column shall be added
-        :return: None
-        """
-        adds_fts_column(schema, session, Ticket.__tablename__,
-                        FTS_TICKET_COL_NAME, ticket_tsvector_string())
-
-    @staticmethod
-    def drop_fts_column(session, schema):
-        """
-        Drops the full text search column
-
-        :param session: db session
-        :param schema: schema the full text column shall be added
-        :return: None
-        """
-        drops_fts_column(schema, session, Ticket.__tablename__,
-                         FTS_TICKET_COL_NAME)
 
 
 class TicketPermission(Base, TimestampMixin):

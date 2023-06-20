@@ -134,6 +134,92 @@ class Searchable:
         """ Returns a list of tags associated with this content. """
         return None
 
+    def psql_tsvector_string(self):
+        """
+        Provides the tsvector string for postgres defining which columns and
+        json fields to be used for full text search index.
+
+        Example:
+        s = create_tsvector_string('title', 'location')
+        s += " || ' ' || coalesce(((content ->> 'description')), '')"
+        s += " || ' ' || coalesce(((content ->> 'organizer')), '')"
+
+        :return: tsvector string
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def reindex(session, schema, model):
+        """
+        Re-indexes the table by dropping and adding the full text search
+        column.
+        """
+        Searchable.drop_fts_column(session, schema, model)
+        Searchable.add_fts_column(session, schema, model)
+
+    @staticmethod
+    def drop_fts_column(session, schema, model, col_name='fts_idx'):
+        """
+        Drops the full text search column
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :param model: model to drop the index from
+        :param col_name: column name of fts index
+        :return: None
+        """
+        query = f"""
+            ALTER TABLE "{schema}".{model.__tablename__} DROP COLUMN IF EXISTS
+            {col_name};
+        """
+        print(f'drop fts column: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def add_fts_column(session, schema, model, col_name='fts_idx'):
+
+        """
+        This function is used for re-indexing and as migration step moving to
+        postgresql full text search (fts), OGC-508.
+
+        It adds a separate column for the tsvector to `schema`.`table`
+
+        :param session: session
+        :param schema: schema name
+        :param model: model to add the index
+        :param col_name: column name of fts index
+        :return: None
+        """
+        # TODO: configure language
+        query = f"""
+            ALTER TABLE "{schema}".{model.__tablename__}
+            ADD COLUMN IF NOT EXISTS {col_name} tsvector GENERATED ALWAYS AS
+            (to_tsvector('german', {model.psql_tsvector_string()})) STORED;
+        """
+        print(f'add fts column: {query}')
+        session.execute(query)
+        session.execute("COMMIT")
+
+    @staticmethod
+    def create_tsvector_string(*cols):
+        """
+        Creates tsvector string for columns
+        Doc reference:
+        https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX
+
+        :param cols: column names to be indexed
+        :return: tsvector string for multiple columns
+        """
+        base = "coalesce({}, '')"
+        ext = " || ' ' || coalesce({}, '')"
+
+        s = base
+        for _ in range(len(cols) - 1):
+            s += ext
+
+        return s.format(*cols)
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults

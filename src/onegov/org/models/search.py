@@ -1,16 +1,13 @@
 from cached_property import cached_property
+from sqlalchemy import func
 
 from onegov.core.collection import Pagination
-from onegov.directory import Directory
+from onegov.core.orm import Base
 from onegov.event.models import Event
-from onegov.page import Page
-from onegov.ticket import Ticket
-from onegov.user import User
-from onegov.people import Person
+from onegov.search.utils import searchable_sqlalchemy_models
 
 
 class Search(Pagination):
-
     results_per_page = 10
     max_query_length = 100
 
@@ -173,46 +170,19 @@ class Search(Pagination):
         results = []
         print('*** tschupre postgresql_search')
 
-        # TODO:language from application setting?:w
-        query = self.request.session.query(Event)
-        query = query.filter(Event.fts_events_idx.match(
-            self.query, postgresql_regconfig='german'))
-        results += query.all()
+        # TODO:language from application setting?
 
-        query = self.request.session.query(Page)
-        query = query.filter(Page.fts_pages_idx.match(
-            self.query, postgresql_regconfig='german'))
-        results += query.all()
-
-        query = self.request.session.query(Person)
-        query = query.filter(Person.fts_people_idx.match(
-            self.query, postgresql_regconfig='german'))
-        results += query.all()
-
-        query = self.request.session.query(User)
-        query = query.filter(User.fts_users_idx.match(
-            self.query, postgresql_regconfig='german'))
-        results += query.all()
-
-        if Ticket.es_public or self.request.is_logged_in:
-            query = self.request.session.query(Ticket)
-            query = query.filter(Ticket.fts_ticket_idx.match(
-                self.query, postgresql_regconfig='german'))
-            results += query.all()
-
-        if Directory.es_public or self.request.is_logged_in:
-            query = self.request.session.query(Directory)
-            query = query.filter(Directory.fts_directory_idx.match(
-                self.query, postgresql_regconfig='german'))
-            results += query.all()
-
-        print(f'len results: {len(results)}')
-
-        # # Perform the full-text search by matching the tsquery against
-        # the content field
-        # results = session.query(Article).filter(
-        #     Article.content.match(self.query),
-        #     postgresql_regconfig='german').all()
+        for model in searchable_sqlalchemy_models(Base):
+            if model.__tablename__ in ['users', 'events', 'page', 'people',
+                                       'tickets', 'directories']:
+                if model.es_public or self.request.is_logged_in:
+                    print(f'*** model to search: {model}')
+                    query = self.request.session.query(model)
+                    query = query.filter(
+                        model.fts_idx.op('@@')
+                        (func.websearch_to_tsquery('german', self.query))
+                    )
+                    results += query.all()
 
         print(f'*** psql res count: {len(results)}')
         for result in results:

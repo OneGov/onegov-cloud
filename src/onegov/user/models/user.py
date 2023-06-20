@@ -8,8 +8,7 @@ from onegov.core.security import forget, remembered
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
-from onegov.search import ORMSearchable
-from onegov.search.utils import drops_fts_column, adds_fts_column
+from onegov.search import ORMSearchable, Searchable
 from onegov.user.models.group import UserGroup
 from sqlalchemy import Boolean, Column, Text, func, ForeignKey, Index
 from sqlalchemy import Computed  # type:ignore[attr-defined]
@@ -17,19 +16,6 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
-
-
-FTS_USERS_COL_NAME = 'fts_users_idx'
-
-
-def user_tsvector_string():
-    """
-    builds the index on '<first name> <last name>' from username (email
-    address) and realname.
-    """
-    return "split_part(split_part(username, '@', 1), '.', 1) || ' ' || " \
-           "split_part(split_part(username, '@', 1), '.', 2) || ' ' || " \
-           "realname"
 
 
 class User(Base, TimestampMixin, ORMSearchable):
@@ -54,6 +40,16 @@ class User(Base, TimestampMixin, ORMSearchable):
         'userprofile': {'type': 'text'}
     }
     es_public = False
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index(
+            'fts_idx',
+            fts_idx,
+            postgresql_using='gin'
+        ),
+    )
 
     @property
     def es_suggestion(self):
@@ -140,19 +136,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the signup token used by the user
     signup_token = Column(Text, nullable=True, default=None)
 
-    # column for full text search index
-    fts_users_idx = Column(TSVECTOR, Computed(
-        f"to_tsvector('german', {user_tsvector_string()}",
-        persisted=True)
-    )
-
-    __table_args__ = (
-        Index(
-            'fts_users',
-            fts_users_idx,
-            postgresql_using='gin'
-        ),
-    )
+    @staticmethod
+    def psql_tsvector_string():
+        return Searchable.create_tsvector_string('username', 'realname')
 
     @hybrid_property
     def title(self):
@@ -314,41 +300,3 @@ class User(Base, TimestampMixin, ORMSearchable):
         self.cleanup_sessions(app)
 
         return count
-
-    @staticmethod
-    def reindex(session, schema):
-        """
-        Re-indexes the table by dropping and adding the full text search
-        column.
-        """
-        User.drop_fts_column(session, schema)
-        User.add_fts_column(session, schema)
-
-    @staticmethod
-    def add_fts_column(session, schema):
-        """
-        This function is used for re-indexing and as migration step moving to
-        postgresql full text search, OGC-508.
-        It adds a separate column for the tsvector
-
-        The text search is based on username split into first and last name
-
-        :param session: db session
-        :param schema: schema the full text column shall be added
-        :return: None
-        """
-        adds_fts_column(schema, session, User.__tablename__,
-                        FTS_USERS_COL_NAME, user_tsvector_string())
-
-    @staticmethod
-    def drop_fts_column(session, schema):
-
-        """
-        Drops the full text search column
-
-        :param session: db session
-        :param schema: schema the full text column shall be added
-        :return: None
-        """
-        drops_fts_column(schema, session, User.__tablename__,
-                         FTS_USERS_COL_NAME)

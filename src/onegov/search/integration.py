@@ -166,63 +166,7 @@ class PostgresqlSearchApp(morepath.App):
             print(f'*** model to reindex: {model}')
             if model.__tablename__ in ['users', 'events', 'pages', 'people',
                                        'tickets', 'directories']:
-                model.reindex(session, self.schema)
-
-    # TODO: move to ticket.py
-    @staticmethod
-    def drop_fts_index(session, schema):
-        """
-        Drops the full text search index. Used for re-indexing
-
-        :param session: db session
-        :param schema: schema on which the fts index shall be dropped
-        :return:
-        """
-        query = f"""
-DROP INDEX IF EXISTS "{schema}".fts_idx_tickets_number
-"""
-        print(f'dropping index query: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
-
-    @staticmethod
-    def create_fts_index(session, schema):
-        """
-        Creates the full text search index based on the separate index
-        column. Used for re-indexing
-
-        :param session: db session
-        :param schema: schema the index shall be created
-        :return:
-        """
-        query = f"""
-CREATE INDEX fts_idx_tickets_number ON "{schema}".tickets USING
-GIN (fts_idx_tickets_number_col);
-"""
-        print(f'create index query: {query}')
-        session.execute(query)
-        session.execute("COMMIT")
-
-    @staticmethod
-    def add_fts_column(session, schema):
-        """
-        This function is used as migration step moving to postgressql full
-        text search, OGC-508. It adds a separate column for the tsvector
-
-        :param session: db session
-        :param schema: schema the full text column shall be added
-        :return: None
-        """
-        from onegov.search.utils import create_tsvector_string
-
-        s = create_tsvector_string('username')
-        query = f"""
-ALTER TABLE "{schema}".users ADD COLUMN
-fts_idx_tickets_number_col tsvector GENERATED ALWAYS AS
-(to_tsvector('german', {s})) STORED;
-"""
-        session.execute(query)
-        session.execute("COMMIT")
+                model.reindex(session, self.schema, model)
 
 
 # TODO: REMOVE
