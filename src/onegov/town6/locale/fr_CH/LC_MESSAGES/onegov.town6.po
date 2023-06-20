@@ -1398,7 +1398,7 @@ msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
 
 msgid "The following reservations have been rejected:"
-msgstr ""
+msgstr "Les réservations suivantes ont été rejetées :"
 
 msgid ""
 "This is a notification for the rejected reservations for ${organisation}. If "
@@ -1784,7 +1784,7 @@ msgid "Receives notifications for internal notes on reservations."
 msgstr "Reçoit des notifications pour les notes internes sur les réservations."
 
 msgid "Receives notifications for rejected reservations."
-msgstr ""
+msgstr "Reçoit des notifications pour les réservations rejetées."
 
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."
