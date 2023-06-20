@@ -4,7 +4,6 @@ from pathlib import Path
 import transaction
 
 from datetime import datetime
-from onegov.core.request import CoreRequest
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -35,23 +34,12 @@ def test_rejected_reservation_sends_email_to_configured_recipients(client,
     assert tickets.query().count() == 1
 
     client.login_admin()
-    request = CoreRequest(
-        environ={
-            "wsgi.url_scheme": "https",
-            "PATH_INFO": "/",
-            "SERVER_NAME": "",
-            "SERVER_PORT": "",
-            "SERVER_PROTOCOL": "https",
-            "HTTP_HOST": "localhost",
-        }, app=town_app,
-    )
-    tickets = TicketCollection(client.app.session()).by_handler_code('RSV')
-    assert len(tickets) == 1
-    ticket = tickets[0]
-    # The 'reject reservation' link is somehow not present in page for some
-    # reason this is why we craft the link manually.
-    crafted_link = request.link(ticket, 'reject')
-    client.get(crafted_link)
+
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    page = page.click("Alle absagen")
+    assert "Reservationen absagen" in page
+
+    assert "Die Reservation wurde abgelehnt" in page
 
     assert len(os.listdir(client.app.maildir)) == 1
     mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
