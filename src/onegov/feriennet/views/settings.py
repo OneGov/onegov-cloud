@@ -71,8 +71,8 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Userprofile"))
 
     show_political_municipality = BooleanField(
-        label=_("Require the political municipality on registration"),
-        fieldset=_("Political Municipality"))
+        label=_("Require the political municipality in the userprofile"),
+        fieldset=_("Userprofile"))
 
     show_related_contacts = BooleanField(
         label=_(

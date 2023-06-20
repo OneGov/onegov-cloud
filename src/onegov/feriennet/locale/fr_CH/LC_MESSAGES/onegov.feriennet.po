@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-06-12 14:30+0200\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -691,26 +691,11 @@ msgstr "Informations santé et autres"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergies, handicaps, particularités"
 
-msgid "The address of the attendee differs from the users address"
-msgstr "L'adresse du participant diffère de l'adresse de l'utilisateur"
-
-msgid "Check this box if the attendee doesn't live with you"
-msgstr "Cochez cette case si le participant ne vit pas avec vous"
-
-msgid "Zip Code"
-msgstr "Code postal"
-
-msgid "Political municipality"
-msgstr "Municipalité politique"
-
 msgid "Attendee"
 msgstr "Participant·e·s"
 
 msgid "Note"
 msgstr "Remarque"
-
-msgid "Political Municipality"
-msgstr "Commune politique"
 
 msgid "Ignore Age Restriction"
 msgstr "Ignorer la restriction d'âge"
@@ -1329,6 +1314,12 @@ msgstr "Civilité"
 
 msgid "Personal"
 msgstr "Personnel"
+
+msgid "Zip Code"
+msgstr "Code postal"
+
+msgid "Political Municipality"
+msgstr "Commune politique"
 
 msgid "Public E-Mail Address"
 msgstr "Adresse e-mail"
@@ -3107,8 +3098,8 @@ msgstr "La majorité civile (18 ans) doit être atteinte pour l'inscription"
 msgid "Userprofile"
 msgstr "Profil d'utilisateur·trice"
 
-msgid "Require the political municipality on registration"
-msgstr "Exiger de la municipalité politique qu'elle s'inscrive"
+msgid "Require the political municipality in the userprofile"
+msgstr "Demander la commune politique dans le profil de l'utilisateur·trice"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
@@ -3196,12 +3187,3 @@ msgstr "Réservations pour ${period}"
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
 
-#~ msgid "Invoice items marked as paid"
-#~ msgstr "Éléments de la facture marqués comme payés"
-
-#~ msgid "Move"
-#~ msgstr "Déplacer"
-
-#, python-format
-#~ msgid "${count} registered Attendees"
-#~ msgstr "${count} participants inscrits"

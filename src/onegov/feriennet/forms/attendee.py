@@ -92,47 +92,6 @@ class AttendeeForm(AttendeeBase):
         description=_("Allergies, Disabilities, Particulars"),
     )
 
-    differing_address = BooleanField(
-        label=_("The address of the attendee differs from the users address"),
-        description=_("Check this box if the attendee doesn't live with you")
-    )
-
-    address = TextAreaField(
-        label=_("Address"),
-        render_kw={'rows': 4},
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
-    zip_code = StringField(
-        label=_("Zip Code"),
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
-    place = StringField(
-        label=_("Place"),
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
-    political_municipality = StringField(
-        label=_("Political municipality"),
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
-    @property
-    def show_political_municipality(self):
-        return self.request.app.org.meta.get('show_political_municipality')
-
-    def toggle_political_municipality(self):
-        if not self.show_political_municipality:
-            self.delete_field('political_municipality')
-
-    def on_request(self):
-        self.toggle_political_municipality()
-
 
 class AttendeeSignupForm(AttendeeBase):
 
@@ -172,37 +131,6 @@ class AttendeeSignupForm(AttendeeBase):
         depends_on=('attendee', 'other')
     )
 
-    differing_address = BooleanField(
-        label=_("The address of the attendee differs from the users address"),
-        description=_("Check this box if the attendee doesn't live with you"),
-        depends_on=('attendee', 'other')
-    )
-
-    address = TextAreaField(
-        label=_("Address"),
-        render_kw={'rows': 4},
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
-    zip_code = StringField(
-        label=_("Zip Code"),
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
-    place = StringField(
-        label=_("Place"),
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
-    political_municipality = StringField(
-        label=_("Political Municipality"),
-        validators=[InputRequired()],
-        depends_on=('differing_address', 'y')
-    )
-
     ignore_age = BooleanField(
         label=_("Ignore Age Restriction"),
         fieldset=_("Administration"),
@@ -230,10 +158,6 @@ class AttendeeSignupForm(AttendeeBase):
         return self.request.app.settings.org.is_complete_userprofile(
             self.request, username=None, user=self.user)
 
-    @property
-    def show_political_municipality(self):
-        return self.request.app.org.meta.get('show_political_municipality')
-
     @cached_property
     def user(self):
         users = UserCollection(self.request.session)
@@ -244,10 +168,6 @@ class AttendeeSignupForm(AttendeeBase):
         return BookingCollection(
             session=self.request.session,
             period_id=self.model.period_id)
-
-    def toggle_political_municipality(self):
-        if not self.show_political_municipality:
-            self.delete_field('political_municipality')
 
     def for_username(self, username):
         url = URL(self.action)
@@ -285,7 +205,6 @@ class AttendeeSignupForm(AttendeeBase):
     def on_request(self):
         self.populate_attendees()
         self.populate_tos()
-        self.toggle_political_municipality()
 
         if not self.request.is_admin:
             self.delete_field('ignore_age')

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-06-12 14:30+0200\n"
+"POT-Creation-Date: 2023-03-13 15:55+0100\n"
 "PO-Revision-Date: 2021-11-11 09:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -347,18 +347,6 @@ msgstr "Voce di fattura importo"
 msgid "Invoice Item References"
 msgstr "Voce di fattura riferimenti"
 
-msgid "Attendee Address"
-msgstr "Indirizzo del partecipante"
-
-msgid "Attendee Zipcode"
-msgstr "CAP del partecipante"
-
-msgid "Attendee Place"
-msgstr "Posto del partecipante"
-
-msgid "Attendee Political Municipality"
-msgstr "Partecipante Comune politico"
-
 msgid "Organiser Last Name"
 msgstr "Cognome organizzatore"
 
@@ -690,26 +678,11 @@ msgstr "Informazioni salute"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergie, disabilità, caratteristiche speciali"
 
-msgid "The address of the attendee differs from the users address"
-msgstr "L'indirizzo del partecipante differisce dall'indirizzo dell'utente"
-
-msgid "Check this box if the attendee doesn't live with you"
-msgstr "Spuntare questa casella se il partecipante non vive con voi"
-
-msgid "Zip Code"
-msgstr "CAP"
-
-msgid "Political municipality"
-msgstr "Comune politico"
-
 msgid "Attendee"
 msgstr "Partecipante"
 
 msgid "Note"
 msgstr "Commento"
-
-msgid "Political Municipality"
-msgstr "Comune politico"
 
 msgid "Ignore Age Restriction"
 msgstr "Ignorare restrizioni di età"
@@ -1321,6 +1294,12 @@ msgstr "Appellativo"
 
 msgid "Personal"
 msgstr "Personale"
+
+msgid "Zip Code"
+msgstr "CAP"
+
+msgid "Political Municipality"
+msgstr "Comune politico"
 
 msgid "Public E-Mail Address"
 msgstr "Indirizzo e-mail"
@@ -3091,8 +3070,8 @@ msgstr "Età completa richiesta per la registrazione"
 msgid "Userprofile"
 msgstr "Profilo utente"
 
-msgid "Require the political municipality on registration"
-msgstr "Richiedere al comune politico la registrazione"
+msgid "Require the political municipality in the userprofile"
+msgstr "Richiedere il comune  nel profilo dell'utente"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
@@ -3179,12 +3158,3 @@ msgstr "Prenotazioni ${period}"
 msgid "Billing for ${period}"
 msgstr "Fatturazione ${period}"
 
-#~ msgid "Invoice items marked as paid"
-#~ msgstr "Voci di fattura contrassegnate come pagate"
-
-#~ msgid "Move"
-#~ msgstr "Spostare"
-
-#, python-format
-#~ msgid "${count} registered Attendees"
-#~ msgstr "${count} partecipanti registrati"
