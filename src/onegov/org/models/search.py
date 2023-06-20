@@ -3,6 +3,7 @@ from cached_property import cached_property
 from onegov.core.collection import Pagination
 from onegov.event.models import Event
 from onegov.page import Page
+from onegov.ticket import Ticket
 from onegov.user import User
 from onegov.people import Person
 
@@ -191,6 +192,12 @@ class Search(Pagination):
         query = query.filter(User.fts_users_idx.match(
             self.query, postgresql_regconfig='german'))
         results += query.all()
+
+        if self.request.is_logged_in:
+            query = self.request.session.query(Ticket)
+            query = query.filter(Ticket.fts_ticket_idx.match(
+                self.query, postgresql_regconfig='german'))
+            results += query.all()
 
         print(f'len results: {len(results)}')
 
