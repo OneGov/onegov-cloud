@@ -1,8 +1,10 @@
 from datetime import date
+from onegov.ballot import Ballot
 from onegov.ballot import Vote
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PanelField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
@@ -42,6 +44,20 @@ class VoteForm(Form):
         render_kw={'long_description': _("Used for import if set.")},
     )
 
+    external_id_counter_proposal = StringField(
+        label=_("External ID of counter proposal"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+        depends_on=('vote_type', 'complex'),
+    )
+
+    external_id_tie_breaker = StringField(
+        label=_("External ID of tie breaker"),
+        fieldset=_("Identifier"),
+        render_kw={'long_description': _("Used for import if set.")},
+        depends_on=('vote_type', 'complex'),
+    )
+
     vote_type = RadioField(
         label=_("Type"),
         fieldset=_("Properties"),
@@ -61,6 +77,15 @@ class VoteForm(Form):
         validators=[
             InputRequired()
         ]
+    )
+
+    municipality = ChosenSelectField(
+        label=_("Municipality"),
+        fieldset=_("Properties"),
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('domain', 'municipality'),
     )
 
     has_expats = BooleanField(
@@ -206,9 +231,40 @@ class VoteForm(Form):
                 not hasattr(self.model, 'external_id')
                 or self.model.external_id != field.data
             ):
-                query = self.request.session.query(Vote.external_id)
-                query = query.filter_by(external_id=field.data)
-                if query.first():
+                for cls in (Vote, Ballot):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+
+    def validate_external_id_counter_proposal(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'counter_proposal')
+                or self.model.counter_proposal.external_id != field.data
+            ):
+                for cls in (Vote, Ballot):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+                if field.data == self.external_id.data:
+                    raise ValidationError(_('ID already exists'))
+
+    def validate_external_id_tie_breaker(self, field):
+        if field.data:
+            if (
+                not hasattr(self.model, 'tie_breaker')
+                or self.model.tie_breaker.external_id != field.data
+            ):
+                for cls in (Vote, Ballot):
+                    query = self.request.session.query(cls)
+                    query = query.filter_by(external_id=field.data)
+                    if query.first():
+                        raise ValidationError(_('ID already exists'))
+                if field.data == self.external_id.data:
+                    raise ValidationError(_('ID already exists'))
+                if field.data == self.external_id_counter_proposal.data:
                     raise ValidationError(_('ID already exists'))
 
     def on_request(self):
@@ -217,6 +273,18 @@ class VoteForm(Form):
         self.domain.choices = [
             (key, text) for key, text in principal.domains_vote.items()
         ]
+
+        municipalities = set([
+            entity.get('name', None)
+            for year in principal.entities.values()
+            for entity in year.values()
+            if entity.get('name', None)
+        ])
+        self.municipality.choices = [
+            (item, item) for item in sorted(municipalities)
+        ]
+        if principal.domain == 'municipality':
+            self.municipality.choices = [(principal.name, principal.name)]
 
         self.vote_de.validators = []
         self.vote_fr.validators = []
@@ -239,6 +307,8 @@ class VoteForm(Form):
         model.external_id = self.external_id.data
         model.date = self.date.data
         model.domain = self.domain.data
+        if model.domain == 'municipality':
+            model.domain_segment = self.municipality.data
         model.has_expats = self.has_expats.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
@@ -275,6 +345,10 @@ class VoteForm(Form):
             )
 
         if model.type == 'complex':
+            model.counter_proposal.external_id = \
+                self.external_id_counter_proposal.data
+            model.tie_breaker.external_id = self.external_id_tie_breaker.data
+
             titles = {}
             if self.counter_proposal_de.data:
                 titles['de_CH'] = self.counter_proposal_de.data
@@ -315,6 +389,8 @@ class VoteForm(Form):
 
         self.date.data = model.date
         self.domain.data = model.domain
+        if model.domain == 'municipality':
+            self.municipality.data = model.domain_segment
         self.has_expats.data = model.has_expats
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
@@ -332,6 +408,10 @@ class VoteForm(Form):
                 ('complex', _("Vote with Counter-Proposal"))
             ]
             self.vote_type.data = 'complex'
+
+            self.external_id_counter_proposal.data = \
+                model.counter_proposal.external_id
+            self.external_id_tie_breaker.data = model.tie_breaker.external_id
 
             titles = model.counter_proposal.title_translations or {}
             self.counter_proposal_de.data = titles.get('de_CH')

@@ -690,7 +690,7 @@ def test_import_wabstic_majorz_regional(session):
         election, principal,
         *create_csv(((1701, False), (1702, False)))
     )
-    assert '1702 is not part of this election' in [
+    assert '1702 is not part of this business' in [
         (e.error.interpolate()) for e in errors
     ]
 

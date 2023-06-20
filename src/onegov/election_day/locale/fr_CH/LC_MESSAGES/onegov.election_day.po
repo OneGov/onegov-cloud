@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 08:34+0200\n"
+"POT-Creation-Date: 2023-06-19 10:25+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -67,8 +67,8 @@ msgid "The file contains an empty line."
 msgstr "Le fichier contient une ligne vide."
 
 #, python-format
-msgid "${name} is not part of this election"
-msgstr "${name} ne fait pas partie de cette élection"
+msgid "${name} is not part of this business"
+msgstr "${name} ne fait pas partie de cet objet"
 
 #, python-format
 msgid "${name} is not part of ${district}"
@@ -650,6 +650,12 @@ msgstr "Numéro de votation"
 
 msgid "Default"
 msgstr "Défaut"
+
+msgid "External ID of counter proposal"
+msgstr "ID externe du contre-projet"
+
+msgid "External ID of tie breaker"
+msgstr "ID externe du jeu décisif"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"

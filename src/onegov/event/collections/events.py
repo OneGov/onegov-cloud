@@ -303,17 +303,19 @@ class EventCollection(Pagination):
 
         return added, updated, purged_event_ids
 
-    def from_ical(self, ical, future_events_only=False, event_image_path=None):
+    def from_ical(self, ical, future_events_only=False,
+                  event_image=None, event_image_name=None):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
-        :type future_events_only: str
         :param ical: ical to be imported
+        :type ical: str
         :param future_events_only: if set only events in the future will be
         imported
         :type future_events_only: bool
-        :param event_image_path: path and filename to image
-        :type event_image_path: str
+        :param event_image: image file
+        :param event_image_name: image name
+        :type event_image_name: str
 
         """
         items = []
@@ -396,9 +398,8 @@ class EventCollection(Pagination):
                         tags=tags or [],
                         source=f'ical-{uid}',
                     ),
-                    image=event_image_path,
-                    image_filename=event_image_path.name if
-                    event_image_path else None,
+                    image=event_image,
+                    image_filename=event_image_name,
                     pdf=None,
                     pdf_filename=None,
                 )

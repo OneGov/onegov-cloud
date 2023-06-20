@@ -1041,7 +1041,6 @@
 </metal:parties-panachage-chart i18n:domain="onegov.election_day">
 
 <metal:embedded_widget define-macro="embedded_widget" i18n:domain="onegov.election_day">
-    <!-- todo: -->
     <div tal:condition="embed_link" class="embedded-widget"
         data-embed-link="Embed table"
         data-embed-source="${embed_link}"
@@ -1442,6 +1441,7 @@
         <ol>
             <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
             <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
+            <li tal:condition="layout.type in ('simple', 'complex')"><a href="${request.link(model, 'data-xml')}">XML</a></li>
         </ol>
 
         <h5 tal:condition="has_party_results" i18n:translate="">Party results</h5>

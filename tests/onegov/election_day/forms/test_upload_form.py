@@ -19,7 +19,9 @@ from tests.onegov.election_day.common import DummyPostData
 
 def test_upload_vote_form(session):
     cantonal_principal = Canton(name='be', canton='be')
-    communal_principal = Municipality(name='bern', municipality='351')
+    communal_principal = Municipality(
+        name='bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     simple_vote = Vote(title='Vote', date=date(2017, 1, 1), domain='canton')
     complex_vote = ComplexVote()
@@ -133,7 +135,9 @@ def test_upload_vote_form(session):
 
 def test_upload_election_form(session):
     cantonal_principal = Canton(name='be', canton='be')
-    communal_principal = Municipality(name='bern', municipality='351')
+    communal_principal = Municipality(
+        name='bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     election = Election(
         title='Election', date=date(2017, 1, 1), domain='canton', type='majorz'
