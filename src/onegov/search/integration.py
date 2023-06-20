@@ -165,7 +165,7 @@ class PostgresqlSearchApp(morepath.App):
             print('---------------------------------------------------------')
             print(f'*** model to reindex: {model}')
             if model.__tablename__ in ['users', 'events', 'pages', 'people',
-                                       'tickets']:
+                                       'tickets', 'directories']:
                 model.reindex(session, self.schema)
 
     # TODO: move to ticket.py

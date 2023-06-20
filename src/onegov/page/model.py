@@ -18,10 +18,10 @@ from onegov.search.utils import create_tsvector_string, adds_fts_column, \
     drops_fts_column
 
 
-FTS_TOPIC_COL_NAME = 'fts_pages_idx'
+FTS_PAGE_IDX_COL_NAME = 'fts_page_idx'
 
 
-def pages_tsvector_string():
+def page_tsvector_string():
     """
     index is built on column title as well as on the json
     fields lead and text in content column if not NULL
@@ -39,7 +39,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
 
     # column for full text search index
     fts_pages_idx = Column(TSVECTOR, Computed(
-        f"to_tsvector('german', {pages_tsvector_string()})",
+        f"to_tsvector('german', {page_tsvector_string()})",
         persisted=True))
 
     __table_args__ = (
@@ -81,7 +81,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
         :return: None
         """
         adds_fts_column(schema, session, Page.__tablename__,
-                        FTS_TOPIC_COL_NAME, pages_tsvector_string())
+                        FTS_PAGE_IDX_COL_NAME, page_tsvector_string())
 
     @staticmethod
     def drop_fts_column(session, schema):
@@ -93,4 +93,4 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
         :return: None
         """
         drops_fts_column(schema, session, Page.__tablename__,
-                         FTS_TOPIC_COL_NAME)
+                         FTS_PAGE_IDX_COL_NAME)

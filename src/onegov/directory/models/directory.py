@@ -1,6 +1,7 @@
 import inspect
 
 from sedate import to_timezone
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
@@ -17,10 +18,11 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent
-from sqlalchemy import Column
+from onegov.search.utils import create_tsvector_string, adds_fts_column, \
+    drops_fts_column
+from sqlalchemy import Column, Text, Index, Integer
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import func, exists, and_
-from sqlalchemy import Integer
-from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -30,11 +32,22 @@ from wtforms import FieldList
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .directory_entry import DirectoryEntry
 
 
 INHERIT = object()
+
+FTS_DIRECTORY_IDX_COL_NAME = 'fts_directory_idx'
+
+
+def directory_tsvector_string():
+    """
+    index is built on columns title and lead
+    """
+    s = create_tsvector_string('title', 'lead')
+    return s
 
 
 class DirectoryFile(File):
@@ -101,6 +114,19 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         'DirectoryEntry',
         order_by='DirectoryEntry.order',
         backref='directory'
+    )
+
+    # column for full text search index
+    fts_directory_idx = Column(TSVECTOR, Computed(
+        f"to_tsvector('german', {directory_tsvector_string()})",
+        persisted=True))
+
+    __table_args__ = (
+        Index(
+            'fts_events',
+            fts_directory_idx,
+            postgresql_using='gin'
+        ),
     )
 
     @property
@@ -485,3 +511,37 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                         form_field.data = data
 
         return DirectoryEntryForm
+
+    @staticmethod
+    def reindex(session, schema):
+        """
+        Re-indexes the table by dropping and adding the full text search
+        column.
+        """
+        Directory.drop_fts_column(session, schema)
+        Directory.add_fts_column(session, schema)
+
+    @staticmethod
+    def add_fts_column(session, schema):
+        """
+        Adds full text search column to table `events`
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        adds_fts_column(schema, session, Directory.__tablename__,
+                        FTS_DIRECTORY_IDX_COL_NAME,
+                        directory_tsvector_string())
+
+    @staticmethod
+    def drop_fts_column(session, schema):
+        """
+        Drops the full text search column
+
+        :param session: db session
+        :param schema: schema the full text column shall be added
+        :return: None
+        """
+        drops_fts_column(schema, session, Directory.__tablename__,
+                         FTS_DIRECTORY_IDX_COL_NAME)

@@ -182,9 +182,10 @@ def adds_fts_column(schema, session, table_name, col_name,
     :param session: session
     :param table_name: db table name
     :param col_name: column name of fts index
-    :param tsvector_string: index expression string
+    :param tsvector_string: expression string used in postgres to_tsvector
     :return: None
     """
+    # TODO: configure language
     query = f"""
         ALTER TABLE "{schema}".{table_name} ADD COLUMN IF NOT EXISTS
         {col_name} tsvector GENERATED ALWAYS AS
@@ -193,6 +194,13 @@ def adds_fts_column(schema, session, table_name, col_name,
     print(f'add fts column: {query}')
     session.execute(query)
     session.execute("COMMIT")
+
+# """
+# ALTER TABLE product ADD COLUMN ts tsvector GENERATED ALWAYS AS (
+#    setweight(to_tsvector('english', coalesce("name"), ''), 'A') ||
+#    setweight(to_tsvector('english', coalesce("description"), ''), 'B')
+# ) STORED;
+# """
 
 
 def drops_fts_column(schema, session, table_name, col_name):
