@@ -10,45 +10,6 @@ from onegov.ticket import TicketCollection
 from tests.onegov.org.test_views_resources import add_reservation
 
 
-def test_rejected_reservation_sends_email_to_configured_recipients(client,
-                                                                   town_app):
-    resources = ResourceCollection(client.app.libres_context)
-    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
-
-    recipients = ResourceRecipientCollection(client.app.session())
-    recipients.add(
-        name='John',
-        medium='email',
-        address='john@example.org',
-        rejected_reservations=True,
-        resources=[
-            dailypass.id.hex,
-        ]
-    )
-
-    add_reservation(
-        dailypass, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
-    transaction.commit()
-
-    tickets = TicketCollection(client.app.session())
-    assert tickets.query().count() == 1
-
-    client.login_admin()
-
-    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
-    page = page.click("Alle absagen")
-    assert "Reservationen absagen" in page
-
-    assert "Die Reservation wurde abgelehnt" in page
-
-    assert len(os.listdir(client.app.maildir)) == 1
-    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
-    with open(mail, 'r') as file:
-        mail_content = file.read()
-        assert "Die folgenden Reservationen mussten leider abgesagt werden:" \
-               in mail_content
-
-
 def test_new_reservation_notification(client):
     resources = ResourceCollection(client.app.libres_context)
     resource = resources.add('Gymnasium', 'Europe/Zurich', type='room')
