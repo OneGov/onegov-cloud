@@ -1,8 +1,23 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Mapping, Sequence
     from typing import TypeVar, Union
     from typing_extensions import NotRequired, TypedDict
+
+    JSON = (
+        dict[str, 'JSON'] | list['JSON']
+        | str | int | float | bool | None
+    )
+    JSONObject = dict[str, JSON]
+    JSONArray = list[JSON]
+
+    # read only variant of JSON type that is covariant
+    JSON_ro = (
+        Mapping[str, 'JSON_ro'] | Sequence['JSON_ro']
+        | str | int | float | bool | None
+    )
+    JSONObject_ro = Mapping[str, JSON_ro]
+    JSONArray_ro = Sequence[JSON_ro]
 
     class HeaderJsonDict(TypedDict):
         Name: str

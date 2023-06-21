@@ -201,6 +201,38 @@ from uuid import uuid4
 from webtest import TestApp as Client
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import (
+        Callable, Collection, Iterator, Mapping, Sequence)
+    from typing import Protocol, TypedDict
+
+    from onegov.core.request import CoreRequest
+    from onegov.core.security.permissions import Intent
+    from onegov.server.config import ApplicationConfig
+
+    # NOTE: We are forward declaring the attributes we expect to
+    #       exist in the mixed in class
+    class _GroupContextAttrs(Protocol):
+        selector: str | None
+        @property
+        def available_selectors(self) -> list[str]: ...
+        @property
+        def matches(self) -> 'Iterator[str]': ...
+        matches_required: bool
+        singular: bool
+        creates_path: bool
+
+    class ContextSpecificSettings(TypedDict, total=False):
+        default_selector: str
+        creates_path: bool
+        singular: bool
+        matches_required: bool
+
+else:
+    _GroupContextAttrs = object
+
+
 #: :class:`GroupContext` settings which may be overriden by commands
 CONTEXT_SPECIFIC_SETTINGS = (
     'default_selector',
@@ -210,21 +242,27 @@ CONTEXT_SPECIFIC_SETTINGS = (
 )
 
 
-class GroupContextGuard:
+class GroupContextGuard(_GroupContextAttrs):
     """ Contains methods which abort the commandline program if any condition
     is not met.
 
     Used as a mixin in :class:`GroupContext`.
 
     """
-    def validate_guard_conditions(self, click_context):
+
+    def validate_guard_conditions(self, click_context: click.Context) -> None:
         matches = tuple(self.matches)
 
         for name, method in inspect.getmembers(self, inspect.ismethod):
             if name.startswith('abort'):
                 method(click_context, matches)
 
-    def abort_if_no_selector(self, click_context, matches):
+    def abort_if_no_selector(
+        self,
+        click_context: click.Context,
+        matches: 'Collection[str]'
+    ) -> None:
+
         if not self.selector:
             click.secho("Available selectors:")
 
@@ -233,7 +271,12 @@ class GroupContextGuard:
 
             abort("No selector provided, aborting.")
 
-    def abort_if_no_subcommand(self, click_context, matches):
+    def abort_if_no_subcommand(
+        self,
+        click_context: click.Context,
+        matches: 'Collection[str]'
+    ) -> None:
+
         if click_context.invoked_subcommand is None:
             click.secho("Paths matching the selector:")
 
@@ -242,7 +285,12 @@ class GroupContextGuard:
 
             abort("No subcommand provided, aborting.")
 
-    def abort_if_no_match(self, click_context, matches):
+    def abort_if_no_match(
+        self,
+        click_context: click.Context,
+        matches: 'Collection[str]'
+    ) -> None:
+
         if self.matches_required and not matches:
             click.secho("Available selectors:")
 
@@ -251,7 +299,12 @@ class GroupContextGuard:
 
             abort("Selector doesn't match any paths, aborting.")
 
-    def abort_if_not_singular(self, click_context, matches):
+    def abort_if_not_singular(
+        self,
+        click_context: click.Context,
+        matches: 'Collection[str]'
+    ) -> None:
+
         if self.singular and len(matches) > 1:
             click.secho("Paths matching the selector:")
 
@@ -260,13 +313,19 @@ class GroupContextGuard:
 
             abort("The selector must match a single path, aborting.")
 
-    def abort_if_no_create_path(self, click_context, matches):
+    def abort_if_no_create_path(
+        self,
+        click_context: click.Context,
+        matches: 'Collection[str]'
+    ) -> None:
+
         if self.creates_path:
             if len(matches) > 1:
                 abort("This selector may not reference an existing path")
 
             self.abort_if_no_selector(click_context, matches)
 
+            assert self.selector is not None
             if len(self.selector.lstrip('/').split('/')) != 2:
                 abort("This selector must reference a full path")
 
@@ -306,8 +365,15 @@ class GroupContext(GroupContextGuard):
 
     """
 
-    def __init__(self, selector, config, default_selector=None,
-                 creates_path=False, singular=False, matches_required=True):
+    def __init__(
+        self,
+        selector: str | None,
+        config: 'Mapping[str, Any] | str',
+        default_selector: str | None = None,
+        creates_path: bool = False,
+        singular: bool = False,
+        matches_required: bool = True
+    ):
 
         if isinstance(config, dict):
             self.config = Config(config)
@@ -324,7 +390,7 @@ class GroupContext(GroupContextGuard):
             self.singular = singular
             self.matches_required = matches_required
 
-    def available_schemas(self, appcfg):
+    def available_schemas(self, appcfg: 'ApplicationConfig') -> list[str]:
         """ Returns all available schemas, if the application is database
         bound.
 
@@ -340,15 +406,13 @@ class GroupContext(GroupContextGuard):
 
         return list(query_schemas(engine, namespace=appcfg.namespace))
 
-    def split_match(self, match):
+    def split_match(self, match: str) -> tuple[str, str]:
         match = match.lstrip('/')
 
-        if '/' in match:
-            return match.split('/', 1)
-        else:
-            return match, ''
+        match, _, remainder = match.partition('/')
+        return match, remainder
 
-    def match_to_path(self, match):
+    def match_to_path(self, match: str) -> str | None:
         """ Takes the given match and returns the application path used in
         http requests.
 
@@ -359,7 +423,9 @@ class GroupContext(GroupContextGuard):
             if appcfg.namespace == namespace:
                 return appcfg.path.replace('*', id).rstrip('/')
 
-    def match_to_appcfg(self, match):
+        return None
+
+    def match_to_appcfg(self, match: str) -> 'ApplicationConfig | None':
         """ Takes the given match and returns the maching appcfg object. """
 
         namespace, id = self.split_match(match)
@@ -368,8 +434,10 @@ class GroupContext(GroupContextGuard):
             if appcfg.namespace == namespace:
                 return appcfg
 
+        return None
+
     @property
-    def appcfgs(self):
+    def appcfgs(self) -> 'Iterator[ApplicationConfig]':
         """ Returns the matching appconfigs.
 
         Since there's only one appconfig per namespace, we ignore the path
@@ -378,6 +446,9 @@ class GroupContext(GroupContextGuard):
             /namespace/application_id
 
         """
+        if not self.selector:
+            return
+
         namespace_selector = self.selector.lstrip('/').split('/')[0]
 
         for appcfg in self.config.applications:
@@ -385,7 +456,7 @@ class GroupContext(GroupContextGuard):
                 yield appcfg
 
     @property
-    def available_selectors(self):
+    def available_selectors(self) -> list[str]:
         """ Generates a list of available selectors.
 
         The list doesn't technically exhaust all options, but it returns
@@ -399,7 +470,7 @@ class GroupContext(GroupContextGuard):
         return sorted(selectors)
 
     @property
-    def all_wildcard_selectors(self):
+    def all_wildcard_selectors(self) -> 'Iterator[str]':
         """ Returns all selectors targeting a namespace by wildcard. """
 
         for appcfg in self.config.applications:
@@ -407,7 +478,7 @@ class GroupContext(GroupContextGuard):
                 yield '/' + appcfg.namespace + '/*'
 
     @property
-    def all_specific_selectors(self):
+    def all_specific_selectors(self) -> 'Iterator[str]':
         """ Returns all selectors targeting an application directly. """
 
         for appcfg in self.config.applications:
@@ -418,7 +489,7 @@ class GroupContext(GroupContextGuard):
                     yield '/' + schema.replace('-', '/')
 
     @property
-    def matches(self):
+    def matches(self) -> 'Iterator[str]':
         """ Returns the specific selectors matching the context selector.
 
         That is, a combination of namespace / application id is returned.
@@ -440,7 +511,9 @@ class GroupContext(GroupContextGuard):
                 yield self.selector.rstrip('/')
 
 
-def get_context_specific_settings(context):
+def get_context_specific_settings(
+    context: click.Context
+) -> 'ContextSpecificSettings':
     """ Takes the given *click* context and extracts all context specific
     settings from it.
 
@@ -452,15 +525,16 @@ def get_context_specific_settings(context):
     # The context settings are stored on the command though they are actually
     # click's settings, not ours. Upon inspection we need to transfer them
     # here as a result. It's basically a piggy back ride.
+    assert isinstance(context.command, click.Group)
     subcommand = context.command.commands[context.invoked_subcommand]
     if not hasattr(subcommand, 'onegov_settings'):
-        subcommand.onegov_settings = {
+        subcommand.onegov_settings = {  # type:ignore[attr-defined]
             key: subcommand.context_settings.pop(key)
             for key in CONTEXT_SPECIFIC_SETTINGS
             if key in subcommand.context_settings
         }
 
-    return subcommand.onegov_settings
+    return subcommand.onegov_settings  # type:ignore[attr-defined]
 
 
 #: Decorator to acquire the group context on a command::
@@ -473,7 +547,7 @@ def get_context_specific_settings(context):
 pass_group_context = click.make_pass_decorator(GroupContext, ensure=True)
 
 
-def command_group():
+def command_group() -> click.Group:
     """ Generates a click command group for individual modules.
 
     Each individual module may have its own command group from which to run
@@ -497,7 +571,7 @@ def command_group():
     @click.option(
         '--config', default='onegov.yml',
         help="The onegov config file")
-    def command_group(select, config):
+    def command_group(select: str | None, config: str) -> None:
         try:
             context = click.get_current_context()
             context_settings = get_context_specific_settings(context)
@@ -511,7 +585,11 @@ def command_group():
             sys.exit(1)
 
     @command_group.result_callback()
-    def process_results(processor, select, config):
+    def process_results(
+        processor: 'Callable[..., Any] | Sequence[Callable[..., Any]]',
+        select: str,
+        config: str
+    ) -> None:
         """ Calls the function returned by the command once for each
         application matching the selector.
 
@@ -522,6 +600,7 @@ def command_group():
         if not processor:
             return
 
+        processors: 'Sequence[Callable[..., Any]]'
         if callable(processor):
             processors = (processor, )
         else:
@@ -535,16 +614,19 @@ def command_group():
 
         for appcfg in group_context.appcfgs:
 
-            class CliApplication(appcfg.application_class):
+            class CliApplication(appcfg.application_class):  # type:ignore
 
-                def is_allowed_application_id(self, application_id):
+                def is_allowed_application_id(
+                    self,
+                    application_id: str
+                ) -> bool:
 
                     if group_context.creates_path:
                         return True
 
                     return super().is_allowed_application_id(application_id)
 
-                def configure_debug(self, **cfg):
+                def configure_debug(self, **cfg: Any) -> None:
                     # disable debug options in cli (like query output)
                     pass
 
@@ -553,15 +635,16 @@ def command_group():
                 pass
 
             @CliApplication.view(model=Model, permission=Public)
-            def run_command(self, request):
-                processor(request, request.app)
+            def run_command(self: Model, request: 'CoreRequest') -> None:
+                # FIXME: Why is this assuming a single processor?
+                processor(request, request.app)  # type:ignore[operator]
 
             @CliApplication.setting(section='cronjobs', name='enabled')
-            def get_cronjobs_enabled():
+            def get_cronjobs_enabled() -> bool:
                 return False
 
             @CliApplication.setting_section(section='roles')
-            def get_roles_setting():
+            def get_roles_setting() -> dict[str, set[type['Intent']]]:
                 # override the security settings -> we need the public
                 # role to work for anonymous users, even if the base
                 # application disables that
@@ -587,7 +670,7 @@ def command_group():
             configure_logging=False
         )
 
-        def expects_request(processor):
+        def expects_request(processor: 'Callable[..., Any]') -> bool:
             return 'request' in processor.__code__.co_varnames
 
         # call the matching applications
@@ -597,6 +680,8 @@ def command_group():
         for match in matches:
             for processor in processors:
                 if expects_request(processor):
+                    # FIXME: This doesn't work for more than one processor
+                    #        we should also pass in the processor index!
                     path = group_context.match_to_path(match)
                     client.get(path + '/' + view_path)
                 else:
@@ -606,7 +691,7 @@ def command_group():
     return command_group
 
 
-def abort(msg):
+def abort(msg: str) -> None:
     """ Prints the given error message and aborts the program with a return
     code of 1.
 
