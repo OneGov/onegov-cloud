@@ -10,12 +10,21 @@ from sqlalchemy import inspect, text
 from sqlalchemy.exc import NoInspectionAvailable
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator, Sequence
+    from sqlalchemy import Column
+    from sqlalchemy.engine import Connection
+
+    from .upgrade import UpgradeContext
+
+
 @upgrade_task('Drop primary key from associated tables')
-def drop_primary_key_from_associated_tables(context):
+def drop_primary_key_from_associated_tables(context: 'UpgradeContext') -> None:
     bases = set()
 
     for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
-        bases.add(cls.association_base())
+        bases.add(cls.association_base())  # type:ignore[attr-defined]
 
     for base in bases:
         for link in base.registered_links.values():
@@ -30,10 +39,13 @@ def drop_primary_key_from_associated_tables(context):
 
 
 @upgrade_task('Migrate to JSONB', always_run=True, raw=True)
-def migrate_to_jsonb(connection, schemas):
+def migrate_to_jsonb(
+    connection: 'Connection',
+    schemas: 'Sequence[str]'
+) -> 'Iterator[bool]':
     """ Migrates all text base json columns to jsonb. """
 
-    def json_columns(cls):
+    def json_columns(cls: type[Any]) -> 'Iterator[Column[Any]]':
         try:
             for column in inspect(cls).columns:
                 if isinstance(column.type, JSON):
@@ -91,11 +103,11 @@ def migrate_to_jsonb(connection, schemas):
 
 
 @upgrade_task('Rename associated tables')
-def rename_associated_tables(context):
+def rename_associated_tables(context: 'UpgradeContext') -> None:
     bases = set()
 
     for cls in find_models(Base, lambda cls: issubclass(cls, Associable)):
-        bases.add(cls.association_base())
+        bases.add(cls.association_base())  # type:ignore[attr-defined]
 
     for base in bases:
         for link in base.registered_links.values():

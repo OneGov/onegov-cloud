@@ -4,7 +4,7 @@ from onegov.core.security import Public
 from webob.exc import HTTPException
 
 
-from typing import Literal, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Protocol
 
@@ -91,7 +91,7 @@ def may_view_http_errors_not_logged_in(
 def may_view_cronjobs_not_logged_in(
     app: Framework,
     identity: None,
-    model: Job,
+    model: Job[Any],
     permission: type[Public]
 ) -> Literal[True]:
     """ Cronjobs are run anonymously from a thread and need to be excluded

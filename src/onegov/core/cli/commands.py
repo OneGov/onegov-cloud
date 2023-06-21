@@ -26,20 +26,34 @@ from transaction import commit
 from uuid import uuid4
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+
+    from onegov.core.cli.core import GroupContext
+    from onegov.core.framework import Framework
+    from onegov.core.mail_processor.core import MailQueueProcessor
+    from onegov.core.request import CoreRequest
+    from onegov.core.upgrade import _Task
+    from onegov.server.config import ApplicationConfig
+
+
 #: onegov.core's own command group
 cli = command_group()
 
 
 @cli.command()
 @pass_group_context
-def delete(group_context):
+def delete(
+    group_context: 'GroupContext'
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Deletes a single instance matching the selector.
 
     Selectors matching multiple organisations are disabled for saftey reasons.
 
     """
 
-    def delete_instance(request, app):
+    def delete_instance(request: 'CoreRequest', app: 'Framework') -> None:
 
         confirmation = "Do you really want to DELETE this instance?"
 
@@ -48,7 +62,7 @@ def delete(group_context):
 
         if app.has_filestorage:
             click.echo("Removing File Storage")
-
+            assert app.filestorage is not None
             for item in app.filestorage.listdir('.'):
                 if app.filestorage.isdir(item):
                     app.filestorage.removedir(item)
@@ -92,7 +106,7 @@ def delete(group_context):
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
 @pass_group_context
-def sendmail(group_context, queue, limit):
+def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
     """ Sends mail from a specific mail queue. """
 
     queues = group_context.config.mail_queues
@@ -107,6 +121,7 @@ def sendmail(group_context, queue, limit):
         click.echo('No directory configured for this queue.', err=True)
         sys.exit(1)
 
+    qp: 'MailQueueProcessor'
     if mailer == 'postmark':
         qp = PostmarkMailQueueProcessor(cfg['token'], directory, limit=limit)
         qp.send_messages()
@@ -146,9 +161,16 @@ def sendmail(group_context, queue, limit):
 @click.option('--add-admins', default=False, is_flag=True,
               help="Add local admins (admin@example.org:test)")
 @pass_group_context
-def transfer(group_context,
-             server, remote_config, confirm, no_filestorage, no_database,
-             transfer_schema, add_admins):
+def transfer(
+    group_context: 'GroupContext',
+    server: str,
+    remote_config: str,
+    confirm: bool,
+    no_filestorage: bool,
+    no_database: bool,
+    transfer_schema: str | None,
+    add_admins: bool
+) -> None:
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -191,7 +213,7 @@ def transfer(group_context,
     remote_dir = os.path.dirname(remote_config)
 
     try:
-        remote_config = Config.from_yaml_string(
+        remote_cfg = Config.from_yaml_string(
             subprocess.check_output([
                 "ssh", server, "-C", "sudo cat '{}'".format(remote_config)
             ])
@@ -199,12 +221,12 @@ def transfer(group_context,
     except subprocess.CalledProcessError:
         sys.exit(1)
 
-    remote_applications = {a.namespace: a for a in remote_config.applications}
+    remote_applications = {a.namespace: a for a in remote_cfg.applications}
 
     # some calls to the storage transfer may be repeated as applications
     # share folders in certain configurations
     @lru_cache(maxsize=None)
-    def transfer_storage(remote, local, glob='*'):
+    def transfer_storage(remote: str, local: str, glob: str = '*') -> None:
 
         # GNUtar differs from MacOS's version somewhat and the combination
         # of parameters leads to a different strip components count. It seems
@@ -223,18 +245,23 @@ def transfer(group_context,
         click.echo(f"Copying {remote}/{glob}")
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
-    def transfer_database(remote_db, local_db, schema_glob='*'):
+    def transfer_database(
+        remote_db: str,
+        local_db: str,
+        schema_glob: str = '*'
+    ) -> tuple[str, ...]:
+
         # Get available schemas
         query = 'SELECT schema_name FROM information_schema.schemata'
 
         lst = f'sudo -u postgres psql {remote_db} -t -c "{query}"'
         lst = f"ssh {server} '{lst}'"
 
-        schemas = subprocess.check_output(lst, shell=True)
-        schemas = (s.strip() for s in schemas.decode('utf-8').splitlines())
-        schemas = (s for s in schemas if s)
-        schemas = (s for s in schemas if fnmatch(s, schema_glob))
-        schemas = tuple(schemas)
+        schemas_str = subprocess.check_output(lst, shell=True).decode('utf-8')
+        schemas_iter = (s.strip() for s in schemas_str.splitlines())
+        schemas_iter = (s for s in schemas_iter if s)
+        schemas_iter = (s for s in schemas_iter if fnmatch(s, schema_glob))
+        schemas = tuple(schemas_iter)
 
         if not schemas:
             click.echo("No matching schema(s) found!")
@@ -271,7 +298,11 @@ def transfer(group_context,
 
         return schemas
 
-    def transfer_storage_of_app(local_cfg, remote_cfg):
+    def transfer_storage_of_app(
+        local_cfg: 'ApplicationConfig',
+        remote_cfg: 'ApplicationConfig'
+    ) -> None:
+
         remote_storage = remote_cfg.configuration.get('filestorage')
         local_storage = local_cfg.configuration.get('filestorage')
 
@@ -287,7 +318,11 @@ def transfer(group_context,
             glob = transfer_schema or f'{local_cfg.namespace}*'
             transfer_storage(remote_storage, local_storage, glob=glob)
 
-    def transfer_depot_storage_of_app(local_cfg, remote_cfg):
+    def transfer_depot_storage_of_app(
+        local_cfg: 'ApplicationConfig',
+        remote_cfg: 'ApplicationConfig'
+    ) -> None:
+
         depot_local_storage = 'depot.io.local.LocalFileStorage'
         remote_backend = remote_cfg.configuration.get('depot_backend')
         local_backend = local_cfg.configuration.get('depot_backend')
@@ -302,12 +337,16 @@ def transfer(group_context,
             glob = transfer_schema or f'{local_cfg.namespace}*'
             transfer_storage(remote_storage, local_storage, glob=glob)
 
-    def transfer_database_of_app(local_cfg, remote_cfg):
+    def transfer_database_of_app(
+        local_cfg: 'ApplicationConfig',
+        remote_cfg: 'ApplicationConfig'
+    ) -> tuple[str, ...]:
+
         if 'dsn' not in remote_cfg.configuration:
-            return
+            return ()
 
         if 'dsn' not in local_cfg.configuration:
-            return
+            return ()
 
         # on an empty database we need to create the extensions first
         mgr = SessionManager(local_cfg.configuration['dsn'], Base)
@@ -319,7 +358,7 @@ def transfer(group_context,
         schema_glob = transfer_schema or f'{local_cfg.namespace}*'
         return transfer_database(remote_db, local_db, schema_glob=schema_glob)
 
-    def add_admins(local_cfg, schema):
+    def do_add_admins(local_cfg: 'ApplicationConfig', schema: str) -> None:
         id_ = str(uuid4())
         password_hash = hash_password('test').replace('$', '\\$')
         query = (
@@ -337,7 +376,7 @@ def transfer(group_context,
         )
 
     # transfer the data
-    schemas = set()
+    schemas: set[str] = set()
     for local_cfg in group_context.appcfgs:
 
         if transfer_schema and local_cfg.namespace not in transfer_schema:
@@ -364,14 +403,17 @@ def transfer(group_context,
     if add_admins:
         for schema in schemas:
             click.echo(f"Adding admin@example:test to {schema}")
-            add_admins(local_cfg, schema)
+            do_add_admins(local_cfg, schema)
 
 
 @cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
               help="Do not write any changes into the database.")
 @pass_group_context
-def upgrade(group_context, dry_run):
+def upgrade(
+    group_context: 'GroupContext',
+    dry_run: bool
+) -> tuple['Callable[..., Any]', ...]:
     """ Upgrades all application instances of the given namespace(s). """
 
     modules = list(get_upgrade_modules())
@@ -382,13 +424,16 @@ def upgrade(group_context, dry_run):
     basic_tasks = tuple((id, task) for id, task in tasks if not task.raw)
     raw_tasks = tuple((id, task) for id, task in tasks if task.raw)
 
-    def on_success(task):
+    def on_success(task: '_Task[..., Any]') -> None:
         print(click.style("* " + str(task.task_name), fg='green'))
 
-    def on_fail(task):
+    def on_fail(task: '_Task[..., Any]') -> None:
         print(click.style("* " + str(task.task_name), fg='red'))
 
-    def run_upgrade_runner(runner, *args):
+    def run_upgrade_runner(
+        runner: UpgradeRunner | RawUpgradeRunner,
+        *args: Any
+    ) -> None:
         executed_tasks = runner.run_upgrade(*args)
 
         if executed_tasks:
@@ -396,7 +441,11 @@ def upgrade(group_context, dry_run):
         else:
             print("no pending upgrade tasks found")
 
-    def run_raw_upgrade(group_context, appcfg):
+    def run_raw_upgrade(
+        group_context: 'GroupContext',
+        appcfg: 'ApplicationConfig'
+    ) -> None:
+
         if appcfg in executed_raw_upgrades:
             return
 
@@ -418,7 +467,7 @@ def upgrade(group_context, dry_run):
             group_context.available_schemas(appcfg),
         )
 
-    def run_upgrade(request, app):
+    def run_upgrade(request: 'CoreRequest', app: 'Framework') -> None:
         title = "Running upgrade for {}".format(request.app.application_id)
         print(click.style(title, underline=True))
 
@@ -431,7 +480,7 @@ def upgrade(group_context, dry_run):
         )
         run_upgrade_runner(upgrade_runner, request)
 
-    def upgrade_steps():
+    def upgrade_steps() -> 'Iterator[Callable[..., Any]]':
         if next((t for n, t in tasks if t.raw), False):
             yield run_raw_upgrade
 
@@ -441,10 +490,10 @@ def upgrade(group_context, dry_run):
 
 
 @cli.command()
-def shell():
+def shell() -> 'Callable[[CoreRequest, Framework], None]':
     """ Enters an interactive shell. """
 
-    def _shell(request, app):
+    def _shell(request: 'CoreRequest', app: 'Framework') -> None:
         shell = InteractiveConsole({
             'app': app,
             'request': request,
