@@ -57,7 +57,7 @@ class Metadata:
         """ Returns a dict with the metadata for the given audience(s). """
 
         def pick(
-            properties: list[tuple[str, property]]
+            properties: list[tuple[str, Any]]
         ) -> 'Iterator[tuple[str, Any]]':
 
             for name, prop in properties:

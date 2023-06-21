@@ -525,7 +525,7 @@ def get_keys_from_list_of_dicts(
     if key:
         fields = tuple(sorted(fields_set, key=key, reverse=reverse))
     else:
-        fields = tuple(fields)
+        fields = tuple(fields_set)
 
     return fields
 
