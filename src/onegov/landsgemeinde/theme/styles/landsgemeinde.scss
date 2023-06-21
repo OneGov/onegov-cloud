@@ -23,6 +23,32 @@ h6 small,
     color: inherit !important;
 }
 
+.main-title {
+    margin-bottom: 3rem;
+    margin-top: 1rem;
+    max-width: none;
+}
+
+@media print, screen and (min-width: 40em) {
+    .content {
+        h1 {
+            hyphens: none;
+        }
+
+        h2 {
+            font-size: 1.7rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        h4 {
+            font-size: 1.3rem;
+        }
+    }
+}
+
 /*
     Manage views
 */
@@ -31,7 +57,8 @@ h6 small,
 }
 
 .agenda-item-vota {
-    .votum {
+    .votum,
+    .ticker-votum {
         margin-bottom: 3em;
 
         blockquote {
@@ -53,6 +80,26 @@ h6 small,
     margin-top: 1rem;
     margin-bottom: 2.5rem;
   }
+
+.ticker-item {
+    h2 {
+        border-top: 3px solid #d9d9d94a;
+        padding-top: 2rem;
+    }
+
+    &:first-child h2 {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    .callout.secondary {
+        background: transparent;
+        border: 0;
+        border-left: 2px solid rgb(227, 0, 11);
+        border-radius: 0;
+        box-shadow: -10px 0 10px -10px rgba(34, 0, 0, .11);
+    }
+}
 
 .states-list {
     list-style: none;
@@ -100,7 +147,6 @@ h6 small,
 .person-card-title {
     font-weight: bold;
 }
-
 
 /*
     Dark Header

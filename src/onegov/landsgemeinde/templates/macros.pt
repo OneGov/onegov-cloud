@@ -84,7 +84,7 @@
         <div class="agenda-item-vota">
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
                 <div class="ticker-item ticker-votum ${votum.state}">
-                    <div class="person-card person-single-item" tal:define="url request.link(votum.person_picture, 'thumbnail')|None">
+                    <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture, 'thumbnail')|None">
                         <div class="grid-x">
                             <div class="cell small-12 medium-6 large-3">
                                 <div class="person-card-portrait">
@@ -119,16 +119,16 @@
 
         <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
 
-        <div class="agenda-item-overview" tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></div>
-
-        <tal:block tal:condition="agenda_item.memorial_pdf">
+        <div class="agenda-item-overview" tal:condition="agenda_item.overview or agenda_item.memorial_pdf">
+            <div tal:content="structure agenda_item.overview"></div>
             <p tal:condition="agenda_item.memorial_pdf">
                 <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
                     <i class="fa fa-download" aria-hidden="true"></i>
                     <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
                 </a>
             </p>
-        </tal:block>
+        </div>
+
     </div>
 </metal:ticker-agenda-item>
 
