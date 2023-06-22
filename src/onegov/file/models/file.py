@@ -3,6 +3,8 @@ import sedate
 import isodate
 
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import Associable
@@ -13,9 +15,10 @@ from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
 from onegov.file.utils import extension_for_content_type
-from onegov.search import ORMSearchable
+from onegov.search import ORMSearchable, Searchable
 from pathlib import Path
 from sqlalchemy import Boolean, Column, Index, Text
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import case
 from sqlalchemy import event
 from sqlalchemy import text
@@ -190,9 +193,19 @@ class File(Base, Associable, TimestampMixin):
         'polymorphic_identity': 'generic'
     }
 
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
     __table_args__ = (
         Index('files_by_type_and_order', 'type', 'order'),
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
     )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on columns title and lead
+        """
+        return Searchable.create_tsvector_string('name', 'note', 'extract')
 
     @hybrid_property
     def signature_timestamp(self):

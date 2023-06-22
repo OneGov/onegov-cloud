@@ -306,7 +306,7 @@ class SearchPostgres(Pagination):
 
         for model in searchable_sqlalchemy_models(Base):
             if model.__tablename__ in ['users', 'events', 'page', 'people',
-                                       'tickets', 'directories']:
+                                       'tickets', 'directories', 'files']:
                 if model.es_public or self.request.is_logged_in:
                     print(f'*** model to search: {model}')
                     query = self.request.session.query(model)
