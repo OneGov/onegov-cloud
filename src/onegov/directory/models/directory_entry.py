@@ -5,12 +5,13 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
-from onegov.search import SearchableContent
+from onegov.search import SearchableContent, Searchable
 from sqlalchemy import Column
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Text
-from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.dialects.postgresql import HSTORE, TSVECTOR
 from sqlalchemy.ext.mutable import MutableDict
 from uuid import uuid4
 
@@ -69,10 +70,23 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         'polymorphic_identity': 'generic',
     }
 
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
     __table_args__ = (
         Index('inverted_keywords', 'keywords', postgresql_using='gin'),
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
+        Index('fts_idx', 'fts_idx', postgresql_using='gin'),
     )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on columns title, lead, keyword and directory id
+        """
+        # FIXME: keywords and directory_id cannot be added to tsvector below
+        # return Searchable.create_tsvector_string('title', 'lead', 'keywords',
+        #                                          'directory_id')
+        return Searchable.create_tsvector_string('title', 'lead')
 
     @property
     def external_link(self):

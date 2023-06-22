@@ -30,7 +30,8 @@ def adding_full_text_search_columns_to_postgres(context):
         print(f'*** model to migrate: {model}')
         if model.__tablename__ in ['users', 'events', 'page', 'people',
                                    'tickets', 'directories', 'files',
-                                   'filesets']:
+                                   'filesets', 'directories',
+                                   'directory_entries', 'newsletters']:
             model.add_fts_column(session, schema)
 
     # def generate_email():

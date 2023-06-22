@@ -1,9 +1,11 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
-from onegov.search import SearchableContent
+from onegov.search import SearchableContent, Searchable
 from sqlalchemy import and_
 from sqlalchemy import Boolean
 from sqlalchemy import column
@@ -14,6 +16,7 @@ from sqlalchemy import not_
 from sqlalchemy import select
 from sqlalchemy import Table
 from sqlalchemy import Text
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session, validates, relationship
 from uuid import uuid4
@@ -85,6 +88,19 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         'Recipient',
         secondary=newsletter_recipients,
         back_populates='newsletters')
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on columns title, lead, html
+        """
+        return Searchable.create_tsvector_string('title', 'lead', 'html')
 
     @property
     def open_recipients(self):
