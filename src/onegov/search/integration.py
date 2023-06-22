@@ -481,18 +481,8 @@ class ElasticsearchApp(morepath.App):
     def psql_perform_reindex(self, session):
         # TODO: remove session from method param?
         print('*** tschupre re-index psql')
-        for i, model in enumerate(searchable_sqlalchemy_models(Base)):
-            print('---------------------------------------------------------')
-            print(f'*** [{i}] model to reindex: {model}')
-            if model.__tablename__ in ['users', 'events', 'pages', 'people',
-                                       'tickets', 'directories', 'files',
-                                       'filesets', 'directory_entries',
-                                       'newsletters', 'agencies', 'forms',
-                                       'agency_memberships',
-                                       'external_links', 'activities',
-                                       'attendees', 'fsi_courses',
-                                       'fsi_attendees', 'fsi_course_events']:
-                model.reindex(session, self.schema, model)
+        for model in searchable_sqlalchemy_models(Base):
+            model.reindex(session, self.schema, model)
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)

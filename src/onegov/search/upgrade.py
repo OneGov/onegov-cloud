@@ -28,15 +28,7 @@ def adding_full_text_search_columns_to_postgres(context):
 
     for model in searchable_sqlalchemy_models(Base):
         print(f'*** model to migrate: {model}')
-        if model.__tablename__ in ['users', 'events', 'page', 'people',
-                                   'tickets', 'directories', 'files',
-                                   'filesets', 'directories',
-                                   'directory_entries', 'newsletters',
-                                   'agencies', 'forms',
-                                   'agency_memberships', 'external_links',
-                                   'activities', 'attendees', 'fsi_courses',
-                                   'fsi_attendees', 'fsi_course_events']:
-            model.add_fts_column(session, schema)
+        model.add_fts_column(session, schema)
 
     # def generate_email():
     #     import random

@@ -305,22 +305,14 @@ class SearchPostgres(Pagination):
         # TODO:language from application setting?
 
         for model in searchable_sqlalchemy_models(Base):
-            if model.__tablename__ in ['users', 'events', 'page', 'people',
-                                       'tickets', 'directories', 'files',
-                                       'directory_entries', 'newsletters',
-                                       'agencies', 'forms',
-                                       'agency_memberships',
-                                       'external_links', 'activities',
-                                       'attendees', 'fsi_courses',
-                                       'fsi_attendees' 'fsi_course_events']:
-                if model.es_public or self.request.is_logged_in:
-                    print(f'*** model to search: {model}')
-                    query = self.request.session.query(model)
-                    query = query.filter(
-                        model.fts_idx.op('@@')
-                        (func.websearch_to_tsquery('german', self.query))
-                    )
-                    results += query.all()
+            if model.es_public or self.request.is_logged_in:
+                print(f'*** model to search: {model}')
+                query = self.request.session.query(model)
+                query = query.filter(
+                    model.fts_idx.op('@@')
+                    (func.websearch_to_tsquery('german', self.query))
+                )
+                results += query.all()
 
         print(f'*** psql res count: {len(results)}')
         for result in results:

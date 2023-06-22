@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -8,7 +10,8 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
-from onegov.search import ORMSearchable
+from onegov.search import ORMSearchable, Searchable
+from sqlalchemy import Computed, Index  # type:ignore[attr-defined]
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -88,6 +91,24 @@ class AgendaItem(
 
     #: The resolution (tags) of the agenda item
     resolution_tags = content_property()
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on column title as well as  on the json
+        fields overview, text and resolution in content column
+        """
+        s = Searchable.create_tsvector_string('title')
+        s += " || ' ' || coalesce(((content ->> 'overview')), '')"
+        s += " || ' ' || coalesce(((content ->> 'text')), '')"
+        s += " || ' ' || coalesce(((content ->> 'resolution')), '')"
+        return s
 
     @property
     def date(self):

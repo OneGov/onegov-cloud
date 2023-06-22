@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -6,8 +8,9 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
-from onegov.search import ORMSearchable
-from sqlalchemy import Column
+from onegov.search import ORMSearchable, Searchable
+from sqlalchemy import Column, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -93,6 +96,27 @@ class Votum(
         ),
         nullable=False
     )
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on columns title and location as well as the json
+        fields description and organizer in content column
+        """
+        s = Searchable.create_tsvector_string('person_name',
+                                              'person_function',
+                                              'person_place',
+                                              'person_political_affiliation')
+        s += " || ' ' || coalesce(((content ->> 'text')), '')"
+        s += " || ' ' || coalesce(((content ->> 'motion')), '')"
+        s += " || ' ' || coalesce(((content ->> 'statement_of_reasons')), '')"
+        return s
 
     @property
     def date(self):

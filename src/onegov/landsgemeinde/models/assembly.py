@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -9,7 +11,8 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean
+from sqlalchemy import Boolean, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -91,3 +94,16 @@ class Assembly(
         lazy='dynamic',
         order_by='AgendaItem.number',
     )
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on the json field overview in content column
+        """
+        return "coalesce(((content ->> 'overview')), '')"
