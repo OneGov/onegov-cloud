@@ -203,7 +203,7 @@ class File(Base, Associable, TimestampMixin):
     @staticmethod
     def psql_tsvector_string():
         """
-        index is built on columns title and lead
+        index is built on columns name, note and extract
         """
         return Searchable.create_tsvector_string('name', 'note', 'extract')
 

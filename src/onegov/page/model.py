@@ -26,11 +26,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     fts_idx = Column(TSVECTOR, Computed('', persisted=True))
 
     __table_args__ = (
-        Index(
-            'fts_idx',
-            fts_idx,
-            postgresql_using='gin'
-        ),
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
     )
 
     @staticmethod

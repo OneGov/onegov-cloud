@@ -1,11 +1,17 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from sqlalchemy import Column, ForeignKey, Table, Text
+from sqlalchemy import Column, ForeignKey, Table, Text, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
+
+from ...search import Searchable
+
 if TYPE_CHECKING:
     from .file import File
 
@@ -58,3 +64,20 @@ class FileSet(Base, ContentMixin, TimestampMixin):
         'polymorphic_on': 'type',
         'polymorphic_identity': 'generic'
     }
+
+    # column for full text search index
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on column title as well as on the json
+        fields lead in meta column if not NULL
+        """
+        s = Searchable.create_tsvector_string('title')
+        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
+        return s
