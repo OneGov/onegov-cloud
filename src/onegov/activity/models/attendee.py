@@ -1,12 +1,15 @@
 from datetime import date
 
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.crypto import random_token
-from onegov.search import ORMSearchable
-from sqlalchemy import case, cast, func, select, and_, type_coerce
+from onegov.search import ORMSearchable, Searchable
+from sqlalchemy import case, cast, func, select, and_, type_coerce, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -42,6 +45,19 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         'notes': {'type': 'localized'}
     }
     es_public = False
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on columns username, name and notes
+        """
+        return Searchable.create_tsvector_string('username', 'name', 'notes')
 
     @property
     def es_suggestion(self):

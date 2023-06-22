@@ -489,7 +489,8 @@ class ElasticsearchApp(morepath.App):
                                        'filesets', 'directory_entries',
                                        'newsletters', 'agencies', 'forms',
                                        'agency_memberships',
-                                       'external_links', 'activities']:
+                                       'external_links', 'activities',
+                                       'attendees']:
                 model.reindex(session, self.schema, model)
 
 
