@@ -14,20 +14,24 @@ cli = command_group()
 def reindex(group_context, fail):
     """ Reindexes all objects in the postgresql database. """
 
-    def run_reindex_psql(request, app):
+    def run_reindex(request, app):
         """
         Looping over all models in project deleting all full text search (
         fts) indexes in postgresql and re-creating them
 
         :param request: request
         :param app: application context
-        :return: re-indexing function
         """
         session = request.session
+
+        title = f"Reindexing {request.app.application_id}"
+        print(click.style(title, underline=True))
+
         start = utcnow()
 
         app.psql_perform_reindex(session)
+        request.app.es_perform_reindex(fail)  # TODO: remove
 
         print(f"took {utcnow() - start}")
 
-    return run_reindex_psql
+    return run_reindex

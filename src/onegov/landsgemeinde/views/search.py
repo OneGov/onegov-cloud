@@ -7,4 +7,5 @@ from onegov.org.views.search import search
 
 @LandsgemeindeApp.html(model=Search, template='search.pt', permission=Public)
 def landsgemeinde_search(self, request):
+    # TODO: switch to postgres search
     return search(self, request, DefaultLayout(self, request))
