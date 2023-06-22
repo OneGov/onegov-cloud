@@ -61,7 +61,6 @@ import time
 import traceback
 import tracemalloc
 
-from datetime import datetime
 from functools import partial
 from onegov.server import Config
 from onegov.server import log
@@ -71,12 +70,26 @@ from sentry_sdk import push_scope, capture_exception
 from sentry_sdk.integrations.redis import RedisIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from sentry_sdk.integrations.wsgi import _get_headers, _get_environ
+from time import perf_counter
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from xtermcolor import colorize
 
 
-RESOURCE_TRACKER = None
+from typing import Any, Literal, TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import OptExcInfo
+    from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
+    from collections.abc import Callable, Iterable
+    from multiprocessing.sharedctypes import Synchronized
+    from sentry_sdk._types import Event, Hint
+    from types import FrameType
+    from watchdog.events import FileSystemEvent
+
+    from onegov.core.types import JSONObject
+
+
+RESOURCE_TRACKER: ResourceTracker = None  # type:ignore[assignment]
 
 
 @click.command()
@@ -91,6 +104,7 @@ RESOURCE_TRACKER = None
     '--port',
     '-p',
     help="Port to bind to",
+    type=click.IntRange(min=0, max=65535),
     default=8080
 )
 @click.option(
@@ -108,6 +122,7 @@ RESOURCE_TRACKER = None
 @click.option(
     '--mode',
     help="Defines the mode used to run the server cli (debug|production)",
+    type=click.Choice(('debug', 'production'), case_sensitive=False),
     default='debug',
 )
 @click.option(
@@ -125,8 +140,16 @@ RESOURCE_TRACKER = None
     help="Sentry release tag (production mode only)",
     default=None,
 )
-def run(config_file, port, pdb, tracemalloc, mode,
-        sentry_dsn, sentry_environment, sentry_release):
+def run(
+    config_file: str | bytes,
+    port: int,
+    pdb: bool,
+    tracemalloc: bool,
+    mode: Literal['debug', 'production'],
+    sentry_dsn: str | None,
+    sentry_environment: str,
+    sentry_release: str | None,
+) -> None:
 
     """ Runs the onegov server with the given configuration file in the
     foreground.
@@ -179,14 +202,18 @@ def run(config_file, port, pdb, tracemalloc, mode,
     return run_production(config_file, port)
 
 
-def run_production(config_file, port):
+def run_production(config_file: str | bytes, port: int) -> None:
 
     class SentryServer(Server):
 
-        def __call__(self, environ, start_response):
+        def __call__(
+            self,
+            environ: 'WSGIEnvironment',
+            start_response: 'StartResponse'
+        ) -> 'Iterable[bytes]':
+
             with push_scope() as scope:
                 scope.clear_breadcrumbs()
-
                 return super().__call__(environ, start_response)
 
     # required by Bjoern
@@ -200,7 +227,7 @@ def run_production(config_file, port):
     bjoern.run(app, '127.0.0.1', port, reuse_port=True)
 
 
-def http_context(environ):
+def http_context(environ: 'WSGIEnvironment') -> 'JSONObject':
     return {
         'method': environ.get('REQUEST_METHOD'),
         'url': ''.join((
@@ -213,13 +240,13 @@ def http_context(environ):
     }
 
 
-def exception_hook(environ):
+def exception_hook(environ: 'WSGIEnvironment') -> None:
 
-    def process_event(event, hint):
-        request_info = event.setdefault("request", {})
+    def process_event(event: 'Event', hint: 'Hint') -> 'Event':
+        request_info = event.setdefault('request', {})
         request_info.update(http_context(environ))
 
-        user_info = event.setdefault("user", {})
+        user_info = event.setdefault('user', {})
         user_info['ip_address'] = environ.get('HTTP_X_REAL_IP')
 
         return event
@@ -229,7 +256,13 @@ def exception_hook(environ):
         capture_exception()
 
 
-def run_debug(config_file, port, pdb, tracemalloc):
+def run_debug(
+    config_file: str | bytes,
+    port: int,
+    pdb: bool,
+    tracemalloc: bool
+) -> None:
+
     multiprocessing.set_start_method('spawn')
 
     factory = partial(debug_wsgi_factory, config_file=config_file, pdb=pdb)
@@ -249,11 +282,8 @@ def run_debug(config_file, port, pdb, tracemalloc):
             server.stop()
             sys.exit(0)
 
-    observer.join()
-    server.join()
 
-
-def debug_wsgi_factory(config_file, pdb):
+def debug_wsgi_factory(config_file: str | bytes, pdb: bool) -> Server:
     return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
 
 
@@ -263,27 +293,42 @@ class WSGIRequestMonitorMiddleware:
 
     """
 
-    def __init__(self, app):
+    def __init__(self, app: 'WSGIApplication'):
         self.app = app
 
-    def __call__(self, environ, start_response):
-        received = datetime.utcnow()
-        received_status = None
+    def __call__(
+        self,
+        environ: 'WSGIEnvironment',
+        start_response: 'StartResponse'
+    ) -> 'Iterable[bytes]':
 
-        def local_start_response(status, headers):
+        received = perf_counter()
+        received_status: str = ''
+
+        def local_start_response(
+            status: str,
+            headers: list[tuple[str, str]],
+            exc_info: 'OptExcInfo | None' = None
+        ) -> 'Callable[[bytes], object]':
+
             nonlocal received_status
             received_status = status
 
-            start_response(status, headers)
+            return start_response(status, headers, exc_info)
 
-        response = self.app.__call__(environ, local_start_response)
-
+        response = self.app(environ, local_start_response)
         self.log(environ, received_status, received)
         return response
 
-    def log(self, environ, status, received):
-        duration = datetime.utcnow() - received
-        duration = int(round(duration.total_seconds() * 1000, 0))
+    def log(
+        self,
+        environ: 'WSGIEnvironment',
+        status: str,
+        received: float
+    ) -> None:
+
+        duration_s = perf_counter() - received
+        duration_ms = int(round(duration_s * 1000, 0))
 
         status = status.split(' ', 1)[0]
         path = f"{environ['SCRIPT_NAME']}{environ['PATH_INFO']}"
@@ -298,15 +343,12 @@ class WSGIRequestMonitorMiddleware:
         else:
             pass  # white
 
-        if duration > 500:
-            duration = click.style(
-                str(duration) + ' ms', fg='red')
-        elif duration > 250:
-            duration = click.style(
-                str(duration) + ' ms', fg='yellow')
+        if duration_ms > 500:
+            duration = click.style(f'{duration_ms} ms', fg='red')
+        elif duration_ms > 250:
+            duration = click.style(f'{duration_ms} ms', fg='yellow')
         else:
-            duration = click.style(
-                str(duration) + ' ms', fg='green')
+            duration = click.style(f'{duration_ms} ms', fg='green')
 
         if method == 'POST':
             method = click.style(method, underline=True)
@@ -332,8 +374,16 @@ class WsgiProcess(multiprocessing.Process):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080, env=None,
-                 enable_tracemalloc=False):
+    _ready: 'Synchronized[int]'
+
+    def __init__(
+        self,
+        app_factory: 'Callable[[], WSGIApplication]',
+        host: str = '127.0.0.1',
+        port: int = 8080,
+        env: dict[str, str] | None = None,
+        enable_tracemalloc: bool = False
+    ):
         env = env or {}
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
@@ -341,7 +391,7 @@ class WsgiProcess(multiprocessing.Process):
         self.port = port
         self.enable_tracemalloc = enable_tracemalloc
 
-        self._ready = multiprocessing.Value('i', 0)
+        self._ready = multiprocessing.Value('i', 0)  # type:ignore[assignment]
 
         # hook up environment variables
         for key, value in env.items():
@@ -353,10 +403,15 @@ class WsgiProcess(multiprocessing.Process):
             pass  # in testing, stdin is not always real
 
     @property
-    def ready(self):
+    def ready(self) -> bool:
         return self._ready.value == 1
 
-    def print_memory_stats(self, signum, frame):
+    def print_memory_stats(
+        self,
+        signum: int,
+        frame: 'FrameType | None'
+    ) -> None:
+
         print("-" * shutil.get_terminal_size((80, 20)).columns)
 
         RESOURCE_TRACKER.show_memory_usage()
@@ -366,7 +421,7 @@ class WsgiProcess(multiprocessing.Process):
 
         print("-" * shutil.get_terminal_size((80, 20)).columns)
 
-    def disable_systemwide_darwin_proxies(self):
+    def disable_systemwide_darwin_proxies(self):  # type:ignore
         # System-wide proxy settings on darwin need to be disabled, because
         # it leads to crashes in our forked subprocess:
         # https://bugs.python.org/issue27126
@@ -375,7 +430,7 @@ class WsgiProcess(multiprocessing.Process):
         urllib.request.proxy_bypass_macosx_sysconf = lambda host: None
         urllib.request.getproxies_macosx_sysconf = lambda: {}
 
-    def run(self):
+    def run(self) -> None:
         # use the parent's process stdin to be able to provide pdb correctly
         if hasattr(self, 'stdin_fileno'):
             sys.stdin = os.fdopen(self.stdin_fileno)
@@ -389,7 +444,7 @@ class WsgiProcess(multiprocessing.Process):
 
         # reset the tty every time, fixing problems that might occur if
         # the process is restarted during a pdb session
-        os.system("stty sane")
+        os.system('stty sane')
 
         try:
             if sys.platform == 'darwin':
@@ -424,18 +479,24 @@ class WsgiServer(FileSystemEventHandler):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080, **kwargs):
+    def __init__(
+        self,
+        app_factory: 'Callable[[], WSGIApplication]',
+        host: str = '127.0.0.1',
+        port: int = 8080,
+        **kwargs: Any
+    ):
         self.app_factory = app_factory
         self._host = host
         self._port = port
         self.kwargs = kwargs
 
-    def spawn(self):
+    def spawn(self) -> WsgiProcess:
         return WsgiProcess(self.app_factory, self._host, self._port, {
             'ONEGOV_DEVELOPMENT': '1'
         }, **self.kwargs)
 
-    def join(self, timeout=None):
+    def join(self, timeout: float | None = None) -> None:
         try:
             self.process.join(timeout)
         except Exception:
@@ -443,20 +504,20 @@ class WsgiServer(FileSystemEventHandler):
             # or already closed process objects - it's used for debug anyway
             log.warning('Could not join')
 
-    def start(self):
+    def start(self) -> None:
         self.process = self.spawn()
         self.process.start()
 
-    def restart(self):
+    def restart(self) -> None:
         self.stop(block=True)
         self.start()
 
-    def stop(self, block=False):
+    def stop(self, block: bool = False) -> None:
         self.process.terminate()
         if block:
             self.join()
 
-    def on_any_event(self, event):
+    def on_any_event(self, event: 'FileSystemEvent') -> None:
         """ If anything of significance changed, restart the process. """
 
         if getattr(event, 'event_type', None) == 'opened':
@@ -518,6 +579,6 @@ class WsgiServer(FileSystemEventHandler):
         if src_path.endswith('~'):
             return
 
-        print("changed: {}".format(src_path))
+        print(f'changed: {src_path}')
 
         self.restart()
