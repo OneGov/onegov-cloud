@@ -86,7 +86,7 @@ if TYPE_CHECKING:
     from types import FrameType
     from watchdog.events import FileSystemEvent
 
-    from onegov.core.types import JSONObject
+    from .types import JSONObject
 
 
 RESOURCE_TRACKER: ResourceTracker = None  # type:ignore[assignment]
@@ -327,9 +327,7 @@ class WSGIRequestMonitorMiddleware:
         received: float
     ) -> None:
 
-        duration_s = perf_counter() - received
-        duration_ms = int(round(duration_s * 1000, 0))
-
+        duration_ms = (perf_counter() - received) * 1000.0
         status = status.split(' ', 1)[0]
         path = f"{environ['SCRIPT_NAME']}{environ['PATH_INFO']}"
         method = environ['REQUEST_METHOD']
@@ -343,12 +341,12 @@ class WSGIRequestMonitorMiddleware:
         else:
             pass  # white
 
-        if duration_ms > 500:
-            duration = click.style(f'{duration_ms} ms', fg='red')
-        elif duration_ms > 250:
-            duration = click.style(f'{duration_ms} ms', fg='yellow')
+        if duration_ms > 500.0:
+            duration = click.style(f'{duration_ms:.0f} ms', fg='red')
+        elif duration_ms > 250.0:
+            duration = click.style(f'{duration_ms:.0f} ms', fg='yellow')
         else:
-            duration = click.style(f'{duration_ms} ms', fg='green')
+            duration = click.style(f'{duration_ms:.0f} ms', fg='green')
 
         if method == 'POST':
             method = click.style(method, underline=True)

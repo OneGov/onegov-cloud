@@ -96,7 +96,10 @@ class Server:
         self.environ_overrides = environ_overrides
         self.exception_hook = exception_hook
 
-    def configure_logging(self, config: '_OptionalDictConfigArgs') -> None:
+    def configure_logging(
+        self,
+        config: '_DictConfigArgs | _OptionalDictConfigArgs'
+    ) -> None:
         """ Configures the python logging.
 
         :config:
