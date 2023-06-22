@@ -140,13 +140,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     @staticmethod
     def psql_tsvector_string():
         """
-        builds the index on '<first name> <last name>' from username (email
-        address) and realname.
+        builds the index on first name, last name, function and email.
         """
-        s = Searchable.create_tsvector_string('function')
-        s += " || ' ' || coalesce(last_name, '')"
-        s += " || ' ' || coalesce(first_name, '')"
-        return s
+        return Searchable.create_tsvector_string('first_name', 'last_name',
+                                                 'function', 'email')
 
     def vcard_object(self, exclude=None, include_memberships=True):
         """ Returns the person as vCard (3.0) object.
