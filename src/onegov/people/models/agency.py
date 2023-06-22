@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import associated
@@ -11,8 +13,9 @@ from onegov.file.utils import content_type_from_fileobj
 from onegov.file.utils import extension_for_content_type
 from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
-from onegov.search import ORMSearchable
-from sqlalchemy import Column
+from onegov.search import ORMSearchable, Searchable
+from sqlalchemy import Column, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 
@@ -80,6 +83,20 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        builds the index on columns title, description and portrait.
+        """
+        return Searchable.create_tsvector_string('title', 'description',
+                                                 'portrait')
 
     @property
     def organigram_file(self):

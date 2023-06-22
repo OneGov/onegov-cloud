@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.mixins import meta_property, content_property
@@ -7,9 +9,12 @@ from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Text, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import observes
+
+from onegov.search import Searchable
 
 
 class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
@@ -114,6 +119,22 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
         "polymorphic_on": 'type',
         'polymorphic_identity': 'generic'
     }
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on column ticket number
+        """
+        s = Searchable.create_tsvector_string('title')
+        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
+        s += " || ' ' || coalesce(((content ->> 'text')), '')"
+        return s
 
     @property
     def form_class(self):
