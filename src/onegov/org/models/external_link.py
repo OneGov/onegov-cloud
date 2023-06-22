@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, \
@@ -9,8 +11,9 @@ from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 from onegov.org.models import AccessExtension
-from onegov.search import SearchableContent
-from sqlalchemy import Column, Text
+from onegov.search import SearchableContent, Searchable
+from sqlalchemy import Column, Text, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy_utils import observes
 
 
@@ -47,6 +50,22 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
     es_id = 'title'
 
     lead = meta_property()
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        builds the index on column title and lead within meta column
+        email.
+        """
+        s = Searchable.create_tsvector_string('title')
+        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
+        return s
 
     @observes('title')
     def title_observer(self, title):

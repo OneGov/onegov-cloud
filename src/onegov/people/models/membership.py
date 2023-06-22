@@ -1,10 +1,13 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable
-from sqlalchemy import Column
+from onegov.search import ORMSearchable, Searchable
+from sqlalchemy import Column, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
@@ -87,6 +90,19 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: when the membership started
     since = Column(Text, nullable=True)
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        builds the index on column title.
+        """
+        return Searchable.create_tsvector_string('title')
 
     @property
     def siblings_by_agency(self):

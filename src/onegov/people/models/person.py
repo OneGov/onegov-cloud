@@ -140,7 +140,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     @staticmethod
     def psql_tsvector_string():
         """
-        builds the index on first name, last name, function and email.
+        builds the index on columns first name, last name, function and email.
         """
         return Searchable.create_tsvector_string('first_name', 'last_name',
                                                  'function', 'email')

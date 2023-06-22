@@ -308,7 +308,8 @@ class SearchPostgres(Pagination):
             if model.__tablename__ in ['users', 'events', 'page', 'people',
                                        'tickets', 'directories', 'files',
                                        'directory_entries', 'newsletters',
-                                       'agencies', 'forms']:
+                                       'agencies', 'forms',
+                                       'agency_memberships', 'external_links']:
                 if model.es_public or self.request.is_logged_in:
                     print(f'*** model to search: {model}')
                     query = self.request.session.query(model)

@@ -487,7 +487,8 @@ class ElasticsearchApp(morepath.App):
             if model.__tablename__ in ['users', 'events', 'pages', 'people',
                                        'tickets', 'directories', 'files',
                                        'filesets', 'directory_entries',
-                                       'newsletters', 'agencies', 'forms']:
+                                       'newsletters', 'agencies', 'forms',
+                                       'agency_memberships', 'external_links']:
                 model.reindex(session, self.schema, model)
 
 
