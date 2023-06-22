@@ -10,10 +10,12 @@ from onegov.core.orm.mixins import (
 )
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
+from onegov.search import Searchable
 from onegov.user import User
-from sqlalchemy import Column, Enum, Text, ForeignKey
+from sqlalchemy import Column, Enum, Text, ForeignKey, Index
 from sqlalchemy import exists, and_, desc
-from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy.dialects.postgresql import HSTORE, TSVECTOR
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import observes
@@ -100,6 +102,23 @@ class Activity(Base, ContentMixin, TimestampMixin):
         'polymorphic_on': 'type',
         'polymorphic_identity': 'generic',
     }
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on columns title and location as well as the json
+        fields description and organizer in content column
+        """
+        s = Searchable.create_tsvector_string('title', 'location')
+        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
+        s += " || ' ' || coalesce(((content ->> 'text')), '')"
+        return s
 
     @observes('title')
     def title_observer(self, title):

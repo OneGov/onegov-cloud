@@ -33,7 +33,8 @@ def adding_full_text_search_columns_to_postgres(context):
                                    'filesets', 'directories',
                                    'directory_entries', 'newsletters',
                                    'agencies', 'forms',
-                                   'agency_memberships', 'external_links']:
+                                   'agency_memberships', 'external_links',
+                                   'activities']:
             model.add_fts_column(session, schema)
 
     # def generate_email():
