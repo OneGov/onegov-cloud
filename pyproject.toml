@@ -28,7 +28,8 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 [[tool.mypy.overrides]]
 # more strict rules for fully typed modules
 module = [
-    "onegov.core.*"
+    "onegov.core.*",
+    "onegov.server.*"
 ]
 warn_unreachable = true
 disallow_any_generics = true

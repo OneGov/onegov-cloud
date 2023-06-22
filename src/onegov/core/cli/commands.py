@@ -303,8 +303,8 @@ def transfer(
         remote_cfg: 'ApplicationConfig'
     ) -> None:
 
-        remote_storage = remote_cfg.configuration.get('filestorage')
-        local_storage = local_cfg.configuration.get('filestorage')
+        remote_storage = remote_cfg.configuration.get('filestorage', '')
+        local_storage = local_cfg.configuration.get('filestorage', '')
 
         if remote_storage.endswith('OSFS') and local_storage.endswith('OSFS'):
             local_fs = local_cfg.configuration['filestorage_options']
@@ -377,33 +377,39 @@ def transfer(
 
     # transfer the data
     schemas: set[str] = set()
-    for local_cfg in group_context.appcfgs:
+    for local_appcfg in group_context.appcfgs:
 
-        if transfer_schema and local_cfg.namespace not in transfer_schema:
+        if transfer_schema and local_appcfg.namespace not in transfer_schema:
             continue
 
-        if local_cfg.namespace not in remote_applications:
+        if local_appcfg.namespace not in remote_applications:
             continue
 
-        if local_cfg.configuration.get('disable_transfer'):
-            click.echo(f"Skipping {local_cfg.namespace}, transfer disabled")
+        if local_appcfg.configuration.get('disable_transfer'):
+            click.echo(f"Skipping {local_appcfg.namespace}, transfer disabled")
             continue
 
-        remote_cfg = remote_applications[local_cfg.namespace]
+        remote_appcfg = remote_applications[local_appcfg.namespace]
 
-        click.echo(f"Fetching {remote_cfg.namespace}")
+        click.echo(f"Fetching {remote_appcfg.namespace}")
 
         if not no_database:
-            schemas.update(transfer_database_of_app(local_cfg, remote_cfg))
+            schemas.update(
+                transfer_database_of_app(local_appcfg, remote_appcfg))
 
         if not no_filestorage:
-            transfer_storage_of_app(local_cfg, remote_cfg)
-            transfer_depot_storage_of_app(local_cfg, remote_cfg)
+            transfer_storage_of_app(local_appcfg, remote_appcfg)
+            transfer_depot_storage_of_app(local_appcfg, remote_appcfg)
 
     if add_admins:
         for schema in schemas:
             click.echo(f"Adding admin@example:test to {schema}")
-            do_add_admins(local_cfg, schema)
+            # FIXME: This is a bit sus, it works because we only access
+            #        the DSN of the app config and it's the same for all
+            #        the app configs, we should be a bit more explicit that
+            #        we are passing a shared configuration value, rather
+            #        than an application specific one
+            do_add_admins(local_appcfg, schema)
 
 
 @cli.command(context_settings={'default_selector': '*'})

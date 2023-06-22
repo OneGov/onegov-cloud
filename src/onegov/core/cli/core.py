@@ -203,8 +203,7 @@ from webtest import TestApp as Client
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import (
-        Callable, Collection, Iterator, Mapping, Sequence)
+    from collections.abc import Callable, Collection, Iterator, Sequence
     from typing import Protocol, TypedDict
 
     from onegov.core.request import CoreRequest
@@ -368,7 +367,7 @@ class GroupContext(GroupContextGuard):
     def __init__(
         self,
         selector: str | None,
-        config: 'Mapping[str, Any] | str',
+        config: dict[str, Any] | str | bytes,
         default_selector: str | None = None,
         creates_path: bool = False,
         singular: bool = False,
