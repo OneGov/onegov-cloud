@@ -1,7 +1,10 @@
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
-from sqlalchemy import Boolean
-from onegov.search import ORMSearchable
+from sqlalchemy import Boolean, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
+from onegov.search import ORMSearchable, Searchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
@@ -106,6 +109,20 @@ class CourseAttendee(Base, ORMSearchable):
         lazy='dynamic',
         cascade='all, delete-orphan'
     )
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on the following columns
+        """
+        return Searchable.create_tsvector_string('first_name', 'last_name',
+                                                 'organisation', '_email')
 
     @property
     def title(self):

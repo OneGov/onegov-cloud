@@ -311,7 +311,8 @@ class SearchPostgres(Pagination):
                                        'agencies', 'forms',
                                        'agency_memberships',
                                        'external_links', 'activities',
-                                       'attendees']:
+                                       'attendees', 'fsi_courses',
+                                       'fsi_attendees' 'fsi_course_events']:
                 if model.es_public or self.request.is_logged_in:
                     print(f'*** model to search: {model}')
                     query = self.request.session.query(model)

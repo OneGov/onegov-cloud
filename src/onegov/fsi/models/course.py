@@ -1,9 +1,12 @@
 from arrow import utcnow
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text, Boolean, Integer
+from onegov.search import ORMSearchable, Searchable
+from sqlalchemy import Column, Text, Boolean, Integer, Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
@@ -31,6 +34,19 @@ class Course(Base, ORMSearchable):
 
     # hides the course in the collection for non-admins
     hidden_from_public = Column(Boolean, nullable=False, default=False)
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on columns name and description
+        """
+        return Searchable.create_tsvector_string('name', 'description')
 
     @property
     def title(self):
