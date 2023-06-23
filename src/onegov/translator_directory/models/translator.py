@@ -1,7 +1,10 @@
 from uuid import uuid4
 
 from libres.db.models.timestamp import TimestampMixin
-from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
+from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float, \
+    Index
+from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
@@ -9,7 +12,7 @@ from onegov.core.orm.mixins import ContentMixin, meta_property
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
-from onegov.search import ORMSearchable
+from onegov.search import ORMSearchable, Searchable
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
 from onegov.translator_directory.models.certificate import (
     certificate_association_table
@@ -187,6 +190,20 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # If entry was imported, for the form and the expertise fields
     imported = Column(Boolean, default=False, nullable=False)
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on the follwoing columns
+        """
+        return Searchable.create_tsvector_string('first_name', 'last_name',
+                                                 'email')
 
     @property
     def title(self):
