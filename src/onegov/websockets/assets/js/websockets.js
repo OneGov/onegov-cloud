@@ -1,4 +1,4 @@
-var openWebsocket = function(endpoint, schema, channel, onNotifcation) {
+var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError) {
     const websocket = new WebSocket(endpoint);
     websocket.addEventListener("open", function() {
         const payload = {
