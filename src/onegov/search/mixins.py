@@ -1,4 +1,4 @@
-from onegov.search.utils import classproperty
+from onegov.search.utils import classproperty, get_fts_index_languages
 from onegov.search.utils import extract_hashtags
 
 
@@ -134,7 +134,8 @@ class Searchable:
         """ Returns a list of tags associated with this content. """
         return None
 
-    def psql_tsvector_string(self):
+    @staticmethod
+    def psql_tsvector_string():
         """
         Provides the tsvector string for postgres defining which columns and
         json fields to be used for full text search index.
@@ -172,7 +173,6 @@ class Searchable:
             ALTER TABLE "{schema}".{model.__tablename__} DROP COLUMN IF EXISTS
             {col_name};
         """
-        print(f'drop fts column: {query}')
         session.execute(query)
         session.execute("COMMIT")
 
@@ -184,6 +184,8 @@ class Searchable:
         postgresql full text search (fts), OGC-508.
 
         It adds a separate column for the tsvector to `schema`.`table`
+        creating a multilingual gin index on the columns/data defined per
+        model.
 
         :param session: session
         :param schema: schema name
@@ -191,13 +193,25 @@ class Searchable:
         :param col_name: column name of fts index
         :return: None
         """
-        # TODO: configure language
+
+        # we build the tsvector expression for all supported languages based
+        # on this format
+        # to_tsvector('simple', '<tsvector_string_of_model') ||
+        # to_tsvector('german', '<tsvector_string_of_model') ||
+        # to_tsvector('french', '<tsvector_string_of_model') ||
+        # ...
+
+        tsvector_multi_language_expression = ' || '.join(
+            "to_tsvector('{}', {})".format(language,
+                                           model.psql_tsvector_string())
+            for language in get_fts_index_languages()
+        )
+
         query = f"""
             ALTER TABLE "{schema}".{model.__tablename__}
             ADD COLUMN IF NOT EXISTS {col_name} tsvector GENERATED ALWAYS AS
-            (to_tsvector('german', {model.psql_tsvector_string()})) STORED;
+            ({tsvector_multi_language_expression}) STORED;
         """
-        print(f'add fts column: {query}')
         session.execute(query)
         session.execute("COMMIT")
 

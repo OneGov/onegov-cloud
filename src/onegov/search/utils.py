@@ -29,6 +29,14 @@ def searchable_sqlalchemy_models(base):
 _invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')
 
 
+def get_fts_index_languages():
+    """ Define index creation languages for full text search as we have a
+    limited set of used languages.
+
+    """
+    return ['simple', 'german', 'french', 'italian', 'english']
+
+
 def is_valid_index_name(name):
     """ Checks if the given name is a valid elasticsearch index name.
     Elasticsearch does it's own checks, but we can do it earlier and we are
