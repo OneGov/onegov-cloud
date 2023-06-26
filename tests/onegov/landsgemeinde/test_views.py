@@ -1,5 +1,9 @@
 from dateutil import parser
 from freezegun import freeze_time
+from onegov.landsgemeinde.models import Assembly
+from tests.onegov.town6.conftest import Client
+from transaction import begin
+from transaction import commit
 
 
 def test_views(client_with_es):
@@ -134,3 +138,57 @@ def test_views(client_with_es):
         page.click('Löschen')
         page = page.click('Archiv', index=0)
     assert 'Noch keine Landsgemeinden erfasst.' in page
+
+
+def test_view_pages_cache(landsgemeinde_app):
+    client = Client(landsgemeinde_app)
+
+    # make sure codes != 200 are not cached
+    anonymous = Client(landsgemeinde_app)
+    anonymous.get('/landsgemeinde/2023-05-07/ticker', status=404)
+    assert len(landsgemeinde_app.pages_cache.keys()) == 0
+
+    # add assembly
+    client.login('admin@example.org', 'hunter2')
+    page = client.get('/').click('Archiv')
+    page = page.click('Landsgemeinde')
+    page.form['date'] = '2023-05-07'
+    page.form['state'] = 'completed'
+    page.form['overview'] = 'Lorem'
+    page = page.form.submit()
+
+    # make sure set-cookies are not cached
+    anonymous = Client(landsgemeinde_app)
+    response = anonymous.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Set-Cookie' in response.headers  # session_id
+    assert len(landsgemeinde_app.pages_cache.keys()) == 0
+
+    # make sure HEAD request are cached without qs
+    anonymous.head('/landsgemeinde/2023-05-07/ticker')
+    assert len(landsgemeinde_app.pages_cache.keys()) == 1
+
+    anonymous.head('/landsgemeinde/2023-05-07/ticker?now')
+    assert len(landsgemeinde_app.pages_cache.keys()) == 1
+
+    # Create cache entries
+    assert 'Lorem' in anonymous.get('/landsgemeinde/2023-05-07/ticker')
+    assert len(landsgemeinde_app.pages_cache.keys()) == 2
+
+    anonymous.get('/landsgemeinde/2023-05-07/ticker?now')
+    assert len(landsgemeinde_app.pages_cache.keys()) == 3
+
+    # Modify without invalidating the cache
+    begin()
+    landsgemeinde_app.session().query(Assembly).one().overview = 'Ipsum'
+    commit()
+
+    assert 'Ipsum' not in anonymous.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Ipsum' in client.get('/landsgemeinde/2023-05-07/ticker')
+
+    # Modify with invalidating the cache
+    edit = client.get('/landsgemeinde/2023-05-07/edit')
+    edit.form['overview'] = 'Adipiscing'
+    edit.form.submit()
+
+    assert 'Adipiscing' in anonymous.get('/landsgemeinde/2023-05-07/ticker')
+    assert 'Adipiscing' in client.get('/landsgemeinde/2023-05-07/ticker')
