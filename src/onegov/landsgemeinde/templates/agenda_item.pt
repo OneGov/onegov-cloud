@@ -45,6 +45,12 @@
                     </tal:block>
 
                 </div>
+
+                <div class="side-panel video" tal:condition="agenda_item.video_url">
+                    <h2 i18n:translate="">Video</h2>
+                    <iframe allow="fullscreen" frameborder="0" src="${agenda_item.video_url}"></iframe>
+                </div>
+
             </div>
         </div>
 

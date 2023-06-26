@@ -83,6 +83,9 @@ class Votum(
     #: A picture of the person
     person_picture = NamedFile()
 
+    #: The video timestamp of this agenda item
+    video_timestamp = content_property()
+
     #: the agenda this votum belongs to
     agenda_item_id = Column(
         UUID,
@@ -101,3 +104,9 @@ class Votum(
     @property
     def agenda_item_number(self):
         return self.agenda_item.number
+
+    @property
+    def video_url(self):
+        video_url = self.agenda_item.assembly.video_url
+        if video_url:
+            return f'{video_url}#t={self.video_timestamp}'
