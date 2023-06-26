@@ -89,16 +89,8 @@ class AgendaItem(
     #: The resolution (tags) of the agenda item
     resolution_tags = content_property()
 
-    @property
-    def date(self):
-        return self.assembly.date
-
-    @property
-    def title_parts(self):
-        lines = (self.title or '').splitlines()
-        lines = [line.strip() for line in lines]
-        lines = [line for line in lines if line]
-        return lines
+    #: The video timestamp of this agenda item
+    video_timestamp = content_property()
 
     #: Start of the agenda item (localized to Europe/Zurich)
     start = Column(Time, nullable=True)
@@ -110,3 +102,20 @@ class AgendaItem(
         backref=backref('agenda_item'),
         order_by='Votum.number',
     )
+
+    @property
+    def date(self):
+        return self.assembly.date
+
+    @property
+    def title_parts(self):
+        lines = (self.title or '').splitlines()
+        lines = [line.strip() for line in lines]
+        lines = [line for line in lines if line]
+        return lines
+
+    @property
+    def video_url(self):
+        video_url = self.assembly.video_url
+        if video_url:
+            return f'{video_url}#t={self.video_timestamp}'
