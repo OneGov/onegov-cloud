@@ -1,11 +1,12 @@
 import transaction
 
 from io import BytesIO
-from onegov.ballot import Vote
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
+from onegov.ballot import Vote
 from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import Canton
+from sqlalchemy.orm import Session
 from tests.onegov.election_day.common import login
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -329,3 +330,28 @@ def test_view_rest_parties(election_day_app_zg):
             assert isinstance(import_.call_args[0][1], Canton)
             assert isinstance(import_.call_args[0][2], BytesIO)
             assert import_.call_args[0][3] == 'application/octet-stream'
+
+
+def test_view_rest_xml(election_day_app_zg):
+    token = UploadTokenCollection(election_day_app_zg.session()).create()
+    token = str(token.token)
+    transaction.commit()
+
+    client = Client(election_day_app_zg)
+    client.authorization = ('Basic', ('', token))
+
+    params = (
+        ('type', 'xml'),
+        ('results', Upload('delivery.xml', 'a'.encode('utf-8'))),
+    )
+    with patch(
+        'onegov.election_day.views.upload.rest.import_xml',
+        return_value=([], [])
+    ) as import_:
+        result = client.post('/upload', params=params)
+        assert result.json['status'] == 'success'
+
+        assert import_.called
+        assert isinstance(import_.call_args[0][0], Canton)
+        assert isinstance(import_.call_args[0][1], Session)
+        assert isinstance(import_.call_args[0][2], BytesIO)
