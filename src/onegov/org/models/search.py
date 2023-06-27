@@ -50,6 +50,7 @@ class Search(Pagination):
 
     @cached_property
     def batch(self):
+        print('*** tschupre search batch')
         if not self.query:
             return None
 
@@ -134,9 +135,16 @@ class Search(Pagination):
         return self.cached_subset and self.cached_subset.hits.total.value or 0
 
     def suggestions(self):
+        print('*** tschupre Search::suggestions')
         return tuple(self.request.app.es_suggestions_by_request(
             self.request, self.query
         ))
+
+
+def locale_mapping(locale):
+    mapping = {'de_CH': 'german', 'fr_CH': 'french', 'it_CH': 'italian',
+               'rm_CH': 'english'}
+    return mapping.get(locale, 'english')
 
 
 class SearchPostgres(Pagination):
@@ -147,7 +155,15 @@ class SearchPostgres(Pagination):
         self.request = request
         self.query = query
         self.page = page  # page index
+
+        self.nbr_of_docs = 0
         print('*** tschupre search __init__')
+
+    @cached_property
+    def available_documents(self):
+        if not self.nbr_of_docs:
+            self.postgres_search()
+        return self.nbr_of_docs
 
     @cached_property
     def explain(self):
@@ -164,13 +180,16 @@ class SearchPostgres(Pagination):
         print('*** tschupre search __eq__')
         return self.page == other.page and self.query == other.query
 
+    def subset(self):
+        return self.postgres_search()
+
     @property
     def page_index(self):
         print('*** tschupre search page_index')
         return self.page
 
     def page_by_index(self, index):
-        print('*** tschupre search page_by_index')
+        print(f'*** tschupre search page_by_index: {index}')
         return SearchPostgres(self.request, self.query, index)
 
     @cached_property
@@ -186,7 +205,8 @@ class SearchPostgres(Pagination):
         #
         # return search[self.offset:self.offset + self.batch_size].execute()
 
-        return self.postgres_search()
+        search = self.postgres_search()
+        return search[self.offset:self.offset + self.batch_size]
 
     # def generic_search(self, search, query):
     #     print('*** tschupre search generic_search')
@@ -259,63 +279,35 @@ class SearchPostgres(Pagination):
     @cached_property
     def subset_count(self):
         print('*** tschupre search subset_count')
-        return 1
-        return self.cached_subset and self.cached_subset.hits.total.value or 0
+        return self.cached_subset and len(self.cached_subset) or 0
 
-    def suggestions(self):
-        print(f'*** tschupre search suggestions for \'{self.query}\'')
-        return tuple()
-        # self.query is the search term e.g. 'test'
+    def suggestions_postgres(self):
+        suggestions = list()
 
-        # session = self.request.session
-        # tsquery = func.websearch_to_tsquery(self.query)
-        # q = session.query(User)
-        # q = q.filter(User.username.match(self.query))  # work but no results
-        # q = q.filter(User.__tsvector__.match(self.query))  # works but no
-        # results
-        # q = q.filter(User.fts_idx_users_username_col.match(self.query))  #
-        # q = q.filter(User.__tsvector__.like(self.query))  # not working
-        # q = q.filter(User.fts_idx_users_username_col.like(self.query))  #
-        # not working
-        # works but no results
-        # q = q.filter(User.username == self.query)  # works but no results
-        # q = q.filter(User.username.like(self.query))  # works but no results
-        # q = q.filter(User.username.match(self.query))  # works but no results
-        # results = q.all()
-        # results = q.limit(5)
-        #
-        # print('*** query results')
-        # for result in results:
-        #     print(f'result: {result}')
-        #
-        # # return results,
-        # es_res = tuple(self.request.app.es_suggestions_by_request(
-        #     self.request, self.query
-        # ))
-        #
-        # print(es_res)
-        # return tuple(self.request.app.es_suggestions_by_request(
-        #     self.request, self.query
-        # ))
+        for element in self.postgres_search():
+            suggest = getattr(element, 'es_suggestion', [])
+            suggestions.append(suggest)
 
+        return tuple(suggestions[:15])
+
+    # @cached_property
     def postgres_search(self):
+        doc_count = 0
         results = []
-        print('*** tschupre postgresql_search')
 
-        # TODO:language from application setting?
+        language = locale_mapping(self.request.locale)
 
         for model in searchable_sqlalchemy_models(Base):
             if model.es_public or self.request.is_logged_in:
-                print(f'*** model to search: {model}')
                 query = self.request.session.query(model)
+                doc_count += query.count()
                 query = query.filter(
                     model.fts_idx.op('@@')
-                    (func.websearch_to_tsquery('german', self.query))
+                    (func.websearch_to_tsquery(language, self.query))
                 )
-                results += query.all()
+                results.extend(query.all())
 
-        print(f'*** psql res count: {len(results)}')
-        for result in results:
-            print(f'*** psql res: {result}')
+        self.nbr_of_docs = doc_count
 
+        results.sort(reverse=False)
         return results

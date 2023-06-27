@@ -57,10 +57,11 @@ def search_postgres(self, request, layout=None):
 
     try:
         searchlabel = _("Search through ${count} indexed documents", mapping={
-            'count': len(self.batch)
+            'count': self.available_documents
         })
         resultslabel = _("${count} Results", mapping={
-            'count': len(self.batch)
+            # 'count': len(self.batch)
+            'count': self.subset_count
         })
     except SearchOfflineError:
         return {
@@ -89,6 +90,7 @@ def search_postgres(self, request, layout=None):
 @OrgApp.json(model=Search, name='suggest', permission=Public)
 def suggestions(self, request):
     try:
+        print('*** tschupre suggestions_es')
         return tuple(self.suggestions())
     except SearchOfflineError as exception:
         raise exc.HTTPNotFound() from exception
