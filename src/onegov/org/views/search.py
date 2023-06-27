@@ -92,3 +92,12 @@ def suggestions(self, request):
         return tuple(self.suggestions())
     except SearchOfflineError as exception:
         raise exc.HTTPNotFound() from exception
+
+
+@OrgApp.json(model=SearchPostgres, name='suggest', permission=Public)
+def suggestions_postgres(self, request):
+    try:
+        print('*** tschupre suggestions_postgres')
+        return tuple(self.suggestions_postgres())
+    except SearchOfflineError as exception:
+        raise exc.HTTPNotFound() from exception
