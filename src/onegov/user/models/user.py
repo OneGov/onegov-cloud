@@ -41,12 +41,6 @@ class User(Base, TimestampMixin, ORMSearchable):
     }
     es_public = False
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
-
     @property
     def es_suggestion(self):
         return (self.realname or self.username, self.username)
@@ -131,6 +125,16 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     #: the signup token used by the user
     signup_token = Column(Text, nullable=True, default=None)
+
+    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+
+    __table_args__ = (
+        Index('fts_idx', fts_idx, postgresql_using='gin'),
+    )
+
+    @property
+    def search_score(self):
+        return 5
 
     @staticmethod
     def psql_tsvector_string():
