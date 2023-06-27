@@ -76,6 +76,11 @@ class AssemblyLayout(DefaultLayout):
                     attrs={'class': 'check-list-link'}
                 ),
                 Link(
+                    text=_('Ticker'),
+                    url=self.request.link(self.model, 'ticker'),
+                    attrs={'class': 'news-link', 'target': '_blank'}
+                ),
+                Link(
                     text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
