@@ -28,10 +28,12 @@ def reindex(group_context, fail):
         print(click.style(title, underline=True))
 
         start = utcnow()
-
         app.psql_perform_reindex(session)
-        request.app.es_perform_reindex(fail)  # TODO: remove
+        print(f"psql indexing took {utcnow() - start}")
 
-        print(f"took {utcnow() - start}")
+        # TODO: remove es indexing
+        start = utcnow()
+        request.app.es_perform_reindex(fail)
+        print(f"es indexing took {utcnow() - start}")
 
     return run_reindex
