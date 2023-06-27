@@ -4,6 +4,11 @@ from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import UserGroup
+
+
 class UserGroupForm(Form):
 
     """ A generic user group form for onegov.user """
@@ -15,8 +20,8 @@ class UserGroupForm(Form):
         ]
     )
 
-    def update_model(self, model):
+    def update_model(self, model: 'UserGroup') -> None:
         model.name = self.name.data
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'UserGroup') -> None:
         self.name.data = model.name

@@ -201,7 +201,7 @@ from uuid import uuid4
 from webtest import TestApp as Client
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, NoReturn, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Collection, Iterator, Sequence
     from typing import Protocol, TypedDict
@@ -690,7 +690,9 @@ def command_group() -> click.Group:
     return command_group
 
 
-def abort(msg: str) -> None:
+# FIXME: Why are we not using click.abort? If we decide to switch
+#        then we can just make this a deprecated alias
+def abort(msg: str) -> NoReturn:
     """ Prints the given error message and aborts the program with a return
     code of 1.
 

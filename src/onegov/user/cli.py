@@ -7,6 +7,20 @@ from onegov.user import User, UserCollection
 from onegov.core.cli import command_group, abort
 from onegov.core.crypto import random_password
 
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from onegov.core.framework import Framework
+    from onegov.core.request import CoreRequest
+    from sqlalchemy.orm import Query
+
+
+# FIXME: This pattern of users.exists and users.by_username seems a
+#        bit insane, we perform two queries for no good reason, just
+#        check for None if we need the actual user object!
+
+
 cli = command_group()
 
 
@@ -23,10 +37,18 @@ cli = command_group()
               help="Sets the phone number")
 @click.option('--no-prompt', default=False,
               help="If no questions should be asked", is_flag=True)
-def add(role, username, password, yubikey, no_prompt, realname, phone_number):
+def add(
+    role: str,
+    username: str,
+    password: str | None,
+    yubikey: str | None,
+    no_prompt: bool,
+    realname: str | None,
+    phone_number: str | None
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Adds a user with the given name to the database. """
 
-    def add_user(request, app):
+    def add_user(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
         print("Adding {} to {}".format(username, app.application_id))
@@ -67,10 +89,10 @@ def add(role, username, password, yubikey, no_prompt, realname, phone_number):
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def delete(username):
+def delete(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     """ Removes the given user from the database. """
 
-    def delete_user(request, app):
+    def delete_user(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
         if not users.exists(username):
@@ -84,10 +106,10 @@ def delete(username):
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def exists(username):
+def exists(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     """ Returns 0 if the user exists, 1 if it doesn't. """
 
-    def find_user(request, app):
+    def find_user(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
         if not users.exists(username):
@@ -100,13 +122,13 @@ def exists(username):
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def activate(username):
+def activate(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     """ Activates the given user. """
 
-    def activate_user(request, app):
+    def activate_user(request: 'CoreRequest', app: 'Framework') -> None:
         user = UserCollection(app.session()).by_username(username)
 
-        if not user:
+        if user is None:
             abort("{} does not exist".format(username))
 
         user.active = True
@@ -117,10 +139,10 @@ def activate(username):
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def deactivate(username):
+def deactivate(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     """ Deactivates the given user. """
 
-    def deactivate_user(request, app):
+    def deactivate_user(request: 'CoreRequest', app: 'Framework') -> None:
         user = UserCollection(app.session()).by_username(username)
 
         if not user:
@@ -135,10 +157,10 @@ def deactivate(username):
 
 @cli.command(context_settings={'singular': True})
 @click.argument('username')
-def logout(username):
+def logout(username: str) -> 'Callable[[CoreRequest, Framework], None]':
     """ Logs out the given user on all sessions. """
 
-    def logout_user(request, app):
+    def logout_user(request: 'CoreRequest', app: 'Framework') -> None:
         user = UserCollection(app.session()).by_username(username)
 
         if not user:
@@ -151,10 +173,10 @@ def logout(username):
 
 
 @cli.command(name='logout-all', context_settings={'singular': True})
-def logout_all():
+def logout_all() -> 'Callable[[CoreRequest, Framework], None]':
     """ Logs out all users on all sessions. """
 
-    def logout_user(request, app):
+    def logout_user(request: 'CoreRequest', app: 'Framework') -> None:
         for user in UserCollection(app.session()).query():
             count = user.logout_all_sessions(request.app)
             if count:
@@ -167,15 +189,19 @@ def logout_all():
 @click.option('--active-only', help="Only show active users", is_flag=True)
 @click.option('--inactive-only', help="Only show inactive users", is_flag=True)
 @click.option('--sources', help="Display sources", is_flag=True, default=False)
-def list(active_only, inactive_only, sources):
+def list(
+    active_only: bool,
+    inactive_only: bool,
+    sources: bool
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Lists all users. """
 
     assert not all((active_only, inactive_only))
 
-    def list_users(request, app):
+    def list_users(request: 'CoreRequest', app: 'Framework') -> None:
 
-        users = UserCollection(app.session()).query()
-        users = users.with_entities(
+        users: 'Query[tuple[str, str, bool, str | None]]'
+        users = UserCollection(app.session()).query().with_entities(
             User.username, User.role, User.active, User.source
         )
         users = users.order_by(User.username, User.role)
@@ -202,10 +228,13 @@ def list(active_only, inactive_only, sources):
 @cli.command(name='change-password', context_settings={'singular': True})
 @click.argument('username')
 @click.option('--password', help="Password to use", default=None)
-def change_password(username, password):
+def change_password(
+    username: str,
+    password: str | None
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Changes the password of the given username. """
 
-    def change(request, app):
+    def change(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
         if not users.exists(username):
@@ -215,6 +244,7 @@ def change_password(username, password):
         password = password or getpass("Enter password: ")
 
         user = users.by_username(username)
+        assert user is not None
         user.password = password
         user.logout_all_sessions(request.app)
 
@@ -226,10 +256,13 @@ def change_password(username, password):
 @cli.command(name='change-yubikey', context_settings={'singular': True})
 @click.argument('username')
 @click.option('--yubikey', help="Yubikey to use", default=None)
-def change_yubikey(username, yubikey):
+def change_yubikey(
+    username: str,
+    yubikey: str | None
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Changes the yubikey of the given username. """
 
-    def change(request, app):
+    def change(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
         if not users.exists(username):
@@ -240,6 +273,7 @@ def change_yubikey(username, yubikey):
         yubikey = yubikey.strip()
 
         user = users.by_username(username)
+        assert user is not None
 
         if yubikey:
             user.second_factor = {
@@ -258,10 +292,13 @@ def change_yubikey(username, yubikey):
 @cli.command(name='transfer-yubikey', context_settings={'singular': True})
 @click.argument('source')
 @click.argument('target')
-def transfer_yubikey(source, target):
+def transfer_yubikey(
+    source: str,
+    target: str
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Transfers the Yubikey from one user to another. """
 
-    def transfer(request, app):
+    def transfer(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
         if not users.exists(source):
@@ -271,6 +308,8 @@ def transfer_yubikey(source, target):
 
         source_user = users.by_username(source)
         target_user = users.by_username(target)
+        assert source_user is not None
+        assert target_user is not None
 
         if not source_user.second_factor:
             abort("{} is not linked to a yubikey".format(source))
@@ -294,16 +333,20 @@ def transfer_yubikey(source, target):
 @cli.command(name='change-role', context_settings={'singular': True})
 @click.argument('username')
 @click.argument('role')
-def change_role(username, role):
+def change_role(
+    username: str,
+    role: str
+) -> 'Callable[[CoreRequest, Framework], None]':
     """ Changes the role of the given username. """
 
-    def change(request, app):
+    def change(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
         if not users.exists(username):
             abort("{} does not exist".format(username))
 
         user = users.by_username(username)
+        assert user is not None
         user.role = role
         user.logout_all_sessions(request.app)
 
@@ -313,10 +356,10 @@ def change_role(username, role):
 
 
 @cli.command(name='list-sessions', context_settings={'singular': True})
-def list_sessions():
+def list_sessions() -> 'Callable[[CoreRequest, Framework], None]':
     """ Lists all sessions of all users. """
 
-    def list_sessions(request, app):
+    def list_sessions(request: 'CoreRequest', app: 'Framework') -> None:
         for user in UserCollection(app.session()).query():
             if user.sessions:
                 click.secho('{}'.format(user.username), fg='yellow')
