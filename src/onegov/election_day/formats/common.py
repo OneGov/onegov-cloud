@@ -9,11 +9,39 @@ from onegov.core.errors import InvalidFormatError
 from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
 from re import match
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.parsers import XmlParser
 
 
 EXPATS = (
     # These are used by the BFS but not in the official data!
     9170,  # sg
+    19010,
+    19020,
+    19030,
+    19040,
+    19050,
+    19060,
+    19070,
+    19080,
+    19090,
+    19100,
+    19110,
+    19120,
+    19130,
+    19140,
+    19150,
+    19160,
+    19170,
+    19180,
+    19190,
+    19200,
+    19210,
+    19220,
+    19230,
+    19240,
+    19250,
+    19260,
 )
 
 
@@ -159,6 +187,24 @@ def load_csv(
         )
 
     return csv, error
+
+
+def load_xml(file):
+    """ Loads the given eCH file and returns it as an object.
+
+    :return: A tuple CSVFile, FileImportError.
+
+    """
+    xml = None
+    error = None
+
+    try:
+        parser = XmlParser(context=XmlContext())
+        xml = parser.from_bytes(file.read())
+    except Exception:
+        error = FileImportError(_("Not a valid eCH xml file."))
+
+    return xml, error
 
 
 def get_entity_and_district(

@@ -9,6 +9,7 @@ from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.formats import import_vote_wabsti
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.formats import import_vote_wabstim
+from onegov.election_day.formats import import_xml
 from onegov.election_day.formats.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layouts import ManageVotesLayout
@@ -47,6 +48,13 @@ def view_upload(self, request, form):
                     principal,
                     form.proposal.file,
                     form.proposal.data['mimetype']
+                )
+            elif form.file_format.data == 'xml':
+                errors, updated = import_xml(
+                    principal,
+                    session,
+                    form.xml.file,
+                    vote=self
                 )
             elif form.file_format.data == 'wabsti':
                 errors = import_vote_wabsti(

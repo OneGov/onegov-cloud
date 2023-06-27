@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 10:25+0200\n"
+"POT-Creation-Date: 2023-06-27 08:45+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -66,6 +66,9 @@ msgstr "La datoteca CSV/XLS/XLSX è vida."
 
 msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
+
+msgid "Not a valid eCH xml file."
+msgstr ""
 
 #, python-format
 msgid "${name} is not part of this business"
@@ -230,6 +233,9 @@ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
+msgstr ""
+
+msgid "Vote type not supported"
 msgstr ""
 
 msgid "Term"
@@ -643,6 +649,9 @@ msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Resultats da las partidas"
+
+msgid "Delivery"
+msgstr ""
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
