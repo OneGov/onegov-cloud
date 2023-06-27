@@ -200,6 +200,10 @@ class File(Base, Associable, TimestampMixin):
         Index('fts_idx', fts_idx, postgresql_using='gin'),
     )
 
+    @property
+    def search_score(self):
+        return 10
+
     @staticmethod
     def psql_tsvector_string():
         """

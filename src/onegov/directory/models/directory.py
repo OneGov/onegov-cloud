@@ -110,6 +110,10 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         Index('fts_idx', fts_idx, postgresql_using='gin'),
     )
 
+    @property
+    def search_score(self):
+        return 7
+
     @staticmethod
     def psql_tsvector_string():
         """

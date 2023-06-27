@@ -40,7 +40,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def es_suggestion(self):
-        return (self.title, f"{self.first_name} {self.last_name}")
+        return self.title
 
     @property
     def title(self):
@@ -144,6 +144,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
         """
         return Searchable.create_tsvector_string('first_name', 'last_name',
                                                  'function', 'email')
+
+    @property
+    def search_score(self):
+        return 3
 
     def vcard_object(self, exclude=None, include_memberships=True):
         """ Returns the person as vCard (3.0) object.

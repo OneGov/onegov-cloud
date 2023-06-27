@@ -134,6 +134,17 @@ class Searchable:
         """ Returns a list of tags associated with this content. """
         return None
 
+    @property
+    def search_score(self):
+        """
+        the lower the score they higher the class type will be shown in search
+        results. Default is 10 (lowest)
+        """
+        return 10
+
+    def __lt__(self, other):
+        return self.search_score < other.search_score
+
     @staticmethod
     def psql_tsvector_string():
         """

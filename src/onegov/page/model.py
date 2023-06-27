@@ -29,6 +29,10 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
         Index('fts_idx', fts_idx, postgresql_using='gin'),
     )
 
+    @property
+    def search_score(self):
+        return 1
+
     @staticmethod
     def psql_tsvector_string():
         """
