@@ -82,26 +82,19 @@ class UserApp(WebassetsApp):
         return None
 
     def configure_authentication_providers(self, **cfg: Any) -> None:
-
-        def bound(provider: type[AuthenticationProvider]) -> dict[str, Any]:
-            if 'authentication_providers' not in cfg:
-                return {}
-
-            if provider.metadata.name not in cfg['authentication_providers']:
-                return {}
-
-            return cfg['authentication_providers'][provider.metadata.name]
-
-        available_cls = AUTHENTICATION_PROVIDERS.values()
-        available_ = (cls.configure(**bound(cls)) for cls in available_cls)
-        available = (obj for obj in available_ if obj is not None)
-
-        self.available_providers = tuple(available)
+        providers_cfg = cfg.get('authentication_providers', {})
+        self.available_providers = tuple(
+            obj
+            for cls in AUTHENTICATION_PROVIDERS.values()
+            if (obj := cls.configure(
+                **providers_cfg.get(cls.metadata.name, {})
+            )) is not None
+        )
 
         # enable auto login for the first provider that has it configured, and
         # only the first (others are ignored)
         for provider in self.available_providers:
-            config = cfg['authentication_providers'][provider.metadata.name]
+            config = providers_cfg.get(provider.metadata.name, {})
 
             if config.get('auto_login'):
                 self.auto_login_provider = provider

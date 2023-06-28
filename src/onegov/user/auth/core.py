@@ -61,9 +61,9 @@ class Auth:
         self.factors = {}
 
         for type, cls in SECOND_FACTORS.items():
-            obj = cls(**cls.args_from_app(app))
+            obj = cls.configure(**cls.args_from_app(app))
 
-            if obj.is_configured():
+            if obj is not None:
                 self.factors[type] = obj
 
     @classmethod

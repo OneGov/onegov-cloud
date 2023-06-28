@@ -4,7 +4,7 @@ from attr import attrs, attrib
 from cached_property import cached_property
 from contextlib import suppress
 from functools import wraps
-from ldap3 import Connection, Server, NONE, RESTARTABLE
+from ldap3 import Connection, Server, AUTO_BIND_DEFAULT, NONE, RESTARTABLE
 from ldap3.core.exceptions import LDAPCommunicationError
 from time import sleep
 
@@ -90,8 +90,8 @@ class LDAPClient():
         return Connection(
             server=Server(self.url, get_info=NONE),
             read_only=True,
-            # FIXME: Figure out the correct value for auto_bind
-            auto_bind=False,  # type:ignore[arg-type]
+            # this is the same as auto_bind=False in earlier versions
+            auto_bind=AUTO_BIND_DEFAULT,
             client_strategy=RESTARTABLE,
         )
 

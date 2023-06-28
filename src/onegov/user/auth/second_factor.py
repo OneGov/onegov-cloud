@@ -6,7 +6,7 @@ from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from onegov.core.framework import Framework
-    from typing import TypedDict
+    from typing_extensions import Self, TypedDict
 
     class YubikeyConfig(TypedDict):
         yubikey_client_id: str | None
@@ -27,6 +27,8 @@ SECOND_FACTORS: dict[str, type['SecondFactor']] = {}
 class SecondFactor(metaclass=ABCMeta):
     """ Base class and registry for secondary auth factors. """
 
+    __slots__ = ()
+
     if TYPE_CHECKING:
         # forward declare for type checking, SecondFactor is
         # abstract so this attribute will always exist
@@ -40,16 +42,14 @@ class SecondFactor(metaclass=ABCMeta):
 
         super().__init_subclass__(**kwargs)
 
+    @classmethod
     @abstractmethod
-    def __init__(self, **kwargs: Any):
+    def configure(self, **cfg: Any) -> 'Self | None':
         """ Initialises the auth factor using a dictionary that may or may
         not contain the configuration values necessary for the auth factor.
 
-        Either way, the auth factor is instantiated even if the needed
-        configuration is not available.
-
-        The :meth:`is_configured` method is responsible for signaling if
-        the configuration has been successful or not.
+        If the configuration is invalid None will be returned, otherwise
+        a new instance is created.
 
         All used configuration values should be popped, not just read.
 
@@ -65,10 +65,6 @@ class SecondFactor(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def is_configured(self) -> bool:
-        """ Returns `True` if the factor has been properly configured. """
-
-    @abstractmethod
     def is_valid(self, user_specific_config: Any, factor: str) -> bool:
         """ Returns true if the given factor is valid for the given
         user-specific configuration. This is the value stored on the
@@ -80,14 +76,24 @@ class SecondFactor(metaclass=ABCMeta):
 class YubikeyFactor(SecondFactor, type='yubikey'):
     """ Implements a yubikey factor for the :class:`Auth` class. """
 
+    __slots__ = ('yubikey_client_id', 'yubikey_secret_key')
+
     def __init__(
         self,
-        yubikey_client_id: str | None = None,
-        yubikey_secret_key: str | None = None,
-        **kwargs: Any
+        yubikey_client_id: str,
+        yubikey_secret_key: str
     ):
         self.yubikey_client_id = yubikey_client_id
         self.yubikey_secret_key = yubikey_secret_key
+
+    @classmethod
+    def configure(cls, **cfg: Any) -> 'Self | None':
+        yubikey_client_id = cfg.pop('yubikey_client_id', None)
+        yubikey_secret_key = cfg.pop('yubikey_secret_key', None)
+        if not yubikey_client_id or not yubikey_secret_key:
+            return None
+
+        return cls(yubikey_client_id, yubikey_secret_key)
 
     @classmethod
     def args_from_app(cls, app: 'Framework') -> 'YubikeyConfig':
@@ -96,14 +102,7 @@ class YubikeyFactor(SecondFactor, type='yubikey'):
             'yubikey_secret_key': getattr(app, 'yubikey_secret_key', None)
         }
 
-    def is_configured(self) -> bool:
-        if self.yubikey_client_id and self.yubikey_secret_key:
-            return True
-        return False
-
     def is_valid(self, user_specific_config: str, factor: str) -> bool:
-        assert self.yubikey_client_id is not None
-        assert self.yubikey_secret_key is not None
         return is_valid_yubikey(
             client_id=self.yubikey_client_id,
             secret_key=self.yubikey_secret_key,

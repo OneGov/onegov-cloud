@@ -16,11 +16,6 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query
 
 
-# FIXME: This pattern of users.exists and users.by_username seems a
-#        bit insane, we perform two queries for no good reason, just
-#        check for None if we need the actual user object!
-
-
 cli = command_group()
 
 
@@ -237,14 +232,13 @@ def change_password(
     def change(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
-        if not users.exists(username):
+        user = users.by_username(username)
+        if user is None:
             abort("{} does not exist".format(username))
 
         nonlocal password
         password = password or getpass("Enter password: ")
 
-        user = users.by_username(username)
-        assert user is not None
         user.password = password
         user.logout_all_sessions(request.app)
 
@@ -265,15 +259,13 @@ def change_yubikey(
     def change(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
-        if not users.exists(username):
+        user = users.by_username(username)
+        if user is None:
             abort("{} does not exist".format(username))
 
         nonlocal yubikey
         yubikey = (yubikey or getpass("Enter yubikey: ")).strip()[:12]
         yubikey = yubikey.strip()
-
-        user = users.by_username(username)
-        assert user is not None
 
         if yubikey:
             user.second_factor = {
@@ -301,15 +293,13 @@ def transfer_yubikey(
     def transfer(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
-        if not users.exists(source):
-            abort("{} does not exist".format(source))
-        if not users.exists(target):
-            abort("{} does not exist".format(target))
-
         source_user = users.by_username(source)
+        if source_user is None:
+            abort("{} does not exist".format(source))
+
         target_user = users.by_username(target)
-        assert source_user is not None
-        assert target_user is not None
+        if target_user is None:
+            abort("{} does not exist".format(target))
 
         if not source_user.second_factor:
             abort("{} is not linked to a yubikey".format(source))
@@ -342,11 +332,10 @@ def change_role(
     def change(request: 'CoreRequest', app: 'Framework') -> None:
         users = UserCollection(app.session())
 
-        if not users.exists(username):
+        user = users.by_username(username)
+        if user is None:
             abort("{} does not exist".format(username))
 
-        user = users.by_username(username)
-        assert user is not None
         user.role = role
         user.logout_all_sessions(request.app)
 
