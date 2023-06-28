@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-27 08:45+0200\n"
+"POT-Creation-Date: 2023-06-28 07:23+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -67,8 +67,9 @@ msgstr "Die CSV/XLS/XLSX Date ist leer."
 msgid "The file contains an empty line."
 msgstr "Die Datei enthält eine leere Zeile."
 
-msgid "Not a valid eCH xml file."
-msgstr "Keine gültige eCH xml-Datei."
+#, python-format
+msgid "Not a valid eCH xml file: ${error}"
+msgstr "Keine gültige eCH xml-Datei: ${error}"
 
 #, python-format
 msgid "${name} is not part of this business"

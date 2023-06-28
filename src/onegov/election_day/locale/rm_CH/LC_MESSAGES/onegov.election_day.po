@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-27 08:45+0200\n"
+"POT-Creation-Date: 2023-06-28 07:23+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -67,7 +67,8 @@ msgstr "La datoteca CSV/XLS/XLSX è vida."
 msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
-msgid "Not a valid eCH xml file."
+#, python-format
+msgid "Not a valid eCH xml file: ${error}"
 msgstr ""
 
 #, python-format

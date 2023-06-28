@@ -201,8 +201,11 @@ def load_xml(file):
     try:
         parser = XmlParser(context=XmlContext())
         xml = parser.from_bytes(file.read())
-    except Exception:
-        error = FileImportError(_("Not a valid eCH xml file."))
+    except Exception as exception:
+        error = FileImportError(_(
+            "Not a valid eCH xml file: ${error}",
+            mapping={'error': exception}
+        ))
 
     return xml, error
 
