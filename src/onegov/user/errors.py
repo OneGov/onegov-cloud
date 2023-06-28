@@ -1,6 +1,6 @@
 class OnegovUserError(Exception):
     """ Base class for all errors raised by onegov.user. """
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.message = message
 
 
@@ -23,12 +23,12 @@ class AlreadyActivatedError(OnegovUserError):
 class ExpiredSignupLinkError(OnegovUserError):
     """ Raised when the signup link in use has expired. """
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
 
 class InsecurePasswordError(OnegovUserError):
     """ Raised when a user's password is not secure enough. """
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
