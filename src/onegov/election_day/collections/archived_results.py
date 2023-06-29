@@ -299,7 +299,9 @@ class ArchivedResultCollection:
             or isinstance(item, Vote)
         )
 
-        for result in self.query().filter_by(url=request.link(item)):
+        url = request.link(item)
+        url = replace_url(url, request.app.principal.official_host)
+        for result in self.query().filter_by(url=url):
             self.session.delete(result)
 
         self.session.delete(item)
