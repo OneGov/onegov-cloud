@@ -66,7 +66,7 @@ class ArchivedResultCollection:
             return None
 
         compounded = {
-            id_ for item in items for id_ in getattr(item, 'elections', [])
+            url for item in items for url in getattr(item, 'elections', [])
         }
 
         dates = groupbydict(

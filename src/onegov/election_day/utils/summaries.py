@@ -114,11 +114,17 @@ def get_summary(item, request):
 
     if isinstance(item, ArchivedResult):
         if item.type == 'election':
-            return get_election_summary(item, None, item.url)
+            return get_election_summary(
+                item, None, item.adjusted_url(request)
+            )
         if item.type == 'election_compound':
-            return get_election_compound_summary(item, None, item.url)
+            return get_election_compound_summary(
+                item, None, item.adjusted_url(request)
+            )
         if item.type == 'vote':
-            return get_vote_summary(item, None, item.url)
+            return get_vote_summary(
+                item, None, item.adjusted_url(request)
+            )
 
     raise NotImplementedError(
         "get_summary can't handle type {}".format(type(item))
