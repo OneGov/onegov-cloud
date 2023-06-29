@@ -1,8 +1,71 @@
 # Changes
 
+## 2023.29
+
+`2023-06-29` | [509e80e963...27882bc78c](https://github.com/OneGov/onegov-cloud/compare/509e80e963^...27882bc78c)
+
+### Core
+
+##### Remove filestorage recursively when deleting an instance.
+
+`Bugfix` | [0fb1381c32](https://github.com/onegov/onegov-cloud/commit/0fb1381c325648f066df14630f4758fd87d7bd24)
+
+### Election Day
+
+##### Add experimental eCH-0252 import for votes.
+
+`Feature` | [OGC-1152](https://linear.app/onegovcloud/issue/OGC-1152) | [c4292828b8](https://github.com/onegov/onegov-cloud/commit/c4292828b80b0a950be98f3fabd6c2e8480b1dcb)
+
+##### Add support for intermediate eCH-0252 results.
+
+`Feature` | [OGC-1152](https://linear.app/onegovcloud/issue/OGC-1152) | [0e761ae784](https://github.com/onegov/onegov-cloud/commit/0e761ae784c85f6eea542b589f8fb64dd37ab90e)
+
+##### Allows instances to be served by multiple sites/hosts.
+
+`Feature` | [OGC-1186](https://linear.app/onegovcloud/issue/OGC-1186) | [48fae4c34a](https://github.com/onegov/onegov-cloud/commit/48fae4c34ac06c023951b45012adcf0c277aeb92)
+
+##### Allows to specify an official host to be used for the archived results when being served by multiple sites.
+
+`Feature` | [OGC-1186](https://linear.app/onegovcloud/issue/OGC-1186) | [27882bc78c](https://github.com/onegov/onegov-cloud/commit/27882bc78c7d0a217533df01efef92a0d75a44a6)
+
+##### Remove cache busting by cache control header.
+
+`Other` | [OGC-1167](https://linear.app/onegovcloud/issue/OGC-1167) | [f9e0d27888](https://github.com/onegov/onegov-cloud/commit/f9e0d2788843584ebaffe7ae7bc7b9d4a40fcc89)
+
+##### Add host to pages cache keys.
+
+`Feture` | [OGC-1186](https://linear.app/onegovcloud/issue/OGC-1186) | [bfb05a2ef3](https://github.com/onegov/onegov-cloud/commit/bfb05a2ef3fcf376f0475d5a7df656946f761be6)
+
+### Landsgemeinde
+
+##### Add cache for ticker.
+
+`Feature` | [509e80e963](https://github.com/onegov/onegov-cloud/commit/509e80e963cd9167b34ed2883015755cfed4505f)
+
+##### Add video timestamps.
+
+`Feature` | [8badd5e907](https://github.com/onegov/onegov-cloud/commit/8badd5e907e4c915e3a5a0787f52d4906d4a7738)
+
+##### Add link to ticker.
+
+`Feature` | [93781524e2](https://github.com/onegov/onegov-cloud/commit/93781524e25d4b20d1b99659a17cc240580d3c0a)
+
+##### Improve ticker code.
+
+Adds fallback to ticker in case of websocket server shutdown and add 
+timestamp to HEAD request to avoid being browser-cached.
+
+`Bugfix` | [093fdf43af](https://github.com/onegov/onegov-cloud/commit/093fdf43af92fb4ecc2de84f815db5a48a08f13a)
+
+### Org
+
+##### Adds infomaniak to child src content policy.
+
+`Feature` | [c851291070](https://github.com/onegov/onegov-cloud/commit/c851291070425b6b4452fe74fe593590ff1a6cc4)
+
 ## 2023.28
 
-`2023-06-23` | [f880391f0d...63685ef987](https://github.com/OneGov/onegov-cloud/compare/f880391f0d^...63685ef987)
+`2023-06-23` | [f880391f0d...179dd8f9c5](https://github.com/OneGov/onegov-cloud/compare/f880391f0d^...179dd8f9c5)
 
 ### Election Day
 
@@ -2748,18 +2811,4 @@ The search bar can now directly be used in the header
 ##### Fixes shift schedule image path colliding with cached files.
 
 `Bugfix` | [OGC-447](https://linear.app/onegovcloud/issue/OGC-447) | [230fbfbab3](https://github.com/onegov/onegov-cloud/commit/230fbfbab3b96de35609edd9083e313547760892)
-
-## 2022.36
-
-`2022-07-09` | [1de8d90f39...8cde20cbf7](https://github.com/OneGov/onegov-cloud/compare/1de8d90f39^...8cde20cbf7)
-
-### Core
-
-##### Add function to check if an enum exists.
-
-`Feature` | [542436165a](https://github.com/onegov/onegov-cloud/commit/542436165aedc25e0c724cf6703bf4544b8b40fb)
-
-##### Fix result of enum_exists.
-
-`Bugfix` | [dd767a7f1e](https://github.com/onegov/onegov-cloud/commit/dd767a7f1ebca0a0302c4149a7729a901ca52fee)
 
