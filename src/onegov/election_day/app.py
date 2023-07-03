@@ -317,18 +317,10 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         )
 
     def micro_cache_anonymous_pages_tween(request):
-        """ Cache all pages for 5 minutes.
+        """ Cache all pages for 5 minutes. """
 
-        Logged in users are exempt of this cache. If a user wants to manually
-        bust the cache he or she just needs to refresh the cached page using
-        Shift + F5 as an anonymous user.
-
-        That is to say, we observe the Cache-Control header.
-
-        """
-
-        # do not cache HEAD, POST, DELETE etc.
-        if request.method != 'GET':
+        # do not cache POST, DELETE etc.
+        if request.method not in ('GET', 'HEAD'):
             return handler(request)
 
         # no cache if the user is logged in
@@ -339,19 +331,20 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         if not cache_paths.match(request.path_info):
             return handler(request)
 
-        # allow cache busting through browser shift+f5
-        if request.headers.get('cache-control') == 'no-cache':
-            return handler(request)
-
-        # each page is cached once per request method, language and
-        # headerless/headerful (and by application id as the pages_cache is
-        # bound to it)
-        key = ':'.join((
-            request.method,
-            request.locale,
-            request.path_qs,
-            'hl' if 'headerless' in request.browser_session else 'hf'
-        ))
+        if request.method == 'HEAD':
+            # HEAD requests are cached with only the path
+            key = ':'.join((request.method, request.path))
+        else:
+            # each page is cached once per request method, host, path including
+            # query string, language and headerless/headerful (and by
+            # application id as the pages_cache is bound to it)
+            key = ':'.join((
+                request.method,
+                request.host,
+                request.path_qs,
+                request.locale,
+                'hl' if 'headerless' in request.browser_session else 'hf'
+            ))
 
         return app.pages_cache.get_or_create(
             key,

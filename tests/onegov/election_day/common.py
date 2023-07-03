@@ -161,6 +161,7 @@ class DummyPrincipal:
         self._is_year_available = True
         self.reply_to = None
         self.superregions = []
+        self.official_host = None
 
     @property
     def notifications(self):

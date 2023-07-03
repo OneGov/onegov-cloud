@@ -9,23 +9,24 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Cuntegn](#Cuntegn)   
-- 2. [Remartgas preliminaras](#Remartgas-preliminaras)   
-   - 2.1. [Unitads](#Unitads)   
-- 3. [Formats](#Formats)   
-   - 3.1. [Format da standard](#Format-da-standard)   
-      - 3.1.1. [Colonnas](#Colonnas)   
-      - 3.1.2. [Resultats temporars](#Resultats-temporars)   
-      - 3.1.3. [Project](#Project)   
-   - 3.2. [OneGov](#OneGov)   
-   - 3.3. [Colonnas](#Colonnas-1)   
-      - 3.3.1. [Resultats temporars](#Resultats-temporars-1)   
-      - 3.3.2. [Project](#Project-1)   
-   - 3.4. [Wabsti](#Wabsti)   
-      - 3.4.1. [Colonnas](#Colonnas-2)   
-      - 3.4.2. [Resultats temporars](#Resultats-temporars-2)   
-      - 3.4.3. [Project](#Project-2)   
-   - 3.5. [WabstiCExport](#WabstiCExport)   
+- 1. [Cuntegn](#cuntegn)
+- 2. [Remartgas preliminaras](#remartgas-preliminaras)
+   - 2.1. [Unitads](#unitads)
+- 3. [Formats](#formats)
+   - 3.1. [Format da standard](#format-da-standard)
+      - 3.1.1. [Colonnas](#colonnas)
+      - 3.1.2. [Resultats temporars](#resultats-temporars)
+      - 3.1.3. [Project](#project)
+   - 3.2. [OneGov](#onegov)
+   - 3.3. [Colonnas](#colonnas)
+      - 3.3.1. [Resultats temporars](#resultats-temporars)
+      - 3.3.2. [Project](#project)
+   - 3.4. [Wabsti](#wabsti)
+      - 3.4.1. [Colonnas](#colonnas)
+      - 3.4.2. [Resultats temporars](#resultats-temporars)
+      - 3.4.3. [Project](#project)
+   - 3.5. [WabstiCExport](#wabsticexport)
+   - 3.6. [eCH-0252](#ech-0252)
 
 <!-- /MDTOC -->
 
@@ -136,3 +137,7 @@ Vischnancas valan sco anc betg dumbradas ora, sch'ina da las duas suandantas cun
 ### WabstiCExport
 
 Sustegnida vegn la versiun `>= 2.2`. Las differentas colonnas da las differentas datotecas èn definidas en la documentaziun dal program Exporter.
+
+### eCH-0252
+
+Vedi [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

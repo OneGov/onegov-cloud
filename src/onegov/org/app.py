@@ -330,6 +330,7 @@ def org_content_security_policy():
     policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
+    policy.child_src.add('https://*.infomaniak.com')
     policy.child_src.add('https://checkout.stripe.com')
 
     policy.connect_src.add(SELF)

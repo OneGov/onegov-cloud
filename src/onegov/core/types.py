@@ -4,6 +4,18 @@ if TYPE_CHECKING:
     from typing import TypeVar, Union
     from typing_extensions import NotRequired, TypedDict
 
+    from onegov.server.types import (
+        JSON, JSON_ro, JSONArray, JSONArray_ro, JSONObject, JSONObject_ro)
+
+    JSON
+    JSONObject
+    JSONArray
+
+    # read only variant of JSON type that is covariant
+    JSON_ro
+    JSONObject_ro
+    JSONArray_ro
+
     class HeaderJsonDict(TypedDict):
         Name: str
         Value: str

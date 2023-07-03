@@ -45,7 +45,7 @@ def view_sitemap_xml(self, request):
                 for items in domains.values():
                     for value in items.values():
                         for result in value:
-                            yield result.url
+                            yield result.adjusted_url(request)
 
     return {'urls': sorted(urls())}
 
