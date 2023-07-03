@@ -13,6 +13,7 @@ from sqlalchemy import desc
 from wtforms.fields import BooleanField
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
+from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.validators import Optional
@@ -59,6 +60,15 @@ class AgendaItemForm(NamedFileForm):
     start = TimeField(
         label=_('Start time'),
         fieldset=_('Progress'),
+        validators=[
+            Optional()
+        ],
+    )
+
+    video_timestamp = StringField(
+        label=_('Video timestamp'),
+        fieldset=_('Progress'),
+        description='2m1s',
         validators=[
             Optional()
         ],

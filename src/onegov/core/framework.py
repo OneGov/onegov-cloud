@@ -489,7 +489,7 @@ class Framework(
             return
 
         if 'filestorage' in cfg:
-            filestorage_class = load_class(cfg.get('filestorage'))
+            filestorage_class = load_class(cfg['filestorage'])
             filestorage_options = cfg.get('filestorage_options', {})
 
             # legacy support for pyfilesystem 1.x parameters

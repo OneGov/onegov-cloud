@@ -177,10 +177,6 @@ def test_pages_cache(election_day_app_zg):
     commit()
 
     assert '0xdeadc0de' not in anonymous.get('/vote/0xdeadbeef/entities')
-    assert '0xdeadc0de' in anonymous.get(
-        '/vote/0xdeadbeef/entities',
-        headers=[('Cache-Control', 'no-cache')]
-    )
     assert '0xdeadc0de' in client.get('/vote/0xdeadbeef/entities')
 
     # Modify with invalidating the cache

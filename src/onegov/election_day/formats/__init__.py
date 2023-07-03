@@ -15,6 +15,7 @@ from onegov.election_day.formats.vote.internal import import_vote_internal
 from onegov.election_day.formats.vote.wabsti import import_vote_wabsti
 from onegov.election_day.formats.vote.wabstic import import_vote_wabstic
 from onegov.election_day.formats.vote.wabstim import import_vote_wabstim
+from onegov.election_day.formats.xml import import_xml
 
 
 __all__ = [
@@ -31,4 +32,5 @@ __all__ = [
     'import_vote_wabsti',
     'import_vote_wabstic',
     'import_vote_wabstim',
+    'import_xml',
 ]

@@ -14,6 +14,7 @@ from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.formats import import_party_results
 from onegov.election_day.formats import import_vote_internal
+from onegov.election_day.formats import import_xml
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.models import Principal
 from onegov.election_day.models import UploadToken
@@ -80,6 +81,7 @@ def view_upload_rest(self, request):
 
     # Check the ID
     session = request.session
+    item = None
     if form.type.data == 'vote':
         item = session.query(Vote).filter(
             or_(
@@ -87,7 +89,9 @@ def view_upload_rest(self, request):
                 Vote.external_id == form.id.data,
             )
         ).first()
-    else:
+        if not item:
+            errors.setdefault('id', []).append(_("Invalid id"))
+    elif form.type.data in ('election', 'parties'):
         item = session.query(ElectionCompound).filter(
             or_(
                 ElectionCompound.id == form.id.data,
@@ -101,8 +105,8 @@ def view_upload_rest(self, request):
                     Election.external_id == form.id.data,
                 )
             ).first()
-    if not item:
-        errors.setdefault('id', []).append(_("Invalid id"))
+        if not item:
+            errors.setdefault('id', []).append(_("Invalid id"))
 
     # Check the type
     if item and form.type.data == 'parties':
@@ -126,9 +130,10 @@ def view_upload_rest(self, request):
         mimetype = form.results.data['mimetype']
 
         err = []
+        updated = [item]
         if form.type.data == 'vote':
             err = import_vote_internal(item, self, file, mimetype)
-        if form.type.data == 'election':
+        elif form.type.data == 'election':
             if isinstance(item, ElectionCompound):
                 err = import_election_compound_internal(
                     item, self, file, mimetype
@@ -141,7 +146,7 @@ def view_upload_rest(self, request):
                 err = import_election_internal_majorz(
                     item, self, file, mimetype
                 )
-        if form.type.data == 'parties':
+        elif form.type.data == 'parties':
             err = import_party_results(
                 item,
                 request.app.principal,
@@ -150,21 +155,28 @@ def view_upload_rest(self, request):
                 request.app.locales,
                 request.app.default_locale
             )
+        elif form.type.data == 'xml':
+            err, updated = import_xml(
+                request.app.principal,
+                session,
+                file
+            )
         if err:
             errors.setdefault('results', []).extend(err)
 
         if not errors:
             archive = ArchivedResultCollection(session)
-            archive.update(item, request)
-            if isinstance(item, ElectionCompound):
-                for election in item.elections:
-                    archive.update(election, request)
-            request.app.send_zulip(
-                self.name,
-                'New results available: [{}]({})'.format(
-                    item.title, request.link(item)
+            for item in updated:
+                archive.update(item, request)
+                if isinstance(item, ElectionCompound):
+                    for election in item.elections:
+                        archive.update(election, request)
+                request.app.send_zulip(
+                    self.name,
+                    'New results available: [{}]({})'.format(
+                        item.title, request.link(item)
+                    )
                 )
-            )
 
     translate_errors(errors, request)
 

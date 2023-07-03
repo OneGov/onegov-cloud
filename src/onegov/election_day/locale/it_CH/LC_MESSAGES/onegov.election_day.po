@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 10:25+0200\n"
+"POT-Creation-Date: 2023-06-28 07:23+0200\n"
 "PO-Revision-Date: 2022-03-22 08:00+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -65,6 +65,10 @@ msgstr "Il file CSV/XLS/XLSX è vuoto."
 
 msgid "The file contains an empty line."
 msgstr "Il file contiene una riga vuota."
+
+#, python-format
+msgid "Not a valid eCH xml file: ${error}"
+msgstr ""
 
 #, python-format
 msgid "${name} is not part of this business"
@@ -228,6 +232,9 @@ msgstr "Impossibile leggere 'Schede bianche'"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
+msgstr ""
+
+msgid "Vote type not supported"
 msgstr ""
 
 msgid "Term"
@@ -636,6 +643,9 @@ msgstr "OneGov Cloud"
 
 msgid "Party results"
 msgstr "Risultati del partito"
+
+msgid "Delivery"
+msgstr ""
 
 msgid "Proposal / Results"
 msgstr "Oggetto della votazione / Risultati"

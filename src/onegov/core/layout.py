@@ -19,6 +19,19 @@ from arrow.locales import ItalianLocale
 from arrow.locales import RomanshLocale
 
 
+from typing import overload, Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from chameleon import BaseTemplate
+    from collections.abc import Callable, Collection, Iterable, Iterator
+    from datetime import date
+
+    from .framework import Framework
+    from .request import CoreRequest
+    from .templates import MacrosLookup, TemplateLoader
+
+_T = TypeVar('_T')
+
+
 SwissLocale.timeframes['week'] = 'einer Woche'
 SwissLocale.timeframes['weeks'] = '{0} Wochen'
 
@@ -80,7 +93,10 @@ class Layout:
     weekday_short_format = 'E'
     month_long_format = 'MMMM'
 
-    def __init__(self, model, request):
+    custom_body_attributes: dict[str, Any]
+    custom_html_attributes: dict[str, Any]
+
+    def __init__(self, model: Any, request: 'CoreRequest'):
         self.model = model
         self.request = request
         self.custom_body_attributes = {}
@@ -88,21 +104,58 @@ class Layout:
             'data-version': self.request.app.version
         }
         if request.app.sentry_dsn:
-            self.custom_html_attributes['data-sentry-dsn'] = \
-                request.app.sentry_dsn
+            self.custom_html_attributes[
+                'data-sentry-dsn'
+            ] = request.app.sentry_dsn
 
     @cached_property
-    def app(self):
+    def app(self) -> 'Framework':
         """ Returns the application behind the request. """
         return self.request.app
 
-    def batched(self, *args, **kwargs):
+    @overload
+    def batched(
+        self,
+        iterable: 'Iterable[_T]',
+        batch_size: int,
+        container_factory: 'type[tuple]' = ...  # type:ignore[type-arg]
+    ) -> 'Iterator[tuple[_T, ...]]': ...
+
+    @overload
+    def batched(
+        self,
+        iterable: 'Iterable[_T]',
+        batch_size: int,
+        container_factory: 'type[list]'  # type:ignore[type-arg]
+    ) -> 'Iterator[list[_T]]': ...
+
+    # NOTE: If there were higher order TypeVars, we could properly infer
+    #       the type of the Container, for now we just add overloads for
+    #       two of the most common container_factories
+    @overload
+    def batched(
+        self,
+        iterable: 'Iterable[_T]',
+        batch_size: int,
+        container_factory: 'Callable[[Iterator[_T]], Collection[_T]]'
+    ) -> 'Iterator[Collection[_T]]': ...
+
+    def batched(
+        self,
+        iterable: 'Iterable[_T]',
+        batch_size: int,
+        container_factory: 'Callable[[Iterator[_T]], Collection[_T]]' = tuple
+    ) -> 'Iterator[Collection[_T]]':
         """ See :func:`onegov.core.utils.batched`. """
 
-        return utils.batched(*args, **kwargs)
+        return utils.batched(
+            iterable,
+            batch_size,
+            container_factory
+        )
 
     @cached_property
-    def csrf_token(self):
+    def csrf_token(self) -> str:
         """ Returns a csrf token for use with DELETE links (forms do their
         own thing automatically).
 
@@ -110,11 +163,11 @@ class Layout:
         token = self.request.new_csrf_token()
         return token.decode('utf-8') if isinstance(token, bytes) else token
 
-    def csrf_protected_url(self, url):
+    def csrf_protected_url(self, url: str) -> str:
         """ Adds a csrf token to the given url. """
         return utils.append_query_param(url, 'csrf-token', self.csrf_token)
 
-    def format_date(self, dt, format):
+    def format_date(self, dt: 'datetime | date | None', format: str) -> str:
         """ Takes a datetime and formats it according to local timezone and
         the given format.
 
@@ -123,15 +176,17 @@ class Layout:
             return ''
 
         if getattr(dt, 'tzinfo', None) is not None:
-            dt = self.timezone.normalize(dt.astimezone(self.timezone))
+            dt = self.timezone.normalize(
+                dt.astimezone(self.timezone)  # type:ignore[attr-defined]
+            )
 
         if format == 'relative':
-            dt = arrow.get(dt)
+            adt = arrow.get(dt)
 
             try:
-                return dt.humanize(locale=self.request.locale)
+                return adt.humanize(locale=self.request.locale)
             except ValueError:
-                return dt.humanize(locale=self.request.locale.split('_')[0])
+                return adt.humanize(locale=self.request.locale.split('_')[0])
 
         locale = self.request.locale
         fmt = getattr(self, format + '_format')
@@ -147,17 +202,17 @@ class Layout:
         else:
             return babel.dates.format_date(dt, format=fmt, locale=locale)
 
-    def isodate(self, date):
+    def isodate(self, date: datetime) -> str:
         """ Returns the given date in the ISO 8601 format. """
         return datetime.isoformat(date)
 
-    def parse_isodate(self, string):
+    def parse_isodate(self, string: str) -> datetime:
         """ Returns the given ISO 8601 string as datetime. """
         return isodate.parse_datetime(string)
 
     @staticmethod
     @lru_cache(maxsize=8)
-    def number_symbols(locale):
+    def number_symbols(locale: str) -> tuple[str, str]:
         """ Returns the locale specific number symbols. """
 
         return (
@@ -165,7 +220,12 @@ class Layout:
             babel.numbers.get_group_symbol(locale)
         )
 
-    def format_number(self, number, decimal_places=None, padding=''):
+    def format_number(
+        self,
+        number: numbers.Number | None,
+        decimal_places: int | None = None,
+        padding: str = ''
+    ) -> str:
         """ Takes the given numer and formats it according to locale.
 
         If the number is an integer, the default decimal places are 0,
@@ -186,7 +246,7 @@ class Layout:
         return result.translate({ord(','): group, ord('.'): decimal})
 
     @property
-    def view_name(self):
+    def view_name(self) -> str | None:
         """ Returns the view name of the current view, or None if it is the
         default view.
 
@@ -195,10 +255,10 @@ class Layout:
         """
         return self.request.unconsumed and self.request.unconsumed[-1] or None
 
-    def today(self):
+    def today(self) -> 'date':
         return self.now().date()
 
-    def now(self):
+    def now(self) -> datetime:
         return sedate.to_timezone(sedate.utcnow(), self.timezone)
 
 
@@ -214,13 +274,13 @@ class ChameleonLayout(Layout):
     """
 
     @cached_property
-    def template_loader(self):
+    def template_loader(self) -> 'TemplateLoader':
         """ Returns the chameleon template loader. """
         registry = self.app.config.template_engine_registry
         return registry._template_loaders['.pt']
 
     @cached_property
-    def base(self):
+    def base(self) -> 'BaseTemplate':
         """ Returns the layout, which defines the base layout of all pages.
 
         See ``templates/layout.pt``.
@@ -229,7 +289,7 @@ class ChameleonLayout(Layout):
         return self.template_loader['layout.pt']
 
     @cached_property
-    def macros(self):
+    def macros(self) -> 'MacrosLookup':
         """ Returns the macros, which offer often used html constructs.
         See ``templates/macros.pt``.
 
@@ -237,7 +297,7 @@ class ChameleonLayout(Layout):
         return self.template_loader.macros
 
     @cached_property
-    def elements(self):
+    def elements(self) -> 'BaseTemplate':
         """ The templates used by the elements. Overwrite this with your
         own ``templates/elements.pt`` if neccessary.
 
