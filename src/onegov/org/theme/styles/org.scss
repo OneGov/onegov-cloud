@@ -1486,6 +1486,7 @@ ul.panel-links {
 .side-panel.highlighted {
     background-color: $topbar-bg-color;
     border: 0;
+    padding: .5rem 1rem 1rem;
 
     h2 {
         @include primary-color-background;
