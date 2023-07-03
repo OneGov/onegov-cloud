@@ -1,6 +1,5 @@
 from onegov.election_day.forms.archive import ArchiveSearchFormElection
 from onegov.election_day.forms.archive import ArchiveSearchFormVote
-from onegov.election_day.forms.common import ChangeIdForm
 from onegov.election_day.forms.common import EmptyForm
 from onegov.election_day.forms.data_source import DataSourceForm
 from onegov.election_day.forms.data_source import DataSourceItemForm
@@ -27,7 +26,6 @@ from onegov.election_day.forms.vote import VoteForm
 __all__ = [
     'ArchiveSearchFormElection',
     'ArchiveSearchFormVote',
-    'ChangeIdForm',
     'DataSourceForm',
     'DataSourceItemForm',
     'ElectionCompoundForm',

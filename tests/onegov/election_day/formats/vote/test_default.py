@@ -8,7 +8,7 @@ from onegov.election_day.models import Municipality
 
 def test_import_default_vote(session):
     session.add(
-        Vote(title='vote', domain='municipality', date=date(2017, 5, 21))
+        Vote(title='vote', domain='canton', date=date(2017, 5, 21))
     )
     session.flush()
     vote = session.query(Vote).one()
@@ -59,7 +59,9 @@ def test_import_default_vote(session):
     assert round(vote.nays_percentage, 2) == 62.79
 
     # Test communal results without quarters
-    principal = Municipality(municipality='1059')
+    principal = Municipality(
+        municipality='1059', canton='lu', canton_name='Kanton Luzern'
+    )
     errors = import_vote_default(
         vote, principal, 'proposal',
         BytesIO((
@@ -91,7 +93,9 @@ def test_import_default_vote(session):
     assert vote.proposal.invalid == 27
 
     # Test communal results with quarters
-    principal = Municipality(municipality='351')
+    principal = Municipality(
+        municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     errors = import_vote_default(
         vote, principal, 'proposal',
         BytesIO((
@@ -377,3 +381,59 @@ def test_import_default_vote_temporary_results(session):
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
     ) == [1702, 1703, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+
+
+def test_import_default_vote_regional(session):
+
+    def create_csv(results):
+        lines = []
+        lines.append((
+            'ID',
+            'Ja Stimmen',
+            'Nein Stimmen',
+            'Ungültige Stimmzettel',
+            'Leere Stimmzettel',
+            'Stimmberechtigte',
+        ))
+        for entity_id in results:
+            lines.append((
+                str(entity_id),  # ID
+                '20',  # Ja Stimmen
+                '10',  # Nein Stimmen
+                '1',  # Ungültige Stimmzettel
+                '1',  # Leere Stimmzettel
+                '100',  # Stimmberechtigte
+            ))
+
+        return BytesIO(
+            '\n'.join(
+                (','.join(column for column in line)) for line in lines
+            ).encode('utf-8')
+        ), 'text/plain'
+
+    session.add(
+        Vote(title='vote', domain='municipality', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+
+    # ZG, municipality, too many municipalitites
+    principal = Canton(canton='zg')
+    vote.domain = 'municipality'
+    vote.domain_segment = 'Baar'
+
+    errors = import_vote_default(
+        vote, principal, 'proposal',
+        *create_csv((1701, 1702))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '1702 is not part of this business'
+    ]
+
+    # ZG, municipality, ok
+    errors = import_vote_default(
+        vote, principal, 'proposal',
+        *create_csv((1701,))
+    )
+    assert not errors
+    assert vote.progress == (1, 1)

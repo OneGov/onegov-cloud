@@ -117,6 +117,10 @@ def test_input_required_if_validator():
         for value in values:
             InputRequiredIf(field.name, value)(form, Field('x', 'y'))
 
+    InputRequiredIf(form.string.name, '!string')(form, Field('x', None))
+    with raises(StopValidation):
+        InputRequiredIf(form.string.name, '!xxx')(form, Field('x', None))
+
 
 def test_swiss_ssn_validator():
 

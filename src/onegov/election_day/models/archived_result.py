@@ -1,4 +1,7 @@
 from copy import deepcopy
+from onegov.ballot import Election
+from onegov.ballot import ElectionCompound
+from onegov.ballot import Vote
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.core.orm import Base
@@ -127,6 +130,16 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
     #: instance.
     local_yeas_percentage = meta_local_property('yeas_percentage', 0.0)
 
+    @property
+    def type_class(self):
+        if self.type == 'vote':
+            return Vote
+        elif self.type == 'election':
+            return Election
+        elif self.type == 'election_compound':
+            return ElectionCompound
+        raise NotImplementedError
+
     def is_fetched(self, request):
         """ Returns True, if this results has been fetched from another
         instance.
@@ -143,6 +156,16 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
             self.is_fetched(request)
             and request.app.principal.domain == 'municipality'
         )
+
+    def adjusted_url(self, request):
+        """ Returns the url adjusted to the current host. Needed if the
+        instance is accessible under different hosts at the same time.
+
+        """
+        if self.is_fetched(request):
+            return self.url
+
+        return request.link(self.type_class(id=self.external_id))
 
     def display_answer(self, request):
         """ Returns the answer (depending on the current instance). """

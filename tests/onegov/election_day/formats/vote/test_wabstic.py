@@ -81,7 +81,10 @@ def test_import_wabstic_vote(session):
         ('68', '2', 3374, 337),
         ('69', '1', 3375, 365),
     ):
-        principal = Municipality(name=str(entity_id), municipality=entity_id)
+        principal = Municipality(
+            name=str(entity_id), municipality=entity_id,
+            canton='sg', canton_name='Kanton St.Gallen'
+        )
         errors = import_vote_wabstic(
             vote, principal, number, district,
             BytesIO(sg_geschaefte), 'text/plain',
@@ -101,7 +104,10 @@ def test_import_wabstic_vote(session):
         ('3', '5', 3204, 'municipality'),  # number missing
     ):
         vote.domain = domain
-        principal = Municipality(name=str(entity_id), municipality=entity_id)
+        principal = Municipality(
+            name=str(entity_id), municipality=entity_id,
+            canton='sg', canton_name='Kanton St.Gallen'
+        )
         errors = import_vote_wabstic(
             vote, principal, number, district,
             BytesIO(sg_geschaefte), 'text/plain',
@@ -120,7 +126,10 @@ def test_import_wabstic_vote(session):
     )
     session.flush()
     vote = session.query(ComplexVote).one()
-    principal = Municipality(name=str(3402), municipality=3402)
+    principal = Municipality(
+        name=str(3402), municipality=3402,
+        canton='sg', canton_name='Kanton St.Gallen'
+    )
     errors = import_vote_wabstic(
         vote, principal, '1', '83',
         BytesIO(sg_geschaefte), 'text/plain',
@@ -279,7 +288,6 @@ def test_import_wabstic_vote_invalid_values(session):
     errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ])
-    print(errors)
     assert errors == [
         ('sg_gemeinden', 2, '100 is unknown'),
         ('sg_gemeinden', 2, 'Could not read the empty votes'),
@@ -462,3 +470,102 @@ def test_import_wabstic_vote_temporary_results(session):
 
     # 1 Present, 76 Missing
     assert vote.progress == (1, 77)
+
+
+def test_import_wabstic_vote_regional(session):
+
+    def create_csv(results):
+        lines = []
+        lines.append((
+            'Art',
+            'SortWahlkreis',
+            'SortGeschaeft',
+            'BfsNrGemeinde',
+            'Sperrung',
+            'Stimmberechtigte',
+            'StmUngueltig',
+            'StmLeer',
+            'StmHGJa',
+            'StmHGNein',
+            'StmHGOhneAw',
+            'StmN1Ja',
+            'StmN1Nein',
+            'StmN1OhneAw',
+            'StmN2Ja',
+            'StmN2Nein',
+            'StmN2OhneAw',
+        ))
+        for entity_id in results:
+            lines.append((
+                'Gde',
+                '0',
+                '0',
+                str(entity_id),  # 'BfsNrGemeinde',
+                '2000',  # 'Sperrung',
+                '100',  # 'Stimmberechtigte',
+                '0',  # 'StmUngueltig',
+                '1',  # 'StmLeer',
+                '',  # 'StmHGJa',
+                '',  # 'StmHGNein',
+                '',  # 'StmHGOhneAw',
+                '',  # 'StmN1Ja',
+                '',  # 'StmN1Nein',
+                '',  # 'StmN1OhneAw',
+                '',  # 'StmN2Ja',
+                '',  # 'StmN2Nein',
+                '',  # 'StmN2OhneAw',
+            ))
+
+        return (
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'Art',
+                        'SortWahlkreis',
+                        'SortGeschaeft',
+                        'Ausmittlungsstand',
+                        'AnzGdePendent'
+                    )),
+                    ','.join((
+                        'Gde',
+                        '0',
+                        '0',
+                        '0',
+                        '1'
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain',
+            BytesIO(
+                '\n'.join(
+                    (','.join(column for column in line)) for line in lines
+                ).encode('utf-8')
+            ),
+            'text/plain'
+        )
+
+    session.add(
+        Vote(title='vote', domain='municipality', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+
+    # ZG, municipality, too many municipalitites
+    principal = Canton(canton='zg')
+    vote.domain = 'municipality'
+    vote.domain_segment = 'Baar'
+    errors = import_vote_wabstic(
+        vote, principal, '0', '0',
+        *create_csv((1701, 1702))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '1702 is not part of this business'
+    ]
+
+    # ZG, municipality, ok
+    errors = import_vote_wabstic(
+        vote, principal, '0', '0',
+        *create_csv((1701,))
+    )
+    assert not errors
+    assert vote.progress == (1, 1)

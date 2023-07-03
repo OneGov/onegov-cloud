@@ -28,15 +28,9 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 [[tool.mypy.overrides]]
 # more strict rules for fully typed modules
 module = [
-    "onegov.core.browser_session.*",
-    "onegov.core.cache.*",
-    "onegov.core.collection.*",
-    "onegov.core.crypto.*",
-    "onegov.core.datamanager.*",
-    "onegov.core.orm.*",
-    "onegov.core.request.*",
-    "onegov.core.security.*",
-    "onegov.core.utils.*"
+    "onegov.core.*",
+    "onegov.server.*",
+    "onegov.user.*"
 ]
 warn_unreachable = true
 disallow_any_generics = true
@@ -94,6 +88,7 @@ module = [
     "qrcode.*",
     "rcssmin.*",
     "reportlab.*",
+    "reg.*",
     "rjsmin.*",
     "sass.*",
     # TODO: Writing stubs for this would probably be really quick

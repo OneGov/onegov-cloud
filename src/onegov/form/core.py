@@ -597,6 +597,8 @@ class Form(BaseForm):
          """
         if hasattr(field, 'long_description'):
             return field.long_description
+        if 'long_description' in (getattr(field, 'render_kw', {}) or {}):
+            return field.render_kw['long_description']
         if not field.description:
             return None
         desc, is_md = Form.as_maybe_markdown(

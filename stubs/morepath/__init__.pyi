@@ -9,7 +9,7 @@ from .core import (
     name_predicate as name_predicate,
     request_method_predicate as request_method_predicate,
 )
-from .reify import reify as reify
+from ._reify import reify as reify
 from .request import Request as Request, Response as Response
 from .run import run as run
 from .view import redirect as redirect, render_html as render_html, render_json as render_json

@@ -275,6 +275,8 @@ class Bunch:
     if TYPE_CHECKING:
         # let mypy know that any attribute access could be valid
         def __getattr__(self, name: str) -> Any: ...
+        def __setattr__(self, name: str, value: Any) -> None: ...
+        def __delattr__(self, name: str) -> None: ...
 
     def __eq__(self, other: object) -> bool:
         if type(other) is type(self):
@@ -554,7 +556,7 @@ def is_non_string_iterable(obj: object) -> bool:
         and isinstance(obj, Iterable)
 
 
-def relative_url(absolute_url: str) -> str:
+def relative_url(absolute_url: str | None) -> str:
     """ Removes everything in front of the path, including scheme, host,
     username, password and port.
 

@@ -76,7 +76,7 @@ class OrmCacheApp:
     schema: str | None
     # FIXME: Define a Protocol for cache and request_cache
     cache: Any
-    request_cache: Any
+    request_cache: dict[str, Any]
 
     def configure_orm_cache(self, **cfg: Any) -> None:
         self.is_orm_cache_setup = getattr(self, 'is_orm_cache_setup', False)

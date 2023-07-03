@@ -60,7 +60,7 @@
                                 <tal:b tal:repeat="vote results">
                                     <tr tal:attributes="class python: 'divider' if repeat.vote.end else ''">
                                         <th class="top-aligned" tal:define="prefix vote.title_prefix(request)">
-                                            <a href="${vote.url}">
+                                            <a href="${vote.adjusted_url(request)}">
                                                 <span tal:condition="prefix">${prefix}: </span>
                                                 <span metal:use-macro="layout.macros['title-translation']" tal:define="item vote"/>
                                             </a>
@@ -106,7 +106,7 @@
                             <tbody>
                                 <tr tal:repeat="election results">
                                     <th class="top-aligned" tal:define="prefix election.title_prefix(request)">
-                                        <a href="${election.url}">
+                                        <a href="${election.adjusted_url(request)}">
                                             <span tal:condition="prefix">${prefix}: </span>
                                             <span metal:use-macro="layout.macros['title-translation']" tal:define="item election"/>
                                         </a>

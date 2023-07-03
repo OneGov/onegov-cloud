@@ -449,3 +449,9 @@ def test_archived_result_collection_updates(session):
     assert old not in [r.url for r in archive.query()]
 
     assert archive.query().count() == 6
+
+    # Test update with official host
+    request.link = lambda x: 'http://wab-test.testing.ch/vote/2001'
+    request.app.principal.official_host = 'https://wab.govikon.ch'
+    result = archive.update(votes[2001], request)
+    assert result.url == 'https://wab.govikon.ch/vote/2001'

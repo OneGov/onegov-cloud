@@ -401,3 +401,66 @@ def test_import_internal_vote_optional_columns(session):
     )
     assert not errors
     assert vote.proposal.results.filter_by(entity_id='1701').one().expats == 30
+
+
+def test_import_internal_vote_regional(session):
+
+    def create_csv(results):
+        lines = []
+        lines.append((
+            'status',
+            'type',
+            'entity_id',
+            'counted',
+            'yeas',
+            'nays',
+            'invalid',
+            'empty',
+            'eligible_voters',
+            'expats',
+        ))
+        for entity_id, counted in results:
+            lines.append((
+                'unknown',  # status
+                'proposal',  # type
+                str(entity_id),  # entity_id
+                str(counted),  # counted
+                '20',  # yeas
+                '10',  # nays
+                '0',  # invalid
+                '0',  # empty
+                '100',  # eligible_voters
+                '30',  # expats
+            ))
+
+        return BytesIO(
+            '\n'.join(
+                (','.join(column for column in line)) for line in lines
+            ).encode('utf-8')
+        ), 'text/plain'
+
+    session.add(
+        Vote(title='vote', domain='municipality', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+
+    # ZG, municipality, too many municipalitites
+    principal = Canton(canton='zg')
+    vote.domain = 'municipality'
+    vote.domain_segment = 'Baar'
+    errors = import_vote_internal(
+        vote, principal,
+        *create_csv(((1701, False), (1702, False)))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '1702 is not part of this business'
+    ]
+
+    # ZG, municipality, ok
+    errors = import_vote_internal(
+        vote, principal,
+        *create_csv(((1701, False),))
+    )
+    assert not errors
+    assert vote.progress == (0, 1)

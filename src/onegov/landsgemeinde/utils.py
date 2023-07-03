@@ -18,6 +18,7 @@ def update_ticker(request, assembly, agenda_item=None, action='refresh'):
 
     """
     assembly.stamp()
+    request.app.pages_cache.flush()
     content = ''
     if action == 'update' and agenda_item:
         layout = DefaultLayout(request.app, request)

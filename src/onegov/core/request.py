@@ -667,11 +667,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         Otherwise, None is returned.
 
         """
-        # FIXME: If we want mypy to understand this we need to use a TypeGuard
-        #        Although honestly an `is` check is super fast, so abstracting
-        #        it is kind of questionable anyways, accessing the cache will
-        #        almost certainly be as slow, or slower...
-        return self.is_logged_in and self.identity.role or None  # type:ignore
+        return self.is_logged_in and self.identity.role or None
 
     def has_role(self, *roles: str) -> bool:
         """ Returns true if the current user has any of the given roles. """

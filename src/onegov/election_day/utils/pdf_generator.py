@@ -3,6 +3,7 @@ from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.election_day import _
 from onegov.election_day import log
+from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.pdf import Pdf
 from onegov.election_day.utils import pdf_filename
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -28,8 +29,9 @@ from reportlab.lib.units import cm
 
 class PdfGenerator():
 
-    def __init__(self, app, renderer=None):
+    def __init__(self, app, request, renderer=None):
         self.app = app
+        self.request = request
         self.pdf_dir = 'pdf'
         self.session = self.app.session()
         self.pdf_signing = self.app.principal.pdf_signing
@@ -749,6 +751,7 @@ class PdfGenerator():
     def add_vote(self, principal, vote, pdf, locale):
         completed = vote.completed
         nan = '-'
+        layout = VoteLayout(vote, self.request)
 
         def format_name(item):
             if hasattr(item, 'entity_id'):
@@ -870,10 +873,10 @@ class PdfGenerator():
                     pdf.translate(format_accepted(ballot)),
                     format_value(ballot, 'yeas_percentage'),
                     format_value(ballot, 'nays_percentage'),
-                ],
+                ] if layout.summarize else None,
                 hide=[
                     False,
-                    not principal.has_districts,
+                    not layout.has_districts,
                     False,
                     False,
                     False,
@@ -881,7 +884,7 @@ class PdfGenerator():
             )
             pdf.pagebreak()
 
-            if principal.is_year_available(vote.date.year):
+            if layout.show_map:
                 pdf.pdf(
                     self.renderer.get_entities_map(ballot, 'pdf', locale),
                     0.8
@@ -889,7 +892,7 @@ class PdfGenerator():
                 pdf.pagebreak()
 
             # Districts
-            if principal.has_districts:
+            if layout.has_districts:
                 subtitle(principal.label('districts'))
                 pdf.spacer()
                 pdf.results(
@@ -913,10 +916,10 @@ class PdfGenerator():
                         pdf.translate(format_accepted(ballot)),
                         format_value(ballot, 'yeas_percentage'),
                         format_value(ballot, 'nays_percentage'),
-                    ],
+                    ] if layout.summarize else None,
                 )
                 pdf.pagebreak()
-                if principal.is_year_available(vote.date.year):
+                if layout.show_map:
                     pdf.pdf(
                         self.renderer.get_districts_map(
                             ballot, 'pdf', locale
@@ -955,10 +958,10 @@ class PdfGenerator():
                     ballot.expats,
                     ballot.cast_ballots or '0',
                     '{0:.2f} %'.format(ballot.turnout),
-                ],
+                ] if layout.summarize else None,
                 hide=[
                     False,
-                    not principal.has_districts,
+                    not layout.has_districts,
                     False,
                     not ballot.expats,
                     False,
@@ -993,10 +996,10 @@ class PdfGenerator():
                     ballot.invalid or '0',
                     ballot.yeas or '0',
                     ballot.nays or '0',
-                ],
+                ] if layout.summarize else None,
                 hide=[
                     False,
-                    not principal.has_districts,
+                    not layout.has_districts,
                     False,
                     False,
                     False,

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-05-25 11:48+0200\n"
+"POT-Creation-Date: 2023-06-15 11:42+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -339,6 +339,17 @@ msgstr "Anzeige"
 
 msgid "Lead-Format"
 msgstr "Lead-Format"
+
+msgid "Empty Directory Notice"
+msgstr "Leeres Verzeichnis Hinweis"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Dieser Text wird dargestellt wenn das Verzeichnis keine (sichtbaren) "
+"Einträge enthält. Falls leergelassen, wird stattdessen ein generischer "
+"Standardtext angezeigt."
 
 msgid "Numbering"
 msgstr "Nummerierung"
@@ -905,6 +916,9 @@ msgstr "Excel Datei"
 
 msgid "JSON File"
 msgstr "JSON Datei"
+
+msgid "XML File"
+msgstr "XML Datei"
 
 msgid "Minimum price total"
 msgstr "Minimalpreis"
@@ -2409,8 +2423,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3565,6 +3579,9 @@ msgstr ""
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
 
+msgid "Back"
+msgstr "Zurück"
+
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
@@ -4218,8 +4235,8 @@ msgstr "Der Eintrag wurde gelöscht"
 msgid ""
 "On the right side, you can filter the entries of this directory to export."
 msgstr ""
-"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den Export "
-"filtern."
+"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den "
+"Export filtern."
 
 msgid "Exports all entries of this directory."
 msgstr "Exportiert alle Einträge dieses Verzeichniseses."

@@ -36,6 +36,9 @@ $(document).ready(function() {
     }
 
     if (endpoint && schema) {
-        openWebsocket(endpoint, schema, null, onWebsocketNotification, onWebsocketError);
+        const websocket = openWebsocket(endpoint, schema, null, onWebsocketNotification, onWebsocketError);
+        websocket.addEventListener("error", function(event) {
+            onWebsocketError(event, websocket);
+        });
     }
 });
