@@ -12,7 +12,7 @@
         </div>
         <div class="row">
             <div class="small-12 medium-8 columns">
-                <h2 tal:condition="primary_separate" i18n:translate>Alternatives</h2>
+                <h2  class="${'ogc-login' if primary_separate else ''}" tal:condition="primary_separate" i18n:translate>Alternatives</h2>
                 <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
                     <tal:b tal:repeat="provider integrated">
                         <div class="panel" tal:define="hint provider.hint(request)" tal:condition="hint">
