@@ -426,6 +426,11 @@ class HeaderSettingsForm(Form):
         fieldset=_("Announcement")
     )
 
+    header_links_fixed = BooleanField(
+        label=_("Keep header links fixed to top on scrolling"),
+        fieldset=_("Header links")
+    )
+
     header_links = StringField(
         label=_("Header links"),
         fieldset=_("Header links"),
@@ -471,7 +476,8 @@ class HeaderSettingsForm(Form):
             'announcement_bg_color': self.announcement_bg_color.data.get_hex(),
             'announcement_font_color':
             self.announcement_font_color.data.get_hex(),
-            'announcement_is_private': self.announcement_is_private.data
+            'announcement_is_private': self.announcement_is_private.data,
+            'header_links_fixed': self.header_links_fixed.data
         }
 
     @header_options.setter
@@ -497,6 +503,8 @@ class HeaderSettingsForm(Form):
             'announcement_font_color', '#000000')
         self.announcement_is_private.data = options.get(
             'announcement_is_private', "")
+        self.header_links_fixed.data = options.get(
+            'header_links_fixed', "")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
