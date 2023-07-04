@@ -483,3 +483,16 @@ class DirectoryZipArchive:
             filename=str(self.path),
             extract_dir=str(self.archive.path),
             format=self.format)
+
+        top_level_dir = next(
+            (
+                entry.path
+                for entry in os.scandir(self.archive.path)
+                if entry.is_dir() and 'metadata.json' in os.listdir(entry.path)
+            ), None,
+        )
+        if top_level_dir:
+            # flatten structure by moving all files to the top level
+            shutil.copytree(top_level_dir, str(self.archive.path),
+                            dirs_exist_ok=True)
+            shutil.rmtree(top_level_dir)
