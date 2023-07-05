@@ -190,10 +190,11 @@ def _make_event_processor(
             #        in the future though, once we start using a real salt
             user_id = request.identity.userid
             if user_id is not None:
-                user_id = app.sign(user_id).replace(user_id, '')
+                user_id = app.sign(user_id).replace(user_id, '')[1:]
             user_info.setdefault('id', user_id)
-            user_info.setdefault(
-                'segment', getattr(request.identity, 'role', 'anonymous'))
+            user_data = user_info.setdefault('data', {})
+            user_data.setdefault(
+                'role', getattr(request.identity, 'role', 'anonymous'))
             if _should_send_default_pii():
                 user_info.setdefault(
                     'ip_address', request.environ.get('HTTP_X_REAL_IP'))

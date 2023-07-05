@@ -240,7 +240,7 @@ def test_has_context(mock_view, sentry_app, sentry_client, capture_events):
     if sentry_app.with_ppi:
         assert event['user'] == {
             'id': None,
-            'segment': 'anonymous',
+            'data': {'role': 'anonymous'},
             'ip_address': None,
             'email': None
         }
@@ -253,7 +253,7 @@ def test_has_context(mock_view, sentry_app, sentry_client, capture_events):
             'url': 'http://localhost/test',
         }
     else:
-        assert event['user'] == {'id': None, 'segment': 'anonymous'}
+        assert event['user'] == {'id': None, 'data': {'role': 'anonymous'}}
         assert event['request'] == {
             'env': {'SERVER_NAME': 'localhost', 'SERVER_PORT': '80'},
             'headers': {'Host': 'localhost:80'},
@@ -292,7 +292,7 @@ def test_has_context_logged_in(
     (event,) = events
     user = event['user']
     assert 'test@example.org' not in user['id']
-    assert user['segment'] == 'admin'
+    assert user['data']['role'] == 'admin'
     if sentry_app.with_ppi:
         assert user['email'] == 'test@example.org'
         assert user['ip_address'] == '1.2.3.4'
