@@ -6,6 +6,7 @@ from onegov.core.security import Public
 from onegov.core.sentry import OneGovCloudIntegration
 from sentry_sdk import capture_message, add_breadcrumb
 from sentry_sdk.transport import Transport
+from sqlalchemy.exc import InterfaceError
 from tests.shared import Client
 from tests.shared.utils import create_app
 from unittest.mock import Mock
@@ -191,6 +192,25 @@ def test_view_http_exception(
     # WebTest error on non-200 responses
     mock_view.side_effect = HTTPOk
     sentry_client.get('/test')
+
+    # it should also not be recorded by sentry
+    assert not exceptions
+
+    # no exceptions means no events either
+    assert not events
+
+
+def test_view_db_connection_exception(
+    mock_view, sentry_client, capture_events, capture_exceptions
+):
+
+    events = capture_events()
+    exceptions = capture_exceptions()
+
+    # a db connection error should not raise, but it will
+    # cause a 500 response
+    mock_view.side_effect = InterfaceError('', '', '')
+    sentry_client.get('/test', expect_errors=True)
 
     # it should also not be recorded by sentry
     assert not exceptions

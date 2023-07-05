@@ -3,6 +3,7 @@ import sys
 import weakref
 
 from onegov.core.framework import Framework
+from onegov.core.orm import DB_CONNECTION_ERRORS
 from morepath.core import excview_tween_factory
 from sentry_sdk.hub import Hub, _should_send_default_pii
 from sentry_sdk.integrations import Integration
@@ -12,7 +13,7 @@ from sentry_sdk.utils import (
     capture_internal_exceptions,
     event_from_exception,
 )
-from webob.exc import HTTPException
+from webob.exc import HTTPException, HTTPServiceUnavailable
 
 
 from typing import TYPE_CHECKING
@@ -85,6 +86,12 @@ class OneGovCloudIntegration(Integration):
 
                 try:
                     return handler(request)
+                except DB_CONNECTION_ERRORS:
+                    # FIXME: This is technically duplicated from
+                    #        Framework.handle_exception, maybe it
+                    #        would be better to add exception views?
+                    #        Since those should be caught by the tween
+                    return HTTPServiceUnavailable()
                 except Exception:
                     _capture_exception(hub, sys.exc_info())
                     raise
