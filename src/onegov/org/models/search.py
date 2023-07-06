@@ -50,7 +50,7 @@ class Search(Pagination):
 
     @cached_property
     def batch(self):
-        print('*** tschupre search batch')
+        print(f'*** tschupre search batch - query: {self.query}')
         if not self.query:
             return None
 
@@ -148,6 +148,9 @@ def locale_mapping(locale):
 
 
 class SearchPostgres(Pagination):
+    """
+    Implements searching in postgres db based on the gin index
+    """
     results_per_page = 10
     max_query_length = 100
 
@@ -181,7 +184,7 @@ class SearchPostgres(Pagination):
         return self.page == other.page and self.query == other.query
 
     def subset(self):
-        return self.postgres_search()
+        return self.batch
 
     @property
     def page_index(self):
@@ -198,52 +201,12 @@ class SearchPostgres(Pagination):
         if not self.query:
             return None
 
-        # if self.query.startswith('#'):
-        #     search = self.hashtag_search(search, self.query)
-        # else:
-        #     search = self.generic_search(search, self.query)
-        #
-        # return search[self.offset:self.offset + self.batch_size].execute()
+        if self.query.startswith('#'):
+            results = self.hashtag_search()
+        else:
+            results = self.generic_search()
 
-        search = self.postgres_search()
-        return search[self.offset:self.offset + self.batch_size]
-
-    # def generic_search(self, search, query):
-    #     print('*** tschupre search generic_search')
-    #
-    #     # "get lucky" functionality is not so lucky after all
-    #     match_title = MatchPhrase(title={"query": query, "boost": 3})
-    #
-    #     # we *could* use Match here and include '_all' fields, but that
-    #     # yields us less exact results, probably because '_all' includes some
-    #     # metadata fields we have no use for
-    #     print('*** registered fields:')
-    #     for field in self.request.app.orm_mappings.registered_fields:
-    #         if not field.startswith('es_'):
-    #             # print(f' * field: {field}')
-    #             pass
-    #     match_rest = MultiMatch(query=query, fields=[
-    #         field for field in self.request.app.orm_mappings.
-    #         registered_fields
-    #         if not field.startswith('es_')
-    #     ], fuzziness='1', prefix_length=3)
-    #
-    #     search = search.query(match_title | match_rest)
-    #
-    #     # favour documents with recent changes, over documents without
-    #     search.query = FunctionScore(query=search.query, functions=[
-    #         SF('gauss', es_last_change={
-    #             'offset': '7d',
-    #             'scale': '90d',
-    #             'decay': '0.99'
-    #         })
-    #     ])
-    #
-    #     return search
-
-    # def hashtag_search(self, search, query):
-    #     print('*** tschupre search hastag_search')
-    #     return search.query(Match(es_tags=query.lstrip('#')))
+        return results[self.offset:self.offset + self.batch_size]
 
     @cached_property
     def load_batch_results(self):
@@ -264,6 +227,42 @@ class SearchPostgres(Pagination):
             return batch
         sorted_events = sorted(events, key=lambda e: e.latest_occurrence.start)
         return sorted_events + non_events
+
+    def generic_search(self):
+        print('*** tschupre search postgres generic_search')
+        doc_count = 0
+        results = []
+
+        language = locale_mapping(self.request.locale)
+        for model in searchable_sqlalchemy_models(Base):
+            if model.es_public or self.request.is_logged_in:
+                query = self.request.session.query(model)
+                doc_count += query.count()
+                query = query.filter(
+                    model.fts_idx.op('@@')
+                    (func.websearch_to_tsquery(language, self.query))
+                )
+                results.extend(query.all())
+
+        self.nbr_of_docs = doc_count
+        results.sort(reverse=False)
+        return results
+
+    def hashtag_search(self):
+        q = self.query.lstrip('#')
+        results = []
+
+        for model in searchable_sqlalchemy_models(Base):
+            # skip certain tables for hashtag search for better performance
+            if model.__tablename__ not in ['attendees', 'files', 'people',
+                                           'tickets', 'users']:
+                if model.es_public or self.request.is_logged_in:
+                    for doc in self.request.session.query(model).all():
+                        if doc.es_tags and q in doc.es_tags:
+                            results.append(doc)
+
+        print(f'*** tschupre hastag_search results: {results}')
+        return results
 
     def feeling_lucky(self):
         print('*** tschupre search feeling_lucky')
