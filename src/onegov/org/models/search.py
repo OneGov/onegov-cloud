@@ -288,7 +288,7 @@ class SearchPostgres(Pagination):
         print('*** tschupre search subset_count')
         return self.available_results
 
-    def suggestions_postgres(self):
+    def suggestions(self):
         suggestions = list()
 
         for element in self.generic_search():

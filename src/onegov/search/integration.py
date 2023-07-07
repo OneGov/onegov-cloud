@@ -92,6 +92,7 @@ def is_5xx_error(error):
     return error.status_code and str(error.status_code).startswith('5')
 
 
+# TODO: remove
 # class PostgresqlSearchApp(morepath.App):
 #     """
 #     Allows to register events: insert, update, remove row
@@ -170,7 +171,7 @@ def is_5xx_error(error):
 #     #             model.reindex(self.session, self.schema, model)
 
 
-# TODO: Remove or rename
+# TODO: rename to search app
 class ElasticsearchApp(morepath.App):
     """ Provides elasticsearch integration for
     :class:`onegov.core.framework.Framework` based applications.

@@ -76,6 +76,8 @@ def search_postgres(self, request, layout=None):
             return morepath.redirect(url)
 
     return {
+        # TODO switch back to 'Search' once es is gone
+        # 'title': _("Search"),
         'title': _("Org Search Postgres"),
         'model': self,
         'layout': layout,
@@ -99,6 +101,6 @@ def suggestions(self, request):
 def suggestions_postgres(self, request):
     try:
         print('*** tschupre suggestions_postgres')
-        return tuple(self.suggestions_postgres())
+        return tuple(self.suggestions())
     except SearchOfflineError as exception:
         raise exc.HTTPNotFound() from exception
