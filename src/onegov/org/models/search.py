@@ -242,6 +242,9 @@ class SearchPostgres(Pagination):
                     model.fts_idx.op('@@')
                     (func.websearch_to_tsquery(language, self.query))
                 )
+                query = query.order_by(func.ts_rank_cd(
+                    model.fts_idx, func.websearch_to_tsquery(language,
+                                                             self.query)))
                 results.extend(query.all())
 
         self.nbr_of_docs = doc_count
