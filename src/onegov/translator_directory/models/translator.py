@@ -200,7 +200,7 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     @staticmethod
     def psql_tsvector_string():
         """
-        index is built on the follwoing columns
+        index is built on the following columns
         """
         return Searchable.create_tsvector_string('first_name', 'last_name',
                                                  'email')
