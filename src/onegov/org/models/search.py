@@ -50,7 +50,7 @@ class Search(Pagination):
 
     @cached_property
     def batch(self):
-        print(f'*** tschupre search batch - query: {self.query}')
+        print(f'*** tschupre search batch query: {self.query}')
         if not self.query:
             return None
 
@@ -77,6 +77,7 @@ class Search(Pagination):
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
 
+        print('*** tschupre Search load_batch_results')
         batch = self.batch.load()
         events = []
         non_events = []
@@ -160,19 +161,20 @@ class SearchPostgres(Pagination):
         self.page = page  # page index
 
         self.nbr_of_docs = 0
+        self.nbr_of_results = 0
         print('*** tschupre search __init__')
 
     @cached_property
     def available_documents(self):
         if not self.nbr_of_docs:
-            self.postgres_search()
+            self.load_batch_results
         return self.nbr_of_docs
 
     @cached_property
-    def explain(self):
-        # what is it used for?
-        print('*** tschupre search explain')
-        return self.request.is_manager and 'explain' in self.request.params
+    def available_results(self):
+        if not self.nbr_of_results:
+            self.load_batch_results
+        return self.nbr_of_results
 
     @property
     def q(self):
@@ -197,7 +199,7 @@ class SearchPostgres(Pagination):
 
     @cached_property
     def batch(self):
-        print('*** tschupre search batch')
+        print(f'*** tschupre search batch query: {self.query}')
         if not self.query:
             return None
 
@@ -215,7 +217,7 @@ class SearchPostgres(Pagination):
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
 
-        batch = self.batch.load()
+        batch = self.batch
         events = []
         non_events = []
         for search_result in batch:
@@ -239,8 +241,8 @@ class SearchPostgres(Pagination):
                 query = self.request.session.query(model)
                 doc_count += query.count()
                 query = query.filter(
-                    model.fts_idx.op('@@')
-                    (func.websearch_to_tsquery(language, self.query))
+                    model.fts_idx.op('@@')(func.websearch_to_tsquery(
+                        language, self.query))
                 )
                 query = query.order_by(func.ts_rank_cd(
                     model.fts_idx, func.websearch_to_tsquery(language,
@@ -248,6 +250,7 @@ class SearchPostgres(Pagination):
                 results.extend(query.all())
 
         self.nbr_of_docs = doc_count
+        self.nbr_of_results = len(results)
         results.sort(reverse=False)
         return results
 
@@ -264,7 +267,9 @@ class SearchPostgres(Pagination):
                         if doc.es_tags and q in doc.es_tags:
                             results.append(doc)
 
-        print(f'*** tschupre hastag_search results: {results}')
+        self.nbr_of_results = len(results)
+        results.sort(reverse=False)
+        print(f'*** tschupre hashtag_search results: {results}')
         return results
 
     def feeling_lucky(self):
@@ -281,35 +286,13 @@ class SearchPostgres(Pagination):
     @cached_property
     def subset_count(self):
         print('*** tschupre search subset_count')
-        return self.cached_subset and len(self.cached_subset) or 0
+        return self.available_results
 
     def suggestions_postgres(self):
         suggestions = list()
 
-        for element in self.postgres_search():
+        for element in self.generic_search():
             suggest = getattr(element, 'es_suggestion', [])
             suggestions.append(suggest)
 
         return tuple(suggestions[:15])
-
-    # @cached_property
-    def postgres_search(self):
-        doc_count = 0
-        results = []
-
-        language = locale_mapping(self.request.locale)
-
-        for model in searchable_sqlalchemy_models(Base):
-            if model.es_public or self.request.is_logged_in:
-                query = self.request.session.query(model)
-                doc_count += query.count()
-                query = query.filter(
-                    model.fts_idx.op('@@')
-                    (func.websearch_to_tsquery(language, self.query))
-                )
-                results.extend(query.all())
-
-        self.nbr_of_docs = doc_count
-
-        results.sort(reverse=False)
-        return results
