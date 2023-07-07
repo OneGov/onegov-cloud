@@ -37,24 +37,24 @@ class ResourceRecipientForm(Form):
     new_reservations = BooleanField(
         label=_("New Reservations"),
         fieldset=_("Notifications *"),
-        description=("Bei jeder neuen Reservation wird eine Benachrichtigung "
-                     "an den obenstehendes Empfänger gesendet."),
+        description=_("For each new reservation, a notification will be sent "
+                      "to the above recipient."),
     )
 
     daily_reservations = BooleanField(
         label=_("Daily Reservations"),
         fieldset=_("Notifications *"),
-        description=("An jedem unten ausgewählten Tag wird um 06:00 eine "
-                     "Benachrichtigung mit den Reservationen des Tages an den "
-                     "obenstehenden Empfänger gesendet."),
+        description=_("On each day selected below, a notification with the "
+                      "day's reservations will be sent to the recipient above "
+                      "at 06:00."),
     )
 
     internal_notes = BooleanField(
         label=_("Internal Notes"),
         fieldset=_("Notifications *"),
-        description=("Bei jeder neuen Notiz auf dem Ticket zu einer "
-                     "Reservation wird eine Benachrichtigung an den "
-                     "obenstehenden Empfänger gesendet."),
+        description=_("Each time a new note is added to the ticket for a "
+                      "reservation, a notification is sent to the recipient "
+                      "above."),
     )
 
     send_on = MultiCheckboxField(
