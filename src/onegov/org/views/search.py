@@ -60,8 +60,7 @@ def search_postgres(self, request, layout=None):
             'count': self.available_documents
         })
         resultslabel = _("${count} Results", mapping={
-            # 'count': len(self.batch)
-            'count': self.subset_count
+            'count': self.available_results
         })
     except SearchOfflineError:
         return {
