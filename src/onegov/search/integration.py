@@ -92,9 +92,9 @@ def is_5xx_error(error):
     return error.status_code and str(error.status_code).startswith('5')
 
 
-# TODO: rename to search app
-class ElasticsearchApp(morepath.App):
-    """ Provides elasticsearch integration for
+# TODO: remove all es specific things ones es is gone
+class SearchApp(morepath.App):
+    """ Provides elasticsearch and postgres integration for
     :class:`onegov.core.framework.Framework` based applications.
 
     The application must be connected to a database.
@@ -404,7 +404,7 @@ class ElasticsearchApp(morepath.App):
             model.reindex(session, self.schema, model)
 
 
-@ElasticsearchApp.tween_factory(over=transaction_tween_factory)
+@SearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(app, handler):
     def process_indexer_tween(request):
 

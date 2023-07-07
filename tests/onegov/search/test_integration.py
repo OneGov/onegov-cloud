@@ -8,7 +8,7 @@ from elasticsearch_dsl.query import MatchPhrase, FunctionScore
 from onegov.core import Framework
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
-from onegov.search import ElasticsearchApp, ORMSearchable
+from onegov.search import SearchApp, ORMSearchable
 from sqlalchemy import Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
@@ -17,7 +17,7 @@ from time import sleep
 
 def test_app_integration(es_url):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     app = App()
@@ -33,7 +33,7 @@ def test_app_integration(es_url):
 
 def test_search_query(es_url, postgres_dsn):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -151,7 +151,7 @@ def test_search_query(es_url, postgres_dsn):
 
 def test_orm_integration(es_url, postgres_dsn, redis_url):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -294,7 +294,7 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
 
 def test_alternate_id_property(es_url, postgres_dsn):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -356,7 +356,7 @@ def test_alternate_id_property(es_url, postgres_dsn):
 
 def test_orm_polymorphic(es_url, postgres_dsn):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -442,7 +442,7 @@ def test_orm_polymorphic(es_url, postgres_dsn):
 
 def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -498,7 +498,7 @@ def test_orm_polymorphic_sublcass_only(es_url, postgres_dsn):
 
 def test_suggestions(es_url, postgres_dsn):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -617,7 +617,7 @@ def test_suggestions(es_url, postgres_dsn):
 
 def test_language_detection(es_url, postgres_dsn):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -671,7 +671,7 @@ def test_language_detection(es_url, postgres_dsn):
 
 
 def test_language_update(es_url, postgres_dsn):
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
@@ -725,7 +725,7 @@ def test_language_update(es_url, postgres_dsn):
 
 def test_date_decay(es_url, postgres_dsn):
 
-    class App(Framework, ElasticsearchApp):
+    class App(Framework, SearchApp):
         pass
 
     Base = declarative_base()
