@@ -127,7 +127,7 @@ def generate_media():
         created, purged = SvgGenerator(app, renderer).create_svgs()
         click.secho(f'Generated {created} SVGs, purged {purged}', fg='green')
 
-        created, purged = PdfGenerator(app, renderer).create_pdfs()
+        created, purged = PdfGenerator(app, request, renderer).create_pdfs()
         click.secho(f'Generated {created} PDFs, purged {purged}', fg='green')
 
     return generate

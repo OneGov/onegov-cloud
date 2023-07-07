@@ -1,9 +1,11 @@
 $check-list-icon: "\f0ae";
 $ordered-list-icon: "\f03a";
+$news-icon: "\f1ea";
 
 .edit-bar {
     .check-list-link::before { @include icon-bold($check-list-icon); }
     .ordered-list-link::before { @include icon-bold($ordered-list-icon); }
+    .news-link::before { @include icon-bold($news-icon); }
 }
 
 h1 small,

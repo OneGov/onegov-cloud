@@ -71,10 +71,11 @@ def get_tar_file_path(
 
 def create_principal(principal=None, municipality=None):
     if principal in Canton.CANTONS:
-        pr = Canton(canton=principal)
-    else:
-        pr = Municipality(municipality=municipality)
-    return pr
+        return Canton(canton=principal)
+
+    return Municipality(
+        municipality=municipality, canton='be', canton_name='Kanton Bern'
+    )
 
 
 PROPORZ_HEADER = (
@@ -160,6 +161,7 @@ class DummyPrincipal:
         self._is_year_available = True
         self.reply_to = None
         self.superregions = []
+        self.official_host = None
 
     @property
     def notifications(self):

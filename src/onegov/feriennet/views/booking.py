@@ -445,8 +445,6 @@ def cancel_booking(self, request):
         request.translate(_("Bookings"))
     )
 
-    dates = (self.dates[0].localized_start,
-             self.dates[0].localized_end)
     subject = request.translate(_(
         'Degregistration of ${attendee} for "${title}"',
         mapping={
@@ -464,7 +462,7 @@ def cancel_booking(self, request):
                 'model': self,
                 'bookings_link': bookings_link,
                 'name': self.attendee.name,
-                'dates': dates
+                'dates': self.dates
             })
         )
 

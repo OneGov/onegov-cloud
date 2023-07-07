@@ -22,7 +22,10 @@ def test_import_wabstim_vote(session):
     with tarfile.open(tar_file, 'r|gz') as f:
         xlsx = f.extractfile(f.next()).read()
 
-    principal = Municipality(municipality='3298', name='Walenstadt')
+    principal = Municipality(
+        municipality='3298', name='Walenstadt',
+        canton='sg', canton_name='Kanton St.Gallen'
+    )
     errors = import_vote_wabstim(
         vote, principal, BytesIO(xlsx), 'application/excel'
     )
@@ -45,7 +48,9 @@ def test_import_wabstim_vote_utf16(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     errors = import_vote_wabstim(
         vote, principal,
@@ -80,7 +85,9 @@ def test_import_wabstim_vote_missing_headers(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     errors = import_vote_wabstim(
         vote, principal,
@@ -116,7 +123,9 @@ def test_import_wabstim_vote_invalid_values(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     errors = import_vote_wabstim(
         vote, principal,
@@ -228,7 +237,9 @@ def test_import_wabstim_vote_expats(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     for has_expats in (False, True):
         vote.has_expats = has_expats
@@ -277,60 +288,3 @@ def test_import_wabstim_vote_expats(session):
             assert errors == []
         else:
             assert errors == ['No data found']
-
-
-def test_import_wabstim_vote_temporary_results(session):
-    session.add(
-        Vote(title='vote', domain='municipality', date=date(2017, 2, 12))
-    )
-    session.flush()
-    vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427', name='Wil')
-
-    errors = import_vote_wabstim(
-        vote, principal,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'Freigegeben',
-                    'StiLeer',
-                    'StiUngueltig',
-                    'StiJaHG',
-                    'StiNeinHG',
-                    'StiOhneAwHG',
-                    'StiJaN1',
-                    'StiNeinN1',
-                    'StiOhneAwN1',
-                    'StiJaN2',
-                    'StiNeinN2',
-                    'StiOhneAwN2',
-                    'Stimmberechtigte',
-                    'BFS',
-                )),
-                ','.join((
-                    '',  # Freigegeben
-                    '0',  # StiLeer
-                    '0',  # StiUngueltig
-                    '10',  # StiJaHG
-                    '20',  # StiNeinHG
-                    '',  # StiOhneAwHG
-                    '',  # StiJaN1
-                    '',  # StiNeinN1
-                    '',  # StiOhneAwN1
-                    '',  # StiJaN2
-                    '',  # StiNeinN2
-                    '',  # StiOhneAwN2
-                    '100',  # Stimmberechtigte
-                    '3427',  # BFS
-                ))
-            ))
-        ).encode('utf-8')),
-        'text/plain',
-    )
-    assert not errors
-    assert [
-        v.entity_id for v in vote.proposal.results.filter_by(counted=True)
-    ] == []
-    assert [
-        v.entity_id for v in vote.proposal.results.filter_by(counted=False)
-    ] == [3427]

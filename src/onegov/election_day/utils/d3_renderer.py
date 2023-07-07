@@ -1,6 +1,7 @@
 from base64 import b64decode
 from io import BytesIO
 from io import StringIO
+from json import dumps, loads
 from onegov.ballot import Ballot
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
@@ -92,7 +93,7 @@ class D3Renderer():
             json={
                 'scripts': self.scripts[chart],
                 'main': self.supported_charts[chart]['main'],
-                'params': params
+                'params': loads(dumps(params).replace("'", '’'))
             },
             timeout=60
         )

@@ -322,6 +322,9 @@ class OccurrenceCollection(Pagination):
         """
         Returns all published occurrences as xml.
 
+        The xml format was Winterthur's wish (no specs behind). Their mobile
+        app will consume the events from xml
+
         Format:
         <events>
             <event>

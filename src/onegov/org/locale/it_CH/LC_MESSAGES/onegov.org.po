@@ -341,6 +341,17 @@ msgstr "Visualizza"
 msgid "Lead-Format"
 msgstr "Formato principale"
 
+msgid "Empty Directory Notice"
+msgstr "Avviso di cartella vuota"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Questo testo viene visualizzato quando la cartella non contiene voci "
+"(visibili). Se lasciato vuoto, verrà visualizzato un testo generico "
+"predefinito."
+
 msgid "Numbering"
 msgstr "Numerazione"
 

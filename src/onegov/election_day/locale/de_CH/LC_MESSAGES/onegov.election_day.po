@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-18 11:59+0100\n"
+"POT-Creation-Date: 2023-06-28 07:23+0200\n"
 "PO-Revision-Date: 2022-03-24 15:35+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -68,8 +68,12 @@ msgid "The file contains an empty line."
 msgstr "Die Datei enthält eine leere Zeile."
 
 #, python-format
-msgid "${name} is not part of this election"
-msgstr "${name} ist nicht Teil dieser Wahl"
+msgid "Not a valid eCH xml file: ${error}"
+msgstr "Keine gültige eCH xml-Datei: ${error}"
+
+#, python-format
+msgid "${name} is not part of this business"
+msgstr "${name} ist nicht Teil dieses Geschäfts"
 
 #, python-format
 msgid "${name} is not part of ${district}"
@@ -232,6 +236,9 @@ msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
+msgid "Vote type not supported"
+msgstr "Abstimmungsart nicht unterstützt"
+
 msgid "Term"
 msgstr "Suchbegriff"
 
@@ -272,23 +279,6 @@ msgstr "Regional"
 msgid "Communal"
 msgstr "Kommunal"
 
-msgid ""
-"The ID is used in the URL and might be used somewhere. Changing theID might "
-"break links on external sites!"
-msgstr ""
-"Die ID wird in der URL verwendet und wird möglicherweise an anderer Stelle "
-"verwendet. Das Ändern der ID kann Links auf externen Seiten unbrauchbar "
-"machen!"
-
-msgid "ID"
-msgstr "ID"
-
-msgid "Invalid ID"
-msgstr "Ungültige ID"
-
-msgid "ID already exists"
-msgstr "ID ist bereits vorhanden"
-
 msgid "Name"
 msgstr "Name"
 
@@ -301,8 +291,28 @@ msgstr "Noch keine Abstimmungen erfasst."
 msgid "No elections yet."
 msgstr "Noch keine Wahlen erfasst."
 
+msgid "Identifier"
+msgstr "ID"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing the ID might "
+"break links on external sites!"
+msgstr ""
+"Die ID wird in der URL verwendet und wird möglicherweise an anderer Stelle "
+"verwendet. Das Ändern der ID kann Links auf externen Seiten unbrauchbar "
+"machen!"
+
+msgid "External ID"
+msgstr "Externe ID"
+
+msgid "Used for import if set."
+msgstr "Wird für den Import verwendet, sofern gesetzt."
+
 msgid "System"
 msgstr "System"
+
+msgid "Properties"
+msgstr "Eigenschaften"
 
 msgid "Election based on the simple majority system"
 msgstr "Majorzwahl"
@@ -331,9 +341,6 @@ msgstr "Gemeinde"
 msgid "Tacit election"
 msgstr "Stille Wahl"
 
-msgid "View options"
-msgstr "Ansichtsoptionen"
-
 msgid "Expats are listed separately"
 msgstr "Auslandschweizer werden separat aufgeführt"
 
@@ -345,8 +352,23 @@ msgstr ""
 "und aufgeführt. Ein Verändern dieser Option erfordert ein erneutes Hochladen "
 "der Daten."
 
+msgid "Date"
+msgstr "Datum"
+
+msgid "Shortcode"
+msgstr "Kürzel"
+
+msgid "Used for sorting."
+msgstr "Wird für die Sortierung verwendet."
+
+msgid "Mandates / Seats"
+msgstr "Mandate / Sitze"
+
 msgid "Voters counts"
 msgstr "Wählerzahlen"
+
+msgid "View options"
+msgstr "Ansichtsoptionen"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
@@ -397,15 +419,6 @@ msgstr "Panaschierstatistik (Parteien)"
 msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
 "Zeigt eine Registerkarte mit Panaschierdaten an. Erfordert Parteiergebnisse."
-
-msgid "Date"
-msgstr "Datum"
-
-msgid "Mandates / Seats"
-msgstr "Mandate / Sitze"
-
-msgid "Shortcode"
-msgstr "Kürzel"
 
 msgid "German"
 msgstr "Deutsch"
@@ -460,6 +473,12 @@ msgstr "Farben"
 
 msgid "Invalid color definitions"
 msgstr "Ungültige Farbdefinitionen"
+
+msgid "Invalid ID"
+msgstr "Ungültige ID"
+
+msgid "ID already exists"
+msgstr "ID ist bereits vorhanden"
 
 msgid "Domain of the elections"
 msgstr "Ebene der Wahlen"
@@ -630,8 +649,8 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Parteiresultate"
 
-msgid "Identifier"
-msgstr "ID"
+msgid "Delivery"
+msgstr "Lieferung"
 
 msgid "Proposal / Results"
 msgstr "Vorlage / Resultate"
@@ -641,6 +660,12 @@ msgstr "Vorlagen-Nummer"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "External ID of counter proposal"
+msgstr "Externe ID des Gegenvorschlags"
+
+msgid "External ID of tie breaker"
+msgstr "Externe ID der Stichfrage"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel der Abstimmung/der Vorlage"
@@ -982,9 +1007,6 @@ msgstr "Anzeigen"
 
 msgid "Edit"
 msgstr "Bearbeiten"
-
-msgid "Change ID"
-msgstr "ID ändern"
 
 msgid "Upload results"
 msgstr "Resultate hochladen"

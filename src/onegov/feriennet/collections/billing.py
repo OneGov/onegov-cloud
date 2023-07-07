@@ -261,8 +261,11 @@ class BookingInvoiceBridge:
 
         # preload data
         self.activities = {
-            r.id: r.title
-            for r in session.query(Occasion.id, Activity.title).join(Activity)
+            r.id: (
+                r.Activity.title,
+                r.Activity.user.data.get('organisation', '')
+            )
+            for r in session.query(Occasion.id, Activity).join(Activity)
         }
 
         # holds invoices which existed already
@@ -331,7 +334,8 @@ class BookingInvoiceBridge:
 
         self.existing[booking.username].add(
             group=self.attendees[booking.attendee_id][0],
-            text=self.activities[booking.occasion_id],
+            text=self.activities[booking.occasion_id][0],
+            organizer=self.activities[booking.occasion_id][1],
             unit=booking.cost,
             quantity=1,
             flush=False

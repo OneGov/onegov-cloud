@@ -5,6 +5,16 @@ from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import TypedDict
+
+    class LoginData(TypedDict):
+        username: str
+        password: str
+        second_factor: str | None
+
+
 class LoginForm(Form):
     """ A generic login form for onegov.user """
 
@@ -28,7 +38,7 @@ class LoginForm(Form):
     )
 
     @property
-    def login_data(self):
+    def login_data(self) -> 'LoginData':
         """ Returns the data required to be passed to the
         :class:`onegov.user.auth.Auth` methods.
 

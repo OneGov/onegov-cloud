@@ -1087,6 +1087,9 @@ msgstr "Bitte geben Sie einen neuen Namen für die Datei ein"
 msgid "Rename"
 msgstr "Umbenennen"
 
+msgid "Download"
+msgstr "Herunterladen"
+
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Digitales Siegel angewendet von ${signee} am ${date}"
 

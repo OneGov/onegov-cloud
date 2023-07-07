@@ -444,7 +444,8 @@ ul.tags {
 .side-panel {
     padding: .5rem 1rem 1rem;
 
-    .title {
+    .title,
+    h2 {
         background: $primary-color;
         color: $white;
         display: block;
@@ -2038,6 +2039,16 @@ $booking-left-margin: 2rem;
     border-bottom: 1px solid $red-pastel;
 }
 
+li.paid {
+    border-top: 1px solid $green-pastel;
+    padding-top: .2rem;
+}
+
+li.unpaid {
+    border-top: 1px solid $red-pastel;
+    padding-top: .2rem;
+}
+
 .invoice-items-list {
     background: $white;
     padding: 1rem 3.5rem 1rem 1.5rem;
@@ -2049,11 +2060,16 @@ $booking-left-margin: 2rem;
         list-style: none;
         margin: 0;
 
-        li.unpaid,
-        li.paid {
+        .text-amount {
             align-items: end;
             display: flex;
             flex-wrap: wrap;
+        }
+
+        .item-organizer {
+            display: block;
+            line-height: .9rem;
+            padding-bottom: .5rem;
         }
     }
 

@@ -197,6 +197,9 @@ def json_export_occurences(self, request):
 def xml_export_all_occurrences(self, request):
     """
     Returns events as xml.
+    This view was requested by Winterthur for their mobile app that displays
+    the events provided by this xml view.
+
     Url for xml view: ../events/xml
     """
 

@@ -27,10 +27,11 @@ class ArchiveGenerator:
         the zip is returned.
     """
     def __init__(self, app: 'ElectionDayApp'):
+        assert app.filestorage is not None
         self.app = app
-        self.session = self.app.session()
-        self.archive_dir: SubFS = self.app.filestorage.makedir("archive",
-                                                               recreate=True)
+        self.session = app.session()
+        self.archive_dir: SubFS = app.filestorage.makedir("archive",
+                                                          recreate=True)
         self.temp_fs = TempFS()
         self.archive_parent_dir = "zip"
         self.MAX_FILENAME_LENGTH = 60

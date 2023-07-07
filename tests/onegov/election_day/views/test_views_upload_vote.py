@@ -156,6 +156,20 @@ def test_upload_vote_submit(election_day_app_zg):
 
         assert import_.called
 
+    # XML
+    with patch(
+        'onegov.election_day.views.upload.vote.import_xml'
+    ) as import_:
+        import_.return_value = [], []
+
+        xml = '<delivery></delivery>'.encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'xml'
+        upload.form['xml'] = Upload('data.xml', xml, 'text/xml')
+        upload = upload.form.submit()
+
+        assert import_.called
+
     # Wabsti
     with patch(
         'onegov.election_day.views.upload.vote.import_vote_wabsti'
@@ -232,7 +246,7 @@ def test_upload_vote_available_formats_canton(election_day_app_zg):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal', 'wabsti'
+        'default', 'internal', 'wabsti', 'xml'
     ]
 
     new = client.get('/manage/votes/new-vote')
@@ -243,7 +257,7 @@ def test_upload_vote_available_formats_canton(election_day_app_zg):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal', 'wabsti'
+        'default', 'internal', 'wabsti', 'xml'
     ]
 
 
@@ -261,7 +275,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal', 'wabsti_m'
+        'default', 'internal', 'wabsti_m', 'xml'
     ]
 
     new = client.get('/manage/votes/new-vote')
@@ -272,7 +286,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal', 'wabsti_m'
+        'default', 'internal', 'wabsti_m', 'xml'
     ]
 
     new = client.get('/manage/votes/new-vote')
@@ -283,7 +297,7 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
     upload = client.get('/vote/vote/upload')
     assert sorted([o[0] for o in upload.form['file_format'].options]) == [
-        'default', 'internal', 'wabsti_m'
+        'default', 'internal', 'wabsti_m', 'xml'
     ]
 
 

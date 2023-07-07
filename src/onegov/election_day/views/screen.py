@@ -19,7 +19,7 @@ from onegov.election_day.utils import add_last_modified_header
 )
 def view_screen(self, request):
 
-    """ Shows a screen """
+    """ Shows a screen. """
 
     @request.after
     def add_headers(response):
@@ -62,7 +62,7 @@ def view_screen(self, request):
 )
 def view_screen_head(self, request):
 
-    """ Shows a screen """
+    """ Get the last modification date. """
 
     @request.after
     def add_headers(response):

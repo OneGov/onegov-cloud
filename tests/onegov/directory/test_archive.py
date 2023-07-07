@@ -1,3 +1,5 @@
+import shutil
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -199,6 +201,52 @@ def test_zip_archive_from_buffer(session, temporary_path):
 
     archive = DirectoryZipArchive.from_buffer(
         (temporary_path / 'archive.zip').open('rb'))
+
+    directory = archive.read()
+    assert directory.title == "Businesses"
+    assert directory.lead == "The town's businesses"
+    assert directory.structure == "Name *= ___"
+    assert len(directory.entries) == 1
+
+
+@pytest.mark.parametrize('archive_format', ['json', 'csv', 'xlsx'])
+def test_zip_archive_from_buffer_with_folder_in_zip(session, temporary_path,
+                                                    archive_format):
+
+    directories = DirectoryCollection(session)
+    businesses = directories.add(
+        title="Businesses",
+        lead="The town's businesses",
+        structure="Name *= ___",
+        configuration=DirectoryConfiguration(
+            title="[name]",
+            order=['name']
+        )
+    )
+
+    businesses.add(values=dict(name="Aesir Corp."))
+    transaction.commit()
+
+    businesses = directories.by_name('businesses')
+
+    original_zip = temporary_path / 'archive.zip'
+    archive = DirectoryZipArchive(original_zip, archive_format)
+    archive.write(businesses)
+
+    def create_new_zip_containing_directory(original_zip):
+        """ Takes the zip and puts a top-level directory in it. """
+        working_directory = temporary_path / "extracted"
+        working_directory.mkdir(parents=True, exist_ok=True)
+        shutil.unpack_archive(original_zip, extract_dir=working_directory)
+        root_dir = temporary_path / "top"
+        wrapper = root_dir / "container"
+        shutil.copytree(working_directory, wrapper)
+        zip_destination = temporary_path / 'archive_with_root'
+        return Path(shutil.make_archive(zip_destination, "zip", root_dir))
+
+    new_zip = create_new_zip_containing_directory(original_zip)
+
+    archive = DirectoryZipArchive.from_buffer(new_zip.open('rb'))
 
     directory = archive.read()
     assert directory.title == "Businesses"

@@ -86,4 +86,9 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     @cached_property
     def show_map(self):
+        if (
+            self.principal.domain == 'canton'
+            and getattr(self.model, 'domain', None) == 'municipality'
+        ):
+            return False
         return self.principal.is_year_available(self.model.date.year)

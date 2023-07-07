@@ -5,6 +5,7 @@ from onegov.core.utils import Bunch
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.exports.booking import BookingExport
 from onegov.feriennet.exports.invoiceitem import InvoiceItemExport
+from sqlalchemy import func
 import transaction
 
 
@@ -130,6 +131,9 @@ def test_exports(client, scenario):
     for item in invoices:
         item.paid = True
         item.payment_date = date(2020, 3, 5)
+
+    # Write the item.group of one item in CAPS since this can apparently happen
+    invoices[0].group = func.upper(invoices[0].group)
 
     transaction.commit()
     scenario.refresh()

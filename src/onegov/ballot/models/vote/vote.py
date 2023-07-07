@@ -24,6 +24,11 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+from xsdata_ech.e_ch_0252_1_0 import Delivery
+from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
+from xsdata.formats.dataclass.serializers import XmlSerializer
+from xsdata.formats.dataclass.serializers.config import SerializerConfig
+from xsdata.models.datatype import XmlDate
 
 
 class Vote(Base, ContentMixin, LastModifiedMixin,
@@ -49,6 +54,9 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     #: identifies the vote, may be used in the url, generated from the title
     id = Column(Text, primary_key=True)
+
+    #: external identifier
+    external_id = Column(Text, nullable=True)
 
     #: shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
@@ -262,6 +270,10 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: resultas (typically with entity_id = 0)
     has_expats = meta_property('expats', default=False)
 
+    #: The segment of the domain. This might be the municipality, if this is a
+    #: communal vote.
+    domain_segment = meta_property('domain_segment', default='')
+
     def clear_results(self):
         """ Clear all the results. """
 
@@ -311,3 +323,23 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
                 rows.append(row)
 
         return rows
+
+    def export_xml(self, canton_id, domain_of_influence):
+        """ Returns all data as an eCH-0252 XML. """
+
+        polling_day = XmlDate.from_date(self.date)
+        ballots = self.ballots.all()
+        delivery = Delivery(
+            vote_base_delivery=EventVoteBaseDeliveryType(
+                canton_id=canton_id,
+                polling_day=polling_day,
+                vote_info=[
+                    ballot.export_xml(canton_id, domain_of_influence)
+                    for ballot in ballots
+                ],
+                number_of_entries=len(ballots)
+            )
+        )
+        config = SerializerConfig(pretty_print=True)
+        serializer = XmlSerializer(config=config)
+        return serializer.render(delivery)

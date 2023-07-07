@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var lastModified;
     function poll() {
-        fetch(window.location.href, {method: "HEAD"})
+        fetch(window.location.href + '?' + new Date().getTime(), {method: "HEAD"})
             .then((response) => {
                 const modified = response.headers.get("Last-Modified");
                 if (lastModified && modified !== lastModified) {
@@ -30,14 +30,32 @@ document.addEventListener("DOMContentLoaded", function() {
             })
             .catch((_error) => {});
     }
+    poll();
+
+    var intervalID;
+    function initiatePolling() {
+        if (!intervalID) {
+            intervalID = setInterval(poll, 30 * 1000);
+        }
+    }
 
     function onWebsocketError(_event, websocket) {
         websocket.close();
-        poll();
-        setInterval(poll, 30 * 1000);
+        initiatePolling();
     }
 
     if (endpoint && schema) {
-        openWebsocket(endpoint, schema, null, onWebsocketNotification, onWebsocketError);
+        const websocket = openWebsocket(
+            endpoint,
+            schema,
+            null,
+            onWebsocketNotification,
+            onWebsocketError
+        );
+        websocket.addEventListener("close", function() {
+            initiatePolling();
+        });
+    } else {
+        initiatePolling();
     }
 });

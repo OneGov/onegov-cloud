@@ -340,6 +340,17 @@ msgstr "Anzeige"
 msgid "Lead-Format"
 msgstr "Lead-Format"
 
+msgid "Empty Directory Notice"
+msgstr "Leeres Verzeichnis Hinweis"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Dieser Text wird dargestellt wenn das Verzeichnis keine (sichtbaren) "
+"Einträge enthält. Falls leergelassen, wird stattdessen ein generischer "
+"Standardtext angezeigt."
+
 msgid "Numbering"
 msgstr "Nummerierung"
 
@@ -2429,8 +2440,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3599,7 +3610,7 @@ msgstr ""
 "Suche im Navigationsbereich."
 
 msgid "Back"
-msgstr "zurück"
+msgstr "Zurück"
 
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"

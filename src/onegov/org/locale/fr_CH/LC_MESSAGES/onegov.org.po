@@ -340,6 +340,17 @@ msgstr "Afficher"
 msgid "Lead-Format"
 msgstr "Format Principal"
 
+msgid "Empty Directory Notice"
+msgstr "Avis de dossier vide"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Ce texte sera affiché lorsque le dossier ne contient pas d'entrées "
+"(visibles). S'il est laissé vide, un texte générique par défaut sera affiché "
+"à la place."
+
 msgid "Numbering"
 msgstr "Numérotation"
 

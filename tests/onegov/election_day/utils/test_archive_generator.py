@@ -39,7 +39,9 @@ def test_query_only_counted_votes_that_have_results(election_day_app_zg):
         vote = session.query(Vote).filter_by(date=sample_vote.date).first()
         vote.proposal.results.append(ballot_result)
 
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     target = ArchivedResult()
     source = ArchivedResult(type='vote')
     add_local_results(source, target, bern, session)
@@ -82,7 +84,9 @@ def test_archive_generation_from_scratch(election_day_app_zg):
         vote = session.query(Vote).filter_by(date=sample_vote.date).first()
         vote.proposal.results.append(ballot_result)
 
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     target = ArchivedResult()
     source = ArchivedResult(type='vote')
     add_local_results(source, target, bern, session)
@@ -199,7 +203,9 @@ def test_long_filenames_are_truncated(election_day_app_zg):
     ))
     session.flush()
 
-    bern = Municipality(name='Bern', municipality='351')
+    bern = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     target = ArchivedResult()
     source = ArchivedResult(type='vote', external_id=vote.id)
     add_local_results(source, target, bern, session)

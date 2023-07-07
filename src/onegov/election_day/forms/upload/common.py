@@ -9,5 +9,11 @@ ALLOWED_MIME_TYPES = {
     'application/zip',
     'text/csv'
 }
+ALLOWED_MIME_TYPES_XML = {
+    'application/xml',
+    'text/xml',
+    'text/plain'
+}
+
 
 MAX_FILE_SIZE = 10 * 1024 * 1024

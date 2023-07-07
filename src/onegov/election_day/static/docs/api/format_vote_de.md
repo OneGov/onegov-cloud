@@ -9,24 +9,25 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Inhalt](#Inhalt)
-- 2. [Vorbemerkungen](#Vorbemerkungen)
-   - 2.1. [Einheiten](#Einheiten)
-- 3. [Formate](#Formate)
-   - 3.1. [Standardformat](#Standardformat)
-      - 3.1.1. [Spalten](#Spalten)
-      - 3.1.2. [Temporäre Resultate](#Temporare-Resultate)
-      - 3.1.3. [Vorlage](#Vorlage)
-   - 3.2. [OneGov](#OneGov)
-      - 3.2.1. [Spalten](#Spalten-1)
-      - 3.2.2. [Temporäre Resultate](#Temporare-Resultate-1)
-      - 3.2.3. [Vorlage](#Vorlage-1)
-   - 3.3. [Wabsti](#Wabsti)
-      - 3.3.1. [Spalten](#Spalten-2)
-      - 3.3.2. [Temporäre Resultate](#Temporare-Resultate-2)
-      - 3.3.3. [Vorlage](#Vorlage-2)
-   - 3.4. [WabstiCExport](#WabstiCExport)
-      - 3.4.1. [Ermittlung des Status einer Wahl](#Ermittlung-des-Status-einer-Wahl)
+- 1. [Inhalt](#inhalt)
+- 2. [Vorbemerkungen](#vorbemerkungen)
+   - 2.1. [Einheiten](#einheiten)
+- 3. [Formate](#formate)
+   - 3.1. [Standardformat](#standardformat)
+      - 3.1.1. [Spalten](#spalten)
+      - 3.1.2. [Temporäre Resultate](#temporäre-resultate)
+      - 3.1.3. [Vorlage](#vorlage)
+   - 3.2. [OneGov](#onegov)
+      - 3.2.1. [Spalten](#spalten)
+      - 3.2.2. [Temporäre Resultate](#temporäre-resultate)
+      - 3.2.3. [Vorlage](#vorlage)
+   - 3.3. [Wabsti](#wabsti)
+      - 3.3.1. [Spalten](#spalten)
+      - 3.3.2. [Temporäre Resultate](#temporäre-resultate)
+      - 3.3.3. [Vorlage](#vorlage)
+   - 3.4. [WabstiCExport](#wabsticexport)
+      - 3.4.1. [Ermittlung des Status einer Abstimmung](#ermittlung-des-status-einer-abstimmung)
+   - 3.5. [eCH-0252](#ech-0252)
 
 <!-- /MDTOC -->
 
@@ -150,3 +151,8 @@ Seit 2020 wird `AnzGdePendent` statt `Ausmittlungsstand` dazu verwendet, um den 
 Der Status ist `final` wenn `AnzGdePendent = 0` ist.
 
 Seit 2023 wird `AnzPendentGde` statt `AnzGdePendent` dazu verwendet, um den Status der Gesamtabstimmung zu setzen.
+
+
+### eCH-0252
+
+Siehe [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

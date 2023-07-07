@@ -1,8 +1,11 @@
 from freezegun import freeze_time
+from onegov.ballot import Vote
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 from onegov.election_day.models import Principal
 from textwrap import dedent
+from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceType
+from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 
 
 SUPPORTED_YEARS = list(range(2002, 2023 + 1))
@@ -30,7 +33,9 @@ def test_principal_load():
     assert list(principal.domains_election.keys()) == [
         'federation', 'canton', 'none', 'municipality'
     ]
-    assert list(principal.domains_vote.keys()) == ['federation', 'canton']
+    assert list(principal.domains_vote.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
     assert len(principal.entities)
     assert len(list(principal.entities.values())[0])
 
@@ -142,11 +147,15 @@ def test_principal_load():
     # Municipality with static data
     principal = Principal.from_yaml(dedent("""
         name: Stadt Bern
+        canton: be
+        canton_name: Kanton Bern
         municipality: '351'
     """))
     assert isinstance(principal, Municipality)
     assert principal.name == 'Stadt Bern'
     assert principal.id == '351'
+    assert principal.canton == 'be'
+    assert principal.canton_name == 'Kanton Bern'
     assert principal.domain == 'municipality'
     assert list(principal.domains_election.keys()) == [
         'federation', 'canton', 'municipality'
@@ -176,10 +185,14 @@ def test_principal_load():
     principal = Principal.from_yaml(dedent("""
         name: Kriens
         municipality: '1059'
+        canton: lu
+        canton_name: Kanton Luzern
     """))
     assert isinstance(principal, Municipality)
     assert principal.name == 'Kriens'
     assert principal.id == '1059'
+    assert principal.canton == 'lu'
+    assert principal.canton_name == 'Kanton Luzern'
     assert principal.domain == 'municipality'
     assert list(principal.domains_election.keys()) == [
         'federation', 'canton', 'municipality'
@@ -281,13 +294,18 @@ def test_canton():
 def test_municipality_entities():
     # Municipality without quarters
     with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
-        principal = Municipality(name='Kriens', municipality='1059')
+        principal = Municipality(
+            name='Kriens', municipality='1059', canton='lu',
+            canton_name='Kanton Luzern'
+        )
         assert principal.entities == {
             year: {1059: {'name': 'Kriens'}} for year in SUPPORTED_YEARS
         }
 
     # Municipality with quarters
-    principal = Municipality(name='Bern', municipality='351')
+    principal = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     entities = {
         1: {'name': 'Innere Stadt'},
         2: {'name': 'Länggasse/Felsenau'},
@@ -302,7 +320,10 @@ def test_municipality_entities():
 def test_principal_years_available():
     # Municipality without quarters/map
     with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
-        principal = Municipality(name='Kriens', municipality='1059')
+        principal = Municipality(
+            name='Kriens', municipality='1059', canton='lu',
+            canton_name='Kanton Luzern'
+        )
         assert not principal.is_year_available(2000)
         assert not principal.is_year_available(2000, map_required=False)
         for year in SUPPORTED_YEARS:
@@ -310,7 +331,9 @@ def test_principal_years_available():
             assert principal.is_year_available(year, map_required=False)
 
     # Municipality with quarters/map
-    principal = Municipality(name='Bern', municipality='351')
+    principal = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     assert not principal.is_year_available(2000)
     assert not principal.is_year_available(2000, map_required=False)
     for year in SUPPORTED_YEARS_NO_MAP:
@@ -559,9 +582,52 @@ def test_principal_label(election_day_app_zg):
         assert translate(principal.label(label), locale) == result
 
     # Bern
-    principal = Municipality(name='Be', municipality='351')
+    principal = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
     for label, locale, result in (
         ('entity', 'de_CH', 'Stadtteil'),
         ('entities', 'de_CH', 'Stadtteile')
     ):
         assert translate(principal.label(label), locale) == result
+
+
+def test_principal_ech_domain():
+
+    def domain(domain, identification, name):
+        return DomainOfInfluenceType(
+            domain_of_influence_type=DomainOfInfluenceTypeType(domain),
+            domain_of_influence_identification=identification,
+            domain_of_influence_name=name
+        )
+
+    vote_f = Vote(domain='federation')
+    vote_c = Vote(domain='canton')
+    vote_r = Vote(domain='region', domain_segment='Chur')
+    vote_d = Vote(domain='district', domain_segment='Wil')
+    vote_m = Vote(domain='municipality', domain_segment='Mels')
+    vote_q = Vote(domain='district', domain_segment='Innere Stadt')
+    vote_n = Vote(domain='none')
+
+    # Canton
+    principal = Canton(name='St.Gallen', canton='sg')
+    assert principal.get_ech_domain() == domain('CT', 'SG', 'St.Gallen')
+    assert principal.get_ech_domain(vote_f) == domain('CH', '1', 'Bund')
+    assert principal.get_ech_domain(vote_d) == domain('BZ', '', 'Wil')
+    assert principal.get_ech_domain(vote_c) == domain('CT', 'SG', 'St.Gallen')
+    assert principal.get_ech_domain(vote_m) == domain('MU', '3293', 'Mels')
+    assert principal.get_ech_domain(vote_n) == domain('AN', '', '')
+
+    principal = Canton(name='Graubünden', canton='gr')
+    assert principal.get_ech_domain(vote_r) == domain('BZ', '', 'Chur')
+
+    # Bern
+    principal = Municipality(
+        name='Bern', municipality='351', canton='be', canton_name='Kt. Bern'
+    )
+    assert principal.get_ech_domain() == domain('MU', '351', 'Bern')
+    assert principal.get_ech_domain(vote_f) == domain('CH', '1', 'Bund')
+    assert principal.get_ech_domain(vote_q) == domain('SK', '', 'Innere Stadt')
+    assert principal.get_ech_domain(vote_c) == domain('CT', 'BE', 'Kt. Bern')
+    assert principal.get_ech_domain(vote_m) == domain('MU', '351', 'Bern')
+    assert principal.get_ech_domain(vote_n) == domain('AN', '', '')

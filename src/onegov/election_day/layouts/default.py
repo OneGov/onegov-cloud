@@ -47,6 +47,11 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def has_districts(self):
+        if (
+            self.principal.domain == 'canton'
+            and getattr(self.model, 'domain', None) == 'municipality'
+        ):
+            return False
         return self.principal.has_districts
 
     @cached_property

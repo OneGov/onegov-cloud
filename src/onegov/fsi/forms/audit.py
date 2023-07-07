@@ -22,9 +22,6 @@ class AuditForm(Form):
     organisations = ChosenSelectMultipleField(
         label=_("By Organisation"),
         choices=[],
-        validators=[
-            InputRequired()
-        ]
     )
 
     letter = SelectField(
