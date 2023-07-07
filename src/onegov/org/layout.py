@@ -284,12 +284,14 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def search_url(self):
         """ Returns the url to the search page. """
+        if 'search_postgres' in self.request.path_info:
+            return self.request.link(SearchPostgres(self.request, None, None))
         return self.request.link(Search(self.request, None, None))
 
     @cached_property
     def suggestions_url(self):
         """ Returns the url to the suggestions json view. """
-        if 'postgres' in self.request.path_info:
+        if 'search_postgres' in self.request.path_info:
             return self.request.link(SearchPostgres(self.request, None,
                                                     None), 'suggest')
         return self.request.link(Search(self.request, None, None), 'suggest')
