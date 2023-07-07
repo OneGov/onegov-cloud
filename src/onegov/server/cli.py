@@ -231,7 +231,7 @@ def run(
             environment=sentry_environment,
             send_default_pii=send_ppi,
             traces_sample_rate=traces_sample_rate,
-            sample_rate=profiles_sample_rate,
+            profiles_sample_rate=profiles_sample_rate,
             integrations=integrations)
 
         # somehow sentry attaches itself to the global exception hook, even if
