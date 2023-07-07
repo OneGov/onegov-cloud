@@ -11,8 +11,6 @@ from webob import exc
 
 @OrgApp.html(model=Search, template='search.pt', permission=Public)
 def search(self, request, layout=None):
-    print('*** tschupre org search')
-
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs.append(Link(_("Search"), '#'))
 
@@ -50,8 +48,6 @@ def search(self, request, layout=None):
 @OrgApp.html(model=SearchPostgres, template='search_postgres.pt',
              permission=Public)
 def search_postgres(self, request, layout=None):
-    print('*** tschupre org search postgres')
-
     layout = layout or DefaultLayout(self, request)
     layout.breadcrumbs.append(Link(_("Search"), '#'))
 
@@ -91,7 +87,6 @@ def search_postgres(self, request, layout=None):
 @OrgApp.json(model=Search, name='suggest', permission=Public)
 def suggestions(self, request):
     try:
-        print('*** tschupre suggestions_es')
         return tuple(self.suggestions())
     except SearchOfflineError as exception:
         raise exc.HTTPNotFound() from exception
@@ -100,7 +95,6 @@ def suggestions(self, request):
 @OrgApp.json(model=SearchPostgres, name='suggest', permission=Public)
 def suggestions_postgres(self, request):
     try:
-        print('*** tschupre suggestions_postgres')
         return tuple(self.suggestions())
     except SearchOfflineError as exception:
         raise exc.HTTPNotFound() from exception

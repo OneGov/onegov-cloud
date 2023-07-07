@@ -50,7 +50,6 @@ class Search(Pagination):
 
     @cached_property
     def batch(self):
-        print(f'*** tschupre search batch query: {self.query}')
         if not self.query:
             return None
 
@@ -77,7 +76,6 @@ class Search(Pagination):
         This methods is a wrapper around `batch.load()`, which returns the
         actual search results form the query. """
 
-        print('*** tschupre Search load_batch_results')
         batch = self.batch.load()
         events = []
         non_events = []
@@ -136,7 +134,6 @@ class Search(Pagination):
         return self.cached_subset and self.cached_subset.hits.total.value or 0
 
     def suggestions(self):
-        print('*** tschupre Search::suggestions')
         return tuple(self.request.app.es_suggestions_by_request(
             self.request, self.query
         ))
@@ -162,7 +159,6 @@ class SearchPostgres(Pagination):
 
         self.nbr_of_docs = 0
         self.nbr_of_results = 0
-        print('*** tschupre search __init__')
 
     @cached_property
     def available_documents(self):
@@ -178,11 +174,9 @@ class SearchPostgres(Pagination):
 
     @property
     def q(self):
-        print('*** tschupre search q')
         return self.query
 
     def __eq__(self, other):
-        print('*** tschupre search __eq__')
         return self.page == other.page and self.query == other.query
 
     def subset(self):
@@ -190,16 +184,13 @@ class SearchPostgres(Pagination):
 
     @property
     def page_index(self):
-        print('*** tschupre search page_index')
         return self.page
 
     def page_by_index(self, index):
-        print(f'*** tschupre search page_by_index: {index}')
         return SearchPostgres(self.request, self.query, index)
 
     @cached_property
     def batch(self):
-        print(f'*** tschupre search batch query: {self.query}')
         if not self.query:
             return None
 
@@ -231,7 +222,6 @@ class SearchPostgres(Pagination):
         return sorted_events + non_events
 
     def generic_search(self):
-        print('*** tschupre search postgres generic_search')
         doc_count = 0
         results = []
 
@@ -269,11 +259,9 @@ class SearchPostgres(Pagination):
 
         self.nbr_of_results = len(results)
         results.sort(reverse=False)
-        print(f'*** tschupre hashtag_search results: {results}')
         return results
 
     def feeling_lucky(self):
-        print('*** tschupre search feeling_lucky')
         if self.batch:
             first_entry = self.batch[0].load()
 
@@ -285,7 +273,6 @@ class SearchPostgres(Pagination):
 
     @cached_property
     def subset_count(self):
-        print('*** tschupre search subset_count')
         return self.available_results
 
     def suggestions(self):
