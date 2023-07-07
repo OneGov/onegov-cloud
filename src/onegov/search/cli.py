@@ -22,18 +22,16 @@ def reindex(group_context, fail):
         :param request: request
         :param app: application context
         """
-        session = request.session
-
         title = f"Reindexing {request.app.application_id}"
         print(click.style(title, underline=True))
 
         start = utcnow()
-        app.psql_perform_reindex(session)
-        print(f"psql indexing took {utcnow() - start}")
+        app.psql_perform_reindex()
+        print(f"- psql indexing took {utcnow() - start}")
 
-        # TODO: remove es indexing
+        # TODO: remove es indexing once es is gone
         start = utcnow()
         request.app.es_perform_reindex(fail)
-        print(f"es indexing took {utcnow() - start}")
+        print(f"- es indexing took {utcnow() - start}")
 
     return run_reindex

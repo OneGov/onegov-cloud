@@ -398,10 +398,10 @@ class SearchApp(morepath.App):
 
         self.es_indexer.bulk_process()
 
-    def psql_perform_reindex(self, session):
-        # TODO: remove session from method param?
+    def psql_perform_reindex(self):
+        """ Re-indexes all `searchable' models in postgresql db. """
         for model in searchable_sqlalchemy_models(Base):
-            model.reindex(session, self.schema, model)
+            model.reindex(self.session(), self.schema, model)
 
 
 @SearchApp.tween_factory(over=transaction_tween_factory)
