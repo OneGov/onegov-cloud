@@ -27,7 +27,6 @@ from onegov.page import Page, PageCollection
 from onegov.pay import PayApp
 from onegov.reservation import LibresIntegration
 from onegov.search import SearchApp
-# from onegov.search import PostgresqlSearchApp
 from onegov.ticket import TicketCollection
 from onegov.ticket import TicketPermission
 from onegov.user import UserApp
@@ -37,9 +36,6 @@ from purl import URL
 
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
-    # class OrgApp(Framework, LibresIntegration,
-    #              PostgresqlSearchApp, MapboxApp,
-    #              DepotApp, PayApp, FormApp, UserApp, WebsocketsApp):
 
     serve_static_files = True
     request_class = OrgRequest
