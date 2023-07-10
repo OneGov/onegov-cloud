@@ -1,8 +1,61 @@
 # Changes
 
+## 2023.31
+
+No changes since last release
+
+## 2023.30
+
+`2023-07-10` | [21ac88f973...ead6346d0e](https://github.com/OneGov/onegov-cloud/compare/21ac88f973^...ead6346d0e)
+
+### Core
+
+##### Adds a proper Sentry Integration
+
+Starts using `SentryWsgiMiddleware`, since this performs
+all the necessary book keeping for traces and profiles
+
+`Feature` | [OGC-1178](https://linear.app/onegovcloud/issue/OGC-1178) | [bf06050587](https://github.com/onegov/onegov-cloud/commit/bf060505870b25cbd6e9c7d2c767d144b32d3a8c)
+
+### Election Day
+
+##### Fixes deleting archived results from alternative sites.
+
+`Bugfix` | [OGC-1186](https://linear.app/onegovcloud/issue/OGC-1186) | [21ac88f973](https://github.com/onegov/onegov-cloud/commit/21ac88f97399f6632167e51a1e4b7644da1519d9)
+
+### Feriennet
+
+##### Fix Invoice Item Export
+
+`Bugfix` | [PRO-1201](https://linear.app/projuventute/issue/PRO-1201) | [78d50f5027](https://github.com/onegov/onegov-cloud/commit/78d50f50278fb7273eec910f9e165286c6468964)
+
+##### Prevent crash in case of invalid period id
+
+`Bugfix` | [PRO-1206](https://linear.app/projuventute/issue/PRO-1206) | [933eb26434](https://github.com/onegov/onegov-cloud/commit/933eb264341d2837a0afcfabba6fab3707da3355)
+
+### Fsi
+
+##### Hide login text on FSI page
+
+`Bugfix` | [b003a1c3ed](https://github.com/onegov/onegov-cloud/commit/b003a1c3ed6b2f5bd782aac6bb6b86261e5b3938)
+
+### Org
+
+##### Replace onegov footer links with admin.digital
+
+`Feature` | [ee6b956371](https://github.com/onegov/onegov-cloud/commit/ee6b9563713a324c9e6362afe786088c20d3f7e3)
+
+##### Fix side panel
+
+`Bugfix` | [9342f64527](https://github.com/onegov/onegov-cloud/commit/9342f645274ee4a28733e42ddd278c82919eb7c7)
+
+##### Make import more robust if the zip contains a directory.
+
+`Bugfix` | [OGC-1142](https://linear.app/onegovcloud/issue/OGC-1142) | [9b279f532d](https://github.com/onegov/onegov-cloud/commit/9b279f532d650e1703b411b48ecfdbf60bc44999)
+
 ## 2023.29
 
-`2023-06-29` | [509e80e963...27882bc78c](https://github.com/OneGov/onegov-cloud/compare/509e80e963^...27882bc78c)
+`2023-06-29` | [509e80e963...c4febf3e82](https://github.com/OneGov/onegov-cloud/compare/509e80e963^...c4febf3e82)
 
 ### Core
 
@@ -2781,34 +2834,4 @@ The search bar can now directly be used in the header
 ##### Excludes invisible allocations in find my spot search results
 
 `Bugfix` | [7f482cb1e0](https://github.com/onegov/onegov-cloud/commit/7f482cb1e09f84a510e85a6aad79c05aff6b27ee)
-
-## 2022.38
-
-`2022-07-13` | [489484c4d7...31f79338d8](https://github.com/OneGov/onegov-cloud/compare/489484c4d7^...31f79338d8)
-
-### Org
-
-##### Add find your spot to search across all rooms in a category
-
-`Feature` | [OGC-328](https://linear.app/onegovcloud/issue/OGC-328) | [87243827ad](https://github.com/onegov/onegov-cloud/commit/87243827ad0dcc655921580d0aa583742a098467)
-
-##### Fixes typo in translation
-
-`Bugfix` | [27b9816e79](https://github.com/onegov/onegov-cloud/commit/27b9816e79b512086c565200dfa94509b4676474)
-
-### Winterthur
-
-##### Fixes title not using translations.
-
-`Bugfix` | [OGC-447](https://linear.app/onegovcloud/issue/OGC-447) | [489484c4d7](https://github.com/onegov/onegov-cloud/commit/489484c4d7fd58f90348ba15314c758456f70b16)
-
-## 2022.37
-
-`2022-07-10` | [230fbfbab3...fd6a1c15cc](https://github.com/OneGov/onegov-cloud/compare/230fbfbab3^...fd6a1c15cc)
-
-### Winterthur
-
-##### Fixes shift schedule image path colliding with cached files.
-
-`Bugfix` | [OGC-447](https://linear.app/onegovcloud/issue/OGC-447) | [230fbfbab3](https://github.com/onegov/onegov-cloud/commit/230fbfbab3b96de35609edd9083e313547760892)
 
