@@ -7,7 +7,7 @@ from sqlalchemy.orm import object_session
 
 
 class CustomReservation(Reservation, ModelBase, Payable):
-    __mapper_args__ = {'polymorphic_identity': 'custom'}
+    __mapper_args__ = {'polymorphic_identity': 'custom'}  # type:ignore
 
     @property
     def resource_obj(self):
