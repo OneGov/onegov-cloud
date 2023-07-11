@@ -44,18 +44,17 @@ class InvoiceItemExport(FeriennetExport):
         q = q.join(Invoice).join(User)
         q = q.join(
             activities, InvoiceItem.text == activities.c.title, isouter=True
-        )
+        ).join(Attendee,
+               func.lower(InvoiceItem.group) == func.lower(Attendee.name),
+               isouter=True
+               )
         q = q.options(
             contains_eager(InvoiceItem.invoice)
             .contains_eager(Invoice.user)
             .undefer(User.data))
         q = q.filter(Invoice.period_id == period.id)
-        q = q.filter(User.username == Attendee.username)
-        q = q.filter(or_(
-            func.lower(InvoiceItem.group) == func.lower(Attendee.name),
-            InvoiceItem.group == 'donation',
-            InvoiceItem.group == 'manual'
-        ))
+        q = q.filter(or_(User.username == Attendee.username,
+                         Attendee.username.is_(None)))
         q = q.filter(User.id == Invoice.user_id)
         q = q.order_by(
             User.username,
