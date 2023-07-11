@@ -152,7 +152,7 @@ class NotificationTemplateLayout(DefaultLayout):
         if view_name != 'edit':
             links.append(
                 Link(
-                    _('Edit'),
+                    _('Add or edit additional Information'),
                     self.request.link(self.model, name='edit'),
                     attrs={'class': 'edit-link'}
                 )

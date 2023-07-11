@@ -879,3 +879,12 @@ def add__differing_attendee_address(context):
             'attendees',
             column=Column('political_municipality', Text, nullable=True)
         )
+
+
+@upgrade_task('Add invoice item organizer')
+def add_invoice_item_organizer(context):
+    if not context.has_column('invoice_items', 'organizer'):
+        context.operations.add_column(
+            'invoice_items',
+            column=Column('organizer', Text, nullable=True)
+        )

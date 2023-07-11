@@ -7,19 +7,25 @@
             <div class="columns small-12">
                 <div class="row">
                     <div tal:condition="show_form|True" class="columns small-12 medium-8">
-
                         <div class="filter-panel">
                             <div metal:use-macro="layout.macros['form']" />
-
-                            <h4 class="filter-title" i18n:translate>By last name</h4>
+                        </div>
+                        <div class="filter-panel">
+                            <p class="label-text" i18n:translate>By last name</p>
                             <div metal:use-macro="layout.macros['tags']" tal:define="tags letters" />
                         </div>
-
                     </div>
                     <div class="columns small-12 medium-4">
                         <div class="info-panel hide-for-print">
                             <tal:b metal:use-macro="layout.macros['color_code_snippet']" />
                         </div>
+                    </div>
+                </div>
+                <div class="row hide-for-print">
+                    <div class="columns small-12 medium-8">
+                        <a class="button ${'' if email_recipients else 'disabled'}" tal:attributes="href python: f'mailto:{email_recipients}?subject={subject}' if email_recipients else ''" ><i class="fa fa-envelope"></i> <tal:b  i18n:translate>Reminder mails</tal:b></a>
+                        <p tal:condition="email_recipients"  i18n:translate>Opens an empty message in your mail program with the course participants filtered visibly here, who have neither attended the course due nor are registered (next attendance).</p>
+                        <p tal:condition="not email_recipients"  i18n:translate>Select one or more organizations. If people in the filtered view have neither attended the due course nor are registered (next attendance), the button can be used to send a reminder email to them.</p>
                     </div>
                 </div>
             </div>
@@ -30,7 +36,7 @@
                 <div class="row">
                     <div class="columns small-12">
                         <tal:b condition="results">
-                            <table class="tablesaw hover fullwidth">
+                            <table class="hover fullwidth">
                                 <thead>
                                 <th class="text-left" i18n:translate="">Name</th>
                                 <th class="text-left" i18n:translate="">Shortcode</th>

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-03 09:17+0200\n"
+"POT-Creation-Date: 2023-06-28 07:23+0200\n"
 "PO-Revision-Date: 2022-03-22 08:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -68,8 +68,12 @@ msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
 #, python-format
-msgid "${name} is not part of this election"
-msgstr "${name} n'è betg ina part da questa elecziun"
+msgid "Not a valid eCH xml file: ${error}"
+msgstr ""
+
+#, python-format
+msgid "${name} is not part of this business"
+msgstr "${name} n'è betg ina part da questa fatschenta"
 
 #, python-format
 msgid "${name} is not part of ${district}"
@@ -232,6 +236,9 @@ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
+msgid "Vote type not supported"
+msgstr ""
+
 msgid "Term"
 msgstr "Noziun tschertgada"
 
@@ -272,23 +279,6 @@ msgstr "Plaun regiunal"
 msgid "Communal"
 msgstr "Plaun communal"
 
-msgid ""
-"The ID is used in the URL and might be used somewhere. Changing theID might "
-"break links on external sites!"
-msgstr ""
-"La ID vegn duvrada en la URL ed eventualmain er en auters lieus. Sche la ID "
-"vegn midada, èsi pussaivel ch'ils links a paginas externas na funcziunan "
-"betg pli!"
-
-msgid "ID"
-msgstr "ID"
-
-msgid "Invalid ID"
-msgstr "ID nunvalaivla"
-
-msgid "ID already exists"
-msgstr "La ID è gia avant maun"
-
 msgid "Name"
 msgstr "Denominaziun"
 
@@ -301,8 +291,28 @@ msgstr "I n'èn registradas anc naginas votaziuns."
 msgid "No elections yet."
 msgstr "I n'èn registradas anc naginas elecziuns."
 
+msgid "Identifier"
+msgstr "ID"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing the ID might "
+"break links on external sites!"
+msgstr ""
+"La ID vegn duvrada en la URL ed eventualmain er en auters lieus. Sche la ID "
+"vegn midada, èsi pussaivel ch'ils links a paginas externas na funcziunan "
+"betg pli!"
+
+msgid "External ID"
+msgstr ""
+
+msgid "Used for import if set."
+msgstr ""
+
 msgid "System"
 msgstr "Sistem"
+
+msgid "Properties"
+msgstr ""
 
 msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
@@ -331,9 +341,6 @@ msgstr "Vischnanca"
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
 
-msgid "View options"
-msgstr "Opziuns da visualisaziun"
-
 msgid "Expats are listed separately"
 msgstr "Las Svizras ed ils Svizzers a l'exteriur figureschan separadamain"
 
@@ -345,8 +352,23 @@ msgstr ""
 "ils resultats sco lingia separada. Sche questa opziun vegn midada, ston las "
 "datas vegnir importadas anc ina giada."
 
+msgid "Date"
+msgstr "Data"
+
+msgid "Shortcode"
+msgstr "Scursanida"
+
+msgid "Used for sorting."
+msgstr ""
+
+msgid "Mandates / Seats"
+msgstr "Mandats / Sezs"
+
 msgid "Voters counts"
 msgstr "Dumber d'electurs"
+
+msgid "View options"
+msgstr "Opziuns da visualisaziun"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
@@ -397,15 +419,6 @@ msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
 "Mussa ina carta da register cun datas panaschadas. Pretenda resultats da "
 "partidas."
-
-msgid "Date"
-msgstr "Data"
-
-msgid "Mandates / Seats"
-msgstr "Mandats / Sezs"
-
-msgid "Shortcode"
-msgstr "Scursanida"
 
 msgid "German"
 msgstr "Tudestg"
@@ -460,6 +473,12 @@ msgstr "Colurs"
 
 msgid "Invalid color definitions"
 msgstr "Definiziuns da colurs nunvalaivlas"
+
+msgid "Invalid ID"
+msgstr "ID nunvalaivla"
+
+msgid "ID already exists"
+msgstr "La ID è gia avant maun"
 
 msgid "Domain of the elections"
 msgstr "Plaun da las elecziuns"
@@ -632,8 +651,8 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Resultats da las partidas"
 
-msgid "Identifier"
-msgstr "ID"
+msgid "Delivery"
+msgstr ""
 
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
@@ -643,6 +662,12 @@ msgstr "Numer dal project"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "External ID of counter proposal"
+msgstr ""
+
+msgid "External ID of tie breaker"
+msgstr ""
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"
@@ -987,9 +1012,6 @@ msgstr "Mussar"
 msgid "Edit"
 msgstr "Modifitgar"
 
-msgid "Change ID"
-msgstr "Midar la ID"
-
 msgid "Upload results"
 msgstr "Chargiar si resultats"
 
@@ -1242,15 +1264,6 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
-msgid "Stack"
-msgstr "Mantunà"
-
-msgid "Toggle"
-msgstr "Selecziun"
-
-msgid "Columns"
-msgstr "Colonnas"
-
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
@@ -1396,6 +1409,10 @@ msgstr "Activar"
 msgid "This will trigger the following notifications:"
 msgstr "Las suandantas communicaziuns vegnan activadas:"
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
+
 msgid "Email: One email containing all the results. The subject will be"
 msgstr "E-mail: in e-mail cun tut ils resultats. L'object sa cloma"
 
@@ -1413,10 +1430,6 @@ msgstr "Ultimas infurmaziuns:"
 
 msgid "No notifications yet."
 msgstr "Anc naginas communicaziuns."
-
-msgid "Browser: A notice in browsers which have opened any affected pages."
-msgstr ""
-"Browser: Einen Hinweis in Browsern, welche betroffene Seiten geöffnet haben."
 
 msgid ""
 "Email: One email containing all the results of the selected elections and "

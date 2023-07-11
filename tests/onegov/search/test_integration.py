@@ -148,6 +148,13 @@ def test_search_query(es_url, postgres_dsn):
     assert document.title == "Öffentlich"
     assert document.public
 
+    ##################
+    # postgresql tests
+    app.psql_perform_reindex()
+
+    # results = app.psql_search('')
+    # assert results
+
 
 def test_orm_integration(es_url, postgres_dsn, redis_url):
 

@@ -22,17 +22,26 @@ from .core import log, MailQueueProcessor
 
 class SMTPMailQueueProcessor(MailQueueProcessor):
 
-    def __init__(self, mailer, *paths, limit=None):
+    def __init__(
+        self,
+        mailer: smtplib.SMTP,
+        *paths: str,
+        limit: int | None = None
+    ):
         super().__init__(*paths, limit=limit)
         self.mailer = mailer
 
-    def parse_payload(self, filename, payload):
+    def parse_payload(
+        self,
+        filename: str,
+        payload: str
+    ) -> list[EmailMessage]:
         try:
             items = json.loads(payload)
             if not isinstance(items, list):
                 raise ValueError('Invalid JSON payload')
 
-            messages = []
+            messages: list[EmailMessage] = []
             for item in items:
                 message = EmailMessage(policy=SMTP)
                 message['from'] = item['From']
@@ -80,7 +89,7 @@ class SMTPMailQueueProcessor(MailQueueProcessor):
             log.error(f'Discarding batch {filename} with invalid JSON payload')
             return []
 
-    def send(self, filename, payload):
+    def send(self, filename: str, payload: str) -> bool:
         """ Sends the mail and returns success as bool """
         messages = self.parse_payload(filename, payload)
         success = len(messages) > 0

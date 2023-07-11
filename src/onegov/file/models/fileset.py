@@ -9,7 +9,6 @@ from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
-
 from ...search import Searchable
 
 if TYPE_CHECKING:

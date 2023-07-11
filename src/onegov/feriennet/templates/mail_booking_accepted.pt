@@ -14,7 +14,7 @@
             <tal:b tal:content="structure bookings_link"></tal:b>
         </p>
         <br>
-        <p i18n:translate>Best regards</p>                    
+        <p i18n:translate>Best regards</p>
         <metal:b use-macro="layout.macros['sender']|nothing" />
     </tal:b>
 </div>

@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-<html class="no-js" lang="${request.html_lang}"
-xmlns="http://www.w3.org/1999/xhtml"
-xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-xmlns:metal="http://xml.zope.org/namespaces/metal"
-xmlns:tal="http://xml.zope.org/namespaces/tal"
-i18n:domain="onegov.gazette"
-metal:define-macro="layout">
+<html
+    class="no-js"
+    lang="${request.html_lang}"
+    tal:attributes="layout.custom_html_attributes|{}"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    i18n:domain="onegov.gazette"
+    metal:define-macro="layout">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,16 +29,10 @@ metal:define-macro="layout">
     -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
-    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
-    <script tal:condition="layout.app.sentry_dsn">
-        Sentry.init({
-            dsn: '${layout.app.sentry_dsn}',
-            release: '${layout.app.sentry_version}',
-            environment: '${layout.app.sentry_environment}',
-        });
-    </script>
+    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
+    <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
 </head>
-<body>
+<body tal:attributes="layout.custom_body_attributes|{}">
     <div class="row header">
         <div class="small-12 medium-6 columns small-only-text-center">
             <div metal:define-slot="logo">

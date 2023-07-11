@@ -22,13 +22,17 @@ class MockRequest:
     locale = 'en'
     is_logged_in = False
     is_manager = False
-    app = Bunch(org=Bunch(
-        geo_provider='geo-mapbox',
-        open_files_target_blank=True,
-        chat_type=None,
-        disable_chat=None,
-        chat_customer_id=None
-    ))
+    app = Bunch(
+        org=Bunch(
+            geo_provider='geo-mapbox',
+            open_files_target_blank=True,
+            chat_type=None,
+            disable_chat=None,
+            chat_customer_id=None
+        ),
+        version='1.0',
+        sentry_dsn=None
+    )
 
     def include(self, *args, **kwargs):
         pass

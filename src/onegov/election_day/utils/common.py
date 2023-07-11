@@ -3,6 +3,8 @@ from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 from onegov.election_day import _
 from sqlalchemy import desc
+from urllib.parse import urlsplit
+from urllib.parse import urlunsplit
 
 
 def sublist_name_from_connection_id(conn_name, subconn_name):
@@ -152,3 +154,15 @@ def get_entity_filter(request, item, view, selected):
     ))
     result.insert(0, (_('All'), not selected, request.link(item, view)))
     return result
+
+
+def replace_url(url, start):
+    if not start:
+        return url
+
+    parts = list(urlsplit(url))
+    for index, part in enumerate(urlsplit(start)):
+        if part:
+            parts[index] = part
+
+    return urlunsplit(parts)

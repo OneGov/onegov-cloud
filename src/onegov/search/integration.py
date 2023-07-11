@@ -403,6 +403,10 @@ class SearchApp(morepath.App):
         for model in searchable_sqlalchemy_models(Base):
             model.reindex(self.session(), self.schema, model)
 
+    def psql_search(self, query=''):
+        from onegov.org.models import SearchPostgres
+        return SearchPostgres(self.request(), query).generic_search()
+
 
 @SearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(app, handler):

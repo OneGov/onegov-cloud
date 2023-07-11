@@ -19,7 +19,7 @@ from onegov.election_day.utils import add_last_modified_header
 )
 def view_screen(self, request):
 
-    """ Shows a screen """
+    """ Shows a screen. """
 
     @request.after
     def add_headers(response):
@@ -39,6 +39,13 @@ def view_screen(self, request):
 
     template = PageTemplate(transform_structure(widgets, self.structure))
 
+    request.include('screen')
+
+    if self.next:
+        layout.custom_body_attributes['data-next'] = request.link(self.next)
+        layout.custom_body_attributes['data-duration'] = \
+            (self.duration or 20) * 1000
+
     default = {
         'layout': layout,
         'template': template,
@@ -55,7 +62,7 @@ def view_screen(self, request):
 )
 def view_screen_head(self, request):
 
-    """ Shows a screen """
+    """ Get the last modification date. """
 
     @request.after
     def add_headers(response):

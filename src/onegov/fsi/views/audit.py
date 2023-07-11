@@ -6,9 +6,8 @@ from onegov.fsi import FsiApp
 from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.forms.audit import AuditForm
 from onegov.fsi.layouts.audit import AuditLayout
-from onegov.fsi.models import CourseAttendee
-from onegov.fsi.models import CourseEvent
 from onegov.fsi.pdf import FsiPdf
+from onegov.fsi.models import CourseAttendee
 from sedate import utcnow
 from webob import Response
 
@@ -67,19 +66,20 @@ def invite_attendees_for_event(self, request, form):
         ) for letter in self.used_letters
     )
 
-    # would be better include this in the audit collection
-    next_subscriptions = {}
-    if self.course_id:
-        query = request.session.query(CourseEvent)
-        query = query.filter(CourseEvent.course_id == self.course_id)
-        query = query.filter(CourseEvent.start >= utcnow())
-        query = query.order_by(CourseEvent.start)
-        for event in query:
-            for attendee in event.attendees.with_entities(CourseAttendee.id):
-                next_subscriptions.setdefault(
-                    attendee[0],
-                    (request.link(event), event.start)
-                )
+    next_subscriptions = self.next_subscriptions(request)
+
+    recipients = self.cached_subset if self.course_id else []
+    recipients = [r.id for r in recipients if not (
+        next_subscriptions.get(r.id, False) or r.event_completed)]
+
+    all_attendees = self.session.query(CourseAttendee).filter(
+        CourseAttendee.id.in_(recipients)
+    ).all()
+
+    email_recipients = ('; '.join([a.email for a in all_attendees])
+                        if len(all_attendees) < 100 else False)
+
+    subject = request.translate(_('Reminder due course registration'))
 
     return {
         'layout': layout,
@@ -89,6 +89,8 @@ def invite_attendees_for_event(self, request, form):
         'button_text': _('Update'),
         'now': now,
         'letters': letters,
+        'email_recipients': email_recipients,
+        'subject': subject,
         'next_subscriptions': next_subscriptions
     }
 

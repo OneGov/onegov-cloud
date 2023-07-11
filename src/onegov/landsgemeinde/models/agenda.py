@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -19,6 +17,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -92,6 +91,20 @@ class AgendaItem(
     #: The resolution (tags) of the agenda item
     resolution_tags = content_property()
 
+    #: The video timestamp of this agenda item
+    video_timestamp = content_property()
+
+    #: Start of the agenda item (localized to Europe/Zurich)
+    start = Column(Time, nullable=True)
+
+    #: An agenda item contains n vota
+    vota = relationship(
+        Votum,
+        cascade='all, delete-orphan',
+        backref=backref('agenda_item'),
+        order_by='Votum.number',
+    )
+
     fts_idx = Column(TSVECTOR, Computed('', persisted=True))
 
     __table_args__ = (
@@ -121,14 +134,8 @@ class AgendaItem(
         lines = [line for line in lines if line]
         return lines
 
-    #: Start of the agenda item (localized to Europe/Zurich)
-    start = Column(Time, nullable=True)
-
-    #: An agenda item contains n vota
-    vota = relationship(
-        Votum,
-        cascade='all, delete-orphan',
-        backref=backref('agenda_item'),
-        lazy='dynamic',
-        order_by='Votum.number',
-    )
+    @property
+    def video_url(self):
+        video_url = self.assembly.video_url
+        if video_url:
+            return f'{video_url}#t={self.video_timestamp}'

@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -16,6 +14,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from uuid import uuid4
 
 
@@ -86,6 +85,9 @@ class Votum(
     #: A picture of the person
     person_picture = NamedFile()
 
+    #: The video timestamp of this agenda item
+    video_timestamp = content_property()
+
     #: the agenda this votum belongs to
     agenda_item_id = Column(
         UUID,
@@ -125,3 +127,9 @@ class Votum(
     @property
     def agenda_item_number(self):
         return self.agenda_item.number
+
+    @property
+    def video_url(self):
+        video_url = self.agenda_item.assembly.video_url
+        if video_url:
+            return f'{video_url}#t={self.video_timestamp}'

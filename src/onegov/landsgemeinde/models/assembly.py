@@ -1,9 +1,9 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
@@ -17,6 +17,7 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -91,9 +92,10 @@ class Assembly(
         AgendaItem,
         cascade='all, delete-orphan',
         backref=backref('assembly'),
-        lazy='dynamic',
         order_by='AgendaItem.number',
     )
+
+    last_modified = Column(UTCDateTime)
 
     fts_idx = Column(TSVECTOR, Computed('', persisted=True))
 
@@ -107,3 +109,6 @@ class Assembly(
         index is built on the json field overview in content column
         """
         return "coalesce(((content ->> 'overview')), '')"
+
+    def stamp(self):
+        self.last_modified = self.timestamp()

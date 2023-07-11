@@ -8,7 +8,7 @@ from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.core.custom import json
-from onegov.core.utils import Bunch, rchop, is_subpath
+from onegov.core.utils import Bunch, is_subpath
 from onegov.directory.errors import MissingColumnError, MissingFileError
 from onegov.directory.models import Directory, DirectoryEntry
 from onegov.directory.types import DirectoryConfiguration
@@ -475,7 +475,7 @@ class DirectoryZipArchive:
 
     def compress(self):
         # make_archive expects a path without extension
-        output_file = rchop(str(self.path), '.' + self.format)
+        output_file = str(self.path).removesuffix('.' + self.format)
         shutil.make_archive(output_file, self.format, str(self.archive.path))
 
     def extract(self):
@@ -483,3 +483,16 @@ class DirectoryZipArchive:
             filename=str(self.path),
             extract_dir=str(self.archive.path),
             format=self.format)
+
+        top_level_dir = next(
+            (
+                entry.path
+                for entry in os.scandir(self.archive.path)
+                if entry.is_dir() and 'metadata.json' in os.listdir(entry.path)
+            ), None,
+        )
+        if top_level_dir:
+            # flatten structure by moving all files to the top level
+            shutil.copytree(top_level_dir, str(self.archive.path),
+                            dirs_exist_ok=True)
+            shutil.rmtree(top_level_dir)

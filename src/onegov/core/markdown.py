@@ -4,21 +4,29 @@ from mistletoe import Document, HTMLRenderer
 from onegov.core.html import sanitize_html
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from mistletoe.span_token import HTMLBlock, HTMLSpan
+
+
 RENDERER_INSTANCES = {}
 
 
 class HTMLRendererWithoutInlineHtml(HTMLRenderer):
 
     @staticmethod
-    def render_html_block(token):
+    def render_html_block(token: 'HTMLBlock') -> str:
         return html.escape(token.content)
 
     @staticmethod
-    def render_html_span(token):
+    def render_html_span(token: 'HTMLSpan') -> str:
         return html.escape(token.content)
 
 
-def render_untrusted_markdown(markdown, cls=HTMLRendererWithoutInlineHtml):
+def render_untrusted_markdown(
+    markdown: str,
+    cls: type[HTMLRenderer] = HTMLRendererWithoutInlineHtml
+) -> str:
 
     # use a global renderer instance, but only create it if used
     if cls not in RENDERER_INSTANCES:

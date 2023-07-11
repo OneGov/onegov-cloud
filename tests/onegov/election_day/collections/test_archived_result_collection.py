@@ -1,4 +1,5 @@
 from datetime import date
+from freezegun import freeze_time
 from onegov.ballot.models import Ballot
 from onegov.ballot.models import BallotResult
 from onegov.ballot.models import Election
@@ -19,7 +20,7 @@ def test_archived_result_collection(session):
     assert archive.for_date('2015-01-01').date == '2015-01-01'
 
     assert archive.get_years() == []
-    assert archive.latest() == ([], None)
+    assert archive.current() == ([], None)
     assert archive.for_date(2015).by_date() == ([], None)
     assert archive.for_date('2015').by_date() == ([], None)
     assert archive.for_date('2015-01-01').by_date() == ([], None)
@@ -59,8 +60,15 @@ def test_archived_result_collection(session):
         2016, 2015, 2014, 2012, 2011, 2009, 2008, 2007
     ]
 
-    for date_ in (2016, '2016', '2016-01-01'):
-        assert archive.latest() == archive.for_date(date_).by_date()
+    with freeze_time('2006-08-31'):
+        assert archive.current() == archive.for_date(2007).by_date()
+    with freeze_time('2007-01-01'):
+        assert archive.current() == archive.for_date(2007).by_date()
+    with freeze_time('2007-01-02'):
+        assert archive.current() == archive.for_date(2008).by_date()
+    with freeze_time('2016-08-31'):
+        for date_ in (2016, '2016', '2016-01-01'):
+            assert archive.current() == archive.for_date(date_).by_date()
 
     assert archive.for_date('2016-02-02').by_date() == ([], None)
 
@@ -441,3 +449,9 @@ def test_archived_result_collection_updates(session):
     assert old not in [r.url for r in archive.query()]
 
     assert archive.query().count() == 6
+
+    # Test update with official host
+    request.link = lambda x: 'http://wab-test.testing.ch/vote/2001'
+    request.app.principal.official_host = 'https://wab.govikon.ch'
+    result = archive.update(votes[2001], request)
+    assert result.url == 'https://wab.govikon.ch/vote/2001'

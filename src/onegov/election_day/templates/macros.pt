@@ -41,10 +41,10 @@
         <div class="small-12 columns">
             <form tal:define="id name.lower()">
                 <label for="filter-${id}">${name}</label>
-                <select id="filter-${id}" name="filter-${id}" onchange="this.options[this.selectedIndex].onclick()">
+                <select id="filter-${id}" name="filter-${id}" class="redirect-dropdown">
                     <tal:block tal:repeat="(name, active, link) options">
                         <option tal:condition="active" selected>${name}</option>
-                        <option tal:condition="not active" onclick="location.href='${link}'">${name}</option>
+                        <option tal:condition="not active" data-redirect="${link}">${name}</option>
                     </tal:block>
                 </select>
             </form>
@@ -61,9 +61,6 @@
                 </li>
                 <li>
                     <a i18n:translate="" class="action-edit" href="${request.link(election, 'edit')}">Edit</a>
-                </li>
-                <li>
-                    <a i18n:translate="" class="action-change-id" href="${request.link(election, 'change-id')}">Change ID</a>
                 </li>
                 <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload results</a>
@@ -99,9 +96,6 @@
                     <a i18n:translate="" class="action-edit" href="${request.link(compound, 'edit')}">Edit</a>
                 </li>
                 <li>
-                    <a i18n:translate="" class="action-change-id" href="${request.link(compound, 'change-id')}">Change ID</a>
-                </li>
-                <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(compound, 'upload')}">Upload results</a>
                 </li>
                 <li>
@@ -133,9 +127,6 @@
                 </li>
                 <li>
                     <a i18n:translate="" class="action-edit" href="${request.link(vote, 'edit')}">Edit</a>
-                </li>
-                <li>
-                    <a i18n:translate="" class="action-change-id" href="${request.link(vote, 'change-id')}">Change ID</a>
                 </li>
                 <li>
                     <a i18n:translate="" class="action-upload" href="${request.link(vote, 'upload')}">Upload results</a>
@@ -1050,7 +1041,6 @@
 </metal:parties-panachage-chart i18n:domain="onegov.election_day">
 
 <metal:embedded_widget define-macro="embedded_widget" i18n:domain="onegov.election_day">
-    <!-- todo: -->
     <div tal:condition="embed_link" class="embedded-widget"
         data-embed-link="Embed table"
         data-embed-source="${embed_link}"
@@ -1131,7 +1121,7 @@
                             <metal:b use-macro="layout.macros['field']" />
                         </div>
 
-                        <p><small id="${field.name}-error" class="error" tal:repeat="error field.errors">${error}</small></p>
+                        <p tal:condition="field.errors"><small id="${field.name}-error" class="error" tal:repeat="error field.errors">${error}</small></p>
                     </tal:block>
                </tal:block>
             </div>
@@ -1144,7 +1134,7 @@
     <tal:block condition="field.type == 'BooleanField'">
         ${field(placeholder=request.translate(field.description))}
         <span class="label-text">${field.label.text}</span>
-        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
+        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}">?</span>
         <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
     </tal:block>
     <tal:block condition="field.type != 'BooleanField'">
@@ -1157,10 +1147,9 @@
             See onegov.core.i18n.get_translation_bound_meta.render_field
         -->
         <tal:b define="(description, is_md) form.as_maybe_markdown(form.request.translate(field.description or '')); long_description form.additional_field_help(field); content field(placeholder=description if not long_description else '')">
-            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
+            <span class="label-text" tal:condition="(not field.hide_label)|(not field.render_kw['hide_label'])|True">${field.label.text}</span>
             <tal:b tal:condition="long_description">
-                <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
-                <span class="visually-hidden">${field.description}</span>
+                <span data-tooltip aria-haspopup="true" class="has-tip" title="${long_description}">?</span>
             </tal:b>
             <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
 
@@ -1452,6 +1441,7 @@
         <ol>
             <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
             <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
+            <li tal:condition="layout.type in ('simple', 'complex')"><a href="${request.link(model, 'data-xml')}">XML</a></li>
         </ol>
 
         <h5 tal:condition="has_party_results" i18n:translate="">Party results</h5>
@@ -1500,19 +1490,6 @@
         </li>
     </ul>
 </metal:file_import_errors>
-
-<metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.election_day">
-    <script>
-        TablesawConfig = {
-            i18n: {
-                modeStack: '<tal:block i18n:translate>Stack</tal:block>',
-                modeToggle: '<tal:block i18n:translate>Toggle</tal:block>',
-                modeSwitchColumns: '<tal:block i18n:translate>Columns</tal:block>',
-                modeSwitchColumnsAbbreviated: '<tal:block i18n:translate>Columns</tal:block>',
-            }
-        };
-    </script>
-</metal:tablesaw_translations>
 
 <metal:seat_allocation_figure define-macro="seat_allocation_figure" i18n:domain="onegov.election_day">
     <figure>

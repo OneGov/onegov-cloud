@@ -90,7 +90,10 @@
                                                         <tal:b i18n:translate>Donation</tal:b> ❤
                                                     </tal:b>
                                                     <tal:b condition="item.group != 'donation'">
-                                                        ${item.text}
+                                                        ${item.text}<br>
+                                                        <span class="item-organizer" tal:condition="item.organizer">
+                                                            <tal:b i18n:translate>Organizer:</tal:b> ${item.organizer}
+                                                        </span>
                                                     </tal:b>
                                                 </td>
                                                 <td class="amount">${'{:.2f}'.format(item.amount)}</td>

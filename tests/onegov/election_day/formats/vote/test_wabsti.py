@@ -493,3 +493,76 @@ def test_import_wabsti_vote_temporary_results(session):
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
     ) == [1702, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+
+
+def test_import_wabsti_vote_regional(session):
+
+    def create_csv(results):
+        lines = []
+        lines.append((
+            'Vorlage-Nr.',
+            'BfS-Nr.',
+            'Stimmberechtigte',
+            'leere SZ',
+            'ungültige SZ',
+            'Ja',
+            'Nein',
+            'InitOAntw',
+            'GegenvJa',
+            'GegenvNein',
+            'GegenvOAntw',
+            'StichfrJa',
+            'StichfrNein',
+            'StichfrOAntw',
+            'StimmBet',
+        ))
+        for entity_id in results:
+            lines.append((
+                '0',  # Vorlage-Nr.',
+                str(entity_id),  # BfS-Nr.',
+                '100',  # Stimmberechtigte',
+                '1',  # leere SZ',
+                '1',  # ungültige SZ',
+                '20',  # Ja',
+                '10',  # Nein',
+                '0',  # InitOAntw',
+                '0',  # GegenvJa',
+                '0',  # GegenvNein',
+                '0',  # GegenvOAntw',
+                '0',  # StichfrJa',
+                '0',  # StichfrNein',
+                '0',  # StichfrOAntw',
+                '10.0',  # StimmBet',
+            ))
+
+        return BytesIO(
+            '\n'.join(
+                (','.join(column for column in line)) for line in lines
+            ).encode('utf-8')
+        ), 'text/plain'
+
+    session.add(
+        Vote(title='vote', domain='municipality', date=date(2017, 2, 12))
+    )
+    session.flush()
+    vote = session.query(Vote).one()
+
+    # ZG, municipality, too many municipalitites
+    principal = Canton(canton='zg')
+    vote.domain = 'municipality'
+    vote.domain_segment = 'Baar'
+    errors = import_vote_wabsti(
+        vote, principal, 0,
+        *create_csv((1701, 1702))
+    )
+    assert [(e.error.interpolate()) for e in errors] == [
+        '1702 is not part of this business'
+    ]
+
+    # ZG, municipality, ok
+    errors = import_vote_wabsti(
+        vote, principal, 0,
+        *create_csv((1701,))
+    )
+    assert not errors
+    assert vote.progress == (1, 1)

@@ -22,6 +22,7 @@ class IdentityPolicy:
                 key: request.browser_session[key] for key in self.required_keys
             }
         except KeyError:
+            # FIXME: According to docs this should return NO_IDENTITY
             return None
         else:
             return Identity(**identifiers)

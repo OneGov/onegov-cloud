@@ -47,6 +47,11 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def has_districts(self):
+        if (
+            self.principal.domain == 'canton'
+            and getattr(self.model, 'domain', None) == 'municipality'
+        ):
+            return False
         return self.principal.has_districts
 
     @cached_property
@@ -92,6 +97,13 @@ class DefaultLayout(ChameleonLayout):
         static_file = StaticFile.from_application(
             self.app, 'font-awesome/css/font-awesome.min.css')
 
+        return self.request.link(static_file)
+
+    @cached_property
+    def sentry_init_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'sentry/js/sentry-init.js'
+        )
         return self.request.link(static_file)
 
     def get_topojson_link(self, id, year):

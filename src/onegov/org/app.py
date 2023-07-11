@@ -330,11 +330,11 @@ def org_content_security_policy():
     policy.child_src.add(SELF)
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
+    policy.child_src.add('https://*.infomaniak.com')
     policy.child_src.add('https://checkout.stripe.com')
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
-    policy.connect_src.add('https://sentry.io')
     policy.connect_src.add('https://*.google-analytics.com')
     policy.connect_src.add('https://stats.g.doubleclick.net')
     policy.connect_src.add('https://map.geo.bs.ch')

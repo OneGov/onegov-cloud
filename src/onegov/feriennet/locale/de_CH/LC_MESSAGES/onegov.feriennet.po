@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-24 08:43+0200\n"
+"POT-Creation-Date: 2023-06-12 14:30+0200\n"
 "PO-Revision-Date: 2021-11-11 09:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1708,6 +1708,9 @@ msgstr "Aktionen"
 
 msgid "Discounts / Surcharges"
 msgstr "Abzüge / Zuschläge"
+
+msgid "Organizer:"
+msgstr "Veranstalter:"
 
 msgid "Unpaid"
 msgstr "Unbezahlt"

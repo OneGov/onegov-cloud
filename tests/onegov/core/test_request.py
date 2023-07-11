@@ -115,7 +115,7 @@ def test_return_to(redis_url):
     assert c.get('/do-something').location == 'http://localhost/default'
 
 
-def test_link_with_query_parameters(redis_url):
+def test_link_with_query_parameters_and_fragement(redis_url):
 
     class App(Framework):
         pass
@@ -132,9 +132,13 @@ def test_link_with_query_parameters(redis_url):
             request.link(self),
             request.link(self, query_params={'a': '1'}),
             request.link(self, query_params={'a': '1', 'b': 2}),
+            request.link(self, fragment='main'),
+            request.link(self, query_params={'a': '1'}, fragment='main'),
             request.link(foo),
             request.link(foo, query_params={'a': '1'}),
             request.link(foo, query_params={'a': '1', 'b': 2}),
+            request.link(foo, fragment='main'),
+            request.link(foo, query_params={'a': '1'}, fragment='main'),
         ))
 
     @App.view(model=Root, name='foo')
@@ -152,9 +156,13 @@ def test_link_with_query_parameters(redis_url):
         'http://localhost/\n'
         'http://localhost/?a=1\n'
         'http://localhost/?a=1&b=2\n'
+        'http://localhost/#main\n'
+        'http://localhost/?a=1#main\n'
         'http://localhost/?foo=bar\n'
         'http://localhost/?foo=bar&a=1\n'
-        'http://localhost/?foo=bar&a=1&b=2'
+        'http://localhost/?foo=bar&a=1&b=2\n'
+        'http://localhost/?foo=bar#main\n'
+        'http://localhost/?foo=bar&a=1#main'
     )
 
 

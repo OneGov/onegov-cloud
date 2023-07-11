@@ -9,26 +9,26 @@ Les formats de fichier acceptés sont les fichiers générés à la main par le 
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Contenu](#Contenu)   
-- 2. [Avant-propos](#Avant-propos)   
-   - 2.1. [Entités](#Entites)   
-- 3. [Formats](#Formats)   
-   - 3.1. [Format standard](#Format-standard)   
-      - 3.1.1. [Colonnes](#Colonnes)   
-      - 3.1.2. [Résultats temporaires](#Resultats-temporaires)   
-      - 3.1.3. [Modèle](#Modele)   
-   - 3.2. [OneGov](#OneGov)   
-      - 3.2.1. [Colonnes](#Colonnes-1)   
-      - 3.2.2. [Résultats temporaires](#Resultats-temporaires-1)   
-      - 3.2.3. [Modèle](#Modele-1)   
-   - 3.3. [Wabsti](#Wabsti)   
-      - 3.3.1. [Colonnes](#Colonnes-2)   
-      - 3.3.2. [Résultats temporaires](#Resultats-temporaires-2)   
-      - 3.3.3. [Modèle](#Modele-2)   
-   - 3.4. [WabstiCExport](#WabstiCExport)   
+- 1. [Contenu](#contenu)
+- 2. [Avant-propos](#avant-propos)
+   - 2.1. [Entités](#entités)
+- 3. [Formats](#formats)
+   - 3.1. [Format standard](#format-standard)
+      - 3.1.1. [Colonnes](#colonnes)
+      - 3.1.2. [Résultats temporaires](#résultats-temporaires)
+      - 3.1.3. [Modèle](#modèle)
+   - 3.2. [OneGov](#onegov)
+      - 3.2.1. [Colonnes](#colonnes)
+      - 3.2.2. [Résultats temporaires](#résultats-temporaires)
+      - 3.2.3. [Modèle](#modèle)
+   - 3.3. [Wabsti](#wabsti)
+      - 3.3.1. [Colonnes](#colonnes)
+      - 3.3.2. [Résultats temporaires](#résultats-temporaires)
+      - 3.3.3. [Modèle](#modèle)
+   - 3.4. [WabstiCExport](#wabsticexport)
+   - 3.5. [eCH-0252](#ech-0252)
 
 <!-- /MDTOC -->
-
 
 ## Avant-propos
 
@@ -138,3 +138,8 @@ Les municipalités sont considérées comme n'étant pas encore décomptées si 
 ### WabstiCExport
 
 La version `>= 2.2` est prise en charge, veuillez vous référer à la documentation fournie par le programme exportateur pour plus d'informations concernant les colonnes des différents fichiers.
+
+
+### eCH-0252
+
+Voir [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

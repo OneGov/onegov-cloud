@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-03 09:17+0200\n"
+"POT-Creation-Date: 2023-06-28 07:23+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -67,8 +67,12 @@ msgid "The file contains an empty line."
 msgstr "Le fichier contient une ligne vide."
 
 #, python-format
-msgid "${name} is not part of this election"
-msgstr "${name} ne fait pas partie de cette élection"
+msgid "Not a valid eCH xml file: ${error}"
+msgstr "Fichier xml eCH non valide : ${error}"
+
+#, python-format
+msgid "${name} is not part of this business"
+msgstr "${name} ne fait pas partie de cet objet"
 
 #, python-format
 msgid "${name} is not part of ${district}"
@@ -231,6 +235,9 @@ msgstr "Impossible de connaître les votes blancs"
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
 
+msgid "Vote type not supported"
+msgstr "Type de vote non pris en charge"
+
 msgid "Term"
 msgstr "Terme de recherche"
 
@@ -271,22 +278,6 @@ msgstr "Régional"
 msgid "Communal"
 msgstr "Municipal"
 
-msgid ""
-"The ID is used in the URL and might be used somewhere. Changing theID might "
-"break links on external sites!"
-msgstr ""
-"L'ID est utilisé dans l'URL et peut être utilisé ailleurs. En changeant "
-"l'ID, vous risquez de briser des liens sur des sites externes !"
-
-msgid "ID"
-msgstr "ID"
-
-msgid "Invalid ID"
-msgstr "ID non valide"
-
-msgid "ID already exists"
-msgstr "L'ID existe déjà"
-
 msgid "Name"
 msgstr "Nom"
 
@@ -299,8 +290,27 @@ msgstr "Pas de votations actuellement."
 msgid "No elections yet."
 msgstr "Pas de elections actuellement."
 
+msgid "Identifier"
+msgstr "Identifiant"
+
+msgid ""
+"The ID is used in the URL and might be used somewhere. Changing the ID might "
+"break links on external sites!"
+msgstr ""
+"L'ID est utilisé dans l'URL et peut être utilisé ailleurs. En changeant "
+"l'ID, vous risquez de briser des liens sur des sites externes !"
+
+msgid "External ID"
+msgstr "ID externe"
+
+msgid "Used for import if set."
+msgstr "Utilisé pour l'importation s'il est défini."
+
 msgid "System"
 msgstr "Système"
+
+msgid "Properties"
+msgstr "Propriétés"
 
 msgid "Election based on the simple majority system"
 msgstr "Election selon le système majoritaire"
@@ -329,9 +339,6 @@ msgstr "Commune"
 msgid "Tacit election"
 msgstr "Élection tacite"
 
-msgid "View options"
-msgstr "Options d'affichage"
-
 msgid "Expats are listed separately"
 msgstr "Les Suisses de l'étranger sont spécifiés séparément"
 
@@ -343,8 +350,23 @@ msgstr ""
 "distincte dans les résultats. La modification de cette option nécessite un "
 "nouveau téléchargement des données."
 
+msgid "Date"
+msgstr "Date"
+
+msgid "Shortcode"
+msgstr "Shortcode"
+
+msgid "Used for sorting."
+msgstr "Utilisé pour le tri."
+
+msgid "Mandates / Seats"
+msgstr "Mandats / Sièges"
+
 msgid "Voters counts"
 msgstr "Nombres de votants"
+
+msgid "View options"
+msgstr "Options d'affichage"
 
 msgid "Shows voters counts instead of votes in the party strengths view."
 msgstr ""
@@ -396,15 +418,6 @@ msgstr "Panachage (partis)"
 msgid "Shows a tab with the panachage. Requires party results."
 msgstr ""
 "Affiche un onglet avec le panachage. Requiert les résultats des parties."
-
-msgid "Date"
-msgstr "Date"
-
-msgid "Mandates / Seats"
-msgstr "Mandats / Sièges"
-
-msgid "Shortcode"
-msgstr "Shortcode"
 
 msgid "German"
 msgstr "Allemand"
@@ -459,6 +472,12 @@ msgstr "Couleurs"
 
 msgid "Invalid color definitions"
 msgstr "Définitions de couleurs non valides"
+
+msgid "Invalid ID"
+msgstr "ID non valide"
+
+msgid "ID already exists"
+msgstr "L'ID existe déjà"
 
 msgid "Domain of the elections"
 msgstr "Echelon des élections"
@@ -630,8 +649,8 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Résultats des partis"
 
-msgid "Identifier"
-msgstr "Identifiant"
+msgid "Delivery"
+msgstr "Livraison"
 
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
@@ -641,6 +660,12 @@ msgstr "Numéro de votation"
 
 msgid "Default"
 msgstr "Défaut"
+
+msgid "External ID of counter proposal"
+msgstr "ID externe du contre-projet"
+
+msgid "External ID of tie breaker"
+msgstr "ID externe du jeu décisif"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"
@@ -984,9 +1009,6 @@ msgstr "Voir"
 msgid "Edit"
 msgstr "Editer"
 
-msgid "Change ID"
-msgstr "Modifier l'ID"
-
 msgid "Upload results"
 msgstr "Mettre à jour les résultats"
 
@@ -1238,15 +1260,6 @@ msgstr "Vos résultats n'ont pas pu être mis à jour."
 msgid "Line"
 msgstr "Ligne"
 
-msgid "Stack"
-msgstr "Pile"
-
-msgid "Toggle"
-msgstr "Levier"
-
-msgid "Columns"
-msgstr "Colonnes"
-
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
@@ -1394,6 +1407,11 @@ msgstr "Activez"
 msgid "This will trigger the following notifications:"
 msgstr "Cela déclenchera les notifications suivantes :"
 
+msgid "Browser: A notice in browsers which have opened any affected pages."
+msgstr ""
+"Browser : Zne indication dans les navigateurs des pages concernées qui ont "
+"été ouvertes."
+
 msgid "Email: One email containing all the results. The subject will be"
 msgstr "Courriel : Un courriel contenant tous les résultats. L'objet sera"
 
@@ -1412,11 +1430,6 @@ msgstr "Les dernières notifications :"
 
 msgid "No notifications yet."
 msgstr "Pas encore de notification."
-
-msgid "Browser: A notice in browsers which have opened any affected pages."
-msgstr ""
-"Browser : Zne indication dans les navigateurs des pages concernées qui ont "
-"été ouvertes."
 
 msgid ""
 "Email: One email containing all the results of the selected elections and "

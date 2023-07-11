@@ -225,6 +225,18 @@
         text-align: left;
     }
 
+    .panel {
+        padding: .7rem;
+        margin-bottom: 1rem;
+        background: #fffbd4;
+        border: 1px solid #ffe16a;
+        color: #9b6e05;
+    }
+
+    .panel p:last-child {
+        margin-bottom: 0;
+    }
+
     </style>
 </head>
 <body bgcolor="#f6f6f6">
@@ -244,7 +256,8 @@
                                 <metal:b use-macro="msg_header" />
                             </tal:b>
 
-                            <div metal:define-slot="body"></div>
+                                <div metal:define-slot="info"></div>
+                                <div metal:define-slot="body"></div>
 
                             <tal:b tal:define="msg_footer layout.macros['email_footer']" tal:condition="msg_footer">
                                 <metal:b use-macro="msg_footer" />

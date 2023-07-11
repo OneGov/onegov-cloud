@@ -49,15 +49,12 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
         super().__init__(model, request)
 
         if self.model.date == date.today():
-            self.body_attributes = {
-                'data-websocket-endpoint': self.app.websockets_client_url(
-                    request
-                ),
-                'data-websocket-schema': self.app.schema,
-                'data-websocket-fallback': request.link(
-                    self.model, 'last-notified'
-                )
-            }
+            self.custom_body_attributes['data-websocket-endpoint'] = \
+                self.app.websockets_client_url(request)
+            self.custom_body_attributes['data-websocket-schema'] = \
+                self.app.schema
+            self.custom_body_attributes['data-websocket-fallback'] = \
+                request.link(self.model, 'last-notified')
 
     @cached_property
     def has_results(self):
@@ -89,4 +86,9 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     @cached_property
     def show_map(self):
+        if (
+            self.principal.domain == 'canton'
+            and getattr(self.model, 'domain', None) == 'municipality'
+        ):
+            return False
         return self.principal.is_year_available(self.model.date.year)

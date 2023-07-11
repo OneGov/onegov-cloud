@@ -19,7 +19,16 @@
                 </div>
 
                 <p id="directory-lead" tal:condition="directory.lead" tal:content="structure layout.linkify(directory.lead)" />
-                <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
+                <tal:b tal:condition="not:entries" tal:switch="not:directory.configuration.empty_notice">
+                    <p tal:case="True" i18n:translate="">No entries found.</p>
+                    <p tal:case="False">${directory.configuration.empty_notice}</p>
+                </tal:b>
+
+                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
+                    <h2 tal:condition="title">${title}</h2>
+                    <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
+                    <tal:b content="structure text"/>
+                </div>
 
                 <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
                     <h2 tal:condition="title">${title}</h2>

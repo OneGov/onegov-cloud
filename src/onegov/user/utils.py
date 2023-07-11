@@ -1,7 +1,17 @@
 from furl import furl
 
 
-def password_reset_url(user, request, url):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.user import User
+    from onegov.core.request import CoreRequest
+
+
+def password_reset_url(
+    user: 'User',
+    request: 'CoreRequest',
+    url: str
+) -> str | None:
     """ Appends the token needed by PasswordResetForm for a password reset.
 
     :user:
@@ -27,4 +37,7 @@ def password_reset_url(user, request, url):
         'modified': user.modified.isoformat() if user.modified else ''
     })
 
+    # FIXME: Don't we have an utils function for that somewhere?
+    #        furl seems expensive just to add a new query parameter
+    #        Plus we also use purl, which does the same thing...
     return furl(url).add({'token': token}).url

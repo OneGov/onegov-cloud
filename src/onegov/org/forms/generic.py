@@ -2,6 +2,7 @@ from morepath.request import Response
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.utils import normalize_for_url
+from onegov.event import OccurrenceCollection
 from onegov.form import Form
 from onegov.form.filters import as_float
 from onegov.org import _
@@ -47,7 +48,8 @@ class ExportForm(Form):
         choices=[
             ('csv', _("CSV File")),
             ('xlsx', _("Excel File")),
-            ('json', _("JSON File"))
+            ('json', _("JSON File")),
+            ('xml', _("XML File")),
         ],
         default='csv',
         validators=[
@@ -68,8 +70,9 @@ class ExportForm(Form):
 
         For json, these additional arguments are ignored.
 
-        """
+        For xml, we export all occurrences.
 
+        """
         if self.format == 'json':
             return Response(
                 json_body=results,
@@ -92,6 +95,14 @@ class ExportForm(Form):
                 content_disposition='inline; filename={}.xlsx'.format(
                     normalize_for_url(title)
                 )
+            )
+
+        if self.format == 'xml':
+            return Response(
+                OccurrenceCollection(self.request.session).as_xml(
+                    future_events_only=True),
+                content_type='text/xml',
+                content_disposition='inline; filename=occurences.xml',
             )
 
         raise NotImplementedError()

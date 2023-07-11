@@ -5,11 +5,23 @@ import transaction
 import yaml
 
 from datetime import datetime, date, timedelta
+import xml.etree.ElementTree as ET
+
 from onegov.event.models import Event
 from tests.shared.utils import create_image
 from tests.shared.utils import get_meta
 from unittest.mock import patch
 from webtest.forms import Upload
+
+
+def etree_to_dict(root, node_name=''):
+    nodes = list()
+    for node in root.iter(node_name):
+        d = dict()
+        for item in node:
+            d[item.tag] = item.text
+        nodes.append(d)
+    return nodes
 
 
 def test_view_occurrences(client):
@@ -39,6 +51,12 @@ def test_view_occurrences(client):
 
     def as_json(query=''):
         return client.get(f'/events/json?{query}').json
+
+    def as_xml():
+        response = client.get('/events/xml')
+        xml_string = response.body.decode('utf-8')
+        root = ET.fromstring(xml_string)
+        return etree_to_dict(root, 'event')
 
     assert len(events()) == 10
     assert len(events('page=1')) == 2
@@ -127,6 +145,13 @@ def test_view_occurrences(client):
     assert len(as_json('cat2=Turnhalle&cat2=Sportanlage')) == 11
     assert len(as_json('cat1=Politics&cat1=Party')) == 2
     assert len(as_json('max=1&cat1=Politics&cat1=Party')) == 1
+
+    # Test xml
+    assert len(as_xml()) == 12
+    assert list(as_xml()[0].keys()) == ['id', 'title', 'tags', 'description',
+                                        'start', 'end', 'location', 'price',
+                                        'organizer', 'event_url',
+                                        'organizer_email', 'modified']
 
     # Test iCal
     assert client.get('/events/').click('Diese Termine exportieren').\

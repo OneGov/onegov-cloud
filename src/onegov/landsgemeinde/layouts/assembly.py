@@ -71,6 +71,16 @@ class AssemblyLayout(DefaultLayout):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    text=_('States'),
+                    url=self.request.link(self.model, 'states'),
+                    attrs={'class': 'check-list-link'}
+                ),
+                Link(
+                    text=_('Ticker'),
+                    url=self.request.link(self.model, 'ticker'),
+                    attrs={'class': 'news-link', 'target': '_blank'}
+                ),
+                Link(
                     text=_('Delete'),
                     url=self.csrf_protected_url(
                         self.request.link(self.model)
@@ -102,3 +112,32 @@ class AssemblyLayout(DefaultLayout):
                     ]
                 )
             )
+
+
+class AssemblyTickerLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return self.assembly_title(self.model)
+
+    @cached_property
+    def og_description(self):
+        return self.request.translate(self.title)
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_('Homepage'), self.homepage_url),
+            Link(_('Ticker'), self.request.link(self.model))
+        ]
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        self.request.include('websockets')
+        self.request.include('ticker')
+
+        self.custom_body_attributes['data-websocket-endpoint'] = \
+            self.app.websockets_client_url(request)
+        self.custom_body_attributes['data-websocket-schema'] = \
+            self.app.schema

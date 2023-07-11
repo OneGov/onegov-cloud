@@ -6,12 +6,15 @@ from datetime import datetime
 from dectate import directive
 from more.content_security import NONE
 from more.content_security import SELF
+from more.content_security import UNSAFE_EVAL
+from more.content_security import UNSAFE_INLINE
 from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
 from onegov.core.framework import current_language_tween_factory
+from onegov.core.framework import default_content_security_policy
 from onegov.core.framework import transaction_tween_factory
 from onegov.core.utils import batched
 from onegov.election_day.directives import CsvFileAction
@@ -21,6 +24,7 @@ from onegov.election_day.directives import ManageHtmlAction
 from onegov.election_day.directives import PdfFileViewAction
 from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
+from onegov.election_day.directives import XmlFileAction
 from onegov.election_day.models import Principal
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.file import DepotApp
@@ -38,6 +42,7 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
     serve_static_files = True
     csv_file = directive(CsvFileAction)
     json_file = directive(JsonFileAction)
+    xml_file = directive(XmlFileAction)
     manage_form = directive(ManageFormAction)
     manage_html = directive(ManageHtmlAction)
     pdf_file = directive(PdfFileViewAction)
@@ -187,6 +192,14 @@ def get_i18n_default_locale():
     return 'de_CH'
 
 
+@ElectionDayApp.setting(section='content_security_policy', name='default')
+def org_content_security_policy():
+    policy = default_content_security_policy()
+    policy.script_src.remove(UNSAFE_EVAL)
+    policy.script_src.remove(UNSAFE_INLINE)
+    return policy
+
+
 @ElectionDayApp.tween_factory(
     under=content_security_policy_tween_factory
 )
@@ -304,18 +317,10 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         )
 
     def micro_cache_anonymous_pages_tween(request):
-        """ Cache all pages for 5 minutes.
+        """ Cache all pages for 5 minutes. """
 
-        Logged in users are exempt of this cache. If a user wants to manually
-        bust the cache he or she just needs to refresh the cached page using
-        Shift + F5 as an anonymous user.
-
-        That is to say, we observe the Cache-Control header.
-
-        """
-
-        # do not cache HEAD, POST, DELETE etc.
-        if request.method != 'GET':
+        # do not cache POST, DELETE etc.
+        if request.method not in ('GET', 'HEAD'):
             return handler(request)
 
         # no cache if the user is logged in
@@ -326,19 +331,20 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         if not cache_paths.match(request.path_info):
             return handler(request)
 
-        # allow cache busting through browser shift+f5
-        if request.headers.get('cache-control') == 'no-cache':
-            return handler(request)
-
-        # each page is cached once per request method, language and
-        # headerless/headerful (and by application id as the pages_cache is
-        # bound to it)
-        key = ':'.join((
-            request.method,
-            request.locale,
-            request.path_qs,
-            'hl' if 'headerless' in request.browser_session else 'hf'
-        ))
+        if request.method == 'HEAD':
+            # HEAD requests are cached with only the path
+            key = ':'.join((request.method, request.path))
+        else:
+            # each page is cached once per request method, host, path including
+            # query string, language and headerless/headerful (and by
+            # application id as the pages_cache is bound to it)
+            key = ':'.join((
+                request.method,
+                request.host,
+                request.path_qs,
+                request.locale,
+                'hl' if 'headerless' in request.browser_session else 'hf'
+            ))
 
         return app.pages_cache.get_or_create(
             key,
@@ -388,6 +394,7 @@ def get_common_asset():
     # Tablesaw
     yield 'tablesaw.css'
     yield 'tablesaw.jquery.js'
+    yield 'tablesaw-translations.js'
     yield 'tablesaw-init.js'
 
     # other frameworks
@@ -430,3 +437,9 @@ def get_backend_common_asset():
     yield 'datetimepicker.js'
     yield 'form_dependencies.js'
     yield 'doubleclick.js'
+
+
+@ElectionDayApp.webasset('screen')
+def get_screen_asset():
+    # Code used for screen update
+    yield 'screen.js'

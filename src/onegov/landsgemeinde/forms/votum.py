@@ -21,10 +21,7 @@ class VotumForm(NamedFileForm):
 
     number = IntegerField(
         label=_('Number'),
-        fieldset=_('General'),
-        validators=[
-            InputRequired()
-        ],
+        fieldset=_('General')
     )
 
     state = RadioField(
@@ -76,6 +73,15 @@ class VotumForm(NamedFileForm):
     start = TimeField(
         label=_('Start time'),
         fieldset=_('Progress'),
+        validators=[
+            Optional()
+        ],
+    )
+
+    video_timestamp = StringField(
+        label=_('Video timestamp'),
+        fieldset=_('Progress'),
+        description='2m1s',
         validators=[
             Optional()
         ],

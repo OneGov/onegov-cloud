@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-04-18 15:20+0200\n"
+"POT-Creation-Date: 2023-06-15 11:42+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -186,27 +186,6 @@ msgstr "Kreditkartenzahlungen"
 msgid "Exports payments and tickets"
 msgstr "Exportiert Zahlungen und Tickets"
 
-msgid "Mo"
-msgstr "Mo"
-
-msgid "Tu"
-msgstr "Di"
-
-msgid "We"
-msgstr "Mi"
-
-msgid "Th"
-msgstr "Do"
-
-msgid "Fr"
-msgstr "Fr"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "So"
-
 msgid "Title"
 msgstr "Titel"
 
@@ -360,6 +339,17 @@ msgstr "Anzeige"
 
 msgid "Lead-Format"
 msgstr "Lead-Format"
+
+msgid "Empty Directory Notice"
+msgstr "Leeres Verzeichnis Hinweis"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Dieser Text wird dargestellt wenn das Verzeichnis keine (sichtbaren) "
+"Einträge enthält. Falls leergelassen, wird stattdessen ein generischer "
+"Standardtext angezeigt."
 
 msgid "Numbering"
 msgstr "Nummerierung"
@@ -634,6 +624,27 @@ msgstr "Jugend"
 msgid "Elderly"
 msgstr "Senioren"
 
+msgid "Mo"
+msgstr "Mo"
+
+msgid "Tu"
+msgstr "Di"
+
+msgid "We"
+msgstr "Mi"
+
+msgid "Th"
+msgstr "Do"
+
+msgid "Fr"
+msgstr "Fr"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "So"
+
 msgid "Concerto in the castle garden"
 msgstr "Konzert im Schlossgarten"
 
@@ -666,6 +677,9 @@ msgstr "Organisator E-Mail"
 
 msgid "Shown as contact address"
 msgstr "Wird als Kontakt-Adresse angezeigt"
+
+msgid "External event URL"
+msgstr "Externe Event-URL"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Der Marker kann mit der Maus verschoben werden"
@@ -903,6 +917,9 @@ msgstr "Excel Datei"
 msgid "JSON File"
 msgstr "JSON Datei"
 
+msgid "XML File"
+msgstr "XML Datei"
+
 msgid "Minimum price total"
 msgstr "Minimalpreis"
 
@@ -981,6 +998,12 @@ msgstr ""
 
 msgid "Recipient"
 msgstr "Empfänger"
+
+msgid "Do not actually import the newsletter subscribers"
+msgstr "Die Newsletter Abonnenten werden nicht gespeichert"
+
+msgid ": (Address already exists)"
+msgstr ": (Adresse existiert bereits)"
 
 msgid "Will be used as image in the page overview on the parent page"
 msgstr ""
@@ -2400,8 +2423,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3556,6 +3579,12 @@ msgstr ""
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
 
+msgid "Back"
+msgstr "Zurück"
+
+msgid "Link to organizers page"
+msgstr "Link zur Veranstalterseite"
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -4206,8 +4235,8 @@ msgstr "Der Eintrag wurde gelöscht"
 msgid ""
 "On the right side, you can filter the entries of this directory to export."
 msgstr ""
-"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den Export "
-"filtern."
+"Auf der rechten Seite können Sie die Einträge des Verzeichnisses für den "
+"Export filtern."
 
 msgid "Exports all entries of this directory."
 msgstr "Exportiert alle Einträge dieses Verzeichniseses."
@@ -4584,6 +4613,32 @@ msgstr "\"${title}\" wurde an ${recipient} gesendet"
 msgid "Sends a test newsletter to the given address"
 msgstr "Sendet ein Test-Newsletter an die gewählte Adresse"
 
+msgid "Newsletter Recipients"
+msgstr "Newsletter Abonnenten"
+
+msgid "Newsletter recipient Export"
+msgstr "Newsletter Abonnenten Export"
+
+msgid "Exports all newsletter recipients."
+msgstr "Exportiert alle Newsletter Abonnenten."
+
+#, python-format
+msgid "The following line(s) contain invalid data: ${lines}"
+msgstr "Die folgende(n) Zeile(n) enthalten ungültige Daten: ${lines}"
+
+#, python-format
+msgid "${count} newsletter subscribers will be imported"
+msgstr "${count} Abonnenten werden importiert"
+
+#, python-format
+msgid "${count} newsletter subscribers imported"
+msgstr "${count} Abonnenten importiert"
+
+msgid "The same format as the export (XLSX) can be used for the import."
+msgstr ""
+"Für den Import kann das gleiche Format wie für den Export (XLSX) verwendet "
+"werden."
+
 msgid "Today"
 msgstr "Heute"
 
@@ -4603,10 +4658,6 @@ msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
 
 #, python-format
-msgid "The following line(s) contain invalid data: ${lines}"
-msgstr "Die folgende(n) Zeile(n) enthalten ungültige Daten: ${lines}"
-
-#, python-format
 msgid "${count} events will be imported"
 msgstr "${count} Veranstaltungen werden importiert"
 
@@ -4614,10 +4665,8 @@ msgstr "${count} Veranstaltungen werden importiert"
 msgid "${count} events imported"
 msgstr "${count} Veranstaltungen importiert"
 
-msgid "The same format as the export (XLSX) can be used for the import."
-msgstr ""
-"Für den Import kann das gleiche Format wie für den Export (XLSX) verwendet "
-"werden."
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Move"
 msgstr "Verschieben"
@@ -5160,13 +5209,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Das OneGov Cloud Team"
-
-#~ msgid "1 entry"
-#~ msgstr "1 Eintrag"
-
-#, python-format
-#~ msgid "${count} entries"
-#~ msgstr "${count} Einträge"

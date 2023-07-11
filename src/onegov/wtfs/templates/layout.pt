@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html class="no-js" lang="${request.html_lang}"
+<html
+    class="no-js"
+    lang="${request.html_lang}"
+    tal:attributes="layout.custom_html_attributes|{}"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     xmlns:metal="http://xml.zope.org/namespaces/metal"
@@ -25,17 +28,11 @@
     -->
 
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/font-awesome/css/font-awesome.min.css">
-    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
-    <script tal:condition="layout.app.sentry_dsn">
-        Sentry.init({
-            dsn: '${layout.app.sentry_dsn}',
-            release: '${layout.app.sentry_version}',
-            environment: '${layout.app.sentry_environment}',
-        });
-    </script>
+    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/7.54.0/bundle.min.js" integrity="sha384-EmlJLN9Q0yu0/2UUCIYnEM88jpQ7xUhtNI2ZeXb/ci3cwoAoIQl350N4PQPlMbP5" crossorigin="anonymous"></script>
+    <script tal:condition="layout.app.sentry_dsn" src="${layout.sentry_init_path}"></script>
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
 </head>
-<body>
+<body tal:attributes="layout.custom_body_attributes|{}">
 
     <div class="ie-11-wrapper">
         <main>
@@ -97,10 +94,10 @@
                 <div class="row footer-links">
                     <div class="small-12 columns">
                         <span>
-                            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+                            <a href="https://www.admin.digital">OneGov Cloud</a>
                         </span>
                         <span>
-                            <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+                            <a href="https://www.admin.digital/datenschutz" i18n:translate>
                                 Privacy Protection
                             </a>
                         </span>

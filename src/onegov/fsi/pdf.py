@@ -146,6 +146,8 @@ class FsiPdf(Pdf):
         def bgcolor(ix, row, color):
             return 'BACKGROUND', (row, ix), (row, ix), color
 
+        next_subscriptions = collection.next_subscriptions(request)
+
         for ix, e in enumerate(collection.query()):
             dt = layout.next_event_date(e.start, refresh_interval)
             if dt:
@@ -164,14 +166,14 @@ class FsiPdf(Pdf):
             data_line = (
                 f"{e.last_name}, {e.first_name}",
                 e.source_id, layout.format_date(e.start, 'datetime'),
-                e.event_completed and "✔" or "-",
+                "✔" if next_subscriptions.get(e[0], None) else "-",
                 next_event_hint
             )
             data.append(data_line)
 
         pdf.table(
             data,
-            columns=[None, None, None, 1.7 * cm, 2.5 * cm],
+            columns=[None, None, None, 2.5 * cm, 2.5 * cm],
             style=style,
         )
 

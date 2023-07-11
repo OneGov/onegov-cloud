@@ -1,9 +1,8 @@
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from onegov.search import utils
+from onegov.search.mixins import Searchable
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
-
-from onegov.search.utils import create_tsvector_string
 
 
 def test_get_searchable_sqlalchemy_models(postgres_dsn):
@@ -106,10 +105,10 @@ def test_related_types_unsearchable_base():
 
 
 def test_create_tsvector_string():
-    assert create_tsvector_string('username') == \
+    assert Searchable.create_tsvector_string('username') == \
            "coalesce(username, '')"
-    assert create_tsvector_string('title', 'body') == \
+    assert Searchable.create_tsvector_string('title', 'body') == \
            "coalesce(title, '') || ' ' || coalesce(body, '')"
-    assert create_tsvector_string('alpha', 'beta', 'gamma') == \
+    assert Searchable.create_tsvector_string('alpha', 'beta', 'gamma') == \
            "coalesce(alpha, '') || ' ' || coalesce(beta, '') || ' ' || " \
            "coalesce(gamma, '')"

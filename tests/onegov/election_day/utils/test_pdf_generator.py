@@ -3,21 +3,23 @@ from datetime import timedelta
 from onegov.ballot import Ballot
 from onegov.ballot import BallotResult
 from onegov.ballot import Vote
+from onegov.election_day.utils.pdf_generator import PdfGenerator
+from pdfrw import PdfReader
+from tests.onegov.election_day.common import DummyRequest
 from tests.onegov.election_day.utils.common import add_election_compound
 from tests.onegov.election_day.utils.common import add_majorz_election
 from tests.onegov.election_day.utils.common import add_proporz_election
 from tests.onegov.election_day.utils.common import add_vote
 from tests.onegov.election_day.utils.common import PatchedD3Renderer
-from onegov.election_day.utils.pdf_generator import PdfGenerator
-from pdfrw import PdfReader
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 
 class PatchedPdfGenerator(PdfGenerator):
     def __init__(self, app):
-        super(PatchedPdfGenerator, self).__init__(app)
-        self.renderer = PatchedD3Renderer(app)
+        renderer = PatchedD3Renderer(app)
+        request = DummyRequest(app=app)
+        super().__init__(app, request, renderer)
 
 
 def test_generate_pdf_election(session, election_day_app_zg):
@@ -174,7 +176,7 @@ def test_generate_pdf_long_title(session, election_day_app_zg):
 
 def test_sign_pdf(session, election_day_app_zg):
     # No signing
-    generator = PdfGenerator(election_day_app_zg)
+    generator = PdfGenerator(election_day_app_zg, DummyRequest())
 
     with patch('onegov.pdf.signature.post') as post:
         generator.sign_pdf('vote.pdf')
@@ -189,7 +191,7 @@ def test_sign_pdf(session, election_day_app_zg):
         'reason': 'why'
     }
     election_day_app_zg.cache.set('principal', principal)
-    generator = PdfGenerator(election_day_app_zg)
+    generator = PdfGenerator(election_day_app_zg, DummyRequest())
 
     with election_day_app_zg.filestorage.open('vote.pdf', 'w') as f:
         f.write('PDF')

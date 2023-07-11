@@ -28,3 +28,22 @@ def convert_agency_portrait_to_html(context):
         for agency in session.query(Agency).all():
             agency.portrait = '<p>{}</p>'.format(
                 linkify(agency.portrait).replace('\n', '<br>'))
+
+
+@upgrade_task("Replace person.address in Agency.export_fields")
+def replace_removed_export_fields(context):
+    session = context.session
+    if context.has_column('agencies', 'meta'):
+        for agency in session.query(Agency).all():
+            export_fields = agency.meta.get('export_fields', [])
+            if 'person.address' in export_fields:
+                # replace old shared field with new split field
+                # but preserving the order
+                idx = export_fields.index('person.address')
+                export_fields = export_fields[:idx] + [
+                    'person.location_address',
+                    'person.location_code_city',
+                    'person.postal_address',
+                    'person.postal_code_city',
+                ] + export_fields[idx + 1:]
+                agency.meta['export_fields'] = export_fields

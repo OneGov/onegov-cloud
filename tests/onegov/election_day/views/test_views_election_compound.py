@@ -708,11 +708,17 @@ def test_view_election_compound_data(election_day_app_gr):
     login(client)
     upload_election_compound(client)
 
-    export = client.get('/elections/elections/data-json')
-    assert all((expected in export for expected in ("3506", "Sieger", "153")))
+    data = client.get('/elections/elections/data-json')
+    assert data.headers['Content-Type'] == 'application/json; charset=utf-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=elections.json'
+    assert all((expected in data for expected in ("3506", "Sieger", "153")))
 
-    export = client.get('/elections/elections/data-csv')
-    assert all((expected in export for expected in ("3506", "Sieger", "153")))
+    data = client.get('/elections/elections/data-csv')
+    assert data.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+    assert data.headers['Content-Disposition'] == \
+        'inline; filename=elections.csv'
+    assert all((expected in data for expected in ("3506", "Sieger", "153")))
 
 
 def test_view_election_compound_relations(election_day_app_zg):

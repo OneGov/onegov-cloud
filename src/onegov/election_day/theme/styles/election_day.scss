@@ -891,6 +891,14 @@ form {
         font-size: $form-label-font-size;
     }
 
+    .label-required {
+        color: $primary-color;
+    }
+
+    .label-text {
+        font-weight: bold;
+    }
+
 }
 
 .cancel-button {

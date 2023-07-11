@@ -19,7 +19,9 @@ from tests.onegov.election_day.common import DummyPostData
 
 def test_upload_vote_form(session):
     cantonal_principal = Canton(name='be', canton='be')
-    communal_principal = Municipality(name='bern', municipality='351')
+    communal_principal = Municipality(
+        name='bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     simple_vote = Vote(title='Vote', date=date(2017, 1, 1), domain='canton')
     complex_vote = ComplexVote()
@@ -29,11 +31,11 @@ def test_upload_vote_form(session):
     assert sorted(f[0] for f in form.file_format.choices) == []
     form.adjust(cantonal_principal, simple_vote)
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'default', 'internal', 'wabsti'
+        'default', 'internal', 'wabsti', 'xml',
     ]
     form.adjust(communal_principal, simple_vote)
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'default', 'internal', 'wabsti_m'
+        'default', 'internal', 'wabsti_m', 'xml',
     ]
 
     # Test if wabsti_c is added when data sources are available
@@ -46,11 +48,11 @@ def test_upload_vote_form(session):
 
     form.adjust(cantonal_principal, session.query(Vote).one())
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'default', 'internal', 'wabsti', 'wabsti_c'
+        'default', 'internal', 'wabsti', 'wabsti_c', 'xml',
     ]
     form.adjust(communal_principal, session.query(Vote).one())
     assert sorted(f[0] for f in form.file_format.choices) == [
-        'default', 'internal', 'wabsti_c', 'wabsti_m'
+        'default', 'internal', 'wabsti_c', 'wabsti_m', 'xml',
     ]
 
     # Test preseting of vote type
@@ -130,10 +132,22 @@ def test_upload_vote_form(session):
     form.proposal.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
+    # todo: xml
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, simple_vote)
+    form.process(DummyPostData({
+        'file_format': 'xml',
+        'type': form.type.data,
+    }))
+    form.xml.data = {'mimetype': 'text/plain'}
+    assert form.validate()
+
 
 def test_upload_election_form(session):
     cantonal_principal = Canton(name='be', canton='be')
-    communal_principal = Municipality(name='bern', municipality='351')
+    communal_principal = Municipality(
+        name='bern', municipality='351', canton='be', canton_name='Kanton Bern'
+    )
 
     election = Election(
         title='Election', date=date(2017, 1, 1), domain='canton', type='majorz'
