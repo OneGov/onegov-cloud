@@ -11,7 +11,7 @@ from onegov.file.utils import get_image_size
 from onegov.file.utils import get_svg_size
 from onegov.file.utils import IMAGE_MIME_TYPES
 from onegov.file.utils import word_count
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from tempfile import SpooledTemporaryFile
 from onegov.pdf.utils import extract_pdf_info
 
@@ -30,7 +30,7 @@ def get_svg_size_or_default(content):
     return width, height
 
 
-def limit_and_store_image_size(file, content, content_type):
+def strip_exif_and_limit_and_store_image_size(file, content, content_type):
 
     if content_type == 'image/svg+xml':
         file.size = get_svg_size_or_default(content)
@@ -38,18 +38,36 @@ def limit_and_store_image_size(file, content, content_type):
     if content_type not in IMAGE_MIME_TYPES:
         return None
 
-    image = Image.open(content)
+    try:
+        image = Image.open(content)
+    except Image.DecompressionBombError:
+        # reraise this one specifically
+        raise
+    except Exception:
+        # treat any other internal error as an UnidentifierImageError
+        raise UnidentifiedImageError from None
 
-    if max(image.size) > IMAGE_MAX_SIZE:
-        image.thumbnail(
-            (IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.Resampling.LANCZOS
-        )
+    needs_resample = max(image.size) > IMAGE_MAX_SIZE
+    has_exif = bool(hasattr(image, 'getexif') and image.getexif())
+
+    if needs_resample or has_exif:
+        params = {}
+
+        if has_exif:
+            # replace EXIF section with an empty one
+            params['exif'] = Image.Exif()
+
+        if needs_resample:
+            image.thumbnail(
+                (IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.Resampling.LANCZOS
+            )
+
         content = SpooledTemporaryFile(INMEMORY_FILESIZE)
         try:
             # Quality is only supported by jpeg
-            image.save(content, image.format, quality=IMAGE_QUALITY)
+            image.save(content, image.format, quality=IMAGE_QUALITY, **params)
         except ValueError:
-            image.save(content, image.format)
+            image.save(content, image.format, **params)
 
     # the file size is stored in pixel as string (for browser usage)
     file.size = get_image_size(image)
@@ -87,7 +105,7 @@ class ProcessedUploadedFile(UploadedFile):
 
     processors = (
         store_checksum,
-        limit_and_store_image_size,
+        strip_exif_and_limit_and_store_image_size,
         sanitize_svg_images,
         store_extract_and_pages,
     )
@@ -106,6 +124,10 @@ class ProcessedUploadedFile(UploadedFile):
             # content is discarded soon afterwards
             content = b''
             content_type = 'application/malicious'
+        except UnidentifiedImageError:
+            # also not a real content type
+            content = b''
+            content_type = 'application/unidentified-image'
         except pdftotext.Error:
             # signed pdfs have shown to be difficult to handle by pdftotext
             # it uses poppler apt package in the background resulting in old
