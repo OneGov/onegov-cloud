@@ -59,7 +59,13 @@ def migrate_to_jsonb(
     # base - so we need to included it manually
     try:
         from libres.db.models import ORMBase
-        classes.extend(find_models(ORMBase, is_match=lambda cls: True))
+        classes.extend(find_models(
+            # TODO: we should change find_models to operate on
+            #       sqlalchemy.orm.DeclarativeBase once we upgrade
+            #       to SQLAlchemy 2.0
+            ORMBase,  # type: ignore[arg-type]
+            is_match=lambda cls: True)
+        )
     except ImportError:
         pass
 

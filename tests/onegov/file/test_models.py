@@ -16,6 +16,7 @@ from PIL import Image
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from unittest.mock import Mock
 
 
 class PolymorphicFile(File):
@@ -155,6 +156,32 @@ def test_save_png_zipbomb(session):
     file = session.query(File).one()
     assert file.reference.file.read() == b''
     assert file.reference.content_type == 'application/malicious'
+
+
+def test_save_image_internal_exception(session, monkeypatch):
+    # simulate internal error in Pillow
+    mock_open = Mock(side_effect=ValueError)
+    monkeypatch.setattr('PIL.Image.open', mock_open)
+
+    session.add(File(name='causes-error.png', reference=create_image(32, 32)))
+
+    transaction.commit()
+    file = session.query(File).one()
+    assert file.reference.file.read() == b''
+    assert file.reference.content_type == 'application/unidentified-image'
+
+
+def test_strip_image_exif(session):
+    path = module_path('tests.onegov.file', 'fixtures/exif.jpg')
+
+    with open(path, 'rb') as f:
+        session.add(File(name='exif.jpg', reference=f))
+
+    transaction.commit()
+    file = session.query(File).one()
+
+    image = Image.open(file.reference.file)
+    assert not image.getexif()
 
 
 def test_pdf_preview_creation(session):
