@@ -4689,9 +4689,6 @@ msgstr "${count} événements ont été importés"
 msgid "Move"
 msgstr "Déplacer"
 
-msgid "Move"
-msgstr "Déplacer"
-
 msgid "Your payment has been received"
 msgstr "Votre paiement a été reçu"
 

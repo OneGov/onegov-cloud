@@ -4668,9 +4668,6 @@ msgstr "${count} Veranstaltungen importiert"
 msgid "Move"
 msgstr "Verschieben"
 
-msgid "Move"
-msgstr "Verschieben"
-
 msgid "Your payment has been received"
 msgstr "Ihre Zahlung ist eingegangen"
 
