@@ -305,11 +305,11 @@ def render_file(file_path: str, request: 'CoreRequest') -> 'Response':
     # changes it's content type, it should usually not, especially since
     # we emphasize the use of random filenames
     @request.app.cache.cache_on_arguments(to_str=hash_path)
-    def get_content_type(path: str) -> str:
-        content_type = mimetypes.guess_type(path)[0]
+    def get_content_type(file_path: str) -> str:
+        content_type = mimetypes.guess_type(file_path)[0]
 
         if not content_type:
-            content_type = magic.from_file(path, mime=True)
+            content_type = magic.from_file(file_path, mime=True)
 
         return content_type
 
