@@ -334,6 +334,7 @@ class BookingInvoiceBridge:
 
         self.existing[booking.username].add(
             group=self.attendees[booking.attendee_id][0],
+            attendee_id=booking.attendee_id,
             text=self.activities[booking.occasion_id][0],
             organizer=self.activities[booking.occasion_id][1],
             unit=booking.cost,
@@ -352,6 +353,7 @@ class BookingInvoiceBridge:
                 if (username, attendee) not in self.billed_attendees:
                     self.existing[username].add(
                         group=attendee,
+                        attendee_id=id,
                         text=all_inclusive_booking_text,
                         unit=self.period.booking_cost,
                         quantity=1,
