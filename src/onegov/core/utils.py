@@ -1,5 +1,4 @@
 import base64
-
 import bleach
 import errno
 import fcntl
@@ -673,6 +672,7 @@ def get_unique_hstore_keys(
         [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
         distinct=True
     ).select_from(base.subquery())
+
     keys = session.execute(query).scalar()
     return set(keys) if keys else set()
 
