@@ -1,5 +1,4 @@
 import base64
-import datetime
 
 import bleach
 import errno
@@ -669,30 +668,6 @@ def get_unique_hstore_keys(
 
     base = session.query(column.keys()).with_entities(  # type:ignore
         sqlalchemy.func.skeys(column).label('keys'))
-
-    query = sqlalchemy.select(
-        [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
-        distinct=True
-    ).select_from(base.subquery())
-    keys = session.execute(query).scalar()
-    return set(keys) if keys else set()
-
-
-def get_unique_hstore_keys_future_occurrences(
-        session: 'Session',
-) -> set[str]:
-    """ Returns a set of keys found in Occurrence._tags hstore column over all
-    future records.
-
-    """
-    from onegov.event.models import Occurrence
-
-    base = session.query(Occurrence._tags.keys()).with_entities(
-        sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
-        Occurrence.start)
-
-    base = base.filter(Occurrence.start >= datetime.datetime.now(
-        datetime.timezone.utc))
 
     query = sqlalchemy.select(
         [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
