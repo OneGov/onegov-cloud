@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from onegov.core.orm.mixins import dict_property
     from onegov.form import Form
     from onegov.reservation.models import CustomReservation
-    from onegov.pay import Payment, PaymentProvider
+    from onegov.pay import Payment, PaymentError, PaymentProvider
     from onegov.pay.types import PaymentMethod
     from sqlalchemy.orm import Query
     from typing_extensions import TypeAlias
@@ -242,7 +242,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     def price_of_reservation(
         self,
         token: 'uuid.UUID',
-        extra: float | None = None
+        extra: Price | None = None
     ) -> Price:
 
         # FIXME: libres is very laissez faire with the polymorphic
@@ -271,12 +271,13 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     def process_payment(
         self,
         price: Price,
-        provider: 'PaymentProvider | None' = None,
+        provider: 'PaymentProvider[Any] | None' = None,
         payment_token: str | None = None
-    ) -> 'Payment | Literal[True] | None':
+    ) -> 'Payment | PaymentError | Literal[True] | None':
         """ Processes the payment for the given reservation token. """
 
         if price and price.amount > 0:
+            assert self.payment_method is not None
             return process_payment(
                 self.payment_method, price, provider, payment_token)
 

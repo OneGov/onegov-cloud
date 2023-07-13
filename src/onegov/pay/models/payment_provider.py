@@ -12,7 +12,22 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class PaymentProvider(Base, TimestampMixin, ContentMixin):
+from typing import Any, Generic, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from decimal import Decimal
+    from onegov.pay import Price
+    from onegov.pay.types import PaymentState
+    from typing_extensions import TypeAlias
+
+# we are shadowing type in the class below, so we need to
+# create a generic TypeAlias that works as a stand-in
+_T = TypeVar('_T')
+_P = TypeVar('_P', bound=Payment)
+_type: 'TypeAlias' = type[_T]
+
+
+class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     """ Represents a payment provider. """
 
     __tablename__ = 'payment_providers'
@@ -41,27 +56,48 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         ),
     )
 
-    payments = relationship(
+    payments: 'relationship[list[Payment]]' = relationship(
         'Payment',
         order_by='Payment.created',
         backref='provider',
         passive_deletes=True
     )
 
-    @property
-    def payment_class(self):
-        assert type(self) is PaymentProvider, "Override this in subclasses"
-        return Payment
+    if TYPE_CHECKING:
+        @property
+        def payment_class(self) -> _type[_P]: ...
+    else:
+        @property
+        def payment_class(self) -> _type[Payment]:
+            assert type(self) is PaymentProvider, "Override this in subclasses"
+            return Payment
 
-    def payment(self, **kwargs):
+    def payment(
+        self,
+        *,
+        amount: 'Decimal | None' = None,
+        currency: str = 'CHF',
+        remote_id: str | None = None,
+        state: 'PaymentState' = 'open',
+        # FIXME: We probably don't want to allow arbitrary kwargs
+        #        but we need to make sure, we don't use any other
+        #        one somewhere first
+        **kwargs: Any
+    ) -> _P:
         """ Creates a new payment using the correct model. """
 
-        payment = self.payment_class(**kwargs)
+        payment = self.payment_class(
+            amount=amount,
+            currency=currency,
+            remote_id=remote_id,
+            state=state,
+            **kwargs
+        )
         payment.provider = self
 
         return payment
 
-    def adjust_price(self, price):
+    def adjust_price(self, price: 'Price | None') -> 'Price | None':
         """ Called by client implementations this method allows to adjust the
         price by adding a fee to it.
 
@@ -71,7 +107,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
 
         return price
 
-    def charge(self, amount, currency, token):
+    def charge(self, amount: Decimal, currency: str, token: str) -> Payment:
         """ Given a payment token, charges the customer and creates a payment
         which is returned.
 
@@ -79,17 +115,17 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         raise NotImplementedError
 
     @property
-    def title(self):
+    def title(self) -> str:
         """ The title of the payment provider (i.e. the product name). """
         raise NotImplementedError
 
     @property
-    def url(self):
+    def url(self) -> str:
         """ The url to the backend of the payment provider. """
         raise NotImplementedError
 
     @property
-    def public_identity(self):
+    def public_identity(self) -> str:
         """ The public identifier of this payment provider. For example, the
         account name.
 
@@ -97,7 +133,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         raise NotImplementedError
 
     @property
-    def identity(self):
+    def identity(self) -> str | None:
         """ Uniquely identifies this payment provider amongst other providers
         of the same type (say the private key of the api). Used to be able
         to tell if a new oauth connection is the same as an existing one.
@@ -108,14 +144,21 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         raise NotImplementedError
 
     @property
-    def connected(self):
+    def connected(self) -> bool:
         """ Returns True if the provider is properly hooked up to the
         payment provider.
 
         """
+        return False
 
-    def checkout_button(self, label, amount, currency, action='submit',
-                        **extra):
+    def checkout_button(
+        self,
+        label: str,
+        amount: Decimal,
+        currency: str,
+        action: str = 'submit',
+        **extra: Any
+    ) -> str:
         """ Renders a checkout button which will store the token for the
         checkout as its own value if clicked.
 
@@ -127,17 +170,31 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin):
         """
         raise NotImplementedError
 
-    def prepare_oauth_request(self, redirect_url, success_url, error_url,
-                              user_fields=None):
+    def prepare_oauth_request(
+        self,
+        redirect_url: str,
+        success_url: str,
+        error_url: str,
+        user_fields: dict[str, Any] | None = None
+    ) -> str:
         """ Registers the oauth request with the oauth_gateway and returns
         an url that is ready to be used for the complete oauth request.
 
         """
         raise NotImplementedError
 
-    def process_oauth_response(self, request_params):
+    def process_oauth_response(
+        self,
+        request_params: 'Mapping[str, Any]'
+    ) -> None:
         """ Processes the oauth response using the parameters passed by
         the returning oauth request via the gateway.
 
         """
         raise NotImplementedError
+
+    def sync(self) -> None:
+        """ Updates the local payment information with the information from
+        the remote payment provider.
+
+        """

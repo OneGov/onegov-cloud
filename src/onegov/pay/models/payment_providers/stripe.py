@@ -16,8 +16,24 @@ from sqlalchemy.orm import object_session
 from uuid import UUID, uuid4, uuid5
 
 
+from typing import Any, TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Callable, Iterator, Mapping
+    from onegov.core.orm.mixins import dict_property
+    from onegov.pay.types import FeePolicy
+    from sqlalchemy.orm import relationship, Query, Session
+    # NOTE: Technically this could be overwritten by anything that
+    #       satisfies the ITransaction interface, but we are happier
+    #       not having to deal with the zope.interface mypy plugin
+    from transaction import Transaction
+    from typing_extensions import ParamSpec
+
+    _R = TypeVar('_R', bound=stripe.api_resources.abstract.ListableAPIResource)
+    _P = ParamSpec('_P')
+
+
 @contextmanager
-def stripe_api_key(key):
+def stripe_api_key(key: str | None) -> 'Iterator[None]':
     old_key = stripe.api_key
     stripe.api_key = key
     yield
@@ -44,22 +60,22 @@ class StripeCaptureManager:
 
     transaction_manager = transaction.manager
 
-    def __init__(self, api_key, charge_id):
+    def __init__(self, api_key: str, charge_id: str):
         self.api_key = api_key
         self.charge_id = charge_id
 
     @classmethod
-    def capture_charge(cls, api_key, charge_id):
+    def capture_charge(cls, api_key: str, charge_id: str) -> None:
         transaction.get().join(cls(api_key, charge_id))
 
-    def sortKey(self):
+    def sortKey(self) -> str:
         return 'charge'
 
-    def tpc_vote(self, transaction):
+    def tpc_vote(self, transaction: 'Transaction') -> None:
         with stripe_api_key(self.api_key):
             self.charge = stripe.Charge.retrieve(self.charge_id)
 
-    def tpc_finish(self, transaction):
+    def tpc_finish(self, transaction: 'Transaction') -> None:
         try:
             with stripe_api_key(self.api_key):
                 self.charge.capture()
@@ -70,16 +86,16 @@ class StripeCaptureManager:
                 self.charge_id
             ))
 
-    def commit(self, transaction):
+    def commit(self, transaction: 'Transaction') -> None:
         pass
 
-    def abort(self, transaction):
+    def abort(self, transaction: 'Transaction') -> None:
         pass
 
-    def tpc_begin(self, transaction):
+    def tpc_begin(self, transaction: 'Transaction') -> None:
         pass
 
-    def tpc_abort(self, transaction):
+    def tpc_abort(self, transaction: 'Transaction') -> None:
         pass
 
 
@@ -90,13 +106,13 @@ class StripeFeePolicy:
     fixed = 0.3
 
     @classmethod
-    def from_amount(cls, amount):
+    def from_amount(cls, amount: Decimal | float) -> float:
         """ Gets the fee for the given amount. """
 
         return round(float(amount) * cls.percentage + cls.fixed, 2)
 
     @classmethod
-    def compensate(cls, amount):
+    def compensate(cls, amount: Decimal | float) -> float:
         """ Increases the amount in such a way that the stripe fee is included
         in the effective charge (that is, the user paying the charge is paying
         the fee as well).
@@ -109,19 +125,25 @@ class StripeFeePolicy:
 class StripePayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
 
-    fee_policy = StripeFeePolicy
+    fee_policy: 'FeePolicy' = StripeFeePolicy
 
     #: the date of the payout
-    payout_date = meta_property()
+    payout_date: 'dict_property[datetime]' = meta_property()
 
     #: the id of the payout
-    payout_id = meta_property()
+    payout_id: 'dict_property[str]' = meta_property()
 
     #: the fee deducted by stripe
-    effective_fee = meta_property()
+    effective_fee: 'dict_property[float]' = meta_property()
+
+    if TYPE_CHECKING:
+        # our provider should always be StripeConnect, we could
+        # assert if we really wanted to make sure, but it would
+        # add a lot of assertions...
+        provider: relationship['StripeConnect']
 
     @property
-    def fee(self):
+    def fee(self) -> Decimal:
         """ The calculated fee or the effective fee if available.
 
         The effective fee is taken from the payout records. In practice
@@ -132,10 +154,11 @@ class StripePayment(Payment):
         if self.effective_fee:
             return Decimal(self.effective_fee)
 
+        assert self.amount is not None
         return Decimal(self.fee_policy.from_amount(self.amount))
 
     @property
-    def remote_url(self):
+    def remote_url(self) -> str:
         if self.provider.livemode:
             base = 'https://dashboard.stripe.com/payments/{}'
         else:
@@ -144,17 +167,17 @@ class StripePayment(Payment):
         return base.format(self.remote_id)
 
     @property
-    def charge(self):
+    def charge(self) -> stripe.Charge:
         with stripe_api_key(self.provider.access_token):
             return stripe.Charge.retrieve(self.remote_id)
 
-    def refund(self):
+    def refund(self) -> stripe.Refund:
         with stripe_api_key(self.provider.access_token):
             refund = stripe.Refund.create(charge=self.remote_id)
             self.state = 'cancelled'
             return refund
 
-    def sync(self, remote_obj=None):
+    def sync(self, remote_obj: stripe.Charge | None = None) -> None:
         charge = remote_obj or self.charge
 
         if not charge.captured:
@@ -170,49 +193,49 @@ class StripePayment(Payment):
             self.state = 'paid'
 
 
-class StripeConnect(PaymentProvider):
+class StripeConnect(PaymentProvider[StripePayment]):
 
     __mapper_args__ = {'polymorphic_identity': 'stripe_connect'}
 
-    fee_policy = StripeFeePolicy
+    fee_policy: 'FeePolicy' = StripeFeePolicy
 
     #: The Stripe Connect client id
-    client_id = meta_property()
+    client_id: 'dict_property[str]' = meta_property()
 
     #: The API key of the connect user
-    client_secret = meta_property()
+    client_secret: 'dict_property[str]' = meta_property()
 
     #: The oauth_redirect gateway in use (see seantis/oauth_redirect on github)
-    oauth_gateway = meta_property()
+    oauth_gateway: 'dict_property[str]' = meta_property()
 
     #: The auth code required by oauth_redirect
-    oauth_gateway_auth = meta_property()
+    oauth_gateway_auth: 'dict_property[str]' = meta_property()
 
     #: The oauth_redirect secret that should be used
-    oauth_gateway_secret = meta_property()
+    oauth_gateway_secret: 'dict_property[str]' = meta_property()
 
     #: The authorization code provided by OAuth
-    authorization_code = meta_property()
+    authorization_code: 'dict_property[str]' = meta_property()
 
     #: The public stripe key
-    publishable_key = meta_property()
+    publishable_key: 'dict_property[str]' = meta_property()
 
     #: The stripe user id as confirmed by OAuth
-    user_id = meta_property()
+    user_id: 'dict_property[str]' = meta_property()
 
     #: The refresh token provided by OAuth
-    refresh_token = meta_property()
+    refresh_token: 'dict_property[str]' = meta_property()
 
     #: The access token provieded by OAuth
-    access_token = meta_property()
+    access_token: 'dict_property[str]' = meta_property()
 
     #: The id of the latest processed balance transaction
-    latest_payout = meta_property()
+    latest_payout: 'dict_property[stripe.Payout]' = meta_property()
 
     #: Should the fee be charged to the customer or not?
-    charge_fee_to_customer = meta_property()
+    charge_fee_to_customer: 'dict_property[bool]' = meta_property()
 
-    def adjust_price(self, price):
+    def adjust_price(self, price: Price | None) -> Price | None:
         if price and self.charge_fee_to_customer:
             new_price = self.fee_policy.compensate(price.amount)
             new_fee = self.fee_policy.from_amount(new_price)
@@ -227,44 +250,51 @@ class StripeConnect(PaymentProvider):
         return price
 
     @property
-    def livemode(self):
+    def livemode(self) -> bool:
+        assert self.access_token is not None
         return not self.access_token.startswith('sk_test')
 
     @property
-    def payment_class(self):
+    def payment_class(self) -> type[StripePayment]:
         return StripePayment
 
     @property
-    def title(self):
+    def title(self) -> str:
         return 'Stripe Connect'
 
     @property
-    def url(self):
+    def url(self) -> str:
         return 'https://dashboard.stripe.com/'
 
     @property
-    def public_identity(self):
+    def public_identity(self) -> str:
         account = self.account
+        assert account is not None
         if account.business_name:
             return f'{account.business_name} / {account.email}'
         return account.email
 
     @property
-    def identity(self):
+    def identity(self) -> str | None:
         return self.user_id
 
     @cached_property
-    def account(self):
+    def account(self) -> stripe.Account | None:
         with stripe_api_key(self.access_token):
             return stripe.Account.retrieve(id=self.user_id)
 
     @property
-    def connected(self):
+    def connected(self) -> bool:
         return self.account and True or False
 
-    def charge(self, amount, currency, token):
-        session = object_session(self)
+    def charge(
+        self,
+        amount: Decimal,
+        currency: str,
+        token: str
+    ) -> StripePayment:
 
+        session = object_session(self)
         payment = self.payment(
             id=uuid5(STRIPE_NAMESPACE, token),
             amount=amount,
@@ -284,6 +314,7 @@ class StripeConnect(PaymentProvider):
                 }
             )
 
+        assert self.access_token is not None
         StripeCaptureManager.capture_charge(self.access_token, charge.id)
         payment.remote_id = charge.id
 
@@ -293,8 +324,14 @@ class StripeConnect(PaymentProvider):
 
         return payment
 
-    def checkout_button(self, label, amount, currency, action='submit',
-                        **extra):
+    def checkout_button(
+        self,
+        label: str,
+        amount: Decimal,
+        currency: str,
+        action: str = 'submit',
+        **extra: Any
+    ) -> str:
         """ Generates the html for the checkout button. """
 
         extra['amount'] = round(amount * 100, 0)
@@ -321,7 +358,12 @@ class StripeConnect(PaymentProvider):
             target=uuid4().hex
         )
 
-    def oauth_url(self, redirect_uri, state=None, user_fields=None):
+    def oauth_url(
+        self,
+        redirect_uri: str,
+        state: str | None = None,
+        user_fields: dict[str, Any] | None = None
+    ) -> str:
         """ Generates an oauth url to be shown in the browser. """
 
         return stripe.OAuth.authorize_url(
@@ -333,20 +375,22 @@ class StripeConnect(PaymentProvider):
             state=state
         )
 
-    def prepare_oauth_request(self, redirect_uri, success_url, error_url,
-                              user_fields=None):
+    def prepare_oauth_request(
+        self,
+        redirect_uri: str,
+        success_url: str,
+        error_url: str,
+        user_fields: dict[str, Any] | None = None
+    ) -> str:
         """ Registers the oauth request with the oauth_gateway and returns
         an url that is ready to be used for the complete oauth request.
 
         """
-        register = '{}/register/{}'.format(
-            self.oauth_gateway,
-            self.oauth_gateway_auth)
+        assert (self.oauth_gateway
+                and self.oauth_gateway_auth
+                and self.oauth_gateway_secret)
 
-        assert self.oauth_gateway \
-            and self.oauth_gateway_auth \
-            and self.oauth_gateway_secret
-
+        register = f'{self.oauth_gateway}/register/{self.oauth_gateway_auth}'
         payload = {
             'url': redirect_uri,
             'secret': self.oauth_gateway_secret,
@@ -364,7 +408,10 @@ class StripeConnect(PaymentProvider):
             user_fields=user_fields
         )
 
-    def process_oauth_response(self, request_params):
+    def process_oauth_response(
+        self,
+        request_params: 'Mapping[str, Any]'
+    ) -> None:
         """ Takes the parameters of an incoming oauth request and stores
         them on the payment provider if successful.
 
@@ -393,40 +440,45 @@ class StripeConnect(PaymentProvider):
         self.refresh_token = data['refresh_token']
         self.access_token = data['access_token']
 
-    def sync(self):
+    def sync(self) -> None:
         session = object_session(self)
         self.sync_payment_states(session)
         self.sync_payouts(session)
 
-    def sync_payment_states(self, session):
+    def sync_payment_states(self, session: 'Session') -> None:
 
-        def payments(ids):
+        def payments(ids: 'Collection[UUID]') -> 'Query[StripePayment]':
             q = session.query(self.payment_class)
             q = q.filter(self.payment_class.id.in_(ids))
 
             return q
 
+        def include_charge(charge: stripe.Charge) -> bool:
+            return 'payment' in charge.metadata
+
         charges = self.paged(
             stripe.Charge.list,
             limit=100,
-            include=lambda r: 'payment_id' in r.metadata
+            include=include_charge
         )
 
-        by_payment = {}
-
-        for charge in charges:
-            by_payment[charge.metadata['payment_id']] = charge
+        by_payment = {
+            charge.metadata['payment_id']: charge
+            for charge in charges
+        }
 
         for payment in payments(by_payment.keys()):
             payment.sync(remote_obj=by_payment[payment.id.hex])
 
-    def sync_payouts(self, session):
+    def sync_payouts(self, session: 'Session') -> None:
         """
         see https://stripe.com/docs/api/balance_transactions/list
         and https://stripe.com/docs/api/payouts
         """
 
-        payouts = self.paged(stripe.Payout.list, limit=100, status='paid')
+        payouts: 'Iterator[stripe.Payout]' = self.paged(
+            stripe.Payout.list, limit=100, status='paid'
+        )
         latest_payout = None
 
         paid_charges = {}
@@ -443,7 +495,7 @@ class StripeConnect(PaymentProvider):
             if not payout.automatic:
                 continue
 
-            transactions = self.paged(
+            transactions: 'Iterator[stripe.BalanceTransaction]' = self.paged(
                 stripe.BalanceTransaction.list,
                 limit=100,
                 payout=payout.id,
@@ -466,10 +518,16 @@ class StripeConnect(PaymentProvider):
 
         self.latest_payout = latest_payout and latest_payout.id
 
-    def paged(self, method, include=lambda record: True, **kwargs):
+    def paged(
+        self,
+        method: 'Callable[_P, stripe.ListObject]',
+        include: 'Callable[[_R], bool]' = lambda record: True,
+        *args: _P.args,
+        **kwargs: _P.kwargs
+    ) -> 'Iterator[_R]':
         with stripe_api_key(self.access_token):
-            records = method(**kwargs)
-            records = (r for r in records.auto_paging_iter())
+            list_obj = method(*args, **kwargs)
+            records = (r for r in list_obj.auto_paging_iter())
             records = (r for r in records if include(r))
 
             yield from records

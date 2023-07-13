@@ -1,3 +1,4 @@
+from enum import IntEnum
 from more.webassets import WebassetsApp
 from onegov.core.orm import orm_cached
 from onegov.pay import log
@@ -7,13 +8,26 @@ from onegov.pay.models.payment import ManualPayment
 from onegov.pay.utils import Price
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.pay.models.payment import Payment
+    from onegov.pay.types import PaymentMethod
+
+
 class PayApp(WebassetsApp):
     """ Provides payment integration for
     :class:`onegov.core.framework.Framework` based applications.
 
     """
 
-    def configure_payment_providers(self, **cfg):
+    def configure_payment_providers(
+        self,
+        *,
+        payment_providers_enabled: bool = False,
+        payment_provider_defaults: dict[str, Any] | None = None,
+        **cfg: Any
+    ) -> None:
         """ Configures the preconfigured parameters for payment providers.
 
         Takes one dictionary for each availble provider. Available providers
@@ -39,20 +53,18 @@ class PayApp(WebassetsApp):
 
         """
 
-        self.payment_providers_enabled = cfg.get(
-            'payment_providers_enabled', False)
+        self.payment_providers_enabled = payment_providers_enabled
 
-        self.payment_provider_defaults = cfg.get(
-            'payment_provider_defaults', {})
+        self.payment_provider_defaults = payment_provider_defaults or {}
 
     @orm_cached(policy='on-table-change:payment_providers')
-    def default_payment_provider(self):
+    def default_payment_provider(self) -> PaymentProvider[Any] | None:
         return self.session().query(PaymentProvider).filter(
             PaymentProvider.default.is_(True),
             PaymentProvider.enabled.is_(True),
         ).first()
 
-    def adjust_price(self, price):
+    def adjust_price(self, price: Price | None) -> Price | None:
         """ Takes the given price object and adjusts it depending on the
         settings of the payment provider (for example, the fee might be
         charged to the user).
@@ -70,19 +82,28 @@ class PayApp(WebassetsApp):
 
 
 @PayApp.webasset_path()
-def get_js_path():
+def get_js_path() -> str:
     return 'assets/js'
 
 
 @PayApp.webasset('pay')
-def get_pay_assets():
+def get_pay_assets() -> 'Iterator[str]':
     yield 'stripe.js'
 
 
-INSUFFICIENT_FUNDS = 1
+class PaymentError(IntEnum):
+    INSUFFICIENT_FUNDS = 1
 
 
-def process_payment(method, price, provider=None, token=None):
+INSUFFICIENT_FUNDS = PaymentError.INSUFFICIENT_FUNDS
+
+
+def process_payment(
+    method: 'PaymentMethod',
+    price: Price,
+    provider: PaymentProvider[Any] | None = None,
+    token: str | None = None
+) -> 'Payment | PaymentError | None':
     """ Processes a payment using various methods.
 
     This method returns one of the following:
@@ -106,13 +127,15 @@ def process_payment(method, price, provider=None, token=None):
     assert method in ('free', 'cc', 'manual') and price.amount > 0
 
     if method == 'free':
-        method = token and 'cc' or 'manual'
+        method = 'cc' if token else 'manual'
 
     if method == 'manual':
+        assert price.currency is not None
         # manual payments do not carry a fee, so we ignore it
         return ManualPayment(amount=price.net_amount, currency=price.currency)
 
     if method == 'cc' and token:
+        assert provider is not None and price.currency is not None
         try:
             return provider.charge(
                 amount=price.amount,
@@ -125,11 +148,8 @@ def process_payment(method, price, provider=None, token=None):
                 return INSUFFICIENT_FUNDS
 
             log.exception(
-                "Processing {} through {} with token {} failed".format(
-                    price,
-                    provider.title,
-                    token
-                )
+                f"Processing {price} through {provider.title} "
+                f"with token {token} failed"
             )
 
     return None
