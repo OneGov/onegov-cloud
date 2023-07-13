@@ -152,8 +152,8 @@ def test_event_collection_pagination(session):
 def test_occurrence_collection(session):
     event = EventCollection(session).add(
         title='Squirrel Park Visit',
-        start=datetime(2015, 6, 16, 9, 30),
-        end=datetime(2015, 6, 16, 18, 00),
+        start=datetime(next_year, 6, 16, 9, 30),
+        end=datetime(next_year, 6, 16, 18, 00),
         timezone='Pacific/Auckland',
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
@@ -167,19 +167,31 @@ def test_occurrence_collection(session):
     event.publish()
     event = EventCollection(session).add(
         title='History of the Squirrel Park',
-        start=datetime(2015, 6, 18, 14, 00),
-        end=datetime(2015, 6, 18, 16, 00),
+        start=datetime(next_year, 6, 18, 14, 00),
+        end=datetime(next_year, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         location='Squirrel Park',
         tags=['history']
     )
     event.submit()
     event.publish()
+    event = EventCollection(session).add(
+        title='Wild West Tour',
+        start=datetime(2023, 7, 12, 00, 00),
+        end=datetime(2023, 7, 12, 22, 00),
+        timezone='US/Central',
+        location='USA',
+        tags=['cowboy']
+    )
+    event.submit()
+    event.publish()
 
     timezones = OccurrenceCollection(session).used_timezones
-    assert sorted(timezones) == ['Europe/Zurich', 'Pacific/Auckland']
+    assert sorted(timezones) == ['Europe/Zurich', 'Pacific/Auckland',
+                                 'US/Central']
 
     tags = OccurrenceCollection(session).used_tags
+    # tags only from future events
     assert sorted(tags) == ['animals', 'fun', 'history', 'park']
 
     assert OccurrenceCollection(session, range='today').start == date.today()
@@ -603,8 +615,8 @@ def test_unique_names(session):
 def test_unicode(session):
     event = EventCollection(session).add(
         title='Salon du mieux-vivre, 16e édition',
-        start=datetime(2015, 6, 16, 9, 30),
-        end=datetime(2015, 6, 16, 18, 00),
+        start=datetime(next_year, 6, 16, 9, 30),
+        end=datetime(next_year, 6, 16, 18, 00),
         timezone='Europe/Zurich',
         content={
             'description': 'Rendez-vous automnal des médecines.'
@@ -616,8 +628,8 @@ def test_unicode(session):
     event.publish()
     event = EventCollection(session).add(
         title='Témoins de Jéhovah',
-        start=datetime(2015, 6, 18, 14, 00),
-        end=datetime(2015, 6, 18, 16, 00),
+        start=datetime(next_year, 6, 18, 14, 00),
+        end=datetime(next_year, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         content={
             'description': 'Congrès en français et espagnol.'

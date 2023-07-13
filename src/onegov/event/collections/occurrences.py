@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
 from lxml import objectify, etree
 from onegov.core.collection import Pagination
-from onegov.core.utils import get_unique_hstore_keys
+from onegov.core.utils import get_unique_hstore_keys_future_occurrences
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
 from sedate import as_datetime
@@ -189,8 +189,7 @@ class OccurrenceCollection(Pagination):
         http://stackoverflow.com/q/12015942/3690178
 
         """
-
-        return get_unique_hstore_keys(self.session, Occurrence._tags)
+        return get_unique_hstore_keys_future_occurrences(self.session)
 
     def query(self):
         """ Queries occurrences with the set parameters.
