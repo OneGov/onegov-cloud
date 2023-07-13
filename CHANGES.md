@@ -1,8 +1,30 @@
 # Changes
 
+## 2023.32
+
+`2023-07-11` | [fa001f406a...63b78a0756](https://github.com/OneGov/onegov-cloud/compare/fa001f406a^...63b78a0756)
+
+### Feriennet
+
+##### Replace Banners
+
+`Feature` | [PRO-1224](https://linear.app/projuventute/issue/PRO-1224) | [fa001f406a](https://github.com/onegov/onegov-cloud/commit/fa001f406aa4d3a1b8446f9796c52e8191bafe38)
+
+##### Bugfix invoice item export
+
+`Bugfix` | [PRO-1201](https://linear.app/projuventute/issue/PRO-1201) | [63b78a0756](https://github.com/onegov/onegov-cloud/commit/63b78a0756282ddcc67d4c58e0f86560e036ccac)
+
+### File
+
+##### Strips EXIF data from uploaded images
+
+Improves robustness of image processing in `ProcessedUploadedFile`
+
+`Feature` | [OGC-1190](https://linear.app/onegovcloud/issue/OGC-1190) | [355c39e74a](https://github.com/onegov/onegov-cloud/commit/355c39e74aeecfd36df17e9749b40c8a11974aa8)
+
 ## 2023.31
 
-No changes since last release
+`2023-07-10` | [7faae3b590...7faae3b590](https://github.com/OneGov/onegov-cloud/compare/7faae3b590^...7faae3b590)
 
 ## 2023.30
 
