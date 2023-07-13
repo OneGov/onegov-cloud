@@ -5222,3 +5222,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Expected header line with the following columns:"
+msgstr "La prima riga deve avere i seguenti nomi di colonna:"
