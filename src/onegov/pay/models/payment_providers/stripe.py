@@ -522,8 +522,8 @@ class StripeConnect(PaymentProvider[StripePayment]):
         self,
         method: 'Callable[_P, stripe.ListObject]',
         include: 'Callable[[_R], bool]' = lambda record: True,
-        *args: _P.args,
-        **kwargs: _P.kwargs
+        *args: '_P.args',
+        **kwargs: '_P.kwargs'
     ) -> 'Iterator[_R]':
         with stripe_api_key(self.access_token):
             list_obj = method(*args, **kwargs)

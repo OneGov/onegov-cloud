@@ -107,7 +107,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
 
         return price
 
-    def charge(self, amount: Decimal, currency: str, token: str) -> Payment:
+    def charge(self, amount: 'Decimal', currency: str, token: str) -> Payment:
         """ Given a payment token, charges the customer and creates a payment
         which is returned.
 
@@ -154,7 +154,7 @@ class PaymentProvider(Base, TimestampMixin, ContentMixin, Generic[_P]):
     def checkout_button(
         self,
         label: str,
-        amount: Decimal,
+        amount: 'Decimal',
         currency: str,
         action: str = 'submit',
         **extra: Any
