@@ -280,6 +280,7 @@ class BookingInvoiceBridge:
             SELECT DISTINCT
                 "group",    -- Text
                 "username", -- Text
+                attendee_id,-- UUID
                 period_id   -- UUID
             FROM invoice_items
 
@@ -291,11 +292,11 @@ class BookingInvoiceBridge:
 
             WHERE "group" != 'manual'
         """)
-        self.billed_attendees = {
-            (r.username, r.group) for r in session.execute(
+        self.billed_attendees = [
+            r.attendee_id for r in session.execute(
                 select(stmt.c).where(stmt.c.period_id == period.id)
             )
-        }
+        ]
 
         self.attendees = {
             a.id: (a.name, a.username)
@@ -349,13 +350,15 @@ class BookingInvoiceBridge:
             return
 
         for id, (attendee, username) in self.attendees.items():
-            if id in self.processed_attendees:
-                if (username, attendee) not in self.billed_attendees:
-                    self.existing[username].add(
-                        group=attendee,
-                        attendee_id=id,
-                        text=all_inclusive_booking_text,
-                        unit=self.period.booking_cost,
-                        quantity=1,
-                        flush=False
-                    )
+            if (
+                id in self.processed_attendees
+                and id not in self.billed_attendees
+            ):
+                self.existing[username].add(
+                    group=attendee,
+                    attendee_id=id,
+                    text=all_inclusive_booking_text,
+                    unit=self.period.booking_cost,
+                    quantity=1,
+                    flush=False
+                )
