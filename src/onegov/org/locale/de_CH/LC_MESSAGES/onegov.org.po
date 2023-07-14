@@ -5206,3 +5206,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Expected header line with the following columns:"
+msgstr "Die erste Zeile soll folgende Spaltennamen haben:"
