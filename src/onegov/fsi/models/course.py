@@ -5,8 +5,7 @@ from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable, Searchable
-from sqlalchemy import Column, Text, Boolean, Integer, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column, Text, Boolean, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
@@ -35,11 +34,8 @@ class Course(Base, ORMSearchable):
     # hides the course in the collection for non-admins
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

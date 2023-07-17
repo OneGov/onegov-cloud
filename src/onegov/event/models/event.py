@@ -25,8 +25,7 @@ from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone
-from sqlalchemy import and_, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import and_
 from sqlalchemy import Column
 from sqlalchemy import desc
 from sqlalchemy import Enum
@@ -109,11 +108,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
     )
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

@@ -1,9 +1,7 @@
 from uuid import uuid4
 
 from libres.db.models.timestamp import TimestampMixin
-from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float, \
-    Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import backref, relationship
 
@@ -191,11 +189,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     # If entry was imported, for the form and the expertise fields
     imported = Column(Boolean, default=False, nullable=False)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():

@@ -4,8 +4,7 @@ of content in a hierarchy.
 See also: `<https://docs.sqlalchemy.org/en/rel_0_9/orm/self_referential.html>`_
 
 """
-from sqlalchemy import func, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import func
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -23,11 +22,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     __tablename__ = 'pages'
 
     # column for full text search index
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

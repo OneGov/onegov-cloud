@@ -6,8 +6,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable, Searchable
-from sqlalchemy import Column, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
@@ -91,11 +90,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: when the membership started
     since = Column(Text, nullable=True)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

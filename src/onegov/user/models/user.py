@@ -10,8 +10,7 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable, Searchable
 from onegov.user.models.group import UserGroup
-from sqlalchemy import Boolean, Column, Text, func, ForeignKey, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Boolean, Column, Text, func, ForeignKey
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship
@@ -146,11 +145,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     signup_token: 'Column[str | None]' = Column(
         Text, nullable=True, default=None)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self) -> int:

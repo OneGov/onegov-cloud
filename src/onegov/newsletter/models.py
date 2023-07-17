@@ -16,7 +16,6 @@ from sqlalchemy import not_
 from sqlalchemy import select
 from sqlalchemy import Table
 from sqlalchemy import Text
-from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session, validates, relationship
 from uuid import uuid4
@@ -89,11 +88,8 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         secondary=newsletter_recipients,
         back_populates='newsletters')
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

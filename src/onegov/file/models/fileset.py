@@ -3,8 +3,7 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from sqlalchemy import Column, ForeignKey, Table, Text, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column, ForeignKey, Table, Text
 from sqlalchemy.orm import relationship
 
 
@@ -65,11 +64,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     }
 
     # column for full text search index
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():

@@ -18,8 +18,7 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent, Searchable
-from sqlalchemy import Column, Text, Index, Integer
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column, Text, Integer
 from sqlalchemy import func, exists, and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -103,11 +102,8 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         backref='directory'
     )
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

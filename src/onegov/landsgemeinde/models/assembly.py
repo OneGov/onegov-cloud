@@ -1,4 +1,3 @@
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -11,8 +10,7 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.agenda import AgendaItem
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.search import ORMSearchable
-from sqlalchemy import Boolean, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
@@ -97,11 +95,8 @@ class Assembly(
 
     last_modified = Column(UTCDateTime)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():

@@ -683,6 +683,8 @@ class SessionManager:
                 for base in self.bases:
                     base.metadata.schema = None
 
+                conn.execute('COMMIT')
+
             # if we have an upgrade state table, we want to prefill it with
             # all the current modules/tasks, to get the correct initial update
             # state (see https://github.com/OneGov/onegov.core/issues/8)

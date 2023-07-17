@@ -12,8 +12,7 @@ from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 from onegov.org.models import AccessExtension
 from onegov.search import SearchableContent, Searchable
-from sqlalchemy import Column, Text, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column, Text
 from sqlalchemy_utils import observes
 
 
@@ -51,11 +50,8 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     lead = meta_property()
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

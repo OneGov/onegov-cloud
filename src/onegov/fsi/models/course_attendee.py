@@ -3,7 +3,6 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
 from onegov.search import ORMSearchable, Searchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
@@ -110,7 +109,8 @@ class CourseAttendee(Base, ORMSearchable):
         cascade='all, delete-orphan'
     )
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     __table_args__ = (
         Index('fts_idx', fts_idx, postgresql_using='gin'),

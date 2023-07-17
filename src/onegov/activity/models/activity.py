@@ -12,9 +12,8 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.search import Searchable
 from onegov.user import User
-from sqlalchemy import Column, Enum, Text, ForeignKey, Index
+from sqlalchemy import Column, Enum, Text, ForeignKey
 from sqlalchemy import exists, and_, desc
-from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy.dialects.postgresql import HSTORE, TSVECTOR
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import object_session, relationship
@@ -103,11 +102,8 @@ class Activity(Base, ContentMixin, TimestampMixin):
         'polymorphic_identity': 'generic',
     }
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

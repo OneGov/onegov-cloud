@@ -8,11 +8,10 @@ from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
 from sqlalchemy import Column, Boolean, SmallInteger, \
-    Enum, Text, Interval, ForeignKey, or_, and_, Index
+    Enum, Text, Interval, ForeignKey, or_, and_
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
-from sqlalchemy import Computed  # type:ignore[attr-defined]
 
 from onegov.core.mail import Attachment
 from onegov.core.orm import Base
@@ -192,11 +191,8 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         nullable=False,
         default=default_reminder_before)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():

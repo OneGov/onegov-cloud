@@ -9,8 +9,7 @@ from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
-from sqlalchemy import Column, Text, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column, Text
 from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import observes
 
@@ -120,11 +119,8 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
         'polymorphic_identity': 'generic'
     }
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

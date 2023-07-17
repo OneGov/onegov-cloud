@@ -7,7 +7,6 @@ from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent, Searchable
 from sqlalchemy import Column
-from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Text
@@ -70,12 +69,12 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         'polymorphic_identity': 'generic',
     }
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     __table_args__ = (
         Index('inverted_keywords', 'keywords', postgresql_using='gin'),
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
-        Index('fts_idx', 'fts_idx', postgresql_using='gin'),
     )
 
     @staticmethod

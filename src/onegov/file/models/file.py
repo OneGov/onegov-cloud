@@ -18,7 +18,6 @@ from onegov.file.utils import extension_for_content_type
 from onegov.search import ORMSearchable, Searchable
 from pathlib import Path
 from sqlalchemy import Boolean, Column, Index, Text
-from sqlalchemy import Computed  # type:ignore[attr-defined]
 from sqlalchemy import case
 from sqlalchemy import event
 from sqlalchemy import text
@@ -193,11 +192,11 @@ class File(Base, Associable, TimestampMixin):
         'polymorphic_identity': 'generic'
     }
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     __table_args__ = (
         Index('files_by_type_and_order', 'type', 'order'),
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
     )
 
     @property

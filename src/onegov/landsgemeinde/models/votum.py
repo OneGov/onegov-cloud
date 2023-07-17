@@ -7,8 +7,7 @@ from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.search import ORMSearchable, Searchable
-from sqlalchemy import Column, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -99,11 +98,8 @@ class Votum(
         nullable=False
     )
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():

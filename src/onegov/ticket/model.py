@@ -10,9 +10,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from onegov.user import UserGroup
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text, \
-    Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
@@ -77,11 +75,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: true if the notifications for this ticket should be muted
     muted = Column(Boolean, nullable=False, default=False)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

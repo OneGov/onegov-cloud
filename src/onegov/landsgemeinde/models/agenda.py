@@ -9,7 +9,6 @@ from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
 from onegov.search import ORMSearchable, Searchable
-from sqlalchemy import Computed, Index  # type:ignore[attr-defined]
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -105,11 +104,8 @@ class AgendaItem(
         order_by='Votum.number',
     )
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():

@@ -14,8 +14,7 @@ from onegov.file.utils import extension_for_content_type
 from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable, Searchable
-from sqlalchemy import Column, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 
@@ -84,11 +83,8 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():

@@ -8,8 +8,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.crypto import random_token
 from onegov.search import ORMSearchable, Searchable
-from sqlalchemy import case, cast, func, select, and_, type_coerce, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import case, cast, func, select, and_, type_coerce
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -46,11 +45,8 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     }
     es_public = False
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

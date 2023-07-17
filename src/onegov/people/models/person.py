@@ -6,8 +6,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable, Searchable
-from sqlalchemy import Column, Text, Index
-from sqlalchemy import Computed  # type:ignore[attr-defined]
+from sqlalchemy import Column, Text
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
@@ -131,11 +130,8 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     #: some remarks about the person
     notes = Column(Text, nullable=True)
 
-    fts_idx = Column(TSVECTOR, Computed('', persisted=True))
-
-    __table_args__ = (
-        Index('fts_idx', fts_idx, postgresql_using='gin'),
-    )
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
 
     @staticmethod
     def psql_tsvector_string():
