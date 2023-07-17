@@ -63,7 +63,7 @@
                                         tal:condition="not url">${header_options['announcement']}</p>
                              </div>
                     </div>
-                    <div data-sticky-container id="header-links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="globals:bottom" data-stick-to="top">
+                    <div id="header-links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
                         <div class="grid-container">
                             <div class="title-bar align-center" data-responsive-toggle="animated-menu" data-hide-for="medium">
                                 <button type="button" data-toggle><i class="fa fa-bars"></i> <span i18n:translate="">Straight to ...</span></button>
@@ -112,7 +112,7 @@
                         </div>
                     </div>
                     <div data-sticky-container id="nav-bar">
-                        <div class="nav-bar-sticky" data-sticky data-options="marginTop:3.44; stickyOn: small;" data-top-anchor="globals:bottom" data-stick-to="top">
+                        <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="globals:bottom" data-stick-to="top">
 
 
                                 <div class="grid-container navigation">

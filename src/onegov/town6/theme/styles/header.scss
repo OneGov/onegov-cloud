@@ -210,13 +210,7 @@ $qr-code-icon: '\f029';
     }
 }
 
-#header-links.is-stuck {
-    border-bottom: 2px solid scale-color($primary-color, $lightness: 80%, $saturation: -12.5%);
-}
-
 #header-links {
-    background-color: $white;
-
     .fa-external-link-alt {
         display: none;
     }
@@ -253,7 +247,7 @@ $qr-code-icon: '\f029';
     }
 }
 
-$navbar-shadow: 0 15px 10px -15px rgba(0, 0, 0, .15);
+$navbar-shadow: 0 15px 10px -15px rgba(0,0,0,0.15);
 $transition-duration: .1s;
 
 #nav-bar {
