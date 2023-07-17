@@ -2,6 +2,8 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from freezegun import freeze_time
+from markupsafe import escape
+
 from onegov.event import Event
 from onegov.event import EventCollection
 from onegov.event.collections.events import EventImportItem
@@ -1052,7 +1054,7 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert event.title == 'Squirrel Park Virsit'
-    assert event.description == '<em>Furri</em> things will happen!'
+    assert event.description == escape('<em>Furri</em> things will happen!')
     assert event.location == 'Squirrel Par'
     assert event.start == tzdatetime(next_year, 6, 16, 9, 31, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
@@ -1097,7 +1099,7 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert event.title == 'Squirrel Park Visit'
-    assert event.description == '<em>Furry</em> things will happen!'
+    assert event.description == escape('<em>Furry</em> things will happen!')
     assert event.location == 'Squirrel Park'
     assert event.start == tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
@@ -1203,3 +1205,37 @@ def test_from_ical(session):
     event = events.query().one()
     assert event.start == tzdatetime(next_year, 6, 16, 13, 30, 'Europe/Zurich')
     assert event.end == tzdatetime(next_year, 6, 16, 22, 0, 'Europe/Zurich')
+
+    # escape of title, description, location and organizer
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Virsit</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DTSTAMP:20140101T000000Z',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            f'UNTIL={next_year}0616T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'CATEGORIES:fun,animals',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.title == '&lt;b&gt;Squirrel Park Virsit&lt;/b&gt;'
+    assert event.description == \
+           '&lt;em&gt;Furri&lt;/em&gt; things will happen!'
+    assert event.location == '&lt;i&gt;Squirrel Par&lt;/i&gt;'
+    assert event.organizer == '&lt;Super ME&gt;'
