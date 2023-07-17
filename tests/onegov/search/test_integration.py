@@ -5,6 +5,7 @@ import transaction
 from datetime import timedelta
 from elasticsearch_dsl.function import SF
 from elasticsearch_dsl.query import MatchPhrase, FunctionScore
+
 from onegov.core import Framework
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import scan_morepath_modules
@@ -46,11 +47,19 @@ def test_search_query(es_url, postgres_dsn):
         body = Column(Text, nullable=True)
         public = Column(Boolean, nullable=False)
         language = Column(Text, nullable=False)
+        # fts_idx = Column(TSVECTOR, Computed('', persisted=True))
+        # __table_args__ = (
+        #     Index('fts_idx', fts_idx, postgresql_using='gin'),
+        # )
 
         es_properties = {
             'title': {'type': 'localized'},
             'body': {'type': 'localized'}
         }
+
+        # @staticmethod
+        # def psql_tsvector_string():
+        #     return Searchable.create_tsvector_string('title', 'body')
 
         @property
         def es_suggestion(self):
@@ -150,7 +159,7 @@ def test_search_query(es_url, postgres_dsn):
 
     ##################
     # postgresql tests
-    app.psql_perform_reindex()
+    # app.psql_perform_reindex()
 
     # results = app.psql_search('')
     # assert results
