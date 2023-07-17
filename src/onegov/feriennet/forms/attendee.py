@@ -2,6 +2,7 @@ from cached_property import cached_property
 from chameleon.utils import Markup
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
+from onegov.activity import InvoiceCollection
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
@@ -132,6 +133,16 @@ class AttendeeForm(AttendeeBase):
 
     def on_request(self):
         self.toggle_political_municipality()
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        invoice_colletcion = InvoiceCollection(
+            session=self.request.session,
+            period_id=self.request.app.active_period.id)
+        invoice_colletcion.update_attendee_name(
+            self.model.id,
+            self.name
+        )
 
 
 class AttendeeSignupForm(AttendeeBase):

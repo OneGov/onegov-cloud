@@ -57,6 +57,13 @@ class InvoiceCollection(GenericCollection):
         return self.__class__(self.session, self.period_id, self.user_id,
                               schema, schema_config)
 
+    def update_attendee_name(self, attendee_id, attendee_name):
+        invoice_items = self.query_items()
+
+        for item in invoice_items:
+            if item.attendee_id == attendee_id:
+                item.group = attendee_name
+
     @cached_property
     def invoice(self):
         # XXX used for compatibility with legacy implementation in Feriennet
