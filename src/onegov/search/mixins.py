@@ -212,19 +212,24 @@ class Searchable:
         # to_tsvector('french', '<tsvector_string_of_model') ||
         # ...
 
-        tsvector_multi_language_expression = ' || '.join(
-            "to_tsvector('{}', {})".format(language,
-                                           model.psql_tsvector_string())
-            for language in get_fts_index_languages()
-        )
+        tsvector_expression = \
+            Searchable.multi_language_tsvector_expression(
+                model.psql_tsvector_string())
 
         query = f"""
             ALTER TABLE "{schema}".{model.__tablename__}
             ADD COLUMN IF NOT EXISTS {col_name} tsvector GENERATED ALWAYS AS
-            ({tsvector_multi_language_expression}) STORED;
+            ({tsvector_expression}) STORED;
         """
         session.execute(query)
         session.execute("COMMIT")
+
+    @staticmethod
+    def multi_language_tsvector_expression(tsvector_string):
+        return ' || '.join(
+            "to_tsvector('{}', {})".format(language, tsvector_string)
+            for language in get_fts_index_languages()
+        )
 
     @staticmethod
     def create_tsvector_string(*cols):
