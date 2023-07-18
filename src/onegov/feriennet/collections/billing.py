@@ -292,11 +292,11 @@ class BookingInvoiceBridge:
 
             WHERE "group" != 'manual'
         """)
-        self.billed_attendees = [
+        self.billed_attendees = {
             r.attendee_id for r in session.execute(
                 select(stmt.c).where(stmt.c.period_id == period.id)
             )
-        ]
+        }
 
         self.attendees = {
             a.id: (a.name, a.username)
