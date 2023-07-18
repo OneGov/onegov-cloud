@@ -249,6 +249,10 @@ class Pagination(Generic[_M]):
         @abstractmethod
         def page(self) -> int: ...
 
+        @page.setter
+        @abstractmethod
+        def page(self, value: int) -> None: ...
+
     @property
     def page_index(self) -> int:
         """ Returns the current page index (starting at 0). """
