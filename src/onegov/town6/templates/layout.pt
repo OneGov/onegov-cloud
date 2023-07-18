@@ -53,44 +53,22 @@
             <main>
                 <header id="header" tal:define="header_options request.app.org.header_options or {}">
                     <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
-                         id="announcement_header"
-                         style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
-                             <div class="grid-container" tal:define="url header_options.get('announcement_url');">
-                                    <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
-                                        tal:condition="url" href="${url}">
-                                        ${header_options['announcement']}</a>
-                                    <p style="color: ${header_options.get('announcement_font_color', '#000000')}"
-                                        tal:condition="not url">${header_options['announcement']}</p>
-                             </div>
-                    </div>
-                    <div id="header-links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
-                        <div class="grid-container">
-                            <div class="title-bar align-center" data-responsive-toggle="animated-menu" data-hide-for="medium">
-                                <button type="button" data-toggle><i class="fa fa-bars"></i> <span i18n:translate="">Straight to ...</span></button>
-                                </div>
-
-                                <div class="top-bar" id="animated-menu">
-                                <div class="top-bar-left">
-                                    <ul class="dropdown menu align-center" data-dropdown-menu>
-                                        <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
-                                    </ul>
-                                </div>
-                            </div>
+                        id="announcement_header"
+                        style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
+                        <div class="grid-container" tal:define="url header_options.get('announcement_url');">
+                                <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                                    tal:condition="url" href="${url}">
+                                    ${header_options['announcement']}</a>
+                                <p style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                                    tal:condition="not url">${header_options['announcement']}</p>
                         </div>
                     </div>
+
                     <div id="globals" class="globals" tal:define="toolbox global_tools|False">
                         <div class="grid-container">
                           <div class="grid-x grid-padding-x">
                               <div class="cell small-12">
                                   <div class="global-header-flex ${'' if toolbox else 'centered'}">
-                                    <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
-                                      <tal:b tal:condition="header_options['left_header_name']|nothing">
-                                          <a class="h4" href="${header_options.get('left_header_url', '#')}"
-                                             style="color:${color or '#fff'}; font-size: ${rem_size}rem">
-                                                  ${header_options['left_header_name']}
-                                          </a>
-                                      </tal:b>
-                                    </div>
                                     <ul tal:condition="toolbox" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
                                       <li tal:repeat="tool toolbox">
                                         <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
@@ -111,62 +89,66 @@
                             </div>
                         </div>
                     </div>
+
+                    <div tal:condition="not header_options.get('header_links_fixed')"  metal:use-macro="layout.macros['header-links']"></div>
+
                     <div data-sticky-container id="nav-bar">
                         <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="globals:bottom" data-stick-to="top">
 
+                            <div tal:condition="header_options.get('header_links_fixed')"  metal:use-macro="layout.macros['header-links']"></div>
 
-                                <div class="grid-container navigation">
-                                    <div class="grid-x">
-                                        <div class="large-2 small-2 cell">
-                                            <button tal:condition="layout.root_pages" data-toggle="offCanvas">
-                                                <i class="fas fa-bars"></i><span class="hide-for-small-only navigation-button">Navigation</span>
-                                            </button>
-                                        </div>
-                                        <div class="large-8 small-8 cell middle">
-                                            <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-                                                <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-                                                <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
-                                            </a>
-                                        </div>
-                                        <div class="large-2 small-2 cell right-side">
-                                            <form class="searchbox header-searchbox show-for-medium" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                                                <div class="input-group">
-                                                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
-                                                    <div class="typeahead">
-                                                        <div class="cell small-12" data-typeahead-container>
-                                                        </div>
-                                                    </div>
-                                                    <div class="input-group-button">
-                                                        <button type="submit" class="search-button">
-                                                            <i class="fa fa-search"></i>
-                                                        </button>
+                            <div class="grid-container navigation">
+                                <div class="grid-x">
+                                    <div class="large-2 small-2 cell">
+                                        <button tal:condition="layout.root_pages" data-toggle="offCanvas">
+                                            <i class="fas fa-bars"></i><span class="hide-for-small-only navigation-button">Navigation</span>
+                                        </button>
+                                    </div>
+                                    <div class="large-8 small-8 cell middle">
+                                        <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+                                            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                                            <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
+                                        </a>
+                                    </div>
+                                    <div class="large-2 small-2 cell right-side">
+                                        <form class="searchbox header-searchbox show-for-medium" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                                            <div class="input-group">
+                                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                                                <div class="typeahead">
+                                                    <div class="cell small-12" data-typeahead-container>
                                                     </div>
                                                 </div>
-                                            </form>
-                                            <div class="accordion search-header-mobile" data-accordion data-allow-all-closed="true">
-                                                <div class="accordion-item" data-accordion-item>
-                                                    <a href="#" class="accordion-title show-for-small-only"><i class="fa fa-search"></i></a>
-                                                    <div class="accordion-content" data-tab-content >
-                                                        <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                                                            <div class="input-group">
-                                                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
-                                                                <div class="input-group-button">
-                                                                    <button type="submit" class="search-button button" i18n:translate="">
-                                                                        Perform Search
-                                                                    </button>
-                                                                </div>
+                                                <div class="input-group-button">
+                                                    <button type="submit" class="search-button">
+                                                        <i class="fa fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <div class="accordion search-header-mobile" data-accordion data-allow-all-closed="true">
+                                            <div class="accordion-item" data-accordion-item>
+                                                <a href="#" class="accordion-title show-for-small-only"><i class="fa fa-search"></i></a>
+                                                <div class="accordion-content" data-tab-content >
+                                                    <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                                                        <div class="input-group">
+                                                            <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                                                            <div class="input-group-button">
+                                                                <button type="submit" class="search-button button" i18n:translate="">
+                                                                    Perform Search
+                                                                </button>
                                                             </div>
-                                                            <div class="typeahead">
-                                                                <div class="cell small-12" data-typeahead-container>
-                                                                </div>
+                                                        </div>
+                                                        <div class="typeahead">
+                                                            <div class="cell small-12" data-typeahead-container>
                                                             </div>
-                                                        </form>
-                                                    </div>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
 
                             <div class="grid-container fluid edit-bar-container" tal:condition="layout.editbar_links">
