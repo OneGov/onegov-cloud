@@ -31,6 +31,9 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     #: the invoice this item belongs to
     invoice_id = Column(UUID, ForeignKey('invoices.id'))
 
+    #: the attendee, if the item is connected to an attendee
+    attendee_id = Column(UUID, ForeignKey('attendees.id'), nullable=True)
+
     #: the item group (all items with the same text are visually grouped)
     group = Column(Text, nullable=False)
 

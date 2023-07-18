@@ -2,6 +2,7 @@ from cached_property import cached_property
 from chameleon.utils import Markup
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
+from onegov.activity import InvoiceCollection
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
@@ -34,6 +35,17 @@ class AttendeeBase(Form):
     def populate_obj(self, model):
         super().populate_obj(model)
         model.name = self.name
+
+        # Update name changes on invoice items of current period
+        invoice_collection = InvoiceCollection(
+            session=self.request.session,
+            period_id=self.request.app.active_period.id)
+
+        invoice_items = invoice_collection.query_items()
+
+        for item in invoice_items:
+            if item.attendee_id == self.model.id:
+                item.group = self.name
 
     def process_obj(self, model):
         super().process_obj(model)

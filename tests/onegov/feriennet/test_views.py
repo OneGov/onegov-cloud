@@ -2717,6 +2717,12 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
         'Fishing',
     ]
 
+    # rename Beavis
+    page = client.get('/my-bookings')
+    page = page.click('Bearbeiten', index=0)
+    page.form['last_name'] = 'Judge'
+    page.form.submit()
+
     # adding Beavis to a second activity this way should not result in
     # an additional all-inclusive charge
     page = client.get('/activity/hunting').click("Anmelden")
@@ -2732,6 +2738,13 @@ def test_booking_after_finalization_all_inclusive(client, scenario):
         'Hunting',
         'Ferienpass',
         'Fishing',
+    ]
+
+    # the name change should have changed the name on the invoce too
+    assert [e.text.strip() for e in page.pyquery('.item-group strong')[:-1]
+            ] == [
+        'Beavis\xa0Judge',
+        'Butthead'
     ]
 
     # none of this should have produced more than one invoice
