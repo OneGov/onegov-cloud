@@ -453,18 +453,15 @@ class StripeConnect(PaymentProvider[StripePayment]):
 
             return q
 
-        def include_charge(charge: stripe.Charge) -> bool:
-            return 'payment' in charge.metadata
-
-        charges = self.paged(
+        charges: 'Iterator[stripe.Charge]' = self.paged(
             stripe.Charge.list,
-            limit=100,
-            include=include_charge
+            limit=100
         )
 
         by_payment = {
-            charge.metadata['payment_id']: charge
+            payment_id: charge
             for charge in charges
+            if (payment_id := charge.metadata.get('payment_id')) is not None
         }
 
         for payment in payments(by_payment.keys()):
@@ -521,13 +518,9 @@ class StripeConnect(PaymentProvider[StripePayment]):
     def paged(
         self,
         method: 'Callable[_P, stripe.ListObject]',
-        include: 'Callable[[_R], bool]' = lambda record: True,
         *args: '_P.args',
         **kwargs: '_P.kwargs'
     ) -> 'Iterator[_R]':
         with stripe_api_key(self.access_token):
             list_obj = method(*args, **kwargs)
-            records = (r for r in list_obj.auto_paging_iter())
-            records = (r for r in records if include(r))
-
-            yield from records
+            yield from list_obj.auto_paging_iter()

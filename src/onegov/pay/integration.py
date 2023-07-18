@@ -129,17 +129,28 @@ def process_payment(
     if method == 'free':
         method = 'cc' if token else 'manual'
 
+    # FIXME: This is kind of bad, we have a default currency of CHF
+    #        for None which either results in an Exception or just
+    #        gets quietly applied depending on whether or not we
+    #        create a ManualPayment or charge through a PaymentProvider
+    #        for now let's always default to CHF, but we should be
+    #        more careful about distinguishing between a Price with
+    #        and without currency and force people to pass a price
+    #        with a currency into this function
+    currency = price.currency or 'CHF'
+
     if method == 'manual':
-        assert price.currency is not None
-        # manual payments do not carry a fee, so we ignore it
-        return ManualPayment(amount=price.net_amount, currency=price.currency)
+        return ManualPayment(
+            amount=price.net_amount,
+            currency=currency
+        )
 
     if method == 'cc' and token:
-        assert provider is not None and price.currency is not None
+        assert provider is not None
         try:
             return provider.charge(
                 amount=price.amount,
-                currency=price.currency,
+                currency=currency,
                 token=token
             )
         except CARD_ERRORS as e:
