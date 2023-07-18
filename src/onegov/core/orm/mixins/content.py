@@ -217,6 +217,9 @@ class dict_property(Generic[_T]):
         del getattr(instance, self.attribute)[self.key]
 
 
+# FIXME: Once we have type annotations on all the models we should make
+#        this return an unbound dict_property instead so we get a type
+#        error everywhere we forgot to specify the bound type.
 def dict_property_factory(attribute: str) -> '_bound_dict_property[Any]':
     def factory(
         key: str | None = None,

@@ -1,8 +1,20 @@
 # Changes
 
+## 2023.33
+
+`2023-07-18` | [05cfebe0e2...79ac2bf63f](https://github.com/OneGov/onegov-cloud/compare/05cfebe0e2^...79ac2bf63f)
+
+### Feriennet
+
+##### Fix invoice item bug on attendee name change
+
+Check for attendee id instead of name in the invoice items after a new booking. Also rename the invoice item group in the current period if the attendee name changes.
+
+`Bugfix` | [PRO-1092](https://linear.app/projuventute/issue/PRO-1092) | [79ac2bf63f](https://github.com/onegov/onegov-cloud/commit/79ac2bf63fcbb1c1b7d3d69e596b393f89869d31)
+
 ## 2023.32
 
-`2023-07-11` | [fa001f406a...63b78a0756](https://github.com/OneGov/onegov-cloud/compare/fa001f406a^...63b78a0756)
+`2023-07-11` | [fa001f406a...d6a24a0433](https://github.com/OneGov/onegov-cloud/compare/fa001f406a^...d6a24a0433)
 
 ### Feriennet
 
@@ -2826,14 +2838,4 @@ The search bar can now directly be used in the header
 ##### Adds test to ensure CI fails if container is missing xmlsec1
 
 `Bugfix` | [ad737f8401](https://github.com/onegov/onegov-cloud/commit/ad737f84015fbab241fd745b858c8677fa2e141a)
-
-## 2022.40
-
-`2022-07-27` | [373f3fe922...e2512b7706](https://github.com/OneGov/onegov-cloud/compare/373f3fe922^...e2512b7706)
-
-### User
-
-##### Adds SAML2 authentication provider
-
-`Feature` | [OGC-430](https://linear.app/onegovcloud/issue/OGC-430) | [373f3fe922](https://github.com/onegov/onegov-cloud/commit/373f3fe9224ddac7a031593a35deb31c270fe808)
 

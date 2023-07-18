@@ -13,38 +13,65 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from onegov.pay.models import PaymentProvider
+    from onegov.pay.types import PaymentState
+    from sqlalchemy.orm import relationship
+    from typing_extensions import Self
+
+
 class Payment(Base, TimestampMixin, ContentMixin, Associable):
     """ Represents a payment done through various means. """
 
     __tablename__ = 'payments'
 
     #: the public id of the payment
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type: ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the polymorphic source of the payment
-    source = Column(Text, nullable=False, default=lambda: 'generic')
+    source: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     #: the amount to pay
-    amount = Column(Numeric(precision=8, scale=2))
+    # FIXME: This was probably meant to be nullable=False
+    amount: 'Column[Decimal | None]' = Column(Numeric(precision=8, scale=2))
 
     #: the currency of the amount to pay
-    currency = Column(Text, nullable=False, default='CHF')
+    currency: 'Column[str]' = Column(Text, nullable=False, default='CHF')
 
     #: remote id of the payment
-    remote_id = Column(Text, nullable=True)
+    remote_id: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the state of the payment
-    state = Column(
-        Enum('open', 'paid', 'failed', 'cancelled', name='payment_state'),
+    state: 'Column[PaymentState]' = Column(
+        Enum(  # type:ignore[arg-type]
+            'open', 'paid', 'failed', 'cancelled',
+            name='payment_state'
+        ),
         nullable=False,
         default='open'
     )
 
     #: the payment provider associated with the payment, if it is missing it
     #: means that the payment is out-of-band (say paid by cash)
-    provider_id = Column(
-        UUID, ForeignKey('payment_providers.id'), nullable=True
+    provider_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey('payment_providers.id'),
+        nullable=True
     )
+
+    if TYPE_CHECKING:
+        # inserted via backref
+        provider: relationship[PaymentProvider['Self'] | None]
 
     __mapper_args__ = {
         'polymorphic_on': source,
@@ -52,7 +79,7 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
     }
 
     @property
-    def fee(self):
+    def fee(self) -> Decimal:
         """ The fee associated with this payment. The payment amount includes
         the fee. To get the net amount use the net_amount property.
 
@@ -60,11 +87,12 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
         return Decimal(0)
 
     @property
-    def net_amount(self):
+    def net_amount(self) -> Decimal:
+        assert self.amount is not None
         return Decimal(self.amount) - self.fee
 
     @hybrid_property
-    def paid(self):
+    def paid(self) -> bool:
         """ Our states are essentially one paid and n unpaid states (indicating
         various ways in which the payment can end up being unpaid).
 
@@ -75,12 +103,12 @@ class Payment(Base, TimestampMixin, ContentMixin, Associable):
         return self.state == 'paid'
 
     @property
-    def remote_url(self):
+    def remote_url(self) -> str:
         """ Returns the url of this object on the payment provider. """
 
         raise NotImplementedError
 
-    def sync(self, remote_obj=None):
+    def sync(self, remote_obj: Any | None = None) -> None:
         """ Updates the local payment information with the information from
         the remote payment provider.
 
@@ -97,5 +125,5 @@ class ManualPayment(Payment):
     """
     __mapper_args__ = {'polymorphic_identity': 'manual'}
 
-    def sync(self, remote_obj=None):
+    def sync(self, remote_obj: None = None) -> None:
         pass
