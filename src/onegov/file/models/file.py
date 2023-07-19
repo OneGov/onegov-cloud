@@ -1,7 +1,10 @@
+import fcntl
 import json
 import sedate
 import isodate
 
+from contextlib import contextmanager
+from collections import defaultdict
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
@@ -9,6 +12,7 @@ from onegov.core.orm.abstract import Associable
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.utils import normalize_for_url
+from onegov.file import log
 from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
@@ -25,10 +29,13 @@ from sqlalchemy.orm import deferred
 from sqlalchemy.orm import object_session, Session
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import observes
+from time import monotonic
 
 
 from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from _typeshed import StrPath
+    from collections.abc import Iterator
     from datetime import datetime
     from depot.fields.upload import UploadedFile
     from onegov.file import FileSet
@@ -361,14 +368,38 @@ class File(Base, Associable, TimestampMixin):
         session = object_session(self)
 
         if 'pending_metadata_changes' not in session.info:
-            session.info['pending_metadata_changes'] = []
+            session.info['pending_metadata_changes'] = defaultdict(dict)
 
         # only support upating existing values - do not create new ones
-        for key, value in options.items():
-            session.info['pending_metadata_changes'].append((path, key, value))
+        session.info['pending_metadata_changes'][path].update(options)
 
         # make sure we cause a commit here
         flag_modified(self, 'reference')
+
+
+@contextmanager
+def metadata_lock(
+    metadata_path: 'StrPath',
+    timeout: float = 0.0,
+) -> 'Iterator[bool]':
+    """ Locks the metadata from a ``filedepot.io.local.LocalStoredFile``.
+        Tries to acquire the lock repeatedly in a spin lock until timeout
+        expires, it will return whether or not it managed to acquire the lock
+    """
+    lock_file = f'{metadata_path}.lock'
+    start_time = monotonic()
+    with open(lock_file, 'wb') as fd:
+        while True:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                if monotonic() - start_time >= timeout:
+                    yield False
+                    break
+            else:
+                yield True
+                fcntl.flock(fd, fcntl.LOCK_UN)
+                break
 
 
 @event.listens_for(Session, 'after_commit')
@@ -376,17 +407,29 @@ def update_metadata_after_commit(session: Session) -> None:
     if 'pending_metadata_changes' not in session.info:
         return
 
-    # FIXME: Opening the file multiple times for reading and writing
-    #        seems really dumb, plus we probably need some kind of flock
-    #        to ensure two transactions can't mess with each other
-    for path, key, value in session.info['pending_metadata_changes']:
-        with open(path, 'r') as f:
-            metadata = json.loads(f.read())
+    for path, values in session.info['pending_metadata_changes'].items():
+        with metadata_lock(path, 0.5) as locked:
+            if not locked:
+                # FIXME: For now we just log an error but still overwrite
+                #        the metadata file, in case we get a flock that
+                #        never gets cleaned up properly
+                log.error(
+                    f'Failed to acquire lock on metadata file {path}. '
+                    'Performing a potentially unsafe override of metadata.'
+                )
 
-        metadata[key] = value
+            # we modify the file in place in rw mode
+            with open(path, 'r+') as f:
+                metadata = json.loads(f.read())
+                metadata.update(values)
 
-        with open(path, 'w') as f:
-            f.write(json.dumps(metadata))
+                # FIXME: This potentially still has some race conditions
+                #        with LocalStoredFile loading the metadata in
+                #        another process, unless the file isn't flushed
+                #        until after we are done writing to it.
+                f.seek(0)
+                f.write(json.dumps(metadata))
+                f.truncate()
 
     del session.info['pending_metadata_changes']
 

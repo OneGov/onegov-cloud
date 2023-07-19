@@ -324,22 +324,30 @@ def test_update_metadata(session):
         return session.query(File).one()
 
     assert get_file().reference.file.filename == 'unnamed'
+    assert get_file().reference.file.content_type == 'application/octet-stream'
 
     get_file()._update_metadata(filename='foobar.txt')
     transaction.abort()
 
     assert get_file().reference.file.filename == 'unnamed'
+    assert get_file().reference.file.content_type == 'application/octet-stream'
 
-    get_file()._update_metadata(filename='foobar.txt')
+    get_file()._update_metadata(
+        filename='foobar.txt',
+        content_type='text/markdown'
+    )
     transaction.commit()
 
     assert get_file().reference.file.filename == 'foobar.txt'
+    assert get_file().reference.file.content_type == 'text/markdown'
 
-    get_file()._update_metadata(filename='foo.txt')
+    get_file()._update_metadata(filename='foo.txt', content_type='text/plain')
+    # this should only override filename not the updated content_type
     get_file()._update_metadata(filename='bar.txt')
     transaction.commit()
 
     assert get_file().reference.file.filename == 'bar.txt'
+    assert get_file().reference.file.content_type == 'text/plain'
 
 
 def test_pdf_text_extraction(session):

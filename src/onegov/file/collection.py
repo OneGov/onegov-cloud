@@ -4,12 +4,10 @@ from onegov.file.models import File, FileSet
 from onegov.file.utils import as_fileintent, digest
 from sedate import utcnow
 from sqlalchemy import and_, text, or_
-from itertools import chain
 
 
 from typing import Any, IO, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
     from datetime import datetime
     from onegov.file.types import SignatureMetadata
     from sqlalchemy.orm import Query, Session
@@ -112,47 +110,28 @@ class FileCollection:
         self.session.delete(file)
         self.session.flush()
 
-    # FIXME: Why does this yield rather than just return a query?
-    #        we don't really gain any advantages from doing that
-    #        in fact we lose the ability to set options on the query
-    #        or filter it further... Iterating through the query is
-    #        still possible, we don't need an iterator.
     def no_longer_published_files(
         self,
         horizon: 'datetime'
-    ) -> 'Iterator[File]':
-        """ Yields files where the publishing end date has expired. """
-        yield from self.query().filter(and_(
-            File.publish_end_date != None,
-            File.published == True,
+    ) -> 'Query[File]':
+        """ Returns a query of files where the publishing end date has expired.
+        """
+        return self.query().filter(and_(
+            File.published.is_(True),
             File.publish_end_date < horizon
         ))
 
-    # FIXME: Why are we doing this in two queries, we can clearly do
-    #        this in one and order by whether or no publish_end_date
-    #        is NULL to preserve the original order
-    def publishable_files(self, horizon: 'datetime') -> 'Iterator[File]':
-        """ Yields files which may be published. """
+    def publishable_files(self, horizon: 'datetime') -> 'Query[File]':
+        """ Returns a query of files which may be published. """
 
-        def publish_in_timeframe() -> 'Iterator[File]':
-            yield from self.query().filter(and_(
-                File.published == False,
-                File.publish_date != None,
-                File.publish_date <= horizon,
-                File.publish_end_date != None,
+        return self.query().filter(and_(
+            File.published.is_(False),
+            File.publish_date <= horizon,
+            or_(
+                File.publish_end_date.is_(None),
                 File.publish_end_date > horizon
-            ))
-
-        def publish_ad_infinitum() -> 'Iterator[File]':
-            # if end_date is None, it follows there is no upper limit
-            yield from self.query().filter(and_(
-                File.published == False,
-                File.publish_date != None,
-                File.publish_date <= horizon,
-                File.publish_end_date == None
-            ))
-
-        yield from chain(publish_in_timeframe(), publish_ad_infinitum())
+            )
+        ))
 
     def publish_files(self, horizon: 'datetime | None' = None) -> None:
         """ Publishes unpublished files with a publish date older than the
@@ -165,6 +144,10 @@ class FileCollection:
 
         for fi in self.no_longer_published_files(horizon):
             fi.published = False
+            # technically this should already be None, but we still set
+            # it to make absolutely sure we don't republish it right
+            # after, because it still had a publish date in the past
+            fi.publish_date = None
             fi.publish_end_date = None
         self.session.flush()
 
