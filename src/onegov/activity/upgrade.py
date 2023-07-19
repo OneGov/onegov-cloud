@@ -32,7 +32,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import or_
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import ARRAY

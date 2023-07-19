@@ -7,7 +7,6 @@ from onegov.feriennet.forms import PeriodExportForm
 from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy import distinct
-from sqlalchemy import func
 from sqlalchemy import or_
 
 
