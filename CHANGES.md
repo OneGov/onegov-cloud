@@ -1,8 +1,18 @@
 # Changes
 
+## 2023.34
+
+`2023-07-18` | [a15b7df028...eeb027e135](https://github.com/OneGov/onegov-cloud/compare/a15b7df028^...eeb027e135)
+
+### Feriennet
+
+##### Fix upgrade step
+
+`Bugfix` | [eeb027e135](https://github.com/onegov/onegov-cloud/commit/eeb027e135809c0b342a84c114f02ee72d880bc8)
+
 ## 2023.33
 
-`2023-07-18` | [05cfebe0e2...79ac2bf63f](https://github.com/OneGov/onegov-cloud/compare/05cfebe0e2^...79ac2bf63f)
+`2023-07-18` | [05cfebe0e2...d6e27abb40](https://github.com/OneGov/onegov-cloud/compare/05cfebe0e2^...d6e27abb40)
 
 ### Feriennet
 
@@ -2750,92 +2760,4 @@ Also, avoid using forms raw_data directly.
 ##### Removes trailing '/' from name_id in SAML2 client.
 
 `Bugfix` | [3d0b81c15b](https://github.com/onegov/onegov-cloud/commit/3d0b81c15b531b26f774bb4c2a3ca581ccd8af82)
-
-## 2022.41
-
-`2022-08-10` | [ad737f8401...d1172ef864](https://github.com/OneGov/onegov-cloud/compare/ad737f8401^...d1172ef864)
-
-### Core
-
-##### Improve compatibility with SQLAlchemy 1.4.
-
-Updates adjacency lists used by page and gazette.
-
-`Feature` | [OGC-15](https://linear.app/onegovcloud/issue/OGC-15) | [6342638855](https://github.com/onegov/onegov-cloud/commit/634263885533fa645d6af959663c195d265c742d)
-
-##### Makes sure Request.application_url strips X_VHM_ROOT
-
-`Bugfix` | [c8d5819e4e](https://github.com/onegov/onegov-cloud/commit/c8d5819e4e1dba9c312f56560c9727f244ead695)
-
-### Election Day
-
-##### Add seat allocation view.
-
-`Feature` | [OGC-487](https://linear.app/onegovcloud/issue/OGC-487) | [2aab61c554](https://github.com/onegov/onegov-cloud/commit/2aab61c5545c49c82047ad6681013589118fde8c)
-
-##### Add apportionment PDFs to election compounds.
-
-`Feature` | [OGC-490](https://linear.app/onegovcloud/issue/OGC-490) | [0f1e8eeb5e](https://github.com/onegov/onegov-cloud/commit/0f1e8eeb5e4e3f71f9e27d12ae196cf38e2ff7ef)
-
-##### Add elected candidates statistics to election compounds.
-
-`Feature` | [OGC-489](https://linear.app/onegovcloud/issue/OGC-489) | [9f9f03f7d2](https://github.com/onegov/onegov-cloud/commit/9f9f03f7d2f25fefe893e42a07a8c7dac6d819ac)
-
-##### Add "no results" text and layout changes
-
-`Feature` | [OGC-282](https://linear.app/onegovcloud/issue/OGC-282) | [2bb2c87a8b](https://github.com/onegov/onegov-cloud/commit/2bb2c87a8bf72181f2cab25e031ed82269c5f013)
-
-##### Fixes election compound statistics showing wrong aggregation level.
-
-Also adds statistics to PDF.
-
-`Bugfix` | [OGC-531](https://linear.app/onegovcloud/issue/OGC-531) | [ff9d88102e](https://github.com/onegov/onegov-cloud/commit/ff9d88102ec923d5a8e819ceb25b8c56dbf82eb5)
-
-### Feriennet
-
-##### Filter for active period and add phase info
-
-`Feature` | [OGC-991](https://linear.app/onegovcloud/issue/OGC-991) | [fca971342e](https://github.com/onegov/onegov-cloud/commit/fca971342eebb1958aaedfe646eca12dd6e010da)
-
-### Org
-
-##### Add option for external resources
-
-It is now possible to add external resources as links.
-
-`Feature` | [OGC-354](https://linear.app/onegovcloud/issue/OGC-354) | [943ea1b337](https://github.com/onegov/onegov-cloud/commit/943ea1b3371526062bffbe15d27b4429b6dfda6c)
-
-##### Fixes AttributeError in Find Your Spot form validation
-
-`Bugfix` | [84299db8c6](https://github.com/onegov/onegov-cloud/commit/84299db8c66be71b6c99b612ff6e573b6265dd9d)
-
-##### Handles DST/ST time transitions better when creating reservations
-
-`Bugfix` | [OGC-466](https://linear.app/onegovcloud/issue/OGC-466) | [9b9a0e6f82](https://github.com/onegov/onegov-cloud/commit/9b9a0e6f826fe5dcf3acf0cda89d3caaceeac61a)
-
-##### Cleans up some additional DST related issues
-
-`Bugfix` | [OGC-466](https://linear.app/onegovcloud/issue/OGC-466) | [7a373969fe](https://github.com/onegov/onegov-cloud/commit/7a373969fee568d274e2bce4d69fd2e255de2bbb)
-
-### Town6
-
-##### Search bar in header
-
-The search bar can now directly be used in the header
-
-`Feature` | [OGC-80](https://linear.app/onegovcloud/issue/OGC-80) | [e05a65d2d5](https://github.com/onegov/onegov-cloud/commit/e05a65d2d57c6802a9be056f720ccf37361f60f6)
-
-##### Add title homepage widget
-
-`Feature` | [OGC-521](https://linear.app/onegovcloud/issue/OGC-521) | [dfe5dd95c7](https://github.com/onegov/onegov-cloud/commit/dfe5dd95c7faa964d929187f8b564518abe23a86)
-
-##### Remove external link icons from partner widget and footer
-
-`Bugfix` | [OGC-522](https://linear.app/onegovcloud/issue/OGC-522) | [d3d71d82ed](https://github.com/onegov/onegov-cloud/commit/d3d71d82ed580fb9b51b7c37caf7dc62b959bf2a)
-
-### User
-
-##### Adds test to ensure CI fails if container is missing xmlsec1
-
-`Bugfix` | [ad737f8401](https://github.com/onegov/onegov-cloud/commit/ad737f84015fbab241fd745b858c8677fa2e141a)
 
