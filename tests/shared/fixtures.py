@@ -438,6 +438,9 @@ def webdriver_executable_path():
     version = re.search(pattern, stdout)
     if version:
         driver = ChromeType.GOOGLE
+        # FIXME: temporary workaround for chrome_webdriver using the
+        #        wrong URL to lookup chrome releases
+        return which('google-chrome') or which('google-chrome-stable')
     else:
         driver = ChromeType.CHROMIUM
     return ChromeDriverManager(chrome_type=driver).install()
