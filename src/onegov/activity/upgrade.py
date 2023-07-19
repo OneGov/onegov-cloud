@@ -7,7 +7,9 @@ import string
 
 from itertools import chain
 from onegov.activity import ActivityCollection
+from onegov.activity import Attendee
 from onegov.activity import Booking
+from onegov.activity import Invoice
 from onegov.activity import InvoiceCollection
 from onegov.activity import InvoiceItem
 from onegov.activity import InvoiceReference
@@ -15,6 +17,7 @@ from onegov.activity import Occasion
 from onegov.activity import OccasionNeed
 from onegov.activity import Period
 from onegov.activity import PeriodCollection
+from onegov.user import User
 from onegov.core.crypto import random_token
 from onegov.core.orm.sql import as_selectable
 from onegov.core.orm.types import UUID, JSON
@@ -26,8 +29,10 @@ from sqlalchemy import Date
 from sqlalchemy import desc
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
+from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
+from sqlalchemy import or_
 from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -896,3 +901,15 @@ def add_attendee_id_to_invoice_item(context):
         context.operations.add_column('invoice_items', Column(
             'attendee_id', UUID, ForeignKey("attendees.id"), nullable=True
         ))
+
+
+@upgrade_task('Fill in attendee ids')
+def fill_in_attendee_ids_1(context):
+    q = context.session.query(InvoiceItem, Attendee).join(Invoice).join(User)
+    q = q.join(Attendee,
+               func.lower(InvoiceItem.group) == func.lower(Attendee.name))
+    q = q.filter(User.username == Attendee.username)
+    q = q.filter(User.id == Invoice.user_id)
+
+    for item, attendee in q.all():
+        item.attendee_id = attendee.id
