@@ -27,9 +27,16 @@ from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import observes
 
 
-from typing import TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from datetime import datetime
     from depot.fields.upload import UploadedFile
+    from onegov.file import FileSet
+    from onegov.file.types import FileStats, SignatureMetadata
+    from sqlalchemy.engine import Dialect
+    from sqlalchemy.orm import relationship
+    from sqlalchemy.orm.session import SessionTransaction
+    from sqlalchemy.sql.type_api import TypeEngine
 
 
 class UploadedFileField(UploadedFileFieldBase):
@@ -38,16 +45,25 @@ class UploadedFileField(UploadedFileFieldBase):
 
     """
 
-    def load_dialect_impl(self, dialect):
+    def load_dialect_impl(
+        self,
+        dialect: 'Dialect'
+    ) -> 'TypeEngine[UploadedFile]':
         return dialect.type_descriptor(JSON())
 
-    def process_bind_param(self, value, dialect):
-        if value:
-            return value
+    def process_bind_param(
+        self,
+        value: 'UploadedFile | None',
+        dialect: 'Dialect'
+    ) -> 'UploadedFile | None':
+        return value if value else None
 
-    def process_result_value(self, value, dialect):
-        if value:
-            return self._upload_type(value)
+    def process_result_value(
+        self,
+        value: dict[str, Any],
+        dialect: 'Dialect'
+    ) -> 'UploadedFile | None':
+        return self._upload_type(value) if value else None
 
 
 class SearchableFile(ORMSearchable):
@@ -67,12 +83,17 @@ class SearchableFile(ORMSearchable):
         'extract': {'type': 'localized'}
     }
 
+    if TYPE_CHECKING:
+        # forward declare columns on File
+        name: Column[str]
+        published: Column[bool]
+
     @property
-    def es_suggestion(self):
+    def es_suggestion(self) -> str:
         return self.name
 
     @property
-    def es_public(self):
+    def es_public(self) -> bool:
         return self.published
 
 
@@ -88,19 +109,24 @@ class File(Base, Associable, TimestampMixin):
     __tablename__ = 'files'
 
     #: the unique, public id of the file
-    id = Column(Text, nullable=False, primary_key=True, default=random_token)
+    id: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        primary_key=True,
+        default=random_token
+    )
 
     #: the name of the file, incl. extension (not used for public links)
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(Text, nullable=False)
 
     #: a short note about the file (for captions, other information)
-    note = Column(Text, nullable=True)
+    note: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: the default order of files
-    order = Column(Text, nullable=False)
+    order: 'Column[str]' = Column(Text, nullable=False)
 
     #: true if published
-    published = Column(Boolean, nullable=False, default=True)
+    published: 'Column[bool]' = Column(Boolean, nullable=False, default=True)
 
     #: the date after which this file will be made public - this controls
     #: the visibility of the object through the ``access``
@@ -109,20 +135,30 @@ class File(Base, Associable, TimestampMixin):
     #: To get a file published, be sure to call
     #: :meth:`onegov.file.collection.FileCollection.publish_files` once an
     #: hour through a cronjob (see :mod:`onegov.core.cronjobs`)!
-    publish_date = Column(UTCDateTime, nullable=True)
+    publish_date: 'Column[datetime | None]' = Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     #: the date up to which the file is published
-    publish_end_date = Column(UTCDateTime, nullable=True)
+    publish_end_date: 'Column[datetime | None]' = Column(
+        UTCDateTime,
+        nullable=True
+    )
 
     #: true if marked for publication
-    publication = Column(Boolean, nullable=False, default=False)
+    publication: 'Column[bool]' = Column(
+        Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: true if the file was digitally signed in the onegov cloud
     #:
     #: (the file could be signed without this being true, but that would
     #: amount to a signature created outside of our platform, which is
     #: something we ignore)
-    signed = Column(Boolean, nullable=False, default=False)
+    signed: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     #: the metadata of the signature - this should include the following
     #: data::
@@ -133,7 +169,9 @@ class File(Base, Associable, TimestampMixin):
     #:  - timestamp: The time the document was signed in UTC
     #:  - request_id: A unique identifier by the signing service
     #:
-    signature_metadata = deferred(Column(JSON, nullable=True))
+    signature_metadata: 'Column[SignatureMetadata | None]' = deferred(
+        Column(JSON, nullable=True)
+    )
 
     #: the type of the file, this can be used to create custom polymorphic
     #: subclasses. See `<https://docs.sqlalchemy.org/en/improve_toc/
@@ -141,7 +179,11 @@ class File(Base, Associable, TimestampMixin):
     #:
     #: not to be confused with the the actual filetype which is stored
     #: on the :attr:`reference`!
-    type = Column(Text, nullable=False, default=lambda: 'generic')
+    type: 'Column[str]' = Column(
+        Text,
+        nullable=False,
+        default=lambda: 'generic'
+    )
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
@@ -170,20 +212,24 @@ class File(Base, Associable, TimestampMixin):
     #:
     #: note, this is not meant to be cryptographically secure - this is
     #: strictly a check of file duplicates, not protection against tampering
-    checksum = Column(Text, nullable=True, index=True)
+    checksum: 'Column[str | None]' = Column(Text, nullable=True, index=True)
 
     #: the content of the given file as text, if it can be extracted
     #: (it is important that this column be loaded deferred by default, lest
     #: we load massive amounts of text on simple queries)
-    extract = deferred(Column(Text, nullable=True))
+    extract: 'Column[str | None]' = deferred(Column(Text, nullable=True))
 
     #: the languge of the file
-    language = Column(Text, nullable=True)
+    language: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: statistics around the extract (number of pages, words, etc.)
     #: those are usually set during file upload (as some information is
     #: lost afterwards)
-    stats = deferred(Column(JSON, nullable=True))
+    stats: 'Column[FileStats | None]' = deferred(Column(JSON, nullable=True))
+
+    if TYPE_CHECKING:
+        # forward declare backref
+        filesets: 'relationship[list[FileSet]]'
 
     __mapper_args__ = {
         'polymorphic_on': 'type',
@@ -195,12 +241,13 @@ class File(Base, Associable, TimestampMixin):
     )
 
     @hybrid_property
-    def signature_timestamp(self):
+    def signature_timestamp(self) -> 'datetime | None':
         if self.signed:
             return sedate.replace_timezone(
                 isodate.parse_datetime(self.signature_metadata['timestamp']),
                 'UTC'
             )
+        return None
 
     @signature_timestamp.expression  # type:ignore[no-redef]
     def signature_timestamp(self):
@@ -220,7 +267,7 @@ class File(Base, Associable, TimestampMixin):
         ), UTCDateTime)
 
     @observes('reference')
-    def reference_observer(self, reference):
+    def reference_observer(self, reference: 'UploadedFile') -> None:
         if 'checksum' in self.reference:
             self.checksum = self.reference.pop('checksum')
 
@@ -231,24 +278,28 @@ class File(Base, Associable, TimestampMixin):
             self.stats = self.reference.pop('stats')
 
     @observes('name')
-    def name_observer(self, name):
+    def name_observer(self, name: str) -> None:
         self.order = normalize_for_url(name)
 
     @property
-    def access(self):
+    def access(self) -> str:
         return 'public' if self.published else 'private'
 
     @property
-    def file_id(self):
+    def file_id(self) -> str:
         """ The file_id of the contained reference.
 
         If :attr:`virtual_file_id` is not None, it is returned instead.
         """
 
-        return self.virtual_file_id or self.reference.file_id
+        # FIXME: Do we use this attribute...? It doesn't seem like it's
+        #        defined, if it's something that is sometimes added at
+        #        runtime we should probably either initalize it to None
+        #        or do a getattr...
+        return self.virtual_file_id or self.reference.file_id  # type:ignore
 
     @property
-    def claimed_extension(self):
+    def claimed_extension(self) -> str:
         """ Returns the extension as defined by the file name or by the
         content type (whatever is found first in this order).
 
@@ -262,7 +313,7 @@ class File(Base, Associable, TimestampMixin):
         return extension_for_content_type(
             self.reference['content_type'], self.name)
 
-    def get_thumbnail_id(self, size):
+    def get_thumbnail_id(self, size: str) -> 'UploadedFile | None':
         """ Returns the thumbnail id with the given size (e.g. 'small').
 
         """
@@ -275,7 +326,21 @@ class File(Base, Associable, TimestampMixin):
 
         return self.reference[name]['id']
 
-    def _update_metadata(self, **options):
+    # FIXME: We may want to restrict the arguments on the actual
+    #        function rather than use overloads as a workaround
+    #        but we will have to be careful about default values
+    @overload
+    def _update_metadata(self) -> None: ...
+
+    @overload
+    def _update_metadata(
+        self,
+        *,
+        content_type: str = ...,
+        filename: str = ...,
+    ) -> None: ...
+
+    def _update_metadata(self, **options: Any) -> None:
         """ Updates the underlying metadata with the give values. This
         operats on low-level interfaces of Depot and assumes local storage.
 
@@ -307,10 +372,13 @@ class File(Base, Associable, TimestampMixin):
 
 
 @event.listens_for(Session, 'after_commit')
-def update_metadata_after_commit(session):
+def update_metadata_after_commit(session: Session) -> None:
     if 'pending_metadata_changes' not in session.info:
         return
 
+    # FIXME: Opening the file multiple times for reading and writing
+    #        seems really dumb, plus we probably need some kind of flock
+    #        to ensure two transactions can't mess with each other
     for path, key, value in session.info['pending_metadata_changes']:
         with open(path, 'r') as f:
             metadata = json.loads(f.read())
@@ -324,6 +392,9 @@ def update_metadata_after_commit(session):
 
 
 @event.listens_for(Session, 'after_soft_rollback')
-def discard_metadata_on_rollback(session, previous_transaction):
+def discard_metadata_on_rollback(
+    session: Session,
+    previous_transaction: 'SessionTransaction'
+) -> None:
     if 'pending_metadata_changes' in session.info:
         del session.info['pending_metadata_changes']

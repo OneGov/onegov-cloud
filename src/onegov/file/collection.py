@@ -7,6 +7,14 @@ from sqlalchemy import and_, text, or_
 from itertools import chain
 
 
+from typing import Any, IO, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from datetime import datetime
+    from onegov.file.types import SignatureMetadata
+    from sqlalchemy.orm import Query, Session
+
+
 class FileCollection:
     """ Manages files.
 
@@ -26,15 +34,25 @@ class FileCollection:
 
     """
 
-    def __init__(self, session, type='*', allow_duplicates=True):
+    def __init__(
+        self,
+        session: 'Session',
+        type: str = '*',
+        allow_duplicates: bool = True
+    ):
         self.session = session
         self.type = type
         self.allow_duplicates = allow_duplicates
 
-    def query(self):
+    def query(self) -> 'Query[File]':
         if self.type != '*':
             model_class = File.get_polymorphic_class(self.type, File)
 
+            # FIXME: this is a weird singularity, which happens to not cause
+            #        any issues since our inheritance structure never inherits
+            #        from a subclass of File, we should be consistent about
+            #        what filterting by type means, does it mean exactly that
+            #        type or does it also allow subclasses?
             if model_class is File:
                 return self.session.query(File).filter_by(type=self.type)
 
@@ -42,8 +60,15 @@ class FileCollection:
 
         return self.session.query(File)
 
-    def add(self, filename, content, note=None, published=True,
-            publish_date=None, publish_end_date=None):
+    def add(
+        self,
+        filename: str,
+        content: bytes | IO[bytes],
+        note: str | None = None,
+        published: bool = True,
+        publish_date: 'datetime | None' = None,
+        publish_end_date: 'datetime | None' = None
+    ) -> File:
         """ Adds a file with the given filename. The content maybe either
         in bytes or a file object.
 
@@ -68,7 +93,7 @@ class FileCollection:
 
         return file
 
-    def replace(self, file, content):
+    def replace(self, file: File, content: bytes | IO[bytes]) -> None:
         """ Replaces the content of the given file with the new content. """
 
         if not self.allow_duplicates:
@@ -77,17 +102,25 @@ class FileCollection:
         file.reference = as_fileintent(content, file.name)
         self.session.flush()
 
-    def assert_not_duplicate(self, content):
+    def assert_not_duplicate(self, content: bytes | IO[bytes]) -> None:
         existing = self.by_content(content).first()
 
         if existing:
             raise FileExistsError(existing)
 
-    def delete(self, file):
+    def delete(self, file: File) -> None:
         self.session.delete(file)
         self.session.flush()
 
-    def no_longer_published_files(self, horizon=None):
+    # FIXME: Why does this yield rather than just return a query?
+    #        we don't really gain any advantages from doing that
+    #        in fact we lose the ability to set options on the query
+    #        or filter it further... Iterating through the query is
+    #        still possible, we don't need an iterator.
+    def no_longer_published_files(
+        self,
+        horizon: 'datetime'
+    ) -> 'Iterator[File]':
         """ Yields files where the publishing end date has expired. """
         yield from self.query().filter(and_(
             File.publish_end_date != None,
@@ -95,10 +128,13 @@ class FileCollection:
             File.publish_end_date < horizon
         ))
 
-    def publishable_files(self, horizon=None):
+    # FIXME: Why are we doing this in two queries, we can clearly do
+    #        this in one and order by whether or no publish_end_date
+    #        is NULL to preserve the original order
+    def publishable_files(self, horizon: 'datetime') -> 'Iterator[File]':
         """ Yields files which may be published. """
 
-        def publish_in_timeframe():
+        def publish_in_timeframe() -> 'Iterator[File]':
             yield from self.query().filter(and_(
                 File.published == False,
                 File.publish_date != None,
@@ -107,7 +143,7 @@ class FileCollection:
                 File.publish_end_date > horizon
             ))
 
-        def publish_ad_infinitum():
+        def publish_ad_infinitum() -> 'Iterator[File]':
             # if end_date is None, it follows there is no upper limit
             yield from self.query().filter(and_(
                 File.published == False,
@@ -118,7 +154,7 @@ class FileCollection:
 
         yield from chain(publish_in_timeframe(), publish_ad_infinitum())
 
-    def publish_files(self, horizon=None):
+    def publish_files(self, horizon: 'datetime | None' = None) -> None:
         """ Publishes unpublished files with a publish date older than the
         given horizon.
 
@@ -137,12 +173,12 @@ class FileCollection:
             f.publish_date = None
         self.session.flush()
 
-    def by_id(self, file_id):
+    def by_id(self, file_id: str) -> File | None:
         """ Returns the file with the given id or None. """
 
         return self.query().filter(File.id == file_id).first()
 
-    def by_filename(self, filename):
+    def by_filename(self, filename: str) -> 'Query[File]':
         """ Returns a query that matches the files with the given filename.
 
         Be aware that there may be multiple files with the same filename!
@@ -150,14 +186,14 @@ class FileCollection:
         """
         return self.query().filter(File.name == filename)
 
-    def by_checksum(self, checksum):
+    def by_checksum(self, checksum: str) -> 'Query[File]':
         """ Returns a query that matches the given checksum (may be more than
         one record).
 
         """
         return self.query().filter(File.checksum == checksum)
 
-    def by_content(self, content):
+    def by_content(self, content: bytes | IO[bytes]) -> 'Query[File]':
         """ Returns a query that matches the given content (may be more than
         one record).
 
@@ -181,7 +217,7 @@ class FileCollection:
             File.signature_metadata['old_digest'].astext == sha
         ))
 
-    def by_content_type(self, content_type):
+    def by_content_type(self, content_type: str) -> 'Query[File]':
         """ Returns a query that matches the given MIME content type (may be
         more than one record).
 
@@ -193,7 +229,7 @@ class FileCollection:
             )
         )
 
-    def by_signature_digest(self, digest):
+    def by_signature_digest(self, digest: str) -> 'Query[File]':
         """ Returns a query that matches the given digest in the signature
         metadata. In other words, given a digest this function will find
         signed files that match the digest - either before or after signing.
@@ -215,7 +251,10 @@ class FileCollection:
             )
         )
 
-    def locate_signature_metadata(self, digest):
+    def locate_signature_metadata(
+        self,
+        digest: str
+    ) -> 'SignatureMetadata | None':
         """ Looks for the given digest in the files table - if that doesn't
         work it will go through the audit trail (i.e. the chat messages) and
         see if the digest can be found there.
@@ -244,46 +283,54 @@ class FileCollection:
             ).bindparams(digest=digest)
         )).with_entities(Message.meta).first()
 
-        if match:
-            return match.meta['action_metadata']
+        return match.meta['action_metadata'] if match else None
 
 
 class FileSetCollection:
     """ Manages filesets. """
 
-    def __init__(self, session, type='*'):
+    def __init__(self, session: 'Session', type: str = '*'):
         self.session = session
         self.type = type
 
-    def query(self):
+    def query(self) -> 'Query[FileSet]':
         if self.type != '*':
             model_class = FileSet.get_polymorphic_class(self.type, FileSet)
 
+            # FIXME: Same weird sigularity as with FileCollection
             if model_class is FileSet:
-                return self.session.query(File).filter_by(type=self.type)
+                return self.session.query(FileSet).filter_by(type=self.type)
 
             return self.session.query(model_class)
 
         return self.session.query(FileSet)
 
-    def add(self, title, meta=None, content=None):
+    def add(
+        self,
+        title: str,
+        meta: dict[str, Any] | None = None,
+        content: dict[str, Any] | None = None
+    ) -> FileSet:
+
         type_ = self.type if self.type != '*' else 'generic'
 
         fileset = FileSet.get_polymorphic_class(type_, FileSet)()
         fileset.title = title
         fileset.type = type_
-        fileset.meta = meta
-        fileset.content = content
+        if meta is not None:
+            fileset.meta = meta
+        if content is not None:
+            fileset.content = content
 
         self.session.add(fileset)
         self.session.flush()
 
         return fileset
 
-    def delete(self, fileset):
+    def delete(self, fileset: FileSet) -> None:
         self.session.delete(fileset)
 
-    def by_id(self, fileset_id):
+    def by_id(self, fileset_id: str) -> FileSet | None:
         """ Returns the fileset with the given id or None. """
 
         return self.query().filter(FileSet.id == fileset_id).first()
