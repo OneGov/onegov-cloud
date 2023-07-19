@@ -909,6 +909,7 @@ def fill_in_attendee_ids_1(context):
                func.lower(InvoiceItem.group) == func.lower(Attendee.name))
     q = q.filter(User.username == Attendee.username)
     q = q.filter(User.id == Invoice.user_id)
+    q = q.filter(InvoiceItem.attendee_id.is_(None))
 
     for item, attendee in q.all():
         item.attendee_id = attendee.id
