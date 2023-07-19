@@ -431,8 +431,9 @@ def webdriver_options():
 
 @pytest.fixture(scope="session")
 def webdriver_executable_path():
-    # TEMPORARY: Always use chromium, this incurs additional overhead on CI
-    return ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+    # FIXME: Stop skipping this after new releases of webdriver_manager
+    #        and/or selenium
+    return pytest.skip('Browser tests are currently broken')
     pattern = r'\d+\.\d+\.\d+'
     stdout = os.popen(
         'google-chrome --version || google-chrome-stable --version'
