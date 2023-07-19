@@ -890,11 +890,9 @@ def add_invoice_item_organizer(context):
         )
 
 
-@upgrade_task('Add attendee id to invoice item and rm')
-def add_attendee_id_to_invoice_item_and_rm(context):
+@upgrade_task('Add attendee id to invoice item')
+def add_attendee_id_to_invoice_item(context):
     if not context.has_column('invoice_items', 'attendee_id'):
         context.operations.add_column('invoice_items', Column(
             'attendee_id', UUID, ForeignKey("attendees.id"), nullable=True
         ))
-
-    context.operations.drop_column('invoice_items', 'period_id')
