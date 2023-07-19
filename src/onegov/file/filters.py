@@ -114,7 +114,7 @@ class WithThumbnailFilter(FileFilter):
             'size': get_image_size(Image.open(fp))
         }
 
-    def on_save(self, uploaded_file: UploadedFile) -> None:
+    def on_save(self, uploaded_file: 'UploadedFile') -> None:
         fp = file_from_content(uploaded_file.original_content)
         self.store_thumbnail(uploaded_file, self.generate_thumbnail(fp))
 
