@@ -45,7 +45,7 @@ class InvoiceItemExport(FeriennetExport):
         q = q.join(
             activities, InvoiceItem.text == activities.c.title, isouter=True
         ).join(Attendee,
-               func.lower(InvoiceItem.group) == func.lower(Attendee.name),
+               InvoiceItem.attendee_id == Attendee.id,
                isouter=True
                )
         q = q.options(
