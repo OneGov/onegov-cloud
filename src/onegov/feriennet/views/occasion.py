@@ -274,7 +274,6 @@ def book_occasion(self, request, form):
                         'title': self.activity.title,
                         'attendee': attendee.name
                     }))
-
             if self.period.booking_start <= date.today():
                 request.app.send_transactional_email(
                     subject=subject,
