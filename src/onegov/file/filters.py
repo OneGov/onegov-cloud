@@ -78,29 +78,26 @@ class WithThumbnailFilter(FileFilter):
         self.size = size
         self.format = format.lower()
 
-    def generate_thumbnail(self, fp: 'SupportsRead[bytes]') -> BytesIO:
+    def generate_thumbnail(
+        self,
+        fp: 'SupportsRead[bytes]'
+    ) -> tuple[BytesIO, tuple[str, str]]:
         output = BytesIO()
 
         thumbnail = Image.open(fp)
         thumbnail.thumbnail(self.size, Image.Resampling.LANCZOS)
         thumbnail = thumbnail.convert('RGBA')
 
-        # FIXME: Why are we doing this when we also pass it to save
-        #        does this even do anything?!
-        thumbnail.format = self.format  # type:ignore[misc]
-
         thumbnail.save(output, self.format, quality=self.quality)
         output.seek(0)
 
-        return output
+        return output, get_image_size(thumbnail)
 
-    # FIXME: This is factored horibbly inefficiently, we open the thumbnail
-    #        we just saved, just to get its size, which we already knew
-    #        when we originally generated the thumbnail...
     def store_thumbnail(
         self,
         uploaded_file: 'UploadedFile',
-        fp: 'SupportsRead[bytes]'
+        fp: 'SupportsRead[bytes]',
+        thumbnail_size: tuple[str, str] | None = None,
     ) -> None:
 
         name = f'thumbnail_{self.name}'
@@ -108,15 +105,19 @@ class WithThumbnailFilter(FileFilter):
 
         path, id = uploaded_file.store_content(fp, filename)
 
+        if thumbnail_size is None:
+            thumbnail_size = get_image_size(Image.open(fp))
+
         uploaded_file[name] = {
             'id': id,
             'path': path,
-            'size': get_image_size(Image.open(fp))
+            'size': thumbnail_size
         }
 
     def on_save(self, uploaded_file: 'UploadedFile') -> None:
         fp = file_from_content(uploaded_file.original_content)
-        self.store_thumbnail(uploaded_file, self.generate_thumbnail(fp))
+        thumbnail_fp, thumbnail_size = self.generate_thumbnail(fp)
+        self.store_thumbnail(uploaded_file, thumbnail_fp, thumbnail_size)
 
 
 class WithPDFThumbnailFilter(WithThumbnailFilter):
@@ -181,7 +182,10 @@ class WithPDFThumbnailFilter(WithThumbnailFilter):
             with png_output.open('rb') as png:
                 return BytesIO(png.read())
 
-    def generate_thumbnail(self, fp: 'SupportsRead[bytes]') -> BytesIO:
+    def generate_thumbnail(
+        self,
+        fp: 'SupportsRead[bytes]'
+    ) -> tuple[BytesIO, tuple[str, str]]:
         # FIXME: This is kinda slow. We should be able to render the
         #        PDF directly at the thumbnail size. Maybe we should
         #        use pdf2image rather than roll our own?
