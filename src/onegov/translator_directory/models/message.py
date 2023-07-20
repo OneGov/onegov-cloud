@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.chat import Message
 from onegov.org.models.message import TicketMessageMixin
 from onegov.translator_directory.models.mutation import TranslatorMutation

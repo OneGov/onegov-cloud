@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.activity.models import Attendee, Booking, Occasion, Period
 from onegov.activity.utils import random_group_code
 from onegov.user import User

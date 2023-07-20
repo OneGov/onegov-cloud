@@ -1,7 +1,7 @@
 import json
 import transaction
 
-from cached_property import cached_property
+from functools import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
 from dateutil.parser import parse

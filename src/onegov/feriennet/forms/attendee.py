@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from chameleon.utils import Markup
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion

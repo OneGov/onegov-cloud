@@ -2,10 +2,10 @@
 
 import sedate
 
-from cached_property import cached_property
 from collections import namedtuple
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from functools import cached_property
 from itertools import chain, groupby
 from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import meta_property

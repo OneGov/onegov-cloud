@@ -2,10 +2,10 @@ import requests
 import stripe
 import transaction
 
-from cached_property import cached_property
 from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal
+from functools import cached_property
 from html import escape
 from onegov.core.orm.mixins import meta_property
 from onegov.pay import log

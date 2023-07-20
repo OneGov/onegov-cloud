@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from datetime import datetime
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile

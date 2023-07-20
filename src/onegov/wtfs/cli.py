@@ -1,8 +1,8 @@
 import click
 import sedate
 
-from cached_property import cached_property
 from datetime import datetime
+from functools import cached_property
 from io import BytesIO
 from onegov.core.cli import abort
 from onegov.core.cli import command_group

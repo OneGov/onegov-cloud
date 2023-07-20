@@ -46,8 +46,6 @@ module = [
     "alembic.*",
     "bjoern.*",
     "blinker.*",
-    # FIXME: replace this with stdlib version that was added in 3.9?
-    "cached_property.*",
     "chameleon.*",
     # FIXME: do we actually make good use of this?
     "colour.*",
@@ -60,7 +58,6 @@ module = [
     "dukpy.*",
     # FIXME: is this still faster than stdlib? it's not maintained
     "fastcache.*",
-    "furl.*",
     "genshi.*",
     "html2text.*",
     "icalendar.*",
@@ -84,7 +81,6 @@ module = [
     "pdfrw.*",
     "pdftotext.*",
     "pglast.*",
-    # FIXME: Do we need both furl and purl?!
     "purl.*",
     "pyquery.*",
     "qrbill.*",
@@ -108,9 +104,6 @@ module = [
     #        would be better to use now?
     "ulid.*",
     "urlextract.*",
-    # FIXME: This is unmaintained. I believe WTForms uses email-validate
-    #        so we could just use that, since it's already installed...
-    "validate_email.*",
     "webassets.*",
     "webtest.*",
     "wtforms.*",

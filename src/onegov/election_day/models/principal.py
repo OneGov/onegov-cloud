@@ -1,6 +1,6 @@
 import onegov.election_day
 
-from cached_property import cached_property
+from functools import cached_property
 from collections import OrderedDict
 from datetime import date
 from onegov.core import utils

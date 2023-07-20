@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from elasticsearch_dsl.query import MultiMatch
+from functools import cached_property
 from onegov.core.templates import render_macro
 from onegov.directory import DirectoryEntry
 from onegov.form import as_internal_id

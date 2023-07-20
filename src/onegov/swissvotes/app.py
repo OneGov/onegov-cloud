@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from more.content_security import SELF
 from more.content_security import UNSAFE_EVAL
 from more.content_security import UNSAFE_INLINE
