@@ -34,18 +34,6 @@ if TYPE_CHECKING:
         SubscriptionTemplate
     )
 
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from .course import Course  # noqa: F811
-    from .course_notification_template import (  # noqa: F811
-        CancellationTemplate,   # noqa: F811
-        CourseNotificationTemplate,  # noqa: F811
-        InfoTemplate,  # noqa: F811
-        ReminderTemplate,   # noqa: F811
-        SubscriptionTemplate  # noqa: F811
-    )
-
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
 COURSE_EVENT_STATUSES_TRANSLATIONS = (
     _('Created'), _('Confirmed'), _('Canceled'), _('Planned'))
