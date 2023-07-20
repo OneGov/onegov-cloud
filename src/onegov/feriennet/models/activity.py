@@ -1,4 +1,7 @@
 from cached_property import cached_property
+from sqlalchemy import Column
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
@@ -7,7 +10,7 @@ from onegov.feriennet import _
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.ticket import OrgTicketMixin, TicketDeletionMixin
-from onegov.search import SearchableContent
+from onegov.search import SearchableContent, Searchable
 from onegov.ticket import handlers, Handler, Ticket
 
 
@@ -23,6 +26,24 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'text': {'type': 'localized_html'},
         'organiser': {'type': 'text'}
     }
+
+    # column for full text search index
+    fts_idx = Column(TSVECTOR)
+
+    @property
+    def search_score(self):
+        return 2
+
+    @staticmethod
+    def psql_tsvector_string():
+        """
+        index is built on column title as well as the json
+        fields lead and text in meta resp. content column
+        """
+        s = Searchable.create_tsvector_string('title')
+        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
+        s += " || ' ' || coalesce(((content ->> 'text')), '')"
+        return s
 
     @property
     def es_public(self):
