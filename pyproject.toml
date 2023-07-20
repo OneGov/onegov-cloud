@@ -74,7 +74,6 @@ module = [
     "langdetect.*",
     "lazy_object_proxy.*",
     "libres.*",
-    "lxml.*",
     "mistletoe.*",
     "more.*",
     "morepath.*",
