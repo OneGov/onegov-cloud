@@ -1,7 +1,7 @@
 import pytest
 import transaction
 
-from email_validator.exception_types import EmailNotValidError
+from email_validator import EmailNotValidError
 from onegov.newsletter import Newsletter, Recipient, Subscription
 from onegov.newsletter.models import newsletter_recipients
 from sqlalchemy.exc import IntegrityError
