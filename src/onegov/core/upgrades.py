@@ -63,7 +63,7 @@ def migrate_to_jsonb(
             # TODO: we should change find_models to operate on
             #       sqlalchemy.orm.DeclarativeBase once we upgrade
             #       to SQLAlchemy 2.0
-            ORMBase,
+            ORMBase,  # ignore[arg-type]
             is_match=lambda cls: True)
         )
     except ImportError:
