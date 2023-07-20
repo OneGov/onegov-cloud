@@ -4,9 +4,9 @@ import transaction
 import pytest
 
 from base64 import b64encode
-from cached_property import cached_property
 from datetime import datetime, timedelta
 from freezegun import freeze_time
+from functools import cached_property
 from gettext import NullTranslations
 from itsdangerous import BadSignature, Signer
 from onegov.core.custom import json
