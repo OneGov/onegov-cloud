@@ -10,6 +10,7 @@ details AS (
         invoice_items.invoice_id,
         users.username,
         "group",
+        attendee_id,
         "text",
         "organizer",
         "family",
@@ -78,6 +79,7 @@ invoices AS (
         details.username,
         INITCAP(users.realname) as realname,
         details.group,
+        details.attendee_id,
         details.text,
         details.organizer,
         details.family,
@@ -122,6 +124,7 @@ SELECT
     realname,            -- Text
     username,            -- Text
     "group",             -- Text
+    attendee_id,         -- UUID
     "text",              -- Text
     "organizer",         -- Text
     "family",            -- Text

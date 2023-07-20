@@ -29,6 +29,9 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 # more strict rules for fully typed modules
 module = [
     "onegov.core.*",
+    "onegov.file.*",
+    "onegov.pay.*",
+    "onegov.reservation.*",
     "onegov.server.*",
     "onegov.user.*"
 ]

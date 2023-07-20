@@ -551,7 +551,10 @@ class EventImportForm(Form):
         try:
             csv = CSVFile(csvfile, expected_headers=headers.values())
         except Exception:
-            return 0, ['0']
+            error_string = _('Expected header line with the following '
+                             'columns:')
+            return 0, ['0 - {} {}'.format(error_string,
+                                          list(headers.values()))]
         lines = list(csv.lines)
         columns = {
             key: csv.as_valid_identifier(value)

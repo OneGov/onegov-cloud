@@ -20,8 +20,15 @@ from uuid import uuid4, UUID as UUIDType
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from onegov.core.orm.mixins import dict_property
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
+    from typing_extensions import TypedDict
+
+    class SessionDict(TypedDict):
+        address: str | None
+        timestamp: str
+        agent: str | None
 
 
 class User(Base, TimestampMixin, ORMSearchable):
@@ -276,13 +283,13 @@ class User(Base, TimestampMixin, ORMSearchable):
         return yubikey and yubikey_otp_to_serial(yubikey) or None
 
     #: sessions of this user
-    sessions = data_property()
+    sessions: 'dict_property[dict[str, SessionDict]]' = data_property()
 
     #: tags of this user
-    tags = data_property()
+    tags: 'dict_property[list[str]]' = data_property()
 
     #: the phone number of this user
-    phone_number = data_property()
+    phone_number: 'dict_property[str]' = data_property()
 
     def cleanup_sessions(self, app: 'Framework') -> None:
         """ Removes stored sessions not valid anymore. """
