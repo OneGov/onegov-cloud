@@ -1,6 +1,6 @@
 import isodate
 
-from cached_property import cached_property
+from functools import cached_property
 from collections import namedtuple
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection

@@ -1,7 +1,7 @@
 import morepath
 
-from cached_property import cached_property
 from datetime import timedelta
+from functools import cached_property
 from onegov.core.cache import instance_lru_cache
 from onegov.core.utils import append_query_param
 from itsdangerous import (

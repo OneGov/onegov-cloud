@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection

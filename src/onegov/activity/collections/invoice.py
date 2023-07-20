@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from decimal import Decimal
+from functools import cached_property
 from onegov.activity.models import Invoice, InvoiceItem
 from onegov.activity.models.invoice import sync_invoice_items
 from onegov.activity.models.invoice_reference import KNOWN_SCHEMAS

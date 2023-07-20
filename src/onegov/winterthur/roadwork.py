@@ -2,8 +2,8 @@ import isodate
 import pycurl
 import sedate
 
-from cached_property import cached_property
 from datetime import datetime, timedelta
+from functools import cached_property
 from io import BytesIO
 from onegov.core.custom import json
 from pathlib import Path

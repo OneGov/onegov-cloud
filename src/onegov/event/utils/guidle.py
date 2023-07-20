@@ -1,5 +1,5 @@
 from bleach.sanitizer import Cleaner
-from cached_property import cached_property
+from functools import cached_property
 from datetime import timedelta
 from dateutil.parser import parse
 from onegov.gis import Coordinates

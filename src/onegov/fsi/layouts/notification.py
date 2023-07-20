@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from cached_property import cached_property
+from functools import cached_property
 
 from onegov.core.elements import Link
 from onegov.fsi.collections.course_event import CourseEventCollection

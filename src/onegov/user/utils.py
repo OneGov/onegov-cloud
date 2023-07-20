@@ -1,6 +1,3 @@
-from furl import furl
-
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.user import User
@@ -37,7 +34,7 @@ def password_reset_url(
         'modified': user.modified.isoformat() if user.modified else ''
     })
 
-    # FIXME: Don't we have an utils function for that somewhere?
-    #        furl seems expensive just to add a new query parameter
-    #        Plus we also use purl, which does the same thing...
-    return furl(url).add({'token': token}).url
+    # we can skip a lot of complexity, because we know the token is
+    # already url safe, so we don't need to do a quote_plus
+    delimeter = '&' if '?' in url else '?'
+    return f'{url}{delimeter}token={token}'

@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.utils import filter_modified_or_created

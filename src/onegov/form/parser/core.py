@@ -368,7 +368,7 @@ import pyparsing as pp
 import re
 import yaml
 
-from cached_property import cached_property
+from functools import cached_property
 from dateutil import parser as dateutil_parser
 from decimal import Decimal
 from onegov.core.cache import lru_cache

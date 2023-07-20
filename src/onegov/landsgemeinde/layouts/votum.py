@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.elements import Link
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.layouts.default import DefaultLayout

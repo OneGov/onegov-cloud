@@ -3,11 +3,11 @@ import re
 
 from babel import Locale
 from chameleon.utils import Markup
-from cached_property import cached_property
 from datetime import date, datetime, time, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from decimal import Decimal
+from functools import cached_property
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json

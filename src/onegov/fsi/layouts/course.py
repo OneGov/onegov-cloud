@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.audit import AuditCollection

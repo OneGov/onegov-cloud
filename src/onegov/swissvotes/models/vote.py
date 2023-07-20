@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from collections import OrderedDict
+from functools import cached_property
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
