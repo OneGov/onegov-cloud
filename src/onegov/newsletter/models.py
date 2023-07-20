@@ -122,7 +122,15 @@ class Recipient(Base, TimestampMixin):
 
     @validates('address')
     def validate_address(self, key, address):
-        assert validate_email(address)
+        assert validate_email(
+            address,
+            # FIXME: We may want to enable these checks, but our
+            #        tests will either need to disable this validation
+            #        or only use existing/active e-mail addresses
+            check_blacklist=False,
+            check_dns=False,
+            check_smtp=False,
+        )
         return address
 
     #: the recipient group, a freely choosable string - may be null
