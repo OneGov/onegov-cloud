@@ -57,3 +57,16 @@ def test_message_file(session):
     session.flush()
 
     assert session.query(File).count() == 0
+
+
+def test_bound_messages(session):
+    class MyMessage(Message):
+        __mapper_args__ = {'polymorphic_identity': 'mymessage'}
+
+    msg1 = Message(text='Hi', channel_id='#public')
+    session.add(msg1)
+    msg2 = MyMessage(text='Hello', channel_id='#public')
+    session.add(msg2)
+
+    assert MyMessage.bound_messages(session).query().all() == [msg2]
+    assert Message.bound_messages(session).query().all() == [msg1]
