@@ -30,12 +30,6 @@
                     <tal:b content="structure text"/>
                 </div>
 
-                <div class="further-information" tal:define="text directory.content.get('text'); title directory.content.get('title_further_information'); above directory.content.get('position')=='above'" tal:condition="text and above">
-                    <h2 tal:condition="title">${title}</h2>
-                    <h2 tal:condition="not title" i18n:translate="">Further Information</h2>
-                    <tal:b content="structure text"/>
-                </div>
-
                 <ul class="more-list directory-list ${'with-thumbnails' if show_thumbnails else ''} grid-x grid-padding-x subpage-cards" tal:condition="entries">
                     <li class="small-12 ${'medium-6' if overview_two_columns else ''} cell" tal:repeat="entry entries">
                         <div class="${'card' if overview_two_columns else 'grid-x grid-padding-x'}">
