@@ -19,7 +19,7 @@ from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
 from onegov.file.utils import extension_for_content_type
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from pathlib import Path
 from sqlalchemy import Boolean, Column, Index, Text
 from sqlalchemy import case
@@ -255,13 +255,6 @@ class File(Base, Associable, TimestampMixin):
     @property
     def search_score(self) -> int:
         return 10
-
-    @staticmethod
-    def psql_tsvector_string() -> str:
-        """
-        index is built on columns name, note and extract
-        """
-        return Searchable.create_tsvector_string('name', 'note', 'extract')
 
     @hybrid_property
     def signature_timestamp(self) -> 'datetime | None':

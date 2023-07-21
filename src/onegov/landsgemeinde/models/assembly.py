@@ -98,12 +98,5 @@ class Assembly(
     # column for full text search index
     fts_idx = Column(TSVECTOR)
 
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on the json field overview in content column
-        """
-        return "coalesce(((content ->> 'overview')), '')"
-
     def stamp(self):
         self.last_modified = self.timestamp()

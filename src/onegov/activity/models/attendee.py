@@ -7,7 +7,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.crypto import random_token
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sqlalchemy import case, cast, func, select, and_, type_coerce
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -51,13 +51,6 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
     @property
     def search_score(self):
         return 3
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on columns username, name and notes
-        """
-        return Searchable.create_tsvector_string('username', 'name', 'notes')
 
     @property
     def es_suggestion(self):

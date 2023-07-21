@@ -18,9 +18,15 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         return self.access == 'public' and self.published
 
     es_properties = {
+        'first_name': {'type': 'text'},
+        'last_name': {'type': 'text'},
         'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
+        'phone': {'type': 'text'},
+        'phone_direct': {'type': 'text'},
+        # FIXME: properties cannot be used for ts tsvector, using phone and
+        # phone_direct instead
         'phone_internal': {'type': 'text'},
         'phone_es': {'type': 'text'}
     }

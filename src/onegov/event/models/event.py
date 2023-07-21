@@ -20,7 +20,7 @@ from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.gis import CoordinatesMixin
-from onegov.search import SearchableContent, Searchable
+from onegov.search import SearchableContent
 from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
@@ -114,17 +114,6 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     @property
     def search_score(self):
         return 2
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on columns title and location as well as the json
-        fields description and organizer in content column
-        """
-        s = Searchable.create_tsvector_string('title', 'location')
-        s += " || ' ' || coalesce(((content ->> 'description')), '')"
-        s += " || ' ' || coalesce(((content ->> 'organizer')), '')"
-        return s
 
     def set_image(self, content, filename=None):
         self.set_blob('image', content, filename)

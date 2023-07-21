@@ -24,6 +24,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'text': {'type': 'localized_html'},
+        # FIXME: properties cannot be used for ts tsvector
         'organiser': {'type': 'text'}
     }
 
@@ -35,7 +36,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         return 2
 
     @staticmethod
-    def psql_tsvector_string():
+    def psql_tsvector_string(model):
         """
         index is built on column title as well as the json
         fields lead and text in meta resp. content column

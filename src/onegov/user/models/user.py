@@ -8,7 +8,7 @@ from onegov.core.security import forget, remembered
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
 from sqlalchemy import Boolean, Column, Text, func, ForeignKey
 from sqlalchemy.dialects.postgresql import TSVECTOR
@@ -157,10 +157,6 @@ class User(Base, TimestampMixin, ORMSearchable):
     @property
     def search_score(self) -> int:
         return 5
-
-    @staticmethod
-    def psql_tsvector_string() -> str:
-        return Searchable.create_tsvector_string('username', 'realname')
 
     if TYPE_CHECKING:
         # HACK: This probably won't be necessary in SQLAlchemy 2.0, but

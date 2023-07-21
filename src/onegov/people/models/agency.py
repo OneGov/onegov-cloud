@@ -13,7 +13,7 @@ from onegov.file.utils import content_type_from_fileobj
 from onegov.file.utils import extension_for_content_type
 from onegov.gis import CoordinatesMixin
 from onegov.people.models.membership import AgencyMembership
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
@@ -85,14 +85,6 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     # column for full text search index
     fts_idx = Column(TSVECTOR)
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        builds the index on columns title, description and portrait.
-        """
-        return Searchable.create_tsvector_string('title', 'description',
-                                                 'portrait')
 
     @property
     def organigram_file(self):

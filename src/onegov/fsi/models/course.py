@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text, Boolean, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
@@ -40,13 +40,6 @@ class Course(Base, ORMSearchable):
     @property
     def search_score(self):
         return 2
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on columns name and description
-        """
-        return Searchable.create_tsvector_string('name', 'description')
 
     @property
     def title(self):

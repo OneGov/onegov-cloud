@@ -17,7 +17,7 @@ from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
-from onegov.search import SearchableContent, Searchable
+from onegov.search import SearchableContent
 from sqlalchemy import Column, Text, Integer
 from sqlalchemy import func, exists, and_
 from sqlalchemy.orm import object_session
@@ -108,13 +108,6 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     @property
     def search_score(self):
         return 7
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on columns title and lead
-        """
-        return Searchable.create_tsvector_string('title', 'lead')
 
     @property
     def entry_cls_name(self):

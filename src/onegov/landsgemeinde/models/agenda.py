@@ -8,7 +8,7 @@ from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.landsgemeinde.models.file import LandsgemeindeFile
 from onegov.landsgemeinde.models.votum import Votum
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -106,18 +106,6 @@ class AgendaItem(
 
     # column for full text search index
     fts_idx = Column(TSVECTOR)
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on column title as well as  on the json
-        fields overview, text and resolution in content column
-        """
-        s = Searchable.create_tsvector_string('title')
-        s += " || ' ' || coalesce(((content ->> 'overview')), '')"
-        s += " || ' ' || coalesce(((content ->> 'text')), '')"
-        s += " || ' ' || coalesce(((content ->> 'resolution')), '')"
-        return s
 
     @property
     def date(self):

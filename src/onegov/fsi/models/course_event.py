@@ -21,7 +21,7 @@ from onegov.fsi import _
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.fsi.models.course_subscription import subscription_table
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -61,6 +61,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     __tablename__ = 'fsi_course_events'
 
     es_properties = {
+        # FIXME: properties cannot be used for ts tsvector
         'name': {'type': 'localized'},
         'description': {'type': 'localized'},
         'location': {'type': 'localized'},
@@ -181,16 +182,6 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     # column for full text search index
     fts_idx = Column(TSVECTOR)
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on the following columns
-        """
-        return Searchable.create_tsvector_string('location',
-                                                 'presenter_name',
-                                                 'presenter_company',
-                                                 'presenter_email')
 
     @property
     def description_html(self):

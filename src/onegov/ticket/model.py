@@ -4,7 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
@@ -38,7 +38,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     #: the group this ticket belongs to. used to differentiate tickets
     #: belonging to one specific handler (handler -> group -> title)
-    group = Column(Text, nullable=False)
+    group_title = Column(Text, nullable=False)
 
     #: the name of the handler associated with this ticket, may be used to
     #: create custom polymorphic subclasses of this class. See
@@ -82,13 +82,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     def search_score(self):
         return 6
 
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on column ticket number
-        """
-        return Searchable.create_tsvector_string('number')
-
     # override the created attribute from the timestamp mixin - we don't want
     # it to be deferred by default because we usually need it
     @declared_attr
@@ -122,10 +115,11 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'number': {'type': 'text'},
         'title': {'type': 'text'},
         'subtitle': {'type': 'text'},
-        'group': {'type': 'text'},
-        'ticket_email': {'type': 'keyword'},
-        'ticket_data': {'type': 'localized_html'},
-        'extra_localized_text': {'type': 'localized'}
+        'group_title': {'type': 'text'},
+        # properties cannot be added to search index
+        # 'ticket_email': {'type': 'keyword'},
+        # 'ticket_data': {'type': 'localized_html'},
+        # 'extra_localized_text': {'type': 'localized'}
     }
 
     @property

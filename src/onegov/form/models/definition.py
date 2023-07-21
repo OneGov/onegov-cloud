@@ -13,8 +13,6 @@ from sqlalchemy import Column, Text
 from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import observes
 
-from onegov.search import Searchable
-
 
 class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     """ Defines a form stored in the database. """
@@ -125,16 +123,6 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     @property
     def search_score(self):
         return 7
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on column ticket number
-        """
-        s = Searchable.create_tsvector_string('title')
-        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
-        s += " || ' ' || coalesce(((content ->> 'text')), '')"
-        return s
 
     @property
     def form_class(self):

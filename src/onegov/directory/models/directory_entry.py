@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
-from onegov.search import SearchableContent, Searchable
+from onegov.search import SearchableContent
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
@@ -25,7 +25,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         'keywords': {'type': 'keyword'},
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
-        'directory_id': {'type': 'keyword'},
+        # FIXME: uuid columns cannot be used for ts tsvector
+        # 'directory_id': {'type': 'keyword'},
 
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search
@@ -76,16 +77,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         Index('inverted_keywords', 'keywords', postgresql_using='gin'),
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
     )
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on columns title, lead, keyword and directory id
-        """
-        # FIXME: keywords and directory_id cannot be added to tsvector below
-        # return Searchable.create_tsvector_string('title', 'lead', 'keywords',
-        #                                          'directory_id')
-        return Searchable.create_tsvector_string('title', 'lead')
 
     @property
     def external_link(self):

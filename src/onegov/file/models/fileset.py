@@ -8,7 +8,6 @@ from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
-from ...search import Searchable
 
 if TYPE_CHECKING:
     from .file import File
@@ -74,13 +73,3 @@ class FileSet(Base, ContentMixin, TimestampMixin):
 
     # column for full text search index
     fts_idx = Column(TSVECTOR)
-
-    @staticmethod
-    def psql_tsvector_string() -> str:
-        """
-        index is built on column title as well as on the json
-        fields lead in meta column if not NULL
-        """
-        s = Searchable.create_tsvector_string('title')
-        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
-        return s

@@ -1,5 +1,7 @@
+from onegov.core.orm.mixins import content
 from onegov.search.utils import classproperty, get_fts_index_languages
 from onegov.search.utils import extract_hashtags
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 
 class Searchable:
@@ -146,7 +148,7 @@ class Searchable:
         return self.search_score < other.search_score
 
     @staticmethod
-    def psql_tsvector_string():
+    def psql_tsvector_string(model):
         """
         Provides the tsvector string for postgres defining which columns and
         json fields to be used for full text search index.
@@ -158,7 +160,23 @@ class Searchable:
 
         :return: tsvector string
         """
-        raise NotImplementedError
+
+        join = " || ' ' || "
+
+        # identify search columns
+        columns = [p for p in model.es_properties if p in model.__dict__
+                   and isinstance(model.__dict__[p], InstrumentedAttribute)]
+        s = Searchable.create_tsvector_string(*columns) if columns else ''
+
+        # identify content and meta properties
+        for p in model.es_properties:
+            if p in model.__dict__ and isinstance(model.__dict__[p],
+                                                  content.dict_property):
+                s += join if s else ''
+                s += f"coalesce((({model.__dict__[p].attribute} " \
+                     f"->> '{p}')), '')"
+
+        return s
 
     @staticmethod
     def reindex(session, schema, model):
@@ -214,7 +232,7 @@ class Searchable:
 
         tsvector_expression = \
             Searchable.multi_language_tsvector_expression(
-                model.psql_tsvector_string())
+                model.psql_tsvector_string(model))
 
         query = f"""
             ALTER TABLE "{schema}".{model.__tablename__}
@@ -239,7 +257,8 @@ class Searchable:
         https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX
 
         :param cols: column names to be indexed
-        :return: tsvector string for multiple columns
+        :return: tsvector string for multiple columns i.e. for columns title
+        and body: coalesce(title, '') || ' ' || coalesce(body, '')
         """
         base = "coalesce({}, '')"
         ext = " || ' ' || coalesce({}, '')"
@@ -270,6 +289,7 @@ class ORMSearchable(Searchable):
         return getattr(self, 'last_change', None)
 
 
+# TODO: rename prefix 'es' to 'ts' for text search
 class SearchableContent(ORMSearchable):
     """ Adds search to all classes using the core's content mixin:
     :class:`onegov.core.orm.mixins.content.ContentMixin`

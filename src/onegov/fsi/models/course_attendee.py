@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import TSVECTOR
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean, Index
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
@@ -43,6 +43,7 @@ class CourseAttendee(Base, ORMSearchable):
         'first_name': {'type': 'text'},
         'last_name': {'type': 'text'},
         'organisation': {'type': 'text'},
+        # FIXME: Properties cannot be used for ts tsvector
         'email': {'type': 'text'},
         'title': {'type': 'text'},
     }
@@ -115,14 +116,6 @@ class CourseAttendee(Base, ORMSearchable):
     __table_args__ = (
         Index('fts_idx', fts_idx, postgresql_using='gin'),
     )
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on the following columns
-        """
-        return Searchable.create_tsvector_string('first_name', 'last_name',
-                                                 'organisation', '_email')
 
     @property
     def title(self):

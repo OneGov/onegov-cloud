@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -96,13 +96,6 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
     @property
     def search_score(self):
         return 3
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        builds the index on column title.
-        """
-        return Searchable.create_tsvector_string('title')
 
     @property
     def siblings_by_agency(self):

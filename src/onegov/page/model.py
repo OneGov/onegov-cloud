@@ -13,7 +13,6 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
-from onegov.search import Searchable
 
 
 class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
@@ -27,17 +26,6 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     @property
     def search_score(self):
         return 1
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on column title as well as on the json
-        fields lead and text in content column if not NULL
-        """
-        s = Searchable.create_tsvector_string('title')
-        s += " || ' ' || coalesce(((content ->> 'lead')), '')"
-        s += " || ' ' || coalesce(((content ->> 'text')), '')"
-        return s
 
     @hybrid_property
     def published_or_created(self):

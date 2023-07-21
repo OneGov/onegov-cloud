@@ -5,7 +5,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
-from onegov.search import SearchableContent, Searchable
+from onegov.search import SearchableContent
 from sqlalchemy import and_
 from sqlalchemy import Boolean
 from sqlalchemy import column
@@ -94,13 +94,6 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     @property
     def search_score(self):
         return 6
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on columns title, lead, html
-        """
-        return Searchable.create_tsvector_string('title', 'lead', 'html')
 
     @property
     def open_recipients(self):

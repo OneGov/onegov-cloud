@@ -6,7 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.file import NamedFile
 from onegov.landsgemeinde import _
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -100,21 +100,6 @@ class Votum(
 
     # column for full text search index
     fts_idx = Column(TSVECTOR)
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on columns title and location as well as the json
-        fields description and organizer in content column
-        """
-        s = Searchable.create_tsvector_string('person_name',
-                                              'person_function',
-                                              'person_place',
-                                              'person_political_affiliation')
-        s += " || ' ' || coalesce(((content ->> 'text')), '')"
-        s += " || ' ' || coalesce(((content ->> 'motion')), '')"
-        s += " || ' ' || coalesce(((content ->> 'statement_of_reasons')), '')"
-        return s
 
     @property
     def date(self):

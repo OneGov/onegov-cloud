@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text
 from uuid import uuid4
 from vobject import vCard
@@ -32,9 +32,13 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     es_public = True
     es_properties = {
+        'first_name': {'type': 'text'},
+        'last_name': {'type': 'text'},
         'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
+        'phone': {'type': 'text'},
+        'phone_direct': {'type': 'text'},
     }
 
     @property
@@ -132,14 +136,6 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     # column for full text search index
     fts_idx = Column(TSVECTOR)
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        builds the index on columns first name, last name, function and email.
-        """
-        return Searchable.create_tsvector_string('first_name', 'last_name',
-                                                 'function', 'email')
 
     @property
     def search_score(self):

@@ -11,7 +11,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 from onegov.org.models import AccessExtension
-from onegov.search import SearchableContent, Searchable
+from onegov.search import SearchableContent
 from sqlalchemy import Column, Text
 from sqlalchemy_utils import observes
 
@@ -56,16 +56,6 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
     @property
     def search_score(self):
         return 8
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        builds the index on column title and lead within meta column
-        email.
-        """
-        s = Searchable.create_tsvector_string('title')
-        s += " || ' ' || coalesce(((meta ->> 'lead')), '')"
-        return s
 
     @observes('title')
     def title_observer(self, title):
