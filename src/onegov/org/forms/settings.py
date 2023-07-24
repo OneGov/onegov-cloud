@@ -1065,6 +1065,16 @@ class GeverSettingsForm(Form):
         self.gever_password.data = model.gever_password or ""
 
 
+class OneGovApiSettingsForm(Form):
+    """Provides a form to generate API keys (UUID'S) for the OneGov API."""
+
+    name = StringField(
+        default=_("API Key"),
+        label=_("Name"),
+        validators=[InputRequired()],
+    )
+
+
 class EventSettingsForm(Form):
 
     submit_events_visible = BooleanField(

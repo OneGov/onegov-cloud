@@ -2,6 +2,16 @@ from cached_property import cached_property
 from logging import getLogger
 from logging import NullHandler
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relation
+from uuid import uuid4
+from sqlalchemy import Text
+from onegov.core.orm import Base
+from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.user import User
 
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
@@ -32,6 +42,12 @@ class ApiInvalidParamException(ApiException):
     def __init__(self, message='Invalid Parameter', status_code=400):
         self.message = message
         self.status_code = status_code
+
+
+# class ApiAuthenticationException(ApiException):
+#     def __init__(self, message='Authentication failed', status_code=400):
+#         self.message = message
+#         self.status_code = status_code
 
 
 class ApiEndpointCollection:
@@ -206,3 +222,39 @@ class ApiEndpoint:
         """
 
         raise NotImplementedError()
+
+
+class AuthEndpoint:
+
+    def __init__(self, app):
+        self.app = app
+
+
+class ApiKey(Base):
+
+    __tablename__ = 'api_keys'
+
+    # internal key of the api key
+    id = Column(UUID, nullable=False, primary_key=True, default=uuid4)
+
+    # the user that created the api key
+    user_id = Column(UUID, ForeignKey('users.id'))
+
+    # the name of the api key, may be any string
+    name = Column(Text, nullable=False)
+
+
+     # todo: defualt to true
+    read_only = Column(Boolean, default=False, nullable=False)
+
+    last_used = Column(UTCDateTime, nullable=True)
+
+    # the key itself.
+    key = Column(UUID, nullable=False, default=uuid4)
+
+    user = relation(
+        User,
+        backref=backref(
+            'api_keys', cascade='all,delete-orphan', lazy='dynamic'
+        )
+    )

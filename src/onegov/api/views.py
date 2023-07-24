@@ -1,11 +1,36 @@
 from datetime import datetime
 from datetime import timedelta
+
+import jwt
+from sqlalchemy.orm.exc import NoResultFound
+from webob.exc import HTTPUnauthorized, HTTPClientError
+
 from onegov.api import ApiApp
-from onegov.api.models import ApiEndpoint
+from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint, ApiKey
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
-from onegov.api.models import ApiException
+from onegov.api.token import get_token, jwt_decode
 from onegov.core.security import Public
+
+
+def _authenticate(request):
+    assert request.authorization[0].lower() == 'basic'
+    auth = request.authorization[1].strip()
+    data = jwt_decode(request, auth)
+
+    session = request.session
+    session.query(ApiKey).filter_by(id=data['id']).one()
+
+
+def authenticate(request):
+    try:
+        _authenticate(request)
+    except jwt.ExpiredSignatureError as exception:
+        raise HTTPUnauthorized() from exception
+    except NoResultFound as no_res:
+        raise HTTPClientError() from no_res
+    except Exception as e:
+        raise ApiException() from e
 
 
 def check_rate_limit(request):
@@ -19,6 +44,10 @@ def check_rate_limit(request):
     """
 
     if request.is_logged_in:
+        return {}
+
+    if request.authorization:
+        authenticate(request)
         return {}
 
     limit, expiration = request.app.rate_limit
@@ -206,3 +235,11 @@ def view_api_endpoint_item(self, request):
 
     except Exception as exception:
         raise ApiException(exception=exception, headers=headers) from exception
+
+
+@ApiApp.json(model=AuthEndpoint, permission=Public)
+def get_time_restricted_token(self, request):
+    try:
+        return get_token(request)
+    except Exception as exception:
+        raise ApiException() from exception

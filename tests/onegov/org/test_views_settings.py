@@ -1,4 +1,7 @@
+from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
+from lxml.etree import tostring
+import re
 
 
 def test_settings(client):
@@ -88,6 +91,28 @@ def test_settings(client):
     assert (
         f'<a style="color: {color}" href="https://other-town.ch"'
     ) in page
+
+
+def test_api_keys_create_and_delete(client):
+
+    client.login_admin()
+
+    settings = client.get('/api-keys')
+    settings.form['name'] = "My API key"
+    page = settings.form.submit()
+    assert 'My API key' in page
+
+    key = client.app.session().query(ApiKey).first()
+    assert key.name == "My API key"
+    assert key.read_only == True
+
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    delete_href = client.extract_href(delete_link)
+    # Must use csrf
+    client.delete(delete_href, status=403)
+    csrf_token_ex = re.compile(r'\?csrf-token=[a-zA-Z0-9\._\-]+')
+    csrf_token = csrf_token_ex.search(str(page)).group()
+    assert client.delete(delete_href + csrf_token).status_code == 200
 
 
 def test_switch_languages(client):
