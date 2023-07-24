@@ -44,12 +44,6 @@ class ApiInvalidParamException(ApiException):
         self.status_code = status_code
 
 
-# class ApiAuthenticationException(ApiException):
-#     def __init__(self, message='Authentication failed', status_code=400):
-#         self.message = message
-#         self.status_code = status_code
-
-
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
 
@@ -243,8 +237,6 @@ class ApiKey(Base):
     # the name of the api key, may be any string
     name = Column(Text, nullable=False)
 
-
-     # todo: defualt to true
     read_only = Column(Boolean, default=False, nullable=False)
 
     last_used = Column(UTCDateTime, nullable=True)
