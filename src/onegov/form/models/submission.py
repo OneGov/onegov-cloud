@@ -216,6 +216,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         """ Claimes the given number of spots (defaults to the requested
         number of spots).
 
+        :return bool: Weather or not claiming spots is possible
         """
         spots = spots or self.spots
 
@@ -225,10 +226,15 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
             limit = self.registration_window.limit
             claimed = self.registration_window.claimed_spots
 
+            # check if limit of participants is reached
+            if spots > (limit - claimed):
+                return False
+
             assert spots <= (limit - claimed)
 
         assert ((self.claimed or 0) + spots) <= self.spots
         self.claimed = (self.claimed or 0) + spots
+        return True
 
     def disclaim(self, spots=None):
         """ Disclaims the given number of spots (defaults to all spots that
