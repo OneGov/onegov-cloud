@@ -173,10 +173,6 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: the view to open in the calendar (fullCalendar view name)
     view: str | None = 'month'
 
-    @property
-    def search_score(self) -> int:
-        return 4
-
     @deadline.setter
     def set_deadline(self, value: tuple[int, 'DeadlineUnit'] | None) -> None:
         value = value or None
