@@ -1,4 +1,5 @@
 from onegov.chat import MessageCollection
+from time import sleep
 
 
 def test_collection_filter(session):
@@ -26,3 +27,28 @@ def test_collection_filter(session):
 
     msgs.limit = 1
     assert msgs.query().count() == 1
+
+
+def test_latest_message(session):
+    msgs = MessageCollection(session)
+    msg1 = msgs.add(channel_id='public', text='Yo!')
+    assert msgs.latest_message() == msg1
+    # to ensure we get an ordered ulid for the next message
+    sleep(0.001)
+
+    msg2 = msgs.add(channel_id='public', text='Yo Sup?')
+    assert msgs.latest_message() == msg2
+    sleep(0.001)
+
+    msg3 = msgs.add(channel_id='public', text='Sup?')
+    assert msgs.latest_message() == msg3
+    sleep(0.001)
+
+    msg4 = msgs.add(channel_id='private', text='U female?')
+    assert msgs.latest_message() == msg4
+    assert msgs.latest_message(offset=1) == msg3
+    assert msgs.latest_message(offset=2) == msg2
+    assert msgs.latest_message(offset=3) == msg1
+    # it shouldn't care if the offset is past the oldest message
+    assert msgs.latest_message(offset=4) is None
+    assert msgs.latest_message(offset=5) is None

@@ -1,6 +1,6 @@
 import msal
 from attr import attrs, attrib
-from cached_property import cached_property
+from functools import cached_property
 
 from onegov.user import log
 

@@ -349,7 +349,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
 
 
 def send_new_note_notification(request: OrgRequest, form: TicketNoteForm,
-                               note: TicketNote, template: str):
+                               note: TicketNote, template):
     """
     Sends an E-mail notification to all resource recipients that have been
     configured to receive notifications for new (ticket) notes.

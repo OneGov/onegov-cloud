@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from datetime import date
+from functools import cached_property
 from onegov.election_day.layouts.default import DefaultLayout
 
 

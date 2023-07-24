@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.ballot import Vote
 from onegov.core.i18n import SiteLocale
 from onegov.election_day import _

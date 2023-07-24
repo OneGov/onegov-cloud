@@ -4,6 +4,13 @@ from onegov.reservation.collection import ResourceCollection
 from uuid import UUID
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from libres.context.registry import Registry
+    from libres.modules.context import Context
+    from onegov.core.orm.session_manager import SessionManager
+
+
 class LibresIntegration:
     """ Provides libres integration for
     :class:`onegov.core.framework.Framework` based applications.
@@ -19,7 +26,12 @@ class LibresIntegration:
 
     """
 
-    def configure_libres(self, **cfg):
+    if TYPE_CHECKING:
+        # necessary forward declaration
+        # provided by onegov.core.framework.Framework
+        session_manager: SessionManager
+
+    def configure_libres(self, **cfg: Any) -> None:
         """ Configures the libres integration and leaves two properties on
         the class:
 
@@ -48,7 +60,11 @@ class LibresIntegration:
         )
 
     @staticmethod
-    def libres_context_from_session_manager(registry, session_manager):
+    def libres_context_from_session_manager(
+        registry: 'Registry',
+        session_manager: 'SessionManager'
+    ) -> 'Context':
+
         if registry.is_existing_context('onegov.reservation'):
             return registry.get_context('onegov.reservation')
 
@@ -58,7 +74,7 @@ class LibresIntegration:
         # onegov.reservation uses uuids for the resources, so we don't need to
         # generate anything, we can just reuse the id (which is passed as the
         # name)
-        def uuid_generator(name):
+        def uuid_generator(name: UUID) -> UUID:
             assert isinstance(name, UUID)
             return name
 
@@ -67,5 +83,5 @@ class LibresIntegration:
         return context
 
     @property
-    def libres_resources(self):
+    def libres_resources(self) -> ResourceCollection:
         return ResourceCollection(self.libres_context)

@@ -353,11 +353,11 @@ def list_sessions() -> 'Callable[[CoreRequest, Framework], None]':
             if user.sessions:
                 click.secho('{}'.format(user.username), fg='yellow')
                 for session in user.sessions.values():
-                    session = session or {}
+                    session = session or {}  # type:ignore[unreachable]
                     print('{} [{}] "{}"'.format(
-                        session.get('address', '?'),
-                        session.get('timestamp', '?'),
-                        session.get('agent', '?'),
+                        session.get('address') or '?',
+                        session.get('timestamp') or '?',
+                        session.get('agent') or '?',
                     ))
 
     return list_sessions

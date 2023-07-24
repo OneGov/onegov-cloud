@@ -6,6 +6,7 @@ from datetime import date, timezone
 from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
+from markupsafe import escape
 
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
@@ -377,10 +378,10 @@ class EventCollection(Pagination):
                 tags = [str(c) for tag in tags for c in tag.cats]
 
             uid = str(vevent.get('uid', ''))
-            title = str(vevent.get('summary', ''))
-            description = str(vevent.get('description', ''))
-            organizer = str(vevent.get('organizer', ''))
-            location = str(vevent.get('location', ''))
+            title = str(escape(vevent.get('summary', '')))
+            description = str(escape(vevent.get('description', '')))
+            organizer = str(escape(vevent.get('organizer', '')))
+            location = str(escape(vevent.get('location', '')))
 
             items.append(
                 EventImportItem(

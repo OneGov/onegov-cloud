@@ -1,9 +1,9 @@
-from cached_property import cached_property
 from elasticsearch_dsl.function import SF
 from elasticsearch_dsl.query import FunctionScore
 from elasticsearch_dsl.query import Match
 from elasticsearch_dsl.query import MatchPhrase
 from elasticsearch_dsl.query import MultiMatch
+from functools import cached_property
 from onegov.core.collection import Pagination
 from onegov.event.models import Event
 

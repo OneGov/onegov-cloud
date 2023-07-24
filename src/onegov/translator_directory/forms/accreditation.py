@@ -1,6 +1,6 @@
-from cached_property import cached_property
 from datetime import date
 from depot.io.utils import FileIntent
+from functools import cached_property
 from io import BytesIO
 from onegov.core.crypto import random_token
 from onegov.core.utils import dictionary_to_binary

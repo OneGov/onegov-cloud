@@ -93,7 +93,7 @@ XML_LINE_OFFSET = 6
 def parse_structure(
     widgets: 'Collection[Widget]',
     structure: str
-) -> etree.ElementTree:
+) -> 'etree._Element':
     """ Takes the XML structure and returns the parsed etree xml.
 
     Raises a wtforms.ValidationError if there's an element which is not
@@ -144,8 +144,8 @@ def transform_structure(widgets: 'Collection[Widget]', structure: str) -> str:
 
     """
 
-    xslt = XSLT_BASE.format('\n'.join(w.template for w in widgets))
-    xslt = etree.fromstring(xslt.encode('utf-8'))
+    xslt_str = XSLT_BASE.format('\n'.join(w.template for w in widgets))
+    xslt = etree.fromstring(xslt_str.encode('utf-8'))
 
     template = etree.XSLT(xslt)(parse_structure(widgets, structure))
 
