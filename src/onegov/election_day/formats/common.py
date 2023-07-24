@@ -9,11 +9,39 @@ from onegov.core.errors import InvalidFormatError
 from onegov.core.errors import MissingColumnsError
 from onegov.election_day import _
 from re import match
+from xsdata.formats.dataclass.context import XmlContext
+from xsdata.formats.dataclass.parsers import XmlParser
 
 
 EXPATS = (
     # These are used by the BFS but not in the official data!
     9170,  # sg
+    19010,
+    19020,
+    19030,
+    19040,
+    19050,
+    19060,
+    19070,
+    19080,
+    19090,
+    19100,
+    19110,
+    19120,
+    19130,
+    19140,
+    19150,
+    19160,
+    19170,
+    19180,
+    19190,
+    19200,
+    19210,
+    19220,
+    19230,
+    19240,
+    19250,
+    19260,
 )
 
 
@@ -161,12 +189,33 @@ def load_csv(
     return csv, error
 
 
+def load_xml(file):
+    """ Loads the given eCH file and returns it as an object.
+
+    :return: A tuple CSVFile, FileImportError.
+
+    """
+    xml = None
+    error = None
+
+    try:
+        parser = XmlParser(context=XmlContext())
+        xml = parser.from_bytes(file.read())
+    except Exception as exception:
+        error = FileImportError(_(
+            "Not a valid eCH xml file: ${error}",
+            mapping={'error': exception}
+        ))
+
+    return xml, error
+
+
 def get_entity_and_district(
-    entity_id, entities, election, principal, errors=None
+    entity_id, entities, election_or_vote, principal, errors=None
 ):
     """ Returns the entity name and district or region (from our static data,
     depending on the domain of the election). Adds optionally an error, if the
-    district or region is not part of this election.
+    district or region is not part of this election or vote.
 
     """
 
@@ -176,28 +225,28 @@ def get_entity_and_district(
     entity = entities.get(entity_id, {})
     name = entity.get('name', '')
     district = entity.get('district', '')
-    if election.domain == 'region':
+    if election_or_vote.domain == 'region':
         district = entity.get('region', '')
     superregion = entity.get('superregion', '')
 
     if errors is not None:
-        if election.domain == 'municipality':
-            if election.domain_segment != name:
+        if election_or_vote.domain == 'municipality':
+            if election_or_vote.domain_segment != name:
                 if principal.domain != 'municipality':
                     errors.append(_(
-                        "${name} is not part of this election",
+                        "${name} is not part of this business",
                         mapping={
                             'name': entity_id,
-                            'district': election.domain_segment
+                            'district': election_or_vote.domain_segment
                         }
                     ))
-        if election.domain in ('region', 'district'):
-            if election.domain_segment != district:
+        if election_or_vote.domain in ('region', 'district'):
+            if election_or_vote.domain_segment != district:
                 errors.append(_(
                     "${name} is not part of ${district}",
                     mapping={
                         'name': entity_id,
-                        'district': election.domain_segment
+                        'district': election_or_vote.domain_segment
                     }
                 ))
 

@@ -341,6 +341,17 @@ msgstr "Visualizza"
 msgid "Lead-Format"
 msgstr "Formato principale"
 
+msgid "Empty Directory Notice"
+msgstr "Avviso di cartella vuota"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Questo testo viene visualizzato quando la cartella non contiene voci "
+"(visibili). Se lasciato vuoto, verrà visualizzato un testo generico "
+"predefinito."
+
 msgid "Numbering"
 msgstr "Numerazione"
 
@@ -907,6 +918,9 @@ msgstr "File Excel"
 
 msgid "JSON File"
 msgstr "File JSON"
+
+msgid "XML File"
+msgstr "File XML"
 
 msgid "Minimum price total"
 msgstr "Prezzo minimo totale"
@@ -2423,8 +2437,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3568,6 +3582,9 @@ msgstr ""
 "Spiacenti, la pagina che stai cercando non è stata trovata. Prova a "
 "controllare l'URL per eventuali errori o utilizza la casella di ricerca in "
 "alto."
+
+msgid "Back"
+msgstr "Indietro"
 
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
@@ -5209,3 +5226,6 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+msgid "Expected header line with the following columns:"
+msgstr "La prima riga deve avere i seguenti nomi di colonna:"

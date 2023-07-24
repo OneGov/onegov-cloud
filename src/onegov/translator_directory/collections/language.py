@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from sqlalchemy import func
 
 from onegov.core.collection import GenericCollection, Pagination

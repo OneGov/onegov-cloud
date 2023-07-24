@@ -2,7 +2,7 @@ import json
 import os
 import re
 
-from cached_property import cached_property
+from functools import cached_property
 from pyquery import PyQuery as pq
 from webtest import TestApp
 

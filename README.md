@@ -322,10 +322,10 @@ To synchronize between different modules:
 Additionally, you can use <https://gengo.com> to translate English messages
 to other languages, like German, French or Italian.
 
-For this to work, you need to set the following variables:
+For this to work, you need to set the following variables (note the single quotes!):
 
-    export GENGO_PUBLIC_KEY="my gengo public key"
-    export GENGO_PRIVATE_KEY="my gengo private key"
+    export GENGO_PUBLIC_KEY='my gengo public key'
+    export GENGO_PRIVATE_KEY='my gengo private key'
 
 To push a translation job to Gengo, run:
 

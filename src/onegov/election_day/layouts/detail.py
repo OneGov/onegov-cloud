@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from datetime import date
+from functools import cached_property
 from onegov.election_day.layouts.default import DefaultLayout
 
 
@@ -86,4 +86,9 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     @cached_property
     def show_map(self):
+        if (
+            self.principal.domain == 'canton'
+            and getattr(self.model, 'domain', None) == 'municipality'
+        ):
+            return False
         return self.principal.is_year_available(self.model.date.year)

@@ -340,6 +340,17 @@ msgstr "Afficher"
 msgid "Lead-Format"
 msgstr "Format Principal"
 
+msgid "Empty Directory Notice"
+msgstr "Avis de dossier vide"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Ce texte sera affiché lorsque le dossier ne contient pas d'entrées "
+"(visibles). S'il est laissé vide, un texte générique par défaut sera affiché "
+"à la place."
+
 msgid "Numbering"
 msgstr "Numérotation"
 
@@ -904,6 +915,9 @@ msgstr "Fichier Excel"
 
 msgid "JSON File"
 msgstr "Fichier JSON"
+
+msgid "XML File"
+msgstr "Fichier XML"
 
 msgid "Minimum price total"
 msgstr "Prix minimum total"
@@ -2413,8 +2427,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Événement"
 
@@ -3575,6 +3589,9 @@ msgstr ""
 "Désolé, la page que vous cherchez n'a pu être trouvée. Essayez de vérifier "
 "qu'il n'y a pas d'erreurs dans l'URL ou utilisez la fenêtre de recherche "
 "située en haut."
+
+msgid "Back"
+msgstr "Retour"
 
 msgid "Link to organizers page"
 msgstr "Lien vers la page de l'organisateur"
@@ -5213,3 +5230,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+msgid "Expected header line with the following columns:"
+msgstr "La première ligne doit avoir les noms de colonne suivants:"

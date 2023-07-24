@@ -261,8 +261,11 @@ class BookingInvoiceBridge:
 
         # preload data
         self.activities = {
-            r.id: r.title
-            for r in session.query(Occasion.id, Activity.title).join(Activity)
+            r.id: (
+                r.Activity.title,
+                r.Activity.user.data.get('organisation', '')
+            )
+            for r in session.query(Occasion.id, Activity).join(Activity)
         }
 
         # holds invoices which existed already
@@ -277,6 +280,7 @@ class BookingInvoiceBridge:
             SELECT DISTINCT
                 "group",    -- Text
                 "username", -- Text
+                attendee_id,-- UUID
                 period_id   -- UUID
             FROM invoice_items
 
@@ -289,7 +293,7 @@ class BookingInvoiceBridge:
             WHERE "group" != 'manual'
         """)
         self.billed_attendees = {
-            (r.username, r.group) for r in session.execute(
+            r.attendee_id for r in session.execute(
                 select(stmt.c).where(stmt.c.period_id == period.id)
             )
         }
@@ -331,7 +335,9 @@ class BookingInvoiceBridge:
 
         self.existing[booking.username].add(
             group=self.attendees[booking.attendee_id][0],
-            text=self.activities[booking.occasion_id],
+            attendee_id=booking.attendee_id,
+            text=self.activities[booking.occasion_id][0],
+            organizer=self.activities[booking.occasion_id][1],
             unit=booking.cost,
             quantity=1,
             flush=False
@@ -344,12 +350,15 @@ class BookingInvoiceBridge:
             return
 
         for id, (attendee, username) in self.attendees.items():
-            if id in self.processed_attendees:
-                if (username, attendee) not in self.billed_attendees:
-                    self.existing[username].add(
-                        group=attendee,
-                        text=all_inclusive_booking_text,
-                        unit=self.period.booking_cost,
-                        quantity=1,
-                        flush=False
-                    )
+            if (
+                id in self.processed_attendees
+                and id not in self.billed_attendees
+            ):
+                self.existing[username].add(
+                    group=attendee,
+                    attendee_id=id,
+                    text=all_inclusive_booking_text,
+                    unit=self.period.booking_cost,
+                    quantity=1,
+                    flush=False
+                )

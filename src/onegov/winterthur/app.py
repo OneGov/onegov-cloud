@@ -1,7 +1,7 @@
 import re
 import subprocess
 
-from cached_property import cached_property
+from functools import cached_property
 from io import BytesIO
 from onegov.core import utils
 from onegov.core.orm.types import JSON

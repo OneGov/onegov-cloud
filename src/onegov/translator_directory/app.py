@@ -1,3 +1,4 @@
+from functools import cached_property
 from onegov.core import utils
 from onegov.gis import Coordinates
 from onegov.translator_directory.initial_content import create_new_organisation
@@ -9,7 +10,6 @@ from onegov.translator_directory.request import TranslatorAppRequest
 from onegov.translator_directory.theme import TranslatorDirectoryTheme
 from purl import URL
 from sqlalchemy import and_
-from cached_property import cached_property
 
 
 class TranslatorDirectoryApp(OrgApp):

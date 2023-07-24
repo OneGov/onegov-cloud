@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from cached_property import cached_property
 from dateutil.parser import isoparse
+from functools import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.collections import PaginatedAgencyCollection
 from onegov.agency.collections import PaginatedMembershipCollection

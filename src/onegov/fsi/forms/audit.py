@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
@@ -22,9 +22,6 @@ class AuditForm(Form):
     organisations = ChosenSelectMultipleField(
         label=_("By Organisation"),
         choices=[],
-        validators=[
-            InputRequired()
-        ]
     )
 
     letter = SelectField(

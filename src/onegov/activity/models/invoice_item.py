@@ -31,6 +31,9 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
     #: the invoice this item belongs to
     invoice_id = Column(UUID, ForeignKey('invoices.id'))
 
+    #: the attendee, if the item is connected to an attendee
+    attendee_id = Column(UUID, ForeignKey('attendees.id'), nullable=True)
+
     #: the item group (all items with the same text are visually grouped)
     group = Column(Text, nullable=False)
 
@@ -39,6 +42,9 @@ class InvoiceItem(Base, TimestampMixin, PayableManyTimes):
 
     #: the item text
     text = Column(Text, nullable=False)
+
+    #: organizer (if the item is an activity)
+    organizer = Column(Text, nullable=True)
 
     #: true if paid
     paid = Column(Boolean, nullable=False, default=False)

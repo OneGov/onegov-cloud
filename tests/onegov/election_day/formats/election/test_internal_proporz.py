@@ -717,7 +717,7 @@ def test_import_internal_proporz_regional(session):
         *create_csv(((1701, False), (1702, False)))
     )
     assert [(e.error.interpolate()) for e in errors] == [
-        '1702 is not part of this election'
+        '1702 is not part of this business'
     ]
 
     # ZG, municipality, ok

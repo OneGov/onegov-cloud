@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.elements import Link
 from onegov.wtfs import _
 from onegov.wtfs.layouts.default import DefaultLayout

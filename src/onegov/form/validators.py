@@ -419,7 +419,10 @@ class InputRequiredIf(InputRequired):
         if any([isinstance(x, bool) or x is None for x in values]):
             required = values[0] is values[1]
         else:
-            required = values[0] == values[1]
+            if isinstance(values[1], str) and '!' in values[1]:
+                required = values[0] != values[1].replace('!', '')
+            else:
+                required = values[0] == values[1]
         if required:
             super(InputRequiredIf, self).__call__(form, field)
         else:

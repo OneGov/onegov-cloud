@@ -1,16 +1,16 @@
 import datetime
-from collections import OrderedDict
-from uuid import uuid4
-
-from cached_property import cached_property
 import pytz
+
+from collections import OrderedDict
+from functools import cached_property
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
-from sqlalchemy import Column, Boolean, SmallInteger, \
-    Enum, Text, Interval, ForeignKey, or_, and_
+from sqlalchemy import (
+    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_)
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
+from uuid import uuid4
 
 from onegov.core.mail import Attachment
 from onegov.core.orm import Base

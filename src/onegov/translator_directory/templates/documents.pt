@@ -10,11 +10,10 @@
                         <h3 i18n:translate="">Upload</h3>
                          <label for="category" i18n:translate>Chose document category for upload: </label>
 
-                        <select name="category" id="select-category" onchange="location = this.value;">
+                        <select name="category" id="select-category">
                              <tal:b tal:repeat="category categories">
                                  <option tal:attributes="value layout.link_for(category); selected category == model.category">${category}</option>
                              </tal:b>
-
                         </select>
 
                         <tal:b metal:use-macro="layout.macros.upload" tal:define="upload_url layout.upload_url">

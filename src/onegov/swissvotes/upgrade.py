@@ -560,3 +560,9 @@ def add_tsvector_column_en(context):
         context.operations.add_column(
             'swissvotes', Column('searchable_text_en_US', TSVECTOR())
         )
+
+
+@upgrade_task('Drops department in charge column')
+def drop_departement_in_charge_columns(context):
+    if context.has_column('swissvotes', 'department_in_charge'):
+        context.operations.drop_column('swissvotes', 'department_in_charge')

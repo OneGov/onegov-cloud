@@ -1,3 +1,4 @@
+from email_validator import validate_email
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
@@ -17,7 +18,6 @@ from sqlalchemy import Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session, validates, relationship
 from uuid import uuid4
-from validate_email import validate_email
 
 # Newsletters and recipients are joined in a many to many relationship
 newsletter_recipients = Table(

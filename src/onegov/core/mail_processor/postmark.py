@@ -17,7 +17,12 @@ from .core import log, MailQueueProcessor
 
 class PostmarkMailQueueProcessor(MailQueueProcessor):
 
-    def __init__(self, postmark_token, *paths, limit=None):
+    def __init__(
+        self,
+        postmark_token: str,
+        *paths: str,
+        limit: int | None = None
+    ):
         super().__init__(*paths, limit=limit)
 
         # Keep a pycurl object around, to use HTTP keep-alive - though pycurl
@@ -34,7 +39,7 @@ class PostmarkMailQueueProcessor(MailQueueProcessor):
         ])
         self.curl.setopt(pycurl.POST, 1)
 
-    def send(self, filename, payload):
+    def send(self, filename: str, payload: str) -> bool:
         """ Sends the mail and returns success as bool """
         code, body = self.send_request(payload)
 
@@ -68,7 +73,7 @@ class PostmarkMailQueueProcessor(MailQueueProcessor):
 
         return success
 
-    def send_request(self, payload):
+    def send_request(self, payload: str) -> tuple[int, str]:
         """ Performes the API request using the given payload. """
 
         body = BytesIO()
@@ -80,6 +85,6 @@ class PostmarkMailQueueProcessor(MailQueueProcessor):
         code = self.curl.getinfo(pycurl.RESPONSE_CODE)
 
         body.seek(0)
-        body = body.read().decode('utf-8')
+        body_str = body.read().decode('utf-8')
 
-        return code, body
+        return code, body_str

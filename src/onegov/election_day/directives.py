@@ -111,7 +111,7 @@ class JsonFileAction(ViewAction):
         name = content.get('name', 'data.json')
         return Response(
             json.dumps(data, sort_keys=True, indent=2).encode('utf-8'),
-            content_type='application/json',
+            content_type='application/json; charset=utf-8',
             content_disposition=f'inline; filename={name}.json')
 
 
@@ -132,6 +132,26 @@ class CsvFileAction(ViewAction):
             convert_list_of_dicts_to_csv(data),
             content_type='text/csv',
             content_disposition=f'inline; filename={name}.csv'
+        )
+
+
+class XmlFileAction(ViewAction):
+
+    """ View directive for viewing XML data as file. """
+
+    def __init__(self, model, **kwargs):
+        kwargs['permission'] = kwargs.get('permission', Public)
+        kwargs['render'] = self.render
+        super().__init__(model, **kwargs)
+
+    @staticmethod
+    def render(content, request):
+        data = content.get('data', {})
+        name = content.get('name', 'delivery')
+        return Response(
+            data,
+            content_type='application/xml',
+            content_disposition=f'inline; filename={name}.xml'
         )
 
 

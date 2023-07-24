@@ -118,3 +118,14 @@ the OneGov Cloud modules documentation.
     :maxdepth: 2
 
     modules
+
+API
+^^^
+
+API documentation
+
+.. toctree::
+    :maxdepth: 2
+
+    api/api.md
+

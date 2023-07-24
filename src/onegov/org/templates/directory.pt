@@ -20,7 +20,10 @@
 
         <div class="row reverse-on-mobile">
             <div class="columns medium-8">
-                <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
+                <tal:b tal:condition="not:entries" tal:switch="not:directory.configuration.empty_notice">
+                    <p tal:case="True" i18n:translate="">No entries found.</p>
+                    <p tal:case="False">${directory.configuration.empty_notice}</p>
+                </tal:b>
 
                 <ul class="directory-list with-lead ${show_thumbnails and 'with-thumbnails' or ''}  ${'row' if overview_two_columns else ''}" tal:condition="entries">
                     <li tal:repeat="entry entries" class="small-12 ${'medium-6' if overview_two_columns else ''} columns">

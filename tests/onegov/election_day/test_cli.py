@@ -61,6 +61,8 @@ def write_principal(temporary_directory, principal, entity='be', params=None):
         params['canton'] = entity
     else:
         params['municipality'] = entity
+        params['canton'] = 'be'
+        params['canton_name'] = 'Kanton Bern'
     path = os.path.join(
         temporary_directory,
         'file-storage/onegov_election_day-{}'.format(principal.lower())

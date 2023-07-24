@@ -1,9 +1,11 @@
 from onegov.election_day import _
 from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES
+from onegov.election_day.forms.upload.common import ALLOWED_MIME_TYPES_XML
 from onegov.election_day.forms.upload.common import MAX_FILE_SIZE
 from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import InputRequiredIf
 from onegov.form.validators import WhitelistedMimeType
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
@@ -19,6 +21,7 @@ class UploadRestForm(Form):
             ('vote', _("Vote")),
             ('election', _("Election")),
             ('parties', _("Party results")),
+            ('xml', "eCH-0252"),
         ],
         validators=[
             InputRequired()
@@ -29,7 +32,7 @@ class UploadRestForm(Form):
     id = StringField(
         label=_("Identifier"),
         validators=[
-            InputRequired()
+            InputRequiredIf('type', '!xml')
         ]
     )
 
@@ -37,7 +40,7 @@ class UploadRestForm(Form):
         label=_("Results"),
         validators=[
             DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         render_kw=dict(force_simple=True)

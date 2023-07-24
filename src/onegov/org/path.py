@@ -1,8 +1,8 @@
 """ Contains the paths to the different models served by onegov.org. """
-
 import sedate
 
 from datetime import date
+
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection

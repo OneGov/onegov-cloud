@@ -9,26 +9,26 @@ I formati di file accettabili sono file generati manualmente, dal software elett
 <!-- https://atom.io/packages/atom-mdtoc -->
 <!-- MDTOC maxdepth:6 firsth1:2 numbering:1 flatten:0 bullets:1 updateOnSave:1 -->
 
-- 1. [Contenuto](#Contenuto)   
-- 2. [Prefazione](#Prefazione)   
-   - 2.1. [Enti](#Enti)   
-- 3. [Formati](#Formati)   
-   - 3.1. [Formato standard](#Formato-standard)   
-      - 3.1.1. [Colonne](#Colonne)   
-      - 3.1.2. [Risultati temporanei](#Risultati-temporanei)   
-      - 3.1.3. [Modello](#Modello)   
-   - 3.2. [OneGov](#OneGov)   
-      - 3.2.1. [Colonne](#Colonne-1)   
-      - 3.2.2. [Risultati temporanei](#Risultati-temporanei-1)   
-      - 3.2.3. [Modello](#Modello-1)   
-   - 3.3. [Wabsti](#Wabsti)   
-      - 3.3.1. [Colonne](#Colonne-2)   
-      - 3.3.2. [Risultati temporanei](#Risultati-temporanei-2)   
-      - 3.3.3. [Modello](#Modello-2)   
-   - 3.4. [WabstiCExport](#WabstiCExport)   
+- 1. [Contenuto](#contenuto)
+- 2. [Prefazione](#prefazione)
+   - 2.1. [Enti](#enti)
+- 3. [Formati](#formati)
+   - 3.1. [Formato standard](#formato-standard)
+      - 3.1.1. [Colonne](#colonne)
+      - 3.1.2. [Risultati temporanei](#risultati-temporanei)
+      - 3.1.3. [Modello](#modello)
+   - 3.2. [OneGov](#onegov)
+      - 3.2.1. [Colonne](#colonne)
+      - 3.2.2. [Risultati temporanei](#risultati-temporanei)
+      - 3.2.3. [Modello](#modello)
+   - 3.3. [Wabsti](#wabsti)
+      - 3.3.1. [Colonne](#colonne)
+      - 3.3.2. [Risultati temporanei](#risultati-temporanei)
+      - 3.3.3. [Modello](#modello)
+   - 3.4. [WabstiCExport](#wabsticexport)
+   - 3.5. [eCH-0252](#ech-0252)
 
 <!-- /MDTOC -->
-
 ## Prefazione
 
 ### Enti
@@ -134,3 +134,8 @@ Si ritiene che i comuni non siano stati conteggiati se si verifica una delle due
 ### WabstiCExport
 
 La versione `>= 2.2` è supportata. Consulta la documentazione del programma di esportazione per ulteriori informazioni riguardo le colonne dei vari file.
+
+
+### eCH-0252
+
+Vedi [eCH-0252](https://www.ech.ch/de/ech/ech-0252).

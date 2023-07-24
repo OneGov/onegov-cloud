@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.layouts.detail import DetailLayout

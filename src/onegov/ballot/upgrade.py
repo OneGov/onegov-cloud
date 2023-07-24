@@ -824,3 +824,22 @@ def fix_file_constraints(context):
             f'ADD CONSTRAINT {table}_{ref}_id_fkey'
             f' FOREIGN KEY ({ref}_id) REFERENCES {ref} (id) ON UPDATE CASCADE'
         )
+
+
+@upgrade_task('Add external ids')
+def add_external_ids(context):
+    for table in ('elections', 'election_compounds', 'votes'):
+        if not context.has_column(table, 'external_id'):
+            context.operations.add_column(
+                table,
+                Column('external_id', Text(), nullable=True)
+            )
+
+
+@upgrade_task('Add external ballot ids')
+def add_external_ballot_ids(context):
+    if not context.has_column('ballots', 'external_id'):
+        context.operations.add_column(
+            'ballots',
+            Column('external_id', Text(), nullable=True)
+        )

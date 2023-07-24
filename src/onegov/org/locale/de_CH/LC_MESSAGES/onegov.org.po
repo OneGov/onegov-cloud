@@ -340,6 +340,17 @@ msgstr "Anzeige"
 msgid "Lead-Format"
 msgstr "Lead-Format"
 
+msgid "Empty Directory Notice"
+msgstr "Leeres Verzeichnis Hinweis"
+
+msgid ""
+"This text will be displayed when the directory contains no (visible) "
+"entries. When left empty a generic default text will be shown instead."
+msgstr ""
+"Dieser Text wird dargestellt wenn das Verzeichnis keine (sichtbaren) "
+"Einträge enthält. Falls leergelassen, wird stattdessen ein generischer "
+"Standardtext angezeigt."
+
 msgid "Numbering"
 msgstr "Nummerierung"
 
@@ -905,6 +916,9 @@ msgstr "Excel Datei"
 
 msgid "JSON File"
 msgstr "JSON Datei"
+
+msgid "XML File"
+msgstr "XML Datei"
 
 msgid "Minimum price total"
 msgstr "Minimalpreis"
@@ -2413,8 +2427,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3568,6 +3582,9 @@ msgstr ""
 "Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden "
 "werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
 "Suche im Navigationsbereich."
+
+msgid "Back"
+msgstr "Zurück"
 
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
@@ -5193,3 +5210,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "Expected header line with the following columns:"
+msgstr "Die erste Zeile soll folgende Spaltennamen haben:"

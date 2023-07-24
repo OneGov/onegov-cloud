@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from sedate import utcnow, to_timezone
 
 from onegov.core.html_diff import render_html_diff

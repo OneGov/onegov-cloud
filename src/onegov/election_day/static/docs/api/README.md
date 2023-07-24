@@ -58,10 +58,11 @@ REST Interface
 The web app allows to upload results in the onegov format using a
 multipart-POST-request to `[base_url]/upload` containing the following fields:
 
-- `type`: The type of upload. This is either `vote`, `election` or `parties`.
-- `id`: The ID of the election compound, election or vote. If `type` is
-  `election` or `parties` an election compound is searched for first, and then
-  an election if none is found.
+- `type`: The type of upload. This is either `vote`, `election`, `parties` or
+  `xml`.
+- `id`: The ID or external ID of the election compound, election or vote. If
+  `type` is `election` or `parties` an election compound is searched for first,
+  and then an election if none is found. Not needed for `type = 'xml'`.
 - `results`: The results. See the [format_descriptions](format__en.md)
 
 A token must be provided using the passwort part of HTTP basic authentication.
@@ -95,14 +96,20 @@ It is possible to set the language used for the error messages by setting the
 `rm_CH`.
 
 
-### cURL Example
+### cURL Examples
 
     curl https://[base_url]/upload \
       --user :[token] \
       --header "Accept-Language: de_CH" \
       --form "type=election" \
       --form "id=test-election" \
-      --form "results=@import/staenderatswahl-2015.csv"
+      --form "results=@staenderatswahl-2015.csv"
+
+    curl https://[base_url]/upload \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "type=xml" \
+      --form "results=@delivery.xml"
 
 
 WabstiCExport

@@ -1,10 +1,12 @@
-from cached_property import cached_property
-from datetime import date
-from datetime import timedelta
+import datetime
+import sqlalchemy
+
+from functools import cached_property
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
+from lxml import objectify, etree
 from onegov.core.collection import Pagination
-from onegov.core.utils import get_unique_hstore_keys
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
 from sedate import as_datetime
@@ -181,7 +183,7 @@ class OccurrenceCollection(Pagination):
 
     @cached_property
     def used_tags(self):
-        """ Returns a list of all the tags used by the occurrences.
+        """ Returns a list of all the tags used by all future occurrences.
 
         This could be solve possibly more effienciently with the skey function
         currently not supported by SQLAlchemy (e.g.
@@ -189,8 +191,18 @@ class OccurrenceCollection(Pagination):
         http://stackoverflow.com/q/12015942/3690178
 
         """
+        base = self.session.query(Occurrence._tags.keys()).with_entities(
+            sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
+            Occurrence.start)
+        base = base.filter(Occurrence.start >= datetime.datetime.now(
+            datetime.timezone.utc))
 
-        return get_unique_hstore_keys(self.session, Occurrence._tags)
+        query = sqlalchemy.select(
+            [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
+            distinct=True
+        ).select_from(base.subquery())
+        keys = self.session.execute(query).scalar()
+        return set(keys) if keys else set()
 
     def query(self):
         """ Queries occurrences with the set parameters.
@@ -317,3 +329,88 @@ class OccurrenceCollection(Pagination):
                 vcalendar.add_component(vevent)
 
         return vcalendar.to_ical()
+
+    def as_xml(self, future_events_only=False):
+        """
+        Returns all published occurrences as xml.
+
+        The xml format was Winterthur's wish (no specs behind). Their mobile
+        app will consume the events from xml
+
+        Format:
+        <events>
+            <event>
+                <id></id>
+                <title></title>
+                <tags></tags>
+                    <tag></tag>
+                <description></description>
+                <start></start>
+                <end></end>
+                <location></location>
+                <price></price>
+                ..
+            </event>
+            <event>
+                ..
+            </event>
+            ..
+        </events>
+
+        :param future_events_only: if set, only future events will be
+        returned, all events otherwise
+        :rtype: str
+        :return: xml string
+        """
+        xml = '<events></events>'
+        root = objectify.fromstring(xml)
+
+        query = self.session.query(Occurrence)
+        for occ in query:
+            e = self.session.query(Event).\
+                filter(Event.id == occ.event_id).first()
+
+            if e.state != 'published':
+                continue
+            if future_events_only and datetime.fromisoformat(str(
+                    occ.end)).date() < datetime.today().date():
+                continue
+
+            event = objectify.Element('event')
+            event.id = e.id
+            event.title = e.title
+            txs = tags(e.tags)
+            event.append(txs)
+            event.description = e.description
+            event.start = occ.start
+            event.end = occ.end
+            event.location = e.location
+            event.price = e.price
+            event.organizer = e.organizer
+            event.event_url = e.external_event_url
+            event.organizer_email = e.organizer_email
+            event.modified = e.last_change
+            root.append(event)
+
+        # remove lxml annotations
+        objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
+        etree.cleanup_namespaces(root)
+
+        return etree.tostring(root, encoding='utf-8', xml_declaration=True,
+                              pretty_print=True)
+
+
+class tags(etree.ElementBase):
+    """
+    Custom class as 'tag' is a member of class Element and cannot be
+    used as tag name.
+    """
+
+    def __init__(self, tags=()):
+        super().__init__()
+        self.tag = 'tags'
+
+        for t in tags:
+            tag = etree.Element('tag')
+            tag.text = t
+            self.append(tag)

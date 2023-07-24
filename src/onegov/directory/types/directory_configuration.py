@@ -87,6 +87,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
     fields = (
         'title',
         'lead',
+        'empty_notice',
         'order',
         'keywords',
         'searchable',
@@ -100,14 +101,15 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         'show_as_thumbnails',
     )
 
-    def __init__(self, title=None, lead=None, order=None, keywords=None,
-                 searchable=None, display=None, direction=None,
+    def __init__(self, title=None, lead=None, empty_notice=None, order=None,
+                 keywords=None, searchable=None, display=None, direction=None,
                  link_pattern=None, link_title=None, link_visible=None,
                  thumbnail=None, address_block_title=None,
                  show_as_thumbnails=None, **kwargs):
 
         self.title = title
         self.lead = lead
+        self.empty_notice = empty_notice
         self.order = order
         self.keywords = keywords
         self.searchable = searchable
