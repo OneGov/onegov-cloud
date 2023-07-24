@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR
 

@@ -1,9 +1,8 @@
 import socket
 
 from attr import attrs, attrib
-from cached_property import cached_property
 from contextlib import suppress
-from functools import wraps
+from functools import cached_property, wraps
 from ldap3 import Connection, Server, AUTO_BIND_DEFAULT, NONE, RESTARTABLE
 from ldap3.core.exceptions import LDAPCommunicationError
 from time import sleep

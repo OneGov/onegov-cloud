@@ -93,7 +93,7 @@ def get_supported_image_mime_types() -> set[str]:
 
 
 # TODO: technically SupportsReadClose is enough
-def get_svg_size(svg: IO[bytes]) -> tuple[str, str]:
+def get_svg_size(svg: IO[bytes]) -> tuple[str | None, str | None]:
     # note, the svg size may not be in pixel, it can include the same units
     # the browser uses for styling, so we need to pass this information down
     # to the browser, instead of using it internally

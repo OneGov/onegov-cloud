@@ -1,4 +1,5 @@
-from cached_property import cached_property
+from functools import cached_property
+
 from elasticsearch_dsl.function import SF
 from elasticsearch_dsl.query import FunctionScore
 from elasticsearch_dsl.query import Match

@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from purl import URL
 
 from onegov.translator_directory import _

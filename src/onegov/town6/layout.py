@@ -1,8 +1,8 @@
 from collections import namedtuple
 
-from cached_property import cached_property
 from dateutil.rrule import rrulestr
 from dateutil import rrule
+from functools import cached_property
 
 from onegov.chat import TextModuleCollection
 from onegov.core.utils import linkify, to_html_ul

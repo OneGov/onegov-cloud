@@ -543,3 +543,8 @@ def websocket_server(websocket_config):
         _websocket_server.start()
 
     yield _websocket_server
+
+
+@pytest.fixture(scope='session', autouse=True)
+def email_validator_environment(monkeysession):
+    monkeysession.setattr('email_validator.TEST_ENVIRONMENT', True)

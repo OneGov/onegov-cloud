@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.file import DepotApp

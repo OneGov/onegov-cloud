@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from markupsafe import Markup
 from onegov.activity import Activity
 from onegov.activity import Booking, BookingCollection
