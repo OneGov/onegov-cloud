@@ -36,7 +36,7 @@ from tests.shared.postgresql import Postgresql
 from threading import Thread
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.utils import ChromeType
+from webdriver_manager.core.os_manager import ChromeType
 
 
 redis_path = which('redis-server')
@@ -540,3 +540,8 @@ def websocket_server(websocket_config):
         _websocket_server.start()
 
     yield _websocket_server
+
+
+@pytest.fixture(scope='session', autouse=True)
+def email_validator_environment(monkeysession):
+    monkeysession.setattr('email_validator.TEST_ENVIRONMENT', True)

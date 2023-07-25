@@ -1,6 +1,6 @@
 import onegov.election_day
 
-from cached_property import cached_property
+from functools import cached_property
 from collections import OrderedDict
 from datetime import date
 from onegov.core import utils
@@ -92,6 +92,7 @@ class Principal:
         cache_expiration_time=300,
         reply_to=None,
         custom_css=None,
+        official_host=None,
         **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -128,6 +129,7 @@ class Principal:
         self.cache_expiration_time = cache_expiration_time
         self.reply_to = reply_to
         self.custom_css = custom_css
+        self.official_host = official_host
 
     @classmethod
     def from_yaml(cls, yaml_source):

@@ -27,7 +27,7 @@ def import_xml(principal, session, file, vote=None):
 
     delivery, error = load_xml(file)
     if error:
-        return [error]
+        return [error], []
 
     results = []
     for vote_info in delivery.vote_base_delivery.vote_info:
@@ -36,11 +36,12 @@ def import_xml(principal, session, file, vote=None):
         )
 
     items, errors = zip(*results)
+    items = {item for item in items if item}
     errors = list(chain.from_iterable(errors))
     if vote and not items and not errors:
         errors.append(FileImportError(_('No data found')))
 
-    return errors, set(items)
+    return errors, items
 
 
 def import_vote_xml(principal, session, vote_info, vote=None):
@@ -85,44 +86,55 @@ def import_vote_xml(principal, session, vote_info, vote=None):
     entities = principal.entities[vote.date.year]
     status = 'final'
     for circle_info in vote_info.counting_circle_info:
-        result = circle_info.result_data
-        voters = result.count_of_voters_information
         try:
+            # entity id
             entity_id = int(circle_info.counting_circle.counting_circle_id)
             assert entity_id is not None
             entity_id = 0 if entity_id in EXPATS else entity_id
             assert entity_id == 0 or entity_id in entities
 
+            # name and district
             line_errors = []
             name, district, superregion = get_entity_and_district(
                 entity_id, entities, vote, principal, line_errors
             )
             assert not line_errors
 
-            expats = [
-                subtotal.count_of_voters for subtotal in voters.subtotal_info
-                if subtotal.voter_type == VoterTypeType.VALUE_2
-            ]
-            expats = expats[0] if expats else None
-            assert expats is None or isinstance(expats, int)
-
-            if not result.fully_counted_true:
-                status = 'interim'
-
+            # ballot result
             result = {
                 'id': uuid4(),
                 'ballot_id': ballot.id,
                 'entity_id': entity_id,
                 'name': name,
                 'district': district,
-                'eligible_voters': voters.count_of_voters_total,
-                'expats': expats,
-                'counted': result.fully_counted_true,
-                'invalid': result.received_invalid_votes or 0,
-                'empty': result.received_blank_votes or 0,
-                'yeas': result.count_of_yes_votes or 0,
-                'nays': result.count_of_no_votes or 0,
+                'counted': False
             }
+
+            # results (optional)
+            result_data = circle_info.result_data
+            if not result_data:
+                status = 'interim'
+            else:
+                voters = result_data.count_of_voters_information
+                expats = [
+                    subtotal.count_of_voters
+                    for subtotal in voters.subtotal_info
+                    if subtotal.voter_type == VoterTypeType.VALUE_2
+                ]
+                expats = expats[0] if expats else None
+                assert expats is None or isinstance(expats, int)
+
+                if not result_data.fully_counted_true:
+                    status = 'interim'
+
+                result['eligible_voters'] = voters.count_of_voters_total
+                result['expats'] = expats
+                result['counted'] = result_data.fully_counted_true
+                result['invalid'] = result_data.received_invalid_votes or 0
+                result['empty'] = result_data.received_blank_votes or 0
+                result['yeas'] = result_data.count_of_yes_votes or 0
+                result['nays'] = result_data.count_of_no_votes or 0
+
         except (AssertionError, TypeError, ValueError):
             errors.append(
                 FileImportError(

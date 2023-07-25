@@ -65,7 +65,7 @@ def delete(
             assert app.filestorage is not None
             for item in app.filestorage.listdir('.'):
                 if app.filestorage.isdir(item):
-                    app.filestorage.removedir(item)
+                    app.filestorage.removetree(item)
                 else:
                     app.filestorage.remove(item)
 

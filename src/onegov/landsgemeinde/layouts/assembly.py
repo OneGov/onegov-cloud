@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
@@ -74,6 +74,11 @@ class AssemblyLayout(DefaultLayout):
                     text=_('States'),
                     url=self.request.link(self.model, 'states'),
                     attrs={'class': 'check-list-link'}
+                ),
+                Link(
+                    text=_('Ticker'),
+                    url=self.request.link(self.model, 'ticker'),
+                    attrs={'class': 'news-link', 'target': '_blank'}
                 ),
                 Link(
                     text=_('Delete'),

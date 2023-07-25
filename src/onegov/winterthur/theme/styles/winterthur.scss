@@ -54,6 +54,26 @@ input[data-street-search]::placeholder {
 /*
     Sidepanel
 */
+
+.homepage .side-panel:first-child,
+.side-panel.highlighted {
+    background-color: $topbar-bg-color;
+    border: 0;
+    padding: .5rem 1rem 1rem;
+
+
+    .title,
+    h2 {
+        background: $primary-color;
+        color: $white;
+        display: block;
+        margin: -.5rem -1rem 1rem;
+        padding: .75rem 1rem;
+        text-transform: uppercase;
+}
+}
+
+
 .side-panel.highlighted {
     &.without-title {
         > ul li:first-child {

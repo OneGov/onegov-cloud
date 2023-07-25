@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.chat import Message
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.utils import paragraphify, linkify

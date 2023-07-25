@@ -40,11 +40,17 @@ class FileDataManager:
 
     def tpc_vote(self, transaction: 'Transaction') -> None:
         if not os.path.exists(self.tempfn):
-            raise ValueError('%s doesnt exist' % self.tempfn)
+            raise ValueError(f'{self.tempfn} doesnt exist')
         if os.path.exists(self.path):
             raise ValueError('file already exists')
 
     def tpc_abort(self, transaction: 'Transaction') -> None:
+        # if another DataManager before us in the chain raises a retryable
+        # error before we get to commit, we still have to execute tpc_abort
+        # despite tempfn not existing yet.
+        if not hasattr(self, 'tempfn'):
+            return
+
         try:
             os.remove(self.tempfn)
         except OSError:

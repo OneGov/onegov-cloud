@@ -2,7 +2,7 @@ import datetime
 import json
 import re
 
-from cached_property import cached_property
+from functools import cached_property
 from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET

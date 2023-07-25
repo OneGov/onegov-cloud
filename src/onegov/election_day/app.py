@@ -335,13 +335,14 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
             # HEAD requests are cached with only the path
             key = ':'.join((request.method, request.path))
         else:
-            # each page is cached once per request method, language and
-            # headerless/headerful (and by application id as the pages_cache is
-            # bound to it)
+            # each page is cached once per request method, host, path including
+            # query string, language and headerless/headerful (and by
+            # application id as the pages_cache is bound to it)
             key = ':'.join((
                 request.method,
-                request.locale,
+                request.host,
                 request.path_qs,
+                request.locale,
                 'hl' if 'headerless' in request.browser_session else 'hf'
             ))
 

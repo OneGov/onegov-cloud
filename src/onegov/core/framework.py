@@ -28,10 +28,9 @@ import sys
 import traceback
 
 from base64 import b64encode
-from cached_property import cached_property
 from datetime import datetime
 from dectate import directive
-from functools import wraps
+from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp
@@ -131,7 +130,7 @@ class Framework(
     def __call__(self) -> 'WSGIApplication':  # type:ignore[override]
         """ Intercept all wsgi calls so we can attach debug tools. """
 
-        fn = super().__call__
+        fn: 'WSGIApplication' = super().__call__
         fn = self.with_print_exceptions(fn)
         fn = self.with_request_cache(fn)
 
@@ -140,6 +139,10 @@ class Framework(
 
         if getattr(self, 'profile', False):
             fn = self.with_profiler(fn)
+
+        if getattr(self, 'with_sentry_middleware', False):
+            from sentry_sdk.integrations.wsgi import SentryWsgiMiddleware
+            fn = SentryWsgiMiddleware(fn)
 
         return fn
 

@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from logging import getLogger
 from logging import NullHandler
 from sqlalchemy.exc import SQLAlchemyError

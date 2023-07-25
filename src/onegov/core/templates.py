@@ -35,7 +35,6 @@ path.
 
 import os.path
 
-from cached_property import cached_property
 from chameleon import PageTemplate as PageTemplateBase
 from chameleon import PageTemplateFile as PageTemplateFileBase
 from chameleon import PageTemplateLoader
@@ -43,6 +42,7 @@ from chameleon import PageTextTemplateFile
 from chameleon.astutil import Builtin
 from chameleon.tal import RepeatDict
 from chameleon.utils import Scope
+from functools import cached_property
 from onegov.core.framework import Framework
 
 

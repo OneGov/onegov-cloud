@@ -1,10 +1,12 @@
-from cached_property import cached_property
-from datetime import date, timedelta, datetime
+import datetime
+import sqlalchemy
+
+from functools import cached_property
+from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
 from lxml import objectify, etree
 from onegov.core.collection import Pagination
-from onegov.core.utils import get_unique_hstore_keys
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
 from sedate import as_datetime
@@ -181,7 +183,7 @@ class OccurrenceCollection(Pagination):
 
     @cached_property
     def used_tags(self):
-        """ Returns a list of all the tags used by the occurrences.
+        """ Returns a list of all the tags used by all future occurrences.
 
         This could be solve possibly more effienciently with the skey function
         currently not supported by SQLAlchemy (e.g.
@@ -189,8 +191,18 @@ class OccurrenceCollection(Pagination):
         http://stackoverflow.com/q/12015942/3690178
 
         """
+        base = self.session.query(Occurrence._tags.keys()).with_entities(
+            sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
+            Occurrence.start)
+        base = base.filter(Occurrence.start >= datetime.datetime.now(
+            datetime.timezone.utc))
 
-        return get_unique_hstore_keys(self.session, Occurrence._tags)
+        query = sqlalchemy.select(
+            [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
+            distinct=True
+        ).select_from(base.subquery())
+        keys = self.session.execute(query).scalar()
+        return set(keys) if keys else set()
 
     def query(self):
         """ Queries occurrences with the set parameters.

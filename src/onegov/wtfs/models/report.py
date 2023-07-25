@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from datetime import date
 from onegov.core.orm.func import unaccent
 from onegov.wtfs import _

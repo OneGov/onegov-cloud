@@ -62,14 +62,14 @@ import traceback
 import tracemalloc
 
 from functools import partial
+from importlib import import_module
 from onegov.server import Config
 from onegov.server import log
 from onegov.server import Server
 from onegov.server.tracker import ResourceTracker
-from sentry_sdk import push_scope, capture_exception
 from sentry_sdk.integrations.redis import RedisIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
-from sentry_sdk.integrations.wsgi import _get_headers, _get_environ
+from sentry_sdk.integrations.wsgi import SentryWsgiMiddleware
 from time import perf_counter
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -82,11 +82,8 @@ if TYPE_CHECKING:
     from _typeshed.wsgi import WSGIApplication, WSGIEnvironment, StartResponse
     from collections.abc import Callable, Iterable
     from multiprocessing.sharedctypes import Synchronized
-    from sentry_sdk._types import Event, Hint
     from types import FrameType
     from watchdog.events import FileSystemEvent
-
-    from .types import JSONObject
 
 
 RESOURCE_TRACKER: ResourceTracker = None  # type:ignore[assignment]
@@ -140,6 +137,24 @@ RESOURCE_TRACKER: ResourceTracker = None  # type:ignore[assignment]
     help="Sentry release tag (production mode only)",
     default=None,
 )
+@click.option(
+    '--send-ppi',
+    help="Allow sentry_sdk to send personally identifiable information",
+    default=False,
+    is_flag=True
+)
+@click.option(
+    '--traces-sample-rate',
+    help="How often should sentry_sdk send traces to the backend",
+    type=click.FloatRange(min=0.0, max=1.0),
+    default=0.1
+)
+@click.option(
+    '--profiles-sample-rate',
+    help="How often should sentry_sdk also send a profile with the trace",
+    type=click.FloatRange(min=0.0, max=1.0),
+    default=0.25
+)
 def run(
     config_file: str | bytes,
     port: int,
@@ -149,6 +164,9 @@ def run(
     sentry_dsn: str | None,
     sentry_environment: str,
     sentry_release: str | None,
+    send_ppi: bool,
+    traces_sample_rate: float,
+    profiles_sample_rate: float
 ) -> None:
 
     """ Runs the onegov server with the given configuration file in the
@@ -184,76 +202,74 @@ def run(
         return run_debug(config_file, port, pdb, tracemalloc)
 
     if sentry_dsn:
+        with_sentry = True
+        integrations = [
+            RedisIntegration(),
+            SqlalchemyIntegration(),
+        ]
+        # HACK: We don't want to statically depend on onegov.core
+        #       from onegov.server, but our sentry integration does
+        #       need to be defined there, so it knows about the internals
+        #       of the application, so we use importlib.import_module
+        #       to make this dependency optional, if we decide we can
+        #       live with less information, we could move this out into
+        #       more.sentry and import the integration from there.
+        try:
+            ogc_sentry = import_module('onegov.core.sentry')
+            integrations.insert(0, ogc_sentry.OneGovCloudIntegration(
+                # while inserting the wsgi middleware twice is not
+                # harmful, we do save ourselves some static overhead
+                # if we don't do it.
+                with_wsgi_middleware=False
+            ))
+        except ImportError:
+            pass
+
         sentry_sdk.init(
             dsn=sentry_dsn,
             release=sentry_release,
             environment=sentry_environment,
-            integrations=(
-                RedisIntegration(),
-                SqlalchemyIntegration(),
-            ))
+            send_default_pii=send_ppi,
+            traces_sample_rate=traces_sample_rate,
+            profiles_sample_rate=profiles_sample_rate,
+            integrations=integrations)
 
         # somehow sentry attaches itself to the global exception hook, even if
         # we set 'install_sys_hook' to False -> so we just reset to the
         # original state before serving our application (otherwise we get each
         # error report twice)
         sys.excepthook = sys.__excepthook__
+    else:
+        with_sentry = False
 
-    return run_production(config_file, port)
+    return run_production(config_file, port, with_sentry=with_sentry)
 
 
-def run_production(config_file: str | bytes, port: int) -> None:
-
-    class SentryServer(Server):
-
-        def __call__(
-            self,
-            environ: 'WSGIEnvironment',
-            start_response: 'StartResponse'
-        ) -> 'Iterable[bytes]':
-
-            with push_scope() as scope:
-                scope.clear_breadcrumbs()
-                return super().__call__(environ, start_response)
+def run_production(
+    config_file: str | bytes,
+    port: int,
+    with_sentry: bool
+) -> None:
 
     # required by Bjoern
     env = {'webob.url_encoding': 'latin-1'}
 
-    app = SentryServer(
+    app: 'WSGIApplication' = Server(
         config=Config.from_yaml_file(config_file),
-        exception_hook=exception_hook,
         environ_overrides=env)
 
+    if with_sentry:
+        # NOTE: Most things should be caught at lower scopes with
+        #       more detailed information by our integrations, but
+        #       the SentryWsgiMiddleware also performs some bookkeeping
+        #       necessary for traces and profiles to work, so we
+        #       should make this the top level application wrapper
+        #       We could wrap each hosted application individually
+        #       instead, but then we are not measuring the overhead
+        #       of this top-level application router.
+        app = SentryWsgiMiddleware(app)
+
     bjoern.run(app, '127.0.0.1', port, reuse_port=True)
-
-
-def http_context(environ: 'WSGIEnvironment') -> 'JSONObject':
-    return {
-        'method': environ.get('REQUEST_METHOD'),
-        'url': ''.join((
-            environ.get('HTTP_X_VHM_HOST', ''),
-            environ.get('PATH_INFO', '')
-        )),
-        'query_string': environ.get('QUERY_STRING'),
-        'headers': dict(_get_headers(environ)),
-        'env': dict(_get_environ(environ))
-    }
-
-
-def exception_hook(environ: 'WSGIEnvironment') -> None:
-
-    def process_event(event: 'Event', hint: 'Hint') -> 'Event':
-        request_info = event.setdefault('request', {})
-        request_info.update(http_context(environ))
-
-        user_info = event.setdefault('user', {})
-        user_info['ip_address'] = environ.get('HTTP_X_REAL_IP')
-
-        return event
-
-    with push_scope() as scope:
-        scope.add_event_processor(process_event)
-        capture_exception()
 
 
 def run_debug(

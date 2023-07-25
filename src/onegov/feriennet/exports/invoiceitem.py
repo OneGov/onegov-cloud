@@ -7,6 +7,7 @@ from onegov.feriennet.forms import PeriodExportForm
 from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy import distinct
+from sqlalchemy import or_
 
 
 @FeriennetApp.export(
@@ -43,14 +44,16 @@ class InvoiceItemExport(FeriennetExport):
         q = q.join(
             activities, InvoiceItem.text == activities.c.title, isouter=True
         ).join(Attendee,
-               InvoiceItem.group == Attendee.name
+               InvoiceItem.attendee_id == Attendee.id,
+               isouter=True
                )
         q = q.options(
             contains_eager(InvoiceItem.invoice)
             .contains_eager(Invoice.user)
             .undefer(User.data))
         q = q.filter(Invoice.period_id == period.id)
-        q = q.filter(User.username == Attendee.username)
+        q = q.filter(or_(User.username == Attendee.username,
+                         Attendee.username.is_(None)))
         q = q.filter(User.id == Invoice.user_id)
         q = q.order_by(
             User.username,

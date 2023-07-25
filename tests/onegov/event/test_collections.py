@@ -2,6 +2,8 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from freezegun import freeze_time
+from markupsafe import escape
+
 from onegov.event import Event
 from onegov.event import EventCollection
 from onegov.event.collections.events import EventImportItem
@@ -152,8 +154,8 @@ def test_event_collection_pagination(session):
 def test_occurrence_collection(session):
     event = EventCollection(session).add(
         title='Squirrel Park Visit',
-        start=datetime(2015, 6, 16, 9, 30),
-        end=datetime(2015, 6, 16, 18, 00),
+        start=datetime(next_year, 6, 16, 9, 30),
+        end=datetime(next_year, 6, 16, 18, 00),
         timezone='Pacific/Auckland',
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
@@ -167,19 +169,31 @@ def test_occurrence_collection(session):
     event.publish()
     event = EventCollection(session).add(
         title='History of the Squirrel Park',
-        start=datetime(2015, 6, 18, 14, 00),
-        end=datetime(2015, 6, 18, 16, 00),
+        start=datetime(next_year, 6, 18, 14, 00),
+        end=datetime(next_year, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         location='Squirrel Park',
         tags=['history']
     )
     event.submit()
     event.publish()
+    event = EventCollection(session).add(
+        title='Wild West Tour',
+        start=datetime(2023, 7, 12, 00, 00),
+        end=datetime(2023, 7, 12, 22, 00),
+        timezone='US/Central',
+        location='USA',
+        tags=['cowboy']
+    )
+    event.submit()
+    event.publish()
 
     timezones = OccurrenceCollection(session).used_timezones
-    assert sorted(timezones) == ['Europe/Zurich', 'Pacific/Auckland']
+    assert sorted(timezones) == ['Europe/Zurich', 'Pacific/Auckland',
+                                 'US/Central']
 
     tags = OccurrenceCollection(session).used_tags
+    # tags only from future events
     assert sorted(tags) == ['animals', 'fun', 'history', 'park']
 
     assert OccurrenceCollection(session, range='today').start == date.today()
@@ -603,8 +617,8 @@ def test_unique_names(session):
 def test_unicode(session):
     event = EventCollection(session).add(
         title='Salon du mieux-vivre, 16e édition',
-        start=datetime(2015, 6, 16, 9, 30),
-        end=datetime(2015, 6, 16, 18, 00),
+        start=datetime(next_year, 6, 16, 9, 30),
+        end=datetime(next_year, 6, 16, 18, 00),
         timezone='Europe/Zurich',
         content={
             'description': 'Rendez-vous automnal des médecines.'
@@ -616,8 +630,8 @@ def test_unicode(session):
     event.publish()
     event = EventCollection(session).add(
         title='Témoins de Jéhovah',
-        start=datetime(2015, 6, 18, 14, 00),
-        end=datetime(2015, 6, 18, 16, 00),
+        start=datetime(next_year, 6, 18, 14, 00),
+        end=datetime(next_year, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         content={
             'description': 'Congrès en français et espagnol.'
@@ -1052,7 +1066,7 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert event.title == 'Squirrel Park Virsit'
-    assert event.description == '<em>Furri</em> things will happen!'
+    assert event.description == escape('<em>Furri</em> things will happen!')
     assert event.location == 'Squirrel Par'
     assert event.start == tzdatetime(next_year, 6, 16, 9, 31, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
@@ -1097,7 +1111,7 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert event.title == 'Squirrel Park Visit'
-    assert event.description == '<em>Furry</em> things will happen!'
+    assert event.description == escape('<em>Furry</em> things will happen!')
     assert event.location == 'Squirrel Park'
     assert event.start == tzdatetime(next_year, 6, 16, 9, 30, 'US/Eastern')
     assert str(event.start.tzinfo) == 'UTC'
@@ -1203,3 +1217,37 @@ def test_from_ical(session):
     event = events.query().one()
     assert event.start == tzdatetime(next_year, 6, 16, 13, 30, 'Europe/Zurich')
     assert event.end == tzdatetime(next_year, 6, 16, 22, 0, 'Europe/Zurich')
+
+    # escape of title, description, location and organizer
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Virsit</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DTSTAMP:20140101T000000Z',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            f'UNTIL={next_year}0616T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'CATEGORIES:fun,animals',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.title == '&lt;b&gt;Squirrel Park Virsit&lt;/b&gt;'
+    assert event.description == \
+           '&lt;em&gt;Furri&lt;/em&gt; things will happen!'
+    assert event.location == '&lt;i&gt;Squirrel Par&lt;/i&gt;'
+    assert event.organizer == '&lt;Super ME&gt;'
