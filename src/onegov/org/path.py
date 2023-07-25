@@ -1,5 +1,4 @@
 """ Contains the paths to the different models served by onegov.org. """
-import morepath
 import sedate
 
 from datetime import date
@@ -10,7 +9,6 @@ from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
 from onegov.core.converters import extended_date_converter
 from onegov.core.converters import json_converter
-from onegov.core.request import CoreRequest
 from onegov.directory import Directory
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntry

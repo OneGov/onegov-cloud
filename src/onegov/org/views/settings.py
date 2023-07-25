@@ -29,7 +29,7 @@ from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
 from onegov.api.models import ApiKey
 from onegov.org.app import OrgApp
-from onegov.user import UserCollection
+from onegov.user import UserCollection, User
 from uuid import uuid4
 
 
@@ -335,11 +335,13 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
         request.session.flush()
         request.success(_("Your changes were saved"))
 
-    def current_api_keys_by_user(request, self, user):
-        for apikey in user.api_keys.all():
+    def current_api_keys_by_user(
+        request: CoreRequest, self: Organisation, user: User
+    ):
+        for api_key in user.api_keys.all():
             delete_link = Link(
                 text=Markup('<i class="fa fa-trash" aria-hidden="True"></i>'),
-                url=request.link(apikey, name='+delete'),
+                url=request.link(api_key, name='+delete'),
                 traits=(
                     Confirm(
                         _("Do you really want to delete this API key?"),
@@ -349,14 +351,13 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
                     ),
                     Intercooler(
                         request_method='DELETE',
-                        # This does not work as expected, it triggers a new
-                         redirect_after=request.link(self, name='api-keys'),
+                        redirect_after=request.link(self, name='api-keys'),
                     ),
                 ),
             )
             # delete_link is temporarily stored on the object itself
-            apikey.delete_link = delete_link
-            yield apikey
+            api_key.delete_link = delete_link
+            yield api_key
 
     return {
         'api_keys_list': current_api_keys_by_user(request, self, user),
