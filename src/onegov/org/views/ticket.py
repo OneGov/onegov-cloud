@@ -7,7 +7,7 @@ from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
-from onegov.core.templates import render_template
+from onegov.core.templates import render_template, PageTemplate
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
@@ -349,7 +349,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
 
 
 def send_new_note_notification(request: OrgRequest, form: TicketNoteForm,
-                               note: TicketNote, template: str):
+                               note: TicketNote, template: PageTemplate):
     """
     Sends an E-mail notification to all resource recipients that have been
     configured to receive notifications for new (ticket) notes.
