@@ -1167,26 +1167,51 @@ def test_get_polymorphic_class():
     assert "No such polymorphic_identity: C" in str(assertion_info.value)
 
 
-def test_dict_properties():
+def test_dict_properties(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
 
-    class Site:
-        users = {}
-        names = dict_property('users')
+    class Site(Base):
+        __tablename__ = 'sites'
+        id = Column(Integer, primary_key=True)
+        users = Column(JSON, nullable=False, default=dict)
+        group = dict_property('users', value_type=str)
+        names = dict_property('users', default=list)
 
-    site = Site()
-    site.names = ['foo', 'bar']
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
 
-    assert site.users == {'names': ['foo', 'bar']}
+    session = mgr.session()
+
+    site = Site(id=1)
+    assert site.names == []
+    assert site.group is None
+    site.names += ['foo', 'bar']
+    site.group = 'test'
+    session.add(site)
+    assert site.users == {'group': 'test', 'names': ['foo', 'bar']}
+
+    # try to query for a dict property
+    group, names = session.query(Site.group, Site.names).one()
+    assert group == 'test'
+    assert names == ['foo', 'bar']
+
+    # try to filter by a dict property
+    query = session.query(Site).filter(Site.names.contains('foo'))
+    query = query.filter(Site.group == 'test')
+    assert query.one() == site
 
 
-def test_content_properties():
+def test_content_properties(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
 
-    class Content:
-        meta = {}
-        content = {}
-
-        type = meta_property('type')
-        name = content_property('name')
+    class Content(Base, ContentMixin):
+        __tablename__ = 'content'
+        id = Column(Integer, primary_key=True)
+        # different attribute name than key
+        _type = meta_property('type')
+        # explicitly set value_type
+        name = content_property(value_type=str)
+        # implicitly set value type from default
         value = meta_property('value', default=1)
 
         @name.setter
@@ -1199,16 +1224,25 @@ def test_content_properties():
             del self.content['name']
             del self.content['name2']
 
-    content = Content()
-    assert content.type is None
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    assert Content.name.hybrid.value_type is str
+    assert Content.value.hybrid.value_type is int
+
+    content = Content(id=1)
+    session.add(content)
+    assert content._type is None
     assert content.name is None
     assert content.value == 1
 
-    content.type = 'page'
-    assert content.type == 'page'
+    content._type = 'page'
+    assert content._type == 'page'
     assert content.meta['type'] == 'page'
-    del content.type
-    assert content.type is None
+    del content._type
+    assert content._type is None
 
     content.name = 'foobar'
     assert content.name == 'foobar'
@@ -1227,10 +1261,10 @@ def test_content_properties():
     assert content.value == 1
 
     content.meta = None
-    assert content.type is None
+    assert content._type is None
     assert content.value == 1
-    content.type = 'Foobar'
-    assert content.type == 'Foobar'
+    content._type = 'Foobar'
+    assert content._type == 'Foobar'
 
     with pytest.raises(AssertionError):
         content.invalid = meta_property('invalid', default=[])
