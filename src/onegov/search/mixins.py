@@ -258,10 +258,12 @@ class Searchable:
 
         :param cols: column names to be indexed
         :return: tsvector string for multiple columns i.e. for columns title
-        and body: coalesce(title, '') || ' ' || coalesce(body, '')
+        and body: coalesce([title], '') || ' ' || coalesce([body], '')
+        Note that the '\"{}\"' escapes the column name in case it is a
+        keyword, see http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html
         """
-        base = "coalesce({}, '')"
-        ext = " || ' ' || coalesce({}, '')"
+        base = "coalesce(\"{}\", '')"
+        ext = " || ' ' || coalesce(\"{}\", '')"
 
         s = base
         for _ in range(len(cols) - 1):
