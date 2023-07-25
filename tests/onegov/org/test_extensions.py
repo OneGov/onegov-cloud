@@ -105,7 +105,7 @@ def test_person_link_extension():
     form.update_model(topic)
 
     assert topic.content['people'] == [
-        ('6d120102d90344868eb32614cf3acb1a', None)
+        ('6d120102d90344868eb32614cf3acb1a', (None, False))
     ]
 
     form.people_6d120102d90344868eb32614cf3acb1a_function.data \
@@ -114,7 +114,7 @@ def test_person_link_extension():
     form.update_model(topic)
 
     assert topic.content['people'] == [
-        ('6d120102d90344868eb32614cf3acb1a', 'The Truest Repairman')
+        ('6d120102d90344868eb32614cf3acb1a', ('The Truest Repairman', False))
     ]
 
     form_class = topic.with_content_extensions(TopicForm, request=request)
@@ -124,6 +124,9 @@ def test_person_link_extension():
     assert form.people_6d120102d90344868eb32614cf3acb1a.data is True
     assert form.people_6d120102d90344868eb32614cf3acb1a_function.data \
         == 'The Truest Repairman'
+
+    assert form.people_6d120102d90344868eb32614cf3acb1a_is_visible_function\
+        .data == False
     assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data
     assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96_function.data
 
@@ -206,17 +209,17 @@ def test_person_link_extension_order():
 
     # the people are kept sorted by lastname, firstname by default
     assert topic.content['people'] == [
-        ('6d120102d90344868eb32614cf3acb1a', None),  # Troy _B_arnes
-        ('f0281b558a5f43f6ac81589d79538a87', None)   # Britta _P_erry
+        ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
     ]
 
     form.people_aa37e9cc40ab402ea70b0d2b4d672de3.data = True
     form.update_model(topic)
 
     assert topic.content['people'] == [
-        ('6d120102d90344868eb32614cf3acb1a', None),  # Troy _B_arnes
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', None),  # Annie _E_dison
-        ('f0281b558a5f43f6ac81589d79538a87', None)   # Britta _P_erry
+        ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False))   # Britta _P_erry
     ]
 
     # once the order changes, people are added at the end
@@ -227,9 +230,9 @@ def test_person_link_extension_order():
     )
 
     assert topic.content['people'] == [
-        ('f0281b558a5f43f6ac81589d79538a87', None),  # Britta _P_erry
-        ('6d120102d90344868eb32614cf3acb1a', None),  # Troy _B_arnes
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', None),  # Annie _E_dison
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False)),  # Britta _P_erry
+        ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
     ]
 
     topic.move_person(
@@ -239,19 +242,19 @@ def test_person_link_extension_order():
     )
 
     assert topic.content['people'] == [
-        ('f0281b558a5f43f6ac81589d79538a87', None),  # Britta _P_erry
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', None),  # Annie _E_dison
-        ('6d120102d90344868eb32614cf3acb1a', None),  # Troy _B_arnes
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False)),  # Britta _P_erry
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
+        ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
     ]
 
     form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data = True
     form.update_model(topic)
 
     assert topic.content['people'] == [
-        ('f0281b558a5f43f6ac81589d79538a87', None),  # Britta _P_erry
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', None),  # Annie _E_dison
-        ('6d120102d90344868eb32614cf3acb1a', None),  # Troy _B_arnes
-        ('adad98ff74e2497a9e1dfbba0a6bbe96', None),  # Abed _N_adir
+        ('f0281b558a5f43f6ac81589d79538a87', (None, False)),  # Britta _P_erry
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', (None, False)),  # Annie _E_dison
+        ('6d120102d90344868eb32614cf3acb1a', (None, False)),  # Troy _B_arnes
+        ('adad98ff74e2497a9e1dfbba0a6bbe96', (None, False)),  # Abed _N_adir
     ]
 
 
@@ -293,8 +296,8 @@ def test_person_link_move_function():
     form.update_model(topic)
 
     assert topic.content['people'] == [
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', "Vice-President"),
-        ('6d120102d90344868eb32614cf3acb1a', "President")
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', ("Vice-President", False)),
+        ('6d120102d90344868eb32614cf3acb1a', ("President", False))
     ]
 
     topic.move_person(
@@ -304,8 +307,8 @@ def test_person_link_move_function():
     )
 
     assert topic.content['people'] == [
-        ('6d120102d90344868eb32614cf3acb1a', "President"),
-        ('aa37e9cc40ab402ea70b0d2b4d672de3', "Vice-President"),
+        ('6d120102d90344868eb32614cf3acb1a', ("President", False)),
+        ('aa37e9cc40ab402ea70b0d2b4d672de3', ("Vice-President", False)),
     ]
 
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-07-25 11:05+0200\n"
+"POT-Creation-Date: 2023-07-25 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2193,6 +2193,10 @@ msgstr "Nascondi le informazioni di contatto nella sidebar"
 
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
+
+#, python-format
+msgid "List this function in the page of ${name}"
+msgstr "Mostra questa funzione nella pagina di ${name}"
 
 msgid "A resource with this name already exists"
 msgstr "Esiste già una risorsa con questo nome"
