@@ -10,7 +10,7 @@ from onegov.core.orm.mixins import ContentMixin, meta_property
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
 from onegov.translator_directory.models.certificate import (
     certificate_association_table
@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from .language import Language
 
 
+# TODO rename to ts (text search)
 class ESMixin(ORMSearchable):
 
     es_properties = {
@@ -191,14 +192,6 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # column for full text search index
     fts_idx = Column(TSVECTOR)
-
-    @staticmethod
-    def psql_tsvector_string():
-        """
-        index is built on the following columns
-        """
-        return Searchable.create_tsvector_string('first_name', 'last_name',
-                                                 'email')
 
     @property
     def title(self):
