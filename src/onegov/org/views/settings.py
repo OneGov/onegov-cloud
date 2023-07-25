@@ -370,6 +370,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
 @OrgApp.view(
     model=ApiKey,
     name='delete',
+    permission=Secret,
     request_method='DELETE',
 )
 def delete_api_key(self: ApiKey, request: CoreRequest):
@@ -378,7 +379,3 @@ def delete_api_key(self: ApiKey, request: CoreRequest):
     request.session.delete(self)
     request.session.flush()
     request.message(_("ApiKey deleted."), 'success')
-
-    # request.method = 'GET'
-    # return request.redirect(request.class_link(Organisation,
-    # name='api-keys'))
