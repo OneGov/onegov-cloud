@@ -1290,11 +1290,24 @@ msgstr "Votre événement a été accepté:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté:"
 
-msgid "The following reservations have been accepted:"
-msgstr "Les réservations suivantes ont été acceptées:"
+msgid "New note in Ticket ${link}"
+msgstr "Nouvelle note dans le billet ${link}"
 
 msgid "${author} wrote"
 msgstr "${author} a écrit"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Il s'agit de la notification de notes sur les réservations pour ${request."
+"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
+"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
+"destinataires."
+
+msgid "The following reservations have been accepted:"
+msgstr "Les réservations suivantes ont été acceptées:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1760,6 +1773,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Reçoit des notifications pour les réservations du jour les jours suivants:"
+
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Reçoit des notifications pour les notes internes sur les réservations."
 
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."

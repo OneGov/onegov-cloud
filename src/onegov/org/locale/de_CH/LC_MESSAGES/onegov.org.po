@@ -1181,8 +1181,33 @@ msgstr "Neue Reservationen"
 msgid "Notifications *"
 msgstr "Benachrichtigungen *"
 
+msgid ""
+"For each new reservation, a notification will be sent to the above recipient."
+msgstr ""
+"Für jede neue Reservierung wird eine Benachrichtigung an den oben genannten "
+"Empfänger gesendet."
+
 msgid "Daily Reservations"
 msgstr "Tägliche Reservationen"
+
+msgid ""
+"On each day selected below, a notification with the day's reservations will "
+"be sent to the recipient above at 06:00."
+msgstr ""
+"An jedem unten ausgewählten Tag wird eine Benachrichtigung mit den "
+"Reservierungen des Tages um 06:00 Uhr an den oben genannten Empfänger "
+"gesendet."
+
+msgid "Internal Notes"
+msgstr "Interne Notizen"
+
+msgid ""
+"Each time a new note is added to the ticket for a reservation, a "
+"notification is sent to the recipient above."
+msgstr ""
+"Jedes Mal, wenn eine neue Notiz zu einem Ticket für eine Reservierung "
+"hinzugefügt wird, wird eine eine Benachrichtigung an den oben genannten "
+"Empfänger gesendet."
 
 msgid "Send on"
 msgstr "Senden am"
@@ -3279,6 +3304,22 @@ msgstr "Ihre Veranstaltung wurde angenommen:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
+msgid "New note in Ticket ${link}"
+msgstr "Neue Notiz in Ticket ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die Benachrichtigung für Notizen zu Reservierungen für ${request."
+"app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
+"entfernen kann."
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Folgendes ist während des letzten Monats auf der ${org} Webseite geschehen:"
@@ -3296,9 +3337,6 @@ msgstr ""
 
 msgid "The following reservations have been accepted:"
 msgstr "Die folgenden Reservationen wurden angenommen:"
-
-msgid "${author} wrote"
-msgstr "${author} schrieb"
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -3755,8 +3793,11 @@ msgid ""
 msgstr ""
 "Erhält Benachrichtigungen für Reservationen des Tages an folgenden Tagen:"
 
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
+
 msgid "Receives notifications for new reservations."
-msgstr "Erhält Benachtchtigungen für neue Reservationen."
+msgstr "Erhält Benachrichtigungen für neue Reservationen."
 
 msgid "Notifications for following Resources"
 msgstr "Benachrichtigungen für die folgenden Reservationen"
@@ -5073,6 +5114,10 @@ msgstr "${amount} rückerstatten"
 
 msgid "Your ticket has a new message"
 msgstr "Ihr Ticket hat eine neue Nachricht"
+
+#, python-format
+msgid "${org} New Note in Reservation for ${resource_title}"
+msgstr "${org} Neue Notiz in Reservation für ${resource_title}"
 
 msgid "Your note was added"
 msgstr "Ihre Notiz wurde hinzugefügt"
