@@ -37,8 +37,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     subtitle = Column(Text, nullable=True)
 
     #: the group this ticket belongs to. used to differentiate tickets
-    #: belonging to one specific handler (handler -> group -> title)
-    group = Column(Text, nullable=False)
+    #: belonging to one specific handler (handler -> group_name -> title)
+    group_name = Column(Text, nullable=False)
 
     #: the name of the handler associated with this ticket, may be used to
     #: create custom polymorphic subclasses of this class. See
@@ -115,7 +115,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'number': {'type': 'text'},
         'title': {'type': 'text'},
         'subtitle': {'type': 'text'},
-        'group': {'type': 'text'},
+        'group_name': {'type': 'text'},
         # properties cannot be added to search index
         # 'ticket_email': {'type': 'keyword'},
         # 'ticket_data': {'type': 'localized_html'},
