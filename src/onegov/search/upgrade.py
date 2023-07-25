@@ -2,7 +2,3 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-
-from onegov.core.upgrade import upgrade_task
-
-
