@@ -13,6 +13,7 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
+from onegov.page import PageCollection
 from onegov.reservation import Resource
 from onegov.user import User
 from sqlalchemy.orm import undefer
@@ -117,6 +118,26 @@ def rename_guideline_to_submissions_guideline(context):
     for directory in directories:
         directory.content['submissions_guideline'] \
             = directory.content.pop('guideline', None)
+
+
+@upgrade_task('Extend content people with show_function property in tuple')
+def add_content_show_property_to_people(context):
+    q = PageCollection(context.session).query()
+    q = q.filter(Topic.type == 'topic')
+    pages = q.filter(Topic.content['people'].isnot(None))
+
+    def is_already_updated(people_item):
+        return isinstance(people_item[1], tuple)
+
+    for page in pages:
+        updated_people = []
+        for person in page.content['people']:
+            if len(person) == 2 and not is_already_updated(person):
+                # (id, function) -> (id, (function, show_function))
+                updated_people.append([person[0], (person[1], True)])
+            else:
+                updated_people.append(person)
+        page.content['people'] = updated_people
 
 
 @upgrade_task('Add meta access property')

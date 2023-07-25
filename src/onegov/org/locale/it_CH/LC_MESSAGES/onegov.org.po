@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-06-15 11:42+0200\n"
+"POT-Creation-Date: 2023-07-25 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -750,6 +750,9 @@ msgstr "Esecuzione del test"
 
 msgid "Do not actually import the events."
 msgstr "Gli eventi non vengono salvati."
+
+msgid "Expected header line with the following columns:"
+msgstr "La prima riga deve avere i seguenti nomi di colonna:"
 
 msgid "Map"
 msgstr "Mappa"
@@ -2168,6 +2171,10 @@ msgstr "Nascondi le informazioni di contatto nella sidebar"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Usa il testo invece dell'estratto nella newsletter"
 
+#, python-format
+msgid "List this function in the page of ${name}"
+msgstr "Mostra questa funzione nella pagina di ${name}"
+
 msgid "A resource with this name already exists"
 msgstr "Esiste già una risorsa con questo nome"
 
@@ -2433,8 +2440,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3051,6 +3058,9 @@ msgstr "Indica il nuovo nome del file"
 
 msgid "Rename"
 msgstr "Rinomina"
+
+msgid "Download"
+msgstr "Scaricare"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sigillo digitale applicato da ${signee} il ${date}"
@@ -5222,6 +5232,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "Expected header line with the following columns:"
-msgstr "La prima riga deve avere i seguenti nomi di colonna:"
