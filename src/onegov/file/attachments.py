@@ -51,12 +51,19 @@ def strip_exif_and_limit_and_store_image_size(
         return None
 
     try:
+        # TODO: We should consider opening the image twice, and calling
+        #       verify on the first open, just in case the verify
+        #       is more thorough than a plain load.
         image = Image.open(content)
+        # we perform a manual load so some of the verification happens
+        # earlier than it otherwise would, so we can catch all the
+        # exceptions here in one place.
+        image.load()
     except Image.DecompressionBombError:
         # reraise this one specifically
         raise
     except Exception:
-        # treat any other internal error as an UnidentifierImageError
+        # treat any other internal error as an UnidentifiedImageError
         raise UnidentifiedImageError from None
 
     needs_resample = max(image.size) > IMAGE_MAX_SIZE
