@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-06-06 19:05+0200\n"
+"POT-Creation-Date: 2023-07-25 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -749,6 +749,9 @@ msgstr "Test"
 
 msgid "Do not actually import the events."
 msgstr "Les événements ne sont pas sauvegardés."
+
+msgid "Expected header line with the following columns:"
+msgstr "La première ligne doit avoir les noms de colonne suivants:"
 
 msgid "Map"
 msgstr "Carte"
@@ -2427,8 +2430,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3054,6 +3057,9 @@ msgstr "Veuillez fournir le nouveau nom du fichier "
 
 msgid "Rename"
 msgstr "Renommer"
+
+msgid "Download"
+msgstr "Télécharger"
 
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sceau digital appliqué par ${signee} le ${date}"
@@ -5230,6 +5236,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-msgid "Expected header line with the following columns:"
-msgstr "La première ligne doit avoir les noms de colonne suivants:"
