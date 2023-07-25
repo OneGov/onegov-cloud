@@ -94,10 +94,10 @@
                 <div class="row footer-links">
                     <div class="small-12 columns">
                         <span>
-                            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+                            <a href="https://www.admin.digital">OneGov Cloud</a>
                         </span>
                         <span>
-                            <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+                            <a href="https://www.admin.digital/datenschutz" i18n:translate>
                                 Privacy Protection
                             </a>
                         </span>

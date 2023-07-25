@@ -1,6 +1,6 @@
 import math
 
-from cached_property import cached_property
+from functools import cached_property
 from sqlalchemy import or_
 from sqlalchemy.inspection import inspect
 
@@ -248,6 +248,10 @@ class Pagination(Generic[_M]):
         @property
         @abstractmethod
         def page(self) -> int: ...
+
+        @page.setter
+        @abstractmethod
+        def page(self, value: int) -> None: ...
 
     @property
     def page_index(self) -> int:

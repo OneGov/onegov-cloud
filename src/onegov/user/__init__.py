@@ -12,7 +12,7 @@ from onegov.user.models import User
 from onegov.user.models import UserGroup
 from onegov.user.models import RoleMapping
 
-__all__ = [
+__all__ = (
     '_',
     'log',
     'Auth',
@@ -22,4 +22,4 @@ __all__ = [
     'UserCollection',
     'UserGroup',
     'UserGroupCollection',
-]
+)

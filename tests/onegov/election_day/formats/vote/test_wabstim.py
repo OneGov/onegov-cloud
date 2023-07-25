@@ -22,7 +22,10 @@ def test_import_wabstim_vote(session):
     with tarfile.open(tar_file, 'r|gz') as f:
         xlsx = f.extractfile(f.next()).read()
 
-    principal = Municipality(municipality='3298', name='Walenstadt')
+    principal = Municipality(
+        municipality='3298', name='Walenstadt',
+        canton='sg', canton_name='Kanton St.Gallen'
+    )
     errors = import_vote_wabstim(
         vote, principal, BytesIO(xlsx), 'application/excel'
     )
@@ -45,7 +48,9 @@ def test_import_wabstim_vote_utf16(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     errors = import_vote_wabstim(
         vote, principal,
@@ -80,7 +85,9 @@ def test_import_wabstim_vote_missing_headers(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     errors = import_vote_wabstim(
         vote, principal,
@@ -116,7 +123,9 @@ def test_import_wabstim_vote_invalid_values(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     errors = import_vote_wabstim(
         vote, principal,
@@ -228,7 +237,9 @@ def test_import_wabstim_vote_expats(session):
     )
     session.flush()
     vote = session.query(Vote).one()
-    principal = Municipality(municipality='3427')
+    principal = Municipality(
+        municipality='3427', canton='sg', canton_name='Kanton St.Gallen'
+    )
 
     for has_expats in (False, True):
         vote.has_expats = has_expats

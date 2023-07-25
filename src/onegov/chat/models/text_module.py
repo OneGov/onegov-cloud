@@ -10,6 +10,11 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+
+
 class TextModule(Base, TimestampMixin):
     """ Defines a text module that can be selected and inserted at the
     cursor position when composing a message in text areas.
@@ -21,34 +26,50 @@ class TextModule(Base, TimestampMixin):
     __tablename__ = 'text_modules'
 
     #: the public id of the text module
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the name of the text module
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(Text, nullable=False)
 
     #: the actual text module
-    text = Column(Text, nullable=False)
+    text: 'Column[str]' = Column(Text, nullable=False)
 
     #: the message type this text module should be available for
-    message_type = Column(Text, nullable=True, index=True)
+    message_type: 'Column[str | None]' = Column(
+        Text,
+        nullable=True,
+        index=True
+    )
 
     #: the ticket handler this text module should be available for
-    handler_code = Column(Text, nullable=True, index=True)
+    handler_code: 'Column[str | None]' = Column(
+        Text,
+        nullable=True,
+        index=True
+    )
 
     #: for a private text module the user it belongs to
-    user_id = Column(UUID, ForeignKey(User.id), nullable=True)
-    user = relationship(User)
+    user_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
+        ForeignKey(User.id),
+        nullable=True
+    )
+    user: 'relationship[User | None]' = relationship(User)
 
     @property
-    def private(self):
+    def private(self) -> bool:
         return self.user_id is not None
 
     @property
-    def formatted_text(self):
+    def formatted_text(self) -> str:
         return paragraphify(linkify(self.text))
 
     @property
-    def preview_text(self):
+    def preview_text(self) -> str:
         lines = self.text.splitlines()
         preview = lines[0]
         if len(lines) > 1 or len(preview) > 50:

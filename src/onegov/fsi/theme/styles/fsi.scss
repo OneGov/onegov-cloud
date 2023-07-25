@@ -245,3 +245,8 @@ a.grayed-out {
 .disabled {
     cursor: default !important;
 }
+
+/* Remove OGC-Login on FSI-Page */
+.ogc-login {
+    display: none;
+}

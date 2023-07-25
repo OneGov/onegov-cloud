@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.activity import Period, PeriodCollection, InvoiceCollection
 from onegov.activity.models.invoice_reference import Schema
 from onegov.core import utils

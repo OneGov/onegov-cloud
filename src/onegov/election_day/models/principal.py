@@ -1,6 +1,6 @@
 import onegov.election_day
 
-from cached_property import cached_property
+from functools import cached_property
 from collections import OrderedDict
 from datetime import date
 from onegov.core import utils
@@ -8,6 +8,8 @@ from onegov.core.custom import json
 from onegov.election_day import _
 from pathlib import Path
 from urllib.parse import urlsplit
+from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceType
+from xsdata_ech.e_ch_0155_5_0 import DomainOfInfluenceTypeType
 from yaml import safe_load
 
 
@@ -90,6 +92,7 @@ class Principal:
         cache_expiration_time=300,
         reply_to=None,
         custom_css=None,
+        official_host=None,
         **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -126,16 +129,16 @@ class Principal:
         self.cache_expiration_time = cache_expiration_time
         self.reply_to = reply_to
         self.custom_css = custom_css
+        self.official_host = official_host
 
     @classmethod
     def from_yaml(cls, yaml_source):
         kwargs = safe_load(yaml_source)
         assert 'canton' in kwargs or 'municipality' in kwargs
-        assert not ('canton' in kwargs and 'municipality' in kwargs)
-        if 'canton' in kwargs:
-            return Canton(**kwargs)
-        else:
+        if 'municipality' in kwargs:
             return Municipality(**kwargs)
+        else:
+            return Canton(**kwargs)
 
     @cached_property
     def base_domain(self):
@@ -348,12 +351,82 @@ class Canton(Principal):
             return _("Mandates")
         return ''
 
+    def get_ech_domain(self, item=None):
+        """ Returns the domain of influence according to eCH-155.
+
+        Returns the domain of the principal if no domain is given, else the
+        domain of the given election or vote.
+
+        """
+
+        if item is None or item.domain == 'canton':
+            # todo:
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.CT
+                ),
+                domain_of_influence_identification=self.id.upper(),
+                domain_of_influence_name=self.name
+            )
+
+        if item.domain == 'federation':
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.CH
+                ),
+                domain_of_influence_identification='1',
+                domain_of_influence_name='Bund'
+            )
+        if item.domain in ('region', 'district'):
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.BZ
+                ),
+                domain_of_influence_identification='',
+                domain_of_influence_name=item.domain_segment or ''
+            )
+        if item.domain == 'municipality':
+            municipalities = {
+                entity.get('name', None): id_
+                for year in self.entities.values()
+                for id_, entity in year.items()
+                if entity.get('name', None)
+            }
+            identification = municipalities.get(
+                item.domain_segment
+            )
+            identification = str(identification) if identification else ''
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.MU
+                ),
+                domain_of_influence_identification=identification,
+                domain_of_influence_name=item.domain_segment or ''
+            )
+
+        return DomainOfInfluenceType(
+            domain_of_influence_type=DomainOfInfluenceTypeType(
+                DomainOfInfluenceTypeType.AN
+            ),
+            domain_of_influence_identification='',
+            domain_of_influence_name=item.domain_segment or ''
+        )
+
 
 class Municipality(Principal):
     """ A communal instance. """
 
-    def __init__(self, municipality=None, **kwargs):
+    def __init__(
+        self, municipality=None, canton=None, canton_name=None, **kwargs
+    ):
         assert municipality
+        assert canton
+        assert canton_name
+
+        self.canton = canton
+        self.canton_name = canton_name
+        self.canton_id = Canton.CANTONS[canton]  # official BFS number
+
         domains = OrderedDict((
             ('federation', _("Federal")),
             ('canton', _("Cantonal")),
@@ -406,3 +479,44 @@ class Municipality(Principal):
         if value == 'entities':
             return _("Quarters") if self.has_quarters else _("Municipalities")
         return ''
+
+    def get_ech_domain(self, item=None):
+        if item is None or item.domain == 'municipality':
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.MU
+                ),
+                domain_of_influence_identification=self.id,
+                domain_of_influence_name=self.name
+            )
+        if item.domain == 'federation':
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.CH
+                ),
+                domain_of_influence_identification='1',
+                domain_of_influence_name='Bund'
+            )
+        if item.domain == 'canton':
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.CT
+                ),
+                domain_of_influence_identification=self.canton.upper(),
+                domain_of_influence_name=self.canton_name
+            )
+        if item.domain in ('district'):
+            return DomainOfInfluenceType(
+                domain_of_influence_type=DomainOfInfluenceTypeType(
+                    DomainOfInfluenceTypeType.SK
+                ),
+                domain_of_influence_identification='',
+                domain_of_influence_name=item.domain_segment or ''
+            )
+        return DomainOfInfluenceType(
+            domain_of_influence_type=DomainOfInfluenceTypeType(
+                DomainOfInfluenceTypeType.AN
+            ),
+            domain_of_influence_identification='',
+            domain_of_influence_name=item.domain_segment or ''
+        )

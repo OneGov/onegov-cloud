@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 10:38+0200\n"
+"POT-Creation-Date: 2023-06-28 07:23+0200\n"
 "PO-Revision-Date: 2022-03-22 07:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -65,6 +65,10 @@ msgstr "Fichier csv/xls/xlsx vide."
 
 msgid "The file contains an empty line."
 msgstr "Le fichier contient une ligne vide."
+
+#, python-format
+msgid "Not a valid eCH xml file: ${error}"
+msgstr "Fichier xml eCH non valide : ${error}"
 
 #, python-format
 msgid "${name} is not part of this business"
@@ -230,6 +234,9 @@ msgstr "Impossible de connaître les votes blancs"
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
+
+msgid "Vote type not supported"
+msgstr "Type de vote non pris en charge"
 
 msgid "Term"
 msgstr "Terme de recherche"
@@ -642,6 +649,9 @@ msgstr "OneGov Cloud"
 msgid "Party results"
 msgstr "Résultats des partis"
 
+msgid "Delivery"
+msgstr "Livraison"
+
 msgid "Proposal / Results"
 msgstr "Objet de la votation / Résultats"
 
@@ -650,6 +660,12 @@ msgstr "Numéro de votation"
 
 msgid "Default"
 msgstr "Défaut"
+
+msgid "External ID of counter proposal"
+msgstr "ID externe du contre-projet"
+
+msgid "External ID of tie breaker"
+msgstr "ID externe du jeu décisif"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titre du vote / de l'initiative"

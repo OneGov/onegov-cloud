@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from decimal import Decimal
+from functools import cached_property
 from onegov.activity.models import Invoice, InvoiceItem
 from onegov.activity.models.invoice import sync_invoice_items
 from onegov.activity.models.invoice_reference import KNOWN_SCHEMAS
@@ -56,6 +56,13 @@ class InvoiceCollection(GenericCollection):
     def for_schema(self, schema, schema_config=None):
         return self.__class__(self.session, self.period_id, self.user_id,
                               schema, schema_config)
+
+    def update_attendee_name(self, attendee_id, attendee_name):
+        invoice_items = self.query_items()
+
+        for item in invoice_items:
+            if item.attendee_id == attendee_id:
+                item.group = attendee_name
 
     @cached_property
     def invoice(self):

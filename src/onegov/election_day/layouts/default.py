@@ -1,6 +1,6 @@
 from babel import Locale
-from cached_property import cached_property
 from datetime import datetime
+from functools import cached_property
 from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout

@@ -81,7 +81,10 @@ def test_import_wabstic_vote(session):
         ('68', '2', 3374, 337),
         ('69', '1', 3375, 365),
     ):
-        principal = Municipality(name=str(entity_id), municipality=entity_id)
+        principal = Municipality(
+            name=str(entity_id), municipality=entity_id,
+            canton='sg', canton_name='Kanton St.Gallen'
+        )
         errors = import_vote_wabstic(
             vote, principal, number, district,
             BytesIO(sg_geschaefte), 'text/plain',
@@ -101,7 +104,10 @@ def test_import_wabstic_vote(session):
         ('3', '5', 3204, 'municipality'),  # number missing
     ):
         vote.domain = domain
-        principal = Municipality(name=str(entity_id), municipality=entity_id)
+        principal = Municipality(
+            name=str(entity_id), municipality=entity_id,
+            canton='sg', canton_name='Kanton St.Gallen'
+        )
         errors = import_vote_wabstic(
             vote, principal, number, district,
             BytesIO(sg_geschaefte), 'text/plain',
@@ -120,7 +126,10 @@ def test_import_wabstic_vote(session):
     )
     session.flush()
     vote = session.query(ComplexVote).one()
-    principal = Municipality(name=str(3402), municipality=3402)
+    principal = Municipality(
+        name=str(3402), municipality=3402,
+        canton='sg', canton_name='Kanton St.Gallen'
+    )
     errors = import_vote_wabstic(
         vote, principal, '1', '83',
         BytesIO(sg_geschaefte), 'text/plain',

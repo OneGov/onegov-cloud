@@ -1,14 +1,19 @@
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+
 class CSVError(Exception):
     pass
 
 
 class MissingColumnsError(CSVError):
-    def __init__(self, columns):
+    def __init__(self, columns: 'Sequence[str]'):
         self.columns = columns
 
 
 class AmbiguousColumnsError(CSVError):
-    def __init__(self, columns):
+    def __init__(self, columns: 'Mapping[str, Sequence[str]]'):
         self.columns = columns
 
 

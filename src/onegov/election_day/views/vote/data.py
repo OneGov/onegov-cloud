@@ -52,3 +52,21 @@ def view_vote_data_as_csv(self, request):
         'data': self.export(sorted(request.app.locales)),
         'name': normalize_for_url(self.title[:60])
     }
+
+
+@ElectionDayApp.xml_file(model=Vote, name='data-xml')
+def view_vote_data_as_xlm(self, request):
+
+    """ View the raw data as eCH-0252 XML. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
+    return {
+        'data': self.export_xml(
+            canton_id=request.app.principal.canton_id,
+            domain_of_influence=request.app.principal.get_ech_domain(self)
+        ),
+        'name': normalize_for_url(self.title[:60])
+    }

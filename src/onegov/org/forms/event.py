@@ -1,7 +1,7 @@
 import json
 import transaction
 
-from cached_property import cached_property
+from functools import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
 from dateutil.parser import parse
@@ -551,7 +551,10 @@ class EventImportForm(Form):
         try:
             csv = CSVFile(csvfile, expected_headers=headers.values())
         except Exception:
-            return 0, ['0']
+            error_string = _('Expected header line with the following '
+                             'columns:')
+            return 0, ['0 - {} {}'.format(error_string,
+                                          list(headers.values()))]
         lines = list(csv.lines)
         columns = {
             key: csv.as_valid_identifier(value)

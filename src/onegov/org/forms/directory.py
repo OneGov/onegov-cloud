@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from colour import Color
 from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration

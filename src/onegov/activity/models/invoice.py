@@ -75,10 +75,11 @@ class Invoice(Base, TimestampMixin):
 
         sync_invoice_items(items, capture=capture)
 
-    def add(self, group, text, unit, quantity, organizer='', flush=True,
-            **kwargs):
+    def add(self, group, text, unit, quantity, organizer='', attendee_id=None,
+            flush=True, **kwargs):
         item = InvoiceItem(
             group=group,
+            attendee_id=attendee_id,
             text=text,
             organizer=organizer,
             unit=unit,

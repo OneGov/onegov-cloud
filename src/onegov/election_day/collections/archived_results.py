@@ -9,6 +9,7 @@ from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
 from onegov.core.collection import Pagination
 from onegov.election_day.models import ArchivedResult
+from onegov.election_day.utils import replace_url
 from sedate import as_datetime
 from sqlalchemy import cast
 from sqlalchemy import desc
@@ -66,7 +67,7 @@ class ArchivedResultCollection:
             return None
 
         compounded = {
-            id_ for item in items for id_ in getattr(item, 'elections', [])
+            url for item in items for url in getattr(item, 'elections', [])
         }
 
         dates = groupbydict(
@@ -188,7 +189,11 @@ class ArchivedResultCollection:
         """ Updates a result. """
 
         url = request.link(item)
-        old = url if not old else old
+        url = replace_url(url, request.app.principal.official_host)
+        if old:
+            old = replace_url(old, request.app.principal.official_host)
+        else:
+            old = url
         result = self.query().filter_by(url=old).first()
 
         add_result = False
@@ -294,7 +299,9 @@ class ArchivedResultCollection:
             or isinstance(item, Vote)
         )
 
-        for result in self.query().filter_by(url=request.link(item)):
+        url = request.link(item)
+        url = replace_url(url, request.app.principal.official_host)
+        for result in self.query().filter_by(url=url):
             self.session.delete(result)
 
         self.session.delete(item)

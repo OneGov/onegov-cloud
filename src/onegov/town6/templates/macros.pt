@@ -186,10 +186,10 @@
   <div class="small-12 medium-4 cell footer-links">
     <tal:b condition="not request.app.org.hide_onegov_footer|True">
         <span>
-            <a href="https://www.onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
+            <a href="https://www.admin.digital">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a>
         </span>
         <span>
-            <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+            <a href="https://www.admin.digital/datenschutz" i18n:translate>
                 Privacy Protection
             </a>
         </span>
@@ -2125,9 +2125,9 @@
             data-confirm-extra="${file.name}"
             data-confirm-yes="Delete File"
             data-confirm-no="Cancel"
-            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
-            i18n:translate>
-            Delete
+            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
+            <span class="fa fa-trash" aria-hidden="true"></span>
+            <span i18n:translate >Delete</span>
         </a>
         <a class="button secondary rename prompt" role="button"
             data-prompt="Please provide the new name for the file"
@@ -2149,10 +2149,14 @@
                     actions.find('a.delete').data('confirm-extra', value);
                 });
             })"
-            i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel"
-            i18n:translate>
-            Rename
-        </a>
+            i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel" >
+           <span class="fa fa-edit" aria-hidden="true"></span>
+           <span i18n:translate>Rename</span>
+      </a>
+      <a class="button secondary delete" role="button" href="${request.link(file)}">
+           <span class="fa fa-download" aria-hidden="true"></span>
+           <span i18n:translate>Download</span>
+     </a>
     </div>
 </metal:file_details>
 

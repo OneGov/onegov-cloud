@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.core.request import CoreRequest
 from onegov.core.security import Private
 from onegov.user import User

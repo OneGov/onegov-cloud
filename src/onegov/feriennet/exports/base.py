@@ -189,11 +189,11 @@ class FeriennetExport(Export):
         )
 
     def invoice_attendee_fields(self, attendee):
-        yield _("Attendee Address"), attendee.address
-        yield _("Attendee Zipcode"), attendee.zip_code
-        yield _("Attendee Place"), attendee.place
+        yield _("Attendee Address"), attendee.address if attendee else ''
+        yield _("Attendee Zipcode"), attendee.zip_code if attendee else ''
+        yield _("Attendee Place"), attendee.place if attendee else ''
         yield _("Attendee Political Municipality"
-                ), attendee.political_municipality
+                ), attendee.political_municipality if attendee else ''
 
     def organiser_fields(self, organiser):
         user_data = organiser.data or {}

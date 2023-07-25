@@ -310,6 +310,9 @@ def get_volunteer_cart_action(request, action, target):
     path='/volunteers/{period_id}',
     converters=dict(period_id=UUID))
 def get_volunteers(request, period_id):
+    if not period_id:
+        return None
+
     if not request.app.show_volunteers(request):
         return None
 
