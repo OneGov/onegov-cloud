@@ -7,7 +7,7 @@ from datetime import datetime
 from onegov.org.models import ResourceRecipientCollection
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
-from tests.onegov.org.test_views_resources import add_reservation
+from tests.shared.utils import add_reservation
 
 
 def test_new_reservation_notification(client):

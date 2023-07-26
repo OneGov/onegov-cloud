@@ -2129,6 +2129,3 @@ msgstr "Festività"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Il team di OneGov Cloud"

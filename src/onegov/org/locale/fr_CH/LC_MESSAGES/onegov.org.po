@@ -1181,14 +1181,34 @@ msgstr "Nouvelles réservations"
 msgid "Notifications *"
 msgstr "Notifications *"
 
+msgid ""
+"For each new reservation, a notification will be sent to the above recipient."
+msgstr ""
+"Pour chaque nouvelle réservation, une notification sera envoyée au "
+"destinataire ci-dessus."
+
 msgid "Daily Reservations"
 msgstr "Réservations quotidiennes"
+
+msgid "Rejected Reservations"
+msgstr "Réservations rejetées"
+
+msgid ""
+"On each day selected below, a notification with the day's reservations will "
+"be sent to the recipient above at 06:00."
+msgstr ""
+"Pour chaque jour sélectionné ci-dessous, une notification avec les "
+"réservations du jour sera envoyée au destinataire ci-dessus à 6h00.."
 
 msgid "Internal Notes"
 msgstr "Notes internes"
 
-msgid "Rejected Reservations"
-msgstr "Réservations rejetées"
+msgid ""
+"Each time a new note is added to the ticket for a reservation, a "
+"notification is sent to the recipient above."
+msgstr ""
+"Chaque fois qu'une nouvelle note est ajoutée au ticket pour une réservation, "
+"une notification est envoyée au destinataire ci-dessus."
 
 msgid "Send on"
 msgstr "Envoyer sur"
@@ -3803,9 +3823,6 @@ msgstr ""
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Reçoit des notifications pour les notes internes sur les réservations."
-
-msgid "Receives notifications for rejected reservations."
-msgstr "Reçoit des notifications pour les réservations rejetées."
 
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."

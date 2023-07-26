@@ -9,7 +9,7 @@ from onegov.core.html import html_to_text
 from onegov.core.orm import as_selectable
 from onegov.core.request import CoreRequest
 from onegov.core.security import Public, Private, Secret
-from onegov.core.templates import render_template, PageTemplate
+from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
@@ -30,7 +30,6 @@ from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
-from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
@@ -368,7 +367,8 @@ def send_new_note_notification(
         q = ResourceRecipientCollection(request.session).query()
         q = q.filter(ResourceRecipient.medium == 'email')
         q = q.order_by(None).order_by(ResourceRecipient.address)
-        q = q.with_entities(ResourceRecipient.address, ResourceRecipient.content)
+        q = q.with_entities(ResourceRecipient.address,
+                            ResourceRecipient.content)
         for r in q:
             if handler.reservations[0].resource.hex in r.content[
                 'resources'
@@ -386,7 +386,9 @@ def send_new_note_notification(
             )
         ),
     )
-    content = render_template(template, request,
+    content = render_template(
+        template,
+        request,
         {
             'layout': DefaultMailLayout(object(), request),
             'title': title,
