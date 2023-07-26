@@ -623,24 +623,25 @@ def accept_reservation(self, request, text=None, notify=False):
             # libres does not automatically detect changes yet
             flag_modified(reservation, 'data')
 
-        ReservationMessage.create(
-            reservations, ticket, request, 'accepted')
+        ReservationMessage.create(reservations, ticket, request, 'accepted')
 
         message = None
         if text:
             message = TicketChatMessage.create(
-                ticket, request,
+                ticket,
+                request,
                 text=text,
                 owner=request.current_username,
                 recipient=self.email,
                 notify=notify,
-                origin='internal')
+                origin='internal',
+            )
 
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
             subject=_("Your reservations were accepted"),
-            receivers=(self.email, ),
+            receivers=(self.email,),
             ticket=ticket,
             content={
                 'model': self,
@@ -648,54 +649,56 @@ def accept_reservation(self, request, text=None, notify=False):
                 'reservations': reservations,
                 'show_submission': show_submission,
                 'form': form,
-                'message': message
-            }
+                'message': message,
+            },
         )
 
         def recipients_which_have_registered_for_mail():
             q = ResourceRecipientCollection(request.session).query()
             q = q.filter(ResourceRecipient.medium == 'email')
             q = q.order_by(None).order_by(ResourceRecipient.address)
-            q = q.with_entities(ResourceRecipient.address,
-                                ResourceRecipient.content)
+            q = q.with_entities(
+                ResourceRecipient.address, ResourceRecipient.content
+            )
 
             for res in q:
-                if self.resource.hex in res.content['resources'] \
-                        and res.content.get('new_reservations', False):
+                if self.resource.hex in res.content[
+                    'resources'
+                ] and res.content.get('new_reservations', False):
                     yield res.address
+
+        title = request.translate(
+            _(
+                "${org} New Reservation(s)",
+                mapping={'org': request.app.org.title},
+            )
+        )
+
+        content = render_template(
+            'mail_new_reservation_notification.pt',
+            request,
+            {
+                'layout': DefaultMailLayout(object(), request),
+                'title': title,
+                'form': form,
+                'model': self,
+                'resource': resource,
+                'reservations': reservations,
+                'show_submission': show_submission,
+                'message': message,
+            },
+        )
+        plaintext = html_to_text(content)
 
         def email_iter():
             for recipient_addr in recipients_which_have_registered_for_mail():
-                title = request.translate(
-                    _(
-                        "${org} New Reservation(s)",
-                        mapping={'org': request.app.org.title},
-                    )
-                )
-
-                content = render_template(
-                    'mail_new_reservation_notification.pt',
-                    request,
-                    {
-                        'layout': DefaultMailLayout(object(), request),
-                        'title': title,
-                        'form': form,
-                        'model': self,
-                        'resource': resource,
-                        'reservations': reservations,
-                        'show_submission': show_submission,
-                        'message': message,
-                    },
-                )
-                plaintext = html_to_text(content)
-
                 yield request.app.prepare_email(
-                    receivers=(recipient_addr, ),
+                    receivers=(recipient_addr,),
                     subject=title,
                     content=content,
                     plaintext=plaintext,
                     category='transactional',
-                    attachments=()
+                    attachments=(),
                 )
 
         request.app.send_transactional_email_batch(email_iter())
