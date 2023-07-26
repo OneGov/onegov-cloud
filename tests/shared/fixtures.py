@@ -3,7 +3,6 @@ import os
 import platform
 import port_for
 import pytest
-import re
 import shlex
 import shutil
 import subprocess
@@ -431,16 +430,29 @@ def webdriver_options():
 
 @pytest.fixture(scope="session")
 def webdriver_executable_path():
-    pattern = r'\d+\.\d+\.\d+'
-    stdout = os.popen(
-        'google-chrome --version || google-chrome-stable --version'
-    ).read()
-    version = re.search(pattern, stdout)
-    if version:
-        driver = ChromeType.GOOGLE
-    else:
-        driver = ChromeType.CHROMIUM
-    return ChromeDriverManager(chrome_type=driver).install()
+    # pattern = r'\d+\.\d+\.\d+'
+    # stdout = os.popen(
+    #     'google-chrome --version || google-chrome-stable --version'
+    # ).read()
+    # version = re.search(pattern, stdout)
+    # if version:
+    #     driver = ChromeType.GOOGLE
+    # else:
+    #     driver = ChromeType.CHROMIUM
+    #
+    # r = requests.get(
+    #     'https://googlechromelabs.github.io/chrome-for-testing/'
+    #     'last-known-good-versions-with-downloads.json')
+    # rjson = json.loads(r.text)
+    # version = rjson['channels']['Stable']['version']
+    # #
+    # url = f"https://chromedriver.storage.googleapis.com/{version}/
+    # chromedriver_linux64.zip"
+
+    # Todo: Change back again once the webdriver_manager issue is fixed
+    driver = ChromeType.CHROMIUM
+    driver = ChromeDriverManager(chrome_type=driver)
+    return driver.install()
 
 
 @pytest.fixture(scope="session")
