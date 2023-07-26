@@ -5,7 +5,9 @@ from morepath import Response
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
+from onegov.core.html import html_to_text
 from onegov.core.orm import as_selectable
+from onegov.core.request import CoreRequest
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template, PageTemplate
 from onegov.core.utils import normalize_for_url
@@ -348,8 +350,9 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
     )
 
 
-def send_new_note_notification(request: OrgRequest, form: TicketNoteForm,
-                               note: TicketNote, template: PageTemplate):
+def send_new_note_notification(
+    request: CoreRequest, form: TicketNoteForm, note: TicketNote, template: str
+):
     """
     Sends an E-mail notification to all resource recipients that have been
     configured to receive notifications for new (ticket) notes.
@@ -361,47 +364,57 @@ def send_new_note_notification(request: OrgRequest, form: TicketNoteForm,
     if not getattr(handler, 'resource', None) or not handler.reservations:
         return
 
-    q = ResourceRecipientCollection(request.session).query()
-    q = q.filter(ResourceRecipient.medium == 'email')
-    q = q.order_by(None).order_by(ResourceRecipient.address)
-    q = q.with_entities(
-        ResourceRecipient.address,
-        ResourceRecipient.content
-    )
-
-    internal_notes_recipients = [
-        r.address
-        for r in q
-        if (
-            handler.reservations[0].resource.hex in r.content['resources']
-            and r.content.get('internal_notes', False)
+    def recipients_with_have_registered_for_mail():
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(
+            ResourceRecipient.address, ResourceRecipient.content
         )
-    ]
+        for r in q:
+            if handler.reservations[0].resource.hex in r.content[
+                'resources'
+            ] and r.content.get('internal_notes', False):
+                yield r.address
 
-    args = {
-        'layout': DefaultMailLayout(object(), request),
-        'title': request.translate(
-            _("${org} New Note in Reservation for ${resource_title}", mapping={
-                'org': request.app.org.title,
-                'resource_title': handler.resource.title
-            })
-        ),
-        'form': form,
-        'model': ticket,
-        'resource': handler.resource,
-        'show_submission': True,
-        'reservations': handler.reservations,
-        'message': note,
-        'ticket_reference': ticket.reference(request)
-    }
-    content = render_template(template, request, args)
+    def email_iter():
+        for recipient_addr in recipients_with_have_registered_for_mail():
+            title = (
+                request.translate(
+                    _(
+                        "${org} New Note in Reservation for ${resource_title}",
+                        mapping={
+                            'org': request.app.org.title,
+                            'resource_title': handler.resource.title,
+                        },
+                    )
+                ),
+            )
+            content = render_template(template, request,
+                {
+                    'layout': DefaultMailLayout(object(), request),
+                    'title': title,
+                    'form': form,
+                    'model': ticket,
+                    'resource': handler.resource,
+                    'show_submission': True,
+                    'reservations': handler.reservations,
+                    'message': note,
+                    'ticket_reference': ticket.reference(request),
+                },
+            )
+            plaintext = html_to_text(content)
 
-    for r in internal_notes_recipients:
-        request.app.send_transactional_email(
-            subject=args['title'],
-            receivers=(r),
-            content=content,
-        )
+            yield request.app.prepare_email(
+                receivers=(recipient_addr,),
+                subject=title,
+                content=content,
+                plaintext=plaintext,
+                category='transactional',
+                attachments=(),
+            )
+
+    request.app.send_transactional_email_batch(email_iter())
 
 
 @OrgApp.form(
