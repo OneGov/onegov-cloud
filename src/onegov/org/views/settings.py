@@ -1,6 +1,8 @@
 """ The settings view, defining things like the logo or color of the org. """
 
 from copy import copy
+
+from aiohttp.web_exceptions import HTTPForbidden
 from dectate import Query
 from markupsafe import Markup
 
@@ -322,6 +324,8 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
 
     collection = UserCollection(request.session)
     user = collection.by_username(request.identity.userid)
+    if not user:
+        raise HTTPForbidden()
 
     if form.submitted(request):
         key = ApiKey(
@@ -338,7 +342,8 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
     def current_api_keys_by_user(
         request: CoreRequest, self: Organisation, user: User
     ):
-        for api_key in user.api_keys.all():
+        # TODO: how to make mypy happy for `api_keys` backref?
+        for api_key in user.api_keys.all():  # type: ignore
             delete_link = Link(
                 text=Markup('<i class="fa fa-trash" aria-hidden="True"></i>'),
                 url=request.link(api_key, name='+delete'),
