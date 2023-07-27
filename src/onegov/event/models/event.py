@@ -113,7 +113,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     @property
     def search_score(self):
-        return 2
+        return 1
 
     def set_image(self, content, filename=None):
         self.set_blob('image', content, filename)

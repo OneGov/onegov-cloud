@@ -33,7 +33,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     @property
     def search_score(self):
-        return 2
+        return 1
 
     @property
     def es_public(self):

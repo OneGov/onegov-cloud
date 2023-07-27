@@ -25,7 +25,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
 
     @property
     def search_score(self):
-        return 1
+        return 2
 
     @hybrid_property
     def published_or_created(self):
