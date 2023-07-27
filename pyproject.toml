@@ -39,6 +39,7 @@ module = [
     "onegov.qrcode.*",
     "onegov.reservation.*",
     "onegov.server.*",
+    "onegov.ticket.*",
     "onegov.user.*"
 ]
 warn_unreachable = true

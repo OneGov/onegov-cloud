@@ -179,6 +179,12 @@ class Subscription:
         self.recipient = recipient
         self.token = token
 
+    @property
+    def recipient_id(self) -> 'uuid.UUID':
+        # even though this seems redundant, we need this property
+        # for morepath, so it can match it to the path variable
+        return self.recipient.id
+
     def confirm(self) -> bool:
         if self.recipient.token != self.token:
             return False
