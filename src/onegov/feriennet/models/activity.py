@@ -37,7 +37,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     @property
     def es_public(self):
-        return self.state == 'accepte'
+        return self.state == 'accepted'
 
     @property
     def es_skip(self):
