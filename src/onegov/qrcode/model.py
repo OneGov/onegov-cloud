@@ -1,12 +1,10 @@
 from base64 import b64encode
+from functools import cached_property
 from io import BytesIO
 from qrcode import QRCode, ERROR_CORRECT_H
 
 
 from typing import Literal
-
-# FIXME: This module seems honestly completely unecessary, this could
-#        easily be moved to a couple of small util functions in core
 
 
 class QrCode:
@@ -41,7 +39,7 @@ class QrCode:
     def from_payload(cls, payload: str | bytes) -> BytesIO:
         return cls(payload).image
 
-    @property
+    @cached_property
     def image(self) -> BytesIO:
         """
         Create an image from the payload
@@ -63,10 +61,8 @@ class QrCode:
         file.seek(0)
         return file
 
-    @property
+    @cached_property
     def encoded_image(self) -> str | bytes:
-        # FIXME: If we access both image and encoded_image this is horribly
-        #        ineffcient, all so we can potentially save one line of code...
         if self.encoding == 'base64':
             return b64encode(self.image.read())
         return self.image.read()
