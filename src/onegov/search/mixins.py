@@ -144,9 +144,6 @@ class Searchable:
         """
         return 10
 
-    def __lt__(self, other):
-        return self.search_score < other.search_score
-
     @staticmethod
     def psql_tsvector_string(model):
         """

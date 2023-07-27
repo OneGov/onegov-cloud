@@ -1,4 +1,5 @@
 from functools import cached_property
+from operator import attrgetter
 
 from elasticsearch_dsl.function import SF
 from elasticsearch_dsl.query import FunctionScore
@@ -242,7 +243,7 @@ class SearchPostgres(Pagination):
 
         self.nbr_of_docs = doc_count
         self.nbr_of_results = len(results)
-        results.sort(reverse=False)
+        results.sort(key=attrgetter('search_score'), reverse=False)
         return results
 
     def hashtag_search(self):
@@ -259,7 +260,7 @@ class SearchPostgres(Pagination):
                             results.append(doc)
 
         self.nbr_of_results = len(results)
-        results.sort(reverse=False)
+        results.sort(key=attrgetter('search_score'), reverse=False)
         return results
 
     def feeling_lucky(self):
