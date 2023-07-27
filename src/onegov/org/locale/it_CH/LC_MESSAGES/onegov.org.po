@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-07-25 12:05+0200\n"
+"POT-Creation-Date: 2023-07-27 11:53+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1193,9 +1193,6 @@ msgstr ""
 msgid "Daily Reservations"
 msgstr "Prenotazioni giornaliere"
 
-msgid "Rejected Reservations"
-msgstr "Prenotazioni rifiutate"
-
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
 "be sent to the recipient above at 06:00."
@@ -1212,6 +1209,9 @@ msgid ""
 msgstr ""
 "Ogni volta in cui sarà aggiunta una nuova nota al biglietto di una "
 "prenotazione, verrà inviata una notifica al suddetto destinatario."
+
+msgid "Rejected Reservations"
+msgstr "Prenotazioni rifiutate"
 
 msgid "Send on"
 msgstr "Invia il"
@@ -2466,8 +2466,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -3814,6 +3814,9 @@ msgstr ""
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
 
+msgid "Receives notifications for rejected reservations."
+msgstr ""
+
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."
 
@@ -4615,8 +4618,12 @@ msgstr "La tua registrazione è stata confermata"
 msgid "The registration has been confirmed"
 msgstr "La registrazione è stata confermata"
 
-msgid "The registration could not be confirmed"
-msgstr "Non è stato possibile confermare la registrazione"
+msgid ""
+"The registration could not be confirmed because the maximum number of "
+"participants has been reached"
+msgstr ""
+"Non è stato possibile confermare la registrazione perché è stato raggiunto "
+"il numero massimo di partecipanti."
 
 msgid "Your registration has been denied"
 msgstr "La tua registrazione è stata rifiutata"
