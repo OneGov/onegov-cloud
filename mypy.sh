@@ -9,4 +9,7 @@ if [ -z "${VIRTUAL_ENV:-}" ]; then
     source venv/bin/activate
 fi
 
+echo "Runing type checks on onegov package"
 mypy -p onegov
+echo "Running type checks on do/changes"
+mypy do/changes
