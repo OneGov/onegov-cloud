@@ -31,9 +31,15 @@ module = [
     "onegov.chat.*",
     "onegov.core.*",
     "onegov.file.*",
+    "onegov.gever.*",
+    "onegov.newsletter.*",
+    "onegov.notice.*",
+    "onegov.page.*",
     "onegov.pay.*",
+    "onegov.qrcode.*",
     "onegov.reservation.*",
     "onegov.server.*",
+    "onegov.ticket.*",
     "onegov.user.*"
 ]
 warn_unreachable = true

@@ -42,6 +42,10 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
         return self.meta.get('trait') == 'link'  # do not index links
 
     @property
+    def es_public(self):
+        return self.access == 'public' and self.published
+
+    @property
     def deletable(self):
         """ Returns true if this page may be deleted. """
         return self.parent is not None
@@ -115,6 +119,10 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     filter_tags: list[str] = []
 
     hashtags = meta_property(default=list)
+
+    @property
+    def es_public(self):
+        return self.access == 'public' and self.published
 
     @observes('content')
     def content_observer(self, files):
