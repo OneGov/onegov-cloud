@@ -120,6 +120,10 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
 
     hashtags = meta_property(default=list)
 
+    @property
+    def es_public(self):
+        return self.access == 'public' and self.published
+
     @observes('content')
     def content_observer(self, files):
         self.hashtags = self.es_tags or []
