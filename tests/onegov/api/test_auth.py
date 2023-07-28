@@ -25,7 +25,7 @@ def test_token_generation(session):
     auth = str(key.key) + ':'
     request = Bunch(
         **{
-            'app.identity_secret': 'secret',
+            'identity_secret': 'secret',
             'session': session,
             'authorization': ('Basic', b64encode(auth.encode('utf-8'))),
         }
