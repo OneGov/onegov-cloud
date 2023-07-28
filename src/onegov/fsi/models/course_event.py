@@ -8,7 +8,6 @@ from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
 from sqlalchemy import (
     Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_)
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
 from uuid import uuid4
@@ -179,9 +178,6 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         Interval,
         nullable=False,
         default=default_reminder_before)
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def description_html(self):

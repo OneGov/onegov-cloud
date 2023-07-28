@@ -1,5 +1,4 @@
 from arrow import utcnow
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
@@ -33,9 +32,6 @@ class Course(Base, ORMSearchable):
 
     # hides the course in the collection for non-admins
     hidden_from_public = Column(Boolean, nullable=False, default=False)
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

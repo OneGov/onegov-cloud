@@ -1,7 +1,5 @@
 from uuid import uuid4
 
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, \
@@ -49,9 +47,6 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
     es_id = 'title'
 
     lead = meta_property()
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

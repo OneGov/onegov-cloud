@@ -227,3 +227,5 @@ class ItemResource(Resource, AccessExtension, SearchableContent,
     show_quota = True
 
     title_template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M} ({quota})'
+
+    # fts_idx = orm.synonym(Searchable.fts_idx)

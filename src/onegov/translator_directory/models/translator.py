@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import backref, relationship
 
 from onegov.core.orm import Base
@@ -189,9 +188,6 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
 
     # If entry was imported, for the form and the expertise fields
     imported = Column(Boolean, default=False, nullable=False)
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def title(self):

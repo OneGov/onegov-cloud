@@ -1,6 +1,4 @@
 from functools import cached_property
-from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
@@ -27,9 +25,6 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         # FIXME: properties cannot be used for ts tsvector
         'organiser': {'type': 'text'}
     }
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

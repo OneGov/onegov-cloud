@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.abstract import associated
@@ -82,9 +80,6 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: a reference to the organization chart
     organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def organigram_file(self):

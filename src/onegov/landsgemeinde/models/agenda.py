@@ -16,7 +16,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy import Time
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -103,9 +102,6 @@ class AgendaItem(
         backref=backref('agenda_item'),
         order_by='Votum.number',
     )
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def date(self):

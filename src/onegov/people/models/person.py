@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -133,9 +131,6 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: some remarks about the person
     notes = Column(Text, nullable=True)
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

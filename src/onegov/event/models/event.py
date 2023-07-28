@@ -6,7 +6,6 @@ from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
@@ -107,9 +106,6 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     pdf = associated(
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
     )
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

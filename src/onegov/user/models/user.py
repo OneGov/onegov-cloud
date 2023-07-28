@@ -11,7 +11,6 @@ from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
 from sqlalchemy import Boolean, Column, Text, func, ForeignKey
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4, UUID as UUIDType
@@ -151,8 +150,6 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: the signup token used by the user
     signup_token: 'Column[str | None]' = Column(
         Text, nullable=True, default=None)
-
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self) -> int:

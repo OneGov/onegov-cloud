@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -89,9 +87,6 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: when the membership started
     since = Column(Text, nullable=True)
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

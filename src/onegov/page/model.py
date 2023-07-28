@@ -5,8 +5,6 @@ See also: `<https://docs.sqlalchemy.org/en/rel_0_9/orm/self_referential.html>`_
 
 """
 from sqlalchemy import func
-from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm.abstract import AdjacencyList
@@ -19,9 +17,6 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     """ Defines a generic page. """
 
     __tablename__ = 'pages'
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

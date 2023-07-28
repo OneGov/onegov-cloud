@@ -1,7 +1,6 @@
 import inspect
 
 from sedate import to_timezone
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.cache import instance_lru_cache
 from onegov.core.cache import lru_cache
@@ -101,9 +100,6 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         order_by='DirectoryEntry.order',
         backref='directory'
     )
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

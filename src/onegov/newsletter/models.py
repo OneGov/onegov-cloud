@@ -15,7 +15,6 @@ from sqlalchemy import not_
 from sqlalchemy import select
 from sqlalchemy import Table
 from sqlalchemy import Text
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import object_session, validates, relationship
 from uuid import uuid4
@@ -86,9 +85,6 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         'Recipient',
         secondary=newsletter_recipients,
         back_populates='newsletters')
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

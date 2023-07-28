@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
@@ -70,6 +68,3 @@ class FileSet(Base, ContentMixin, TimestampMixin):
         'polymorphic_on': 'type',
         'polymorphic_identity': 'generic'
     }
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)

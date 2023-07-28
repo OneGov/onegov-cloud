@@ -1,7 +1,14 @@
+from sqlalchemy import Column
+from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy.orm import deferred
+
 from onegov.core.orm.mixins import content
 from onegov.search.utils import classproperty, get_fts_index_languages
 from onegov.search.utils import extract_hashtags
-from sqlalchemy.orm.attributes import InstrumentedAttribute
+
+from typing import Any, TYPE_CHECKING
 
 
 class Searchable:
@@ -40,6 +47,16 @@ class Searchable:
     identity is a completely different model.
 
     """
+
+    if TYPE_CHECKING:
+        fts_idx: 'Column[dict[str, Any]]'
+
+    # column for full text search index
+    @declared_attr  # type:ignore[no-redef]
+    def fts_idx(cls) -> 'Column[dict[str, Any]]':
+        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, 'fts_idx'):
+            return deferred(cls.__table__.c.fts_idx)
+        return deferred(Column(TSVECTOR, index=True))
 
     @classproperty
     def es_properties(self):
@@ -139,7 +156,7 @@ class Searchable:
     @property
     def search_score(self):
         """
-        the lower the score they higher the class type will be shown in search
+        the lower the score the higher the class type will be shown in search
         results. Default is 10 (lowest)
         """
         return 10
@@ -269,6 +286,7 @@ class Searchable:
         return s.format(*cols)
 
 
+# TODO: rename prefix 'es' to 'ts' for text search
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults
     for SQLAlchemy orm models.

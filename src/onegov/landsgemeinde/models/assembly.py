@@ -15,7 +15,6 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import Text
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -94,9 +93,6 @@ class Assembly(
     )
 
     last_modified = Column(UTCDateTime)
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     def stamp(self):
         self.last_modified = self.timestamp()

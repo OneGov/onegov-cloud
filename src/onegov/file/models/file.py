@@ -6,7 +6,6 @@ import isodate
 from contextlib import contextmanager
 from collections import defaultdict
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
-from sqlalchemy.dialects.postgresql import TSVECTOR
 
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
@@ -244,9 +243,6 @@ class File(Base, Associable, TimestampMixin):
         'polymorphic_on': 'type',
         'polymorphic_identity': 'generic'
     }
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     __table_args__ = (
         Index('files_by_type_and_order', 'type', 'order'),

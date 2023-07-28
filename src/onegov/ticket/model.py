@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
@@ -74,9 +72,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     #: true if the notifications for this ticket should be muted
     muted = Column(Boolean, nullable=False, default=False)
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

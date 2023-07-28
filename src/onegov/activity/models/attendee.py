@@ -1,7 +1,5 @@
 from datetime import date
 
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -44,9 +42,6 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         'notes': {'type': 'localized'}
     }
     es_public = False
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):

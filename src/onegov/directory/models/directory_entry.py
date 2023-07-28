@@ -10,7 +10,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Text
-from sqlalchemy.dialects.postgresql import HSTORE, TSVECTOR
+from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from uuid import uuid4
 
@@ -69,9 +69,6 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         'polymorphic_on': type,
         'polymorphic_identity': 'generic',
     }
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     __table_args__ = (
         Index('inverted_keywords', 'keywords', postgresql_using='gin'),

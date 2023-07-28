@@ -1,5 +1,3 @@
-from sqlalchemy.dialects.postgresql import TSVECTOR
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.mixins import meta_property, content_property
@@ -116,9 +114,6 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
         "polymorphic_on": 'type',
         'polymorphic_identity': 'generic'
     }
-
-    # column for full text search index
-    fts_idx = Column(TSVECTOR)
 
     @property
     def search_score(self):
