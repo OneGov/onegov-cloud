@@ -58,7 +58,6 @@ module = [
     "cssutils.*",
     "elasticsearch_dsl.*",
     "dectate.*",
-    "depot.*",
     "docxtpl.*",
     "dill.*",
     "dukpy.*",

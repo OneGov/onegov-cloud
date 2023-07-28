@@ -9,7 +9,7 @@ from PIL import Image
 from tempfile import TemporaryDirectory
 
 
-from typing import TYPE_CHECKING
+from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRead
     from depot.fields.upload import UploadedFile
@@ -80,7 +80,7 @@ class WithThumbnailFilter(FileFilter):
 
     def generate_thumbnail(
         self,
-        fp: 'SupportsRead[bytes]'
+        fp: IO[bytes]
     ) -> tuple[BytesIO, tuple[str, str]]:
         output = BytesIO()
 
@@ -96,7 +96,7 @@ class WithThumbnailFilter(FileFilter):
     def store_thumbnail(
         self,
         uploaded_file: 'UploadedFile',
-        fp: 'SupportsRead[bytes]',
+        fp: IO[bytes],
         thumbnail_size: tuple[str, str] | None = None,
     ) -> None:
 
