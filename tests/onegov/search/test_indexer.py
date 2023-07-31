@@ -760,6 +760,7 @@ def test_psql_tsvector_string_generation_models():
         tsvector = model.psql_tsvector_string(model)
         for p in getattr(model, 'es_properties', []):
             if p in model.__dict__ and not p.startswith('_es'):
+                # verify all properties are reflected in the tsvector
                 assert p in tsvector
 
         # random sample
@@ -792,9 +793,8 @@ def test_psql_tsvector_string_generation_models():
         elif model == Topic:
             count += 1
             assert tsvector == "'func.coalesce(title, '')' || ' ' || " \
-                               "'func.coalesce(((content ->> lead)), '')'" \
-                               " || ' ' || " \
-                               "'func.coalesce(((content ->> text)), '')'"
+                               "'func.coalesce(lead, '')' || ' ' || " \
+                               "'func.coalesce(text, '')'"
 
     # verify if statements reached and tested
     assert count == 5

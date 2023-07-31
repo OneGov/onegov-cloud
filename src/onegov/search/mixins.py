@@ -1,11 +1,8 @@
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm import deferred
 
-from onegov.core.orm.mixins import content
 from onegov.search.utils import classproperty, get_fts_index_languages
 from onegov.search.utils import extract_hashtags
 
@@ -177,25 +174,9 @@ class Searchable:
         :return: tsvector string
         """
 
-        join = " || ' ' || "
-
-        # identify search columns
         columns = [p for p in model.es_properties if p in model.__dict__
-                   and not p.startswith('es_')
-                   and isinstance(model.__dict__[p], (InstrumentedAttribute,
-                                                      property,
-                                                      hybrid_property))]
-        s = Searchable.create_tsvector_string(*columns) if columns else ''
-
-        # identify content and meta properties
-        for p in model.es_properties:
-            if p in model.__dict__ and isinstance(model.__dict__[p],
-                                                  content.dict_property):
-                s += join if s else ''
-                s += f"'func.coalesce((({model.__dict__[p].attribute} " \
-                     f"->> {p})), '')'"
-
-        return s
+                   and not p.startswith('es_')]
+        return Searchable.create_tsvector_string(*columns) if columns else ''
 
     @staticmethod
     def reindex(session, schema, model):
