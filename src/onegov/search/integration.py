@@ -406,9 +406,12 @@ class SearchApp(morepath.App):
         done = []
 
         for model in searchable_sqlalchemy_models(Base):
+            print(f'*** tschupre searchable model {model}')
             if model.__tablename__ not in done:
                 model.reindex(self.session(), self.schema, model)
                 done.append(model.__tablename__)
+
+        print(f'*** tschupre reindexed {len(done)} tables: {done}')
 
     def psql_search(self, query=''):
         from onegov.org.models import SearchPostgres

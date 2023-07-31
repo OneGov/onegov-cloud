@@ -36,7 +36,7 @@ from tests.shared.postgresql import Postgresql
 from threading import Thread
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
+# from webdriver_manager.core.os_manager import ChromeType
 
 
 redis_path = which('redis-server')

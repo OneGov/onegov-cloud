@@ -1,5 +1,7 @@
 from functools import cached_property
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
@@ -22,8 +24,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'text': {'type': 'localized_html'},
-        # FIXME: properties cannot be used for ts tsvector
-        'organiser': {'type': 'text'}
+        # 'organiser': {'type': 'text'}
     }
 
     @property
@@ -38,7 +39,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     def es_skip(self):
         return self.state == 'preview'
 
-    @property
+    @hybrid_property
     def organiser(self):
         organiser = [
             self.user.username,

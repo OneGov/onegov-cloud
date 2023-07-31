@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -30,20 +32,16 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     es_public = True
     es_properties = {
-        'first_name': {'type': 'text'},
-        'last_name': {'type': 'text'},
-        'title': {'type': 'text'},
+        # 'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
-        'phone': {'type': 'text'},
-        'phone_direct': {'type': 'text'},
     }
 
     @property
     def es_suggestion(self):
         return self.title
 
-    @property
+    @hybrid_property
     def title(self):
         """ Returns the Estern-ordered name. """
 

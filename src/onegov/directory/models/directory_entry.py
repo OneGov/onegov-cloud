@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -22,16 +24,15 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     __tablename__ = 'directory_entries'
 
     es_properties = {
-        'keywords': {'type': 'keyword'},
+        # 'keywords': {'type': 'keyword'},
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
-        # FIXME: uuid columns cannot be used for ts tsvector
         # 'directory_id': {'type': 'keyword'},
 
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search
         # quality a bit
-        'text': {'type': 'localized_html'}
+        # 'text': {'type': 'localized_html'}
     }
 
     @property
@@ -99,7 +100,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def keywords(self, value):
         self._keywords = {k: '' for k in value} if value else None
 
-    @property
+    @hybrid_property
     def text(self):
         return self.directory.configuration.extract_searchable(self.values)
 

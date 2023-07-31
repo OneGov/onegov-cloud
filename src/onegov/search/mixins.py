@@ -1,6 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm import deferred
 
@@ -56,7 +57,8 @@ class Searchable:
     def fts_idx(cls) -> 'Column[dict[str, Any]]':
         if hasattr(cls, '__table__') and hasattr(cls.__table__.c, 'fts_idx'):
             return deferred(cls.__table__.c.fts_idx)
-        return deferred(Column(TSVECTOR, index=True))
+        # return deferred(Column(TSVECTOR, index=True))
+        return deferred(Column(TSVECTOR))
 
     @classproperty
     def es_properties(self):
@@ -178,9 +180,12 @@ class Searchable:
         join = " || ' ' || "
 
         # identify search columns
-        columns = [p for p in model.es_properties if p in model.__dict__
-                   and isinstance(model.__dict__[p], InstrumentedAttribute)]
+        columns = [p for p in model.es_properties if p in model.__dict__ and
+                   not p.startswith('es_') and
+                   isinstance(model.__dict__[p], (InstrumentedAttribute,
+                                                  property, hybrid_property))]
         s = Searchable.create_tsvector_string(*columns) if columns else ''
+        print(f'*** tschupre tsvector string columns: {columns}')
 
         # identify content and meta properties
         for p in model.es_properties:
@@ -244,6 +249,7 @@ class Searchable:
         # to_tsvector('french', '<tsvector_string_of_model') ||
         # ...
 
+        print(f'*** tschurpe reindexing {model}..')
         tsvector_expression = \
             Searchable.multi_language_tsvector_expression(
                 model.psql_tsvector_string(model))
@@ -272,9 +278,10 @@ class Searchable:
 
         :param cols: column names to be indexed
         :return: tsvector string for multiple columns i.e. for columns title
-        and body: coalesce([title], '') || ' ' || coalesce([body], '')
+        and body: coalesce(\"title\", '') || ' ' || coalesce(\"body\", '')
         Note that the '\"{}\"' escapes the column name in case it is a
-        keyword, see http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html
+        keyword, see
+        http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html
         """
         base = "coalesce(\"{}\", '')"
         ext = " || ' ' || coalesce(\"{}\", '')"

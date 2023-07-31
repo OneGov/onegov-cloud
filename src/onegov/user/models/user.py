@@ -50,7 +50,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     es_properties = {
         'username': {'type': 'text'},
         'realname': {'type': 'text'},
-        'userprofile': {'type': 'text'}
+        # 'userprofile': {'type': 'text'}
     }
     es_public = False
 
@@ -58,7 +58,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     def es_suggestion(self) -> tuple[str, str]:
         return (self.realname or self.username, self.username)
 
-    @property
+    @hybrid_property
     def userprofile(self) -> list[str]:
         if not self.data:
             return []

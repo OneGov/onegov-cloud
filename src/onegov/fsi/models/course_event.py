@@ -60,9 +60,8 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     __tablename__ = 'fsi_course_events'
 
     es_properties = {
-        # FIXME: properties cannot be used for ts tsvector
-        'name': {'type': 'localized'},
-        'description': {'type': 'localized'},
+        # 'name': {'type': 'localized'},
+        # 'description': {'type': 'localized'},
         'location': {'type': 'localized'},
         'presenter_name': {'type': 'text'},
         'presenter_company': {'type': 'text'},
@@ -86,7 +85,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def title(self):
         return str(self)
 
-    @property
+    @hybrid_property
     def name(self):
         return self.course.name
 
@@ -98,7 +97,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
             f'{self.presenter_company}'
         )
 
-    @property
+    @hybrid_property
     def description(self):
         return self.course.description
 

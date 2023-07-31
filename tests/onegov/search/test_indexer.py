@@ -2,6 +2,10 @@ import logging
 import pytest
 
 from datetime import datetime
+
+from onegov.core.orm import Base
+from onegov.directory import DirectoryEntry
+from onegov.people import Agency
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name
 from onegov.search.indexer import (
@@ -13,6 +17,9 @@ from onegov.search.indexer import (
 )
 from queue import Queue
 from unittest.mock import Mock
+
+from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.user import User
 
 
 def test_index_manager_assertions(es_client):
@@ -717,3 +724,64 @@ def test_elasticsearch_outage(es_client, es_url):
     indexer.es_client.indices.refresh(index='_all')
     assert indexer.es_client\
         .search(index='_all')['hits']['total']['value'] == 2
+
+
+def test_psql_tsvector_string():
+    assert Searchable.create_tsvector_string('col_lower') == \
+        """coalesce("col_lower", '')"""
+
+    # assert Searchable.create_tsvector_string(['Col_Higher']) == \
+    #        'coalesce("\'col_higher\'", \'\')'
+
+    assert Searchable.create_tsvector_string('a', 'b') == \
+        """coalesce("a", '') || ' ' || coalesce("b", '')"""
+
+    assert Searchable.create_tsvector_string('a', 'b', 'c') == \
+       """coalesce("a", '') || ' ' || coalesce("b", '') || ' ' || coalesce("c", '')"""
+
+    cols = ['col_a', 'col_b']
+    assert Searchable.create_tsvector_string(*cols) == \
+           """coalesce("col_a", '') || ' ' || coalesce("col_b", '')"""
+    
+    
+def test_multi_language_tsvector_expression():
+    assert False
+
+
+def test_psql_tsvector_string_generation_models():
+    count = 0
+
+    for model in searchable_sqlalchemy_models(Base):
+        print(f'model {model}..')
+        tsvector = model.psql_tsvector_string(model)
+        for p in getattr(model, 'es_properties', []):
+            if p in model.__dict__ and not p.startswith('_es'):
+                assert p in tsvector
+
+        # random sample
+        if model == Agency:
+            count += 1
+            assert tsvector == \
+                'coalesce("title", \'\') || \' \' || ' \
+                'coalesce("description", \'\') || \' \' || ' \
+                'coalesce("portrait", \'\')'
+        elif model == User:
+            count += 1
+            assert tsvector == \
+                'coalesce("username", \'\') || \' \' || ' \
+                'coalesce("realname", \'\') || \' \' || ' \
+                'coalesce("userprofile", \'\')'
+        elif model == DirectoryEntry:
+            count += 1
+            assert tsvector == \
+                'coalesce("title", \'\') || \' \' || ' \
+                'coalesce("lead", \'\') || \' \' || ' \
+                'coalesce("text", \'\')'
+            # TODO missing properties keywords, directory_id
+
+        # else:
+        #     # Not all models tested
+        #     print(f'ERROR: No tsvector generation test for model {model}')
+        #     assert False
+
+    assert count == 3
