@@ -356,11 +356,13 @@ def test_registration_claims_with_a_limit(session):
         spots=100
     )
 
-    assert not submission.claim()
+    with pytest.raises(AssertionError):
+        submission.claim()
 
-    assert not submission.claim(11)
+    with pytest.raises(AssertionError):
+        submission.claim(11)
 
-    assert submission.claim(spots=10)
+    submission.claim(spots=10)
     session.flush()
 
     assert window.claimed_spots == 10

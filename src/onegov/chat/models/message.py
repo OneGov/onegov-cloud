@@ -8,7 +8,7 @@ from sqlalchemy import Column, Text
 from sqlalchemy import event
 from sqlalchemy import inspect
 from sqlalchemy.ext.hybrid import hybrid_property
-from ulid import ULID
+from ulid import ulid
 
 
 from typing import Any, TYPE_CHECKING
@@ -35,11 +35,7 @@ class Message(Base):
     __tablename__ = 'messages'
 
     #: the public id of the message - uses ulid for absolute ordering
-    id: 'Column[str]' = Column(
-        Text,
-        primary_key=True,
-        default=lambda: str(ULID())
-    )
+    id: 'Column[str]' = Column(Text, primary_key=True, default=ulid)
 
     #: channel to which this message belongs -> this might one day be
     #: linked to an actual channel record - for now it's just a string that
@@ -149,4 +145,4 @@ def init(
     randomly.
 
     """
-    target.id = str(ULID())
+    target.id = ulid()

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-07-27 11:53+0200\n"
+"POT-Creation-Date: 2023-07-25 12:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1190,6 +1190,9 @@ msgstr ""
 msgid "Daily Reservations"
 msgstr "Réservations quotidiennes"
 
+msgid "Rejected Reservations"
+msgstr "Réservations rejetées"
+
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
 "be sent to the recipient above at 06:00."
@@ -1206,9 +1209,6 @@ msgid ""
 msgstr ""
 "Chaque fois qu'une nouvelle note est ajoutée au ticket pour une réservation, "
 "une notification est envoyée au destinataire ci-dessus."
-
-msgid "Rejected Reservations"
-msgstr "Réservations rejetées"
 
 msgid "Send on"
 msgstr "Envoyer sur"
@@ -2456,8 +2456,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3824,9 +3824,6 @@ msgstr ""
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Reçoit des notifications pour les notes internes sur les réservations."
 
-msgid "Receives notifications for rejected reservations."
-msgstr ""
-
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."
 
@@ -4623,12 +4620,8 @@ msgstr "Votre inscription a été confirmée"
 msgid "The registration has been confirmed"
 msgstr "L'inscription a été confirmée"
 
-msgid ""
-"The registration could not be confirmed because the maximum number of "
-"participants has been reached"
-msgstr ""
-"L'inscription n'a pas pu être confirmée car le nombre maximum de "
-"participants a été atteint."
+msgid "The registration could not be confirmed"
+msgstr "L'inscription n'a pas pu être confirmée"
 
 msgid "Your registration has been denied"
 msgstr "Votre inscription a été refusée"

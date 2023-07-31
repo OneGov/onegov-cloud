@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-07-27 11:53+0200\n"
+"POT-Creation-Date: 2023-07-25 12:05+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1190,6 +1190,9 @@ msgstr ""
 msgid "Daily Reservations"
 msgstr "Tägliche Reservationen"
 
+msgid "Rejected Reservations"
+msgstr "Abgelehnte Reservationen"
+
 msgid ""
 "On each day selected below, a notification with the day's reservations will "
 "be sent to the recipient above at 06:00."
@@ -1208,9 +1211,6 @@ msgstr ""
 "Jedes Mal, wenn eine neue Notiz zu einem Ticket für eine Reservierung "
 "hinzugefügt wird, wird eine eine Benachrichtigung an den oben genannten "
 "Empfänger gesendet."
-
-msgid "Rejected Reservations"
-msgstr "Abgelehnte Reservationen"
 
 msgid "Send on"
 msgstr "Senden am"
@@ -2458,8 +2458,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -4600,12 +4600,8 @@ msgstr "Ihre Anmeldung wurde bestätigt"
 msgid "The registration has been confirmed"
 msgstr "Die Anmeldung wurde bestätigt"
 
-msgid ""
-"The registration could not be confirmed because the maximum number of "
-"participants has been reached"
-msgstr ""
-"Die Anmeldung konnte nicht bestätigt werden da die maximale Teilnehmerzahl "
-"erreicht ist"
+msgid "The registration could not be confirmed"
+msgstr "Die Anmeldung konnte nicht bestätigt werden"
 
 msgid "Your registration has been denied"
 msgstr "Ihre Anmeldung wurde abgelehnt"

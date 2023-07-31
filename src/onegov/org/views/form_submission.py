@@ -319,12 +319,11 @@ def handle_submission_action(
     if action == 'confirmed':
         subject = _("Your registration has been confirmed")
         success = _("The registration has been confirmed")
-        failure = _("The registration could not be confirmed because the "
-                    "maximum number of participants has been reached")
+        failure = _("The registration could not be confirmed")
 
         def execute():
             if self.registration_window and self.claimed is None:
-                return self.claim()
+                return self.claim() or True
 
     elif action == 'denied':
         subject = _("Your registration has been denied")
@@ -371,6 +370,5 @@ def handle_submission_action(
             raise ValueError(request.translate(failure))
         if not no_messages:
             request.alert(failure)
-            return
 
     return request.redirect(request.link(self))

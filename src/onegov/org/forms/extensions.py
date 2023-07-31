@@ -247,10 +247,9 @@ class PublicationFormExtension(FormExtension, name='publication'):
                     return
 
                 if end.data <= start.data:
-                    for field_name in ('publication_start', 'publication_end'):
-                        field = getattr(self, field_name)
-                        field.errors.append(
-                            _("Publication start must be prior to end"))
+                    self.errors.setdefault('global-errors', [])
+                    self.errors['global-errors'].append(
+                        _("Publication start must be prior to end"))
                     return False
 
         return PublicationForm

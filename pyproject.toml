@@ -76,10 +76,8 @@ module = [
     "morepath.*",
     "msal.*",
     "pdfdocument.*",
-    # FIXME: We only use this to convert a PDF to an XObject and then
-    #        embed it as a reportlab Flowable. I think we could implement
-    #        this using just pypdf, having multiple PDF parsers just for
-    #        this one use-case seems bad
+    # FIXME: pypdf has a sane API now and is still maintained
+    #        so maybe we should switch to using that
     "pdfrw.*",
     "pdftotext.*",
     "pglast.*",
@@ -102,6 +100,9 @@ module = [
     "stdnum.*",
     "transaction.*",
     "ua_parser.*",
+    # FIXME: This is unmaintained, maybe python-ulid or ulid-transform
+    #        would be better to use now?
+    "ulid.*",
     "urlextract.*",
     "webassets.*",
     "webtest.*",
