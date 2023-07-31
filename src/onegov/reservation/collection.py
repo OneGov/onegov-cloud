@@ -7,8 +7,8 @@ from uuid import uuid4, UUID
 from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from libres.context.core import Context
     from libres.db.models import Allocation, Reservation
-    from libres.modules.context import Context
     from sqlalchemy.orm import Query
     from typing_extensions import TypeAlias
 

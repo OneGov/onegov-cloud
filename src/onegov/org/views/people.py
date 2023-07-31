@@ -46,9 +46,10 @@ def view_person(self, request, layout=None):
     }
 
 
-def person_functions_by_organization(subject, pages, request):
+def person_functions_by_organization(subject_person, pages, request):
     """ Collects 1:1 mappings of all context-specific functions and
-     organizations for a person. The organizations include the link.
+     organizations for a person. Organizations are pages where `subject_person`
+     is listed as a person.
 
      Returns a List of strings in the form:
 
@@ -62,20 +63,18 @@ def person_functions_by_organization(subject, pages, request):
 
     for topic in pages:
         people = topic.people
-        if people is None:
-            continue
-        for person in people:
-            if person.id == subject.id:
+        for person in people or []:
+            if person.id == subject_person.id:
                 try:
-                    func = person.context_specific_function
+                    if person.display_function_in_person_directory:
+                        func = person.context_specific_function
+                        if func:
+                            page = f"<a href=\"{request.link(topic)}\">" \
+                                   f"{topic.title}</a>"
+                            organization_to_function.append(
+                                Markup(f"<span>{page}: {func}</span>"))
                 except AttributeError:
                     continue
-                if func:
-                    org_with_link = f"<a href=\"{request.link(topic)}\">" \
-                                    f"{topic.title}</a>"
-                    organization_to_function.append(
-                        Markup(f"<span>{org_with_link}: {func}</span>")
-                    )
     return organization_to_function
 
 

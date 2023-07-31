@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-06-15 11:42+0200\n"
+"POT-Creation-Date: 2023-07-25 11:24+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -750,6 +750,9 @@ msgstr "Test"
 msgid "Do not actually import the events."
 msgstr "Les événements ne sont pas sauvegardés."
 
+msgid "Expected header line with the following columns:"
+msgstr "La première ligne doit avoir les noms de colonne suivants:"
+
 msgid "Map"
 msgstr "Carte"
 
@@ -1178,8 +1181,31 @@ msgstr "Nouvelles réservations"
 msgid "Notifications *"
 msgstr "Notifications *"
 
+msgid ""
+"For each new reservation, a notification will be sent to the above recipient."
+msgstr ""
+"Pour chaque nouvelle réservation, une notification sera envoyée au "
+"destinataire ci-dessus."
+
 msgid "Daily Reservations"
 msgstr "Réservations quotidiennes"
+
+msgid ""
+"On each day selected below, a notification with the day's reservations will "
+"be sent to the recipient above at 06:00."
+msgstr ""
+"Pour chaque jour sélectionné ci-dessous, une notification avec les "
+"réservations du jour sera envoyée au destinataire ci-dessus à 6h00.."
+
+msgid "Internal Notes"
+msgstr "Notes internes"
+
+msgid ""
+"Each time a new note is added to the ticket for a reservation, a "
+"notification is sent to the recipient above."
+msgstr ""
+"Chaque fois qu'une nouvelle note est ajoutée au ticket pour une réservation, "
+"une notification est envoyée au destinataire ci-dessus."
 
 msgid "Send on"
 msgstr "Envoyer sur"
@@ -2158,6 +2184,10 @@ msgstr "Nascondi le informazioni di contatto nella sidebar"
 msgid "Use text instead of lead in the newsletter"
 msgstr "Utiliser le texte au lieu de l'introduction dans le newsletter"
 
+#, python-format
+msgid "List this function in the page of ${name}"
+msgstr "Afficher cette fonction sur la page de ${name}"
+
 msgid "A resource with this name already exists"
 msgstr "Une ressource portant ce nom existe déjà"
 
@@ -2423,8 +2453,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3051,6 +3081,9 @@ msgstr "Veuillez fournir le nouveau nom du fichier "
 msgid "Rename"
 msgstr "Renommer"
 
+msgid "Download"
+msgstr "Télécharger"
+
 msgid "Digital seal applied by ${signee} on ${date}"
 msgstr "Sceau digital appliqué par ${signee} le ${date}"
 
@@ -3133,10 +3166,10 @@ msgid ""
 "newsletter:"
 msgstr ""
 "Vous recevez ce courriel parce que vous vous êtes abonné à la lettre "
-"d'informations suivante :"
+"d'informations suivante:"
 
 msgid "Plese click the following link to confirm your subscription:"
-msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement :"
+msgstr "Veuillez cliquer sur le lien suivant pour confirmer votre abonnement:"
 
 msgid "Confirm subscription"
 msgstr "Confirmer l'abonnement"
@@ -3271,6 +3304,22 @@ msgstr "Votre événement a été accepté :"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté :"
 
+msgid "New note in Ticket ${link}"
+msgstr "Nouvelle note dans le billet ${link}"
+
+msgid "${author} wrote"
+msgstr "${author} a écrit"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Il s'agit de la notification de notes sur les réservations pour ${request."
+"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
+"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
+"destinataires."
+
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr ""
 "Voici ce qui s'est passé la semaine dernière sur le site web de ${org} :"
@@ -3287,9 +3336,6 @@ msgstr "Ou en changeant les réglages dans votre profil d'utilisateur."
 
 msgid "The following reservations have been accepted:"
 msgstr "Les réservations suivantes ont été acceptées :"
-
-msgid "${author} wrote"
-msgstr "${author} a écrit"
 
 msgid ""
 "This is the notification for reservations for ${request.app.org.title}. If "
@@ -3758,6 +3804,9 @@ msgid ""
 "Receives notifications for reservations of the day on the following days:"
 msgstr ""
 "Reçoit des notifications pour les réservations du jour les jours suivants:"
+
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Reçoit des notifications pour les notes internes sur les réservations."
 
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."
@@ -4555,8 +4604,8 @@ msgstr "Votre inscription a été confirmée"
 msgid "The registration has been confirmed"
 msgstr "L'inscription a été confirmée"
 
-msgid "The registration could not be confirmed"
-msgstr "L'inscription n'a pas pu être confirmée"
+msgid "The registration could not be confirmed because the maximum number of participants has been reached"
+msgstr "L'inscription n'a pas pu être confirmée car le nombre maximum de participants a été atteint."
 
 msgid "Your registration has been denied"
 msgstr "Votre inscription a été refusée"
@@ -5086,6 +5135,10 @@ msgstr "Rembourser ${amount}"
 msgid "Your ticket has a new message"
 msgstr "Votre ticket a un nouveau message"
 
+#, python-format
+msgid "${org} New Note in Reservation for ${resource_title}"
+msgstr "${org} Nouvelle note dans la réservation pour ${resource_title}"
+
 msgid "Your note was added"
 msgstr "Votre note a été ajoutée"
 
@@ -5226,6 +5279,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-msgid "Expected header line with the following columns:"
-msgstr "La première ligne doit avoir les noms de colonne suivants:"

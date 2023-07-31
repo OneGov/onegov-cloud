@@ -431,9 +431,6 @@ def webdriver_options():
 
 @pytest.fixture(scope="session")
 def webdriver_executable_path():
-    # FIXME: Stop skipping this after new releases of webdriver_manager
-    #        and/or selenium
-    return pytest.skip('Browser tests are currently broken')
     pattern = r'\d+\.\d+\.\d+'
     stdout = os.popen(
         'google-chrome --version || google-chrome-stable --version'

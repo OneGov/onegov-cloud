@@ -6,10 +6,10 @@ from onegov.ticket.model import TicketPermission
 from onegov.ticket.collection import TicketCollection
 
 
-__all__ = [
+__all__ = (
     'Handler',
     'handlers',
     'Ticket',
     'TicketCollection',
     'TicketPermission'
-]
+)

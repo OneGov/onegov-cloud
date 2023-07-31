@@ -39,12 +39,22 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from datetime import datetime
     from depot.fields.upload import UploadedFile
+    from depot.io.utils import FileIntent
     from onegov.file import FileSet
     from onegov.file.types import FileStats, SignatureMetadata
     from sqlalchemy.engine import Dialect
     from sqlalchemy.orm import relationship
     from sqlalchemy.orm.session import SessionTransaction
     from sqlalchemy.sql.type_api import TypeEngine
+
+    # HACK: This column accepts FileIntent as an input, but when
+    #       we ask for the value we always get an UploadedFile
+    class _UploadedFileColumn(Column[UploadedFile]):
+        def __set__(
+            self,
+            obj: object,
+            value: UploadedFile | FileIntent
+        ) -> None: ...
 
 
 class UploadedFileField(UploadedFileFieldBase):
@@ -59,7 +69,7 @@ class UploadedFileField(UploadedFileFieldBase):
     ) -> 'TypeEngine[UploadedFile]':
         return dialect.type_descriptor(JSON())
 
-    def process_bind_param(
+    def process_bind_param(  # type:ignore[override]
         self,
         value: 'UploadedFile | None',
         dialect: 'Dialect'
@@ -68,7 +78,7 @@ class UploadedFileField(UploadedFileFieldBase):
 
     def process_result_value(
         self,
-        value: dict[str, Any],
+        value: dict[str, Any] | None,
         dialect: 'Dialect'
     ) -> 'UploadedFile | None':
         return self._upload_type(value) if value else None
@@ -195,7 +205,7 @@ class File(Base, Associable, TimestampMixin):
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
-    reference: 'Column[UploadedFile]' = Column(UploadedFileField(
+    reference: '_UploadedFileColumn' = Column(UploadedFileField(  # type:ignore
         upload_type=ProcessedUploadedFile,
         filters=[
             OnlyIfImage(

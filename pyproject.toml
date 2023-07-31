@@ -31,9 +31,15 @@ module = [
     "onegov.chat.*",
     "onegov.core.*",
     "onegov.file.*",
+    "onegov.gever.*",
+    "onegov.newsletter.*",
+    "onegov.notice.*",
+    "onegov.page.*",
     "onegov.pay.*",
+    "onegov.qrcode.*",
     "onegov.reservation.*",
     "onegov.server.*",
+    "onegov.ticket.*",
     "onegov.user.*"
 ]
 warn_unreachable = true
@@ -52,7 +58,6 @@ module = [
     "cssutils.*",
     "elasticsearch_dsl.*",
     "dectate.*",
-    "depot.*",
     "docxtpl.*",
     "dill.*",
     "dukpy.*",
@@ -70,14 +75,15 @@ module = [
     #       langdetect is really, really slow by comparison...
     "langdetect.*",
     "lazy_object_proxy.*",
-    "libres.*",
     "mistletoe.*",
     "more.*",
     "morepath.*",
     "msal.*",
     "pdfdocument.*",
-    # FIXME: pypdf has a sane API now and is still maintained
-    #        so maybe we should switch to using that
+    # FIXME: We only use this to convert a PDF to an XObject and then
+    #        embed it as a reportlab Flowable. I think we could implement
+    #        this using just pypdf, having multiple PDF parsers just for
+    #        this one use-case seems bad
     "pdfrw.*",
     "pdftotext.*",
     "pglast.*",
@@ -100,9 +106,6 @@ module = [
     "stdnum.*",
     "transaction.*",
     "ua_parser.*",
-    # FIXME: This is unmaintained, maybe python-ulid or ulid-transform
-    #        would be better to use now?
-    "ulid.*",
     "urlextract.*",
     "webassets.*",
     "webtest.*",
