@@ -365,6 +365,42 @@ def test_contact_extension():
     )
 
 
+def test_contact_extension_with_top_level_domain_agency():
+
+    class Topic(ContactExtension):
+        content = {}
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+
+    assert topic.contact is None
+    assert topic.contact_html is None
+
+    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class()
+
+    assert 'contact' in form._fields
+
+    form.contact.data = (
+        "longdomain GmbH\n"
+        "hello@thismatters.agency\n"
+        "https://custom.longdomain"
+    )
+
+    form.populate_obj(topic)
+
+    assert topic.contact == (
+        "longdomain GmbH\n"
+        "hello@thismatters.agency\n"
+        "https://custom.longdomain"
+    )
+    d = topic.contact_html
+    assert '<a href="mailto:hello@thismatters.ag"' not in d
+
+
 def test_honeypot_extension():
 
     class Submission(Extendable, HoneyPotExtension):

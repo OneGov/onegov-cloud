@@ -1,5 +1,7 @@
 import base64
 import bleach
+from bleach import linkifier
+from bleach.linkifier import TLDS
 import errno
 import fcntl
 import gzip
@@ -416,17 +418,27 @@ def linkify(text: str, escape: bool = True) -> str:
     if not text:
         return text
 
-    linkified = linkify_phone(bleach.linkify(text, parse_email=True))
+    extended_tlds_list: list[str] = ['agency'] + TLDS
+    extended_tlds_list.remove('ag')
+    assert 'ag' not in extended_tlds_list
+
+    linkifier.URL_RE = linkifier.build_url_re(tlds=extended_tlds_list)
+    linkifier.EMAIL_RE = linkifier.build_email_re(tlds=extended_tlds_list)
+
+    bleached = bleach.linkify(text, parse_email=True)
+
+    linkified = linkify_phone(bleached)
 
     if not escape:
         return linkified
 
-    return bleach.clean(
+    cleaned = bleach.clean(
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
         protocols=['http', 'https', 'mailto', 'tel']
     )
+    return cleaned
 
 
 def paragraphify(text: str) -> str:
