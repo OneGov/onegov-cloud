@@ -24,7 +24,7 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     __tablename__ = 'pages'
 
     @property
-    def search_score(self):
+    def search_score(self) -> int:
         return 2
 
     if TYPE_CHECKING:

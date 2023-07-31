@@ -180,20 +180,20 @@ class Searchable:
         join = " || ' ' || "
 
         # identify search columns
-        columns = [p for p in model.es_properties if p in model.__dict__ and
-                   not p.startswith('es_') and
-                   isinstance(model.__dict__[p], (InstrumentedAttribute,
-                                                  property, hybrid_property))]
+        columns = [p for p in model.es_properties if p in model.__dict__
+                   and not p.startswith('es_')
+                   and isinstance(model.__dict__[p], (InstrumentedAttribute,
+                                                      property,
+                                                      hybrid_property))]
         s = Searchable.create_tsvector_string(*columns) if columns else ''
-        print(f'*** tschupre tsvector string columns: {columns}')
 
         # identify content and meta properties
         for p in model.es_properties:
             if p in model.__dict__ and isinstance(model.__dict__[p],
                                                   content.dict_property):
                 s += join if s else ''
-                s += f"coalesce((({model.__dict__[p].attribute} " \
-                     f"->> '{p}')), '')"
+                s += f"'func.coalesce((({model.__dict__[p].attribute} " \
+                     f"->> {p})), '')'"
 
         return s
 
@@ -249,7 +249,6 @@ class Searchable:
         # to_tsvector('french', '<tsvector_string_of_model') ||
         # ...
 
-        print(f'*** tschurpe reindexing {model}..')
         tsvector_expression = \
             Searchable.multi_language_tsvector_expression(
                 model.psql_tsvector_string(model))
@@ -283,14 +282,15 @@ class Searchable:
         keyword, see
         http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html
         """
-        base = "coalesce(\"{}\", '')"
-        ext = " || ' ' || coalesce(\"{}\", '')"
 
-        s = base
+        base = "'func.coalesce({}, '')'"
+        ext = " || ' ' || 'func.coalesce({}, '')'"
+
+        exp = base
         for _ in range(len(cols) - 1):
-            s += ext
+            exp += ext
 
-        return s.format(*cols)
+        return exp.format(*cols)
 
 
 # TODO: rename prefix 'es' to 'ts' for text search

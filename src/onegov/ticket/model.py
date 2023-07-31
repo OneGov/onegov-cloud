@@ -154,9 +154,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'title': {'type': 'text'},
         'subtitle': {'type': 'text'},
         'group': {'type': 'text'},
-        # 'ticket_email': {'type': 'keyword'},
-        # 'ticket_data': {'type': 'localized_html'},
-        # 'extra_localized_text': {'type': 'localized'}
+        'ticket_email': {'type': 'keyword'},
+        'ticket_data': {'type': 'localized_html'},
+        'extra_localized_text': {'type': 'localized'}
     }
 
     @hybrid_property

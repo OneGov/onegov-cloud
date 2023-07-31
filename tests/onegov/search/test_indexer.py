@@ -5,6 +5,7 @@ from datetime import datetime
 
 from onegov.core.orm import Base
 from onegov.directory import DirectoryEntry
+from onegov.org.models import Topic
 from onegov.people import Agency
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name
@@ -19,6 +20,7 @@ from queue import Queue
 from unittest.mock import Mock
 
 from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.ticket import Ticket
 from onegov.user import User
 
 
@@ -727,25 +729,27 @@ def test_elasticsearch_outage(es_client, es_url):
 
 
 def test_psql_tsvector_string():
-    assert Searchable.create_tsvector_string('col_lower') == \
-        """coalesce("col_lower", '')"""
+    assert Searchable.create_tsvector_string(('col_lower')) == \
+        "'func.coalesce(col_lower, '')'"
 
+    # FIXME: implement lower
     # assert Searchable.create_tsvector_string(['Col_Higher']) == \
     #        'coalesce("\'col_higher\'", \'\')'
 
-    assert Searchable.create_tsvector_string('a', 'b') == \
-        """coalesce("a", '') || ' ' || coalesce("b", '')"""
+    assert Searchable.create_tsvector_string('col_a', 'col_b') == \
+        "'func.coalesce(col_a, '')' || ' ' || 'func.coalesce(col_b, '')'"
 
     assert Searchable.create_tsvector_string('a', 'b', 'c') == \
-       """coalesce("a", '') || ' ' || coalesce("b", '') || ' ' || coalesce("c", '')"""
+        "'func.coalesce(a, '')' || ' ' || 'func.coalesce(b, '')' || ' ' || " \
+        "'func.coalesce(c, '')'"
 
     cols = ['col_a', 'col_b']
     assert Searchable.create_tsvector_string(*cols) == \
-           """coalesce("col_a", '') || ' ' || coalesce("col_b", '')"""
-    
-    
-def test_multi_language_tsvector_expression():
-    assert False
+           "'func.coalesce(col_a, '')' || ' ' || 'func.coalesce(col_b, '')'"
+
+
+# def test_multi_language_tsvector_expression():
+#     assert False
 
 
 def test_psql_tsvector_string_generation_models():
@@ -761,27 +765,36 @@ def test_psql_tsvector_string_generation_models():
         # random sample
         if model == Agency:
             count += 1
-            assert tsvector == \
-                'coalesce("title", \'\') || \' \' || ' \
-                'coalesce("description", \'\') || \' \' || ' \
-                'coalesce("portrait", \'\')'
+            assert tsvector == "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(description, '')' || ' ' || " \
+                               "'func.coalesce(portrait, '')'"
         elif model == User:
             count += 1
-            assert tsvector == \
-                'coalesce("username", \'\') || \' \' || ' \
-                'coalesce("realname", \'\') || \' \' || ' \
-                'coalesce("userprofile", \'\')'
+            assert tsvector == "'func.coalesce(username, '')' || ' ' || " \
+                               "'func.coalesce(realname, '')' || ' ' || " \
+                               "'func.coalesce(userprofile, '')'"
         elif model == DirectoryEntry:
             count += 1
-            assert tsvector == \
-                'coalesce("title", \'\') || \' \' || ' \
-                'coalesce("lead", \'\') || \' \' || ' \
-                'coalesce("text", \'\')'
-            # TODO missing properties keywords, directory_id
+            assert tsvector == "'func.coalesce(keywords, '')' || ' ' || " \
+                               "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(lead, '')' || ' ' || " \
+                               "'func.coalesce(directory_id, '')' || ' ' || " \
+                               "'func.coalesce(text, '')'"
+        elif model == Ticket:
+            count += 1
+            assert tsvector == "'func.coalesce(number, '')' || ' ' || " \
+                               "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(subtitle, '')' || ' ' || " \
+                               "'func.coalesce(group, '')' || ' ' || " \
+                               "'func.coalesce(ticket_email, '')' || ' ' || " \
+                               "'func.coalesce(ticket_data, '')' || ' ' || " \
+                               "'func.coalesce(extra_localized_text, '')'"
+        elif model == Topic:
+            count += 1
+            assert tsvector == "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(((content ->> lead)), '')'" \
+                               " || ' ' || " \
+                               "'func.coalesce(((content ->> text)), '')'"
 
-        # else:
-        #     # Not all models tested
-        #     print(f'ERROR: No tsvector generation test for model {model}')
-        #     assert False
-
-    assert count == 3
+    # verify if statements reached and tested
+    assert count == 5

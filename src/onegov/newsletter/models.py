@@ -95,7 +95,7 @@ class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
         back_populates='newsletters')
 
     @property
-    def search_score(self):
+    def search_score(self) -> int:
         return 6
 
     def open_recipients(self) -> tuple['Recipient', ...]:
