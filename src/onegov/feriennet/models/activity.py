@@ -24,7 +24,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'text': {'type': 'localized_html'},
-        # 'organiser': {'type': 'text'}
+        'organiser': {'type': 'text'}
     }
 
     @property

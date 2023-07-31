@@ -43,8 +43,8 @@ class CourseAttendee(Base, ORMSearchable):
         'first_name': {'type': 'text'},
         'last_name': {'type': 'text'},
         'organisation': {'type': 'text'},
-        # 'email': {'type': 'text'},
-        # 'title': {'type': 'text'},
+        'email': {'type': 'text'},
+        'title': {'type': 'text'},
     }
 
     es_public = False

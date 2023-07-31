@@ -60,8 +60,8 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     __tablename__ = 'fsi_course_events'
 
     es_properties = {
-        # 'name': {'type': 'localized'},
-        # 'description': {'type': 'localized'},
+        'name': {'type': 'localized'},
+        'description': {'type': 'localized'},
         'location': {'type': 'localized'},
         'presenter_name': {'type': 'text'},
         'presenter_company': {'type': 'text'},

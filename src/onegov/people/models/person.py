@@ -32,7 +32,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     es_public = True
     es_properties = {
-        # 'title': {'type': 'text'},
+        'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
     }
