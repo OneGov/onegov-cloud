@@ -57,20 +57,11 @@ class ResourceRecipientForm(Form):
                       "above."),
     )
 
-    internal_notes = BooleanField(
-        label=_("Internal Notes"),
-        fieldset=_("Notifications *"),
-        description=("Bei jeder neuen Notiz auf dem Ticket zu einer "
-                     "Reservation wird eine Benachrichtigung an den "
-                     "obenstehenden Empfänger gesendet."),
-    )
-
     rejected_reservations = BooleanField(
         label=_("Rejected Reservations"),
         fieldset=_("Notifications *"),
-        description=("Bei der Stornierung einer Reservation wird eine "
-                     "Benachrichtigung an den obenstehenden Empfänger "
-                     "gesendet."),
+        description=_("When a reservation is cancelled, a notification will "
+                      "be sent to the above recipient."),
     )
 
     send_on = MultiCheckboxField(

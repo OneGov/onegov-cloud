@@ -3640,7 +3640,7 @@ msgstr ""
 "Suche im Navigationsbereich."
 
 msgid "Back"
-msgstr "zurück"
+msgstr "Zurück"
 
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
