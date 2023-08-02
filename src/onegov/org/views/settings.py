@@ -344,8 +344,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
     def current_api_keys_by_user(
         request: CoreRequest, self: Organisation, user: User, layout
     ):
-        # TODO: how to make mypy happy for `api_keys` backref?
-        for api_key in user.api_keys.all():  # type: ignore
+        for api_key in user.api_keys:
             delete_link = Link(
                 text=Markup('<i class="fa fa-trash" aria-hidden="True"></i>'),
                 url=layout.csrf_protected_url(
