@@ -14,20 +14,13 @@ from onegov.api.token import get_token, jwt_decode
 from onegov.core.security import Public
 
 
-def _authenticate(request):
-    assert request.authorization[0].lower() == 'basic'
-
-    auth = b64decode(request.authorization[1].strip()).decode('utf-8')
-    auth, _ = auth.split(':', 1)
-    data = jwt_decode(request, auth)
-
-    session = request.session
-    session.query(ApiKey).filter_by(id=data['id']).one()
-
-
 def authenticate(request):
     try:
-        _authenticate(request)
+        assert request.authorization[0].lower() == 'basic'
+        auth = b64decode(request.authorization[1].strip()).decode('utf-8')
+        auth, _ = auth.split(':', 1)
+        data = jwt_decode(request, auth)
+        request.session.query(ApiKey).filter_by(id=data['id']).one()
     except jwt.ExpiredSignatureError as exception:
         raise HTTPUnauthorized() from exception
     except NoResultFound as no_res:
