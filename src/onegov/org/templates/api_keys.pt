@@ -4,6 +4,8 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
+        <p i18n:translate="">Api keys can be used to ensure you're not being rate limited. They are not required to use the API.</p>
+
         <h3 i18n:translate="">Application Keys</h3>
         <table class="table table-bordered table-striped">
             <thead>

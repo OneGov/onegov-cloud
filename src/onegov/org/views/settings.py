@@ -368,7 +368,9 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
             yield api_key
 
     return {
-        'api_keys_list': current_api_keys_by_user(request, self, user, layout),
+        'api_keys_list': list(
+            current_api_keys_by_user(request, self, user, layout)
+        ),
         'title': "OneGov API",
         'form': form,
         'layout': layout,
