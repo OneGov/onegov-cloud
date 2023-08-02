@@ -317,11 +317,13 @@ def handle_event_settings(self, request, form, layout=None):
 @OrgApp.form(
     model=Organisation, name='api-keys', template='api_keys.pt',
     permission=Secret, form=OneGovApiSettingsForm, setting=_("OneGov API"),
-    icon='fa-user-lock', order=1)
+    icon='fa-key', order=1)
 def handle_api_keys(self: Organisation, request: CoreRequest,
                     form: OneGovApiSettingsForm, layout=None):
     """Handles the generation of API access keys."""
 
+    request.include('fontpreview')
+    title = _("OneGov API")
     collection = UserCollection(request.session)
     user = collection.by_username(request.identity.userid)
     if not user:
@@ -339,7 +341,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
         request.session.flush()
         request.success(_("Your changes were saved"))
 
-    layout = layout or SettingsLayout(self, request)
+    layout = layout or SettingsLayout(self, request, title)
 
     def current_api_keys_by_user(
         request: CoreRequest, self: Organisation, user: User, layout
@@ -370,7 +372,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
         'api_keys_list': list(
             current_api_keys_by_user(request, self, user, layout)
         ),
-        'title': "OneGov API",
+        'title': title,
         'form': form,
         'layout': layout,
     }
