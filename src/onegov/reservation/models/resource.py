@@ -181,7 +181,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
             if len(value) != 2:
                 raise ValueError("Deadline is not a tuple with two elements")
 
-            if type(value[0]) != int:
+            if not isinstance(value[0], int):
                 raise ValueError("Deadline value is not an int")
 
             if value[0] < 1:
