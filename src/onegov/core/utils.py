@@ -423,7 +423,7 @@ def linkify(text: str, escape: bool = True) -> str:
     if any(domain in text for domain in long_top_level_domains):
         if '@' in text:
             linkified = str(
-                Markup('<a href="mailto:{text}">{' 'text}</a>').format(
+                Markup('<a href="mailto:{text}">{text}</a>').format(
                     text=text
                 )
             )
