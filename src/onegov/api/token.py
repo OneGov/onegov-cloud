@@ -39,9 +39,11 @@ def get_token(request: CoreRequest) -> dict[str, str]:
 
 
 def try_get_encoded_token(request: CoreRequest) -> str:
-    assert request.authorization[0].lower() == 'basic'  # type: ignore[index]
+    assert request.authorization is not None
+    assert request.authorization.authtype == 'Basic'
+    assert isinstance(request.authorization.params, str)
     auth = b64decode(
-        request.authorization[1].strip()  # type: ignore[index, union-attr]
+        request.authorization.params.strip()
     ).decode('utf-8')
     auth, _ = auth.split(':', 1)
     return auth
