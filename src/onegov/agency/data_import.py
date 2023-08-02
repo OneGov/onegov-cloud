@@ -64,8 +64,9 @@ def get_address(line):
         if stao_addr == post_addr:
             return br(split_address_on_new_line(stao_addr))
         else:
-            return br(split_address_on_new_line(stao_addr, True)) +\
-                   br(split_address_on_new_line(post_addr))
+            return br(split_address_on_new_line(stao_addr, True)) + br(
+                split_address_on_new_line(post_addr)
+            )
     elif stao_addr:
         return br(split_address_on_new_line(stao_addr))
     if post_addr:
