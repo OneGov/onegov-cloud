@@ -339,14 +339,17 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
         request.session.flush()
         request.success(_("Your changes were saved"))
 
+    layout = layout or SettingsLayout(self, request)
+
     def current_api_keys_by_user(
-        request: CoreRequest, self: Organisation, user: User
+        request: CoreRequest, self: Organisation, user: User, layout
     ):
         # TODO: how to make mypy happy for `api_keys` backref?
         for api_key in user.api_keys.all():  # type: ignore
             delete_link = Link(
                 text=Markup('<i class="fa fa-trash" aria-hidden="True"></i>'),
-                url=request.link(api_key, name='+delete'),
+                url=layout.csrf_protected_url(
+                    request.link(api_key, name='+delete')),
                 traits=(
                     Confirm(
                         _("Do you really want to delete this API key?"),
@@ -365,10 +368,10 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
             yield api_key
 
     return {
-        'api_keys_list': current_api_keys_by_user(request, self, user),
+        'api_keys_list': current_api_keys_by_user(request, self, user, layout),
         'title': "OneGov API",
         'form': form,
-        'layout': layout or SettingsLayout(self, request),
+        'layout': layout,
     }
 
 
@@ -379,7 +382,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
     request_method='DELETE',
 )
 def delete_api_key(self: ApiKey, request: CoreRequest):
-    # request.assert_valid_csrf_token()
+    request.assert_valid_csrf_token()
 
     request.session.delete(self)
     request.session.flush()
