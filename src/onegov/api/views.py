@@ -1,4 +1,3 @@
-from base64 import b64decode
 from datetime import datetime
 from datetime import timedelta
 
@@ -10,23 +9,23 @@ from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint, ApiKey
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
-from onegov.api.token import get_token, jwt_decode
+from onegov.api.token import get_token, jwt_decode, try_get_encoded_token
 from onegov.core.security import Public
 
 
 def authenticate(request):
     try:
-        assert request.authorization[0].lower() == 'basic'
-        auth = b64decode(request.authorization[1].strip()).decode('utf-8')
-        auth, _ = auth.split(':', 1)
+        auth = try_get_encoded_token(request)
         data = jwt_decode(request, auth)
-        request.session.get(ApiKey, data['id'])
     except jwt.ExpiredSignatureError as exception:
         raise HTTPUnauthorized() from exception
-    except NoResultFound as no_res:
-        raise HTTPClientError() from no_res
     except Exception as e:
         raise ApiException() from e
+
+    try:
+        request.browser_session.get(ApiKey, data['id'])
+    except NoResultFound as no_res:
+        raise HTTPClientError() from no_res
 
 
 def check_rate_limit(request):
