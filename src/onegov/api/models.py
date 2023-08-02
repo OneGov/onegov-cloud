@@ -1,7 +1,6 @@
 from functools import cached_property
 from logging import getLogger
 from logging import NullHandler
-from typing import TYPE_CHECKING
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -14,6 +13,8 @@ from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.user import User
 
+
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import datetime
@@ -233,15 +234,19 @@ class ApiKey(Base):
 
     __tablename__ = 'api_keys'
 
-    id = Column(
-        UUID,
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type: ignore[arg-type]
         nullable=False,
         primary_key=True,
         default=uuid4
     )
 
     # the user that created the api key
-    user_id = Column(UUID, ForeignKey('users.id'))
+    user_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type: ignore[arg-type]
+        ForeignKey('users.id'),
+        nullable=False
+    )
 
     # the name of the api key, may be any string
     name: 'Column[str]' = Column(Text, nullable=False)

@@ -2,9 +2,9 @@
 
 from copy import copy
 
-from aiohttp.web_exceptions import HTTPForbidden
 from dectate import Query
 from markupsafe import Markup
+from webob.exc import HTTPForbidden
 
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.request import CoreRequest
