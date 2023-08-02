@@ -33,6 +33,7 @@ def test_token_generation(session):
     time_restricted_token = get_token(request)['token']
     assert time_restricted_token
     # roundtrip
+
     decoded_result = jwt_decode(request, time_restricted_token)
     assert decoded_result['id'] == str(key.id)
 
@@ -59,3 +60,31 @@ def test_get_token(client):
     # Make a GET request to get the token
     response = client.get('/api/authenticate', headers=headers)
     assert response
+
+
+def test_api_auth(client):
+
+    user = UserCollection(client.app.session()).add(
+        username='a@a.a', password='a', role='admin'
+    )
+    # create an access key
+    uuid = uuid4()
+    key = ApiKey(
+        name='key', read_only=False, last_used=None, key=uuid, user=user
+    )
+    client.app.session().add(key)
+    transaction.commit()
+
+    auth_header = b64encode(f"{str(uuid)}:".encode()).decode()
+    headers = {"Authorization": f"Basic {auth_header}"}
+    response = client.get('/api/authenticate', headers=headers)
+    assert response.status_code == 200
+    d = response.body.decode('utf-8')
+    assert d.startswith('{"token":')
+
+    token = d.split('"')[3]
+    auth_header = b64encode(f"{token}:".encode()).decode()
+    headers = {"Authorization": f"Basic {auth_header}"}
+
+    response = client.get('/api/endpoint/1', headers=headers)
+    assert response.status_code == 200

@@ -1,3 +1,4 @@
+from base64 import b64decode
 from datetime import datetime
 from datetime import timedelta
 
@@ -15,7 +16,9 @@ from onegov.core.security import Public
 
 def _authenticate(request):
     assert request.authorization[0].lower() == 'basic'
-    auth = request.authorization[1].strip()
+
+    auth = b64decode(request.authorization[1].strip()).decode('utf-8')
+    auth, _ = auth.split(':', 1)
     data = jwt_decode(request, auth)
 
     session = request.session

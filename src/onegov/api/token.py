@@ -9,7 +9,7 @@ from onegov.api.models import ApiKey
 from onegov.core.request import CoreRequest
 
 
-def jwt_decode(request: CoreRequest, token: str) -> Dict[str, Any]:
+def jwt_decode(request: CoreRequest, token: str | bytes) -> Dict[str, Any]:
     return jwt.decode(token, request.identity_secret, algorithms=['HS512'])
 
 
