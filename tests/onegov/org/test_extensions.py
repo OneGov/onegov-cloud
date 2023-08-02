@@ -386,7 +386,7 @@ def test_contact_extension_with_top_level_domain_agency():
 
     form.contact.data = (
         "longdomain GmbH\n"
-        "hello@thismatters.agency\n"
+        "hello@website.agency\n"
         "https://custom.longdomain"
     )
 
@@ -394,11 +394,11 @@ def test_contact_extension_with_top_level_domain_agency():
 
     assert topic.contact == (
         "longdomain GmbH\n"
-        "hello@thismatters.agency\n"
+        "hello@website.agency\n"
         "https://custom.longdomain"
     )
     d = topic.contact_html
-    assert '<a href="mailto:hello@thismatters.ag"' not in d
+    assert '<a href="mailto:hello@website.ag"' not in d
 
 
 def test_honeypot_extension():

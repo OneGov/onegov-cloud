@@ -422,9 +422,15 @@ def linkify(text: str, escape: bool = True) -> str:
     # bleach.linkify supports only a fairly limited amount of tlds
     if any(domain in text for domain in long_top_level_domains):
         if '@' in text:
-            linkified = str(Markup(f'<a href="mailto:{text}">{text}</a>'))
+            linkified = str(
+                Markup('<a href="mailto:{text}">{' 'text}</a>').format(
+                    text=text
+                )
+            )
         else:
-            linkified = str(Markup(f'<a href="{text}">{text}</a>'))
+            linkified = str(
+                Markup('<a href="{text}">{text}</a>').format(text=text)
+            )
     else:
         linkified = linkify_phone(bleach.linkify(text, parse_email=True))
 
