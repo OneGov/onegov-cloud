@@ -22,9 +22,7 @@ def authenticate(request):
     except Exception as e:
         raise ApiException() from e
 
-    try:
-        request.browser_session.get(ApiKey, data['id'])
-    except NoResultFound as no_res:
+    if request.session.query(ApiKey).get(data['id']) is None:
         raise HTTPClientError() from no_res
 
 
