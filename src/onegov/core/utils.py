@@ -1,7 +1,5 @@
 import base64
 import bleach
-from bleach import linkifier
-from bleach.linkifier import TLDS
 import errno
 import fcntl
 import gzip
@@ -18,6 +16,7 @@ import shutil
 import sqlalchemy
 import urllib.request
 
+from markupsafe import Markup
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
@@ -418,27 +417,26 @@ def linkify(text: str, escape: bool = True) -> str:
     if not text:
         return text
 
-    extended_tlds_list: list[str] = ['agency'] + TLDS
-    extended_tlds_list.remove('ag')
-    assert 'ag' not in extended_tlds_list
+    long_top_level_domains = ['.agency']
 
-    linkifier.URL_RE = linkifier.build_url_re(tlds=extended_tlds_list)
-    linkifier.EMAIL_RE = linkifier.build_email_re(tlds=extended_tlds_list)
-
-    bleached = bleach.linkify(text, parse_email=True)
-
-    linkified = linkify_phone(bleached)
+    # bleach.linkify supports only a fairly limited amount of tlds
+    if any(domain in text for domain in long_top_level_domains):
+        if '@' in text:
+            linkified = str(Markup(f'<a href="mailto:{text}">{text}</a>'))
+        else:
+            linkified = str(Markup(f'<a href="{text}">{text}</a>'))
+    else:
+        linkified = linkify_phone(bleach.linkify(text, parse_email=True))
 
     if not escape:
         return linkified
 
-    cleaned = bleach.clean(
+    return bleach.clean(
         linkified,
         tags=['a'],
         attributes={'a': ['href', 'rel']},
         protocols=['http', 'https', 'mailto', 'tel']
     )
-    return cleaned
 
 
 def paragraphify(text: str) -> str:
