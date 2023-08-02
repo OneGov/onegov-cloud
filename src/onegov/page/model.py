@@ -13,19 +13,24 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy import Column
+
+
 class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
     """ Defines a generic page. """
 
     __tablename__ = 'pages'
 
-    @hybrid_property
-    def published_or_created(self):
-        return self.publication_start or self.created
+    if TYPE_CHECKING:
+        # HACK: Workaround for hybrid_property not working until SQLAlchemy 2.0
+        published_or_created: 'Column[bool]'
+    else:
+        @hybrid_property
+        def published_or_created(self):
+            return self.publication_start or self.created
 
-    @published_or_created.expression  # type:ignore[no-redef]
-    def published_or_created(self):
-        return func.coalesce(Page.publication_start, Page.created)
-
-    @property
-    def es_public(self):
-        return self.access == 'public' and self.published
+        @published_or_created.expression  # type:ignore[no-redef]
+        def published_or_created(self):
+            return func.coalesce(Page.publication_start, Page.created)

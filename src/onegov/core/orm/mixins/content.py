@@ -1,19 +1,24 @@
 from onegov.core.orm.types import JSON
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import ExprComparator
 from sqlalchemy.orm import deferred
+from sqlalchemy.orm.attributes import create_proxied_attribute
+from sqlalchemy.orm.interfaces import InspectionAttrInfo
 from sqlalchemy.schema import Column
 
 
-from typing import Any, Generic, Protocol, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Generic, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from sqlalchemy.orm.attributes import QueryableAttribute
     from typing_extensions import Self
 
     class _bound_dict_property(Protocol['_T']):
         def __call__(
             self,
             key: str | None = ...,
-            default: '_T | None' = ...
+            default: '_T | Callable[[], _T] | None' = ...,
+            value_type: 'type[_T] | None' = ...,
         ) -> 'dict_property[_T]': ...
 
 
@@ -58,7 +63,7 @@ def is_valid_default(default: object | None) -> bool:
     return False
 
 
-class dict_property(Generic[_T]):
+class dict_property(InspectionAttrInfo, Generic[_T]):
     """ Enables access of dictionaries through properties.
 
     Usage::
@@ -120,9 +125,34 @@ class dict_property(Generic[_T]):
                 del self.meta['content']
                 del self.meta['content_html']
 
+    This also behaves like a hybrid_property in that you can use
+    these properties inside select and filter statements, if you
+    provider a custom getter you will also need to provide a custom
+    expression, otherwise we will return an expression which retrieves
+    the value from the JSON column::
+
+        class Model(ContentMixin):
+            names = meta_property(default=list)
+
+        session.query(Model).filter(Model.names.contains('foo'))
+
+    By default that will mean that the RHS of a comparison will also
+    expect a JSONB object, but if you explicitly pass in a value_type
+    or a default that is not None, then we will try to first convert
+    to that type, so type coercion is a bit more flexible::
+
+        class Model(ContentMixin):
+            name = meta_property(value_type=str)
+
+        session.query(Model.name)
+
     """
 
+    is_attribute = True
+
     custom_getter: 'Callable[[Any], _T | None] | None'
+    # FIXME: Use SQLAlchemy 2.0 as reference for the allowed return types.
+    custom_expression: 'Callable[[type[Any]], Any] | None'
     custom_setter: 'Callable[[Any, _T | None], None] | None'
     custom_deleter: 'Callable[[Any], None] | None'
 
@@ -130,16 +160,34 @@ class dict_property(Generic[_T]):
         self,
         attribute: str,
         key: str | None = None,
-        default: '_T | Callable[[], _T] | None' = None
+        default: '_T | Callable[[], _T] | None' = None,
+        # this is for coercing the result of the json access to
+        # the appropriate type, otherwise the rhs of the comparison
+        # needs to be casted to
+        value_type: type[_T] | None = None
     ):
         assert is_valid_default(default)
         self.attribute = attribute
         self.key = key
         self.default = default
 
+        if value_type is None and default is not None:
+            if callable(default):
+                value_type = type(default())
+            else:
+                value_type = type(default)
+        elif value_type is None:
+            # FIXME: for now we default to this, but eventually
+            #        we probably want to raise a ValueError
+            value_type = str  # type:ignore[assignment]
+
+        self.value_type = value_type
         self.custom_getter = None
+        self.custom_expression = None
         self.custom_setter = None
         self.custom_deleter = None
+        # compatibility with ExprComparator
+        self.update_expr = None
 
     def __set_name__(self, owner: type[Any], name: str) -> None:
         """ Sets the dictionary key, if none is provided. """
@@ -171,15 +219,68 @@ class dict_property(Generic[_T]):
 
         return wrapper
 
+    @property
+    def expression(self) -> 'Callable[[Callable[[Any], Any]], Self]':
+        def wrapper(fn: 'Callable[[Any], Any]') -> Any:
+            self.custom_expression = fn
+            return self
+
+        return wrapper
+
+    def _expr(self, owner: type[Any]) -> 'QueryableAttribute | None':
+        if self.custom_getter is None:
+            column: 'Column[dict[str, Any]]' = getattr(owner, self.attribute)
+            expr = column[self.key]
+            if self.value_type is None:
+                # FIXME: Maybe we should return None here or raise
+                #        an Exception
+                pass
+            elif issubclass(self.value_type, str):
+                expr = expr.as_string()
+            elif issubclass(self.value_type, bool):
+                expr = expr.as_boolean()
+            elif issubclass(self.value_type, float):
+                expr = expr.as_float()
+            elif issubclass(self.value_type, int):
+                expr = expr.as_integer()
+        elif self.custom_expression is None:
+            return None
+        else:
+            expr = self.custom_expression(owner)
+
+        # FIXME: This will need to change for SQLAlchemy 1.4/2.0
+        comparator = ExprComparator(owner, expr, self)  # type:ignore[call-arg]
+        proxy_attr = create_proxied_attribute(self)
+        return proxy_attr(
+            owner,
+            self.attribute,
+            self,
+            comparator,
+            doc=comparator.__doc__ or self.__doc__
+        )
+
+    @overload
+    def __get__(
+        self,
+        instance: None,
+        owner: type[object]
+    ) -> 'QueryableAttribute | None': ...
+
+    @overload
+    def __get__(
+        self,
+        instance: object,
+        owner: type[object]
+    ) -> _T | None: ...
+
     def __get__(
         self,
         instance: object | None,
-        owner: type[Any]
-    ) -> _T | None:
+        owner: type[object]
+    ) -> '_T | QueryableAttribute | None':
 
-        # do not implement class-only behaviour
         if instance is None:
-            return None
+            return self._expr(owner)
 
         # pass control wholly to the custom getter if available
         if self.custom_getter:
@@ -223,9 +324,15 @@ class dict_property(Generic[_T]):
 def dict_property_factory(attribute: str) -> '_bound_dict_property[Any]':
     def factory(
         key: str | None = None,
-        default: Any | None = None
+        default: Any | None = None,
+        value_type: type[Any] | None = None
     ) -> dict_property[Any]:
-        return dict_property(attribute, key=key, default=default)
+        return dict_property(
+            attribute,
+            key=key,
+            default=default,
+            value_type=value_type
+        )
 
     return factory
 

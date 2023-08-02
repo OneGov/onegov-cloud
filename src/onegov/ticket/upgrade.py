@@ -8,8 +8,13 @@ from onegov.ticket import Ticket
 from sqlalchemy import Boolean, Column, Integer, Text, Enum
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.upgrade import UpgradeContext
+
+
 @upgrade_task('Add handler_id to ticket')
-def add_handler_id_to_ticket(context):
+def add_handler_id_to_ticket(context: 'UpgradeContext') -> None:
 
     if not context.has_column('tickets', 'handler_id'):
         context.operations.add_column(
@@ -19,7 +24,12 @@ def add_handler_id_to_ticket(context):
         )
 
         for ticket in context.session.query(Ticket).all():
-            ticket.handler_id = ticket.handler_data.get('submission_id')
+            # this should probably use [] access, but either way it will
+            # fail in the alter column below if some handler_ids ended
+            # up being NULL at the end, so let's just ignore it
+            ticket.handler_id = ticket.handler_data.get(  # type:ignore
+                'submission_id'
+            )
             ticket.handler_data = {}
 
         context.session.flush()
@@ -30,7 +40,7 @@ def add_handler_id_to_ticket(context):
 
 
 @upgrade_task('Add snapshot json column to ticket')
-def add_snapshot_json_column_to_ticket(context):
+def add_snapshot_json_column_to_ticket(context: 'UpgradeContext') -> None:
 
     context.operations.add_column(
         'tickets', Column('snapshot', JSON, nullable=True)
@@ -44,7 +54,7 @@ def add_snapshot_json_column_to_ticket(context):
 
 
 @upgrade_task('Add subtitle to ticket')
-def add_subtitle_to_ticket(context):
+def add_subtitle_to_ticket(context: 'UpgradeContext') -> None:
 
     context.operations.add_column(
         'tickets', Column('subtitle', Text, nullable=True))
@@ -56,7 +66,7 @@ def add_subtitle_to_ticket(context):
 
 
 @upgrade_task('Add process time to ticket')
-def add_process_time_to_ticket(context):
+def add_process_time_to_ticket(context: 'UpgradeContext') -> None:
 
     if not context.has_column('tickets', 'last_state_change'):
         context.operations.add_column(
@@ -72,9 +82,9 @@ def add_process_time_to_ticket(context):
 
 
 @upgrade_task('Add muted state to ticket')
-def add_muted_state_to_ticket(context):
+def add_muted_state_to_ticket(context: 'UpgradeContext') -> None:
     if context.has_column('tickets', 'muted'):
-        return False
+        return
 
     context.operations.add_column(
         'tickets', Column('muted', Boolean, nullable=True))
@@ -87,12 +97,12 @@ def add_muted_state_to_ticket(context):
 
 
 @upgrade_task('Add archived flag to ticket')
-def add_archived_flag_to_ticket(context):
+def add_archived_flag_to_ticket(context: 'UpgradeContext') -> None:
     pass
 
 
 @upgrade_task('Add archived as a state and remove flag')
-def add_archived_state_to_ticket(context):
+def add_archived_state_to_ticket(context: 'UpgradeContext') -> None:
     if context.has_column('tickets', 'archived'):
         context.operations.drop_column('tickets', 'archived')
 

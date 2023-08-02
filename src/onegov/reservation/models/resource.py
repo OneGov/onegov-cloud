@@ -21,8 +21,8 @@ from typing import cast, Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Sequence
+    from libres.context.core import Context
     from libres.db.scheduler import Scheduler
-    from libres.modules.context import Context
     from onegov.core.orm.mixins import dict_property
     from onegov.form import Form
     from onegov.reservation.models import CustomReservation

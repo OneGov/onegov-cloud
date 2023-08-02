@@ -31,9 +31,15 @@ module = [
     "onegov.chat.*",
     "onegov.core.*",
     "onegov.file.*",
+    "onegov.gever.*",
+    "onegov.newsletter.*",
+    "onegov.notice.*",
+    "onegov.page.*",
     "onegov.pay.*",
+    "onegov.qrcode.*",
     "onegov.reservation.*",
     "onegov.server.*",
+    "onegov.ticket.*",
     "onegov.user.*"
 ]
 warn_unreachable = true
@@ -52,7 +58,6 @@ module = [
     "cssutils.*",
     "elasticsearch_dsl.*",
     "dectate.*",
-    "depot.*",
     "docxtpl.*",
     "dill.*",
     "dukpy.*",
@@ -70,7 +75,6 @@ module = [
     #       langdetect is really, really slow by comparison...
     "langdetect.*",
     "lazy_object_proxy.*",
-    "libres.*",
     "mistletoe.*",
     "more.*",
     "morepath.*",
