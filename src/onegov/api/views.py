@@ -20,7 +20,7 @@ def authenticate(request):
         auth = b64decode(request.authorization[1].strip()).decode('utf-8')
         auth, _ = auth.split(':', 1)
         data = jwt_decode(request, auth)
-        request.session.query(ApiKey).filter_by(id=data['id']).one()
+        request.session.get(ApiKey, data['id'])
     except jwt.ExpiredSignatureError as exception:
         raise HTTPUnauthorized() from exception
     except NoResultFound as no_res:
