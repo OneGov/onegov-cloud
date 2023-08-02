@@ -1,8 +1,7 @@
 from base64 import b64encode
 from uuid import uuid4
-
+from collections import namedtuple
 import transaction
-
 from onegov.api.models import ApiKey
 from onegov.api.token import jwt_decode, get_token
 from onegov.core.utils import Bunch
@@ -24,11 +23,15 @@ def test_token_generation(session):
     session.flush()
 
     auth = str(key.key) + ':'
+
+    authorization = namedtuple('authorization', ['authtype', 'params'])
+    authorization.authtype = 'Basic'
+    authorization.params = b64encode(auth.encode('utf-8')).decode()
     request = Bunch(
         **{
             'identity_secret': 'secret',
             'session': session,
-            'authorization': ('Basic', b64encode(auth.encode('utf-8'))),
+            'authorization': authorization,
         }
     )
     time_restricted_token = get_token(request)['token']
