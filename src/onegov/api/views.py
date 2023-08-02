@@ -2,7 +2,6 @@ from datetime import datetime
 from datetime import timedelta
 
 import jwt
-from sqlalchemy.orm.exc import NoResultFound
 from webob.exc import HTTPUnauthorized, HTTPClientError
 
 from onegov.api import ApiApp
@@ -23,7 +22,7 @@ def authenticate(request):
         raise ApiException() from e
 
     if request.session.query(ApiKey).get(data['id']) is None:
-        raise HTTPClientError() from no_res
+        raise HTTPClientError()
 
 
 def check_rate_limit(request):
