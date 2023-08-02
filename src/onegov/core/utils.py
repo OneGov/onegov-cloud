@@ -16,6 +16,7 @@ import shutil
 import sqlalchemy
 import urllib.request
 
+from markupsafe import Markup
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
@@ -416,7 +417,22 @@ def linkify(text: str, escape: bool = True) -> str:
     if not text:
         return text
 
-    linkified = linkify_phone(bleach.linkify(text, parse_email=True))
+    long_top_level_domains = ['.agency']
+
+    # bleach.linkify supports only a fairly limited amount of tlds
+    if any(domain in text for domain in long_top_level_domains):
+        if '@' in text:
+            linkified = str(
+                Markup('<a href="mailto:{text}">{text}</a>').format(
+                    text=text
+                )
+            )
+        else:
+            linkified = str(
+                Markup('<a href="{text}">{text}</a>').format(text=text)
+            )
+    else:
+        linkified = linkify_phone(bleach.linkify(text, parse_email=True))
 
     if not escape:
         return linkified
