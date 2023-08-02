@@ -31,7 +31,8 @@ def check_rate_limit(request):
     Raises an exception if the rate limit is reached. Returns response headers
     containing informations about the remaining rate limit.
 
-    Logged in users don't have rate limits.
+    Logged in users don't have rate limits. The same goes for users that have
+    authenticated with a valid token.
 
     """
 
