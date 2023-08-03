@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-07-25 11:24+0200\n"
+"POT-Creation-Date: 2023-08-02 14:33+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1649,6 +1649,9 @@ msgstr "Gever API-Endpunkt, wo die Dokumente hochgeladen werden."
 msgid "Website address including https://"
 msgstr "Webseiten-Adresse inklusive https://"
 
+msgid "API Key"
+msgstr "API Schlüssel"
+
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
 
@@ -2624,6 +2627,27 @@ msgstr "Zusammenfassung"
 
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
+
+msgid ""
+"Api keys can be used to ensure you're not being rate limited. They are not "
+"required to use the API."
+msgstr "Api-Schlüssel können verwendet werden, um sicherzustellen, dass Sie keine Tarifbeschränkungen haben. "
+"Sie sind nicht erforderlich, um die API zu nutzen."
+
+msgid "Application Keys"
+msgstr "Applikations-Schlüssel"
+
+msgid "Key"
+msgstr "Schlüssel"
+
+msgid "Read only"
+msgstr "Nur Lesezugriff"
+
+msgid "Last used"
+msgstr "Zuletzt benutzt"
+
+msgid "Add Key"
+msgstr "Schlüssel hinzufügen"
 
 msgid "State:"
 msgstr "Status:"
@@ -4585,8 +4609,12 @@ msgstr "Ihre Anmeldung wurde bestätigt"
 msgid "The registration has been confirmed"
 msgstr "Die Anmeldung wurde bestätigt"
 
-msgid "The registration could not be confirmed because the maximum number of participants has been reached"
-msgstr "Die Anmeldung konnte nicht bestätigt werden da die maximale Teilnehmerzahl erreicht ist"
+msgid ""
+"The registration could not be confirmed because the maximum number of "
+"participants has been reached"
+msgstr ""
+"Die Anmeldung konnte nicht bestätigt werden da die maximale Teilnehmerzahl "
+"erreicht ist"
 
 msgid "Your registration has been denied"
 msgstr "Ihre Anmeldung wurde abgelehnt"
@@ -5030,6 +5058,18 @@ msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
 "Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\"."
+
+msgid "OneGov API"
+msgstr "OneGov API"
+
+msgid "Do you really want to delete this API key?"
+msgstr "Möchten sie diesen API Key wirklich löschen?"
+
+msgid "This action cannot be undone."
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
+
+msgid "ApiKey deleted."
+msgstr "ApiKey gelöscht."
 
 msgid "Topics"
 msgstr "Themen"
