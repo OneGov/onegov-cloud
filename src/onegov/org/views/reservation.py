@@ -804,21 +804,25 @@ def reject_reservation(self, request, text=None, notify=False):
         q = ResourceRecipientCollection(request.session).query()
         q = q.filter(ResourceRecipient.medium == 'email')
         q = q.order_by(None).order_by(ResourceRecipient.address)
-        q = q.with_entities(ResourceRecipient.address, ResourceRecipient.content)
+        q = q.with_entities(ResourceRecipient.address,
+                            ResourceRecipient.content)
 
         for res in q:
-            if (self.resource.hex in res.content['resources'] and
-                    res.content.get('rejected_reservations', {})):
+            if self.resource.hex in res.content['resources'] \
+                    and res.content.get('rejected_reservations', {}):
                 yield res.address
 
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
     if submission:
-        title = request.translate(
-                _("${org} Rejected Reservation", mapping={
-                    'org': request.app.org.title
-                })
+        title = (
+            request.translate(
+                _(
+                    "${org} Rejected Reservation",
+                    mapping={'org': request.app.org.title},
+                )
             ),
+        )
 
         form = submission.form_obj
 
