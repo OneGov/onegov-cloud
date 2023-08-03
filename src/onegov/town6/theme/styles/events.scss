@@ -153,6 +153,12 @@ $event-image-max-height: 150px;
     max-width: $max-line-width;
 }
 
+.occurrence-price {
+    dd {
+        white-space: pre-wrap;
+    }
+}
+
 .event-more-link.button.hollow {
     border: 1px solid $gray;
 }
