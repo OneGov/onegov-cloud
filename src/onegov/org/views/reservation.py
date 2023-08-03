@@ -799,49 +799,57 @@ def reject_reservation(self, request, text=None, notify=False):
         }
     )
 
-    # get all recipients which want to receive e-mail for rejected reservations
-    q = ResourceRecipientCollection(request.session).query()
-    q = q.filter(ResourceRecipient.medium == 'email')
-    q = q.order_by(None).order_by(ResourceRecipient.address)
-    q = q.with_entities(ResourceRecipient.address, ResourceRecipient.content)
-    recipients = [
-        r.address
-        for r in q
-        if (
-            self.resource.hex in r.content['resources']
-            and r.content.get('rejected_reservations', {})
-        )
-    ]
+    def recipients_with_mail_for_reservation():
+        # all recipients which want to receive e-mail for rejected reservations
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(ResourceRecipient.address, ResourceRecipient.content)
+
+        for res in q:
+            if (self.resource.hex in res.content['resources'] and
+                    res.content.get('rejected_reservations', {})):
+                yield res.address
+
     forms = FormCollection(request.session)
     submission = forms.submissions.by_id(token)
     if submission:
-        form = submission.form_obj
-
-        args = {
-            'layout': DefaultMailLayout(object(), request),
-            'title': request.translate(
+        title = request.translate(
                 _("${org} Rejected Reservation", mapping={
                     'org': request.app.org.title
                 })
             ),
-            'form': form,
-            'model': self,
-            'resource': resource,
-            'reservations': targeted,
-            'show_submission': True,
-            'message': message
-        }
+
+        form = submission.form_obj
 
         content = render_template(
-            'mail_rejected_reservation_notification', request, args
+            'mail_rejected_reservation_notification',
+            request,
+            {
+                'layout': DefaultMailLayout(object(), request),
+                'title': title,
+                'form': form,
+                'model': self,
+                'resource': resource,
+                'reservations': targeted,
+                'show_submission': True,
+                'message': message,
+            },
         )
+        plaintext = html_to_text(content)
 
-        for r in recipients:
-            request.app.send_transactional_email(
-                subject=args['title'],
-                receivers=(r),
-                content=content,
-            )
+        def email_iter():
+            for recipient_addr in recipients_with_mail_for_reservation():
+                yield request.app.prepare_email(
+                    receivers=(recipient_addr,),
+                    subject=title,
+                    content=content,
+                    plaintext=plaintext,
+                    category='transactional',
+                    attachments=(),
+                )
+
+        request.app.send_transactional_email_batch(email_iter())
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:
