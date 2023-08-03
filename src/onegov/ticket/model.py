@@ -108,7 +108,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     muted: 'Column[bool]' = Column(Boolean, nullable=False, default=False)
 
     @property
-    def search_score(self):
+    def search_score(self) -> int:
         return 6
 
     if TYPE_CHECKING:

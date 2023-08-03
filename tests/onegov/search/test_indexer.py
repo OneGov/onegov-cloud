@@ -748,8 +748,21 @@ def test_psql_tsvector_string():
            "'func.coalesce(col_a, '')' || ' ' || 'func.coalesce(col_b, '')'"
 
 
-# def test_multi_language_tsvector_expression():
-#     assert False
+def test_multi_language_tsvector_expression(monkeypatch):
+    tsvector_string = "'func.coalesce(my_col, '')'"
+    x = Searchable.multi_language_tsvector_expression(tsvector_string)
+    assert x == "to_tsvector('simple', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('german', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('french', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('italian', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('english', 'func.coalesce(my_col, '')')"
+
+    def fake():
+        return ['simple']
+    tsvector_string = "'func.coalesce(group, '')'"
+    monkeypatch.setattr(utils, 'get_fts_index_languages', fake)
+    assert Searchable.multi_language_tsvector_expression(
+        tsvector_string) == "to_tsvector('simple', 'func.coalesce(group, '')')"
 
 
 def test_psql_tsvector_string_generation_models():
