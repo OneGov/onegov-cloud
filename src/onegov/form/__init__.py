@@ -33,7 +33,7 @@ from onegov.form.parser import parse_formcode
 from onegov.form.parser import WTFormsClassBuilder
 from onegov.form.utils import decimal_range, as_internal_id
 
-__all__ = [
+__all__ = (
     '_',
     'as_internal_id',
     'CompleteFormSubmission',
@@ -60,4 +60,4 @@ __all__ = [
     'PendingFormSubmission',
     'render_field',
     'WTFormsClassBuilder',
-]
+)

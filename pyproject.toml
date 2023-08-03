@@ -31,6 +31,7 @@ module = [
     "onegov.chat.*",
     "onegov.core.*",
     "onegov.file.*",
+    "onegov.form.*",
     "onegov.gever.*",
     "onegov.newsletter.*",
     "onegov.notice.*",

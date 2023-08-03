@@ -89,7 +89,7 @@ def migrate_file_metadata_to_jsonb(context: 'UpgradeContext') -> None:
 
     context.operations.drop_index('files_by_type_and_name')
 
-    context.add_column_with_defaults(  # type:ignore[misc]
+    context.add_column_with_defaults(
         table='files',
         column=Column('order', Text, nullable=False),
         default=lambda r: normalize_for_url(r.name))

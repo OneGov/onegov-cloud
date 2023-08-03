@@ -17,7 +17,8 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import cast, Any, Literal, TYPE_CHECKING
+# type gets shadowed by type in model, so we use Type as an alias
+from typing import cast, Any, Literal, Type, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Sequence
@@ -231,7 +232,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         self.libres_context = libres_context
 
     @property
-    def form_class(self) -> 'Form | None':
+    def form_class(self) -> 'Type[Form] | None':
         """ Parses the form definition and returns a form class. """
 
         if not self.definition:
