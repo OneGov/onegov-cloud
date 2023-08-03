@@ -347,7 +347,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
         request: CoreRequest, self: Organisation, user: User, layout
     ):
         for api_key in user.api_keys:
-            delete_link = Link(
+            api_key_delete_link = Link(
                 text=Markup('<i class="fa fa-trash" aria-hidden="True"></i>'),
                 url=layout.csrf_protected_url(
                     request.link(api_key, name='+delete')),
@@ -365,7 +365,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
                 ),
             )
             # delete_link is temporarily stored on the object itself
-            api_key.delete_link = delete_link
+            api_key.delete_link = api_key_delete_link
             yield api_key
 
     return {

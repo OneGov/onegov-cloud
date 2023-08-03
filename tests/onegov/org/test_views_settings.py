@@ -1,5 +1,6 @@
 from onegov.api.models import ApiKey
 from onegov.org.theme.org_theme import HELVETICA
+from xml.etree.ElementTree import tostring
 
 
 def test_settings(client):
@@ -103,6 +104,16 @@ def test_api_keys_create_and_delete(client):
     key = client.app.session().query(ApiKey).first()
     assert key.name == "My API key"
     assert key.read_only == True
+
+    # manually extract the link
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    url = client.extract_href(delete_link)
+    remove_chars = len("http://localhost")
+    link = url[remove_chars:]
+
+    client.delete(link)
+    # should be gone
+    assert client.app.session().query(ApiKey).first() is None
 
 
 def test_switch_languages(client):
