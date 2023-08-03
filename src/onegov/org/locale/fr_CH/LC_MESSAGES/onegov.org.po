@@ -4628,7 +4628,7 @@ msgstr "Votre inscription a été confirmée"
 msgid "The registration has been confirmed"
 msgstr "L'inscription a été confirmée"
 
-msgid "The registration could not be confirmed"
+msgid "The registration could not be confirmed because the maximum number of participants has been reached"
 msgstr "L'inscription n'a pas pu être confirmée"
 
 msgid "Your registration has been denied"
