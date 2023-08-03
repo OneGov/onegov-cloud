@@ -443,10 +443,6 @@ class PreviewWidget:
 class PanelWidget:
     """ A widget that displays the field's text as panel (no input). """
 
-    template = Markup(
-        """<div class="panel {kind}">{text}</div>"""
-    )
-
     def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(
