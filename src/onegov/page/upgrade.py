@@ -9,8 +9,13 @@ from onegov.core.upgrade import upgrade_task
 from sqlalchemy.sql.expression import text
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.upgrades import UpgradeContext
+
+
 @upgrade_task('Add parent order index')
-def add_parent_order_index(context):
+def add_parent_order_index(context: 'UpgradeContext') -> None:
     context.operations.create_index(
         'page_order', 'pages', [
             text('"parent_id" NULLS FIRST'),
@@ -20,7 +25,7 @@ def add_parent_order_index(context):
 
 
 @upgrade_task('Adds publication dates to pages')
-def add_publication_dates_to_pages(context):
+def add_publication_dates_to_pages(context: 'UpgradeContext') -> None:
     if not context.has_column('pages', 'publication_start'):
         context.operations.add_column(
             'pages',
@@ -34,7 +39,9 @@ def add_publication_dates_to_pages(context):
 
 
 @upgrade_task('Make pages polymorphic type non-nullable')
-def make_pages_polymorphic_type_non_nullable(context):
+def make_pages_polymorphic_type_non_nullable(
+    context: 'UpgradeContext'
+) -> None:
     if context.has_table('pages'):
         context.operations.execute("""
             UPDATE pages SET type = 'generic' WHERE type IS NULL;

@@ -3,6 +3,7 @@ import sedate
 
 from datetime import date
 
+from onegov.api.models import ApiKey
 from onegov.chat import MessageCollection
 from onegov.chat import TextModule
 from onegov.chat import TextModuleCollection
@@ -734,3 +735,10 @@ def get_qr_code(app, payload, border=None, box_size=None, fill_color=None,
         img_format=img_format,
         encoding=encoding
     )
+
+
+@OrgApp.path(
+    model=ApiKey, path='/api_keys/{key}/delete', converters=dict(key=UUID)
+)
+def get_api_key_for_delete(request, key):
+    return request.session.query(ApiKey).filter_by(key=key).first()

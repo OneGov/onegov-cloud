@@ -16,6 +16,9 @@ if TYPE_CHECKING:
     JSONObject_ro
     JSONArray_ro
 
+    class EmptyDict(TypedDict):
+        pass
+
     class HeaderJsonDict(TypedDict):
         Name: str
         Value: str
@@ -37,6 +40,18 @@ if TYPE_CHECKING:
         HtmlBody: NotRequired[str]
         Headers: NotRequired[list[HeaderJsonDict]]
         Attachments: NotRequired[list[AttachmentJsonDict]]
+
+    class FileDict(TypedDict):
+        data: str
+        filename: str | None
+        mimetype: str
+        size: int
+
+    class LaxFileDict(TypedDict):
+        data: str
+        filename: NotRequired[str | None]
+        mimetype: NotRequired[str]
+        size: NotRequired[int]
 
     _T = TypeVar('_T')
     SequenceOrScalar = Union[Sequence[_T], _T]

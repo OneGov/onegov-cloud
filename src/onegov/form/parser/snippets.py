@@ -1,6 +1,12 @@
 from onegov.form import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from onegov.core.request import CoreRequest
+
+
 class Snippets:
 
     fragments = (
@@ -49,6 +55,9 @@ class Snippets:
         (_("Markdown"), '<markdown>')
     )
 
-    def translated(self, request):
+    def translated(
+        self,
+        request: 'CoreRequest'
+    ) -> 'Iterator[tuple[str, str | None]]':
         for title, snippet in self.fragments:
             yield request.translate(title), snippet

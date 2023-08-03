@@ -6,8 +6,8 @@ from uuid import UUID
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
+    from libres.context.core import Context
     from libres.context.registry import Registry
-    from libres.modules.context import Context
     from onegov.core.orm.session_manager import SessionManager
 
 

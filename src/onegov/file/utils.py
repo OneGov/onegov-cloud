@@ -33,7 +33,7 @@ def content_type_from_fileobj(fileobj: 'SupportsRead[bytes]') -> str:
 
 def as_fileintent(
     content: bytes | IO[bytes],
-    filename: str
+    filename: str | None
 ) -> FileIntent:
 
     # this is far stricter than filedepot is, but our custom UploadedFile

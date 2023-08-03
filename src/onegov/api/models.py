@@ -2,6 +2,22 @@ from functools import cached_property
 from logging import getLogger
 from logging import NullHandler
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
+from uuid import uuid4
+from sqlalchemy import Text
+from onegov.core.orm import Base
+from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.user import User
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from datetime import datetime
 
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
@@ -206,3 +222,51 @@ class ApiEndpoint:
         """
 
         raise NotImplementedError()
+
+
+class AuthEndpoint:
+
+    def __init__(self, app):
+        self.app = app
+
+
+class ApiKey(Base):
+
+    __tablename__ = 'api_keys'
+
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type: ignore[arg-type]
+        nullable=False,
+        primary_key=True,
+        default=uuid4
+    )
+
+    # the user that created the api key
+    user_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type: ignore[arg-type]
+        ForeignKey('users.id'),
+        nullable=False
+    )
+
+    # the name of the api key, may be any string
+    name: 'Column[str]' = Column(Text, nullable=False)
+
+    # For now, we only support read-only api keys
+    read_only: 'Column[bool]' = Column(Boolean, default=True, nullable=False)
+
+    # the last time a token was generated based on this api key
+    last_used: 'Column[datetime | None]' = Column(UTCDateTime, nullable=True)
+
+    # the key itself
+    key: 'Column[uuid.UUID]' = Column(
+        UUID,  # type: ignore[arg-type]
+        nullable=False,
+        default=uuid4
+    )
+
+    user: 'relationship[User]' = relationship(
+        User,
+        backref=backref(
+            'api_keys', cascade='all,delete-orphan', lazy='dynamic'
+        )
+    )

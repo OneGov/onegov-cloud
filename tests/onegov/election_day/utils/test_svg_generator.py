@@ -22,7 +22,6 @@ def test_generate_svg(election_day_app_gr, session):
 
     election_day_app_gr.filestorage.makedir('svg')
     generator = SvgGenerator(election_day_app_gr)
-    generate = generator.generate_svg
 
     def generate(item, type_, locale):
         filename = svg_filename(item, type_, locale)

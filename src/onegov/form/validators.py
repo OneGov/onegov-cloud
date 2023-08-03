@@ -24,17 +24,25 @@ from wtforms.validators import StopValidation
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection, Sequence
+    from onegov.core.orm import Base
+    from onegov.form import Form
+    from wtforms import Field
+
+
 class Stdnum:
     """ Validates a string using any python-stdnum format.
 
     See `<https://github.com/arthurdejong/python-stdnum>`_.
 
     """
-    def __init__(self, format):
+    def __init__(self, format: str):
         module = '.'.join(p for p in format.split('.') if p)
         self.format = importlib.import_module('stdnum.' + module)
 
-    def __call__(self, form, field):
+    def __call__(self, form: 'Form', field: 'Field') -> None:
         # only do a check for filled out values, to check for the existance
         # of any value use DataRequired!
         if not field.data:
@@ -61,16 +69,18 @@ class FileSizeLimit:
         "The file is too large, please provide a file smaller than {}."
     )
 
-    def __init__(self, max_bytes):
+    def __init__(self, max_bytes: int):
         self.max_bytes = max_bytes
 
-    def __call__(self, form, field):
-        if field.data:
-            if field.data.get('size', 0) > self.max_bytes:
-                message = field.gettext(self.message).format(
-                    humanize.naturalsize(self.max_bytes)
-                )
-                raise ValidationError(message)
+    def __call__(self, form: 'Form', field: 'Field') -> None:
+        if not field.data:
+            return
+
+        if field.data.get('size', 0) > self.max_bytes:
+            message = field.gettext(self.message).format(
+                humanize.naturalsize(self.max_bytes)
+            )
+            raise ValidationError(message)
 
 
 class WhitelistedMimeType:
@@ -80,7 +90,7 @@ class WhitelistedMimeType:
     :class:`onegov.form.fields.UploadMultipleField` instance.
     """
 
-    whitelist = {
+    whitelist: 'Collection[str]' = {
         'application/excel',
         'application/vnd.ms-excel',
         'application/msword',
@@ -96,14 +106,16 @@ class WhitelistedMimeType:
 
     message = _("Files of this type are not supported.")
 
-    def __init__(self, whitelist=None):
+    def __init__(self, whitelist: 'Collection[str] | None' = None):
         if whitelist is not None:
             self.whitelist = whitelist
 
-    def __call__(self, form, field):
-        if field.data:
-            if field.data['mimetype'] not in self.whitelist:
-                raise ValidationError(field.gettext(self.message))
+    def __call__(self, form: 'Form', field: 'Field') -> None:
+        if not field.data:
+            return
+
+        if field.data['mimetype'] not in self.whitelist:
+            raise ValidationError(field.gettext(self.message))
 
 
 class ExpectedExtensions(WhitelistedMimeType):
@@ -119,7 +131,7 @@ class ExpectedExtensions(WhitelistedMimeType):
         ExpectedExtensions(['pdf'])  # makes sure the given file is a pdf
     """
 
-    def __init__(self, extensions):
+    def __init__(self, extensions: 'Sequence[str]'):
         # normalize extensions
         if len(extensions) == 1 and extensions[0] == '*':
             mimetypes = None
@@ -152,114 +164,118 @@ class ValidFormDefinition:
         "is defined."
     )
 
-    def __init__(self,
-                 require_email_field=True,
-                 reserved_fields=None,
-                 require_title_fields=False,
-                 validate_prices=True):
+    def __init__(
+        self,
+        require_email_field: bool = True,
+        reserved_fields: 'Collection[str] | None' = None,
+        require_title_fields: bool = False,
+        validate_prices: bool = True
+    ):
         self.require_email_field = require_email_field
         self.reserved_fields = reserved_fields or set()
         self.require_title_fields = require_title_fields
         self.validate_prices = validate_prices
 
-    def __call__(self, form, field):
-        if field.data:
-            # XXX circular import
-            from onegov.form import parse_form
+    def __call__(self, form: 'Form', field: 'Field') -> None:
+        if not field.data:
+            return
 
-            try:
-                parsed_form = parse_form(field.data,
-                                         enable_indent_check=True)()
-            except InvalidFormSyntax as exception:
-                field.render_kw = field.render_kw or {}
-                field.render_kw['data-highlight-line'] = exception.line
-                raise ValidationError(
-                    field.gettext(self.syntax).format(line=exception.line)
-                ) from exception
-            except InvalidIndentSyntax as exception:
-                raise ValidationError(
-                    field.gettext(self.indent).format(line=exception.line)
-                ) from exception
-            except DuplicateLabelError as exception:
-                raise ValidationError(
-                    field.gettext(self.duplicate).format(label=exception.label)
-                ) from exception
-            except (FieldCompileError, MixedTypeError) as exception:
-                raise ValidationError(
-                    exception.field_name
-                ) from exception
-            except AttributeError as exception:
-                raise ValidationError(
-                    field.gettext(self.message)
-                ) from exception
-            else:
-                if self.require_email_field:
-                    if not parsed_form.has_required_email_field:
-                        raise ValidationError(field.gettext(self.email))
+        # XXX circular import
+        from onegov.form import parse_form
 
-                if self.require_title_fields and not parsed_form.title_fields:
-                    raise ValidationError(field.gettext(self.required))
+        try:
+            parsed_form = parse_form(field.data,
+                                     enable_indent_check=True)()
+        except InvalidFormSyntax as exception:
+            field.render_kw = field.render_kw or {}
+            field.render_kw['data-highlight-line'] = exception.line
+            raise ValidationError(
+                field.gettext(self.syntax).format(line=exception.line)
+            ) from exception
+        except InvalidIndentSyntax as exception:
+            raise ValidationError(
+                field.gettext(self.indent).format(line=exception.line)
+            ) from exception
+        except DuplicateLabelError as exception:
+            raise ValidationError(
+                field.gettext(self.duplicate).format(label=exception.label)
+            ) from exception
+        except (FieldCompileError, MixedTypeError) as exception:
+            raise ValidationError(
+                exception.field_name
+            ) from exception
+        except AttributeError as exception:
+            raise ValidationError(
+                field.gettext(self.message)
+            ) from exception
 
-                if self.reserved_fields:
-                    for formfield_id, formfield in parsed_form._fields.items():
-                        if formfield_id in self.reserved_fields:
+        if self.require_email_field:
+            if not parsed_form.has_required_email_field:
+                raise ValidationError(field.gettext(self.email))
 
-                            raise ValidationError(
-                                field.gettext(self.reserved).format(
-                                    label=formfield.label.text
-                                )
-                            )
+        if self.require_title_fields and not parsed_form.title_fields:
+            raise ValidationError(field.gettext(self.required))
 
-                if self.validate_prices and 'payment_method' in form:
-                    for formfield in parsed_form:
-                        if not hasattr(formfield, 'pricing'):
-                            continue
+        if self.reserved_fields:
+            for formfield_id, formfield in parsed_form._fields.items():
+                if formfield_id in self.reserved_fields:
 
-                        if not formfield.pricing.has_payment_rule:
-                            continue
+                    raise ValidationError(
+                        field.gettext(self.reserved).format(
+                            label=formfield.label.text
+                        )
+                    )
 
-                        # NOTE: If we end up allowing 'manual' in addition to
-                        #       'free' we should also check if the application
-                        #       has a payment_provider set.
-                        if form.payment_method.data != 'free':
-                            # add the error message to both affected fields
-                            error = field.gettext(self.payment_method).format(
-                                label=formfield.label.text
-                            )
-                            # if the payment_method field is below the form
-                            # definition field, then validate will not have
-                            # been run yet and we can only add process_errors
-                            errors = form.payment_method.errors
-                            if not isinstance(errors, list):
-                                errors = form.payment_method.process_errors
-                                assert isinstance(errors, list)
+        if self.validate_prices and 'payment_method' in form:
+            for formfield in parsed_form:
+                if not hasattr(formfield, 'pricing'):
+                    continue
 
-                            errors.append(error)
-                            raise ValidationError(error)
+                if not formfield.pricing.has_payment_rule:
+                    continue
 
-                if self.validate_prices and 'minimum_price_total' in form:
-                    has_pricing = (
-                        hasattr(form, 'currency') and form.currency.data
-                        or any(hasattr(formfield, 'pricing')
-                               for formfield in parsed_form._fields.values()))
+                # NOTE: If we end up allowing 'manual' in addition to
+                #       'free' we should also check if the application
+                #       has a payment_provider set.
+                if form.payment_method.data != 'free':
+                    # add the error message to both affected fields
+                    error = field.gettext(self.payment_method).format(
+                        label=formfield.label.text
+                    )
+                    # if the payment_method field is below the form
+                    # definition field, then validate will not have
+                    # been run yet and we can only add process_errors
+                    errors = form.payment_method.errors
+                    if not isinstance(errors, list):
+                        errors = form.payment_method.process_errors
+                        assert isinstance(errors, list)
 
-                    if form.minimum_price_total.data and not has_pricing:
-                        # add the error message to all affected fields
-                        # FIXME: ideally we would get more consistent about
-                        #        having a field like 'pricing_method' that
-                        #        we can attach this error to. It doesn't
-                        #        really make sense to show it on 'currency'
-                        error = field.gettext(self.minimum_price)
-                        # if the minimum_price_total field is below the form
-                        # definition field, then validate will not have
-                        # been run yet and we can only add process_errors
-                        errors = form.minimum_price_total.errors
-                        if not isinstance(errors, list):
-                            errors = form.minimum_price_total.process_errors
-                            assert isinstance(errors, list)
+                    errors.append(error)
+                    raise ValidationError(error)
 
-                        errors.append(error)
-                        raise ValidationError(error)
+        if self.validate_prices and 'minimum_price_total' in form:
+            has_pricing = (
+                hasattr(form, 'currency') and form.currency.data
+                or any(hasattr(formfield, 'pricing')
+                       for formfield in parsed_form._fields.values()))
+
+            if form.minimum_price_total.data and not has_pricing:
+                # add the error message to all affected fields
+                # FIXME: ideally we would get more consistent about
+                #        having a field like 'pricing_method' that
+                #        we can attach this error to. It doesn't
+                #        really make sense to show it on 'currency'
+                error = field.gettext(self.minimum_price)
+                # if the minimum_price_total field is below the form
+                # definition field, then validate will not have
+                # been run yet and we can only add process_errors
+                errors = form.minimum_price_total.errors
+                if not isinstance(errors, list):
+                    errors = form.minimum_price_total.process_errors
+                    assert isinstance(errors, list)
+
+                errors.append(error)
+                raise ValidationError(error)
 
 
 class LaxDataRequired(DataRequired):
@@ -273,7 +289,7 @@ class LaxDataRequired(DataRequired):
 
     """
 
-    def __call__(self, form, field):
+    def __call__(self, form: 'Form', field: 'Field') -> None:
         if field.data is False:
             # guard against False, False is an instance of int, since
             # bool derives from int, so we need to check this first
@@ -294,7 +310,7 @@ class StrictOptional(Optional):
 
     """
 
-    def is_missing(self, value):
+    def is_missing(self, value: object) -> bool:
         if isinstance(value, FieldStorage):
             return False
 
@@ -306,7 +322,7 @@ class StrictOptional(Optional):
 
         return False
 
-    def __call__(self, form, field):
+    def __call__(self, form: 'Form', field: 'Field') -> None:
         raw = field.raw_data and field.raw_data[0]
         val = field.data
 
@@ -330,22 +346,24 @@ class ValidPhoneNumber:
 
     message = _("Not a valid phone number.")
 
-    def __init__(self, country='CH'):
+    def __init__(self, country: str = 'CH'):
         self.country = country
 
-    def __call__(self, form, field):
-        if field.data:
-            try:
-                number = phonenumbers.parse(field.data, self.country)
-            except Exception as exception:
-                raise ValidationError(self.message) from exception
+    def __call__(self, form: 'Form', field: 'Field') -> None:
+        if not field.data:
+            return
 
-            valid = (
-                phonenumbers.is_valid_number(number)
-                and phonenumbers.is_possible_number(number)
-            )
-            if not valid:
-                raise ValidationError(self.message)
+        try:
+            number = phonenumbers.parse(field.data, self.country)
+        except Exception as exception:
+            raise ValidationError(self.message) from exception
+
+        valid = (
+            phonenumbers.is_valid_number(number)
+            and phonenumbers.is_possible_number(number)
+        )
+        if not valid:
+            raise ValidationError(self.message)
 
 
 swiss_ssn_rgxp = re.compile(r'756\.\d{4}\.\d{4}\.\d{2}$')
@@ -360,10 +378,12 @@ class ValidSwissSocialSecurityNumber:
 
     message = _("Not a valid swiss social security number.")
 
-    def __call__(self, form, field):
-        if field.data:
-            if not re.match(swiss_ssn_rgxp, field.data):
-                raise ValidationError(self.message)
+    def __call__(self, form: 'Form', field: 'Field') -> None:
+        if not field.data:
+            return
+
+        if not re.match(swiss_ssn_rgxp, field.data):
+            raise ValidationError(self.message)
 
 
 class UniqueColumnValue:
@@ -379,11 +399,11 @@ class UniqueColumnValue:
 
     """
 
-    def __init__(self, table):
+    def __init__(self, table: type['Base']):
         self.table = table
 
-    def __call__(self, form, field):
-        if field.name not in self.table.__table__.columns:
+    def __call__(self, form: 'Form', field: 'Field') -> None:
+        if field.name not in self.table.__table__.columns:  # type:ignore
             raise RuntimeError("The field name must match a column!")
 
         if hasattr(form, 'model'):
@@ -404,25 +424,34 @@ class InputRequiredIf(InputRequired):
 
     """
 
-    def __init__(self, field_name, field_data, message=None, **kwargs):
+    def __init__(
+        self,
+        field_name: str,
+        field_data: object,
+        message: str | None = None
+    ):
         self.field_name = field_name
         self.field_data = field_data
         self.message = message
 
-    def __call__(self, form, field):
+    def __call__(self, form: 'Form', field: 'Field') -> None:
         if not hasattr(form, self.field_name):
-            raise RuntimeError("No field named '{}' not in form").format(
-                self.field_name
-            )
+            raise RuntimeError(f"No field named '{self.field_name}' in form")
 
-        values = (getattr(form, self.field_name).data, self.field_data)
-        if any([isinstance(x, bool) or x is None for x in values]):
-            required = values[0] is values[1]
+        field_data = getattr(form, self.field_name).data
+        filter_data = self.field_data
+        if (
+            field_data is None or filter_data is None
+            or isinstance(field_data, bool)
+            or isinstance(filter_data, bool)
+        ):
+            required = field_data is filter_data
+
+        elif isinstance(filter_data, str) and filter_data.startswith('!'):
+            required = field_data != filter_data[1:]
         else:
-            if isinstance(values[1], str) and '!' in values[1]:
-                required = values[0] != values[1].replace('!', '')
-            else:
-                required = values[0] == values[1]
+            required = field_data == filter_data
+
         if required:
             super(InputRequiredIf, self).__call__(form, field)
         else:
@@ -436,23 +465,27 @@ class ValidDateRange:
     after_message = _("Needs to be on or after {date}.")
     before_message = _("Needs to be on or before {date}.")
 
-    def __init__(self, min, max):
+    def __init__(
+        self,
+        min: date | relativedelta | None,
+        max: date | relativedelta | None
+    ):
         self.min = min
         self.max = max
 
     @property
-    def min_date(self):
+    def min_date(self) -> date | None:
         if isinstance(self.min, relativedelta):
             return date.today() + self.min
         return self.min
 
     @property
-    def max_date(self):
+    def max_date(self) -> date | None:
         if isinstance(self.max, relativedelta):
             return date.today() + self.max
         return self.max
 
-    def __call__(self, form, field):
+    def __call__(self, form: 'Form', field: 'Field') -> None:
         if field.data is None:
             return
 

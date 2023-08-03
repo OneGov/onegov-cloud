@@ -506,7 +506,7 @@ def test_require_spots_if_registration_window(session):
             spots=0
         )
 
-    with pytest.raises(TypeError):
+    with pytest.raises(AssertionError):
         forms.submissions.add(
             name='summercamp',
             form=summer.form_class(data={'e_mail': 'info@example.org'}),
