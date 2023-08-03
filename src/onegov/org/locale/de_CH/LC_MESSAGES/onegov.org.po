@@ -5066,7 +5066,7 @@ msgid "Do you really want to delete this API key?"
 msgstr "Möchten sie diesen API Key wirklich löschen?"
 
 msgid "This action cannot be undone."
-msgstr "Diese Aktion kann nicht rückgängig gemacht werdenl"
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
 
 msgid "ApiKey deleted."
 msgstr "ApiKey gelöscht."
