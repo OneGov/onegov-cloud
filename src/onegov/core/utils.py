@@ -48,16 +48,9 @@ if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from types import ModuleType
-    from typing_extensions import TypedDict
     from webob import Response
     from .request import CoreRequest
-
-    # FIXME: Move this to onegov.core.types or onegov.file.types
-    class FileDict(TypedDict):
-        data: str
-        filename: str | None
-        mimetype: str
-        size: int
+    from .types import FileDict, LaxFileDict
 
 
 _T = TypeVar('_T')
@@ -814,7 +807,7 @@ def binary_to_dictionary(
     }
 
 
-def dictionary_to_binary(dictionary: 'FileDict') -> bytes:
+def dictionary_to_binary(dictionary: 'LaxFileDict') -> bytes:
     """ Takes a dictionary created by :func:`binary_to_dictionary` and returns
     the original binary data.
 

@@ -20,14 +20,14 @@
     :license: BSD, see LICENSE for more details.
 """
 import re
+from contextlib import contextmanager
 from difflib import SequenceMatcher
 from itertools import chain, zip_longest
-from contextlib import contextmanager
-
-from genshi.core import Stream, QName, Attrs, START, END, TEXT
-from genshi.input import ET
 
 import html5lib
+from genshi.core import Stream, QName, Attrs, START, END, TEXT
+from genshi.input import ET
+from markupsafe import Markup
 
 
 from typing import Any, TYPE_CHECKING
@@ -55,12 +55,12 @@ def render_html_diff(
     new: str,
     wrapper_element: str = 'div',
     wrapper_class: str = 'diff'
-) -> str:
+) -> Markup:
     """Renders the diff between two HTML fragments."""
     old_stream = parse_html(old, wrapper_element, wrapper_class)
     new_stream = parse_html(new, wrapper_element, wrapper_class)
     rv = diff_genshi_stream(old_stream, new_stream)
-    return rv.render('html', encoding=None)
+    return Markup(rv.render('html', encoding=None))
 
 
 def parse_html(
