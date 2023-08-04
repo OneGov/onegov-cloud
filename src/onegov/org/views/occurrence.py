@@ -4,7 +4,7 @@ from datetime import date
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private
-from onegov.core.utils import linkify, normalize_for_url
+from onegov.core.utils import normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -95,13 +95,13 @@ def view_occurrence(self, request, layout=None):
     today = replace_timezone(as_datetime(date.today()), self.timezone)
     occurrences = self.event.occurrence_dates(localize=True)
     occurrences = list(filter(lambda x: x >= today, occurrences))
-    description = linkify(self.event.description).replace('\n', '<br>')
+    # description = linkify(self.event.description).replace('\n', '<br>')
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
 
     return {
-        'description': description,
+        # 'description': description,
         'framed': framed,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
