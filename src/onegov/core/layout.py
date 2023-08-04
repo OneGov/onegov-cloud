@@ -7,6 +7,8 @@ import sedate
 
 from datetime import datetime
 from functools import cached_property
+from markupsafe import escape, Markup
+
 from onegov.core import utils
 from onegov.core.cache import lru_cache
 from onegov.core.templates import PageTemplate
@@ -260,6 +262,14 @@ class Layout:
 
     def now(self) -> datetime:
         return sedate.to_timezone(sedate.utcnow(), self.timezone)
+
+    @staticmethod
+    def render_newlines(data: str) -> 'str':
+        """
+        Escapes and replaces new line characters with a `<br />` html tag.
+
+        """
+        return Markup('<br />').join(escape(data).splitlines())
 
 
 class ChameleonLayout(Layout):
