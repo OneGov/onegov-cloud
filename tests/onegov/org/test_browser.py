@@ -13,6 +13,12 @@ from sedate import utcnow
 from tempfile import NamedTemporaryFile
 from time import sleep
 from tests.shared.utils import encode_map_value
+from onegov.org.models import ResourceRecipientCollection
+import os
+from pathlib import Path
+from onegov.reservation import ResourceCollection
+from onegov.ticket import TicketCollection
+from tests.onegov.org.test_views_resources import add_reservation
 
 
 def test_browse_activities(browser):
@@ -469,3 +475,65 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
 
     browser.visit(f"/person/{person.id.hex}")
     browser.find_by_text('All About Berry: Logician')
+
+
+def test_rejected_reservation_sends_email_to_configured_recipients(browser,
+                                                                   client):
+    resources = ResourceCollection(client.app.libres_context)
+    dailypass = resources.add('Dailypass', 'Europe/Zurich', type='daypass')
+
+    recipients = ResourceRecipientCollection(client.app.session())
+    recipients.add(
+        name='John',
+        medium='email',
+        address='john@example.org',
+        rejected_reservations=True,
+        resources=[
+            dailypass.id.hex,
+        ]
+    )
+
+    add_reservation(
+        dailypass, client, datetime(2017, 1, 6, 12), datetime(2017, 1, 6, 16))
+    transaction.commit()
+
+    tickets = TicketCollection(client.app.session())
+    assert tickets.query().count() == 1
+
+    browser.login_admin()
+    browser.visit('/tickets/ALL/open')
+    browser.find_by_value("Annehmen").click()
+
+    def is_advanced_dropdown_present():
+        e = [e for e in browser.find_by_tag("button") if 'Erweitert' in e.text]
+        return len(e) == 1
+
+    browser.wait_for(
+        lambda: is_advanced_dropdown_present(),
+        timeout=5,
+    )
+    advanced_menu_options = browser.find_by_tag("button")
+    next(e for e in advanced_menu_options if 'Erweitert' in e.text).click()
+    browser.wait_for(
+        lambda: browser.is_element_present_by_xpath(
+            '//a['
+            '@data-confirm="Möchten Sie diese Reservation wirklich absagen?"]'
+        ),
+        timeout=5,
+    )
+    reject_reservation = browser.find_by_xpath(
+        '//a[@data-confirm="Möchten Sie diese Reservation wirklich absagen?"]'
+    )[0]
+    reject_reservation.click()
+    # confirm dialog
+    browser.find_by_value("Reservation absagen").click()
+    assert browser.is_text_present("Die Reservation wurde abgelehnt")
+
+    assert len(os.listdir(client.app.maildir)) == 1
+    mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
+    with open(mail, 'r') as file:
+        mail_content = file.read()
+        assert (
+            "Die folgenden Reservationen mussten leider abgesagt werden:"
+            in mail_content
+        )

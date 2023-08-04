@@ -7,6 +7,7 @@ from datetime import time, timedelta
 from dill import pickles
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
+from onegov.core.html import html_to_text
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.form import FormCollection, merge_forms, as_internal_id
@@ -622,24 +623,25 @@ def accept_reservation(self, request, text=None, notify=False):
             # libres does not automatically detect changes yet
             flag_modified(reservation, 'data')
 
-        ReservationMessage.create(
-            reservations, ticket, request, 'accepted')
+        ReservationMessage.create(reservations, ticket, request, 'accepted')
 
         message = None
         if text:
             message = TicketChatMessage.create(
-                ticket, request,
+                ticket,
+                request,
                 text=text,
                 owner=request.current_username,
                 recipient=self.email,
                 notify=notify,
-                origin='internal')
+                origin='internal',
+            )
 
         send_ticket_mail(
             request=request,
             template='mail_reservation_accepted.pt',
             subject=_("Your reservations were accepted"),
-            receivers=(self.email, ),
+            receivers=(self.email,),
             ticket=ticket,
             content={
                 'model': self,
@@ -647,52 +649,59 @@ def accept_reservation(self, request, text=None, notify=False):
                 'reservations': reservations,
                 'show_submission': show_submission,
                 'form': form,
-                'message': message
-            }
+                'message': message,
+            },
         )
 
-        # get all recipients which require an e-mail for this resource
-        q = ResourceRecipientCollection(request.session).query()
-        q = q.filter(ResourceRecipient.medium == 'email')
-        q = q.order_by(None).order_by(ResourceRecipient.address)
-        q = q.with_entities(
-            ResourceRecipient.address,
-            ResourceRecipient.content
-        )
-        recipients = [
-            r.address
-            for r in q if (
-                self.resource.hex in r.content['resources']
-                and r.content.get('new_reservations', False)
+        def recipients_which_have_registered_for_mail():
+            q = ResourceRecipientCollection(request.session).query()
+            q = q.filter(ResourceRecipient.medium == 'email')
+            q = q.order_by(None).order_by(ResourceRecipient.address)
+            q = q.with_entities(
+                ResourceRecipient.address, ResourceRecipient.content
             )
-        ]
 
-        # E-mail for new reservations
-        args = {
-            'layout': DefaultMailLayout(object(), request),
-            'title': request.translate(
-                _("${org} New Reservation(s)", mapping={
-                    'org': request.app.org.title
-                })
-            ),
-            'form': form,
-            'model': self,
-            'resource': resource,
-            'reservations': reservations,
-            'show_submission': show_submission,
-            'message': message
-        }
+            for res in q:
+                if self.resource.hex in res.content[
+                    'resources'
+                ] and res.content.get('new_reservations', False):
+                    yield res.address
+
+        title = request.translate(
+            _(
+                "${org} New Reservation(s)",
+                mapping={'org': request.app.org.title},
+            )
+        )
 
         content = render_template(
-            'mail_new_reservation_notification.pt', request, args
+            'mail_new_reservation_notification.pt',
+            request,
+            {
+                'layout': DefaultMailLayout(object(), request),
+                'title': title,
+                'form': form,
+                'model': self,
+                'resource': resource,
+                'reservations': reservations,
+                'show_submission': show_submission,
+                'message': message,
+            },
         )
+        plaintext = html_to_text(content)
 
-        for r in recipients:
-            request.app.send_transactional_email(
-                subject=args['title'],
-                receivers=(r),
-                content=content,
-            )
+        def email_iter():
+            for recipient_addr in recipients_which_have_registered_for_mail():
+                yield request.app.prepare_email(
+                    receivers=(recipient_addr,),
+                    subject=title,
+                    content=content,
+                    plaintext=plaintext,
+                    category='transactional',
+                    attachments=(),
+                )
+
+        request.app.send_transactional_email_batch(email_iter())
 
         request.success(_("The reservations were accepted"))
     else:
@@ -789,6 +798,62 @@ def reject_reservation(self, request, text=None, notify=False):
             'message': message
         }
     )
+
+    def recipients_with_mail_for_reservation():
+        # all recipients which want to receive e-mail for rejected reservations
+        q = ResourceRecipientCollection(request.session).query()
+        q = q.filter(ResourceRecipient.medium == 'email')
+        q = q.order_by(None).order_by(ResourceRecipient.address)
+        q = q.with_entities(ResourceRecipient.address,
+                            ResourceRecipient.content)
+
+        for res in q:
+            if self.resource.hex in res.content['resources'] \
+                    and res.content.get('rejected_reservations', {}):
+                yield res.address
+
+    forms = FormCollection(request.session)
+    submission = forms.submissions.by_id(token)
+    if submission:
+        title = (
+            request.translate(
+                _(
+                    "${org} Rejected Reservation",
+                    mapping={'org': request.app.org.title},
+                )
+            ),
+        )
+
+        form = submission.form_obj
+
+        content = render_template(
+            'mail_rejected_reservation_notification',
+            request,
+            {
+                'layout': DefaultMailLayout(object(), request),
+                'title': title,
+                'form': form,
+                'model': self,
+                'resource': resource,
+                'reservations': targeted,
+                'show_submission': True,
+                'message': message,
+            },
+        )
+        plaintext = html_to_text(content)
+
+        def email_iter():
+            for recipient_addr in recipients_with_mail_for_reservation():
+                yield request.app.prepare_email(
+                    receivers=(recipient_addr,),
+                    subject=title,
+                    content=content,
+                    plaintext=plaintext,
+                    category='transactional',
+                    attachments=(),
+                )
+
+        request.app.send_transactional_email_batch(email_iter())
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:

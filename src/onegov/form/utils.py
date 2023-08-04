@@ -5,42 +5,52 @@ import wtforms.widgets.core
 from decimal import Decimal
 from unidecode import unidecode
 
+
+from typing import overload, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.form import Form
+    from typing_extensions import Self
+    from wtforms.fields.core import UnboundField
+
+
 _unwanted_characters = re.compile(r'[^a-zA-Z0-9]+')
 _html_tags = re.compile(r'<.*?>')
 
 original_html_params = wtforms.widgets.core.html_params
 
 
-def as_internal_id(label):
+def as_internal_id(label: str) -> str:
     clean = unidecode(label).strip(' \"\'').lower()
     clean = _unwanted_characters.sub('_', clean)
 
     return clean
 
 
-def get_fields_from_class(cls):
-    fields = []
+def get_fields_from_class(
+    cls: type['Form']
+) -> list[tuple[str, 'UnboundField']]:
 
-    for name in dir(cls):
-        if not name.startswith('_'):
-            field = getattr(cls, name)
-
-            if hasattr(field, '_formfield'):
-                fields.append((name, field))
+    fields = [
+        (name, field)
+        for name in dir(cls)
+        if not name.startswith('_')
+        and hasattr((field := getattr(cls, name)), '_formfield')
+    ]
 
     fields.sort(key=lambda x: (x[1].creation_counter, x[0]))
 
     return fields
 
 
-def extract_text_from_html(html):
+# FIXME: What about html entities? i.e. &.*;
+def extract_text_from_html(html: str) -> str:
     return _html_tags.sub('', html)
 
 
-def disable_required_attribute_in_html_inputs():
+def disable_required_attribute_in_html_inputs() -> None:
     """ Replaces the required attribute with aria-required. """
 
-    def patched_html_params(**kwargs):
+    def patched_html_params(**kwargs: object) -> str:
         if kwargs.pop('required', None):
             kwargs['aria_required'] = True
         return original_html_params(**kwargs)
@@ -55,19 +65,24 @@ class decimal_range:
 
     """
 
-    def __init__(self, start, stop, step=None):
-        if step is None and start <= stop:
-            step = '1.0'
-        elif step is None and start >= stop:
-            step = '-1.0'
+    __slots__ = ('start', 'stop', 'step', 'current')
+
+    def __init__(
+        self,
+        start: float | Decimal,
+        stop: float | Decimal,
+        step: str | float | Decimal | None = None
+    ):
+        if step is None:
+            step = 1 if start <= stop else -1
 
         self.start = self.current = Decimal(start)
         self.stop = Decimal(stop)
         self.step = Decimal(step)
 
-        assert self.step != Decimal('0')
+        assert self.step != Decimal(0)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self.start <= self.stop and self.step == Decimal('1.0'):
             return "decimal_range('{}', '{}')".format(self.start, self.stop)
         elif self.start >= self.stop and self.step == Decimal('-1.0'):
@@ -77,17 +92,20 @@ class decimal_range:
                 self.start, self.stop, self.step
             )
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False
 
-        return (self.start, self.stop, self.step)\
-            == (other.start, other.stop, other.step)
+        return (
+            self.start, self.stop, self.step
+        ) == (
+            other.start, other.stop, other.step
+        )
 
-    def __iter__(self):
+    def __iter__(self) -> 'Self':
         return self
 
-    def __next__(self):
+    def __next__(self) -> Decimal:
         result, self.current = self.current, self.current + self.step
 
         if self.step > 0 and result >= self.stop:
@@ -99,21 +117,27 @@ class decimal_range:
         return result
 
 
-def hash_definition(definition):
-    return hashlib.new(
+def hash_definition(definition: str) -> str:
+    return hashlib.new(  # nosec:B324
         'md5',
         definition.encode('utf-8'),
         usedforsecurity=False
     ).hexdigest()
 
 
-def path_to_filename(path):
+@overload
+def path_to_filename(path: None) -> None: ...
+@overload
+def path_to_filename(path: str) -> str: ...
+
+
+def path_to_filename(path: str | None) -> str | None:
     if not path:
-        return
+        return None
     if not isinstance(path, str):
         raise ValueError
     if '/' in path:
-        return path.split('/')[-1]
+        return path.rsplit('/', 1)[-1]
     if '\\' in path:
-        return path.split('\\')[-1]
+        return path.rsplit('\\', 1)[-1]
     return path

@@ -1,6 +1,21 @@
-from datetime import datetime
-from datetime import timedelta
-from onegov.api.models import ApiException
+from datetime import datetime, timedelta
+import jwt
+from webob.exc import HTTPUnauthorized, HTTPClientError
+from onegov.api.models import ApiException, ApiKey
+from onegov.api.token import try_get_encoded_token, jwt_decode
+
+
+def authenticate(request):
+    try:
+        auth = try_get_encoded_token(request)
+        data = jwt_decode(request, auth)
+    except jwt.ExpiredSignatureError as exception:
+        raise HTTPUnauthorized() from exception
+    except Exception as e:
+        raise ApiException() from e
+
+    if request.session.query(ApiKey).get(data['id']) is None:
+        raise HTTPClientError()
 
 
 def check_rate_limit(request):
@@ -9,11 +24,16 @@ def check_rate_limit(request):
     Raises an exception if the rate limit is reached. Returns response headers
     containing informations about the remaining rate limit.
 
-    Logged in users don't have rate limits.
+    Logged in users don't have rate limits. The same is true for users that
+    have authenticated with a token.
 
     """
 
     if request.is_logged_in:
+        return {}
+
+    if request.authorization:
+        authenticate(request)
         return {}
 
     limit, expiration = request.app.rate_limit

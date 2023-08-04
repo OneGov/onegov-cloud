@@ -16,6 +16,7 @@ import shutil
 import sqlalchemy
 import urllib.request
 
+from markupsafe import Markup
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
@@ -47,16 +48,9 @@ if TYPE_CHECKING:
     from sqlalchemy import Column
     from sqlalchemy.orm import Session
     from types import ModuleType
-    from typing_extensions import TypedDict
     from webob import Response
     from .request import CoreRequest
-
-    # FIXME: Move this to onegov.core.types or onegov.file.types
-    class FileDict(TypedDict):
-        data: str
-        filename: str | None
-        mimetype: str
-        size: int
+    from .types import FileDict, LaxFileDict
 
 
 _T = TypeVar('_T')
@@ -416,7 +410,22 @@ def linkify(text: str, escape: bool = True) -> str:
     if not text:
         return text
 
-    linkified = linkify_phone(bleach.linkify(text, parse_email=True))
+    long_top_level_domains = ['.agency']
+
+    # bleach.linkify supports only a fairly limited amount of tlds
+    if any(domain in text for domain in long_top_level_domains):
+        if '@' in text:
+            linkified = str(
+                Markup('<a href="mailto:{text}">{text}</a>').format(
+                    text=text
+                )
+            )
+        else:
+            linkified = str(
+                Markup('<a href="{text}">{text}</a>').format(text=text)
+            )
+    else:
+        linkified = linkify_phone(bleach.linkify(text, parse_email=True))
 
     if not escape:
         return linkified
@@ -798,7 +807,7 @@ def binary_to_dictionary(
     }
 
 
-def dictionary_to_binary(dictionary: 'FileDict') -> bytes:
+def dictionary_to_binary(dictionary: 'LaxFileDict') -> bytes:
     """ Takes a dictionary created by :func:`binary_to_dictionary` and returns
     the original binary data.
 

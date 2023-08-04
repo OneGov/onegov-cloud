@@ -161,6 +161,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         #       Column[str]
         title: Column[str]
         password: Column[str]
+        api_keys: 'relationship[list[Any]]'
     else:
         @hybrid_property
         def title(self) -> str:

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-07-25 11:24+0200\n"
+"POT-Creation-Date: 2023-08-03 17:58+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1209,6 +1209,14 @@ msgstr ""
 "hinzugefügt wird, wird eine eine Benachrichtigung an den oben genannten "
 "Empfänger gesendet."
 
+msgid "Rejected Reservations"
+msgstr "Abgelehnte Reservationen"
+
+msgid ""
+"If a reservation is cancelled, a notification will be sent to the above "
+"recipient."
+msgstr ""
+
 msgid "Send on"
 msgstr "Senden am"
 
@@ -1648,6 +1656,9 @@ msgstr "Gever API-Endpunkt, wo die Dokumente hochgeladen werden."
 
 msgid "Website address including https://"
 msgstr "Webseiten-Adresse inklusive https://"
+
+msgid "API Key"
+msgstr "API Schlüssel"
 
 msgid "Submit your event"
 msgstr "Veranstaltung vorschlagen"
@@ -2625,6 +2636,27 @@ msgstr "Zusammenfassung"
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
+msgid ""
+"Api keys can be used to ensure you're not being rate limited. They are not "
+"required to use the API."
+msgstr "Api-Schlüssel können verwendet werden, um sicherzustellen, dass Sie keine Tarifbeschränkungen haben. "
+"Sie sind nicht erforderlich, um die API zu nutzen."
+
+msgid "Application Keys"
+msgstr "Applikations-Schlüssel"
+
+msgid "Key"
+msgstr "Schlüssel"
+
+msgid "Read only"
+msgstr "Nur Lesezugriff"
+
+msgid "Last used"
+msgstr "Zuletzt benutzt"
+
+msgid "Add Key"
+msgstr "Schlüssel hinzufügen"
+
 msgid "State:"
 msgstr "Status:"
 
@@ -3418,6 +3450,19 @@ msgstr "Anmeldung"
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
 
+msgid "The following reservations have been rejected:"
+msgstr "Folgende Reservationen wurden abgelehnt:"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für "
+"${Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
+"möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
+"Empfängerliste entfernen kann."
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
@@ -3795,6 +3840,9 @@ msgstr ""
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Erhält Benachrichtigungen für abgelehnte Reservationen."
 
 msgid "Receives notifications for new reservations."
 msgstr "Erhält Benachrichtigungen für neue Reservationen."
@@ -4585,8 +4633,12 @@ msgstr "Ihre Anmeldung wurde bestätigt"
 msgid "The registration has been confirmed"
 msgstr "Die Anmeldung wurde bestätigt"
 
-msgid "The registration could not be confirmed because the maximum number of participants has been reached"
-msgstr "Die Anmeldung konnte nicht bestätigt werden da die maximale Teilnehmerzahl erreicht ist"
+msgid ""
+"The registration could not be confirmed because the maximum number of "
+"participants has been reached"
+msgstr ""
+"Die Anmeldung konnte nicht bestätigt werden da die maximale Teilnehmerzahl "
+"erreicht ist"
 
 msgid "Your registration has been denied"
 msgstr "Ihre Anmeldung wurde abgelehnt"
@@ -4917,6 +4969,10 @@ msgstr ""
 msgid "The following reservations were rejected"
 msgstr "Die folgenden Reservationen wurden abgelehnt"
 
+#, python-format
+msgid "${org} Rejected Reservation"
+msgstr "${org} Abgelehnte Reservation"
+
 msgid "The reservations were rejected"
 msgstr "Die Reservationen wurden abgelehnt"
 
@@ -5030,6 +5086,18 @@ msgid ""
 "Migrates links from the given domain to the current domain \"${domain}\"."
 msgstr ""
 "Migriert Links von der angegebenen Domain zur aktuellen Domain \"${domain}\"."
+
+msgid "OneGov API"
+msgstr "OneGov API"
+
+msgid "Do you really want to delete this API key?"
+msgstr "Möchten sie diesen API Key wirklich löschen?"
+
+msgid "This action cannot be undone."
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
+
+msgid "ApiKey deleted."
+msgstr "ApiKey gelöscht."
 
 msgid "Topics"
 msgstr "Themen"

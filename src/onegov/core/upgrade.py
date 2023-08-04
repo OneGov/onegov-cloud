@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     # FIXME: Switch to importlib.resources
     from pkg_resources import Distribution, EntryPoint
     from sqlalchemy.engine import Connection
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Query, Session
     from types import CodeType, ModuleType
     from typing import Protocol
     from typing_extensions import ParamSpec, TypeAlias, TypeGuard
@@ -509,12 +509,20 @@ class UpgradeContext:
     def records_per_table(
         self,
         table: str,
-        columns: 'Iterable[Column[Any]]'
+        columns: 'Iterable[Column[Any]] | None' = None
     ) -> 'Iterator[Any]':
+
+        if columns is None:
+            def filter_columns(q: 'Query[Any]') -> 'Query[Any]':
+                return q
+        else:
+            column_names = tuple(c.name for c in columns)
+
+            def filter_columns(q: 'Query[Any]') -> 'Query[Any]':
+                return q.options(load_only(*column_names))
+
         for model in self.models(table):
-            yield from self.session.query(model).options(
-                load_only(*(c.name for c in columns))
-            )
+            yield from filter_columns(self.session.query(model))
 
     @contextmanager
     def stop_search_updates(self) -> 'Iterator[None]':
@@ -535,7 +543,7 @@ class UpgradeContext:
         self,
         table: str,
         column: 'Column[_T]',
-        default: '_T'
+        default: '_T | Callable[[Any], _T]'
     ) -> None:
         # XXX while adding default values we shouldn't reindex the data
         # since this is what the default add_column code does and will be
