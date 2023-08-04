@@ -5,6 +5,8 @@ import time
 
 from contextlib import suppress
 from http.client import RemoteDisconnected
+from typing import Callable
+
 from onegov.core.utils import module_path
 from time import sleep
 
@@ -150,6 +152,24 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         if time_budget <= 0:
             raise RuntimeError("Timeout reached")
+
+    def wait_for(self, condition: Callable[..., bool], timeout: float = 10.0):
+        """Wait until the condition is satisfied or timeout is reached."""
+
+        if not callable(condition):
+            raise ValueError("The condition must be a callable object.")
+
+        time_budget = timeout
+        interval = 0.1
+
+        while time_budget > 0:
+            if condition():
+                return True
+
+            time.sleep(interval)
+            time_budget -= interval
+
+        raise TimeoutError("Timeout reached")
 
     def scroll_to_css(self, css):
         """ Scrolls to the first element matching the given css expression. """

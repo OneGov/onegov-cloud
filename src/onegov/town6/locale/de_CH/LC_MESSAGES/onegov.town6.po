@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-07-25 11:25+0200\n"
+"POT-Creation-Date: 2023-08-03 17:58+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1407,6 +1407,19 @@ msgstr "Anmeldezeitraum"
 msgid "The ticket number is"
 msgstr "Ihre Ticket Referenz"
 
+msgid "The following reservations have been rejected:"
+msgstr "Folgende Reservationen sind abgelehnt worden:"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist eine Benachrichtigung über die abgelehnten Reservierungen für "
+"${Organisation}. Wenn Sie diese Benachrichtigungen nicht mehr erhalten "
+"möchten, kontaktieren Sie bitte einen Administrator, damit er Sie aus der "
+"Empfängerliste entfernen kann."
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Die folgenden Reservationen mussten leider abgesagt werden:"
 
@@ -1773,6 +1786,9 @@ msgstr ""
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Erhält Benachrichtigungen für interne Notizen zu Reservationen."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Erhält Benachrichtigungen für abgelehnte Reservationen."
 
 msgid "Receives notifications for new reservations."
 msgstr "Erhält Benachrichtigungen für neue Reservationen."

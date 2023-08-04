@@ -57,6 +57,13 @@ class ResourceRecipientForm(Form):
                       "above."),
     )
 
+    rejected_reservations = BooleanField(
+        label=_("Rejected Reservations"),
+        fieldset=_("Notifications *"),
+        description=_("If a reservation is cancelled, a notification will "
+                      "be sent to the above recipient."),
+    )
+
     send_on = MultiCheckboxField(
         label=_("Send on"),
         fieldset="Tage und Ressourcen",
@@ -76,8 +83,12 @@ class ResourceRecipientForm(Form):
 
     def validate(self):
         result = super().validate()
-        if not (self.new_reservations.data or self.daily_reservations.data
-                or self.internal_notes.data):
+        if not (
+            self.new_reservations.data
+            or self.daily_reservations.data
+            or self.internal_notes.data
+            or self.rejected_reservations.data
+        ):
             self.daily_reservations.errors.append(
                 _("Please add at least one notification.")
             )

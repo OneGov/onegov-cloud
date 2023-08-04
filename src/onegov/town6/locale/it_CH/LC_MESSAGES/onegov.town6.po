@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-07-25 11:25+0200\n"
+"POT-Creation-Date: 2023-08-03 17:58+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1389,6 +1389,18 @@ msgstr "Finestra di registrazione"
 msgid "The ticket number is"
 msgstr "Il numero del biglietto è"
 
+msgid "The following reservations have been rejected:"
+msgstr "Le seguenti prenotazioni sono state rifiutate:"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Questa è una notifica per le prenotazioni rifiutate per ${organization}. Se "
+"non desideri più ricevere queste notifiche, contatta un amministratore in "
+"modo che possa rimuoverti dall'elenco dei destinatari."
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
@@ -1765,6 +1777,9 @@ msgstr ""
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
 
+msgid "Receives notifications for rejected reservations."
+msgstr "Riceve le notifiche per le prenotazioni rifiutate."
+
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."
 
@@ -2117,6 +2132,3 @@ msgstr "Festività"
 
 msgid "Link Migration"
 msgstr "Migrazione dei link"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Il team di OneGov Cloud"

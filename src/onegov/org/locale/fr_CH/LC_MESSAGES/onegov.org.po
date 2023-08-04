@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-08-02 14:33+0200\n"
+"POT-Creation-Date: 2023-08-03 17:58+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1209,6 +1209,14 @@ msgid ""
 msgstr ""
 "Chaque fois qu'une nouvelle note est ajoutée au ticket pour une réservation,"
 " une notification est envoyée au destinataire ci-dessus."
+
+msgid "Rejected Reservations"
+msgstr "Réservations rejetées"
+
+msgid ""
+"If a reservation is cancelled, a notification will be sent to the above "
+"recipient."
+msgstr ""
 
 msgid "Send on"
 msgstr "Envoyer sur"
@@ -3459,6 +3467,19 @@ msgstr "Inscription "
 msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
 
+msgid "The following reservations have been rejected:"
+msgstr "Les réservations suivantes ont été rejetées :"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Il s'agit d'une notification concernant les réservations rejetées pour "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"veuillez contacter un administrateur afin qu'il vous retire de la liste des "
+"destinataires."
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées :"
 
@@ -3847,6 +3868,9 @@ msgstr ""
 msgid "Receives notifications for internal notes on reservations."
 msgstr ""
 "Reçoit des notifications pour les notes internes sur les réservations."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Reçoit des notifications pour les réservations rejetées."
 
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."
@@ -4981,6 +5005,10 @@ msgstr ""
 
 msgid "The following reservations were rejected"
 msgstr "Les réservations suivantes ont été rejetées"
+
+#, python-format
+msgid "${org} Rejected Reservation"
+msgstr "${org} Réservation rejetée"
 
 msgid "The reservations were rejected"
 msgstr "Les réservations ont été rejetées"

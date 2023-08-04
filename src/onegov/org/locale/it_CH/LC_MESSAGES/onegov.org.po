@@ -2,6 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
+"POT-Creation-Date: 2023-08-03 17:58+0200\n"
 "POT-Creation-Date: 2023-08-02 14:33+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
@@ -1210,6 +1211,14 @@ msgid ""
 msgstr ""
 "Ogni volta in cui sarà aggiunta una nuova nota al biglietto di una "
 "prenotazione, verrà inviata una notifica al suddetto destinatario."
+
+msgid "Rejected Reservations"
+msgstr "Prenotazioni rifiutate"
+
+msgid ""
+"If a reservation is cancelled, a notification will be sent to the above "
+"recipient."
+msgstr ""
 
 msgid "Send on"
 msgstr "Invia il"
@@ -3446,6 +3455,18 @@ msgstr "Registrazione"
 msgid "The ticket number is"
 msgstr "Il numero del biglietto è"
 
+msgid "The following reservations have been rejected:"
+msgstr "Le seguenti prenotazioni sono state rifiutate:"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Questa è una notifica per le prenotazioni rifiutate per ${organization}. Se "
+"non desideri più ricevere queste notifiche, contatta un amministratore in "
+"modo che possa rimuoverti dall'elenco dei destinatari."
+
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
 
@@ -3830,6 +3851,9 @@ msgstr ""
 
 msgid "Receives notifications for internal notes on reservations."
 msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Riceve le notifiche per le prenotazioni rifiutate."
 
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."
@@ -4969,6 +4993,10 @@ msgstr ""
 
 msgid "The following reservations were rejected"
 msgstr "Le seguenti prenotazioni sono state rifiutate"
+
+#, python-format
+msgid "${org} Rejected Reservation"
+msgstr "${org} Prenotazione rifiutata"
 
 msgid "The reservations were rejected"
 msgstr "Le prenotazioni sono state rifiutate"
