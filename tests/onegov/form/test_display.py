@@ -22,6 +22,13 @@ def test_render_textfields():
     assert render_field(MockField('StringField', 'asdf')) == 'asdf'
     assert render_field(MockField('StringField', '<b>')) == '&lt;b&gt;'
 
+    assert render_field(MockField('TextAreaField', 'asdf')) == 'asdf'
+    assert render_field(MockField('TextAreaField', '<b>')) == '&lt;b&gt;'
+    assert render_field(
+        MockField('TextAreaField',
+                  '<script>alert(document.cookie)</script>')) == \
+           '&lt;script&gt;alert(document.cookie)&lt;/script&gt;'
+
 
 def test_render_password():
     assert render_field(MockField('PasswordField', '123')) == '***'
