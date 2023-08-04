@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="occurrence-description">
-                    <p tal:content="structure description"></p>
+                    <span>${layout.render_newlines(occurrence.event.description)}</span>
                 </div>
 
                 <div class="occurrence-image" tal:condition="occurrence.event.image">
@@ -40,7 +40,7 @@
                 <div class="occurrence-price" tal:condition="occurrence.event.price">
                     <dl>
                         <dt i18n:translate>Price</dt>
-                        <dd>${occurrence.event.price}</dd>
+                        <dd>${layout.render_newlines(occurrence.event.price)}</dd>
                     </dl>
                 </div>
 
