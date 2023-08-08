@@ -232,17 +232,24 @@ def change_daily_ticket_statistics_data_format(context):
 
 @upgrade_task('Fix content people for models that use PersonLinkExtension')
 def fix_content_people_for_models_that_use_person_link_extension(context):
-    pages = context.session.query(Page)
-    pages = pages.filter(Page.content['people'].isnot(None))
-    forms = context.session.query(FormDefinition)
-    forms = forms.filter(FormDefinition.content['people'].isnot(None))
-    resources = context.session.query(Resource)
-    resources = resources.filter(Resource.content['people'].isnot(None))
+    iterables = []
+    if context.has_table('pages'):
+        pages = context.session.query(Page)
+        pages = pages.filter(Page.content['people'].isnot(None))
+        iterables.append(pages)
+    if context.has_table('forms'):
+        forms = context.session.query(FormDefinition)
+        forms = forms.filter(FormDefinition.content['people'].isnot(None))
+        iterables.append(forms)
+    if context.has_table('resources'):
+        resources = context.session.query(Resource)
+        resources = resources.filter(Resource.content['people'].isnot(None))
+        iterables.append(resources)
 
     def is_already_updated(people_item):
         return len(people_item) == 2 and isinstance(people_item[1], bool)
 
-    for obj in chain(pages, forms, resources):
+    for obj in chain(*iterables):
         updated_people = []
         for person in obj.content['people']:
             if len(person) == 2 and not is_already_updated(person):
