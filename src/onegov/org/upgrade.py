@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from itertools import chain
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.types import JSON
@@ -13,7 +14,7 @@ from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
-from onegov.page import PageCollection
+from onegov.page import Page, PageCollection
 from onegov.reservation import Resource
 from onegov.user import User
 from sqlalchemy.orm import undefer
@@ -127,7 +128,7 @@ def add_content_show_property_to_people(context):
     pages = q.filter(Topic.content['people'].isnot(None))
 
     def is_already_updated(people_item):
-        return isinstance(people_item[1], tuple)
+        return len(people_item) == 2 and isinstance(people_item[1], bool)
 
     for page in pages:
         updated_people = []
@@ -227,3 +228,26 @@ def change_daily_ticket_statistics_data_format(context):
             'ticket_statistics',
             'daily' if daily else 'never'
         )
+
+
+@upgrade_task('Fix content people for models that use PersonLinkExtension')
+def fix_content_people_for_models_that_use_person_link_extension(context):
+    pages = context.session.query(Page)
+    pages = pages.filter(Page.content['people'].isnot(None))
+    forms = context.session.query(FormDefinition)
+    forms = forms.filter(FormDefinition.content['people'].isnot(None))
+    resources = context.session.query(Resource)
+    resources = resources.filter(Resource.content['people'].isnot(None))
+
+    def is_already_updated(people_item):
+        return len(people_item) == 2 and isinstance(people_item[1], bool)
+
+    for obj in chain(pages, forms, resources):
+        updated_people = []
+        for person in obj.content['people']:
+            if len(person) == 2 and not is_already_updated(person):
+                # (id, function) -> (id, (function, show_function))
+                updated_people.append([person[0], (person[1], True)])
+            else:
+                updated_people.append(person)
+        obj.content['people'] = updated_people
