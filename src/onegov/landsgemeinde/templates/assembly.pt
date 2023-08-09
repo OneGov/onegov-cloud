@@ -4,21 +4,11 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
-            <div class="medium-7 cell main-content">
+            <div class="medium-6  cell main-content">
                 <div class="assembly-overview" tal:content="structure assembly.overview"></div>
-                <div class="assembly-agenda-items" tal:condition="agenda_items">
-                    <h2 i18n:translate="">Agenda items</h2>
-                    <ul class="more-list agenda-item-list">
-                        <li tal:repeat="agenda_item agenda_items">
-                            <a class="list-link" tal:attributes="href request.link(agenda_item)">
-                                <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h5>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
             </div>
 
-            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+            <div class="medium-5 cell medium-offset-1 sidebar">
 
                 <div class="side-panel downloads" tal:condition="assembly.memorial_pdf or assembly.memorial_2_pdf or assembly.memorial_supplement_pdf or assembly.protocol_pdf or assembly.audio_mp3 or assembly.audio_zip">
                     <h2 i18n:translate="">Downloads</h2>
@@ -72,6 +62,26 @@
                 <div class="side-panel video" tal:condition="assembly.video_url">
                     <h2 i18n:translate="">Video</h2>
                     <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
+                </div>
+
+                <div class="side-panel assembly-agenda-items" tal:condition="agenda_items">
+                    <h2 i18n:translate="">Agenda items</h2>
+                    <ul class="more-list agenda-item-list"> 
+                        <li tal:repeat="agenda_item agenda_items">
+                            <a class="list-link" tal:attributes="href request.link(agenda_item)">
+                                <div class="timeline">
+                                    <div class="line"></div>
+                                    <div class="circle">
+                                        <span class="number">${agenda_items.index(agenda_item)+1}</span>
+                                    </div>
+                                    <div class="line"></div>
+                                </div>
+                                <div class="title">
+                                    <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h5>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
