@@ -77,8 +77,14 @@ h6 small,
 }
 
 .callout.secondary.agenda-item-resolution {
-    margin-top: 1rem;
+    background: transparent;
+    border: 0;
+    border-left: 2px solid rgb(227, 0, 11);
+    border-radius: 0;
+    box-shadow: -10px 0 10px -10px rgba(34, 0, 0, .11);
+    font-weight: bold;
     margin-bottom: 2.5rem;
+    margin-top: 1rem;
   }
 
 .ticker-item {
@@ -92,12 +98,8 @@ h6 small,
         padding-top: 0;
     }
 
-    .callout.secondary {
-        background: transparent;
-        border: 0;
-        border-left: 2px solid rgb(227, 0, 11);
-        border-radius: 0;
-        box-shadow: -10px 0 10px -10px rgba(34, 0, 0, .11);
+    .agenda-item-resolution {
+        font-weight: normal;
     }
 }
 
@@ -248,7 +250,8 @@ h6 small,
 }
 
 /*Download Icons*/
-.downloads a {
+.downloads a,
+.memorial-link {
     background: $white-smoke;
     border-radius: .7rem;
     display: block;
@@ -267,12 +270,10 @@ h6 small,
 }
 
 .memorial-link {
-    background: $white-smoke;
-    border-radius: .7rem;
-    display: block;
-    padding: .7rem 1.5rem;
+    background: transparent;
+    border: 1px solid $aluminum;
 
-    .fa-download {
-        margin-right: 1rem;
+    &:hover {
+        background: $white-smoke;
     }
 }
