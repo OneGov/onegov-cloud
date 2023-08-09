@@ -1,19 +1,19 @@
 import sedate
 
-from cached_property import cached_property
 from copy import copy
 from datetime import timedelta
+from functools import cached_property
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
-from onegov.directory import Directory, DirectoryEntry, \
-    DirectoryEntryCollection
+from onegov.directory import (
+    Directory, DirectoryEntry, DirectoryEntryCollection)
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.submissions import prepare_for_submission
 from onegov.org import _
-from onegov.org.models.extensions import CoordinatesExtension, \
-    PublicationExtension
+from onegov.org.models.extensions import (
+    CoordinatesExtension, PublicationExtension)
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.pay import Price

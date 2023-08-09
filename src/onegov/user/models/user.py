@@ -162,6 +162,7 @@ class User(Base, TimestampMixin, ORMSearchable):
         #       Column[str]
         title: Column[str]
         password: Column[str]
+        api_keys: 'relationship[list[Any]]'
     else:
         @hybrid_property
         def title(self) -> str:
@@ -175,7 +176,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
             return self.username
 
-        @title.expression  # type:ignore[no-redef]
+        @title.expression
         def title(cls):
             return func.coalesce(
                 func.nullif(func.trim(cls.realname), ''), cls.username
@@ -186,7 +187,7 @@ class User(Base, TimestampMixin, ORMSearchable):
             """ An alias for :attr:`password_hash`. """
             return self.password_hash
 
-        @password.setter  # type:ignore[no-redef]
+        @password.setter
         def password(self, value):
             """ When set, the given password in cleartext is hashed using
             onegov.core's default hashing algorithm.

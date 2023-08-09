@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.gis import Coordinates
 from onegov.translator_directory import _
 from onegov.translator_directory.constants import ADMISSIONS

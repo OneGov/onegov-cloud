@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from sedate import utcnow, to_timezone
 
 from onegov.core.html_diff import render_html_diff
@@ -247,9 +247,10 @@ class PublicationFormExtension(FormExtension, name='publication'):
                     return
 
                 if end.data <= start.data:
-                    self.errors.setdefault('global-errors', [])
-                    self.errors['global-errors'].append(
-                        _("Publication start must be prior to end"))
+                    for field_name in ('publication_start', 'publication_end'):
+                        field = getattr(self, field_name)
+                        field.errors.append(
+                            _("Publication start must be prior to end"))
                     return False
 
         return PublicationForm

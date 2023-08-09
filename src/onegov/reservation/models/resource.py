@@ -17,12 +17,13 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import cast, Any, Literal, TYPE_CHECKING
+# type gets shadowed by type in model, so we use Type as an alias
+from typing import cast, Any, Literal, Type, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Sequence
+    from libres.context.core import Context
     from libres.db.scheduler import Scheduler
-    from libres.modules.context import Context
     from onegov.core.orm.mixins import dict_property
     from onegov.form import Form
     from onegov.reservation.models import CustomReservation
@@ -181,7 +182,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
             if len(value) != 2:
                 raise ValueError("Deadline is not a tuple with two elements")
 
-            if type(value[0]) != int:
+            if not isinstance(value[0], int):
                 raise ValueError("Deadline value is not an int")
 
             if value[0] < 1:
@@ -231,7 +232,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         self.libres_context = libres_context
 
     @property
-    def form_class(self) -> 'Form | None':
+    def form_class(self) -> 'Type[Form] | None':
         """ Parses the form definition and returns a form class. """
 
         if not self.definition:

@@ -39,7 +39,9 @@
                 <div class="occurrence-price" tal:condition="occurrence.event.price">
                     <dl>
                         <dt i18n:translate>Price</dt>
-                        <dd>${occurrence.event.price}</dd>
+                        <tal:dd tal:repeat="line occurrence.event.price.split('\n')">
+                        ${line}<br tal:condition="not:repeat.line.end" />
+                        </tal:dd>
                     </dl>
                 </div>
 

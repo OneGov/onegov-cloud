@@ -31,9 +31,16 @@ module = [
     "onegov.chat.*",
     "onegov.core.*",
     "onegov.file.*",
+    "onegov.form.*",
+    "onegov.gever.*",
+    "onegov.newsletter.*",
+    "onegov.notice.*",
+    "onegov.page.*",
     "onegov.pay.*",
+    "onegov.qrcode.*",
     "onegov.reservation.*",
     "onegov.server.*",
+    "onegov.ticket.*",
     "onegov.user.*"
 ]
 warn_unreachable = true
@@ -46,21 +53,17 @@ module = [
     "alembic.*",
     "bjoern.*",
     "blinker.*",
-    # FIXME: replace this with stdlib version that was added in 3.9?
-    "cached_property.*",
     "chameleon.*",
     # FIXME: do we actually make good use of this?
     "colour.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
     "dectate.*",
-    "depot.*",
     "docxtpl.*",
     "dill.*",
     "dukpy.*",
     # FIXME: is this still faster than stdlib? it's not maintained
     "fastcache.*",
-    "furl.*",
     "genshi.*",
     "html2text.*",
     "icalendar.*",
@@ -73,18 +76,18 @@ module = [
     #       langdetect is really, really slow by comparison...
     "langdetect.*",
     "lazy_object_proxy.*",
-    "libres.*",
     "mistletoe.*",
     "more.*",
     "morepath.*",
     "msal.*",
     "pdfdocument.*",
-    # FIXME: pypdf has a sane API now and is still maintained
-    #        so maybe we should switch to using that
+    # FIXME: We only use this to convert a PDF to an XObject and then
+    #        embed it as a reportlab Flowable. I think we could implement
+    #        this using just pypdf, having multiple PDF parsers just for
+    #        this one use-case seems bad
     "pdfrw.*",
     "pdftotext.*",
     "pglast.*",
-    # FIXME: Do we need both furl and purl?!
     "purl.*",
     "pyquery.*",
     "qrbill.*",
@@ -104,13 +107,7 @@ module = [
     "stdnum.*",
     "transaction.*",
     "ua_parser.*",
-    # FIXME: This is unmaintained, maybe python-ulid or ulid-transform
-    #        would be better to use now?
-    "ulid.*",
     "urlextract.*",
-    # FIXME: This is unmaintained. I believe WTForms uses email-validate
-    #        so we could just use that, since it's already installed...
-    "validate_email.*",
     "webassets.*",
     "webtest.*",
     "wtforms.*",

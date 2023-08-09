@@ -35,7 +35,6 @@ path.
 
 import os.path
 
-from cached_property import cached_property
 from chameleon import PageTemplate as PageTemplateBase
 from chameleon import PageTemplateFile as PageTemplateFileBase
 from chameleon import PageTemplateLoader
@@ -43,6 +42,7 @@ from chameleon import PageTextTemplateFile
 from chameleon.astutil import Builtin
 from chameleon.tal import RepeatDict
 from chameleon.utils import Scope
+from functools import cached_property
 from onegov.core.framework import Framework
 
 
@@ -219,7 +219,7 @@ def get_chameleon_render(
 
 
 def render_template(
-    template: PageTemplate,
+    template: str,
     request: 'CoreRequest',
     content: dict[str, Any],
     suppress_global_variables: bool = True
@@ -237,12 +237,12 @@ def render_template(
         suppress_global_variables = template.startswith('mail_')
 
     registry = request.app.config.template_engine_registry
-    template = registry._template_loaders['.pt'][template]
+    page_template = registry._template_loaders['.pt'][template]
 
     variables = get_default_vars(
         request, content, suppress_global_variables=suppress_global_variables)
 
-    return template.render(**variables)
+    return page_template.render(**variables)
 
 
 def render_macro(

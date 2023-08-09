@@ -1,5 +1,5 @@
-from cached_property import cached_property
 from decimal import Decimal
+from functools import cached_property
 from onegov.swissvotes import _
 
 

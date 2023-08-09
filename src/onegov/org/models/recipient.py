@@ -7,7 +7,9 @@ class ResourceRecipient(GenericRecipient):
 
     daily_reservations = content_property()
     new_reservations = content_property()
+    internal_notes = content_property()
     send_on = content_property()
+    rejected_reservations = content_property()
     resources = content_property()
 
 

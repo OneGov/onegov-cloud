@@ -72,7 +72,7 @@
     <table class="field-display" tal:condition="rendered_fields">
         <tal:b repeat="(field, rendered) rendered_fields">
             <tr><td><b>${field.label.text}</b></td></tr>
-            <tr><td><tal:b replace="structure rendered" /></td></tr>
+            <tr><td>${rendered}</td></tr>
             <tr><td height="5"></td></tr>
         </tal:b>
     </table>

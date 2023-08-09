@@ -89,7 +89,7 @@ def migrate_file_metadata_to_jsonb(context: 'UpgradeContext') -> None:
 
     context.operations.drop_index('files_by_type_and_name')
 
-    context.add_column_with_defaults(  # type:ignore[misc]
+    context.add_column_with_defaults(
         table='files',
         column=Column('order', Text, nullable=False),
         default=lambda r: normalize_for_url(r.name))
@@ -144,13 +144,13 @@ def add_thumbnails_to_pdfs(context: 'UpgradeContext') -> None:
                 e.map(pdf_filter.generate_thumbnail, contents)
             )
 
-            for pdf, thumbnail in results:
+            for pdf, (thumbnail, size) in results:
                 # potentially dangerous and might not work with other storage
                 # providers, so don't reuse unless you are sure about the
                 # consequences
                 pdf.reference._thaw()
 
-                pdf_filter.store_thumbnail(pdf.reference, thumbnail)
+                pdf_filter.store_thumbnail(pdf.reference, thumbnail, size)
 
                 flag_modified(pdf, 'reference')
 

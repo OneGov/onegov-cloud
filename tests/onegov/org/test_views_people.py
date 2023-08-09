@@ -132,7 +132,7 @@ def test_delete_linked_person_issue_149(client):
     edit_page.form.submit().follow()
 
 
-def test_context_specific_function_substring_removed(session, org_app):
+def test_context_specific_function(session, org_app):
     organizations = ["Urnenbüro", "Forum der Ortsparteien und Quartiervereine"]
     context_specific_functions = [
         "Präsidentin Urnenbüro",
@@ -145,8 +145,10 @@ def test_context_specific_function_substring_removed(session, org_app):
         last_name="Fall",
     )
     session.add(person)
-    person_to_function1 = [[person.id.hex, context_specific_functions[0]]]
-    person_to_function2 = [[person.id.hex, context_specific_functions[1]]]
+    person_to_function1 = [[person.id.hex, (context_specific_functions[0],
+                                            True)]]
+    person_to_function2 = [[person.id.hex, (context_specific_functions[1],
+                                            True)]]
 
     topic1 = Topic(title=organizations[0], name="topic1")
     topic2 = Topic(title=organizations[1], name="topic2")
@@ -161,9 +163,6 @@ def test_context_specific_function_substring_removed(session, org_app):
         environ={
             "wsgi.url_scheme": "https",
             "PATH_INFO": "/",
-            "SERVER_NAME": "",
-            "SERVER_PORT": "",
-            "SERVER_PROTOCOL": "https",
             "HTTP_HOST": "localhost",
         }, app=org_app,
     )
@@ -183,3 +182,22 @@ def test_context_specific_function_substring_removed(session, org_app):
                              f"{context_specific_functions[1]}</span>")
     assert organization_to_function[0] == first_expected
     assert organization_to_function[1] == second_expected
+
+    # Now make it not visible
+    person_to_function1 = [[person.id.hex, (context_specific_functions[0],
+                                            False)]]
+    person_to_function2 = [[person.id.hex, (context_specific_functions[1],
+                                            False)]]
+
+    topic1.content = {'people': person_to_function1}
+    topic2.content = {'people': person_to_function2}
+    session.add(topic1)
+    session.add(topic2)
+    topics = [topic1, topic2]
+
+    session.flush()
+
+    organization_to_function = person_functions_by_organization(
+        person, topics, request
+    )
+    assert organization_to_function == []

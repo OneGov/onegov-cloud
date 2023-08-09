@@ -1,4 +1,4 @@
-from cached_property import cached_property
+from functools import cached_property
 from onegov.activity import Activity, Attendee, Booking, Occasion
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp

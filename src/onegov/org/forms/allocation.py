@@ -1,6 +1,6 @@
 import sedate
 
-from cached_property import cached_property
+from functools import cached_property
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY

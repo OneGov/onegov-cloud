@@ -1,7 +1,7 @@
 import re
 
-from cached_property import cached_property
 from collections import defaultdict
+from functools import cached_property
 from datetime import date
 from decimal import Decimal
 from lxml import etree

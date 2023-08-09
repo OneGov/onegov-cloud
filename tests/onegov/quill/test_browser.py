@@ -66,7 +66,11 @@ def browser(request, browser, wsgi_server):
 
 
 def test_init(browser):
-    browser.visit('/')
+    # FIXME: Getting rid of this error might require updating
+    #        to a newer version of quill
+    browser.visit('/', expected_errors=[{
+        'level': 'WARNING', 'rgxp': 'Consider using MutationObserver'
+    }])
     assert 'quill.bundle.js' in browser.html
     browser.wait_for_js_variable('loaded')
     toolbars = browser.find_by_css('.ql-toolbar')

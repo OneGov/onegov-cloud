@@ -37,16 +37,31 @@ class ResourceRecipientForm(Form):
     new_reservations = BooleanField(
         label=_("New Reservations"),
         fieldset=_("Notifications *"),
-        description=("Bei jeder neuen Reservation wird eine Benachrichtigung "
-                     "an den obenstehendes Empfänger gesendet."),
+        description=_("For each new reservation, a notification will be sent "
+                      "to the above recipient."),
     )
 
     daily_reservations = BooleanField(
         label=_("Daily Reservations"),
         fieldset=_("Notifications *"),
-        description=("An jedem unten ausgewählten Tag wird um 06:00 eine "
-                     "Benachrichtigung mit den Reservationen des Tages an den "
-                     "obenstehenden Empfänger gesendet."),
+        description=_("On each day selected below, a notification with the "
+                      "day's reservations will be sent to the recipient above "
+                      "at 06:00."),
+    )
+
+    internal_notes = BooleanField(
+        label=_("Internal Notes"),
+        fieldset=_("Notifications *"),
+        description=_("Each time a new note is added to the ticket for a "
+                      "reservation, a notification is sent to the recipient "
+                      "above."),
+    )
+
+    rejected_reservations = BooleanField(
+        label=_("Rejected Reservations"),
+        fieldset=_("Notifications *"),
+        description=_("If a reservation is cancelled, a notification will "
+                      "be sent to the above recipient."),
     )
 
     send_on = MultiCheckboxField(
@@ -68,7 +83,12 @@ class ResourceRecipientForm(Form):
 
     def validate(self):
         result = super().validate()
-        if not (self.new_reservations.data or self.daily_reservations.data):
+        if not (
+            self.new_reservations.data
+            or self.daily_reservations.data
+            or self.internal_notes.data
+            or self.rejected_reservations.data
+        ):
             self.daily_reservations.errors.append(
                 _("Please add at least one notification.")
             )

@@ -2,7 +2,7 @@ import datetime
 import json
 import re
 
-from cached_property import cached_property
+from functools import cached_property
 from lxml import etree
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
@@ -1063,6 +1063,16 @@ class GeverSettingsForm(Form):
 
         self.gever_username.data = model.gever_username or ""
         self.gever_password.data = model.gever_password or ""
+
+
+class OneGovApiSettingsForm(Form):
+    """Provides a form to generate API keys (UUID'S) for the OneGov API."""
+
+    name = StringField(
+        default=_("API Key"),
+        label=_("Name"),
+        validators=[InputRequired()],
+    )
 
 
 class EventSettingsForm(Form):

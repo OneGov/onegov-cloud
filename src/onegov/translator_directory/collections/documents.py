@@ -1,6 +1,6 @@
 from itertools import groupby
 
-from cached_property import cached_property
+from functools import cached_property
 
 
 # This can be changed anytime without making further changes

@@ -2,12 +2,12 @@ import babel.dates
 import re
 
 from babel import Locale
-from chameleon.utils import Markup
-from cached_property import cached_property
 from datetime import date, datetime, time, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
 from decimal import Decimal
+from functools import cached_property
+from markupsafe import Markup
 from onegov.chat import TextModuleCollection
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.custom import json
@@ -549,7 +549,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             text = self.request.translate(text)
         return linkify(text).replace('\n', '<br>') if text else text
 
-    def linkify_field(self, field, rendered):
+    def linkify_field(self, field, rendered: Markup) -> Markup:
         include = ('TextAreaField', 'StringField', 'EmailField', 'URLField')
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
@@ -558,13 +558,20 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             if field.render_kw.get('class_') == 'editor':
                 return rendered
         if field.type in include:
-            return self.linkify(rendered.replace('<br>', '\n'))
+            # FIXME: Get rid of this conversion back and forth between Markup
+            #        and str, but for now we only wanted to ensure rendered
+            #        fields always return Markup, so we don't have to change
+            #        as many places
+            return Markup(self.linkify(str(rendered).replace('<br>', '\n')))
         return rendered
 
     @property
     def file_link_target(self):
         """ Use with tal:attributes='target layout.file_link_target' """
         return '_blank' if self.org.open_files_target_blank else None
+
+    # so we can create Markup in layouts
+    Markup = Markup
 
 
 class DefaultLayoutMixin:

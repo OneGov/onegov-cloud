@@ -28,10 +28,9 @@ import sys
 import traceback
 
 from base64 import b64encode
-from cached_property import cached_property
 from datetime import datetime
 from dectate import directive
-from functools import wraps
+from functools import cached_property, wraps
 from itsdangerous import BadSignature, Signer
 from morepath.publish import resolve_model, get_view_name
 from more.content_security import ContentSecurityApp

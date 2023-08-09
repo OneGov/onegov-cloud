@@ -1,7 +1,7 @@
 import datetime
 import sqlalchemy
 
-from cached_property import cached_property
+from functools import cached_property
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
