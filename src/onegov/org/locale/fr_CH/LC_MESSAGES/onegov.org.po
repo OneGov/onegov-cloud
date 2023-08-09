@@ -1433,6 +1433,9 @@ msgstr "Couleur de la police de l'annonce"
 msgid "Only show Announcement for logged-in users"
 msgstr "Afficher l'annonce uniquement pour les utilisateurs connectés"
 
+msgid "Keep header links fixed to top on scrolling"
+msgstr "Maintenir les liens de l'en-tête en haut lors du défilement"
+
 msgid "Header links"
 msgstr "Liens d'en-tête"
 
@@ -2472,6 +2475,7 @@ msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 

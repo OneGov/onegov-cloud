@@ -1432,6 +1432,9 @@ msgstr "Schriftfarbe der Ankündigung"
 msgid "Only show Announcement for logged-in users"
 msgstr "Ankündigung nur für eingeloggte Benutzer anzeigen"
 
+msgid "Keep header links fixed to top on scrolling"
+msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"
+
 msgid "Header links"
 msgstr "Kopfzeilenlinks"
 
