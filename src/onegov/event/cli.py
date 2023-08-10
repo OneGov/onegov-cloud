@@ -190,6 +190,7 @@ def import_json(group_context, url, tagmap, clear):
             ) if line))
 
             organizer_email = item['contact_email'] or None
+            organizer_phone = item['contact_phone'] or None
 
             location = ', '.join((line for line in (
                 item['locality'] or '',
@@ -241,6 +242,7 @@ def import_json(group_context, url, tagmap, clear):
                 description=description,
                 organizer=organizer,
                 organizer_email=organizer_email,
+                organizer_phone=organizer_phone,
                 location=location,
                 coordinates=coordinates,
                 price=price,
@@ -416,6 +418,7 @@ def import_guidle(group_context, url, tagmap, clear):
                             description=offer.description,
                             organizer=offer.organizer,
                             organizer_email=offer.organizer_email,
+                            organizer_phone=offer.organizer_phone,
                             price=offer.price,
                             location=offer.location,
                             coordinates=offer.coordinates,

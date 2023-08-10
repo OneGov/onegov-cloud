@@ -884,8 +884,11 @@ msgstr "Prezzo"
 msgid "Organizer"
 msgstr "Organizzatore"
 
-msgid "Organizer E-Mail"
-msgstr "E-mail dell'organizzatore"
+msgid "Organizer E-Mail Address"
+msgstr "Indirizzo e-mail dell'organizzatore"
+
+msgid "Organizer Phone Number"
+msgstr "Numero di telefono dell'organizzatore"
 
 msgid "Tags"
 msgstr "Tag"

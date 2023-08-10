@@ -389,6 +389,7 @@ class OccurrenceCollection(Pagination):
             event.organizer = e.organizer
             event.event_url = e.external_event_url
             event.organizer_email = e.organizer_email
+            event.organizer_phone = e.organizer_phone
             event.modified = e.last_change
             root.append(event)
 

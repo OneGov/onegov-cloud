@@ -672,8 +672,11 @@ msgstr "Organisator"
 msgid "Music society"
 msgstr "Musikverein"
 
-msgid "Organizer E-Mail"
-msgstr "Organisator E-Mail"
+msgid "Organizer E-Mail Address"
+msgstr "Organisator E-Mail Adresse"
+
+msgid "Organizer Phone Number"
+msgstr "Organisator Telefon Nummer"
 
 msgid "Shown as contact address"
 msgstr "Wird als Kontakt-Adresse angezeigt"
