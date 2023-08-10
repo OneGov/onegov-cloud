@@ -310,8 +310,8 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         # onegov specific kwargs that get popped off
         *,
         fieldset: str | None = None,
-        depends_on: Sequence[Any] | None = None,
-        pricing: PricingRules | None = None,
+        depends_on: 'Sequence[Any] | None' = None,
+        pricing: 'PricingRules | None' = None,
     ):
         if upload_widget is None:
             upload_widget = self.upload_widget
