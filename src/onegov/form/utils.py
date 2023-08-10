@@ -6,7 +6,7 @@ from decimal import Decimal
 from unidecode import unidecode
 
 
-from typing import overload, TYPE_CHECKING
+from typing import overload, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.form import Form
     from typing_extensions import Self
@@ -28,7 +28,7 @@ def as_internal_id(label: str) -> str:
 
 def get_fields_from_class(
     cls: type['Form']
-) -> list[tuple[str, 'UnboundField']]:
+) -> list[tuple[str, 'UnboundField[Any]']]:
 
     fields = [
         (name, field)
@@ -56,7 +56,8 @@ def disable_required_attribute_in_html_inputs() -> None:
         return original_html_params(**kwargs)
 
     wtforms.widgets.core.html_params = patched_html_params
-    wtforms.widgets.core.Input.html_params = staticmethod(patched_html_params)
+    wtforms.widgets.core.Input.html_params = staticmethod(  # type:ignore
+        patched_html_params)
 
 
 class decimal_range:

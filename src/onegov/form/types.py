@@ -1,19 +1,20 @@
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable
     from onegov.form import Form
-    from markupsafe import Markup
-    from typing import Any, Literal, Protocol
+    from typing import Any, Literal, TypeVar
     from typing_extensions import TypeAlias
     from webob.request import _FieldStorageWithFile
-    from wtforms import Field, Form as BaseForm
+    from wtforms.fields.core import _Filter, _Validator, _Widget, Field
 
-    class Widget(Protocol):
-        def __call__(self, field: 'Field', **kwargs: Any) -> Markup: ...
+    _FormT = TypeVar('_FormT', bound=Form, contravariant=True)
+    _FieldT = TypeVar('_FieldT', bound=Field, contravariant=True)
 
-    Filter: TypeAlias = Callable[[Any], Any]
-    BaseValidator: TypeAlias = Callable[[BaseForm, Field], object]
-    Validator: TypeAlias = Callable[[Form, Field], object] | BaseValidator
+    Widget: TypeAlias = _Widget
+    Filter: TypeAlias = _Filter
+    BaseValidator: TypeAlias = _Validator
+    # validator is slightly more specific in that it expects our Form type
+    Validator: TypeAlias = _Validator[_FormT, _FieldT]
+    Validators: TypeAlias = tuple[_Validator[_FormT, _FieldT], ...] | list[Any]
     RawPricing: TypeAlias = tuple[float, str] | tuple[float, str, bool]
     PricingRules: TypeAlias = dict[str | range, RawPricing]
     SubmissionState: TypeAlias = Literal['pending', 'complete']
