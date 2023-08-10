@@ -1,6 +1,6 @@
 import json
 import re
-import textwrap
+from textwrap import dedent
 from datetime import date, timedelta, datetime
 
 import os
@@ -249,7 +249,7 @@ def test_send_ticket_email(client):
 
     # make sure the same holds true for forms
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         Name * = ___
         E-Mail * = @@@
     """), type='custom')
@@ -318,7 +318,7 @@ def test_email_for_new_tickets(client):
 
     # fill out a form to automatically send a notification mail
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         Name * = ___
         E-Mail * = @@@
     """), type='custom')
@@ -379,7 +379,7 @@ def test_email_for_new_tickets(client):
 
 def test_ticket_notes(client):
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         First name * = ___
         Last name * = ___
         E-Mail * = @@@
@@ -458,7 +458,7 @@ def test_ticket_notes(client):
 
 def test_ticket_chat(client):
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         First name * = ___
         Last name * = ___
         E-Mail * = @@@
@@ -709,3 +709,34 @@ def test_assign_tickets(client):
         f'{ticket_number} / newsletter: Sie haben ein neues Ticket'
     )
     assert message['To'] == 'editor@example.org'
+
+
+def test_redact_tickets(client):
+    client.login_admin()
+
+    # add form
+    manage = client.get('/forms/new')
+    manage.form['title'] = 'newsletter'
+    manage.form['definition'] = dedent("""# Personendaten
+        Vorname *= ___
+        Name *= ___
+        Strasse/Nummer *= ___
+        PLZ *= ___
+        Ort *= ___
+        Telefon *= ___
+        Bemerkung = ...
+
+        # Versand
+        Versand * =
+            (x) Ich möchte die Bestellung am Schalter abholen.
+            ( ) Ich möchte die Bestellung mittels Post erhalten. (5 CHF!) """)
+
+    manage.form.submit()
+
+    # open a ticket
+    page = client.get('/form/newsletter')
+    page.form['e_mail'] = 'hans.maulwurf@simpsons.com'
+
+    # page = page.form.submit().follow().form.submit().follow()
+
+    # archive and delete ticket

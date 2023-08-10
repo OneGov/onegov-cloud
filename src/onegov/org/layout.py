@@ -1176,20 +1176,6 @@ class TicketLayout(DefaultLayout):
                         self.request.link(self.model, 'delete')
                     ),
                     attrs={'class': ('ticket-button', 'ticket-delete')},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to delete this ticket?"),
-                            _("This cannot be undone."),
-                            _("Delete ticket "),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='GET',
-                            redirect_after=self.request.link(
-                                self.collection
-                            ),
-                        )
-                    )
                 ))
 
             if self.model.state != 'closed':

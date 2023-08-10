@@ -207,12 +207,15 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
         return False
         #  ...for later when deletion will be available
         if not self.ticket.state == 'archived':
+            breakpoint()
             return False
         if self.payment:
             # For now we do not handle this case since payment might be
             # needed for exports
+            breakpoint()
             return False
         if self.undecided:
+            breakpoint()
             return False
         return True
 

@@ -2563,6 +2563,7 @@ $ticket-archive-icon: '\f1c6';
 $ticket-filter-icon-mr: .5em;
 $ticket-notification-enabled-icon: '\f0f3';
 $ticket-notification-disabled-icon: '\f1f6';
+$delete-ticket-icon: '\f1f8';
 $archive-ticket-icon: '\f1c6';
 
 .ticket-notifications {
@@ -2785,6 +2786,16 @@ tr.ticket:hover {
     &:hover::before {
         content: $close-ticket-icon-hover;
     }
+}
+
+.ticket-delete {
+    float: right;
+
+    &::before {
+        @include icon($delete-ticket-icon);
+        margin-right: 1ex;
+    }
+
 }
 
 .ticket-reopen {
