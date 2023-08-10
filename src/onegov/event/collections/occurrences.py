@@ -49,6 +49,7 @@ class OccurrenceCollection(Pagination):
         tags=None,
         locations=None,
         only_public=False,
+        search_widget=None,
     ):
         self.session = session
         self.page = page
@@ -58,12 +59,21 @@ class OccurrenceCollection(Pagination):
         self.tags = tags if tags else []
         self.locations = locations if locations else []
         self.only_public = only_public
+        self.search_widget = search_widget
 
     def __eq__(self, other):
         return self.page == other.page
 
     def subset(self):
         return self.query()
+
+    @property
+    def search(self):
+        return self.search_widget and self.search_widget.name
+
+    @property
+    def search_query(self):
+        return self.search_widget and self.search_widget.search_query
 
     @property
     def page_index(self):
@@ -80,6 +90,7 @@ class OccurrenceCollection(Pagination):
             tags=self.tags,
             locations=self.locations,
             only_public=self.only_public,
+            search_widget=self.search_widget
         )
 
     def range_to_dates(self, range, start=None, end=None):
@@ -171,6 +182,7 @@ class OccurrenceCollection(Pagination):
             tags=tags,
             locations=locations,
             only_public=self.only_public,
+            search_widget=self.search_widget,
         )
 
     @cached_property
@@ -215,6 +227,8 @@ class OccurrenceCollection(Pagination):
         Start and end date are assumed to be dates only and therefore without
         a timezone - we search for the given date in the timezone of the
         occurrence.
+
+        In case of a search widget the query is handled by the widget
 
         """
 
@@ -291,6 +305,9 @@ class OccurrenceCollection(Pagination):
             query = query.order_by(Occurrence.start.desc(), Occurrence.title)
         else:
             query = query.order_by(Occurrence.start, Occurrence.title)
+
+        if self.search_widget:
+            query = self.search_widget.adapt(query)
 
         return query
 

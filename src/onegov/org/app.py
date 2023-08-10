@@ -45,6 +45,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     export = directive(directives.ExportAction)
     userlinks = directive(directives.UserlinkAction)
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
+    event_search_widget = directive(directives.EventSearchWidgetAction)
     settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
 

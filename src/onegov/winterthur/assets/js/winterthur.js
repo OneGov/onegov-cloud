@@ -17,7 +17,7 @@ $(document).ready(function() {
 
 // the search reset button in the directory search resets the whole view
 $(document).ready(function() {
-    $('#inline-search .reset-button').click(function(e) {
+    $('#inline-directory-search .reset-button').click(function(e) {
         var $form = $(this).closest('form');
         var $inputs = $form.find('input');
 

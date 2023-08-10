@@ -81,6 +81,28 @@ class DirectorySearchWidgetAction(Action):
         directory_search_widget_registry[self.name] = cls
 
 
+class EventSearchWidgetAction(Action):
+    """ Registers a text search widget. """
+
+    config = {
+        'event_search_widget_registry': dict
+    }
+
+    def __init__(self, name):
+        self.name = name
+
+    def identifier(self, event_search_widget_registry):
+        return self.name
+
+    def perform(self, cls, event_search_widget_registry):
+        cls.name = self.name
+
+        assert hasattr(cls, 'html')
+        assert hasattr(cls, 'adapt')
+
+        event_search_widget_registry[self.name] = cls
+
+
 class SettingsView(Action):
     """ Registers a settings view. """
 
