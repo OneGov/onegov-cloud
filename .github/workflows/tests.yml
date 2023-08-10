@@ -74,20 +74,6 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Get branch name (merge)
-      if: github.event_name != 'pull_request'
-      shell: bash
-      run: |
-        echo "BUILDKITE_BRANCH=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" \
-             >> $GITHUB_ENV
-
-    - name: Get branch name (pull request)
-      if: github.event_name == 'pull_request'
-      shell: bash
-      run: |
-        echo "BUILDKITE_BRANCH=$(echo ${GITHUB_HEAD_REF} | tr / -)" \
-             >> $GITHUB_ENV
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -105,7 +91,9 @@ jobs:
       run: bandit --recursive --configfile pyproject.toml src/
 
     - name: Static type checking
-      run: mypy -p onegov
+      run: bash mypy.sh
+      env:
+        SKIP_VENV: 1
 
   test:
     strategy:
