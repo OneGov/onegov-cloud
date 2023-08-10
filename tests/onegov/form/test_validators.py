@@ -91,6 +91,7 @@ def test_input_required_if_validator():
         def gettext(self, text):
             return text
 
+    # FIXME: stop mocking Form, just use an actual Form...
     class Form:
         def __init__(self):
             self.true = Field('true', True)
@@ -100,6 +101,12 @@ def test_input_required_if_validator():
             self.none = Field('none', None)
             self.empty = Field('empty', '')
             self.string = Field('string', 'string')
+
+        def __contains__(self, name):
+            return hasattr(self, name)
+
+        def __getitem__(self, name):
+            return getattr(self, name)
 
     form = Form()
     values = (None, False, 0, '', True, 1, 'string', 'xxx')
