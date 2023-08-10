@@ -413,6 +413,8 @@ class Auth:
         if role is None:
             raise ExpiredSignupLinkError()
 
+        assert form.username.data is not None
+        assert form.password.data is not None
         return UserCollection(self.session).register(
             username=form.username.data,
             password=form.password.data,

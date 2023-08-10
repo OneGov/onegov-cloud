@@ -6,7 +6,7 @@ from onegov.form.fields import UploadField
 from onegov.form.validators import StrictOptional
 
 
-from typing import overload, Literal, TypeVar, TYPE_CHECKING
+from typing import overload, Any, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Iterator
     from onegov.form import Form
@@ -24,7 +24,7 @@ def prepare_for_submission(
     # force all upload fields to be simple, we do not support the more
     # complex add/keep/replace widget, which is hard to properly support
     # and is not super useful in submissions
-    def is_upload(attribute: object) -> 'TypeGuard[UnboundField]':
+    def is_upload(attribute: object) -> 'TypeGuard[UnboundField[UploadField]]':
         if not hasattr(attribute, 'field_class'):
             return False
 
@@ -55,7 +55,7 @@ def get_fields(
     form_class: type['Form'],
     names_only: Literal[False] = False,
     exclude: 'Collection[str] | None' = None
-) -> 'Iterator[tuple[str, UnboundField]]': ...
+) -> 'Iterator[tuple[str, UnboundField[Any]]]': ...
 
 
 @overload
@@ -70,9 +70,9 @@ def get_fields(
     form_class: type['Form'],
     names_only: bool = False,
     exclude: 'Collection[str] | None' = None
-) -> 'Iterator[str | tuple[str, UnboundField]]':
+) -> 'Iterator[str | tuple[str, UnboundField[Any]]]':
     """ Takes an unbound form and returns the name of the fields """
-    def is_field(attribute: object) -> 'TypeGuard[UnboundField]':
+    def is_field(attribute: object) -> 'TypeGuard[UnboundField[Any]]':
         return hasattr(attribute, 'field_class')
 
     for name, field in getmembers(form_class, predicate=is_field):

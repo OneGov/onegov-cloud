@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from onegov.core.orm import Base
     from onegov.form import Form
     from wtforms import Field
+    from wtforms.form import BaseForm
 
 
 class Stdnum:
@@ -237,7 +238,7 @@ class ValidFormDefinition:
                 # NOTE: If we end up allowing 'manual' in addition to
                 #       'free' we should also check if the application
                 #       has a payment_provider set.
-                if form.payment_method.data != 'free':
+                if form['payment_method'].data != 'free':
                     # add the error message to both affected fields
                     error = field.gettext(self.payment_method).format(
                         label=formfield.label.text
@@ -245,9 +246,9 @@ class ValidFormDefinition:
                     # if the payment_method field is below the form
                     # definition field, then validate will not have
                     # been run yet and we can only add process_errors
-                    errors = form.payment_method.errors
+                    errors = form['payment_method'].errors
                     if not isinstance(errors, list):
-                        errors = form.payment_method.process_errors
+                        errors = form['payment_method'].process_errors
                         assert isinstance(errors, list)
 
                     errors.append(error)
@@ -259,7 +260,7 @@ class ValidFormDefinition:
                 or any(hasattr(formfield, 'pricing')
                        for formfield in parsed_form._fields.values()))
 
-            if form.minimum_price_total.data and not has_pricing:
+            if form['minimum_price_total'].data and not has_pricing:
                 # add the error message to all affected fields
                 # FIXME: ideally we would get more consistent about
                 #        having a field like 'pricing_method' that
@@ -269,9 +270,9 @@ class ValidFormDefinition:
                 # if the minimum_price_total field is below the form
                 # definition field, then validate will not have
                 # been run yet and we can only add process_errors
-                errors = form.minimum_price_total.errors
+                errors = form['minimum_price_total'].errors
                 if not isinstance(errors, list):
-                    errors = form.minimum_price_total.process_errors
+                    errors = form['minimum_price_total'].process_errors
                     assert isinstance(errors, list)
 
                 errors.append(error)
@@ -289,7 +290,7 @@ class LaxDataRequired(DataRequired):
 
     """
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: 'BaseForm', field: 'Field') -> None:
         if field.data is False:
             # guard against False, False is an instance of int, since
             # bool derives from int, so we need to check this first
@@ -322,7 +323,7 @@ class StrictOptional(Optional):
 
         return False
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: 'BaseForm', field: 'Field') -> None:
         raw = field.raw_data and field.raw_data[0]
         val = field.data
 
@@ -333,7 +334,7 @@ class StrictOptional(Optional):
             val = None
 
         if self.is_missing(raw) and self.is_missing(val):
-            field.errors[:] = []
+            field.errors = []
             raise StopValidation()
 
 
@@ -434,11 +435,11 @@ class InputRequiredIf(InputRequired):
         self.field_data = field_data
         self.message = message
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
-        if not hasattr(form, self.field_name):
+    def __call__(self, form: 'BaseForm', field: 'Field') -> None:
+        if self.field_name not in form:
             raise RuntimeError(f"No field named '{self.field_name}' in form")
 
-        field_data = getattr(form, self.field_name).data
+        field_data = form[self.field_name].data
         filter_data = self.field_data
         if (
             field_data is None or filter_data is None
