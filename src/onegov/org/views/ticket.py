@@ -21,7 +21,7 @@ from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
 from onegov.org.layout import FindYourSpotLayout, DefaultMailLayout
 from onegov.org.layout import TicketChatMessageLayout
-from onegov.org.layout import TicketLayout
+from onegov.town6.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
 from onegov.org.mail import send_ticket_mail

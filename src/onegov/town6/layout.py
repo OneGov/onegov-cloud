@@ -717,6 +717,21 @@ class TicketLayout(DefaultLayout):
                     url=self.request.link(self.model, 'unarchive'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
+                links.append(Link(
+                    text=_("Delete Ticket"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model, 'delete')
+                    ),
+                    attrs={'class': ('ticket-button', 'ticket-delete')},
+                    # traits=(
+                    #     Confirm(
+                    #         _("Do you really want to delete this ticket?"),
+                    #         _("This cannot be undone."),
+                    #         _("Delete ticket "),
+                    #         _("Cancel")
+                    #     ),
+                    # )
+                ))
 
             # ticket notes are always enabled
             links.append(
