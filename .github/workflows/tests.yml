@@ -212,4 +212,3 @@ jobs:
           --codecov-slug=OneGov/onegov-cloud \
           --codecov-token="${{ secrets.CODECOV_TOKEN }}" \
           tests
-
