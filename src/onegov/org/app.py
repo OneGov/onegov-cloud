@@ -382,6 +382,11 @@ def get_default_directory_search_widget():
     return None
 
 
+@OrgApp.setting(section='org', name='default_event_search_widget')
+def get_default_event_search_widget():
+    return None
+
+
 @OrgApp.setting(section='org', name='public_ticket_messages')
 def get_public_ticket_messages():
     """ Returns a list of message types which are availble on the ticket
