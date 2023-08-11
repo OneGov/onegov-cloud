@@ -492,10 +492,10 @@ class EventImportForm(Form):
             'location': self.request.translate(_("Venue")),
             'price': self.request.translate(_("Price")),
             'organizer': self.request.translate(_("Organizer")),
-            'organizer_email': self.request.translate(_("Organizer E-Mail "
-                                                        "Address")),
-            'organizer_phone': self.request.translate(_("Organizer Phone "
-                                                        "Number")),
+            'organizer_email': self.request.translate(_("Organizer e-mail "
+                                                        "address")),
+            'organizer_phone': self.request.translate(_("Organizer phone "
+                                                        "number")),
             'external_event_url': self.request.translate(
                 _("External event URL")),
             'tags': self.request.translate(_("Tags")),

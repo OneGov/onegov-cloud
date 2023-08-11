@@ -678,8 +678,11 @@ msgstr "Organisator E-Mail Adresse"
 msgid "Organizer phone number"
 msgstr "Organisator Telefonnummer"
 
-msgid "Shown as contact address"
-msgstr "Wird als Kontakt-Adresse angezeigt"
+msgid "Shown as contact e-mail address"
+msgstr "Wird als Kontakt-Email-Adresse angezeigt"
+
+msgid "Shown as contact phone number"
+msgstr "Wird als Kontakttelefonnummer angezeigt"
 
 msgid "External event URL"
 msgstr "Externe Event-URL"

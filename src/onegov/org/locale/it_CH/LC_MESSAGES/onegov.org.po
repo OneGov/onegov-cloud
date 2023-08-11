@@ -681,8 +681,11 @@ msgstr "Indirizzo e-mail dell'organizzatore"
 msgid "Organizer phone number"
 msgstr "Numero di telefono dell'organizzatore"
 
-msgid "Shown as contact address"
-msgstr "Indicato come indirizzo di contatto"
+msgid "Shown as contact e-mail address"
+msgstr "Indicato come indirizzo email di contatto"
+
+msgid "Shown as contact phone number"
+msgstr "Indicato come numero di telefono di contatto"
 
 msgid "External event URL"
 msgstr "URL evento esterno"
