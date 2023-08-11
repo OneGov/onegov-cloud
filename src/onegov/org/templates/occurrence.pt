@@ -57,9 +57,8 @@
                             <dd><a href="mailto:${organizer_email}" tal:content="organizer_email" /></dd>
                         </div>
                         <div tal:condition="organizer_phone">
-                            <dt i18n:translate>Phone Number</dt>
-                        <dd><a href="mailto:${organizer_phone}" tal:content="organizer_phone" />
-                            </dd>
+                            <dt i18n:translate></dt>
+                            <dd>${organizer_phone}</dd>
                         </div>
                     </dl>
                 </div>
