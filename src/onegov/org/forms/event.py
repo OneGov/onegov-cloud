@@ -153,7 +153,7 @@ class EventForm(Form):
 
     organizer_email = EmailField(
         label=_("Organizer E-Mail address"),
-        description=_("Shown as contact e-mail address"),
+        description=_("Shown as contact E-Mail address"),
         validators=[Optional(), Email()]
     )
 
@@ -492,7 +492,7 @@ class EventImportForm(Form):
             'location': self.request.translate(_("Venue")),
             'price': self.request.translate(_("Price")),
             'organizer': self.request.translate(_("Organizer")),
-            'organizer_email': self.request.translate(_("Organizer e-mail "
+            'organizer_email': self.request.translate(_("Organizer E-Mail "
                                                         "address")),
             'organizer_phone': self.request.translate(_("Organizer phone "
                                                         "number")),

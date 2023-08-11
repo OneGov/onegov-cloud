@@ -678,7 +678,7 @@ msgstr "Organisator E-Mail Adresse"
 msgid "Organizer phone number"
 msgstr "Organisator Telefonnummer"
 
-msgid "Shown as contact e-mail address"
+msgid "Shown as contact E-Mail address"
 msgstr "Wird als Kontakt-Email-Adresse angezeigt"
 
 msgid "Shown as contact phone number"
