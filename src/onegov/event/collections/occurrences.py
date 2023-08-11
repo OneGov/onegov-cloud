@@ -228,7 +228,8 @@ class OccurrenceCollection(Pagination):
         a timezone - we search for the given date in the timezone of the
         occurrence.
 
-        In case of a search widget the query is handled by the widget
+        In case of a search widget request the query will filter for events
+        containing the text search term in e.g. title
 
         """
 

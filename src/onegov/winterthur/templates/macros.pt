@@ -31,7 +31,7 @@
     <div class="filter-panel">
         <h2 tal:condition="title" class="filter-title" i18n:translate>Search in <tal:b i18n:name="directory">${title}</tal:b></h2>
 
-        <form id='inline-directory-search' class="searchbox" action="${action}" method="GET" onsubmit="return submitInlineSearch();">
+        <form id='inline-search' class="searchbox" action="${action}" method="GET" onsubmit="return submitInlineSearch();">
             <div class="row collapse">
                 <div class="columns small-10">
                     <input id="search-term" type="text" placeholder="Suche" required autocomplete="off" autocorrect="off" value="${term or ''}">
