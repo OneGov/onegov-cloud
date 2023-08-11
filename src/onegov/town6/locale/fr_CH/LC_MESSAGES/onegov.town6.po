@@ -888,8 +888,11 @@ msgstr "Prix"
 msgid "Organizer"
 msgstr "Organisateur"
 
-msgid "Organizer E-Mail"
-msgstr "Courriel de l'organisateur"
+msgid "Organizer E-Mail address"
+msgstr "Adresse e-mail de l'organisateur"
+
+msgid "Organizer phone number"
+msgstr "Numéro de téléphone de l'organisateur"
 
 msgid "Tags"
 msgstr "Étiquettes"
