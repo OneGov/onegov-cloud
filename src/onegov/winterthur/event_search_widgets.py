@@ -9,7 +9,6 @@ from onegov.winterthur.app import WinterthurApp
 @WinterthurApp.event_search_widget('inline')
 class InlineEventSearch:
 
-    # TODO view allow empty search query
     def __init__(self, request, search_query):
         self.app = request.app
         self.request = request
