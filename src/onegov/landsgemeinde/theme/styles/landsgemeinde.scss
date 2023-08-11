@@ -98,7 +98,7 @@ h6 small,
         padding-top: 0;
     }
 
-    .agenda-item-resolution {
+    .callout.secondary.agenda-item-resolution {
         font-weight: normal;
     }
 }
@@ -130,6 +130,9 @@ h6 small,
     Person
 */
 .person-list-card {
+    align-items: center;
+    color: $dark-gray;
+
     span {
         margin-right: 1em;
     }
@@ -163,13 +166,39 @@ h6 small,
 }
 
 
-/* Side panel items*/
+/* Side panel*/
+.agenda-item-list.with-current {
+    height: 25rem;
+    overflow-y: scroll;
+    scrollbar-color: $charcoal $white-smoke;
+
+    &::-webkit-scrollbar-tracK {
+        background-color: $white-smoke;
+    }
+
+    &::-webkit-scrollbar {
+        background-color: $white-smoke;
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $charcoal;
+    }
+}
+
+@-moz-document url-prefix() {
+    .agenda-item-list.with-current {
+        box-shadow: inset 0 10px 8px -10px rgba(0, 0, 0, .07), inset 0 -10px 8px -10px rgba(0, 0, 0, .07);
+    }
+}
+
 .side-panel audio {
     border-radius: .7rem;
     width: 100%;
 }
 
 /* Items list*/
+
 .more-list.agenda-item-list {
 
     li {
@@ -180,7 +209,8 @@ h6 small,
             border-left: 0;
         }
 
-        &:hover .circle {
+        &:hover .circle,
+        .current .circle {
             background: $primary-color;
             transition: background 200ms linear;
 
@@ -203,7 +233,6 @@ h6 small,
     .circle {
         align-items: center;
         background: $smoke;
-        // border: 1px solid $aluminum;
         border-radius: 100%;
         display: flex;
         height: 2rem;
@@ -256,7 +285,7 @@ h6 small,
     border-radius: .7rem;
     display: block;
     font-weight: bold;
-    padding: .7rem 1.5rem;
+    padding: 1rem;
     transition: background 200ms linear;
 
     &:hover {
@@ -269,11 +298,12 @@ h6 small,
     }
 }
 
-.memorial-link {
+.agenda-item-overview .memorial-link {
     background: transparent;
-    border: 1px solid $aluminum;
+    border: 1px solid $gainsboro;
+    padding: 1.3rem 1.5rem;
 
     &:hover {
-        background: $white-smoke;
+        background: $vapor;
     }
 }

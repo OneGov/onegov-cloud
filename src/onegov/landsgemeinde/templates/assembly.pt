@@ -64,25 +64,8 @@
                     <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>
                 </div>
 
-                <div class="side-panel assembly-agenda-items" tal:condition="agenda_items">
-                    <h2 i18n:translate="">Agenda items</h2>
-                    <ul class="more-list agenda-item-list"> 
-                        <li tal:repeat="agenda_item agenda_items">
-                            <a class="list-link" tal:attributes="href request.link(agenda_item)">
-                                <div class="timeline">
-                                    <div class="line"></div>
-                                    <div class="circle">
-                                        <span class="number">${agenda_items.index(agenda_item)+1}</span>
-                                    </div>
-                                    <div class="line"></div>
-                                </div>
-                                <div class="title">
-                                    <h5 class="list-title"><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h5>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                <tal:block metal:use-macro="layout.macros['agenda-item-list']" />
+                
             </div>
         </div>
 

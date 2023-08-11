@@ -17,6 +17,28 @@
     <tal:block tal:content="structure layout.agenda_item_title(agenda_item, True)" />
 </metal:agenda-item-title>
 
+<metal:agenda-item-list define-macro="agenda_item_list">
+    <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
+        <h2 i18n:translate="">Agenda items</h2>
+        <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}"> 
+            <li tal:repeat="current_agenda_item agenda_items">
+                <a class="list-link ${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
+                    <div class="timeline">
+                        <div class="line"></div>
+                        <div class="circle">
+                            <span class="number">${agenda_items.index(current_agenda_item)+1}</span>
+                        </div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="title">
+                        <h5 class="list-title"><tal:block tal:content="structure layout.agenda_item_title(current_agenda_item, True)" /></h5>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>   
+</metal:agenda-item-list>
+
 <metal:state define-macro="state">
     <tal:block tal:switch="state">
         <span class="label secondary" tal:case="'scheduled'" i18n:translate="">${state}</span>
