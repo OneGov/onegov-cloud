@@ -418,7 +418,6 @@ def import_guidle(group_context, url, tagmap, clear):
                             description=offer.description,
                             organizer=offer.organizer,
                             organizer_email=offer.organizer_email,
-                            organizer_phone=offer.organizer_phone,
                             price=offer.price,
                             location=offer.location,
                             coordinates=offer.coordinates,
