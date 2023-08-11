@@ -60,10 +60,11 @@ class InlineDirectorySearch:
         return {hit.meta.id: hit for hit in search[0:100].execute()}
 
     def html(self, layout):
-        return render_macro(layout.macros['inline_directory_search'],
+        return render_macro(layout.macros['inline_search'],
                             self.request, {
             'term': self.term,
             'directory': self.directory,
+            'title': self.directory.title,
             'action': self.request.class_link(
                 ExtendedDirectoryEntryCollection,
                 variables={

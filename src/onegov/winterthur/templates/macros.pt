@@ -15,7 +15,7 @@
 </metal:before_directory_entry_lead>
 
 
-<metal:inline_directory_search define-macro="inline_directory_search" i18n:domain="onegov.winterthur">
+<metal:inline_search define-macro="inline_search" i18n:domain="onegov.winterthur">
     <script>
         function submitInlineSearch() {
             var query = {
@@ -29,7 +29,7 @@
     </script>
 
     <div class="filter-panel">
-        <h2 class="filter-title" i18n:translate>Search in <tal:b i18n:name="directory">${directory.title}</tal:b></h2>
+        <h2 tal:condition="title" class="filter-title" i18n:translate>Search in <tal:b i18n:name="directory">${title}</tal:b></h2>
 
         <form id='inline-directory-search' class="searchbox" action="${action}" method="GET" onsubmit="return submitInlineSearch();">
             <div class="row collapse">
@@ -49,42 +49,8 @@
         </form>
     </div>
 
-</metal:inline_directory_search>
+</metal:inline_search>
 
-<!--? integrate with inline_directory-search right above?! -->
-<metal:inline_event_search define-macro="inline_event_search" i18n:domain="onegov .winterthur">
-    <script>
-        function submitInlineSearch() {
-            var query = {
-                'term': $('#search-term').val()
-            };
-
-            $('input[name="search_query"]').val(JSON.stringify(query));
-
-            return true;
-        }
-    </script>
-
-    <div class="filter-panel">
-        <form id='inline-event-search' class="searchbox" action="${action}" method="GET" onsubmit="return submitInlineSearch();">
-            <div class="row collapse">
-                <div class="columns small-10">
-                    <input id="search-term" type="text" placeholder="Suche" required autocomplete="off" autocorrect="off" value="${term or ''}">
-                    <button type="reset" class="reset-button" tabindex="-1"></button>
-
-                    <input type="hidden" name='search' value='inline'>
-                    <input type="hidden" name='search_query'>
-                </div>
-                <div class="columns small-2">
-                    <button type="submit" class="button postfix" aria-label="Suche">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-</metal:inline_event_search>
 
 <metal:inline_search_entry_lead define-macro="inline_search_entry_lead" i18n:domain="onegov.winterthur">
     <dl>

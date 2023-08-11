@@ -20,9 +20,10 @@ class InlineEventSearch:
         return (self.search_query or {}).get('term', None)
 
     def html(self, layout):
-        return render_macro(layout.macros['inline_event_search'],
+        return render_macro(layout.macros['inline_search'],
                             self.request, {
             'term': self.term,
+            'title': None,
             'action': self.request.class_link(
                 OccurrenceCollection,
                 variables={
