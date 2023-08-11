@@ -966,12 +966,12 @@
         </tal:b>
 
         <tal:b condition="event.organizer_email">
-            <dt i18n:translate>Organizer E-Mail Address</dt>
+            <dt i18n:translate>Organizer E-Mail address</dt>
             <dd><a href="mailto:${event.organizer_email}" tal:content="event.organizer_email" /></dd>
         </tal:b>
 
         <tal:b condition="event.organizer_phone">
-            <dt i18n:translate>Organizer Phone Number</dt>
+            <dt i18n:translate>Organizer phone number</dt>
             <dd><a href="mailto:${event.organizer_phone}" tal:content="event.organizer_phone" />
             </dd>
         </tal:b>

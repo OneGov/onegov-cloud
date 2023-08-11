@@ -675,10 +675,10 @@ msgstr "Organizzatore"
 msgid "Music society"
 msgstr "Società musicale"
 
-msgid "Organizer E-Mail Address"
+msgid "Organizer E-Mail address"
 msgstr "Indirizzo e-mail dell'organizzatore"
 
-msgid "Organizer Phone Number"
+msgid "Organizer phone number"
 msgstr "Numero di telefono dell'organizzatore"
 
 msgid "Shown as contact address"

@@ -152,13 +152,13 @@ class EventForm(Form):
     )
 
     organizer_email = EmailField(
-        label=_("Organizer E-Mail Address"),
+        label=_("Organizer E-Mail address"),
         description=_("Shown as contact e-mail address"),
         validators=[Optional(), Email()]
     )
 
     organizer_phone = StringField(
-        label=_("Organizer Phone Number"),
+        label=_("Organizer phone number"),
         description=_("Shown as contact phone number"),
         validators=[Optional(), ValidPhoneNumber()]
     )

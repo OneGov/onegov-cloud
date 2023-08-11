@@ -892,11 +892,11 @@ msgstr "Preis"
 msgid "Organizer"
 msgstr "Organisator"
 
-msgid "Organizer E-Mail Address"
+msgid "Organizer E-Mail address"
 msgstr "Organisator E-Mail Adresse"
 
-msgid "Organizer Phone Number"
-msgstr "Organisator Telefon Nummer"
+msgid "Organizer phone number"
+msgstr "Organisator Telefonnummer"
 
 msgid "Tags"
 msgstr "Schlagworte"
