@@ -539,7 +539,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Electoral strength
     national_council_election_year = Column(Integer)
-    # drop?
     national_council_share_fdp = Column(Numeric(13, 10))
     national_council_share_cvp = Column(Numeric(13, 10))
     national_council_share_sps = Column(Numeric(13, 10))
@@ -572,8 +571,28 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def has_national_council_share_data(self):
-        if self.national_council_election_year:
+        """ Returns true, if the vote contains national council share data.
+
+        Returns true, if a national council year is set and
+        - any aggregated national council share data is present (yeas, nays,
+          none, empty, free vote, neutral, unknown)
+        - or any national council share data of parties with national council
+          share and a recommendation regarding this vote is present
+        """
+        if (
+            self.national_council_election_year and (
+                self.national_council_share_yeas
+                or self.national_council_share_nays
+                or self.national_council_share_none
+                or self.national_council_share_empty
+                or self.national_council_share_free_vote
+                or self.national_council_share_neutral
+                or self.national_council_share_unknown
+                or self.sorted_actors_list
+            )
+        ):
             return True
+
         return False
 
     # attachments
