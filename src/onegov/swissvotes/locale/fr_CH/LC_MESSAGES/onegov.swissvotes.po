@@ -1509,6 +1509,9 @@ msgstr "Texte d’exposé"
 msgid "Statistical data"
 msgstr "Données statistiques"
 
+msgid "Website"
+msgstr "Site web"
+
 msgid "Link eMuseum.ch"
 msgstr "Lien eMuseum.ch"
 

@@ -209,7 +209,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
 @mark.parametrize('file', [
     module_path('tests.onegov.swissvotes', 'fixtures/metadata.xlsx'),
 ])
-def test_view_update_metdata(swissvotes_app, file, sample_vote):
+def test_view_update_metadata(swissvotes_app, file, sample_vote):
     session = swissvotes_app.session()
     sample_vote.bfs_number = Decimal('236')
     session.add(sample_vote)

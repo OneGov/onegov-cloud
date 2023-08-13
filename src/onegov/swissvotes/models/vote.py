@@ -198,6 +198,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('lecture', _('Text of a presentation')),
                 ('statistics', _('Statistical data')),
                 ('other', _('Other')),
+                ('website', _('Website')),
             ))
 
         raise RuntimeError(f"No codes available for '{attribute}'")

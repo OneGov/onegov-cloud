@@ -503,6 +503,7 @@ def test_swissvotes_metadata_field_all_okay():
         'x',  # Typ REFERATSTEXT
         'x',  # Typ STATISTIK
         'x',  # Typ ANDERES
+        'x',  # Typ WEBSITE
     ])
     worksheet.write_row(2, 0, [
         '100.1',  # Abst-Nummer
@@ -532,6 +533,7 @@ def test_swissvotes_metadata_field_all_okay():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     worksheet.write_row(3, 0, [
         '100.2',  # Abst-Nummer
@@ -561,6 +563,7 @@ def test_swissvotes_metadata_field_all_okay():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     workbook.close()
     file.seek(0)
@@ -592,7 +595,8 @@ def test_swissvotes_metadata_field_all_okay():
                     'legal',
                     'lecture',
                     'statistics',
-                    'other'
+                    'other',
+                    'website'
                 ],
                 'editor': 'Herausgeber',
                 'filename': 'letter.pdf',
@@ -679,6 +683,7 @@ def test_swissvotes_metadata_skip_empty_columns():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     workbook.close()
     file.seek(0)
