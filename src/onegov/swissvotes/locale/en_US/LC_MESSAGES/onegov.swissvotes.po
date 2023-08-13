@@ -1665,6 +1665,12 @@ msgstr "Keyword"
 msgid "Vote date"
 msgstr "Voting day"
 
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "and ${number} out of ${total} votes of the Cantons"
+
+msgid "Yeas"
+msgstr "Yes votes"
+
 msgid "Vote number"
 msgstr "Vote Nº"
 
@@ -1839,9 +1845,6 @@ msgstr "Display the list of documents"
 
 msgid "People"
 msgstr "People"
-
-msgid "Yeas"
-msgstr "Yes"
 
 msgid "Cantons"
 msgstr "Cantons"

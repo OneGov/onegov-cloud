@@ -1670,6 +1670,12 @@ msgstr "Schlagwort"
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
 
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "und ${number} von ${total} Standesstimmen"
+
+msgid "Yeas"
+msgstr "Ja-Stimmen"
+
 msgid "Vote number"
 msgstr "Abstimmungsnummer"
 
@@ -1841,9 +1847,6 @@ msgstr "Liste der Dokumente anzeigen"
 
 msgid "People"
 msgstr "Volk"
-
-msgid "Yeas"
-msgstr "Ja-Stimmen"
 
 msgid "Cantons"
 msgstr "Stände"

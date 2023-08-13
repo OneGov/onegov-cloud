@@ -380,6 +380,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     result_zh_accepted = encoded_property()
 
     @cached_property
+    def number_of_cantons(self):
+        if self.bfs_number <= 292:
+            return 22
+        return 23
+
+    @cached_property
     def results_cantons(self):
         """ Returns the results of all cantons. """
 

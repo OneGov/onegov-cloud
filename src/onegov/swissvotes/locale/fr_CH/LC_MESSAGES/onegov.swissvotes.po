@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-13 07:05+0100\n"
+"POT-Creation-Date: 2023-08-13 12:48+0200\n"
 "PO-Revision-Date: 2021-01-07 09:13+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1677,6 +1677,12 @@ msgstr "Mot-clé"
 msgid "Vote date"
 msgstr "Date de la votation"
 
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "et ${number} de ${total} voix des cantons"
+
+msgid "Yeas"
+msgstr "Oui"
+
 msgid "Vote number"
 msgstr "Votation n°"
 
@@ -1846,9 +1852,6 @@ msgstr "Afficher la liste des documents"
 
 msgid "People"
 msgstr "Peuple"
-
-msgid "Yeas"
-msgstr "Oui"
 
 msgid "Cantons"
 msgstr "Cantons"
