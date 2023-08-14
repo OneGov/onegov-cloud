@@ -457,8 +457,7 @@
                         <th class="column-30" i18n:translate>Result by canton, district and municipality</th>
                         <td>
                             <a href="${layout.attachments['results_by_domain']['url']}" target="_blank" class="results-by-domain">Excel</a>
-                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
-                            <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                            <tal:block metal:use-macro="layout.macros['attachment_locale']" tal:define="name 'results_by_domain'"/>
                         </td>
                     </tr>
                     <tr tal:condition="vote.link_bk_results">
