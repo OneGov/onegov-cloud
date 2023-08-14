@@ -836,6 +836,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     vote = session.query(SwissVote).one()
     assert vote.ad_analysis is None
     assert vote.brief_description is None
+    assert vote.easyvote_booklet is None
     assert vote.federal_council_message is None
     assert vote.foeg_analysis is None
     assert vote.parliamentary_debate is None
@@ -843,8 +844,8 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.post_vote_poll_codebook is None
     assert vote.post_vote_poll_codebook_xlsx is None
     assert vote.post_vote_poll_dataset is None
-    assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_dataset_dta is None
+    assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_methodology is None
     assert vote.post_vote_poll_report is None
     assert vote.preliminary_examination is None
@@ -860,17 +861,18 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert set(vote.localized_files().keys()) == {
         'ad_analysis',
         'brief_description',
+        'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
         'parliamentary_debate',
-        'post_vote_poll',
-        'post_vote_poll_codebook',
         'post_vote_poll_codebook_xlsx',
-        'post_vote_poll_dataset',
-        'post_vote_poll_dataset_sav',
+        'post_vote_poll_codebook',
         'post_vote_poll_dataset_dta',
+        'post_vote_poll_dataset_sav',
+        'post_vote_poll_dataset',
         'post_vote_poll_methodology',
         'post_vote_poll_report',
+        'post_vote_poll',
         'preliminary_examination',
         'realization',
         'resolution',
@@ -883,9 +885,9 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'brief_description',
         'federal_council_message',
         'parliamentary_debate',
+        'preliminary_examination',
         'realization',
         'voting_text',
-        'preliminary_examination'
     }
 
     # Upload de_CH

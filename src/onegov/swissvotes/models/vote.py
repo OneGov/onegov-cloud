@@ -618,6 +618,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
             'fr_CH': 'brochure-fr.pdf',
         }
     )
+    easyvote_booklet = LocalizedFile(
+        label=_('Explanatory brochure by Easyvote'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'easyvote-de.pdf',
+            'fr_CH': 'easyvote-fr.pdf',
+        }
+    )
     resolution = LocalizedFile(
         label=_('Resolution'),
         extension='pdf',
@@ -740,10 +748,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         'brief_description',
         'federal_council_message',
         'parliamentary_debate',
-        # we don't include the voting booklet, resolution and ad analysis
-        # - they might contain other votes from the same day!
+        # we don't include the voting booklet, resolution, ad analysis and
+        # easyvote booklet - they might contain other votes from the same day!
         'realization',
-        'preliminary_examination'
+        'preliminary_examination',
     }
 
     def reindex_files(self):

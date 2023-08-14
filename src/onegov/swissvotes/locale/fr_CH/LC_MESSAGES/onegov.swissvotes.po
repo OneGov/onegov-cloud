@@ -80,6 +80,9 @@ msgstr "Brochure explicative officielle"
 msgid "Voting campaign"
 msgstr "Campagne"
 
+msgid "Explanatory brochure by Easyvote"
+msgstr "Brochure d’easyvote"
+
 msgid "Advertisment analysis"
 msgstr "Analyse des annonces de campagne"
 
@@ -1623,6 +1626,9 @@ msgstr "Réinitialiser"
 
 msgid "Show all"
 msgstr "Tout afficher"
+
+msgid "(in German)"
+msgstr "(en allemand)"
 
 msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"
