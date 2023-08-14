@@ -1554,6 +1554,9 @@ msgstr "Text of a presentation"
 msgid "Statistical data"
 msgstr "Statistical data"
 
+msgid "Website"
+msgstr "Website"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 

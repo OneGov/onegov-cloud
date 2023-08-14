@@ -1507,6 +1507,9 @@ msgstr "Referatstext"
 msgid "Statistical data"
 msgstr "Statistik"
 
+msgid "Website"
+msgstr "Website"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 

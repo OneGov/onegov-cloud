@@ -945,7 +945,8 @@ def test_layout_vote_campaign_material(swissvotes_app):
             'legal': 'Legal text',
             'lecture': 'Text of a presentation',
             'statistics': 'Statistical data',
-            'other': 'Other'
+            'other': 'Other',
+            'website': 'Website'
         },
         'language': {
             'de': 'German',

@@ -744,6 +744,7 @@ class ColumnMapperMetadata:
             ('t:t:doctype!lecture', 'Typ REFERATSTEXT'),
             ('t:t:doctype!statistics', 'Typ STATISTIK'),
             ('t:t:doctype!other', 'Typ ANDERES'),
+            ('t:t:doctype!website', 'Typ WEBSITE'),
         ))
 
     def set_value(self, data, attribute, value):

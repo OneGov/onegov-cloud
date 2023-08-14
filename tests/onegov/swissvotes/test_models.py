@@ -1245,7 +1245,8 @@ def test_model_column_mapper_metadata():
         ('t:t:doctype!legal', 'Typ RECHTSTEXT', 'TEXT', True, None, None),
         ('t:t:doctype!lecture', 'Typ REFERATSTEXT', 'TEXT', True, None, None),
         ('t:t:doctype!statistics', 'Typ STATISTIK', 'TEXT', True, None, None),
-        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None)
+        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None),
+        ('t:t:doctype!website', 'Typ WEBSITE', 'TEXT', True, None, None)
     ]
 
 
