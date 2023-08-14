@@ -374,6 +374,8 @@ def sample_vote():
     }
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
+    vote.link_easyvote_de = 'https://easy.vote/de'
+    vote.link_easyvote_fr = 'https://easy.vote/fr'
     vote.link_bk_results_de = 'https://bk.results/de'
     vote.link_bk_results_fr = 'https://bk.results/fr'
     vote.link_bk_chrono_de = 'https://bk.chrono/de'

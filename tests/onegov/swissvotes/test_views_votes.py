@@ -97,7 +97,7 @@ def test_view_update_votes(swissvotes_app, file):
     )
     manage = manage.form.submit().follow()
 
-    assert "Datensatz aktualisiert (673 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (683 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
