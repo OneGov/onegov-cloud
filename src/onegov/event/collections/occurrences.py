@@ -1,4 +1,6 @@
 import datetime
+from collections import defaultdict
+
 import sqlalchemy
 
 from functools import cached_property
@@ -180,6 +182,23 @@ class OccurrenceCollection(Pagination):
         return [
             tz[0] for tz in self.session.query(distinct(Occurrence.timezone))
         ]
+
+    @cached_property
+    def tag_counts(self):
+        counts = defaultdict(int)
+
+        base = self.session.query(Occurrence._tags.keys())
+        base = base.filter(Occurrence.start >= datetime.datetime.now(
+            datetime.timezone.utc))
+
+        for keys in base.all():
+            for tag in keys[0]:
+                if tag in counts.keys():
+                    counts[tag] += 1
+                else:
+                    counts[tag] = 1
+
+        return counts
 
     @cached_property
     def used_tags(self):
