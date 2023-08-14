@@ -22,7 +22,7 @@
         <h2 i18n:translate="">Agenda items</h2>
         <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}"> 
             <li tal:repeat="current_agenda_item agenda_items">
-                <a class="list-link ${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
+                <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
                     <div class="timeline">
                         <div class="line"></div>
                         <div class="circle">
@@ -36,7 +36,12 @@
                 </a>
             </li>
         </ul>
-    </div>   
+    </div>
+    <script>
+        document.getElementById('current').scrollIntoView({behavior: "smooth", block: 'center', inline: 'start'});
+        /*document.body.scrollIntoView(true);*/
+        /*document.body.scrollTo(0, 0);*/
+    </script>  
 </metal:agenda-item-list>
 
 <metal:state define-macro="state">

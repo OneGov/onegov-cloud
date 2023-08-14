@@ -210,7 +210,7 @@ h6 small,
         }
 
         &:hover .circle,
-        .current .circle {
+        #current .circle {
             background: $primary-color;
             transition: background 200ms linear;
 
