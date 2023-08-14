@@ -57,7 +57,7 @@ msgid "Preliminary examination"
 msgstr "Examen préliminaire"
 
 msgid "Submission"
-msgstr "Dépôt"
+msgstr "Récolte de signatures"
 
 msgid "Realization"
 msgstr "Aboutissement"
@@ -75,7 +75,7 @@ msgid "Parliamentary phase"
 msgstr "Au Parlement"
 
 msgid "Voting booklet"
-msgstr "Brochure explicative"
+msgstr "Brochure explicative officielle"
 
 msgid "Voting campaign"
 msgstr "Campagne"
@@ -1231,10 +1231,10 @@ msgid "d-2-103"
 msgstr "Groupes sociaux"
 
 msgid "d-3-1031"
-msgstr "Politique des étrangers"
+msgstr "Politique des étranger·ère·s"
 
 msgid "d-3-1032"
-msgstr "Réfugiés"
+msgstr "Réfugié·e·s"
 
 msgid "d-3-1033"
 msgstr "Condition de la femme"
@@ -1693,7 +1693,7 @@ msgid "Related votes"
 msgstr "Objets apparentés"
 
 msgid "Initiator"
-msgstr "Initiants"
+msgstr "Initiant·e·s"
 
 msgid "Signatures"
 msgstr "Signatures"
@@ -1748,6 +1748,9 @@ msgstr "Lien département"
 
 msgid "Link federal office"
 msgstr "Lien office fédéral"
+
+msgid "Explainer video by Easyvote"
+msgstr "Vidéo explicative d’Easyvote"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"

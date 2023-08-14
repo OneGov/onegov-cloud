@@ -50,7 +50,11 @@ class LoginForm(Form):
         yubikey = yubikey and (yubikey.data or '').strip() or None
 
         return {
-            'username': self.username.data,
-            'password': self.password.data,
+            # these should be set if the form has been validated
+            # but the type checker can't know that, plus someone
+            # might call this prior to validation, it should still
+            # work in that case
+            'username': self.username.data or '',
+            'password': self.password.data or '',
             'second_factor': yubikey
         }

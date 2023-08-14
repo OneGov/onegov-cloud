@@ -133,10 +133,6 @@
                         PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="vote._position_federal_council">
-                        <th class="column-30" i18n:translate>Position of the Federal Council</th>
-                        <td>${vote.position_federal_council}</td>
-                    </tr>
                 </tbody>
             </table>
 
@@ -250,12 +246,22 @@
                         <a href="${layout.attachments['voting_booklet']}" target="_blank" class="voting-booklet">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
+                    <tr tal:condition="vote._position_federal_council">
+                        <th class="column-30" i18n:translate>Position of the Federal Council</th>
+                        <td>${vote.position_federal_council}</td>
+                    </tr>
                     <tr tal:condition="vote.link_federal_council or vote.link_federal_departement or vote.link_federal_office">
                         <th class="column-30" i18n:translate>Online information by the federal authorities</th>
                         <td class="inline-links">
                             <a tal:condition="vote.link_federal_council" href="${vote.link_federal_council}" target="_blank" i18n:translate>Link Federal Council</a>
                             <a tal:condition="vote.link_federal_departement" href="${vote.link_federal_departement}" target="_blank" i18n:translate>Link department</a>
                             <a tal:condition="vote.link_federal_office" href="${vote.link_federal_office}" target="_blank" i18n:translate>Link federal office</a>
+                        </td>
+                    </tr>
+                    <tr tal:condition="vote.link_easyvote">
+                        <th class="column-30" i18n:translate>Explainer video by Easyvote</th>
+                        <td>
+                            <a href="${vote.link_easyvote}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
                     <tr tal:condition="vote.recommendations_parties">

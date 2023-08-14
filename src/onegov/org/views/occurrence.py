@@ -105,6 +105,7 @@ def view_occurrence(self, request, layout=None):
         'framed': framed,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
+        'organizer_phone': self.event.organizer_phone,
         'external_event_url': self.event.external_event_url,
         'layout': layout,
         'occurrence': self,

@@ -22,12 +22,15 @@ from wtforms.validators import InputRequired, DataRequired
 
 from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Callable, Collection, Iterable, Iterator
+    from collections.abc import (
+        Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from onegov.core.request import CoreRequest
-    from onegov.form.types import Filter, PricingRules
+    from onegov.form.types import PricingRules
     from typing_extensions import Self, TypedDict
+    from weakref import CallableProxyType
     from webob.multidict import MultiDict
     from wtforms import Field
+    from wtforms.meta import _MultiDictLike
 
     class DependencyDict(TypedDict):
         field_id: str
@@ -146,6 +149,13 @@ class Form(BaseForm):
     fieldsets: list['Fieldset']
     hidden_fields: set[str]
 
+    # FIXME: These get set by the request, we should probably move them to
+    #        meta, since that is where data like that is supposed to live
+    #        but it'll be a pain to find everywhere we access request through
+    #        anything other than meta.
+    request: 'CoreRequest'
+    model: Any
+
     def __init__(
         self,
         formdata: 'MultiDict[str, Any] | None' = None,
@@ -154,7 +164,7 @@ class Form(BaseForm):
         data: dict[str, Any] | None = None,
         meta: dict[str, Any] | None = None,
         *,
-        extra_filters: dict[str, 'Filter'] | None = None,
+        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
         **kwargs: Any
     ):
 
@@ -427,7 +437,7 @@ class Form(BaseForm):
         """
         if self.meta.csrf_field_name in self.errors:
             del self.errors[self.meta.csrf_field_name]
-            self.csrf_token.errors = []
+            self[self.meta.csrf_field_name].errors = []
 
     @property
     def has_required_email_field(self) -> bool:
@@ -555,10 +565,10 @@ class Form(BaseForm):
 
     def process(
         self,
-        formdata: 'MultiDict[str, Any] | None' = None,
+        formdata: '_MultiDictLike | None' = None,
         obj: object | None = None,
-        data: dict[str, Any] | None = None,
-        extra_filters: dict[str, 'Filter'] | None = None,
+        data: 'Mapping[str, Any] | None' = None,
+        extra_filters: 'Mapping[str, Sequence[Any]] | None' = None,
         **kwargs: Any
     ) -> None:
         """ Calls :meth:`process_obj` if ``process()`` was called with
@@ -603,7 +613,10 @@ class Form(BaseForm):
 
         del self[fieldname]
 
-    def validate(self) -> bool:
+    def validate(
+        self,
+        extra_validators: 'Mapping[str, Sequence[Any]] | None' = None
+    ) -> bool:
         """ Adds support for 'ensurances' to the form. An ensurance is a
         method which is called during validation when all the fields have
         been populated. Therefore it is a good place to validate against
@@ -621,7 +634,7 @@ class Form(BaseForm):
         of the form or by showing an alert through the request.
 
         """
-        result = super().validate()
+        result = super().validate(extra_validators=extra_validators)
 
         for ensurance in self.ensurances:
             if ensurance() is False:
@@ -702,7 +715,7 @@ class Fieldset:
     def __len__(self) -> int:
         return len(self.fields)
 
-    def __getitem__(self, key: str) -> 'Field':
+    def __getitem__(self, key: str) -> 'CallableProxyType[Field]':
         return self.fields[key]
 
     @property
@@ -710,7 +723,7 @@ class Fieldset:
         return self.label is not None
 
     @property
-    def non_empty_fields(self) -> dict[str, 'Field']:
+    def non_empty_fields(self) -> dict[str, 'CallableProxyType[Field]']:
         """ Returns only the fields which are not empty. """
         return OrderedDict(
             (id, field) for id, field in self.fields.items() if field.data)

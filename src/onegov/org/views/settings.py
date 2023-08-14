@@ -330,6 +330,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
         raise HTTPForbidden()
 
     if form.submitted(request):
+        assert form.name.data is not None
         key = ApiKey(
             name=form.name.data,
             read_only=True,
