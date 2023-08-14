@@ -173,10 +173,22 @@ def test_occurrence_collection(session):
         end=datetime(next_year, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         location='Squirrel Park',
-        tags=['history']
+        tags=['history', 'park', 'fun']
     )
     event.submit()
     event.publish()
+    event = EventCollection(session).add(
+        title='Zirkus Knie - Manage frei!',
+        start=datetime(next_year, 6, 20, 19, 00),
+        end=datetime(next_year, 6, 20, 21, 00),
+        timezone='Europe/Zurich',
+        location='Allmend Luzern',
+        tags=['fun']
+    )
+    event.submit()
+    event.publish()
+
+    # add event in the past
     event = EventCollection(session).add(
         title='Wild West Tour',
         start=datetime(2023, 7, 12, 00, 00),
@@ -188,13 +200,19 @@ def test_occurrence_collection(session):
     event.submit()
     event.publish()
 
-    timezones = OccurrenceCollection(session).used_timezones
-    assert sorted(timezones) == ['Europe/Zurich', 'Pacific/Auckland',
-                                 'US/Central']
+    occurrences = OccurrenceCollection(session)
+    assert sorted(occurrences.used_timezones) == ['Europe/Zurich',
+                                                  'Pacific/Auckland',
+                                                  'US/Central']
 
-    tags = OccurrenceCollection(session).used_tags
+    # tags counts only from future events
+    assert dict(sorted(occurrences.tag_counts.items())) == {'animals': 1,
+                                                            'fun': 3,
+                                                            'history': 1,
+                                                            'park': 2}
     # tags only from future events
-    assert sorted(tags) == ['animals', 'fun', 'history', 'park']
+    assert sorted(occurrences.used_tags) == ['animals', 'fun', 'history',
+                                             'park']
 
     assert OccurrenceCollection(session, range='today').start == date.today()
     assert OccurrenceCollection(session, range='today').end == date.today()
@@ -286,7 +304,6 @@ def test_occurrence_collection_query(session):
 
 
 def test_occurrence_collection_pagination(session):
-
     occurrences = OccurrenceCollection(session)
     assert occurrences.page_index == 0
     assert occurrences.pages_count == 0
@@ -645,6 +662,9 @@ def test_unicode(session):
 
     occurrences = OccurrenceCollection(session, outdated=True)
 
+    assert dict(sorted(occurrences.tag_counts.items())) == {'congrès': 1,
+                                                            'salons': 1,
+                                                            'témoins': 1}
     assert sorted(occurrences.used_tags) == ['congrès', 'salons', 'témoins']
 
     assert occurrences.query().count() == 2
@@ -655,7 +675,7 @@ def test_unicode(session):
     assert occurrence.location == 'Salon du mieux-vivre à Saignelégier'
     assert sorted(occurrence.tags) == ['congrès', 'salons']
     assert occurrence.event.description \
-        == 'Rendez-vous automnal des médecines.'
+           == 'Rendez-vous automnal des médecines.'
 
     occurrences = occurrences.for_filter(tags=['témoins'])
     occurrence = occurrences.query().one()
@@ -666,7 +686,6 @@ def test_unicode(session):
 
 
 def test_as_ical(session):
-
     def as_ical(occurrences):
         result = occurrences.as_ical(DummyRequest())
         result = result.decode().strip().splitlines()
