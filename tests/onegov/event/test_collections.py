@@ -14,7 +14,6 @@ from sedate import replace_timezone
 from sedate import standardize_date
 import transaction
 
-
 # keep dates in the future
 next_year = datetime.today().year + 1
 
@@ -286,7 +285,6 @@ def test_occurrence_collection_query(session):
 
 
 def test_occurrence_collection_pagination(session):
-
     occurrences = OccurrenceCollection(session)
     assert occurrences.page_index == 0
     assert occurrences.pages_count == 0
@@ -655,7 +653,7 @@ def test_unicode(session):
     assert occurrence.location == 'Salon du mieux-vivre à Saignelégier'
     assert sorted(occurrence.tags) == ['congrès', 'salons']
     assert occurrence.event.description \
-        == 'Rendez-vous automnal des médecines.'
+           == 'Rendez-vous automnal des médecines.'
 
     occurrences = occurrences.for_filter(tags=['témoins'])
     occurrence = occurrences.query().one()
@@ -666,7 +664,6 @@ def test_unicode(session):
 
 
 def test_as_ical(session):
-
     def as_ical(occurrences):
         result = occurrences.as_ical(DummyRequest())
         result = result.decode().strip().splitlines()
@@ -1251,3 +1248,50 @@ def test_from_ical(session):
            '&lt;em&gt;Furri&lt;/em&gt; things will happen!'
     assert event.location == '&lt;i&gt;Squirrel Par&lt;/i&gt;'
     assert event.organizer == '&lt;Super ME&gt;'
+
+    # empty category
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Tour</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'CATEGORIES:',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]))
+    transaction.commit()
+    event = events.query().one()
+    assert event.tags == ['']
+
+    # no category -> default category
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Tour</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]), default_categories=['Sport'])
+    transaction.commit()
+    event = events.query().one()
+    assert sorted(event.tags) == ['Sport']
