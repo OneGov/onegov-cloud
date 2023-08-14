@@ -39,8 +39,7 @@
     </div>
     <script>
         document.getElementById('current').scrollIntoView({behavior: "smooth", block: 'center', inline: 'start'});
-        /*document.body.scrollIntoView(true);*/
-        /*document.body.scrollTo(0, 0);*/
+        window.scrollTo(0, 0);
     </script>  
 </metal:agenda-item-list>
 
