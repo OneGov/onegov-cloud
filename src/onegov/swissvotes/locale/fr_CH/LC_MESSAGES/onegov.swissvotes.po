@@ -1749,6 +1749,9 @@ msgstr "Lien département"
 msgid "Link federal office"
 msgstr "Lien office fédéral"
 
+msgid "Explainer video by Easyvote"
+msgstr "Vidéo explicative d’Easyvote"
+
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"
 

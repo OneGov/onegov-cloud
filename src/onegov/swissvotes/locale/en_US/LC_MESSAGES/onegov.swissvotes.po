@@ -1788,6 +1788,9 @@ msgstr "Link department"
 msgid "Link federal office"
 msgstr "Link federal office"
 
+msgid "Explainer video by Easyvote"
+msgstr "Explainer video by Easyvote"
+
 msgid "Recommendations of the Parties"
 msgstr "Recommendations by parties"
 

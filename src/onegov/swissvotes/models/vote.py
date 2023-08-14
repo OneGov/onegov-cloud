@@ -257,6 +257,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     link_post_vote_poll_fr = content_property()
     link_post_vote_poll_en = content_property()
     link_post_vote_poll = localized_property()
+    link_easyvote_de = content_property()
+    link_easyvote_fr = content_property()
+    link_easyvote = localized_property()
 
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea = Column(Text)

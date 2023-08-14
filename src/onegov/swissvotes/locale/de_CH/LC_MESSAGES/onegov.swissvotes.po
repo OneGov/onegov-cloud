@@ -1742,6 +1742,9 @@ msgstr "Link Departement"
 msgid "Link federal office"
 msgstr "Link Bundesamt"
 
+msgid "Explainer video by Easyvote"
+msgstr "Erklärvideo von Easyvote"
+
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
 
@@ -2046,7 +2049,8 @@ msgstr "Wählendenanteile der Parteien: Ablehnende Parteien ${x}%"
 msgid ""
 "Electoral shares of parties: Parties preferring the counter-proposal ${x}%"
 msgstr ""
-"Wählendenanteile der Parteien: Parteien für Bevorzugung des Gegenentwurfs ${x}%"
+"Wählendenanteile der Parteien: Parteien für Bevorzugung des Gegenentwurfs "
+"${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
