@@ -197,7 +197,7 @@ def attachment_urls():
     yield {
         'de_CH': {
             'ad_analysis': 'inserateanalyse.pdf',
-            'brief_description': 'kurzbeschreibung.pdf',
+            'brief_description': 'kurzbeschreibung-de.pdf',
             'easyvote_booklet': 'easyvote-de.pdf',
             'federal_council_message': 'botschaft-de.pdf',
             'foeg_analysis': 'medienanalyse.pdf',
@@ -213,11 +213,12 @@ def attachment_urls():
             'preliminary_examination': 'vorpruefung-de.pdf',
             'realization': 'zustandekommen-de.pdf',
             'resolution': 'erwahrung-de.pdf',
-            'results_by_domain': 'staatsebenen.xlsx',
+            'results_by_domain': 'staatsebenen-de.xlsx',
             'voting_booklet': 'brochure-de.pdf',
             'voting_text': 'abstimmungstext-de.pdf',
         },
         'fr_CH': {
+            'brief_description': 'kurzbeschreibung-fr.pdf',
             'easyvote_booklet': 'easyvote-fr.pdf',
             'federal_council_message': 'botschaft-fr.pdf',
             'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-fr.xlsx',
@@ -227,6 +228,7 @@ def attachment_urls():
             'preliminary_examination': 'vorpruefung-fr.pdf',
             'realization': 'zustandekommen-fr.pdf',
             'resolution': 'erwahrung-fr.pdf',
+            'results_by_domain': 'staatsebenen-fr.xlsx',
             'voting_booklet': 'brochure-fr.pdf',
             'voting_text': 'abstimmungstext-fr.pdf',
         },

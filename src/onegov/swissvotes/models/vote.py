@@ -612,7 +612,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         label=_('Brief description Swissvotes'),
         extension='pdf',
         static_views={
-            'de_CH': 'kurzbeschreibung.pdf',
+            'de_CH': 'kurzbeschreibung-de.pdf',
+            'fr_CH': 'kurzbeschreibung-fr.pdf',
         }
     )
     federal_council_message = LocalizedFile(
@@ -673,7 +674,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         label=_('Result by canton, district and municipality'),
         extension='xlsx',
         static_views={
-            'de_CH': 'staatsebenen.xlsx',
+            'de_CH': 'staatsebenen-de.xlsx',
+            'fr_CH': 'staatsebenen-fr.xlsx',
         }
     )
     foeg_analysis = LocalizedFile(
