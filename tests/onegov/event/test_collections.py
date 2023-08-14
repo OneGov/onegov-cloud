@@ -210,6 +210,8 @@ def test_occurrence_collection(session):
                                                             'fun': 3,
                                                             'history': 1,
                                                             'park': 2}
+    assert occurrences.tag_counts['not_existing_tag'] == 0
+
     # tags only from future events
     assert sorted(occurrences.used_tags) == ['animals', 'fun', 'history',
                                              'park']

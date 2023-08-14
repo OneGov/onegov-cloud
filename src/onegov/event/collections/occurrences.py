@@ -184,8 +184,13 @@ class OccurrenceCollection(Pagination):
         ]
 
     @cached_property
-    def tag_counts(self):
-        counts = defaultdict(int)
+    def tag_counts(self) -> defaultdict[str, int]:
+        """
+        Returns a dict with all existing tags as keys and the number of
+        existence as value.
+
+        """
+        counts = defaultdict(int)  # type: defaultdict[str, int]
 
         base = self.session.query(Occurrence._tags.keys())
         base = base.filter(Occurrence.start >= datetime.datetime.now(
@@ -193,10 +198,7 @@ class OccurrenceCollection(Pagination):
 
         for keys in base.all():
             for tag in keys[0]:
-                if tag in counts.keys():
-                    counts[tag] += 1
-                else:
-                    counts[tag] = 1
+                counts[tag] += 1
 
         return counts
 
