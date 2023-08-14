@@ -78,6 +78,9 @@ msgstr "Official explanatory brochure"
 msgid "Voting campaign"
 msgstr "Public campaign"
 
+msgid "Explanatory brochure by Easyvote"
+msgstr "Explanatory brochure by Easyvote"
+
 msgid "Advertisment analysis"
 msgstr "Analysis of advertisement campaign"
 
@@ -1661,6 +1664,9 @@ msgstr "Reset"
 
 msgid "Show all"
 msgstr "Show all"
+
+msgid "(in German)"
+msgstr "(in German)"
 
 msgid "Dear Sir or Madam,"
 msgstr "Dear Sir or Madam,"

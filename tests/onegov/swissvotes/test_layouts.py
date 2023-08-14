@@ -709,7 +709,10 @@ def test_layout_vote_file_urls(swissvotes_app, attachments, attachment_urls,
             attachment_urls.get(locale, {}).get(attachment)
             or attachment_urls['de_CH'][attachment]  # fallback
         )
-        assert layout.attachments[attachment] == f'SwissVote/100/{filename}'
+        assert layout.attachments[attachment] == {
+            'locale': locale,
+            'url': f'SwissVote/100/{filename}'
+        }
 
 
 def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
@@ -735,9 +738,10 @@ def test_layout_vote_file_urls_fallback(swissvotes_app, attachments,
     request.locale = 'fr_CH'
 
     layout = VoteLayout(model, request)
-    assert layout.attachments['post_vote_poll'] == (
-        'SwissVote/100/nachbefragung-de.pdf'
-    )
+    assert layout.attachments['post_vote_poll'] == {
+        'locale': 'de_CH',
+        'url': 'SwissVote/100/nachbefragung-de.pdf'
+    }
 
 
 def test_layout_vote_search_results(swissvotes_app, attachments,

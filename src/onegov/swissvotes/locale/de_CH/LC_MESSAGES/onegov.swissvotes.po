@@ -80,6 +80,9 @@ msgstr "Offizielles Abstimmungsbüchlein"
 msgid "Voting campaign"
 msgstr "Abstimmungskampf"
 
+msgid "Explanatory brochure by Easyvote"
+msgstr "Broschüre von Easyvote"
+
 msgid "Advertisment analysis"
 msgstr "Inserateanalyse"
 
@@ -1616,6 +1619,9 @@ msgstr "Zurücksetzen"
 
 msgid "Show all"
 msgstr "Alle anzeigen"
+
+msgid "(in German)"
+msgstr "(auf Deutsch)"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"

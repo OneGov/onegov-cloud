@@ -98,6 +98,7 @@ def test_cli_import_attachments(session_manager, temporary_directory,
     create_file(folder / 'voting_text' / 'de_CH' / '01.1.pdf')
     create_file(folder / 'voting_text' / 'de_CH' / '01.10.pdf')
     create_file(folder / 'voting_text' / 'de_CH' / '001.100.pdf')
+    create_file(folder / 'voting_text' / 'de_CH' / '10-12.pdf')
 
     create_file(folder / 'voting_text' / 'de_CH' / 'a.pdf')
     create_file(folder / 'voting_text' / 'de_CH' / '100.pdx')
@@ -119,6 +120,9 @@ def test_cli_import_attachments(session_manager, temporary_directory,
     assert "1.1 for voting_text/de_CH/01.1.pdf" in result.output
     assert "1.10 for voting_text/de_CH/01.10.pdf" in result.output
     assert "1.100 for voting_text/de_CH/001.100.pdf" in result.output
+    assert "10 for voting_text/de_CH/10-12.pdf" in result.output
+    assert "11 for voting_text/de_CH/10-12.pdf" in result.output
+    assert "12 for voting_text/de_CH/10-12.pdf" in result.output
 
     assert "Invalid name voting_text/de_CH/a.pdf" in result.output
     assert "Ignoring voting_text/de_CH/100.pdx" in result.output
