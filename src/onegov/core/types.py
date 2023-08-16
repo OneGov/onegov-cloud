@@ -1,6 +1,10 @@
+from abc import ABC
 from typing import TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from onegov.core.collection import GenericCollection, Pagination, _M
     from typing import TypeVar, Union
     from typing_extensions import NotRequired, TypedDict
 
@@ -52,3 +56,6 @@ if TYPE_CHECKING:
 
     _T = TypeVar('_T')
     SequenceOrScalar = Union[Sequence[_T], _T]
+
+    class PaginatedGenericCollection(GenericCollection[_M], Pagination[_M]):
+        pass

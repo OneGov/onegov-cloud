@@ -3,6 +3,7 @@ from onegov.api.models import ApiEndpoint, AuthEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiException
+from onegov.org import OrgApp
 
 
 @ApiApp.path(
@@ -32,7 +33,7 @@ def get_api_endpoint(app, endpoint, page=0, extra_parameters=None):
     model=ApiEndpointItem,
     path='/api/{endpoint}/{id}',
 )
-def get_api_endpoint_item(app, endpoint, id):
+def get_api_endpoint_item(app: OrgApp, endpoint: str, id) -> ApiEndpointItem:
     item = ApiEndpointItem(app, endpoint, id)
     if not item.api_endpoint or not item.item:
         raise ApiException('Not found', status_code=404)
