@@ -4,7 +4,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred
 
 from onegov.core.upgrade import UpgradeContext
-from onegov.search.utils import classproperty, get_fts_index_languages
+from onegov.search.utils import classproperty, \
+    get_fts_index_localized_languages, get_fts_index_basic_languages
 from onegov.search.utils import extract_hashtags
 
 from typing import Any, TYPE_CHECKING
@@ -219,9 +220,27 @@ class Searchable:
         col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
         context = UpgradeContext(request)
         if not context.has_column(model.__tablename__, col_name):
-            tsvector_expression = \
-                Searchable.multi_language_tsvector_expression(
-                    model.psql_tsvector_expression(model))
+            tsvector_expression = None
+            for prop_name, type_info in model.es_properties.items():
+                if not prop_name.startswith('es_'):
+                    prop_type = type_info.get('type', None)
+                    prop = getattr(model, prop_name)
+                    languages = get_fts_index_basic_languages()
+
+                    if prop_type in ['localized', 'localized_html']:
+                        # only for 'localized' properties we create the
+                        # index localized
+                        languages.extend(get_fts_index_localized_languages())
+
+                    for language in languages:
+                        expr = func.to_tsvector(language,
+                                                func.coalesce(prop, ''))
+
+                        if tsvector_expression is None:
+                            tsvector_expression = expr
+                        else:
+                            tsvector_expression = tsvector_expression.concat(
+                                expr)
 
             context.operations.add_column(
                 model.__tablename__,
@@ -233,47 +252,6 @@ class Searchable:
                        )
             )
             context.operations.execute("COMMIT")
-
-    @staticmethod
-    def multi_language_tsvector_expression(tsvector_expression):
-        """
-        build the tsvector expression for all supported languages based
-        on this format
-
-        :param tsvector_expression:
-        :return: multilingual tsvector expression
-        """
-
-        language = get_fts_index_languages()[0]
-        expr = func.to_tsvector(language, tsvector_expression)
-
-        for language in get_fts_index_languages()[1:]:
-            expr = expr.concat(' ')
-            expr = expr.concat(func.to_tsvector(language, tsvector_expression))
-
-        return expr
-
-    @staticmethod
-    def create_tsvector_expression(*cols):
-        """
-        Creates tsvector expression for columns/properties
-
-        Doc reference:
-        https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX
-
-        :param cols: column names / properties to be indexed
-        :return: tsvector expression for multiple columns / properties
-
-        """
-        assert len(cols) >= 1, "Need to provide at least one column"
-
-        first_col, *remaining_cols = cols
-        expr = func.coalesce(first_col, '')
-        for col in remaining_cols:
-            expr = expr.concat(' ')
-            expr = expr.concat(func.coalesce(col, ''))
-
-        return expr
 
 
 # TODO: rename prefix 'es' to 'ts' for text search
