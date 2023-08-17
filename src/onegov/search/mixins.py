@@ -1,8 +1,9 @@
-from sqlalchemy import Column
+from sqlalchemy import Column, func, Computed  # type:ignore[attr-defined]
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred
 
+from onegov.core.upgrade import UpgradeContext
 from onegov.search.utils import classproperty, get_fts_index_languages
 from onegov.search.utils import extract_hashtags
 
@@ -45,6 +46,7 @@ class Searchable:
     identity is a completely different model.
 
     """
+    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
 
     if TYPE_CHECKING:
         fts_idx: 'Column[dict[str, Any]]'
@@ -52,10 +54,10 @@ class Searchable:
     # column for full text search index
     @declared_attr  # type:ignore[no-redef]
     def fts_idx(cls) -> 'Column[dict[str, Any]]':
-        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, 'fts_idx'):
+        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
+        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
             return deferred(cls.__table__.c.fts_idx)
-        # return deferred(Column(TSVECTOR, index=True))
-        return deferred(Column(TSVECTOR))
+        return deferred(Column(col_name, TSVECTOR))
 
     @classproperty
     def es_properties(self):
@@ -161,52 +163,46 @@ class Searchable:
         return 10
 
     @staticmethod
-    def psql_tsvector_string(model):
+    def psql_tsvector_expression(model):
         """
-        Provides the tsvector string for postgres defining which columns and
-        json fields to be used for full text search index.
+        Provides the tsvector expression for postgres for the defined
+        model. Depending on the model columns and properties are used for full
+        text search index.
 
-        Example:
-        s = create_tsvector_string('title', 'location')
-        s += " || ' ' || coalesce(((content ->> 'description')), '')"
-        s += " || ' ' || coalesce(((content ->> 'organizer')), '')"
-
-        :return: tsvector string
+        :return: tsvector expression
         """
-
-        columns = [p for p in model.es_properties if p in model.__dict__
-                   and not p.startswith('es_')]
-        return Searchable.create_tsvector_string(*columns) if columns else ''
+        columns = [p for p in model.es_properties if
+                   p in model.__dict__ and not p.startswith('es_')]
+        objects = [getattr(model, col) for col in columns]
+        return Searchable.create_tsvector_expression(*objects)
 
     @staticmethod
-    def reindex(session, schema, model):
+    def reindex(request, model):
         """
         Re-indexes the table by dropping and adding the full text search
         column.
         """
-        Searchable.drop_fts_column(session, schema, model)
-        Searchable.add_fts_column(session, schema, model)
+        Searchable.drop_fts_column(request, model)
+        Searchable.add_fts_column(request, model)
 
     @staticmethod
-    def drop_fts_column(session, schema, model, col_name='fts_idx'):
+    def drop_fts_column(request, model):
         """
         Drops the full text search column
 
-        :param session: db session
-        :param schema: schema the full text column shall be added
+        :param request: request object
         :param model: model to drop the index from
-        :param col_name: column name of fts index
         :return: None
         """
-        query = f"""
-            ALTER TABLE "{schema}".{model.__tablename__} DROP COLUMN IF EXISTS
-            {col_name};
-        """
-        session.execute(query)
-        session.execute("COMMIT")
+
+        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
+        context = UpgradeContext(request)
+
+        if context.has_column(model.__tablename__, col_name):
+            context.operations.drop_column(model.__tablename__, col_name)
 
     @staticmethod
-    def add_fts_column(session, schema, model, col_name='fts_idx'):
+    def add_fts_column(request, model):
 
         """
         This function is used for re-indexing and as migration step moving to
@@ -216,62 +212,69 @@ class Searchable:
         creating a multilingual gin index on the columns/data defined per
         model.
 
-        :param session: session
-        :param schema: schema name
+        :param request: request object
         :param model: model to add the index
-        :param col_name: column name of fts index
         :return: None
         """
 
-        # we build the tsvector expression for all supported languages based
-        # on this format
-        # to_tsvector('simple', '<tsvector_string_of_model') ||
-        # to_tsvector('german', '<tsvector_string_of_model') ||
-        # to_tsvector('french', '<tsvector_string_of_model') ||
-        # ...
+        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
+        context = UpgradeContext(request)
+        if not context.has_column(model.__tablename__, col_name):
+            tsvector_expression = \
+                Searchable.multi_language_tsvector_expression(
+                    model.psql_tsvector_expression(model))
 
-        tsvector_expression = \
-            Searchable.multi_language_tsvector_expression(
-                model.psql_tsvector_string(model))
-
-        query = f"""
-            ALTER TABLE "{schema}".{model.__tablename__}
-            ADD COLUMN IF NOT EXISTS {col_name} tsvector GENERATED ALWAYS AS
-            ({tsvector_expression}) STORED;
-        """
-        session.execute(query)
-        session.execute("COMMIT")
-
-    @staticmethod
-    def multi_language_tsvector_expression(tsvector_string):
-        return ' || '.join(
-            "to_tsvector('{}', {})".format(language, tsvector_string)
-            for language in get_fts_index_languages()
-        )
+            context.operations.add_column(
+                model.__tablename__,
+                Column(col_name,
+                       TSVECTOR,
+                       Computed(
+                           tsvector_expression,
+                           persisted=True),
+                       )
+            )
+            context.operations.execute("COMMIT")
 
     @staticmethod
-    def create_tsvector_string(*cols):
+    def multi_language_tsvector_expression(tsvector_expression):
         """
-        Creates tsvector string for columns
+        build the tsvector expression for all supported languages based
+        on this format
+
+        :param tsvector_expression:
+        :return: multilingual tsvector expression
+        """
+
+        language = get_fts_index_languages()[0]
+        expr = func.to_tsvector(language, tsvector_expression)
+
+        for language in get_fts_index_languages()[1:]:
+            expr = expr.concat(' ')
+            expr = expr.concat(func.to_tsvector(language, tsvector_expression))
+
+        return expr
+
+    @staticmethod
+    def create_tsvector_expression(*cols):
+        """
+        Creates tsvector expression for columns/properties
+
         Doc reference:
         https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX
 
-        :param cols: column names to be indexed
-        :return: tsvector string for multiple columns i.e. for columns title
-        and body: coalesce(\"title\", '') || ' ' || coalesce(\"body\", '')
-        Note that the '\"{}\"' escapes the column name in case it is a
-        keyword, see
-        http://www.postgresql.org/docs/current/static/sql-keywords-appendix.html
+        :param cols: column names / properties to be indexed
+        :return: tsvector expression for multiple columns / properties
+
         """
+        assert len(cols) >= 1, "Need to provide at least one column"
 
-        base = "'func.coalesce({}, '')'"
-        ext = " || ' ' || 'func.coalesce({}, '')'"
+        first_col, *remaining_cols = cols
+        expr = func.coalesce(first_col, '')
+        for col in remaining_cols:
+            expr = expr.concat(' ')
+            expr = expr.concat(func.coalesce(col, ''))
 
-        exp = base
-        for _ in range(len(cols) - 1):
-            exp += ext
-
-        return exp.format(*cols)
+        return expr
 
 
 # TODO: rename prefix 'es' to 'ts' for text search

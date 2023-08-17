@@ -34,6 +34,7 @@ def get_fts_index_languages():
     limited set of used languages.
 
     NOTE: 'simple' is used for tag, label or phrase searches
+
     """
     return ['simple', 'german', 'french', 'italian', 'english']
 

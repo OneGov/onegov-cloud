@@ -398,7 +398,7 @@ class SearchApp(morepath.App):
 
         self.es_indexer.bulk_process()
 
-    def psql_perform_reindex(self):
+    def psql_perform_reindex(self, request):
         """ Re-indexes all `searchable' models in postgresql db ensuring
         each table will be indexed only once.
 
@@ -406,12 +406,9 @@ class SearchApp(morepath.App):
         done = []
 
         for model in searchable_sqlalchemy_models(Base):
-            print(f'*** tschupre searchable model {model}')
             if model.__tablename__ not in done:
-                model.reindex(self.session(), self.schema, model)
+                model.reindex(request, model)
                 done.append(model.__tablename__)
-
-        print(f'*** tschupre reindexed {len(done)} tables: {done}')
 
     def psql_search(self, query=''):
         from onegov.org.models import SearchPostgres

@@ -26,7 +26,7 @@ def reindex(group_context, fail):
         print(click.style(title, underline=True))
 
         start = utcnow()
-        app.psql_perform_reindex()
+        app.psql_perform_reindex(request)
         print(f"- psql indexing took {utcnow() - start}")
 
         # TODO: remove es indexing once es is gone
