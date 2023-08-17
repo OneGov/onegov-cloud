@@ -63,7 +63,7 @@ $pdf-icon: '\f1c1';
 $qr-code-icon: '\f029';
 
 .globals {
-    @include primary-color-background;
+    background: $tuatara;
 
     @include breakpoint(small only) {
         padding: 0;
@@ -108,7 +108,8 @@ $qr-code-icon: '\f029';
             > li {
 
                 > a {
-                    @include primary-color-background;
+                    background: $tuatara;
+                    color: white;
                     height: 100%;
                     line-height: $globals-height;
                     padding: 0 1rem;

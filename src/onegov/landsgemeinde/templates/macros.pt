@@ -36,11 +36,7 @@
                 </a>
             </li>
         </ul>
-    </div>
-    <script>
-        document.getElementById('current').scrollIntoView({behavior: "smooth", block: 'center', inline: 'start'});
-        window.scrollTo(0, 0);
-    </script>  
+    </div> 
 </metal:agenda-item-list>
 
 <metal:state define-macro="state">

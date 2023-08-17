@@ -77,6 +77,12 @@ class AgendaItemLayout(DefaultLayout):
             )
         ]
 
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        self.request.include('agenda_items')
+
+
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
