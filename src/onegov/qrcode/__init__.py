@@ -1,6 +1,5 @@
-from onegov.qrcode.model import QrCode, QrCodeMixin
+from onegov.qrcode.model import QrCode
 
 __all__ = (
     'QrCode',
-    'QrCodeMixin'
 )

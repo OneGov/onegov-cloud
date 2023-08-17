@@ -7,8 +7,13 @@ from onegov.core.orm.types import UTCDateTime
 from sqlalchemy import Column
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.upgrade import UpgradeContext
+
+
 @upgrade_task('Add scheduled column')
-def add_scheduled_column(context):
+def add_scheduled_column(context: 'UpgradeContext') -> None:
     context.operations.add_column('newsletters', Column(
         'scheduled', UTCDateTime, nullable=True
     ))

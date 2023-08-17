@@ -38,5 +38,17 @@ if TYPE_CHECKING:
         Headers: NotRequired[list[HeaderJsonDict]]
         Attachments: NotRequired[list[AttachmentJsonDict]]
 
+    class FileDict(TypedDict):
+        data: str
+        filename: str | None
+        mimetype: str
+        size: int
+
+    class LaxFileDict(TypedDict):
+        data: str
+        filename: NotRequired[str | None]
+        mimetype: NotRequired[str]
+        size: NotRequired[int]
+
     _T = TypeVar('_T')
     SequenceOrScalar = Union[Sequence[_T], _T]

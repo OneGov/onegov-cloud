@@ -2,13 +2,24 @@
 
 import humanize
 
-from html import escape
+from markupsafe import escape, Markup
 from onegov.core.markdown import render_untrusted_markdown
 from onegov.form import log
 from translationstring import TranslationString
+from wtforms.widgets.core import html_params
 
 
-__all__ = ['render_field']
+from typing import TypeVar, TYPE_CHECKING
+if TYPE_CHECKING:
+    from abc import abstractmethod
+    from collections.abc import Callable
+    from wtforms import Field
+
+
+_R = TypeVar('_R', bound='BaseRenderer')
+
+
+__all__ = ('render_field', )
 
 
 class Registry:
@@ -16,12 +27,14 @@ class Registry:
     making sure each renderer is only instantiated once.
 
     """
-    def __init__(self):
+    renderer_map: dict[str, 'BaseRenderer']
+
+    def __init__(self) -> None:
         self.renderer_map = {}
 
-    def register_for(self, *types):
+    def register_for(self, *types: str) -> 'Callable[[type[_R]], type[_R]]':
         """ Decorator to register a renderer. """
-        def wrapper(renderer):
+        def wrapper(renderer: type[_R]) -> type[_R]:
             instance = renderer()
 
             for type in types:
@@ -30,17 +43,16 @@ class Registry:
             return renderer
         return wrapper
 
-    def render(self, field):
+    def render(self, field: 'Field') -> Markup:
         """ Renders the given field with the correct renderer. """
-        # no point rendering empty fields
         if not field.data:
-            return ''
+            return Markup('')
 
         renderer = self.renderer_map.get(field.type)
 
         if renderer is None:
-            log.warning('No renderer found for {}'.format(field.type))
-            return ''
+            log.warning(f'No renderer found for {field.type}')
+            return Markup('')
         else:
             return renderer(field)
 
@@ -54,10 +66,15 @@ render_field = registry.render
 class BaseRenderer:
     """ Provides utility functions for all renderers. """
 
-    def escape(self, text):
-        return escape(text, quote=True)
+    if TYPE_CHECKING:
+        # forward declare that Renderer needs to be callable
+        @abstractmethod
+        def __call__(self, field: Field) -> Markup: ...
 
-    def translate(self, field, text):
+    def escape(self, text: str) -> Markup:
+        return escape(text)
+
+    def translate(self, field: 'Field', text: str) -> str:
         if isinstance(text, TranslationString):
             return field.gettext(text)
 
@@ -69,35 +86,37 @@ class BaseRenderer:
     'TextAreaField',
 )
 class StringFieldRenderer(BaseRenderer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __call__(self, field):
+    def __call__(self, field: 'Field') -> Markup:
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
-                return render_untrusted_markdown(field.data)
+                # FIXME: This utility function should return Markup
+                return Markup(render_untrusted_markdown(field.data))
 
-        return self.escape(str(field.data)).replace('\n', '<br>')
+        return self.escape(str(field.data)).replace('\n', Markup('<br>'))
 
 
 @registry.register_for('PasswordField')
 class PasswordFieldRenderer(BaseRenderer):
-    def __call__(self, field):
-        return '*' * len(field.data)
+    def __call__(self, field: 'Field') -> Markup:
+        return Markup('*' * len(field.data))
 
 
 @registry.register_for('EmailField')
 class EmailFieldRenderer(BaseRenderer):
-    def __call__(self, field):
-        return '<a href="mailto:{mail}">{mail}</a>'.format(
-            mail=self.escape(field.data))
+    def __call__(self, field: 'Field') -> Markup:
+        params = {'href': f'mailto:{field.data}'}
+        return Markup(
+            f'<a {html_params(**params)}>{{email}}</a>'
+        ).format(email=field.data)
 
 
 @registry.register_for('URLField')
 class URLFieldRenderer(BaseRenderer):
-    def __call__(self, field):
-        return '<a href="{url}">{url}</a>'.format(
-            url=self.escape(field.data))
+    def __call__(self, field: 'Field') -> Markup:
+        params = {'href': field.data}
+        return Markup(
+            f'<a {html_params(**params)}>{{url}}</a>'
+        ).format(url=field.data)
 
 
 @registry.register_for('DateField')
@@ -107,8 +126,8 @@ class DateFieldRenderer(BaseRenderer):
     # be doable with little work (not necessary for now)
     date_format = '%d.%m.%Y'
 
-    def __call__(self, field):
-        return field.data.strftime(self.date_format)
+    def __call__(self, field: 'Field') -> Markup:
+        return self.escape(field.data.strftime(self.date_format))
 
 
 @registry.register_for('DateTimeLocalField')
@@ -123,16 +142,16 @@ class TimezoneDateTimeFieldRenderer(DateFieldRenderer):
 
 @registry.register_for('TimeField')
 class TimeFieldRenderer(BaseRenderer):
-    def __call__(self, field):
-        return '{:02d}:{:02d}'.format(field.data.hour, field.data.minute)
+    def __call__(self, field: 'Field') -> Markup:
+        return Markup(f'{field.data.hour:02d}:{field.data.minute:02d}')
 
 
 @registry.register_for('UploadField')
 class UploadFieldRenderer(BaseRenderer):
 
-    def __call__(self, field):
-        return '{filename} ({size})'.format(
-            filename=self.escape(field.data['filename']),
+    def __call__(self, field: 'Field') -> Markup:
+        return Markup('{filename} ({size})').format(
+            filename=field.data['filename'],
             size=humanize.naturalsize(field.data['size'])
         )
 
@@ -140,10 +159,10 @@ class UploadFieldRenderer(BaseRenderer):
 @registry.register_for('UploadMultipleField')
 class UploadMultipleFieldRenderer(BaseRenderer):
 
-    def __call__(self, field):
-        return '<br>'.join(
-            '{filename} ({size})'.format(
-                filename=self.escape(data['filename']),
+    def __call__(self, field: 'Field') -> Markup:
+        return Markup('<br>').join(
+            Markup('{filename} ({size})').format(
+                filename=data['filename'],
                 size=humanize.naturalsize(data['size'])
             ) for data in field.data if data
         )
@@ -152,42 +171,38 @@ class UploadMultipleFieldRenderer(BaseRenderer):
 @registry.register_for('RadioField')
 class RadioFieldRenderer(BaseRenderer):
 
-    def __call__(self, field):
-        try:
-            return "✓ " + self.escape(self.translate(
-                field, dict(field.choices)[field.data]
-            ))
-        except Exception:
-            return "✓ ?"
+    def __call__(self, field: 'Field') -> Markup:
+        choices = dict(field.choices)  # type:ignore[attr-defined]
+        return self.escape("✓ " + self.translate(
+            field, choices.get(field.data, '?')
+        ))
 
 
 @registry.register_for('MultiCheckboxField')
 class MultiCheckboxFieldRenderer(BaseRenderer):
 
-    def __call__(self, field):
+    def __call__(self, field: 'Field') -> Markup:
         choices = {value: f'? ({value})' for value in field.data}
-        choices.update(dict(field.choices))
-        return "".join(
-            "✓ "
-            + self.escape(self.translate(field, choices[value]))
-            + '<br>'
+        choices.update(field.choices)  # type:ignore[attr-defined]
+        return Markup('<br>').join(
+            f'✓ {self.translate(field, choices[value])}'
             for value in field.data
-        )[:-4]
+        )
 
 
 @registry.register_for('CSRFTokenField', 'HiddenField')
 class NullRenderer(BaseRenderer):
-    def __call__(self, field):
-        return ''
+    def __call__(self, field: 'Field') -> Markup:
+        return Markup('')
 
 
 @registry.register_for('DecimalField')
 class DecimalRenderer(BaseRenderer):
-    def __call__(self, field):
-        return '{:.2f}'.format(field.data)
+    def __call__(self, field: 'Field') -> Markup:
+        return Markup(f'{field.data:.2f}')
 
 
 @registry.register_for('IntegerField')
 class IntegerRenderer(BaseRenderer):
-    def __call__(self, field):
-        return '{}'.format(int(field.data))
+    def __call__(self, field: 'Field') -> Markup:
+        return Markup(f'{int(field.data)}')

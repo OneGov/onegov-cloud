@@ -1,11 +1,16 @@
 """ The settings view, defining things like the logo or color of the org. """
 
 from copy import copy
+
 from dectate import Query
+from markupsafe import Markup
+from webob.exc import HTTPForbidden
+
+from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.request import CoreRequest
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
 from onegov.org import _
-from onegov.org.app import OrgApp
 from onegov.org.forms import AnalyticsSettingsForm
 from onegov.org.forms import FooterSettingsForm
 from onegov.org.forms import GeneralSettingsForm
@@ -13,16 +18,21 @@ from onegov.org.forms import HolidaySettingsForm
 from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
-from onegov.org.forms.settings import OrgTicketSettingsForm, \
-    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm, \
-    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm, \
-    SocialMediaSettingsForm, EventSettingsForm, GeverSettingsForm
+from onegov.org.forms.settings import OrgTicketSettingsForm,\
+    HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm,\
+    NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm,\
+    SocialMediaSettingsForm, EventSettingsForm, GeverSettingsForm,\
+    OneGovApiSettingsForm
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.management import LinkMigration
 from onegov.org.models import Organisation
 from onegov.org.models import SwissHolidays
+from onegov.api.models import ApiKey
+from onegov.org.app import OrgApp
+from onegov.user import UserCollection, User
+from uuid import uuid4
 
 
 @OrgApp.html(
@@ -302,3 +312,82 @@ def handle_link_health_check(self, request, form, layout=None):
     icon='fa-calendar-alt', order=-700)
 def handle_event_settings(self, request, form, layout=None):
     return handle_generic_settings(self, request, form, _("Events"), layout)
+
+
+@OrgApp.form(
+    model=Organisation, name='api-keys', template='api_keys.pt',
+    permission=Secret, form=OneGovApiSettingsForm, setting=_("OneGov API"),
+    icon='fa-key', order=1)
+def handle_api_keys(self: Organisation, request: CoreRequest,
+                    form: OneGovApiSettingsForm, layout=None):
+    """Handles the generation of API access keys."""
+
+    request.include('fontpreview')
+    title = _("OneGov API")
+    collection = UserCollection(request.session)
+    user = collection.by_username(request.identity.userid)
+    if not user:
+        raise HTTPForbidden()
+
+    if form.submitted(request):
+        assert form.name.data is not None
+        key = ApiKey(
+            name=form.name.data,
+            read_only=True,
+            last_used=None,
+            key=uuid4(),
+            user=user,
+        )
+        request.session.add(key)
+        request.session.flush()
+        request.success(_("Your changes were saved"))
+
+    layout = layout or SettingsLayout(self, request, title)
+
+    def current_api_keys_by_user(
+        request: CoreRequest, self: Organisation, user: User, layout
+    ):
+        for api_key in user.api_keys:
+            api_key_delete_link = Link(
+                text=Markup('<i class="fa fa-trash" aria-hidden="True"></i>'),
+                url=layout.csrf_protected_url(
+                    request.link(api_key, name='+delete')),
+                traits=(
+                    Confirm(
+                        _("Do you really want to delete this API key?"),
+                        _("This action cannot be undone."),
+                        _("Delete"),
+                        _("Cancel"),
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=request.link(self, name='api-keys'),
+                    ),
+                ),
+            )
+            # delete_link is temporarily stored on the object itself
+            api_key.delete_link = api_key_delete_link
+            yield api_key
+
+    return {
+        'api_keys_list': list(
+            current_api_keys_by_user(request, self, user, layout)
+        ),
+        'title': title,
+        'form': form,
+        'layout': layout,
+    }
+
+
+@OrgApp.view(
+    model=ApiKey,
+    name='delete',
+    permission=Secret,
+    request_method='DELETE',
+)
+def delete_api_key(self: ApiKey, request: CoreRequest):
+    request.assert_valid_csrf_token()
+
+    request.session.delete(self)
+    request.session.flush()
+    request.message(_("ApiKey deleted."), 'success')

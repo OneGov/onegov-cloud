@@ -10,7 +10,7 @@ from onegov.core.utils import module_path, Bunch
 from onegov.user import User
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
-from ulid import ulid
+from ulid import ULID
 
 
 class BillingCollection:
@@ -117,7 +117,7 @@ class BillingCollection:
             .filter(User.username.in_(users))
 
         # each time we add a position, we group it uniquely using a family
-        family = f"{group}-{ulid()}"
+        family = f"{group}-{ULID()}"
         count = 0
 
         for invoice in invoices:

@@ -198,6 +198,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('lecture', _('Text of a presentation')),
                 ('statistics', _('Statistical data')),
                 ('other', _('Other')),
+                ('website', _('Website')),
             ))
 
         raise RuntimeError(f"No codes available for '{attribute}'")
@@ -257,6 +258,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     link_post_vote_poll_fr = content_property()
     link_post_vote_poll_en = content_property()
     link_post_vote_poll = localized_property()
+    link_easyvote_de = content_property()
+    link_easyvote_fr = content_property()
+    link_easyvote = localized_property()
 
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea = Column(Text)
@@ -539,7 +543,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Electoral strength
     national_council_election_year = Column(Integer)
-    # drop?
     national_council_share_fdp = Column(Numeric(13, 10))
     national_council_share_cvp = Column(Numeric(13, 10))
     national_council_share_sps = Column(Numeric(13, 10))
@@ -572,8 +575,28 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def has_national_council_share_data(self):
-        if self.national_council_election_year:
+        """ Returns true, if the vote contains national council share data.
+
+        Returns true, if a national council year is set and
+        - any aggregated national council share data is present (yeas, nays,
+          none, empty, free vote, neutral, unknown)
+        - or any national council share data of parties with national council
+          share and a recommendation regarding this vote is present
+        """
+        if (
+            self.national_council_election_year and (
+                self.national_council_share_yeas
+                or self.national_council_share_nays
+                or self.national_council_share_none
+                or self.national_council_share_empty
+                or self.national_council_share_free_vote
+                or self.national_council_share_neutral
+                or self.national_council_share_unknown
+                or self.sorted_actors_list
+            )
+        ):
             return True
+
         return False
 
     # attachments
@@ -589,7 +612,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         label=_('Brief description Swissvotes'),
         extension='pdf',
         static_views={
-            'de_CH': 'kurzbeschreibung.pdf',
+            'de_CH': 'kurzbeschreibung-de.pdf',
+            'fr_CH': 'kurzbeschreibung-fr.pdf',
         }
     )
     federal_council_message = LocalizedFile(
@@ -613,6 +637,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         static_views={
             'de_CH': 'brochure-de.pdf',
             'fr_CH': 'brochure-fr.pdf',
+        }
+    )
+    easyvote_booklet = LocalizedFile(
+        label=_('Explanatory brochure by Easyvote'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'easyvote-de.pdf',
+            'fr_CH': 'easyvote-fr.pdf',
         }
     )
     resolution = LocalizedFile(
@@ -642,7 +674,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         label=_('Result by canton, district and municipality'),
         extension='xlsx',
         static_views={
-            'de_CH': 'staatsebenen.xlsx',
+            'de_CH': 'staatsebenen-de.xlsx',
+            'fr_CH': 'staatsebenen-fr.xlsx',
         }
     )
     foeg_analysis = LocalizedFile(
@@ -737,10 +770,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         'brief_description',
         'federal_council_message',
         'parliamentary_debate',
-        # we don't include the voting booklet, resolution and ad analysis
-        # - they might contain other votes from the same day!
+        # we don't include the voting booklet, resolution, ad analysis and
+        # easyvote booklet - they might contain other votes from the same day!
         'realization',
-        'preliminary_examination'
+        'preliminary_examination',
     }
 
     def reindex_files(self):

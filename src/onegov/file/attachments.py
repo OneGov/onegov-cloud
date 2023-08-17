@@ -18,6 +18,7 @@ from onegov.pdf.utils import extract_pdf_info
 
 from typing import IO, TYPE_CHECKING
 if TYPE_CHECKING:
+    from depot.io.interfaces import _FileContent
     from typing_extensions import NotRequired, TypedDict
 
     class _ImageSaveOptionalParams(TypedDict):
@@ -51,12 +52,19 @@ def strip_exif_and_limit_and_store_image_size(
         return None
 
     try:
+        # TODO: We should consider opening the image twice, and calling
+        #       verify on the first open, just in case the verify
+        #       is more thorough than a plain load.
         image = Image.open(content)
+        # we perform a manual load so some of the verification happens
+        # earlier than it otherwise would, so we can catch all the
+        # exceptions here in one place.
+        image.load()
     except Image.DecompressionBombError:
         # reraise this one specifically
         raise
     except Exception:
-        # treat any other internal error as an UnidentifierImageError
+        # treat any other internal error as an UnidentifiedImageError
         raise UnidentifiedImageError from None
 
     needs_resample = max(image.size) > IMAGE_MAX_SIZE
@@ -135,7 +143,7 @@ class ProcessedUploadedFile(UploadedFile):
 
     def process_content(
         self,
-        content: IO[bytes],
+        content: '_FileContent',
         filename: str | None = None,
         content_type: str | None = None
     ) -> None:
@@ -151,11 +159,11 @@ class ProcessedUploadedFile(UploadedFile):
             # not a real content type - but useful for us to be able to rely
             # on anything uploaded having a content type, even though that
             # content is discarded soon afterwards
-            content = b''  # type:ignore[assignment]
+            content = b''
             content_type = 'application/malicious'
         except UnidentifiedImageError:
             # also not a real content type
-            content = b''  # type:ignore[assignment]
+            content = b''
             content_type = 'application/unidentified-image'
         except pdftotext.Error:
             # signed pdfs have shown to be difficult to handle by pdftotext

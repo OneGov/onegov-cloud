@@ -1462,6 +1462,8 @@ def test_votes_export(swissvotes_app):
     vote.bfs_map_fr = 'map fr'
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
+    vote.link_easyvote_de = 'https://easy.vote/de'
+    vote.link_easyvote_fr = 'https://easy.vote/fr'
     vote.link_bk_results_de = 'https://bk.results/de'
     vote.link_bk_results_fr = 'https://bk.results/fr'
     vote.link_bk_chrono_de = 'https://bk.chrono/de'
@@ -1546,6 +1548,8 @@ def test_votes_export(swissvotes_app):
         'bs-annahme': '0',
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
+        'easyvideo_de': 'https://easy.vote/de',
+        'easyvideo_fr': 'https://easy.vote/fr',
         'info_br-de': 'https://federal.council/de',
         'info_br-fr': 'https://federal.council/fr',
         'info_br-en': 'https://federal.council/en',
@@ -2189,6 +2193,8 @@ def test_votes_export(swissvotes_app):
         'bs-annahme': 0.0,
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
+        'easyvideo_de': 'https://easy.vote/de',
+        'easyvideo_fr': 'https://easy.vote/fr',
         'info_br-de': 'https://federal.council/de',
         'info_br-fr': 'https://federal.council/fr',
         'info_br-en': 'https://federal.council/en',

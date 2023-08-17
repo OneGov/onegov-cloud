@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-06-05 10:02+0200\n"
+"POT-Creation-Date: 2023-08-04 19:35+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -888,8 +888,11 @@ msgstr "Prix"
 msgid "Organizer"
 msgstr "Organisateur"
 
-msgid "Organizer E-Mail"
-msgstr "Courriel de l'organisateur"
+msgid "Organizer E-Mail address"
+msgstr "Adresse e-mail de l'organisateur"
+
+msgid "Organizer phone number"
+msgstr "Numéro de téléphone de l'organisateur"
 
 msgid "Tags"
 msgstr "Étiquettes"
@@ -1290,11 +1293,24 @@ msgstr "Votre événement a été accepté:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Votre événement a malheureusement été rejeté:"
 
-msgid "The following reservations have been accepted:"
-msgstr "Les réservations suivantes ont été acceptées:"
+msgid "New note in Ticket ${link}"
+msgstr "Nouvelle note dans le billet ${link}"
 
 msgid "${author} wrote"
 msgstr "${author} a écrit"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Il s'agit de la notification de notes sur les réservations pour ${request."
+"app.org.title}. Si vous ne souhaitez plus recevoir cet e-mail, veuillez "
+"contacter un administrateur afin qu'il puisse vous retirer de la liste des "
+"destinataires."
+
+msgid "The following reservations have been accepted:"
+msgstr "Les réservations suivantes ont été acceptées:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1386,6 +1402,19 @@ msgstr "Fenêtre d'inscription"
 
 msgid "The ticket number is"
 msgstr "Le numéro du ticket est"
+
+msgid "The following reservations have been rejected:"
+msgstr "Les réservations suivantes ont été rejetées :"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Il s'agit d'une notification concernant les réservations rejetées pour "
+"${organisation}. Si vous ne souhaitez plus recevoir ces notifications, "
+"veuillez contacter un administrateur afin qu'il vous retire de la liste des "
+"destinataires."
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées:"
@@ -1761,6 +1790,12 @@ msgid ""
 msgstr ""
 "Reçoit des notifications pour les réservations du jour les jours suivants:"
 
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Reçoit des notifications pour les notes internes sur les réservations."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Reçoit des notifications pour les réservations rejetées."
+
 msgid "Receives notifications for new reservations."
 msgstr "Recevoir des notifications pour les nouvelles réservations."
 
@@ -2110,6 +2145,9 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+msgid "OneGov API"
+msgstr "API OneGov"
 
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "L'équipe de OneGov Cloud"

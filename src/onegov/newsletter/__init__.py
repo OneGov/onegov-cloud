@@ -3,10 +3,10 @@ from onegov.newsletter.collection import (
     NewsletterCollection, RecipientCollection
 )
 
-__all__ = [
+__all__ = (
     'Newsletter',
     'NewsletterCollection',
     'Recipient',
     'RecipientCollection',
     'Subscription'
-]
+)

@@ -71,6 +71,7 @@ def handle_new_resource_recipient(self, request, form, layout=None):
             address=form.address.data,
             daily_reservations=form.daily_reservations.data,
             new_reservations=form.new_reservations.data,
+            internal_notes=form.internal_notes.data,
             send_on=form.send_on.data,
             resources=form.resources.data,
         )

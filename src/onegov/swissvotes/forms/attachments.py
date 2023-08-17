@@ -103,6 +103,15 @@ class AttachmentsForm(Form):
         fieldset=_("Voting campaign"),
     )
 
+    easyvote_booklet = UploadField(
+        label=_("Explanatory brochure by Easyvote"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Voting campaign"),
+    )
+
     ad_analysis = UploadField(
         label=_("Advertisment analysis"),
         validators=[

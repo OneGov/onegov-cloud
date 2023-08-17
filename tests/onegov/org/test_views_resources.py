@@ -18,6 +18,8 @@ from openpyxl import load_workbook
 from pathlib import Path
 from unittest.mock import patch
 
+from tests.shared.utils import add_reservation
+
 
 def test_resource_slots(client):
     resources = ResourceCollection(client.app.libres_context)
@@ -197,42 +199,6 @@ def test_find_your_spot(client):
     assert '04.01.2020' in result
     assert '05.01.2020' in result
     assert '06.01.2020' in result
-
-
-def add_reservation(
-    resource,
-    client,
-    start,
-    end,
-    email=None,
-    partly_available=True,
-    reserve=True,
-    approve=True,
-    add_ticket=True
-):
-    if not email:
-        email = f'{resource.name}@example.org'
-
-    allocation = resource.scheduler.allocate(
-        (start, end),
-        partly_available=partly_available,
-    )[0]
-
-    if reserve:
-        resource_token = resource.scheduler.reserve(
-            email,
-            (allocation.start, allocation.end),
-        )
-
-    if reserve and approve:
-        resource.scheduler.approve_reservations(resource_token)
-        if add_ticket:
-            with client.app.session().no_autoflush:
-                tickets = TicketCollection(client.app.session())
-                tickets.open_ticket(
-                    handler_code='RSV', handler_id=resource_token.hex
-                )
-    return resource
 
 
 def test_resource_room_deletion(client):
@@ -2481,7 +2447,7 @@ def test_resource_recipient_overview(client):
     page = client.get('/resource-recipients')
     assert "John" in page
     assert "john@example.org" in page
-    assert "Erhält Benachtchtigungen für neue Reservationen." in page
+    assert "Erhält Benachrichtigungen für neue Reservationen." in page
     assert "für Reservationen des Tages an folgenden Tagen:" in page
     assert "Fr , So" in page
     assert "Gymnasium" in page

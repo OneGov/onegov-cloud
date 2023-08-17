@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-06-05 10:02+0200\n"
+"POT-Creation-Date: 2023-08-04 19:35+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -884,8 +884,11 @@ msgstr "Prezzo"
 msgid "Organizer"
 msgstr "Organizzatore"
 
-msgid "Organizer E-Mail"
-msgstr "E-mail dell'organizzatore"
+msgid "Organizer E-Mail address"
+msgstr "Indirizzo e-mail dell'organizzatore"
+
+msgid "Organizer phone number"
+msgstr "Numero di telefono dell'organizzatore"
 
 msgid "Tags"
 msgstr "Tag"
@@ -1287,11 +1290,23 @@ msgstr "L'evento è stato accettato:"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Purtroppo l'evento è stato rifiutato:"
 
-msgid "The following reservations have been accepted:"
-msgstr "Sono state accettate le seguenti prenotazioni:"
+msgid "New note in Ticket ${link}"
+msgstr "Nuova nota nel ticket ${link}"
 
 msgid "${author} wrote"
 msgstr "${author} ha scritto"
+
+msgid ""
+"This is the notification for notes on reservations for ${request.app.org."
+"title}. If you no longer want to receive this e-mail please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Dies ist die Benachrichtigung für Notiz zu Reservierungen für ${request.app."
+"org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
+"Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
+
+msgid "The following reservations have been accepted:"
+msgstr "Sono state accettate le seguenti prenotazioni:"
 
 msgid ""
 "This is a notification for the new reservations for ${organisation}. If you "
@@ -1376,6 +1391,18 @@ msgstr "Finestra di registrazione"
 
 msgid "The ticket number is"
 msgstr "Il numero del biglietto è"
+
+msgid "The following reservations have been rejected:"
+msgstr "Le seguenti prenotazioni sono state rifiutate:"
+
+msgid ""
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
+"administrator so they can remove you from the recipients list."
+msgstr ""
+"Questa è una notifica per le prenotazioni rifiutate per ${organization}. Se "
+"non desideri più ricevere queste notifiche, contatta un amministratore in "
+"modo che possa rimuoverti dall'elenco dei destinatari."
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Purtroppo le seguenti prenotazioni sono state annullate:"
@@ -1750,6 +1777,12 @@ msgid ""
 msgstr ""
 "Riceve le notifiche per le prenotazioni del giorno nei giorni successivi:"
 
+msgid "Receives notifications for internal notes on reservations."
+msgstr "Riceve le notifiche per le note interne sulle prenotazioni."
+
+msgid "Receives notifications for rejected reservations."
+msgstr "Riceve le notifiche per le prenotazioni rifiutate."
+
 msgid "Receives notifications for new reservations."
 msgstr "Riceve le notifiche per le nuove prenotazioni."
 
@@ -2103,5 +2136,5 @@ msgstr "Festività"
 msgid "Link Migration"
 msgstr "Migrazione dei link"
 
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Il team di OneGov Cloud"
+msgid "OneGov API"
+msgstr "API OneGov"

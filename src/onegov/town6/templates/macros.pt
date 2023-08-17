@@ -748,7 +748,7 @@
                 <tal:b tal:case="'UploadField'">
                     <tal:b tal:define="url layout.field_download_link(field)">
                         <a href="${url}" tal:condition="not allow_views or not field.is_image">
-                            <tal:b replace="structure rendered" />
+                            ${rendered}
                         </a>
                         <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
                             <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
@@ -761,13 +761,13 @@
                         </div>
                     </tal:b>
                 </tal:b>
-                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter zip(field, rendered.split('<br>'))">
+                <tal:b tal:case="'UploadMultipleField'" tal:repeat="iter zip(field, rendered.split(layout.Markup('<br>')))">
                     <tal:b tal:define="subfield iter[0];
                                        rendered iter[1];
                                        url layout.field_download_link(subfield);
                                        show_image allow_views and subfield.is_image">
                         <a href="${url}" tal:condition="not show_image">
-                            <tal:b replace="structure rendered" />
+                            ${rendered}
                         </a>
                         <br tal:condition="not show_image and not repeat.iter.end" />
                         <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="show_image">
@@ -785,8 +785,8 @@
             </tal:b>
             <tal:b condition="not (allow_downloads or allow_views) or field.type not in ('UploadField', 'UploadMultipleField')" >
                 <tal:b tal:switch="linkify_display|False">
-                    <tal:b tal:case="True" replace="structure layout.linkify_field(field, rendered)" />
-                    <tal:b tal:case="False" replace="structure rendered" />
+                    <tal:b tal:case="True" replace="layout.linkify_field(field, rendered)" />
+                    <tal:b tal:case="False" replace="rendered" />
                 </tal:b>
             </tal:b>
         </dd>
@@ -1128,8 +1128,12 @@
         </tal:b>
 
         <tal:b condition="event.organizer_email">
-            <dt i18n:translate>Organizer E-Mail</dt>
+            <dt i18n:translate>Organizer E-Mail address</dt>
             <dd><a href="mailto:${event.organizer_email}" tal:content="event.organizer_email" /></dd>
+        </tal:b>
+        <tal:b condition="event.organizer_phone">
+            <dt i18n:translate>Organizer phone number</dt>
+            <dd><a href="mailto:${event.organizer_phone}" tal:content="event.organizer_phone" /></dd>
         </tal:b>
 
         <tal:b condition="event.tags">

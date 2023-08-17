@@ -57,7 +57,7 @@ msgid "Preliminary examination"
 msgstr "Vorprüfung"
 
 msgid "Submission"
-msgstr "Einreichung"
+msgstr "Unterschriftensammlung"
 
 msgid "Realization"
 msgstr "Zustandekommen"
@@ -75,10 +75,13 @@ msgid "Parliamentary phase"
 msgstr "Im Parlament"
 
 msgid "Voting booklet"
-msgstr "Abstimmungsbüchlein"
+msgstr "Offizielles Abstimmungsbüchlein"
 
 msgid "Voting campaign"
 msgstr "Abstimmungskampf"
+
+msgid "Explanatory brochure by Easyvote"
+msgstr "Broschüre von Easyvote"
 
 msgid "Advertisment analysis"
 msgstr "Inserateanalyse"
@@ -266,7 +269,7 @@ msgid "Delete vote"
 msgstr "Abstimmung löschen"
 
 msgid "Voter strengths"
-msgstr "Wählerstärken"
+msgstr "Wählendenanteile"
 
 msgid "Documents from the campaign"
 msgstr "Dokumente aus der Abstimmungskampagne"
@@ -914,7 +917,7 @@ msgid "d-2-27"
 msgstr "Diplomatie"
 
 msgid "d-2-28"
-msgstr "Auslandschweizerinnen und Auslandschweizer"
+msgstr "Auslandschweizer:innen"
 
 msgid "d-1-3"
 msgstr "Sicherheitspolitik"
@@ -1226,7 +1229,7 @@ msgid "d-2-103"
 msgstr "Soziale Gruppen"
 
 msgid "d-3-1031"
-msgstr "Ausländerpolitik"
+msgstr "Ausländer:innen"
 
 msgid "d-3-1032"
 msgstr "Flüchtlinge"
@@ -1241,7 +1244,7 @@ msgid "d-3-1035"
 msgstr "Kinder und Jugendliche"
 
 msgid "d-3-1036"
-msgstr "Seniorinnen und Senioren"
+msgstr "Senior:innen"
 
 msgid "d-3-1037"
 msgstr "Behinderte"
@@ -1504,6 +1507,9 @@ msgstr "Referatstext"
 msgid "Statistical data"
 msgstr "Statistik"
 
+msgid "Website"
+msgstr "Website"
+
 msgid "Link eMuseum.ch"
 msgstr "Link eMuseum.ch"
 
@@ -1617,6 +1623,9 @@ msgstr "Zurücksetzen"
 msgid "Show all"
 msgstr "Alle anzeigen"
 
+msgid "(in German)"
+msgstr "(auf Deutsch)"
+
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
@@ -1632,16 +1641,16 @@ msgid "Files"
 msgstr "Dateien"
 
 msgid "Patrons"
-msgstr "Gönner"
+msgstr "Gönner:innen"
 
 msgid "Cumulated electoral shares"
-msgstr "Kumulierte Wählerstärken"
+msgstr "Kumulierte Wählendenanteile"
 
 msgid "Recommendation"
 msgstr "Parole"
 
 msgid "Percentage of voters in the National Council elections"
-msgstr "Wähleranteil bei der Nationalratswahl"
+msgstr "Wählendenanteil bei der Nationalratswahl"
 
 msgid "Parties"
 msgstr "Parteien"
@@ -1686,7 +1695,7 @@ msgid "Related votes"
 msgstr "Verwandte Vorlagen"
 
 msgid "Initiator"
-msgstr "Urheber"
+msgstr "Urheber:innen"
 
 msgid "Signatures"
 msgstr "Unterschriften"
@@ -1742,25 +1751,28 @@ msgstr "Link Departement"
 msgid "Link federal office"
 msgstr "Link Bundesamt"
 
+msgid "Explainer video by Easyvote"
+msgstr "Erklärvideo von Easyvote"
+
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
 
 msgid "Voter share of yes camp"
-msgstr "Wähleranteil des Ja-Lagers"
+msgstr "Wählendenanteil des Ja-Lagers"
 
 msgid "Cumulated electoral share of the parties which recommend to vote Yes"
 msgstr ""
-"Kumulierter Wähleranteil der Parteien, die die Ja-Parole zur Vorlage gefasst "
-"haben"
+"Kumulierter Wählendenanteil der Parteien, die die Ja-Parole zur Vorlage "
+"gefasst haben"
 
 msgid "Electoral share of pro-initiative camp"
-msgstr "Wähleranteil des Lagers für Bevorzugung der Volksinitiative"
+msgstr "Wählendenanteil des Lagers für Bevorzugung der Volksinitiative"
 
 msgid ""
 "Cumulated electoral share of the parties which recommend to prefer the "
 "popular initiative"
 msgstr ""
-"Kumulierter Wähleranteil der Parteien, die die Parole zur Bevorzugung der "
+"Kumulierter Wählendenanteil der Parteien, die die Parole zur Bevorzugung der "
 "Initiative gefasst haben"
 
 msgid "Details"
@@ -2031,26 +2043,27 @@ msgstr "Empfehlungen der politischen Parteien"
 
 #, python-format
 msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
-msgstr "Wähleranteile der Parteien: Befürwortende Parteien ${x}%"
+msgstr "Wählendenanteile der Parteien: Befürwortende Parteien ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: Parties preferring the initiative ${x}%"
 msgstr ""
-"Wähleranteile der Parteien: Parteien für Bevorzugung der Initiative ${x}%"
+"Wählendenanteile der Parteien: Parteien für Bevorzugung der Initiative ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: Parties recommending No ${x}%"
-msgstr "Wähleranteile der Parteien: Ablehnende Parteien ${x}%"
+msgstr "Wählendenanteile der Parteien: Ablehnende Parteien ${x}%"
 
 #, python-format
 msgid ""
 "Electoral shares of parties: Parties preferring the counter-proposal ${x}%"
 msgstr ""
-"Wähleranteile der Parteien: Parteien für Bevorzugung des Gegenentwurfs ${x}%"
+"Wählendenanteile der Parteien: Parteien für Bevorzugung des Gegenentwurfs "
+"${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
-msgstr "Wähleranteile der Parteien: Neutral/unbekannt ${x}%"
+msgstr "Wählendenanteile der Parteien: Neutral/unbekannt ${x}%"
 
 msgid "Attachments updated"
 msgstr "Anhänge aktualisiert"
