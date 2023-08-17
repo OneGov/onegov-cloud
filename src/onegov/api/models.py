@@ -117,6 +117,7 @@ class ApiEndpoint:
     """
 
     name: str = ''
+    endpoint: str = ''
     filters: list[str] = []
 
     def __init__(
@@ -155,7 +156,7 @@ class ApiEndpoint:
         target = str(item)
         if hasattr(item, 'id'):
             target = getattr(item.id, 'hex', str(item.id))
-
+        breakpoint()
         return ApiEndpointItem(self.app, self.endpoint, target)
 
     def get_filter(

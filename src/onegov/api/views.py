@@ -21,7 +21,7 @@ def handle_exception(
 ) -> dict[str, dict[str, dict[str, Any] | str]]:
 
     @request.after
-    def add_headers(response) -> None:
+    def add_headers(response: 'Response') -> None:
         response.status_code = self.status_code
         response.headers['Content-Type'] = 'application/vnd.collection+json'
         for header in self.headers.items():
@@ -43,10 +43,10 @@ def handle_exception(
     permission=Public
 )
 def view_api_endpoints(
-    self: ApiEndpointCollection, request: CoreRequest
+    self: ApiEndpointCollection, request: 'CoreRequest'
 ) -> dict[str, Any]:
     @request.after
-    def add_headers(response: Response) -> None:
+    def add_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     return {
@@ -73,13 +73,13 @@ def view_api_endpoints(
     permission=Public
 )
 def view_api_endpoint(
-    self: ApiEndpoint, request: CoreRequest
+    self: ApiEndpoint, request: 'CoreRequest'
 ) -> dict[str, Any]:
 
     headers = check_rate_limit(request)
 
     @request.after
-    def add_headers(response: Response) -> None:
+    def add_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
@@ -129,12 +129,12 @@ def view_api_endpoint(
     permission=Public
 )
 def view_api_endpoint_item(
-    self: ApiEndpointItem, request: CoreRequest
+    self: ApiEndpointItem, request: 'CoreRequest'
 ) -> dict[str, Any]:
     headers = check_rate_limit(request)
 
     @request.after
-    def add_headers(response: Response) -> None:
+    def add_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
@@ -173,7 +173,7 @@ def view_api_endpoint_item(
 
 @ApiApp.json(model=AuthEndpoint, permission=Public)
 def get_time_restricted_token(
-    self: AuthEndpoint, request: CoreRequest
+    self: AuthEndpoint, request: 'CoreRequest'
 ) -> dict[str, str]:
     try:
         return get_token(request)

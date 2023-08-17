@@ -27,7 +27,7 @@ class ApiApp(App):
         )
 
     @property
-    def rate_limit_cache(self: 'Framework') -> cache.RedisCacheRegion:
+    def rate_limit_cache(self: 'Framework') -> 'cache.RedisCacheRegion':
         """ A cache for rate limits. """
 
         limit, expiration = self.rate_limit
