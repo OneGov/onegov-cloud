@@ -426,8 +426,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         form = form_class(formdata=formdata, meta=meta, data=data)
 
         assert not hasattr(form, 'request')
-        form.request = self
-        form.model = model
+        form.request = self  # type:ignore[attr-defined]
+        form.model = model  # type:ignore[attr-defined]
 
         if hasattr(form, 'on_request'):
             form.on_request()

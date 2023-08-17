@@ -381,6 +381,7 @@ class FormSubmissionCollection:
         exclude = set(exclude) if exclude else set()
         exclude.add(form.meta.csrf_field_name)  # never include the csrf token
 
+        assert hasattr(form, '_source')
         submission.definition = form._source
         submission.data = {
             k: v for k, v in form.data.items() if k not in exclude

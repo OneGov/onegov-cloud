@@ -1,0 +1,4 @@
+# Error: variable differs from runtime
+# ======================
+# These are false positives due to Action using ABCMeta
+morepath\.directive\.[A-Z]\w+Action\.group_class

@@ -50,3 +50,9 @@ repos:
         exclude: '.*'
         always_run: true
         pass_filenames: false
+      - id: system
+        name: stubtest
+        entry: ./stubtest.sh
+        language: system
+        files:  '^stubs/.*\.pyi$'
+        pass_filenames: false

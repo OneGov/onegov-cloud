@@ -77,8 +77,8 @@ def parse_form(
 def parse_form(
     text: str,
     enable_indent_check: bool = False,
-    base_class: type[_FormT] = Form
-) -> type[_FormT]:
+    base_class: type[Form] = Form
+) -> type[Form]:
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
@@ -117,6 +117,8 @@ def handle_field(
 ) -> None:
     """ Takes the given parsed field and adds it to the form. """
 
+    validators: list['Validator[Any, Any]']
+    widget: 'Widget[Any] | None'
     if field.type == 'text':
         render_kw = None
         if field.maxlength:
@@ -393,7 +395,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_extend(
         self,
-        validators: list['Validator'],
+        validators: list['Validator[Any, Any]'],
         required: bool,
         dependency: FieldDependency | None
     ) -> None:
@@ -405,7 +407,10 @@ class WTFormsClassBuilder(Generic[_FormT]):
         else:
             self.validators_add_optional(validators)
 
-    def validators_add_required(self, validators: list['Validator']) -> None:
+    def validators_add_required(
+        self,
+        validators: list['Validator[Any, Any]']
+    ) -> None:
         # we use the DataRequired check instead of InputRequired, since
         # InputRequired only works if the data comes over the wire. We
         # also want to load forms with data from the database, where
@@ -416,7 +421,7 @@ class WTFormsClassBuilder(Generic[_FormT]):
 
     def validators_add_dependency(
         self,
-        validators: list['Validator'],
+        validators: list['Validator[Any, Any]'],
         dependency: FieldDependency
     ) -> None:
         # if the dependency is not fulfilled, the field may be empty
@@ -430,7 +435,10 @@ class WTFormsClassBuilder(Generic[_FormT]):
         validator.field_flags = {'required': True}
         validators.insert(0, validator)
 
-    def validators_add_optional(self, validators: list['Validator']) -> None:
+    def validators_add_optional(
+        self,
+        validators: list['Validator[Any, Any]']
+    ) -> None:
         validators.insert(0, StrictOptional())
 
     def mark_as_dependent(
@@ -472,9 +480,9 @@ class WTFormsClassBuilder(Generic[_FormT]):
         required: bool,
         dependency: FieldDependency | None = None,
         pricing: 'PricingRules | None' = None,
-        validators: list['Validator'] | None = None,
+        validators: list['Validator[Any, Any]'] | None = None,
         description: str | None = None,
-        widget: 'Widget | None' = None,
+        widget: 'Widget[Any] | None' = None,
         render_kw: dict[str, Any] | None = None,
         # for field classes that have more than just the base arguments
         **extra_field_kwargs: Any

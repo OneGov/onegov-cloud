@@ -172,8 +172,9 @@ class UploadMultipleFieldRenderer(BaseRenderer):
 class RadioFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
+        choices = dict(field.choices)  # type:ignore[attr-defined]
         return self.escape("✓ " + self.translate(
-            field, dict(field.choices).get(field.data, '?')
+            field, choices.get(field.data, '?')
         ))
 
 
@@ -182,7 +183,7 @@ class MultiCheckboxFieldRenderer(BaseRenderer):
 
     def __call__(self, field: 'Field') -> Markup:
         choices = {value: f'? ({value})' for value in field.data}
-        choices.update(field.choices)
+        choices.update(field.choices)  # type:ignore[attr-defined]
         return Markup('<br>').join(
             f'✓ {self.translate(field, choices[value])}'
             for value in field.data
