@@ -28,7 +28,7 @@ def get_api_endpoint(
     endpoint: str,
     page: int = 0,
     extra_parameters: dict[str, Any] | None = None,
-) -> 'ApiEndpoint | AuthEndpoint':
+) -> ApiEndpoint | AuthEndpoint:
     if endpoint == 'authenticate':
         return AuthEndpoint(app)
 
