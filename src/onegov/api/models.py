@@ -248,7 +248,7 @@ class ApiEndpointCollection:
         self.app = app
 
     @cached_property
-    def endpoints(self) -> dict[str, Type['ApiEndpoint']]:
+    def endpoints(self) -> dict[str, type[ApiEndpoint]]:
         return {
             endpoint.endpoint: endpoint
             for endpoint in self.app.config.setting_registry.api.endpoints
