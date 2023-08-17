@@ -171,9 +171,8 @@ class Searchable:
 
         :return: tsvector expression
         """
-        columns = [p for p in model.es_properties if
-                   p in model.__dict__ and not p.startswith('es_')]
-        objects = [getattr(model, col) for col in columns]
+        objects = [getattr(model, p) for p in model.es_properties if
+                   not p.startswith('es_')]
         return Searchable.create_tsvector_expression(*objects)
 
     @staticmethod
