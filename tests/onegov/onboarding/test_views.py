@@ -65,7 +65,7 @@ def test_town_valid_values(onboarding_app):
 
     assert "Feld kann nicht länger als 63 Zeichen sein" in a
     assert "Ungültige Email-Adresse" in a
-    assert "'grüen' is not a recognized color" in a
+    assert "Ungültige Farbe" in a
     assert "Ungültige Telefonnummer" in a
 
 

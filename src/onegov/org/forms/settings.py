@@ -8,11 +8,11 @@ from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ColorField
 from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
-from wtforms.fields import PasswordField
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -23,11 +23,11 @@ from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
 from onegov.user import User
 from purl import URL
-from wtforms_components import ColorField
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import FloatField
 from wtforms.fields import IntegerField
+from wtforms.fields import PasswordField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField

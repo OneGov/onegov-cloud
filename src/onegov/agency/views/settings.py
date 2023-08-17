@@ -1,10 +1,8 @@
-from wtforms_components import ColorField
-
 from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField, ColorField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from wtforms.fields import BooleanField, IntegerField, RadioField

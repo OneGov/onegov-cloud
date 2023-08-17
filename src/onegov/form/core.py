@@ -9,11 +9,10 @@ from onegov.form import utils
 from onegov.form.display import render_field
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
-from onegov.form.validators import StrictOptional
+from onegov.form.validators import If, StrictOptional
 from onegov.pay import Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
-from wtforms_components import If, Chain
 from wtforms.fields import EmailField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -296,7 +295,7 @@ class Form(BaseForm):
                 field.kwargs['validators'] = (
                     If(
                         field.depends_on.fulfilled,
-                        Chain(field.kwargs['validators'])
+                        *field.kwargs['validators']
                     ),
                     If(
                         field.depends_on.unfulfilled,
