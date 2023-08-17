@@ -1,3 +1,5 @@
+from typing_extensions import reveal_type
+
 from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint
 from onegov.api.models import ApiEndpointCollection
@@ -7,14 +9,19 @@ from onegov.api.utils import check_rate_limit
 from onegov.core.security import Public
 
 
-@ApiApp.json(
-    model=ApiException,
-    permission=Public
-)
-def handle_exception(self, request):
+from typing import TYPE_CHECKING, Any
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from morepath.request import Response
+
+
+@ApiApp.json(model=ApiException, permission=Public)
+def handle_exception(
+    self: 'ApiException', request: 'CoreRequest'
+) -> dict[str, dict[str, dict[str, Any] | str]]:
 
     @request.after
-    def add_headers(response):
+    def add_headers(response) -> None:
         response.status_code = self.status_code
         response.headers['Content-Type'] = 'application/vnd.collection+json'
         for header in self.headers.items():
@@ -35,10 +42,11 @@ def handle_exception(self, request):
     model=ApiEndpointCollection,
     permission=Public
 )
-def view_api_endpoints(self, request):
-
+def view_api_endpoints(
+    self: ApiEndpointCollection, request: CoreRequest
+) -> dict[str, Any]:
     @request.after
-    def add_headers(response):
+    def add_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     return {
@@ -64,12 +72,14 @@ def view_api_endpoints(self, request):
     model=ApiEndpoint,
     permission=Public
 )
-def view_api_endpoint(self, request):
+def view_api_endpoint(
+    self: ApiEndpoint, request: CoreRequest
+) -> dict[str, Any]:
 
     headers = check_rate_limit(request)
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
@@ -118,12 +128,13 @@ def view_api_endpoint(self, request):
     model=ApiEndpointItem,
     permission=Public
 )
-def view_api_endpoint_item(self, request):
-
+def view_api_endpoint_item(
+    self: ApiEndpointItem, request: CoreRequest
+) -> dict[str, Any]:
     headers = check_rate_limit(request)
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: Response) -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
@@ -161,7 +172,9 @@ def view_api_endpoint_item(self, request):
 
 
 @ApiApp.json(model=AuthEndpoint, permission=Public)
-def get_time_restricted_token(self, request):
+def get_time_restricted_token(
+    self: AuthEndpoint, request: CoreRequest
+) -> dict[str, str]:
     try:
         return get_token(request)
     except Exception as exception:

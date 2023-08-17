@@ -5,7 +5,13 @@ from onegov.api.models import ApiException, ApiKey
 from onegov.api.token import try_get_encoded_token, jwt_decode
 
 
-def authenticate(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from morepath.request import Response
+
+
+def authenticate(request: 'CoreRequest') -> None:
     try:
         auth = try_get_encoded_token(request)
         data = jwt_decode(request, auth)
@@ -18,7 +24,7 @@ def authenticate(request):
         raise HTTPClientError()
 
 
-def check_rate_limit(request):
+def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     """ Checks if the rate limit for the current client.
 
     Raises an exception if the rate limit is reached. Returns response headers
@@ -57,7 +63,7 @@ def check_rate_limit(request):
     }
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: Response) -> None:
         for header in headers.items():
             response.headers.add(*header)
 

@@ -10,21 +10,20 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 from sqlalchemy import Text
 
-from onegov.agency.models import ExtendedAgency
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.user import User
-from onegov.org import OrgApp
 
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Type
 if TYPE_CHECKING:
+    from onegov.core import Framework
     from sqlalchemy.orm import Session
-    from onegov.core.collection import PKType
+    from onegov.core.collection import PKType, _M
     from onegov.core.types import PaginatedGenericCollection
-    # T = TypeVar('T', bound=PaginatedGenericCollection)
     import uuid
     from datetime import datetime
+
 
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
@@ -76,28 +75,33 @@ class ApiEndpointItem:
 
     """
 
-    def __init__(self, app: OrgApp, endpoint: str, id: str):
+    def __init__(self, app: 'Framework', endpoint: str, id: str):
         self.app = app
         self.endpoint = endpoint
         self.id = id
 
     @property
-    def api_endpoint(self) -> 'ApiEndpoint':
-        cls: 'ApiEndpoint | None' = \
-            ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
+    def api_endpoint(self) -> 'ApiEndpoint | None':
+        cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
         return cls(self.app) if cls else None
 
     @property
     def item(self) -> 'ApiEndpointItem | None':
-        return self.api_endpoint.by_id(self.id)
+        if self.api_endpoint:
+            return self.api_endpoint.by_id(self.id)
+        return None
 
     @property
-    def data(self) -> dict[str, Any]:
-        return self.api_endpoint.item_data(self.item)
+    def data(self) -> dict[str, Any] | None:
+        if self.api_endpoint:
+            return self.api_endpoint.item_data(self.item)
+        return None
 
     @property
-    def links(self) -> dict[str, Any]:
-        return self.api_endpoint.item_links(self.item)
+    def links(self) -> dict[str, Any] | None:
+        if self.api_endpoint:
+            return self.api_endpoint.item_links(self.item)
+        return None
 
 
 class ApiEndpoint:
@@ -117,7 +121,7 @@ class ApiEndpoint:
 
     def __init__(
         self,
-        app: OrgApp,
+        app: 'Framework',
         extra_parameters: dict[str, Any] | None = None,
         page: int | None = None,
     ):
@@ -126,7 +130,7 @@ class ApiEndpoint:
         self.page = int(page) if page else page
         self.batch_size = 100
 
-    def for_page(self, page: int | None) -> 'ApiEndpoint':
+    def for_page(self, page: int | None) -> 'ApiEndpoint | None':
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
@@ -176,10 +180,11 @@ class ApiEndpoint:
         return self.app.session()
 
     @property
-    def links(self) -> dict[str, Any]:
+    def links(self) -> dict[str, 'ApiEndpoint | None']:
         """ Returns a dictionary with pagination instances. """
 
-        result = {'prev': None, 'next': None}
+        result: dict[str, 'ApiEndpoint | None'] = {'prev': None, 'next': None}
+
         previous = self.collection.previous
         if previous:
             result['prev'] = self.for_page(previous.page)
@@ -189,7 +194,7 @@ class ApiEndpoint:
         return result
 
     @property
-    def batch(self) -> dict['ApiEndpointItem | None', ExtendedAgency]:
+    def batch(self) -> dict['ApiEndpointItem | None', Any]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
@@ -199,7 +204,7 @@ class ApiEndpoint:
             for item in self.collection.batch
         }
 
-    def item_data(self, item: 'ApiEndpointItem') -> dict[str, Any]:
+    def item_data(self, item: 'ApiEndpointItem | None') -> dict[str, Any]:
         """ Return the data properties of the collection item as a dictionary.
 
         For example:
@@ -212,7 +217,7 @@ class ApiEndpoint:
 
         raise NotImplementedError()
 
-    def item_links(self, item: 'ApiEndpointItem') -> dict[str, Any]:
+    def item_links(self, item: 'ApiEndpointItem | None') -> dict[str, Any]:
         """ Return the link properties of the collection item as a dictionary.
         Links can either be string or a linkable object.
 
@@ -228,7 +233,7 @@ class ApiEndpoint:
         raise NotImplementedError()
 
     @property
-    def collection(self) -> 'PaginatedGenericCollection':
+    def collection(self) -> 'PaginatedGenericCollection[_M]':
         """ Return an instance of the collection with filters and page set.
         """
 
@@ -238,11 +243,11 @@ class ApiEndpoint:
 class ApiEndpointCollection:
     """ A collection of all available API endpoints. """
 
-    def __init__(self, app: OrgApp):
+    def __init__(self, app: 'Framework'):
         self.app = app
 
     @cached_property
-    def endpoints(self) -> dict[str, 'ApiEndpoint']:
+    def endpoints(self) -> dict[str, Type['ApiEndpoint']]:
         return {
             endpoint.endpoint: endpoint
             for endpoint in self.app.config.setting_registry.api.endpoints
@@ -251,7 +256,7 @@ class ApiEndpointCollection:
 
 class AuthEndpoint:
 
-    def __init__(self, app: OrgApp):
+    def __init__(self, app: 'Framework'):
         self.app = app
 
 
