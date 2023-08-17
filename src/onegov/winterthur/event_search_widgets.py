@@ -32,16 +32,21 @@ class InlineEventSearch:
         })
 
     def adapt(self, query):
-        conditions = []
+        """
+        Adapt the query to search for words in the search term `self.term in
+        event search properties.
 
+        """
         if not self.term:
             return query
 
         search_properties = [p for p in Event.es_properties.keys() if not
                              p.startswith('es_')]
-        for p in search_properties:
-            conditions.append(
-                func.lower(getattr(Event, p)).contains(self.term))
+        for word in self.term.split():
+            conditions = []
+            for p in search_properties:
+                conditions.append(
+                    func.lower(getattr(Event, p)).contains(word))
+            query = query.filter(or_(*conditions))
 
-        query = query.filter(or_(*conditions))
         return query
