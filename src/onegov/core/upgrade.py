@@ -480,6 +480,12 @@ class UpgradeContext:
             table, schema=self.schema
         )}
 
+    def has_index(self, table: str, index: str) -> bool:
+        inspector = Inspector(self.operations_connection)
+        return index in {i['name'] for i in inspector.get_indexes(
+            table, schema=self.schema
+        )}
+
     def has_enum(self, enum: str) -> bool:
         return self.session.execute(f"""
             SELECT EXISTS (
