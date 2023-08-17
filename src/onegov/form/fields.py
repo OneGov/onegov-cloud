@@ -2,6 +2,7 @@ import inspect
 import phonenumbers
 import sedate
 
+from colour import Color
 from cssutils.css import CSSStyleSheet
 from itertools import zip_longest
 from onegov.core.html import sanitize_html
@@ -9,7 +10,7 @@ from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
-from onegov.form import log
+from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import ChosenSelectWidget
@@ -24,7 +25,6 @@ from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
 from werkzeug.datastructures import MultiDict
-from wtforms_components import TimeField as DefaultTimeField
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.fields import Field
 from wtforms.fields import FieldList
@@ -34,11 +34,12 @@ from wtforms.fields import SelectMultipleField
 from wtforms.fields import StringField
 from wtforms.fields import TelField
 from wtforms.fields import TextAreaField
+from wtforms.fields import TimeField as DefaultTimeField
 from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
-from wtforms.widgets import CheckboxInput
+from wtforms.widgets import CheckboxInput, ColorInput
 
 
 from typing import Any, IO, Literal, TYPE_CHECKING
@@ -666,3 +667,36 @@ class HoneyPotField(StringField):
         if self.data:
             log.info(f'Honeypot used by {form.request.client_addr}')
             raise ValidationError('Invalid value')
+
+
+# FIXME: We should probably try to get rid of the colours dependency
+#        all we really need is a validator to check if the supplied
+#        string is a valid web color (by name, by 3 or 6 hex digits)
+class ColorField(StringField):
+    """ A string field that coerces data to a ``colours.Color`` object """
+
+    widget = ColorInput()
+
+    def _value(self) -> str:
+        if self.raw_data:
+            return self.raw_data[0]
+
+        return '' if self.data is None else str(self.data)
+
+    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+        if not valuelist:
+            self.data = None
+            return
+
+        value = valuelist[0]
+        if not isinstance(value, str) or value == '':
+            self.data = None
+            return
+
+        try:
+            self.data = Color(value)
+        # for some weird reason web2hex emits AttributeError
+        except (ValueError, AttributeError):
+            self.data = None
+            msg = self.gettext(_('Not a valid color.'))
+            raise ValueError(msg) from None

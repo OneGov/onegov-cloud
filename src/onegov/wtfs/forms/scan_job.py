@@ -1,15 +1,16 @@
 from datetime import date, datetime
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
 from onegov.core.orm.func import unaccent
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
+from onegov.form.validators import If, ValidDateRange
 from onegov.wtfs import _
 from onegov.wtfs.fields import HintField
 from onegov.wtfs.models import Municipality, ScanJob
 from onegov.wtfs.models import PickupDate
-from wtforms_components import DateRange, If, Chain
 from wtforms.fields import DateField
 from wtforms.fields import HiddenField
 from wtforms.fields import IntegerField
@@ -99,7 +100,10 @@ class AddScanJobForm(Form):
         depends_on=('type', 'express'),
         validators=[
             InputRequired(),
-            DateRange(min=date.today, message=_("Date can't be in the past."))
+            ValidDateRange(
+                min=relativedelta(days=0),
+                message=_("Date can't be in the past.")
+            )
         ],
         default=date.today
     )
@@ -114,7 +118,8 @@ class AddScanJobForm(Form):
             ),
             If(
                 lambda form, field: form.type.data != 'normal',
-                Chain([Optional(), NumberRange(min=0)])
+                Optional(),
+                NumberRange(min=0)
             ),
         ],
         render_kw={'size': 3, 'clear': False},

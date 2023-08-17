@@ -110,7 +110,6 @@ module = [
     "urlextract.*",
     "webassets.*",
     "webtest.*",
-    "wtforms_components.*",
     "xlrd.*",
     "xlsxwriter.*",
     "xtermcolor.*",

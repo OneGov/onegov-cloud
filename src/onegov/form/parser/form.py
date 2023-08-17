@@ -4,18 +4,18 @@ from onegov.form import errors
 from onegov.form.core import FieldDependency
 from onegov.form.core import Form
 from onegov.form.fields import MultiCheckboxField, DateTimeLocalField
-from onegov.form.fields import UploadField, UploadMultipleField
+from onegov.form.fields import TimeField, UploadField, UploadMultipleField
 from onegov.form.parser.core import parse_formcode
 from onegov.form.utils import as_internal_id
 from onegov.form.validators import LaxDataRequired
 from onegov.form.validators import ExpectedExtensions
 from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import If
 from onegov.form.validators import Stdnum
 from onegov.form.validators import StrictOptional
 from onegov.form.validators import ValidDateRange
 from onegov.form.widgets import DateRangeInput
 from onegov.form.widgets import DateTimeLocalRangeInput
-from wtforms_components import Email, If, TimeField
 from wtforms.fields import DateField
 from wtforms.fields import DecimalField
 from wtforms.fields import EmailField
@@ -25,6 +25,7 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
+from wtforms.validators import Email
 from wtforms.validators import Length
 from wtforms.validators import NumberRange
 from wtforms.validators import Regexp
@@ -427,12 +428,12 @@ class WTFormsClassBuilder(Generic[_FormT]):
         # if the dependency is not fulfilled, the field may be empty
         # but it must still validate otherwise (invalid = nok, empty = ok)
         validator = If(dependency.unfulfilled, StrictOptional())
-        validator.field_flags = {'required': True}
+        validator.field_flags = {'required': True}  # type:ignore[attr-defined]
         validators.insert(0, validator)
 
         # if the dependency is fulfilled, the field is required
         validator = If(dependency.fulfilled, LaxDataRequired())
-        validator.field_flags = {'required': True}
+        validator.field_flags = {'required': True}  # type:ignore[attr-defined]
         validators.insert(0, validator)
 
     def validators_add_optional(

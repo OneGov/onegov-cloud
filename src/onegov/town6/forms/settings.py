@@ -1,9 +1,8 @@
-from wtforms_components import ColorField
-
 from onegov.form import Form
-from onegov.org.forms.settings import GeneralSettingsForm as \
-    OrgGeneralSettingsForm
-from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
+from onegov.org.forms.settings import (
+    GeneralSettingsForm as OrgGeneralSettingsForm)
+from onegov.form.fields import (
+    ChosenSelectField, ChosenSelectMultipleField, ColorField)
 from onegov.town6 import _
 from onegov.town6.theme import user_options
 from wtforms.fields import BooleanField
