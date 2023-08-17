@@ -147,7 +147,7 @@ class AgencySettingsForm(Form):
         obj.agency_path_display_on_people = \
             self.agency_path_display_on_people.data
         obj.pdf_underline_links = self.underline_links.data
-        obj.pdf_link_color = self.link_color.data.get_hex()
+        obj.pdf_link_color = self.link_color.data
 
 
 @AgencyApp.form(

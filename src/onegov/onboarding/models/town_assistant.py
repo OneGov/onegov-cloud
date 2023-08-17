@@ -27,7 +27,7 @@ class TownAssistant(Assistant):
             request.browser_session['user'] = form.data['user']
             request.browser_session['user_name'] = form.data['user_name']
             request.browser_session['phone_number'] = form.data['phone_number']
-            request.browser_session['color'] = form.data['color'].get_hex()
+            request.browser_session['color'] = form.data['color']
 
             return morepath.redirect(request.link(self.for_next_step()))
 

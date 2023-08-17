@@ -31,12 +31,12 @@ def test_town_go_back(onboarding_app):
 
     assert 'New York' in a
     assert 'admin@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
     assert 'new-york.example.org' in a
     a = a.click("Zurück")
     assert 'New York' in a
     assert 'admin@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
 
     a.form['name'] = 'New Jersey'
     a.form['user'] = 'major@example.org'
@@ -47,7 +47,7 @@ def test_town_go_back(onboarding_app):
 
     assert 'New Jersey' in a
     assert 'major@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
     assert 'new-jersey.example.org' in a
 
 
@@ -86,7 +86,7 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
 
     assert 'New York' in a
     assert 'admin@example.org' in a
-    assert '#f0f' in a
+    assert '#ff00ff' in a
     assert 'new-york.example.org' in a
 
     a = a.form.submit()

@@ -2,7 +2,6 @@ import inspect
 import phonenumbers
 import sedate
 
-from colour import Color
 from cssutils.css import CSSStyleSheet
 from itertools import zip_longest
 from onegov.core.html import sanitize_html
@@ -24,6 +23,7 @@ from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
+from webcolors import name_to_hex, normalize_hex
 from werkzeug.datastructures import MultiDict
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.fields import Field
@@ -669,34 +669,33 @@ class HoneyPotField(StringField):
             raise ValidationError('Invalid value')
 
 
-# FIXME: We should probably try to get rid of the colours dependency
-#        all we really need is a validator to check if the supplied
-#        string is a valid web color (by name, by 3 or 6 hex digits)
 class ColorField(StringField):
-    """ A string field that coerces data to a ``colours.Color`` object """
+    """ A string field that renders a html5 color picker and coerces
+    to a normalized six digit hex string.
+
+    It will result in a process_error for invalid colors.
+    """
 
     widget = ColorInput()
 
-    def _value(self) -> str:
-        if self.raw_data:
-            return self.raw_data[0]
+    def coerce(self, value: object) -> str | None:
+        if not isinstance(value, str) or value == '':
+            return None
 
-        return '' if self.data is None else str(self.data)
+        try:
+            if not value.startswith('#'):
+                value = name_to_hex(value)
+            return normalize_hex(value)
+        except ValueError:
+            msg = self.gettext(_('Not a valid color.'))
+            raise ValueError(msg) from None
+
+    def process_data(self, value: object) -> None:
+        self.data = self.coerce(value)
 
     def process_formdata(self, valuelist: list['RawFormValue']) -> None:
         if not valuelist:
             self.data = None
             return
 
-        value = valuelist[0]
-        if not isinstance(value, str) or value == '':
-            self.data = None
-            return
-
-        try:
-            self.data = Color(value)
-        # for some weird reason web2hex emits AttributeError
-        except (ValueError, AttributeError):
-            self.data = None
-            msg = self.gettext(_('Not a valid color.'))
-            raise ValueError(msg) from None
+        self.data = self.coerce(valuelist[0])
