@@ -1,5 +1,3 @@
-from typing_extensions import reveal_type
-
 from onegov.api import ApiApp
 from onegov.api.models import ApiEndpoint, ApiException, AuthEndpoint
 from onegov.api.models import ApiEndpointCollection
@@ -138,6 +136,8 @@ def view_api_endpoint_item(
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
+        links = self.links or {}
+        data = self.data or {}
         return {
             'collection': {
                 'version': '1.0',
@@ -150,7 +150,7 @@ def view_api_endpoint_item(
                                 'name': name,
                                 'value': value
                             }
-                            for name, value in self.data.items()
+                            for name, value in data.items()
                         ],
                         'links': [
                             {
@@ -160,7 +160,7 @@ def view_api_endpoint_item(
                                     else request.link(link)
                                 ),
                             }
-                            for rel, link in self.links.items()
+                            for rel, link in links.items()
                         ]
                     }
                 ],
