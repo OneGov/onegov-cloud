@@ -1,5 +1,4 @@
 from functools import cached_property
-from colour import Color
 from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
@@ -485,13 +484,11 @@ class DirectoryBaseForm(Form):
 
     @property
     def marker_color(self):
-        if self.marker_color_value.data:
-            return self.marker_color_value.data.get_hex()
+        return self.marker_color_value.data
 
     @marker_color.setter
     def marker_color(self, value):
-        self.marker_color_value.data = Color(
-            value or self.default_marker_color)
+        self.marker_color_value.data = value or self.default_marker_color
 
     @property
     def configuration(self):

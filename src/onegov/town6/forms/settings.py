@@ -32,10 +32,10 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
     def theme_options(self):
         options = self.model.theme_options
 
-        try:
-            options['primary-color-ui'] = self.primary_color.data.get_hex()
-        except AttributeError:
+        if self.primary_color.data is None:
             options['primary-color-ui'] = user_options['primary-color-ui']
+        else:
+            options['primary-color-ui'] = self.primary_color.data
 
         body_family = self.body_font_family_ui.data
         if body_family not in self.theme.font_families.values():
@@ -134,4 +134,4 @@ class ChatSettingsForm(Form):
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
-        obj.chat_bg_color = self.chat_color.data.get_hex()
+        obj.chat_bg_color = self.chat_color.data

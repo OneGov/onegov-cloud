@@ -93,10 +93,10 @@ class GeneralSettingsForm(Form):
     def theme_options(self):
         options = self.model.theme_options
 
-        try:
-            options['primary-color'] = self.primary_color.data.get_hex()
-        except AttributeError:
+        if self.primary_color.data is None:
             options['primary-color'] = user_options['primary-color']
+        else:
+            options['primary-color'] = self.primary_color.data
         font_family = self.font_family_sans_serif.data
         if font_family not in self.theme.font_families.values():
             options['font-family-sans-serif'] = self.default_font_family
@@ -464,13 +464,12 @@ class HeaderSettingsForm(Form):
             'header_links': self.json_to_links(self.header_links.data) or None,
             'left_header_name': self.left_header_name.data or None,
             'left_header_url': self.left_header_url.data or None,
-            'left_header_color': self.left_header_color.data.get_hex(),
+            'left_header_color': self.left_header_color.data,
             'left_header_rem': self.left_header_rem.data,
             'announcement': self.announcement.data,
             'announcement_url': self.announcement_url.data,
-            'announcement_bg_color': self.announcement_bg_color.data.get_hex(),
-            'announcement_font_color':
-            self.announcement_font_color.data.get_hex(),
+            'announcement_bg_color': self.announcement_bg_color.data,
+            'announcement_font_color': self.announcement_font_color.data,
             'announcement_is_private': self.announcement_is_private.data
         }
 
