@@ -36,19 +36,23 @@
             </div>
             
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
-                <div class="side-panel downloads" tal:condition="agenda_item.memorial_pdf">
-                    <tal:block tal:condition="agenda_item.memorial_pdf">
-                        <h2 i18n:translate="">Downloads</h2>
-                        <p tal:condition="agenda_item.memorial_pdf">
-                            <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
-                            </a>
-                        </p>
-                    </tal:block>
+                <div class="sidebar-wrapper">
+
+                    <div class="sidebar-content-wrapper">
+                        <div class="side-panel downloads" tal:condition="agenda_item.memorial_pdf">
+                            <tal:block tal:condition="agenda_item.memorial_pdf">
+                                <h2 i18n:translate="">Downloads</h2>
+                                <p tal:condition="agenda_item.memorial_pdf">
+                                    <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
+                                        <i class="fa fa-download" aria-hidden="true"></i>
+                                        <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
+                                    </a>
+                                </p>
+                            </tal:block>
+                        </div>
+                        <tal:block metal:use-macro="layout.macros['agenda-item-list']" />
+                    </div>
                 </div>
-                
-                <tal:block metal:use-macro="layout.macros['agenda-item-list']" />
             </div>
         </div>
 
