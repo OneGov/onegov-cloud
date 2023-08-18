@@ -154,19 +154,19 @@ def test_calculate_example_1(app):
 
     results = [(r.title, r.operation, r.amount) for r in actual.results]
     assert results == [
-        ("Übertrag", None, Decimal('107.00')),
-        ("Zusatzbeitrag Eltern", "+", Decimal('0.00')),
+        ("Übertrag", None, Decimal('107')),
+        ("Zusatzbeitrag Eltern", "+", Decimal('1')),
         ("Rabatt", "-", Decimal('5.35')),
-        ("Elternbeitrag pro Tag", "=", Decimal('101.65')),
-        ("Städtischer Beitrag pro Tag", None, Decimal('6.35'))
+        ("Elternbeitrag pro Tag", "=", Decimal('102.65')),
+        ("Städtischer Beitrag pro Tag", None, Decimal('5.35'))
     ]
 
     results = [(r.title, r.operation, r.amount) for r in monthly.results]
     assert results == [
-        ("Wochentarif", None, Decimal('508.25')),
+        ("Wochentarif", None, Decimal('513.25')),
         ("Faktor", "×", Decimal('4.25')),
-        ("Elternbeitrag pro Monat", "=", Decimal('2160.06')),
-        ("Städtischer Beitrag pro Monat", None, Decimal('134.94')),
+        ("Elternbeitrag pro Monat", "=", Decimal('2181.31')),
+        ("Städtischer Beitrag pro Monat", None, Decimal('113.69')),
     ]
 
 
@@ -376,15 +376,15 @@ def test_calculate_example_5(app):
     results = [(r.title, r.amount) for r in actual.results]
     assert results == [
         ("Übertrag", Decimal('51.80')),
-        ("Zusatzbeitrag Eltern", Decimal('0.00')),
-        ("Elternbeitrag pro Tag", Decimal('51.80')),
-        ("Städtischer Beitrag pro Tag", Decimal('68.20'))
+        ("Zusatzbeitrag Eltern", Decimal('13')),
+        ("Elternbeitrag pro Tag", Decimal('64.80')),
+        ("Städtischer Beitrag pro Tag", Decimal('55.20'))
     ]
 
     results = [(r.title, r.amount) for r in monthly.results]
     assert results == [
-        ("Wochentarif", Decimal('129.50')),
+        ("Wochentarif", Decimal('162')),
         ("Faktor", Decimal('4.0833')),
-        ("Elternbeitrag pro Monat", Decimal('528.79')),
-        ("Städtischer Beitrag pro Monat", Decimal('696.21')),
+        ("Elternbeitrag pro Monat", Decimal('661.50')),
+        ("Städtischer Beitrag pro Monat", Decimal('563.50')),
     ]
