@@ -41,7 +41,8 @@ module = [
     "onegov.reservation.*",
     "onegov.server.*",
     "onegov.ticket.*",
-    "onegov.user.*"
+    "onegov.user.*",
+    "onegov.websockets.*"
 ]
 warn_unreachable = true
 disallow_any_generics = true
