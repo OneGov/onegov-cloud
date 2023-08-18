@@ -451,7 +451,7 @@ class DaycareSubsidyCalculator:
 
         actual.op(
             title="Zusatzbeitrag Eltern",
-            amount=max(daycare.rate - cfg.max_subsidy - gross.total, 0),
+            amount=max(daycare.rate - cfg.max_subsidy - cfg.min_rate, 0),
             operation="+",
             note=f"""
                 Zusatzbeitrag für Kitas, deren Tagestarif über
