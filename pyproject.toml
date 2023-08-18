@@ -54,8 +54,6 @@ module = [
     "bjoern.*",
     "blinker.*",
     "chameleon.*",
-    # FIXME: do we actually make good use of this?
-    "colour.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
     "dectate.*",
@@ -108,10 +106,12 @@ module = [
     "transaction.*",
     "ua_parser.*",
     "urlextract.*",
+    # TEMPORARY: webcolors has type annotations but is missing its
+    #            py.typed marker, once that has been fixed, we should
+    #            remove the module from this list.
+    "webcolors.*",
     "webassets.*",
     "webtest.*",
-    "wtforms.*",
-    "wtforms_components.*",
     "xlrd.*",
     "xlsxwriter.*",
     "xtermcolor.*",

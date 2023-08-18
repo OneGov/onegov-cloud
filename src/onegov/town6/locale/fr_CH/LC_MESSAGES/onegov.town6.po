@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-08-03 17:58+0200\n"
+"POT-Creation-Date: 2023-08-04 19:35+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -888,8 +888,11 @@ msgstr "Prix"
 msgid "Organizer"
 msgstr "Organisateur"
 
-msgid "Organizer E-Mail"
-msgstr "Courriel de l'organisateur"
+msgid "Organizer E-Mail address"
+msgstr "Adresse e-mail de l'organisateur"
+
+msgid "Organizer phone number"
+msgstr "Numéro de téléphone de l'organisateur"
 
 msgid "Tags"
 msgstr "Étiquettes"
@@ -2142,6 +2145,9 @@ msgstr "Jours fériés"
 
 msgid "Link Migration"
 msgstr "Migration des liens"
+
+msgid "OneGov API"
+msgstr "API OneGov"
 
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "L'équipe de OneGov Cloud"

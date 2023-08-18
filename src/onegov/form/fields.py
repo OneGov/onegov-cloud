@@ -9,7 +9,7 @@ from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
-from onegov.form import log
+from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import ChosenSelectWidget
@@ -23,8 +23,8 @@ from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
+from webcolors import name_to_hex, normalize_hex
 from werkzeug.datastructures import MultiDict
-from wtforms_components import TimeField as DefaultTimeField
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.fields import Field
 from wtforms.fields import FieldList
@@ -34,11 +34,12 @@ from wtforms.fields import SelectMultipleField
 from wtforms.fields import StringField
 from wtforms.fields import TelField
 from wtforms.fields import TextAreaField
+from wtforms.fields import TimeField as DefaultTimeField
 from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
-from wtforms.widgets import CheckboxInput
+from wtforms.widgets import CheckboxInput, ColorInput
 
 
 from typing import Any, IO, Literal, TYPE_CHECKING
@@ -46,10 +47,27 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from datetime import datetime
     from depot.fields.upload import UploadedFile
-    from onegov.core.types import EmptyDict, FileDict
+    from onegov.core.types import FileDict as StrictFileDict
     from onegov.file import File
-    from onegov.form.types import Filter, RawFormValue, Validator, Widget
-    from wtforms import Form as BaseForm
+    from onegov.form import Form
+    from onegov.form.types import (
+        _FormT, Filter, PricingRules, RawFormValue, Validators, Widget)
+    from typing_extensions import Self, TypedDict
+    from wtforms.form import BaseForm
+    from wtforms.meta import (
+        _MultiDictLikeWithGetlist, _SupportsGettextAndNgettext, DefaultMeta)
+
+    class FileDict(TypedDict, total=False):
+        data: str
+        filename: str | None
+        mimetype: str
+        size: int
+
+    # this is only generic at type checking time
+    class UploadMultipleBase(FieldList['UploadField']):
+        pass
+else:
+    UploadMultipleBase = FieldList
 
 
 FIELDS_NO_RENDERED_PLACEHOLDER = (
@@ -96,8 +114,35 @@ class UploadField(FileField):
     file: IO[bytes] | None
     filename: str | None
 
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            label: str | None = None,
+            validators: 'Validators[_FormT, Self] | None' = None,
+            filters: 'Sequence[Filter]' = (),
+            description: str = '',
+            id: str | None = None,
+            default: 'Sequence[StrictFileDict]' = (),
+            widget: 'Widget[Self] | None' = None,
+            render_kw: dict[str, Any] | None = None,
+            name: str | None = None,
+            _form: 'BaseForm | None' = None,
+            _prefix: str = '',
+            _translations: '_SupportsGettextAndNgettext | None' = None,
+            _meta: 'DefaultMeta | None' = None,
+            # onegov specific kwargs that get popped off
+            *,
+            fieldset: str | None = None,
+            depends_on: Sequence[Any] | None = None,
+            pricing: PricingRules | None = None,
+        ): ...
+
+    # this is not quite accurate, since it is either a dictionary with all
+    # the keys or none of the keys, which would make type narrowing easier
+    # unfortunately a union of two TypedDict will narrow to the TypedDict
+    # with the fewest shared keys, which would always be an empty dictionary
     @property
-    def data(self) -> 'FileDict | EmptyDict | None':
+    def data(self) -> 'StrictFileDict | FileDict | None':
         frame = inspect.currentframe()
         assert frame is not None and frame.f_back is not None
         caller = frame.f_back.f_locals.get('self')
@@ -115,12 +160,14 @@ class UploadField(FileField):
         return getattr(self, '_data', None)
 
     @data.setter
-    def data(self, value: 'FileDict | EmptyDict') -> None:
+    def data(self, value: 'FileDict') -> None:
         self._data = value
 
     @property
     def is_image(self) -> bool:
-        return (self.data or {}).get('mimetype') in IMAGE_MIME_TYPES_AND_SVG
+        if not self.data:
+            return False
+        return self.data.get('mimetype') in IMAGE_MIME_TYPES_AND_SVG
 
     def process_formdata(self, valuelist: list['RawFormValue']) -> None:
 
@@ -160,7 +207,7 @@ class UploadField(FileField):
     def process_fieldstorage(
         self,
         fs: 'RawFormValue'
-    ) -> 'FileDict | EmptyDict':
+    ) -> 'StrictFileDict | FileDict':
 
         self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
         self.filename = path_to_filename(getattr(fs, 'filename', None))
@@ -216,7 +263,7 @@ class UploadFileWithORMSupport(UploadField):
 
     def process_data(self, value: 'UploadedFile | None') -> None:
         if value:
-            self.data = {  # type:ignore[assignment]
+            self.data = {
                 'filename': value.name,
                 'size': value.reference.file.content_length,
                 'mimetype': value.reference.content_type
@@ -225,7 +272,7 @@ class UploadFileWithORMSupport(UploadField):
             super().process_data(value)
 
 
-class UploadMultipleField(FieldList, FileField):
+class UploadMultipleField(UploadMultipleBase, FileField):
     """ A custom file field that turns the uploaded files into a list of
     compressed base64 strings together with the filename, size and mimetype.
 
@@ -236,26 +283,36 @@ class UploadMultipleField(FieldList, FileField):
     """
 
     widget = UploadMultipleWidget()
+    raw_data: list['RawFormValue']
 
-    upload_field_class = UploadField
-    upload_widget = UploadWidget()
+    if TYPE_CHECKING:
+        _separator: str
+        def _add_entry(self, __d: _MultiDictLikeWithGetlist) -> object: ...
+
+    upload_field_class: type[UploadField] = UploadField
+    upload_widget: 'Widget[UploadField]' = UploadWidget()
 
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Sequence[Validator] | None' = None,
+        validators: 'Validators[_FormT, UploadField] | None' = None,
         filters: 'Sequence[Filter]' = (),
         description: str = '',
         id: str | None = None,
         default: 'Sequence[FileDict]' = (),
-        widget: 'Widget | None' = None,
+        widget: 'Widget[Self] | None' = None,
         render_kw: dict[str, Any] | None = None,
         name: str | None = None,
-        upload_widget: 'Widget | None' = None,
+        upload_widget: 'Widget[UploadField] | None' = None,
         _form: 'BaseForm | None' = None,
         _prefix: str = '',
-        _translations: object = None,
-        _meta: object = None,
+        _translations: '_SupportsGettextAndNgettext | None' = None,
+        _meta: 'DefaultMeta | None' = None,
+        # onegov specific kwargs that get popped off
+        *,
+        fieldset: str | None = None,
+        depends_on: 'Sequence[Any] | None' = None,
+        pricing: 'PricingRules | None' = None,
     ):
         if upload_widget is None:
             upload_widget = self.upload_widget
@@ -275,7 +332,7 @@ class UploadMultipleField(FieldList, FileField):
             max_entries=None,
             id=id,
             default=default,
-            widget=widget,
+            widget=widget,  # type:ignore[arg-type]
             render_kw=render_kw,
             name=name,
             _form=_form,
@@ -292,7 +349,7 @@ class UploadMultipleField(FieldList, FileField):
 
     def process(
         self,
-        formdata: 'MultiDict[str, RawFormValue]',
+        formdata: '_MultiDictLikeWithGetlist | None',
         data: object = unset_value,
         extra_filters: 'Sequence[Filter] | None' = None
     ) -> None:
@@ -407,7 +464,7 @@ class TagsField(StringField):
     widget = TagsWidget()
     # FIXME: Why does data have a different shape depending on if it's
     #        passed in by the form or the object?! This seems like a bug
-    data: str | list[str]
+    data: str | list[str]  # type:ignore[assignment]
 
     def process_formdata(self, valuelist: list['RawFormValue']) -> None:
         if not valuelist:
@@ -435,8 +492,6 @@ class IconField(StringField):
 class PhoneNumberField(TelField):
     """ A string field with support for phone numbers. """
 
-    validators: 'Sequence[Validator]'
-
     def __init__(self, *args: Any, country: str = 'CH', **kwargs: Any):
 
         self.country = country
@@ -451,10 +506,10 @@ class PhoneNumberField(TelField):
             self.validators.append(ValidPhoneNumber(self.country))
 
     @property
-    def formatted_data(self) -> str:
+    def formatted_data(self) -> str | None:
         try:
             return phonenumbers.format_number(
-                phonenumbers.parse(self.data, self.country),
+                phonenumbers.parse(self.data or '', self.country),
                 phonenumbers.PhoneNumberFormat.E164
             )
         except Exception:
@@ -477,7 +532,7 @@ class PreviewField(Field):
 
     fields: 'Sequence[str]'
     events: 'Sequence[str]'
-    url: 'Callable[[Any], str] | str | None'
+    url: 'Callable[[DefaultMeta], str | None] | str | None'
     display: str
 
     widget = PreviewWidget()
@@ -486,7 +541,7 @@ class PreviewField(Field):
         self,
         *args: Any,
         fields: 'Sequence[str]' = (),
-        url: 'Callable[[Any], str] | str | None' = None,
+        url: 'Callable[[DefaultMeta], str | None] | str | None' = None,
         events: 'Sequence[str]' = (),
         display: str = 'inline',
         **kwargs: Any
@@ -533,7 +588,7 @@ class DateTimeLocalField(DateTimeLocalFieldBase):
     def __init__(
         self,
         label: str | None = None,
-        validators: 'Sequence[Validator] | None' = None,
+        validators: 'Validators[_FormT, Self] | None' = None,
         format: str = '%Y-%m-%dT%H:%M',
         **kwargs: Any
     ):
@@ -606,9 +661,41 @@ class HoneyPotField(StringField):
 
     def post_validate(
         self,
-        form: 'BaseForm',
+        form: 'Form',  # type:ignore[override]
         validation_stopped: bool
     ) -> None:
         if self.data:
             log.info(f'Honeypot used by {form.request.client_addr}')
             raise ValidationError('Invalid value')
+
+
+class ColorField(StringField):
+    """ A string field that renders a html5 color picker and coerces
+    to a normalized six digit hex string.
+
+    It will result in a process_error for invalid colors.
+    """
+
+    widget = ColorInput()
+
+    def coerce(self, value: object) -> str | None:
+        if not isinstance(value, str) or value == '':
+            return None
+
+        try:
+            if not value.startswith('#'):
+                value = name_to_hex(value)
+            return normalize_hex(value)
+        except ValueError:
+            msg = self.gettext(_('Not a valid color.'))
+            raise ValueError(msg) from None
+
+    def process_data(self, value: object) -> None:
+        self.data = self.coerce(value)
+
+    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+        if not valuelist:
+            self.data = None
+            return
+
+        self.data = self.coerce(valuelist[0])

@@ -21,7 +21,6 @@ from translationstring import TranslationString
 from typing import Dict
 from typing import Optional
 from webob import Response
-from webob.exc import HTTPClientError
 
 
 from typing import Any, ClassVar, Literal, TypeVar, TYPE_CHECKING
@@ -657,14 +656,13 @@ class LDAPKerberosProvider(
 
         response = self.kerberos.authenticated_username(request)
 
-        # authentication failed
-        # we need to check this first since HTTPClientError is a Response
-        if response is None or isinstance(response, HTTPClientError):
-            return Failure(_("Authentication failed"))
-
         # handshake
         if isinstance(response, Response):
             return response
+
+        # authentication failed
+        if response is None:
+            return Failure(_("Authentication failed"))
 
         # we got authentication, do we also have authorization?
         name = response

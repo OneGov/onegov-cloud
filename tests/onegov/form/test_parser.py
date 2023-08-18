@@ -5,14 +5,13 @@ from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
 from onegov.form.errors import InvalidIndentSyntax
-from onegov.form.fields import DateTimeLocalField
+from onegov.form.fields import DateTimeLocalField, TimeField
 from onegov.form.parser.form import normalize_label_for_dependency
 from onegov.form.parser.grammar import field_help_identifier
 from onegov.form.validators import LaxDataRequired
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
-from wtforms_components import TimeField
 from wtforms.fields import DateField
 from wtforms.fields import EmailField
 from wtforms.fields import FileField

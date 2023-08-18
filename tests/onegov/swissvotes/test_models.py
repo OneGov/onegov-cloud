@@ -376,6 +376,7 @@ def test_model_vote(session, sample_vote):
     assert vote.link_bk_chrono == 'https://bk.chrono/de'
     assert vote.link_bk_results == 'https://bk.results/de'
     assert vote.link_curia_vista == 'https://curia.vista/de'
+    assert vote.link_easyvote == 'https://easy.vote/de'
     assert vote.link_federal_council == 'https://federal.council/de'
     assert vote.link_federal_departement == 'https://federal.departement/de'
     assert vote.link_federal_office == 'https://federal.office/de'
@@ -409,6 +410,7 @@ def test_model_vote(session, sample_vote):
     assert vote.link_bk_chrono == 'https://bk.chrono/fr'
     assert vote.link_bk_results == 'https://bk.results/fr'
     assert vote.link_curia_vista == 'https://curia.vista/fr'
+    assert vote.link_easyvote == 'https://easy.vote/fr'
     assert vote.link_federal_council == 'https://federal.council/fr'
     assert vote.link_federal_departement == 'https://federal.departement/fr'
     assert vote.link_federal_office == 'https://federal.office/fr'
@@ -424,13 +426,14 @@ def test_model_vote(session, sample_vote):
     assert vote.link_bk_chrono == 'https://bk.chrono/de'
     assert vote.link_bk_results == 'https://bk.results/de'
     assert vote.link_curia_vista == 'https://curia.vista/de'
+    assert vote.link_easyvote == 'https://easy.vote/de'
     assert vote.link_federal_council == 'https://federal.council/en'
     assert vote.link_federal_departement == 'https://federal.departement/en'
     assert vote.link_federal_office == 'https://federal.office/en'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/en'
 
+    # descriptors
     vote.session_manager.current_locale = 'de_CH'
-
     assert vote.descriptor_1_level_1 == Decimal('4')
     assert vote.descriptor_1_level_2 == Decimal('4.2')
     assert vote.descriptor_1_level_3 == Decimal('4.21')
@@ -833,6 +836,7 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     vote = session.query(SwissVote).one()
     assert vote.ad_analysis is None
     assert vote.brief_description is None
+    assert vote.easyvote_booklet is None
     assert vote.federal_council_message is None
     assert vote.foeg_analysis is None
     assert vote.parliamentary_debate is None
@@ -840,8 +844,8 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.post_vote_poll_codebook is None
     assert vote.post_vote_poll_codebook_xlsx is None
     assert vote.post_vote_poll_dataset is None
-    assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_dataset_dta is None
+    assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_methodology is None
     assert vote.post_vote_poll_report is None
     assert vote.preliminary_examination is None
@@ -857,17 +861,18 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert set(vote.localized_files().keys()) == {
         'ad_analysis',
         'brief_description',
+        'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
         'parliamentary_debate',
-        'post_vote_poll',
-        'post_vote_poll_codebook',
         'post_vote_poll_codebook_xlsx',
-        'post_vote_poll_dataset',
-        'post_vote_poll_dataset_sav',
+        'post_vote_poll_codebook',
         'post_vote_poll_dataset_dta',
+        'post_vote_poll_dataset_sav',
+        'post_vote_poll_dataset',
         'post_vote_poll_methodology',
         'post_vote_poll_report',
+        'post_vote_poll',
         'preliminary_examination',
         'realization',
         'resolution',
@@ -880,9 +885,9 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'brief_description',
         'federal_council_message',
         'parliamentary_debate',
+        'preliminary_examination',
         'realization',
         'voting_text',
-        'preliminary_examination'
     }
 
     # Upload de_CH
@@ -1240,7 +1245,8 @@ def test_model_column_mapper_metadata():
         ('t:t:doctype!legal', 'Typ RECHTSTEXT', 'TEXT', True, None, None),
         ('t:t:doctype!lecture', 'Typ REFERATSTEXT', 'TEXT', True, None, None),
         ('t:t:doctype!statistics', 'Typ STATISTIK', 'TEXT', True, None, None),
-        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None)
+        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None),
+        ('t:t:doctype!website', 'Typ WEBSITE', 'TEXT', True, None, None)
     ]
 
 

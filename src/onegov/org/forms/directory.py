@@ -1,5 +1,4 @@
 from functools import cached_property
-from colour import Color
 from onegov.core.utils import safe_format_keys
 from onegov.directory import DirectoryConfiguration
 from onegov.directory import DirectoryZipArchive
@@ -10,6 +9,7 @@ from onegov.form import merge_forms
 from onegov.form import move_fields
 from onegov.form import parse_formcode
 from onegov.form.errors import FormError
+from onegov.form.fields import ColorField
 from onegov.form.fields import IconField, MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.filters import as_float
@@ -21,7 +21,6 @@ from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import PaymentForm
 from onegov.org.theme.org_theme import user_options
 from sqlalchemy.orm import object_session
-from wtforms_components import ColorField
 from wtforms.fields import BooleanField
 from wtforms.fields import DecimalField
 from wtforms.fields import RadioField
@@ -485,13 +484,11 @@ class DirectoryBaseForm(Form):
 
     @property
     def marker_color(self):
-        if self.marker_color_value.data:
-            return self.marker_color_value.data.get_hex()
+        return self.marker_color_value.data
 
     @marker_color.setter
     def marker_color(self, value):
-        self.marker_color_value.data = Color(
-            value or self.default_marker_color)
+        self.marker_color_value.data = value or self.default_marker_color
 
     @property
     def configuration(self):
