@@ -456,5 +456,8 @@ msgstr "Strassenverzeichnis"
 msgid "The streets directory has been updated"
 msgstr "Das Strassenverzeichnis wurde aktualisiert"
 
+msgid "Search in ${title}"
+msgstr "Suche in ${title}"
+
 #~ msgid "# Missions"
 #~ msgstr "# Einsätze"

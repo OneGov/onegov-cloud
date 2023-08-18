@@ -84,6 +84,7 @@ def view_occurrences(self, request, layout=None):
         'tags': tags,
         'locations': locations,
         'title': _('Events'),
+        'search_widget': self.search_widget,
     }
 
 

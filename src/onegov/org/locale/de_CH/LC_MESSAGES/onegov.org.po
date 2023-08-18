@@ -986,6 +986,9 @@ msgstr "Aktuelles"
 msgid "Events"
 msgstr "Veranstaltungen"
 
+msgid "Search in Events"
+msgstr "Suche in Veranstaltungen"
+
 msgid "Publications"
 msgstr "Publikationen"
 
