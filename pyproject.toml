@@ -106,10 +106,6 @@ module = [
     "transaction.*",
     "ua_parser.*",
     "urlextract.*",
-    # TEMPORARY: webcolors has type annotations but is missing its
-    #            py.typed marker, once that has been fixed, we should
-    #            remove the module from this list.
-    "webcolors.*",
     "webassets.*",
     "webtest.*",
     "xlrd.*",
