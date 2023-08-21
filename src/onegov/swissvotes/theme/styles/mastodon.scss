@@ -1,0 +1,17 @@
+.timeline {
+
+    .mt-body {
+        padding: 0;
+    }
+
+    .mt-toot {
+        padding-left: 0;
+    }
+
+    .mt-avatar,
+    .toot-media,
+    .toot-date {
+        display: none;
+    }
+
+}

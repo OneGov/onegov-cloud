@@ -141,6 +141,9 @@ msgstr "No eMuseum API key available."
 msgid "Title"
 msgstr "Title"
 
+msgid "Show Mastodon timeline"
+msgstr "Show Mastodon timeline"
+
 msgid "Content"
 msgstr "Content"
 
@@ -1679,6 +1682,9 @@ msgstr "Click the following link to set a new password:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr "If you don't want to change your password, you can ignore this email."
+
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes on Mastodon"
 
 msgid "Files"
 msgstr "Files"

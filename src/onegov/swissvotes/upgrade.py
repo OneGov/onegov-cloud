@@ -574,3 +574,14 @@ def add_english_short_title_column(context):
         context.operations.add_column(
             'swissvotes', Column('short_title_en', Text())
         )
+
+
+@upgrade_task('Adds meta to pages')
+def add_meta_to_pages(context):
+
+    if not context.has_column('swissvotes_page', 'meta'):
+        context.add_column_with_defaults(
+            'swissvotes_page',
+            Column('meta', JSON, nullable=False),
+            default=dict()
+        )

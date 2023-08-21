@@ -14,6 +14,7 @@ class SwissvotesTheme(BaseTheme):
         return super().post_imports + [
             'mixin',
             'header',
+            'mastodon',
             'footer',
             'form',
             'table',
