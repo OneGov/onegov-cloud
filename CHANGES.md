@@ -1,8 +1,96 @@
 # Changes
 
+## 2023.37
+
+`2023-08-21` | [161ee64bb5...493691e9fd](https://github.com/OneGov/onegov-cloud/compare/161ee64bb5^...493691e9fd)
+
+### Core
+
+##### Fixes authentication in LDAPKerberosProvider (#941)
+
+`Bugfix` | [OGC-1209](https://linear.app/onegovcloud/issue/OGC-1209) | [a7db20dea7](https://github.com/onegov/onegov-cloud/commit/a7db20dea722844fe4faabc831fbb94b987427b9)
+
+##### Pin validators
+
+`Bugfix` | [OGC-1224](https://linear.app/onegovcloud/issue/OGC-1224) | [fe6cdd2af0](https://github.com/onegov/onegov-cloud/commit/fe6cdd2af0fa68cc9f55f8ac25dcbbbf1c0fb7af)
+
+### Event
+
+##### Adds optional field for organizer's phone number
+
+`Feature` | [ogc-1222](#ogc-1222) | [e2162f780a](https://github.com/onegov/onegov-cloud/commit/e2162f780a8a1a3476d3f867c1a1cf36400ee01a)
+
+##### Show number of occurrences per tag
+
+`Feature` | [ogc-1220](#ogc-1220) | [ea6d77a2a1](https://github.com/onegov/onegov-cloud/commit/ea6d77a2a1bc416dba1aaeba26d09620ceed5257)
+
+##### Allow to set default event category when importing from ical if non is given
+
+For Winterthur importing the DWS calendar from ical. Usually no categories are set so we can set a default if non is given for daily imports.
+
+`Feature` | [ogc-1225](#ogc-1225) | [fec26f2ebd](https://github.com/onegov/onegov-cloud/commit/fec26f2ebd8f68f4baaaabd0243f4ff5e3192b74)
+
+### Form
+
+##### Gets rid of `colour` dependency
+
+Instead uses actively maintained `webcolors` to validate `ColorField`
+
+`Feature` | [OGC-1229](https://linear.app/onegovcloud/issue/OGC-1229) | [a291a9b82f](https://github.com/onegov/onegov-cloud/commit/a291a9b82f22cfb6b30e9e889471e8114db6d181)
+
+##### Remove wtforms-components dependency
+
+`Bugfix` | [OGC-1226](https://linear.app/onegovcloud/issue/OGC-1226) | [b813409480](https://github.com/onegov/onegov-cloud/commit/b813409480e69efa38b388b3f95ee6d059d9c57d)
+
+### Swissvotes
+
+##### Move position of the federal council to voting campaign.
+
+`Feature` | [SWI-40](https://linear.app/swissvotes/issue/SWI-40) | [278800c9fe](https://github.com/onegov/onegov-cloud/commit/278800c9feff00ff98e4dc3fb46e5422c57549e4)
+
+##### Add English translations of actors and update some other translations.
+
+`Feature` | [SWI-41](https://linear.app/swissvotes/issue/SWI-41) | [abf1307af1](https://github.com/onegov/onegov-cloud/commit/abf1307af14b333eeab1810e1ab94bcbed28e39c)
+
+##### Add easyvote video links.
+
+`Feature` | [SWI-34](https://linear.app/swissvotes/issue/SWI-34) | [2f515e2034](https://github.com/onegov/onegov-cloud/commit/2f515e2034e4e82ba974848bfaa5c1e8e9dd6122)
+
+##### Add easyvote booklet.
+
+`Feature` | [SWI-34](https://linear.app/swissvotes/issue/SWI-34) | [ded8fa6a5f](https://github.com/onegov/onegov-cloud/commit/ded8fa6a5fc65f88fb24782a003de51172c498dc)
+
+##### Add doctype website.
+
+`Feature` | [SWI-39](https://linear.app/swissvotes/issue/SWI-39) | [f48cad690c](https://github.com/onegov/onegov-cloud/commit/f48cad690c0848cadd76297e6900dd23cf0ee279)
+
+##### Enable french brief descriptions and result files.
+
+`Feature` | [SWI-33](https://linear.app/swissvotes/issue/SWI-33) | [73eb4611f9](https://github.com/onegov/onegov-cloud/commit/73eb4611f9ecb1463b81a5107025e23a265411e3)
+
+##### Fixes national council share indicator.
+
+`Bugfix` | [SWI-36](https://linear.app/swissvotes/issue/SWI-36) | [2fb9d9b44e](https://github.com/onegov/onegov-cloud/commit/2fb9d9b44e430be118fdfb8040e8ecd075d2b9e7)
+
+### Town6
+
+##### Adds misssing wrapper for view that is used by org.
+
+`Bugfix` | [2985f67ff8](https://github.com/onegov/onegov-cloud/commit/2985f67ff8bffdc364b3e271b9f51e8b42b6e940)
+
+### Winterthur
+
+##### Adds inline text search for events
+
+`Feature` | [ogc-1201](#ogc-1201) | [3b5f385b72](https://github.com/onegov/onegov-cloud/commit/3b5f385b7236b6d2633c1a023f15ff014d96047c)
+
+##### Daycare calculation correction
+
+`Bugfix` | [OGC-1207](https://linear.app/onegovcloud/issue/OGC-1207) | [493691e9fd](https://github.com/onegov/onegov-cloud/commit/493691e9fd3dace9365e18162ba6afc90c2894dc)
+
 ## 2023.36
 
-`2023-08-04` | [c1bddcd2d7...e07158b8f1](https://github.com/OneGov/onegov-cloud/compare/c1bddcd2d7^...e07158b8f1)
+`2023-08-04` | [c1bddcd2d7...8e1eb9630c](https://github.com/OneGov/onegov-cloud/compare/c1bddcd2d7^...8e1eb9630c)
 
 ### Api
 
@@ -2528,18 +2616,4 @@ Also cleanup the documentation.
 ##### Fix agency upgrade step.
 
 `Bugfix` | [f09e155b1f](https://github.com/onegov/onegov-cloud/commit/f09e155b1fd0026f17cfd1732ba75a34e27a246a)
-
-## 2022.44
-
-`2022-09-03` | [563b896390...a3ae3af9e9](https://github.com/OneGov/onegov-cloud/compare/563b896390^...a3ae3af9e9)
-
-### Core
-
-##### Add add-admins flag to transfer command.
-
-`Feature` | [89ed4bbbec](https://github.com/onegov/onegov-cloud/commit/89ed4bbbecffb119de3d7be51795fe24335f3863)
-
-##### Switch to python 3.10.
-
-`Feature` | [OGC-578](https://linear.app/onegovcloud/issue/OGC-578) | [63a6f19e9a](https://github.com/onegov/onegov-cloud/commit/63a6f19e9a8cf8d0d3914a553f6175e2aae835b2)
 
