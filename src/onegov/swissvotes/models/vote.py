@@ -73,11 +73,12 @@ class localized_property:
         self.name = name
 
     def __get__(self, instance, owner):
+        default = getattr(instance, f'{self.name}_de', None)
         lang = instance.session_manager.current_locale[:2]
         attribute = f'{self.name}_{lang}'
         if hasattr(instance, attribute):
-            return getattr(instance, attribute)
-        return getattr(instance, f'{self.name}_de', None)
+            return getattr(instance, attribute) or default
+        return default
 
 
 class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
@@ -213,6 +214,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     title = localized_property()
     short_title_de = Column(Text, nullable=False)
     short_title_fr = Column(Text, nullable=False)
+    short_title_en = Column(Text, nullable=True)
     short_title = localized_property()
     brief_description_title = Column(Text)
     keyword = Column(Text)
