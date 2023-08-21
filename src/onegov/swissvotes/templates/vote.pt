@@ -125,7 +125,7 @@
                 </tbody>
             </table>
 
-            <table class="collapsible">
+            <table class="collapsible" tal:condition="vote._parliamentary_initiated != 1">
                 <thead>
                     <tr><th colspan="2" i18n:translate>Pre-parliamentary phase</th></tr>
                 </thead>
@@ -147,6 +147,24 @@
                     <tr tal:condition="vote.procedure_number">
                         <th class="column-30" i18n:translate>Procedure number</th>
                         <td>${vote.procedure_number}</td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['parliamentary_initiative']">
+                        <th class="column-30" i18n:translate>Parliamentary initiative</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'parliamentary_initiative'" />
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['parliamentary_committee_report']">
+                        <th class="column-30" i18n:translate>Report of the parliamentary committee</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'parliamentary_committee_report'" />
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['federal_council_opinion']">
+                        <th class="column-30" i18n:translate>Opinion of the Federal Council</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'federal_council_opinion'" />
+                        </td>
                     </tr>
                     <tr tal:condition="layout.attachments['parliamentary_debate'] or vote.link_curia_vista">
                         <th class="column-30" i18n:translate>Parliamentary debate</th>

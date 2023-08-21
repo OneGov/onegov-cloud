@@ -574,3 +574,11 @@ def add_english_short_title_column(context):
         context.operations.add_column(
             'swissvotes', Column('short_title_en', Text())
         )
+
+
+@upgrade_task('Adds parliamentary initiative')
+def add_parliamentary_initiative(context):
+    if not context.has_column('swissvotes', 'parliamentary_initiated'):
+        context.operations.add_column(
+            'swissvotes', Column('parliamentary_initiated', Integer())
+        )

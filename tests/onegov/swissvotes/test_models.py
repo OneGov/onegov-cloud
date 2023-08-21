@@ -336,6 +336,7 @@ def test_model_vote(session, sample_vote):
     assert vote.keyword == "Keyword"
     assert vote._legal_form == 1
     assert vote.legal_form == "Mandatory referendum"
+    assert vote._parliamentary_initiated == 0
     assert vote.initiator == "Initiator"
     assert vote.anneepolitique == "anneepolitique"
     assert vote.bfs_map_de == (
@@ -840,6 +841,9 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert vote.easyvote_booklet is None
     assert vote.federal_council_message is None
     assert vote.foeg_analysis is None
+    assert vote.parliamentary_initiative is None
+    assert vote.parliamentary_committee_report is None
+    assert vote.federal_council_opinion is None
     assert vote.parliamentary_debate is None
     assert vote.post_vote_poll is None
     assert vote.post_vote_poll_codebook is None
@@ -865,6 +869,9 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
+        'parliamentary_initiative',
+        'parliamentary_committee_report',
+        'federal_council_opinion',
         'parliamentary_debate',
         'post_vote_poll_codebook_xlsx',
         'post_vote_poll_codebook',
@@ -1177,7 +1184,7 @@ def test_model_column_mapper_dataset():
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
     ]
-    assert list(mapper.items())[298] == (
+    assert list(mapper.items())[299] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )

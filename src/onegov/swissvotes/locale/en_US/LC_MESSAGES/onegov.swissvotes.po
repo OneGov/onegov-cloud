@@ -72,6 +72,15 @@ msgstr "Parliamentary debate"
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
 
+msgid "Parliamentary initiative"
+msgstr "Parliamentary initiative"
+
+msgid "Report of the parliamentary committee"
+msgstr "Report of the parliamentary committee"
+
+msgid "Opinion of the Federal Council"
+msgstr "Opinion of the Federal Council"
+
 msgid "Voting booklet"
 msgstr "Official explanatory brochure"
 
