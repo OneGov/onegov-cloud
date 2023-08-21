@@ -1,3 +1,16 @@
+function scrollToCurrentItem() {
+    const positionCurrent = $('#current').position().top - $('.agenda-item-list').position().top;
+    const listHeight = $('.agenda-item-list').height();
+    const currentHeight = $('#current').height();
+    const scrollTopList = $('.agenda-item-list').scrollTop();
+
+    $('.agenda-item-list').animate({
+    scrollTop: positionCurrent - listHeight/2 + currentHeight/2 + scrollTopList
+    })
+}
+
+scrollToCurrentItem();
+
 document.addEventListener("DOMContentLoaded", function() {
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
@@ -10,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (message.event === 'update') {
                 const agendaItem = document.getElementById(message.node);
                 const agendaListItem = document.querySelector('#list-' + message.node + ' a');
-                const currentAgendaListItem = document.getElementById('current')
+                const currentAgendaListItem = document.getElementById('current');
                 if (agendaItem && message.content) {
                     const content = document.createElement('div');
                     content.innerHTML = message.content;
@@ -26,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         currentAgendaListItem.id = ''
                     }
                     agendaListItem.id = 'current'
+                    scrollToCurrentItem();
                 }
                 if (message.state == 'completed') {
                     agendaListItem.classList.remove('scheduled');
