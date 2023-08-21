@@ -74,6 +74,15 @@ msgstr "Parlamentsberatung"
 msgid "Parliamentary phase"
 msgstr "Im Parlament"
 
+msgid "Parliamentary initiative"
+msgstr "Parlamentarische Initiative"
+
+msgid "Report of the parliamentary committee"
+msgstr "Bericht der parlamentarischen Kommission"
+
+msgid "Opinion of the Federal Council"
+msgstr "Stellungnahme des Bundesrats"
+
 msgid "Voting booklet"
 msgstr "Offizielles Abstimmungsbüchlein"
 

@@ -262,8 +262,7 @@ def test_vote_upload(swissvotes_app, attachments):
     for name in names:
         name = name.replace('_', '-')
         url = manage.pyquery(f'a.{name}')[0].attrib['href']
-        page = client.get(
-            url).maybe_follow()
+        page = client.get(url).maybe_follow()
         assert page.content_type in (
             'text/plain',
             'text/csv',
