@@ -637,6 +637,8 @@ class ColumnMapperDataset:
             ('!t!content!link_post_vote_poll_en', 'nach_cockpit_e'),
             ('procedure_number', 'gesch_nr'),
             ('brief_description_title', 'kurzbetitel'),
+            ('!t!content!link_easyvote_de', 'easyvideo_de'),
+            ('!t!content!link_easyvote_fr', 'easyvideo_fr'),
         ))
 
     def set_value(self, vote, attribute, value):
@@ -742,6 +744,7 @@ class ColumnMapperMetadata:
             ('t:t:doctype!lecture', 'Typ REFERATSTEXT'),
             ('t:t:doctype!statistics', 'Typ STATISTIK'),
             ('t:t:doctype!other', 'Typ ANDERES'),
+            ('t:t:doctype!website', 'Typ WEBSITE'),
         ))
 
     def set_value(self, data, attribute, value):

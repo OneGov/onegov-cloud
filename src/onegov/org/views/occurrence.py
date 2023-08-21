@@ -28,7 +28,7 @@ def view_occurrences(self, request, layout=None):
 
     tags = [
         Link(
-            text=translation,
+            text=translation + f' ({self.tag_counts[tag]})',
             url=request.link(self.for_filter(tag=tag)),
             active=tag in self.tags and 'active' or ''
         ) for tag, translation in translated_tags
@@ -84,6 +84,7 @@ def view_occurrences(self, request, layout=None):
         'tags': tags,
         'locations': locations,
         'title': _('Events'),
+        'search_widget': self.search_widget,
     }
 
 
@@ -105,6 +106,7 @@ def view_occurrence(self, request, layout=None):
         'framed': framed,
         'organizer': self.event.organizer,
         'organizer_email': self.event.organizer_email,
+        'organizer_phone': self.event.organizer_phone,
         'external_event_url': self.event.external_event_url,
         'layout': layout,
         'occurrence': self,

@@ -441,11 +441,21 @@ def get_resource_move(app, key, subject, direction, target):
         start=extended_date_converter,
         end=extended_date_converter,
         tags=[],
-        locations=[]
+        locations=[],
+        search_query=json_converter,
     )
 )
 def get_occurrences(app, request, page=0, range=None, start=None, end=None,
-                    tags=None, locations=None):
+                    tags=None, locations=None, search=None, search_query=None):
+
+    if not search:
+        search = app.settings.org.default_event_search_widget
+
+    if search and search in app.config.event_search_widget_registry:
+        cls = app.config.event_search_widget_registry[search]
+        search_widget = cls(request, search_query)
+    else:
+        search_widget = None
 
     return OccurrenceCollection(
         app.session(),
@@ -455,7 +465,8 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
         end=end,
         tags=tags,
         locations=locations,
-        only_public=(not request.is_manager)
+        only_public=(not request.is_manager),
+        search_widget=search_widget,
     )
 
 
@@ -640,9 +651,9 @@ def get_directory_entries(
 
     if search and search in app.config.directory_search_widget_registry:
         cls = app.config.directory_search_widget_registry[search]
-        searchwidget = cls(request, directory, search_query)
+        search_widget = cls(request, directory, search_query)
     else:
-        searchwidget = None
+        search_widget = None
 
     if not published_only and not request.is_manager:
         published_only = True
@@ -653,7 +664,7 @@ def get_directory_entries(
             type='extended',
             keywords=keywords,
             page=page,
-            searchwidget=searchwidget,
+            search_widget=search_widget,
             published_only=published_only,
             past_only=past_only,
             upcoming_only=upcoming_only

@@ -206,6 +206,11 @@ def get_default_directory_search_widget():
     return 'inline'
 
 
+@WinterthurApp.setting(section='org', name='default_event_search_widget')
+def get_default_event_search_widget():
+    return 'inline'
+
+
 @WinterthurApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
     mine = utils.module_path('onegov.winterthur', 'locale')

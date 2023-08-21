@@ -8,7 +8,7 @@ from .request import Request, Response
 class NoIdentity:
     userid: None
 
-NO_IDENTITY: TypeAlias = NoIdentity
+NO_IDENTITY: NoIdentity
 
 # NOTE: Technically the actual Identity class is more generic and generates
 #       attributes based on what's passed to __init__, but for simplicity we

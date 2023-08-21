@@ -215,4 +215,17 @@
         </ul>
     </metal:slider>
 
+    <metal:attachment_locale define-macro="attachment_locale" i18n:domain="onegov.swissvotes">
+        <tal:block tal:condition="name in layout.attachments and layout.attachments[name]">
+            <span tal:condition="request.html_lang.replace('-', '_') != layout.attachments[name]['locale']" i18n:translate="">(in German)</span>
+        </tal:block>
+    </metal:attachment_locale>
+
+    <metal:attachment_link define-macro="attachment_link" i18n:domain="onegov.swissvotes">
+        <tal:block tal:condition="name in layout.attachments and layout.attachments[name]">
+            <a href="${layout.attachments[name]['url']}" target="_blank" class="${name.replace('_', '-')}">PDF</a>
+            <tal:block metal:use-macro="layout.macros['attachment_locale']"/>
+        </tal:block>
+    </metal:attachment_link>
+
 </body>

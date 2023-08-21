@@ -1,10 +1,8 @@
-from wtforms_components import ColorField
-
 from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField, ColorField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from wtforms.fields import BooleanField, IntegerField, RadioField
@@ -149,7 +147,7 @@ class AgencySettingsForm(Form):
         obj.agency_path_display_on_people = \
             self.agency_path_display_on_people.data
         obj.pdf_underline_links = self.underline_links.data
-        obj.pdf_link_color = self.link_color.data.get_hex()
+        obj.pdf_link_color = self.link_color.data
 
 
 @AgencyApp.form(

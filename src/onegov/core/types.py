@@ -16,9 +16,6 @@ if TYPE_CHECKING:
     JSONObject_ro
     JSONArray_ro
 
-    class EmptyDict(TypedDict):
-        pass
-
     class HeaderJsonDict(TypedDict):
         Name: str
         Value: str

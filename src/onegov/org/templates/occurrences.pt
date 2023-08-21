@@ -20,6 +20,13 @@
 
             <div class="large-4 medium-4 columns">
 
+                <div class="grid-x borderless-side-panel" tal:condition="search_widget">
+                    <h2 i18n:translate>Search in Events</h2>
+                    <div class="cell medium-12">
+                        <tal:b replace="structure search_widget.html(layout)"/>
+                    </div>
+                </div>
+
                 <div class="tag-filters borderless-side-panel" tal:condition="tags">
                     <h2 i18n:translate>Tag</h2>
                     <div class="occurrences-filter-tags">

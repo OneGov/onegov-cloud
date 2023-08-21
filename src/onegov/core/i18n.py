@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from translationstring import _ChameleonTranslate
     from typing_extensions import Self, TypeAlias
     from wtforms import Field, Form
-    from wtforms.meta import FormMeta
+    from wtforms.meta import DefaultMeta
 
     from .request import CoreRequest
 
@@ -69,7 +69,7 @@ if TYPE_CHECKING:
     ]
 
 _F = TypeVar('_F', bound='Form')
-_FM = TypeVar('_FM', bound='FormMeta')
+_M = TypeVar('_M', bound='DefaultMeta')
 
 
 # the language codes must be written thusly: de_CH, en_GB, en, fr and so on
@@ -250,9 +250,9 @@ def translation_chain(
 
 
 def get_translation_bound_meta(
-    meta_class: type[_FM],
+    meta_class: type[_M],
     translations: gettext.GNUTranslations
-) -> type[_FM]:
+) -> type[_M]:
     """ Takes a wtforms Meta class and combines our translate class with
     the one provided by WTForms itself.
 

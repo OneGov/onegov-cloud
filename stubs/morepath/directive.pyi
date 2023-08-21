@@ -179,7 +179,7 @@ class HtmlAction(ViewAction):
 class DummyModel: ...
 
 class MountAction(PathAction):
-    group_class = PathAction
+    group_class: type[PathAction]
     name: str
     model: type[DummyModel]
     app: dectate.App
@@ -201,7 +201,7 @@ class MountAction(PathAction):
     def perform(self, obj: Callable, path_registry: PathRegistry) -> None: ...  # type:ignore[override]
 
 class DeferLinksAction(dectate.Action):
-    group_class = PathAction
+    group_class: type[PathAction]
     model: type | str
     def __init__(self, model: type | str) -> None: ...
     def identifier(self, path_registry: PathRegistry) -> tuple[Literal['defer_links'], type | str]: ...  # type:ignore[override]
@@ -209,7 +209,7 @@ class DeferLinksAction(dectate.Action):
     def perform(self, obj: Any, path_registry: PathRegistry) -> None: ...  # type:ignore[override]
 
 class DeferClassLinksAction(dectate.Action):
-    group_class = PathAction
+    group_class: type[PathAction]
     model: type | str
     variables: Callable[[Any], dict[str, Any]] | str
     def __init__(self, model: type | str, variables: Callable[[Any], dict[str, Any]] | str) -> None: ...

@@ -27,7 +27,7 @@ repos:
     - id: sass-lint
       files: '^src/.*\.scss'
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.46.0
+    rev: v8.47.0
     hooks:
     - id: eslint
       files: '^src/.*\.jsx?$'
@@ -49,4 +49,10 @@ repos:
         #       instead of for every file. So we exclude all files
         exclude: '.*'
         always_run: true
+        pass_filenames: false
+      - id: system
+        name: stubtest
+        entry: ./stubtest.sh
+        language: system
+        files:  '^stubs/.*\.pyi$'
         pass_filenames: false

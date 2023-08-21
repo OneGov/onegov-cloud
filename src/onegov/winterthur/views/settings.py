@@ -40,37 +40,37 @@ class WinterthurDaycareSettingsForm(Form):
     max_income = DecimalField(
         label=_("Maximum taxable income"),
         fieldset=_("Variables"),
-        places=0,
+        places=2,
         validators=[InputRequired()])
 
     max_wealth = DecimalField(
         label=_("Maximum taxable wealth"),
         fieldset=_("Variables"),
-        places=0,
+        places=2,
         validators=[InputRequired()])
 
     min_income = DecimalField(
         label=_("Minimum income"),
         fieldset=_("Variables"),
-        places=0,
+        places=2,
         validators=[InputRequired()])
 
     min_rate = DecimalField(
         label=_("Minimum day-rate"),
         fieldset=_("Variables"),
-        places=0,
+        places=2,
         validators=[InputRequired()])
 
     max_rate = DecimalField(
         label=_("Maximum day-rate"),
         fieldset=_("Variables"),
-        places=0,
+        places=2,
         validators=[InputRequired()])
 
     max_subsidy = DecimalField(
         label=_("Maximum subsidy"),
         fieldset=_("Variables"),
-        places=0,
+        places=2,
         validators=[InputRequired()])
 
     wealth_premium = DecimalField(

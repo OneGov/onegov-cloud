@@ -1,4 +1,6 @@
 import datetime
+from collections import defaultdict
+
 import sqlalchemy
 
 from functools import cached_property
@@ -49,6 +51,7 @@ class OccurrenceCollection(Pagination):
         tags=None,
         locations=None,
         only_public=False,
+        search_widget=None,
     ):
         self.session = session
         self.page = page
@@ -58,12 +61,21 @@ class OccurrenceCollection(Pagination):
         self.tags = tags if tags else []
         self.locations = locations if locations else []
         self.only_public = only_public
+        self.search_widget = search_widget
 
     def __eq__(self, other):
         return self.page == other.page
 
     def subset(self):
         return self.query()
+
+    @property
+    def search(self):
+        return self.search_widget and self.search_widget.name
+
+    @property
+    def search_query(self):
+        return self.search_widget and self.search_widget.search_query
 
     @property
     def page_index(self):
@@ -80,6 +92,7 @@ class OccurrenceCollection(Pagination):
             tags=self.tags,
             locations=self.locations,
             only_public=self.only_public,
+            search_widget=self.search_widget
         )
 
     def range_to_dates(self, range, start=None, end=None):
@@ -171,6 +184,7 @@ class OccurrenceCollection(Pagination):
             tags=tags,
             locations=locations,
             only_public=self.only_public,
+            search_widget=self.search_widget,
         )
 
     @cached_property
@@ -180,6 +194,25 @@ class OccurrenceCollection(Pagination):
         return [
             tz[0] for tz in self.session.query(distinct(Occurrence.timezone))
         ]
+
+    @cached_property
+    def tag_counts(self) -> defaultdict[str, int]:
+        """
+        Returns a dict with all existing tags as keys and the number of
+        existence as value.
+
+        """
+        counts = defaultdict(int)  # type: defaultdict[str, int]
+
+        base = self.session.query(Occurrence._tags.keys())
+        base = base.filter(Occurrence.start >= datetime.datetime.now(
+            datetime.timezone.utc))
+
+        for keys in base.all():
+            for tag in keys[0]:
+                counts[tag] += 1
+
+        return counts
 
     @cached_property
     def used_tags(self):
@@ -215,6 +248,9 @@ class OccurrenceCollection(Pagination):
         Start and end date are assumed to be dates only and therefore without
         a timezone - we search for the given date in the timezone of the
         occurrence.
+
+        In case of a search widget request the query will filter for events
+        containing the text search term in e.g. title
 
         """
 
@@ -291,6 +327,9 @@ class OccurrenceCollection(Pagination):
             query = query.order_by(Occurrence.start.desc(), Occurrence.title)
         else:
             query = query.order_by(Occurrence.start, Occurrence.title)
+
+        if self.search_widget:
+            query = self.search_widget.adapt(query)
 
         return query
 
@@ -389,6 +428,7 @@ class OccurrenceCollection(Pagination):
             event.organizer = e.organizer
             event.event_url = e.external_event_url
             event.organizer_email = e.organizer_email
+            event.organizer_phone = e.organizer_phone
             event.modified = e.last_change
             root.append(event)
 

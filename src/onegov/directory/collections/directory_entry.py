@@ -18,14 +18,14 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
     """
 
     def __init__(self, directory, type='*', keywords=None, page=0,
-                 searchwidget=None):
+                 search_widget=None):
         super().__init__(object_session(directory))
 
         self.type = type
         self.directory = directory
         self.keywords = keywords or {}
         self.page = page
-        self.searchwidget = searchwidget
+        self.search_widget = search_widget
 
     def __eq__(self, other):
         return self.type == other.type and self.page == other.page
@@ -35,11 +35,11 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
 
     @property
     def search(self):
-        return self.searchwidget and self.searchwidget.name
+        return self.search_widget and self.search_widget.name
 
     @property
     def search_query(self):
-        return self.searchwidget and self.searchwidget.search_query
+        return self.search_widget and self.search_widget.search_query
 
     @property
     def page_index(self):
@@ -84,8 +84,8 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         else:
             query = query.order_by(cls.order)
 
-        if self.searchwidget:
-            query = self.searchwidget.adapt(query)
+        if self.search_widget:
+            query = self.search_widget.adapt(query)
 
         return query
 
@@ -150,7 +150,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         return self.__class__(
             directory=self.directory,
             type=self.type,
-            searchwidget=self.searchwidget,
+            search_widget=self.search_widget,
             keywords=parameters)
 
     def without_keywords(self):
@@ -158,5 +158,5 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
             directory=self.directory,
             type=self.type,
             page=self.page,
-            searchwidget=self.searchwidget
+            search_widget=self.search_widget
         )
