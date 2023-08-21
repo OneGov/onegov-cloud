@@ -23,6 +23,14 @@ h6 small,
     color: inherit !important;
 }
 
+// Overwrite if the header has a different height
+:target::before {
+    content: "";
+    display: block;
+    height: 96px;
+    margin: -96px 0 0;
+}
+
 .main-title {
     margin-bottom: 3rem;
     margin-top: 1rem;
@@ -219,6 +227,15 @@ h6 small,
                 transition: color 200ms linear;
             }
         }
+
+        .scheduled .list-title {
+            opacity: .5;
+            transition: opacity 200ms linear;
+        }
+
+        .scheduled {
+            cursor: default;
+        }
     }
 
     li:not(.medium-6):hover {
@@ -259,6 +276,7 @@ h6 small,
         border-top: 1px solid $white-smoke;
         margin-bottom: .7rem;
         padding-top: .7rem;
+        transition: opacity 200ms linear;
 
 
         &::after {

@@ -8,11 +8,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 window.location.reload();
             }
             if (message.event === 'update') {
-                const node = document.getElementById(message.node);
-                if (node && message.content) {
+                const agendaItem = document.getElementById(message.node);
+                const agendaListItem = document.querySelector('#list-' + message.node + ' a');
+                const currentAgendaListItem = document.getElementById('current')
+                if (agendaItem && message.content) {
                     const content = document.createElement('div');
                     content.innerHTML = message.content;
-                    node.replaceWith(content.firstChild);
+                    agendaItem.replaceWith(content.firstChild);
+                }
+                if (message.state == 'scheduled') {
+                    agendaListItem.classList.add('scheduled');
+                    agendaListItem.id = ''
+                }
+                if (message.state == 'ongoing') {
+                    agendaListItem.classList.remove('scheduled');
+                    if (currentAgendaListItem) {
+                        currentAgendaListItem.id = ''
+                    }
+                    agendaListItem.id = 'current'
+                }
+                if (message.state == 'completed') {
+                    agendaListItem.classList.remove('scheduled');
+                    agendaListItem.id = ''
                 }
             }
         }

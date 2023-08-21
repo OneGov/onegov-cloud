@@ -26,7 +26,7 @@
                     <div class="timeline">
                         <div class="line"></div>
                         <div class="circle">
-                            <span class="number">${agenda_items.index(current_agenda_item)+1}</span>
+                            <span class="number">${current_agenda_item.number}</span>
                         </div>
                         <div class="line"></div>
                     </div>
@@ -38,6 +38,32 @@
         </ul>
     </div> 
 </metal:agenda-item-list>
+
+<metal:ticker-agenda-item-list define-macro="ticker_agenda_item_list">
+    <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
+        <h2 i18n:translate="">Agenda items</h2>
+        <ul class="more-list agenda-item-list with-current"> 
+            <tal:b tal:repeat="current_agenda_item agenda_items">
+                <li id="list-agenda-item-${current_agenda_item.number}">
+                    <a class="list-link ${current_agenda_item.state}"
+                    id="${'current' if current else ''}" tal:define="current current_agenda_item.state == 'ongoing'"
+                    href="#agenda-item-${current_agenda_item.number}">
+                        <div class="timeline">
+                            <div class="line"></div>
+                            <div class="circle">
+                                <span class="number">${current_agenda_item.number}</span>
+                            </div>
+                            <div class="line"></div>
+                        </div>
+                        <div class="title">
+                            <h5 class="list-title"><tal:block tal:content="structure layout.agenda_item_title(current_agenda_item, True)" /></h5>
+                        </div>
+                    </a>
+                </li>
+            </tal:b>
+        </ul>
+    </div> 
+</metal:ticker-agenda-item-list>
 
 <metal:state define-macro="state">
     <tal:block tal:switch="state">
