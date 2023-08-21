@@ -566,3 +566,11 @@ def add_tsvector_column_en(context):
 def drop_departement_in_charge_columns(context):
     if context.has_column('swissvotes', 'department_in_charge'):
         context.operations.drop_column('swissvotes', 'department_in_charge')
+
+
+@upgrade_task('Adds english short title column')
+def add_english_short_title_column(context):
+    if not context.has_column('swissvotes', 'short_title_en'):
+        context.operations.add_column(
+            'swissvotes', Column('short_title_en', Text())
+        )

@@ -25,6 +25,7 @@ class ColumnMapperDataset:
             ('date', 'datum'),
             ('short_title_de', 'titel_kurz_d'),
             ('short_title_fr', 'titel_kurz_f'),
+            ('short_title_en', 'titel_kurz_e'),
             ('title_de', 'titel_off_d'),
             ('title_fr', 'titel_off_f'),
             ('keyword', 'stichwort'),

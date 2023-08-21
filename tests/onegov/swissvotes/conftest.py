@@ -346,6 +346,7 @@ def sample_vote():
     vote.title_fr = "Vote FR"
     vote.short_title_de = "V D"
     vote.short_title_fr = "V F"
+    vote.short_title_en = "V E"
     vote.keyword = "Keyword"
     vote._legal_form = 1
     vote.initiator = "Initiator"

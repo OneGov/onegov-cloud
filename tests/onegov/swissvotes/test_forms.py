@@ -446,6 +446,7 @@ def test_update_dataset_form(session):
         '1.2.2008',  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
