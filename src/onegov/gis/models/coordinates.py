@@ -2,6 +2,8 @@ from onegov.core.custom import json
 
 
 from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy import Column
 
 
 class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):
@@ -50,13 +52,15 @@ class CoordinatesMixin:
     """
 
     if TYPE_CHECKING:
-        content: dict[str, Any]
+        # forward declare content column from ContentMixin
+        content: Column[dict[str, Any]]
 
+    # FIXME: This should probably be more serious about validation
     @property
-    def coordinates(self) -> Coordinates:
+    def coordinates(self) -> Coordinates | dict[str, Any]:
         return self.content.get('coordinates') or Coordinates()
 
     @coordinates.setter
-    def coordinates(self, value: Coordinates | None) -> None:
+    def coordinates(self, value: Coordinates | dict[str, Any]) -> None:
         self.content = self.content or {}
         self.content['coordinates'] = value or {}
