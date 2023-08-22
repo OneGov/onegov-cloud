@@ -32,7 +32,7 @@ window.addEventListener("load", () => {
     hashtag_name: "",
 
     // Maximum amount of toots to get. Default: 20
-    toots_limit: "5",
+    toots_limit: "2",
 
     // Hide unlisted toots. Default: don't hide
     hide_unlisted: true,
@@ -47,7 +47,7 @@ window.addEventListener("load", () => {
     hide_preview_link: true,
 
     // Hide custom emojis available on the server. Default: don't hide
-    hide_emojos: true,
+    hide_emojos: false,
 
     // Converts Markdown symbol ">" at the beginning of a paragraph into a blockquote HTML tag. Ddefault: don't apply
     markdown_blockquote: false,

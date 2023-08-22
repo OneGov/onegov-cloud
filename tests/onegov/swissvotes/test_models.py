@@ -136,7 +136,8 @@ def test_model_page(session):
         TranslatablePage(
             id='page',
             title_translations={'de_CH': "Titel", 'en': "Title"},
-            content_translations={'de_CH': "Inhalt", 'en': "Content"}
+            content_translations={'de_CH': "Inhalt", 'en': "Content"},
+            show_timeline=True
         )
     )
     session.flush()
@@ -146,6 +147,7 @@ def test_model_page(session):
     assert page.title_translations == {'de_CH': "Titel", 'en': "Title"}
     assert page.content_translations == {'de_CH': "Inhalt", 'en': "Content"}
     assert page.order == 65536
+    assert page.show_timeline is True
 
     session.add(
         TranslatablePage(
