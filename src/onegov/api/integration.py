@@ -3,7 +3,7 @@ from morepath import App
 
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
-    from onegov.core import Framework, cache
+    from onegov.core import cache
 
 
 class ApiApp(App):
@@ -35,7 +35,7 @@ class ApiApp(App):
         )
 
     @property
-    def rate_limit_cache(self: 'Framework') -> 'cache.RedisCacheRegion':
+    def rate_limit_cache(self) -> 'cache.RedisCacheRegion':
         """ A cache for rate limits. """
 
         limit, expiration = self.rate_limit
