@@ -6,6 +6,7 @@ from datetime import date, timezone
 from datetime import datetime
 from datetime import timedelta
 from icalendar import Calendar as vCalendar
+from icalendar.prop import vCategory
 from markupsafe import escape
 
 from onegov.core.collection import Pagination
@@ -305,7 +306,8 @@ class EventCollection(Pagination):
         return added, updated, purged_event_ids
 
     def from_ical(self, ical, future_events_only=False,
-                  event_image=None, event_image_name=None):
+                  event_image=None, event_image_name=None,
+                  default_categories=None):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
@@ -317,9 +319,14 @@ class EventCollection(Pagination):
         :param event_image: image file
         :param event_image_name: image name
         :type event_image_name: str
+        :param default_categories: categories applied if non is given in ical
+        :type default_categories: [str]
 
         """
         items = []
+
+        if default_categories:
+            assert isinstance(default_categories, list)
 
         cal = vCalendar.from_ical(ical)
         for vevent in cal.walk('vevent'):
@@ -368,7 +375,7 @@ class EventCollection(Pagination):
                     coordinates.latitude, coordinates.longitude
                 )
 
-            tags = vevent.get('categories')
+            tags = vevent.get('categories') or vCategory(default_categories)
             if tags:
                 # categories may be in lists or they may be single values
                 # whose 'cats' member contains the texts

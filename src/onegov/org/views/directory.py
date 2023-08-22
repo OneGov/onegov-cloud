@@ -297,7 +297,7 @@ def view_directory(self, request, layout=None):
         'title': self.directory.title,
         'entries': entries,
         'directory': self.directory,
-        'searchwidget': self.searchwidget,
+        'search_widget': self.search_widget,
         'filters': filters,
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),

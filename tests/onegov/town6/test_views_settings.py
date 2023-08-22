@@ -1,3 +1,7 @@
+from xml.etree.ElementTree import tostring
+
+from onegov.api.models import ApiKey
+
 
 def test_settings(client):
     client.login_admin()
@@ -30,3 +34,27 @@ def test_gever_settings_only_https_allowed(client):
 
     res = client.get('/settings').click('Gever API')
     assert res.status_code == 200
+
+
+def test_api_keys_create_and_delete(client):
+
+    client.login_admin()
+
+    settings = client.get('/api-keys')
+    settings.form['name'] = "My API key"
+    page = settings.form.submit()
+    assert 'My API key' in page
+
+    key = client.app.session().query(ApiKey).first()
+    assert key.name == "My API key"
+    assert key.read_only == True
+
+    # manually extract the link
+    delete_link = tostring(page.pyquery('a.confirm')[0]).decode('utf-8')
+    url = client.extract_href(delete_link)
+    remove_chars = len("http://localhost")
+    link = url[remove_chars:]
+
+    client.delete(link)
+    # should be gone
+    assert client.app.session().query(ApiKey).first() is None

@@ -41,7 +41,8 @@ module = [
     "onegov.reservation.*",
     "onegov.server.*",
     "onegov.ticket.*",
-    "onegov.user.*"
+    "onegov.user.*",
+    "onegov.websockets.*"
 ]
 warn_unreachable = true
 disallow_any_generics = true
@@ -54,8 +55,6 @@ module = [
     "bjoern.*",
     "blinker.*",
     "chameleon.*",
-    # FIXME: do we actually make good use of this?
-    "colour.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
     "dectate.*",
@@ -110,7 +109,6 @@ module = [
     "urlextract.*",
     "webassets.*",
     "webtest.*",
-    "wtforms_components.*",
     "xlrd.*",
     "xlsxwriter.*",
     "xtermcolor.*",

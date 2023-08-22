@@ -45,6 +45,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     export = directive(directives.ExportAction)
     userlinks = directive(directives.UserlinkAction)
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
+    event_search_widget = directive(directives.EventSearchWidgetAction)
     settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
 
@@ -378,6 +379,11 @@ def get_is_complete_userprofile_handler():
 
 @OrgApp.setting(section='org', name='default_directory_search_widget')
 def get_default_directory_search_widget():
+    return None
+
+
+@OrgApp.setting(section='org', name='default_event_search_widget')
+def get_default_event_search_widget():
     return None
 
 

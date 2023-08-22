@@ -122,6 +122,7 @@ def test_swissvotes_dataset_field_types_and_missing_values():
             content,  # datum / DATE
             content,  # short_title_de / TEXT
             content,  # short_title_fr / TEXT
+            content,  # short_title_en / TEXT
             content,  # title_de / TEXT
             content,  # title_fr / TEXT
             content,  # stichwort / TEXT
@@ -187,6 +188,7 @@ def test_swissvotes_dataset_field_all_okay():
         '1.2.2008',  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
@@ -210,6 +212,7 @@ def test_swissvotes_dataset_field_all_okay():
         date(2008, 2, 1),  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
@@ -275,6 +278,7 @@ def test_swissvotes_dataset_skip_empty_columns():
         '1.2.2008',  # datum / DATE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_kurz_e',  # short_title_en / TEXT
         'titel_off_d',  # title_de / TEXT
         'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
@@ -503,6 +507,7 @@ def test_swissvotes_metadata_field_all_okay():
         'x',  # Typ REFERATSTEXT
         'x',  # Typ STATISTIK
         'x',  # Typ ANDERES
+        'x',  # Typ WEBSITE
     ])
     worksheet.write_row(2, 0, [
         '100.1',  # Abst-Nummer
@@ -532,6 +537,7 @@ def test_swissvotes_metadata_field_all_okay():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     worksheet.write_row(3, 0, [
         '100.2',  # Abst-Nummer
@@ -561,6 +567,7 @@ def test_swissvotes_metadata_field_all_okay():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     workbook.close()
     file.seek(0)
@@ -592,7 +599,8 @@ def test_swissvotes_metadata_field_all_okay():
                     'legal',
                     'lecture',
                     'statistics',
-                    'other'
+                    'other',
+                    'website'
                 ],
                 'editor': 'Herausgeber',
                 'filename': 'letter.pdf',
@@ -679,6 +687,7 @@ def test_swissvotes_metadata_skip_empty_columns():
         '',  # Typ REFERATSTEXT
         '',  # Typ STATISTIK
         '',  # Typ ANDERES
+        '',  # Typ WEBSITE
     ])
     workbook.close()
     file.seek(0)

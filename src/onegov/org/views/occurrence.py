@@ -28,7 +28,7 @@ def view_occurrences(self, request, layout=None):
 
     tags = [
         Link(
-            text=translation,
+            text=translation + f' ({self.tag_counts[tag]})',
             url=request.link(self.for_filter(tag=tag)),
             active=tag in self.tags and 'active' or ''
         ) for tag, translation in translated_tags
@@ -84,6 +84,7 @@ def view_occurrences(self, request, layout=None):
         'tags': tags,
         'locations': locations,
         'title': _('Events'),
+        'search_widget': self.search_widget,
     }
 
 
@@ -198,17 +199,14 @@ def json_export_occurences(self, request):
 def xml_export_all_occurrences(self, request):
     """
     Returns events as xml.
-    This view was requested by Winterthur for their mobile app that displays
-    the events provided by this xml view.
-
     Url for xml view: ../events/xml
-    """
 
+    """
     collection = OccurrenceCollection(request.session)
     return Response(
         collection.as_xml(),
         content_type='text/xml',
-        content_disposition='inline; filename=occurences.xml'
+        content_disposition='inline; filename=occurrences.xml'
     )
 
 

@@ -329,16 +329,15 @@ def test_model_vote(session, sample_vote):
     assert vote.date == date(1990, 6, 2)
     assert vote.title_de == "Vote DE"
     assert vote.title_fr == "Vote FR"
+    assert vote.title == "Vote DE"
     assert vote.short_title_de == "V D"
     assert vote.short_title_fr == "V F"
+    assert vote.short_title_en == "V E"
     assert vote.short_title == "V D"
-
-    assert vote.title == "Vote DE"
-    assert vote.short_title == "V D"
-
     assert vote.keyword == "Keyword"
     assert vote._legal_form == 1
     assert vote.legal_form == "Mandatory referendum"
+    assert vote._parliamentary_initiated == 0
     assert vote.initiator == "Initiator"
     assert vote.anneepolitique == "anneepolitique"
     assert vote.bfs_map_de == (
@@ -377,6 +376,7 @@ def test_model_vote(session, sample_vote):
     assert vote.link_bk_chrono == 'https://bk.chrono/de'
     assert vote.link_bk_results == 'https://bk.results/de'
     assert vote.link_curia_vista == 'https://curia.vista/de'
+    assert vote.link_easyvote == 'https://easy.vote/de'
     assert vote.link_federal_council == 'https://federal.council/de'
     assert vote.link_federal_departement == 'https://federal.departement/de'
     assert vote.link_federal_office == 'https://federal.office/de'
@@ -410,6 +410,7 @@ def test_model_vote(session, sample_vote):
     assert vote.link_bk_chrono == 'https://bk.chrono/fr'
     assert vote.link_bk_results == 'https://bk.results/fr'
     assert vote.link_curia_vista == 'https://curia.vista/fr'
+    assert vote.link_easyvote == 'https://easy.vote/fr'
     assert vote.link_federal_council == 'https://federal.council/fr'
     assert vote.link_federal_departement == 'https://federal.departement/fr'
     assert vote.link_federal_office == 'https://federal.office/fr'
@@ -417,7 +418,7 @@ def test_model_vote(session, sample_vote):
 
     vote.session_manager.current_locale = 'en_US'
     assert vote.title == "Vote DE"
-    assert vote.short_title == "V D"
+    assert vote.short_title == "V E"
     assert vote.bfs_map == (
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
@@ -425,13 +426,17 @@ def test_model_vote(session, sample_vote):
     assert vote.link_bk_chrono == 'https://bk.chrono/de'
     assert vote.link_bk_results == 'https://bk.results/de'
     assert vote.link_curia_vista == 'https://curia.vista/de'
+    assert vote.link_easyvote == 'https://easy.vote/de'
     assert vote.link_federal_council == 'https://federal.council/en'
     assert vote.link_federal_departement == 'https://federal.departement/en'
     assert vote.link_federal_office == 'https://federal.office/en'
     assert vote.link_post_vote_poll == 'https://post.vote.poll/en'
 
-    vote.session_manager.current_locale = 'de_CH'
+    vote.short_title_en = ''
+    assert vote.short_title == "V D"
 
+    # descriptors
+    vote.session_manager.current_locale = 'de_CH'
     assert vote.descriptor_1_level_1 == Decimal('4')
     assert vote.descriptor_1_level_2 == Decimal('4.2')
     assert vote.descriptor_1_level_3 == Decimal('4.21')
@@ -834,15 +839,19 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     vote = session.query(SwissVote).one()
     assert vote.ad_analysis is None
     assert vote.brief_description is None
+    assert vote.easyvote_booklet is None
     assert vote.federal_council_message is None
     assert vote.foeg_analysis is None
+    assert vote.parliamentary_initiative is None
+    assert vote.parliamentary_committee_report is None
+    assert vote.federal_council_opinion is None
     assert vote.parliamentary_debate is None
     assert vote.post_vote_poll is None
     assert vote.post_vote_poll_codebook is None
     assert vote.post_vote_poll_codebook_xlsx is None
     assert vote.post_vote_poll_dataset is None
-    assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_dataset_dta is None
+    assert vote.post_vote_poll_dataset_sav is None
     assert vote.post_vote_poll_methodology is None
     assert vote.post_vote_poll_report is None
     assert vote.preliminary_examination is None
@@ -858,17 +867,21 @@ def test_model_vote_attachments(swissvotes_app, attachments,
     assert set(vote.localized_files().keys()) == {
         'ad_analysis',
         'brief_description',
+        'easyvote_booklet',
         'federal_council_message',
         'foeg_analysis',
+        'parliamentary_initiative',
+        'parliamentary_committee_report',
+        'federal_council_opinion',
         'parliamentary_debate',
-        'post_vote_poll',
-        'post_vote_poll_codebook',
         'post_vote_poll_codebook_xlsx',
-        'post_vote_poll_dataset',
-        'post_vote_poll_dataset_sav',
+        'post_vote_poll_codebook',
         'post_vote_poll_dataset_dta',
+        'post_vote_poll_dataset_sav',
+        'post_vote_poll_dataset',
         'post_vote_poll_methodology',
         'post_vote_poll_report',
+        'post_vote_poll',
         'preliminary_examination',
         'realization',
         'resolution',
@@ -881,9 +894,9 @@ def test_model_vote_attachments(swissvotes_app, attachments,
         'brief_description',
         'federal_council_message',
         'parliamentary_debate',
+        'preliminary_examination',
         'realization',
         'voting_text',
-        'preliminary_examination'
     }
 
     # Upload de_CH
@@ -1063,6 +1076,7 @@ def test_model_column_mapper_dataset():
     mapper.set_value(vote, 'title_fr', 'title fr')
     mapper.set_value(vote, 'short_title_de', 'short title de')
     mapper.set_value(vote, 'short_title_fr', 'short title fr')
+    mapper.set_value(vote, 'short_title_en', 'short title en')
     mapper.set_value(vote, 'keyword', 'keyword')
     mapper.set_value(vote, '_legal_form', 4)
     mapper.set_value(vote, '!i!recommendations!fdp', 66)
@@ -1074,6 +1088,7 @@ def test_model_column_mapper_dataset():
     assert vote.title_fr == 'title fr'
     assert vote.short_title_de == 'short title de'
     assert vote.short_title_fr == 'short title fr'
+    assert vote.short_title_en == 'short title en'
     assert vote.keyword == 'keyword'
     assert vote.legal_form == 'Direct counter-proposal'
     assert vote.get_recommendation('fdp') == 'Neutral'
@@ -1084,6 +1099,7 @@ def test_model_column_mapper_dataset():
     assert mapper.get_value(vote, 'title_fr') == 'title fr'
     assert mapper.get_value(vote, 'short_title_de') == 'short title de'
     assert mapper.get_value(vote, 'short_title_fr') == 'short title fr'
+    assert mapper.get_value(vote, 'short_title_en') == 'short title en'
     assert mapper.get_value(vote, 'keyword') == 'keyword'
     assert mapper.get_value(vote, '_legal_form') == 4
     assert mapper.get_value(vote, '!i!recommendations!fdp') == 66
@@ -1091,11 +1107,12 @@ def test_model_column_mapper_dataset():
         'http://a.b'
     )
 
-    assert list(mapper.get_values(vote))[:21] == [
+    assert list(mapper.get_values(vote))[:22] == [
         Decimal('100.1'),
         date(2019, 1, 1),
         'short title de',
         'short title fr',
+        'short title en',
         'title de',
         'title fr',
         'keyword',
@@ -1114,11 +1131,12 @@ def test_model_column_mapper_dataset():
         None,
         None,
     ]
-    assert list(mapper.get_items(vote))[:21] == [
+    assert list(mapper.get_items(vote))[:22] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
         ('short_title_de', 'short title de'),
         ('short_title_fr', 'short title fr'),
+        ('short_title_en', 'short title en'),
         ('title_de', 'title de'),
         ('title_fr', 'title fr'),
         ('keyword', 'keyword'),
@@ -1137,11 +1155,12 @@ def test_model_column_mapper_dataset():
         ('descriptor_3_level_3', None),
         ('_position_federal_council', None),
     ]
-    assert list(mapper.items())[:21] == [
+    assert list(mapper.items())[:22] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
         ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
         ('short_title_fr', 'titel_kurz_f', 'TEXT', False, None, None),
+        ('short_title_en', 'titel_kurz_e', 'TEXT', True, None, None),
         ('title_de', 'titel_off_d', 'TEXT', False, None, None),
         ('title_fr', 'titel_off_f', 'TEXT', False, None, None),
         ('keyword', 'stichwort', 'TEXT', True, None, None),
@@ -1166,7 +1185,7 @@ def test_model_column_mapper_dataset():
         ('descriptor_3_level_3', 'd3e3', 'NUMERIC(8, 4)', True, 8, 4),
         ('_position_federal_council', 'br-pos', 'INTEGER', True, None, None),
     ]
-    assert list(mapper.items())[297] == (
+    assert list(mapper.items())[299] == (
         '!i!recommendations_divergent!gps_ar', 'pdev-gps_AR', 'INTEGER',
         True, None, None
     )
@@ -1241,7 +1260,8 @@ def test_model_column_mapper_metadata():
         ('t:t:doctype!legal', 'Typ RECHTSTEXT', 'TEXT', True, None, None),
         ('t:t:doctype!lecture', 'Typ REFERATSTEXT', 'TEXT', True, None, None),
         ('t:t:doctype!statistics', 'Typ STATISTIK', 'TEXT', True, None, None),
-        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None)
+        ('t:t:doctype!other', 'Typ ANDERES', 'TEXT', True, None, None),
+        ('t:t:doctype!website', 'Typ WEBSITE', 'TEXT', True, None, None)
     ]
 
 
