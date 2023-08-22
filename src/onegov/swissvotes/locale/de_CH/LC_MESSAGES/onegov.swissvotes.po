@@ -68,20 +68,20 @@ msgstr "Botschaft des Bundesrats"
 msgid "Pre-parliamentary phase"
 msgstr "Vorparlamentarische Phase"
 
-msgid "Parliamentary debate"
-msgstr "Parlamentsberatung"
+msgid "Parliamentary initiative"
+msgstr "Parlamentarische Initiative"
 
 msgid "Parliamentary phase"
 msgstr "Im Parlament"
-
-msgid "Parliamentary initiative"
-msgstr "Parlamentarische Initiative"
 
 msgid "Report of the parliamentary committee"
 msgstr "Bericht der parlamentarischen Kommission"
 
 msgid "Opinion of the Federal Council"
 msgstr "Stellungnahme des Bundesrats"
+
+msgid "Parliamentary debate"
+msgstr "Parlamentsberatung"
 
 msgid "Voting booklet"
 msgstr "Offizielles Abstimmungsbüchlein"
@@ -1649,11 +1649,11 @@ msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
 "möchten."
 
-msgid "Swissvotes on Mastodon"
-msgstr "Swissvotes bei Mastodon"
-
 msgid "Files"
 msgstr "Dateien"
+
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes bei Mastodon"
 
 msgid "Patrons"
 msgstr "Gönner:innen"
@@ -1697,8 +1697,8 @@ msgstr "Abstimmungsdatum"
 msgid "and ${number} out of ${total} votes of the Cantons"
 msgstr "und ${number} von ${total} Standesstimmen"
 
-msgid "Yeas"
-msgstr "Ja-Stimmen"
+msgid "% Yes votes"
+msgstr "% Ja-Stimmen"
 
 msgid "Vote number"
 msgstr "Abstimmungsnummer"

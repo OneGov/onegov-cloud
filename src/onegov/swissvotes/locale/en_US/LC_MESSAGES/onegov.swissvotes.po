@@ -66,20 +66,20 @@ msgstr "Federal Council dispatch"
 msgid "Pre-parliamentary phase"
 msgstr "Pre-parliamentary phase"
 
-msgid "Parliamentary debate"
-msgstr "Parliamentary debate"
+msgid "Parliamentary initiative"
+msgstr "Parliamentary initiative"
 
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
-
-msgid "Parliamentary initiative"
-msgstr "Parliamentary initiative"
 
 msgid "Report of the parliamentary committee"
 msgstr "Report of the parliamentary committee"
 
 msgid "Opinion of the Federal Council"
 msgstr "Opinion of the Federal Council"
+
+msgid "Parliamentary debate"
+msgstr "Parliamentary debate"
 
 msgid "Voting booklet"
 msgstr "Official explanatory brochure"
@@ -1692,11 +1692,11 @@ msgstr "Click the following link to set a new password:"
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr "If you don't want to change your password, you can ignore this email."
 
-msgid "Swissvotes on Mastodon"
-msgstr "Swissvotes on Mastodon"
-
 msgid "Files"
 msgstr "Files"
+
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes on Mastodon"
 
 msgid "Patrons"
 msgstr "Sponsors"
@@ -1740,8 +1740,8 @@ msgstr "Voting day"
 msgid "and ${number} out of ${total} votes of the Cantons"
 msgstr "and ${number} out of ${total} votes of the Cantons"
 
-msgid "Yeas"
-msgstr "Yes votes"
+msgid "% Yes votes"
+msgstr "% Yes votes"
 
 msgid "Vote number"
 msgstr "Vote Nº"
