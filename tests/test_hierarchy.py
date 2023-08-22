@@ -5,9 +5,7 @@ from pathlib import Path
 from onegov.core import LEVELS
 
 
-# HACK: we reference the email_validator_environment fixture here because
-#       for some reason it does not get executed for `store-durations`
-def test_hierarchy(email_validator_environment):
+def test_hierarchy():
     """ Originally, onegov.* modules were separated into separate repositories
     and deployed individually to PyPI.
 
