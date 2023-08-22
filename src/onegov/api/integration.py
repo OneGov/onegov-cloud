@@ -8,6 +8,14 @@ if TYPE_CHECKING:
 
 class ApiApp(App):
 
+    if TYPE_CHECKING:
+        # forward declare Framework.get_cache
+        def get_cache(
+            self,
+            name: str,
+            expiration_time: float
+        ) -> cache.RedisCacheRegion: ...
+
     def configure_api(self, **cfg: Any) -> None:
         """ Configures the API.
 
