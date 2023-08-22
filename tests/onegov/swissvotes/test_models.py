@@ -327,6 +327,7 @@ def test_model_vote(session, sample_vote):
     vote = session.query(SwissVote).one()
     assert vote.id == 1
     assert vote.bfs_number == Decimal('100.10')
+    assert vote.number_of_cantons == 22
     assert vote.date == date(1990, 6, 2)
     assert vote.title_de == "Vote DE"
     assert vote.title_fr == "Vote FR"
