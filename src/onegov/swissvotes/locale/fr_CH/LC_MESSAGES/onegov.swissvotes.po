@@ -152,6 +152,9 @@ msgstr "Aucune clé API eMuseum n’est disponible."
 msgid "Title"
 msgstr "Titre"
 
+msgid "Show Mastodon timeline"
+msgstr "Afficher la chronologie de Mastodon"
+
 msgid "Content"
 msgstr "Contenu"
 
@@ -1652,6 +1655,9 @@ msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
 "message."
+
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes sur Mastodon"
 
 msgid "Files"
 msgstr "Fichiers"
