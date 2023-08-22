@@ -138,3 +138,6 @@ def test_switch_languages(client):
     assert 'Tedesco' in page
     assert 'Allemand' not in page
     assert 'Deutsch' not in page
+
+
+

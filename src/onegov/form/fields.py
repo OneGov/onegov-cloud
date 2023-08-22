@@ -580,7 +580,7 @@ class PanelField(Field):
 
 
 class DateTimeLocalField(DateTimeLocalFieldBase):
-    """ A custom implementation of the DateTimeLocalField to fix issues with
+    """ A custom imlementation of the DateTimeLocalField to fix issues with
     the format and the datetimepicker plugin.
 
     """

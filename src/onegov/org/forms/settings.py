@@ -4,6 +4,9 @@ import re
 
 from functools import cached_property
 from lxml import etree
+from sedate import utcnow
+from wtforms import DateField
+from wtforms.fields import SelectField
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
@@ -13,6 +16,7 @@ from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
+from onegov.form.widgets import DateRangeInput
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -1081,3 +1085,21 @@ class EventSettingsForm(Form):
         description=_('Enables website visitors to submit their own events'),
         default=True
     )
+
+
+class TicketDeletionForm(Form):
+
+    """How long ticket should be kept before they are archived, and before
+    they are deleted."""
+
+    relative_time_for_auto_archive = SelectField(
+        label=_('The time span from ticket creation to archiving'),
+        choices=[
+            (utcnow() + datetime.timedelta(minutes=1), _("1 minute")),
+            # for test
+            (utcnow() + datetime.timedelta(days=180), _("6 months")),
+            (utcnow() + datetime.timedelta(days=365), _("1 year")),
+            (utcnow() + datetime.timedelta(days=730), ("2 years")),
+        ],
+    )
+

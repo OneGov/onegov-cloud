@@ -731,7 +731,9 @@ def test_redact_tickets(client):
             (x) Ich möchte die Bestellung am Schalter abholen.
             ( ) Ich möchte die Bestellung mittels Post erhalten. (5 CHF!) """)
 
-    manage.form.submit()
+    page = manage.form.submit()
+
+    client.logout()
 
     # open a ticket
     page = client.get('/form/newsletter')

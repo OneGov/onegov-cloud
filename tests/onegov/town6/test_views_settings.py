@@ -58,3 +58,10 @@ def test_api_keys_create_and_delete(client):
     client.delete(link)
     # should be gone
     assert client.app.session().query(ApiKey).first() is None
+
+
+
+def test_all_settings_are_reachable(client):
+    # This test should catch missing views, eg. where the wrapper is missing
+    pass
+
