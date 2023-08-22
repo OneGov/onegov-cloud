@@ -9,6 +9,7 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 from sqlalchemy import Text
+from typing_extensions import Self
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
@@ -131,7 +132,7 @@ class ApiEndpoint:
         self.page = int(page) if page else page
         self.batch_size = 100
 
-    def for_page(self, page: int | None) -> 'ApiEndpoint | None':
+    def for_page(self, page: int | None) -> 'Self | None':
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
@@ -139,7 +140,7 @@ class ApiEndpoint:
 
         return self.__class__(self.app, self.extra_parameters, page)
 
-    def for_filter(self, **filters: Any) -> 'ApiEndpoint':
+    def for_filter(self, **filters: Any) -> 'Self':
         """ Return a new endpoint instance with the given filters while
         discarding the current filters and page.
 
@@ -168,11 +169,11 @@ class ApiEndpoint:
             return default
         return self.extra_parameters[name] or empty
 
-    def by_id(self, id_: 'PKType') -> Any | None:
+    def by_id(self, id: 'PKType') -> Any | None:
         """ Return the item with the given ID from the collection. """
 
         try:
-            return self.__class__(self.app).collection.by_id(id_)
+            return self.__class__(self.app).collection.by_id(id)
         except SQLAlchemyError:
             return None
 
@@ -181,7 +182,7 @@ class ApiEndpoint:
         return self.app.session()
 
     @property
-    def links(self) -> dict[str, 'ApiEndpoint | None']:
+    def links(self) -> dict[str, 'Self | None']:
         """ Returns a dictionary with pagination instances. """
 
         result: dict[str, 'ApiEndpoint | None'] = {'prev': None, 'next': None}
@@ -234,7 +235,7 @@ class ApiEndpoint:
         raise NotImplementedError()
 
     @property
-    def collection(self) -> 'PaginatedGenericCollection[_M]':
+    def collection(self) -> Any:
         """ Return an instance of the collection with filters and page set.
         """
 
