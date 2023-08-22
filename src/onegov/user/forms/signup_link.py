@@ -53,6 +53,7 @@ class SignupLinkForm(Form):
             'month': 60 * 60 * 24 * 30
         }.get(self.max_age.data, 60 * 60)
 
+        assert self.max_uses.data is not None
         max_uses = int(self.max_uses.data)
 
         return auth.new_signup_token(self.role.data, max_age, max_uses)

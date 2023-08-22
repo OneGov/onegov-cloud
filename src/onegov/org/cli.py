@@ -598,6 +598,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                                 coordinates=event_.coordinates,
                                 organizer=event_.organizer,
                                 organizer_email=event_.organizer_email,
+                                organizer_phone=event_.organizer_phone,
                                 price=event_.price,
                             ),
                             image=(

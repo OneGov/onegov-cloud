@@ -38,7 +38,7 @@
                                 <span tal:condition="entry.number" class="entry-number">${entry.number}. </span>${entry.title}
                             </a><metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
-                            <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                            <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
                                 <div class="list-lead">
                                     <tal:b condition="custom_lead" replace="structure custom_lead" />
                                     <tal:b condition="not:custom_lead" replace="entry.lead" />
@@ -57,9 +57,9 @@
 
             <div class="columns medium-4">
 
-                <div class="row" tal:condition="searchwidget">
+                <div class="row" tal:condition="search_widget">
                     <div class="columns medium-12">
-                        <tal:b replace="structure searchwidget.html(layout)" />
+                        <tal:b replace="structure search_widget.html(layout)" />
                     </div>
                 </div>
 

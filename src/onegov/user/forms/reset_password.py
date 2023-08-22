@@ -44,11 +44,17 @@ class PasswordResetForm(Form):
 
         Returns True if successful, False if not successful.
         """
-        data = request.load_url_safe_token(self.token.data, max_age=86400)
+        data = request.load_url_safe_token(
+            self.token.data or '',
+            max_age=86400
+        )
 
         if not data or not data.get('username') or 'modified' not in data:
             return False
 
+        # this should be true if the form has been validated
+        assert self.email.data is not None
+        assert self.password.data is not None
         if data['username'].lower() != self.email.data.lower():
             return False
 

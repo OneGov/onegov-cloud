@@ -8,6 +8,9 @@ from websockets.legacy.server import serve
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.core.types import JSONObject
+    from onegov.core.types import JSONObject_ro
     from websockets.legacy.server import WebSocketServerProtocol
 
 
@@ -15,7 +18,10 @@ CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
 TOKEN = ''  # nosec: B105
 
 
-def get_payload(message, expected):
+def get_payload(
+    message: str | bytes,
+    expected: 'Collection[str]'
+) -> 'JSONObject | None':
     """ Deserialize JSON payload and check type. """
 
     try:
@@ -24,9 +30,14 @@ def get_payload(message, expected):
         return payload
     except Exception:
         log.warning('Invalid payload received')
+        return None
 
 
-async def error(websocket, message, close=True):
+async def error(
+    websocket: 'WebSocketServerProtocol',
+    message: str,
+    close: bool = True
+) -> None:
     """ Sends an error. """
 
     await websocket.send(
@@ -39,7 +50,7 @@ async def error(websocket, message, close=True):
         await websocket.close()
 
 
-async def acknowledge(websocket):
+async def acknowledge(websocket: 'WebSocketServerProtocol') -> None:
     """ Sends an acknowledge. """
 
     await websocket.send(
@@ -49,7 +60,10 @@ async def acknowledge(websocket):
     )
 
 
-async def handle_listen(websocket, payload):
+async def handle_listen(
+    websocket: 'WebSocketServerProtocol',
+    payload: 'JSONObject_ro'
+) -> None:
     """ Handles listening clients. """
 
     assert payload.get('type') == 'register'
@@ -78,7 +92,10 @@ async def handle_listen(websocket, payload):
             connections.remove(websocket)
 
 
-async def handle_authentication(websocket, payload):
+async def handle_authentication(
+    websocket: 'WebSocketServerProtocol',
+    payload: 'JSONObject_ro'
+) -> None:
     """ Handles authentication. """
 
     assert payload.get('type') == 'authenticate'
@@ -96,7 +113,10 @@ async def handle_authentication(websocket, payload):
     log.debug(f'{websocket.id} authenticated')
 
 
-async def handle_status(websocket, payload):
+async def handle_status(
+    websocket: 'WebSocketServerProtocol',
+    payload: 'JSONObject_ro'
+) -> None:
     """ Handles status requests. """
 
     assert payload.get('type') == 'status'
@@ -118,7 +138,10 @@ async def handle_status(websocket, payload):
     log.debug(f'{websocket.id} status sent')
 
 
-async def handle_broadcast(websocket, payload):
+async def handle_broadcast(
+    websocket: 'WebSocketServerProtocol',
+    payload: 'JSONObject_ro'
+) -> None:
     """ Handles broadcasts. """
 
     assert payload.get('type') == 'broadcast'
@@ -155,10 +178,13 @@ async def handle_broadcast(websocket, payload):
     )
 
 
-async def handle_manage(websocket, payload):
+async def handle_manage(
+    websocket: 'WebSocketServerProtocol',
+    authentication_payload: 'JSONObject_ro'
+) -> None:
     """ Handles managing clients. """
 
-    await handle_authentication(websocket, payload)
+    await handle_authentication(websocket, authentication_payload)
 
     async for message in websocket:
         payload = get_payload(message, ('broadcast', 'status'))
@@ -167,10 +193,14 @@ async def handle_manage(websocket, payload):
         elif payload and payload['type'] == 'status':
             await handle_status(websocket, payload)
         else:
-            await error(websocket, f'invalid command: {message}')
+            await error(
+                websocket,
+                # FIXME: technically message can be bytes
+                f'invalid command: {message}'  # type:ignore
+            )
 
 
-async def handle_start(websocket):
+async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
     payload = get_payload(message, ('authenticate', 'register'))
@@ -179,11 +209,12 @@ async def handle_start(websocket):
     elif payload and payload['type'] == 'register':
         await handle_listen(websocket, payload)
     else:
-        await error(websocket, f'invalid command: {message}')
+        # FIXME: technically message can be bytes
+        await error(websocket, f'invalid command: {message}')  # type:ignore
     log.debug(f'{websocket.id} disconnected')
 
 
-async def main(host, port, token):
+async def main(host: str, port: int, token: str) -> None:
     global TOKEN
     TOKEN = token
     log.debug(f'Serving on ws://{host}:{port}')

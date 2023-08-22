@@ -316,9 +316,6 @@ class ElectionForm(Form):
         label=_('Colors'),
         fieldset=_("Colors"),
         render_kw={'rows': 12},
-        description=(
-
-        )
     )
 
     def parse_colors(self, text):

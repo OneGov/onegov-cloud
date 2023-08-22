@@ -70,6 +70,7 @@ def test_votes(swissvotes_app):
             title_fr="Vote FR",
             short_title_de="V D",
             short_title_fr="V F",
+            short_title_en="V E",
             _legal_form=1
         )
 
@@ -80,6 +81,7 @@ def test_votes(swissvotes_app):
     assert vote.title_fr == "Vote FR"
     assert vote.short_title_de == "V D"
     assert vote.short_title_fr == "V F"
+    assert vote.short_title_en == "V E"
     assert vote.legal_form == "Mandatory referendum"
 
     assert votes.last_modified == datetime(2019, 1, 1, 10, tzinfo=utc)
@@ -154,6 +156,7 @@ def test_votes_pagination(swissvotes_app):
             title_fr="Vote",
             short_title_de="Vote",
             short_title_fr="Vote",
+            short_title_en="Vote",
             _legal_form=1
         )
 
@@ -190,6 +193,7 @@ def test_votes_term_filter(swissvotes_app):
     c_title_fr = "to_tsvector('french', swissvotes.title_fr)"
     c_short_title_de = "to_tsvector('german', swissvotes.short_title_de)"
     c_short_title_fr = "to_tsvector('french', swissvotes.short_title_fr)"
+    c_short_title_en = "to_tsvector('english', swissvotes.short_title_en)"
     c_keyword = "to_tsvector('german', swissvotes.keyword)"
     c_initiator = "to_tsvector('german', swissvotes.initiator)"
     c_text_de = 'swissvotes."searchable_text_de_CH"'
@@ -204,6 +208,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '987')",
         f"{c_short_title_de} @@ to_tsquery('german', '987')",
         f"{c_short_title_fr} @@ to_tsquery('french', '987')",
+        f"{c_short_title_en} @@ to_tsquery('english', '987')",
         f"{c_keyword} @@ to_tsquery('german', '987')",
     ]
 
@@ -214,6 +219,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '17.060')",
         f"{c_short_title_de} @@ to_tsquery('german', '17.060')",
         f"{c_short_title_fr} @@ to_tsquery('french', '17.060')",
+        f"{c_short_title_en} @@ to_tsquery('english', '17.060')",
         f"{c_keyword} @@ to_tsquery('german', '17.060')",
     ]
 
@@ -222,6 +228,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '17.12.2004')",
         f"{c_short_title_de} @@ to_tsquery('german', '17.12.2004')",
         f"{c_short_title_fr} @@ to_tsquery('french', '17.12.2004')",
+        f"{c_short_title_en} @@ to_tsquery('english', '17.12.2004')",
         f"{c_keyword} @@ to_tsquery('german', '17.12.2004')",
     ]
 
@@ -231,6 +238,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '1893002')",
         f"{c_short_title_de} @@ to_tsquery('german', '1893002')",
         f"{c_short_title_fr} @@ to_tsquery('french', '1893002')",
+        f"{c_short_title_en} @@ to_tsquery('english', '1893002')",
         f"{c_keyword} @@ to_tsquery('german', '1893002')",
     ]
 
@@ -239,6 +247,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_short_title_de} @@ to_tsquery('german', 'abc')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
     ]
     assert compiled(term='abc', full_text=True) == [
@@ -246,6 +255,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_short_title_de} @@ to_tsquery('german', 'abc')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
         f"{c_initiator} @@ to_tsquery('german', 'abc')",
         f"{c_text_de} @@ to_tsquery('german', 'abc')",
@@ -259,6 +269,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'Müller')",
         f"{c_short_title_de} @@ to_tsquery('german', 'Müller')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'Müller')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'Müller')",
         f"{c_keyword} @@ to_tsquery('german', 'Müller')",
     ]
 
@@ -267,6 +278,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', '20,20')",
         f"{c_short_title_de} @@ to_tsquery('german', '20,20')",
         f"{c_short_title_fr} @@ to_tsquery('french', '20,20')",
+        f"{c_short_title_en} @@ to_tsquery('english', '20,20')",
         f"{c_keyword} @@ to_tsquery('german', '20,20')",
     ]
 
@@ -275,6 +287,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'Neu')",
         f"{c_short_title_de} @@ to_tsquery('german', 'Neu')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'Neu')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'Neu')",
         f"{c_keyword} @@ to_tsquery('german', 'Neu')",
     ]
 
@@ -283,6 +296,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'H <-> P <-> Müller')",
         f"{c_short_title_de} @@ to_tsquery('german', 'H <-> P <-> Müller')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'H <-> P <-> Müller')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'H <-> P <-> Müller')",
         f"{c_keyword} @@ to_tsquery('german', 'H <-> P <-> Müller')",
     ]
 
@@ -291,6 +305,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'x <-> AND <-> y')",
         f"{c_short_title_de} @@ to_tsquery('german', 'x <-> AND <-> y')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'x <-> AND <-> y')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'x <-> AND <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'x <-> AND <-> y')",
     ]
 
@@ -299,6 +314,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'x <-> y')",
         f"{c_short_title_de} @@ to_tsquery('german', 'x <-> y')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'x <-> y')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'x <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'x <-> y')",
     ]
 
@@ -307,6 +323,7 @@ def test_votes_term_filter(swissvotes_app):
         f"{c_title_fr} @@ to_tsquery('french', 'y <-> y')",
         f"{c_short_title_de} @@ to_tsquery('german', 'y <-> y')",
         f"{c_short_title_fr} @@ to_tsquery('french', 'y <-> y')",
+        f"{c_short_title_en} @@ to_tsquery('english', 'y <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'y <-> y')",
     ]
 
@@ -321,6 +338,7 @@ def test_votes_query(swissvotes_app):
         title_fr="Vote sur cette question",
         short_title_de="diese Sache",
         short_title_fr="cette question",
+        short_title_en="this thing",
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -344,6 +362,7 @@ def test_votes_query(swissvotes_app):
         title_fr="Nous voulons cette version de la chose",
         short_title_de="diese Version",
         short_title_fr="cette version",
+        short_title_en="that version",
         keyword="Variant A of X",
         initiator="The group that wants something",
         _legal_form=2,
@@ -366,6 +385,7 @@ def test_votes_query(swissvotes_app):
         title_fr="Nous voulons encore une autre version de la chose",
         short_title_de="Nochmals etwas anderes",
         short_title_fr="encore une autre version",
+        short_title_en="something else again",
         keyword="Variant B of X",
         _legal_form=2,
         descriptor_3_level_1=Decimal('8'),
@@ -442,6 +462,8 @@ def test_votes_query(swissvotes_app):
     assert count(term='cette question') == 1
     assert count(term='version') == 2
     assert count(term='encore') == 1
+    assert count(term='thing') == 1
+    assert count(term='something') == 1
     assert count(term='riant') == 0
     assert count(term='A of X') == 1
     assert count(term='group') == 0
@@ -494,6 +516,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="Vote on that one thing",
         short_title_de="Vote on that one thing",
         short_title_fr="Vote on that one thing",
+        short_title_en="Vote on that one thing",
         _legal_form=1,
     )
     votes.add(
@@ -504,6 +527,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="We want this version the thing",
         short_title_de="We want this version the thing",
         short_title_fr="We want this version the thing",
+        short_title_en="We want this version the thing",
         _legal_form=2,
     )
     vote = votes.add(
@@ -514,6 +538,7 @@ def test_votes_query_attachments(swissvotes_app, attachments,
         title_fr="We want that version of the thing",
         short_title_de="We want that version of the thing",
         short_title_fr="We want that version of the thing",
+        short_title_en="We want that version of the thing",
         _legal_form=2,
     )
     for name, attachment in attachments.items():
@@ -556,7 +581,7 @@ def test_votes_order(swissvotes_app):
             title_fr=''.join(reversed(title)),
             short_title_de=title,
             short_title_fr=''.join(reversed(title)),
-
+            short_title_en=''.join(reversed(title)),
             _legal_form=index,
             _result=index,
             result_people_yeas_p=index / 10,
@@ -700,6 +725,7 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        short_title_en="Vote",
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
         descriptor_1_level_2=Decimal('4.2'),
@@ -719,6 +745,7 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        short_title_en="Vote",
         _legal_form=1,
         descriptor_1_level_1=Decimal('10'),
         descriptor_1_level_2=Decimal('10.3'),
@@ -735,6 +762,7 @@ def test_votes_available_descriptors(swissvotes_app):
         title_fr="Vote",
         short_title_de="Vote",
         short_title_fr="Vote",
+        short_title_en="Vote",
         _legal_form=1,
         descriptor_3_level_1=Decimal('8'),
         descriptor_3_level_2=Decimal('8.3'),
@@ -758,6 +786,7 @@ def test_votes_update(swissvotes_app):
             title_fr="First",
             short_title_de="First",
             short_title_fr="First",
+            short_title_en="First",
             _legal_form=1,
         ),
         SwissVote(
@@ -767,6 +796,7 @@ def test_votes_update(swissvotes_app):
             title_fr="Second",
             short_title_de="Second",
             short_title_fr="Second",
+            short_title_en="Second",
             _legal_form=1,
         )
     ])
@@ -782,6 +812,7 @@ def test_votes_update(swissvotes_app):
             title_fr="First",
             short_title_de="First",
             short_title_fr="First",
+            short_title_en="First",
             _legal_form=1,
         )
     ])
@@ -796,6 +827,7 @@ def test_votes_update(swissvotes_app):
             title_fr="First vote",
             short_title_de="First vote",
             short_title_fr="First vote",
+            short_title_en="First vote",
             _legal_form=1,
         )
     ])
@@ -813,6 +845,7 @@ def test_votes_update_metadata(swissvotes_app):
         title_fr="First",
         short_title_de="First",
         short_title_fr="First",
+        short_title_en="First",
         _legal_form=1,
     )
     vote_2 = votes.add(
@@ -822,6 +855,7 @@ def test_votes_update_metadata(swissvotes_app):
         title_fr="Second",
         short_title_de="Second",
         short_title_fr="Second",
+        short_title_en="Second",
         _legal_form=1,
     )
 
@@ -871,8 +905,10 @@ def test_votes_export(swissvotes_app):
         title_fr="Vote FR",
         short_title_de="V D",
         short_title_fr="V F",
+        short_title_en="V E",
         keyword="Keyword",
         _legal_form=1,
+        _parliamentary_initiated=1,
         initiator="Initiator",
         anneepolitique="anneepolitique",
         descriptor_1_level_1=Decimal('4'),
@@ -1462,6 +1498,8 @@ def test_votes_export(swissvotes_app):
     vote.bfs_map_fr = 'map fr'
     vote.link_curia_vista_de = 'https://curia.vista/de'
     vote.link_curia_vista_fr = 'https://curia.vista/fr'
+    vote.link_easyvote_de = 'https://easy.vote/de'
+    vote.link_easyvote_fr = 'https://easy.vote/fr'
     vote.link_bk_results_de = 'https://bk.results/de'
     vote.link_bk_results_fr = 'https://bk.results/fr'
     vote.link_bk_chrono_de = 'https://bk.chrono/de'
@@ -1515,9 +1553,11 @@ def test_votes_export(swissvotes_app):
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',
         'titel_kurz_f': 'V F',
+        'titel_kurz_e': 'V E',
         'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
         'rechtsform': '1',
+        'pa-iv': '1',
         'd1e1': '4',
         'd1e2': '4,2',
         'd1e3': '4,21',
@@ -1546,6 +1586,8 @@ def test_votes_export(swissvotes_app):
         'bs-annahme': '0',
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
+        'easyvideo_de': 'https://easy.vote/de',
+        'easyvideo_fr': 'https://easy.vote/fr',
         'info_br-de': 'https://federal.council/de',
         'info_br-fr': 'https://federal.council/fr',
         'info_br-en': 'https://federal.council/en',
@@ -2158,9 +2200,11 @@ def test_votes_export(swissvotes_app):
         'titel_off_f': 'Vote FR',
         'titel_kurz_d': 'V D',
         'titel_kurz_f': 'V F',
+        'titel_kurz_e': 'V E',
         'kurzbetitel': 'Kurzbeschreibung',
         'stichwort': 'Keyword',
         'rechtsform': 1.0,
+        'pa-iv': 1.0,
         'd1e1': 4.0,
         'd1e2': 4.2,
         'd1e3': 4.21,
@@ -2189,6 +2233,8 @@ def test_votes_export(swissvotes_app):
         'bs-annahme': 0.0,
         'curiavista-de': 'https://curia.vista/de',
         'curiavista-fr': 'https://curia.vista/fr',
+        'easyvideo_de': 'https://easy.vote/de',
+        'easyvideo_fr': 'https://easy.vote/fr',
         'info_br-de': 'https://federal.council/de',
         'info_br-fr': 'https://federal.council/fr',
         'info_br-en': 'https://federal.council/en',
