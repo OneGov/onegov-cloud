@@ -33,6 +33,7 @@ module = [
     "onegov.file.*",
     "onegov.form.*",
     "onegov.gever.*",
+    "onegov.gis.*",
     "onegov.newsletter.*",
     "onegov.notice.*",
     "onegov.page.*",
