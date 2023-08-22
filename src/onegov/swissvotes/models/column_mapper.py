@@ -56,6 +56,7 @@ class ColumnMapperDataset:
             ('duration_initative_collection', 'i-dauer_samm'),
             ('duration_referendum_collection', 'fr-dauer_samm'),
             ('signatures_valid', 'unter_g'),
+            ('_parliamentary_initiated', 'pa-iv'),
             ('initiator', 'urheber'),
             ('!i!recommendations!fdp', 'p-fdp'),
             ('!i!recommendations!cvp', 'p-cvp'),

@@ -128,6 +128,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (5, _("Tie-breaker")),
             ))
 
+        if attribute == 'parliamentary_initiated':
+            return OrderedDict((
+                (0, _("No")),
+                (1, _("Yes")),
+                (None, _("No")),
+            ))
+
         if attribute == 'result' or attribute.endswith('_accepted'):
             return OrderedDict((
                 (0, _("Rejected")),
@@ -219,6 +226,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     brief_description_title = Column(Text)
     keyword = Column(Text)
     legal_form = encoded_property(nullable=False)
+    parliamentary_initiated = encoded_property()
     initiator = Column(Text)
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
@@ -624,6 +632,27 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         static_views={
             'de_CH': 'botschaft-de.pdf',
             'fr_CH': 'botschaft-fr.pdf',
+        }
+    )
+    parliamentary_initiative = LocalizedFile(
+        label=_('Parliamentary initiative'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'parlamentarische-initiative.pdf',
+        }
+    )
+    parliamentary_committee_report = LocalizedFile(
+        label=_('Report of the parliamentary committee'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'bericht-parlamentarische-kommission.pdf',
+        }
+    )
+    federal_council_opinion = LocalizedFile(
+        label=_('Opinion of the Federal Council'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'stellungnahme-bundesrat.pdf',
         }
     )
     parliamentary_debate = LocalizedFile(

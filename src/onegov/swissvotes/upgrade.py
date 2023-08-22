@@ -576,6 +576,14 @@ def add_english_short_title_column(context):
         )
 
 
+@upgrade_task('Adds parliamentary initiative')
+def add_parliamentary_initiative(context):
+    if not context.has_column('swissvotes', 'parliamentary_initiated'):
+        context.operations.add_column(
+            'swissvotes', Column('parliamentary_initiated', Integer())
+        )
+
+
 @upgrade_task('Adds meta to pages')
 def add_meta_to_pages(context):
 
