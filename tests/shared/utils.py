@@ -27,7 +27,7 @@ def get_meta(page, property, returns='content', index=0):
 
 
 def encode_map_value(dictionary):
-    return b64encode(json.dumps(dictionary).encode('utf-8'))
+    return b64encode(json.dumps(dictionary).encode('utf-8')).decode('ascii')
 
 
 def decode_map_value(value):
