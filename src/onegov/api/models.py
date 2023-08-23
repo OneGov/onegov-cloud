@@ -16,11 +16,12 @@ from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.user import User
 
 
-from typing import TYPE_CHECKING, Any, Type
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from onegov.core import Framework
     from sqlalchemy.orm import Session
-    from onegov.core.collection import PKType, _M
+    from onegov.core.collection import PKType
+    from onegov.core.collection import _M
     from onegov.core.types import PaginatedGenericCollection
     import uuid
     from datetime import datetime
@@ -124,7 +125,7 @@ class ApiEndpoint:
     def __init__(
         self,
         app: 'Framework',
-        extra_parameters: dict[str, Any] | None = None,
+        extra_parameters: dict[str, 'str | int | None'] | None = None,
         page: int | None = None,
     ):
         self.app = app
@@ -161,15 +162,22 @@ class ApiEndpoint:
         return ApiEndpointItem(self.app, self.endpoint, target)
 
     def get_filter(
-        self, name: str, default: None = None, empty: None = None
-    ) -> int | None:
+        self, name: str, default: 'int | None' = None, empty: 'int | None' =
+        None
+    ) -> 'str | int | None':
+
         """Returns the filter value with the given name."""
 
-        if name not in self.extra_parameters:
-            return default
-        return self.extra_parameters[name] or empty
+        filter_value = self.extra_parameters.get(name)
 
-    def by_id(self, id: 'PKType') -> Any | None:
+        if filter_value is not None:
+            return filter_value
+        elif filter_value is None and default is not None:
+            return default
+        else:
+            return empty
+
+    def by_id(self, id: 'PKType') -> '_M | None':
         """ Return the item with the given ID from the collection. """
 
         try:
@@ -185,7 +193,7 @@ class ApiEndpoint:
     def links(self) -> dict[str, 'Self | None']:
         """ Returns a dictionary with pagination instances. """
 
-        result: dict[str, 'ApiEndpoint | None'] = {'prev': None, 'next': None}
+        result: dict[str, 'Self | None'] = {'prev': None, 'next': None}
 
         previous = self.collection.previous
         if previous:
@@ -235,7 +243,7 @@ class ApiEndpoint:
         raise NotImplementedError()
 
     @property
-    def collection(self) -> Any:
+    def collection(self) -> 'PaginatedGenericCollection[Any]':
         """ Return an instance of the collection with filters and page set.
         """
 
