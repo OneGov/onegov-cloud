@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from _typeshed import SupportsItems
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from sqlalchemy import Column
-    from abc import abstractmethod
     from functools import cached_property
     from sqlalchemy.orm import Query
     from uuid import UUID
@@ -70,7 +69,7 @@ if TYPE_CHECKING:
 
     class PaginatedGenericCollection(Protocol[_M]):
         """ Intersection type of GenericCollection and Pagination, as
-          implemented by for example:
+          implemented by, for example:
           PaginatedAgencyCollection(GenericCollection, Pagination)"""
 
         # GenericCollection
@@ -118,12 +117,10 @@ if TYPE_CHECKING:
             ...
 
         @property
-        @abstractmethod
-        def page(self) -> int:
+        def page(self) -> 'int | None':
             ...
 
         @page.setter
-        @abstractmethod
         def page(self, value: int) -> None:
             ...
 

@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from morepath.request import Response
+    from onegov.core.collection import _M
 
 
 @ApiApp.json(model=ApiException, permission=Public)
@@ -71,7 +72,7 @@ def view_api_endpoints(
     permission=Public
 )
 def view_api_endpoint(
-    self: ApiEndpoint, request: 'CoreRequest'
+    self: 'ApiEndpoint[_M]', request: 'CoreRequest'
 ) -> dict[str, Any]:
 
     headers = check_rate_limit(request)

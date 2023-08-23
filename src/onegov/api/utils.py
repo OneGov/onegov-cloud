@@ -63,7 +63,7 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     }
 
     @request.after
-    def add_headers(response: Response) -> None:
+    def add_headers(response: 'Response') -> None:
         for header in headers.items():
             response.headers.add(*header)
 

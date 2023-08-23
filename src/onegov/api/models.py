@@ -9,23 +9,21 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 from sqlalchemy import Text
-from typing_extensions import Self
-
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.user import User
+from onegov.core.collection import _M
 
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic
 if TYPE_CHECKING:
     from onegov.core import Framework
     from sqlalchemy.orm import Session
     from onegov.core.collection import PKType
-    from onegov.core.collection import _M
     from onegov.core.types import PaginatedGenericCollection
     import uuid
     from datetime import datetime
-
+    from typing_extensions import Self
 
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
@@ -83,14 +81,16 @@ class ApiEndpointItem:
         self.id = id
 
     @property
-    def api_endpoint(self) -> 'ApiEndpoint | None':
+    def api_endpoint(self) -> 'ApiEndpoint[_M] | None':
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
+        # todo: why is mypy complaining here?
+        # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
         return cls(self.app) if cls else None
 
     @property
-    def item(self) -> 'ApiEndpointItem | None':
+    def item(self) -> '_M | None':
         if self.api_endpoint:
-            return self.api_endpoint.by_id(self.id)
+            return self.api_endpoint.by_id(self.id)  # for. ex. ExtendedAgency
         return None
 
     @property
@@ -106,7 +106,7 @@ class ApiEndpointItem:
         return None
 
 
-class ApiEndpoint:
+class ApiEndpoint(Generic[_M]):
     """ An API endpoint.
 
     API endpoints wrap collection and do some filter mapping.
@@ -149,7 +149,7 @@ class ApiEndpoint:
 
         return self.__class__(self.app, filters)
 
-    def for_item(self, item: 'ApiEndpointItem') -> 'ApiEndpointItem | None':
+    def for_item(self, item: Any | None) -> 'ApiEndpointItem | None':
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
@@ -168,14 +168,9 @@ class ApiEndpoint:
 
         """Returns the filter value with the given name."""
 
-        filter_value = self.extra_parameters.get(name)
-
-        if filter_value is not None:
-            return filter_value
-        elif filter_value is None and default is not None:
+        if name not in self.extra_parameters:
             return default
-        else:
-            return empty
+        return self.extra_parameters[name] or empty
 
     def by_id(self, id: 'PKType') -> '_M | None':
         """ Return the item with the given ID from the collection. """
@@ -243,7 +238,7 @@ class ApiEndpoint:
         raise NotImplementedError()
 
     @property
-    def collection(self) -> 'PaginatedGenericCollection[Any]':
+    def collection(self) -> 'PaginatedGenericCollection[_M]':
         """ Return an instance of the collection with filters and page set.
         """
 
@@ -257,7 +252,7 @@ class ApiEndpointCollection:
         self.app = app
 
     @cached_property
-    def endpoints(self) -> dict[str, type[ApiEndpoint]]:
+    def endpoints(self) -> dict[str, type[ApiEndpoint[_M]]]:
         return {
             endpoint.endpoint: endpoint
             for endpoint in self.app.config.setting_registry.api.endpoints

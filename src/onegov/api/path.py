@@ -3,6 +3,7 @@ from onegov.api.models import ApiEndpoint, AuthEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiException
+from onegov.core.collection import _M
 
 
 from typing import Any, TYPE_CHECKING
@@ -28,7 +29,8 @@ def get_api_endpoint(
     endpoint: str,
     page: int = 0,
     extra_parameters: dict[str, Any] | None = None,
-) -> ApiEndpoint | AuthEndpoint:
+) -> ApiEndpoint[_M] | AuthEndpoint | Any:
+
     if endpoint == 'authenticate':
         return AuthEndpoint(app)
 
@@ -46,6 +48,6 @@ def get_api_endpoint_item(
     app: 'Framework', endpoint: str, id: str
 ) -> ApiEndpointItem:
     item = ApiEndpointItem(app, endpoint, id)
-    if not item.api_endpoint or not item.item:
+    if not item.api_endpoint or not item.item:  # ExtendedAgency
         raise ApiException('Not found', status_code=404)
     return item
