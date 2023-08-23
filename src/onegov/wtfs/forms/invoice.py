@@ -8,6 +8,11 @@ from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.wtfs.models import Invoice
+
+
 class CreateInvoicesForm(Form):
 
     from_date = DateField(
@@ -58,7 +63,7 @@ class CreateInvoicesForm(Form):
         ]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
@@ -72,7 +77,7 @@ class CreateInvoicesForm(Form):
             (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
         ]
 
-    def update_model(self, model):
+    def update_model(self, model: 'Invoice') -> None:
         model.from_date = self.from_date.data
         model.to_date = self.to_date.data
         model.cs2_user = self.cs2_user.data

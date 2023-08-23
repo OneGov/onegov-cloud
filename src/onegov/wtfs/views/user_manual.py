@@ -11,12 +11,18 @@ from onegov.wtfs.security import EditModel
 from onegov.wtfs.security import ViewModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+
+
 @WtfsApp.html(
     model=UserManual,
     template='user_manual.pt',
     permission=ViewModel
 )
-def view_user_manual(self, request):
+def view_user_manual(self: UserManual, request: 'CoreRequest') -> 'RenderData':
     """ View the user manual. """
     layout = UserManualLayout(self, request)
     filesize = naturalsize(self.content_length or 0)
@@ -34,7 +40,11 @@ def view_user_manual(self, request):
     permission=EditModel,
     form=UserManualForm
 )
-def edit_user_manual(self, request, form):
+def edit_user_manual(
+    self: UserManual,
+    request: 'CoreRequest',
+    form: UserManualForm
+) -> 'Response | RenderData':
     """ Edit the user manual """
 
     layout = EditUserManualLayout(self, request)
@@ -60,7 +70,7 @@ def edit_user_manual(self, request, form):
     permission=ViewModel,
     name='pdf'
 )
-def user_manual_pdf(self, request):
+def user_manual_pdf(self: UserManual, request: 'CoreRequest') -> Response:
     if not self.pdf:
         return Response(status='503 Service Unavailable')
 

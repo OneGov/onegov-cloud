@@ -10,17 +10,27 @@ from onegov.wtfs.models import Principal
 from onegov.wtfs.security import ViewModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+
+
 @WtfsApp.html(
     model=Principal,
     template='home.pt',
     permission=Public
 )
-def view_home(self, request):
+def view_home(
+    self: Principal,
+    request: 'CoreRequest'
+) -> 'Response | RenderData':
     """ The home page. """
 
     layout = DefaultLayout(self, request)
 
     if not request.is_logged_in:
+        assert layout.login_url is not None
         return request.redirect(layout.login_url)
 
     if not layout.notifications.query().first():
@@ -35,11 +45,16 @@ def view_home(self, request):
     name='dispatch-dates',
     form=MunicipalityIdSelectionForm
 )
-def view_dispatch_dates(self, request, form):
+def view_dispatch_dates(
+    self: Principal,
+    request: 'CoreRequest',
+    form: MunicipalityIdSelectionForm
+) -> Response | str:
     """ Show dispatches dates for a given municipality. """
 
     if form.submitted(request):
         layout = DefaultLayout(self, request)
+        assert form.municipality is not None
         dates = [
             r.date for r in form.municipality.pickup_dates.filter(
                 PickupDate.date > date.today()

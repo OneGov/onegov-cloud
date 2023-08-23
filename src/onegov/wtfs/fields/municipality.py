@@ -6,27 +6,75 @@ from onegov.wtfs import _
 from wtforms.validators import ValidationError
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from onegov.core.types import FileDict
+    from onegov.form.types import PricingRules
+    from typing_extensions import Self
+    from wtforms.fields.core import _Filter, _Widget
+    from wtforms.form import BaseForm
+    from wtforms.meta import _SupportsGettextAndNgettext, DefaultMeta
+
+
 class MunicipalityDataUploadField(UploadField):
     """ An upload field containg municipality data. """
 
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('validators', [])
-        kwargs['validators'].append(WhitelistedMimeType({'text/plain', }))
-        kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
+    # FIXME: This field is doing some real nasty stuff with post_validate
+    #        modifying data in place, this seems really fragile, we should
+    #        come up with a more robust way to do this
+    data: Any
 
-        kwargs.setdefault('render_kw', {})
-        kwargs['render_kw']['force_simple'] = True
+    if TYPE_CHECKING:
+        def __init__(
+            self,
+            *,
+            label: str | None = None,
+            # FIXME: allow tuple[Validator, ...], but we need to
+            #        change the implementation for that
+            validators: list[Any] | None = None,
+            filters: 'Sequence[_Filter]' = (),
+            description: str = '',
+            id: str | None = None,
+            default: 'Sequence[FileDict]' = (),
+            widget: '_Widget[Self] | None' = None,
+            render_kw: dict[str, Any] | None = None,
+            name: str | None = None,
+            _form: 'BaseForm | None' = None,
+            _prefix: str = '',
+            _translations: '_SupportsGettextAndNgettext | None' = None,
+            _meta: 'DefaultMeta | None' = None,
+            # onegov specific kwargs that get popped off
+            fieldset: str | None = None,
+            depends_on: Sequence[Any] | None = None,
+            pricing: PricingRules | None = None,
+        ): ...
+    else:
+        def __init__(self, *args: Any, **kwargs: Any):
+            kwargs.setdefault('validators', [])
+            kwargs['validators'].append(WhitelistedMimeType({'text/plain', }))
+            kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
 
-        super().__init__(*args, **kwargs)
+            kwargs.setdefault('render_kw', {})
+            kwargs['render_kw']['force_simple'] = True
 
-    def post_validate(self, form, validation_stopped):
+            super().__init__(*args, **kwargs)
+
+    def post_validate(
+        self,
+        form: 'BaseForm',
+        validation_stopped: bool
+    ) -> None:
+
         errors = []
         data = {}
 
         if not self.data:
             raise ValidationError(_("No data"))
 
-        lines = self.file.read().decode('cp1252').split('\r\n')
+        file = self.file
+        assert file is not None
+        lines = file.read().decode('cp1252').split('\r\n')
         for line_number, line in enumerate(lines):
             if not line.strip():
                 continue

@@ -43,7 +43,8 @@ module = [
     "onegov.server.*",
     "onegov.ticket.*",
     "onegov.user.*",
-    "onegov.websockets.*"
+    "onegov.websockets.*",
+    "onegov.wtfs.*"
 ]
 warn_unreachable = true
 disallow_any_generics = true

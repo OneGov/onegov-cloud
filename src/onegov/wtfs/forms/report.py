@@ -64,17 +64,20 @@ class ReportSelectionForm(Form):
         ),
     )
 
-    def ensure_start_end_in_same_year(self):
+    def ensure_start_end_in_same_year(self) -> bool:
         if self.report_type.data == 'boxes':
-            return
+            return True
+
         if self.start.data and self.end.data:
             if self.start.data.year != self.end.data.year:
+                assert isinstance(self.end.errors, list)
                 self.end.errors.append(
                     _('Start and end must be in the same year')
                 )
                 return False
+        return True
 
-    def on_request(self):
+    def on_request(self) -> None:
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
@@ -85,7 +88,14 @@ class ReportSelectionForm(Form):
             (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
         ]
 
-    def get_model(self):
+    def get_model(self) -> (
+        ReportBoxes
+        | ReportBoxesAndForms
+        | ReportFormsByMunicipality
+        | ReportFormsAllMunicipalities
+        | ReportBoxesAndFormsByDelivery
+        | None
+    ):
         if self.report_type.data == 'boxes':
             return ReportBoxes(
                 self.request.session,
@@ -115,6 +125,8 @@ class ReportSelectionForm(Form):
                 type=self.scan_job_type.data,
             )
         if self.report_type.data == 'delivery':
+            assert self.start.data is not None
+            assert self.end.data is not None
             return ReportBoxesAndFormsByDelivery(
                 self.request.session,
                 start=self.start.data,
@@ -122,3 +134,4 @@ class ReportSelectionForm(Form):
                 type=self.scan_job_type.data,
                 municipality_id=self.municipality_id.data
             )
+        return None
