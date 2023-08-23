@@ -569,7 +569,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def has_permission(
         self,
         model: object,
-        permission: 'Intent | None',
+        permission: type['Intent'] | None,
         user: 'UserLike | None' = None
     ) -> bool:
         """ Returns True if the current or given user has the given permission

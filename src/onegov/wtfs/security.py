@@ -2,6 +2,7 @@ import sedate
 
 from datetime import datetime, timedelta
 from onegov.core.security import Public
+from onegov.core.security.permissions import Intent
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.wtfs import WtfsApp
@@ -14,35 +15,40 @@ from onegov.wtfs.models import ScanJob
 from onegov.wtfs.models import UserManual
 
 
-class AddModel:
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from morepath import Identity
+
+
+class AddModel(Intent):
     """ The permission to add a given model. """
 
 
-class AddModelUnrestricted:
+class AddModelUnrestricted(Intent):
     """ The permission to add given model without any restrictions. """
 
 
-class EditModel:
+class EditModel(Intent):
     """ The permission to edit a given model. """
 
 
-class EditModelUnrestricted:
+class EditModelUnrestricted(Intent):
     """ The permission to edit a given model without any restrictions. """
 
 
-class DeleteModel:
+class DeleteModel(Intent):
     """ The permission to delete a given model. """
 
 
-class ViewModel:
+class ViewModel(Intent):
     """ The permission to view a given model. """
 
 
-class ViewModelUnrestricted:
+class ViewModelUnrestricted(Intent):
     """ The permission to view a given model without any restrictions. """
 
 
-def same_group(model, identity):
+def same_group(model: object, identity: 'Identity') -> bool:
     """ Returns True, if the given model is in the same user group/municipality
     as the given identy.
 
@@ -57,9 +63,9 @@ def same_group(model, identity):
 
 
 @WtfsApp.setting_section(section="roles")
-def get_roles_setting():
+def get_roles_setting() -> dict[str, set[type[Intent]]]:
     return {
-        'admin': set((
+        'admin': {
             AddModel,
             AddModelUnrestricted,
             EditModel,
@@ -68,21 +74,26 @@ def get_roles_setting():
             ViewModel,
             ViewModelUnrestricted,
             Public,
-        )),
-        'editor': set((
+        },
+        'editor': {
             Public,
-        )),
-        'member': set((
+        },
+        'member': {
             Public,
-        )),
-        'anonymous': set((
+        },
+        'anonymous': {
             Public,
-        )),
+        },
     }
 
 
 @WtfsApp.permission_rule(model=Municipality, permission=object)
-def has_permission_municipality(app, identity, model, permission):
+def has_permission_municipality(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: Municipality,
+    permission: object
+) -> bool:
     # Municipalities with data and/or users cannot not be deleted
     if permission in {DeleteModel}:
         if model.users.first():
@@ -94,7 +105,12 @@ def has_permission_municipality(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=UserCollection, permission=object)
-def has_permission_users(app, identity, model, permission):
+def has_permission_users(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: UserCollection,
+    permission: object
+) -> bool:
     # Editors may view and add users
     if identity.role == 'editor':
         if permission in {ViewModel, AddModel}:
@@ -104,7 +120,12 @@ def has_permission_users(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=User, permission=object)
-def has_permission_user(app, identity, model, permission):
+def has_permission_user(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: User,
+    permission: object
+) -> bool:
     # One may not delete himself
     if model.username == identity.userid:
         if permission in {DeleteModel}:
@@ -125,7 +146,12 @@ def has_permission_user(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=ScanJobCollection, permission=object)
-def has_permission_scan_jobs(app, identity, model, permission):
+def has_permission_scan_jobs(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: ScanJobCollection,
+    permission: object
+) -> bool:
     # Editors and members of groups may view and add scan jobs
     if identity.role in ('editor', 'member'):
         if identity.groupid:
@@ -136,7 +162,12 @@ def has_permission_scan_jobs(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=ScanJob, permission=object)
-def has_permission_scan_job(app, identity, model, permission):
+def has_permission_scan_job(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: ScanJob,
+    permission: object
+) -> bool:
     # Editors and members of groups may view and edit scan jobs within
     # the same group
     if identity.role in ('editor', 'member'):
@@ -164,7 +195,12 @@ def has_permission_scan_job(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=DailyList, permission=object)
-def has_permission_daily_list(app, identity, model, permission):
+def has_permission_daily_list(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: DailyList,
+    permission: object
+) -> bool:
     # Members without groups (transport company) may view the daily list
     # selection form
     if identity.role == 'member':
@@ -176,7 +212,12 @@ def has_permission_daily_list(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=DailyListBoxes, permission=object)
-def has_permission_daily_list_boxes(app, identity, model, permission):
+def has_permission_daily_list_boxes(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: DailyListBoxes,
+    permission: object
+) -> bool:
     # Members without groups (transport company) may view the daily list boxes
     if identity.role == 'member':
         if not identity.groupid:
@@ -187,7 +228,12 @@ def has_permission_daily_list_boxes(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=Notification, permission=object)
-def has_permission_notification(app, identity, model, permission):
+def has_permission_notification(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: Notification,
+    permission: object
+) -> bool:
     # Everybody may view notifications
     if permission in {ViewModel}:
         return True
@@ -196,7 +242,12 @@ def has_permission_notification(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=UserManual, permission=object)
-def has_permission_user_manual(app, identity, model, permission):
+def has_permission_user_manual(
+    app: WtfsApp,
+    identity: 'Identity',
+    model: UserManual,
+    permission: object
+) -> bool:
     # Everybody may view the user manual
     if permission in {ViewModel}:
         return True

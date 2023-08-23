@@ -24,7 +24,12 @@ from wtforms.validators import Optional
 from sedate import pytz, replace_timezone, utcnow
 
 
-def coerce_date(value):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.wtfs.collections import ScanJobCollection
+
+
+def coerce_date(value: str | date | None) -> date | None:
     if isinstance(value, str):
         return parse(value).date()
     return value
@@ -33,11 +38,11 @@ def coerce_date(value):
 class DispatchTimeValidator:
     """Ensures no scan jobs are submitted on the same day after 17:00"""
 
-    def __init__(self, max_hour=17):
+    def __init__(self, max_hour: int = 17):
         self.max_hour = max_hour
         self.timezone = "Europe/Zurich"
 
-    def __call__(self, form, field):
+    def __call__(self, form: Form, field: DateField) -> None:
         dispatch_date = field.data
         now = utcnow()
 
@@ -53,13 +58,20 @@ class DispatchTimeValidator:
                 )
             )
 
-    def too_late_to_scan(self):
+    def too_late_to_scan(self) -> bool:
         now = datetime.now(pytz.timezone(self.timezone))
         y, m, d = now.year, now.month, now.day
         max_hour_date = self.tzdatetime(y, m, d, hour=self.max_hour, minute=0)
         return now.time() > max_hour_date.time()
 
-    def tzdatetime(self, year, month, day, hour, minute):
+    def tzdatetime(
+        self,
+        year: int,
+        month: int,
+        day: int,
+        hour: int,
+        minute: int
+    ) -> datetime:
         """Returns the timezone-aware datetime"""
         return replace_timezone(
             datetime(year, month, day, hour, minute), self.timezone
@@ -168,16 +180,17 @@ class AddScanJobForm(Form):
     )
 
     @property
-    def municipality_id(self):
+    def municipality_id(self) -> str | None:
         return self.request.identity.groupid or None
 
     @property
-    def dispatch_date(self):
+    def dispatch_date(self) -> date:
         if self.type.data == 'express':
+            assert self.dispatch_date_express.data is not None
             return self.dispatch_date_express.data
         return self.dispatch_date_normal.data
 
-    def dispatch_dates(self, after):
+    def dispatch_dates(self, after: date) -> list[date]:
         query = self.request.session.query(PickupDate.date.label('date'))
         query = query.filter(
             PickupDate.municipality_id == self.municipality_id
@@ -187,12 +200,12 @@ class AddScanJobForm(Form):
         return [r.date for r in query] or [date(2018, 1, 1), date.today()]
 
     @property
-    def return_date(self):
+    def return_date(self) -> date | None:
         if self.type.data == 'express':
             return None
-        return (self.dispatch_dates(self.dispatch_date) or [None])[0]
+        return self.dispatch_dates(self.dispatch_date)[0]
 
-    def update_labels(self):
+    def update_labels(self) -> None:
         year = date.today().year
         self.dispatch_tax_forms_older.label.text = _(
             "Tax forms until ${year}", mapping={'year': year - 2}
@@ -204,7 +217,7 @@ class AddScanJobForm(Form):
             "Tax forms ${year}", mapping={'year': year}
         )
 
-    def on_request(self):
+    def on_request(self) -> None:
         # Shipment types
         if self.request.has_role('editor'):
             self.type.choices = [
@@ -220,7 +233,7 @@ class AddScanJobForm(Form):
         # Labels
         self.update_labels()
 
-    def update_model(self, model):
+    def update_model(self, model: ScanJob) -> None:
         model.municipality_id = self.request.identity.groupid
         model.type = self.type.data
         model.dispatch_date = self.dispatch_date
@@ -291,7 +304,7 @@ class EditScanJobForm(Form):
         render_kw={'size': 6},
     )
 
-    def update_labels(self):
+    def update_labels(self) -> None:
         year = self.model.dispatch_date.year
         self.dispatch_tax_forms_older.label.text = _(
             "Tax forms until ${year}", mapping={'year': year - 2}
@@ -303,10 +316,10 @@ class EditScanJobForm(Form):
             "Tax forms ${year}", mapping={'year': year}
         )
 
-    def on_request(self):
+    def on_request(self) -> None:
         self.update_labels()
 
-    def update_model(self, model):
+    def update_model(self, model: ScanJob) -> None:
         for name in (
             'dispatch_boxes',
             'dispatch_tax_forms_current_year',
@@ -319,7 +332,7 @@ class EditScanJobForm(Form):
         ):
             setattr(model, name, getattr(self, name).data)
 
-    def apply_model(self, model):
+    def apply_model(self, model: ScanJob) -> None:
         for name in (
             'dispatch_boxes',
             'dispatch_tax_forms_current_year',
@@ -489,7 +502,7 @@ class UnrestrictedScanJobForm(Form):
         render_kw={'rows': 5},
     )
 
-    def update_labels(self):
+    def update_labels(self) -> None:
         if isinstance(self.model, ScanJob):
             year = self.model.dispatch_date.year
         else:
@@ -523,7 +536,7 @@ class UnrestrictedScanJobForm(Form):
             "Unscanned tax forms ${year}", mapping={'year': year}
         )
 
-    def on_request(self):
+    def on_request(self) -> None:
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
@@ -536,7 +549,7 @@ class UnrestrictedScanJobForm(Form):
 
         self.update_labels()
 
-    def update_model(self, model):
+    def update_model(self, model: ScanJob) -> None:
         for name in (
             'municipality_id',
             'type',
@@ -563,7 +576,7 @@ class UnrestrictedScanJobForm(Form):
         ):
             setattr(model, name, getattr(self, name).data)
 
-    def apply_model(self, model):
+    def apply_model(self, model: ScanJob) -> None:
         self.municipality_id.data = model.municipality_id.hex
         for name in (
             'type',
@@ -620,19 +633,19 @@ class ScanJobsForm(Form):
         fieldset=_("Filter")
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         if hasattr(self, 'csrf_token'):
             self.delete_field('csrf_token')
 
-    def select_all(self, name):
+    def select_all(self, name: str) -> None:
         field = getattr(self, name)
         if not field.data:
             field.data = list(next(zip(*field.choices)))
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'ScanJobCollection') -> None:
         self.from_date.data = model.from_date
         self.to_date.data = model.to_date
-        self.type.data = model.type
+        self.type.data = model.type  # type:ignore[assignment]
         self.term.data = model.term
         self.sort_by.data = model.sort_by
         self.sort_order.data = model.sort_order
@@ -649,7 +662,7 @@ class UnrestrictedScanJobsForm(ScanJobsForm):
         choices=[]
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         super().on_request()
         query = self.request.session.query(
             Municipality.id.label('id'),
@@ -661,6 +674,6 @@ class UnrestrictedScanJobsForm(ScanJobsForm):
             (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
         ]
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'ScanJobCollection') -> None:
         super().apply_model(model)
-        self.municipality_id.data = model.municipality_id
+        self.municipality_id.data = model.municipality_id  # type:ignore
