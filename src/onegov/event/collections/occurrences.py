@@ -47,6 +47,7 @@ class OccurrenceCollection(Pagination):
         end=None,
         outdated=False,
         tags=None,
+        filter_config=None,
         locations=None,
         only_public=False,
         search_widget=None,
@@ -57,6 +58,7 @@ class OccurrenceCollection(Pagination):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
+        self.filter_config = filter_config if filter_config else []
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
@@ -88,9 +90,10 @@ class OccurrenceCollection(Pagination):
             end=self.end,
             outdated=self.outdated,
             tags=self.tags,
+            filter_config=self.filter_config,
             locations=self.locations,
             only_public=self.only_public,
-            search_widget=self.search_widget
+            search_widget=self.search_widget,
         )
 
     def range_to_dates(self, range, start=None, end=None):
@@ -164,6 +167,12 @@ class OccurrenceCollection(Pagination):
             elif tag is not None:
                 tags.append(tag)
 
+        print(f'*** tschupre checking filter config kwargs: {kwargs}, '
+              f'{self.filter_config}')
+        filters = kwargs.get('filters', self.filter_config)
+        if filters:
+            print(f'*** tschupre filter config found: {filters}')
+
         locations = kwargs.get('locations', list(self.locations))
         if 'location' in kwargs:
             location = kwargs.get('location')
@@ -180,6 +189,7 @@ class OccurrenceCollection(Pagination):
             end=end,
             outdated=kwargs.get('outdated', self.outdated),
             tags=tags,
+            filter_config=self.filter_config,
             locations=locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
@@ -210,6 +220,15 @@ class OccurrenceCollection(Pagination):
                 counts[tag] += 1
 
         return counts
+
+    @cached_property
+    def config_filters(self):
+        """
+
+        :return:
+        """
+        # TODO: from db
+        return ('Sportart', 'Veranstaltungstyp', 'Zielgruppe')
 
     @cached_property
     def used_tags(self):
