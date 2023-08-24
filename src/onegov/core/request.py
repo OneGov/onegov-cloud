@@ -200,14 +200,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return self.headers.get('X_VHM_ROOT', '').rstrip('/')
 
     @cached_property
-    def url(self) -> str:
-        """ Returns the current url, taking the virtual hosting in account. """
-        url = self.transform(self.path)
-
-        if self.query_string:
-            url += '?' + self.query_string
-
-        return url
+    def path_url(self) -> str:
+        """ Returns the path_url, taking the virtual hosting in account. """
+        return self.transform(self.path)
 
     @cached_property
     def application_url(self) -> str:
@@ -216,7 +211,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         #        same is already true for X_VHM_ROOT and X_VHM_HOST, if we
         #        want to be able to deal with this properly we should add
         #        a function that does the same thing webob does internally
-        return self.transform(self.script_name)
+        return self.transform(self.script_name).rstrip('/')
 
     def transform(self, url: str) -> str:
         """ Applies X_VHM_HOST and X_VHM_ROOT to the given url (which is
