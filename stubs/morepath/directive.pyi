@@ -120,8 +120,8 @@ class PathCompositeAction(dectate.Composite):
 class PermissionRuleAction(dectate.Action):
     model: type | str
     permission: object | str
-    identity: Identity | Sentinel | str
-    def __init__(self, model: type | str, permission: object | str, identity: type[Identity] | None = ...) -> None: ...
+    identity: type[Identity | NoIdentity]
+    def __init__(self, model: type | str, permission: object | str, identity: type[Identity | NoIdentity] | None = ...) -> None: ...
     def identifier(self, app_class: type[dectate.App]) -> tuple[type | str, object | str, type[Identity | NoIdentity]]: ...  # type:ignore[override]
     def perform(self, obj: Callable, app_class: type[dectate.App]) -> None: ...  # type:ignore[override]
 
