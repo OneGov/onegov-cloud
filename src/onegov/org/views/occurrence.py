@@ -3,12 +3,14 @@
 from datetime import date
 from morepath import redirect
 from morepath.request import Response
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.org import _, OrgApp
+from onegov.winterthur import WinterthurApp
 from onegov.org.elements import Link
 from onegov.org.forms import ExportForm, EventImportForm
+from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
@@ -26,13 +28,21 @@ def view_occurrences(self, request, layout=None):
     ]
     translated_tags.sort(key=lambda i: i[1])
 
-    tags = [
-        Link(
-            text=translation + f' ({self.tag_counts[tag]})',
-            url=request.link(self.for_filter(tag=tag)),
-            active=tag in self.tags and 'active' or ''
-        ) for tag, translation in translated_tags
-    ]
+    filters = None
+    tags = None
+    if isinstance(request.app, WinterthurApp):
+        filters = [
+            Link(text=f, url=request.link(self.for_filter(filters=f)))
+            for f in self.config_filters
+        ]
+    else:
+        tags = [
+            Link(
+                text=translation + f' ({self.tag_counts[tag]})',
+                url=request.link(self.for_filter(tag=tag)),
+                active=tag in self.tags and 'active' or ''
+            ) for tag, translation in translated_tags
+        ]
 
     locations = [
         Link(
@@ -82,6 +92,7 @@ def view_occurrences(self, request, layout=None):
         'start': self.start.isoformat() if self.start else '',
         'ranges': ranges,
         'tags': tags,
+        'filters': filters,
         'locations': locations,
         'title': _('Events'),
         'search_widget': self.search_widget,
@@ -114,6 +125,39 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
+    }
+
+
+@OrgApp.form(model=OccurrenceCollection, name='edit',
+             template='directory_form.pt', permission=Secret,
+             form = EventConfigurationForm)
+def handle_edit_event_filters(self, request, form, layout=None):
+    print(f'*** tschupre handle edit event configuration. model: {self}')
+
+    if form.submitted(request):
+        print(f'*** tschupre structure data:\n {form.structure.data}')
+        print(f'*** tschupre keyword fields:\n {form.keyword_fields.data}')
+        form.populate_obj(self)
+
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self))
+
+    elif not request.POST:
+        form.process(obj=self.filter_config)
+
+    layout = layout or OccurrencesLayout(self, request)
+    layout.include_code_editor()
+    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.editbar_links = []
+
+    return {
+        'layout': layout,
+        'title': 'Edit Event Filter Configuration',
+        'form': form,
+        'form_width': 'large',
+        'migration': None,
+        'model': self,
+        'error': None,
     }
 
 
