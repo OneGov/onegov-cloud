@@ -10,9 +10,11 @@ from onegov.pay.utils import Price
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Callable, Iterator
+    from functools import cached_property
     from onegov.pay.models.payment import Payment
     from onegov.pay.types import PaymentMethod
+    from sqlalchemy.orm import Session
 
 
 class PayApp(WebassetsApp):
@@ -20,6 +22,11 @@ class PayApp(WebassetsApp):
     :class:`onegov.core.framework.Framework` based applications.
 
     """
+
+    if TYPE_CHECKING:
+        # forward declare the attributes from Framework we depend on
+        @cached_property
+        def session(self) -> 'Callable[[], Session]': ...
 
     def configure_payment_providers(
         self,

@@ -33,8 +33,11 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from depot.io.interfaces import FileStorage, StoredFile
+    from functools import cached_property
+    from onegov.core.orm import SessionManager
     from onegov.core.request import CoreRequest
     from onegov.file.types import SigningServiceConfig
+    from sqlalchemy.orm import Session
     from webob import Response
 
 
@@ -49,6 +52,18 @@ class DepotApp(App):
     :class:`onegov.core.framework.Framework` based applications.
 
     """
+
+    if TYPE_CHECKING:
+        # forward declare the Framework attributes we need
+        application_id: str
+        schema: str
+        yubikey_client_id: str | None
+        yubikey_secret_key: str | None
+        session_manager: SessionManager
+        @cached_property
+        def session(self) -> Callable[[], Session]: ...
+        @property
+        def has_database_connection(self) -> bool: ...
 
     custom_depot_id = None
 
@@ -275,7 +290,11 @@ class DepotApp(App):
 
         if token_type == 'yubikey':  # nosec: B105
             def is_valid_token(token: str) -> bool:
-                if not getattr(self, 'yubikey_client_id', None):
+                if (
+                    not hasattr(self, 'yubikey_client_id')
+                    or self.yubikey_client_id is None
+                    or self.yubikey_secret_key is None
+                ):
                     raise TokenConfigurationError(token_type)
 
                 return is_valid_yubikey(
@@ -492,7 +511,7 @@ def view_thumbnail(self: File, request: 'CoreRequest') -> 'StoredFile':
     if not thumbnail_id:
         return morepath.redirect(request.link(self))
 
-    return request.app.bound_depot.get(thumbnail_id)
+    return request.app.bound_depot.get(thumbnail_id)  # type:ignore
 
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public,
@@ -575,6 +594,9 @@ def delete_file(self: File, request: 'CoreRequest') -> None:
 
     if self.signed:
         from onegov.file.models.file_message import FileMessage  # circular
-        FileMessage.log_signed_file_removal(self, request.current_username)
+        # FIXME: this is a weird cross-dependency on OrgRequest
+        #        we should probably refactor this
+        username = getattr(request, 'current_username', None)
+        FileMessage.log_signed_file_removal(self, username)
 
     FileCollection(request.session).delete(self)

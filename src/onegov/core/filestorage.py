@@ -91,4 +91,5 @@ def delete_static_file(self: FilestorageFile, request: 'CoreRequest') -> None:
 
     """
     request.assert_valid_csrf_token()
+    assert request.app.filestorage is not None
     request.app.filestorage.remove(self.path)

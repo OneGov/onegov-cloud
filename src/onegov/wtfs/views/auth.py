@@ -52,7 +52,7 @@ def handle_login(
         'layout': DefaultLayout(self, request),
         'title': _("Login"),
         'form': form,
-        'providers': request.app.providers,
+        'providers': request.app.providers,  # type:ignore[attr-defined]
         'provider_login': provider_login,
         'render_untrusted_markdown': render_untrusted_markdown,
         'password_reset_link': request.link(
@@ -99,6 +99,7 @@ def handle_password_reset_request(
                 request.link(self, name='reset-password')
             )
 
+            assert request.app.mail is not None
             request.app.send_transactional_email(
                 subject=request.translate(_("Password reset")),
                 receivers=(user.username, ),

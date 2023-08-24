@@ -107,14 +107,16 @@ class OneGovCloudIntegration(Integration):
             return integration.with_wsgi_middleware
 
         # add a marker so Framework instances will add the wsgi middleware
-        Framework.with_sentry_middleware = property(with_sentry_middleware)
+        Framework.with_sentry_middleware = property(  # type:ignore
+            with_sentry_middleware
+        )
 
 
 class CoreRequestExtractor(RequestExtractor):
     request: 'CoreRequest'
 
     def url(self) -> str:
-        return self.request.path_url
+        return self.request.transform(self.request.path_url)
 
     def env(self) -> 'WSGIEnvironment':
         return self.request.environ

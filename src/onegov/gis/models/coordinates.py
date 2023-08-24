@@ -3,7 +3,7 @@ from onegov.core.custom import json
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy import Column
+    from sqlalchemy.schema import Column
 
 
 class Coordinates(json.Serializable, keys=('lon', 'lat', 'zoom')):

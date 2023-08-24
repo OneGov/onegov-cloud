@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from onegov.core.browser_session import BrowserSession
     from onegov.core.security.permissions import Intent
     from sqlalchemy.orm import Session
+    from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol
     from wtforms import Form
     from uuid import UUID
@@ -137,6 +138,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     """
 
+    app: 'Framework'
+
     @cached_property
     def identity_secret(self) -> str:
         return self.app.identity_secret
@@ -145,7 +148,10 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def session(self) -> 'Session':
         return self.app.session()
 
-    def link_prefix(self, app: 'Framework | None' = None) -> str:
+    def link_prefix(
+        self,
+        app: 'Framework | None' = None  # type:ignore[override]
+    ) -> str:
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
         hostname, which is not useful in our case - we'll add the hostname
@@ -225,7 +231,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
         return url
 
-    @overload
+    @overload  # type:ignore[override]
     def link(  # type:ignore[misc]
         self,
         obj: None,
@@ -283,7 +289,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         model: type[Any],
         variables: dict[str, Any] | None = None,
         name: str = '',
-        app: 'Framework | Sentinel' = SAME_APP,
+        app: 'Framework | Sentinel' = SAME_APP,  # type:ignore[override]
     ) -> str:
         """ Extends the default class link generating function of Morepath. """
         return self.transform(super().class_link(
@@ -301,6 +307,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """
 
         app = self.app
+        if app.filestorage is None:
+            return None
 
         if not app.filestorage.exists(path):
             return None
@@ -373,7 +381,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                     self.cookies['session_id'],
                     secure=self.app.identity_secure,
                     httponly=True,
-                    samesite=self.app.same_site_cookie_policy
+                    samesite=self.app.same_site_cookie_policy  # type:ignore
                 )
 
         return self.app.modules.browser_session.BrowserSession(
@@ -463,12 +471,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return translate
 
     @cached_property
-    def default_locale(self) -> str:
+    def default_locale(self) -> str | None:
         """ Returns the default locale. """
         return self.app.default_locale
 
     @cached_property
-    def locale(self) -> str:
+    def locale(self) -> str | None:
         """ Returns the current locale of this request. """
         settings = self.app.settings
 
@@ -481,10 +489,22 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         """ The language code for the html tag. """
         return self.locale and self.locale.replace('_', '-') or ''
 
+    @overload
+    def get_translate(
+        self,
+        for_chameleon: 'Literal[False]' = False
+    ) -> 'GNUTranslations | None': ...
+
+    @overload
+    def get_translate(
+        self,
+        for_chameleon: 'Literal[True]'
+    ) -> '_ChameleonTranslate | None': ...
+
     def get_translate(
         self,
         for_chameleon: bool = False
-    ) -> 'GNUTranslations | None':
+    ) -> 'GNUTranslations | _ChameleonTranslate | None':
         """ Returns the translate method to the given request, or None
         if no such method is availabe.
 
@@ -497,10 +517,12 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         if not self.app.locales:
             return None
 
+        locale = self.locale
+        assert locale is not None
         if for_chameleon:
-            return self.app.chameleon_translations.get(self.locale)
+            return self.app.chameleon_translations.get(locale)
         else:
-            return self.app.translations.get(self.locale)
+            return self.app.translations.get(locale)
 
     def message(self, text: str, type: 'MessageType') -> None:
         """ Adds a message with the given type to the messages list. This
@@ -583,7 +605,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         if user:
             identity = self.app.application_bound_identity(
                 user.username,
-                user.group_id.hex if user.group_id else user.group_id,
+                user.group_id.hex if user.group_id else None,
                 user.role
             )
 
