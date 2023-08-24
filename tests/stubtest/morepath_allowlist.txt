@@ -26,3 +26,10 @@ morepath\.(app\.)?App\.identity_policy
 morepath\.(app\.)?App\.verify_identity
 morepath\.(app\.)?App\.dump_json
 morepath\.(app\.)?App\.link_prefix
+
+# Error: is not present at runtime
+# ======================
+# These __getattr__ need to be there so mypy is aware that these objects
+# can contain arbitary attributes
+morepath.settings.SettingRegistry.__getattr__
+morepath.settings.SettingSection.__getattr__

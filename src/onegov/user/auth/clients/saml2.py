@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from onegov.user import User, UserApp
     from onegov.user.auth.provider import (
         HasApplicationIdAndNamespace, SAML2Provider)
+    from webob import Response
     from typing_extensions import Self
 
 
@@ -71,7 +72,7 @@ def finish_logout(
     user: 'User',
     to: str,
     local: bool = True
-) -> morepath.Response:
+) -> 'Response':
     # this always finishes the SAML2 logout, but it may delay
     # the local logout and make it the regular logout view's
     # responsibility
@@ -313,7 +314,7 @@ class SAML2Client():
         self,
         provider: 'SAML2Provider',
         request: 'CoreRequest'
-    ) -> morepath.Response:
+    ) -> 'Response':
 
         # this could be either a request or a response
         saml_request = request.params.get('SAMLRequest')

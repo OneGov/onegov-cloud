@@ -47,9 +47,9 @@ class UserForm(Form):
         model.data['contact'] = self.contact.data or False
         model.role = 'member'
         if logged_out:
-            if self.request.identity.role == 'editor':
+            if self.request.identity.role == 'editor':  # type:ignore
                 model.role = 'editor'
-        model.group_id = self.request.identity.groupid
+        model.group_id = self.request.identity.groupid  # type:ignore
 
         # set some initial values if we create this user
         if not model.password:

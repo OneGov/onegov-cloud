@@ -4,3 +4,8 @@
 # as such stubtest can't know it's there
 reg.Dispatch.call
 reg.dispatch.Dispatch.call
+# Error: failed to find stubs
+# ======================
+# tests should not be part of stubs
+reg.tests
+reg.tests.*

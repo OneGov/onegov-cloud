@@ -25,7 +25,7 @@ class Notification(Message):
     ) -> 'Self':
 
         return cls.bound_messages(request.session).add(
-            channel_id=request.identity.application_id,
+            channel_id=request.identity.application_id,  # type:ignore
             owner=request.identity.userid,
             text=text,
             meta={'title': title}

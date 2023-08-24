@@ -168,6 +168,7 @@ def add_scan_job(
         request.message(_("Scan job added."), 'success')
 
         assert request.app.mail is not None
+        assert request.identity.userid is not None
         subject = request.translate(
             _("Order confirmation for scanning your tax returns")
         )

@@ -59,7 +59,6 @@ module = [
     "chameleon.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
-    "dectate.*",
     "docxtpl.*",
     "dill.*",
     "dukpy.*",
@@ -78,7 +77,6 @@ module = [
     "langdetect.*",
     "lazy_object_proxy.*",
     "mistletoe.*",
-    "morepath.*",
     "msal.*",
     "pdfdocument.*",
     # FIXME: We only use this to convert a PDF to an XObject and then
@@ -94,7 +92,6 @@ module = [
     "qrcode.*",
     "rcssmin.*",
     "reportlab.*",
-    "reg.*",
     "rjsmin.*",
     "sass.*",
     # TODO: Writing stubs for this would probably be really quick

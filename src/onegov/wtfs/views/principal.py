@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.core.types import RenderData
+    from webob import Response as BaseResponse
 
 
 @WtfsApp.html(
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
 def view_home(
     self: Principal,
     request: 'CoreRequest'
-) -> 'Response | RenderData':
+) -> 'BaseResponse | RenderData':
     """ The home page. """
 
     layout = DefaultLayout(self, request)

@@ -3,7 +3,7 @@ from typing import Any, Generic, TypeVar, overload
 from typing_extensions import Concatenate, ParamSpec
 
 from reg.dispatch import Dispatch, dispatch, _GetKeyLookup
-from reg.predicates import Predicate
+from reg.predicate import Predicate
 
 _T = TypeVar('_T')
 _T1 = TypeVar('_T1')

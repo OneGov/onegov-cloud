@@ -2,10 +2,9 @@ from collections.abc import Callable
 from typing import Any
 
 from dectate import directive
+from more.webassets import directives
 from morepath.app import App
-from morepath.request import Request
-from morepath.response import Response
-from . import directives
+from morepath.request import Request, Response
 
 class IncludeRequest(Request):
     included_assets: set[str]

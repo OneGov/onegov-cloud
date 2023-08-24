@@ -4,7 +4,7 @@ import weakref
 
 from onegov.core.framework import Framework
 from onegov.core.orm import DB_CONNECTION_ERRORS
-from morepath.core import excview_tween_factory
+from morepath.core import excview_tween_factory  # type:ignore[import]
 from sentry_sdk.hub import Hub, _should_send_default_pii
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations._wsgi_common import RequestExtractor

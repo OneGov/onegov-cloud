@@ -12,10 +12,12 @@ from onegov.user.auth.second_factor import SECOND_FACTORS
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from morepath.authentication import Identity, NoIdentity
     from onegov.core.request import CoreRequest
     from onegov.user import User, UserApp
     from onegov.user.forms import RegistrationForm
     from typing_extensions import Self, TypedDict
+    from webob import Response
 
     class SignupToken(TypedDict):
         role: str
@@ -95,7 +97,7 @@ class Auth:
     def users(self) -> UserCollection:
         return UserCollection(self.session)
 
-    def redirect(self, request: 'CoreRequest', path: str) -> morepath.Response:
+    def redirect(self, request: 'CoreRequest', path: str) -> 'Response':
         return morepath.redirect(request.transform(path))
 
     def skippable(self, request: 'CoreRequest') -> bool:
@@ -227,7 +229,7 @@ class Auth:
         log.info(f"Successful login by {client} ({username})")
         return user
 
-    def as_identity(self, user: 'User') -> morepath.Identity:
+    def as_identity(self, user: 'User') -> 'Identity':
         """ Returns the morepath identity of the given user. """
 
         return self.identity_class(
@@ -237,9 +239,10 @@ class Auth:
             application_id=self.application_id
         )
 
-    def by_identity(self, identity: morepath.Identity) -> 'User | None':
+    def by_identity(self, identity: 'Identity | NoIdentity') -> 'User | None':
         """ Returns the user record of the given identity. """
-
+        if identity.userid is None:
+            return None
         return self.users.by_username(identity.userid)
 
     def login_to(
@@ -249,7 +252,7 @@ class Auth:
         request: 'CoreRequest',
         second_factor: str | None = None,
         skip_providers: bool = False
-    ) -> morepath.Response | None:
+    ) -> 'Response | None':
         """ Takes a user login request and remembers the user if the
         authentication completes successfully.
 
@@ -291,7 +294,7 @@ class Auth:
         self,
         user: 'User',
         request: 'CoreRequest'
-    ) -> morepath.Response:
+    ) -> 'Response':
         """ Takes a user record, remembers its session and returns a proper
         redirect response to complete the login.
 
@@ -329,7 +332,7 @@ class Auth:
         self,
         request: 'CoreRequest',
         to: str | None = None
-    ) -> morepath.Response:
+    ) -> 'Response':
         """ Logs the current user out and redirects to ``to`` or ``self.to``.
 
         :return: A response redirecting to ``self.to`` with the identity
