@@ -23,6 +23,7 @@ class Request(BaseRequest):
     # view_code_info: Incomplete
     unconsumed: list[str]
     app: App
+    view_name: str  # this technically only exists after resolve_response
     def __init__(self, environ: WSGIEnvironment, app: App, **kw: Any) -> None: ...
     def reset(self) -> None: ...
     @reify

@@ -110,6 +110,7 @@ def add_scan_job_unrestricted(
 
         receivers = scan_job.municipality.contacts
         if receivers:
+            assert request.app.mail is not None
             subject = request.translate(
                 _("Order confirmation for scanning your tax returns")
             )
@@ -166,6 +167,7 @@ def add_scan_job(
         request.session.add(scan_job)
         request.message(_("Scan job added."), 'success')
 
+        assert request.app.mail is not None
         subject = request.translate(
             _("Order confirmation for scanning your tax returns")
         )

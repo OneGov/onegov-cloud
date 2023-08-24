@@ -18,6 +18,7 @@ from .template import TemplateEngineRegistry
 from .tween import TweenRegistry
 
 _T = TypeVar('_T')
+_RequestT = TypeVar('_RequestT', bound=Request, contravariant=True)
 _Type: TypeAlias = type
 
 def isbaseclass(a: type, b: type) -> bool: ...
@@ -150,7 +151,7 @@ def issubclass_or_none(a: type | None, b: type | None) -> bool: ...
 
 class ViewAction(dectate.Action):
     model: type | str
-    render: Callable[[Any, Request], BaseResponse] | str
+    render: Callable[[Any, _RequestT], BaseResponse] | str
     load: Callable[[Request], Any] | str | None
     template: StrOrBytesPath | None
     permission: object | str | None
@@ -159,9 +160,9 @@ class ViewAction(dectate.Action):
     def __init__(
         self,
         model,
-        render: Callable[[Any, Request], BaseResponse] | str | None = None,
+        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath | None = None,
-        load: Callable[[Request], Any] | str | None = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,

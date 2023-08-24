@@ -13,7 +13,7 @@ from onegov.user.auth.second_factor import SECOND_FACTORS
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
-    from onegov.user import User
+    from onegov.user import User, UserApp
     from onegov.user.forms import RegistrationForm
     from typing_extensions import Self, TypedDict
 
@@ -33,7 +33,7 @@ class Auth:
 
     def __init__(
         self,
-        app: morepath.App,
+        app: 'UserApp',
         # FIXME: For now we allow None, because purl.URL will default
         #        to '/' for None, which is used by relative_url, but
         #        we should probably be more vigilant about this...
@@ -74,7 +74,12 @@ class Auth:
         skip: bool = False,
         signup_token: str | None = None
     ) -> 'Self':
-        return cls(request.app, to, skip, signup_token)
+        return cls(
+            request.app,  # type:ignore[arg-type]
+            to,
+            skip,
+            signup_token
+        )
 
     @classmethod
     def from_request_path(
@@ -298,6 +303,8 @@ class Auth:
 
         identity = self.as_identity(user)
 
+        to: str | None
+        assert hasattr(request.app, 'redirect_after_login')
         to = request.app.redirect_after_login(identity, request, self.to)
         to = to or self.to
 

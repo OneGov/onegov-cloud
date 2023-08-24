@@ -25,7 +25,11 @@ class FileMessage(Message):
         )
 
     @classmethod
-    def log_signed_file_removal(cls, file: 'File', username: str) -> None:
+    def log_signed_file_removal(
+        cls,
+        file: 'File',
+        username: str | None
+    ) -> None:
         cls.bound_messages(object_session(file)).add(
             channel_id=file.id,
             owner=username,

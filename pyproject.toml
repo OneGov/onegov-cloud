@@ -78,7 +78,6 @@ module = [
     "langdetect.*",
     "lazy_object_proxy.*",
     "mistletoe.*",
-    "more.*",
     "morepath.*",
     "msal.*",
     "pdfdocument.*",

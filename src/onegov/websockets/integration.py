@@ -31,6 +31,12 @@ class WebsocketsApp(WebassetsApp):
 
     """
 
+    if TYPE_CHECKING:
+        # we forward declare the attributes from Framework we need
+        configuration: dict[str, Any]
+        schema: str
+        def sign(self, text: str) -> str: ...
+
     _websockets_client_url: str
     websockets_manage_url: str
     websockets_manage_token: str

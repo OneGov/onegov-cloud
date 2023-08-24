@@ -316,4 +316,4 @@ def get_payment_types(request: 'CoreRequest') -> PaymentTypeCollection:
     path='/user-manual',
 )
 def get_user_manual(request: 'CoreRequest') -> UserManual:
-    return UserManual(request.app)
+    return UserManual(request.app)  # type:ignore[arg-type]
