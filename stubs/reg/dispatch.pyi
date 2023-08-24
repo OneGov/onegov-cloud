@@ -3,7 +3,7 @@ from inspect import FullArgSpec
 from typing import Any, Generic, NamedTuple, Protocol, TypeVar
 from typing_extensions import ParamSpec, TypeAlias
 
-from .predicate import Predicate, PredicateRegistry
+from reg.predicate import Predicate, PredicateRegistry
 
 _T = TypeVar('_T')
 _F = TypeVar('_F', bound=Callable[..., Any])

@@ -28,19 +28,20 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Iterator
     from dectate import Sentinel
     from gettext import GNUTranslations
+    from morepath.authentication import Identity, NoIdentity
     from onegov.core import Framework
     from onegov.core.browser_session import BrowserSession
     from onegov.core.security.permissions import Intent
+    from onegov.core.types import MessageType
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
     from typing import Literal, Protocol
+    from typing_extensions import TypeGuard
+    from webob import Response
     from wtforms import Form
     from uuid import UUID
 
     _BaseRequest = morepath.Request
-
-    # FIXME: Move this to onegov.core.types
-    MessageType = Literal['success', 'info', 'warning', 'alert']
 
     # NOTE: To avoid a dependency between onegov.core and onegov.user
     #       we use a UserLike Protocol to define the properties we need
@@ -60,7 +61,6 @@ _T = TypeVar('_T')
 _F = TypeVar('_F', bound='Form')
 
 
-# FIXME: Move this to onegov.core.types
 class Message(NamedTuple):
     text: str
     type: 'MessageType'
@@ -119,7 +119,7 @@ class ReturnToMixin(_BaseRequest):
     def return_here(self, url: str) -> str:
         return self.return_to(url, self.url)
 
-    def redirect(self, url: str) -> 'morepath.Response':
+    def redirect(self, url: str) -> 'Response':
         if 'return-to' in self.GET:
             try:
                 url = self.redirect_signer.loads(self.GET['return-to'])
@@ -127,6 +127,10 @@ class ReturnToMixin(_BaseRequest):
                 pass
 
         return morepath.redirect(url)
+
+
+def is_logged_in(identity: 'Identity | NoIdentity') -> 'TypeGuard[Identity]':
+    return identity is not NO_IDENTITY
 
 
 class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
@@ -598,13 +602,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         if permission is None:
             return True
 
-        identity = self.identity
-        if user:
-            identity = self.app.application_bound_identity(
-                user.username,
-                user.group_id.hex if user.group_id else None,
-                user.role
-            )
+        identity = self.app.application_bound_identity(
+            user.username,
+            user.group_id.hex if user.group_id else None,
+            user.role
+        ) if user else self.identity
 
         return self.app._permits(identity, model, permission)
 
@@ -686,7 +688,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         Otherwise, None is returned.
 
         """
-        return self.is_logged_in and self.identity.role or None
+        return self.identity.role if is_logged_in(self.identity) else None
 
     def has_role(self, *roles: str) -> bool:
         """ Returns true if the current user has any of the given roles. """

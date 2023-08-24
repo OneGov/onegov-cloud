@@ -181,7 +181,7 @@ class AddScanJobForm(Form):
 
     @property
     def municipality_id(self) -> str | None:
-        return self.request.identity.groupid or None
+        return self.request.identity.groupid or None  # type:ignore
 
     @property
     def dispatch_date(self) -> date:
@@ -234,7 +234,7 @@ class AddScanJobForm(Form):
         self.update_labels()
 
     def update_model(self, model: ScanJob) -> None:
-        model.municipality_id = self.request.identity.groupid
+        model.municipality_id = self.request.identity.groupid  # type:ignore
         model.type = self.type.data
         model.dispatch_date = self.dispatch_date
         model.return_date = self.return_date

@@ -98,14 +98,16 @@ uuid_converter = morepath.Converter(
 
 
 @Framework.converter(type=UUID)
-def get_default_uuid_converter() -> morepath.Converter:
+def get_default_uuid_converter() -> 'morepath.Converter[UUID]':
     return uuid_converter
 
 
 @overload
-def bool_decode(s: Literal['0', '']) -> Literal[False]: ...  # type:ignore
+def bool_decode(s: Literal['0', '']) -> Literal[False]: ...
 @overload
-def bool_decode(s: Literal['1'] | str) -> Literal[True]: ...
+def bool_decode(s: Literal['1']) -> Literal[True]: ...
+@overload
+def bool_decode(s: str) -> bool: ...
 
 
 def bool_decode(s: str) -> bool:
@@ -117,6 +119,8 @@ def bool_decode(s: str) -> bool:
 def bool_encode(d: Literal[False] | None) -> Literal['0']: ...
 @overload
 def bool_encode(d: Literal[True]) -> Literal['1']: ...
+@overload
+def bool_encode(d: bool | None) -> Literal['0', '1']: ...
 
 
 def bool_encode(d: bool | None) -> Literal['0', '1']:
@@ -124,13 +128,13 @@ def bool_encode(d: bool | None) -> Literal['0', '1']:
     return d and '1' or '0'
 
 
-bool_converter = morepath.Converter(
+bool_converter: 'morepath.Converter[bool]' = morepath.Converter(
     decode=bool_decode, encode=bool_encode
 )
 
 
 @Framework.converter(type=bool)
-def get_default_bool_converter() -> morepath.Converter:
+def get_default_bool_converter() -> 'morepath.Converter[bool]':
     return bool_converter
 
 
@@ -145,7 +149,7 @@ def datetime_decode(s: str) -> datetime | None:
     return None if not s else isodate.parse_datetime(s)
 
 
-def datetime_encode(d: datetime) -> str:
+def datetime_encode(d: datetime | None) -> str:
     """ Encodes a datetime. """
     return isodate.datetime_isoformat(d) if d else ''
 
@@ -156,7 +160,7 @@ datetime_converter = morepath.Converter(
 
 
 @Framework.converter(type=datetime)
-def get_default_datetime_converter() -> morepath.Converter:
+def get_default_datetime_converter() -> 'morepath.Converter[datetime]':
     return datetime_converter
 
 

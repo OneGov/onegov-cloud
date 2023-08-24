@@ -88,7 +88,7 @@ _T = TypeVar('_T')
 # This should be in more.webassets:
 # https://github.com/morepath/more.webassets/blob/master/more/webassets/core.py#L55
 if not WebassetsApp.dectate._directives[0][0].kw:
-    from morepath.core import excview_tween_factory
+    from morepath.core import excview_tween_factory  # type:ignore[import]
     WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
 
 
@@ -743,8 +743,10 @@ class Framework(
         model = model if inspect.isclass(model) else model.__class__
         predicates = {'name': view_name} if view_name else {}
 
-        query = dectate.Query('view')
-        query = query.filter(model=model, predicates=predicates)
+        query = dectate.Query('view').filter(
+            model=model,
+            predicates=predicates
+        )
 
         try:
             action, handler = next(query(self.__class__))

@@ -55,9 +55,9 @@ if TYPE_CHECKING:
     from collections.abc import (
         Callable, Collection, Iterable, Iterator, Sequence)
     from markupsafe import Markup
-    from morepath import Response
     from translationstring import _ChameleonTranslate
     from typing_extensions import Self, TypeAlias
+    from webob import Response
     from wtforms import Field, Form
     from wtforms.meta import DefaultMeta
 

@@ -3,8 +3,7 @@ from collections.abc import Callable, Iterator
 from urllib.parse import unquote as unquote
 
 from more.webassets.core import IncludeRequest
-from morepath.request import Request
-from morepath.response import Response
+from morepath.request import Request, Response
 from webassets import Environment
 
 CONTENT_TYPES: set[str]

@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from onegov.core.types import RenderData
+    from webob.response import Response as BaseResponse
 
 
 @WtfsApp.html(
@@ -44,7 +45,7 @@ def edit_user_manual(
     self: UserManual,
     request: 'CoreRequest',
     form: UserManualForm
-) -> 'Response | RenderData':
+) -> 'BaseResponse | RenderData':
     """ Edit the user manual """
 
     layout = EditUserManualLayout(self, request)

@@ -7,15 +7,15 @@ from typing_extensions import TypeAlias
 from webob import Response as BaseResponse
 
 import dectate
-from .authentication import Identity
-from .converter import Converter, ConverterRegistry
-from .path import PathRegistry
-from .predicate import PredicateRegistry
-from .request import Request
-from .settings import SettingRegistry
-from .sentinel import Sentinel
-from .template import TemplateEngineRegistry
-from .tween import TweenRegistry
+from morepath.authentication import Identity
+from morepath.converter import Converter, ConverterRegistry
+from morepath.path import PathRegistry  # type:ignore[import]
+from morepath.predicate import PredicateRegistry  # type:ignore[import]
+from morepath.request import Request
+from morepath.settings import SettingRegistry
+from morepath.sentinel import Sentinel  # type:ignore[import]
+from morepath.template import TemplateEngineRegistry  # type:ignore[import]
+from morepath.tween import TweenRegistry  # type:ignore[import]
 
 _T = TypeVar('_T')
 _RequestT = TypeVar('_RequestT', bound=Request, contravariant=True)

@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
     from sqlalchemy.orm import Query
-    from typing import Any, TypeVar, Union
+    from typing import Any, Literal, TypeVar, Union
     from typing_extensions import NotRequired, TypeAlias, TypedDict
 
     from onegov.server.types import (
@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
     # output for views rendered through Chameleon
     RenderData: TypeAlias = dict[str, Any]
+
+    MessageType: TypeAlias = Literal['success', 'info', 'warning', 'alert']
 
     class HeaderJsonDict(TypedDict):
         Name: str

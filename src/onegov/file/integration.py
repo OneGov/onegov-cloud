@@ -496,7 +496,10 @@ def view_file(self: File, request: 'CoreRequest') -> 'StoredFile':
                render=render_depot_file)
 @DepotApp.view(model=File, name='medium', permission=Public,
                render=render_depot_file)
-def view_thumbnail(self: File, request: 'CoreRequest') -> 'StoredFile':
+def view_thumbnail(
+    self: File,
+    request: 'CoreRequest'
+) -> 'StoredFile | Response':
     if request.view_name in ('small', 'medium'):
         size = request.view_name
     else:
@@ -527,7 +530,10 @@ def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
 
 @DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
                permission=Public, request_method='HEAD')
-def view_thumbnail_head(self: File, request: 'CoreRequest') -> 'StoredFile':
+def view_thumbnail_head(
+    self: File,
+    request: 'CoreRequest'
+) -> 'StoredFile | Response':
 
     @request.after
     def set_cache(response: 'Response') -> None:

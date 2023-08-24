@@ -5,9 +5,9 @@ from webob.request import BaseRequest
 from webob.response import Response as BaseResponse
 from typing import overload, Any, TypeVar
 
-from .app import App
-from .authentication import Identity, NoIdentity
-from .reify import reify
+from morepath import reify
+from morepath.app import App
+from morepath.authentication import Identity, NoIdentity
 
 _T = TypeVar('_T')
 _AfterF = TypeVar('_AfterF', bound=Callable[[Response], Any])

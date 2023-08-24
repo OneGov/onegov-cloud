@@ -4,14 +4,13 @@ from typing import Any, TypeVar, overload
 
 from dectate.app import App as DectateApp, directive
 from morepath import directive as action, reify
-from morepath.authentication import Identity
-from morepath.request import Request
-from morepath.response import Response
-from morepath.setting import SettingRegistry
+from morepath.authentication import Identity, NoIdentity
+from morepath.request import Request, Response
+from morepath.settings import SettingRegistry
 from reg.cache import DictCachingKeyLookup
 from reg.context import dispatch_method as _dispatch_method
 from reg.dispatch import _GetKeyLookup, _KeyLookup
-from reg.predicates import Predicate
+from reg.predicate import Predicate
 from webob.response import Response as BaseResponse
 
 _AppT = TypeVar('_AppT', bound=App)
@@ -78,8 +77,8 @@ class App(DectateApp):
     @dispatch_method()
     def get_view(self, obj: object, request: Request) -> BaseResponse: ...
     @dispatch_method()
-    def _permits(self, identity: Identity, obj: object, permission: object) -> bool: ...
+    def _permits(self, identity: Identity | NoIdentity, obj: object, permission: object) -> bool: ...
     @classmethod
     def clean(cls) -> None: ...
-    def remember_identity(self, response: Response, request: Request, identity: Identity) -> None: ...
-    def forget_identity(self, response: Response, request: Request) -> None: ...
+    def remember_identity(self, response: BaseResponse, request: Request, identity: Identity) -> None: ...
+    def forget_identity(self, response: BaseResponse, request: Request) -> None: ...

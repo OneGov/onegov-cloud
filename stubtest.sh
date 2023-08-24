@@ -46,8 +46,7 @@ stubtest more.webassets \
 echo "Running stubtest on reg"
 stubtest reg \
          --mypy-config-file pyproject.toml \
-         --allowlist tests/stubtest/reg_allowlist.txt \
-         --ignore-missing-stub
+         --allowlist tests/stubtest/reg_allowlist.txt
 
 echo "Running stubtest on webcolors"
 stubtest webcolors \

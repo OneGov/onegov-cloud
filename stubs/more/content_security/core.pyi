@@ -2,8 +2,7 @@ from collections.abc import Callable
 from typing import Literal
 
 from morepath import App
-from morepath.request import Request
-from morepath.response import Response
+from morepath.request import Request, Response
 from more.content_security.policy import ContentSecurityPolicy
 
 NONCE_LENGTH: int
