@@ -115,9 +115,6 @@ class OneGovCloudIntegration(Integration):
 class CoreRequestExtractor(RequestExtractor):
     request: 'CoreRequest'
 
-    def url(self) -> str:
-        return self.request.transform(self.request.path_url)
-
     def env(self) -> 'WSGIEnvironment':
         return self.request.environ
 
@@ -177,6 +174,11 @@ def _make_event_processor(
 
         with capture_internal_exceptions():
             CoreRequestExtractor(request).extract_into_event(event)
+            request_info = event.setdefault('request', {})
+            # we override what the base WSGIMiddleware does, since
+            # they don't take X_VHM_ROOT into account, so the url
+            # contains extra stuff we don't want
+            request_info['url'] = request.path_url
 
             app = request.app
             extra_info = event.setdefault('extra', {})
