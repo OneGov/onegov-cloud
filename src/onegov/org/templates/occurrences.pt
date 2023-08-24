@@ -38,6 +38,17 @@
                     </div>
                 </div>
 
+                <div class="config-filters borderless-side-panel" tal:condition="filters">
+                    <h2 i18n:translate>Filter</h2>
+                    <div class="occurrences-config-filter side-panel-with-bg">
+                        <tal:b tal:repeat="filter filters">
+                            <span class="blank-label click-through ${filter.active and 'active' or ''}">
+                                <tal:b replace="structure filter(request)"></tal:b>
+                            </span>
+                        </tal:b>
+                    </div>
+                </div>
+
                 <div class="location-filters borderless-side-panel" tal:condition="locations">
                     <h2 i18n:translate>Location</h2>
                     <div class="occurrences-filter-locations">
