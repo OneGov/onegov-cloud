@@ -7,13 +7,13 @@ from typing_extensions import TypeAlias
 from webob import Response as BaseResponse
 
 import dectate
-from morepath.authentication import Identity
+from dectate.sentinel import Sentinel
+from morepath.authentication import Identity, NoIdentity
 from morepath.converter import Converter, ConverterRegistry
 from morepath.path import PathRegistry  # type:ignore[import]
 from morepath.predicate import PredicateRegistry  # type:ignore[import]
 from morepath.request import Request
 from morepath.settings import SettingRegistry
-from morepath.sentinel import Sentinel  # type:ignore[import]
 from morepath.template import TemplateEngineRegistry  # type:ignore[import]
 from morepath.tween import TweenRegistry  # type:ignore[import]
 
@@ -121,8 +121,8 @@ class PermissionRuleAction(dectate.Action):
     model: type | str
     permission: object | str
     identity: Identity | Sentinel | str
-    def __init__(self, model: type | str, permission: object | str, identity: Identity | Sentinel | str = ...) -> None: ...
-    def identifier(self, app_class: type[dectate.App]) -> tuple[type | str, object | str, Identity | Sentinel | str]: ...  # type:ignore[override]
+    def __init__(self, model: type | str, permission: object | str, identity: type[Identity] | None = ...) -> None: ...
+    def identifier(self, app_class: type[dectate.App]) -> tuple[type | str, object | str, type[Identity | NoIdentity]]: ...  # type:ignore[override]
     def perform(self, obj: Callable, app_class: type[dectate.App]) -> None: ...  # type:ignore[override]
 
 template_directory_id: int
