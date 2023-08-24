@@ -16,7 +16,8 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.validators import FileSizeLimit, ValidPhoneNumber
+from onegov.form.validators import FileSizeLimit, ValidPhoneNumber, \
+    ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -601,3 +602,32 @@ class EventImportForm(Form):
             transaction.abort()
 
         return count, errors
+
+
+class EventConfigurationForm(Form):
+    """ Form to configure filters for events view. """
+
+    # title = StringField(
+    #     label=_("Title"),
+    #     fieldset=_("General"),
+    #     validators=[InputRequired()])
+
+    structure = TextAreaField(
+        label=_("Definition"),
+        fieldset=_("General"),
+        validators=[
+            InputRequired(),
+            ValidFormDefinition(
+                require_email_field=False,
+                require_title_fields=True
+            )
+        ],
+        render_kw={'rows': 32, 'data-editor': 'form'})
+
+    keyword_fields = TextAreaField(
+        label=_("Filters"),
+        fieldset=_("Display"),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'radio,checkbox'
+        })
