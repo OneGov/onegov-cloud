@@ -518,7 +518,9 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return None
 
         locale = self.locale
-        assert locale is not None
+        if locale is None:
+            return None
+
         if for_chameleon:
             return self.app.chameleon_translations.get(locale)
         else:
