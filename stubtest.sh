@@ -38,7 +38,7 @@ stubtest more.transaction \
          --mypy-config-file pyproject.toml \
          --allowlist tests/stubtest/more.transaction_allowlist.txt
 
-echo "Running stubtest on more.content_security"
+echo "Running stubtest on more.webassets"
 stubtest more.webassets \
          --mypy-config-file pyproject.toml \
          --allowlist tests/stubtest/more.webassets_allowlist.txt
