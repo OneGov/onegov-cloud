@@ -1,5 +1,6 @@
 import base64
 import bleach
+from bleach.linkifier import TLDS
 import errno
 import fcntl
 import gzip
@@ -24,6 +25,9 @@ from functools import reduce
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, islice
+
+from typing_extensions import reveal_type
+
 from onegov.core import log
 from onegov.core.cache import lru_cache
 from onegov.core.custom import json
@@ -392,6 +396,8 @@ def linkify_phone(text: str) -> str:
 
 
 # FIXME: A lot of these methods should be using MarkupSafe
+
+
 def linkify(text: str, escape: bool = True) -> str:
     """ Takes plain text and injects html links for urls and email addresses.
 
@@ -410,16 +416,29 @@ def linkify(text: str, escape: bool = True) -> str:
     if not text:
         return text
 
-    long_top_level_domains = ['.agency']
+    def add_dots(tlds: list[str]) -> 'Iterator[str]':
+        return ('.' + domain for domain in tlds)
 
     # bleach.linkify supports only a fairly limited amount of tlds
-    if any(domain in text for domain in long_top_level_domains):
+    custom_top_level_domains = ['agency', 'ngo', 'swiss', 'gle']
+
+    reveal_type(add_dots)
+
+    if any(domain in text for domain in add_dots(custom_top_level_domains)):
         if '@' in text:
-            linkified = str(
-                Markup('<a href="mailto:{text}">{text}</a>').format(
-                    text=text
-                )
+            all_tlds = TLDS + custom_top_level_domains
+
+            # Longest first, to prevent eager matching, if for example
+            # .co is matched before .com
+            all_tlds.sort(key=lambda s: len(s), reverse=True)
+
+            bleach_linker = bleach.Linker(
+
+                url_re=bleach.linkifier.build_url_re(tlds=all_tlds),
+                email_re=bleach.linkifier.build_email_re(tlds=all_tlds),
+                parse_email=True
             )
+            linkified = bleach_linker.linkify(text)
         else:
             linkified = str(
                 Markup('<a href="{text}">{text}</a>').format(text=text)
