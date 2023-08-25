@@ -1,5 +1,6 @@
 import base64
 import bleach
+from urlextract import URLExtract, CacheFileError
 from bleach.linkifier import TLDS
 import errno
 import fcntl
@@ -391,6 +392,16 @@ def linkify_phone(text: str) -> str:
     return _phone_ch_html_safe.sub(handle_match, text)
 
 
+@lru_cache(maxsize=None)
+def top_level_domains() -> set[str]:
+    try:
+        return URLExtract()._load_cached_tlds()
+    except CacheFileError:
+        pass
+    # fallback
+    return {'agency', 'ngo', 'swiss', 'gle'}
+
+
 # FIXME: A lot of these methods should be using MarkupSafe
 def linkify(text: str, escape: bool = True) -> str:
     """ Takes plain text and injects html links for urls and email addresses.
@@ -410,15 +421,14 @@ def linkify(text: str, escape: bool = True) -> str:
     if not text:
         return text
 
-    def add_dots(tlds: list[str]) -> 'Iterator[str]':
-        return ('.' + domain for domain in tlds)
+    def remove_dots(tlds: set[str]) -> list[str]:
+        return [domain[1:] for domain in tlds]
 
     # bleach.linkify supports only a fairly limited amount of tlds
-    custom_top_level_domains = ['agency', 'ngo', 'swiss', 'gle']
+    additional_tlds = top_level_domains()
+    if any(domain in text for domain in additional_tlds):
 
-    if any(domain in text for domain in add_dots(custom_top_level_domains)):
-
-        all_tlds = TLDS + custom_top_level_domains
+        all_tlds = list(set(TLDS + remove_dots(additional_tlds)))
 
         # Longest first, to prevent eager matching, if for example
         # .co is matched before .com

@@ -1,5 +1,7 @@
 import re
 
+from urlextract import URLExtract
+
 import onegov.core
 import os.path
 import pytest
@@ -190,6 +192,22 @@ def test_linkify_with_custom_domain_and_without_email():
     assert (utils.linkify(
         "https://thismatters.agency\nhttps://google.com"
     ) == expected)
+
+
+def test_load_tlds():
+
+    def remove_dots(tlds):
+        return [domain[1:] for domain in tlds]
+
+    extract = URLExtract()
+    tlds = remove_dots(extract._load_cached_tlds())
+
+    assert all("." not in item for item in tlds)
+    assert len(tlds) > 1600  # make sure the reading worked
+
+    # if these are not in the list, the list is probably outdated
+    additional_tlds = ['agency', 'ngo', 'swiss', 'gle']
+    assert all(domain in tlds for domain in additional_tlds)
 
 
 def test_increment_name():
