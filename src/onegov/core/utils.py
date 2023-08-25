@@ -17,7 +17,6 @@ import shutil
 import sqlalchemy
 import urllib.request
 
-from markupsafe import Markup
 from collections.abc import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
@@ -418,24 +417,20 @@ def linkify(text: str, escape: bool = True) -> str:
     custom_top_level_domains = ['agency', 'ngo', 'swiss', 'gle']
 
     if any(domain in text for domain in add_dots(custom_top_level_domains)):
-        if '@' in text:
-            all_tlds = TLDS + custom_top_level_domains
 
-            # Longest first, to prevent eager matching, if for example
-            # .co is matched before .com
-            all_tlds.sort(key=lambda s: len(s), reverse=True)
+        all_tlds = TLDS + custom_top_level_domains
 
-            bleach_linker = bleach.Linker(
-                url_re=bleach.linkifier.build_url_re(tlds=all_tlds),
-                email_re=bleach.linkifier.build_email_re(tlds=all_tlds),
-                parse_email=True
-            )
-            linkified = linkify_phone(bleach_linker.linkify(text))
-        else:
-            # url
-            linkified = str(
-                Markup('<a href="{text}">{text}</a>').format(text=text)
-            )
+        # Longest first, to prevent eager matching, if for example
+        # .co is matched before .com
+        all_tlds.sort(key=lambda s: len(s), reverse=True)
+
+        bleach_linker = bleach.Linker(
+            url_re=bleach.linkifier.build_url_re(tlds=all_tlds),
+            email_re=bleach.linkifier.build_email_re(tlds=all_tlds),
+            parse_email=True if '@' in text else False
+        )
+        linkified = linkify_phone(bleach_linker.linkify(text))
+
     else:
         linkified = linkify_phone(bleach.linkify(text, parse_email=True))
 

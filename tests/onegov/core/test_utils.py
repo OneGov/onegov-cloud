@@ -151,6 +151,47 @@ def test_linkify_with_phone_newline():
     )
 
 
+def test_linkify_with_custom_domains():
+
+    assert utils.linkify(
+        "https://forms.gle/123\nfoo@bar.agency\nfoo@bar.co\nfoo@bar.com\n"
+        "https://foobar.agency\n+41 41 511 21 21\nfoo@bar.ngo"
+    ) == (
+        "<a href=\"https://forms.gle/123\" rel=\"nofollow\">"
+        "https://forms.gle/123</a>\n<a href=\"mailto:foo@bar.agency\">"
+        "foo@bar.agency</a>\n<a href=\"mailto:foo@bar.co\">foo@bar.co</a>\n"
+        "<a href=\"mailto:foo@bar.com\">foo@bar.com</a>\n"
+        "<a href=\"https://foobar.agency\" rel=\"nofollow\">"
+        "https://foobar.agency</a>\n<a href=\"tel:+41 41 511 21 21\">"
+        "+41 41 511 21 21</a> \n<a href=\"mailto:foo@bar.ngo\">foo@bar.ngo</a>"
+    )
+
+
+def test_linkify_with_custom_domain_and_with_email_and_links():
+    assert utils.linkify(
+        "foo@bar.agency\nhttps://thismatters.agency\nhttps://google.com"
+    ) == ("<a href=\"mailto:foo@bar.agency\">foo@bar.agency</a>\n"
+          "<a href=\"https://thismatters.agency\" rel=\"nofollow\">"
+          "https://thismatters.agency</a>\n<a href=\"https://google.com\" rel"
+          "=\"nofollow\">https://google.com</a>")
+
+
+def test_linkify_with_custom_domain_and_without_email():
+
+    expected_link = "<a href=\"https://thismatters.agency\" " \
+                    "rel=\"nofollow\">https://thismatters.agency</a>"
+    expected_link2 = (
+        "<a href=\"https://google.com\" rel=\"nofollow\">" "https://google.com"
+        "</a>"
+    )
+
+    # linkify should work even if no email is present
+    expected = '\n'.join([expected_link, expected_link2])
+    assert (utils.linkify(
+        "https://thismatters.agency\nhttps://google.com"
+    ) == expected)
+
+
 def test_increment_name():
     assert utils.increment_name('test') == 'test-1'
     assert utils.increment_name('test-2') == 'test-3'
