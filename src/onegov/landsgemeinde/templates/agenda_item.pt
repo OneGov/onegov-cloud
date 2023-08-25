@@ -10,8 +10,10 @@
             <div class="medium-7 cell main-content">
                 
                 <div class="video" tal:condition="agenda_item.video_url">
-                    <h2 i18n:translate="">Video</h2>
-                    <iframe allow="fullscreen" frameborder="0" src="${agenda_item.video_url}"></iframe>
+                    <h2 i18n:translate="" class="visually-hidden">Video</h2>
+                    <div class="videowrapper">
+                        <iframe allow="fullscreen" width="100%" frameborder="0" src="${agenda_item.video_url}"></iframe>
+                    </div>
                 </div>
 
                 <p tal:condition="agenda_item.start" class="subheader agenda-item-timestamp">${layout.format_date(agenda_item.start, 'datetime')}</p>

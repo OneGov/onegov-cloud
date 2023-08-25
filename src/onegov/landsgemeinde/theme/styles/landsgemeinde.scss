@@ -133,6 +133,24 @@ h6 small,
     }
 }
 
+.videowrapper {
+    clear: both;
+    float: none;
+    height: 0;
+    padding-bottom: 56.25%;
+    padding-top: 25px;
+    position: relative;
+    width: 100%;
+}
+
+.videowrapper iframe {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
 /*
     Person
 */
