@@ -432,7 +432,7 @@ def linkify(text: str, escape: bool = True) -> str:
 
         # Longest first, to prevent eager matching, if for example
         # .co is matched before .com
-        all_tlds.sort(key=lambda s: len(s), reverse=True)
+        all_tlds.sort(key=len, reverse=True)
 
         bleach_linker = bleach.Linker(
             url_re=bleach.linkifier.build_url_re(tlds=all_tlds),
