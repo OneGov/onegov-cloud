@@ -967,3 +967,46 @@ ul.recipients {
 .sidebar {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
 }
+
+.sidebar-toggler {
+    background: $black;
+    border-radius: 200px 0 0 200px;
+    opacity: .5;
+    padding: .7rem .4rem .7rem 1rem;
+    position: fixed;
+    right: 0;
+    top: calc(50vh - 23px);
+    z-index: 1001;
+
+    i {
+        color: $white;
+    }
+}
+
+#offCanvasSidebar {
+    background: $white;
+    padding: 2rem;
+    z-index: 1000;
+}
+
+$offcanvas-sizes: (
+    small: 90vw,
+    medium: 350px,
+);
+$offcanvas-vertical-sizes: (
+    small: 90vw,
+    medium: 350px,
+);
+
+.rotate {
+    -moz-transition: all 200ms linear;
+    -webkit-transition: all 200ms linear;
+    transition: all 200ms linear;
+}
+
+.rotate.down {
+    -ms-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
