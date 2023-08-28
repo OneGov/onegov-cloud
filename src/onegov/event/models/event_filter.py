@@ -1,0 +1,43 @@
+from functools import lru_cache
+from uuid import uuid4
+
+from sqlalchemy import Column, Text
+
+from onegov.core.orm import Base
+from onegov.core.orm.types import UUID
+from onegov.event.types import EventConfigurationStorage
+from onegov.form import flatten_fieldsets, parse_formcode
+
+
+class EventFilter(Base):
+    """
+
+    """
+
+    __tablename__ = 'event_filters'
+
+    #: An internal id for references (not public)
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: The data structure of the contained entries
+    structure = Column(Text, nullable=False)
+
+    #: The configuration of the contained entries
+    configuration = Column(EventConfigurationStorage, nullable=False)
+
+    @property
+    def entry_cls_name(self):
+        return 'EventFilter'
+
+    @property
+    def entry_cls(self):
+        return self.__class__._decl_class_registry[self.entry_cls_name]
+
+    @property
+    def fields(self):
+        return self.fields_from_structure(self.structure)
+
+    @staticmethod
+    @lru_cache(maxsize=1)
+    def fields_from_structure(structure):
+        return tuple(flatten_fieldsets(parse_formcode(structure)))

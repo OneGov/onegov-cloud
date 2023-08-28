@@ -18,6 +18,9 @@ from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 
+from onegov.event.models.event_filter import EventFilter
+from onegov.form import as_internal_id
+
 
 class OccurrenceCollection(Pagination):
     """ Manages a list of occurrences.
@@ -222,13 +225,36 @@ class OccurrenceCollection(Pagination):
         return counts
 
     @cached_property
-    def config_filters(self):
-        """
+    def event_config(self):
+        return self.session.query(EventFilter).first()
 
-        :return:
+    def available_filters(self, sort_choices=False, sortfunc=None):
         """
-        # TODO: from db
-        return ('Sportart', 'Veranstaltungstyp', 'Zielgruppe')
+        Retrieve the filters with their choices. Return by default in the
+        order of how they are defined in the config structure.
+        To filter alphabetically, set sort_choices=True.
+
+        """
+        keywords = tuple(
+            as_internal_id(k)
+            for k in self.event_config.configuration.keywords.split('\r\n')
+            or tuple()
+        )
+        fields = {
+            f.id: f for f in self.event_config.fields if f.id in keywords
+        }
+
+        def _sort(values):
+            if not sort_choices:
+                return values
+            if not sortfunc:
+                return sorted(values)
+            return sorted(values, key=sortfunc)
+
+        return (
+            (k, fields[k].label, _sort([c.label for c in fields[k].choices]))
+            for k in keywords if hasattr(fields[k], 'choices')
+        )
 
     @cached_property
     def used_tags(self):

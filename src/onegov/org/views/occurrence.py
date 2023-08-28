@@ -1,11 +1,15 @@
 """ The onegov org collection of images uploaded to the site. """
-
+from collections import namedtuple
 from datetime import date
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
+from onegov.event.models.event_filter import EventFilter
+from onegov.event.types import EventConfiguration
+from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
+    DuplicateLabelError
 from onegov.org import _, OrgApp
 from onegov.winterthur import WinterthurApp
 from onegov.org.elements import Link
@@ -14,6 +18,40 @@ from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
+
+
+def get_filters(request, self, keyword_counts=None, view_name=None):
+    Filter = namedtuple('Filter', ('title', 'tags'))
+    filters = []
+    # empty = tuple()
+
+    radio_fields = set(
+        f.id for f in self.event_config.fields if f.type == 'radio'
+    )
+
+    def link_title(field_id, value):
+        if keyword_counts is None:
+            return value
+        count = keyword_counts.get(field_id, {}).get(value, 0)
+        return f'{value} ({count})'
+
+    for keyword, title, values in self.available_filters(sort_choices=False):
+        print(f'*** tschupre get_filters keyword: {keyword}, title: '
+              f'{title}, values: {values}')
+        filters.append(Filter(title=title, tags=tuple(
+            Link(
+                text=link_title(keyword, value),
+                # active=value in self.keywords.get(keyword, empty),
+                active=value,
+                url=request.link(self.for_filter(
+                    singular=keyword in radio_fields,
+                    **{keyword: value}
+                ), name=view_name),
+                # rounded=keyword in radio_fields
+            ) for value in values
+        )))
+
+    return filters
 
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
@@ -30,11 +68,11 @@ def view_occurrences(self, request, layout=None):
 
     filters = None
     tags = None
+
     if isinstance(request.app, WinterthurApp):
-        filters = [
-            Link(text=f, url=request.link(self.for_filter(filters=f)))
-            for f in self.config_filters
-        ]
+        filters = get_filters(request, self)
+        # TODO keyword counts
+        print(f'*** tschupre filters: {filters}')
     else:
         tags = [
             Link(
@@ -130,20 +168,60 @@ def view_occurrence(self, request, layout=None):
 
 @OrgApp.form(model=OccurrenceCollection, name='edit',
              template='directory_form.pt', permission=Secret,
-             form = EventConfigurationForm)
+             form=EventConfigurationForm)
 def handle_edit_event_filters(self, request, form, layout=None):
     print(f'*** tschupre handle edit event configuration. model: {self}')
 
-    if form.submitted(request):
-        print(f'*** tschupre structure data:\n {form.structure.data}')
-        print(f'*** tschupre keyword fields:\n {form.keyword_fields.data}')
-        form.populate_obj(self)
+    def set_event_filter_data(event_filter, structure, configuration):
+        event_filter.structure = structure
+        event_filter.configuration = EventConfiguration(title='', order=[],
+                                                        keywords=configuration)
+    try:
+        if form.submitted(request):
+            if self.session.query(EventFilter).count():
+                # update existing event configuration
+                event_filter = self.event_config
+                print(f'*** tschupre first event filter: {event_filter}')
+                set_event_filter_data(event_filter, form.structure.data,
+                                      form.keyword_fields.data)
+            else:
+                # add new event configuration
+                event_filter = EventFilter()
+                set_event_filter_data(event_filter, form.structure.data,
+                                      form.keyword_fields.data)
+                self.session.add(event_filter)
 
-        request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self))
+            self.session.flush()
 
-    elif not request.POST:
-        form.process(obj=self.filter_config)
+            print(f'**** tschupre count EventFilter in db: '
+                  f'{self.session.query(EventFilter).count()}')
+            print(f'**** tschupre count EventFilter in db: '
+                  f'{self.session.query(EventFilter).all()}')
+
+            form.populate_obj(event_filter)
+            request.success(_("Your changes were saved"))
+            return request.redirect(request.link(self))
+
+        elif not request.POST:
+            event_filter = self.session.query(EventFilter).first()
+            form.process(obj=event_filter)
+            # TODO: filters are not selected when editing
+    except InvalidFormSyntax as e:
+        request.warning(
+            _("Syntax Error in line ${line}", mapping={'line': e.line})
+        )
+    except AttributeError:
+        request.warning(_("Syntax error in form"))
+
+    except MixedTypeError as e:
+        request.warning(
+            _("Syntax error in field ${field_name}",
+              mapping={'field_name': e.field_name})
+        )
+    except DuplicateLabelError as e:
+        request.warning(
+            _("Error: Duplicate label ${label}", mapping={'label': e.label})
+        )
 
     layout = layout or OccurrencesLayout(self, request)
     layout.include_code_editor()

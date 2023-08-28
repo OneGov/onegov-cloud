@@ -124,6 +124,7 @@ def handle_new_directory(self, request, form, layout=None):
     }
 
 
+# tschupre
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
@@ -298,7 +299,7 @@ def view_directory(self, request, layout=None):
         'entries': entries,
         'directory': self.directory,
         'search_widget': self.search_widget,
-        'filters': filters,
+        'filters': filters,  # tschupre
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),
         'show_thumbnails': layout.thumbnail_field_id and True or False,

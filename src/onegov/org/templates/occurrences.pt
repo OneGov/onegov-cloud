@@ -27,23 +27,19 @@
                     </div>
                 </div>
 
+                <div class="filter-panel" tal:condition="filters">
+                    <div tal:repeat="filter filters" class="filter-periods">
+                        <h2 class="filter-title">${filter.title}</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filter.tags" />
+                    </div>
+                </div>
+
                 <div class="tag-filters borderless-side-panel" tal:condition="tags">
                     <h2 i18n:translate>Tag</h2>
                     <div class="occurrences-filter-tags">
                         <tal:b tal:repeat="tag tags">
                             <span class="blank-label click-through ${tag.active and 'active' or ''}">
                                 <tal:b replace="structure tag(request)"></tal:b>
-                            </span>
-                        </tal:b>
-                    </div>
-                </div>
-
-                <div class="config-filters borderless-side-panel" tal:condition="filters">
-                    <h2 i18n:translate>Filter</h2>
-                    <div class="occurrences-config-filter side-panel-with-bg">
-                        <tal:b tal:repeat="filter filters">
-                            <span class="blank-label click-through ${filter.active and 'active' or ''}">
-                                <tal:b replace="structure filter(request)"></tal:b>
                             </span>
                         </tal:b>
                     </div>
