@@ -262,7 +262,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         self.state = 'closed'
         self.user = user
 
-    def redact_ticket_data(self):
+    def redact_ticket_data(self) -> None:
         """ Redacts sensitive information from the ticket to protect personal
         data.
 
@@ -277,10 +277,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         self.snapshot = {}
 
-        # redact the handler data
-        self.handler.redact()
-
-
+        # redact the handler data (todo)
 
     def create_snapshot(self, request: 'CoreRequest') -> None:
         """ Takes the current handler and stores the output of the summary
