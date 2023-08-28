@@ -49,7 +49,7 @@
             <div metal:use-macro="layout.macros['side_navigation']"></div>
         </div>
 
-        <div class="sidebar-toggler" data-toggle="offCanvasSidebar">
+        <div class="sidebar-toggler show-for-small-only" data-toggle="offCanvasSidebar">
             <i class="fa fa-chevron-left rotate"></i>
         </div>
 

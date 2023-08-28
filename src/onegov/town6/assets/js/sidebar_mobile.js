@@ -1,4 +1,4 @@
-if ($('.sidebar-content-wrapper').length && $('div[class^="page"]').length) {
+if ($('.sidebar-content-wrapper').length){
     $('.sidebar-toggler').css('display','block');
-    $(".sidebar-content-wrapper").detach().appendTo("#offCanvasSidebar");
+    $(".sidebar-content-wrapper").clone().appendTo("#offCanvasSidebar");
 }

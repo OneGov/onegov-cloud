@@ -968,6 +968,12 @@ ul.recipients {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
 }
 
+@media #{$small-only} {
+    .sidebar .sidebar-wrapper {
+        display: none;
+    }
+}
+
 .sidebar-toggler {
     background: $black;
     border-radius: 200px 0 0 200px;
