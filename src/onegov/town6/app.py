@@ -201,6 +201,7 @@ def get_common_asset():
     yield 'aos.css'
     yield 'homepage_video.js'
     yield 'notifications.js'
+    yield 'sidebar_mobile.js'
     yield 'jquery.sticky-sidebar.js'
     yield 'sidebar_fixed.js'
 

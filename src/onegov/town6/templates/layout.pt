@@ -54,7 +54,7 @@
         </div>
 
         <div class="off-canvas position-right" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas data-off-canvas >
-            <div metal:define-slot="offcanvas-sidebar"></div>
+            <!-- Gets filled by sidebar-mobile.js -->
         </div>
 
         <div class="off-canvas-content" data-off-canvas-content>

@@ -1,4 +1,4 @@
-if ($('.sidebar-content-wrapper') && $('.sidebar-wrapper')) {
+if ($('.sidebar-content-wrapper').length && $('.sidebar-wrapper').length) {
     $('.sidebar-wrapper').stickySidebar({
         topSpacing: 115,
         innerWrapperSelector: '.sidebar-content-wrapper'
