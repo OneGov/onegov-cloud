@@ -977,7 +977,7 @@ ul.recipients {
 .sidebar-toggler {
     background: $black;
     border-radius: 200px 0 0 200px;
-    display: none;
+    display: block;
     opacity: .5;
     padding: .9rem .4rem .7rem 1rem;
     position: fixed;

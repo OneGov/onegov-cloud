@@ -38,7 +38,6 @@
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
     <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
-    <div class="off-canvas-wrapper">
         <div class="off-canvas position-left" id="offCanvas" data-off-canvas data-auto-focus="false" >
             <!-- Close button -->
             <button class="close-button" aria-label="Close menu" type="button" data-close>
@@ -53,8 +52,8 @@
             <i class="fa fa-chevron-left rotate"></i>
         </div>
 
-        <div class="off-canvas position-right" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas data-off-canvas >
-            <!-- Gets filled by sidebar-mobile.js -->
+        <div class="off-canvas position-right show-for-small-only" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas data-off-canvas >
+            <!-- Gets filled by sidebar_mobile.js -->
         </div>
 
         <div class="off-canvas-content" data-off-canvas-content>
@@ -259,6 +258,6 @@
             <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
             <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
         </div>
-    </div>
+
 </body>
 </html>
