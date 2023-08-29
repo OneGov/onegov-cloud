@@ -7,15 +7,20 @@ from dateutil import rrule
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from itertools import chain
+
+from wtforms import FieldList, FormField
+
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.event.collections import EventCollection, OccurrenceCollection
 from onegov.event.models import EventFile
+from onegov.event.models.event_filter import EventFilter
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
+from onegov.form.parser.core import CheckboxField
 from onegov.form.validators import FileSizeLimit, ValidPhoneNumber, \
     ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
@@ -175,10 +180,15 @@ class EventForm(Form):
         render_kw={'data-map-type': 'marker'}
     )
 
+    # tschupre
     tags = MultiCheckboxField(
         label=_("Tags"),
         choices=[(tag, tag) for tag in TAGS],
     )
+
+    # filters = FieldList(
+    #     label=_("Filters"),
+    # )
 
     start_date = DateField(
         label=_("Date"),
@@ -267,8 +277,10 @@ class EventForm(Form):
             self.email.data = self.request.current_username
 
     def on_request(self):
-        if self.custom_tags():
+        if self.custom_tags() and self.tags:
             self.tags.choices = [(tags, tags) for tags in self.custom_tags()]
+
+        # tschupre or maybe populate filters here?
 
         for include in self.on_request_include:
             self.request.include(include)
@@ -444,6 +456,40 @@ class EventForm(Form):
                 } for ix, d in enumerate(dates)
             ]
         })
+
+
+class EventFilterForm(EventForm):
+    """ Defines filters for event forms instead of tags. """
+
+    tags = None
+    filters = None
+
+    # I thought about a field list to populate checkboxes according the
+    # event configutation
+    filters = FieldList(
+        # SelectField(),
+        FormField(),
+        label=_("Filters"),
+    )
+
+    def populate_obj(self, model):
+        """ Stores the form values on the model. """
+
+        super().populate_obj(model)
+
+    def process_obj(self, model):
+        """ Stores the page values on the form. """
+
+        super().process_obj(model)
+        print('*** tschupre process obj EventFilterForm')
+
+        event_filter = self.request.session.query(EventFilter).first()
+        for field in event_filter.fields:
+            if isinstance(field, (RadioField, CheckboxField,
+                          MultiCheckboxField)):
+
+                # how to populate additional radio and multi checkboxes?
+                pass
 
 
 class EventImportForm(Form):
