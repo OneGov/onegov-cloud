@@ -233,7 +233,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
         # there's a decision to be made about the registration
         window = (self.submission.registration_window
-                  if self.submission else None)
+                  if self.submission is not None else None)
 
         if window:
             if self.submission.spots and self.submission.claimed is None:
