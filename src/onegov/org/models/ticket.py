@@ -154,11 +154,11 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def email(self):
-        return self.submission.email
+        return self.submission.email if self.submission else ''
 
     @property
     def title(self):
-        return self.submission.title
+        return self.submission.title if self.submission else ''
 
     @property
     def subtitle(self):
@@ -166,7 +166,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def group(self):
-        return self.submission.form.title
+        return self.submission.form.title if self.submission else ''
 
     @property
     def payment(self):
@@ -768,7 +768,8 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     @cached_property
     def form(self):
-        return self.submission.form_class(data=self.submission.data)
+        return self.submission.form_class(data=self.submission.data) if \
+            self.submission else None
 
     @cached_property
     def directory(self):
@@ -814,7 +815,7 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     @property
     def email(self):
-        return self.submission.email
+        return self.submission.email if self.submission else ''
 
     @property
     def submitter_name(self):
@@ -833,7 +834,7 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     @property
     def title(self):
-        return self.submission.title
+        return self.submission.title if self.submission else ''
 
     @property
     def subtitle(self):
