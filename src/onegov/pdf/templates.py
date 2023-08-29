@@ -1,10 +1,15 @@
 from pdfdocument.document import ReportingDocTemplate
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from reportlab.platypus.flowables import Flowable
+
+
 class Template(ReportingDocTemplate):
     """ Extends the ReportingDocTemplate with Table of Contents printing. """
 
-    def afterFlowable(self, flowable):
+    def afterFlowable(self, flowable: 'Flowable') -> None:
 
         ReportingDocTemplate.afterFlowable(self, flowable)
 
