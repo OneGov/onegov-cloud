@@ -769,7 +769,7 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
     @cached_property
     def form(self):
         return self.submission.form_class(data=self.submission.data) if \
-            self.submission else None
+            self.submission is not None else None
 
     @cached_property
     def directory(self):
