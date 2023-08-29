@@ -231,7 +231,8 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
         extra = []
 
         # there's a decision to be made about the registration
-        window = self.submission.registration_window
+        window = (self.submission.registration_window
+                  if self.submission else None)
 
         if window:
             if self.submission.spots and self.submission.claimed is None:
@@ -323,16 +324,17 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
                 )
             )
 
-        edit_link = URL(request.link(self.submission))
-        edit_link = edit_link.query_param('edit', '').as_string()
+        if self.submission:
+            edit_link = URL(request.link(self.submission))
+            edit_link = edit_link.query_param('edit', '').as_string()
 
-        (links if not links else extra).append(
-            Link(
-                text=_('Edit submission'),
-                url=request.return_here(edit_link),
-                attrs={'class': 'edit-link'}
+            (links if not links else extra).append(
+                Link(
+                    text=_('Edit submission'),
+                    url=request.return_here(edit_link),
+                    attrs={'class': 'edit-link'}
+                )
             )
-        )
 
         if extra:
             links.append(LinkGroup(
