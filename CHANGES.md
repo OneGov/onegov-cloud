@@ -1,8 +1,18 @@
 # Changes
 
+## 2023.40
+
+`2023-08-29` | [bdbad28762...469592aecc](https://github.com/OneGov/onegov-cloud/compare/bdbad28762^...469592aecc)
+
+### Landsgemeinde
+
+##### More adjustments
+
+`Feature` | [8feeabf916](https://github.com/onegov/onegov-cloud/commit/8feeabf9166987ddab0f21c4e0e9c41a05209398)
+
 ## 2023.39
 
-`2023-08-29` | [3df972f740...2e6ea7db51](https://github.com/OneGov/onegov-cloud/compare/3df972f740^...2e6ea7db51)
+`2023-08-29` | [3df972f740...30d9caebb6](https://github.com/OneGov/onegov-cloud/compare/3df972f740^...30d9caebb6)
 
 ### Core
 
@@ -2598,8 +2608,4 @@ Also improve help texts.
 ##### Fixes flaky test.
 
 `Bugfix` | [ba468fc43d](https://github.com/onegov/onegov-cloud/commit/ba468fc43d98f668dbca7a6bb0e7b6b5a3e623fa)
-
-## 2022.47
-
-`2022-09-11` | [73cba7eba1...655cc2fe97](https://github.com/OneGov/onegov-cloud/compare/73cba7eba1^...655cc2fe97)
 
