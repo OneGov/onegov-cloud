@@ -66,11 +66,20 @@ msgstr "Federal Council dispatch"
 msgid "Pre-parliamentary phase"
 msgstr "Pre-parliamentary phase"
 
-msgid "Parliamentary debate"
-msgstr "Parliamentary debate"
+msgid "Parliamentary initiative"
+msgstr "Parliamentary initiative"
 
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
+
+msgid "Report of the parliamentary committee"
+msgstr "Report of the parliamentary committee"
+
+msgid "Opinion of the Federal Council"
+msgstr "Opinion of the Federal Council"
+
+msgid "Parliamentary debate"
+msgstr "Parliamentary debate"
 
 msgid "Voting booklet"
 msgstr "Official explanatory brochure"
@@ -140,6 +149,9 @@ msgstr "No eMuseum API key available."
 
 msgid "Title"
 msgstr "Title"
+
+msgid "Show Mastodon timeline"
+msgstr "Show Mastodon timeline"
 
 msgid "Content"
 msgstr "Content"
@@ -1683,6 +1695,9 @@ msgstr "If you don't want to change your password, you can ignore this email."
 msgid "Files"
 msgstr "Files"
 
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes on Mastodon"
+
 msgid "Patrons"
 msgstr "Sponsors"
 
@@ -1721,6 +1736,12 @@ msgstr "Keyword"
 
 msgid "Vote date"
 msgstr "Voting day"
+
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "and ${number} out of ${total} votes of the Cantons"
+
+msgid "% Yes votes"
+msgstr "% Yes votes"
 
 msgid "Vote number"
 msgstr "Vote Nº"
@@ -1779,11 +1800,11 @@ msgid "for the counter-proposal"
 msgstr "for the counter-proposal"
 
 msgid ""
-"Number of days between the Parliament’s final vote and the decree to declare "
-"the success of the referendum"
+"Number of days from the start of the collection period (publication of the "
+"parliamentary decision) until the submission of signatures."
 msgstr ""
-"Number of days between the Parliament’s final vote and the decree to declare "
-"the success of the referendum"
+"Number of days from the start of the collection period (publication of the "
+"parliamentary decision) until the submission of signatures."
 
 msgid "Online information by the federal authorities"
 msgstr "Online information by the federal authorities"
@@ -1899,9 +1920,6 @@ msgstr "Display the list of documents"
 
 msgid "People"
 msgstr "People"
-
-msgid "Yeas"
-msgstr "Yes"
 
 msgid "Cantons"
 msgstr "Cantons"

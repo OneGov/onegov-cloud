@@ -20,7 +20,7 @@ from onegov.core.security import Public
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from morepath import Response
+    from webob import Response
 
     from .request import CoreRequest
 

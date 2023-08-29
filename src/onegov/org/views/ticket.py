@@ -7,7 +7,6 @@ from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
 from onegov.core.orm import as_selectable
-from onegov.core.request import CoreRequest
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
@@ -30,6 +29,7 @@ from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
@@ -350,7 +350,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
 
 
 def send_new_note_notification(
-    request: CoreRequest, form: TicketNoteForm, note: TicketNote, template: str
+    request: OrgRequest, form: TicketNoteForm, note: TicketNote, template: str
 ):
     """
     Sends an E-mail notification to all resource recipients that have been

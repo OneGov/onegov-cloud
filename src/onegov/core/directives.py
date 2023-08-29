@@ -52,7 +52,7 @@ class HtmlHandleFormAction(HtmlAction):
     def __init__(
         self,
         model: type | str,
-        form: type['Form'],
+        form: 'type[Form] | Callable[[Any, CoreRequest], type[Form]]',
         render: 'Callable[[Any, Request], Response] | str | None' = None,
         template: 'StrOrBytesPath | None' = None,
         load: 'Callable[[Request], Any] | str | None' = None,
@@ -66,7 +66,7 @@ class HtmlHandleFormAction(HtmlAction):
 
     def perform(
         self,
-        obj: 'Callable[..., Any]',
+        obj: 'Callable[[Any, CoreRequest, Any], Any]',
         *args: Any,
         **kwargs: Any
     ) -> None:
@@ -124,6 +124,7 @@ def query_form_class(
 
     appcls = request.app.__class__
     action = appcls.form.action_factory
+    assert issubclass(action, HtmlHandleFormAction)
 
     for a, fn in Query(action)(appcls):
         if not isinstance(a, action):
@@ -135,8 +136,7 @@ def query_form_class(
 
 
 def wrap_with_generic_form_handler(
-    # FIXME: Having the third argument be optional is a bit suspect
-    obj: 'Callable[[_T, CoreRequest, _Form | None], Any]',
+    obj: 'Callable[[_T, CoreRequest, _Form], Any]',
     form_class: 'type[_Form] | Callable[[_T, CoreRequest], type[_Form]]'
 ) -> 'Callable[[_T, CoreRequest], Any]':
     """ Wraps a view handler with generic form handling.
@@ -159,7 +159,7 @@ def wrap_with_generic_form_handler(
             #        we could just throw an exception here...
             form = None
 
-        return obj(self, request, form)
+        return obj(self, request, form)  # type:ignore[arg-type]
 
     return handle_form
 

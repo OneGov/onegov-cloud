@@ -73,11 +73,12 @@ class localized_property:
         self.name = name
 
     def __get__(self, instance, owner):
+        default = getattr(instance, f'{self.name}_de', None)
         lang = instance.session_manager.current_locale[:2]
         attribute = f'{self.name}_{lang}'
         if hasattr(instance, attribute):
-            return getattr(instance, attribute)
-        return getattr(instance, f'{self.name}_de', None)
+            return getattr(instance, attribute) or default
+        return default
 
 
 class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
@@ -125,6 +126,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (3, _("Popular initiative")),
                 (4, _("Direct counter-proposal")),
                 (5, _("Tie-breaker")),
+            ))
+
+        if attribute == 'parliamentary_initiated':
+            return OrderedDict((
+                (0, _("No")),
+                (1, _("Yes")),
+                (None, _("No")),
             ))
 
         if attribute == 'result' or attribute.endswith('_accepted'):
@@ -213,10 +221,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     title = localized_property()
     short_title_de = Column(Text, nullable=False)
     short_title_fr = Column(Text, nullable=False)
+    short_title_en = Column(Text, nullable=True)
     short_title = localized_property()
     brief_description_title = Column(Text)
     keyword = Column(Text)
     legal_form = encoded_property(nullable=False)
+    parliamentary_initiated = encoded_property()
     initiator = Column(Text)
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
@@ -382,6 +392,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     result_vs_accepted = encoded_property()
     result_zg_accepted = encoded_property()
     result_zh_accepted = encoded_property()
+
+    @cached_property
+    def number_of_cantons(self):
+        if self.bfs_number <= 292:
+            return 22
+        return 23
 
     @cached_property
     def results_cantons(self):
@@ -622,6 +638,27 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         static_views={
             'de_CH': 'botschaft-de.pdf',
             'fr_CH': 'botschaft-fr.pdf',
+        }
+    )
+    parliamentary_initiative = LocalizedFile(
+        label=_('Parliamentary initiative'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'parlamentarische-initiative.pdf',
+        }
+    )
+    parliamentary_committee_report = LocalizedFile(
+        label=_('Report of the parliamentary committee'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'bericht-parlamentarische-kommission.pdf',
+        }
+    )
+    federal_council_opinion = LocalizedFile(
+        label=_('Opinion of the Federal Council'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'stellungnahme-bundesrat.pdf',
         }
     )
     parliamentary_debate = LocalizedFile(

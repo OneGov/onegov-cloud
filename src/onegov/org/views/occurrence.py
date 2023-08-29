@@ -199,17 +199,14 @@ def json_export_occurences(self, request):
 def xml_export_all_occurrences(self, request):
     """
     Returns events as xml.
-    This view was requested by Winterthur for their mobile app that displays
-    the events provided by this xml view.
-
     Url for xml view: ../events/xml
-    """
 
+    """
     collection = OccurrenceCollection(request.session)
     return Response(
         collection.as_xml(),
         content_type='text/xml',
-        content_disposition='inline; filename=occurences.xml'
+        content_disposition='inline; filename=occurrences.xml'
     )
 
 

@@ -7,6 +7,13 @@ from sqlalchemy import Text
 from uuid import uuid4, UUID as UUIDType
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import AppenderQuery
+    from onegov.user import User
+    from sqlalchemy.orm import relationship
+
+
 class UserGroup(Base, ContentMixin, TimestampMixin):
     """ Defines a generic user group. """
 
@@ -33,3 +40,7 @@ class UserGroup(Base, ContentMixin, TimestampMixin):
 
     #: the name of this group
     name: 'Column[str | None]' = Column(Text, nullable=True)
+
+    if TYPE_CHECKING:
+        # forward declare backref
+        users: relationship[AppenderQuery[User]]

@@ -17,11 +17,11 @@ NO_IDENTITY: NoIdentity
 #       generic again.
 class Identity:
     userid: str
-    groupid: str
+    groupid: str | None
     role: str
     application_id: str
     verified: bool | None
-    def __init__(self, userid: str, *, groupid: str, role: str, application_id: str) -> None: ...
+    def __init__(self, userid: str, *, groupid: str | None, role: str, application_id: str) -> None: ...
     def as_dict(self) -> dict[str, str]: ...
 
 class IdentityPolicy(metaclass=abc.ABCMeta):

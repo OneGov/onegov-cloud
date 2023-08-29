@@ -656,7 +656,7 @@ def morepath_modules(cls: type[morepath.App]) -> 'Iterator[str]':
 
 
 def scan_morepath_modules(cls: type[morepath.App]) -> None:
-    """ Tries to scann all the morepath modules required for the given
+    """ Tries to scan all the morepath modules required for the given
     application class. This is not guaranteed to stay reliable as there is
     no sure way to discover all modules required by the application class.
 

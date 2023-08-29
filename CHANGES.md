@@ -1,8 +1,46 @@
 # Changes
 
+## 2023.38
+
+`2023-08-22` | [7ae984d376...aa40de9fb7](https://github.com/OneGov/onegov-cloud/compare/7ae984d376^...aa40de9fb7)
+
+### Core
+
+##### Add compatibility with mistletoe 1.2.
+
+`Bugfix` | [e61fb068a7](https://github.com/onegov/onegov-cloud/commit/e61fb068a7093be3e5048a86b387ea9227c676a8)
+
+### Events
+
+##### Winterthur adding xml view for anthrazit format
+
+`Feature` | [ogc-1048](#ogc-1048) | [7ae984d376](https://github.com/onegov/onegov-cloud/commit/7ae984d37638afcccf0b53d4badd3aad37c128a6)
+
+### Swissvotes
+
+##### Change collection duration info.
+
+`Feature` | [SWI-38](https://linear.app/swissvotes/issue/SWI-38) | [4826eccffe](https://github.com/onegov/onegov-cloud/commit/4826eccffe2d6c633877a7f21a10a4684a5fb571)
+
+##### Add English short title.
+
+`Feature` | [SWI-38](https://linear.app/swissvotes/issue/SWI-38) | [a487782052](https://github.com/onegov/onegov-cloud/commit/a4877820523f872e726d9c2dc745796a3b4b88dd)
+
+##### Add parliamentary initiatives.
+
+`Feature` | [SWI-32](https://linear.app/swissvotes/issue/SWI-32) | [52c3314581](https://github.com/onegov/onegov-cloud/commit/52c33145813b0c8f7277b0ff785dfe329cadee2e)
+
+##### Add mastodon timeline.
+
+`Feature` | [SWI-37](https://linear.app/swissvotes/issue/SWI-37) | [4dea33f44e](https://github.com/onegov/onegov-cloud/commit/4dea33f44ecde483555adcea06186daf56d3c560)
+
+##### Add a voting result line to general.
+
+`Feature` | [SWI-35](https://linear.app/swissvotes/issue/SWI-35) | [aa40de9fb7](https://github.com/onegov/onegov-cloud/commit/aa40de9fb7476e7552b0f617faf03ea391abb10b)
+
 ## 2023.37
 
-`2023-08-21` | [161ee64bb5...493691e9fd](https://github.com/OneGov/onegov-cloud/compare/161ee64bb5^...493691e9fd)
+`2023-08-21` | [161ee64bb5...cce9f9d188](https://github.com/OneGov/onegov-cloud/compare/161ee64bb5^...cce9f9d188)
 
 ### Core
 
@@ -2596,24 +2634,4 @@ Also cleanup the documentation.
 ##### Revert back to using a string field instead of an email field for logins.
 
 `Bugfix` | [OGC-591](https://linear.app/onegovcloud/issue/OGC-591) | [b4dd0109aa](https://github.com/onegov/onegov-cloud/commit/b4dd0109aa48154f3290e22cf66e7640b023ea57)
-
-## 2022.45
-
-`2022-09-04` | [bdb747639b...711063ad8c](https://github.com/OneGov/onegov-cloud/compare/bdb747639b^...711063ad8c)
-
-### Pdf
-
-##### Remove whitespaces from PDF extracts.
-
-`Feature` | [f523c8c174](https://github.com/onegov/onegov-cloud/commit/f523c8c1749e571c701fc1c7c0f80c1fef567544)
-
-##### Allow to remove additional characters from PDF extracts.
-
-`Feature` | [5cdddf291e](https://github.com/onegov/onegov-cloud/commit/5cdddf291e40f8463dcbb32e50d69f9ff5ac7c55)
-
-### People
-
-##### Fix agency upgrade step.
-
-`Bugfix` | [f09e155b1f](https://github.com/onegov/onegov-cloud/commit/f09e155b1fd0026f17cfd1732ba75a34e27a246a)
 

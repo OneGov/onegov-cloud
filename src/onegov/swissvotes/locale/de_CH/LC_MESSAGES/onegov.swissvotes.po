@@ -68,11 +68,20 @@ msgstr "Botschaft des Bundesrats"
 msgid "Pre-parliamentary phase"
 msgstr "Vorparlamentarische Phase"
 
-msgid "Parliamentary debate"
-msgstr "Parlamentsberatung"
+msgid "Parliamentary initiative"
+msgstr "Parlamentarische Initiative"
 
 msgid "Parliamentary phase"
 msgstr "Im Parlament"
+
+msgid "Report of the parliamentary committee"
+msgstr "Bericht der parlamentarischen Kommission"
+
+msgid "Opinion of the Federal Council"
+msgstr "Stellungnahme des Bundesrats"
+
+msgid "Parliamentary debate"
+msgstr "Parlamentsberatung"
 
 msgid "Voting booklet"
 msgstr "Offizielles Abstimmungsbüchlein"
@@ -143,6 +152,9 @@ msgstr "Kein eMuseum API Schlüssel verfügbar."
 
 msgid "Title"
 msgstr "Titel"
+
+msgid "Show Mastodon timeline"
+msgstr "Mastodon-Zeitleiste anzeigen"
 
 msgid "Content"
 msgstr "Inhalt"
@@ -1640,6 +1652,9 @@ msgstr ""
 msgid "Files"
 msgstr "Dateien"
 
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes bei Mastodon"
+
 msgid "Patrons"
 msgstr "Gönner:innen"
 
@@ -1678,6 +1693,12 @@ msgstr "Schlagwort"
 
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
+
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "und ${number} von ${total} Standesstimmen"
+
+msgid "% Yes votes"
+msgstr "% Ja-Stimmen"
 
 msgid "Vote number"
 msgstr "Abstimmungsnummer"
@@ -1734,10 +1755,11 @@ msgid "for the counter-proposal"
 msgstr "für den Gegenentwurf"
 
 msgid ""
-"Number of days between the Parliament’s final vote and the decree to declare "
-"the success of the referendum"
+"Number of days from the start of the collection period (publication of the "
+"parliamentary decision) until the submission of signatures."
 msgstr ""
-"Anzahl Tage vom Parlamentsbeschluss bis zum Beschluss über das Zustandekommen"
+"Anzahl Tage ab Beginn der Sammelfrist (Veröffentlichung des "
+"Parlamentsbeschlusses) bis zur Einreichung der Unterschriften."
 
 msgid "Online information by the federal authorities"
 msgstr "Online-Informationen der Behörden"
@@ -1853,9 +1875,6 @@ msgstr "Liste der Dokumente anzeigen"
 
 msgid "People"
 msgstr "Volk"
-
-msgid "Yeas"
-msgstr "Ja-Stimmen"
 
 msgid "Cantons"
 msgstr "Stände"

@@ -4,6 +4,7 @@ from onegov.form import Form
 from onegov.quill import QuillField
 from onegov.swissvotes import _
 from onegov.swissvotes.models import TranslatablePage
+from wtforms.fields import BooleanField
 from wtforms.fields import StringField
 from wtforms.validators import InputRequired
 
@@ -15,6 +16,10 @@ class PageForm(Form):
         validators=[
             InputRequired()
         ]
+    )
+
+    show_timeline = BooleanField(
+        label=_("Show Mastodon timeline")
     )
 
     content = QuillField(
@@ -38,8 +43,10 @@ class PageForm(Form):
     def update_model(self, model):
         model.title = self.title.data
         model.content = self.content.data
+        model.show_timeline = self.show_timeline.data
         model.id = model.id or self.id
 
     def apply_model(self, model):
         self.title.data = model.title
         self.content.data = model.content
+        self.show_timeline.data = model.show_timeline

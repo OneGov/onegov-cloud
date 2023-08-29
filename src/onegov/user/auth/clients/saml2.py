@@ -23,8 +23,10 @@ if TYPE_CHECKING:
     from onegov.core.cache import RedisCacheRegion
     from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
-    from onegov.user import User
-    from onegov.user.auth.provider import SAML2Provider
+    from onegov.user import User, UserApp
+    from onegov.user.auth.provider import (
+        HasApplicationIdAndNamespace, SAML2Provider)
+    from webob import Response
     from typing_extensions import Self
 
 
@@ -70,7 +72,7 @@ def finish_logout(
     user: 'User',
     to: str,
     local: bool = True
-) -> morepath.Response:
+) -> 'Response':
     # this always finishes the SAML2 logout, but it may delay
     # the local logout and make it the regular logout view's
     # responsibility
@@ -151,12 +153,12 @@ class SAML2Client():
         else:
             raise NotImplementedError()
 
-    def get_sessions(self, app: 'Framework') -> 'Mangled':
+    def get_sessions(self, app: 'UserApp | Framework') -> 'Mangled':
         # this can use our short-lived cache, it will likely
         # be deleted before it can expire anyways
         return Mangled(app.cache, 'saml2_sessions')
 
-    def get_redirects(self, app: 'Framework') -> 'Mangled':
+    def get_redirects(self, app: 'UserApp | Framework') -> 'Mangled':
         # same here
         return Mangled(app.cache, 'saml2_redirects')
 
@@ -312,12 +314,13 @@ class SAML2Client():
         self,
         provider: 'SAML2Provider',
         request: 'CoreRequest'
-    ) -> morepath.Response:
+    ) -> 'Response':
 
         # this could be either a request or a response
         saml_request = request.params.get('SAMLRequest')
         saml_response = request.params.get('SAMLResponse')
-        user = request.current_user
+        # FIXME: This depends on OrgRequest, we should refactor this
+        user = request.current_user  # type:ignore
         to = request.browser_session.pop('logout_to', provider.to or '/')
         if saml_request:
             # this should be a LogoutRequest
@@ -391,7 +394,10 @@ class SAML2Connections():
     # instantiated connections for every tenant
     connections: dict[str, SAML2Client] = attrib()
 
-    def client(self, app: 'Framework') -> SAML2Client | None:
+    def client(
+        self,
+        app: 'HasApplicationIdAndNamespace'
+    ) -> SAML2Client | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
 

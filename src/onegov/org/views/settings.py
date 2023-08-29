@@ -325,7 +325,7 @@ def handle_api_keys(self: Organisation, request: CoreRequest,
     request.include('fontpreview')
     title = _("OneGov API")
     collection = UserCollection(request.session)
-    user = collection.by_username(request.identity.userid)
+    user = collection.by_username(request.identity.userid)  # type:ignore
     if not user:
         raise HTTPForbidden()
 
