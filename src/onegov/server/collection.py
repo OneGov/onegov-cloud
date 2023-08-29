@@ -5,7 +5,6 @@ from onegov.server import errors
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    import morepath
     from collections.abc import Iterable, Iterator
 
     from .application import Application
@@ -91,7 +90,7 @@ class ApplicationCollection:
         else:
             return application.get()
 
-    def morepath_applications(self) -> 'Iterator[morepath.App]':
+    def morepath_applications(self) -> 'Iterator[CachedApplication]':
         """ Iterates through the applications that depend on morepath. """
 
         for app in self.applications.values():

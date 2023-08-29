@@ -1,6 +1,6 @@
 import html
 
-from mistletoe import Document, HTMLRenderer
+from mistletoe import Document, HtmlRenderer
 from onegov.core.html import sanitize_html
 
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 RENDERER_INSTANCES = {}
 
 
-class HTMLRendererWithoutInlineHtml(HTMLRenderer):
+class HTMLRendererWithoutInlineHtml(HtmlRenderer):
 
     @staticmethod
     def render_html_block(token: 'HTMLBlock') -> str:
@@ -25,7 +25,7 @@ class HTMLRendererWithoutInlineHtml(HTMLRenderer):
 
 def render_untrusted_markdown(
     markdown: str,
-    cls: type[HTMLRenderer] = HTMLRendererWithoutInlineHtml
+    cls: type[HtmlRenderer] = HTMLRendererWithoutInlineHtml
 ) -> str:
 
     # use a global renderer instance, but only create it if used

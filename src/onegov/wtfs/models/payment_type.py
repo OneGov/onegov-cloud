@@ -11,16 +11,20 @@ class PaymentType(Base, TimestampMixin):
     __tablename__ = 'wtfs_payment_type'
 
     #: The name of the type
-    name = Column(Text, primary_key=True)
+    name: 'Column[str]' = Column(Text, primary_key=True)
 
     #: The price per quantity times hundred, used for invoices. Typically
     #: 700 (normal) or 850 (special).
-    _price_per_quantity = Column('price_per_quantity', Integer, nullable=False)
+    _price_per_quantity: 'Column[int]' = Column(
+        'price_per_quantity',
+        Integer,
+        nullable=False
+    )
 
     @property
-    def price_per_quantity(self):
+    def price_per_quantity(self) -> float:
         return (self._price_per_quantity or 0) / 100
 
     @price_per_quantity.setter
-    def price_per_quantity(self, value):
-        self._price_per_quantity = (value or 0) * 100
+    def price_per_quantity(self, value: float) -> None:
+        self._price_per_quantity = (value or 0) * 100  # type:ignore

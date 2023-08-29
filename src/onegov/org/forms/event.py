@@ -16,7 +16,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, ValidPhoneNumber
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -152,9 +152,15 @@ class EventForm(Form):
     )
 
     organizer_email = EmailField(
-        label=_("Organizer E-Mail"),
-        description=_("Shown as contact address"),
+        label=_("Organizer E-Mail address"),
+        description=_("Shown as contact E-Mail address"),
         validators=[Optional(), Email()]
+    )
+
+    organizer_phone = StringField(
+        label=_("Organizer phone number"),
+        description=_("Shown as contact phone number"),
+        validators=[Optional(), ValidPhoneNumber()]
     )
 
     external_event_url = StringField(
@@ -485,8 +491,11 @@ class EventImportForm(Form):
             'description': self.request.translate(_("Description")),
             'location': self.request.translate(_("Venue")),
             'price': self.request.translate(_("Price")),
-            'organizer': self.request.translate(("Organizer")),
-            'organizer_email': self.request.translate(_("Organizer E-Mail")),
+            'organizer': self.request.translate(_("Organizer")),
+            'organizer_email': self.request.translate(_("Organizer E-Mail "
+                                                        "address")),
+            'organizer_phone': self.request.translate(_("Organizer phone "
+                                                        "number")),
             'external_event_url': self.request.translate(
                 _("External event URL")),
             'tags': self.request.translate(_("Tags")),

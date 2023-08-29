@@ -214,6 +214,8 @@ class SwissVoteCollection(Pagination):
             from onegov.core.orm.func import unaccent
             if self.app.session_manager.current_locale == 'fr_CH':
                 result = unaccent(SwissVote.short_title_fr)
+            elif self.app.session_manager.current_locale == 'en_US':
+                result = unaccent(SwissVote.short_title_en)
             else:
                 result = unaccent(SwissVote.short_title_de)
         else:
@@ -290,6 +292,7 @@ class SwissVoteCollection(Pagination):
                 match_convert(SwissVote.title_fr, 'french'),
                 match_convert(SwissVote.short_title_de, 'german'),
                 match_convert(SwissVote.short_title_fr, 'french'),
+                match_convert(SwissVote.short_title_en, 'english'),
                 match_convert(SwissVote.keyword, 'german'),
             ]
         return [
@@ -297,6 +300,7 @@ class SwissVoteCollection(Pagination):
             match_convert(SwissVote.title_fr, 'french'),
             match_convert(SwissVote.short_title_de, 'german'),
             match_convert(SwissVote.short_title_fr, 'french'),
+            match_convert(SwissVote.short_title_en, 'english'),
             match_convert(SwissVote.keyword, 'german'),
             match_convert(SwissVote.initiator, 'german'),
             match(SwissVote.searchable_text_de_CH, 'german'),

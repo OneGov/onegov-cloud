@@ -151,7 +151,8 @@ def test_view_occurrences(client):
     assert list(as_xml()[0].keys()) == ['id', 'title', 'tags', 'description',
                                         'start', 'end', 'location', 'price',
                                         'organizer', 'event_url',
-                                        'organizer_email', 'modified']
+                                        'organizer_email', 'organizer_phone',
+                                        'modified']
 
     # Test iCal
     assert client.get('/events/').click('Diese Termine exportieren').\
@@ -199,6 +200,8 @@ def fill_event_form(form_page, start_date, end_date, add_image=False):
     form_page.form['description'] = "My event is an event."
     form_page.form['location'] = "Location"
     form_page.form['organizer'] = "The Organizer"
+    form_page.form['organizer_email'] = "event@myevents.ch"
+    form_page.form['organizer_phone'] = "076 987 65 43"
     form_page.form.set('tags', True, index=0)
     form_page.form.set('tags', True, index=1)
     form_page.form['start_date'] = start_date.isoformat()
@@ -248,6 +251,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Ausstellung" in preview_page
     assert "Bibliothek" in preview_page
     assert "The Organizer" in preview_page
+    assert "event@myevents.ch" in preview_page
+    assert "076 987 65 43" in preview_page
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
             start_date, format='d. MMMM yyyy', locale='de'
@@ -326,6 +331,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "My event is exceptional." in ticket_page
     assert "A special place" in ticket_page
     assert "The Organizer" in ticket_page
+    assert "event@myevents.ch" in preview_page
+    assert "076 987 65 43" in preview_page
     assert "Ausstellung" in ticket_page
     assert "Bibliothek" in ticket_page
     assert "Veranstaltung bearbeitet" in ticket_page
@@ -348,6 +355,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     # Make some more corrections
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['organizer'] = "A carful organizer"
+    form_page.form['organizer_email'] = "info@myevents.ch"
     preview_page = form_page.form.submit().follow()
     assert "My event is exceptional." in preview_page
 
@@ -359,6 +367,7 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
 
     form_page = confirmation_page.click("Bearbeiten Sie diese Veranstaltung.")
     form_page.form['title'] = "My special event"
+    form_page.form['organizer_phone'] = "076 111 22 33"
     preview_page = form_page.form.submit().follow()
     assert "A special place" in preview_page
 
@@ -378,6 +387,8 @@ def test_submit_event(broadcast, authenticate, connect, client, skip):
     assert "Ausstellung" in message
     assert "Bibliothek" in message
     assert "A carful organizer" in message
+    assert "info@myevents.ch" in preview_page
+    assert "076 111 22 33" in preview_page
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
@@ -528,6 +539,7 @@ def test_import_export_events(client):
     page.form['price'] = "CHF 75.-"
     page.form['organizer'] = "Sinfonieorchester"
     page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['organizer_phone'] = "+41 41 123 45 67"
     page.form['tags'] = ["Music", "Tradition"]
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = "18:00"
@@ -585,6 +597,7 @@ def test_import_export_events(client):
     assert events[0].price == events[1].price
     assert events[0].organizer == events[1].organizer
     assert events[0].organizer_email == events[1].organizer_email
+    assert events[0].organizer_phone == events[1].organizer_phone
     assert events[0].tags == events[1].tags
     assert events[0].start == events[1].start
     assert events[0].end == events[1].end
@@ -617,6 +630,7 @@ def test_import_export_events_with_custom_tags(client):
     page.form['price'] = "CHF 75.-"
     page.form['organizer'] = "Sinfonieorchester"
     page.form['organizer_email'] = "sinfonieorchester@govikon.org"
+    page.form['organizer_phone'] = "+41 41 123 45 67"
     page.form['tags'] = ["Singing", "Christmas"]
     page.form['start_date'] = event_date.isoformat()
     page.form['start_time'] = "18:00"
@@ -674,6 +688,7 @@ def test_import_export_events_with_custom_tags(client):
     assert events[0].price == events[1].price
     assert events[0].organizer == events[1].organizer
     assert events[0].organizer_email == events[1].organizer_email
+    assert events[0].organizer_phone == events[1].organizer_phone
     assert events[0].tags == events[1].tags
     assert events[0].start == events[1].start
     assert events[0].end == events[1].end

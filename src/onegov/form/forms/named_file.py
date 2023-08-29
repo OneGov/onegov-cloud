@@ -90,10 +90,7 @@ class NamedFileForm(Form):
         for name, field in self.file_fields.items():
             file = getattr(obj, name)
             if file:
-                # FIXME: Consider allowing omitting content field
-                #        but it's dangerous since that should only
-                #        happen if action != 'replace'
-                field.data = {  # type: ignore[assignment]
+                field.data = {
                     'filename': file.reference.filename,
                     'size': file.reference.file.content_length,
                     'mimetype': file.reference.content_type

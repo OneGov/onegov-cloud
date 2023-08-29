@@ -1,0 +1,11 @@
+# Error: variable differs from runtime
+# ======================
+# These are false positives due to Action using ABCMeta
+more\.webassets\.directives\.Webasset([A-Z]\w+)?\.group_class
+# bound directives are very complex and can't be verified properly
+more\.webassets\.(core\.)?WebassetsApp\.webasset_path
+more\.webassets\.(core\.)?WebassetsApp\.webasset_output
+more\.webassets\.(core\.)?WebassetsApp\.webasset_filter
+more\.webassets\.(core\.)?WebassetsApp\.webasset_mapping
+more\.webassets\.(core\.)?WebassetsApp\.webasset_url
+more\.webassets\.(core\.)?WebassetsApp\.webasset

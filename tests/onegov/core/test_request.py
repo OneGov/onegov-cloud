@@ -68,11 +68,12 @@ def test_return_to_mixin():
     assert r.redirect('http://safe').location == 'http://safe'
 
 
-def test_vhm_root_application_url():
+def test_vhm_root_urls():
 
     request = CoreRequest(environ={
         'wsgi.url_scheme': 'https',
-        'PATH_INFO': '/',
+        'PATH_INFO': '/events',
+        'QUERY_STRING': 'page=1',
         'SCRIPT_NAME': '/town/example',
         'SERVER_NAME': '',
         'SERVER_PORT': '',
@@ -82,7 +83,9 @@ def test_vhm_root_application_url():
     }, app=Bunch())
 
     assert request.x_vhm_root == '/town/example'
-    assert request.application_url == 'https://example.com/'
+    assert request.application_url == 'https://example.com'
+    assert request.path_url == 'https://example.com/events'
+    assert request.url == 'https://example.com/events?page=1'
 
 
 def test_return_to(redis_url):
