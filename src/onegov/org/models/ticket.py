@@ -218,11 +218,12 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
-
-        return render_macro(layout.macros['display_form'], request, {
-            'form': self.form,
-            'layout': layout
-        })
+        if self.submission:
+            return render_macro(layout.macros['display_form'], request, {
+                'form': self.form,
+                'layout': layout
+            })
+        return None
 
     def get_links(self, request):
         layout = DefaultLayout(self.submission, request)
