@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-06-26 08:31+0200\n"
+"POT-Creation-Date: 2023-08-29 16:02+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -122,14 +122,8 @@ msgstr "Name"
 msgid "Person"
 msgstr "Person"
 
-msgid "Function"
-msgstr "Funktion"
-
-msgid "Party or parliamentary group"
-msgstr "Partei oder Fraktion"
-
-msgid "Place"
-msgstr "Ort"
+msgid "Function, Place & Party or parliamentary group"
+msgstr "Funktion, Ort & Partei oder Fraktion"
 
 msgid "Picture"
 msgstr "Bild"
@@ -189,14 +183,14 @@ msgstr "Landsgemeinde"
 msgid "States"
 msgstr "Status"
 
+msgid "Ticker"
+msgstr "Ticker"
+
 msgid "Do you really want to delete this assembly?"
 msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
 
 msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
-
-msgid "Ticker"
-msgstr "Ticker"
 
 #, python-format
 msgid "Extraodinary assembly from ${date}"
@@ -225,6 +219,9 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
+msgid "Video"
+msgstr "Video"
+
 msgid "No assemblies defined yet."
 msgstr "Noch keine Landsgemeinden erfasst."
 
@@ -236,9 +233,6 @@ msgstr "Audio"
 
 msgid "Download audio"
 msgstr "Audio herunterladen"
-
-msgid "Video"
-msgstr "Video"
 
 msgid "Close"
 msgstr "Schliessen"
@@ -274,3 +268,12 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
+
+#~ msgid "Function"
+#~ msgstr "Funktion"
+
+#~ msgid "Party or parliamentary group"
+#~ msgstr "Partei oder Fraktion"
+
+#~ msgid "Place"
+#~ msgstr "Ort"
