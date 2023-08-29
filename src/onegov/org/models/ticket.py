@@ -166,7 +166,9 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def group(self):
-        return self.submission.form.title if self.submission is not None else ''
+        return (
+            self.submission.form.title if self.submission is not None else ''
+        )
 
     @property
     def payment(self):
