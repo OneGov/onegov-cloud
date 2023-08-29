@@ -10,7 +10,7 @@ from onegov.election_day.formats import import_vote_wabsti
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.formats import import_vote_wabstim
 from onegov.election_day.formats import import_xml
-from onegov.election_day.formats.common import BALLOT_TYPES
+from onegov.election_day.formats.imports.common import BALLOT_TYPES
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.views.upload import unsupported_year_error

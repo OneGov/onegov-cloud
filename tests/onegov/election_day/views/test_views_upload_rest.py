@@ -294,7 +294,8 @@ def test_view_rest_parties(election_day_app_zg):
     # election
     for id_ in ('election', '200'):
         with patch(
-            'onegov.election_day.views.upload.rest.import_party_results',
+            'onegov.election_day.views.upload.rest.'
+            'import_party_results_internal',
             return_value=[]
         ) as import_:
             params = (
@@ -314,7 +315,8 @@ def test_view_rest_parties(election_day_app_zg):
     # compound
     for id_ in ('elections', '300'):
         with patch(
-            'onegov.election_day.views.upload.rest.import_party_results',
+            'onegov.election_day.views.upload.rest.'
+            'import_party_results_internal',
             return_value=[]
         ) as import_:
             params = (
