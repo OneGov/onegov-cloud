@@ -1,4 +1,7 @@
 import os
+import transaction
+
+from onegov.org.models.ticket import FormSubmissionHandler
 from onegov.ticket import Ticket
 
 
@@ -48,12 +51,24 @@ def test_ticket_deleted_submission_is_resilient(client):
     ticket_page = client.get(ticket_url)
     ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
 
-    ticket = client.app.session().query(Ticket).first()
-    client.app.session().delete(ticket.handler.submission)
-    ticket.deleted = True
-    client.app.session().flush()
-    ticket = client.app.session().query(Ticket).first()
+    session = client.app.session()
+
+    ticket = session.query(Ticket).first()
+    session.delete(ticket.handler.submission)
+
+    transaction.commit()
+    ticket = session.query(Ticket).first()
+
+    # monkey patch the property
+    ticket.handler.__dict__['deleted'] = True
+
+    session.add(ticket)
+    transaction.commit()
+
+    ticket = session.query(Ticket).first()
     assert ticket.handler.submission is None
+    assert ticket.handler.deleted
+    assert isinstance(ticket.handler, FormSubmissionHandler)
 
     # now navigate to ticket submission is None
     ticket_url = ticket_close_url[:-6]
