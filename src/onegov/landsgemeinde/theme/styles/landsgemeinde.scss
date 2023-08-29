@@ -68,7 +68,8 @@ h6 small,
     .ticker-votum {
         margin-bottom: 3em;
 
-        blockquote {
+        blockquote, blockquote p {
+            color: $charcoal;
             border-left: 0;
             box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
         }
@@ -146,6 +147,7 @@ h6 small,
 .videowrapper iframe {
     height: 100%;
     left: 0;
+    padding-bottom: 2rem;
     position: absolute;
     top: 0;
     width: 100%;
@@ -156,11 +158,11 @@ h6 small,
 */
 .person-list-card {
     align-items: center;
-    color: $dark-gray;
+    color: $charcoal;
+}
 
-    span {
-        margin-right: 1em;
-    }
+.person-card-portrait {
+    margin-right: 1rem;
 }
 
 .person-reveal {
