@@ -1,8 +1,44 @@
 # Changes
 
+## 2023.39
+
+`2023-08-29` | [3df972f740...2e6ea7db51](https://github.com/OneGov/onegov-cloud/compare/3df972f740^...2e6ea7db51)
+
+### Core
+
+##### Fixes `request.application_url`/`request.path_url`
+
+Also fixes incorrect url in sentry events
+
+`Bugfix` | [8b0cc00129](https://github.com/onegov/onegov-cloud/commit/8b0cc00129d1d79333d36a584e86eb6a8bd9a8d1)
+
+### Events
+
+##### Organizer phone number not always shown and translated
+
+`Bugfix` | [ogc-1222](#ogc-1222) | [879cab78f0](https://github.com/onegov/onegov-cloud/commit/879cab78f0331ab79f14a4f2e1c00519159811b8)
+
+### Landsgemeinde
+
+##### Styling and Sidebar
+
+`Feature` | [OGC-1116](https://linear.app/onegovcloud/issue/OGC-1116) | [2e6ea7db51](https://github.com/onegov/onegov-cloud/commit/2e6ea7db512234d4776a1146311def3b9531be52)
+
+### Org
+
+##### Make linkify parser more robust.
+
+`Bugfix` | [OGC-1233](https://linear.app/onegovcloud/issue/OGC-1233) | [5063677158](https://github.com/onegov/onegov-cloud/commit/506367715872eed269153a4717ca4adcc1a7750e)
+
+### Swissvotes
+
+##### Style mastodon timeline.
+
+`Bugfix` | [SWI-37](https://linear.app/swissvotes/issue/SWI-37) | [b95a54050c](https://github.com/onegov/onegov-cloud/commit/b95a54050c521e06dfe1d3905d4d7253512df3d8)
+
 ## 2023.38
 
-`2023-08-22` | [7ae984d376...aa40de9fb7](https://github.com/OneGov/onegov-cloud/compare/7ae984d376^...aa40de9fb7)
+`2023-08-22` | [7ae984d376...1a47ed40da](https://github.com/OneGov/onegov-cloud/compare/7ae984d376^...1a47ed40da)
 
 ### Core
 
@@ -2566,72 +2602,4 @@ Also improve help texts.
 ## 2022.47
 
 `2022-09-11` | [73cba7eba1...655cc2fe97](https://github.com/OneGov/onegov-cloud/compare/73cba7eba1^...655cc2fe97)
-
-## 2022.46
-
-`2022-09-11` | [e6857e75b0...c697cabe7a](https://github.com/OneGov/onegov-cloud/compare/e6857e75b0^...c697cabe7a)
-
-### Agency
-
-##### Use secure requests for map integration.
-
-`Bugfix` | [OGC-241](https://linear.app/onegovcloud/issue/OGC-241) | [0ca196bb00](https://github.com/onegov/onegov-cloud/commit/0ca196bb0058b21c481ab51fec2e000e17151cd4)
-
-### Core
-
-##### Fixes documentation not being built.
-
-Also cleanup the documentation.
-
-`Bugfix` | [OGC-481](https://linear.app/onegovcloud/issue/OGC-481) | [46007815bd](https://github.com/onegov/onegov-cloud/commit/46007815bdfebf778546cae8be659374aa75f204)
-
-##### Removes obsolete package from documentation.
-
-`Bugfix` | [OGC-589](https://linear.app/onegovcloud/issue/OGC-589) | [fb904c42d3](https://github.com/onegov/onegov-cloud/commit/fb904c42d33f08f8212215819a666912523f4260)
-
-### Core 
-
-##### Use autoapi for documentation.
-
-`Feature` | [OGC-589](https://linear.app/onegovcloud/issue/OGC-589) | [1a886c594a](https://github.com/onegov/onegov-cloud/commit/1a886c594af0d61883e3316704cb6302d1552b15)
-
-### Feriennet
-
-##### Clarify labels and error messages for QR bill settings.
-
-`Feature` | [PRO-1003](https://linear.app/projuventute/issue/PRO-1003) | [3ec3340d35](https://github.com/onegov/onegov-cloud/commit/3ec3340d3551c0af88ee697c8898b60ba3f9b233)
-
-##### Check if news item is in siblings list
-
-`Bugfix` | [e67d91c886](https://github.com/onegov/onegov-cloud/commit/e67d91c886ed3e25f2d601b0d8269d41e4ec2068)
-
-##### Fixes occasion choices in notification template not being rendered as HTML.
-
-`Bugfix` | [PRO-1079](https://linear.app/projuventute/issue/PRO-1079) | [87ec196dbe](https://github.com/onegov/onegov-cloud/commit/87ec196dbe841c4e70f85bedd24dc200f03ca74e)
-
-##### Make test less flaky.
-
-`Bugfix` | [OGC-587](https://linear.app/onegovcloud/issue/OGC-587) | [72fb109fcd](https://github.com/onegov/onegov-cloud/commit/72fb109fcd5522df35b68f99d5cfc57eddd87e76)
-
-### Pay
-
-##### Allow disabling payment providers.
-
-`Feature` | [PRO-1026](https://linear.app/projuventute/issue/PRO-1026) | [0489204323](https://github.com/onegov/onegov-cloud/commit/0489204323ee2f1759c7ad75d09ae986cfb18108)
-
-### Town
-
-##### Display absolute date instead of relative.
-
-`Feature` | [OGC-576](https://linear.app/onegovcloud/issue/OGC-576) | [baf5c7696c](https://github.com/onegov/onegov-cloud/commit/baf5c7696ce4c7162c0230e39880e2f68ef6d7ef)
-
-##### Remove town package.
-
-`Other` | [OGC-594](https://linear.app/onegovcloud/issue/OGC-594) | [625c802b6a](https://github.com/onegov/onegov-cloud/commit/625c802b6a81051876624f7bad25058c4cd4b348)
-
-### User
-
-##### Revert back to using a string field instead of an email field for logins.
-
-`Bugfix` | [OGC-591](https://linear.app/onegovcloud/issue/OGC-591) | [b4dd0109aa](https://github.com/onegov/onegov-cloud/commit/b4dd0109aa48154f3290e22cf66e7640b023ea57)
 
