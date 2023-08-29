@@ -2,6 +2,7 @@ from functools import lru_cache
 from uuid import uuid4
 
 from sqlalchemy import Column, Text
+from sqlalchemy.orm import object_session
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
@@ -41,3 +42,8 @@ class EventFilter(Base):
     @lru_cache(maxsize=1)
     def fields_from_structure(structure):
         return tuple(flatten_fieldsets(parse_formcode(structure)))
+
+    @classmethod
+    def instance_from_object(self, object):
+        session = object_session(object)
+        return session.query(EventFilter).first() or None
