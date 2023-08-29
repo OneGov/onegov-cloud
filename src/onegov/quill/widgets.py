@@ -89,16 +89,20 @@ class QuillInput(HiddenInput):
         input_id = f'quill-input-{self.id}'
         kwargs['id'] = input_id
 
-        return Markup("""
+        # FIXME: we should probably escape the json dump, but then we
+        #        need to adjust the tests to detect the &quot; for the
+        #        strings inside the JSON. (The &quot; will be turned back
+        #        into `"` in javascript, so there's no harm to it)
+        return Markup(f"""
             <div style="position:relative" class="quill-widget"
-                data-input-id="{input_id}"
-                data-container-id="{container_id}"
-                data-scroll-container-id="{scroll_container_id}"
-                data-formats="{formats}"
-                data-toolbar="[{toolbar}]"
+                data-input-id="{{input_id}}"
+                data-container-id="{{container_id}}"
+                data-scroll-container-id="{{scroll_container_id}}"
+                data-formats='{dumps(self.formats)}'
+                data-toolbar='[{dumps(self.toolbar)}]'
                 >
-                <div class="scrolling-container" id="{scroll_container_id}">
-                  <div class="quill-container" id="{container_id}"></div>
+                <div class="scrolling-container" id="{{scroll_container_id}}">
+                  <div class="quill-container" id="{{container_id}}"></div>
                 </div>
             </div>
             {input}
@@ -106,7 +110,5 @@ class QuillInput(HiddenInput):
             input_id=input_id,
             container_id=f'quill-container-{self.id}',
             scroll_container_id=f'scrolling-container-{self.id}',
-            formats=dumps(self.formats),
-            toolbar=dumps(self.toolbar),
             input=super(QuillInput, self).__call__(field, **kwargs)
         )
