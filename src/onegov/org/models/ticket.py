@@ -158,7 +158,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def title(self):
-        return self.submission.title if self.submission else ''
+        return self.submission.title if self.submission is not None else ''
 
     @property
     def subtitle(self):
