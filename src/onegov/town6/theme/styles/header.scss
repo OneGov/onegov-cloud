@@ -63,13 +63,12 @@ $pdf-icon: '\f1c1';
 $qr-code-icon: '\f029';
 
 .globals {
-    @include primary-color-background;
+    background: $tuatara;
+    padding-top: 1px;
 
     @include breakpoint(small only) {
         padding: 0;
     }
-
-    padding: .5rem;
 
     a {
         &::before {
@@ -84,6 +83,7 @@ $qr-code-icon: '\f029';
         display: flex;
         justify-content: space-between;
         min-height: $globals-height;
+        padding: .5rem;
 
         @include breakpoint(small only) {
             &.centered {
@@ -108,7 +108,7 @@ $qr-code-icon: '\f029';
             > li {
 
                 > a {
-                    @include primary-color-background;
+                    color: $white;
                     height: 100%;
                     line-height: $globals-height;
                     padding: 0 1rem;
@@ -118,6 +118,10 @@ $qr-code-icon: '\f029';
                         display: flex;
                         justify-content: flex-end;
                         padding-right: 0;
+                    }
+
+                    &:hover {
+                        color: $white-smoke;
                     }
 
                     &::after {
@@ -136,8 +140,10 @@ $qr-code-icon: '\f029';
         a {
             color: $body-font-color;
 
-            &:hover {
-                @include primary-color-background;
+            &:hover,
+            &:focus {
+                background: $tuatara;
+                color: $white;
             }
 
             @include breakpoint(small only) {
@@ -202,7 +208,7 @@ $qr-code-icon: '\f029';
 }
 
 #announcement_header {
-    padding: 1rem;
+    padding: .5rem;
     text-align: center;
 
     p {
@@ -226,6 +232,10 @@ $qr-code-icon: '\f029';
 
     li {
         border-left: 1px solid scale-color($primary-color, $lightness: 80%, $saturation: -12.5%);
+
+        a {
+            padding: .3rem 1rem;
+        }
     }
 
     li:first-child {
@@ -315,12 +325,13 @@ $transition-duration: .1s;
         }
     }
 
-    i {
+    .search-button i,
+    .menu-button i {
         color: $primary-color;
         margin-right: .5rem;
 
         @include breakpoint(medium up) {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             padding-top: 2px;
         }
     }

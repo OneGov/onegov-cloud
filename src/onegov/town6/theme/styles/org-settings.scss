@@ -32,6 +32,15 @@
     margin: 0 0 1rem;
 }
 
+#header-links {
+    background: $primary-color;
+
+    a {
+        color: $white;
+    }
+
+}
+
 #fieldset-header-links {
     .field-button {
         margin-top: 0 !important;

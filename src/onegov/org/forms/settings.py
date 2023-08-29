@@ -473,9 +473,9 @@ class HeaderSettingsForm(Form):
             'left_header_rem': self.left_header_rem.data,
             'announcement': self.announcement.data,
             'announcement_url': self.announcement_url.data,
-            'announcement_bg_color': self.announcement_bg_color.data.get_hex(),
+            'announcement_bg_color': self.announcement_bg_color.data,
             'announcement_font_color':
-            self.announcement_font_color.data.get_hex(),
+            self.announcement_font_color.data,
             'announcement_is_private': self.announcement_is_private.data,
             'header_links_fixed': self.header_links_fixed.data
         }
