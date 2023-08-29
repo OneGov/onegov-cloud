@@ -63,13 +63,15 @@ $pdf-icon: '\f1c1';
 $qr-code-icon: '\f029';
 
 .globals {
-    @include primary-color-background;
+    background: $tuatara;
 
     @include breakpoint(small only) {
         padding: 0;
     }
 
     padding: .5rem;
+    position: relative;
+    z-index: 999;
 
     a {
         &::before {
@@ -108,7 +110,8 @@ $qr-code-icon: '\f029';
             > li {
 
                 > a {
-                    @include primary-color-background;
+                    background: $tuatara;
+                    color: white;
                     height: 100%;
                     line-height: $globals-height;
                     padding: 0 1rem;
@@ -557,3 +560,5 @@ $editbar-fg-color-active: $white;
     color: $primary-color;
     transition: color 2ms linear;
 }
+
+$small-header-height: 96px;

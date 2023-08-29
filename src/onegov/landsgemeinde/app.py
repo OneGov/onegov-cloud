@@ -59,8 +59,13 @@ def get_theme():
 
 
 @LandsgemeindeApp.webasset('ticker')
-def get_backend_common_asset():
+def get_backend_ticker():
     yield 'ticker.js'
+
+
+@LandsgemeindeApp.webasset('agenda_items')
+def get_backend_agenda_items():
+    yield 'agenda_items.js'
 
 
 @LandsgemeindeApp.tween_factory(

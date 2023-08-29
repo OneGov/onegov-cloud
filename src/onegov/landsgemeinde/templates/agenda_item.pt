@@ -5,9 +5,18 @@
     <tal:b metal:fill-slot="main-title">
         <tal:block metal:use-macro="layout.macros['agenda-item-title']" />
     </tal:b>
+
+
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
+                
+                <div class="video" tal:condition="agenda_item.video_url">
+                    <h2 i18n:translate="" class="visually-hidden">Video</h2>
+                    <div class="videowrapper">
+                        <iframe allow="fullscreen" width="100%" frameborder="0" src="${agenda_item.video_url}"></iframe>
+                    </div>
+                </div>
 
                 <p tal:condition="agenda_item.start" class="subheader agenda-item-timestamp">${layout.format_date(agenda_item.start, 'datetime')}</p>
 
@@ -17,7 +26,6 @@
                 </div>
 
                 <div class="agenda-item-overview" tal:condition="agenda_item.overview" tal:content="structure agenda_item.overview"></div>
-                <hr>
 
                 <div class="agenda-item-content" tal:condition="agenda_item.text" tal:content="structure agenda_item.text"></div>
 
@@ -28,29 +36,27 @@
                 <div class="agenda-item-tags">
                     <span tal:repeat="tag agenda_item.resolution_tags" class="blank-label">${tag}</span>
                 </div>
-
+                
             </div>
-
+            
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
-                <div class="side-panel downloads" tal:condition="agenda_item.memorial_pdf">
+                <div class="sidebar-wrapper">
 
-                    <tal:block tal:condition="agenda_item.memorial_pdf">
-                        <h2 i18n:translate="">Downloads</h2>
-                        <p tal:condition="agenda_item.memorial_pdf">
-                            <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                                <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
-                            </a>
-                        </p>
-                    </tal:block>
-
+                    <div class="sidebar-content-wrapper">
+                        <div class="side-panel downloads" tal:condition="agenda_item.memorial_pdf">
+                            <tal:block tal:condition="agenda_item.memorial_pdf">
+                                <h2 i18n:translate="">Downloads</h2>
+                                <p tal:condition="agenda_item.memorial_pdf">
+                                    <a href="${request.link(agenda_item.memorial_pdf)}" class="memorial-link">
+                                        <i class="fa fa-download" aria-hidden="true"></i>
+                                        <span i18n:translate="">Excerpt from the Memorial (PDF)</span>
+                                    </a>
+                                </p>
+                            </tal:block>
+                        </div>
+                        <tal:block metal:use-macro="layout.macros['agenda-item-list']" />
+                    </div>
                 </div>
-
-                <div class="side-panel video" tal:condition="agenda_item.video_url">
-                    <h2 i18n:translate="">Video</h2>
-                    <iframe allow="fullscreen" frameborder="0" src="${agenda_item.video_url}"></iframe>
-                </div>
-
             </div>
         </div>
 

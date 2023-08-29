@@ -14,7 +14,6 @@ $('#nav-bar').on('sticky.zf.unstuckfrom:top', function() {
     }
 });
 
-
 $('#nav-bar').on('sticky.zf.stuckto:top', function() {
     // console.log('on downscroll and hide')
     var el = $(this).children(':first-child');
@@ -40,4 +39,8 @@ $(document).on("keypress", function(e) {
     if(e.ctrlKey && e.shiftKey && (code === 6 || code === 19) ) {
         $('#offCanvas').foundation('toggle', e)
     }
+});
+
+$(".rotate").parent().click(function(){
+    $(this).children('.fa').eq(0).toggleClass("down");
 });

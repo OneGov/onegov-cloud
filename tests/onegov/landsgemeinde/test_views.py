@@ -120,7 +120,7 @@ def test_views(client_with_es):
     # delete votum
     with freeze_time('2023-05-07 9:36'):
         page.click('Löschen', href='votum')
-        page = page.click('Traktandum')
+        page = page.click('Traktandum 6', index=0)
     assert '<p>Dolore magna aliqua.</p>' in page
     assert 'Joe Quimby' not in page
     assert_last_modified()
