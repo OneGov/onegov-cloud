@@ -8,7 +8,7 @@ from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
-from onegov.org.forms import EventForm
+from onegov.org.forms import EventForm, EventFilterForm
 from onegov.org.layout import EventLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
@@ -17,6 +17,8 @@ from onegov.ticket import TicketCollection
 from sedate import utcnow
 from uuid import uuid4
 from webob import exc
+
+from onegov.winterthur import WinterthurApp
 
 
 def get_session_id(request):
@@ -62,6 +64,9 @@ def event_form(model, request, form=None):
         # unlike typical extended models, the property of this is defined
         # on the event model, while we are only using the form extension part
         # here
+        if isinstance(request.app, WinterthurApp):
+            return AccessExtension().extend_form(form or EventFilterForm,
+                                                 request)
         return AccessExtension().extend_form(form or EventForm, request)
 
     return form or EventForm
