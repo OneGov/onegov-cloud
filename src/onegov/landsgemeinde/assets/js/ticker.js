@@ -1,12 +1,14 @@
 function scrollToCurrentItem() {
-    const positionCurrent = $('#current').position().top - $('.agenda-item-list').position().top;
-    const listHeight = $('.agenda-item-list').height();
-    const currentHeight = $('#current').height();
-    const scrollTopList = $('.agenda-item-list').scrollTop();
+    if ($('#current').length) {
+        const positionCurrent = $('#current').position().top - $('.agenda-item-list').position().top;
+        const listHeight = $('.agenda-item-list').height();
+        const currentHeight = $('#current').height();
+        const scrollTopList = $('.agenda-item-list').scrollTop();
 
-    $('.agenda-item-list').animate({
-    scrollTop: positionCurrent - listHeight/2 + currentHeight/2 + scrollTopList
-    })
+        $('.agenda-item-list').animate({
+        scrollTop: positionCurrent - listHeight/2 + currentHeight/2 + scrollTopList
+        })
+    }
 }
 
 scrollToCurrentItem();
