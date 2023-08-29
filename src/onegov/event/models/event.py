@@ -6,6 +6,9 @@ from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
+from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.ext.mutable import MutableDict
+
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
@@ -13,10 +16,12 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.event.models.event_filter import EventFilter
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
 from onegov.file.utils import as_fileintent
+from onegov.form import parse_form
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
 from PIL.Image import DecompressionBombError
@@ -109,6 +114,12 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
     )
 
+    # TODO indexed
+    #: All filter keywords defined for this entry
+    _filter_keywords = Column(  # type:ignore
+        MutableDict.as_mutable(HSTORE), nullable=True, name='filter_keywords'
+    )
+
     def set_image(self, content, filename=None):
         self.set_blob('image', content, filename)
 
@@ -169,7 +180,10 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             return f"https://www.guidle.com/angebote/{guidle_id}"
 
     def __setattr__(self, name, value):
-        """ Automatically update the occurrences if shared attributes change.
+        """ Automatically update the occurrences if shared attributes change
+        # session = object_session(self)
+        # event_filter = session.query(EventFilter).first()
+.
         """
 
         super().__setattr__(name, value)
@@ -396,6 +410,25 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         assert self.state in ('submitted', 'published')
         self.state = 'withdrawn'
+
+    @property
+    def form_class(self):
+        """ Parses the filter definition and returns a form from it. """
+
+        event_filter = EventFilter.instance_from_object(self)
+        if not event_filter.fields:
+            return None
+
+        return parse_form(event_filter.structure)
+
+    @property
+    def filter_keywords(self):
+        return set(self._filter_keywords.keys()) if self._filter_keywords \
+            else set()
+
+    @filter_keywords.setter
+    def filter_keywords(self, value):
+        self._filter_keywords = {k: '' for k in value} if value else None
 
     def get_ical_vevents(self, url=None):
         """ Returns the event and all its occurrences as icalendar objects.

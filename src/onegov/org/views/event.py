@@ -5,10 +5,11 @@ from morepath.request import Response
 from onegov.core.crypto import random_token
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
+from onegov.form import merge_forms
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
-from onegov.org.forms import EventForm, EventFilterForm
+from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
@@ -65,8 +66,8 @@ def event_form(model, request, form=None):
         # on the event model, while we are only using the form extension part
         # here
         if isinstance(request.app, WinterthurApp):
-            return AccessExtension().extend_form(form or EventFilterForm,
-                                                 request)
+            form = merge_forms(form or EventForm, model.form_class)
+            return AccessExtension().extend_form(form, request)
         return AccessExtension().extend_form(form or EventForm, request)
 
     return form or EventForm

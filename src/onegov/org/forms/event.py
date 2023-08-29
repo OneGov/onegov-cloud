@@ -8,8 +8,6 @@ from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from itertools import chain
 
-from wtforms import FieldList, FormField
-
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.event.collections import EventCollection, OccurrenceCollection
@@ -20,7 +18,6 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.parser.core import CheckboxField
 from onegov.form.validators import FileSizeLimit, ValidPhoneNumber, \
     ValidFormDefinition
 from onegov.form.validators import WhitelistedMimeType
@@ -394,6 +391,22 @@ class EventForm(Form):
         else:
             raise NotImplementedError
 
+        print('*** tschupre populate obj')
+        from onegov.form.parser.core import CheckboxField, RadioField
+        filter_keywords = set()
+        event_filter = EventFilter.instance_from_object(model)
+        for field in event_filter.fields:
+
+            form_field = getattr(self, field.id)
+            if isinstance(field, CheckboxField):
+                for value in form_field.data:
+                    filter_keywords.add(f'{field.id}:{value}')
+            if isinstance(field, RadioField):
+                filter_keywords.add(f'{field.id}:{form_field.data}')
+
+        if filter_keywords:
+            model.filter_keywords = filter_keywords
+
     def process_obj(self, model):
         """ Stores the page values on the form. """
 
@@ -428,6 +441,29 @@ class EventForm(Form):
         if model.meta:
             self.email.data = model.meta.get('submitter_email')
 
+        if model.filter_keywords:
+            from onegov.form.parser.core import CheckboxField, RadioField
+            print('*** tschupre set filter in form from model')
+            event_filter = EventFilter.instance_from_object(model)
+            keywords = dict()
+            for item in model.filter_keywords:
+                k, v = item.split(':')
+                if k not in keywords:
+                    keywords[k] = v
+                else:
+                    if not isinstance(keywords[k], list):
+                        keywords[k] = [keywords[k]]
+                    keywords[k].append(v)
+
+            for field in event_filter.fields:
+                form_field = getattr(self, field.id)
+
+                if form_field is None:
+                    continue
+
+                if isinstance(field, (CheckboxField, RadioField)):
+                    form_field.data = keywords[field.id]
+
     @cached_property
     def parsed_dates(self):
         return self.json_to_dates(self.dates.data)
@@ -458,38 +494,39 @@ class EventForm(Form):
         })
 
 
-class EventFilterForm(EventForm):
-    """ Defines filters for event forms instead of tags. """
-
-    tags = None
-    filters = None
-
-    # I thought about a field list to populate checkboxes according the
-    # event configutation
-    filters = FieldList(
-        # SelectField(),
-        FormField(),
-        label=_("Filters"),
-    )
-
-    def populate_obj(self, model):
-        """ Stores the form values on the model. """
-
-        super().populate_obj(model)
-
-    def process_obj(self, model):
-        """ Stores the page values on the form. """
-
-        super().process_obj(model)
-        print('*** tschupre process obj EventFilterForm')
-
-        event_filter = self.request.session.query(EventFilter).first()
-        for field in event_filter.fields:
-            if isinstance(field, (RadioField, CheckboxField,
-                          MultiCheckboxField)):
-
-                # how to populate additional radio and multi checkboxes?
-                pass
+# class EventFilterForm(EventForm):
+#     """ Defines filters for event forms instead of tags. """
+#
+#     tags = None
+#     filters = None
+#
+#     # I thought about a field list to populate checkboxes according the
+#     # event configutation
+#     # filters = FieldList(
+#     #     # SelectField(),
+#     #     FormField(),
+#     #     label=_("Filters"),
+#     # )
+#     filters = MultiCheckboxField()
+#
+#     def populate_obj(self, model):
+#         """ Stores the form values on the model. """
+#
+#         super().populate_obj(model)
+#
+#     def process_obj(self, model):
+#         """ Stores the page values on the form. """
+#
+#         super().process_obj(model)
+#         print('*** tschupre process obj EventFilterForm')
+#
+#         event_filter = self.request.session.query(EventFilter).first()
+#         for field in event_filter.fields:
+#             if isinstance(field, (RadioField, CheckboxField,
+#                           MultiCheckboxField)):
+#
+#                 # how to populate additional radio and multi checkboxes?
+#                 pass
 
 
 class EventImportForm(Form):

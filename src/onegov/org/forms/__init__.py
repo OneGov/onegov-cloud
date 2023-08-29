@@ -5,8 +5,7 @@ from onegov.org.forms.allocation import RoomAllocationEditForm
 from onegov.org.forms.allocation import RoomAllocationForm
 from onegov.org.forms.directory import DirectoryForm
 from onegov.org.forms.directory import DirectoryImportForm
-from onegov.org.forms.event import EventForm, EventFilterForm
-# from onegov.org.forms.event import EventForm
+from onegov.org.forms.event import EventForm
 from onegov.org.forms.event import EventImportForm
 from onegov.org.forms.form_definition import FormDefinitionForm
 from onegov.org.forms.form_export import FormSubmissionsExport
