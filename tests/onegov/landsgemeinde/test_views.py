@@ -77,16 +77,12 @@ def test_views(client_with_es):
         page.form['state'] = 'completed'
         page.form['person_name'] = 'Quimby'
         page.form['person_function'] = 'Mayor'
-        page.form['person_political_affiliation'] = 'Liberals'
-        page.form['person_place'] = 'Springfield'
         page.form['text'] = '<p>Ullamco laboris.</p>'
         page.form['motion'] = '<p>Nisi ut aliquip.</p>'
         page.form['statement_of_reasons'] = '<p>Ex ea commodo consequat.</p>'
         page = page.form.submit().follow()
     assert 'Quimby' in page
     assert 'Mayor' in page
-    assert 'Liberals' in page
-    assert 'Springfield' in page
     assert '<p>Ullamco laboris.</p>' in page
     assert '<p>Nisi ut aliquip.</p>' in page
     assert '<p>Ex ea commodo consequat.</p>' in page
@@ -111,8 +107,6 @@ def test_views(client_with_es):
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=nostrud')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=quimby')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=mayor')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=liberals')
-    assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=springfield')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=laboris')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=aliquip')
     assert 'Landsgemeinde vom 07. Mai' in client.get('/search?q=consequat')
