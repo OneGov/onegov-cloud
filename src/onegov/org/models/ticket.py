@@ -325,7 +325,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
                 )
             )
 
-        if self.submission:
+        if self.submission is not None:
             edit_link = URL(request.link(self.submission))
             edit_link = edit_link.query_param('edit', '').as_string()
 
