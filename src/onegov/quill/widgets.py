@@ -105,7 +105,7 @@ class QuillInput(HiddenInput):
                   <div class="quill-container" id="{{container_id}}"></div>
                 </div>
             </div>
-            {input}
+            {{input}}
         """).format(
             input_id=input_id,
             container_id=f'quill-container-{self.id}',
