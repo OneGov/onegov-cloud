@@ -154,7 +154,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def email(self):
-        return self.submission.email if self.submission else ''
+        return self.submission.email if self.submission is not None else ''
 
     @property
     def title(self):
