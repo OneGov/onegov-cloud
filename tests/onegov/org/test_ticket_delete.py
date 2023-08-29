@@ -6,8 +6,9 @@ from onegov.ticket import Ticket
 
 
 def test_ticket_deleted_submission_is_resilient(client):
-    # it has happened that the submission to a ticket was None
-    # Test ensures viewing the ticket will not break the `get_links`
+    # it so happened that the ticket.handler.submission was None
+    # Viewing a ticket should not break this if that is the case.
+
     client.login_editor()
 
     page = client.get('/forms/new')
@@ -49,7 +50,7 @@ def test_ticket_deleted_submission_is_resilient(client):
     # reopen
     client.login_admin()
     ticket_page = client.get(ticket_url)
-    ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
+    ticket_page.click('Ticket wieder öffnen').follow()
 
     session = client.app.session()
 
