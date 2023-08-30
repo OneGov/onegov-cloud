@@ -7,20 +7,22 @@ if TYPE_CHECKING:
 
     _T = TypeVar('_T')
 
+    # we have to forward declare the implementation, since QueryChainBase
+    # is only generic in our stub and not at runtime
     class QueryChain(QueryChainBase[_T]):
         def slice(self, start: int | None, end: int | None) -> 'Self': ...
         def first(self) -> _T | None: ...
         def all(self) -> tuple[_T, ...]: ...
-else:
 
-    class QueryChain(QueryChainBase):
-        """ Extends SQLAlchemy Utils' QueryChain with some extra methods. """
 
-        def slice(self, start: int | None, end: int | None) -> 'Self':
-            return self[start:end]
+class QueryChain(QueryChainBase):  # type:ignore  # noqa:F811
+    """ Extends SQLAlchemy Utils' QueryChain with some extra methods. """
 
-        def first(self) -> _T | None:
-            return next((o for o in self), None)
+    def slice(self, start: int | None, end: int | None) -> 'Self':
+        return self[start:end]
 
-        def all(self) -> tuple[_T, ...]:
-            return tuple(self)
+    def first(self) -> '_T | None':
+        return next((o for o in self), None)
+
+    def all(self) -> tuple['_T', ...]:
+        return tuple(self)
