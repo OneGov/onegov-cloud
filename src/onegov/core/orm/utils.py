@@ -1,20 +1,26 @@
 from sqlalchemy_utils import QueryChain as QueryChainBase
 
 
-from typing import Any, TYPE_CHECKING
+from typing import TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+    _T = TypeVar('_T')
 
-# FIXME: We should create stubs for QueryChainBase
-class QueryChain(QueryChainBase):
-    """ Extends SQLAlchemy Utils' QueryChain with some extra methods. """
+    class QueryChain(QueryChainBase[_T]):
+        def slice(self, start: int | None, end: int | None) -> 'Self': ...
+        def first(self) -> _T | None: ...
+        def all(self) -> tuple[_T, ...]: ...
+else:
 
-    def slice(self, start: int | None, end: int | None) -> 'Self':
-        return self[start:end]
+    class QueryChain(QueryChainBase):
+        """ Extends SQLAlchemy Utils' QueryChain with some extra methods. """
 
-    def first(self) -> Any | None:
-        return next((o for o in self), None)
+        def slice(self, start: int | None, end: int | None) -> 'Self':
+            return self[start:end]
 
-    def all(self) -> tuple[Any, ...]:
-        return tuple(self)
+        def first(self) -> _T | None:
+            return next((o for o in self), None)
+
+        def all(self) -> tuple[_T, ...]:
+            return tuple(self)
