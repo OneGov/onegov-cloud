@@ -1222,7 +1222,7 @@ msgstr "Réservations rejetées"
 msgid ""
 "If a reservation is cancelled, a notification will be sent to the above "
 "recipient."
-msgstr ""
+msgstr "Si une réservation est annulée, une notification sera envoyée au destinataire mentionné ci-dessus."
 
 msgid "Send on"
 msgstr "Envoyer sur"
