@@ -17,7 +17,7 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.datatype import XmlDate
 
 
-def export_ballot_ech0_252(ballot, canton_id, domain_of_influence):
+def export_ballot_ech_0252(ballot, canton_id, domain_of_influence):
     """ Returns all data as an eCH-0252 VoteInfoType. """
 
     SubtotalInfo = CountOfVotersInformationType.SubtotalInfo
@@ -103,7 +103,7 @@ def export_vote_ech_0252(vote, canton_id, domain_of_influence):
             canton_id=canton_id,
             polling_day=polling_day,
             vote_info=[
-                export_ballot_ech0_252(ballot, canton_id, domain_of_influence)
+                export_ballot_ech_0252(ballot, canton_id, domain_of_influence)
                 for ballot in ballots
             ],
             number_of_entries=len(ballots)

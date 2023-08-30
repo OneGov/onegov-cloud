@@ -347,7 +347,7 @@ def test_view_rest_xml(election_day_app_zg):
         ('results', Upload('delivery.xml', 'a'.encode('utf-8'))),
     )
     with patch(
-        'onegov.election_day.views.upload.rest.import_xml',
+        'onegov.election_day.views.upload.rest.import_ech',
         return_value=([], [])
     ) as import_:
         result = client.post('/upload', params=params)
@@ -355,5 +355,5 @@ def test_view_rest_xml(election_day_app_zg):
 
         assert import_.called
         assert isinstance(import_.call_args[0][0], Canton)
-        assert isinstance(import_.call_args[0][1], Session)
-        assert isinstance(import_.call_args[0][2], BytesIO)
+        assert isinstance(import_.call_args[0][1], BytesIO)
+        assert isinstance(import_.call_args[0][2], Session)

@@ -1,7 +1,7 @@
 from datetime import date
 from io import BytesIO
 from onegov.election_day.formats import export_vote_ech_0252
-from onegov.election_day.formats import import_xml
+from onegov.election_day.formats import import_vote_ech_0252
 from tests.onegov.election_day.common import create_principal
 
 
@@ -37,15 +37,13 @@ def test_import_vote_ech_0252(session, import_test_datasets):
         canton_id=principal.canton_id,
         domain_of_influence=principal.get_ech_domain(vote)
     )
-    errors, updated = import_xml(
+    errors = import_vote_ech_0252(
+        vote,
         principal,
-        session,
         BytesIO(xml.encode('utf-8')),
-        vote=vote
     )
 
     assert not errors
-    assert updated == {vote}
     assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 1
@@ -59,7 +57,7 @@ def test_import_vote_ech_0252(session, import_test_datasets):
     assert vote.proposal.invalid == 52
 
 
-def test_import_xml_vote_complex(session, import_test_datasets):
+def test_import_vote_ech_0252_complex(session, import_test_datasets):
 
     vote, errors = import_test_datasets(
         'internal',
@@ -101,15 +99,13 @@ def test_import_xml_vote_complex(session, import_test_datasets):
         canton_id=principal.canton_id,
         domain_of_influence=principal.get_ech_domain(vote)
     )
-    errors, updated = import_xml(
+    errors = import_vote_ech_0252(
+        vote,
         principal,
-        session,
         BytesIO(xml.encode('utf-8')),
-        vote=vote
     )
 
     assert not errors
-    assert updated == {vote}
     assert vote.last_result_change
     assert vote.completed
     assert vote.ballots.count() == 3

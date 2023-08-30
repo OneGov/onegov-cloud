@@ -7,16 +7,14 @@ from onegov.election_day.formats.imports.common import FileImportError
 from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import load_xml
 from sqlalchemy import or_
+from sqlalchemy.orm import object_session
 from uuid import uuid4
 from xsdata_ech.e_ch_0252_1_0 import VoterTypeType
 from xsdata_ech.e_ch_0252_1_0 import VoteSubTypeType
 
 
-def import_xml(principal, session, file, vote=None):
-    """ Tries to import the given eCH-0252 XML file.
-
-    This function is typically called automatically every few minutes during
-    an election day - we use bulk inserts to speed up the import.
+def import_vote_ech_0252(vote, principal, file):
+    """ Tries to import the given eCH-0252 XML file to a given vote.
 
     :return:
         A list containing errors.
@@ -27,22 +25,43 @@ def import_xml(principal, session, file, vote=None):
     if error:
         return [error], []
 
+    session = object_session(vote)
+    errors, items = import_votes_ech_0252(
+        principal, delivery, session, vote=vote
+    )
+
+    if not items and not errors:
+        errors.append(FileImportError(_('No data found')))
+
+    return errors
+
+
+def import_votes_ech_0252(principal, delivery, session, vote=None):
+    """ Tries to import a single or all votes from a given eCH-0252 delivery.
+
+    This function is typically called automatically every few minutes during
+    an election day - we use bulk inserts to speed up the import.
+
+    :return:
+        A tuple consisting of a list with errors and a list with updated
+        votes.
+
+    """
+
     results = []
     for vote_info in delivery.vote_base_delivery.vote_info:
         results.append(
-            import_vote_xml(principal, session, vote_info, vote=vote)
+            _import_vote_info(principal, session, vote_info, vote=vote)
         )
 
-    items, errors = zip(*results)
-    items = {item for item in items if item}
+    votes, errors = zip(*results)
+    votes = {vote for vote in votes if vote}
     errors = list(chain.from_iterable(errors))
-    if vote and not items and not errors:
-        errors.append(FileImportError(_('No data found')))
 
-    return errors, items
+    return errors, votes
 
 
-def import_vote_xml(principal, session, vote_info, vote=None):
+def _import_vote_info(principal, session, vote_info, vote=None):
     """ Imports a vote_info from a delivery, optionally to a give vote. """
 
     # get vote
