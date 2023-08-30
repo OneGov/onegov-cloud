@@ -1224,7 +1224,10 @@ msgstr "Abgelehnte Reservationen"
 msgid ""
 "If a reservation is cancelled, a notification will be sent to the above "
 "recipient."
-msgstr ""
+msgstr "Wenn eine Reservierung storniert wird, wird dem oben genannten Empfänger eine Benachrichtigung gesendet."
+
+msgid "foobar"
+msgstr "foo"
 
 msgid "Send on"
 msgstr "Senden am"
