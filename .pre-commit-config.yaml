@@ -43,7 +43,7 @@ repos:
     rev: '2c9989ff933b17d496bcaca5a80c9f08ee6677db'
     hooks:
       - id: untranslated-messages
-        files: '^src/.*\.po$'
+        files: '\.po$'
   - repo: local
     hooks:
       - id: system
