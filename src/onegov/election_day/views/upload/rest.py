@@ -12,9 +12,9 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import import_election_compound_internal
 from onegov.election_day.formats import import_election_internal_majorz
 from onegov.election_day.formats import import_election_internal_proporz
-from onegov.election_day.formats import import_party_results
+from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.formats import import_vote_internal
-from onegov.election_day.formats import import_xml
+from onegov.election_day.formats import import_ech
 from onegov.election_day.forms import UploadRestForm
 from onegov.election_day.models import Principal
 from onegov.election_day.models import UploadToken
@@ -147,7 +147,7 @@ def view_upload_rest(self, request):
                     item, self, file, mimetype
                 )
         elif form.type.data == 'parties':
-            err = import_party_results(
+            err = import_party_results_internal(
                 item,
                 request.app.principal,
                 file,
@@ -156,10 +156,10 @@ def view_upload_rest(self, request):
                 request.app.default_locale
             )
         elif form.type.data == 'xml':
-            err, updated = import_xml(
+            err, updated = import_ech(
                 request.app.principal,
-                session,
-                file
+                file,
+                session
             )
         if err:
             errors.setdefault('results', []).extend(err)
