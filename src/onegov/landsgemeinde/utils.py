@@ -36,7 +36,8 @@ def update_ticker(request, assembly, agenda_item=None, action='refresh'):
             'event': 'update',
             'assembly': assembly.date.isoformat(),
             'node': f'agenda-item-{agenda_item.number}',
-            'content': content
+            'content': content,
+            'state': agenda_item.state
         })
     elif action == 'refresh':
         request.app.send_websocket({

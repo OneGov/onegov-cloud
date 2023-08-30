@@ -70,6 +70,9 @@ $qr-code-icon: '\f029';
         padding: 0;
     }
 
+    padding: .5rem;
+    position: relative;
+
     a {
         &::before {
             margin-right: 1ex;
@@ -568,3 +571,5 @@ $editbar-fg-color-active: $white;
     color: $primary-color;
     transition: color 2ms linear;
 }
+
+$small-header-height: 96px;

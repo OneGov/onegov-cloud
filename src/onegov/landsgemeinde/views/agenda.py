@@ -55,10 +55,12 @@ def add_agenda_item(self, request, form):
 def view_agenda_item(self, request):
 
     layout = AgendaItemLayout(self, request)
+    agenda_items = self.assembly.agenda_items
 
     return {
         'layout': layout,
         'agenda_item': self,
+        'agenda_items': agenda_items,
         'title': layout.title,
     }
 
