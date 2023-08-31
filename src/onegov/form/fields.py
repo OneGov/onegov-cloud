@@ -313,6 +313,9 @@ class UploadMultipleField(UploadMultipleBase, FileField):
         fieldset: str | None = None,
         depends_on: 'Sequence[Any] | None' = None,
         pricing: 'PricingRules | None' = None,
+        # if we change the upload_field_class there may be additional
+        # parameters that are allowed so we pass them through
+        **extra_arguments: Any
     ):
         if upload_widget is None:
             upload_widget = self.upload_widget
@@ -324,6 +327,7 @@ class UploadMultipleField(UploadMultipleBase, FileField):
             description=description,
             widget=upload_widget,
             render_kw=render_kw,
+            **extra_arguments
         )
         super().__init__(
             unbound_field,
@@ -399,7 +403,7 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
     upload_field_class = UploadFileWithORMSupport
 
     def __init__(self, *args: Any, **kwargs: Any):
-        self.file_class = kwargs.pop('file_class')
+        self.file_class = kwargs['file_class']
         super().__init__(*args, **kwargs)
 
     def populate_obj(self, obj: object, name: str) -> None:

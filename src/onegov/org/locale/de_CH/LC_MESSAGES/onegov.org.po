@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-08-03 17:58+0200\n"
+"POT-Creation-Date: 2023-08-31 10:31+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -675,11 +675,11 @@ msgstr "Musikverein"
 msgid "Organizer E-Mail address"
 msgstr "Organisator E-Mail Adresse"
 
-msgid "Organizer phone number"
-msgstr "Organisator Telefonnummer"
-
 msgid "Shown as contact E-Mail address"
 msgstr "Wird als Kontakt-Email-Adresse angezeigt"
+
+msgid "Organizer phone number"
+msgstr "Organisator Telefonnummer"
 
 msgid "Shown as contact phone number"
 msgstr "Wird als Kontakttelefonnummer angezeigt"
@@ -985,9 +985,6 @@ msgstr "Aktuelles"
 
 msgid "Events"
 msgstr "Veranstaltungen"
-
-msgid "Search in Events"
-msgstr "Suche in Veranstaltungen"
 
 msgid "Publications"
 msgstr "Publikationen"
@@ -2225,6 +2222,9 @@ msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
 msgid "Show image on page"
 msgstr "Bild auf der Seite anzeigen"
 
+msgid "Documents"
+msgstr "Dokumente"
+
 msgid "This month"
 msgstr "Diesen Monat"
 
@@ -2475,8 +2475,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2648,8 +2648,9 @@ msgstr "Keine Regeln definiert."
 msgid ""
 "Api keys can be used to ensure you're not being rate limited. They are not "
 "required to use the API."
-msgstr "Api-Schlüssel können verwendet werden, um sicherzustellen, dass Sie keine Tarifbeschränkungen haben. "
-"Sie sind nicht erforderlich, um die API zu nutzen."
+msgstr ""
+"Api-Schlüssel können verwendet werden, um sicherzustellen, dass Sie keine "
+"Tarifbeschränkungen haben. Sie sind nicht erforderlich, um die API zu nutzen."
 
 msgid "Application Keys"
 msgstr "Applikations-Schlüssel"
@@ -3701,6 +3702,9 @@ msgstr "Herkunft"
 
 msgid "This is an imported event"
 msgstr "Dies ist eine importierte Veranstaltung"
+
+msgid "Search in Events"
+msgstr "Suche in Veranstaltungen"
 
 msgid "Tag"
 msgstr "Schlagwort"

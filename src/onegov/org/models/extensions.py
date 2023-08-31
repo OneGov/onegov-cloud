@@ -2,6 +2,7 @@ from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
+from onegov.form.fields import UploadMultipleFilesWithORMSupport
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
@@ -17,6 +18,21 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from onegov.form.types import _FormT
+    from onegov.org.request import OrgRequest
+    from typing import Protocol
+
+    class SupportsExtendForm(Protocol):
+        def extend_form(
+            self,
+            form_class: type[_FormT],
+            request: OrgRequest
+        ) -> type[_FormT]: ...
+
+
 class ContentExtension:
     """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
     with custom data that is stored in either 'meta' or 'content'.
@@ -24,7 +40,7 @@ class ContentExtension:
     """
 
     @property
-    def content_extensions(self):
+    def content_extensions(self) -> 'Iterator[type[ContentExtension]]':
         """ Returns all base classes of the current class which themselves have
         ``ContentExtension`` as baseclass.
 
@@ -33,7 +49,12 @@ class ContentExtension:
             if ContentExtension in cls.__bases__:
                 yield cls
 
-    def with_content_extensions(self, form_class, request, extensions=None):
+    def with_content_extensions(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest',
+        extensions: 'Iterable[type[SupportsExtendForm]] | None' = None
+    ) -> type['_FormT']:
         """ Takes the given form and request and extends the form with
         all content extensions in the order in which they occur in the base
         class list.
@@ -49,7 +70,11 @@ class ContentExtension:
 
         return form_class
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
         """ Must be implemented by each ContentExtension. Takes the form
         class without extension and adds the required fields to it.
 
@@ -511,3 +536,28 @@ class ImageExtension(ContentExtension):
             )
 
         return PageImageForm
+
+
+class GeneralFileLinkExtension(ContentExtension):
+    """ Extends any class that has a files relationship to reference files from
+    :class:`onegov.org.models.file.GeneralFileCollection`.
+
+    """
+
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        from onegov.org.models import GeneralFile  # circular
+
+        class GeneralFileForm(form_class):  # type:ignore
+            # TODO: upgrade this to a specialized Field which can select
+            #       existing files in addition to uploading new ones
+            files = UploadMultipleFilesWithORMSupport(
+                label=_("Documents"),
+                file_class=GeneralFile
+            )
+
+        return GeneralFileForm
