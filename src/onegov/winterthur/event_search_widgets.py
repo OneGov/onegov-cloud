@@ -46,7 +46,7 @@ class InlineEventSearch:
             conditions = []
             for p in search_properties:
                 conditions.append(
-                    func.lower(getattr(Event, p)).contains(word))
+                    func.lower(getattr(Event, p)).contains(word.lower()))
             query = query.filter(or_(*conditions))
 
         return query
