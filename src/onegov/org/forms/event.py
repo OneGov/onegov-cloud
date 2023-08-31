@@ -451,9 +451,9 @@ class EventForm(Form):
                 if k not in keywords:
                     keywords[k] = v
                 else:
-                    if not isinstance(keywords[k], list):
-                        keywords[k] = [keywords[k]]
-                    keywords[k].append(v)
+                    if isinstance(keywords[k], list):
+                        keywords[k].append(v)
+                    keywords[k] = [keywords[k]]
 
             for field in event_filter.fields:
                 form_field = getattr(self, field.id)
@@ -462,7 +462,8 @@ class EventForm(Form):
                     continue
 
                 if isinstance(field, (CheckboxField, RadioField)):
-                    form_field.data = keywords[field.id]
+                    form_field.data = keywords[field.id] \
+                        if (field.id in keywords) else None
 
     @cached_property
     def parsed_dates(self):

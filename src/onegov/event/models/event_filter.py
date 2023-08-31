@@ -6,7 +6,7 @@ from sqlalchemy.orm import object_session
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
-from onegov.event.types import EventConfigurationStorage
+from onegov.event.types import EventConfigurationStorage, EventConfiguration
 from onegov.form import flatten_fieldsets, parse_formcode
 
 
@@ -18,10 +18,10 @@ class EventFilter(Base):
     __tablename__ = 'event_filters'
 
     #: An internal id for references (not public)
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[UUID]' = Column(UUID, primary_key=True, default=uuid4)
 
-    #: The data structure of the contained entries
-    structure = Column(Text, nullable=False)
+    #: The custom form definition of the event filters
+    structure: 'Column[str | None]' = Column(Text, nullable=False)
 
     #: The configuration of the contained entries
     configuration = Column(EventConfigurationStorage, nullable=False)
@@ -47,3 +47,8 @@ class EventFilter(Base):
     def instance_from_object(self, object):
         session = object_session(object)
         return session.query(EventFilter).first() or None
+
+    def update(self, structure, configuration):
+        self.structure = structure
+        self.configuration = EventConfiguration(order=[],
+                                                keywords=configuration)

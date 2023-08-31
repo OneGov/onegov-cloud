@@ -54,9 +54,3 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     @property
     def access(self):
         return self.event.access
-
-    @property
-    def event_filter(self):
-        # return Directory.get_polymorphic_class(self.type, Directory)
-        # return EventFilter
-        return self.session.query(EventFilter).first()

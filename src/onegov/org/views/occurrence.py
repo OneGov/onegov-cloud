@@ -25,6 +25,9 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
     filters = []
     # empty = tuple()
 
+    if not self.event_config:
+        return filters
+
     radio_fields = set(
         f.id for f in self.event_config.fields if f.type == 'radio'
     )
@@ -172,23 +175,19 @@ def view_occurrence(self, request, layout=None):
 def handle_edit_event_filters(self, request, form, layout=None):
     print(f'*** tschupre handle edit event configuration. model: {self}')
 
-    def set_event_filter_data(event_filter, structure, configuration):
-        event_filter.structure = structure
-        event_filter.configuration = EventConfiguration(title='', order=[],
-                                                        keywords=configuration)
     try:
         if form.submitted(request):
             if self.session.query(EventFilter).count():
                 # update existing event configuration
                 event_filter = self.event_config
                 print(f'*** tschupre first event filter: {event_filter}')
-                set_event_filter_data(event_filter, form.structure.data,
-                                      form.keyword_fields.data)
+                event_filter.update(form.structure.data,
+                                    form.keyword_fields.data)
             else:
                 # add new event configuration
                 event_filter = EventFilter()
-                set_event_filter_data(event_filter, form.structure.data,
-                                      form.keyword_fields.data)
+                event_filter.update(form.structure.data,
+                                    form.keyword_fields.data)
                 self.session.add(event_filter)
 
             self.session.flush()
@@ -205,7 +204,7 @@ def handle_edit_event_filters(self, request, form, layout=None):
         elif not request.POST:
             event_filter = self.session.query(EventFilter).first()
             form.process(obj=event_filter)
-            # TODO: filters are not selected when editing
+
     except InvalidFormSyntax as e:
         request.warning(
             _("Syntax Error in line ${line}", mapping={'line': e.line})

@@ -234,12 +234,16 @@ class OccurrenceCollection(Pagination):
         order of how they are defined in the config structure.
         To filter alphabetically, set sort_choices=True.
 
+        :return tuple containing tuples with keyword, label and list of values
+        :rtype tuple(tuples(keyword, title, values as list)
+
         """
         keywords = tuple(
             as_internal_id(k)
             for k in self.event_config.configuration.keywords.split('\r\n')
             or tuple()
         )
+
         fields = {
             f.id: f for f in self.event_config.fields if f.id in keywords
         }
@@ -250,6 +254,9 @@ class OccurrenceCollection(Pagination):
             if not sortfunc:
                 return sorted(values)
             return sorted(values, key=sortfunc)
+
+        if not fields:
+            return set()
 
         return (
             (k, fields[k].label, _sort([c.label for c in fields[k].choices]))
