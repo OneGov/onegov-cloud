@@ -1,9 +1,16 @@
+import pytest
+
+from dateutil.relativedelta import relativedelta
+from depot.manager import DepotManager
+from io import BytesIO
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.form.extensions import Extendable
-from onegov.org.models import (
-    PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension
+from onegov.org.models.extensions import (
+    PersonLinkExtension, ContactExtension, AccessExtension, HoneyPotExtension,
+    GeneralFileLinkExtension, PublicationExtension
 )
+from sedate import utcnow
 from uuid import UUID
 
 
@@ -455,3 +462,138 @@ def test_honeypot_extension():
     form.model = submission
     form.on_request()
     assert 'duplicate_of' not in form._fields
+
+
+@pytest.fixture(scope='function')
+def depot(temporary_directory):
+    DepotManager.configure('default', {
+        'depot.backend': 'depot.io.local.LocalFileStorage',
+        'depot.storage_path': temporary_directory
+    })
+
+    yield DepotManager.get()
+
+    DepotManager._clear()
+
+
+def test_general_file_link_extension(depot):
+
+    class Topic(GeneralFileLinkExtension):
+        files = []
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+    assert topic.files == []
+
+    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class()
+
+    assert 'files' in form._fields
+    assert form.files.data == []
+
+    form.files.append_entry()
+    form.files[0].file = BytesIO(b'hello world')
+    form.files[0].filename = 'test.txt'
+    form.files[0].action = 'replace'
+    form.populate_obj(topic)
+
+    assert len(topic.files) == 1
+    assert topic.files[0].name == 'test.txt'
+
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class()
+
+    form.process(obj=topic)
+
+    assert form.files.data == [{
+        'filename': 'test.txt',
+        'size': 11,
+        'mimetype': 'text/plain'
+    }]
+    form.files[0].action = 'delete'
+
+    form.populate_obj(topic)
+
+    assert topic.files == []
+
+
+def test_general_file_link_extension_with_publication(depot):
+
+    class Topic(GeneralFileLinkExtension, PublicationExtension):
+        files = []
+        publication_start = None
+        publication_end = None
+
+    class TopicForm(Form):
+        pass
+
+    topic = Topic()
+    assert topic.files == []
+
+    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    form_class = topic.with_content_extensions(TopicForm, request=request)
+    form = form_class()
+
+    assert 'files' in form._fields
+    assert form.files.data == []
+
+    publish_date = utcnow() + relativedelta(days=+1)
+    form.publication_start.data = publish_date
+    form.files.append_entry()
+    form.files[0].file = BytesIO(b'hello world')
+    form.files[0].filename = 'test.txt'
+    form.files[0].action = 'replace'
+    form.populate_obj(topic)
+
+    assert len(topic.files) == 1
+    assert topic.files[0].name == 'test.txt'
+    assert topic.files[0].published is False
+    assert topic.files[0].publish_date == publish_date
+    assert topic.files[0].publish_end_date is None
+
+    # this should not change anything on already populated files
+    publish_end_date = publish_date + relativedelta(months=+1)
+    form.publication_end.data = publish_end_date
+    form.files[0].action = 'keep'
+    form.populate_obj(topic)
+    assert form.files.added_files == []
+    assert len(topic.files) == 1
+    assert topic.files[0].name == 'test.txt'
+    assert topic.files[0].published is False
+    assert topic.files[0].publish_date == publish_date
+    assert topic.files[0].publish_end_date is None
+
+    # but should on newly populated files
+    topic2 = Topic()
+    form.files[0].action = 'replace'
+    form.populate_obj(topic2)
+    assert len(topic2.files) == 1
+    assert topic2.files[0].name == 'test.txt'
+    assert topic2.files[0].published is False
+    assert topic2.files[0].publish_date == publish_date
+    assert topic2.files[0].publish_end_date == publish_end_date
+
+    # publish date in past
+    publish_date = utcnow() + relativedelta(days=-1)
+    form.publication_start.data = publish_date
+    topic.files = []  # reset files
+    form.populate_obj(topic)
+    assert len(topic.files) == 1
+    assert topic.files[0].name == 'test.txt'
+    assert topic.files[0].published is True
+    assert topic.files[0].publish_date is None
+    assert topic.files[0].publish_end_date == publish_end_date
+
+    # publish end date in past
+    publish_end_date = utcnow()
+    form.publication_end.data = publish_end_date
+    topic.files = []  # reset files
+    form.populate_obj(topic)
+    assert len(topic.files) == 1
+    assert topic.files[0].name == 'test.txt'
+    assert topic.files[0].published is False
+    assert topic.files[0].publish_date is None
+    assert topic.files[0].publish_end_date is None

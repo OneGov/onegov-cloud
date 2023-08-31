@@ -400,6 +400,7 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
     """ Extends the upload multiple field with onegov.file support. """
 
     file_class: type['File']
+    added_files: list['File']
     upload_field_class = UploadFileWithORMSupport
 
     def __init__(self, *args: Any, **kwargs: Any):
@@ -407,6 +408,7 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
         super().__init__(*args, **kwargs)
 
     def populate_obj(self, obj: object, name: str) -> None:
+        self.added_files = []
         files = getattr(obj, name, ())
         output: list['File'] = []
         for field, file in zip_longest(self.entries, files):
@@ -415,6 +417,9 @@ class UploadMultipleFilesWithORMSupport(UploadMultipleField):
             field.populate_obj(dummy, 'file')
             if dummy.file is not None:
                 output.append(dummy.file)
+                if file is None:
+                    # added file
+                    self.added_files.append(dummy.file)
 
         setattr(obj, name, output)
 

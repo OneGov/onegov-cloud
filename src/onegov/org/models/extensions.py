@@ -10,6 +10,7 @@ from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
+from sedate import to_timezone, utcnow
 from sqlalchemy.orm import object_session
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
@@ -18,7 +19,7 @@ from wtforms.fields import TextAreaField
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
     from onegov.form.types import _FormT
@@ -559,5 +560,47 @@ class GeneralFileLinkExtension(ContentExtension):
                 label=_("Documents"),
                 file_class=GeneralFile
             )
+
+            def populate_obj(
+                self,
+                obj: object,
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+
+                # transfer the publication settings to newly added files
+                # TODO: maybe we should take access into account as well?
+                if (
+                    self.files.added_files
+                    and 'publication_start' in self
+                    and 'publication_end' in self
+                ):
+                    start = self['publication_start'].data
+                    end = self['publication_end'].data
+                    if start is None and end is None:
+                        # nothing to do
+                        return
+
+                    now = utcnow()
+                    published = True
+                    if end is not None and to_timezone(end, 'UTC') < now:
+                        # clear both dates and set published to False
+                        published = False
+                        start = None
+                        end = None
+
+                    elif start is not None:
+                        if to_timezone(start, 'UTC') < now:
+                            # clear the date since we're already published
+                            start = None
+                        else:
+                            # otherwise set published to False
+                            published = False
+
+                    for file in self.files.added_files:
+                        file.published = published
+                        file.publish_date = start
+                        file.publish_end_date = end
 
         return GeneralFileForm
