@@ -690,11 +690,6 @@ class EventImportForm(Form):
 class EventConfigurationForm(Form):
     """ Form to configure filters for events view. """
 
-    # title = StringField(
-    #     label=_("Title"),
-    #     fieldset=_("General"),
-    #     validators=[InputRequired()])
-
     structure = TextAreaField(
         label=_("Definition"),
         fieldset=_("General"),
@@ -702,7 +697,7 @@ class EventConfigurationForm(Form):
             InputRequired(),
             ValidFormDefinition(
                 require_email_field=False,
-                require_title_fields=True
+                require_title_fields=False,
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})

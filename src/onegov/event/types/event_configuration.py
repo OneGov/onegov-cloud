@@ -24,14 +24,12 @@ class EventConfigurationStorage(TypeDecorator, ScalarCoercible):
 class EventConfiguration(DirectoryConfiguration):
 
     fields = (
-        'title',
         'order',
         'keywords',
     )
 
-    def __init__(self, title=None, order=None, keywords=None, **kwargs):
+    def __init__(self, order=None, keywords=None, **kwargs):
 
-        self.title = title
         self.order = order
         self.keywords = keywords
 
