@@ -709,3 +709,9 @@ class EventConfigurationForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
+
+    def populate_obj(self, obj):
+        super().populate_obj(obj)
+
+    def process_obj(self, obj):
+        self.keyword_fields.data = obj.configuration.keywords
