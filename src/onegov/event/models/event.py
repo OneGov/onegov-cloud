@@ -114,7 +114,6 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
     )
 
-    # TODO indexed
     #: All filter keywords defined for this entry
     _filter_keywords = Column(  # type:ignore
         MutableDict.as_mutable(HSTORE), nullable=True, name='filter_keywords'
@@ -158,7 +157,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         'title': {'type': 'localized'},
         'description': {'type': 'localized'},
         'location': {'type': 'localized'},
-        'organizer': {'type': 'localized'}
+        'organizer': {'type': 'localized'},
+        'filter_keywords': {'type': 'keyword'}
     }
 
     @property
