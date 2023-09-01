@@ -4,7 +4,14 @@ from onegov.core.security import Private
 from onegov.user import User
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.app import OrgApp
+
+
 class OrgRequest(CoreRequest):
+
+    app: 'OrgApp'
 
     @cached_property
     def is_manager(self):

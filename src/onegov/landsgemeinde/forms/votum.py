@@ -41,19 +41,7 @@ class VotumForm(NamedFileForm):
     )
 
     person_function = StringField(
-        label=_('Function'),
-        fieldset=_('Person'),
-        render_kw={'rows': 5}
-    )
-
-    person_political_affiliation = StringField(
-        label=_('Party or parliamentary group'),
-        fieldset=_('Person'),
-        render_kw={'rows': 5}
-    )
-
-    person_place = StringField(
-        label=_('Place'),
+        label=_('Function, Place & Party or parliamentary group'),
         fieldset=_('Person'),
         render_kw={'rows': 5}
     )

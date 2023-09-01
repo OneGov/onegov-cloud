@@ -67,6 +67,7 @@ if TYPE_CHECKING:
     from email.headerregistry import Address
     from fs.base import FS, SubFS
     from gettext import GNUTranslations
+    from morepath.request import Request
     from morepath.settings import SettingRegistry
     from sqlalchemy.orm import Session
     from translationstring import _ChameleonTranslate
@@ -87,7 +88,7 @@ _T = TypeVar('_T')
 # This should be in more.webassets:
 # https://github.com/morepath/more.webassets/blob/master/more/webassets/core.py#L55
 if not WebassetsApp.dectate._directives[0][0].kw:
-    from morepath.core import excview_tween_factory
+    from morepath.core import excview_tween_factory  # type:ignore[import]
     WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
 
 
@@ -96,18 +97,20 @@ class Framework(
     WebassetsApp,
     OrmCacheApp,
     ContentSecurityApp,
-    ServerApplication
+    ServerApplication,
 ):
     """ Baseclass for Morepath OneGov applications. """
 
-    request_class = CoreRequest
+    request_class: type['Request'] = CoreRequest
 
     #: holds the database connection string, *if* there is a database connected
-    dsn = None
+    dsn: str | None = None
 
     #: holdes the current schema associated with the database connection, set
     #: by and derived from :meth:`set_application_id`.
-    schema = None
+    # NOTE: Since this should almost always be set, we pretent it is always
+    #       set to save ourselves the pain of having to check it everywhere
+    schema: str = None  # type:ignore[assignment]
 
     #: framework directives
     form = directive(directives.HtmlHandleFormAction)
@@ -126,8 +129,16 @@ class Framework(
         from onegov.core import __version__
         return __version__
 
-    @morepath.reify
-    def __call__(self) -> 'WSGIApplication':  # type:ignore[override]
+    if TYPE_CHECKING:
+        # this avoids us having to ignore a whole bunch of errors
+        def __call__(
+            self,
+            environ: WSGIEnvironment,
+            start_response: StartResponse
+        ) -> Iterable[bytes]: ...
+
+    @morepath.reify  # type:ignore[no-redef]
+    def __call__(self) -> 'WSGIApplication':  # noqa:F811
         """ Intercept all wsgi calls so we can attach debug tools. """
 
         fn: 'WSGIApplication' = super().__call__
@@ -719,7 +730,7 @@ class Framework(
         self,
         model: type[object] | object,
         view_name: str | None = None
-    ) -> 'Intent':
+    ) -> type['Intent']:
         """ Returns the permission required for the given model and view_name.
 
         The model may be an instance or a class.
@@ -732,8 +743,10 @@ class Framework(
         model = model if inspect.isclass(model) else model.__class__
         predicates = {'name': view_name} if view_name else {}
 
-        query = dectate.Query('view')
-        query = query.filter(model=model, predicates=predicates)
+        query = dectate.Query('view').filter(
+            model=model,
+            predicates=predicates
+        )
 
         try:
             action, handler = next(query(self.__class__))
@@ -1155,7 +1168,7 @@ class Framework(
     def application_bound_identity(
         self,
         userid: str,
-        groupid: str,
+        groupid: str | None,
         role: str
     ) -> morepath.authentication.Identity:
         """ Returns a new morepath identity for the given userid, group and

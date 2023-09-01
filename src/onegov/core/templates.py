@@ -278,7 +278,7 @@ def render_macro(
         variables.setdefault('__decode', bytes.decode)
         variables.setdefault('__on_error_handler', Builtin('str'))
         variables.setdefault('target_language', None)
-        request._macro_variables = variables
+        request._macro_variables = variables  # type:ignore[attr-defined]
     else:
         variables = request._macro_variables.copy()
 

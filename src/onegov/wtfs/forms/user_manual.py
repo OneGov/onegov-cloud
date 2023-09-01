@@ -5,6 +5,11 @@ from onegov.form.validators import WhitelistedMimeType
 from onegov.wtfs import _
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.wtfs.models import UserManual
+
+
 class UserManualForm(Form):
 
     pdf = UploadField(
@@ -15,18 +20,20 @@ class UserManualForm(Form):
         ]
     )
 
-    def update_model(self, model):
+    def update_model(self, model: 'UserManual') -> None:
         action = getattr(self.pdf, 'action', '')
         if action == 'delete':
             del model.pdf
         if action == 'replace':
             if self.pdf.data:
-                model.pdf = self.pdf.file.read()
+                model.pdf = self.pdf.file.read()  # type:ignore
 
-    def apply_model(self, model):
+    def apply_model(self, model: 'UserManual') -> None:
         if model.exists:
+            content_length = model.content_length
+            assert content_length is not None
             self.pdf.data = {
                 'filename': model.filename,
-                'size': model.content_length,
+                'size': content_length,
                 'mimetype': model.content_type
             }

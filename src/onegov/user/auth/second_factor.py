@@ -5,7 +5,7 @@ from onegov.core.utils import is_valid_yubikey
 from typing import Any, ClassVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Mapping
-    from onegov.core.framework import Framework
+    from morepath import App
     from typing_extensions import Self, TypedDict
 
     class YubikeyConfig(TypedDict):
@@ -57,7 +57,7 @@ class SecondFactor(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def args_from_app(cls, app: 'Framework') -> 'Mapping[str, Any]':
+    def args_from_app(cls, app: 'App') -> 'Mapping[str, Any]':
         """ Copies the required configuration values from the app, returning
         a dictionary with all keys present. The values should be either the
         ones from the application or None.
@@ -96,7 +96,7 @@ class YubikeyFactor(SecondFactor, type='yubikey'):
         return cls(yubikey_client_id, yubikey_secret_key)
 
     @classmethod
-    def args_from_app(cls, app: 'Framework') -> 'YubikeyConfig':
+    def args_from_app(cls, app: 'App') -> 'YubikeyConfig':
         return {
             'yubikey_client_id': getattr(app, 'yubikey_client_id', None),
             'yubikey_secret_key': getattr(app, 'yubikey_secret_key', None)

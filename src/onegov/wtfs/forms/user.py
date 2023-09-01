@@ -37,18 +37,19 @@ class UserForm(Form):
         depends_on=('role', '!admin'),
     )
 
-    def update_model(self, model):
+    def update_model(self, model: User) -> bool:
         logged_out = self.request.identity.userid == model.username
 
         model.realname = self.realname.data
+        assert self.username.data is not None
         model.username = self.username.data
         model.data = model.data or {}
         model.data['contact'] = self.contact.data or False
         model.role = 'member'
         if logged_out:
-            if self.request.identity.role == 'editor':
+            if self.request.identity.role == 'editor':  # type:ignore
                 model.role = 'editor'
-        model.group_id = self.request.identity.groupid
+        model.group_id = self.request.identity.groupid  # type:ignore
 
         # set some initial values if we create this user
         if not model.password:
@@ -60,7 +61,7 @@ class UserForm(Form):
 
         return logged_out
 
-    def apply_model(self, model):
+    def apply_model(self, model: User) -> None:
         self.realname.data = model.realname
         self.username.data = model.username
         self.contact.data = (model.data or {}).get('contact', False)
@@ -90,7 +91,7 @@ class UnrestrictedUserForm(UserForm):
         depends_on=('role', '!admin'),
     )
 
-    def on_request(self):
+    def on_request(self) -> None:
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
@@ -104,13 +105,13 @@ class UnrestrictedUserForm(UserForm):
             0, ('', self.request.translate(_("- none -")))
         )
 
-    def update_model(self, model):
+    def update_model(self, model: User) -> bool:
         logged_out = super().update_model(model)
         model.role = self.role.data
         model.group_id = self.municipality_id.data or None
         return logged_out
 
-    def apply_model(self, model):
+    def apply_model(self, model: User) -> None:
         super().apply_model(model)
         self.role.data = model.role
         self.municipality_id.data = (

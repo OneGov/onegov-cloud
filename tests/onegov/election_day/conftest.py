@@ -19,7 +19,7 @@ from onegov.election_day.formats import import_election_internal_majorz,\
     import_election_internal_proporz, import_election_wabstic_proporz,\
     import_election_wabstic_majorz, import_election_wabsti_proporz,\
     import_election_wabsti_majorz, import_vote_internal, import_vote_wabsti,\
-    import_party_results, import_election_compound_internal
+    import_party_results_internal, import_election_compound_internal
 from tests.onegov.election_day.common import print_errors,\
     get_tar_file_path, create_principal
 from onegov.pdf import Pdf
@@ -376,7 +376,7 @@ def import_parties_internal(
             if name == dataset_name:
                 file = f.extractfile(member).read()
                 principal_obj = create_principal(principal)
-                errors = import_party_results(
+                errors = import_party_results_internal(
                     election, principal_obj, BytesIO(file), 'text/plain',
                     ['de_CH', 'fr_CH', 'it_CH'], 'de_CH'
                 )

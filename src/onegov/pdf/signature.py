@@ -4,26 +4,35 @@ from requests import get
 from requests import post
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRead
+    from typing import Protocol
+
+    class SupportsReadAndSeek(SupportsRead[bytes], Protocol):
+        def seek(self, __offset: int) -> object: ...
+
+
 class LexworkSigner:
     """ Allows the sign PDFs using the lexwork PDF signing interface. """
 
-    def __init__(self, host, login, password):
+    def __init__(self, host: str, login: str, password: str):
         self.host = host.rstrip('/')
         self.login = login
         self.password = password
 
-    def url(self, endpoint):
-        return '{}/admin_interface/{}.json'.format(self.host, endpoint)
+    def url(self, endpoint: str) -> str:
+        return f'{self.host}/admin_interface/{endpoint}.json'
 
     @property
-    def headers(self):
+    def headers(self) -> dict[str, str]:
         return {
             'X-LEXWORK-LOGIN': self.login,
             'X-LEXWORK-PASSWORD': self.password
         }
 
     @property
-    def signing_reasons(self):
+    def signing_reasons(self) -> list[str]:
         """ List all possible signing reasons for the given credentials."""
 
         response = get(
@@ -34,7 +43,12 @@ class LexworkSigner:
         response.raise_for_status()
         return response.json().get('result')
 
-    def sign(self, file, filename, reason):
+    def sign(
+        self,
+        file: 'SupportsReadAndSeek',
+        filename: str,
+        reason: str
+    ) -> bytes:
         """ Signs the given file. """
 
         file.seek(0)

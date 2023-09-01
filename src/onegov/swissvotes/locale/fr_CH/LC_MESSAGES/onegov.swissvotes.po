@@ -68,11 +68,20 @@ msgstr "Message du Conseil fédéral"
 msgid "Pre-parliamentary phase"
 msgstr "Phase pré-parlementaire"
 
-msgid "Parliamentary debate"
-msgstr "Débat parlementaire"
+msgid "Parliamentary initiative"
+msgstr "Initiative parlementaire"
 
 msgid "Parliamentary phase"
 msgstr "Au Parlement"
+
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Rapport de la commission parlementaire (seulement dans Iv.Pa.)"
+
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Avis du Conseil fédéral (seulement dans Iv.Pa.)"
+
+msgid "Parliamentary debate"
+msgstr "Débat parlementaire"
 
 msgid "Voting booklet"
 msgstr "Brochure explicative officielle"
@@ -142,6 +151,9 @@ msgstr "Aucune clé API eMuseum n’est disponible."
 
 msgid "Title"
 msgstr "Titre"
+
+msgid "Show Mastodon timeline"
+msgstr "Afficher la chronologie de Mastodon"
 
 msgid "Content"
 msgstr "Contenu"
@@ -1524,6 +1536,12 @@ msgstr "Lien Archives Sociales"
 msgid "Swissvotes database"
 msgstr "Base de données Swissvotes"
 
+msgid "Report of the parliamentary committee"
+msgstr "Rapport de la commission parlementaire"
+
+msgid "Opinion of the Federal Council"
+msgstr "Avis du Conseil fédéral"
+
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analyse APS des annonces de campagne"
 
@@ -1647,6 +1665,9 @@ msgstr ""
 msgid "Files"
 msgstr "Fichiers"
 
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes sur Mastodon"
+
 msgid "Patrons"
 msgstr "Sponsors"
 
@@ -1685,6 +1706,12 @@ msgstr "Mot-clé"
 
 msgid "Vote date"
 msgstr "Date de la votation"
+
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "et ${number} de ${total} voix des cantons"
+
+msgid "% Yes votes"
+msgstr "% de Oui"
 
 msgid "Vote number"
 msgstr "Votation n°"
@@ -1858,9 +1885,6 @@ msgstr "Afficher la liste des documents"
 
 msgid "People"
 msgstr "Peuple"
-
-msgid "Yeas"
-msgstr "Oui"
 
 msgid "Cantons"
 msgstr "Cantons"

@@ -26,8 +26,9 @@ class DailyListSelectionForm(Form):
         default='boxes'
     )
 
-    def get_model(self):
+    def get_model(self) -> DailyListBoxes | DailyListBoxesAndForms | None:
         if self.type.data == 'boxes':
             return DailyListBoxes(self.request.session, self.date.data)
         if self.type.data == 'boxes_and_forms':
             return DailyListBoxesAndForms(self.request.session, self.date.data)
+        return None

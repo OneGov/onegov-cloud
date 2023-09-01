@@ -66,11 +66,20 @@ msgstr "Federal Council dispatch"
 msgid "Pre-parliamentary phase"
 msgstr "Pre-parliamentary phase"
 
-msgid "Parliamentary debate"
-msgstr "Parliamentary debate"
+msgid "Parliamentary initiative"
+msgstr "Parliamentary initiative"
 
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
+
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Report of the parliamentary committee (only for Pa.Iv.)"
+
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Opinion of the Federal Council (only for Pa.Iv.)"
+
+msgid "Parliamentary debate"
+msgstr "Parliamentary debate"
 
 msgid "Voting booklet"
 msgstr "Official explanatory brochure"
@@ -140,6 +149,9 @@ msgstr "No eMuseum API key available."
 
 msgid "Title"
 msgstr "Title"
+
+msgid "Show Mastodon timeline"
+msgstr "Show Mastodon timeline"
 
 msgid "Content"
 msgstr "Content"
@@ -1566,6 +1578,12 @@ msgstr "Link Social Archives"
 msgid "Swissvotes database"
 msgstr "Swissvotes database"
 
+msgid "Report of the parliamentary committee"
+msgstr "Report of the parliamentary committee"
+
+msgid "Opinion of the Federal Council"
+msgstr "Opinion of the Federal Council"
+
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analysis of the advertising campaign by Année Politique"
 
@@ -1683,6 +1701,9 @@ msgstr "If you don't want to change your password, you can ignore this email."
 msgid "Files"
 msgstr "Files"
 
+msgid "Swissvotes on Mastodon"
+msgstr "Swissvotes on Mastodon"
+
 msgid "Patrons"
 msgstr "Sponsors"
 
@@ -1721,6 +1742,12 @@ msgstr "Keyword"
 
 msgid "Vote date"
 msgstr "Voting day"
+
+msgid "and ${number} out of ${total} votes of the Cantons"
+msgstr "and ${number} out of ${total} votes of the Cantons"
+
+msgid "% Yes votes"
+msgstr "% Yes votes"
 
 msgid "Vote number"
 msgstr "Vote Nº"
@@ -1899,9 +1926,6 @@ msgstr "Display the list of documents"
 
 msgid "People"
 msgstr "People"
-
-msgid "Yeas"
-msgstr "Yes"
 
 msgid "Cantons"
 msgstr "Cantons"

@@ -12,7 +12,7 @@ log = logging.getLogger('onegov.pdf')
 log.addHandler(logging.NullHandler())
 
 
-__all__ = [
+__all__ = (
     'LexworkSigner',
     'log',
     'page_fn_footer',
@@ -21,4 +21,4 @@ __all__ = [
     'page_fn_header_logo',
     'page_fn_header',
     'Pdf',
-]
+)

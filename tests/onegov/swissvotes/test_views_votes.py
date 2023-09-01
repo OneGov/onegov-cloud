@@ -173,6 +173,7 @@ def test_view_update_votes_unknown_descriptors(swissvotes_app):
         '1.2.2008',  # datum
         'kurztitel de',  # titel_kurz_d
         'kurztitel fr',  # titel_kurz_f
+        'kurztitel en',  # titel_kurz_e
         'titel de',  # titel_off_d
         'titel fr',  # titel_off_f
         'stichwort',  # stichwort
