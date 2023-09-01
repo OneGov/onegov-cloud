@@ -1,3 +1,5 @@
+from itertools import groupby
+
 import sqlalchemy
 
 from collections import defaultdict
@@ -7,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
 from lxml import objectify, etree
 from onegov.core.collection import Pagination
+from onegov.core.utils import toggle
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
 from sedate import as_datetime
@@ -50,7 +53,7 @@ class OccurrenceCollection(Pagination):
         end=None,
         outdated=False,
         tags=None,
-        filter_config=None,
+        filter_keywords=None,
         locations=None,
         only_public=False,
         search_widget=None,
@@ -61,7 +64,7 @@ class OccurrenceCollection(Pagination):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
-        self.filter_config = filter_config if filter_config else []
+        self.filter_keywords = filter_keywords or {}
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
@@ -93,7 +96,7 @@ class OccurrenceCollection(Pagination):
             end=self.end,
             outdated=self.outdated,
             tags=self.tags,
-            filter_config=self.filter_config,
+            filter_keywords=self.filter_keywords,
             locations=self.locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
@@ -142,7 +145,7 @@ class OccurrenceCollection(Pagination):
             return millennium, yesterday
         pass
 
-    def for_filter(self, **kwargs):
+    def for_filter(self, singular=False, **kwargs):
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
 
@@ -170,11 +173,20 @@ class OccurrenceCollection(Pagination):
             elif tag is not None:
                 tags.append(tag)
 
-        print(f'*** tschupre checking filter config kwargs: {kwargs}, '
-              f'{self.filter_config}')
-        filters = kwargs.get('filters', self.filter_config)
-        if filters:
-            print(f'*** tschupre filter config found: {filters}')
+        # keyword filter, if used
+        keywords = self.filter_keywords.copy()
+        for keyword, value in self.valid_keywords(kwargs).items():
+            collection = set(keywords.get(keyword, []))
+
+            if singular:
+                collection = set() if value in collection else {value}
+            else:
+                collection = toggle(collection, value)
+
+            if collection:
+                keywords[keyword] = list(collection)
+            elif keyword in keywords:
+                del keywords[keyword]
 
         locations = kwargs.get('locations', list(self.locations))
         if 'location' in kwargs:
@@ -192,7 +204,7 @@ class OccurrenceCollection(Pagination):
             end=end,
             outdated=kwargs.get('outdated', self.outdated),
             tags=tags,
-            filter_config=self.filter_config,
+            filter_keywords=keywords,
             locations=locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
@@ -226,7 +238,44 @@ class OccurrenceCollection(Pagination):
 
     @cached_property
     def event_config(self):
+        """ Returns the only `EventFilter` entry from the db. """
         return self.session.query(EventFilter).first()
+
+    @cached_property
+    def event_config_keywords(self) -> 'set[str]':
+        """
+        Returns the configuration keywords of the `EventFilter` configuration.
+        :rtype: set
+
+        """
+        return {
+            as_internal_id(kw)
+            for kw in self.event_config.configuration.keywords.split('\r\n')
+        }
+
+    @cached_property
+    def event_config_keywords_dict(self):
+        """
+        Returns dict with keywords and values of the event
+        configuration.
+        """
+
+        keywords = tuple(
+            as_internal_id(k)
+            for k in self.event_config.configuration.keywords.split('\r\n')
+        )
+
+        fields = {
+            f.id: f for f in self.event_config.fields if f.id in keywords
+        }
+
+        return {k: [c.label for c in fields[k].choices] for k in keywords}
+
+    def valid_keywords(self, parameters):
+        return {
+            as_internal_id(k): v for k, v in parameters.items()
+            if k in self.event_config_keywords
+        }
 
     def available_filters(self, sort_choices=False, sortfunc=None):
         """
@@ -238,6 +287,7 @@ class OccurrenceCollection(Pagination):
         :rtype tuple(tuples(keyword, title, values as list)
 
         """
+        # replace with func above (tuple vs set)
         keywords = tuple(
             as_internal_id(k)
             for k in self.event_config.configuration.keywords.split('\r\n')
@@ -354,6 +404,26 @@ class OccurrenceCollection(Pagination):
 
         if self.tags:
             query = query.filter(Occurrence._tags.has_any(array(self.tags)))
+
+        if self.filter_keywords:
+            keywords = self.valid_keywords(self.filter_keywords)
+
+            def keyword_group(value):
+                return value.split(':')[0]
+
+            values = [
+                ':'.join((keyword, value))
+                for keyword in keywords
+                for value in keywords[keyword]
+            ]
+            values.sort(key=keyword_group)
+
+            values = [
+                Event._filter_keywords.has_any(array(group_values))
+                for group, group_values in groupby(values, key=keyword_group)
+            ]
+            if values:
+                query = query.filter(and_(*values))
 
         if self.locations:
 
