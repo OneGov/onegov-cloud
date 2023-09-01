@@ -2,12 +2,12 @@ from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import normalize_for_url, to_html_ul
 from onegov.form import FieldDependency, WTFormsClassBuilder
-from onegov.form.fields import UploadMultipleFilesWithORMSupport
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms import ResourceForm
 from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
+from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
 from sedate import to_timezone, utcnow
@@ -551,14 +551,9 @@ class GeneralFileLinkExtension(ContentExtension):
         request: 'OrgRequest'
     ) -> type['_FormT']:
 
-        from onegov.org.models import GeneralFile  # circular
-
         class GeneralFileForm(form_class):  # type:ignore
-            # TODO: upgrade this to a specialized Field which can select
-            #       existing files in addition to uploading new ones
-            files = UploadMultipleFilesWithORMSupport(
+            files = UploadOrSelectExistingMultipleFilesField(
                 label=_("Documents"),
-                file_class=GeneralFile
             )
 
             def populate_obj(
