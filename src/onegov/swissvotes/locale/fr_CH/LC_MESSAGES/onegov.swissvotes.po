@@ -1705,7 +1705,7 @@ msgid "and ${number} out of ${total} votes of the Cantons"
 msgstr "et ${number} de ${total} voix des cantons"
 
 msgid "% Yes votes"
-msgstr "% de votes favorables"
+msgstr "% de Oui"
 
 msgid "Vote number"
 msgstr "Votation n°"
