@@ -1,0 +1,31 @@
+.timeline {
+
+    .mt-timeline {
+        background: $snow;
+        border: solid 1px $gainsboro;
+    }
+
+    .mt-body {
+        padding: 0;
+    }
+
+    .mt-user {
+        a::before {
+            content: '@';
+        }
+    }
+
+    .mt-toot {
+        padding-left: 4px;
+
+        &:first-child {
+            padding-top: 8px;
+        }
+    }
+
+    .mt-avatar,
+    .toot-date {
+        display: none;
+    }
+
+}

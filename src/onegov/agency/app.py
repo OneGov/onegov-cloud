@@ -12,14 +12,13 @@ from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
 from onegov.api import ApiApp
 from onegov.core import utils
-from onegov.form import FormApp
 from onegov.org import OrgApp
 from onegov.org.app import get_editor_asset as editor_assets
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_redactor_asset as redactor_assets
 
 
-class AgencyApp(OrgApp, FormApp, ApiApp):
+class AgencyApp(OrgApp, ApiApp):
 
     request_class = AgencyRequest
 

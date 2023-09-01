@@ -14,12 +14,14 @@ from webob.response import Response
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
-    from onegov.core.framework import Framework
+    from functools import cached_property
+    from onegov.core.cache import RedisCacheRegion
     from onegov.core.request import CoreRequest
     from onegov.user import User
     from onegov.user.auth.provider import (
         IntegratedAuthenticationProvider, OauthProvider,
         SeparateAuthenticationProvider)
+    from sqlalchemy.orm import Session
     from typing import Union
     from typing_extensions import TypeAlias
 
@@ -47,6 +49,15 @@ class UserApp(WebassetsApp):
         :mod:`onegov.user.auth.provider` for more information.
 
     """
+
+    if TYPE_CHECKING:
+        # we forward declare the Framework attributes we depend on
+        application_id: str
+        namespace: str
+        @cached_property
+        def session(self) -> Callable[[], Session]: ...
+        @property
+        def cache(self) -> RedisCacheRegion: ...
 
     auto_login_provider: AuthenticationProvider | None
 
@@ -107,7 +118,7 @@ class UserApp(WebassetsApp):
     model=AuthenticationProvider,
     path='/auth/provider/{name}')
 def authentication_provider(
-    app: 'Framework',
+    app: UserApp,
     name: str,
     to: str = '/'
 ) -> AuthenticationProvider | None:
@@ -255,7 +266,7 @@ def get_preview_widget_asset() -> 'Iterator[str]':
 
 @UserApp.tween_factory(over=webassets_injector_tween)
 def auto_login_tween_factory(
-    app: 'Framework',
+    app: UserApp,
     handler: 'Callable[[CoreRequest], Response]'
 ) -> 'Callable[[CoreRequest], Response]':
 

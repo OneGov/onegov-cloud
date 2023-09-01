@@ -133,7 +133,7 @@ def add_content_show_property_to_people(context):
     for page in pages:
         updated_people = []
         for person in page.content['people']:
-            if len(person) == 2 and not is_already_updated(person):
+            if len(person) == 2 and not is_already_updated(person[1]):
                 # (id, function) -> (id, (function, show_function))
                 updated_people.append([person[0], (person[1], True)])
             else:
@@ -252,9 +252,42 @@ def fix_content_people_for_models_that_use_person_link_extension(context):
     for obj in chain(*iterables):
         updated_people = []
         for person in obj.content['people']:
-            if len(person) == 2 and not is_already_updated(person):
+            if len(person) == 2 and not is_already_updated(person[1]):
                 # (id, function) -> (id, (function, show_function))
                 updated_people.append([person[0], (person[1], True)])
+            else:
+                updated_people.append(person)
+        obj.content['people'] = updated_people
+
+
+@upgrade_task('Fix nested list in content people')
+def fix_nested_list_in_content_people(context):
+    iterables = []
+    if context.has_table('pages'):
+        pages = context.session.query(Page)
+        pages = pages.filter(Page.content['people'].isnot(None))
+        iterables.append(pages)
+    if context.has_table('forms'):
+        forms = context.session.query(FormDefinition)
+        forms = forms.filter(FormDefinition.content['people'].isnot(None))
+        iterables.append(forms)
+    if context.has_table('resources'):
+        resources = context.session.query(Resource)
+        resources = resources.filter(Resource.content['people'].isnot(None))
+        iterables.append(resources)
+
+    def is_broken(people_item):
+        return (
+            len(people_item) == 2
+            and isinstance(people_item[0], list)
+        )
+
+    for obj in chain(*iterables):
+        updated_people = []
+        for person in obj.content['people']:
+            if len(person) == 2 and is_broken(person[1]):
+                # (id, ((function, show), show)) -> (id, (function, show))
+                updated_people.append([person[0], (person[1][0][0], True)])
             else:
                 updated_people.append(person)
         obj.content['people'] = updated_people

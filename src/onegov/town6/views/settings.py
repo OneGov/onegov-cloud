@@ -7,12 +7,12 @@ from onegov.org import _
 from onegov.town6.forms.settings import GeneralSettingsForm,\
     ChatSettingsForm
 
-from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm, \
-    HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm, \
-    MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm, \
-    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm, \
-    LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm, \
-    EventSettingsForm, GeverSettingsForm
+from onegov.org.forms.settings import FaviconSettingsForm, LinksSettingsForm,\
+    HeaderSettingsForm, FooterSettingsForm, ModuleSettingsForm,\
+    MapSettingsForm, AnalyticsSettingsForm, HolidaySettingsForm,\
+    OrgTicketSettingsForm, HomepageSettingsForm, NewsletterSettingsForm,\
+    LinkMigrationForm, LinkHealthCheckForm, SocialMediaSettingsForm,\
+    EventSettingsForm, GeverSettingsForm, OneGovApiSettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import (
     handle_homepage_settings, view_settings,
@@ -22,7 +22,7 @@ from onegov.org.views.settings import (
     handle_analytics_settings, handle_holiday_settings,
     handle_newsletter_settings, handle_generic_settings, handle_migrate_links,
     handle_link_health_check, handle_social_media_settings,
-    handle_event_settings)
+    handle_event_settings, handle_api_keys)
 
 from onegov.town6.app import TownApp
 
@@ -294,3 +294,11 @@ def town_handle_event(self, request, form):
     return handle_event_settings(
         self, request, form, DefaultLayout(self, request)
     )
+
+
+@TownApp.form(
+    model=Organisation, name='api-keys', template='api_keys.pt',
+    permission=Secret, form=OneGovApiSettingsForm, icon='fa-key',
+    setting=_("OneGov API"), order=1)
+def town_handle_api_keys(self, request, form):
+    return handle_api_keys(self, request, form, SettingsLayout(self, request))

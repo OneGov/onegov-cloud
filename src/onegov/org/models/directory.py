@@ -237,7 +237,7 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     minimum_price_total = meta_property()
     payment_method = meta_property()
 
-    searchwidget_config = content_property()
+    search_widget_config = content_property()
 
     marker_icon = content_property()
     marker_color = content_property()
@@ -365,9 +365,9 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
 class ExtendedDirectoryEntryCollection(DirectoryEntryCollection):
 
     def __init__(self, directory, type='extended', keywords=None, page=0,
-                 searchwidget=None, published_only=None, past_only=None,
+                 search_widget=None, published_only=None, past_only=None,
                  upcoming_only=None):
-        super().__init__(directory, type, keywords, page, searchwidget)
+        super().__init__(directory, type, keywords, page, search_widget)
         self.published_only = published_only
         self.past_only = past_only
         self.upcoming_only = upcoming_only

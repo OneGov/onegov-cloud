@@ -14,6 +14,7 @@ _P = ParamSpec('_P')
 order_count: int
 
 class Configurable:
+    _directives: list[tuple[Directive, object]]
     app_class: type[App] | None
     extends: list[Configurable]
     config: Config
@@ -77,9 +78,9 @@ class Directive:
     code_info: CodeInfo
     app_class: type[App]
     configurable: Configurable
-    args: Sequence[Any]
-    kw: Mapping[str, Any]
-    argument_info: tuple[Sequence[Any], Mapping[str, Any]]
+    args: tuple[Any, ...]
+    kw: dict[str, Any]
+    argument_info: tuple[tuple[Any, ...], dict[str, Any]]
     # FIXME: ParamSpec might be too strict for optional parameters
     def __init__(self, action_factory: Callable[_P, Action], code_info: CodeInfo, app_class: type[App], args: _P.args, kw: _P.kwargs) -> None: ...
     @property

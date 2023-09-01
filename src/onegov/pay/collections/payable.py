@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from typing import overload, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.orm import Base
-    from sqlalchemy.orm import Query, Session
+    from sqlalchemy.orm import Session
     from typing_extensions import Self
 
 
@@ -53,6 +53,14 @@ class PayableCollection(Pagination[_P]):
         self.cls = cls
         self.page = page
 
+    if TYPE_CHECKING:
+        # we override the method that would not be type safe since the type
+        # of query changed from the base class Pagination
+        def transform_batch_query(  # type:ignore[override]
+            self,
+            query: 'QueryChain[_P]'  # type:ignore[override]
+        ) -> 'QueryChain[_P]': ...
+
     @property
     def classes(self) -> tuple[type['Base'], ...]:
         if self.cls != '*':
@@ -61,8 +69,8 @@ class PayableCollection(Pagination[_P]):
         assert Payment.registered_links is not None
         return tuple(link.cls for link in Payment.registered_links.values())
 
-    def query(self) -> 'Query[_P]':
-        return QueryChain((
+    def query(self) -> 'QueryChain[_P]':
+        return QueryChain(tuple(
             self.session.query(cls).options(
                 joinedload(cls.payment)  # type:ignore[attr-defined]
             )
@@ -75,7 +83,7 @@ class PayableCollection(Pagination[_P]):
 
         return self.cls == other.cls and self.page == other.page
 
-    def subset(self) -> 'Query[_P]':
+    def subset(self) -> 'QueryChain[_P]':  # type:ignore[override]
         return self.query()
 
     @property

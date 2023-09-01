@@ -5,18 +5,23 @@ from onegov.wtfs.models import PickupDate
 from sqlalchemy import Integer
 
 
-class MunicipalityCollection(GenericCollection):
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Query
+
+
+class MunicipalityCollection(GenericCollection[Municipality]):
 
     @property
-    def model_class(self):
+    def model_class(self) -> type[Municipality]:
         return Municipality
 
-    def query(self):
+    def query(self) -> 'Query[Municipality]':
         query = super(MunicipalityCollection, self).query()
         query = query.order_by(None).order_by(unaccent(Municipality.name))
         return query
 
-    def import_data(self, data):
+    def import_data(self, data: dict[int, dict[str, Any]]) -> None:
         for bfs_number, values in data.items():
             query = self.query()
             query = query.filter(

@@ -180,15 +180,16 @@ class Layout:
                 dt.astimezone(self.timezone)  # type:ignore[attr-defined]
             )
 
+        locale = self.request.locale
+        assert locale is not None, "Cannot format date without a locale"
         if format == 'relative':
             adt = arrow.get(dt)
 
             try:
-                return adt.humanize(locale=self.request.locale)
+                return adt.humanize(locale=locale)
             except ValueError:
-                return adt.humanize(locale=self.request.locale.split('_')[0])
+                return adt.humanize(locale=locale.split('_')[0])
 
-        locale = self.request.locale
         fmt = getattr(self, format + '_format')
         if fmt.startswith('skeleton:'):
             return babel.dates.format_skeleton(

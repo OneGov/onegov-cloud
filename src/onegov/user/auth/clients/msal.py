@@ -7,7 +7,7 @@ from onegov.user import log
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.framework import Framework
+    from onegov.user.auth.provider import HasApplicationIdAndNamespace
     from typing_extensions import Self
 
 
@@ -104,7 +104,7 @@ class MSALConnections():
     # instantiated connections for every tenant
     connections: dict[str, MSALClient] = attrib()
 
-    def client(self, app: 'Framework') -> MSALClient | None:
+    def client(self, app: 'HasApplicationIdAndNamespace') -> MSALClient | None:
         if app.application_id in self.connections:
             return self.connections[app.application_id]
 

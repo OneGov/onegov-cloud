@@ -5,7 +5,7 @@ from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
-from onegov.election_day.formats import import_party_results
+from onegov.election_day.formats import import_party_results_internal
 from onegov.election_day.forms import UploadPartyResultsForm
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
@@ -26,7 +26,7 @@ def view_upload_election_party_results(self, request, form):
     status = 'open'
     last_change = self.last_result_change
     if form.submitted(request):
-        errors = import_party_results(
+        errors = import_party_results_internal(
             self,
             request.app.principal,
             form.parties.file,
@@ -82,7 +82,7 @@ def view_upload_election_compound_party_results(self, request, form):
     status = 'open'
     last_change = self.last_result_change
     if form.submitted(request):
-        errors = import_party_results(
+        errors = import_party_results_internal(
             self,
             request.app.principal,
             form.parties.file,

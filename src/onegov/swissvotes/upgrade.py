@@ -566,3 +566,30 @@ def add_tsvector_column_en(context):
 def drop_departement_in_charge_columns(context):
     if context.has_column('swissvotes', 'department_in_charge'):
         context.operations.drop_column('swissvotes', 'department_in_charge')
+
+
+@upgrade_task('Adds english short title column')
+def add_english_short_title_column(context):
+    if not context.has_column('swissvotes', 'short_title_en'):
+        context.operations.add_column(
+            'swissvotes', Column('short_title_en', Text())
+        )
+
+
+@upgrade_task('Adds parliamentary initiative')
+def add_parliamentary_initiative(context):
+    if not context.has_column('swissvotes', 'parliamentary_initiated'):
+        context.operations.add_column(
+            'swissvotes', Column('parliamentary_initiated', Integer())
+        )
+
+
+@upgrade_task('Adds meta to pages')
+def add_meta_to_pages(context):
+
+    if not context.has_column('swissvotes_page', 'meta'):
+        context.add_column_with_defaults(
+            'swissvotes_page',
+            Column('meta', JSON, nullable=False),
+            default=dict()
+        )
