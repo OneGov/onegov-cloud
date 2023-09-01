@@ -74,11 +74,11 @@ msgstr "Parlamentarische Initiative"
 msgid "Parliamentary phase"
 msgstr "Im Parlament"
 
-msgid "Report of the parliamentary committee"
-msgstr "Bericht der parlamentarischen Kommission"
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Bericht der parlamentarischen Kommission (nur bei Pa.Iv.)"
 
-msgid "Opinion of the Federal Council"
-msgstr "Stellungnahme des Bundesrats"
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Stellungnahme des Bundesrats (nur bei Pa.Iv.)"
 
 msgid "Parliamentary debate"
 msgstr "Parlamentsberatung"
@@ -1530,6 +1530,12 @@ msgstr "Link Sozialarchiv"
 
 msgid "Swissvotes database"
 msgstr "Swissvotes-Datenbank"
+
+msgid "Report of the parliamentary committee"
+msgstr "Bericht der parlamentarischen Kommission"
+
+msgid "Opinion of the Federal Council"
+msgstr "Stellungnahme des Bundesrats"
 
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Inseratekampagne: Analyse von APS"
