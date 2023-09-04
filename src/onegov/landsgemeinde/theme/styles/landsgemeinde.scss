@@ -66,13 +66,26 @@ h6 small,
 .agenda-item-vota {
     .votum,
     .ticker-votum {
+        border-left: 2px solid $smoke;
+        box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
         margin-bottom: 3em;
+        padding-left: 1rem;
 
-        blockquote, blockquote p {
-            color: $charcoal;
-            border-left: 0;
-            box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
+        blockquote {
+            padding-left: .5rem;
+            padding-top: 0;
         }
+
+        blockquote,
+        blockquote p {
+            border-left: 0;
+            color: $charcoal;
+
+            span {
+                text-decoration: underline;
+            }
+        }
+
     }
 
     .edit-bar {
@@ -84,7 +97,8 @@ h6 small,
     margin-bottom: 4rem;
 }
 
-.callout.secondary.agenda-item-resolution {
+.callout.secondary.agenda-item-resolution,
+.callout.secondary.assembly-completed {
     background: transparent;
     border: 0;
     border-left: 2px solid rgb(227, 0, 11);
@@ -93,7 +107,12 @@ h6 small,
     font-weight: bold;
     margin-bottom: 2.5rem;
     margin-top: 1rem;
-  }
+}
+
+.callout.secondary.assembly-completed {
+    background-color: transparent;
+    margin-bottom: 4rem;
+}
 
 .ticker-item {
     h2 {
@@ -101,7 +120,8 @@ h6 small,
         padding-top: 2rem;
     }
 
-    &:first-child h2 {
+    &:first-child h2,
+    &:nth-child(2) h2 {
         border-top: 0;
         padding-top: 0;
     }
@@ -341,5 +361,52 @@ h6 small,
 
     &:hover {
         background: $vapor;
+    }
+}
+
+
+#liveticker {
+    color: $primary-color;
+    font-size: 2rem;
+    font-weight: bold;
+    display: flex;
+    margin-top: 1rem;
+
+
+    .blob {
+        display: block;
+        background-color: rgba(255, 82, 82, 1);
+        border-radius: 50%;
+        animation: pulse-red 2s infinite;
+        height: 30px;
+        width: 30px;
+        margin-right: 1.5rem;
+        margin-top: .1rem;
+    }
+
+    &.inactive {
+        color: $iron;
+
+        .blob {
+            animation: none;
+            background-color: $iron;
+        }
+    }
+
+    @keyframes pulse-red {
+        0% {
+            transform: scale(0.9);
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+        }
+
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+        }
+
+        100% {
+            transform: scale(0.9);
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+        }
     }
 }

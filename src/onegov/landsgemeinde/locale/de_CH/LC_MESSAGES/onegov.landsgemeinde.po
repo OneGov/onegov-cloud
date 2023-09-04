@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-09-04 06:48+0200\n"
+"POT-Creation-Date: 2023-09-04 14:06+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -119,8 +119,14 @@ msgstr "Name"
 msgid "Person"
 msgstr "Person"
 
-msgid "Function, Place & Party or parliamentary group"
-msgstr "Funktion, Ort & Partei oder Fraktion"
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Party or parliamentary group"
+msgstr "Partei oder Fraktion"
+
+msgid "Place"
+msgstr "Ort"
 
 msgid "Picture"
 msgstr "Bild"
@@ -272,11 +278,5 @@ msgstr "Neue Wortmeldung hinzugefügt"
 msgid "New votum"
 msgstr "Neue Wortmeldung"
 
-#~ msgid "Function"
-#~ msgstr "Funktion"
-
-#~ msgid "Party or parliamentary group"
-#~ msgstr "Partei oder Fraktion"
-
-#~ msgid "Place"
-#~ msgstr "Ort"
+#~ msgid "Function, Place & Party or parliamentary group"
+#~ msgstr "Funktion, Ort & Partei oder Fraktion"

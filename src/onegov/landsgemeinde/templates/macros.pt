@@ -98,21 +98,23 @@
                 <li tal:condition="votum.person_name" class="person-card-title">
                     <span>${votum.person_name}</span>
                 </li>
-                <li tal:condition="votum.person_function" class="person-card-function">
-                    ${votum.person_function}
-                </li>
-                <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
-                    ${votum.person_political_affiliation}
-                </li>
-                <li tal:condition="votum.person_place" class="person-card-place">
-                    ${votum.person_place}
+                <li tal:condition="votum.person_function or votum.person_political_affiliation or votum.person_place" class="person-card-function">
+                    <tal:b tal:condition="votum.person_function">${votum.person_function}</tal:b><tal:b tal:condition="votum.person_political_affiliation">, ${votum.person_political_affiliation}</tal:b><tal:b tal:condition="votum.person_place">, ${votum.person_place}</tal:b>
                 </li>
             </ul>
         </div>
-        <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
-        <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
-        <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
-    </div>
+        <blockquote class="votum-content" tal:condition="votum.text">
+            <tal:b tal:content="structure votum.text"/>
+        </blockquote>
+        <blockquote class="votum-motion" tal:condition="votum.motion">
+            <span i18n:translate="">Motion</span><br/>
+            <tal:b tal:content="structure votum.motion"></tal:b>
+        </blockquote>
+        <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
+            <span i18n:translate="">Statement of reasons</span><br/>
+            <tal:b tal:content="structure votum.statement_of_reasons"></tal:b>
+        </blockquote>
+        </div>
 </metal:votum>
 
 <metal:ticker-agenda-item define-macro="ticker-agenda-item" i18n:domain="onegov.landsgemeinde">
@@ -138,25 +140,27 @@
                                 <i class="fa fa-user" tal:condition="not:url"></i>
                                 <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
                             </div>
-                        <ul>
-                            <li class="person-card-title" tal:condition="votum.person_name">
-                                <span>${votum.person_name}</span>
-                            </li>
-                            <li tal:condition="votum.person_function" class="person-card-function">
-                                ${votum.person_function}
-                            </li>
-                            <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
-                                ${votum.person_political_affiliation}
-                            </li>
-                            <li tal:condition="votum.person_place" class="person-card-place">
-                                ${votum.person_place}
-                            </li>
-                        </ul>
+                            <ul>
+                                <li tal:condition="votum.person_name" class="person-card-title">
+                                    <span>${votum.person_name}</span>
+                                </li>
+                                <li tal:condition="votum.person_function or votum.person_political_affiliation or votum.person_place" class="person-card-function">
+                                    <tal:b tal:condition="votum.person_function">${votum.person_function}</tal:b><tal:b tal:condition="votum.person_political_affiliation">, ${votum.person_political_affiliation}</tal:b><tal:b tal:condition="votum.person_place">, ${votum.person_place}</tal:b>
+                                </li>
+                            </ul>
 
                     </div>
-                    <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
-                    <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
-                    <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
+                    <blockquote class="votum-content" tal:condition="votum.text">
+                        <tal:b tal:content="structure votum.text"/>
+                    </blockquote>
+                    <blockquote class="votum-motion" tal:condition="votum.motion">
+                        <span i18n:translate="">Motion</span><br/>
+                        <tal:b tal:content="structure votum.motion"></tal:b>
+                    </blockquote>
+                    <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
+                        <span i18n:translate="">Statement of reasons</span><br/>
+                        <tal:b tal:content="structure votum.statement_of_reasons"></tal:b>
+                    </blockquote>
                 </div>
             </tal:block>
         </div>
