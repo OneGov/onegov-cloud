@@ -46,11 +46,12 @@ def validate_existing_rrules(context):
         event.validate_recurrence('recurrence', event.recurrence)
 
 
-@upgrade_task('Adds column filter keywords to events 3')
+@upgrade_task('Adds column filter keywords to events and event occurrences')
 def add_filter_keywords_column(context):
-    table = 'events'
+    tables = ['events', 'event_occurrences']
     column_name = 'filter_keywords'
-    if not context.has_column(table, column_name):
-        context.operations.add_column(
-            table, Column(column_name, MutableDict.as_mutable(
-                HSTORE), nullable=True))
+    for table in tables:
+        if not context.has_column(table, column_name):
+            context.operations.add_column(
+                table, Column(column_name, MutableDict.as_mutable(
+                    HSTORE), nullable=True))
