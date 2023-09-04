@@ -274,14 +274,14 @@ class EventForm(Form):
             self.email.data = self.request.current_username
 
     def on_request(self):
-        if self.custom_tags() and self.tags:
-            self.tags.choices = [(tags, tags) for tags in self.custom_tags()]
+        if self.tags:
+            if self.custom_tags() and self.tags:
+                self.tags.choices = [(tags, tags) for tags in
+                                     self.custom_tags()]
 
-        # tschupre or maybe populate filters here?
-
-        for include in self.on_request_include:
-            self.request.include(include)
-        self.sort_tags()
+            for include in self.on_request_include:
+                self.request.include(include)
+            self.sort_tags()
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
