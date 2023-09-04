@@ -6,7 +6,7 @@
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
 
-                <div class="callout secondary agenda-item-resolution" tal:condition="assembly.state == 'completed'">
+                <div class="callout secondary assembly-completed" tal:condition="assembly.state == 'completed'">
                     <p i18n:translate="">The assembly has ended.</p>
                 </div>
 

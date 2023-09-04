@@ -5,18 +5,24 @@ from onegov.landsgemeinde.models import Assembly
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.utils import ensure_states
 from onegov.landsgemeinde.utils import update_ticker
-from unittest.mock import Mock
 
 
 def test_update_ticker(landsgemeinde_app, assembly):
 
     class Request:
         app = landsgemeinde_app
-        include = Mock()
-        get_translate = Mock()
-        translate = Mock(return_value='__translated__')
         is_manager = True
         url = 'http://localhost'
+        locale = 'de_CH'
+
+        def include(self, asset):
+            pass
+
+        def translate(*args, **kwargs):
+            return '__translated__'
+
+        def get_translate(self, for_chameleon=False):
+            return self.translate
 
     request = Request()
     agenda_item_2 = assembly.agenda_items[0]

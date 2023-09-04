@@ -45,6 +45,7 @@ def update_ticker(request, updated):
         else:
             content = ''
             for agenda_item in agenda_items:
+                agenda_item.stamp()
                 if agenda_item.assembly == assembly:
                     layout = DefaultLayout(request.app, request)
                     content = render_macro(

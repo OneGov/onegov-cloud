@@ -21,3 +21,12 @@ def remove_start_time_from_agenda_item_and_votum(context):
     for table in ('landsgemeinde_agenda_items', 'landsgemeinde_vota'):
         if context.has_column(table, 'start'):
             context.operations.drop_column(table, 'start')
+
+
+@upgrade_task('Add last modified column to agenda items')
+def add_last_modified_to_agenda_items(context):
+    if not context.has_column('landsgemeinde_agenda_items', 'last_modified'):
+        context.operations.add_column(
+            'landsgemeinde_agenda_items',
+            Column('last_modified', UTCDateTime())
+        )

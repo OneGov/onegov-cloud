@@ -119,6 +119,8 @@
     <div class="ticker-item ticker-item-agenda-item ${agenda_item.state}" id="agenda-item-${agenda_item.number}">
         <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
 
+        <p tal:condition="agenda_item.last_modified" class="subheader agenda-item-timestamp"><span i18n:translate>Updated:</span> ${layout.format_date(agenda_item.last_modified, 'datetime')}</p>
+
         <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
             <tal:block tal:content="structure agenda_item.resolution">
             <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>

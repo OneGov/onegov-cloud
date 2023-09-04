@@ -234,6 +234,9 @@ msgstr "Audio herunterladen"
 msgid "Close"
 msgstr "Schliessen"
 
+msgid "Updated:"
+msgstr "Stand:"
+
 msgid ""
 "Shows the status of each element of an assembly. The statuses of each "
 "element are automatically adjusted when editing an element, if possible."
