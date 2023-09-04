@@ -2,6 +2,8 @@ import morepath
 
 from datetime import date
 from morepath import Response
+from sqlalchemy.orm.exc import UnmappedInstanceError
+
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
@@ -18,7 +20,8 @@ from onegov.org.forms import InternalTicketChatMessageForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
-from onegov.org.layout import FindYourSpotLayout, DefaultMailLayout
+from onegov.org.layout import FindYourSpotLayout, DefaultMailLayout,\
+    ArchivedTicketsLayout
 from onegov.org.layout import TicketChatMessageLayout
 from onegov.org.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
@@ -27,7 +30,7 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
     Organisation, ResourceRecipient, ResourceRecipientCollection
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.org.models.ticket import ticket_submitter
+from onegov.org.models.ticket import ticket_submitter, TicketDeletionMixin
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
@@ -40,6 +43,12 @@ from onegov.user import User, UserCollection
 from sqlalchemy import select
 from webob import exc
 from urllib.parse import urlsplit
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from sqlalchemy.orm import Query
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -149,10 +158,8 @@ def delete_ticket(self, request, form, layout=None):
         }
 
     if form.submitted(request):
-        messages = MessageCollection(request.session, channel_id=self.number)
 
-        for message in messages.query():
-            messages.delete(message)
+        delete_messages_from_ticket(request, self.number)
 
         self.handler.prepare_delete_ticket()
 
@@ -1000,7 +1007,7 @@ def view_archived_tickets(self, request, layout=None):
     owners = tuple(get_owners(self, request))
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
-    layout = layout or TicketsLayout(self, request)
+    layout = layout or ArchivedTicketsLayout(self, request)
 
     def action_link(ticket):
         return ''
@@ -1020,6 +1027,60 @@ def view_archived_tickets(self, request, layout=None):
         'owner': owner,
         'action_link': action_link
     }
+
+
+@OrgApp.html(model=ArchivedTicketsCollection, name='delete',
+             request_method='DELETE', permission=Secret)
+def view_delete_all_archived_tickets(self, request):
+    tickets = self.query().filter_by(state='archived')
+
+    errors, ok = delete_tickets_and_related_data(request, tickets)
+
+    msg = _(
+        "{success_count} tickets deleted, "
+        "{error_count} are not deletable",
+        mapping={'success_count': len(ok), 'error_count': len(errors)},
+    )
+    request.message(msg)
+
+
+def delete_tickets_and_related_data(
+    request: 'CoreRequest', tickets: 'Query[Ticket]'
+) -> tuple[list['Ticket'], list['Ticket']]:
+
+    not_deletable = []
+    successfully_deleted = []
+
+    for ticket in tickets:
+        if ticket.handler is not None:
+
+            delete_messages_from_ticket(request, ticket.number)
+
+            # Mixing expected as part of the super class list
+            if isinstance(ticket.handler, TicketDeletionMixin):
+
+                if ticket.handler.ticket_deletable():
+                    ticket.handler.prepare_delete_ticket()
+                else:
+                    not_deletable.append(ticket)
+
+                try:
+                    request.session.delete(ticket.handler)
+                except UnmappedInstanceError:
+                    pass
+
+        request.session.delete(ticket)
+        successfully_deleted.append(ticket)
+
+    return not_deletable, successfully_deleted
+
+
+def delete_messages_from_ticket(request: 'CoreRequest', number: str):
+    messages = MessageCollection(
+        request.session, channel_id=number
+    )
+    for message in messages.query():
+        messages.delete(message)
 
 
 @OrgApp.html(model=FindYourSpotCollection, name='tickets',

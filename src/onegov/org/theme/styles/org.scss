@@ -1584,6 +1584,7 @@ $view-link: '\f06e';
 $pdf-icon: '\f1c1';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
+$delete-ticket-icon: '\f1f8';
 $editbar-bg-color: $topbar-link-bg-hover;
 
 .edit-bar {
@@ -1669,14 +1670,13 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .copy-link::before { @include icon($copy-link-icon); }
     .delete-link::before { @include icon($delete-link-icon); }
     .edit-link::before { @include icon($edit-link-icon); }
+    .delete-ticket-link::before { @include icon($delete-ticket-icon); }
     .export-link::before { @include icon($export-link-icon); }
     .envelope::before { @include icon($envelope-icon); }
     .move-link::before { @include icon($move-link-icon); }
     .file-url::before { @include icon($file-link-icon); }
     .image-url::before { @include icon($image-link-icon); }
     .import-link::before { @include icon($import-link-icon); }
-    .internal-url::before { @include icon($internal-link-icon); }
-    .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
@@ -2547,7 +2547,6 @@ $close-ticket-icon: '\f1db';
 $close-ticket-icon-hover: '\f05d';
 $reopen-ticket-icon: '\f1db';
 $reopen-ticket-icon-hover: '\f192';
-$delete-ticket-icon: '\f1f8';
 $delete-ticket-icon-active: '\f00c';
 $all-handler-icon: '\f069';
 $frm-handler-icon: '\f044';

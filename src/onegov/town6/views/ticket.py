@@ -15,7 +15,7 @@ from onegov.ticket import Ticket
 from onegov.ticket.collection import TicketCollection
 from onegov.town6.layout import (
     FindYourSpotLayout, TicketLayout, TicketNoteLayout,
-    TicketChatMessageLayout, TicketsLayout)
+    TicketChatMessageLayout, TicketsLayout, ArchivedTicketsLayout)
 
 
 @TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -75,7 +75,9 @@ def town_view_tickets(self, request):
 @TownApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
               permission=Private)
 def town_view_archived_tickets(self, request):
-    return view_archived_tickets(self, request, TicketsLayout(self, request))
+    return view_archived_tickets(
+        self, request, ArchivedTicketsLayout(self, request)
+    )
 
 
 @TownApp.html(model=FindYourSpotCollection, name='tickets',
