@@ -43,7 +43,6 @@ def add_assembly(self, request, form):
 
     if form.submitted(request):
         assembly = self.add(**form.get_useful_data())
-        update_ticker(request, assembly)
         request.success(_("Added a new assembly"))
 
         return redirect(request.link(assembly))
@@ -149,8 +148,9 @@ def edit_assembly(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
-        ensure_states(self)
-        update_ticker(request, self)
+        updated = ensure_states(self)
+        updated.add(self)
+        update_ticker(request, updated)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 

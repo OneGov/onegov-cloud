@@ -5,6 +5,11 @@
     <tal:b metal:fill-slot="content">
         <div class="grid-x grid-padding-x">
             <div class="medium-7 cell main-content">
+
+                <div class="callout secondary agenda-item-resolution" tal:condition="assembly.state == 'completed'">
+                    <p i18n:translate="">The assembly has ended.</p>
+                </div>
+
                 <tal:block tal:repeat="agenda_item agenda_items">
                     <tal:block metal:use-macro="layout.macros['ticker-agenda-item']" />
                 </tal:block>
@@ -59,7 +64,7 @@
                                 </a>
                             </p>
                         </div>
-        
+
                         <div class="side-panel audio" tal:condition="assembly.audio_mp3">
                             <h2 i18n:translate="">Audio</h2>
                             <audio controls="">
@@ -67,7 +72,7 @@
                                 <p><a href="${request.link(assembly.audio_mp3)}" i18n:translate="">Download audio</a></p>
                             </audio>
                         </div>
-        
+
                         <div class="side-panel video" tal:condition="assembly.video_url">
                             <h2 i18n:translate="">Video</h2>
                             <iframe allow="fullscreen" frameborder="0" src="${assembly.video_url}"></iframe>

@@ -6,72 +6,105 @@ from onegov.landsgemeinde.models import Votum
 from re import sub
 
 
-def update_ticker(request, assembly, agenda_item=None, action='refresh'):
-    """ Updates the ticker.
+def update_ticker(request, updated):
+    """ Updates the ticker by a set of updated assemblies, agenda items or
+    vota.
 
     Sends either a 'refresh' event to reload the whole ticker (in case the
     assembly has been changed or an agenda item has been added/deleted) or
     and 'update' event with the changed content of the agenda item.
 
+    Provide an assembly to ensure, that the whole ticker is reloaded.
+
     Also sets the modified timestamp on the assembly used for the polling
     fallback.
 
     """
-    assembly.stamp()
-    request.app.pages_cache.flush()
-    content = ''
-    if action == 'update' and agenda_item:
-        layout = DefaultLayout(request.app, request)
-        content = render_macro(
-            layout.macros['ticker_agenda_item'],
-            request,
-            {
-                'agenda_item': agenda_item,
-                'layout': layout,
-            }
-        )
-        content = sub(r'\s+', ' ', content)
-        content = content.replace('> ', '>').replace(' <', '<')
-        request.app.send_websocket({
-            'event': 'update',
-            'assembly': assembly.date.isoformat(),
-            'node': f'agenda-item-{agenda_item.number}',
-            'content': content,
-            'state': agenda_item.state
-        })
-    elif action == 'refresh':
-        request.app.send_websocket({
-            'event': 'refresh',
-            'assembly': assembly.date.isoformat(),
-        })
+
+    # collapse vota to agenda items
+    vota = {item for item in updated if isinstance(item, Votum)}
+    agenda_items = {item for item in updated if isinstance(item, AgendaItem)}
+    agenda_items.update({votum.agenda_item for votum in vota})
+
+    # distinguish between directly given assemblies which will trigger a reload
+    # and assemblies given indirectly by agenda items or vota
+    given_assemblies = {item for item in updated if isinstance(item, Assembly)}
+    other_assemblies = {agenda_item.assembly for agenda_item in agenda_items}
+    assemblies = given_assemblies | other_assemblies
+
+    if assemblies:
+        request.app.pages_cache.flush()
+
+    for assembly in assemblies:
+        assembly.stamp()
+        if assembly in given_assemblies:
+            request.app.send_websocket({
+                'event': 'refresh',
+                'assembly': assembly.date.isoformat(),
+            })
+        else:
+            content = ''
+            for agenda_item in agenda_items:
+                if agenda_item.assembly == assembly:
+                    layout = DefaultLayout(request.app, request)
+                    content = render_macro(
+                        layout.macros['ticker_agenda_item'],
+                        request,
+                        {
+                            'agenda_item': agenda_item,
+                            'layout': layout,
+                        }
+                    )
+                    content = sub(r'\s+', ' ', content)
+                    content = content.replace('> ', '>').replace(' <', '<')
+                    request.app.send_websocket({
+                        'event': 'update',
+                        'assembly': assembly.date.isoformat(),
+                        'node': f'agenda-item-{agenda_item.number}',
+                        'content': content,
+                        'state': agenda_item.state
+                    })
 
 
 def ensure_states(item):
     """ Ensure that all the states are meaningful when changing the state of
     an assembly, agenda item or votum.
 
+    Returns a set with updated assemblies, agenda items and vota.
+
     """
 
-    def set_by_children(parent, children):
+    def set_state(item, state, updated):
+        if item.state != state:
+            item.state = state
+            updated.add(item)
+
+    def set_by_children(parent, children, updated):
         if all(x.state == 'scheduled' for x in children):
-            parent.state = 'scheduled'
+            set_state(parent, 'scheduled', updated)
         elif all(x.state == 'completed' for x in children):
-            parent.state = 'completed'
+            set_state(parent, 'completed', updated)
         else:
-            parent.state = 'ongoing'
+            set_state(parent, 'ongoing', updated)
 
-    def set_vota(vota, state):
+    def set_vota(vota, state, updated):
+
         for votum in vota:
-            votum.state = state
+            set_state(votum, state, updated)
 
-    def set_agenda_items(agenda_items, state):
+    def set_agenda_items(agenda_items, state, updated):
+
         for agenda_item in agenda_items:
-            agenda_item.state = state
-            set_vota(agenda_item.vota, state)
+            set_state(agenda_item, state, updated)
+            set_vota(agenda_item.vota, state, updated)
+
+        return updated
+
+    updated = set()
 
     if isinstance(item, Assembly):
         if item.state in ('scheduled', 'completed'):
-            set_agenda_items(item.agenda_items, item.state)
+            set_agenda_items(item.agenda_items, item.state, updated)
         if item.state == 'ongoing':
             pass
 
@@ -80,17 +113,17 @@ def ensure_states(item):
         prev = [x for x in assembly.agenda_items if x.number < item.number]
         next = [x for x in assembly.agenda_items if x.number > item.number]
         if item.state == 'scheduled':
-            set_vota(item.vota, 'scheduled')
-            set_agenda_items(next, 'scheduled')
-            set_by_children(assembly, assembly.agenda_items)
+            set_vota(item.vota, 'scheduled', updated)
+            set_agenda_items(next, 'scheduled', updated)
+            set_by_children(assembly, assembly.agenda_items, updated)
         if item.state == 'ongoing':
-            set_agenda_items(prev, 'completed')
-            set_agenda_items(next, 'scheduled')
-            assembly.state = 'ongoing'
+            set_agenda_items(prev, 'completed', updated)
+            set_agenda_items(next, 'scheduled', updated)
+            set_state(assembly, 'ongoing', updated)
         if item.state == 'completed':
-            set_vota(item.vota, 'completed')
-            set_agenda_items(prev, 'completed')
-            set_by_children(assembly, assembly.agenda_items)
+            set_vota(item.vota, 'completed', updated)
+            set_agenda_items(prev, 'completed', updated)
+            set_by_children(assembly, assembly.agenda_items, updated)
 
     if isinstance(item, Votum):
         agenda_item = item.agenda_item
@@ -104,19 +137,21 @@ def ensure_states(item):
             x for x in assembly.agenda_items if x.number > agenda_item.number
         ]
         if item.state == 'scheduled':
-            set_vota(next_v, 'scheduled')
-            set_agenda_items(next_a, 'scheduled')
-            set_by_children(agenda_item, agenda_item.vota)
-            set_by_children(assembly, assembly.agenda_items)
+            set_vota(next_v, 'scheduled', updated)
+            set_agenda_items(next_a, 'scheduled', updated)
+            set_by_children(agenda_item, agenda_item.vota, updated)
+            set_by_children(assembly, assembly.agenda_items, updated)
         if item.state == 'ongoing':
-            set_vota(prev_v, 'completed')
-            set_vota(next_v, 'scheduled')
-            set_agenda_items(prev_a, 'completed')
-            set_agenda_items(next_a, 'scheduled')
-            agenda_item.state = 'ongoing'
-            assembly.state = 'ongoing'
+            set_vota(prev_v, 'completed', updated)
+            set_vota(next_v, 'scheduled', updated)
+            set_agenda_items(prev_a, 'completed', updated)
+            set_agenda_items(next_a, 'scheduled', updated)
+            set_state(agenda_item, 'ongoing', updated)
+            set_state(assembly, 'ongoing', updated)
         if item.state == 'completed':
-            set_vota(prev_v, 'completed')
-            set_agenda_items(prev_a, 'completed')
-            set_by_children(agenda_item, agenda_item.vota)
-            set_by_children(assembly, assembly.agenda_items)
+            set_vota(prev_v, 'completed', updated)
+            set_agenda_items(prev_a, 'completed', updated)
+            set_by_children(agenda_item, agenda_item.vota, updated)
+            set_by_children(assembly, assembly.agenda_items, updated)
+
+    return updated
