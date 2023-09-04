@@ -72,11 +72,11 @@ msgstr "Parliamentary initiative"
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
 
-msgid "Report of the parliamentary committee"
-msgstr "Report of the parliamentary committee"
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Report of the parliamentary committee (only for Pa.Iv.)"
 
-msgid "Opinion of the Federal Council"
-msgstr "Opinion of the Federal Council"
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Opinion of the Federal Council (only for Pa.Iv.)"
 
 msgid "Parliamentary debate"
 msgstr "Parliamentary debate"
@@ -1577,6 +1577,12 @@ msgstr "Link Social Archives"
 
 msgid "Swissvotes database"
 msgstr "Swissvotes database"
+
+msgid "Report of the parliamentary committee"
+msgstr "Report of the parliamentary committee"
+
+msgid "Opinion of the Federal Council"
+msgstr "Opinion of the Federal Council"
 
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analysis of the advertising campaign by Année Politique"

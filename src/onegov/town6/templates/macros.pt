@@ -886,7 +886,7 @@
             </div>
             <div class="cell small-12 medium-8 large-9">
                 <ul>
-                    <li tal:condition="person.function and not organization_to_function" class="person-card-function">
+                    <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>
                     </li>
                     <li class="person-card-personal">
@@ -1153,7 +1153,7 @@
         </tal:b>
         <tal:b condition="event.organizer_phone">
             <dt i18n:translate>Organizer phone number</dt>
-            <dd><a href="${event.organizer_phone}" tal:content="event.organizer_phone" /></dd>
+            <dd><a href="tel:${event.organizer_phone}" tal:content="event.organizer_phone" /></dd>
         </tal:b>
 
         <tal:b condition="event.tags">

@@ -2,7 +2,7 @@ from email.headerregistry import Address
 from onegov.core.collection import Pagination
 from onegov.core.templates import render_template
 from onegov.election_day import _
-from onegov.election_day.formats.common import load_csv
+from onegov.election_day.formats.imports.common import load_csv
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import SmsSubscriber
 from onegov.election_day.models import Subscriber

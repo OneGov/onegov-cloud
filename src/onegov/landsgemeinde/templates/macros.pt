@@ -20,7 +20,7 @@
 <metal:agenda-item-list define-macro="agenda_item_list">
     <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
         <h2 i18n:translate="">Agenda items</h2>
-        <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}"> 
+        <ul class="more-list agenda-item-list ${'with-current' if agenda_item else ''}">
             <li tal:repeat="current_agenda_item agenda_items">
                 <a class="list-link" id="${'current' if current else ''}" tal:attributes="href request.link(current_agenda_item)" tal:define="current agenda_item == current_agenda_item">
                     <div class="timeline">
@@ -36,13 +36,13 @@
                 </a>
             </li>
         </ul>
-    </div> 
+    </div>
 </metal:agenda-item-list>
 
 <metal:ticker-agenda-item-list define-macro="ticker_agenda_item_list">
     <div class="side-panel assembly-agenda-items" tal:condition="agenda_items" tal:define="agenda_item agenda_item|None">
         <h2 i18n:translate="">Agenda items</h2>
-        <ul class="more-list agenda-item-list with-current"> 
+        <ul class="more-list agenda-item-list with-current">
             <tal:b tal:repeat="current_agenda_item agenda_items">
                 <li id="list-agenda-item-${current_agenda_item.number}">
                     <a class="list-link ${current_agenda_item.state}"
@@ -62,7 +62,7 @@
                 </li>
             </tal:b>
         </ul>
-    </div> 
+    </div>
 </metal:ticker-agenda-item-list>
 
 <metal:state define-macro="state">
@@ -75,7 +75,7 @@
 </metal:state>
 
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
-    <div id="votum-${votum.number}" class="votum" tal:define="thumbnail request.link(votum.person_picture, 'thumbnail')|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
+    <div tal:condition="request.is_logged_in or votum.state != 'scheduled'" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail request.link(votum.person_picture, 'thumbnail')|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
         <div tal:condition="thumbnail or votum.video_url" class="reveal small person-reveal" id="${modal}" data-reveal="" data-reveal-width="${votum.person_picture.reference.size[0]|'50%'}">
             <button class="close-button" data-close="" i18n:attributes="aria-label" aria-label="Close" type="button">
@@ -118,7 +118,8 @@
 <metal:ticker-agenda-item define-macro="ticker-agenda-item" i18n:domain="onegov.landsgemeinde">
     <div class="ticker-item ticker-item-agenda-item ${agenda_item.state}" id="agenda-item-${agenda_item.number}">
         <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
-        <p tal:condition="agenda_item.start" class="subheader agenda-item-timestamp">${layout.format_date(agenda_item.start, 'datetime')}</p>
+
+        <p tal:condition="agenda_item.last_modified" class="subheader agenda-item-timestamp"><span i18n:translate>Updated:</span> ${layout.format_date(agenda_item.last_modified, 'datetime')}</p>
 
         <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
             <tal:block tal:content="structure agenda_item.resolution">
