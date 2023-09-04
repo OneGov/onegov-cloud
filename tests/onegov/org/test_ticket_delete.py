@@ -1,5 +1,5 @@
 import os
-from onegov.org.models.ticket import FormSubmissionHandler
+from onegov.org.models.ticket import FormSubmissionHandler, TicketDeletionMixin
 import transaction
 from datetime import datetime
 from onegov.core.utils import Bunch
@@ -19,7 +19,7 @@ class EchoTicket(Ticket):
     es_type_name = 'echo_tickets'
 
 
-class EchoHandler(Handler):
+class EchoHandler(Handler, TicketDeletionMixin):
     handler_title = "Echo"
 
     @property
@@ -47,6 +47,12 @@ class EchoHandler(Handler):
 
     def get_links(self, request):
         return self.data.get('links')
+
+    def prepare_delete_ticket(self):
+
+        """The handler knows best what to do when a ticket is called for
+        deletion. """
+        return
 
 
 def register_echo_handler(handlers):

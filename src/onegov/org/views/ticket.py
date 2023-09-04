@@ -2,8 +2,6 @@ import morepath
 
 from datetime import date
 from morepath import Response
-from sqlalchemy.orm.exc import UnmappedInstanceError
-
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
@@ -1041,7 +1039,8 @@ def view_delete_all_archived_tickets(self, request):
         "{error_count} are not deletable",
         mapping={'success_count': len(ok), 'error_count': len(errors)},
     )
-    request.message(msg)
+
+    request.message(msg, 'success' if not errors else 'warning')
 
 
 def delete_tickets_and_related_data(
@@ -1059,15 +1058,13 @@ def delete_tickets_and_related_data(
             # Mixing expected as part of the super class list
             if isinstance(ticket.handler, TicketDeletionMixin):
 
-                if ticket.handler.ticket_deletable():
+                if ticket.handler.ticket_deletable:
                     ticket.handler.prepare_delete_ticket()
                 else:
                     not_deletable.append(ticket)
 
-                try:
-                    request.session.delete(ticket.handler)
-                except UnmappedInstanceError:
-                    pass
+                request.session.delete(ticket.handler)
+                request.session.commit()
 
         request.session.delete(ticket)
         successfully_deleted.append(ticket)
