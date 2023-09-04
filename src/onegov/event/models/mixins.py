@@ -45,6 +45,15 @@ class OccurrenceMixin:
     def tags(self, value):
         self._tags = dict(((key.strip(), '') for key in value))
 
+    @property
+    def filter_keywords(self):
+        return set(self._filter_keywords.keys()) if self._filter_keywords \
+            else set()
+
+    @filter_keywords.setter
+    def filter_keywords(self, value):
+        self._filter_keywords = {k: '' for k in value} if value else None
+
     #: Timezone of the event
     timezone = Column(String, nullable=False)
 
