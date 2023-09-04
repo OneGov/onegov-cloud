@@ -32,8 +32,8 @@ msgstr "Benutzer"
 msgid "Settings"
 msgstr "Einstellungen"
 
-msgid "Archive"
-msgstr "Archiv"
+msgid "Assemblies"
+msgstr "Landsgemeinden"
 
 msgid "Number"
 msgstr "Nummer"
