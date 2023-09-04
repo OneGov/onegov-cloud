@@ -101,7 +101,7 @@ h6 small,
 .callout.secondary.assembly-completed {
     background: transparent;
     border: 0;
-    border-left: 2px solid rgb(227, 0, 11);
+    border-left: 2px solid $primary-color;
     border-radius: 0;
     box-shadow: -10px 0 10px -10px rgba(34, 0, 0, .11);
     font-weight: bold;
@@ -116,18 +116,33 @@ h6 small,
 
 .ticker-item {
     h2 {
-        border-top: 3px solid #d9d9d94a;
+        border-top: 3px solid $smoke;
         padding-top: 2rem;
     }
 
-    &:first-child h2,
-    &:nth-child(2) h2 {
-        border-top: 0;
-        padding-top: 0;
-    }
+    // &:first-child h2 {
+    //     border-top: 0;
+    //     padding-top: 0;
+    // }
 
     .callout.secondary.agenda-item-resolution {
         font-weight: normal;
+    }
+
+    .ticker-info {
+        position: relative;
+
+        .agenda-item-timestamp {
+            margin-top: 0;
+            background-color: $smoke;
+            color: $aluminum;
+            padding: .5rem .7rem .3rem .7rem;
+            border-radius: 0 0 1rem 1rem;
+            position: absolute;
+            right: 0;
+            text-align: right;
+            top: 0;
+        }
     }
 }
 
@@ -136,11 +151,11 @@ h6 small,
     margin-left: 0;
 
     a {
-        display: flex;
-        justify-content: space-between;
-        font-weight: bold;
-        padding: .5rem 0;
         color: $charcoal;
+        display: flex;
+        font-weight: bold;
+        justify-content: space-between;
+        padding: .5rem 0;
 
         &:first-child {
             flex-grow: 10;
