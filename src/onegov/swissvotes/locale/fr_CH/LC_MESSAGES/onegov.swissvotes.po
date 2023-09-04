@@ -90,7 +90,7 @@ msgid "Voting campaign"
 msgstr "Campagne"
 
 msgid "Explanatory brochure by Easyvote"
-msgstr "Brochure d’easyvote"
+msgstr "Brochure d’Easyvote"
 
 msgid "Advertisment analysis"
 msgstr "Analyse des annonces de campagne"
