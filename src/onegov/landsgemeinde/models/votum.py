@@ -12,7 +12,6 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy import Time
 from uuid import uuid4
 
 
@@ -64,9 +63,6 @@ class Votum(
 
     #: Statement of reasons of the votum
     statement_of_reasons = content_property()
-
-    #: Start of the votum (localized to Europe/Zurich)
-    start = Column(Time, nullable=True)
 
     #: The name of the person
     person_name = Column(Text, nullable=True)

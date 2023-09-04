@@ -15,7 +15,6 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy import Time
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -91,9 +90,6 @@ class AgendaItem(
 
     #: The video timestamp of this agenda item
     video_timestamp = content_property()
-
-    #: Start of the agenda item (localized to Europe/Zurich)
-    start = Column(Time, nullable=True)
 
     #: An agenda item contains n vota
     vota = relationship(

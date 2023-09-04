@@ -56,14 +56,11 @@ msgstr "Auszug aus dem Memorial (PDF)"
 msgid "Downloads"
 msgstr "Downloads"
 
-msgid "Start time"
-msgstr "Startzeit"
+msgid "Video timestamp"
+msgstr "Video-Zeitstempel"
 
 msgid "Progress"
 msgstr "Ablauf"
-
-msgid "Video timestamp"
-msgstr "Video-Zeitstempel"
 
 msgid "Text"
 msgstr "Text"
