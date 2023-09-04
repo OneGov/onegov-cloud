@@ -866,7 +866,7 @@
             </div>
             <div class="cell small-12 medium-8 large-9">
                 <ul>
-                    <li tal:condition="person.function and not organization_to_function" class="person-card-function">
+                    <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>
                     </li>
                     <li class="person-card-personal">
