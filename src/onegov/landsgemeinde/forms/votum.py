@@ -1,5 +1,4 @@
 from onegov.election_day import _
-from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
@@ -56,14 +55,6 @@ class VotumForm(NamedFileForm):
             }),
             FileSizeLimit(1 * 1024 * 1024)
         ]
-    )
-
-    start = TimeField(
-        label=_('Start time'),
-        fieldset=_('Progress'),
-        validators=[
-            Optional()
-        ],
     )
 
     video_timestamp = StringField(

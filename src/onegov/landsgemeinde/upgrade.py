@@ -14,3 +14,10 @@ def add_last_modified_to_assemblies(context):
             'landsgemeinde_assemblies',
             Column('last_modified', UTCDateTime())
         )
+
+
+@upgrade_task('Remove start time from agenda item and votum')
+def remove_start_time_from_agenda_item_and_votum(context):
+    for table in ('landsgemeinde_agenda_items', 'landsgemeinde_vota'):
+        if context.has_column(table, 'start'):
+            context.operations.drop_column(table, 'start')
