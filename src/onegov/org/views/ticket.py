@@ -1051,20 +1051,17 @@ def delete_tickets_and_related_data(
     successfully_deleted = []
 
     for ticket in tickets:
-        if ticket.handler is not None:
+        handler = ticket.handler
 
-            delete_messages_from_ticket(request, ticket.number)
+        delete_messages_from_ticket(request, ticket.number)
 
-            # Mixing expected as part of the super class list
-            if isinstance(ticket.handler, TicketDeletionMixin):
-
-                if ticket.handler.ticket_deletable:
-                    ticket.handler.prepare_delete_ticket()
-                else:
-                    not_deletable.append(ticket)
-
-                request.session.delete(ticket.handler)
-                request.session.commit()
+        # Mixing expected as part of the super class list
+        if isinstance(handler, TicketDeletionMixin):
+            if handler.ticket_deletable:
+                handler.prepare_delete_ticket()
+            else:
+                not_deletable.append(ticket)
+                continue
 
         request.session.delete(ticket)
         successfully_deleted.append(ticket)

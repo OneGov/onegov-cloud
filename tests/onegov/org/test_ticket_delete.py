@@ -1,5 +1,5 @@
 import os
-from onegov.org.models.ticket import FormSubmissionHandler, TicketDeletionMixin
+from onegov.org.models.ticket import FormSubmissionHandler
 import transaction
 from datetime import datetime
 from onegov.core.utils import Bunch
@@ -17,6 +17,19 @@ class Client(BaseClient):
 class EchoTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EHO'}
     es_type_name = 'echo_tickets'
+
+
+class TicketDeletionMixin:
+
+    @property
+    def ticket_deletable(self):
+        return self.ticket.state == 'archived'
+
+    def prepare_delete_ticket(self):
+        """The handler knows best what to do when a ticket is called for
+        deletion. """
+        assert self.ticket_deletable
+        pass
 
 
 class EchoHandler(Handler, TicketDeletionMixin):
@@ -48,12 +61,6 @@ class EchoHandler(Handler, TicketDeletionMixin):
     def get_links(self, request):
         return self.data.get('links')
 
-    def prepare_delete_ticket(self):
-
-        """The handler knows best what to do when a ticket is called for
-        deletion. """
-        return
-
 
 def register_echo_handler(handlers):
     handlers.register('EHO', EchoHandler)
@@ -72,7 +79,7 @@ def archive_all_tickets(session, tickets, tz):
         t.modified = datetime(2016, 1, 2, 10, tzinfo=tz)
 
 
-def test_ticket_archived_manual_delete(org_app, handlers):
+def test_delete_ticket_without_submission(org_app, handlers):
     register_echo_handler(handlers)
 
     client = Client(org_app)
@@ -140,12 +147,10 @@ def test_ticket_archived_manual_delete(org_app, handlers):
     client.login_admin()
     client.get('/tickets-archive/ALL')
 
-    assert session.query(Ticket).filter_by(state='archived').count() == len(
-        tickets)
+    assert session.query(Ticket).filter_by(state='archived').count() == 6
     client.delete('/tickets-archive/ALL/delete')
     assert session.query(Ticket).filter_by(state='archived').count() == 0
 
-    # todo: try what happens if you access a link that was deleted
 
 
 def test_ticket_deleted_submission_is_resilient(client):
