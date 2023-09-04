@@ -58,7 +58,7 @@ class VotumLayout(DefaultLayout):
             ),
             Link(
                 self.agenda_item_title(self.model.agenda_item, short=True),
-                '#'
+                self.request.link(self.model.agenda_item)
             ),
-            Link(self.title, self.request.link(self.model))
+            Link(self.title, '#')
         ]
