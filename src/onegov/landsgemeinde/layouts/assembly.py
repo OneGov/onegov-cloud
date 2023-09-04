@@ -12,7 +12,7 @@ class AssemblyCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _('Archive')
+        return _('Assemblies')
 
     @cached_property
     def og_description(self):
@@ -56,7 +56,10 @@ class AssemblyLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Archive'), self.request.link(self.assembly_collection())),
+            Link(
+                _('Assemblies'),
+                self.request.link(self.assembly_collection())
+            ),
             Link(self.title, self.request.link(self.model))
         ]
 

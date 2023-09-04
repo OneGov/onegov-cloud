@@ -1,5 +1,7 @@
 import re
 
+from urlextract import URLExtract
+
 import onegov.core
 import os.path
 import pytest
@@ -149,6 +151,63 @@ def test_linkify_with_phone_newline():
     assert utils.linkify('Foo\n041 123 45 67') == (
         'Foo\n<a href="tel:041 123 45 67">041 123 45 67</a> '
     )
+
+
+def test_linkify_with_custom_domains():
+
+    assert utils.linkify(
+        "https://forms.gle/123\nfoo@bar.agency\nfoo@bar.co\nfoo@bar.com\n"
+        "https://foobar.agency\n+41 41 511 21 21\nfoo@bar.ngo"
+    ) == (
+        "<a href=\"https://forms.gle/123\" rel=\"nofollow\">"
+        "https://forms.gle/123</a>\n<a href=\"mailto:foo@bar.agency\">"
+        "foo@bar.agency</a>\n<a href=\"mailto:foo@bar.co\">foo@bar.co</a>\n"
+        "<a href=\"mailto:foo@bar.com\">foo@bar.com</a>\n"
+        "<a href=\"https://foobar.agency\" rel=\"nofollow\">"
+        "https://foobar.agency</a>\n<a href=\"tel:+41 41 511 21 21\">"
+        "+41 41 511 21 21</a> \n<a href=\"mailto:foo@bar.ngo\">foo@bar.ngo</a>"
+    )
+
+
+def test_linkify_with_custom_domain_and_with_email_and_links():
+    assert utils.linkify(
+        "foo@bar.agency\nhttps://thismatters.agency\nhttps://google.com"
+    ) == ("<a href=\"mailto:foo@bar.agency\">foo@bar.agency</a>\n"
+          "<a href=\"https://thismatters.agency\" rel=\"nofollow\">"
+          "https://thismatters.agency</a>\n<a href=\"https://google.com\" rel"
+          "=\"nofollow\">https://google.com</a>")
+
+
+def test_linkify_with_custom_domain_and_without_email():
+
+    expected_link = "<a href=\"https://thismatters.agency\" " \
+                    "rel=\"nofollow\">https://thismatters.agency</a>"
+    expected_link2 = (
+        "<a href=\"https://google.com\" rel=\"nofollow\">" "https://google.com"
+        "</a>"
+    )
+
+    # linkify should work even if no email is present
+    expected = '\n'.join([expected_link, expected_link2])
+    assert (utils.linkify(
+        "https://thismatters.agency\nhttps://google.com"
+    ) == expected)
+
+
+def test_load_tlds():
+
+    def remove_dots(tlds):
+        return [domain[1:] for domain in tlds]
+
+    extract = URLExtract()
+    tlds = remove_dots(extract._load_cached_tlds())
+
+    assert all("." not in item for item in tlds)
+    assert len(tlds) > 1600  # make sure the reading worked
+
+    # if these are not in the list, the list is probably outdated
+    additional_tlds = ['agency', 'ngo', 'swiss', 'gle']
+    assert all(domain in tlds for domain in additional_tlds)
 
 
 def test_increment_name():

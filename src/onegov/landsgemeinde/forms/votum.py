@@ -1,5 +1,4 @@
 from onegov.election_day import _
-from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
@@ -41,19 +40,7 @@ class VotumForm(NamedFileForm):
     )
 
     person_function = StringField(
-        label=_('Function'),
-        fieldset=_('Person'),
-        render_kw={'rows': 5}
-    )
-
-    person_political_affiliation = StringField(
-        label=_('Party or parliamentary group'),
-        fieldset=_('Person'),
-        render_kw={'rows': 5}
-    )
-
-    person_place = StringField(
-        label=_('Place'),
+        label=_('Function, Place & Party or parliamentary group'),
         fieldset=_('Person'),
         render_kw={'rows': 5}
     )
@@ -68,14 +55,6 @@ class VotumForm(NamedFileForm):
             }),
             FileSizeLimit(1 * 1024 * 1024)
         ]
-    )
-
-    start = TimeField(
-        label=_('Start time'),
-        fieldset=_('Progress'),
-        validators=[
-            Optional()
-        ],
     )
 
     video_timestamp = StringField(

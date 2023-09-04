@@ -325,7 +325,7 @@ class Associable:
         )
 
     @property
-    def links(self) -> QueryChain:
+    def links(self) -> 'QueryChain[Base]':
         """ Returns a query chain with all records of all models which attach
         to the associable model.
 

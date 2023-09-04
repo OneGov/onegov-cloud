@@ -38,6 +38,10 @@ def test_models(session, assembly):
     assembly.stamp()
     assert assembly.last_modified is not None
 
+    assert assembly.agenda_items[0].last_modified is None
+    assembly.agenda_items[0].stamp()
+    assert assembly.agenda_items[0].last_modified is not None
+
     # test multiline agenda item title
     assert assembly.agenda_items[0].title_parts == []
     assembly.agenda_items[0].title = '   \n Lorem\r   ipsum\r\n '

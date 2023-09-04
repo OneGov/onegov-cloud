@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from onegov.ballot.models.election_compound.association import \
     ElectionCompoundAssociation
 from onegov.ballot.models.election_compound.mixins import \
@@ -10,7 +9,6 @@ from onegov.ballot.models.mixins import TitleTranslationsMixin
 from onegov.ballot.models.party_result.mixins import \
     HistoricalPartyResultsMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsCheckMixin
-from onegov.ballot.models.party_result.mixins import PartyResultsExportMixin
 from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
@@ -39,7 +37,7 @@ if TYPE_CHECKING:
 class ElectionCompound(
     Base, ContentMixin, LastModifiedMixin,
     DomainOfInfluenceMixin, TitleTranslationsMixin,
-    PartyResultsOptionsMixin, PartyResultsCheckMixin, PartyResultsExportMixin,
+    PartyResultsOptionsMixin, PartyResultsCheckMixin,
     HistoricalPartyResultsMixin,
     ExplanationsPdfMixin, DerivedAttributesMixin
 ):
@@ -201,35 +199,3 @@ class ElectionCompound(
 
         for election in self.elections:
             election.clear_results()
-
-    def export(self, locales):
-        """ Returns all data connected to this election compound as list with
-        dicts.
-
-        This is meant as a base for json/csv/excel exports. The result is
-        therefore a flat list of dictionaries with repeating values to avoid
-        the nesting of values. Each record in the resulting list is a single
-        candidate result for each political entity. Party results are not
-        included in the export (since they are not really connected with the
-        lists).
-
-        If consider completed, status for candidate_elected and
-        absolute_majority will be set to None if election is not completed.
-
-        """
-
-        common = OrderedDict()
-        for locale in locales:
-            common[f'compound_title_{locale}'] = self.title_translations.get(
-                locale, ''
-            )
-        common['compound_date'] = self.date.isoformat()
-        common['compound_mandates'] = self.number_of_mandates
-
-        rows = []
-        for election in self.elections:
-            for row in election.export(locales):
-                rows.append(
-                    OrderedDict(list(common.items()) + list(row.items()))
-                )
-        return rows

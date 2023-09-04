@@ -285,7 +285,7 @@ class GazetteNotice(
 
     @organization_id.setter
     def organization_id(self, value):
-        self.organizations = [value]
+        self.organizations = [] if value is None else [value]
 
     @property
     def organization_object(self):

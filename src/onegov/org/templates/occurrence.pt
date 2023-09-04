@@ -58,7 +58,7 @@
                         </div>
                         <div tal:condition="organizer_phone">
                             <dt i18n:translate>Organizer phone number</dt>
-                            <dd>${organizer_phone}</dd>
+                            <dd><a href="tel:${organizer_phone}" tal:content="organizer_phone" /></dd>
                         </div>
                     </dl>
                 </div>

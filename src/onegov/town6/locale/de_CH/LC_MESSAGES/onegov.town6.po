@@ -2131,7 +2131,7 @@ msgid "Links"
 msgstr "Links"
 
 msgid "Chat"
-msgstr ""
+msgstr "Chat"
 
 msgid "Header"
 msgstr "Kopfzeile"
