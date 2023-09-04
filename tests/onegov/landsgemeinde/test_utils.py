@@ -137,7 +137,6 @@ def test_ensure_states():
     assembly = create()
     assembly.agenda_items[0].state = 'scheduled'
     assert ensure_states(assembly.agenda_items[0]) == {
-        assembly,  # was ongoing
         assembly.agenda_items[0].vota[0],  # was completed
         assembly.agenda_items[0].vota[1],  # was completed
         assembly.agenda_items[0].vota[2],  # was completed
@@ -146,7 +145,7 @@ def test_ensure_states():
         assembly.agenda_items[1].vota[1],  # was ongoing
     }
     assert get(assembly) == {
-        '': 'scheduled',
+        '': 'ongoing',
         '1': 'scheduled',
         '1.1': 'scheduled',
         '1.2': 'scheduled',

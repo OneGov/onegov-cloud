@@ -81,7 +81,8 @@ def ensure_states(item):
 
     def set_by_children(parent, children, updated):
         if all(x.state == 'scheduled' for x in children):
-            set_state(parent, 'scheduled', updated)
+            if parent.state != 'ongoing':
+                set_state(parent, 'scheduled', updated)
         elif all(x.state == 'completed' for x in children):
             set_state(parent, 'completed', updated)
         else:
