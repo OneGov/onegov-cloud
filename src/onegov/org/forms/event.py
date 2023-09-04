@@ -38,6 +38,7 @@ from wtforms.validators import Optional
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -177,15 +178,10 @@ class EventForm(Form):
         render_kw={'data-map-type': 'marker'}
     )
 
-    # tschupre
     tags = MultiCheckboxField(
         label=_("Tags"),
         choices=[(tag, tag) for tag in TAGS],
     )
-
-    # filters = FieldList(
-    #     label=_("Filters"),
-    # )
 
     start_date = DateField(
         label=_("Date"),
@@ -391,7 +387,6 @@ class EventForm(Form):
         else:
             raise NotImplementedError
 
-        print('*** tschupre populate obj')
         from onegov.form.parser.core import CheckboxField, RadioField
         filter_keywords = set()
         event_filter = EventFilter.instance_from_object(model)
@@ -406,6 +401,8 @@ class EventForm(Form):
 
         if filter_keywords:
             model.filter_keywords = filter_keywords
+            for occ in model.occurrences:
+                occ.filter_keywords = filter_keywords
 
     def process_obj(self, model):
         """ Stores the page values on the form. """
@@ -443,7 +440,6 @@ class EventForm(Form):
 
         if model.filter_keywords:
             from onegov.form.parser.core import CheckboxField, RadioField
-            print('*** tschupre set filter in form from model')
             event_filter = EventFilter.instance_from_object(model)
             keywords = dict()
             for item in model.filter_keywords:
@@ -493,41 +489,6 @@ class EventForm(Form):
                 } for ix, d in enumerate(dates)
             ]
         })
-
-
-# class EventFilterForm(EventForm):
-#     """ Defines filters for event forms instead of tags. """
-#
-#     tags = None
-#     filters = None
-#
-#     # I thought about a field list to populate checkboxes according the
-#     # event configutation
-#     # filters = FieldList(
-#     #     # SelectField(),
-#     #     FormField(),
-#     #     label=_("Filters"),
-#     # )
-#     filters = MultiCheckboxField()
-#
-#     def populate_obj(self, model):
-#         """ Stores the form values on the model. """
-#
-#         super().populate_obj(model)
-#
-#     def process_obj(self, model):
-#         """ Stores the page values on the form. """
-#
-#         super().process_obj(model)
-#         print('*** tschupre process obj EventFilterForm')
-#
-#         event_filter = self.request.session.query(EventFilter).first()
-#         for field in event_filter.fields:
-#             if isinstance(field, (RadioField, CheckboxField,
-#                           MultiCheckboxField)):
-#
-#                 # how to populate additional radio and multi checkboxes?
-#                 pass
 
 
 class EventImportForm(Form):

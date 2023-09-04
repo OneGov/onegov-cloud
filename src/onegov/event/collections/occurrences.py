@@ -64,7 +64,7 @@ class OccurrenceCollection(Pagination):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
-        self.filter_keywords = filter_keywords or {}
+        self.filter_keywords = filter_keywords or dict()
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
@@ -173,7 +173,6 @@ class OccurrenceCollection(Pagination):
             elif tag is not None:
                 tags.append(tag)
 
-        # keyword filter, if used
         keywords = self.filter_keywords.copy()
         for keyword, value in self.valid_keywords(kwargs).items():
             collection = set(keywords.get(keyword, []))
@@ -206,6 +205,20 @@ class OccurrenceCollection(Pagination):
             tags=tags,
             filter_keywords=keywords,
             locations=locations,
+            only_public=self.only_public,
+            search_widget=self.search_widget,
+        )
+
+    def without_keywords(self):
+        return self.__class__(
+            self.session,
+            page=self.page,
+            range=self.range,
+            start=self.start,
+            end=self.end,
+            outdated=self.outdated,
+            tags=self.tags,
+            locations=self.locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
         )
@@ -249,32 +262,15 @@ class OccurrenceCollection(Pagination):
 
         """
         return {
-            as_internal_id(kw)
-            for kw in self.event_config.configuration.keywords.split('\r\n')
-        }
-
-    @cached_property
-    def event_config_keywords_dict(self):
-        """
-        Returns dict with keywords and values of the event
-        configuration.
-        """
-
-        keywords = tuple(
-            as_internal_id(k)
-            for k in self.event_config.configuration.keywords.split('\r\n')
-        )
-
-        fields = {
-            f.id: f for f in self.event_config.fields if f.id in keywords
-        }
-
-        return {k: [c.label for c in fields[k].choices] for k in keywords}
+            kw for kw in self.event_config.configuration.keywords.split('\r\n')
+        } if self.event_config else set()
 
     def valid_keywords(self, parameters):
         return {
             as_internal_id(k): v for k, v in parameters.items()
-            if k in self.event_config_keywords
+            if k in {
+                as_internal_id(kw) for kw in self.event_config_keywords
+            }
         }
 
     def available_filters(self, sort_choices=False, sortfunc=None):
@@ -289,8 +285,8 @@ class OccurrenceCollection(Pagination):
         """
         # replace with func above (tuple vs set)
         keywords = tuple(
-            as_internal_id(k)
-            for k in self.event_config.configuration.keywords.split('\r\n')
+            as_internal_id(k) for k in
+            self.event_config.configuration.keywords.split('\r\n')
             or tuple()
         )
 

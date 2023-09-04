@@ -124,7 +124,6 @@ def handle_new_directory(self, request, form, layout=None):
     }
 
 
-# tschupre
 @OrgApp.form(model=ExtendedDirectoryEntryCollection, name='edit',
              template='directory_form.pt', permission=Secret,
              form=get_directory_form_class)
@@ -259,12 +258,14 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
 
 def keyword_count(request, collection):
     self = collection
+    counts = {}
+
     keywords = tuple(
         as_internal_id(k)
         for k in self.directory.configuration.keywords or tuple()
     )
     fields = {f.id: f for f in self.directory.fields if f.id in keywords}
-    counts = {}
+
     for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
             field_id, value = entry.split(':', 1)
@@ -299,7 +300,7 @@ def view_directory(self, request, layout=None):
         'entries': entries,
         'directory': self.directory,
         'search_widget': self.search_widget,
-        'filters': filters,  # tschupre
+        'filters': filters,
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),
         'show_thumbnails': layout.thumbnail_field_id and True or False,

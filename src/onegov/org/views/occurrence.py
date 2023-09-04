@@ -1,5 +1,5 @@
 """ The onegov org collection of images uploaded to the site. """
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from datetime import date
 from morepath import redirect
 from morepath.request import Response
@@ -7,7 +7,7 @@ from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.event.models.event_filter import EventFilter
-from onegov.event.types import EventConfiguration
+from onegov.form import as_internal_id
 from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
     DuplicateLabelError
 from onegov.org import _, OrgApp
@@ -21,16 +21,18 @@ from sedate import as_datetime, replace_timezone
 
 
 def get_filters(request, self, keyword_counts=None, view_name=None):
+    from onegov.core.elements import Link
+
     Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
-    # empty = tuple()
-
-    if not self.event_config:
-        return filters
+    empty = tuple()
 
     radio_fields = set(
         f.id for f in self.event_config.fields if f.type == 'radio'
     )
+
+    def get_count(title, value):
+        return keyword_counts.get(title, {}).get(value, 0)
 
     def link_title(field_id, value):
         if keyword_counts is None:
@@ -39,22 +41,40 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
         return f'{value} ({count})'
 
     for keyword, title, values in self.available_filters(sort_choices=False):
-        print(f'*** tschupre get_filters keyword: {keyword}, title: '
-              f'{title}, values: {values}')
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
-                # active=value in self.keywords.get(keyword, empty),
-                active=value,
+                active=value in self.filter_keywords.get(title, empty),
                 url=request.link(self.for_filter(
                     singular=keyword in radio_fields,
-                    **{keyword: value}
+                    ** {keyword: value}
                 ), name=view_name),
-                # rounded=keyword in radio_fields
-            ) for value in values
+                rounded=keyword in radio_fields
+            ) for value in values if get_count(keyword, value)
         )))
 
     return filters
+
+
+def keyword_count(request, collection):
+    self = collection
+
+    keywords = tuple(
+        as_internal_id(k) for k in (
+            self.event_config.configuration.keywords.split('\r\n') or tuple()
+        )
+    )
+
+    fields = {f.id: f for f in self.event_config.fields if f.id in keywords}
+
+    counts = {}
+    for model in request.exclude_invisible(self.without_keywords().query()):
+        for keyword in model.filter_keywords:
+            field_id, value = keyword.split(':', 1)
+            if field_id in fields:
+                f_count = counts.setdefault(field_id, defaultdict(int))
+                f_count[value] += 1
+    return counts
 
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
@@ -72,10 +92,10 @@ def view_occurrences(self, request, layout=None):
     filters = None
     tags = None
 
-    if isinstance(request.app, WinterthurApp):
-        filters = get_filters(request, self)
+    if isinstance(request.app, WinterthurApp) and self.event_config:
+        keyword_counts = keyword_count(request, self)
+        filters = get_filters(request, self, keyword_counts)
         # TODO keyword counts
-        print(f'*** tschupre filters: {filters}')
     else:
         tags = [
             Link(
@@ -137,6 +157,7 @@ def view_occurrences(self, request, layout=None):
         'locations': locations,
         'title': _('Events'),
         'search_widget': self.search_widget,
+        'winti': isinstance(request.app, WinterthurApp),
     }
 
 
@@ -166,6 +187,7 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
+        'winti': isinstance(request.app, WinterthurApp),
     }
 
 
@@ -173,14 +195,11 @@ def view_occurrence(self, request, layout=None):
              template='directory_form.pt', permission=Secret,
              form=EventConfigurationForm)
 def handle_edit_event_filters(self, request, form, layout=None):
-    print(f'*** tschupre handle edit event configuration. model: {self}')
-
     try:
         if form.submitted(request):
             if self.session.query(EventFilter).count():
                 # update existing event configuration
                 event_filter = self.event_config
-                print(f'*** tschupre first event filter: {event_filter}')
                 event_filter.update(form.structure.data,
                                     form.keyword_fields.data)
             else:
@@ -191,11 +210,6 @@ def handle_edit_event_filters(self, request, form, layout=None):
                 self.session.add(event_filter)
 
             self.session.flush()
-
-            print(f'**** tschupre count EventFilter in db: '
-                  f'{self.session.query(EventFilter).count()}')
-            print(f'**** tschupre count EventFilter in db: '
-                  f'{self.session.query(EventFilter).all()}')
 
             form.populate_obj(event_filter)
             request.success(_("Your changes were saved"))

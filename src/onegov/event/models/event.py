@@ -136,7 +136,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             except DecompressionBombError:
                 setattr(self, blob, None)
 
-    #: Occurences of the event
+    #: Occurrences of the event
     occurrences: 'relationship[list[Occurrence]]' = relationship(
         "Occurrence",
         cascade="all, delete-orphan",

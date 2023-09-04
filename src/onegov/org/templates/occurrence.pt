@@ -14,8 +14,13 @@
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>
 
-                <div class="occurrence-tags">
+                <div class="occurrence-tags" tal:condition="occurrence.tags and not winti">
                     <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate="">${tag}</span>
+                </div>
+
+                <div class="occurrence-filters" tal:condition="occurrence.filter_keywords and winti">
+                    <span tal:repeat="filter occurrence.filter_keywords" tal:content="'{}: {}'.format(filter.split(':')[0].title(), filter.split(':')[1])"
+                            class="blank-label"></span>
                 </div>
 
                 <div class="occurence-link" tal:define="event_link occurrence.event.content.get('external_event_url')">

@@ -51,7 +51,6 @@ __all__ = [
     'DirectoryForm',
     'DirectoryImportForm',
     'EventForm',
-    'EventFilterForm',
     'EventImportForm',
     'ExportForm',
     'FindYourSpotForm',
