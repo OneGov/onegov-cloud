@@ -19,6 +19,7 @@
                 </div>
 
                 <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
+                    <b i18n:translate="">Resolution</b>
                     <tal:block tal:content="structure agenda_item.resolution">
                     <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
                 </div>

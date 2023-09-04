@@ -135,22 +135,54 @@ h6 small,
     list-style: none;
     margin-left: 0;
 
-    .label {
-        float: right;
+    a {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        padding: .5rem 0;
+        color: $charcoal;
+
+        &:first-child {
+            flex-grow: 10;
+        }
     }
 
+    i {
+        // color: $primary-color;
+        margin-right: .7rem;
+    }
+
+
     .agenda-item {
-        padding-left: 1em;
+        border-top: 2px solid $smoke;
     }
 
     .votum {
-        padding-left: 2em;
-    }   
+        padding-left: 2rem;
+
+    }
 
     li {
         border-top: 1px solid $white-smoke;
-        padding-bottom: .5rem;
-        padding-top: .5rem;
+        display: flex;
+        justify-content: space-between;
+        transition: background-color 200ms linear;
+        padding-left: 1rem;
+
+        .fa-edit {
+            color: $iron;
+            margin-right: 1rem;
+            opacity: 0;
+            transition: opacity 200ms linear;
+        }
+
+        &:hover {
+            background-color: $ghost;
+
+            .fa-edit {
+                opacity: 1;
+            }
+        }
     }
 }
 
