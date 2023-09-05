@@ -32,8 +32,13 @@ from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
-from sqlalchemy.orm import noload
+from sqlalchemy.orm import noload, undefer
 from sqlalchemy.orm.attributes import set_committed_value
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -118,7 +123,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return tuple(p for p in self.pages_tree if include(p))
 
     @orm_cached(policy='on-table-change:pages')
-    def pages_tree(self):
+    def pages_tree(self) -> tuple[Page, ...]:
         """
         This is the entire pages tree preloaded into the individual
         parent/children attributes. We optimize this as much as possible
@@ -128,6 +133,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         query = PageCollection(self.session()).query(ordered=False)
         # we populate these relationship ourselves
         query = query.options(noload(Page.parent, Page.children))
+        # since we cache this result we should undefer loading the
+        # page meta, so we don't need to deserialize it every time
+        query = query.options(undefer(Page.meta))
         query = query.order_by(Page.order)
 
         # first we build a map from parent_ids to their children
@@ -177,21 +185,28 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         return result
 
     @orm_cached(policy='on-table-change:pages')
-    def homepage_pages(self):
-        # FIXME: We may want to consider implementing this using pages_tree
-        #        in order to avoid an extra query, even if it is cached.
-        pages = PageCollection(self.session()).query()
-        pages = pages.filter(Topic.type == 'topic')
-        pages = pages.filter(Topic.meta['is_visible_on_homepage'] == True)
+    def homepage_pages(self) -> dict[int, list[Topic]]:
+
+        def visit_topics(
+            pages: 'Iterable[Page]',
+            root_id: int | None = None
+        ) -> 'Iterator[tuple[int, Topic]]':
+            for page in pages:
+
+                if root_id is None:
+                    root_id = page.id
+
+                if isinstance(page, Topic):
+                    yield root_id, page
+                yield from visit_topics(page.children, root_id=root_id)
 
         result = defaultdict(list)
+        for root_id, topic in visit_topics(self.root_pages):
+            if topic.is_visible_on_homepage:
+                result[root_id].append(topic)
 
-        for page in pages.all():
-            if page.is_visible_on_homepage:
-                result[page.root.id].append(page)
-
-        for pages in result.values():
-            pages.sort(
+        for topics in result.values():
+            topics.sort(
                 key=lambda p: utils.normalize_for_url(p.title)
             )
 
