@@ -27,7 +27,10 @@ class AgendaItemCollectionLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Archive'), self.request.link(self.assembly_collection())),
+            Link(
+                _('Assemblies'),
+                self.request.link(self.assembly_collection())
+            ),
             Link(
                 self.assembly_title(self.model.assembly),
                 self.request.link(self.model.assembly)
@@ -66,7 +69,10 @@ class AgendaItemLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Archive'), self.request.link(self.assembly_collection())),
+            Link(
+                _('Assemblies'),
+                self.request.link(self.assembly_collection())
+            ),
             Link(
                 self.assembly_title(self.model.assembly),
                 self.request.link(self.model.assembly)

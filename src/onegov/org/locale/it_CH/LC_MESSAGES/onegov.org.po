@@ -1223,6 +1223,8 @@ msgid ""
 "If a reservation is cancelled, a notification will be sent to the above "
 "recipient."
 msgstr ""
+"Se una prenotazione viene annullata, una notifica verrà inviata al "
+"destinatario sopra indicato."
 
 msgid "Send on"
 msgstr "Invia il"
@@ -2485,6 +2487,7 @@ msgstr "Rifiuta prenotazione"
 
 #.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3356,9 +3359,10 @@ msgid ""
 "title}. If you no longer want to receive this e-mail please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist die Benachrichtigung für Notiz zu Reservierungen für ${request.app."
-"org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
-"Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
+"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
+"title}. Se non si desidera più ricevere questo messaggio di posta "
+"elettronica si prega di contattare un amministratore in modo che possa "
+"rimuovervi dall'elenco dei destinatari lista"
 
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
@@ -3700,7 +3704,7 @@ msgid "This is an imported event"
 msgstr "Questo è un evento importato"
 
 msgid "Search in Events"
-msgstr ""
+msgstr "Ricerca negli eventi"
 
 msgid "Tag"
 msgstr "Tag"

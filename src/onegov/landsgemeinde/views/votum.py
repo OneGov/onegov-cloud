@@ -23,13 +23,9 @@ def add_votum(self, request, form):
 
     if form.submitted(request):
         votum = self.add(**form.get_useful_data())
-        ensure_states(votum)
-        update_ticker(
-            request,
-            votum.agenda_item.assembly,
-            agenda_item=votum.agenda_item,
-            action='update'
-        )
+        updated = ensure_states(votum)
+        updated.add(votum)
+        update_ticker(request, updated)
         request.success(_("Added a new votum"))
 
         return redirect(
@@ -60,13 +56,9 @@ def edit_votum(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
-        ensure_states(self)
-        update_ticker(
-            request,
-            self.agenda_item.assembly,
-            agenda_item=self.agenda_item,
-            action='update'
-        )
+        updated = ensure_states(self)
+        updated.add(self)
+        update_ticker(request, updated)
         request.success(_("Your changes were saved"))
         return request.redirect(
             request.link(self.agenda_item, fragment=f'votum-{self.number}')
@@ -102,9 +94,4 @@ def delete_votum(self, request):
         if self.agenda_item.vota else self.agenda_item
     )
 
-    update_ticker(
-        request,
-        self.agenda_item.assembly,
-        agenda_item=self.agenda_item,
-        action='update'
-    )
+    update_ticker(request, {self.agenda_item})

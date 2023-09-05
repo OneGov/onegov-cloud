@@ -1222,6 +1222,8 @@ msgid ""
 "If a reservation is cancelled, a notification will be sent to the above "
 "recipient."
 msgstr ""
+"Wenn eine Reservierung storniert wird, wird dem oben genannten Empfänger "
+"eine Benachrichtigung gesendet."
 
 msgid "Send on"
 msgstr "Senden am"
@@ -3385,6 +3387,10 @@ msgid ""
 "you no longer want to receive this e-mail please contact an administrator so "
 "they can remove you from the recipients list."
 msgstr ""
+"Dies ist die Benachrichtigung für Notizen zu Reservierungen für ${request."
+"app.org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, "
+"kontaktieren Sie bitte einen Administrator, damit er Sie aus der Liste "
+"entfernen kann."
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -5014,7 +5020,7 @@ msgid "New Item"
 msgstr "Neuer Gegenstand"
 
 msgid "Edit resource"
-msgstr ""
+msgstr "Reservation bearbeiten"
 
 #, python-format
 msgid "Successfully removed ${count} unused allocations"
