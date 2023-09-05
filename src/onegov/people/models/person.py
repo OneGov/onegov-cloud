@@ -133,7 +133,6 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
     show_context_specific_functions = Column(Boolean, nullable=False,
                                              default=True)
 
-
     def vcard_object(self, exclude=None, include_memberships=True):
         """ Returns the person as vCard (3.0) object.
 

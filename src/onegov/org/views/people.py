@@ -36,9 +36,8 @@ def view_person(self, request, layout=None):
 
     pages = request.session.query(Topic)
     pages = pages.filter(Topic.people is not None).all()
-    org_to_func = (person_functions_by_organization(self, pages, request)
-        if self.show_context_specific_functions else []
-    )
+    org_to_func = (person_functions_by_organization(self, pages, request) if
+                   self.show_context_specific_functions else [])
 
     return {
         'title': self.title,

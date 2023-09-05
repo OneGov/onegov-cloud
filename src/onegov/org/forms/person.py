@@ -58,4 +58,3 @@ class PersonForm(Form):
         label=_("Show context-specific function"),
         default=True,
     )
-
