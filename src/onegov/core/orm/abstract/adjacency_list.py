@@ -248,6 +248,14 @@ class AdjacencyList(Base):
         itself.
 
         """
+
+        # FIXME: There is a subtle issue here if we use this mixin in a
+        #        polymorphic class, since it will only return siblings of
+        #        the same polymorphic type, which is probably not what
+        #        we want, since it doesn't match the behavior of root
+        #        ancestors, parent, children, etc. We could use inspect
+        #        to determine whether or not the model is polymorphic
+        #        and to retrieve the base class.
         query = object_session(self).query(self.__class__)
         query = query.order_by(self.__class__.order)
         query = query.filter(self.__class__.parent == self.parent)
