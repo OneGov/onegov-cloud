@@ -139,8 +139,14 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         # then we populate the children and parent based on this information
         # this should result in no pending modifications, because we use
         # set_committed_value to set them
-        for page in (pages for pages in parent_to_child.values()):
-            children = parent_to_child[page.id]
+        for page in (
+            page
+            for pages in parent_to_child.values()
+            for page in pages
+        ):
+            # even though this is a defaultdict, we need to use get
+            # since otherwise we modifiy the dictionary
+            children = parent_to_child.get(page.id, [])
             for child in children:
                 set_committed_value(child, 'parent', page)
             set_committed_value(page, 'children', children)
