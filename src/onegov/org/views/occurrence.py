@@ -95,7 +95,6 @@ def view_occurrences(self, request, layout=None):
     if isinstance(request.app, WinterthurApp) and self.event_config:
         keyword_counts = keyword_count(request, self)
         filters = get_filters(request, self, keyword_counts)
-        # TODO keyword counts
     else:
         tags = [
             Link(
