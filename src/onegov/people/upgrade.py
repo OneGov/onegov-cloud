@@ -9,7 +9,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.people import Agency
 from onegov.people import AgencyMembership
-from sqlalchemy import Column
+from sqlalchemy import Column, Boolean
 from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import Text
@@ -238,3 +238,15 @@ def extend_agency_and_person_with_more_fields(context):
                 Column(column, Text, nullable=True),
                 default=lambda x: ''
             )
+
+
+@upgrade_task('Add boolean value to hide/show context-specific function')
+def add_show_context_specific_function(context):
+
+    if not context.has_column('people', 'show_context_specific_functions'):
+
+        context.add_column_with_defaults(
+            'people',
+            Column('show_context_specific_functions', Boolean, nullable=False),
+            default=True
+        )
