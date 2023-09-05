@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-05 16:00+0200\n"
+"POT-Creation-Date: 2023-08-30 15:12+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -677,11 +677,11 @@ msgstr "Società musicale"
 msgid "Organizer E-Mail address"
 msgstr "Indirizzo e-mail dell'organizzatore"
 
-msgid "Shown as contact E-Mail address"
-msgstr "Indicato come indirizzo email di contatto"
-
 msgid "Organizer phone number"
 msgstr "Numero di telefono dell'organizzatore"
+
+msgid "Shown as contact E-Mail address"
+msgstr "Indicato come indirizzo email di contatto"
 
 msgid "Shown as contact phone number"
 msgstr "Indicato come numero di telefono di contatto"
@@ -1098,9 +1098,6 @@ msgstr "Note"
 
 msgid "Public extra information about this person"
 msgstr "Informazioni pubbliche aggiuntive su questa persona"
-
-msgid "Show context-specific function"
-msgstr "Mostra la funzione specifica del contesto"
 
 msgid "Rooms"
 msgstr "Camere"
