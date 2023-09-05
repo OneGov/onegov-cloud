@@ -190,8 +190,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             if page.is_visible_on_homepage:
                 result[page.root.id].append(page)
 
-        for key in result:
-            result[key].sort(
+        for pages in result.values():
+            pages.sort(
                 key=lambda p: utils.normalize_for_url(p.title)
             )
 
