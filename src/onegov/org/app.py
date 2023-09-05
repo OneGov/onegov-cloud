@@ -127,8 +127,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         """
         query = PageCollection(self.session()).query(ordered=False)
         # we populate these relationship ourselves
-        query = query.options(noload(Page.parent))
-        query = query.options(noload(Page.children))
+        query = query.options(noload(Page.parent, Page.children))
         query = query.order_by(Page.order)
 
         # first we build a map from parent_ids to their children
@@ -144,7 +143,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             for pages in parent_to_child.values()
             for page in pages
         ):
-            # even though this is a defaultdict, we need to use get
+            # even though this is a defaultdict, we need to use get()
             # since otherwise we modifiy the dictionary
             children = parent_to_child.get(page.id, [])
             for child in children:
@@ -179,6 +178,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:pages')
     def homepage_pages(self):
+        # FIXME: We may want to consider implementing this using pages_tree
+        #        in order to avoid an extra query, even if it is cached.
         pages = PageCollection(self.session()).query()
         pages = pages.filter(Topic.type == 'topic')
         pages = pages.filter(Topic.meta['is_visible_on_homepage'] == True)
