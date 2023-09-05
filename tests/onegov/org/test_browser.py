@@ -490,7 +490,6 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     assert not browser.is_text_present('Logician')
 
 
-
 def test_rejected_reservation_sends_email_to_configured_recipients(browser,
                                                                    client):
     resources = ResourceCollection(client.app.libres_context)
