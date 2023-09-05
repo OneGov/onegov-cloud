@@ -70,6 +70,7 @@ class Organisation(Base, TimestampMixin):
     hide_onegov_footer = meta_property(default=False)
     standard_image = meta_property()
     submit_events_visible = meta_property(default=True)
+    event_filter_type = meta_property(default='tags')
 
     # social media
     facebook_url = meta_property()
