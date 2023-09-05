@@ -44,7 +44,7 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
-                active=value in self.filter_keywords.get(title, empty),
+                active=value in self.filter_keywords.get(keyword, empty),
                 url=request.link(self.for_filter(
                     singular=keyword in radio_fields,
                     ** {keyword: value}
