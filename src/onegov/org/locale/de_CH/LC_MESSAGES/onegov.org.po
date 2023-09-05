@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-08-30 15:12+0200\n"
+"POT-Creation-Date: 2023-09-05 16:00+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -675,11 +675,11 @@ msgstr "Musikverein"
 msgid "Organizer E-Mail address"
 msgstr "Organisator E-Mail Adresse"
 
-msgid "Organizer phone number"
-msgstr "Organisator Telefonnummer"
-
 msgid "Shown as contact E-Mail address"
 msgstr "Wird als Kontakt-Email-Adresse angezeigt"
+
+msgid "Organizer phone number"
+msgstr "Organisator Telefonnummer"
 
 msgid "Shown as contact phone number"
 msgstr "Wird als Kontakttelefonnummer angezeigt"
@@ -1095,6 +1095,9 @@ msgstr "Notizen"
 
 msgid "Public extra information about this person"
 msgstr "Öffentliche Extra Informationen zu dieser Person"
+
+msgid "Show context-specific function"
+msgstr "Kontext-spezifische Funktion anzeigen"
 
 msgid "Rooms"
 msgstr "Räume"
