@@ -4,7 +4,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Boolean
+from sqlalchemy import Column
 from sqlalchemy import Text
 from uuid import uuid4
 from vobject import vCard
@@ -128,11 +128,6 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: some remarks about the person
     notes = Column(Text, nullable=True)
-
-    #: hide/show all the context specific functions on the person
-    show_context_specific_functions = Column(Boolean, nullable=False,
-                                             default=True)
-
 
     def vcard_object(self, exclude=None, include_memberships=True):
         """ Returns the person as vCard (3.0) object.

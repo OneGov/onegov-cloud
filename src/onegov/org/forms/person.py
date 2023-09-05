@@ -1,5 +1,3 @@
-from wtforms import BooleanField
-
 from onegov.core.utils import ensure_scheme
 from onegov.form import Form
 from onegov.org import _
@@ -53,9 +51,3 @@ class PersonForm(Form):
         description=_("Public extra information about this person"),
         render_kw={'rows': 5}
     )
-
-    show_context_specific_functions = BooleanField(
-        label=_("Show context-specific function"),
-        default=True,
-    )
-
