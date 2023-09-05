@@ -69,8 +69,15 @@ class AdjacencyList(Base):
 
     if TYPE_CHECKING:
         parent_id: 'Column[int | None]'
-        parent: 'relationship[Self | None]'
-        children: 'relationship[list[Self]]'
+        # subclasses need to override with the correct relationship
+        # with generics there's an issue with class vs instance access
+        # technically AdjacencyList is abstract, so as long as we force
+        # subclasses to bind a type we could make this type safe, but
+        # there is no way to express this in mypy, we could write a
+        # mypy plugin to ensure these relationships get generated
+        # properly...
+        parent: 'relationship[AdjacencyList | None]'
+        children: 'relationship[Sequence[AdjacencyList]]'
 
     #: the id of the parent
     @declared_attr  # type:ignore[no-redef]
@@ -221,7 +228,7 @@ class AdjacencyList(Base):
             setattr(self, key, value)
 
     @property
-    def root(self) -> 'Self':
+    def root(self) -> 'AdjacencyList':
         """ Returns the root of this item. """
         if self.parent is None:
             return self
@@ -229,7 +236,7 @@ class AdjacencyList(Base):
             return self.parent.root
 
     @property
-    def ancestors(self) -> 'Iterator[Self]':
+    def ancestors(self) -> 'Iterator[AdjacencyList]':
         """ Returns all ancestors of this item. """
         if self.parent:
             yield from self.parent.ancestors
