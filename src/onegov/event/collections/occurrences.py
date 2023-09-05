@@ -297,9 +297,8 @@ class OccurrenceCollection(Pagination):
         def _sort(values):
             if not sort_choices:
                 return values
-            if not sortfunc:
-                return sorted(values)
-            return sorted(values, key=sortfunc)
+            values.sort(key=sortfunc)
+            return values
 
         if not fields:
             return set()
