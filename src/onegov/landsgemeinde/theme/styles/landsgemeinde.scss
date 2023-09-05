@@ -120,11 +120,6 @@ h6 small,
         padding-top: 2rem;
     }
 
-    // &:first-child h2 {
-    //     border-top: 0;
-    //     padding-top: 0;
-    // }
-
     .callout.secondary.agenda-item-resolution {
         font-weight: normal;
     }
@@ -226,6 +221,10 @@ h6 small,
 .person-list-card {
     align-items: center;
     color: $charcoal;
+
+    .person-card-function {
+        font-size: 1rem;
+    }
 }
 
 .person-card-portrait {

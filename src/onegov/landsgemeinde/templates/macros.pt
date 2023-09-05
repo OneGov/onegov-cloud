@@ -89,9 +89,8 @@
         </div>
         <div class="person-card person-list-card">
             <span href="#votum-${votum.number}" tal:attributes="data-open modal if thumbnail or votum.video_url else None">
-                <div class="person-card-portrait">
-                    <i class="fa fa-user" tal:condition="not:thumbnail"></i>
-                    <div class="cover-image" tal:condition="thumbnail" style='background-image: url("${thumbnail}");'></div>
+                <div class="person-card-portrait" tal:condition="thumbnail">
+                    <div class="cover-image" style='background-image: url("${thumbnail}");'></div>
                 </div>
             </span>
             <ul>
@@ -138,9 +137,8 @@
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
                 <div class="ticker-item ticker-votum ${votum.state}">
                     <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture, 'thumbnail')|None">
-                            <div class="person-card-portrait">
-                                <i class="fa fa-user" tal:condition="not:url"></i>
-                                <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                            <div class="person-card-portrait" tal:condition="url" >
+                                <div class="cover-image" style='background-image: url("${url}");'></div>
                             </div>
                             <ul>
                                 <li tal:condition="votum.person_name" class="person-card-title">
