@@ -32,6 +32,8 @@ from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
+from sqlalchemy.orm import noload
+from sqlalchemy.orm.attributes import set_committed_value
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -106,9 +108,6 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:pages')
     def root_pages(self):
-        query = PageCollection(self.session()).query(ordered=False)
-        query = query.order_by(Page.order)
-        query = query.filter(Page.parent_id == None)
 
         def include(page):
             if page.type != 'news':
@@ -116,7 +115,39 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
             return True if page.children else False
 
-        return tuple(p for p in query if include(p))
+        return tuple(p for p in self.pages_tree if include(p))
+
+    @orm_cached(policy='on-table-change:pages')
+    def pages_tree(self):
+        """
+        This is the entire pages tree preloaded into the individual
+        parent/children attributes. We optimize this as much as possible
+        by performing the recursive join in Python, rather than SQL.
+
+        """
+        query = PageCollection(self.session()).query(ordered=False)
+        # we populate these relationship ourselves
+        query = query.options(noload(Page.parent))
+        query = query.options(noload(Page.children))
+        query = query.order_by(Page.order)
+
+        # first we build a map from parent_ids to their children
+        parent_to_child = defaultdict(list)
+        for page in query:
+            parent_to_child[page.parent_id].append(page)
+
+        # then we populate the children and parent based on this information
+        # this should result in no pending modifications, because we use
+        # set_committed_value to set them
+        for page in (pages for pages in parent_to_child.values()):
+            children = parent_to_child[page.id]
+            for child in children:
+                set_committed_value(child, 'parent', page)
+            set_committed_value(page, 'children', children)
+
+        # we return the root pages which should contain references to all
+        # the child pages
+        return tuple(p for p in parent_to_child.get(None, []))
 
     @orm_cached(policy='on-table-change:organisations')
     def homepage_template(self):
@@ -153,10 +184,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 result[page.root.id].append(page)
 
         for key in result:
-            result[key] = list(sorted(
-                result[key],
+            result[key].sort(
                 key=lambda p: utils.normalize_for_url(p.title)
-            ))
+            )
 
         return result
 
