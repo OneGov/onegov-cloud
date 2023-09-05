@@ -131,11 +131,19 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         """
         query = PageCollection(self.session()).query(ordered=False)
-        # we populate these relationship ourselves
-        query = query.options(noload(Page.parent, Page.children))
-        # since we cache this result we should undefer loading the
-        # page meta, so we don't need to deserialize it every time
-        query = query.options(undefer(Page.meta))
+        query = query.options(
+            # we populate these relationship ourselves
+            noload(Page.parent),
+            noload(Page.children),
+            # since we cache this result we should undefer loading the
+            # page meta, so we don't need to deserialize it every time
+            # this causes a fairly substantial overhead on uncached
+            # loads of pages_tree, but it's also a fairly big win
+            # once it is cached. There may be call-sites other than
+            # homepage_pages that benefit from this. If there aren't
+            # we can always go back on this decision
+            undefer(Page.meta)
+        )
         query = query.order_by(Page.order)
 
         # first we build a map from parent_ids to their children
