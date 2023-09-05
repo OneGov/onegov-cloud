@@ -3,8 +3,6 @@ from collections import namedtuple
 from dateutil.rrule import rrulestr
 from dateutil import rrule
 from functools import cached_property
-
-from markupsafe import Markup
 from onegov.chat import TextModuleCollection
 from onegov.core.utils import linkify, to_html_ul
 from onegov.directory import DirectoryCollection
@@ -649,12 +647,9 @@ class ArchivedTicketsLayout(DefaultLayout):
             text = self.request.translate(_("Delete archived tickets"))
             links.append(
                 Link(
-                    Markup(
-                        f'<i class="fa fa-trash" aria-hidden="True"></i><span>'
-                        f' {text}</span>'
-                    ),
-                    self.csrf_protected_url(self.request.link(self.model,
-                                                              'delete')),
+                    text=text,
+                    url=self.csrf_protected_url(self.request.link(self.model,
+                                                                  'delete')),
                     traits=(
                         Confirm(
                             _("Do you really want to delete all archived "
@@ -670,7 +665,7 @@ class ArchivedTicketsLayout(DefaultLayout):
                             ),
                         ),
                     ),
-                    attrs={'class': 'delete-ticket-link'},
+                    attrs={'class': 'delete-link'},
                 )
             )
         return links

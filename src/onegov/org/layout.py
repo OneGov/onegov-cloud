@@ -1130,7 +1130,7 @@ class ArchivedTicketsLayout(DefaultLayout):
                             ),
                         ),
                     ),
-                    attrs={'class': 'delete-ticket-link'},
+                    attrs={'class': 'delete-link'},
                 )
             )
         return links

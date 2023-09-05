@@ -152,7 +152,6 @@ def test_delete_ticket_without_submission(org_app, handlers):
     assert session.query(Ticket).filter_by(state='archived').count() == 0
 
 
-
 def test_ticket_deleted_submission_is_resilient(client):
     # it so happened that the ticket.handler.submission was None
     # Viewing a ticket should not break this if that is the case.
