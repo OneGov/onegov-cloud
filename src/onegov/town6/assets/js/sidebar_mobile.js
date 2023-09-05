@@ -4,4 +4,5 @@ if (!$('.sidebar-content-wrapper').length) {
 
 if ($('.sidebar-toggler').css('display') == 'block') {
     $(".sidebar-content-wrapper").detach().appendTo("#offCanvasSidebar");
+    $('.off-canvas a').click(function() { $('.off-canvas').foundation('close'); });
 }
