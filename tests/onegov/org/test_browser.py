@@ -474,7 +474,21 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     browser.find_by_value("Absenden").click()
 
     browser.visit(f"/person/{person.id.hex}")
+
     browser.find_by_text('All About Berry: Logician')
+
+    # now hide all functions
+    browser.visit(f"/person/{person.id.hex}/edit")
+    browser.fill_form({
+        'show_context_specific_functions': False
+    })
+    browser.find_by_value("Absenden").click()
+
+    browser.visit(f"/person/{person.id.hex}")
+
+    assert not browser.is_text_present('Funktionen:')
+    assert not browser.is_text_present('Logician')
+
 
 
 def test_rejected_reservation_sends_email_to_configured_recipients(browser,
