@@ -4,7 +4,6 @@ from icalendar import Event as vEvent
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.event.models.event_filter import EventFilter
 from onegov.event.models.mixins import OccurrenceMixin
 from pytz import UTC
 from sedate import to_timezone
