@@ -252,7 +252,7 @@ class OccurrenceCollection(Pagination):
     @cached_property
     def event_config(self):
         """ Returns the only `EventFilter` entry from the db. """
-        return self.session.query(EventFilter).first()
+        return self.session.query(EventFilter).first() or None
 
     @cached_property
     def event_config_keywords(self) -> 'set[str]':
