@@ -18,8 +18,8 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.validators import FileSizeLimit, ValidPhoneNumber, \
-    ValidFormDefinition
+from onegov.form.validators import (
+    FileSizeLimit, ValidPhoneNumber, ValidFormDefinition)
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
