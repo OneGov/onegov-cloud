@@ -47,8 +47,11 @@ class OccurrenceMixin:
 
     @property
     def filter_keywords(self):
-        return set(self._filter_keywords.keys()) if self._filter_keywords \
+        return (
+            set(self._filter_keywords.keys())
+            if self._filter_keywords
             else set()
+        )
 
     @filter_keywords.setter
     def filter_keywords(self, value):
