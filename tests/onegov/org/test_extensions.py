@@ -476,7 +476,7 @@ def depot(temporary_directory):
     DepotManager._clear()
 
 
-def test_general_file_link_extension(depot):
+def test_general_file_link_extension(depot, session):
 
     class Topic(GeneralFileLinkExtension):
         files = []
@@ -487,9 +487,12 @@ def test_general_file_link_extension(depot):
     topic = Topic()
     assert topic.files == []
 
-    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    request = Bunch(**{
+        'app.settings.org.disabled_extensions': [],
+        'session': session
+    })
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
+    form = form_class(meta={'request': request})
 
     assert 'files' in form._fields
     assert form.files.data == []
@@ -504,7 +507,7 @@ def test_general_file_link_extension(depot):
     assert topic.files[0].name == 'test.txt'
 
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
+    form = form_class(meta={'request': request})
 
     form.process(obj=topic)
 
@@ -520,7 +523,7 @@ def test_general_file_link_extension(depot):
     assert topic.files == []
 
 
-def test_general_file_link_extension_with_publication(depot):
+def test_general_file_link_extension_with_publication(depot, session):
 
     class Topic(GeneralFileLinkExtension, PublicationExtension):
         files = []
@@ -533,9 +536,12 @@ def test_general_file_link_extension_with_publication(depot):
     topic = Topic()
     assert topic.files == []
 
-    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    request = Bunch(**{
+        'app.settings.org.disabled_extensions': [],
+        'session': session
+    })
     form_class = topic.with_content_extensions(TopicForm, request=request)
-    form = form_class()
+    form = form_class(meta={'request': request})
 
     assert 'files' in form._fields
     assert form.files.data == []
@@ -554,10 +560,10 @@ def test_general_file_link_extension_with_publication(depot):
     assert topic.files[0].publish_date == publish_date
     assert topic.files[0].publish_end_date is None
 
-    # this should not change anything on already populated files
+    # this should not change anything on already uploaded files
+    # even if it replaces an existing file
     publish_end_date = publish_date + relativedelta(months=+1)
     form.publication_end.data = publish_end_date
-    form.files[0].action = 'keep'
     form.populate_obj(topic)
     assert form.files.added_files == []
     assert len(topic.files) == 1
@@ -566,34 +572,44 @@ def test_general_file_link_extension_with_publication(depot):
     assert topic.files[0].publish_date == publish_date
     assert topic.files[0].publish_end_date is None
 
-    # but should on newly populated files
-    topic2 = Topic()
-    form.files[0].action = 'replace'
-    form.populate_obj(topic2)
-    assert len(topic2.files) == 1
-    assert topic2.files[0].name == 'test.txt'
-    assert topic2.files[0].published is False
-    assert topic2.files[0].publish_date == publish_date
-    assert topic2.files[0].publish_end_date == publish_end_date
+    # but should on newly uploaded files
+    form.files.append_entry()
+    form.files[1].file = BytesIO(b'hello world 2')
+    form.files[1].filename = 'test2.txt'
+    form.files[1].action = 'replace'
+    form.populate_obj(topic)
+    assert len(topic.files) == 2
+    assert topic.files[1].name == 'test2.txt'
+    assert topic.files[1].published is False
+    assert topic.files[1].publish_date == publish_date
+    assert topic.files[1].publish_end_date == publish_end_date
 
     # publish date in past
     publish_date = utcnow() + relativedelta(days=-1)
     form.publication_start.data = publish_date
-    topic.files = []  # reset files
+    # add another new entry
+    form.files.append_entry()
+    form.files[2].file = BytesIO(b'hello world 3')
+    form.files[2].filename = 'test3.txt'
+    form.files[2].action = 'replace'
     form.populate_obj(topic)
-    assert len(topic.files) == 1
-    assert topic.files[0].name == 'test.txt'
-    assert topic.files[0].published is True
-    assert topic.files[0].publish_date is None
-    assert topic.files[0].publish_end_date == publish_end_date
+    assert len(topic.files) == 3
+    assert topic.files[2].name == 'test3.txt'
+    assert topic.files[2].published is True
+    assert topic.files[2].publish_date is None
+    assert topic.files[2].publish_end_date == publish_end_date
 
     # publish end date in past
     publish_end_date = utcnow()
     form.publication_end.data = publish_end_date
-    topic.files = []  # reset files
+    # add another new entry
+    form.files.append_entry()
+    form.files[3].file = BytesIO(b'hello world 4')
+    form.files[3].filename = 'test4.txt'
+    form.files[3].action = 'replace'
     form.populate_obj(topic)
-    assert len(topic.files) == 1
-    assert topic.files[0].name == 'test.txt'
-    assert topic.files[0].published is False
-    assert topic.files[0].publish_date is None
-    assert topic.files[0].publish_end_date is None
+    assert len(topic.files) == 4
+    assert topic.files[3].name == 'test4.txt'
+    assert topic.files[3].published is False
+    assert topic.files[3].publish_date is None
+    assert topic.files[3].publish_end_date is None
