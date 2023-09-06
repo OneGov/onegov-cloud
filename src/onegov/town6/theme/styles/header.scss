@@ -64,12 +64,9 @@ $qr-code-icon: '\f029';
 
 .globals {
     background: $tuatara;
-    padding-top: 1px;
     position: relative;
+    padding-top: 1px;
 
-    &.public {
-        background-color: $primary-color;
-    }
 
     @include breakpoint(small only) {
         padding: 0;
