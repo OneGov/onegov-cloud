@@ -100,7 +100,6 @@ module = [
     "rcssmin.*",
     "reportlab.*",
     "rjsmin.*",
-    "sass.*",
     # TODO: Writing stubs for this would probably be really quick
     #       but do we actually have a good use-case for this or
     #       could we just do the sort at the end?
