@@ -18,7 +18,7 @@ def extract_pdf_info(
     try:
         content.seek(0)  # type:ignore[attr-defined]
     except Exception:
-        log.warning('Invalid PDF for extraction')
+        log.debug('Content does not support seek')
 
     pages = PDF(content)
 
