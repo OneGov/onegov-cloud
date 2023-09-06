@@ -84,7 +84,7 @@ def test_settings(client):
     assert text in page
     assert '' in page
     assert (
-        f'<div id="announcement_header" '
+        f'<div id="header_announcement" '
         f'style="background-color: {bg_color};">'
     ) in page
     assert (

@@ -87,8 +87,20 @@
                         </div>
                     </div>
 
+                    <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
+                    id="header_announcement"
+                    style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
+                        <div class="grid-container" tal:define="url header_options.get('announcement_url');">
+                                <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                                    tal:condition="url" href="${url}">
+                                    ${header_options['announcement']}</a>
+                                <span style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                                    tal:condition="not url">${header_options['announcement']}</span>
+                        </div>
+                    </div>
+
                     <tal:b tal:condition="not header_options.get('header_additions_fixed')">
-                        <tal:b metal:use-macro="layout.macros['header-links']"></tal:b>
+                        <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
                         <tal:b metal:use-macro="layout.macros['header-text']"></tal:b>
                     </tal:b>
 
@@ -96,7 +108,7 @@
                         <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;" data-top-anchor="globals:bottom" data-stick-to="top">
 
                             <tal:b tal:condition="header_options.get('header_additions_fixed')">
-                                <tal:b metal:use-macro="layout.macros['header-links']"></tal:b>
+                                <tal:b metal:use-macro="layout.macros['header_links']"></tal:b>
                                 <tal:b metal:use-macro="layout.macros['header-text']"></tal:b>
                             </tal:b>
 
