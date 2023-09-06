@@ -101,9 +101,21 @@
             </div>
         </div>
     </div>
-
 </metal:header-links>
 
+<metal:header-text define-macro="header-text">
+    <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
+    id="announcement_header"
+    style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
+    <div class="grid-container" tal:define="url header_options.get('announcement_url');">
+            <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                tal:condition="url" href="${url}">
+                ${header_options['announcement']}</a>
+            <span style="color: ${header_options.get('announcement_font_color', '#000000')}"
+                tal:condition="not url">${header_options['announcement']}</span>
+    </div>
+    </div>
+</metal:header-text>
 
 <metal:editbar define-macro="dropdown-editbar">
     <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links|layout.editbar_links">

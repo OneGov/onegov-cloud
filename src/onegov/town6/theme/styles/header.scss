@@ -65,13 +65,19 @@ $qr-code-icon: '\f029';
 .globals {
     background: $tuatara;
     padding-top: 1px;
+    position: relative;
+
+    &.public {
+        background-color: $primary-color;
+    }
 
     @include breakpoint(small only) {
         padding: 0;
     }
 
-    padding: .5rem;
-    position: relative;
+    .is-dropdown-submenu-parent a {
+        color: $white !important;
+    }
 
     a {
         &::before {
@@ -212,7 +218,8 @@ $qr-code-icon: '\f029';
 
 #announcement_header {
     padding: .5rem;
-    text-align: center;
+    text-align: left;
+    font-weight: bold;
 
     p {
         margin-bottom: 0;
