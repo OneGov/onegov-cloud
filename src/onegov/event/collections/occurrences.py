@@ -210,7 +210,7 @@ class OccurrenceCollection(Pagination):
             search_widget=self.search_widget,
         )
 
-    def without_keywords(self):
+    def without_keywords_and_tags(self):
         return self.__class__(
             request=self.request,
             session=self.session,
@@ -219,7 +219,8 @@ class OccurrenceCollection(Pagination):
             start=self.start,
             end=self.end,
             outdated=self.outdated,
-            tags=self.tags,
+            tags=None,
+            filter_keywords=None,
             locations=self.locations,
             only_public=self.only_public,
             search_widget=self.search_widget,

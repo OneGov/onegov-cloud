@@ -29,8 +29,8 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
         f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
     )
 
-    def get_count(title, value):
-        return keyword_counts.get(title, {}).get(value, 0)
+    def get_count(keyword, value):
+        return keyword_counts.get(keyword, {}).get(value, 0)
 
     def link_title(field_id, value):
         if keyword_counts is None:
@@ -67,7 +67,8 @@ def keyword_count(request, collection):
               f.id in keywords}
 
     counts = {}
-    for model in request.exclude_invisible(self.without_keywords().query()):
+    for model in request.exclude_invisible(
+            self.without_keywords_and_tags().query()):
         for keyword, value in model.filter_keywords.items() if \
                 model.filter_keywords else ():
             if keyword in fields:
