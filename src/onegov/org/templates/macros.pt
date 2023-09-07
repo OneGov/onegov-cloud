@@ -1092,10 +1092,10 @@
             <div class="occurrence-time" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
                 ${time[0].upper()}${time[1:]}
             </div>
-            <div tal:condition="occurrence.tags and not winti" class="occurrence-tags" >
+            <div tal:condition="occurrence.tags and show_tags" class="occurrence-tags" >
                 <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
             </div>
-            <div tal:condition="occurrence.filter_keywords and winti" class="occurrence-filter">
+            <div tal:condition="occurrence.filter_keywords and show_filters" class="occurrence-filter">
                 <span tal:repeat="filter occurrence.filter_keywords"
                         tal:content="'{}: {}'.format(filter.split(':')[0].title(), filter.split(':')[1])" class="blank-label">
                 </span>

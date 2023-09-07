@@ -452,7 +452,7 @@ class EventForm(Form):
                     keywords[k] = [keywords[k], v]
 
             for field in event_filter.fields:
-                form_field = getattr(self, field.id)
+                form_field = getattr(self, field.id, None)
 
                 if form_field is None:
                     continue

@@ -11,7 +11,6 @@ from onegov.form import as_internal_id
 from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
     DuplicateLabelError
 from onegov.org import _, OrgApp
-from onegov.winterthur import WinterthurApp
 from onegov.org.elements import Link
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.org.forms.event import EventConfigurationForm
@@ -47,7 +46,7 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
                 active=value in self.filter_keywords.get(keyword, empty),
                 url=request.link(self.for_filter(
                     singular=keyword in radio_fields,
-                    ** {keyword: value}
+                    **{keyword: value}
                 ), name=view_name),
                 rounded=keyword in radio_fields
             ) for value in values if get_count(keyword, value)
@@ -81,6 +80,9 @@ def keyword_count(request, collection):
              permission=Public)
 def view_occurrences(self, request, layout=None):
     """ View all occurrences of all events. """
+    filters = None
+    tags = None
+    filter_type = request.app.org.event_filter_type
 
     layout = layout or OccurrencesLayout(self, request)
 
@@ -89,13 +91,12 @@ def view_occurrences(self, request, layout=None):
     ]
     translated_tags.sort(key=lambda i: i[1])
 
-    filters = None
-    tags = None
-
-    if isinstance(request.app, WinterthurApp) and self.event_config:
+    if (request.app.org.event_filter_type in ['filters', 'tags_and_filters']
+            and self.event_config):
         keyword_counts = keyword_count(request, self)
         filters = get_filters(request, self, keyword_counts)
-    else:
+
+    if request.app.org.event_filter_type in ['tags', 'tags_and_filters']:
         tags = [
             Link(
                 text=translation + f' ({self.tag_counts[tag]})',
@@ -156,7 +157,8 @@ def view_occurrences(self, request, layout=None):
         'locations': locations,
         'title': _('Events'),
         'search_widget': self.search_widget,
-        'winti': isinstance(request.app, WinterthurApp),
+        'show_tags': filter_type in ['tags', 'tags_and_filters'],
+        'show_filters': filter_type in ['filters', 'tags_and_filters'],
     }
 
 
@@ -172,6 +174,7 @@ def view_occurrence(self, request, layout=None):
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
+    filter_type = request.app.org.event_filter_type
 
     return {
         'description': description,
@@ -186,7 +189,8 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
-        'winti': isinstance(request.app, WinterthurApp),
+        'show_tags': filter_type in ['tags', 'tags_and_filters'],
+        'show_filters': filter_type in ['filters', 'tags_and_filters'],
     }
 
 
@@ -352,7 +356,6 @@ def xml_export_all_occurrences(self, request):
     permission=Private
 )
 def import_occurrences(self, request, form, layout=None):
-
     if form.submitted(request):
         count, errors = form.run_import()
         if errors:

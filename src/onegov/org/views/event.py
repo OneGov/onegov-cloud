@@ -20,8 +20,6 @@ from sedate import utcnow
 from uuid import uuid4
 from webob import exc
 
-from onegov.winterthur import WinterthurApp
-
 
 def get_session_id(request):
     if not request.browser_session.has('event_session_id'):
@@ -66,13 +64,17 @@ def event_form(model, request, form=None):
         # unlike typical extended models, the property of this is defined
         # on the event model, while we are only using the form extension part
         # here
-        if isinstance(request.app, WinterthurApp):
-            # merge event filter form and prevent showing tags
+        if request.app.org.event_filter_type in ['filters',
+                                                 'tags_and_filters']:
+            # merge event filter form
             event_filter = request.session.query(EventFilter).first() or None
             if event_filter:
                 form = merge_forms(form or EventForm, parse_form(
                     event_filter.structure))
-                form.tags = None
+
+        if request.app.org.event_filter_type == 'filters':
+            # prevent showing tags
+            form.tags = None
         return AccessExtension().extend_form(form or EventForm, request)
 
     return form or EventForm

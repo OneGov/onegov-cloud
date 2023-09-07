@@ -52,7 +52,6 @@ from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
-from onegov.winterthur import WinterthurApp
 from sedate import to_timezone
 from translationstring import TranslationString
 
@@ -1721,7 +1720,8 @@ class OccurrencesLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         def links():
-            if self.request.is_admin and isinstance(self.app, WinterthurApp):
+            if (self.request.is_admin and self.org.event_filter_type in
+                    ['filter', 'tags_and_filters']):
                 yield Link(
                     text=_("Configure"),
                     url=self.request.link(self.model, '+edit'),
