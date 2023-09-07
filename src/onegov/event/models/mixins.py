@@ -1,3 +1,4 @@
+from onegov.core.orm.mixins import content_property, ContentMixin
 from onegov.core.orm.types import UTCDateTime
 from sedate import to_timezone
 from sqlalchemy import Column
@@ -7,7 +8,7 @@ from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 
 
-class OccurrenceMixin:
+class OccurrenceMixin(ContentMixin):
     """ Contains all attributes events and ocurrences share.
 
     The ``start`` and ``end`` date and times are stored in UTC - that is, they
@@ -30,10 +31,10 @@ class OccurrenceMixin:
     _tags = Column(  # type:ignore[call-overload]
         MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
 
-    #: All filter keywords defined for this entry
-    _filter_keywords = Column(  # type:ignore
-        MutableDict.as_mutable(HSTORE), nullable=True, name='filter_keywords'
-    )
+    # #: All filter keywords defined for this entry
+    # _filter_keywords = Column(  # type:ignore
+    #     MutableDict.as_mutable(HSTORE), nullable=True, name='filter_keywords'
+    # )
 
     @property
     def tags(self):
@@ -45,17 +46,8 @@ class OccurrenceMixin:
     def tags(self, value):
         self._tags = dict(((key.strip(), '') for key in value))
 
-    @property
-    def filter_keywords(self):
-        return (
-            set(self._filter_keywords.keys())
-            if self._filter_keywords
-            else set()
-        )
-
-    @filter_keywords.setter
-    def filter_keywords(self, value):
-        self._filter_keywords = {k: '' for k in value} if value else None
+    #: Filter keywords if organisation settings enabled filters
+    filter_keywords = content_property()
 
     #: Timezone of the event
     timezone = Column(String, nullable=False)
