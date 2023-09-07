@@ -66,3 +66,12 @@ def add_default_setting_for_event_filter_type(context):
     if org and 'event_filter_type' not in org.meta:
         org.meta['event_filter_type'] = 'tags'
 
+
+@upgrade_task('Add meta data and content columns to occurrences')
+def add_meta_data_and_content_columns_to_occurrences(context):
+    table = 'event_occurrences'
+    if not context.has_column(table, 'meta'):
+        context.operations.add_column(table, Column('meta', JSON()))
+
+    if not context.has_column(table, 'content'):
+        context.operations.add_column(table, Column('content', JSON))
