@@ -1,5 +1,3 @@
-from itertools import groupby
-
 import sqlalchemy
 
 from collections import defaultdict
@@ -21,7 +19,6 @@ from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 
-from onegov.event.models.event_filter import EventFilter
 from onegov.form import as_internal_id
 
 
@@ -46,6 +43,7 @@ class OccurrenceCollection(Pagination):
 
     def __init__(
         self,
+        request,
         session,
         page=0,
         range=None,
@@ -58,6 +56,7 @@ class OccurrenceCollection(Pagination):
         only_public=False,
         search_widget=None,
     ):
+        self.request = request
         self.session = session
         self.page = page
         self.range = range if range in self.date_ranges else None
@@ -89,7 +88,8 @@ class OccurrenceCollection(Pagination):
 
     def page_by_index(self, index):
         return self.__class__(
-            self.session,
+            request=self.request,
+            session=self.session,
             page=index,
             range=self.range,
             start=self.start,
@@ -196,7 +196,8 @@ class OccurrenceCollection(Pagination):
                 locations.append(location)
 
         return self.__class__(
-            self.session,
+            request=self.request,
+            session=self.session,
             page=0,
             range=range,
             start=start,
@@ -211,7 +212,8 @@ class OccurrenceCollection(Pagination):
 
     def without_keywords(self):
         return self.__class__(
-            self.session,
+            request=self.request,
+            session=self.session,
             page=self.page,
             range=self.range,
             start=self.start,
@@ -249,27 +251,13 @@ class OccurrenceCollection(Pagination):
 
         return counts
 
-    @cached_property
-    def event_config(self):
-        """ Returns the only `EventFilter` entry from the db. """
-        return self.session.query(EventFilter).first() or None
-
-    @cached_property
-    def event_config_keywords(self) -> 'set[str]':
-        """
-        Returns the configuration keywords of the `EventFilter` configuration.
-        :rtype: set
-
-        """
-        return {
-            kw for kw in self.event_config.configuration.keywords.split('\r\n')
-        } if self.event_config else set()
-
     def valid_keywords(self, parameters):
         return {
             as_internal_id(k): v for k, v in parameters.items()
             if k in {
-                as_internal_id(kw) for kw in self.event_config_keywords
+                as_internal_id(kw) for kw in
+                self.request.app.org.event_filter_configuration.get(
+                    'keywords', set)
             }
         }
 
@@ -283,15 +271,15 @@ class OccurrenceCollection(Pagination):
         :rtype tuple(tuples(keyword, title, values as list)
 
         """
-        # replace with func above (tuple vs set)
         keywords = tuple(
             as_internal_id(k) for k in
-            self.event_config.configuration.keywords.split('\r\n')
-            or tuple()
+            self.request.app.org.event_filter_configuration.get('keywords',
+                                                                set)
         )
 
         fields = {
-            f.id: f for f in self.event_config.fields if f.id in keywords
+            f.id: f for f in
+            self.request.app.org.event_filter_fields if (f.id in keywords)
         }
 
         def _sort(values):
@@ -320,7 +308,7 @@ class OccurrenceCollection(Pagination):
         """
         base = self.session.query(Occurrence._tags.keys()).with_entities(
             sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
-            Occurrence.start)
+            Occurrence.end)
         base = base.filter(Occurrence.start >= datetime.now(timezone.utc))
 
         query = sqlalchemy.select(
@@ -400,25 +388,41 @@ class OccurrenceCollection(Pagination):
         if self.tags:
             query = query.filter(Occurrence._tags.has_any(array(self.tags)))
 
-        if self.filter_keywords:
-            keywords = self.valid_keywords(self.filter_keywords)
-
-            def keyword_group(value):
-                return value.split(':')[0]
-
-            values = [
-                ':'.join((keyword, value))
-                for keyword in keywords
-                for value in keywords[keyword]
-            ]
-            values.sort(key=keyword_group)
-
-            values = [
-                Event._filter_keywords.has_any(array(group_values))
-                for group, group_values in groupby(values, key=keyword_group)
-            ]
-            if values:
-                query = query.filter(and_(*values))
+        # if self.filter_keywords:
+        #     keywords = self.valid_keywords(self.filter_keywords)
+        #
+        #     # def keyword_group(value):
+        #     #     return value.split(':')[0]
+        #     #
+        #     # values = [
+        #     #     ':'.join((keyword, value))
+        #     #     for keyword in keywords
+        #     #     for value in keywords[keyword]
+        #     # ]
+        #     # values.sort(key=keyword_group)
+        #
+        #     # values = [
+        #     #     Event.filter_keywords.has_any(array(group_values))
+        #     #     for group, group_values in groupby(values, key=keyword_group)
+        #     # ]
+        #
+        #     # values = [
+        #     #     ':'.join((keyword, value))
+        #     #     for keyword in keywords
+        #     #     for value in keywords[keyword]
+        #     # ]
+        #     values = [val for sublist in keywords.values() for val in sublist]
+        #     # values.extend([key for key in keywords.keys()])
+        #
+        #     values.sort()
+        #
+        #     values = [
+        #         Event.filter_keywords.any_(array(group_values))
+        #         for group, group_values in groupby(values)
+        #     ]
+        #
+        #     if values:
+        #         query = query.filter(and_(*values))
 
         if self.locations:
 

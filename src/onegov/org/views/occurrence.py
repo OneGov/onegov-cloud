@@ -6,7 +6,6 @@ from morepath.request import Response
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.event.models.event_filter import EventFilter
 from onegov.form import as_internal_id
 from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
     DuplicateLabelError
@@ -27,7 +26,7 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
     empty = tuple()
 
     radio_fields = set(
-        f.id for f in self.event_config.fields if f.type == 'radio'
+        f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
     )
 
     def get_count(title, value):
@@ -39,7 +38,8 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
-    for keyword, title, values in self.available_filters(sort_choices=False):
+    for keyword, title, values in self.available_filters(
+            request, sort_choices=False):
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
@@ -60,19 +60,25 @@ def keyword_count(request, collection):
 
     keywords = tuple(
         as_internal_id(k) for k in (
-            self.event_config.configuration.keywords.split('\r\n') or tuple()
+            request.app.org.event_filter_configuration.get('keywords', set)
         )
     )
 
-    fields = {f.id: f for f in self.event_config.fields if f.id in keywords}
+    fields = {f.id: f for f in request.app.org.event_filter_fields if
+              f.id in keywords}
 
     counts = {}
     for model in request.exclude_invisible(self.without_keywords().query()):
-        for keyword in model.filter_keywords:
-            field_id, value = keyword.split(':', 1)
-            if field_id in fields:
-                f_count = counts.setdefault(field_id, defaultdict(int))
+        for keyword, value in model.filter_keywords.items() if \
+                model.filter_keywords else ():
+            if keyword in fields:
+                f_count = counts.setdefault(keyword, defaultdict(int))
                 f_count[value] += 1
+        # TODO: try
+        # f_count = ...
+        # if keyword in fields
+        # for keyword, value in ...
+        # for model in ...
     return counts
 
 
@@ -92,7 +98,7 @@ def view_occurrences(self, request, layout=None):
     translated_tags.sort(key=lambda i: i[1])
 
     if (request.app.org.event_filter_type in ['filters', 'tags_and_filters']
-            and self.event_config):
+            and request.app.org.event_filter_configuration.get('keywords')):
         keyword_counts = keyword_count(request, self)
         filters = get_filters(request, self, keyword_counts)
 
@@ -200,27 +206,20 @@ def view_occurrence(self, request, layout=None):
 def handle_edit_event_filters(self, request, form, layout=None):
     try:
         if form.submitted(request):
-            if self.session.query(EventFilter).count():
-                # update existing event configuration
-                event_filter = self.event_config
-                event_filter.update(form.structure.data,
-                                    form.keyword_fields.data)
-            else:
-                # add new event configuration
-                event_filter = EventFilter()
-                event_filter.update(form.structure.data,
-                                    form.keyword_fields.data)
-                self.session.add(event_filter)
+            request.app.org.event_filter_configuration = {
+                'order': [],
+                'keywords': form.keyword_fields.data.split('\r\n')
+            }
+            request.app.org.event_filter_definition = form.structure.data
 
-            self.session.flush()
-
-            form.populate_obj(event_filter)
             request.success(_("Your changes were saved"))
             return request.redirect(request.link(self))
 
         elif not request.POST:
-            event_filter = self.session.query(EventFilter).first()
-            form.process(obj=event_filter)
+            # Store the model data on the form
+            form.structure.data = request.app.org.event_filter_definition
+            form.keyword_fields.data = (
+                request.app.org.event_filter_configuration.get('keywords', []))
 
     except InvalidFormSyntax as e:
         request.warning(

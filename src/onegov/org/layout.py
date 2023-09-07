@@ -295,7 +295,7 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def events_url(self):
         return self.request.link(
-            OccurrenceCollection(self.request.session)
+            OccurrenceCollection(self.request, self.request.session)
         )
 
     @cached_property
@@ -1752,7 +1752,7 @@ class OccurrenceLayout(EventBaseLayout):
 
     @cached_property
     def collection(self):
-        return OccurrenceCollection(self.request.session)
+        return OccurrenceCollection(self.request, self.request.session)
 
     @property
     def og_description(self):

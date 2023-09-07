@@ -12,7 +12,6 @@ from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.event.collections import EventCollection, OccurrenceCollection
 from onegov.event.models import EventFile
-from onegov.event.models.event_filter import EventFilter
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
@@ -388,19 +387,17 @@ class EventForm(Form):
             raise NotImplementedError
 
         from onegov.form.parser.core import CheckboxField, RadioField
-        filter_keywords = set()
-        event_filter = EventFilter.instance_from_object(model)
-        for field in event_filter.fields:
-
+        filter_keywords = dict()
+        for field in self.request.app.org.event_filter_fields:
             form_field = getattr(self, field.id)
             if isinstance(field, CheckboxField):
                 for value in form_field.data:
-                    filter_keywords.add(f'{field.id}:{value}')
+                    filter_keywords[field.id] = value
             if isinstance(field, RadioField):
-                filter_keywords.add(f'{field.id}:{form_field.data}')
+                filter_keywords[field.id] = form_field.data
 
         if filter_keywords:
-            model.filter_keywords = filter_keywords
+            model.filer_keywords = filter_keywords
             for occ in model.occurrences:
                 occ.filter_keywords = filter_keywords
 
@@ -440,18 +437,9 @@ class EventForm(Form):
 
         if model.filter_keywords:
             from onegov.form.parser.core import CheckboxField, RadioField
-            event_filter = EventFilter.instance_from_object(model)
-            keywords = dict()
-            for item in model.filter_keywords:
-                k, v = item.split(':')
-                if k not in keywords:
-                    keywords[k] = v
-                else:
-                    if isinstance(keywords[k], list):
-                        keywords[k].append(v)
-                    keywords[k] = [keywords[k], v]
+            keywords = model.filter_keywords
 
-            for field in event_filter.fields:
+            for field in self.request.app.org.event_filter_fields:
                 form_field = getattr(self, field.id, None)
 
                 if form_field is None:
@@ -652,6 +640,7 @@ class EventImportForm(Form):
 class EventConfigurationForm(Form):
     """ Form to configure filters for events view. """
 
+    # TODO: rename to definition
     structure = TextAreaField(
         label=_("Definition"),
         fieldset=_("General"),
@@ -671,9 +660,3 @@ class EventConfigurationForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
-
-    def populate_obj(self, obj):
-        super().populate_obj(obj)
-
-    def process_obj(self, obj):
-        self.keyword_fields.data = obj.configuration.keywords

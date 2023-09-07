@@ -5,7 +5,6 @@ from morepath.request import Response
 from onegov.core.crypto import random_token
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
-from onegov.event.models.event_filter import EventFilter
 from onegov.form import merge_forms, parse_form
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
@@ -67,10 +66,9 @@ def event_form(model, request, form=None):
         if request.app.org.event_filter_type in ['filters',
                                                  'tags_and_filters']:
             # merge event filter form
-            event_filter = request.session.query(EventFilter).first() or None
-            if event_filter:
+            if request.app.org.event_filter_definition:
                 form = merge_forms(form or EventForm, parse_form(
-                    event_filter.structure))
+                    request.app.org.event_filter_definition))
 
         if request.app.org.event_filter_type == 'filters':
             # prevent showing tags

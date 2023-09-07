@@ -1,11 +1,13 @@
 """ Contains the model describing the organisation proper. """
 
 from datetime import date
+from functools import lru_cache
 from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify, paragraphify
+from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.org.theme import user_options
 from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
@@ -71,6 +73,8 @@ class Organisation(Base, TimestampMixin):
     standard_image = meta_property()
     submit_events_visible = meta_property(default=True)
     event_filter_type = meta_property(default='tags')
+    event_filter_definition = meta_property()
+    event_filter_configuration = meta_property()
 
     # social media
     facebook_url = meta_property()
@@ -238,3 +242,12 @@ class Organisation(Base, TimestampMixin):
 
     def excluded_person_fields(self, request):
         return [] if request.is_logged_in else self.hidden_people_fields
+
+    @property
+    def event_filter_fields(self):
+        @staticmethod
+        @lru_cache(maxsize=1)
+        def fields_from_definition(definition):
+            return tuple(flatten_fieldsets(parse_formcode(definition)))
+
+        return fields_from_definition(self.event_filter_definition)
