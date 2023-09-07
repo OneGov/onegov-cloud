@@ -389,41 +389,23 @@ class OccurrenceCollection(Pagination):
         if self.tags:
             query = query.filter(Occurrence._tags.has_any(array(self.tags)))
 
-        # if self.filter_keywords:
-        #     keywords = self.valid_keywords(self.filter_keywords)
-        #
-        #     # def keyword_group(value):
-        #     #     return value.split(':')[0]
-        #     #
-        #     # values = [
-        #     #     ':'.join((keyword, value))
-        #     #     for keyword in keywords
-        #     #     for value in keywords[keyword]
-        #     # ]
-        #     # values.sort(key=keyword_group)
-        #
-        #     # values = [
-        #     #     Event.filter_keywords.has_any(array(group_values))
-        #     #     for group, group_values in groupby(values, key=keyword_group)
-        #     # ]
-        #
-        #     # values = [
-        #     #     ':'.join((keyword, value))
-        #     #     for keyword in keywords
-        #     #     for value in keywords[keyword]
-        #     # ]
-        #     values = [val for sublist in keywords.values() for val in sublist]
-        #     # values.extend([key for key in keywords.keys()])
-        #
-        #     values.sort()
-        #
-        #     values = [
-        #         Event.filter_keywords.any_(array(group_values))
-        #         for group, group_values in groupby(values)
-        #     ]
-        #
-        #     if values:
-        #         query = query.filter(and_(*values))
+        if self.filter_keywords:
+            keywords = self.valid_keywords(self.filter_keywords)
+
+            values = [val for sublist in keywords.values() for val in sublist]
+            values.sort()
+
+            values = [
+                Event.filter_keywords.contains(value)
+                # Event.filter_keywords.in_(value)
+                # Event.filter_keywords.ilike(value)
+                # Event.filter_keywords.match(value)
+                for value in values
+            ]
+
+            if values:
+                query = query.filter(and_(*values))
+                # query = query.filter(*values)
 
         if self.locations:
 
