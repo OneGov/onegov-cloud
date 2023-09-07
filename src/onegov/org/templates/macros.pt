@@ -1096,9 +1096,7 @@
                 <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
             </div>
             <div tal:condition="occurrence.filter_keywords and show_filters" class="occurrence-filter">
-                <span tal:repeat="filter occurrence.filter_keywords"
-                        tal:content="'{}: {}'.format(filter.split(':')[0].title(), filter.split(':')[1])" class="blank-label">
-                </span>
+                <span tal:repeat="filter occurrence.filter_keywords.items()" class="blank-label">${filter[0].title()}: ${filter[1]}</span>
             </div>
         </div>
         <div class="clearfix"></div>
