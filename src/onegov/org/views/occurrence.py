@@ -38,8 +38,7 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
-    for keyword, title, values in self.available_filters(
-            request, sort_choices=False):
+    for keyword, title, values in self.available_filters(sort_choices=False):
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
