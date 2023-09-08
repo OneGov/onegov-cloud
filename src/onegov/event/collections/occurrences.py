@@ -10,7 +10,7 @@ from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
 from sqlalchemy import distinct
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 
@@ -410,7 +410,7 @@ class OccurrenceCollection(Pagination):
             values.sort()
 
             values = [
-                Occurrence.filter_keywords[keyword].in_(values)
+                Event.filter_keywords[keyword].has_any(array(values))
                 for keyword in keywords.keys()
             ]
 

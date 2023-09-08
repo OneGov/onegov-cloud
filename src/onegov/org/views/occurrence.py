@@ -69,16 +69,16 @@ def keyword_count(request, collection):
     counts = {}
     for model in request.exclude_invisible(
             self.without_keywords_and_tags().query()):
-        for keyword, value in model.filter_keywords.items() if \
-                model.filter_keywords else ():
+        for keyword, values in model.filter_keywords.items() if (
+                model.filter_keywords) else ():
             if keyword in fields:
-                f_count = counts.setdefault(keyword, defaultdict(int))
-                f_count[value] += 1
-        # TODO: try
-        # f_count = ...
-        # if keyword in fields
-        # for keyword, value in ...
-        # for model in ...
+                if not isinstance(values, list):
+                    values = [values]
+
+                for value in values:
+                    f_count = counts.setdefault(keyword, defaultdict(int))
+                    f_count[value] += 1
+
     return counts
 
 
