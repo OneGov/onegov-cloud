@@ -257,7 +257,8 @@ class OccurrenceCollection(Pagination):
         self.event_filter_fields = fields
 
     def valid_keywords(self, parameters):
-        assert self.event_filter_configuration
+        if not self.event_filter_configuration:
+            return set
 
         return {
             as_internal_id(k): v for k, v in parameters.items()
@@ -277,8 +278,8 @@ class OccurrenceCollection(Pagination):
         :rtype tuple(tuples(keyword, title, values as list)
 
         """
-        assert self.event_filter_configuration
-        assert self.event_filter_fields
+        if not self.event_filter_configuration or not self.event_filter_fields:
+            return set
 
         keywords = tuple(
             as_internal_id(k) for k in
