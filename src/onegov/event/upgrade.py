@@ -10,8 +10,6 @@ from onegov.core.upgrade import upgrade_task
 from onegov.event import EventCollection
 from sqlalchemy import Column
 
-from onegov.org.models import Organisation
-
 
 @upgrade_task('Add coordinates column')
 def add_coordinates_column(context):
@@ -57,14 +55,6 @@ def add_filter_keywords_column(context):
             context.operations.add_column(
                 table, Column(column_name, MutableDict.as_mutable(
                     HSTORE), nullable=True))
-
-
-@upgrade_task('Adds default value for event filter type')
-def add_default_setting_for_event_filter_type(context):
-    org = context.session.query(Organisation).first()
-
-    if org and 'event_filter_type' not in org.meta:
-        org.meta['event_filter_type'] = 'tags'
 
 
 @upgrade_task('Add meta data and content columns to occurrences')
