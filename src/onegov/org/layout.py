@@ -1720,8 +1720,8 @@ class OccurrencesLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         def links():
-            if (self.request.is_admin and self.org.event_filter_type in
-                    ['filter', 'tags_and_filters']):
+            if (self.request.is_admin and self.request.app.org.
+                    event_filter_type in ['filters', 'tags_and_filters']):
                 yield Link(
                     text=_("Configure"),
                     url=self.request.link(self.model, '+edit'),
