@@ -631,10 +631,8 @@ class ModuleSettingsForm(Form):
         label=_("Values of the location filter"),
         fieldset=_("Events"),)
 
-    # TODO: add translations
     event_filter_type = RadioField(
-        label=_('Choose the filter type for events to be used (default is '
-                '\'tags\')'),
+        label=_('Choose the filter type for events (default is \'tags\')'),
         choices=(
             ('tags', _('A predefined set of tags')),
             ('filters', _('Manually configurable filters')),
