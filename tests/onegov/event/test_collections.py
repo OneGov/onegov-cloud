@@ -1,6 +1,8 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+
+from fastcache import lru_cache
 from freezegun import freeze_time
 from markupsafe import escape
 
@@ -9,7 +11,7 @@ from onegov.event import EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
-from onegov.event.models.event_filter import EventFilter
+from onegov.form import parse_formcode, flatten_fieldsets
 from onegov.gis import Coordinates
 from sedate import replace_timezone
 from sedate import standardize_date
@@ -394,24 +396,26 @@ def test_occurrence_collection_pagination(session):
                 for o in occurrences.batch])
 
 
-def setup_event_config(session):
-    event_filter = EventFilter()
-    # Note '( )' will crate Radio buttons which leads to 'singular'
-    config_structure = """
-    Filter *= 
+def test_occurrence_collection_for_filter(session):
+    definition = """Filter *=
     ( ) Filter A
     ( ) Filter B
     ( ) Filter C
     """
-    config = "filter"
-    event_filter.update(config_structure, config)
-    session.add(event_filter)
+    config = {'keywords': ['Filter'], 'order': []}
 
+    @lru_cache(maxsize=1)
+    def fields_from_definition(definition):
+        return tuple(flatten_fieldsets(parse_formcode(definition)))
 
-def test_occurrence_collection_for_filter(session):
-    setup_event_config(session)
+    def set_event_filter_config_and_fields(collection, config, definition):
+        collection.set_event_filter_configuration(config)
+        collection.set_event_filter_fields(fields_from_definition(definition))
 
-    occurrences = OccurrenceCollection(session=session).for_filter()
+    occurrences = OccurrenceCollection(session=session)
+    set_event_filter_config_and_fields(occurrences, config, definition)
+
+    occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start is None
     assert occurrences.end is None
@@ -426,7 +430,9 @@ def test_occurrence_collection_for_filter(session):
         tags=['month-6'],
         locations=['Bar'],
         filter_keywords={'filter': ['Filter A']}
-    ).for_filter()
+    )
+    set_event_filter_config_and_fields(occurrences, config, definition)
+    occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start == date(2009, 5, 1)
     assert occurrences.end == date(2009, 6, 30)

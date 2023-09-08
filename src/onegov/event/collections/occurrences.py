@@ -54,6 +54,8 @@ class OccurrenceCollection(Pagination):
         locations=None,
         only_public=False,
         search_widget=None,
+        event_filter_configuration=None,
+        event_filter_fields=None,
     ):
         self.session = session
         self.page = page
@@ -65,9 +67,8 @@ class OccurrenceCollection(Pagination):
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
-
-        self.event_filter_configuration = None
-        self.event_filter_fields = None
+        self.event_filter_configuration = event_filter_configuration or None
+        self.event_filter_fields = event_filter_fields or None
 
     def __eq__(self, other):
         return self.page == other.page
@@ -100,6 +101,8 @@ class OccurrenceCollection(Pagination):
             locations=self.locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
         )
 
     def range_to_dates(self, range, start=None, end=None):
@@ -207,6 +210,8 @@ class OccurrenceCollection(Pagination):
             locations=locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
         )
 
     def without_keywords_and_tags(self):
@@ -222,6 +227,8 @@ class OccurrenceCollection(Pagination):
             locations=self.locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
         )
 
     @cached_property
@@ -258,7 +265,7 @@ class OccurrenceCollection(Pagination):
 
     def valid_keywords(self, parameters):
         if not self.event_filter_configuration:
-            return set
+            return dict()
 
         return {
             as_internal_id(k): v for k, v in parameters.items()
@@ -279,7 +286,7 @@ class OccurrenceCollection(Pagination):
 
         """
         if not self.event_filter_configuration or not self.event_filter_fields:
-            return set
+            return set()
 
         keywords = tuple(
             as_internal_id(k) for k in
