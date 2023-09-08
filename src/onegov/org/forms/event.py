@@ -385,20 +385,23 @@ class EventForm(Form):
         else:
             raise NotImplementedError
 
-        from onegov.form.parser.core import CheckboxField, RadioField
-        filter_keywords = dict()
-        for field in self.request.app.org.event_filter_fields:
-            form_field = getattr(self, field.id)
-            if isinstance(field, CheckboxField):
-                for value in form_field.data:
-                    filter_keywords[field.id] = value
-            if isinstance(field, RadioField):
-                filter_keywords[field.id] = form_field.data
+        if self.request.app.org.event_filter_type in ['filters',
+                                                      'tags_and_filters']:
+            from onegov.form.parser.core import CheckboxField, RadioField
+            filter_keywords = dict()
+            for field in self.request.app.org.event_filter_fields:
+                form_field = getattr(self, field.id)
+                # TODO optimize isinstance
+                if isinstance(field, CheckboxField):
+                    # for value in form_field.data:
+                    filter_keywords[field.id] = form_field.data
+                if isinstance(field, RadioField):
+                    filter_keywords[field.id] = form_field.data
 
-        if filter_keywords:
-            model.filer_keywords = filter_keywords
-            for occ in model.occurrences:
-                occ.filter_keywords = filter_keywords
+            if filter_keywords:
+                model.filter_keywords = filter_keywords
+                for occ in model.occurrences:
+                    occ.filter_keywords = filter_keywords
 
     def process_obj(self, model):
         """ Stores the page values on the form. """
