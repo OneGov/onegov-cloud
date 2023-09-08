@@ -24,7 +24,10 @@ class VotumCollectionLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Archive'), self.request.link(self.assembly_collection())),
+            Link(
+                _('Assemblies'),
+                self.request.link(self.assembly_collection())
+            ),
             Link(
                 self.assembly_title(self.model.assembly),
                 self.request.link(self.model.assembly)
@@ -51,14 +54,17 @@ class VotumLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_('Homepage'), self.homepage_url),
-            Link(_('Archive'), self.request.link(self.assembly_collection())),
+            Link(
+                _('Assemblies'),
+                self.request.link(self.assembly_collection())
+            ),
             Link(
                 self.assembly_title(self.model.agenda_item.assembly),
                 self.request.link(self.model.agenda_item.assembly)
             ),
             Link(
                 self.agenda_item_title(self.model.agenda_item, short=True),
-                '#'
+                self.request.link(self.model.agenda_item)
             ),
-            Link(self.title, self.request.link(self.model))
+            Link(self.title, '#')
         ]

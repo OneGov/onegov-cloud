@@ -676,11 +676,11 @@ msgstr "Société musicale"
 msgid "Organizer E-Mail address"
 msgstr "Adresse e-mail de l'organisateur"
 
-msgid "Shown as contact E-Mail address"
-msgstr "Affichée comme adresse e-mail de contact"
-
 msgid "Organizer phone number"
 msgstr "Numéro de téléphone de l'organisateur"
+
+msgid "Shown as contact E-Mail address"
+msgstr "Affichée comme adresse e-mail de contact"
 
 msgid "Shown as contact phone number"
 msgstr "Affiché comme numéro de téléphone de contact"

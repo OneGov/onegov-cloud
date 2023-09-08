@@ -675,11 +675,11 @@ msgstr "Musikverein"
 msgid "Organizer E-Mail address"
 msgstr "Organisator E-Mail Adresse"
 
-msgid "Shown as contact E-Mail address"
-msgstr "Wird als Kontakt-Email-Adresse angezeigt"
-
 msgid "Organizer phone number"
 msgstr "Organisator Telefonnummer"
+
+msgid "Shown as contact E-Mail address"
+msgstr "Wird als Kontakt-Email-Adresse angezeigt"
 
 msgid "Shown as contact phone number"
 msgstr "Wird als Kontakttelefonnummer angezeigt"

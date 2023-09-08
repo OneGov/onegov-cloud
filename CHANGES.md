@@ -1,8 +1,34 @@
 # Changes
 
+## 2023.43
+
+`2023-09-04` | [bbca2e85e1...ccab5dce85](https://github.com/OneGov/onegov-cloud/compare/bbca2e85e1^...ccab5dce85)
+
+### Landsgemeinde
+
+##### Remove start time from agenda items and vota.
+
+`Feature` | [OGC-638](https://linear.app/onegovcloud/issue/OGC-638) | [b1ff00ae9c](https://github.com/onegov/onegov-cloud/commit/b1ff00ae9c79b7008506db4148a290d7ed3e25a5)
+
+##### Update archive title.
+
+`Feature` | [OGC-1239](https://linear.app/onegovcloud/issue/OGC-1239) | [ccab5dce85](https://github.com/onegov/onegov-cloud/commit/ccab5dce85f5b0e035a2a64416816e55f3045948)
+
+### Landsgmeinde
+
+##### Improve tracking of ticker changes and add a hint for completed assemblies.
+
+`Feature` | [OGC-1238](https://linear.app/onegovcloud/issue/OGC-1238) | [4c878bf697](https://github.com/onegov/onegov-cloud/commit/4c878bf697f5f8eb7c70633e44270a0b9ff2cdf5)
+
+### Swissvotes
+
+##### Update translations.
+
+`Feature` | [SWI](#SWI) | [ce76cd136b](https://github.com/onegov/onegov-cloud/commit/ce76cd136bb67eb795cb5bfc076252a773a24f8c)
+
 ## 2023.42
 
-`2023-09-01` | [d9cfe17091...ed0f12ed53](https://github.com/OneGov/onegov-cloud/compare/d9cfe17091^...ed0f12ed53)
+`2023-09-01` | [d9cfe17091...c52430d8d5](https://github.com/OneGov/onegov-cloud/compare/d9cfe17091^...c52430d8d5)
 
 ### Election Day
 
@@ -2434,72 +2460,4 @@ LING: OGC-669
 ##### Fixed Typo
 
 `Bugfix` | [OGC-679](https://linear.app/onegovcloud/issue/OGC-679) | [f9dbb3a226](https://github.com/onegov/onegov-cloud/commit/f9dbb3a226bc67226371dc59291775f86b69e92e)
-
-## 2022.50
-
-`2022-10-18` | [882bf8e010...f016c97cc8](https://github.com/OneGov/onegov-cloud/compare/882bf8e010^...f016c97cc8)
-
-### Agency
-
-##### Add information for changes form
-
-`Feature` | [OGC-650](https://linear.app/onegovcloud/issue/OGC-650) | [c0a04a906d](https://github.com/onegov/onegov-cloud/commit/c0a04a906d0dd7af513f92f85648f954a4cc5fff)
-
-##### Delete reference on non-existant address fields
-
-`Bugfix` | [OGC-645](https://linear.app/onegovcloud/issue/OGC-645) | [f4d2fd08c2](https://github.com/onegov/onegov-cloud/commit/f4d2fd08c20bac393533e55ab0837d1a98940364)
-
-### Election Day
-
-##### Export all votes and elections of all time.
-
-`Feature` | [OGC-483](https://linear.app/onegovcloud/issue/OGC-483) | [882bf8e010](https://github.com/onegov/onegov-cloud/commit/882bf8e0100dcd7bcf1e13386ab8531c48677033)
-
-##### Allow alternative expats column name.
-
-`Feature` | [404e98a5e5](https://github.com/onegov/onegov-cloud/commit/404e98a5e5c3b236636ea920f3c60a434bb73055)
-
-##### Color contrasts
-
-`Feature` | [OGC-556](https://linear.app/onegovcloud/issue/OGC-556) | [77ce7da75c](https://github.com/onegov/onegov-cloud/commit/77ce7da75c90a4cc5c0557a4c046389a84d6fbc1)
-
-##### Add white background to terms of usage image
-
-`Feature` | [OGC-538](https://linear.app/onegovcloud/issue/OGC-538) | [23a89290b4](https://github.com/onegov/onegov-cloud/commit/23a89290b47e6fb19ec6e489d66b4aa7fd9cdf14)
-
-##### Fix HTML Errors
-
-`Bugfix` | [OGC-562](https://linear.app/onegovcloud/issue/OGC-562) | [aa9ca0ca1b](https://github.com/onegov/onegov-cloud/commit/aa9ca0ca1bcaaafbce8fff7f174998566f65ad86)
-
-##### Fix broken up definition list
-
-`Bugfix` | [OGC-552](https://linear.app/onegovcloud/issue/OGC-552) | [05705527e2](https://github.com/onegov/onegov-cloud/commit/05705527e2e89bad6a25c7c44524ba2340a306f7)
-
-### Feriennet
-
-##### Fix age check options being escaped.
-
-`Bugfix` | [PRO-1094](https://linear.app/projuventute/issue/PRO-1094) | [0e58e5755c](https://github.com/onegov/onegov-cloud/commit/0e58e5755c79b2280d3712c02f08db1967b455e3)
-
-### Org
-
-##### Fix signed class rendering.
-
-`Bugfix` | [94ea74c201](https://github.com/onegov/onegov-cloud/commit/94ea74c20182cd0693cae7a097c635156aa9aea5)
-
-##### Fix label nesting problem
-
-Fixed problem with nested labels on multiple choice fields in forms
-
-`Bugfix` | [OGC-554](https://linear.app/onegovcloud/issue/OGC-554) | [e4a799e5c0](https://github.com/onegov/onegov-cloud/commit/e4a799e5c0b3eab6be8c1b5766c996987e00e0fe)
-
-### Town6
-
-##### Display contact information correctly
-
-`Bugfix` | [OGC-648](https://linear.app/onegovcloud/issue/OGC-648) | [9fe7bd211a](https://github.com/onegov/onegov-cloud/commit/9fe7bd211add87148fd0ea88965d2cf487121c5e)
-
-##### Homepage widget adjustments
-
-`Bugfix` | [cc30098a80](https://github.com/onegov/onegov-cloud/commit/cc30098a80f5ba810f143b8c78db825d3c0d95fb)
 
