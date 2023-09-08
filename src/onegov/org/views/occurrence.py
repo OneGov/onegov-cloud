@@ -89,8 +89,8 @@ def view_occurrences(self, request, layout=None):
     filters = None
     tags = None
     filter_type = request.app.org.event_filter_type
-    self.set_event_filter_configuration(
-        request.app.org.event_filter_configuration)
+    filter_config = request.app.org.event_filter_configuration or dict()
+    self.set_event_filter_configuration(filter_config)
     self.set_event_filter_fields(request.app.org.event_filter_fields)
 
     layout = layout or OccurrencesLayout(self, request)
@@ -100,8 +100,11 @@ def view_occurrences(self, request, layout=None):
     ]
     translated_tags.sort(key=lambda i: i[1])
 
-    if (request.app.org.event_filter_type in ['filters', 'tags_and_filters']
-            and request.app.org.event_filter_configuration.get('keywords')):
+    if (filter_type in ['filters', 'tags_and_filters']
+            and filter_config.get('keywords', None)):
+        # self.set_event_filter_configuration(filter_config)
+        # self.set_event_filter_fields(request.app.org.event_filter_fields)
+
         keyword_counts = keyword_count(request, self)
         filters = get_filters(request, self, keyword_counts)
 
