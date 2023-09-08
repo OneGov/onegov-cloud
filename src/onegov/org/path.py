@@ -460,7 +460,6 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
         search_widget = None
 
     return OccurrenceCollection(
-        request=request,
         session=app.session(),
         page=page,
         range=range,
@@ -476,7 +475,7 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
 
 @OrgApp.path(model=Occurrence, path='/event/{name}')
 def get_occurrence(app, name):
-    return OccurrenceCollection(app.request, app.session()).by_name(name)
+    return OccurrenceCollection(app.session()).by_name(name)
 
 
 @OrgApp.path(model=Event, path='/event-management/{name}')

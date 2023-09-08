@@ -43,7 +43,6 @@ class OccurrenceCollection(Pagination):
 
     def __init__(
         self,
-        request,
         session,
         page=0,
         range=None,
@@ -56,7 +55,6 @@ class OccurrenceCollection(Pagination):
         only_public=False,
         search_widget=None,
     ):
-        self.request = request
         self.session = session
         self.page = page
         self.range = range if range in self.date_ranges else None
@@ -67,6 +65,9 @@ class OccurrenceCollection(Pagination):
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
+
+        self.event_filter_configuration = None
+        self.event_filter_fields = None
 
     def __eq__(self, other):
         return self.page == other.page
@@ -88,7 +89,6 @@ class OccurrenceCollection(Pagination):
 
     def page_by_index(self, index):
         return self.__class__(
-            request=self.request,
             session=self.session,
             page=index,
             range=self.range,
@@ -196,7 +196,6 @@ class OccurrenceCollection(Pagination):
                 locations.append(location)
 
         return self.__class__(
-            request=self.request,
             session=self.session,
             page=0,
             range=range,
@@ -212,7 +211,6 @@ class OccurrenceCollection(Pagination):
 
     def without_keywords_and_tags(self):
         return self.__class__(
-            request=self.request,
             session=self.session,
             page=self.page,
             range=self.range,
@@ -252,13 +250,20 @@ class OccurrenceCollection(Pagination):
 
         return counts
 
+    def set_event_filter_configuration(self, config):
+        self.event_filter_configuration = config
+
+    def set_event_filter_fields(self, fields):
+        self.event_filter_fields = fields
+
     def valid_keywords(self, parameters):
+        assert self.event_filter_configuration
+
         return {
             as_internal_id(k): v for k, v in parameters.items()
             if k in {
                 as_internal_id(kw) for kw in
-                self.request.app.org.event_filter_configuration.get(
-                    'keywords', set)
+                self.event_filter_configuration.get('keywords', set)
             }
         }
 
@@ -272,15 +277,17 @@ class OccurrenceCollection(Pagination):
         :rtype tuple(tuples(keyword, title, values as list)
 
         """
+        assert self.event_filter_configuration
+        assert self.event_filter_fields
+
         keywords = tuple(
             as_internal_id(k) for k in
-            self.request.app.org.event_filter_configuration.get('keywords',
-                                                                set)
+            self.event_filter_configuration.get('keywords', set)
         )
 
         fields = {
             f.id: f for f in
-            self.request.app.org.event_filter_fields if (f.id in keywords)
+            self.event_filter_fields if (f.id in keywords)
         }
 
         def _sort(values):

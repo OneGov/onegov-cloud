@@ -89,6 +89,9 @@ def view_occurrences(self, request, layout=None):
     filters = None
     tags = None
     filter_type = request.app.org.event_filter_type
+    self.set_event_filter_configuration(
+        request.app.org.event_filter_configuration)
+    self.set_event_filter_fields(request.app.org.event_filter_fields)
 
     layout = layout or OccurrencesLayout(self, request)
 
