@@ -109,6 +109,8 @@ def view_ticket(self, request, layout=None):
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
 
+    filter_type = request.app.org.event_filter_type
+
     return {
         'title': self.number,
         'layout': layout,
@@ -126,7 +128,9 @@ def view_ticket(self, request, layout=None):
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
-        'edit_amount_url': edit_amount_url
+        'edit_amount_url': edit_amount_url,
+        'show_tags': filter_type in ['tags', 'tags_and_filters'],
+        'show_filters': filter_type in ['filters', 'tags_and_filters'],
     }
 
 

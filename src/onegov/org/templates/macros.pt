@@ -975,7 +975,7 @@
             <dd><a href="tel:${event.organizer_phone}" tal:content="event.organizer_phone" /></dd>
         </tal:b>
 
-        <tal:b condition="event.tags">
+        <tal:b condition="event.tags and show_tags">
             <dt i18n:translate>Tags</dt>
             <dd>
                 <ul class="no-margin-bottom">
@@ -984,7 +984,7 @@
             </dd>
         </tal:b>
 
-        <tal:b condition="event.filter_keywords">
+        <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
                 <ul class="no-margin-bottom">

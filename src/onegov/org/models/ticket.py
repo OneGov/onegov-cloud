@@ -668,9 +668,12 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
 
     def get_summary(self, request):
         layout = EventLayout(self.event, request)
+        filter_type = request.app.org.event_filter_type
         return render_macro(layout.macros['display_event'], request, {
             'event': self.event,
-            'layout': layout
+            'layout': layout,
+            'show_tags': filter_type in ['tags', 'tags_and_filters'],
+            'show_filters': filter_type in ['filters', 'tags_and_filters'],
         })
 
     def get_links(self, request):

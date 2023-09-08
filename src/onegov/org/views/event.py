@@ -180,13 +180,17 @@ def handle_new_event(self, request, form, layout=None):
     layout = layout or EventLayout(self, request)
     layout.editbar_links = []
 
+    filter_type = request.app.org.event_filter_type
+
     return {
         'layout': layout,
         'title': self.title,
         'form': form,
         'form_width': 'large',
         'lead': terms,
-        'button_text': _('Continue')
+        'button_text': _('Continue'),
+        'show_tags': filter_type in ['tags', 'tags_and_filters'],
+        'show_filters': filter_type in ['filters', 'tags_and_filters'],
     }
 
 
@@ -226,13 +230,17 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
     layout.editbar_links = []
     layout.hide_steps = True
 
+    filter_type = request.app.org.event_filter_type
+
     return {
         'layout': layout,
         'title': self.title,
         'form': form,
         'form_width': 'large',
         'lead': '',
-        'button_text': _('Submit')
+        'button_text': _('Submit'),
+        'show_tags': filter_type in ['tags', 'tags_and_filters'],
+        'show_filters': filter_type in ['filters', 'tags_and_filters'],
     }
 
 
@@ -314,6 +322,8 @@ def view_event(self, request, layout=None):
 
         return morepath.redirect(request.link(ticket, 'status'))
 
+    filter_type = request.app.org.event_filter_type
+
     return {
         'completable': self.state in ('initiated', 'submitted'),
         'edit_url': request.link(self, 'edit'),
@@ -321,6 +331,8 @@ def view_event(self, request, layout=None):
         'layout': layout or EventLayout(self, request),
         'ticket': ticket,
         'title': self.title,
+        'show_tags': filter_type in ['tags', 'tags_and_filters'],
+        'show_filters': filter_type in ['filters', 'tags_and_filters'],
     }
 
 
