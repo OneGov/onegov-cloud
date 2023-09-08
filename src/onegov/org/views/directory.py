@@ -258,14 +258,12 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
 
 def keyword_count(request, collection):
     self = collection
-    counts = {}
-
     keywords = tuple(
         as_internal_id(k)
         for k in self.directory.configuration.keywords or tuple()
     )
     fields = {f.id: f for f in self.directory.fields if f.id in keywords}
-
+    counts = {}
     for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
             field_id, value = entry.split(':', 1)
