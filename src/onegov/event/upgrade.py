@@ -43,16 +43,6 @@ def validate_existing_rrules(context):
         event.validate_recurrence('recurrence', event.recurrence)
 
 
-# @upgrade_task('Adds column filter keywords to events and event occurrences')
-# def add_filter_keywords_column(context):
-#     tables = ['events', 'event_occurrences']
-#     column_name = 'filter_keywords'
-#     for table in tables:
-#         if not context.has_column(table, column_name):
-#             context.operations.add_column(
-#                 table, Column(column_name, JSON(), nullable=True))
-
-
 @upgrade_task('Add meta data and content columns to occurrences')
 def add_meta_data_and_content_columns_to_occurrences(context):
     table = 'event_occurrences'
