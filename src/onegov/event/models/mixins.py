@@ -47,7 +47,7 @@ class OccurrenceMixin(ContentMixin):
         self._tags = dict(((key.strip(), '') for key in value))
 
     #: Filter keywords if organisation settings enabled filters
-    filter_keywords = content_property()
+    filter_keywords = content_property(value_type=dict)
 
     #: Timezone of the event
     timezone = Column(String, nullable=False)

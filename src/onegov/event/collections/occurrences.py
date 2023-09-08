@@ -6,6 +6,8 @@ from datetime import date, timedelta, datetime, timezone
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
 from lxml import objectify, etree
+from sqlalchemy.dialects import postgresql
+
 from onegov.core.collection import Pagination
 from onegov.core.utils import toggle
 from onegov.event.models import Event
@@ -410,17 +412,24 @@ class OccurrenceCollection(Pagination):
             values = [val for sublist in keywords.values() for val in sublist]
             values.sort()
 
+            print(f'*** tschupre query values: {values}')
+            # values = [
+            #     # Event.filter_keywords.contains(value)
+            #     Event.filter_keywords.in_(values)
+            #     # for value in values
+            # ]
             values = [
-                Event.filter_keywords.contains(value)
-                # Event.filter_keywords.in_(value)
-                # Event.filter_keywords.ilike(value)
-                # Event.filter_keywords.match(value)
-                for value in values
+                Event.filter_keywords[keyword].in_(values)
+                for keyword in keywords.keys()
             ]
 
             if values:
                 query = query.filter(and_(*values))
                 # query = query.filter(*values)
+                print(f'*** tschupre query: {query}')
+                print(str(query.statement.compile(
+                    dialect=postgresql.dialect(),
+                ).params))
 
         if self.locations:
 
