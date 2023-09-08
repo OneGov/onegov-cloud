@@ -2,9 +2,6 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sqlalchemy.dialects.postgresql import HSTORE
-from sqlalchemy.ext.mutable import MutableDict
-
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.event import EventCollection
@@ -46,15 +43,14 @@ def validate_existing_rrules(context):
         event.validate_recurrence('recurrence', event.recurrence)
 
 
-@upgrade_task('Adds column filter keywords to events and event occurrences')
-def add_filter_keywords_column(context):
-    tables = ['events', 'event_occurrences']
-    column_name = 'filter_keywords'
-    for table in tables:
-        if not context.has_column(table, column_name):
-            context.operations.add_column(
-                table, Column(column_name, MutableDict.as_mutable(
-                    HSTORE), nullable=True))
+# @upgrade_task('Adds column filter keywords to events and event occurrences')
+# def add_filter_keywords_column(context):
+#     tables = ['events', 'event_occurrences']
+#     column_name = 'filter_keywords'
+#     for table in tables:
+#         if not context.has_column(table, column_name):
+#             context.operations.add_column(
+#                 table, Column(column_name, JSON(), nullable=True))
 
 
 @upgrade_task('Add meta data and content columns to occurrences')
@@ -64,4 +60,4 @@ def add_meta_data_and_content_columns_to_occurrences(context):
         context.operations.add_column(table, Column('meta', JSON()))
 
     if not context.has_column(table, 'content'):
-        context.operations.add_column(table, Column('content', JSON))
+        context.operations.add_column(table, Column('content', JSON()))

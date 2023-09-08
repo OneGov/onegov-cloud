@@ -460,7 +460,7 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
         search_widget = None
 
     return OccurrenceCollection(
-        session=app.session(),
+        app.session(),
         page=page,
         range=range,
         start=start,

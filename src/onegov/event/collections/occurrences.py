@@ -1,25 +1,23 @@
 import sqlalchemy
 
 from collections import defaultdict
-from functools import cached_property
 from datetime import date, timedelta, datetime, timezone
 from dateutil.relativedelta import relativedelta
+from functools import cached_property
 from icalendar import Calendar as vCalendar
 from lxml import objectify, etree
-
-from onegov.core.collection import Pagination
-from onegov.core.utils import toggle
-from onegov.event.models import Event
-from onegov.event.models import Occurrence
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
-from sqlalchemy import and_
 from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
 
+from onegov.core.collection import Pagination
+from onegov.core.utils import toggle
+from onegov.event.models import Event
+from onegov.event.models import Occurrence
 from onegov.form import as_internal_id
 
 
@@ -91,7 +89,7 @@ class OccurrenceCollection(Pagination):
 
     def page_by_index(self, index):
         return self.__class__(
-            session=self.session,
+            self.session,
             page=index,
             range=self.range,
             start=self.start,
@@ -200,7 +198,7 @@ class OccurrenceCollection(Pagination):
                 locations.append(location)
 
         return self.__class__(
-            session=self.session,
+            self.session,
             page=0,
             range=range,
             start=start,
@@ -217,7 +215,7 @@ class OccurrenceCollection(Pagination):
 
     def without_keywords_and_tags(self):
         return self.__class__(
-            session=self.session,
+            self.session,
             page=self.page,
             range=self.range,
             start=self.start,

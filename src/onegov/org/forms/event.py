@@ -37,7 +37,6 @@ from wtforms.validators import Optional
 
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -640,8 +639,7 @@ class EventImportForm(Form):
 class EventConfigurationForm(Form):
     """ Form to configure filters for events view. """
 
-    # TODO: rename to definition
-    structure = TextAreaField(
+    definition = TextAreaField(
         label=_("Definition"),
         fieldset=_("General"),
         validators=[

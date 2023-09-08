@@ -41,7 +41,7 @@ def keywords_encode(keywords):
 
 
 def keywords_decode(text):
-    """ Decodes keywords created by :func:`keywords_encode`. """
+    """ Decodes keywords creaged by :func:`keywords_encode`. """
 
     if not text:
         return None

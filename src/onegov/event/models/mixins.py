@@ -31,11 +31,6 @@ class OccurrenceMixin(ContentMixin):
     _tags = Column(  # type:ignore[call-overload]
         MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
 
-    # #: All filter keywords defined for this entry
-    # _filter_keywords = Column(  # type:ignore
-    #     MutableDict.as_mutable(HSTORE), nullable=True, name='filter_keywords'
-    # )
-
     @property
     def tags(self):
         """ Tags/Categories of the event. """

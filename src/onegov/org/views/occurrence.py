@@ -214,14 +214,14 @@ def handle_edit_event_filters(self, request, form, layout=None):
                 'order': [],
                 'keywords': form.keyword_fields.data.split('\r\n')
             }
-            request.app.org.event_filter_definition = form.structure.data
+            request.app.org.event_filter_definition = form.definition.data
 
             request.success(_("Your changes were saved"))
             return request.redirect(request.link(self))
 
         elif not request.POST:
             # Store the model data on the form
-            form.structure.data = request.app.org.event_filter_definition
+            form.definition.data = request.app.org.event_filter_definition
             form.keyword_fields.data = (
                 request.app.org.event_filter_configuration.get('keywords', []))
 
