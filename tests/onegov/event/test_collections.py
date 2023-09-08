@@ -397,12 +397,12 @@ def test_occurrence_collection_pagination(session):
 
 
 def test_occurrence_collection_for_filter(session):
+    config = {'keywords': ['Filter'], 'order': []}
     definition = """Filter *=
     ( ) Filter A
     ( ) Filter B
     ( ) Filter C
     """
-    config = {'keywords': ['Filter'], 'order': []}
 
     @lru_cache(maxsize=1)
     def fields_from_definition(definition):
@@ -413,7 +413,6 @@ def test_occurrence_collection_for_filter(session):
         collection.set_event_filter_fields(fields_from_definition(definition))
 
     occurrences = OccurrenceCollection(session=session)
-    set_event_filter_config_and_fields(occurrences, config, definition)
 
     occurrences = occurrences.for_filter()
     assert occurrences.range is None
@@ -422,6 +421,7 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is False
     assert occurrences.tags == []
     assert occurrences.locations == []
+    assert occurrences.filter_keywords == {}
 
     occurrences = OccurrenceCollection(
         session=session,
@@ -490,14 +490,14 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.filter_keywords == {'filter': ['Filter C']}
 
     occurrences = occurrences.for_filter(tag='a', location='A',
-                                         filter='Filter A', singular=True)
+                                         filter='Filter X', singular=True)
     assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter A']}
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(range='today', start=date(2010, 5, 1))
     assert occurrences.range == 'today'
@@ -506,7 +506,7 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter A']}
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(start=date(2010, 5, 1))
     assert occurrences.range is None
@@ -515,7 +515,7 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter A']}
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(range='-', end=date(2010, 5, 1))
     assert occurrences.range is None
@@ -524,7 +524,7 @@ def test_occurrence_collection_for_filter(session):
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
-    assert occurrences.filter_keywords == {'filter': ['Filter A']}
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
 
 def test_occurrence_collection_outdated(session):
