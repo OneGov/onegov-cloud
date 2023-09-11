@@ -210,9 +210,13 @@ def view_occurrence(self, request, layout=None):
 def handle_edit_event_filters(self, request, form, layout=None):
     try:
         if form.submitted(request):
+            keywords = form.keyword_fields.data
+            keywords = keywords.split('\r\n') if '\r\n' in keywords \
+                else [keywords]
+
             request.app.org.event_filter_configuration = {
                 'order': [],
-                'keywords': form.keyword_fields.data.split('\r\n')
+                'keywords': keywords
             }
             request.app.org.event_filter_definition = form.definition.data
 
