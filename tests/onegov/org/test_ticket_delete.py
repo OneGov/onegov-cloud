@@ -15,7 +15,7 @@ class Client(BaseClient):
 
 # This is used implicitly to check for polymorphic identity
 class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EHO'}
+    __mapper_args__ = {'polymorphic_identity': 'FOO'}
     es_type_name = 'echo_tickets'
 
 
@@ -63,7 +63,7 @@ class EchoHandler(Handler, TicketDeletionMixin):
 
 
 def register_echo_handler(handlers):
-    handlers.register('EHO', EchoHandler)
+    handlers.register('FOO', EchoHandler)
 
 
 def archive_all_tickets(session, tickets, tz):
@@ -93,7 +93,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
     tickets = [
         collection.open_ticket(
             handler_id='1',
-            handler_code='EHO',
+            handler_code='FOO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -101,7 +101,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='2',
-            handler_code='EHO',
+            handler_code='FOO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -109,7 +109,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='3',
-            handler_code='EHO',
+            handler_code='FOO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -117,7 +117,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='4',
-            handler_code='EHO',
+            handler_code='FOO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -125,7 +125,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='5',
-            handler_code='EHO',
+            handler_code='FOO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -133,7 +133,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
         ),
         collection.open_ticket(
             handler_id='6',
-            handler_code='EHO',
+            handler_code='FOO',
             title="Title",
             group="Group",
             email="citizen@example.org",
