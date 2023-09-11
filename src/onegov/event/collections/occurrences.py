@@ -454,6 +454,9 @@ class OccurrenceCollection(Pagination):
                 </termin>
                 <text>Beschreibung</text>
                 <urlweb>url</urlweb>
+                <hauptrubrik>XXX</hauptrubrik>
+                NOTE: if event filter keyword specifies 'kalender' its value
+                will be set as 'Hauptrubrik'
                 <rubrik>tag 1</rubrik>
                 <rubrik>tag 2</rubrik>
                 <veranstaltungsort>
@@ -475,6 +478,18 @@ class OccurrenceCollection(Pagination):
         :return: xml string
 
         """
+        def flatten_dict_values(data, exclude=()):
+            """ Flattens the values of a given dict. """
+            values = []
+            for k, v in data.items():
+                if k in exclude:
+                    continue
+                if isinstance(v, list):
+                    values.extend(v)
+                else:
+                    values.append(v)
+            return values
+
         xml = ('<import partner="" partnerid="" passwort="" importid="">'
                '</import>')
         root = objectify.fromstring(xml)
@@ -515,6 +530,13 @@ class OccurrenceCollection(Pagination):
                 event.urlweb = e.external_event_url
             if e.tags:
                 event.rubrik = e.tags
+            if hasattr(e, 'filter_keywords'):
+                hauptrubrik = e.filter_keywords.get('kalender', [])
+                if hauptrubrik:
+                    event.hauptrubrik = hauptrubrik
+                # overwriting tags from filters
+                event.rubrik = flatten_dict_values(e.filter_keywords,
+                                                   exclude=('kalender'))
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
             ort.adresse = ''
