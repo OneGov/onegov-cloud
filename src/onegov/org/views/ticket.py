@@ -28,7 +28,7 @@ from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
     Organisation, ResourceRecipient, ResourceRecipientCollection
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.org.models.ticket import ticket_submitter, TicketDeletionMixin
+from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
@@ -1047,21 +1047,21 @@ def delete_tickets_and_related_data(
     request: 'CoreRequest', tickets: 'Query[Ticket]'
 ) -> tuple[list['Ticket'], list['Ticket']]:
 
-    not_deletable = []
-    successfully_deleted = []
+    not_deletable, successfully_deleted = [], []
 
     for ticket in tickets:
-        handler = ticket.handler
+        if (hasattr(
+                ticket.handler, 'ticket_deletable')
+                and ticket.handler.ticket_deletable is None):
+            not_deletable.append(ticket)
+            continue
 
         delete_messages_from_ticket(request, ticket.number)
 
-        # Mixing expected as part of the super class list
-        if isinstance(handler, TicketDeletionMixin):
-            if handler.ticket_deletable:
-                handler.prepare_delete_ticket()
-            else:
-                not_deletable.append(ticket)
-                continue
+        if hasattr(ticket.handler, 'prepare_delete_ticket'):
+            ticket.handler.prepare_delete_ticket()
+
+        delete_files_and_submissions_from_ticket(request, ticket)
 
         request.session.delete(ticket)
         successfully_deleted.append(ticket)
@@ -1075,6 +1075,15 @@ def delete_messages_from_ticket(request: 'CoreRequest', number: str):
     )
     for message in messages.query():
         messages.delete(message)
+
+
+def delete_files_and_submissions_from_ticket(request: 'CoreRequest',
+                                             ticket: 'Ticket'):
+
+    if hasattr(ticket, 'submission') and ticket.submission is not None:
+        for file in ticket.submission.files:
+            request.session.delete(file)
+        request.session.delete(ticket.submission)
 
 
 @OrgApp.html(model=FindYourSpotCollection, name='tickets',
