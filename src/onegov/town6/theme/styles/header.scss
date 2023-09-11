@@ -565,17 +565,25 @@ $editbar-fg-color-active: $white;
     }
 
     .navigation-area {
-
+        display: flex;
         height: 100%;
+        justify-content: center;
         padding-top: 10vh;
     }
 
     .side-navigation {
-        background-color: transparent;
-        padding: 0 4rem;
+        padding: 0 2rem;
+        width: 30rem;
+
+        @include breakpoint(small only) {
+            width: auto;
+
+            .menu {
+                background: $primary-color;
+            }
+        }
 
         li {
-
             a {
                 padding: 0;
 
@@ -586,9 +594,9 @@ $editbar-fg-color-active: $white;
             }
 
             .navlink {
+                border-radius: .7rem;
                 margin-right: 3rem;
                 padding: 1rem;
-                border-radius: .7rem;
                 transition: background-color 200ms linear;
 
                 &:hover {
@@ -598,15 +606,6 @@ $editbar-fg-color-active: $white;
             }
         }
 
-        @include breakpoint(small only) {
-            background: $offcanvas-background;
-
-            &.drilldown a,
-            &.drilldown li,
-            &.drilldown .is-drilldown-submenu {
-                background: $offcanvas-background;
-            }
-        }
 
         span[data-click-target] {
             z-index: 100;
@@ -617,10 +616,15 @@ $editbar-fg-color-active: $white;
         }
     }
 
+    .drilldown a {
+        background-color: $primary-color !important;
+    }
+
     // Overwrite foundation arrows
-    .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle) > a::after {
+    .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle) > a::after,
+    .drilldown .is-drilldown-submenu-parent > a::after,
+    .js-drilldown-back::before {
         border: 0;
-        content: "\f078";
         font-family: 'Font Awesome 5 Free';
         font-style: normal;
         font-variant: normal;
@@ -628,7 +632,35 @@ $editbar-fg-color-active: $white;
         height: auto;
         right: 0;
         top: 0;
+        font-size: 1rem;
         width: auto;
+    }
+
+    .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle) > a::after{
+        content: "\f078";
+    }
+
+    .drilldown .is-drilldown-submenu-parent > a::after {
+        top: .3rem;
+        content: "\f054";
+    }
+
+    .js-drilldown-back {
+        padding: 1rem;
+        padding-bottom: 1.5rem;
+        padding-left: 3rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid $white;
+
+        &::before {
+            content: "\f053";
+            display: block;
+            position: absolute;
+            left: 1rem;
+            top: .8rem;
+            right: auto;
+            background-color: $primary-color;
+        }
     }
 
     * {
