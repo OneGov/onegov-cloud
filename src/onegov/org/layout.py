@@ -1109,12 +1109,9 @@ class ArchivedTicketsLayout(DefaultLayout):
             text = self.request.translate(_("Delete archived tickets"))
             links.append(
                 Link(
-                    Markup(
-                        f'<i class="fa fa-trash" aria-hidden="True"></i><span>'
-                        f' {text}</span>'
-                    ),
-                    self.csrf_protected_url(self.request.link(self.model,
-                                                              'delete')),
+                    text=text,
+                    url=self.csrf_protected_url(self.request.link(self.model,
+                                                                  'delete')),
                     traits=(
                         Confirm(
                             _("Do you really want to delete all archived "
@@ -1132,6 +1129,7 @@ class ArchivedTicketsLayout(DefaultLayout):
                     ),
                     attrs={'class': 'delete-link'},
                 )
+
             )
         return links
 
