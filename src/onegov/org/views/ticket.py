@@ -1033,14 +1033,19 @@ def view_delete_all_archived_tickets(self, request):
     tickets = self.query().filter_by(state='archived')
 
     errors, ok = delete_tickets_and_related_data(request, tickets)
-
-    msg = _(
-        "{success_count} tickets deleted, "
-        "{error_count} are not deletable",
-        mapping={'success_count': len(ok), 'error_count': len(errors)},
-    )
-
-    request.message(msg, 'success' if not errors else 'warning')
+    if errors:
+        msg = _(
+            "{success_count} tickets deleted, "
+            "{error_count} are not deletable",
+            mapping={'success_count': len(ok), 'error_count': len(errors)},
+        )
+        request.message(msg, 'warning')
+    else:
+        msg = _(
+            "{success_count} tickets deleted.",
+            mapping={'success_count': len(ok)}
+        )
+        request.message(msg, 'success')
 
 
 def delete_tickets_and_related_data(

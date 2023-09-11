@@ -1898,11 +1898,11 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 msgid "Delete person"
 msgstr "Person löschen"
 
-msgid "Do you really want to delete all archived tickets?"
-msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
-
 msgid "Delete archived tickets"
 msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
@@ -5321,6 +5321,14 @@ msgstr "Alle Tickets"
 
 msgid "All Users"
 msgstr "Alle Benutzer"
+
+#, python-format
+msgid "{success_count} tickets deleted, {error_count} are not deletable"
+msgstr "{success_count} tickets gelöscht, {error_count} sind nicht löschbar."
+
+#, python-format
+msgid "{success_count} tickets deleted."
+msgstr "{success_count} tickets gelöscht."
 
 msgid "Submitted Requests"
 msgstr "Eingereichte Anfragen"

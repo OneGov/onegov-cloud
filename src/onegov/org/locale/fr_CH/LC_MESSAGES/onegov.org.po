@@ -1900,11 +1900,11 @@ msgstr "Voulez-vous vraiment supprimer cette personne ?"
 msgid "Delete person"
 msgstr "Supprimer la personne"
 
-msgid "Do you really want to delete all archived tickets?"
-msgstr "Voulez-vous vraiment supprimer tous les tickets archivés ?"
-
 msgid "Delete archived tickets"
 msgstr "Supprimer les tickets archivés"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Voulez-vous vraiment supprimer tous les tickets archivés ?"
 
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
@@ -3473,8 +3473,8 @@ msgid "The following reservations have been rejected:"
 msgstr "Les réservations suivantes ont été rejetées :"
 
 msgid ""
-"This is a notification for the rejected reservations for ${organisation}. If"
-" you no longer wish to receive these notifications, please contact an "
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
 "Il s'agit d'une notification concernant les réservations rejetées pour "
@@ -5335,6 +5335,15 @@ msgstr "Tous les tickets"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"
+
+#, python-format
+msgid "{success_count} tickets deleted, {error_count} are not deletable"
+msgstr ""
+"{success_count} tickets supprimés, {error_count} ne sont pas supprimables."
+
+#, python-format
+msgid "{success_count} tickets deleted."
+msgstr "{success_count} tickets supprimés."
 
 msgid "Submitted Requests"
 msgstr "Demandes soumises"

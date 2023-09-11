@@ -1908,11 +1908,11 @@ msgstr "Vuoi davvero eliminare questa persona?"
 msgid "Delete person"
 msgstr "Elimina persona"
 
-msgid "Do you really want to delete all archived tickets?"
-msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
-
 msgid "Delete archived tickets"
 msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
 
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
@@ -5330,6 +5330,15 @@ msgstr "Tutti i biglietti"
 
 msgid "All Users"
 msgstr "Tutti gli utenti"
+
+#, python-format
+msgid "{success_count} tickets deleted, {error_count} are not deletable"
+msgstr ""
+"{success_count} biglietti cancellati, {error_count} non sono cancellabili."
+
+#, python-format
+msgid "{success_count} tickets deleted."
+msgstr "{success_count} biglietti cancellati."
 
 msgid "Submitted Requests"
 msgstr "Richieste inoltrate"
