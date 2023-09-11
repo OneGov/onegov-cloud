@@ -390,12 +390,8 @@ class EventForm(Form):
             from onegov.form.parser.core import CheckboxField, RadioField
             filter_keywords = dict()
             for field in self.request.app.org.event_filter_fields:
-                form_field = getattr(self, field.id)
-                # TODO optimize isinstance
-                if isinstance(field, CheckboxField):
-                    # for value in form_field.data:
-                    filter_keywords[field.id] = form_field.data
-                if isinstance(field, RadioField):
+                if isinstance(field, (CheckboxField, RadioField)):
+                    form_field = getattr(self, field.id)
                     filter_keywords[field.id] = form_field.data
 
             if filter_keywords:
