@@ -348,22 +348,19 @@ $transition-duration: .1s;
     .search-button i,
     .menu-button i {
         color: $primary-color;
+        font-size: 25px;
         margin-right: .5rem;
 
         @include breakpoint(medium up) {
-            font-size: 1.5rem;
+            font-size: 23px;
             padding-top: 2px;
         }
     }
 }
 
-#offCanvas .side-navigation {
-    margin-top: 3rem;
-}
-
 .header-searchbox {
     input {
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid $iron;
         border-left: 0;
         border-radius: 0 !important;
         border-right: 0;
@@ -546,29 +543,116 @@ $editbar-fg-color-active: $white;
 }
 
 
-.side-navigation {
-    li span:hover {
-        color: $editbar-bg-color;
+.off-canvas-close-button {
+    font-size: 23px;
+    padding: 1rem 1.5rem;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+#offCanvasSearch {
+    background-color: $white;
+}
+
+#offCanvas {
+    background: $primary-color;
+
+    .button-area {
+        display: flex;
+        justify-content: end;
     }
 
-    li a:hover{
-        background: #d7d7d7;
+    .navigation-area {
+
+        height: 100%;
+        padding-top: 10vh;
     }
 
-    @include breakpoint(small only) {
-        background: $offcanvas-background;
+    .side-navigation {
+        background-color: transparent;
+        padding: 0 4rem;
 
-        &.drilldown a,
-        &.drilldown li,
-        &.drilldown .is-drilldown-submenu {
+        li {
+
+            a {
+                padding: 0;
+
+                &::after {
+                    padding: 1rem;
+                    transition: transform 200ms linear;
+                }
+            }
+
+            .navlink {
+                margin-right: 3rem;
+                padding: 1rem;
+                border-radius: .7rem;
+                transition: background-color 200ms linear;
+
+                &:hover {
+                    background: rgba(250, 250, 250, .15);
+                    color: $white;
+                }
+            }
+        }
+
+        @include breakpoint(small only) {
             background: $offcanvas-background;
+
+            &.drilldown a,
+            &.drilldown li,
+            &.drilldown .is-drilldown-submenu {
+                background: $offcanvas-background;
+            }
+        }
+
+        span[data-click-target] {
+            z-index: 100;
+        }
+
+        .nested.is-accordion-submenu {
+            border-left: 2px solid rgba(250, 250, 250, .15);
         }
     }
 
-    span[data-click-target] {
-        z-index: 100;
+    // Overwrite foundation arrows
+    .accordion-menu .is-accordion-submenu-parent:not(.has-submenu-toggle) > a::after {
+        border: 0;
+        content: "\f078";
+        font-family: 'Font Awesome 5 Free';
+        font-style: normal;
+        font-variant: normal;
+        font-weight: 900;
+        height: auto;
+        right: 0;
+        top: 0;
+        width: auto;
+    }
+
+    * {
+        color: $white;
     }
 }
+
+#offCanvasSidebar {
+    background: $white;
+    padding: 2rem;
+    z-index: 1000;
+}
+
+$offcanvas-sizes: (
+    small: 90vw,
+    medium: 60vw,
+    large: 30vw,
+);
+$offcanvas-vertical-sizes: (
+    small: 90vw,
+    medium: 60vw,
+    large: 30vw,
+);
+
 
 #page-root #header .alerts .alert-box {
     margin-bottom: 0;

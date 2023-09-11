@@ -40,20 +40,41 @@
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
         <div class="off-canvas position-left" id="offCanvas" data-off-canvas data-auto-focus="false" >
             <!-- Close button -->
-            <button class="close-button" aria-label="Close menu" type="button" data-close>
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <div class="button-area">
+                <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
 
             <!-- Menu -->
-            <div metal:use-macro="layout.macros['side_navigation']"></div>
+            <div class="navigation-area">
+                <tal:b metal:use-macro="layout.macros['side_navigation']"></tal:b>
+            </div>
         </div>
 
         <div class="sidebar-toggler show-for-small-only" data-toggle="offCanvasSidebar">
             <i class="fa fa-chevron-left rotate"></i>
         </div>
 
-        <div class="off-canvas position-right show-for-small-only" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas data-off-canvas >
+        <div class="off-canvas position-right show-for-small-only" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas >
             <!-- Gets filled by sidebar_mobile.js -->
+        </div>
+
+        <div class="off-canvas position-right" id="offCanvasSearch" data-auto-focus="false" data-off-canvas>
+            <form class="searchbox header-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                <div class="input-group">
+                    <input class="input-group-field" type="search" id="search-side" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                    <div class="typeahead">
+                        <div class="cell small-12" data-typeahead-container>
+                        </div>
+                    </div>
+                    <div class="input-group-button">
+                        <button class="button" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
 
         <div class="off-canvas-content" data-off-canvas-content>
@@ -116,7 +137,7 @@
                                 <div class="grid-x">
                                     <div class="large-2 small-2 cell">
                                         <button class="menu-button" tal:condition="layout.root_pages" data-toggle="offCanvas">
-                                            <i class="fas fa-bars"></i><span class="hide-for-small-only navigation-button">Navigation</span>
+                                            <i class="fas fa-bars"></i>
                                         </button>
                                     </div>
                                     <div class="large-8 small-8 cell middle">
@@ -126,41 +147,9 @@
                                         </a>
                                     </div>
                                     <div class="large-2 small-2 cell right-side">
-                                        <form class="searchbox header-searchbox show-for-medium" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                                            <div class="input-group">
-                                                <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
-                                                <div class="typeahead">
-                                                    <div class="cell small-12" data-typeahead-container>
-                                                    </div>
-                                                </div>
-                                                <div class="input-group-button">
-                                                    <button type="submit" class="search-button">
-                                                        <i class="fa fa-search"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                        <div class="accordion search-header-mobile" data-accordion data-allow-all-closed="true">
-                                            <div class="accordion-item" data-accordion-item>
-                                                <a href="#" class="accordion-title show-for-small-only"><i class="fa fa-search"></i></a>
-                                                <div class="accordion-content" data-tab-content >
-                                                    <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                                                        <div class="input-group">
-                                                            <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
-                                                            <div class="input-group-button">
-                                                                <button type="submit" class="search-button button" i18n:translate="">
-                                                                    Perform Search
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="typeahead">
-                                                            <div class="cell small-12" data-typeahead-container>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <button class="search-button" data-toggle="offCanvasSearch">
+                                            <i class="fa fa-search"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

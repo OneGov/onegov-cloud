@@ -27,10 +27,8 @@ $('#nav-bar').on('sticky.zf.stuckto:top', function() {
     el.data('modified', true)
 });
 
-$('#offCanvas').on('opened.zf.offCanvas', function (e) {
-    $(this).find('#search').focus()
-}).on('close.zf.offCanvas', function (e) {
-    $(this).find('#search').blur()
+$('#offCanvasSearch').on('opened.zf.offCanvas', function (e) {
+    $(this).find('#search-side').focus()
 })
 
 $(document).on("keypress", function(e) {
