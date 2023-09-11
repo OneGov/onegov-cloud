@@ -516,7 +516,7 @@ def test_event_form_create_rrule():
             org=Bunch(event_filter_type='tags')
         )
     )
-    
+
     assert occurrences(form) == [date(2015, 6, 1)]
 
     form.end_date.data = date(2015, 6, 8)
