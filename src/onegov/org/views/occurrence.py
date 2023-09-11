@@ -226,7 +226,7 @@ def handle_edit_event_filters(self, request, form, layout=None):
         elif not request.POST:
             # Store the model data on the form
             form.definition.data = request.app.org.event_filter_definition
-            form.keyword_fields.data = (
+            form.keyword_fields.data = '\r\n'.join(
                 request.app.org.event_filter_configuration.get('keywords', []))
 
     except InvalidFormSyntax as e:
