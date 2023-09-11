@@ -1332,7 +1332,7 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.tags == ['']
+    assert event.tags == []
 
     # no category -> default category
     events.from_ical('\n'.join([
@@ -1356,3 +1356,29 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert sorted(event.tags) == ['Sport']
+    assert event.filter_keywords == None
+
+    # default keywords
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Tour</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]), default_filter_keywords=dict(kalender='Sport Veranstaltungskalender'))
+    transaction.commit()
+    event = events.query().one()
+    assert sorted(event.tags) == []
+    assert (event.filter_keywords == dict(
+        kalender='Sport Veranstaltungskalender'))
