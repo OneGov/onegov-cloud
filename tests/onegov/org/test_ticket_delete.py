@@ -13,12 +13,6 @@ class Client(BaseClient):
     skip_n_forms = 1
 
 
-# This is used implicitly to check for polymorphic identity
-class EchoTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'FOO'}
-    es_type_name = 'echo_tickets'
-
-
 class TicketDeletionMixin:
 
     @property
@@ -60,6 +54,12 @@ class EchoHandler(Handler, TicketDeletionMixin):
 
     def get_links(self, request):
         return self.data.get('links')
+
+
+# This is used implicitly to check for polymorphic identity
+class EchoTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'FRR'}
+    es_type_name = 'frr_tickets'
 
 
 def register_echo_handler(handlers):
@@ -107,38 +107,6 @@ def test_delete_ticket_without_submission(org_app, handlers):
             email="citizen@example.org",
             created=datetime(2016, 1, 2, 10, tzinfo=tz),
         ),
-        collection.open_ticket(
-            handler_id='3',
-            handler_code='FOO',
-            title="Title",
-            group="Group",
-            email="citizen@example.org",
-            created=datetime(2016, 1, 2, 10, tzinfo=tz),
-        ),
-        collection.open_ticket(
-            handler_id='4',
-            handler_code='FOO',
-            title="Title",
-            group="Group",
-            email="citizen@example.org",
-            created=datetime(2016, 1, 2, 10, tzinfo=tz),
-        ),
-        collection.open_ticket(
-            handler_id='5',
-            handler_code='FOO',
-            title="Title",
-            group="Group",
-            email="citizen@example.org",
-            created=datetime(2016, 1, 2, 10, tzinfo=tz),
-        ),
-        collection.open_ticket(
-            handler_id='6',
-            handler_code='FOO',
-            title="Title",
-            group="Group",
-            email="citizen@example.org",
-            created=datetime(2016, 1, 2, 10, tzinfo=tz),
-        ),
     ]
 
     archive_all_tickets(session, tickets, tz)
@@ -147,7 +115,7 @@ def test_delete_ticket_without_submission(org_app, handlers):
     client.login_admin()
     client.get('/tickets-archive/ALL')
 
-    assert session.query(Ticket).filter_by(state='archived').count() == 6
+    assert session.query(Ticket).filter_by(state='archived').count() == 2
     client.delete('/tickets-archive/ALL/delete')
     assert session.query(Ticket).filter_by(state='archived').count() == 0
 
