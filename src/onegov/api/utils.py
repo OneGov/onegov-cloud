@@ -10,8 +10,7 @@ if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from morepath.request import Response
     from onegov.api import ApiApp
-    # # forward declare rate_limit_cache(
-    # def rate_limit_cache(self) -> 'cache.RedisCacheRegion': ...
+
 
 def authenticate(request: 'CoreRequest') -> None:
     try:
