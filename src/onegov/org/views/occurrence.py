@@ -11,6 +11,7 @@ from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
     DuplicateLabelError
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
+from onegov.core.elements import Link as CoreLink
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
@@ -23,10 +24,10 @@ from typing import NamedTuple
 
 class Filter(NamedTuple):
     title: str
-    tags: tuple[Link, ...]
+    tags: tuple[CoreLink, ...]
+
 
 def get_filters(request, self, keyword_counts=None, view_name=None):
-    from onegov.core.elements import Link
     filters = []
     empty = tuple()
 
@@ -45,7 +46,7 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
 
     for keyword, title, values in self.available_filters(sort_choices=False):
         filters.append(Filter(title=title, tags=tuple(
-            Link(
+            CoreLink(
                 text=link_title(keyword, value),
                 active=value in self.filter_keywords.get(keyword, empty),
                 url=request.link(self.for_filter(
