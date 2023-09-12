@@ -1,7 +1,7 @@
 """ Contains the model describing the organisation proper. """
 
 from datetime import date
-from functools import lru_cache
+from functools import cached_property
 from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
@@ -243,10 +243,8 @@ class Organisation(Base, TimestampMixin):
     def excluded_person_fields(self, request):
         return [] if request.is_logged_in else self.hidden_people_fields
 
-    @property
+    @cached_property
     def event_filter_fields(self):
-        @staticmethod
-        @lru_cache(maxsize=1)
         def fields_from_definition(definition):
             return tuple(flatten_fieldsets(parse_formcode(definition)))
 
