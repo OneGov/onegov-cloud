@@ -53,4 +53,13 @@ if (document.getElementById("autoplay-video")) {
             vid.play();
         }
     }
+
+    // Remove height of header from video
+    var header_height = $('#header').height();
+    var video_wrapper = $('.homepage-video');
+    var current_height = video_wrapper.data('max-height');
+    var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
+    console.log(new_height)
+    console.log(current_height)
+    video_wrapper.css('max-height', new_height)
 }

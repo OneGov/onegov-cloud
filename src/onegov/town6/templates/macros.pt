@@ -1422,7 +1422,7 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div tal:condition="link_mp4 or link_webm" class="homepage-video" style="max-height: ${max_height};"
+    <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}"
     >
         <video id="autoplay-video" autoplay playsinline loop muted
             data-link-mp4="${link_mp4}"
@@ -1432,7 +1432,14 @@
         >
             Your browser does not support the video tag.
         </video>
-        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer"></div>
+        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
+            <div class="dark-overlay"></div>
+            <div class="grid-container">
+                <div class="text">
+                    <h1>Willkommen in Meggen</h1>
+                </div>
+            </div>
+        </div>
     </div>
 </metal:autoplay_video>
 
