@@ -15,7 +15,7 @@ from onegov.user import User
 from onegov.core.collection import _M
 
 
-from typing import TYPE_CHECKING, Any, Generic
+from typing import TYPE_CHECKING, Any, Generic, overload
 if TYPE_CHECKING:
     from onegov.core import Framework
     from sqlalchemy.orm import Session
@@ -148,6 +148,11 @@ class ApiEndpoint(Generic[_M]):
 
         return self.__class__(self.app, filters)
 
+    @overload
+    def for_item(self, None) ->  None: ...
+    @overload
+    def for_item(self, item: _M) -> 'ApiEndpointItem[_M]': ...
+   
     def for_item(self, item: _M | None) -> 'ApiEndpointItem[_M] | None':
         """ Return a new endpoint item instance with the given item. """
 
@@ -198,7 +203,7 @@ class ApiEndpoint(Generic[_M]):
         return result
 
     @property
-    def batch(self) -> dict['ApiEndpointItem[_M] | None', _M]:
+    def batch(self) -> dict['ApiEndpointItem[_M]', _M]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
