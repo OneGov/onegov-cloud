@@ -61,6 +61,9 @@
         </div>
 
         <div class="off-canvas position-right" id="offCanvasSearch" data-auto-focus="false" data-off-canvas>
+            <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
+                <i class="fa fa-times"></i>
+            </button>
             <form class="searchbox header-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
                 <div class="input-group">
                     <input class="input-group-field" type="search" id="search-side" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
