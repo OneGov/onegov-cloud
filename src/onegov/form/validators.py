@@ -16,6 +16,7 @@ from onegov.form.errors import FieldCompileError
 from onegov.form.errors import InvalidFormSyntax
 from onegov.form.errors import MixedTypeError
 from stdnum.exceptions import ValidationError as StdnumValidationError
+from wtforms import RadioField
 from wtforms.fields import SelectField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
@@ -205,12 +206,8 @@ class ValidFormDefinition:
         if not field.data:
             return
 
-        # XXX circular import
-        from onegov.form import parse_form
-
         try:
-            parsed_form = parse_form(field.data,
-                                     enable_indent_check=True)()
+            parsed_form = self._parse_form(field)
         except InvalidFormSyntax as exception:
             field.render_kw = field.render_kw or {}
             field.render_kw['data-highlight-line'] = exception.line
@@ -297,6 +294,39 @@ class ValidFormDefinition:
                 errors = form['minimum_price_total'].errors
                 if not isinstance(errors, list):
                     errors = form['minimum_price_total'].process_errors
+                    assert isinstance(errors, list)
+
+                errors.append(error)
+                raise ValidationError(error)
+
+    def _parse_form(self, field, enable_indent_check=True):
+        # XXX circular import
+        from onegov.form import parse_form
+
+        return parse_form(field.data,
+                          enable_indent_check=enable_indent_check)()
+
+
+class ValidFilterFormDefinition(ValidFormDefinition):
+    invalid_field_type = _("Invalid field type for field {label}. For filters "
+                           "only 'select' or 'multiple select' fields are "
+                           "allowed.")
+
+    def __call__(self, form: 'Form', field: 'Field') -> None:
+        from onegov.form.fields import MultiCheckboxField
+
+        super().__call__(form, field)
+
+        # limit the definition to MultiCheckboxField, RadioField which can
+        # be used for filter definition
+        parsed_form = self._parse_form(field, enable_indent_check=False)
+        for field in parsed_form._fields.values():
+            if not isinstance(field, (MultiCheckboxField, RadioField)):
+                error = field.gettext(self.invalid_field_type.format(
+                    label=field.label.text))
+                errors = form['definition'].errors
+                if not isinstance(errors, list):
+                    errors = form['definition'].process_errors
                     assert isinstance(errors, list)
 
                 errors.append(error)
