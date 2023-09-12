@@ -323,7 +323,7 @@ class OccurrenceCollection(Pagination):
         """
         base = self.session.query(Occurrence._tags.keys()).with_entities(
             sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
-            Occurrence.end)
+            Occurrence.start)
         base = base.filter(Occurrence.start >= datetime.now(timezone.utc))
 
         query = sqlalchemy.select(
