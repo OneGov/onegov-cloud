@@ -310,9 +310,9 @@ class ValidFormDefinition:
 
 
 class ValidFilterFormDefinition(ValidFormDefinition):
-    invalid_field_type = _("Invalid field type for field {label}. For filters "
-                           "only 'select' or 'multiple select' fields are "
-                           "allowed.")
+    invalid_field_type = _("Invalid field type for field '{label}'. For "
+                           "filters only 'select' or 'multiple select' "
+                           "fields are allowed.")
 
     def __call__(self, form: 'Form', field: 'Field') -> 'type[Form] | None':
         from onegov.form.fields import MultiCheckboxField
