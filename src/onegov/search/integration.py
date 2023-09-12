@@ -410,10 +410,6 @@ class SearchApp(morepath.App):
                 model.reindex(request, model)
                 done.append(model.__tablename__)
 
-    def psql_search(self, query=''):
-        from onegov.org.models import SearchPostgres
-        return SearchPostgres(self.request(), query).generic_search()
-
 
 @SearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(app, handler):
