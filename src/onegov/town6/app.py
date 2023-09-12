@@ -121,6 +121,11 @@ def get_default_directory_search_widget():
     return None
 
 
+@TownApp.setting(section='org', name='default_event_search_widget')
+def get_default_event_search_widget():
+    return None
+
+
 @TownApp.setting(section='org', name='public_ticket_messages')
 def get_public_ticket_messages():
     """ Returns a list of message types which are availble on the ticket
@@ -196,6 +201,9 @@ def get_common_asset():
     yield 'aos.css'
     yield 'homepage_video.js'
     yield 'notifications.js'
+    yield 'sidebar_mobile.js'
+    yield 'jquery.sticky-sidebar.js'
+    yield 'sidebar_fixed.js'
 
 
 @TownApp.webasset('editor')

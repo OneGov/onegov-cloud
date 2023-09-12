@@ -12,7 +12,7 @@ import transaction
 from onegov.election_day import _
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.formats.election.wabstic_proporz import \
+from onegov.election_day.formats.imports.election.wabstic_proporz import \
     create_election_wabstic_proporz
 from onegov.election_day.forms.upload.wabsti_proporz import \
     CreateWabstiProporzElectionForm

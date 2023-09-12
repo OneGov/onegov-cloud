@@ -1,22 +1,18 @@
-from typing import TYPE_CHECKING, Any
-
-
+from functools import cached_property
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.collection import _M
+    from onegov.core.collection import _M, PKType,\
+        _FormThatSupportsGetUsefulData
     from typing import TypeVar, Union, Protocol
     from typing_extensions import NotRequired, TypedDict, Self
-    from _typeshed import SupportsItems
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from sqlalchemy import Column
-    from functools import cached_property
     from sqlalchemy.orm import Query
     from uuid import UUID
-
-    PKType = UUID | str | int
-    TextColumn = Column[str] | Column[str | None]
-
-    class _FormThatSupportsGetUsefulData(Protocol):
-        def get_useful_data(self) -> SupportsItems[str, Any]: ...
+    from collections.abc import Iterable, Sequence
+    from sqlalchemy.orm import Query
+    from typing import Any, Literal, TypeVar, Union
+    from typing_extensions import NotRequired, TypeAlias, TypedDict
 
     from onegov.server.types import (
         JSON, JSON_ro, JSONArray, JSONArray_ro, JSONObject, JSONObject_ro)
@@ -29,6 +25,11 @@ if TYPE_CHECKING:
     JSON_ro
     JSONObject_ro
     JSONArray_ro
+
+    # output for views rendered through Chameleon
+    RenderData: TypeAlias = dict[str, Any]
+
+    MessageType: TypeAlias = Literal['success', 'info', 'warning', 'alert']
 
     class HeaderJsonDict(TypedDict):
         Name: str
@@ -63,9 +64,6 @@ if TYPE_CHECKING:
         filename: NotRequired[str | None]
         mimetype: NotRequired[str]
         size: NotRequired[int]
-
-    _T = TypeVar('_T')
-    SequenceOrScalar = Union[Sequence[_T], _T]
 
     class PaginatedGenericCollection(Protocol[_M]):
         """ Intersection type of GenericCollection and Pagination, as
@@ -161,3 +159,16 @@ if TYPE_CHECKING:
         @property
         def next(self) -> 'Self | None':
             ...
+
+    _T = TypeVar('_T')
+    SequenceOrScalar: TypeAlias = Union[Sequence[_T], _T]
+
+    # TEMPORARY: sqlalchemy-stubs does not have good type annotations
+    #            for AppenderQuery, so we define our own, we can get
+    #            rid of this once we move to SQLAlchemy 2.0
+    class AppenderQuery(Query[_T]):
+        def __getitem__(self, index: int) -> _T: ...
+        def count(self) -> int: ...
+        def extend(self, iterator: Iterable[_T]) -> None: ...
+        def append(self, item: _T) -> None: ...
+        def remove(self, item: _T) -> None: ...

@@ -29,20 +29,30 @@ mypy_path = "$MYPY_CONFIG_FILE_DIR/src:$MYPY_CONFIG_FILE_DIR/stubs"
 # more strict rules for fully typed modules
 module = [
     "onegov.api.*",
+    "onegov.async_http.*",
     "onegov.chat.*",
     "onegov.core.*",
     "onegov.file.*",
     "onegov.form.*",
+    "onegov.foundation.*",
+    "onegov.foundation6.*",
     "onegov.gever.*",
+    "onegov.gis.*",
     "onegov.newsletter.*",
     "onegov.notice.*",
     "onegov.page.*",
     "onegov.pay.*",
+    "onegov.pdf.*",
     "onegov.qrcode.*",
+    "onegov.quill.*",
     "onegov.reservation.*",
     "onegov.server.*",
+    "onegov.shared.*",
+    "onegov.stepsequence.*",
     "onegov.ticket.*",
-    "onegov.user.*"
+    "onegov.user.*",
+    "onegov.websockets.*",
+    "onegov.wtfs.*"
 ]
 warn_unreachable = true
 disallow_any_generics = true
@@ -55,11 +65,8 @@ module = [
     "bjoern.*",
     "blinker.*",
     "chameleon.*",
-    # FIXME: do we actually make good use of this?
-    "colour.*",
     "cssutils.*",
     "elasticsearch_dsl.*",
-    "dectate.*",
     "docxtpl.*",
     "dill.*",
     "dukpy.*",
@@ -78,8 +85,6 @@ module = [
     "langdetect.*",
     "lazy_object_proxy.*",
     "mistletoe.*",
-    "more.*",
-    "morepath.*",
     "msal.*",
     "pdfdocument.*",
     # FIXME: We only use this to convert a PDF to an XObject and then
@@ -95,14 +100,11 @@ module = [
     "qrcode.*",
     "rcssmin.*",
     "reportlab.*",
-    "reg.*",
     "rjsmin.*",
-    "sass.*",
     # TODO: Writing stubs for this would probably be really quick
     #       but do we actually have a good use-case for this or
     #       could we just do the sort at the end?
     "sortedcontainers.*",
-    "sqlalchemy_utils.*",
     "sqlparse.*",
     "svglib.*",
     "stdnum.*",
@@ -111,7 +113,6 @@ module = [
     "urlextract.*",
     "webassets.*",
     "webtest.*",
-    "wtforms_components.*",
     "xlrd.*",
     "xlsxwriter.*",
     "xtermcolor.*",

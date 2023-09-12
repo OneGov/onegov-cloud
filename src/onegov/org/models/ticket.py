@@ -154,11 +154,11 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def email(self):
-        return self.submission.email
+        return self.submission.email if self.submission is not None else ''
 
     @property
     def title(self):
-        return self.submission.title
+        return self.submission.title if self.submission is not None else ''
 
     @property
     def subtitle(self):
@@ -166,7 +166,9 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def group(self):
-        return self.submission.form.title
+        return (
+            self.submission.form.title if self.submission is not None else ''
+        )
 
     @property
     def payment(self):
@@ -218,11 +220,12 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
-
-        return render_macro(layout.macros['display_form'], request, {
-            'form': self.form,
-            'layout': layout
-        })
+        if self.submission is not None:
+            return render_macro(layout.macros['display_form'], request, {
+                'form': self.form,
+                'layout': layout
+            })
+        return None
 
     def get_links(self, request):
         layout = DefaultLayout(self.submission, request)
@@ -231,7 +234,8 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
         extra = []
 
         # there's a decision to be made about the registration
-        window = self.submission.registration_window
+        window = (self.submission.registration_window
+                  if self.submission is not None else None)
 
         if window:
             if self.submission.spots and self.submission.claimed is None:
@@ -323,16 +327,17 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
                 )
             )
 
-        edit_link = URL(request.link(self.submission))
-        edit_link = edit_link.query_param('edit', '').as_string()
+        if self.submission is not None:
+            edit_link = URL(request.link(self.submission))
+            edit_link = edit_link.query_param('edit', '').as_string()
 
-        (links if not links else extra).append(
-            Link(
-                text=_('Edit submission'),
-                url=request.return_here(edit_link),
-                attrs={'class': 'edit-link'}
+            (links if not links else extra).append(
+                Link(
+                    text=_('Edit submission'),
+                    url=request.return_here(edit_link),
+                    attrs={'class': 'edit-link'}
+                )
             )
-        )
 
         if extra:
             links.append(LinkGroup(
@@ -765,7 +770,8 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     @cached_property
     def form(self):
-        return self.submission.form_class(data=self.submission.data)
+        return self.submission.form_class(data=self.submission.data) if \
+            self.submission is not None else None
 
     @cached_property
     def directory(self):
@@ -811,7 +817,7 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     @property
     def email(self):
-        return self.submission.email
+        return self.submission.email if self.submission is not None else ''
 
     @property
     def submitter_name(self):
@@ -830,7 +836,7 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
 
     @property
     def title(self):
-        return self.submission.title
+        return self.submission.title if self.submission is not None else ''
 
     @property
     def subtitle(self):

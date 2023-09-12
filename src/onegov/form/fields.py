@@ -9,7 +9,7 @@ from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
-from onegov.form import log
+from onegov.form import log, _
 from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import ChosenSelectWidget
@@ -23,8 +23,8 @@ from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
+from webcolors import name_to_hex, normalize_hex
 from werkzeug.datastructures import MultiDict
-from wtforms_components import TimeField as DefaultTimeField
 from wtforms.fields import DateTimeLocalField as DateTimeLocalFieldBase
 from wtforms.fields import Field
 from wtforms.fields import FieldList
@@ -34,11 +34,12 @@ from wtforms.fields import SelectMultipleField
 from wtforms.fields import StringField
 from wtforms.fields import TelField
 from wtforms.fields import TextAreaField
+from wtforms.fields import TimeField as DefaultTimeField
 from wtforms.utils import unset_value
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.validators import ValidationError
-from wtforms.widgets import CheckboxInput
+from wtforms.widgets import CheckboxInput, ColorInput
 
 
 from typing import Any, IO, Literal, TYPE_CHECKING
@@ -666,3 +667,35 @@ class HoneyPotField(StringField):
         if self.data:
             log.info(f'Honeypot used by {form.request.client_addr}')
             raise ValidationError('Invalid value')
+
+
+class ColorField(StringField):
+    """ A string field that renders a html5 color picker and coerces
+    to a normalized six digit hex string.
+
+    It will result in a process_error for invalid colors.
+    """
+
+    widget = ColorInput()
+
+    def coerce(self, value: object) -> str | None:
+        if not isinstance(value, str) or value == '':
+            return None
+
+        try:
+            if not value.startswith('#'):
+                value = name_to_hex(value)
+            return normalize_hex(value)
+        except ValueError:
+            msg = self.gettext(_('Not a valid color.'))
+            raise ValueError(msg) from None
+
+    def process_data(self, value: object) -> None:
+        self.data = self.coerce(value)
+
+    def process_formdata(self, valuelist: list['RawFormValue']) -> None:
+        if not valuelist:
+            self.data = None
+            return
+
+        self.data = self.coerce(valuelist[0])

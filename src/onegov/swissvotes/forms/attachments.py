@@ -85,6 +85,33 @@ class AttachmentsForm(Form):
         fieldset=_("Pre-parliamentary phase"),
     )
 
+    parliamentary_initiative = UploadField(
+        label=_("Parliamentary initiative"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Parliamentary phase"),
+    )
+
+    parliamentary_committee_report = UploadField(
+        label=_("Report of the parliamentary committee (only for Pa.Iv.)"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Parliamentary phase"),
+    )
+
+    federal_council_opinion = UploadField(
+        label=_("Opinion of the Federal Council (only for Pa.Iv.)"),
+        validators=[
+            WhitelistedMimeType(PDF_MIME_TYPES),
+            FileSizeLimit(120 * 1024 * 1024)
+        ],
+        fieldset=_("Parliamentary phase"),
+    )
+
     parliamentary_debate = UploadField(
         label=_("Parliamentary debate"),
         validators=[

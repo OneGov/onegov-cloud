@@ -39,6 +39,14 @@
                         <th class="column-30" i18n:translate>Vote date</th>
                         <td>${layout.format_date(vote.date, 'date')}</td>
                     </tr>
+
+                    <tr tal:condition="vote.result">
+                        <th class="column-30" i18n:translate>Voting result</th>
+                        <td>
+                            ${vote.result} (${layout.format_number(vote.result_people_yeas_p, 2)}<tal:block i18n:translate>% Yes votes</tal:block><tal:block tal:condition="vote._result_cantons_accepted != 3"> <tal:block i18n:translate> and <span tal:replace="vote.result_cantons_yeas" i18n:name="number" /> out of <span tal:replace="vote.number_of_cantons" i18n:name="total" /> votes of the Cantons</tal:block></tal:block>)
+                        </td>
+                    </tr>
+
                     <tr tal:condition="vote.bfs_number is not None">
                         <th class="column-30" i18n:translate>Vote number</th>
                         <td>${layout.format_bfs_number(vote.bfs_number)}</td>
@@ -111,8 +119,8 @@
                     </tr>
                     <tr tal:condition="vote.duration_initative_collection is not None">
                         <th class="column-30">
-                        <span i18n:translate>Collection duration</span>
-                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the start of collecting signatures and their filing by the initiators"><i class="fa fa-info" aria-hidden="true"></i></span>
+                            <span i18n:translate>Collection duration</span>
+                            <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the start of collecting signatures and their filing by the initiators"><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td>${layout.format_number(vote.duration_initative_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
@@ -125,7 +133,7 @@
                 </tbody>
             </table>
 
-            <table class="collapsible">
+            <table class="collapsible" tal:condition="vote._parliamentary_initiated != 1">
                 <thead>
                     <tr><th colspan="2" i18n:translate>Pre-parliamentary phase</th></tr>
                 </thead>
@@ -147,6 +155,24 @@
                     <tr tal:condition="vote.procedure_number">
                         <th class="column-30" i18n:translate>Procedure number</th>
                         <td>${vote.procedure_number}</td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['parliamentary_initiative']">
+                        <th class="column-30" i18n:translate>Parliamentary initiative</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'parliamentary_initiative'" />
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['parliamentary_committee_report']">
+                        <th class="column-30" i18n:translate>Report of the parliamentary committee</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'parliamentary_committee_report'" />
+                        </td>
+                    </tr>
+                    <tr tal:condition="layout.attachments['federal_council_opinion']">
+                        <th class="column-30" i18n:translate>Opinion of the Federal Council</th>
+                        <td>
+                            <tal:block metal:use-macro="layout.macros['attachment_link']" tal:define="name 'federal_council_opinion'" />
+                        </td>
                     </tr>
                     <tr tal:condition="layout.attachments['parliamentary_debate'] or vote.link_curia_vista">
                         <th class="column-30" i18n:translate>Parliamentary debate</th>
@@ -225,8 +251,8 @@
                     </tr>
                     <tr tal:condition="vote.duration_referendum_collection is not None">
                         <th class="column-30">
-                        <span i18n:translate>Collection duration</span>
-                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the Parliament’s final vote and the decree to declare the success of the referendum"><i class="fa fa-info" aria-hidden="true"></i></span>
+                            <span i18n:translate>Collection duration</span>
+                            <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days from the start of the collection period (publication of the parliamentary decision) until the submission of signatures."><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td>${layout.format_number(vote.duration_referendum_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
@@ -411,7 +437,7 @@
                             <tal:block tal:condition="vote.result_people_yeas_p">
                                 <tal:b tal:switch="vote._legal_form == 5">
                                     <tal:b tal:case="False">
-                                        (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>Yeas</tal:b>)
+                                        (${layout.format_number(vote.result_people_yeas_p, 2)}<tal:b i18n:translate>% Yes votes</tal:b>)
                                     </tal:b>
                                     <tal:b tal:case="True">
                                         (${layout.format_number(vote.result_people_yeas_p, 2)}% <tal:b i18n:translate>for the popular initiative</tal:b>)

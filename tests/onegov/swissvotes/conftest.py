@@ -87,6 +87,9 @@ def attachments(swissvotes_app):
         ('easyvote_booklet', "Easyvote"),
         ('federal_council_message', "Message du Conseil fédéral"),
         ('foeg_analysis', "Medienanalyse fög"),
+        ('parliamentary_initiative', "Initiative"),
+        ('parliamentary_committee_report', "Bericht"),
+        ('federal_council_opinion', "Stellungnahme"),
         ('parliamentary_debate', "Parlamentdebatte"),
         ('post_vote_poll_codebook', "Codebuch"),
         ('post_vote_poll_methodology', "Methodenbeschrieb"),
@@ -201,6 +204,10 @@ def attachment_urls():
             'easyvote_booklet': 'easyvote-de.pdf',
             'federal_council_message': 'botschaft-de.pdf',
             'foeg_analysis': 'medienanalyse.pdf',
+            'parliamentary_initiative': 'parlamentarische-initiative-de.pdf',
+            'parliamentary_committee_report':
+            'bericht-parlamentarische-kommission-de.pdf',
+            'federal_council_opinion': 'stellungnahme-bundesrat-de.pdf',
             'parliamentary_debate': 'parlamentsberatung.pdf',
             'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-de.xlsx',
             'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
@@ -220,6 +227,10 @@ def attachment_urls():
         'fr_CH': {
             'brief_description': 'kurzbeschreibung-fr.pdf',
             'easyvote_booklet': 'easyvote-fr.pdf',
+            'parliamentary_initiative': 'parlamentarische-initiative-fr.pdf',
+            'parliamentary_committee_report':
+            'bericht-parlamentarische-kommission-fr.pdf',
+            'federal_council_opinion': 'stellungnahme-bundesrat-fr.pdf',
             'federal_council_message': 'botschaft-fr.pdf',
             'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-fr.xlsx',
             'post_vote_poll_codebook': 'nachbefragung-codebuch-fr.pdf',
@@ -346,8 +357,10 @@ def sample_vote():
     vote.title_fr = "Vote FR"
     vote.short_title_de = "V D"
     vote.short_title_fr = "V F"
+    vote.short_title_en = "V E"
     vote.keyword = "Keyword"
     vote._legal_form = 1
+    vote._parliamentary_initiated = 0
     vote.initiator = "Initiator"
     vote.anneepolitique = "anneepolitique"
     vote.bfs_map_de = (

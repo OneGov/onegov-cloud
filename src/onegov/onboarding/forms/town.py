@@ -1,9 +1,9 @@
 import re
 
 from onegov.form import Form
+from onegov.form.fields import ColorField
 from onegov.form.fields import PhoneNumberField
 from onegov.onboarding import _
-from wtforms_components import ColorField
 from wtforms.fields import BooleanField
 from wtforms.fields import EmailField
 from wtforms.fields import StringField

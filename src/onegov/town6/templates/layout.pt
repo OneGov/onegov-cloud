@@ -38,8 +38,7 @@
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)} town-6" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}" tal:attributes="layout.custom_body_attributes">
     <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
-
-        <div class="off-canvas position-left" id="offCanvas" data-off-canvas data-auto-focus="false">
+        <div class="off-canvas position-left" id="offCanvas" data-off-canvas data-auto-focus="false" >
             <!-- Close button -->
             <button class="close-button" aria-label="Close menu" type="button" data-close>
                 <span aria-hidden="true">&times;</span>
@@ -48,20 +47,29 @@
             <!-- Menu -->
             <div metal:use-macro="layout.macros['side_navigation']"></div>
         </div>
+
+        <div class="sidebar-toggler show-for-small-only" data-toggle="offCanvasSidebar">
+            <i class="fa fa-chevron-left rotate"></i>
+        </div>
+
+        <div class="off-canvas position-right show-for-small-only" id="offCanvasSidebar" data-auto-focus="false" data-off-canvas data-off-canvas >
+            <!-- Gets filled by sidebar_mobile.js -->
+        </div>
+
         <div class="off-canvas-content" data-off-canvas-content>
             <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
             <main>
                 <header id="header" tal:define="header_options request.app.org.header_options or {}">
                     <div tal:condition="header_options.get('announcement', '') and (request.is_logged_in or not header_options.get('announcement_is_private'))"
-                         id="announcement_header"
-                         style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
-                             <div class="grid-container" tal:define="url header_options.get('announcement_url');">
+                        id="announcement_header"
+                        style="background-color: ${header_options.get('announcement_bg_color', '#FBBC05')};">
+                            <div class="grid-container" tal:define="url header_options.get('announcement_url');">
                                     <a style="color: ${header_options.get('announcement_font_color', '#000000')}"
                                         tal:condition="url" href="${url}">
                                         ${header_options['announcement']}</a>
                                     <p style="color: ${header_options.get('announcement_font_color', '#000000')}"
                                         tal:condition="not url">${header_options['announcement']}</p>
-                             </div>
+                            </div>
                     </div>
                     <div id="header-links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
                         <div class="grid-container">
@@ -80,34 +88,34 @@
                     </div>
                     <div id="globals" class="globals" tal:define="toolbox global_tools|False">
                         <div class="grid-container">
-                          <div class="grid-x grid-padding-x">
-                              <div class="cell small-12">
-                                  <div class="global-header-flex ${'' if toolbox else 'centered'}">
+                        <div class="grid-x grid-padding-x">
+                            <div class="cell small-12">
+                                <div class="global-header-flex ${'' if toolbox else 'centered'}">
                                     <div class="global-header" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
-                                      <tal:b tal:condition="header_options['left_header_name']|nothing">
-                                          <a class="h4" href="${header_options.get('left_header_url', '#')}"
-                                             style="color:${color or '#fff'}; font-size: ${rem_size}rem">
-                                                  ${header_options['left_header_name']}
-                                          </a>
-                                      </tal:b>
+                                    <tal:b tal:condition="header_options['left_header_name']|nothing">
+                                        <a class="h4" href="${header_options.get('left_header_url', '#')}"
+                                            style="color:${color or '#fff'}; font-size: ${rem_size}rem">
+                                                ${header_options['left_header_name']}
+                                        </a>
+                                    </tal:b>
                                     </div>
                                     <ul tal:condition="toolbox" class="vertical medium-horizontal menu global-tools-menu" data-responsive-menu="accordion medium-dropdown">
-                                      <li tal:repeat="tool toolbox">
+                                    <li tal:repeat="tool toolbox">
                                         <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                                          <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
-                                              <li tal:repeat="link tool.links">
-                                                  <tal:b replace="structure link(layout)" />
-                                              </li>
-                                          </ul>
+                                        <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                                        <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
+                                            <li tal:repeat="link tool.links">
+                                                <tal:b replace="structure link(layout)" />
+                                            </li>
+                                        </ul>
                                         </tal:b>
                                         <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                                          <tal:b replace="structure link(layout)" />
+                                        <tal:b replace="structure link(layout)" />
                                         </tal:b>
-                                      </li>
+                                    </li>
                                     </ul>
-                                  </div>
-                              </div>
+                                </div>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -191,7 +199,7 @@
                                 <div tal:condition="not: layout.on_homepage" metal:use-macro="layout.macros['breadcrumbs']"></div>
                             </div>
                         </div>
-                         <div class="grid-x alerts">
+                        <div class="grid-x alerts">
                             <div id="alert-boxes" class="cell small-12">
                                 <div tal:condition="form.errors|nothing" data-alert class="callout alert" data-closable>
                                     <tal:b i18n:translate>The form contains errors. Please check the fields marked in red.</tal:b>
@@ -250,5 +258,6 @@
             <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
             <div id="clipboard-copy" class="flash-message hidden" i18n:translate>Copied to Clipboard!</div>
         </div>
-    </body>
+
+</body>
 </html>

@@ -26,15 +26,21 @@ from webob import Response
 from typing import Any, ClassVar, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
-    from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
+    from onegov.user import UserApp
     from sqlalchemy.orm import Session
     from typing import Protocol
     from typing_extensions import Self
 
     class HasName(Protocol):
         @property
-        def name(str) -> str: ...
+        def name(self) -> str: ...
+
+    class HasApplicationIdAndNamespace(Protocol):
+        @property
+        def application_id(self) -> str: ...
+        @property
+        def namespace(self) -> str: ...
 
 
 _P = TypeVar('_P', bound='AuthenticationProvider')
@@ -145,12 +151,12 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         return cls()
 
-    def is_primary(self, app: 'Framework') -> bool:
+    def is_primary(self, app: 'UserApp') -> bool:
         """ Returns whether the authentication provider is intended to be
         the primary provider for this app."""
         return self.primary if self.available(app) else False
 
-    def available(self, app: 'Framework') -> bool:
+    def available(self, app: 'UserApp') -> bool:
         """Returns whether the authentication provider is available for the
         current app. Since there are tenant specific connections, we want to
         tcheck, if for the tenant of the app, there is an available client."""
@@ -343,7 +349,11 @@ class RolesMapping:
 
     roles: Dict[str, Dict[str, str]]
 
-    def app_specific(self, app: 'Framework') -> dict[str, str] | None:
+    def app_specific(
+        self,
+        app: 'HasApplicationIdAndNamespace'
+    ) -> dict[str, str] | None:
+
         if app.application_id in self.roles:
             return self.roles[app.application_id]
 
@@ -1040,13 +1050,13 @@ class AzureADProvider(
             'user': user.username
         }))
 
-    def is_primary(self, app: 'Framework') -> bool:
+    def is_primary(self, app: 'UserApp') -> bool:
         client = self.tenants.client(app)
         if client:
             return client.primary
         return False
 
-    def available(self, app: 'Framework') -> bool:
+    def available(self, app: 'UserApp') -> bool:
         return self.tenants.client(app) and True or False
 
 
@@ -1290,11 +1300,11 @@ class SAML2Provider(
             'user': user.username
         }))
 
-    def is_primary(self, app: 'Framework') -> bool:
+    def is_primary(self, app: 'UserApp') -> bool:
         client = self.tenants.client(app)
         if client:
             return client.primary
         return False
 
-    def available(self, app: 'Framework') -> bool:
+    def available(self, app: 'UserApp') -> bool:
         return self.tenants.client(app) and True or False

@@ -62,7 +62,7 @@ def add_image_size(context: 'UpgradeContext') -> None:
                 thumbnail_metadata = copy(image.reference.thumbnail_small)
                 thumbnail_metadata['size'] = get_image_size(
                     Image.open(
-                        context.app.bound_depot.get(
+                        context.app.bound_depot.get(  # type:ignore
                             image.get_thumbnail_id(size='small')
                         )
                     )
@@ -104,7 +104,8 @@ def add_thumbnails_to_pdfs(context: 'UpgradeContext') -> None:
     if not isinstance(context.app, DepotApp):
         return False  # type:ignore[return-value]
 
-    depot = context.request.app.bound_depot
+    depot = context.app.bound_depot
+    assert depot is not None
 
     files_query = FileCollection(context.session).query()
     files = iter(files_query.filter(text(

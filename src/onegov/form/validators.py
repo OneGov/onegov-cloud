@@ -29,8 +29,32 @@ if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
     from onegov.core.orm import Base
     from onegov.form import Form
+    from onegov.form.types import (
+        _BaseFormT, _FieldT, BaseValidator, FieldCondition)
     from wtforms import Field
     from wtforms.form import BaseForm
+
+
+class If:
+    """ Wraps a single validator or a list of validators, which will
+    only be executed if the supplied condition callback returns `True`.
+
+    """
+    def __init__(
+        self,
+        condition: 'FieldCondition[_BaseFormT, _FieldT]',
+        *validators: 'BaseValidator[_BaseFormT, _FieldT]'
+    ):
+        assert len(validators) > 0, "Need to supply at least one validator"
+        self.condition = condition
+        self.validators = validators
+
+    def __call__(self, form: '_BaseFormT', field: '_FieldT') -> None:
+        if not self.condition(form, field):
+            return
+
+        for validator in self.validators:
+            validator(form, field)
 
 
 class Stdnum:
@@ -460,19 +484,36 @@ class InputRequiredIf(InputRequired):
 
 
 class ValidDateRange:
-    """ Makes sure the selected date is in a valid range. """
+    """
+        Makes sure the selected date is in a valid range.
 
-    message = _("Needs to be between {min_date} and {max_date}.")
+        The default error message can be overriden and be parametrized
+        with ``min_date`` and ``max_date`` if both are supplied or just
+        with ``date`` if only one of them is specified.
+
+    """
+
+    between_message = _("Needs to be between {min_date} and {max_date}.")
     after_message = _("Needs to be on or after {date}.")
     before_message = _("Needs to be on or before {date}.")
 
     def __init__(
         self,
-        min: date | relativedelta | None,
-        max: date | relativedelta | None
+        min: date | relativedelta | None = None,
+        max: date | relativedelta | None = None,
+        message: str | None = None
     ):
         self.min = min
         self.max = max
+        if message is not None:
+            self.message = message
+        elif min is None:
+            assert max is not None, "Need to supply either min or max"
+            self.message = self.before_message
+        elif max is None:
+            self.message = self.after_message
+        else:
+            self.message = self.between_message
 
     @property
     def min_date(self) -> date | None:
@@ -517,11 +558,11 @@ class ValidDateRange:
         elif min_date is not None and value < min_date:
             min_str = format_date(min_date, format='dd.MM.yyyy', locale=locale)
             raise ValidationError(
-                field.gettext(self.after_message).format(date=min_str)
+                field.gettext(self.message).format(date=min_str)
             )
 
         elif max_date is not None and value > max_date:
             max_str = format_date(max_date, format='dd.MM.yyyy', locale=locale)
             raise ValidationError(
-                field.gettext(self.before_message).format(date=max_str)
+                field.gettext(self.message).format(date=max_str)
             )
