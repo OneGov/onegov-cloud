@@ -18,10 +18,15 @@ from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
 
 
+from typing import NamedTuple
+
+
+class Filter(NamedTuple):
+    title: str
+    tags: tuple[Link, ...]
+
 def get_filters(request, self, keyword_counts=None, view_name=None):
     from onegov.core.elements import Link
-
-    Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
     empty = tuple()
 
