@@ -387,12 +387,10 @@ class EventForm(Form):
 
         if self.request.app.org.event_filter_type in ['filters',
                                                       'tags_and_filters']:
-            from onegov.form.parser.core import CheckboxField, RadioField
             filter_keywords = dict()
             for field in self.request.app.org.event_filter_fields:
-                if isinstance(field, (CheckboxField, RadioField)):
-                    form_field = getattr(self, field.id)
-                    filter_keywords[field.id] = form_field.data
+                form_field = getattr(self, field.id)
+                filter_keywords[field.id] = form_field.data
 
             if filter_keywords:
                 model.filter_keywords = filter_keywords
@@ -434,7 +432,6 @@ class EventForm(Form):
             self.email.data = model.meta.get('submitter_email')
 
         if model.filter_keywords:
-            from onegov.form.parser.core import CheckboxField, RadioField
             keywords = model.filter_keywords
 
             for field in self.request.app.org.event_filter_fields:
@@ -443,9 +440,8 @@ class EventForm(Form):
                 if form_field is None:
                     continue
 
-                if isinstance(field, (CheckboxField, RadioField)):
-                    form_field.data = keywords[field.id] \
-                        if (field.id in keywords) else None
+                form_field.data = (
+                    keywords)[field.id] if field.id in keywords else None
 
     @cached_property
     def parsed_dates(self):
