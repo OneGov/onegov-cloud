@@ -1,5 +1,5 @@
 """ The onegov org collection of images uploaded to the site. """
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from datetime import date
 from morepath import redirect
 from morepath.request import Response
@@ -17,7 +17,6 @@ from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
-
 
 from typing import NamedTuple
 
