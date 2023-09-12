@@ -325,6 +325,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             name=name,
             location=self.location,
             tags=self.tags,
+            filter_keywords=self.filter_keywords,
             start=start,
             end=end,
             timezone=self.timezone,
@@ -376,9 +377,6 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
             self.occurrences.append(self.spawn_occurrence(start))
-
-        for occ in self.occurrences:
-            occ.filter_keywords = self.filter_keywords
 
     def submit(self):
         """ Submit the event. """
