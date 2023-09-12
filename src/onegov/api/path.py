@@ -45,8 +45,8 @@ def get_api_endpoint(
 )
 def get_api_endpoint_item(
     app: 'Framework', endpoint: str, id: str
-) -> ApiEndpointItem:
-    item = ApiEndpointItem(app, endpoint, id)
-    if not item.api_endpoint or not item.item:  # ExtendedAgency
+) -> ApiEndpointItem[Any]:
+    item: ApiEndpointItem[Any] = ApiEndpointItem(app, endpoint, id)
+    if not item.api_endpoint or not item.item:  # for ex. ExtendedAgency
         raise ApiException('Not found', status_code=404)
     return item

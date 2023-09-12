@@ -127,7 +127,7 @@ def view_api_endpoint(
     permission=Public
 )
 def view_api_endpoint_item(
-    self: ApiEndpointItem, request: 'CoreRequest'
+    self: ApiEndpointItem[Any], request: 'CoreRequest'
 ) -> dict[str, Any]:
     headers = check_rate_limit(request)
 

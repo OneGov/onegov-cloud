@@ -67,7 +67,7 @@ class ApiInvalidParamException(ApiException):
         self.status_code = status_code
 
 
-class ApiEndpointItem:
+class ApiEndpointItem(Generic[_M]):
     """ A single instance of an item of a specific endpoint.
 
     Passes all functionality to the specific API endpoint and is mainly used
@@ -148,7 +148,7 @@ class ApiEndpoint(Generic[_M]):
 
         return self.__class__(self.app, filters)
 
-    def for_item(self, item: _M | None) -> 'ApiEndpointItem | None':
+    def for_item(self, item: _M | None) -> 'ApiEndpointItem[Any] | None':
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
@@ -198,7 +198,7 @@ class ApiEndpoint(Generic[_M]):
         return result
 
     @property
-    def batch(self) -> dict['ApiEndpointItem | None', Any]:
+    def batch(self) -> dict['ApiEndpointItem[Any] | None', Any]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
