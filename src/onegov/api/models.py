@@ -198,7 +198,7 @@ class ApiEndpoint(Generic[_M]):
         return result
 
     @property
-    def batch(self) -> dict['ApiEndpointItem[_M]', _M]:
+    def batch(self) -> dict['ApiEndpointItem[_M] | None', _M]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 

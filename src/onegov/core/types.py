@@ -1,18 +1,14 @@
-from functools import cached_property
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.collection import _M, PKType,\
         _FormThatSupportsGetUsefulData
-    from typing import TypeVar, Union, Protocol
-    from typing_extensions import NotRequired, TypedDict, Self
+    from typing import TypeVar, Union, Protocol, Any, Literal
+    from typing_extensions import NotRequired, TypedDict, Self, TypeAlias
     from collections.abc import Collection, Iterable, Iterator, Sequence
     from sqlalchemy import Column
     from sqlalchemy.orm import Query
     from uuid import UUID
-    from collections.abc import Iterable, Sequence
-    from sqlalchemy.orm import Query
-    from typing import Any, Literal, TypeVar, Union
-    from typing_extensions import NotRequired, TypeAlias, TypedDict
+    from functools import cached_property
 
     from onegov.server.types import (
         JSON, JSON_ro, JSONArray, JSONArray_ro, JSONObject, JSONObject_ro)

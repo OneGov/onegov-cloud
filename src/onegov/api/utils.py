@@ -9,7 +9,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from morepath.request import Response
-
+    from onegov.api import ApiApp
+    # # forward declare rate_limit_cache(
+    # def rate_limit_cache(self) -> 'cache.RedisCacheRegion': ...
 
 def authenticate(request: 'CoreRequest') -> None:
     try:
@@ -41,6 +43,10 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     if request.authorization:
         authenticate(request)
         return {}
+
+    assert isinstance(request.app, ApiApp)
+    if request.client_addr is None:
+        raise ValueError("Client address is missing")
 
     limit, expiration = request.app.rate_limit
     requests, timestamp = request.app.rate_limit_cache.get_or_create(
