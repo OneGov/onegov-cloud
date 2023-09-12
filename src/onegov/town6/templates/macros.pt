@@ -1433,10 +1433,10 @@
             Your browser does not support the video tag.
         </video>
         <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
-            <div class="dark-overlay"></div>
-            <div class="grid-container">
+            <div class="dark-overlay" tal:condition="text"></div>
+            <div class="grid-container" tal:condition="text">
                 <div class="text">
-                    <h1>Willkommen in Meggen</h1>
+                    <h1>${text}</h1>
                 </div>
             </div>
         </div>
