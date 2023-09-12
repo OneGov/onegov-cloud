@@ -301,7 +301,8 @@ class ValidFormDefinition:
 
         return parsed_form
 
-    def _parse_form(self, field, enable_indent_check=True):
+    def _parse_form(self, field: 'Field',
+                    enable_indent_check: 'bool' = True) -> 'Form':
         # XXX circular import
         from onegov.form import parse_form
 
@@ -317,14 +318,12 @@ class ValidFilterFormDefinition(ValidFormDefinition):
     def __call__(self, form: 'Form', field: 'Field') -> 'type[Form] | None':
         from onegov.form.fields import MultiCheckboxField
 
-        # super().__call__(form, field)
         parsed_form = super().__call__(form, field)
         if parsed_form is None:
             return None
 
         # limit the definition to MultiCheckboxField, RadioField which can
         # be used for filter definition
-        # parsed_form = self._parse_form(field, enable_indent_check=False)
         errors = None
         for field in parsed_form._fields.values():
             if not isinstance(field, (MultiCheckboxField, RadioField)):
@@ -334,7 +333,6 @@ class ValidFilterFormDefinition(ValidFormDefinition):
                 if not isinstance(errors, list):
                     errors = form['definition'].process_errors
                     assert isinstance(errors, list)
-
                 errors.append(error)
 
         if errors:
