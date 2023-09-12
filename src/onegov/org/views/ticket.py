@@ -31,6 +31,7 @@ from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
@@ -109,8 +110,6 @@ def view_ticket(self, request, layout=None):
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
 
-    filter_type = request.app.org.event_filter_type
-
     return {
         'title': self.number,
         'layout': layout,
@@ -129,8 +128,8 @@ def view_ticket(self, request, layout=None):
             view_messages_feed(messages, request)
         ),
         'edit_amount_url': edit_amount_url,
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 

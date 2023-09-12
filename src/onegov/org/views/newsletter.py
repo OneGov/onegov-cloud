@@ -35,6 +35,8 @@ from sqlalchemy.orm import undefer
 from string import Template
 from webob.exc import HTTPNotFound
 
+from onegov.org.views.utils import show_tags, show_filters
+
 
 def get_newsletter_form(model, request):
 
@@ -199,8 +201,6 @@ def view_newsletter(self, request, layout=None):
 
     layout = layout or NewsletterLayout(self, request)
 
-    filter_type = request.app.org.event_filter_type
-
     return {
         'layout': layout,
         'newsletter': self,
@@ -212,8 +212,8 @@ def view_newsletter(self, request, layout=None):
         'link': link,
         'name_without_extension': name_without_extension,
         'get_lead': get_lead,
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 

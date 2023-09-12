@@ -15,6 +15,7 @@ from onegov.core.elements import Link as CoreLink
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
 
@@ -172,8 +173,8 @@ def view_occurrences(self, request, layout=None):
         'locations': locations,
         'title': _('Events'),
         'search_widget': self.search_widget,
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -189,7 +190,6 @@ def view_occurrence(self, request, layout=None):
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
-    filter_type = request.app.org.event_filter_type
 
     return {
         'description': description,
@@ -204,8 +204,8 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
