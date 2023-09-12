@@ -304,9 +304,9 @@ class OccurrenceCollection(Pagination):
             return values
 
         if not fields:
-            return set()
+            return ()
 
-        return (
+        return tuple(
             (k, fields[k].label, _sort([c.label for c in fields[k].choices]))
             for k in keywords if hasattr(fields[k], 'choices')
         )
