@@ -208,7 +208,7 @@ class ApiEndpoint(Generic[_M]):
             for item in self.collection.batch
         }
 
-    def item_data(self, item: 'ApiEndpointItem | None') -> dict[str, Any]:
+    def item_data(self, item: '_M | None') -> dict[str, Any]:
         """ Return the data properties of the collection item as a dictionary.
 
         For example:
@@ -221,7 +221,7 @@ class ApiEndpoint(Generic[_M]):
 
         raise NotImplementedError()
 
-    def item_links(self, item: 'ApiEndpointItem | None') -> dict[str, Any]:
+    def item_links(self, item: '_M | None') -> dict[str, Any]:
         """ Return the link properties of the collection item as a dictionary.
         Links can either be string or a linkable object.
 
