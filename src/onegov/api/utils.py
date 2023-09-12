@@ -44,12 +44,11 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
         return {}
 
     assert isinstance(request.app, ApiApp)
-    if request.client_addr is None:
-        raise ValueError("Client address is missing")
+    addr = request.client_addr or 'unknown'
 
     limit, expiration = request.app.rate_limit
     requests, timestamp = request.app.rate_limit_cache.get_or_create(
-        request.client_addr,
+        addr,
         creator=lambda: (0, datetime.utcnow()),
     )
     if (datetime.utcnow() - timestamp).seconds < expiration:
@@ -58,7 +57,7 @@ def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
         timestamp = datetime.utcnow()
         requests = 1
     request.app.rate_limit_cache.set(
-        request.client_addr, (requests, timestamp)
+        addr, (requests, timestamp)
     )
     reset = timestamp + timedelta(seconds=expiration)
     headers = {
