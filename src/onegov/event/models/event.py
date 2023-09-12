@@ -10,7 +10,6 @@ from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -41,8 +40,8 @@ class EventFile(File):
     __mapper_args__ = {'polymorphic_identity': 'eventfile'}
 
 
-class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
-            SearchableContent, CoordinatesMixin):
+class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
+            CoordinatesMixin):
     """ Defines an event.
 
     Occurrences are stored in a seperate table containing only a minimal set
