@@ -3,13 +3,13 @@ import jwt
 from webob.exc import HTTPUnauthorized, HTTPClientError
 from onegov.api.models import ApiException, ApiKey
 from onegov.api.token import try_get_encoded_token, jwt_decode
+from onegov.api import ApiApp
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from morepath.request import Response
-    from onegov.api import ApiApp
 
 
 def authenticate(request: 'CoreRequest') -> None:
