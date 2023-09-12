@@ -3,7 +3,6 @@ from onegov.api.models import ApiEndpoint, AuthEndpoint
 from onegov.api.models import ApiEndpointCollection
 from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiException
-from onegov.core.collection import _M
 
 
 from typing import Any, TYPE_CHECKING
@@ -29,7 +28,7 @@ def get_api_endpoint(
     endpoint: str,
     page: int = 0,
     extra_parameters: dict[str, Any] | None = None,
-) -> ApiEndpoint[_M] | AuthEndpoint | Any:
+) -> 'ApiEndpoint[Any] | AuthEndpoint':
 
     if endpoint == 'authenticate':
         return AuthEndpoint(app)

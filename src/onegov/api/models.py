@@ -81,9 +81,8 @@ class ApiEndpointItem:
         self.id = id
 
     @property
-    def api_endpoint(self) -> 'ApiEndpoint[_M] | None':
+    def api_endpoint(self) -> 'ApiEndpoint[Any] | None':
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
-        # todo: why is mypy complaining here?
         # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
         return cls(self.app) if cls else None
 
@@ -149,7 +148,7 @@ class ApiEndpoint(Generic[_M]):
 
         return self.__class__(self.app, filters)
 
-    def for_item(self, item: Any | None) -> 'ApiEndpointItem | None':
+    def for_item(self, item: _M | None) -> 'ApiEndpointItem | None':
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
@@ -252,7 +251,7 @@ class ApiEndpointCollection:
         self.app = app
 
     @cached_property
-    def endpoints(self) -> dict[str, type[ApiEndpoint[_M]]]:
+    def endpoints(self) -> dict[str, type[ApiEndpoint[Any]]]:
         return {
             endpoint.endpoint: endpoint
             for endpoint in self.app.config.setting_registry.api.endpoints
