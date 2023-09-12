@@ -81,7 +81,7 @@ class ApiEndpointItem(Generic[_M]):
         self.id = id
 
     @property
-    def api_endpoint(self) -> 'ApiEndpoint[Any] | None':
+    def api_endpoint(self) -> 'ApiEndpoint[_M] | None':
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
         # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
         return cls(self.app) if cls else None
@@ -148,7 +148,7 @@ class ApiEndpoint(Generic[_M]):
 
         return self.__class__(self.app, filters)
 
-    def for_item(self, item: _M | None) -> 'ApiEndpointItem[Any] | None':
+    def for_item(self, item: _M | None) -> 'ApiEndpointItem[_M] | None':
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
@@ -198,7 +198,7 @@ class ApiEndpoint(Generic[_M]):
         return result
 
     @property
-    def batch(self) -> dict['ApiEndpointItem[Any] | None', Any]:
+    def batch(self) -> dict['ApiEndpointItem[_M]', _M]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
