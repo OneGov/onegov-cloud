@@ -149,10 +149,10 @@ class ApiEndpoint(Generic[_M]):
         return self.__class__(self.app, filters)
 
     @overload
-    def for_item(self, None) ->  None: ...
+    def for_item(self, item: None) -> None: ...
     @overload
     def for_item(self, item: _M) -> 'ApiEndpointItem[_M]': ...
-   
+
     def for_item(self, item: _M | None) -> 'ApiEndpointItem[_M] | None':
         """ Return a new endpoint item instance with the given item. """
 
