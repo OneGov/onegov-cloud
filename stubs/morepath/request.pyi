@@ -5,9 +5,9 @@ from webob.request import BaseRequest
 from webob.response import Response as BaseResponse
 from typing import overload, Any, TypeVar
 
-from .app import App
-from .authentication import Identity, NoIdentity
-from .reify import reify
+from morepath import reify
+from morepath.app import App
+from morepath.authentication import Identity, NoIdentity
 
 _T = TypeVar('_T')
 _AfterF = TypeVar('_AfterF', bound=Callable[[Response], Any])
@@ -23,6 +23,7 @@ class Request(BaseRequest):
     # view_code_info: Incomplete
     unconsumed: list[str]
     app: App
+    view_name: str  # this technically only exists after resolve_response
     def __init__(self, environ: WSGIEnvironment, app: App, **kw: Any) -> None: ...
     def reset(self) -> None: ...
     @reify

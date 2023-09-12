@@ -15,7 +15,9 @@ from onegov.core.orm.mixins import UTCPublicationMixin
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from sqlalchemy import Column
+    from sqlalchemy.orm import relationship
 
 
 class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
@@ -28,6 +30,14 @@ class Page(AdjacencyList, ContentMixin, TimestampMixin, UTCPublicationMixin):
         return 2
 
     if TYPE_CHECKING:
+        # we override these relationships to be more specific
+        parent: relationship['Page']
+        children: relationship[list['Page']]
+        @property
+        def root(self) -> 'Page': ...
+        @property
+        def ancestors(self) -> 'Iterator[Page]': ...
+
         # HACK: Workaround for hybrid_property not working until SQLAlchemy 2.0
         published_or_created: 'Column[bool]'
     else:

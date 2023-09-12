@@ -19,11 +19,14 @@ from wtforms.widgets import TextInput
 from wtforms.widgets.core import html_params
 
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.chat import TextModule
-    from wtforms import Field
+    from onegov.form.fields import (
+        PanelField, PreviewField, UploadField, UploadMultipleField)
+    from wtforms import Field, StringField
+    from wtforms.fields.choices import SelectFieldBase
 
 
 class OrderedListWidget(ListWidget):
@@ -42,6 +45,7 @@ class OrderedListWidget(ListWidget):
         # but builting a new field or changing the existing one would
         # require even more knowledge, so this is the better approach
 
+        assert hasattr(field, '__iter__')
         ordered = [subfield for subfield in field]
         ordered.sort(key=lambda f: field.gettext(f.label.text))
 
@@ -52,13 +56,13 @@ class OrderedListWidget(ListWidget):
             def __iter__(self) -> 'Iterator[Field]':
                 return iter(ordered)
 
-        return super().__call__(FakeField(), **kwargs)
+        return super().__call__(FakeField(), **kwargs)  # type:ignore[arg-type]
 
 
 class MultiCheckboxWidget(ListWidget):
     """ The default list widget with the label behind the checkbox. """
 
-    def __init__(self, html_tag: str = 'ul'):
+    def __init__(self, html_tag: Literal['ul', 'ol'] = 'ul'):
         super().__init__(html_tag=html_tag, prefix_label=False)
 
 
@@ -92,7 +96,7 @@ class UploadWidget(FileInput):
 
     """
 
-    def image_source(self, field: 'Field') -> str | None:
+    def image_source(self, field: 'UploadField') -> str | None:
         """ Returns the image source url if the field points to an image and
         if it can be done (it looks like it's possible, but I'm not super
         sure this is always possible).
@@ -118,7 +122,12 @@ class UploadWidget(FileInput):
             return field.meta.request.link(field.object_data)
         return None
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(
+        self,
+        field: 'UploadField',  # type:ignore[override]
+        **kwargs: Any
+    ) -> Markup:
+
         force_simple = kwargs.pop('force_simple', False)
         resend_upload = kwargs.pop('resend_upload', False)
         wrapper_css_class = kwargs.pop('wrapper_css_class', '')
@@ -218,7 +227,12 @@ class UploadMultipleWidget(FileInput):
     def __init__(self) -> None:
         self.multiple = True
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(
+        self,
+        field: 'UploadMultipleField',  # type:ignore[override]
+        **kwargs: Any
+    ) -> Markup:
+
         force_simple = kwargs.pop('force_simple', False)
         resend_upload = kwargs.pop('resend_upload', False)
         input_html = super().__call__(field, **kwargs)
@@ -281,7 +295,7 @@ class TextAreaWithTextModules(TextArea):
         </div>
     """)
 
-    def text_modules(self, field: 'Field') -> list['TextModule']:
+    def text_modules(self, field: 'StringField') -> list['TextModule']:
         if not hasattr(field.meta, 'request'):
             # we depend on the field containing a reference to
             # the current request, which should be passed from
@@ -292,7 +306,7 @@ class TextAreaWithTextModules(TextArea):
         collection = TextModuleCollection(request.session)
         return collection.query().all()
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: 'StringField', **kwargs: Any) -> Markup:
         input_html = super().__call__(field, **kwargs)
         text_modules = self.text_modules(field)
         if not text_modules:
@@ -395,7 +409,7 @@ class IconWidget(TextInput):
 
 class ChosenSelectWidget(Select):
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: 'SelectFieldBase', **kwargs: Any) -> Markup:
         kwargs['class_'] = '{} chosen-select'.format(
             kwargs.get('class_', '')
         ).strip()
@@ -424,7 +438,7 @@ class PreviewWidget:
         </div>
     """)
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: 'PreviewField', **kwargs: Any) -> Markup:
         field.meta.request.include('preview-widget-handler')
 
         if callable(field.url):
@@ -443,7 +457,7 @@ class PreviewWidget:
 class PanelWidget:
     """ A widget that displays the field's text as panel (no input). """
 
-    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+    def __call__(self, field: 'PanelField', **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
         return Markup(
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'

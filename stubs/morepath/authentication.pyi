@@ -8,7 +8,7 @@ from .request import Request, Response
 class NoIdentity:
     userid: None
 
-NO_IDENTITY: TypeAlias = NoIdentity
+NO_IDENTITY: NoIdentity
 
 # NOTE: Technically the actual Identity class is more generic and generates
 #       attributes based on what's passed to __init__, but for simplicity we
@@ -17,11 +17,11 @@ NO_IDENTITY: TypeAlias = NoIdentity
 #       generic again.
 class Identity:
     userid: str
-    groupid: str
+    groupid: str | None
     role: str
     application_id: str
     verified: bool | None
-    def __init__(self, userid: str, *, groupid: str, role: str, application_id: str) -> None: ...
+    def __init__(self, userid: str, *, groupid: str | None, role: str, application_id: str) -> None: ...
     def as_dict(self) -> dict[str, str]: ...
 
 class IdentityPolicy(metaclass=abc.ABCMeta):

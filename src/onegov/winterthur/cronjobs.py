@@ -43,7 +43,8 @@ def import_dws_vk(request):
     added, updated, purged = \
         collection.from_ical(response.content,
                              future_events_only=True,
-                             event_image=file)
+                             event_image=file,
+                             default_categores=['Sport'])
     log.info(f"Events successfully imported "
              f"({len(added)} added, {len(updated)} updated, "
              f"{len(purged)} deleted)")

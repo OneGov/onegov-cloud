@@ -7,17 +7,18 @@ from typing_extensions import TypeAlias
 from webob import Response as BaseResponse
 
 import dectate
-from .authentication import Identity
-from .converter import Converter, ConverterRegistry
-from .path import PathRegistry
-from .predicate import PredicateRegistry
-from .request import Request
-from .settings import SettingRegistry
-from .sentinel import Sentinel
-from .template import TemplateEngineRegistry
-from .tween import TweenRegistry
+from dectate.sentinel import Sentinel
+from morepath.authentication import Identity, NoIdentity
+from morepath.converter import Converter, ConverterRegistry
+from morepath.path import PathRegistry  # type:ignore[import]
+from morepath.predicate import PredicateRegistry  # type:ignore[import]
+from morepath.request import Request
+from morepath.settings import SettingRegistry
+from morepath.template import TemplateEngineRegistry  # type:ignore[import]
+from morepath.tween import TweenRegistry  # type:ignore[import]
 
 _T = TypeVar('_T')
+_RequestT = TypeVar('_RequestT', bound=Request, contravariant=True)
 _Type: TypeAlias = type
 
 def isbaseclass(a: type, b: type) -> bool: ...
@@ -119,9 +120,9 @@ class PathCompositeAction(dectate.Composite):
 class PermissionRuleAction(dectate.Action):
     model: type | str
     permission: object | str
-    identity: Identity | Sentinel | str
-    def __init__(self, model: type | str, permission: object | str, identity: Identity | Sentinel | str = ...) -> None: ...
-    def identifier(self, app_class: type[dectate.App]) -> tuple[type | str, object | str, Identity | Sentinel | str]: ...  # type:ignore[override]
+    identity: type[Identity | NoIdentity]
+    def __init__(self, model: type | str, permission: object | str, identity: type[Identity | NoIdentity] | None = ...) -> None: ...
+    def identifier(self, app_class: type[dectate.App]) -> tuple[type | str, object | str, type[Identity | NoIdentity]]: ...  # type:ignore[override]
     def perform(self, obj: Callable, app_class: type[dectate.App]) -> None: ...  # type:ignore[override]
 
 template_directory_id: int
@@ -150,7 +151,7 @@ def issubclass_or_none(a: type | None, b: type | None) -> bool: ...
 
 class ViewAction(dectate.Action):
     model: type | str
-    render: Callable[[Any, Request], BaseResponse] | str
+    render: Callable[[Any, _RequestT], BaseResponse] | str
     load: Callable[[Request], Any] | str | None
     template: StrOrBytesPath | None
     permission: object | str | None
@@ -159,9 +160,9 @@ class ViewAction(dectate.Action):
     def __init__(
         self,
         model,
-        render: Callable[[Any, Request], BaseResponse] | str | None = None,
+        render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath | None = None,
-        load: Callable[[Request], Any] | str | None = None,
+        load: Callable[[_RequestT], Any] | str | None = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any,
@@ -179,7 +180,7 @@ class HtmlAction(ViewAction):
 class DummyModel: ...
 
 class MountAction(PathAction):
-    group_class = PathAction
+    group_class: type[PathAction]
     name: str
     model: type[DummyModel]
     app: dectate.App
@@ -201,7 +202,7 @@ class MountAction(PathAction):
     def perform(self, obj: Callable, path_registry: PathRegistry) -> None: ...  # type:ignore[override]
 
 class DeferLinksAction(dectate.Action):
-    group_class = PathAction
+    group_class: type[PathAction]
     model: type | str
     def __init__(self, model: type | str) -> None: ...
     def identifier(self, path_registry: PathRegistry) -> tuple[Literal['defer_links'], type | str]: ...  # type:ignore[override]
@@ -209,7 +210,7 @@ class DeferLinksAction(dectate.Action):
     def perform(self, obj: Any, path_registry: PathRegistry) -> None: ...  # type:ignore[override]
 
 class DeferClassLinksAction(dectate.Action):
-    group_class = PathAction
+    group_class: type[PathAction]
     model: type | str
     variables: Callable[[Any], dict[str, Any]] | str
     def __init__(self, model: type | str, variables: Callable[[Any], dict[str, Any]] | str) -> None: ...

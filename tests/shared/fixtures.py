@@ -542,6 +542,9 @@ def websocket_server(websocket_config):
     yield _websocket_server
 
 
-@pytest.fixture(scope='session', autouse=True)
-def email_validator_environment(monkeysession):
-    monkeysession.setattr('email_validator.TEST_ENVIRONMENT', True)
+@pytest.fixture(scope='module', autouse=True)
+def email_validator_environment():
+    import email_validator
+    email_validator.TEST_ENVIRONMENT = True
+    yield
+    email_validator.TEST_ENVIRONMENT = False

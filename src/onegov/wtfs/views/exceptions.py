@@ -6,16 +6,26 @@ from webob.exc import HTTPForbidden
 from webob.exc import HTTPNotFound
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.html(
     model=HTTPForbidden,
     template='exception.pt',
     permission=Public
 )
-def handle_forbidden(self, request):
+def handle_forbidden(
+    self: HTTPForbidden,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ Displays a nice HTTP 403 error. """
 
     @request.after
-    def set_status_code(response):
+    def set_status_code(response: 'Response') -> None:
         response.status_code = self.code
 
     return {
@@ -32,11 +42,14 @@ def handle_forbidden(self, request):
     template='exception.pt',
     permission=Public
 )
-def handle_notfound(self, request):
+def handle_notfound(
+    self: HTTPNotFound,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ Displays a nice HTTP 404 error. """
 
     @request.after
-    def set_status_code(response):
+    def set_status_code(response: 'Response') -> None:
         response.status_code = self.code
 
     return {

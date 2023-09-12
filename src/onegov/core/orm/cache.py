@@ -36,6 +36,7 @@ if TYPE_CHECKING:
 
     from . import Base
     from .session_manager import SessionManager
+    from ..cache import RedisCacheRegion
 
     _M = TypeVar('_M', bound=Base)
     # NOTE: it would be more correct to make OrmCacheApp the first
@@ -70,13 +71,13 @@ class OrmCacheApp:
 
     """
 
-    # FIXME: These should probably be defined as an abstract properties
-    #        so derived classes are forced to implement them
-    session_manager: 'SessionManager'
-    schema: str | None
-    # FIXME: Define a Protocol for cache and request_cache
-    cache: Any
-    request_cache: dict[str, Any]
+    if TYPE_CHECKING:
+        # forward declare the attributes we need from Framework
+        session_manager: SessionManager
+        schema: str
+        @property
+        def cache(self) -> RedisCacheRegion: ...
+        request_cache: dict[str, Any]
 
     def configure_orm_cache(self, **cfg: Any) -> None:
         self.is_orm_cache_setup = getattr(self, 'is_orm_cache_setup', False)
@@ -274,24 +275,29 @@ class OrmCacheDescriptor(Generic[_T]):
 
         return obj
 
+    # NOTE: Technically this descriptor should only work on
+    #       applications that derive from OrmCacheApp, however
+    #       since we heavily use mixins that restriction becomes
+    #       tedious, once Intersection is a thing, we can restrict
+    #       this once again
     @overload
     def __get__(
         self,
         instance: None,
-        owner: type[OrmCacheApp]
+        owner: type[Any]
     ) -> 'Self': ...
 
     @overload
     def __get__(
         self,
-        instance: OrmCacheApp,
-        owner: type[OrmCacheApp]
+        instance: Any,
+        owner: type[Any]
     ) -> _T: ...
 
     def __get__(
         self,
-        instance: OrmCacheApp | None,
-        owner: type[OrmCacheApp]
+        instance: Any | None,
+        owner: type[Any]
     ) -> 'Self | _T':
         """ Handles the object/cache access. """
 

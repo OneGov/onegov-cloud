@@ -1,7 +1,6 @@
 import os.path
 
 from dectate import Action, Query
-from inspect import isclass
 from morepath.directive import HtmlAction
 from onegov.core.utils import Bunch
 
@@ -53,7 +52,7 @@ class HtmlHandleFormAction(HtmlAction):
     def __init__(
         self,
         model: type | str,
-        form: 'Form',
+        form: 'type[Form] | Callable[[Any, CoreRequest], type[Form]]',
         render: 'Callable[[Any, Request], Response] | str | None' = None,
         template: 'StrOrBytesPath | None' = None,
         load: 'Callable[[Request], Any] | str | None' = None,
@@ -67,30 +66,31 @@ class HtmlHandleFormAction(HtmlAction):
 
     def perform(
         self,
-        obj: 'Callable[..., Any]',
+        obj: 'Callable[[Any, CoreRequest, Any], Any]',
         *args: Any,
         **kwargs: Any
     ) -> None:
-        obj = wrap_with_generic_form_handler(obj, self.form)
+
+        wrapped = wrap_with_generic_form_handler(obj, self.form)
 
         # if a request method is given explicitly, we honor it
         if 'request_method' in self.predicates:
-            return super().perform(obj, *args, **kwargs)
+            return super().perform(wrapped, *args, **kwargs)
 
         # otherwise we register ourselves twice, once for each method
         predicates = self.predicates.copy()
 
         self.predicates['request_method'] = 'GET'
-        super().perform(obj, *args, **kwargs)
+        super().perform(wrapped, *args, **kwargs)
 
         self.predicates['request_method'] = 'POST'
-        super().perform(obj, *args, **kwargs)
+        super().perform(wrapped, *args, **kwargs)
 
         self.predicates = predicates
 
 
 def fetch_form_class(
-    form_class: 'type[_Form] | Callable[[Any, CoreRequest], _Form]',
+    form_class: 'type[_Form] | Callable[[Any, CoreRequest], type[_Form]]',
     model: object,
     request: 'CoreRequest'
 ) -> type['_Form']:
@@ -99,7 +99,7 @@ def fetch_form_class(
 
     """
 
-    if isclass(form_class):
+    if isinstance(form_class, type):
         return form_class
     else:
         return form_class(model, request)
@@ -109,7 +109,7 @@ def query_form_class(
     request: 'CoreRequest',
     model: object,
     name: str | None = None
-) -> 'Form | None':
+) -> 'type[Form] | None':
     """ Queries the app configuration for the form class associated with
     the given model and name. Take this configuration for example::
 
@@ -124,6 +124,7 @@ def query_form_class(
 
     appcls = request.app.__class__
     action = appcls.form.action_factory
+    assert issubclass(action, HtmlHandleFormAction)
 
     for a, fn in Query(action)(appcls):
         if not isinstance(a, action):
@@ -135,9 +136,8 @@ def query_form_class(
 
 
 def wrap_with_generic_form_handler(
-    # FIXME: Having the third argument be optional is a bit suspect
-    obj: 'Callable[[_T, CoreRequest, _Form | None], Any]',
-    form_class: 'type[_Form] | Callable[[_T, CoreRequest], _Form]'
+    obj: 'Callable[[_T, CoreRequest, _Form], Any]',
+    form_class: 'type[_Form] | Callable[[_T, CoreRequest], type[_Form]]'
 ) -> 'Callable[[_T, CoreRequest], Any]':
     """ Wraps a view handler with generic form handling.
 
@@ -152,14 +152,14 @@ def wrap_with_generic_form_handler(
 
         if _class:
             form = request.get_form(_class, model=self)
-            form.action = request.url
+            form.action = request.url  # type: ignore[attr-defined]
         else:
             # FIXME: This seems potentially bad, do we actually ever want
             #        to handle a missing form within the view? If we don't
             #        we could just throw an exception here...
             form = None
 
-        return obj(self, request, form)
+        return obj(self, request, form)  # type:ignore[arg-type]
 
     return handle_form
 

@@ -18,12 +18,22 @@ from onegov.wtfs.security import EditModel
 from onegov.wtfs.security import ViewModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.html(
     model=MunicipalityCollection,
     template='municipalities.pt',
     permission=ViewModel
 )
-def view_municipalities(self, request):
+def view_municipalities(
+    self: MunicipalityCollection,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ View the list of municipalities. """
 
     layout = MunicipalitiesLayout(self, request)
@@ -40,7 +50,11 @@ def view_municipalities(self, request):
     permission=EditModel,
     form=ImportMunicipalityDataForm
 )
-def import_municipality_data(self, request, form):
+def import_municipality_data(
+    self: MunicipalityCollection,
+    request: 'CoreRequest',
+    form: ImportMunicipalityDataForm
+) -> 'Response | RenderData':
     """ Import municipality data. """
 
     layout = ImportMunicipalityDataLayout(self, request)
@@ -65,7 +79,11 @@ def import_municipality_data(self, request, form):
     permission=AddModel,
     form=MunicipalityForm
 )
-def add_municipality(self, request, form):
+def add_municipality(
+    self: MunicipalityCollection,
+    request: 'CoreRequest',
+    form: MunicipalityForm
+) -> 'Response | RenderData':
     """ Create a new municipality. """
 
     layout = AddMunicipalityLayout(self, request)
@@ -90,7 +108,10 @@ def add_municipality(self, request, form):
     template='municipality.pt',
     permission=ViewModel
 )
-def view_municipality(self, request):
+def view_municipality(
+    self: Municipality,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ View a single municipality. """
 
     layout = MunicipalityLayout(self, request)
@@ -107,7 +128,11 @@ def view_municipality(self, request):
     permission=EditModel,
     form=MunicipalityForm
 )
-def edit_municipality(self, request, form):
+def edit_municipality(
+    self: Municipality,
+    request: 'CoreRequest',
+    form: MunicipalityForm
+) -> 'Response | RenderData':
     """ Edit a municipality. """
 
     layout = EditMunicipalityLayout(self, request)
@@ -135,7 +160,11 @@ def edit_municipality(self, request, form):
     permission=EditModel,
     form=DeleteMunicipalityDatesForm
 )
-def delete_municipality_dates(self, request, form):
+def delete_municipality_dates(
+    self: Municipality,
+    request: 'CoreRequest',
+    form: DeleteMunicipalityDatesForm
+) -> 'Response | RenderData':
     """ Delete a range of pick-up dates of a municipality. """
 
     layout = DeleteMunicipalityDatesLayout(self, request)
@@ -161,7 +190,10 @@ def delete_municipality_dates(self, request, form):
     request_method='DELETE',
     permission=DeleteModel
 )
-def delete_municipality(self, request):
+def delete_municipality(
+    self: Municipality,
+    request: 'CoreRequest'
+) -> None:
     """ Delete a municipality. """
 
     request.assert_valid_csrf_token()

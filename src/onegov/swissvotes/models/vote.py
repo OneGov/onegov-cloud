@@ -73,11 +73,12 @@ class localized_property:
         self.name = name
 
     def __get__(self, instance, owner):
+        default = getattr(instance, f'{self.name}_de', None)
         lang = instance.session_manager.current_locale[:2]
         attribute = f'{self.name}_{lang}'
         if hasattr(instance, attribute):
-            return getattr(instance, attribute)
-        return getattr(instance, f'{self.name}_de', None)
+            return getattr(instance, attribute) or default
+        return default
 
 
 class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
@@ -125,6 +126,13 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 (3, _("Popular initiative")),
                 (4, _("Direct counter-proposal")),
                 (5, _("Tie-breaker")),
+            ))
+
+        if attribute == 'parliamentary_initiated':
+            return OrderedDict((
+                (0, _("No")),
+                (1, _("Yes")),
+                (None, _("No")),
             ))
 
         if attribute == 'result' or attribute.endswith('_accepted'):
@@ -198,6 +206,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
                 ('lecture', _('Text of a presentation')),
                 ('statistics', _('Statistical data')),
                 ('other', _('Other')),
+                ('website', _('Website')),
             ))
 
         raise RuntimeError(f"No codes available for '{attribute}'")
@@ -212,10 +221,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     title = localized_property()
     short_title_de = Column(Text, nullable=False)
     short_title_fr = Column(Text, nullable=False)
+    short_title_en = Column(Text, nullable=True)
     short_title = localized_property()
     brief_description_title = Column(Text)
     keyword = Column(Text)
     legal_form = encoded_property(nullable=False)
+    parliamentary_initiated = encoded_property()
     initiator = Column(Text)
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
@@ -257,6 +268,9 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     link_post_vote_poll_fr = content_property()
     link_post_vote_poll_en = content_property()
     link_post_vote_poll = localized_property()
+    link_easyvote_de = content_property()
+    link_easyvote_fr = content_property()
+    link_easyvote = localized_property()
 
     # space-separated poster URLs coming from the dataset
     posters_mfg_yea = Column(Text)
@@ -378,6 +392,12 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
     result_vs_accepted = encoded_property()
     result_zg_accepted = encoded_property()
     result_zh_accepted = encoded_property()
+
+    @cached_property
+    def number_of_cantons(self):
+        if self.bfs_number <= 292:
+            return 22
+        return 23
 
     @cached_property
     def results_cantons(self):
@@ -539,7 +559,6 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     # Electoral strength
     national_council_election_year = Column(Integer)
-    # drop?
     national_council_share_fdp = Column(Numeric(13, 10))
     national_council_share_cvp = Column(Numeric(13, 10))
     national_council_share_sps = Column(Numeric(13, 10))
@@ -572,8 +591,28 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
 
     @cached_property
     def has_national_council_share_data(self):
-        if self.national_council_election_year:
+        """ Returns true, if the vote contains national council share data.
+
+        Returns true, if a national council year is set and
+        - any aggregated national council share data is present (yeas, nays,
+          none, empty, free vote, neutral, unknown)
+        - or any national council share data of parties with national council
+          share and a recommendation regarding this vote is present
+        """
+        if (
+            self.national_council_election_year and (
+                self.national_council_share_yeas
+                or self.national_council_share_nays
+                or self.national_council_share_none
+                or self.national_council_share_empty
+                or self.national_council_share_free_vote
+                or self.national_council_share_neutral
+                or self.national_council_share_unknown
+                or self.sorted_actors_list
+            )
+        ):
             return True
+
         return False
 
     # attachments
@@ -589,7 +628,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         label=_('Brief description Swissvotes'),
         extension='pdf',
         static_views={
-            'de_CH': 'kurzbeschreibung.pdf',
+            'de_CH': 'kurzbeschreibung-de.pdf',
+            'fr_CH': 'kurzbeschreibung-fr.pdf',
         }
     )
     federal_council_message = LocalizedFile(
@@ -598,6 +638,30 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         static_views={
             'de_CH': 'botschaft-de.pdf',
             'fr_CH': 'botschaft-fr.pdf',
+        }
+    )
+    parliamentary_initiative = LocalizedFile(
+        label=_('Parliamentary initiative'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'parlamentarische-initiative-de.pdf',
+            'fr_CH': 'parlamentarische-initiative-fr.pdf',
+        }
+    )
+    parliamentary_committee_report = LocalizedFile(
+        label=_('Report of the parliamentary committee'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'bericht-parlamentarische-kommission-de.pdf',
+            'fr_CH': 'bericht-parlamentarische-kommission-fr.pdf',
+        }
+    )
+    federal_council_opinion = LocalizedFile(
+        label=_('Opinion of the Federal Council'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'stellungnahme-bundesrat-de.pdf',
+            'fr_CH': 'stellungnahme-bundesrat-fr.pdf',
         }
     )
     parliamentary_debate = LocalizedFile(
@@ -613,6 +677,14 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         static_views={
             'de_CH': 'brochure-de.pdf',
             'fr_CH': 'brochure-fr.pdf',
+        }
+    )
+    easyvote_booklet = LocalizedFile(
+        label=_('Explanatory brochure by Easyvote'),
+        extension='pdf',
+        static_views={
+            'de_CH': 'easyvote-de.pdf',
+            'fr_CH': 'easyvote-fr.pdf',
         }
     )
     resolution = LocalizedFile(
@@ -642,7 +714,8 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         label=_('Result by canton, district and municipality'),
         extension='xlsx',
         static_views={
-            'de_CH': 'staatsebenen.xlsx',
+            'de_CH': 'staatsebenen-de.xlsx',
+            'fr_CH': 'staatsebenen-fr.xlsx',
         }
     )
     foeg_analysis = LocalizedFile(
@@ -737,10 +810,10 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         'brief_description',
         'federal_council_message',
         'parliamentary_debate',
-        # we don't include the voting booklet, resolution and ad analysis
-        # - they might contain other votes from the same day!
+        # we don't include the voting booklet, resolution, ad analysis and
+        # easyvote booklet - they might contain other votes from the same day!
         'realization',
-        'preliminary_examination'
+        'preliminary_examination',
     }
 
     def reindex_files(self):

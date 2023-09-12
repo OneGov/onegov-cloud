@@ -70,6 +70,7 @@ def delete(
                     app.filestorage.remove(item)
 
         if getattr(app, 'depot_storage_path', ''):
+            assert hasattr(app, 'bound_storage_path')
             if app.bound_storage_path:
                 click.echo("Removing Depot Storage")
                 shutil.rmtree(str(app.bound_storage_path.absolute()))

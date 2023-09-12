@@ -77,6 +77,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     #: the event organizer's public e-mail address
     organizer_email = content_property()
 
+    #: the event organizer's phone number
+    organizer_phone = content_property()
+
     #: an external url for the event
     external_event_url = content_property()
 

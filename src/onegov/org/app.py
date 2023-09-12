@@ -32,6 +32,13 @@ from onegov.ticket import TicketPermission
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
 from purl import URL
+from sqlalchemy.orm import noload, undefer
+from sqlalchemy.orm.attributes import set_committed_value
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
 
 
 class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
@@ -45,6 +52,7 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
     export = directive(directives.ExportAction)
     userlinks = directive(directives.UserlinkAction)
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
+    event_search_widget = directive(directives.EventSearchWidgetAction)
     settings_view = directive(directives.SettingsView)
     boardlet = directive(directives.Boardlet)
 
@@ -105,9 +113,6 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
     @orm_cached(policy='on-table-change:pages')
     def root_pages(self):
-        query = PageCollection(self.session()).query(ordered=False)
-        query = query.order_by(Page.order)
-        query = query.filter(Page.parent_id == None)
 
         def include(page):
             if page.type != 'news':
@@ -115,7 +120,55 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
 
             return True if page.children else False
 
-        return tuple(p for p in query if include(p))
+        return tuple(p for p in self.pages_tree if include(p))
+
+    @orm_cached(policy='on-table-change:pages')
+    def pages_tree(self) -> tuple[Page, ...]:
+        """
+        This is the entire pages tree preloaded into the individual
+        parent/children attributes. We optimize this as much as possible
+        by performing the recursive join in Python, rather than SQL.
+
+        """
+        query = PageCollection(self.session()).query(ordered=False)
+        query = query.options(
+            # we populate these relationship ourselves
+            noload(Page.parent),
+            noload(Page.children),
+            # since we cache this result we should undefer loading the
+            # page meta, so we don't need to deserialize it every time
+            # this causes a fairly substantial overhead on uncached
+            # loads of pages_tree, but it's also a fairly big win
+            # once it is cached. There may be call-sites other than
+            # homepage_pages that benefit from this. If there aren't
+            # we can always go back on this decision
+            undefer(Page.meta)
+        )
+        query = query.order_by(Page.order)
+
+        # first we build a map from parent_ids to their children
+        parent_to_child = defaultdict(list)
+        for page in query:
+            parent_to_child[page.parent_id].append(page)
+
+        # then we populate the children and parent based on this information
+        # this should result in no pending modifications, because we use
+        # set_committed_value to set them
+        for page in (
+            page
+            for pages in parent_to_child.values()
+            for page in pages
+        ):
+            # even though this is a defaultdict, we need to use get()
+            # since otherwise we modifiy the dictionary
+            children = parent_to_child.get(page.id, [])
+            for child in children:
+                set_committed_value(child, 'parent', page)
+            set_committed_value(page, 'children', children)
+
+        # we return the root pages which should contain references to all
+        # the child pages
+        return tuple(p for p in parent_to_child.get(None, []))
 
     @orm_cached(policy='on-table-change:organisations')
     def homepage_template(self):
@@ -140,22 +193,30 @@ class OrgApp(Framework, LibresIntegration, SearchApp, MapboxApp,
         return result
 
     @orm_cached(policy='on-table-change:pages')
-    def homepage_pages(self):
-        pages = PageCollection(self.session()).query()
-        pages = pages.filter(Topic.type == 'topic')
-        pages = pages.filter(Topic.meta['is_visible_on_homepage'] == True)
+    def homepage_pages(self) -> dict[int, list[Topic]]:
+
+        def visit_topics(
+            pages: 'Iterable[Page]',
+            root_id: int | None = None
+        ) -> 'Iterator[tuple[int, Topic]]':
+            for page in pages:
+
+                if root_id is None:
+                    root_id = page.id
+
+                if isinstance(page, Topic):
+                    yield root_id, page
+                yield from visit_topics(page.children, root_id=root_id)
 
         result = defaultdict(list)
+        for root_id, topic in visit_topics(self.root_pages):
+            if topic.is_visible_on_homepage:
+                result[root_id].append(topic)
 
-        for page in pages.all():
-            if page.is_visible_on_homepage:
-                result[page.root.id].append(page)
-
-        for key in result:
-            result[key] = list(sorted(
-                result[key],
+        for topics in result.values():
+            topics.sort(
                 key=lambda p: utils.normalize_for_url(p.title)
-            ))
+            )
 
         return result
 
@@ -378,6 +439,11 @@ def get_is_complete_userprofile_handler():
 
 @OrgApp.setting(section='org', name='default_directory_search_widget')
 def get_default_directory_search_widget():
+    return None
+
+
+@OrgApp.setting(section='org', name='default_event_search_widget')
+def get_default_event_search_widget():
     return None
 
 

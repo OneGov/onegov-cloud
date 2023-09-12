@@ -51,7 +51,7 @@
                                 </a>
                                 <metal:hint use-macro="layout.macros['access-hint']" tal:define="item entry" />
 
-                                <tal:b define="custom_lead searchwidget.lead(layout, entry)|nothing">
+                                <tal:b define="custom_lead search_widget.lead(layout, entry)|nothing">
                                     <a tal:attributes="href request.link(entry)">
                                         <p class="list-lead preview">
                                             <tal:b condition="custom_lead" replace="structure custom_lead" />
@@ -74,9 +74,9 @@
             </div>
 
             <div class="cell medium-4 large-offset-1 sidebar">
-                <div class="grid-x" tal:condition="searchwidget">
+                <div class="grid-x" tal:condition="search_widget">
                     <div class="cell medium-12">
-                        <tal:b replace="structure searchwidget.html(layout)" />
+                        <tal:b replace="structure search_widget.html(layout)" />
                     </div>
                 </div>
 
