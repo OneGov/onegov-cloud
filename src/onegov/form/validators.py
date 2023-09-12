@@ -202,9 +202,9 @@ class ValidFormDefinition:
         self.require_title_fields = require_title_fields
         self.validate_prices = validate_prices
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: 'Form', field: 'Field') -> 'type[Form] | None':
         if not field.data:
-            return
+            return None
 
         try:
             parsed_form = self._parse_form(field)
@@ -299,6 +299,8 @@ class ValidFormDefinition:
                 errors.append(error)
                 raise ValidationError(error)
 
+        return parsed_form
+
     def _parse_form(self, field, enable_indent_check=True):
         # XXX circular import
         from onegov.form import parse_form
@@ -312,14 +314,18 @@ class ValidFilterFormDefinition(ValidFormDefinition):
                            "only 'select' or 'multiple select' fields are "
                            "allowed.")
 
-    def __call__(self, form: 'Form', field: 'Field') -> None:
+    def __call__(self, form: 'Form', field: 'Field') -> 'type[Form] | None':
         from onegov.form.fields import MultiCheckboxField
 
-        super().__call__(form, field)
+        # super().__call__(form, field)
+        parsed_form = super().__call__(form, field)
+        if parsed_form is None:
+            return None
 
         # limit the definition to MultiCheckboxField, RadioField which can
         # be used for filter definition
-        parsed_form = self._parse_form(field, enable_indent_check=False)
+        # parsed_form = self._parse_form(field, enable_indent_check=False)
+        errors = None
         for field in parsed_form._fields.values():
             if not isinstance(field, (MultiCheckboxField, RadioField)):
                 error = field.gettext(self.invalid_field_type.format(
@@ -330,7 +336,11 @@ class ValidFilterFormDefinition(ValidFormDefinition):
                     assert isinstance(errors, list)
 
                 errors.append(error)
-                raise ValidationError(error)
+
+        if errors:
+            raise ValidationError(error)
+
+        return parsed_form
 
 
 class LaxDataRequired(DataRequired):
