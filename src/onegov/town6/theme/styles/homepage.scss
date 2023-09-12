@@ -35,8 +35,8 @@
             position: absolute;
             text-shadow: 0 0 2em $black;
 
-            h1 {
-                margin-bottom: 0;
+            span {
+                font-size: 4rem;
             }
 
             @media #{$small-only} {

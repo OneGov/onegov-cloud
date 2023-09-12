@@ -1436,7 +1436,7 @@
             <div class="dark-overlay" tal:condition="text"></div>
             <div class="grid-container" tal:condition="text">
                 <div class="text">
-                    <h1>${text}</h1>
+                    <span>${text}</span>
                 </div>
             </div>
         </div>
