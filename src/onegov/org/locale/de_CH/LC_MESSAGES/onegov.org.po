@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-08-30 15:12+0200\n"
+"POT-Creation-Date: 2023-09-13 12:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -675,11 +675,11 @@ msgstr "Musikverein"
 msgid "Organizer E-Mail address"
 msgstr "Organisator E-Mail Adresse"
 
-msgid "Organizer phone number"
-msgstr "Organisator Telefonnummer"
-
 msgid "Shown as contact E-Mail address"
 msgstr "Wird als Kontakt-Email-Adresse angezeigt"
+
+msgid "Organizer phone number"
+msgstr "Organisator Telefonnummer"
 
 msgid "Shown as contact phone number"
 msgstr "Wird als Kontakttelefonnummer angezeigt"
@@ -1440,14 +1440,11 @@ msgstr "Schriftfarbe der Ankündigung"
 msgid "Only show Announcement for logged-in users"
 msgstr "Ankündigung nur für eingeloggte Benutzer anzeigen"
 
-msgid "Keep header links fixed to top on scrolling"
-msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"
-
 msgid "Header links"
 msgstr "Kopfzeilenlinks"
 
-msgid "Title header left side"
-msgstr "Titel Kopfzeile links"
+msgid "Text header left side"
+msgstr "Text Kopfzeile links"
 
 msgid "Optional"
 msgstr "Optional"
@@ -1457,6 +1454,14 @@ msgstr "Schriftfarbe"
 
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
+
+msgid "Keep header links and/or header text fixed to top on scrolling"
+msgstr ""
+"Kopfzeilenlinks und/oder Kopfzeilentext beim Scrollen oben fixiert "
+"lassen"
+
+msgid "Header fixation"
+msgstr "Fixierung der Kopfzeilenelemente"
 
 msgid "Please add an url to each link"
 msgstr "Bitte geben Sie für jeden Link eine URL ein"
@@ -5348,3 +5353,9 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Keep header links fixed to top on scrolling"
+#~ msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"
+
+#~ msgid "Title header left side"
+#~ msgstr "Titel Kopfzeile links"

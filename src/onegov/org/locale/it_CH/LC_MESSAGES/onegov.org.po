@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-08-30 15:12+0200\n"
+"POT-Creation-Date: 2023-09-13 12:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -677,11 +677,11 @@ msgstr "Società musicale"
 msgid "Organizer E-Mail address"
 msgstr "Indirizzo e-mail dell'organizzatore"
 
-msgid "Organizer phone number"
-msgstr "Numero di telefono dell'organizzatore"
-
 msgid "Shown as contact E-Mail address"
 msgstr "Indicato come indirizzo email di contatto"
+
+msgid "Organizer phone number"
+msgstr "Numero di telefono dell'organizzatore"
 
 msgid "Shown as contact phone number"
 msgstr "Indicato come numero di telefono di contatto"
@@ -1441,14 +1441,11 @@ msgstr "Colore del carattere dell'annuncio"
 msgid "Only show Announcement for logged-in users"
 msgstr "Mostra solo gli annunci per gli utenti connessi"
 
-msgid "Keep header links fixed to top on scrolling"
-msgstr "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
-
 msgid "Header links"
 msgstr "Collegamenti di intestazione"
 
-msgid "Title header left side"
-msgstr "Lato sinistro dell'intestazione del titolo"
+msgid "Text header left side"
+msgstr "Intestazione testo a sinistra"
 
 msgid "Optional"
 msgstr "Facoltativo"
@@ -1458,6 +1455,14 @@ msgstr "Colore del carattere"
 
 msgid "Relative font size"
 msgstr "Dimensione relativa del carattere"
+
+msgid "Keep header links and/or header text fixed to top on scrolling"
+msgstr ""
+"Mantenere i link dell'intestazione e/o il testo dell'intestazione fissi in "
+"alto durante lo scorrimento"
+
+msgid "Header fixation"
+msgstr "Fissare gli elementi dell'intestazione"
 
 msgid "Please add an url to each link"
 msgstr "Aggiungere un url a ciascun link"
@@ -5357,3 +5362,10 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Keep header links fixed to top on scrolling"
+#~ msgstr ""
+#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
+
+#~ msgid "Title header left side"
+#~ msgstr "Lato sinistro dell'intestazione del titolo"
