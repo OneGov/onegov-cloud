@@ -180,6 +180,10 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     expertise_professional_guilds_other = meta_property(default=tuple)
 
     @property
+    def search_score(self):
+        return 4
+
+    @property
     def expertise_professional_guilds_all(self):
         return (
             tuple(self.expertise_professional_guilds or tuple())
