@@ -336,7 +336,7 @@ class ValidFilterFormDefinition(ValidFormDefinition):
                 errors.append(error)
 
         if errors:
-            raise ValidationError(error)
+            raise ValidationError()
 
         return parsed_form
 
