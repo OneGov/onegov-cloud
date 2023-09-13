@@ -226,25 +226,36 @@ def transfer(
 
     # some calls to the storage transfer may be repeated as applications
     # share folders in certain configurations
+
+    # @lru_cache(maxsize=None)
+    # def transfer_storage(remote: str, local: str, glob: str = '*') -> None:
+    #
+    #     # GNUtar differs from MacOS's version somewhat and the combination
+    #     # of parameters leads to a different strip components count. It seems
+    #     # as if GNUtar will count the components after stripping, while MacOS
+    #     # counts them before stripping
+    #     count = remote.count('/')
+    #     count += platform.system() == 'Darwin' and 1 or 0
+    #
+    #     send = f"ssh {server} -C 'sudo nice -n 10 tar cz {remote}/{glob}'"
+    #     send = f"{send} --absolute-names"
+    #     recv = f"tar xz  --strip-components {count} -C {local}"
+    #
+    #     if shutil.which('pv'):
+    #         recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
+    #
+    #     click.echo(f"Copying {remote}/{glob}")
+    #     subprocess.check_output(f'{send} | {recv}', shell=True)
+
+
     @lru_cache(maxsize=None)
     def transfer_storage(remote: str, local: str, glob: str = '*') -> None:
-
-        # GNUtar differs from MacOS's version somewhat and the combination
-        # of parameters leads to a different strip components count. It seems
-        # as if GNUtar will count the components after stripping, while MacOS
-        # counts them before stripping
-        count = remote.count('/')
-        count += platform.system() == 'Darwin' and 1 or 0
-
-        send = f"ssh {server} -C 'sudo nice -n 10 tar cz {remote}/{glob}'"
-        send = f"{send} --absolute-names"
-        recv = f"tar xz  --strip-components {count} -C {local}"
-
+        send = f"rsync -av --ignore-existing --include='{glob}' --exclude='*' {server}:{remote}/ {local}/"
         if shutil.which('pv'):
-            recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
-
+            send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
         click.echo(f"Copying {remote}/{glob}")
-        subprocess.check_output(f'{send} | {recv}', shell=True)
+        subprocess.check_output(send, shell=True)
+
 
     def transfer_database(
         remote_db: str,
