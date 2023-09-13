@@ -2,7 +2,7 @@ import sqlalchemy
 
 from collections import defaultdict
 from functools import cached_property
-from datetime import date, timedelta, datetime, timezone
+from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
 from lxml import objectify, etree
@@ -12,7 +12,7 @@ from onegov.event.models import Occurrence
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
@@ -203,7 +203,7 @@ class OccurrenceCollection(Pagination):
         counts = defaultdict(int)  # type: defaultdict[str, int]
 
         base = self.session.query(Occurrence._tags.keys())
-        base = base.filter(Occurrence.start >= datetime.now(timezone.utc))
+        base = base.filter(func.DATE(Occurrence.end) >= date.today())
 
         for keys in base.all():
             for tag in keys[0]:
@@ -223,8 +223,8 @@ class OccurrenceCollection(Pagination):
         """
         base = self.session.query(Occurrence._tags.keys()).with_entities(
             sqlalchemy.func.skeys(Occurrence._tags).label('keys'),
-            Occurrence.start)
-        base = base.filter(Occurrence.start >= datetime.now(timezone.utc))
+            Occurrence.end)
+        base = base.filter(func.DATE(Occurrence.end) >= date.today())
 
         query = sqlalchemy.select(
             [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
