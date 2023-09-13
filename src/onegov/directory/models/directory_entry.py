@@ -44,8 +44,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     name = Column(Text, nullable=False)
 
     #: The directory this entry belongs to
-    directory_id: 'Column[UUID]' = Column(
-        ForeignKey('directories.id'), nullable=False)
+    _directory_id: 'Column[UUID]' = Column(
+        ForeignKey('directories.id'), name='directory_id', nullable=False)
 
     #: the polymorphic type of the entry
     type = Column(Text, nullable=False, default=lambda: 'generic')
@@ -73,6 +73,10 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         Index('inverted_keywords', 'keywords', postgresql_using='gin'),
         Index('unique_entry_name', 'directory_id', 'name', unique=True),
     )
+
+    @property
+    def directory_id(self):
+        return self.directory_id
 
     @property
     def external_link(self):
