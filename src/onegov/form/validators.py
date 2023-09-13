@@ -202,7 +202,7 @@ class ValidFormDefinition:
         self.require_title_fields = require_title_fields
         self.validate_prices = validate_prices
 
-    def __call__(self, form: 'Form', field: 'Field') -> 'type[Form] | None':
+    def __call__(self, form: 'Form', field: 'Field') -> 'Form | None':
         if not field.data:
             return None
 
@@ -315,7 +315,7 @@ class ValidFilterFormDefinition(ValidFormDefinition):
                            "filters only 'select' or 'multiple select' "
                            "fields are allowed.")
 
-    def __call__(self, form: 'Form', field: 'Field') -> 'type[Form] | None':
+    def __call__(self, form: 'Form', field: 'Field') -> 'Form | None':
         from onegov.form.fields import MultiCheckboxField
 
         parsed_form = super().__call__(form, field)
