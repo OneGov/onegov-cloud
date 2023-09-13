@@ -15,7 +15,7 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
-from wtforms.validators import Optional
+from wtforms.validators import Optional, NumberRange
 from wtforms.validators import ValidationError
 
 
@@ -62,6 +62,10 @@ class AgendaItemForm(NamedFileForm):
              assembly), but opens it on the chosen page number"""),
         label=_('Alternatively: Page from the Memorial'),
         fieldset=_('Memorial'),
+        validators=[
+            NumberRange(min=1),
+            Optional()
+        ],
     )
 
     video_timestamp = StringField(
