@@ -27,8 +27,14 @@ $('#nav-bar').on('sticky.zf.stuckto:top', function() {
     el.data('modified', true)
 });
 
+if ($('#page-search').length) {
+    $('.search-button').click(function(){
+            $('#page-search').find('#search').focus()
+        });
+}
+
 $('#offCanvasSearch').on('opened.zf.offCanvas', function (e) {
-    $(this).find('#search-side').focus()
+    $(this).find('#search').focus()
 })
 
 $(document).on("keypress", function(e) {
