@@ -1,7 +1,5 @@
 from functools import cached_property
 
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
@@ -39,7 +37,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
     def es_skip(self):
         return self.state == 'preview'
 
-    @hybrid_property
+    @property
     def organiser(self):
         organiser = [
             self.user.username,

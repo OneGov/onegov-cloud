@@ -85,7 +85,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def title(self):
         return str(self)
 
-    @hybrid_property
+    @property
     def name(self):
         return self.course.name
 
@@ -97,7 +97,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
             f'{self.presenter_company}'
         )
 
-    @hybrid_property
+    @property
     def description(self):
         return self.course.description
 

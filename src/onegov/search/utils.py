@@ -39,6 +39,14 @@ def get_fts_index_languages():
     return ['simple', 'german', 'french', 'italian', 'english']
 
 
+def get_fts_index_basic_languages():
+    return ['simple', 'german']
+
+
+def get_fts_index_localized_languages():
+    return ['french', 'italian', 'english']
+
+
 def is_valid_index_name(name):
     """ Checks if the given name is a valid elasticsearch index name.
     Elasticsearch does it's own checks, but we can do it earlier and we are
