@@ -1,5 +1,11 @@
 from collections import namedtuple
+from datetime import datetime
 
+import requests
+from lxml import etree
+import xml.etree.ElementTree as ET
+
+from onegov.core.widgets import XML_BASE
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.org.elements import Link, LinkGroup
@@ -13,6 +19,11 @@ from onegov.reservation import ResourceCollection
 
 from onegov.town6 import TownApp
 from onegov.town6 import _
+
+
+from typing import NamedTuple, TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import Iterator
 
 
 @TownApp.homepage_widget(tag='row')
@@ -541,3 +552,80 @@ class TestimonialSliderWidget:
             />
         </xsl:template>
     """
+
+
+@TownApp.homepage_widget(tag='jobs')
+class JobsWidget:
+
+    template = """
+    <xsl:template match="jobs">
+        <div metal:use-macro="layout.macros['jobs-cards']"
+        tal:define="title" '{@title}';
+        />
+    </xsl:template>
+    """
+
+    def get_variables(self, layout):
+
+        # this is some self-referential thing, but we need this here
+        # because the variables themselves are dependent on the link
+        structure = layout.org.meta.get('homepage_structure')
+        xml = XML_BASE.format(structure)
+        xml_tree = etree.fromstring(xml.encode('utf-8'))
+
+        try:
+            rss_feed_url = xml_tree .find(".//jobs").attrib['rss_feed']
+            rss = requests.get(rss_feed_url, timeout=4).content.decode('utf-8')
+            return {'parsed_rss_feed': parse_rss(rss)}
+        except Exception:
+            return {'parsed_rss_feed', ''}
+
+
+class RSSItem(NamedTuple):
+    title: str
+    description: str
+    guid: str
+    pubDate: str | None
+
+
+class RSSChannel(NamedTuple):
+    """ Represents a parsed RSS Feed (channel tag) """
+    title: str
+    link: str
+    description: str
+    language: str
+    copyright: str
+    items: 'Iterator[RSSItem]'
+
+
+def parse_rss(rss):
+
+    def parse_date(date_str):
+        try:
+            return datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z')
+        except ValueError:
+            return None
+
+    def get_text(element):
+        return element.text if element is not None else ''
+
+    def extract_channel_info(channel, keys):
+        return (get_text(channel.find(key)) for key in keys)
+
+    def extract_items(channel):
+        for item in channel.findall("item"):
+            yield RSSItem(
+                title=get_text(item.find("title")),
+                description=get_text(item.find("description")),
+                guid=get_text(item.find("guid")),
+                pubDate=parse_date(get_text(item.find("pubDate")))
+            )
+
+    root = ET.fromstring(rss)
+    channel = root.find(".//channel")
+    channel_keys = [field for field in RSSChannel._fields if field != 'items']
+
+    return RSSChannel(
+        *extract_channel_info(channel, channel_keys),
+        extract_items(channel)
+    )
