@@ -4,6 +4,7 @@ from onegov.core.security import Public, Private, Secret
 
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.org.forms.event import EventConfigurationForm
+from onegov.town6.layout import OccurrenceLayout
 from onegov.org.views.occurrence import view_occurrences, view_occurrence, \
     export_occurrences, import_occurrences, handle_edit_event_filters
 from onegov.town6 import TownApp
@@ -19,7 +20,7 @@ def town_view_occurrences(self, request):
 
 @TownApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
 def town_view_occurrence(self, request):
-    layout = OccurrencesLayout(self, request)
+    layout = OccurrenceLayout(self, request)
     request.include('monthly-view')
     return view_occurrence(self, request, layout)
 
