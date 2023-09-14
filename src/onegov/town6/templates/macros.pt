@@ -2492,7 +2492,7 @@
             <style>
 
                     .pj-widget-jobs-container {
-                        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif!important;
                         font-size: 15px;
                     }
 
@@ -2690,6 +2690,10 @@
 
                         .pj-widget-col-sm-6 {
                             width: 50%;
+                        }
+
+                        .pj-widget-col-sm-6 > p {
+                            margin-bottom: 0!important; // additional fix
                         }
 
                         .pj-widget-col-sm-9 {
@@ -3023,8 +3027,8 @@
                         <span class="pj-widget-arrow"></span>
                         <div class="pj-widget-row">
                             <div class="pj-widget-col-sm-6 pj-widget-col-xs-12">
-                                <div>${item.title}</div>
-                                <div>${item.description}</div>
+                                <p class="homepage-text" style="font-size: 1.1em;">${item.title}</p>
+                                <p class="homepage-text">${item.description}</p>
                             </div>
                             <div class="pj-widget-col-sm-3 pj-widget-col-xs-12">${layout.format_date(item.pubDate, 'date')}</div>
                         </div>
