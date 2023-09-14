@@ -1339,7 +1339,6 @@ class OccurrencesLayout(EventBaseLayout):
         return list(links())
 
 
-
 class OccurrenceLayout(EventBaseLayout):
 
     def __init__(self, model, request):
