@@ -629,6 +629,8 @@ class OccurrenceCollection(Pagination):
                 event.urlweb = e.external_event_url
             if e.tags:
                 event.rubrik = e.tags
+            if 'kalender' in e.filter_keywords:
+                event.hauptrubrik = e.filter_keywords['kalender']
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
             ort.adresse = ''
