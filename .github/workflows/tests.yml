@@ -202,7 +202,7 @@ jobs:
     - name: Run tests
       run: |
         py.test \
-          --splits "8" \
+          --splits "6" \
           --group "${{matrix.group}}" \
           --cov \
           --cov-config=pyproject.toml \
