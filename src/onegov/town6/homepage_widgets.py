@@ -1,10 +1,8 @@
 from collections import namedtuple
 from datetime import datetime
-
 import requests
 from lxml import etree
 import xml.etree.ElementTree as ET
-import time
 from onegov.core.widgets import XML_BASE
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
@@ -554,27 +552,8 @@ class TestimonialSliderWidget:
     """
 
 
-class SimpleCache:
-    def __init__(self, ttl):
-        self.ttl = ttl
-        self.cache = {}
-        self.timestamps = {}
-
-    def get(self, key):
-        if (key in self.cache
-                and (time.time() - self.timestamps[key]) < self.ttl):
-            return self.cache[key]
-        return None
-
-    def set(self, key, value):
-        self.cache[key] = value
-        self.timestamps[key] = time.time()
-
-
 @TownApp.homepage_widget(tag='jobs')
 class JobsWidget:
-
-    rss_cache = SimpleCache(ttl=3600) # update once an hour
 
     template = """
     <xsl:template match="jobs">
@@ -584,32 +563,39 @@ class JobsWidget:
     </xsl:template>
     """
 
-    def get_rss(self, rss_feed_url):
-        cached_data = self.rss_cache.get(rss_feed_url)
-        if cached_data:
-            breakpoint()
-            return cached_data
-        rss = requests.get(rss_feed_url, timeout=4).content.decode('utf-8')
-        self.rss_cache.set(rss_feed_url, rss)
-        return rss
+    def should_cache_fn(self, response):
+        return response.status_code == 200
 
     def get_variables(self, layout):
 
-        # this is some self-referential thing, but we need this here
-        # because the variables themselves are dependent on the link
         structure = layout.org.meta.get('homepage_structure')
         xml = XML_BASE.format(structure)
         xml_tree = etree.fromstring(xml.encode('utf-8'))
+        rss_feed_url = xml_tree.find(".//jobs").attrib['rss_feed']
 
         try:
-            rss_feed_url = xml_tree.find(".//jobs").attrib['rss_feed']
-            rss = self.get_rss(rss_feed_url)
-            return {'parsed_rss_feed': parse_rss(rss)}
+
+            app = layout.request.app
+            from onegov.org import OrgApp
+            app: OrgApp
+
+            # Avoid making a new request each time by caching the RSS feed
+            response = app.cache.get_or_create(
+                'jobs_rss_feed',
+                creator=lambda: requests.get(rss_feed_url, timeout=4),
+                expiration_time=3600,
+                should_cache_fn=self.should_cache_fn
+            )
+            rss = response.content.decode('utf-8')
+            parsed = parsed_rss(rss)
+
+            return {'parsed_rss_feed': parsed}
         except Exception:
             return {'parsed_rss_feed': ''}
 
 
 class RSSItem(NamedTuple):
+    """ The elements inside <item> """
     title: str
     description: str
     guid: str
@@ -617,7 +603,7 @@ class RSSItem(NamedTuple):
 
 
 class RSSChannel(NamedTuple):
-    """ Represents a parsed RSS Feed (channel tag) """
+    """ The elements inside <channel> """
     title: str
     link: str
     description: str
@@ -626,7 +612,7 @@ class RSSChannel(NamedTuple):
     items: 'Iterator[RSSItem]'
 
 
-def parse_rss(rss):
+def parsed_rss(rss):
 
     def parse_date(date_str):
         try:

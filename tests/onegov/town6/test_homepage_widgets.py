@@ -1,7 +1,7 @@
 from onegov.core.utils import scan_morepath_modules
 from onegov.core.widgets import transform_structure
 from onegov.town6 import TownApp
-from onegov.town6.homepage_widgets import parse_rss
+from onegov.town6.homepage_widgets import parsed_rss
 from datetime import datetime, timezone, timedelta
 
 
@@ -217,7 +217,7 @@ def test_parse_rss_to_named_tuple():
     </rss>
     """
 
-    parsed_channel = parse_rss(rss)
+    parsed_channel = parsed_rss(rss)
 
     assert parsed_channel.title == "example.com RSS feed"
     assert parsed_channel.link == "https://www.example.com"
