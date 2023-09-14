@@ -248,3 +248,22 @@ def test_parse_rss_to_named_tuple():
         2023, 8, 21, 0, 0,
         tzinfo=timezone(timedelta(seconds=7200)),
     )
+
+
+def test_rss_jobs_widget(town_app):
+    class App(TownApp):
+        pass
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    widgets = App().config.homepage_widget_registry.values()
+
+    structure = """<jobs
+                rss_feed="example.com"
+                jobs_card_title="wir suchen" >
+            </jobs>
+            """
+    result = transform_structure(widgets, structure)
+
+    assert "tal:define=\"jobs_card_title \'wir suchen\'\"" in result
