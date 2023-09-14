@@ -202,8 +202,8 @@ jobs:
     - name: Run tests
       run: |
         py.test \
-          --splits "6" \
-          --group "${{matrix.group}}" \
+          --splits "7" \
+          --group 6 \
           --cov \
           --cov-config=pyproject.toml \
           --codecov \
