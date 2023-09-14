@@ -4,7 +4,7 @@ from datetime import datetime
 import requests
 from lxml import etree
 import xml.etree.ElementTree as ET
-
+import time
 from onegov.core.widgets import XML_BASE
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
@@ -554,8 +554,27 @@ class TestimonialSliderWidget:
     """
 
 
+class SimpleCache:
+    def __init__(self, ttl):
+        self.ttl = ttl
+        self.cache = {}
+        self.timestamps = {}
+
+    def get(self, key):
+        if (key in self.cache
+                and (time.time() - self.timestamps[key]) < self.ttl):
+            return self.cache[key]
+        return None
+
+    def set(self, key, value):
+        self.cache[key] = value
+        self.timestamps[key] = time.time()
+
+
 @TownApp.homepage_widget(tag='jobs')
 class JobsWidget:
+
+    rss_cache = SimpleCache(ttl=3600) # update once an hour
 
     template = """
     <xsl:template match="jobs">
@@ -564,6 +583,15 @@ class JobsWidget:
         />
     </xsl:template>
     """
+
+    def get_rss(self, rss_feed_url):
+        cached_data = self.rss_cache.get(rss_feed_url)
+        if cached_data:
+            breakpoint()
+            return cached_data
+        rss = requests.get(rss_feed_url, timeout=4).content.decode('utf-8')
+        self.rss_cache.set(rss_feed_url, rss)
+        return rss
 
     def get_variables(self, layout):
 
@@ -575,10 +603,10 @@ class JobsWidget:
 
         try:
             rss_feed_url = xml_tree.find(".//jobs").attrib['rss_feed']
-            rss = requests.get(rss_feed_url, timeout=4).content.decode('utf-8')
+            rss = self.get_rss(rss_feed_url)
             return {'parsed_rss_feed': parse_rss(rss)}
         except Exception:
-            return {'parsed_rss_feed', ''}
+            return {'parsed_rss_feed': ''}
 
 
 class RSSItem(NamedTuple):
