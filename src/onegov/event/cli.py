@@ -318,14 +318,13 @@ def import_ical(group_context, ical, future_events_only=False,
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
         --event-image /path/to/image.jpg
 
-        onegov-event --select /onegov_winterthur/winterthur
-        import-ical ./basic.ics --future-events-only
-        --event-image ~/Veranstaltung_breit.jpg -c Sport -c Fussball
+        onegov-event --select /onegov_winterthur/winterthur import-ical
+        ./basic.ics --future-events-only --event-image
+        ~/Veranstaltung_breit.jpg -c Sport -c Fussball
 
-        onegov-event --select /onegov_winterthur/winterthur
-        import-ical ./basic.ics --future-events-only
-        --event-image ~/Veranstaltung_breit.jpg
-        -f "kalender" "Sport Veranstaltungskalender"
+        onegov-event --select /onegov_winterthur/winterthur import-ical
+        ./basic.ics --future-events-only --event-image
+        ~/Veranstaltung_breit.jpg -f "kalender" "Sport Veranstaltungskalender"
 
     """
     cat = list()
