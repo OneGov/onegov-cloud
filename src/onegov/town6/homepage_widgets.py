@@ -1,9 +1,8 @@
 from collections import namedtuple
 from datetime import datetime
 import requests
-from lxml import etree
 import xml.etree.ElementTree as ET
-from onegov.core.widgets import XML_BASE
+
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.org.elements import Link, LinkGroup
@@ -20,8 +19,11 @@ from onegov.town6 import _
 
 
 from typing import NamedTuple, TYPE_CHECKING
+
+
 if TYPE_CHECKING:
     from typing import Iterator
+    from onegov.town6.layout import HomepageLayout
 
 
 @TownApp.homepage_widget(tag='row')
@@ -566,23 +568,15 @@ class JobsWidget:
     def should_cache_fn(self, response):
         return response.status_code == 200
 
-    def get_variables(self, layout):
-
-        structure = layout.org.meta.get('homepage_structure')
-        xml = XML_BASE.format(structure)
-        xml_tree = etree.fromstring(xml.encode('utf-8'))
-        rss_feed_url = xml_tree.find(".//jobs").attrib['rss_feed']
+    def get_variables(self, layout: 'HomepageLayout'):
 
         try:
-
             app = layout.request.app
-            from onegov.org import OrgApp
-            app: OrgApp
 
             # Avoid making a new request each time by caching the RSS feed
             response = app.cache.get_or_create(
                 'jobs_rss_feed',
-                creator=lambda: requests.get(rss_feed_url, timeout=4),
+                creator=lambda: requests.get(layout.rss_feed_url, timeout=4),
                 expiration_time=3600,
                 should_cache_fn=self.should_cache_fn
             )
