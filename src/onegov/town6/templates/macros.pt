@@ -1136,11 +1136,20 @@
             <dd><a href="tel:${event.organizer_phone}" tal:content="event.organizer_phone" /></dd>
         </tal:b>
 
-        <tal:b condition="event.tags">
+        <tal:b condition="event.tags and show_tags">
             <dt i18n:translate>Tags</dt>
             <dd>
                 <ul class="no-margin-bottom">
                     <li tal:repeat="tag event.tags" i18n:translate>${tag}</li>
+                </ul>
+            </dd>
+        </tal:b>
+
+        <tal:b condition="event.filter_keywords and show_filters">
+            <dt i18n:translate>Filters</dt>
+            <dd>
+                <ul class="no-margin-bottom">
+                    <li tal:repeat="filter event.filter_keywords" i18n:translate>${filter}</li>
                 </ul>
             </dd>
         </tal:b>
@@ -1262,6 +1271,17 @@
                                     </div>
                                     <div class="cell small-11 medium-10">
                                         <div>${occurrence.location}</div>
+                                    </div>
+                                </div>
+                                <hr/>
+                                <div class="grid-x">
+                                    <div class="cell small-11 medium-12">
+                                        <div tal:condition="occurrence.tags and show_tags" class="occurrence-tags">
+                                            <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
+                                        </div>
+                                        <div tal:condition="occurrence.filter_keywords and show_filters" class="occurrence-filter">
+                                            <span tal:repeat="filter occurrence.filter_keywords.items()" class="blank-label">${filter[0].title()}: ${', '.join(item for item in filter[1]) if isinstance(filter[1], list) else filter[1]}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

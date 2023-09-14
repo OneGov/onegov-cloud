@@ -441,12 +441,14 @@ def get_resource_move(app, key, subject, direction, target):
         start=extended_date_converter,
         end=extended_date_converter,
         tags=[],
+        filter_keywords=keywords_converter,
         locations=[],
         search_query=json_converter,
     )
 )
 def get_occurrences(app, request, page=0, range=None, start=None, end=None,
-                    tags=None, locations=None, search=None, search_query=None):
+                    tags=None, filter_keywords=None, locations=None,
+                    search=None, search_query=None):
 
     if not search:
         search = app.settings.org.default_event_search_widget
@@ -464,6 +466,7 @@ def get_occurrences(app, request, page=0, range=None, start=None, end=None,
         start=start,
         end=end,
         tags=tags,
+        filter_keywords=filter_keywords,
         locations=locations,
         only_public=(not request.is_manager),
         search_widget=search_widget,

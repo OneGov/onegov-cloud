@@ -1,23 +1,101 @@
 """ The onegov org collection of images uploaded to the site. """
-
+from collections import defaultdict
 from datetime import date
 from morepath import redirect
 from morepath.request import Response
-from onegov.core.security import Public, Private
+from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
+from onegov.form import as_internal_id
+from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
+    DuplicateLabelError
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
+from onegov.core.elements import Link as CoreLink
 from onegov.org.forms import ExportForm, EventImportForm
+from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
+
+from typing import NamedTuple
+
+
+class Filter(NamedTuple):
+    title: str
+    tags: tuple[CoreLink, ...]
+
+
+def get_filters(request, self, keyword_counts=None, view_name=None):
+    filters = []
+    empty = tuple()
+
+    radio_fields = set(
+        f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
+    )
+
+    def get_count(keyword, value):
+        return keyword_counts.get(keyword, {}).get(value, 0)
+
+    def link_title(field_id, value):
+        if keyword_counts is None:
+            return value
+        count = keyword_counts.get(field_id, {}).get(value, 0)
+        return f'{value} ({count})'
+
+    for keyword, title, values in self.available_filters(sort_choices=False):
+        filters.append(Filter(title=title, tags=tuple(
+            CoreLink(
+                text=link_title(keyword, value),
+                active=value in self.filter_keywords.get(keyword, empty),
+                url=request.link(self.for_filter(
+                    singular=keyword in radio_fields,
+                    **{keyword: value}
+                ), name=view_name),
+                rounded=keyword in radio_fields
+            ) for value in values if get_count(keyword, value)
+        )))
+
+    return filters
+
+
+def keyword_count(request, collection):
+    self = collection
+
+    keywords = tuple(
+        as_internal_id(k) for k in (
+            request.app.org.event_filter_configuration.get('keywords', set)
+        )
+    )
+
+    fields = {f.id: f for f in request.app.org.event_filter_fields if
+              f.id in keywords}
+
+    counts = {}
+    for model in request.exclude_invisible(
+            self.without_keywords_and_tags().query()):
+        for keyword, values in model.filter_keywords.items() if (
+                model.filter_keywords) else ():
+            if keyword in fields:
+                if not isinstance(values, list):
+                    values = [values]
+
+                for value in values:
+                    f_count = counts.setdefault(keyword, defaultdict(int))
+                    f_count[value] += 1
+
+    return counts
 
 
 @OrgApp.html(model=OccurrenceCollection, template='occurrences.pt',
              permission=Public)
 def view_occurrences(self, request, layout=None):
     """ View all occurrences of all events. """
+    filters = None
+    tags = None
+    filter_type = request.app.org.event_filter_type
+    filter_config = request.app.org.event_filter_configuration or dict()
 
     layout = layout or OccurrencesLayout(self, request)
 
@@ -26,13 +104,22 @@ def view_occurrences(self, request, layout=None):
     ]
     translated_tags.sort(key=lambda i: i[1])
 
-    tags = [
-        Link(
-            text=translation + f' ({self.tag_counts[tag]})',
-            url=request.link(self.for_filter(tag=tag)),
-            active=tag in self.tags and 'active' or ''
-        ) for tag, translation in translated_tags
-    ]
+    if (filter_type in ['filters', 'tags_and_filters']
+            and filter_config.get('keywords', None)):
+        self.set_event_filter_configuration(filter_config)
+        self.set_event_filter_fields(request.app.org.event_filter_fields)
+
+        keyword_counts = keyword_count(request, self)
+        filters = get_filters(request, self, keyword_counts)
+
+    if request.app.org.event_filter_type in ['tags', 'tags_and_filters']:
+        tags = [
+            Link(
+                text=translation + f' ({self.tag_counts[tag]})',
+                url=request.link(self.for_filter(tag=tag)),
+                active=tag in self.tags and 'active' or ''
+            ) for tag, translation in translated_tags
+        ]
 
     locations = [
         Link(
@@ -82,9 +169,12 @@ def view_occurrences(self, request, layout=None):
         'start': self.start.isoformat() if self.start else '',
         'ranges': ranges,
         'tags': tags,
+        'filters': filters,
         'locations': locations,
         'title': _('Events'),
         'search_widget': self.search_widget,
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -114,6 +204,63 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
+    }
+
+
+@OrgApp.form(model=OccurrenceCollection, name='edit',
+             template='directory_form.pt', permission=Secret,
+             form=EventConfigurationForm)
+def handle_edit_event_filters(self, request, form, layout=None):
+    try:
+        if form.submitted(request):
+            keywords = form.keyword_fields.data.splitlines()
+            request.app.org.event_filter_configuration = {
+                'order': [],
+                'keywords': keywords
+            }
+            request.app.org.event_filter_definition = form.definition.data
+
+            request.success(_("Your changes were saved"))
+            return request.redirect(request.link(self))
+
+        elif not request.POST:
+            # Store the model data on the form
+            form.definition.data = request.app.org.event_filter_definition
+            form.keyword_fields.data = '\r\n'.join(
+                request.app.org.event_filter_configuration.get('keywords', []))
+
+    except InvalidFormSyntax as e:
+        request.warning(
+            _("Syntax Error in line ${line}", mapping={'line': e.line})
+        )
+    except AttributeError:
+        request.warning(_("Syntax error in form"))
+
+    except MixedTypeError as e:
+        request.warning(
+            _("Syntax error in field ${field_name}",
+              mapping={'field_name': e.field_name})
+        )
+    except DuplicateLabelError as e:
+        request.warning(
+            _("Error: Duplicate label ${label}", mapping={'label': e.label})
+        )
+
+    layout = layout or OccurrencesLayout(self, request)
+    layout.include_code_editor()
+    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.editbar_links = []
+
+    return {
+        'layout': layout,
+        'title': 'Edit Event Filter Configuration',
+        'form': form,
+        'form_width': 'large',
+        'migration': None,
+        'model': self,
+        'error': None,
     }
 
 
@@ -218,7 +365,6 @@ def xml_export_all_occurrences(self, request):
     permission=Private
 )
 def import_occurrences(self, request, form, layout=None):
-
     if form.submitted(request):
         count, errors = form.run_import()
         if errors:
