@@ -560,7 +560,7 @@ class JobsWidget:
     template = """
     <xsl:template match="jobs">
         <div metal:use-macro="layout.macros['jobs-cards']"
-        tal:define="title" '{@title}';
+        tal:define="jobs_card_title '{@jobs_card_title}'"
         />
     </xsl:template>
     """
@@ -574,7 +574,7 @@ class JobsWidget:
         xml_tree = etree.fromstring(xml.encode('utf-8'))
 
         try:
-            rss_feed_url = xml_tree .find(".//jobs").attrib['rss_feed']
+            rss_feed_url = xml_tree.find(".//jobs").attrib['rss_feed']
             rss = requests.get(rss_feed_url, timeout=4).content.decode('utf-8')
             return {'parsed_rss_feed': parse_rss(rss)}
         except Exception:

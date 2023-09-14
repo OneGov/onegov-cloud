@@ -2486,9 +2486,7 @@
 
 
 <metal:jobs define-macro="jobs-cards">
-
-    <div class= "job-widget card aos-init aos-animate" tal:condition="parsed_rss_feed">
-
+    <div class= "job-widget card aos-init aos-animate" tal:condition="parsed_rss_feed and jobs_card_title">
         <div id="pj-widget-container1" class="pj-widget-jobs-container" tal:define="channel parsed_rss_feed">
 
             <style>
@@ -3016,9 +3014,8 @@
 
             </style>
 
-
         <div class="card-section">
-            <h5>${channel.title}</h5>
+            <h5>${jobs_card_title}</h5>
 
             <ul class="pj-widget-job-results pj-widget-list-unstyled pj-widget-list-group" tal:repeat="item channel.items">
                 <li class="list-group-item">
@@ -3026,7 +3023,7 @@
                         <span class="pj-widget-arrow"></span>
                         <div class="pj-widget-row">
                             <div class="pj-widget-col-sm-6 pj-widget-col-xs-12">
-                                <strong>${item.title}</strong>
+                                <div>${item.title}</div>
                                 <div>${item.description}</div>
                             </div>
                             <div class="pj-widget-col-sm-3 pj-widget-col-xs-12">${layout.format_date(item.pubDate, 'date')}</div>
