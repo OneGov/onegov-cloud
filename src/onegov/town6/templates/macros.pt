@@ -2607,18 +2607,11 @@
                         height: 9px;
                     }
 
-                    .pj-widget-input-group .pj-widget-form-control, .pj-widget-input-group-addon, .pj-widget-input-group-btn {
-                        display: table-cell;
-                    }
 
                     .pj-widget-jobmail-container .pj-widget-input-group .pj-widget-form-control {
                         border-radius: 0;
                     }
 
-                    .pj-widget-input-group-btn:last-child > .pj-widget-btn {
-                        border-top-left-radius: 0;
-                        border-bottom-left-radius: 0;
-                    }
 
                     .pj-widget-input-group .pj-widget-form-control:focus {
                         z-index: 3;
