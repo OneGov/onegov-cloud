@@ -2549,9 +2549,6 @@
                         transform: rotate(45deg);
                     }
 
-                    .pj-widget-btn:focus, .pj-widget-btn:hover {
-                        text-decoration: none;
-                    }
 
                     .pj-widget-row {
                         margin-right: -15px;
@@ -2582,16 +2579,6 @@
 
                         .pj-widget-col-sm-6 > p {
                             margin-bottom: 0!important; // additional fix
-                        }
-                    }
-
-                    @media (min-width: 992px) {
-                        .pj-widget-col-md-12 {
-                            width: 100%;
-                        }
-
-                        .pj-widget-col-md-4 {
-                            width: 33.33333333%;
                         }
                     }
 
@@ -2645,55 +2632,6 @@
                         margin-bottom: 0;
                     }
 
-
-                    .pj-widget-input-group-btn:last-child > .pj-widget-btn {
-                        z-index: 2;
-                        margin-left: -1px;
-                    }
-
-                    .pj-widget-input-group-btn > .pj-widget-btn {
-                        position: relative;
-                    }
-
-                    .pj-widget-form-control:focus {
-                        border-color: #66afe9;
-                        outline: 0;
-                        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-                        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-                    }
-
-                    .pj-widget-btn-primary:active:focus {
-                        background-color: #204d74;
-                        border-color: #122b40;
-                    }
-
-                    .pj-widget-job-category option:first-child {
-                        font-weight: bold;
-                    }
-
-                    .pj-widget-sort-btn-container .pj-widget-btn {
-                        border-radius: 0;
-                    }
-
-                    .pj-widget-sort-btn-container .pj-widget-btn:not(:first-child) {
-                        border-left: 0;
-                    }
-
-                    .pj-widget-sort-btn-container .pj-widget-btn:first-child {
-                        border-radius: 4px 0 0 4px;
-                    }
-
-                    .pj-widget-sort-btn-container .pj-widget-btn:last-child {
-                        border-radius: 0 4px 4px 0;
-                    }
-
-                    .pj-widget-sort-btn.active:before {
-                        content: "";
-                        display: inline-block;
-                        margin-right: 5px;
-                        color: gray;
-                    }
-
                     .pj-widget-input-group .pj-widget-form-control:last-child {
                         border-top-left-radius: 0;
                         border-bottom-left-radius: 0;
@@ -2735,10 +2673,6 @@
                         border-radius: 0px !important;
                         background-color: transparent !important;
                         padding-left: 5px !important
-                    }
-
-                    ul.pj-widget-job-results > .list-group-item .pj-widget-row > .job-companyLogo {
-                        display: none;
                     }
 
             </style>
