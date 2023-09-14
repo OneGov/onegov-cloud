@@ -164,6 +164,13 @@ msgstr ""
 "Ein Minimalpreis kann nur gesetzt werden, wenn mindestens ein "
 "kostenpflichtiges Feld definiert ist."
 
+msgid ""
+"Invalid field type for field '{label}'. For filters only 'select' or "
+"'multiple select' fields are allowed."
+msgstr ""
+"Ungültiger Feldtyp für Feld '{label}'. Für Filter sind nur 'Auswahl' "
+"oder 'Mehrfach-Auswahl' Felder erlaubt."
+
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
 

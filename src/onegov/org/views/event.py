@@ -14,6 +14,7 @@ from onegov.org.layout import EventLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
 from uuid import uuid4
@@ -180,8 +181,6 @@ def handle_new_event(self, request, form, layout=None):
     layout = layout or EventLayout(self, request)
     layout.editbar_links = []
 
-    filter_type = request.app.org.event_filter_type
-
     return {
         'layout': layout,
         'title': self.title,
@@ -189,8 +188,8 @@ def handle_new_event(self, request, form, layout=None):
         'form_width': 'large',
         'lead': terms,
         'button_text': _('Continue'),
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -230,8 +229,6 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
     layout.editbar_links = []
     layout.hide_steps = True
 
-    filter_type = request.app.org.event_filter_type
-
     return {
         'layout': layout,
         'title': self.title,
@@ -239,8 +236,8 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
         'form_width': 'large',
         'lead': '',
         'button_text': _('Submit'),
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -322,8 +319,6 @@ def view_event(self, request, layout=None):
 
         return morepath.redirect(request.link(ticket, 'status'))
 
-    filter_type = request.app.org.event_filter_type
-
     return {
         'completable': self.state in ('initiated', 'submitted'),
         'edit_url': request.link(self, 'edit'),
@@ -331,8 +326,8 @@ def view_event(self, request, layout=None):
         'layout': layout or EventLayout(self, request),
         'ticket': ticket,
         'title': self.title,
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 

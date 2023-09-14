@@ -7,6 +7,7 @@ from onegov.org import _
 from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.chat import Message
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
@@ -668,12 +669,11 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
 
     def get_summary(self, request):
         layout = EventLayout(self.event, request)
-        filter_type = request.app.org.event_filter_type
         return render_macro(layout.macros['display_event'], request, {
             'event': self.event,
             'layout': layout,
-            'show_tags': filter_type in ['tags', 'tags_and_filters'],
-            'show_filters': filter_type in ['filters', 'tags_and_filters'],
+            'show_tags': show_tags(request),
+            'show_filters': show_filters(request),
         })
 
     def get_links(self, request):

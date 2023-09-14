@@ -271,7 +271,7 @@ def view_translator(self, request):
     hometown_query = translator_handler_data.with_entities(
         Ticket.handler_data['handler_data']['hometown']
     )
-    hometown = hometown_query.first()
+    hometown = hometown_query.first()[0] if hometown_query.first() else None
 
     return {
         'layout': layout,

@@ -616,6 +616,36 @@ def test_occurrence_collection_range_to_dates():
     ) == (date(2019, 1, 1), date(2019, 1, 31))
 
 
+def test_occurrence_collection_used_tags_tag_count(session):
+    """ Two occurrences one today the second some when in the future."""
+    year = date.today().year
+    month = date.today().month
+    day = date.today().day
+    next = date.today() + timedelta(days=3)
+
+    event = EventCollection(session).add(
+        title='Dampferträffe',
+        start=datetime(year, month, day, 9, 30),
+        end=datetime(year, month, day, 16, 30),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Liebe Dampferfreunde!'
+        },
+        location='Luzern am Quai',
+        tags=['dampfer', 'treffen'],
+        recurrence=f'RDATE:{next.strftime("%Y%m%d")}T000000Z',
+    )
+    event.submit()
+    event.publish()
+    session.flush()
+
+    occurrences = OccurrenceCollection(session, outdated=True)
+
+    assert dict(sorted(occurrences.tag_counts.items())) == {'dampfer': 2,
+                                                            'treffen': 2}
+    assert sorted(occurrences.used_tags) == ['dampfer', 'treffen']
+
+
 def test_unique_names(session):
     events = EventCollection(session)
     added = [

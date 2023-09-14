@@ -245,9 +245,10 @@ class Organisation(Base, TimestampMixin):
 
     @property
     def event_filter_fields(self):
-        @staticmethod
-        @lru_cache(maxsize=1)
-        def fields_from_definition(definition):
-            return tuple(flatten_fieldsets(parse_formcode(definition)))
+        return flatten_event_filter_fields_from_definition(
+            self.event_filter_definition)
 
-        return fields_from_definition(self.event_filter_definition)
+
+@lru_cache(maxsize=64)
+def flatten_event_filter_fields_from_definition(definition):
+    return tuple(flatten_fieldsets(parse_formcode(definition)))

@@ -18,7 +18,7 @@ from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.validators import (
-    FileSizeLimit, ValidPhoneNumber, ValidFormDefinition)
+    FileSizeLimit, ValidPhoneNumber, ValidFilterFormDefinition)
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -444,8 +444,8 @@ class EventForm(Form):
                     continue
 
                 if isinstance(field, (CheckboxField, RadioField)):
-                    form_field.data = keywords[field.id] \
-                        if (field.id in keywords) else None
+                    form_field.data = keywords[field.id] if (
+                        field.id in keywords) else None
 
     @cached_property
     def parsed_dates(self):
@@ -643,7 +643,7 @@ class EventConfigurationForm(Form):
         fieldset=_("General"),
         validators=[
             InputRequired(),
-            ValidFormDefinition(
+            ValidFilterFormDefinition(
                 require_email_field=False,
                 require_title_fields=False,
             )

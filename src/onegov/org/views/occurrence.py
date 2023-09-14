@@ -1,5 +1,4 @@
-""" The onegov org collection of images uploaded to the site. """
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 from datetime import date
 from morepath import redirect
 from morepath.request import Response
@@ -7,21 +6,27 @@ from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.form import as_internal_id
-from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
-    DuplicateLabelError
+from onegov.form.errors import (InvalidFormSyntax, MixedTypeError,
+                                DuplicateLabelError)
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
+from onegov.core.elements import Link as CoreLink
 from onegov.org.forms import ExportForm, EventImportForm
 from onegov.org.forms.event import EventConfigurationForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
 
+from typing import NamedTuple
+
+
+class Filter(NamedTuple):
+    title: str
+    tags: tuple[CoreLink, ...]
+
 
 def get_filters(request, self, keyword_counts=None, view_name=None):
-    from onegov.core.elements import Link
-
-    Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
     empty = tuple()
 
@@ -40,7 +45,7 @@ def get_filters(request, self, keyword_counts=None, view_name=None):
 
     for keyword, title, values in self.available_filters(sort_choices=False):
         filters.append(Filter(title=title, tags=tuple(
-            Link(
+            CoreLink(
                 text=link_title(keyword, value),
                 active=value in self.filter_keywords.get(keyword, empty),
                 url=request.link(self.for_filter(
@@ -167,8 +172,8 @@ def view_occurrences(self, request, layout=None):
         'locations': locations,
         'title': _('Events'),
         'search_widget': self.search_widget,
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -184,7 +189,6 @@ def view_occurrence(self, request, layout=None):
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
     framed = request.GET.get('framed')
-    filter_type = request.app.org.event_filter_type
 
     return {
         'description': description,
@@ -199,8 +203,8 @@ def view_occurrence(self, request, layout=None):
         'overview': request.class_link(OccurrenceCollection),
         'ticket': ticket,
         'title': self.title,
-        'show_tags': filter_type in ['tags', 'tags_and_filters'],
-        'show_filters': filter_type in ['filters', 'tags_and_filters'],
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -210,10 +214,7 @@ def view_occurrence(self, request, layout=None):
 def handle_edit_event_filters(self, request, form, layout=None):
     try:
         if form.submitted(request):
-            keywords = form.keyword_fields.data
-            keywords = keywords.split('\r\n') if '\r\n' in keywords \
-                else [keywords]
-
+            keywords = form.keyword_fields.data.splitlines()
             request.app.org.event_filter_configuration = {
                 'order': [],
                 'keywords': keywords
