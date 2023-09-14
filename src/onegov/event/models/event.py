@@ -377,6 +377,9 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         for start in self.occurrence_dates():
             self.occurrences.append(self.spawn_occurrence(start))
 
+        for occ in self.occurrences:
+            occ.filter_keywords = self.filter_keywords
+
     def submit(self):
         """ Submit the event. """
 

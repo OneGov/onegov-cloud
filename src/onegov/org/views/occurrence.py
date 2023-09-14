@@ -7,8 +7,8 @@ from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.form import as_internal_id
-from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
-    DuplicateLabelError
+from onegov.form.errors import (InvalidFormSyntax, MixedTypeError,
+                                DuplicateLabelError)
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.core.elements import Link as CoreLink

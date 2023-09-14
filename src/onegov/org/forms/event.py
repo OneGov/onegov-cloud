@@ -440,8 +440,8 @@ class EventForm(Form):
                 if form_field is None:
                     continue
 
-                form_field.data = (
-                    keywords)[field.id] if field.id in keywords else None
+                    form_field.data = keywords[field.id] if (
+                        field.id in keywords) else None
 
     @cached_property
     def parsed_dates(self):
