@@ -3037,6 +3037,9 @@
             </ul>
         </div>
       </div>
+
+        <div style="width:100%;display:block;font-size:12px;color:#999999;text-align:center;padding-top:5px;margin-bottom: 2rem;">
+            Jobs bereitgestellt von <a href="https://www.publicjobs.ch/" target="_blank">publicjobs.ch</a></div>
     </div>
 
 </metal:jobs>
