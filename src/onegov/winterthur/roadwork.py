@@ -280,9 +280,12 @@ class RoadworkCollection:
         url = URL(f'odata/Baustellen({int(id)})')\
             .query_param('addGisLink', 'True')
 
-        work = tuple(
-            Roadwork(r) for r in self.client.get(
-                url.as_string()).get('value', ()))
+        try:
+            work = tuple(
+                Roadwork(r) for r in self.client.get(
+                    url.as_string()).get('value', ()))
+        except (RoadworkConnectionError, RoadworkError):
+            work = None
 
         if work:
             return work[0]
