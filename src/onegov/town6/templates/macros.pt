@@ -2491,11 +2491,6 @@
 
             <style>
 
-                    .pj-widget-jobs-container {
-                        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif!important;
-                        font-size: 15px;
-                    }
-
                     .pj-widget-jobs-container * {
                         -webkit-box-sizing: border-box;
                         -moz-box-sizing: border-box;
@@ -2505,16 +2500,6 @@
                     .pj-widget-jobs-container a {
                         color: #337ab7;
                         text-decoration: none;
-                    }
-
-                    .pjw-home-link img {
-                        width: 100px;
-                    }
-
-                    .pjw-home-link {
-                        width: 100%;
-                        display: block;
-                        padding-top: 10px;
                     }
 
                     ul.pj-widget-job-results .list-group-item:nth-child(2n-1) {
@@ -2564,105 +2549,8 @@
                         transform: rotate(45deg);
                     }
 
-                    .pj-widget-form-control {
-                        display: block;
-                        width: 100%;
-                        height: 34px;
-                        padding: 6px 12px;
-                        font-size: 14px;
-                        line-height: 1.42857143;
-                        color: #555;
-                        background-color: #fff;
-                        background-image: none;
-                        border: 1px solid #ccc;
-                        border-radius: 4px;
-                        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-                        box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-                        -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-                        -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-                        transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-                    }
-
-                    .pj-widget-search_query {
-                        border-right: 0;
-                        border-top-right-radius: 0;
-                        border-bottom-right-radius: 0;
-                    }
-
-                    .pj-widget-search_query.pj-widget-form-control {
-                        width: 200px;
-                        display: inline-block;
-                        margin-bottom: 10px;
-                    }
-
-                    .pj-widget-btn {
-                        display: inline-block;
-                        padding: 6px 12px;
-                        margin-bottom: 0;
-                        font-size: 14px;
-                        font-weight: 400;
-                        line-height: 1.42857143;
-                        text-align: center;
-                        white-space: nowrap;
-                        -ms-touch-action: manipulation;
-                        touch-action: manipulation;
-                        cursor: pointer;
-                        -webkit-user-select: none;
-                        -moz-user-select: none;
-                        -ms-user-select: none;
-                        user-select: none;
-                        background-image: none;
-                        border-radius: 4px;
-                        color: #333;
-                        background-color: #fff;
-                        border: 1px solid #ccc;
-                        vertical-align: top;
-                    }
-
                     .pj-widget-btn:focus, .pj-widget-btn:hover {
                         text-decoration: none;
-                    }
-
-                    .pj-widget-search-btn {
-                        border-radius: 0;
-                    }
-
-                    .pj-widget-search-btn:hover, .pj-widget-btn-default:hover {
-                        background-color: #e6e6e6;
-                        border-color: #adadad;
-                    }
-
-                    .pj-widget-btn-default:active, .pj-widget-btn-default:focus {
-                        color: #333;
-                        background-color: #d4d4d4;
-                        border-color: #8c8c8c;
-                    }
-
-                    .pj-widget-btn-default.active {
-                        background-image: none;
-                        color: #333;
-                        background-color: #e6e6e6;
-                        border-color: #adadad;
-                    }
-
-                    .pj-widget-btn.active {
-                        -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-                        box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
-                    }
-
-                    .pj-widget-btn-default.active:hover {
-                        background-color: #d4d4d4;
-                        border-color: #8c8c8c;
-                    }
-
-                    .pj-widget-clear-search-btn {
-                        border-left: 0;
-                        border-top-left-radius: 0;
-                        border-bottom-left-radius: 0;
-                    }
-
-                    .pj-widget-search-btn {
-                        border-radius: 0;
                     }
 
                     .pj-widget-row {
@@ -2694,10 +2582,6 @@
 
                         .pj-widget-col-sm-6 > p {
                             margin-bottom: 0!important; // additional fix
-                        }
-
-                        .pj-widget-col-sm-9 {
-                            width: 75%;
                         }
                     }
 
@@ -2964,14 +2848,6 @@
                         margin-bottom: 0;
                     }
 
-                    .pj-widget-table {
-                        width: 100%;
-                        max-width: 100%;
-                        margin-bottom: 20px;
-                        background-color: transparent;
-                        border-spacing: 0;
-                        border-collapse: 0;
-                    }
 
                     .pj-widget-table > tbody > tr > td {
                         padding: 8px;
@@ -2988,11 +2864,7 @@
                         margin-bottom: 0;
                     }
 
-                    .pj-widget-text-center {
-                        text-align: center;
-                    }
 
-                    .pjw-home-link,
                     .pj-widget-jobs-container > h2 {
                         display: none;
                     }
