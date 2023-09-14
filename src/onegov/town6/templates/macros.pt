@@ -2612,58 +2612,12 @@
                         margin-bottom: 20px;
                     }
 
-                    .pj-widget-pull-right {
-                        float: right;
-                    }
-
                     .pj-widget-arrow {
                         position: absolute;
                         border-top: 3px solid #337ab7;
                         border-right: 3px solid #337ab7;
                         width: 9px;
                         height: 9px;
-                    }
-
-                    .pj-widget-arrow-right {
-                        right: 15px;
-                        transform: rotate(45deg);
-                        bottom: 5px;
-                    }
-
-                    .pj-widget-arrow-left {
-                        transform: rotate(-135deg);
-                        bottom: 5px;
-                        left: 17px;
-                    }
-
-                    .pj-widget-input-group {
-                        position: relative;
-                        display: table;
-                        border-collapse: separate;
-                    }
-
-                    .pj-widget-input-group-addon:first-child {
-                        border-right: 0;
-                        border-top-right-radius: 0;
-                        border-bottom-right-radius: 0;
-                    }
-
-                    .pj-widget-input-group-addon {
-                        padding: 6px 12px;
-                        font-size: 14px;
-                        font-weight: 400;
-                        line-height: 1;
-                        color: #555;
-                        text-align: center;
-                        background-color: #eee;
-                        border: 1px solid #ccc;
-                        border-radius: 4px;
-                    }
-
-                    .pj-widget-input-group-addon, .pj-widget-input-group-btn {
-                        width: 1%;
-                        white-space: nowrap;
-                        vertical-align: middle;
                     }
 
                     .pj-widget-input-group .pj-widget-form-control, .pj-widget-input-group-addon, .pj-widget-input-group-btn {
@@ -2691,11 +2645,6 @@
                         margin-bottom: 0;
                     }
 
-                    .pj-widget-input-group-btn {
-                        position: relative;
-                        font-size: 0;
-                        white-space: nowrap;
-                    }
 
                     .pj-widget-input-group-btn:last-child > .pj-widget-btn {
                         z-index: 2;
@@ -2713,59 +2662,9 @@
                         box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
                     }
 
-                    .pj-widget-btn-primary {
-                        color: #fff;
-                        background-color: #337ab7;
-                        border-color: #2e6da4;
-                    }
-
-                    .pj-widget-btn-primary:hover {
-                        color: #fff;
-                        background-color: #286090;
-                        border-color: #204d74;
-                    }
-
                     .pj-widget-btn-primary:active:focus {
                         background-color: #204d74;
                         border-color: #122b40;
-                    }
-
-                    .pj-widget-talent-pool-btn-container {
-                        text-align: center;
-                        padding-top: 15px;
-                    }
-
-                    .pj-widget-alert {
-                        padding: 15px;
-                        margin-top: 10px;
-                        margin-bottom: 10px;
-                        border: 1px solid transparent;
-                        border-radius: 4px;
-                        display: none;
-                    }
-
-                    .pj-widget-alert-success {
-                        color: #3c763d;
-                        background-color: #dff0d8;
-                        border-color: #d6e9c6;
-                    }
-
-                    .pj-widget-alert-danger {
-                        color: #a94442;
-                        background-color: #f2dede;
-                        border-color: #ebccd1;
-                    }
-
-                    .pj-widget-btn[disabled] {
-                        cursor: not-allowed;
-                        filter: alpha(opacity=65);
-                        -webkit-box-shadow: none;
-                        box-shadow: none;
-                        opacity: .65;
-                    }
-
-                    .pj-widget-form-group {
-                        margin-bottom: 15px;
                     }
 
                     .pj-widget-job-category option:first-child {
@@ -2795,33 +2694,9 @@
                         color: gray;
                     }
 
-                    .pj-widget-sort-btn.active[data-dir="-"]:before {
-                        border-top: 5px solid;
-                        border-left: 4px solid transparent;
-                        border-right: 4px solid transparent;
-                    }
-
-                    .pj-widget-sort-btn.active[data-dir=""]:before {
-                        border-bottom: 5px solid;
-                        border-left: 4px solid transparent;
-                        border-right: 4px solid transparent;
-                    }
-
                     .pj-widget-input-group .pj-widget-form-control:last-child {
                         border-top-left-radius: 0;
                         border-bottom-left-radius: 0;
-                    }
-
-                    .pj-widget-panel {
-                        background-color: #fff;
-                        border: 1px solid transparent;
-                        border-radius: 4px;
-                        -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-                        box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-                    }
-
-                    .pj-widget-panel-default {
-                        border-color: #ddd;
                     }
 
                     .pj-widget-panel-default > .pj-widget-panel-heading {
@@ -2830,19 +2705,6 @@
                         border-color: #ddd;
                     }
 
-                    .pj-widget-panel-heading {
-                        padding: 10px 15px;
-                        border-bottom: 1px solid transparent;
-                        border-top-left-radius: 3px;
-                        border-top-right-radius: 3px;
-                    }
-
-                    .pj-widget-panel-title {
-                        margin-top: 0;
-                        margin-bottom: 0;
-                        font-size: 16px;
-                        color: inherit;
-                    }
 
                     .pj-widget-panel > .table {
                         margin-bottom: 0;
@@ -2864,15 +2726,6 @@
                         margin-bottom: 0;
                     }
 
-
-                    .pj-widget-jobs-container > h2 {
-                        display: none;
-                    }
-
-                    #portal_wrapper > .container-fluid > .row > .dynpg_A_content, .pj-widget-jobs-container {
-                        font-family: "Raleway", sans-serif;
-                        line-height: 20px;
-                    }
 
                     ul.pj-widget-job-results > .list-group-item {
                         border-top-color: #009476 !important;
