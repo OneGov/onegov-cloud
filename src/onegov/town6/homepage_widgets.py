@@ -560,32 +560,49 @@ class JobsWidget:
     template = """
     <xsl:template match="jobs">
         <div metal:use-macro="layout.macros['jobs-cards']"
-        tal:define="jobs_card_title '{@jobs_card_title}'"
+        tal:define="jobs_card_title '{@jobs_card_title}';
+        rss_feed '{@rss_feed}';
+        "
         />
     </xsl:template>
     """
 
+    def __init__(self):
+        self.layout = None
+
     def should_cache_fn(self, response):
         return response.status_code == 200
 
-    def get_variables(self, layout: 'HomepageLayout'):
+    def dynamic_rss_widget_builder(self, rss_feed_url):
+        """ Builds and caches widget data from the given RSS URL.
+        Note that this is called within the <?python> tag in the macro.
+
+        This is done so we can get the ``rss_feed_url`` which itself is a
+        dependency to build the actual widget.
+
+        On exception, returns an empty string and the widget isn't rendered.
+        """
 
         try:
-            app = layout.request.app
+            app = self.layout.request.app
 
-            # Avoid making a new request each time by caching the RSS feed
             response = app.cache.get_or_create(
                 'jobs_rss_feed',
-                creator=lambda: requests.get(layout.rss_feed_url, timeout=4),
+                creator=lambda: requests.get(rss_feed_url, timeout=4),
                 expiration_time=3600,
                 should_cache_fn=self.should_cache_fn
             )
             rss = response.content.decode('utf-8')
             parsed = parsed_rss(rss)
+            return parsed
 
-            return {'parsed_rss_feed': parsed}
         except Exception:
-            return {'parsed_rss_feed': ''}
+            return ''
+
+    def get_variables(self, layout: 'HomepageLayout'):
+
+        self.layout = layout
+        return {'dynamic_rss_widget_builder': self.dynamic_rss_widget_builder}
 
 
 class RSSItem(NamedTuple):

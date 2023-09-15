@@ -1,5 +1,4 @@
 from collections import namedtuple
-from lxml import etree
 
 from dateutil.rrule import rrulestr
 from dateutil import rrule
@@ -33,7 +32,6 @@ from onegov.ticket import TicketCollection
 from onegov.town6 import _
 from onegov.core.elements import Link, Block, Confirm, Intercooler, LinkGroup
 from onegov.core.static import StaticFile
-from onegov.core.widgets import XML_BASE
 from onegov.town6.theme import user_options
 from onegov.org.layout import (
     Layout as OrgLayout, AdjacencyListMixin,
@@ -2448,11 +2446,3 @@ class HomepageLayout(DefaultLayout):
                     ),
                 ),
             ]
-
-    @cached_property
-    def rss_feed_url(self):
-        structure = self.org.meta.get('homepage_structure')
-        xml = XML_BASE.format(structure)
-        xml_tree = etree.fromstring(xml.encode('utf-8'))
-        rss_feed_url = xml_tree.find(".//jobs").attrib['rss_feed']
-        return rss_feed_url
