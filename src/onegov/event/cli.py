@@ -301,8 +301,11 @@ def import_json(group_context, url, tagmap, clear):
 @click.argument('ical', type=click.File())
 @click.option('--future-events-only', is_flag=True, default=False)
 @click.option('--event-image', type=click.File('rb'))
+@click.option("--cat", "-c", 'categories', type=str, multiple=True)
+@click.option("--fil", "-f", 'keyword_filters', type=(str, str),
+              multiple=True)
 def import_ical(group_context, ical, future_events_only=False,
-                event_image=None):
+                event_image=None, categories=None, keyword_filters=None):
     """ Imports events from an iCalendar file.
 
     Example:
@@ -315,12 +318,28 @@ def import_ical(group_context, ical, future_events_only=False,
         onegov-event --select '/veranstaltungen/zug' import-ical import.ics
         --event-image /path/to/image.jpg
 
+        onegov-event --select /onegov_winterthur/winterthur import-ical
+        ./basic.ics --future-events-only --event-image
+        ~/Veranstaltung_breit.jpg -c Sport -c Fussball
+
+        onegov-event --select /onegov_winterthur/winterthur import-ical
+        ./basic.ics --future-events-only --event-image
+        ~/Veranstaltung_breit.jpg -f "kalender" "Sport Veranstaltungskalender"
+
     """
+    cat = list()
+    for e in categories:
+        cat.append(e)
+    filters = dict()
+    for k, v in keyword_filters:
+        filters[k] = v
 
     def _import_ical(request, app):
         collection = EventCollection(app.session())
-        added, updated, purged = \
-            collection.from_ical(ical.read(), future_events_only, event_image)
+        added, updated, purged = collection.from_ical(
+            ical.read(), future_events_only, event_image,
+            default_categories=cat, default_filter_keywords=filters,
+        )
         click.secho(
             f"Events successfully imported "
             f"({len(added)} added, {len(updated)} updated, "
