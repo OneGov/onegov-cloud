@@ -55,15 +55,15 @@
 
 <metal:navigation define-macro="side-navigation-nested">
     <a tal:condition="children">
-        <span data-click-target="${link.attrs['href']}">${link.text}</span>
+        <div class="navlink"><span data-click-target="${link.attrs['href']}">${link.text}</span>
         <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
-        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/></div>
     </a>
     <tal:b tal:condition="not: children">
         <a href="${link.attrs['href']}">
-            <span>${link.text}</span>
+            <div class="navlink"><span>${link.text}</span>
             <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
-            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/></div>
         </a>
     </tal:b>
     <ul class="vertical menu nested"  tal:condition="children">
@@ -84,6 +84,35 @@
     </ul>
 </metal:navigation>
 
+
+<metal:header_links define-macro="header_links">
+    <div id="header_links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
+        <div class="grid-container">
+            <div class="title-bar align-center" data-responsive-toggle="animated-menu" data-hide-for="medium">
+                <button type="button" data-toggle><i class="fa fa-bars"></i> </button>
+                </div>
+
+                <div class="top-bar" id="animated-menu">
+                <div class="top-bar-left">
+                    <ul class="dropdown menu align-center" data-dropdown-menu>
+                        <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</metal:header_links>
+
+<metal:header-text define-macro="header-text">
+    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+        <div class="grid-container">
+            <a class="h4" href="${header_options.get('left_header_url', '#')}"
+                style="color:${color or '#fff'}; font-size: ${rem_size}rem">
+                    ${header_options['left_header_name']}
+            </a>
+        </div>
+    </div>
+</metal:header-text>
 
 <metal:editbar define-macro="dropdown-editbar">
     <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links|layout.editbar_links">

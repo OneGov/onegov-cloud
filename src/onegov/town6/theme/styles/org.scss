@@ -102,6 +102,7 @@ html {
     scroll-behavior: smooth;
 }
 
+
 .off-canvas-content {
     display: flex;
     flex-direction: column;
@@ -989,21 +990,6 @@ ul.recipients {
         color: $white;
     }
 }
-
-#offCanvasSidebar {
-    background: $white;
-    padding: 2rem;
-    z-index: 1000;
-}
-
-$offcanvas-sizes: (
-    small: 90vw,
-    medium: 350px,
-);
-$offcanvas-vertical-sizes: (
-    small: 90vw,
-    medium: 350px,
-);
 
 .rotate {
     -moz-transition: all 200ms linear;

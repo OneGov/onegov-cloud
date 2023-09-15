@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-08-30 15:12+0200\n"
+"POT-Creation-Date: 2023-09-13 12:02+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -681,23 +681,17 @@ msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 
+msgid "Search term"
+msgstr "Suchbegriff"
+
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
-
-msgid "Straight to ..."
-msgstr "Direkt zu ..."
 
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
 
 msgid "Logo"
 msgstr "Logo"
-
-msgid "Search term"
-msgstr "Suchbegriff"
-
-msgid "Perform Search"
-msgstr "Suchen"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -2144,6 +2138,12 @@ msgstr "Migration Links"
 
 msgid "OneGov API"
 msgstr "OneGov API"
+
+#~ msgid "Straight to ..."
+#~ msgstr "Direkt zu ..."
+
+#~ msgid "Perform Search"
+#~ msgstr "Suchen"
 
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "Das OneGov Cloud Team"

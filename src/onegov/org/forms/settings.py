@@ -433,29 +433,35 @@ class HeaderSettingsForm(Form):
     )
 
     left_header_name = StringField(
-        label=_("Name"),
+        label=_("Text"),
         description=_(""),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side")
     )
 
     left_header_url = URLField(
         label=_("URL"),
         description=_("Optional"),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side")
     )
 
     left_header_color = ColorField(
         label=_("Font color"),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side")
     )
 
     left_header_rem = FloatField(
         label=_("Relative font size"),
-        fieldset=_("Title header left side"),
+        fieldset=_("Text header left side"),
         validators=[
             NumberRange(0.5, 7)
         ],
         default=1
+    )
+
+    header_additions_fixed = BooleanField(
+        label=_(
+            "Keep header links and/or header text fixed to top on scrolling"),
+        fieldset=_("Header fixation")
     )
 
     @property
@@ -469,8 +475,10 @@ class HeaderSettingsForm(Form):
             'announcement': self.announcement.data,
             'announcement_url': self.announcement_url.data,
             'announcement_bg_color': self.announcement_bg_color.data,
-            'announcement_font_color': self.announcement_font_color.data,
-            'announcement_is_private': self.announcement_is_private.data
+            'announcement_font_color':
+            self.announcement_font_color.data,
+            'announcement_is_private': self.announcement_is_private.data,
+            'header_additions_fixed': self.header_additions_fixed.data
         }
 
     @header_options.setter
@@ -496,6 +504,8 @@ class HeaderSettingsForm(Form):
             'announcement_font_color', '#000000')
         self.announcement_is_private.data = options.get(
             'announcement_is_private', "")
+        self.header_additions_fixed.data = options.get(
+            'header_additions_fixed', "")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

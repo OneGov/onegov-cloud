@@ -16,7 +16,7 @@ if (document.getElementById("autoplay-video")) {
     }
 
     // Once only one video remains
-    if (document.getElementsByClassName("homepage-video").length ==1) {
+    if (document.getElementsByClassName("homepage-video").length) {
 
         // Resize spacer
         var vid = document.querySelector('#autoplay-video');
