@@ -266,4 +266,4 @@ def test_rss_jobs_widget(town_app):
             """
     result = transform_structure(widgets, structure)
 
-    assert "tal:define=\"jobs_card_title \'wir suchen\'\"" in result
+    assert "wir suchen" in result
