@@ -641,6 +641,17 @@ class ModuleSettingsForm(Form):
         label=_("Values of the location filter"),
         fieldset=_("Events"),)
 
+    event_filter_type = RadioField(
+        label=_('Choose the filter type for events (default is \'tags\')'),
+        choices=(
+            ('tags', _('A predefined set of tags')),
+            ('filters', _('Manually configurable filters')),
+            ('tags_and_filters', _('Both, predefined tags as well as '
+                                   'configurable filters')),
+        ),
+        default='tags'
+    )
+
 
 class MapSettingsForm(Form):
 

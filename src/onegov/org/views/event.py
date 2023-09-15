@@ -5,6 +5,7 @@ from morepath.request import Response
 from onegov.core.crypto import random_token
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
+from onegov.form import merge_forms, parse_form
 from onegov.org import _, OrgApp
 from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
@@ -13,6 +14,7 @@ from onegov.org.layout import EventLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import TicketCollection
 from sedate import utcnow
 from uuid import uuid4
@@ -62,6 +64,16 @@ def event_form(model, request, form=None):
         # unlike typical extended models, the property of this is defined
         # on the event model, while we are only using the form extension part
         # here
+        if request.app.org.event_filter_type in ['filters',
+                                                 'tags_and_filters']:
+            # merge event filter form
+            if request.app.org.event_filter_definition:
+                form = merge_forms(form or EventForm, parse_form(
+                    request.app.org.event_filter_definition))
+
+        if request.app.org.event_filter_type == 'filters':
+            # prevent showing tags
+            form.tags = None
         return AccessExtension().extend_form(form or EventForm, request)
 
     return form or EventForm
@@ -175,7 +187,9 @@ def handle_new_event(self, request, form, layout=None):
         'form': form,
         'form_width': 'large',
         'lead': terms,
-        'button_text': _('Continue')
+        'button_text': _('Continue'),
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -221,7 +235,9 @@ def handle_new_event_without_workflow(self, request, form, layout=None):
         'form': form,
         'form_width': 'large',
         'lead': '',
-        'button_text': _('Submit')
+        'button_text': _('Submit'),
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -310,6 +326,8 @@ def view_event(self, request, layout=None):
         'layout': layout or EventLayout(self, request),
         'ticket': ticket,
         'title': self.title,
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 

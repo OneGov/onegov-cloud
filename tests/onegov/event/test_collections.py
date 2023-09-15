@@ -1,6 +1,8 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+
+from fastcache import lru_cache
 from freezegun import freeze_time
 from markupsafe import escape
 
@@ -9,6 +11,7 @@ from onegov.event import EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
+from onegov.form import parse_formcode, flatten_fieldsets
 from onegov.gis import Coordinates
 from sedate import replace_timezone
 from sedate import standardize_date
@@ -393,28 +396,50 @@ def test_occurrence_collection_pagination(session):
                 for o in occurrences.batch])
 
 
-def test_occurrence_collection_for_filter():
-    occurrences = OccurrenceCollection(None).for_filter()
+def test_occurrence_collection_for_filter(session):
+    config = {'keywords': ['Filter'], 'order': []}
+    definition = """Filter *=
+    ( ) Filter A
+    ( ) Filter B
+    ( ) Filter C
+    """
+
+    @lru_cache(maxsize=1)
+    def fields_from_definition(definition):
+        return tuple(flatten_fieldsets(parse_formcode(definition)))
+
+    def set_event_filter_config_and_fields(collection, config, definition):
+        collection.set_event_filter_configuration(config)
+        collection.set_event_filter_fields(fields_from_definition(definition))
+
+    occurrences = OccurrenceCollection(session=session)
+
+    occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start is None
     assert occurrences.end is None
     assert occurrences.outdated is False
     assert occurrences.tags == []
     assert occurrences.locations == []
+    assert occurrences.filter_keywords == {}
 
     occurrences = OccurrenceCollection(
-        None,
+        session=session,
         start=date(2009, 5, 1),
         end=date(2009, 6, 30),
         tags=['month-6'],
-        locations=['Bar']
-    ).for_filter()
+        locations=['Bar'],
+        filter_keywords={'filter': ['Filter A']}
+    )
+    set_event_filter_config_and_fields(occurrences, config, definition)
+    occurrences = occurrences.for_filter()
     assert occurrences.range is None
     assert occurrences.start == date(2009, 5, 1)
     assert occurrences.end == date(2009, 6, 30)
     assert occurrences.outdated is False
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
+    assert occurrences.filter_keywords == {'filter': ['Filter A']}
 
     occurrences = occurrences.for_filter(start=date(2010, 5, 1))
     assert occurrences.range is None
@@ -423,6 +448,7 @@ def test_occurrence_collection_for_filter():
     assert occurrences.outdated is False
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
+    assert occurrences.filter_keywords == {'filter': ['Filter A']}
 
     occurrences = occurrences.for_filter(end=None, outdated=True)
     assert occurrences.range is None
@@ -431,38 +457,47 @@ def test_occurrence_collection_for_filter():
     assert occurrences.outdated is True
     assert occurrences.tags == ['month-6']
     assert occurrences.locations == ['Bar']
+    assert occurrences.filter_keywords == {'filter': ['Filter A']}
 
-    occurrences = occurrences.for_filter(tags=[], locations=[])
+    occurrences = occurrences.for_filter(tags=[], locations=[],
+                                         filter='Filter B', singular=True)
     assert occurrences.range is None
     assert occurrences.start == date(2010, 5, 1)
     assert occurrences.end is None
     assert occurrences.outdated is True
     assert occurrences.tags == []
     assert occurrences.locations == []
+    assert occurrences.filter_keywords == {'filter': ['Filter B']}
 
-    occurrences = occurrences.for_filter(tags=['a', 'b'], locations=['A', 'B'])
+    occurrences = occurrences.for_filter(tags=['a', 'b'], locations=['A', 'B'],
+                                         filter='Filter B', singular=True)
     assert occurrences.range is None
     assert occurrences.start == date(2010, 5, 1)
     assert occurrences.end is None
     assert occurrences.outdated is True
     assert occurrences.tags == ['a', 'b']
     assert occurrences.locations == ['A', 'B']
+    assert occurrences.filter_keywords == {}
 
-    occurrences = occurrences.for_filter(tag='c', location='C', range='today')
+    occurrences = occurrences.for_filter(tag='c', location='C', range='today',
+                                         filter='Filter C', singular=True)
     assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
     assert occurrences.tags == ['a', 'b', 'c']
     assert occurrences.locations == ['A', 'B', 'C']
+    assert occurrences.filter_keywords == {'filter': ['Filter C']}
 
-    occurrences = occurrences.for_filter(tag='a', location='A')
+    occurrences = occurrences.for_filter(tag='a', location='A',
+                                         filter='Filter X', singular=True)
     assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(range='today', start=date(2010, 5, 1))
     assert occurrences.range == 'today'
@@ -471,6 +506,7 @@ def test_occurrence_collection_for_filter():
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(start=date(2010, 5, 1))
     assert occurrences.range is None
@@ -479,6 +515,7 @@ def test_occurrence_collection_for_filter():
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
     occurrences = occurrences.for_filter(range='-', end=date(2010, 5, 1))
     assert occurrences.range is None
@@ -487,6 +524,7 @@ def test_occurrence_collection_for_filter():
     assert occurrences.outdated is True
     assert occurrences.tags == ['b', 'c']
     assert occurrences.locations == ['B', 'C']
+    assert occurrences.filter_keywords == {'filter': ['Filter X']}
 
 
 def test_occurrence_collection_outdated(session):
@@ -1324,7 +1362,7 @@ def test_from_ical(session):
     ]))
     transaction.commit()
     event = events.query().one()
-    assert event.tags == ['']
+    assert event.tags == []
 
     # no category -> default category
     events.from_ical('\n'.join([
@@ -1348,3 +1386,29 @@ def test_from_ical(session):
     transaction.commit()
     event = events.query().one()
     assert sorted(event.tags) == ['Sport']
+    assert event.filter_keywords == None
+
+    # default keywords
+    events.from_ical('\n'.join([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:<b>Squirrel Park Tour</b>',
+        'UID:squirrel-park-visit@onegov.event',
+        f'DTSTART;VALUE=DATE:{next_year}0616',
+        f'DTEND;VALUE=DATE:{next_year}0616',
+        'DESCRIPTION:<em>Furri</em> things will happen!',
+        'LAST-MODIFIED:20140101T000000Z',
+        'LOCATION:<i>Squirrel Par</i>',
+        'ORGANIZER:<Super ME>',
+        'GEO:48.051752750515746;9.305739625357093',
+        'URL:https://example.org/event/squirrel-park-visit',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ]), default_filter_keywords=dict(kalender='Sport Veranstaltungskalender'))
+    transaction.commit()
+    event = events.query().one()
+    assert sorted(event.tags) == []
+    assert (event.filter_keywords == dict(
+        kalender='Sport Veranstaltungskalender'))

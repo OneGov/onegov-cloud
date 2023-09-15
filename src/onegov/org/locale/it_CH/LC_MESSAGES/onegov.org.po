@@ -5363,9 +5363,14 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr ""
-#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
+msgid "Choose the filter type for events (default is 'tags')"
+msgstr "Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è 'tag')"
 
-#~ msgid "Title header left side"
-#~ msgstr "Lato sinistro dell'intestazione del titolo"
+msgid "A predefined set of tags"
+msgstr "Un insieme predefinito di tag"
+
+msgid "Manually configurable filters"
+msgstr "Filtri configurabili manualmente"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Entrambi, tag predefiniti e filtri configurabili"

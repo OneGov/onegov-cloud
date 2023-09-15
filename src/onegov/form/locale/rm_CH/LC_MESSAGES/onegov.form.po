@@ -153,6 +153,11 @@ msgid ""
 "defined."
 msgstr ""
 
+msgid ""
+"Invalid field type for field '{label}'. For filters only 'select' or "
+"'multiple select' fields are allowed."
+msgstr ""
+
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
 

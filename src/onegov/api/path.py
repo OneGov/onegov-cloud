@@ -5,11 +5,16 @@ from onegov.api.models import ApiEndpointItem
 from onegov.api.models import ApiException
 
 
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core import Framework
+
+
 @ApiApp.path(
     model=ApiEndpointCollection,
     path='/api'
 )
-def get_api_endpoints(app):
+def get_api_endpoints(app: 'Framework') -> ApiEndpointCollection:
     return ApiEndpointCollection(app)
 
 
@@ -18,7 +23,13 @@ def get_api_endpoints(app):
     path='/api/{endpoint}',
     converters=dict(page=int)
 )
-def get_api_endpoint(app, endpoint, page=0, extra_parameters=None):
+def get_api_endpoint(
+    app: 'Framework',
+    endpoint: str,
+    page: int = 0,
+    extra_parameters: dict[str, Any] | None = None,
+) -> 'ApiEndpoint[Any] | AuthEndpoint':
+
     if endpoint == 'authenticate':
         return AuthEndpoint(app)
 
@@ -32,8 +43,10 @@ def get_api_endpoint(app, endpoint, page=0, extra_parameters=None):
     model=ApiEndpointItem,
     path='/api/{endpoint}/{id}',
 )
-def get_api_endpoint_item(app, endpoint, id):
-    item = ApiEndpointItem(app, endpoint, id)
-    if not item.api_endpoint or not item.item:
+def get_api_endpoint_item(
+    app: 'Framework', endpoint: str, id: str
+) -> ApiEndpointItem[Any]:
+    item: ApiEndpointItem[Any] = ApiEndpointItem(app, endpoint, id)
+    if not item.api_endpoint or not item.item:  # for ex. ExtendedAgency
         raise ApiException('Not found', status_code=404)
     return item

@@ -1063,3 +1063,43 @@ def test_edit_page_people_function_is_displayed(client, session):
     new_page = client.get('/editor/new/page/1')
     default_function = new_page.form['people_' + person.id.hex + '_function']
     assert default_function.value == 'President'
+
+
+def test_event_configuration_validation(client):
+    """
+    Tests ValidFilterFormDefinition only allows Radio and Checkbox
+    fields.
+    """
+
+    client.login_admin()
+
+    page = client.get('/events/+edit')
+    page.form['definition'] = """
+    Kalender *=
+        ( ) Sport Veranstaltungskalender
+        ( ) Agenda Verkehrsgarten
+    Sportart =
+        [ ] Volleyball
+        [ ] Walking
+    Email Adresse = @@@
+    """
+    page.form['keyword_fields'] = ['kalender', 'sportart']
+    page = page.form.submit()
+    assert 'Invalid field type for field \'Email Adresse\'.' in page
+
+    # test multiple errors
+    page = client.get('/events/+edit')
+    page.form['definition'] = """
+    Kalender *=
+        ( ) Sport Veranstaltungskalender
+        ( ) Agenda Verkehrsgarten
+    Text = ___
+    Sportart =
+        [ ] Volleyball
+        [ ] Walking
+    Webpage = https://srf.ch
+    """
+    page.form['keyword_fields'] = ['kalender', 'sportart']
+    page = page.form.submit()
+    assert 'Invalid field type for field \'Text\'.' in page
+    assert 'Invalid field type for field \'Webpage\'.' in page
