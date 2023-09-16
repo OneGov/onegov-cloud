@@ -532,3 +532,12 @@ class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
             kwargs.setdefault('max', max_date.isoformat() + 'T23:59')
 
         return super().__call__(field, **kwargs)
+
+
+class TypeAheadInput(TextInput):
+    """ A widget with typeahead. """
+
+    def __call__(self, field: 'Field', **kwargs: Any) -> Markup:
+        field.meta.request.include('typeahead-standalone')
+        kwargs['class_'] = (kwargs.get('class_', '') + ' typeaheadstd').strip()
+        return super().__call__(field, **kwargs)

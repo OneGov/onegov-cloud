@@ -21,6 +21,7 @@ from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import TextAreaWithTextModules
+from onegov.form.widgets import TypeAheadInput
 from onegov.form.widgets import UploadWidget
 from onegov.form.widgets import UploadMultipleWidget
 from webcolors import name_to_hex, normalize_hex
@@ -699,3 +700,21 @@ class ColorField(StringField):
             return
 
         self.data = self.coerce(valuelist[0])
+
+
+class TypeAheadField(StringField):
+    """ A string field with typeahead. """
+
+    url: 'Callable[[DefaultMeta], str | None] | str | None'
+
+    widget = TypeAheadInput()
+
+    def __init__(
+        self,
+        *args: Any,
+        url: 'Callable[[DefaultMeta], str | None] | str | None' = None,
+        **kwargs: Any
+    ):
+        self.url = url
+
+        super().__init__(*args, **kwargs)

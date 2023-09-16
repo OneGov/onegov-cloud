@@ -1,5 +1,6 @@
 from onegov.election_day import _
 from onegov.form.fields import UploadField
+from onegov.form.fields import TypeAheadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
@@ -33,16 +34,18 @@ class VotumForm(NamedFileForm):
         default=list(STATES.keys())[0]
     )
 
-    person_name = StringField(
+    person_name = TypeAheadField(
         label=_('Name'),
         fieldset=_('Person'),
-        render_kw={'rows': 5}
+        url=lambda meta: meta.request.link(
+            meta.request.app.org,
+            name='person-names'
+        )
     )
 
     person_function = StringField(
         label=_('Function, Place & Party or parliamentary group'),
-        fieldset=_('Person'),
-        render_kw={'rows': 5}
+        fieldset=_('Person')
     )
 
     person_picture = UploadField(
