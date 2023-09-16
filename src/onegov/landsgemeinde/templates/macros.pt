@@ -77,6 +77,7 @@
 <metal:votum define-macro="votum" i18n:domain="onegov.landsgemeinde">
     <div tal:condition="request.is_logged_in or votum.state != 'scheduled'" id="votum-${votum.number}" class="votum ${votum.state}" tal:define="thumbnail request.link(votum.person_picture, 'thumbnail')|None; modal f'modal-{votum.agenda_item.number}-{votum.number}'">
         <div metal:use-macro="layout.macros['dropdown-editbar']" tal:define="editbar_links layout.editbar_links_for_votum(votum)"></div>
+        <tal:block tal:condition="request.is_logged_in" metal:use-macro="layout.macros['state']" tal:define="state votum.state"/>
         <div tal:condition="thumbnail or votum.video_url" class="reveal small person-reveal" id="${modal}" data-reveal="" data-reveal-width="${votum.person_picture.reference.size[0]|'50%'}">
             <button class="close-button" data-close="" i18n:attributes="aria-label" aria-label="Close" type="button">
                 <span aria-hidden="true">&times;</span>
@@ -89,39 +90,42 @@
         </div>
         <div class="person-card person-list-card">
             <span href="#votum-${votum.number}" tal:attributes="data-open modal if thumbnail or votum.video_url else None">
-                <div class="person-card-portrait">
-                    <i class="fa fa-user" tal:condition="not:thumbnail"></i>
-                    <div class="cover-image" tal:condition="thumbnail" style='background-image: url("${thumbnail}");'></div>
+                <div class="person-card-portrait" tal:condition="thumbnail">
+                    <div class="cover-image" style='background-image: url("${thumbnail}");'></div>
                 </div>
             </span>
             <ul>
                 <li tal:condition="votum.person_name" class="person-card-title">
                     <span>${votum.person_name}</span>
                 </li>
-                <li tal:condition="votum.person_function" class="person-card-function">
-                    ${votum.person_function}
-                </li>
-                <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
-                    ${votum.person_political_affiliation}
-                </li>
-                <li tal:condition="votum.person_place" class="person-card-place">
-                    ${votum.person_place}
+                <li tal:condition="votum.person_details" class="person-card-function">
+                    ${votum.person_details}
                 </li>
             </ul>
         </div>
-        <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
-        <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
-        <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
-    </div>
+        <blockquote class="votum-content" tal:condition="votum.text">
+            <tal:b tal:content="structure votum.text"/>
+        </blockquote>
+        <blockquote class="votum-motion" tal:condition="votum.motion">
+            <span i18n:translate="">Motion</span><br/>
+            <tal:b tal:content="structure votum.motion"></tal:b>
+        </blockquote>
+        <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
+            <span i18n:translate="">Statement of reasons</span><br/>
+            <tal:b tal:content="structure votum.statement_of_reasons"></tal:b>
+        </blockquote>
+        </div>
 </metal:votum>
 
 <metal:ticker-agenda-item define-macro="ticker-agenda-item" i18n:domain="onegov.landsgemeinde">
     <div class="ticker-item ticker-item-agenda-item ${agenda_item.state}" id="agenda-item-${agenda_item.number}">
-        <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
-
-        <p tal:condition="agenda_item.last_modified" class="subheader agenda-item-timestamp"><tal:block i18n:translate>Updated:</tal:block> ${layout.format_date(agenda_item.last_modified, 'datetime')}</p>
+        <div class="ticker-info">
+            <h2><tal:block metal:use-macro="layout.macros['agenda-item-title']" /></h2>
+            <p tal:condition="agenda_item.last_modified" class="subheader agenda-item-timestamp"><span><i class="far fa-clock"></i> ${layout.format_date(agenda_item.last_modified, 'time')}</span></p>
+        </div>
 
         <div class="callout secondary agenda-item-resolution" tal:condition="agenda_item.resolution or agenda_item.tacitly_accepted">
+            <strong i18n:translate="">Resolution</strong>
             <tal:block tal:content="structure agenda_item.resolution">
             <p tal:condition="agenda_item.tacitly_accepted" i18n:translate="">Tacitly accepted</p>
         </div>
@@ -134,29 +138,29 @@
             <tal:block tal:repeat="votum reversed(agenda_item.vota)">
                 <div class="ticker-item ticker-votum ${votum.state}">
                     <div class="person-card person-list-card" tal:define="url request.link(votum.person_picture, 'thumbnail')|None">
-                            <div class="person-card-portrait">
-                                <i class="fa fa-user" tal:condition="not:url"></i>
-                                <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                            <div class="person-card-portrait" tal:condition="url" >
+                                <div class="cover-image" style='background-image: url("${url}");'></div>
                             </div>
-                        <ul>
-                            <li class="person-card-title" tal:condition="votum.person_name">
-                                <span>${votum.person_name}</span>
-                            </li>
-                            <li tal:condition="votum.person_function" class="person-card-function">
-                                ${votum.person_function}
-                            </li>
-                            <li tal:condition="votum.person_political_affiliation" class="person-card-political-affiliation">
-                                ${votum.person_political_affiliation}
-                            </li>
-                            <li tal:condition="votum.person_place" class="person-card-place">
-                                ${votum.person_place}
-                            </li>
-                        </ul>
-
+                            <ul>
+                                <li tal:condition="votum.person_name" class="person-card-title">
+                                    <span>${votum.person_name}</span>
+                                </li>
+                                <li tal:condition="votum.person_details" class="person-card-function">
+                                    ${votum.person_details}
+                                </li>
+                            </ul>
                     </div>
-                    <blockquote class="votum-content" tal:condition="votum.text" tal:content="structure votum.text">
-                    <blockquote class="votum-motion" tal:condition="votum.motion" tal:content="structure votum.motion" />
-                    <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons" tal:content="structure votum.statement_of_reasons" />
+                    <blockquote class="votum-content" tal:condition="votum.text">
+                        <tal:b tal:content="structure votum.text"/>
+                    </blockquote>
+                    <blockquote class="votum-motion" tal:condition="votum.motion">
+                        <span i18n:translate="">Motion</span><br/>
+                        <tal:b tal:content="structure votum.motion"></tal:b>
+                    </blockquote>
+                    <blockquote class="votum-statement-of-reasons" tal:condition="votum.statement_of_reasons">
+                        <span i18n:translate="">Statement of reasons</span><br/>
+                        <tal:b tal:content="structure votum.statement_of_reasons"></tal:b>
+                    </blockquote>
                 </div>
             </tal:block>
         </div>
