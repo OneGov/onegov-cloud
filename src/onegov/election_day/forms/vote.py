@@ -15,6 +15,8 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
@@ -184,7 +186,8 @@ class VoteForm(Form):
 
     related_link = URLField(
         label=_("Link"),
-        fieldset=_("Related link")
+        fieldset=_("Related link"),
+        validators=[URL(), Optional()]
     )
 
     related_link_label_de = StringField(
