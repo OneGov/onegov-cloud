@@ -2,11 +2,12 @@ import pytest
 
 from depot.manager import DepotManager
 from onegov.core import Framework
+from onegov.core.framework import default_content_security_policy
 from onegov.form import FormApp
 from onegov.form.extensions import form_extensions
-from tests.shared.utils import create_app
-from pytest_localserver.http import WSGIServer
 from onegov.form.utils import disable_required_attribute_in_html_inputs
+from pytest_localserver.http import WSGIServer
+from tests.shared.utils import create_app
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -52,6 +53,12 @@ def form_app(request):
 
     class Content:
         pass
+
+    @TestApp.setting(section='content_security_policy', name='default')
+    def get_content_security_policy():
+        policy = default_content_security_policy()
+        policy.script_src.add('https://unpkg.com')
+        return policy
 
     @TestApp.path(path='/snippets')
     class Snippets(Content):
