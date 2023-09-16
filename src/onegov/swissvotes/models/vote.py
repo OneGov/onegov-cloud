@@ -680,7 +680,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     easyvote_booklet = LocalizedFile(
-        label=_('Explanatory brochure by Easyvote'),
+        label=_('Explanatory brochure by easyvote'),
         extension='pdf',
         static_views={
             'de_CH': 'easyvote-de.pdf',
