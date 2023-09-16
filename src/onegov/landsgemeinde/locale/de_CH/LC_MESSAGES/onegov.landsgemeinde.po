@@ -287,9 +287,3 @@ msgstr "Neue Wortmeldung hinzugefügt"
 
 msgid "New votum"
 msgstr "Neue Wortmeldung"
-
-#~ msgid "Updated:"
-#~ msgstr "Stand:"
-
-#~ msgid "Function, Place & Party or parliamentary group"
-#~ msgstr "Funktion, Ort & Partei oder Fraktion"

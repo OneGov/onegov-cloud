@@ -106,3 +106,12 @@ class Votum(
         video_url = self.agenda_item.assembly.video_url
         if video_url:
             return f'{video_url}#t={self.video_timestamp}'
+
+    @property
+    def person_details(self):
+        details = (
+            self.person_function,
+            self.person_political_affiliation,
+            self.person_place
+        )
+        return ', '.join(d for d in details if d)
