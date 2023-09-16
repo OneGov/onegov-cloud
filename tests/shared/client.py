@@ -176,9 +176,7 @@ class SkipNFormsExtension:
 
     @property
     def form(self):
-        """ Ignore the first n forms, which are the general search forms on
-        the top of the page. There are two different forms for mobile and
-        desktop in the town6 instances.
+        """ Ignore the first n forms.
 
         """
         if len(self.forms) > self.n:

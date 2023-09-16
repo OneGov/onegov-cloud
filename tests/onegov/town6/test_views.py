@@ -133,7 +133,7 @@ def test_announcement(client):
 
     assert text in page
     assert (
-        f'<div id="announcement_header" '
+        f'<div id="header_announcement" '
         f'style="background-color: {bg_color};">'
     ) in page
     assert (
@@ -182,7 +182,7 @@ def test_header_links(client):
     client.login_admin()
 
     page = client.get('/')
-    assert 'id="header-links"' not in page
+    assert 'id="header_links"' not in page
 
     settings = client.get('/header-settings')
     settings.form['header_links'] = '''
@@ -196,7 +196,7 @@ def test_header_links(client):
     '''
     page = settings.form.submit().follow()
 
-    assert 'id="header-links"' not in page
+    assert 'id="header_links"' not in page
 
     settings = client.get('/header-settings')
     settings.form['header_links'] = '''

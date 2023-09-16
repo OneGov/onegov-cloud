@@ -27,10 +27,14 @@ $('#nav-bar').on('sticky.zf.stuckto:top', function() {
     el.data('modified', true)
 });
 
-$('#offCanvas').on('opened.zf.offCanvas', function (e) {
+if ($('#page-search').length) {
+    $('.search-button').click(function(){
+            $('#page-search').find('#search').focus()
+        });
+}
+
+$('#offCanvasSearch').on('opened.zf.offCanvas', function (e) {
     $(this).find('#search').focus()
-}).on('close.zf.offCanvas', function (e) {
-    $(this).find('#search').blur()
 })
 
 $(document).on("keypress", function(e) {

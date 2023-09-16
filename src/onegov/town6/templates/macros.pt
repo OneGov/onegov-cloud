@@ -55,15 +55,15 @@
 
 <metal:navigation define-macro="side-navigation-nested">
     <a tal:condition="children">
-        <span data-click-target="${link.attrs['href']}">${link.text}</span>
+        <div class="navlink"><span data-click-target="${link.attrs['href']}">${link.text}</span>
         <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
-        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/></div>
     </a>
     <tal:b tal:condition="not: children">
         <a href="${link.attrs['href']}">
-            <span>${link.text}</span>
+            <div class="navlink"><span>${link.text}</span>
             <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
-            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/>
+            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/></div>
         </a>
     </tal:b>
     <ul class="vertical menu nested"  tal:condition="children">
@@ -84,6 +84,35 @@
     </ul>
 </metal:navigation>
 
+
+<metal:header_links define-macro="header_links">
+    <div id="header_links" class="text-center" tal:define="links header_options.get('header_links')" tal:condition="links">
+        <div class="grid-container">
+            <div class="title-bar align-center" data-responsive-toggle="animated-menu" data-hide-for="medium">
+                <button type="button" data-toggle><i class="fa fa-bars"></i> </button>
+                </div>
+
+                <div class="top-bar" id="animated-menu">
+                <div class="top-bar-left">
+                    <ul class="dropdown menu align-center" data-dropdown-menu>
+                        <li tal:repeat="link links"><a href="${link[1]}">${link[0] if link[0] else link[1]}</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</metal:header_links>
+
+<metal:header-text define-macro="header-text">
+    <div id="header_text" tal:condition="header_options['left_header_name']|nothing" tal:define="color header_options.get('left_header_color'); rem_size header_options.get('left_header_rem', 1)">
+        <div class="grid-container">
+            <a class="h4" href="${header_options.get('left_header_url', '#')}"
+                style="color:${color or '#fff'}; font-size: ${rem_size}rem">
+                    ${header_options['left_header_name']}
+            </a>
+        </div>
+    </div>
+</metal:header-text>
 
 <metal:editbar define-macro="dropdown-editbar">
     <ul class="dropdown menu edit-bar" data-dropdown-menu tal:condition="editbar_links|layout.editbar_links">
@@ -2503,3 +2532,221 @@
         tal:condition="not: layout.org.disable_page_refs"
     ></div>
 </metal:pageref>
+
+
+<metal:jobs define-macro="jobs-cards">
+    <?python
+            if dynamic_rss_widget_builder:
+                parsed_rss_feed = dynamic_rss_widget_builder(rss_feed)
+            else:
+                parsed_rss_feed = None
+            ?>
+    <div class= "job-widget card aos-init aos-animate" tal:condition="parsed_rss_feed and jobs_card_title">
+        <div id="pj-widget-container1" class="pj-widget-jobs-container" tal:define="channel parsed_rss_feed">
+
+            <style>
+
+                    .pj-widget-jobs-container * {
+                        -webkit-box-sizing: border-box;
+                        -moz-box-sizing: border-box;
+                        box-sizing: border-box;
+                    }
+
+                    .pj-widget-jobs-container a {
+                        color: #337ab7;
+                        text-decoration: none;
+                    }
+
+                    ul.pj-widget-job-results .list-group-item:nth-child(2n-1) {
+                        background-color: rgba(179, 179, 179, 0.8);
+                    }
+
+                    ul.pj-widget-job-results .list-group-item:nth-child(2n) {
+                        background-color: rgba(114, 110, 110, 0.2);
+                    }
+
+                    .pj-widget-job-results .list-group-item:first-child {
+                        border-top-left-radius: 4px;
+                        border-top-right-radius: 4px;
+                    }
+
+                    .pj-widget-job-results .list-group-item:last-child {
+                        border-bottom-left-radius: 4px;
+                        border-bottom-right-radius: 4px;
+                    }
+
+                    .pj-widget-job-results .list-group-item {
+                        position: relative;
+                        display: block;
+                        padding: 10px 15px;
+                        margin-bottom: -1px;
+                        background-color: #fff;
+                        border: 1px solid #ddd;
+                    }
+
+                    ul.pj-widget-job-results a {
+                        color: #333;
+                    }
+
+                    .job-companyLogo > img {
+                        max-height: 50px;
+                        max-width: 100%;
+                        background-color: white;
+                        display: block;
+                        margin-right: auto;
+                        margin-left: auto;
+                    }
+
+                    ul.pj-widget-job-results li.list-group-item span.pj-widget-arrow {
+                        border-color: black;
+                        right: 10px;
+                        top: 40%;
+                        transform: rotate(45deg);
+                    }
+
+
+                    .pj-widget-row {
+                        margin-right: -15px;
+                        margin-left: -15px;
+                    }
+
+                    .pj-widget-row::before, .pj-widget-row::after {
+                        display: table;
+                        content: " ";
+                    }
+
+                    .pj-widget-row::after {
+                        clear: both;
+                    }
+
+                    .pj-widget-col-xs-12 {
+                        width: 100%;
+                    }
+
+                    @media (min-width: 768px) {
+                        .pj-widget-col-sm-3 {
+                            width: 25%;
+                        }
+
+                        .pj-widget-col-sm-6 {
+                            width: 50%;
+                        }
+
+                        .pj-widget-col-sm-6 > p {
+                            margin-bottom: 0!important; // additional fix
+                        }
+                    }
+
+                    .pj-widget-col-md-12, .pj-widget-col-sm-3, .pj-widget-col-sm-6, .pj-widget-col-sm-9, .pj-widget-col-md-4 {
+                        float: left;
+                        position: relative;
+                        min-height: 1px;
+                        padding-left: 15px;
+                        padding-right: 15px;
+                    }
+
+                    .pj-widget-list-unstyled {
+                        list-style: none;
+                    }
+
+                    .pj-widget-list-group {
+                        padding-left: 0;
+                        margin-bottom: 20px;
+                    }
+
+                    .pj-widget-arrow {
+                        position: absolute;
+                        border-top: 3px solid #337ab7;
+                        border-right: 3px solid #337ab7;
+                        width: 9px;
+                        height: 9px;
+                    }
+
+
+                    .pj-widget-jobmail-container .pj-widget-input-group .pj-widget-form-control {
+                        border-radius: 0;
+                    }
+
+
+                    .pj-widget-input-group .pj-widget-form-control:focus {
+                        z-index: 3;
+                    }
+
+                    .pj-widget-input-group .pj-widget-form-control {
+                        position: relative;
+                        z-index: 2;
+                        float: left;
+                        width: 100%;
+                        margin-bottom: 0;
+                    }
+
+                    .pj-widget-input-group .pj-widget-form-control:last-child {
+                        border-top-left-radius: 0;
+                        border-bottom-left-radius: 0;
+                    }
+
+                    .pj-widget-panel-default > .pj-widget-panel-heading {
+                        color: #333;
+                        background-color: #f5f5f5;
+                        border-color: #ddd;
+                    }
+
+
+                    .pj-widget-panel > .table {
+                        margin-bottom: 0;
+                    }
+
+
+                    .pj-widget-table > tbody > tr > td {
+                        padding: 8px;
+                        line-height: 1.42857143;
+                        vertical-align: top;
+                        border-top: 1px solid #ddd;
+                    }
+
+                    .pj-widget-panel > .pj-widget-table > tbody:first-child > tr:first-child td {
+                        border-top: 0;
+                    }
+
+                    .pj-widget-panel > .pj-widget-table {
+                        margin-bottom: 0;
+                    }
+
+
+                    ul.pj-widget-job-results > .list-group-item {
+                        border-top-color: #009476 !important;
+                        border-bottom-color: #009476 !important;
+                        border-left: transparent !important;
+                        border-right: transparent !important;
+                        border-radius: 0px !important;
+                        background-color: transparent !important;
+                        padding-left: 5px !important
+                    }
+
+            </style>
+
+        <div class="card-section">
+            <h5>${jobs_card_title}</h5>
+
+            <ul class="pj-widget-job-results pj-widget-list-unstyled pj-widget-list-group" tal:repeat="item channel.items">
+                <li class="list-group-item">
+                    <a target="_blank" href="${item.guid}" rel="nofollow">
+                        <span class="pj-widget-arrow"></span>
+                        <div class="pj-widget-row">
+                            <div class="pj-widget-col-sm-6 pj-widget-col-xs-12">
+                                <p class="homepage-text" style="font-size: 1.1em;">${item.title}</p>
+                                <p class="homepage-text">${item.description}</p>
+                            </div>
+                            <div class="pj-widget-col-sm-3 pj-widget-col-xs-12">${layout.format_date(item.pubDate, 'date')}</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+      </div>
+
+        <div style="width:100%;display:block;font-size:12px;color:#999999;text-align:center;padding-top:5px;margin-bottom: 2rem;">
+            Jobs bereitgestellt von <a href="https://www.publicjobs.ch/" target="_blank">publicjobs.ch</a></div>
+    </div>
+
+</metal:jobs>
