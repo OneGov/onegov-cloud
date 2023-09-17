@@ -87,8 +87,8 @@ msgstr "Official explanatory brochure"
 msgid "Voting campaign"
 msgstr "Public campaign"
 
-msgid "Explanatory brochure by Easyvote"
-msgstr "Explanatory brochure by Easyvote"
+msgid "Explanatory brochure by easyvote"
+msgstr "Explanatory brochure by easyvote"
 
 msgid "Advertisment analysis"
 msgstr "Analysis of advertisement campaign"
@@ -1824,8 +1824,8 @@ msgstr "Link department"
 msgid "Link federal office"
 msgstr "Link federal office"
 
-msgid "Explainer video by Easyvote"
-msgstr "Explainer video by Easyvote"
+msgid "Explainer video by easyvote"
+msgstr "Explainer video by easyvote"
 
 msgid "Recommendations of the Parties"
 msgstr "Recommendations by parties"
@@ -1954,6 +1954,10 @@ msgid ""
 "research purposes; see the Swissvotes codebook for more details on this "
 "(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
 msgstr ""
+"Due to data protection requirements, Swissvotes publishes a slightly reduced "
+"version of this dataset. Access to the full version might be possible for "
+"research purposes; see the Swissvotes codebook for more details on this "
+"(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Full-text search in all documents on this vote"
@@ -1978,14 +1982,14 @@ msgstr "Date"
 
 #. Default: Voting result
 msgid "voting_result_hyphenated"
-msgstr ""
+msgstr "Voting result"
 
 msgid "Yeas Percentage People"
 msgstr "Yes share"
 
 #. Default: Turnout
 msgid "turnout_hyphenated"
-msgstr ""
+msgstr "Turnout"
 
 msgid "Search results in the documents on this vote"
 msgstr "Search results in the documents on this vote"

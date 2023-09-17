@@ -1,8 +1,50 @@
 # Changes
 
+## 2023.45
+
+`2023-09-17` | [bdc3f8199a...fe41d22058](https://github.com/OneGov/onegov-cloud/compare/bdc3f8199a^...fe41d22058)
+
+### Core
+
+##### Tighten CSP.
+
+`Feature` | [OGC-1156](https://linear.app/onegovcloud/issue/OGC-1156) | [ddd93a96c4](https://github.com/onegov/onegov-cloud/commit/ddd93a96c4db85333c8b737d08fb0228099b0387)
+
+### Landsgemeinde
+
+##### Redesign and improvements.
+
+`Feature` | [OGC-638](https://linear.app/onegovcloud/issue/OGC-638) | [0b55e2df61](https://github.com/onegov/onegov-cloud/commit/0b55e2df61ace6de047a513bdb900a816eb43718)
+
+### Multiple
+
+##### Add URL validators to URLFields.
+
+`Bugfix` | [OGC-1130](https://linear.app/onegovcloud/issue/OGC-1130) | [e869c97c09](https://github.com/onegov/onegov-cloud/commit/e869c97c095b25734c160296870b1f6b3d13e364)
+
+##### Update jQuery.
+
+`Bugfix` | [OGC-1130](https://linear.app/onegovcloud/issue/OGC-1130) | [db639425d2](https://github.com/onegov/onegov-cloud/commit/db639425d2dbdf5e3c553ef13be52facfd3b1bd9)
+
+### Org
+
+##### Lax CSP.
+
+`Bugfix` | [OGC-1156](https://linear.app/onegovcloud/issue/OGC-1156) | [fe41d22058](https://github.com/onegov/onegov-cloud/commit/fe41d220587932dee3cb263e63e57d80dba2c9fa)
+
+### Swissvotes
+
+##### Update translations.
+
+`Feature` | [bdc3f8199a](https://github.com/onegov/onegov-cloud/commit/bdc3f8199a5e704df6650821033022c8327e7209)
+
+##### Include mastodon assets only when used.
+
+`Bugfix` | [d83aa8daed](https://github.com/onegov/onegov-cloud/commit/d83aa8daed1db7095156a03ac801a66da1ec0472)
+
 ## 2023.44
 
-`2023-09-15` | [aa4f78c218...fdbb1c7ffe](https://github.com/OneGov/onegov-cloud/compare/aa4f78c218^...fdbb1c7ffe)
+`2023-09-15` | [aa4f78c218...ba8bc7d4ec](https://github.com/OneGov/onegov-cloud/compare/aa4f78c218^...ba8bc7d4ec)
 
 **Upgrade hints**
 - onegov-core --select /onegov_org/* upgrade or `onegov-core upgrade
@@ -2448,14 +2490,4 @@ Form: Fix Formcode for dependent fields with price
 ##### Add zoom levels for swiss admin map
 
 `Feature` | [OGC-694](https://linear.app/onegovcloud/issue/OGC-694) | [eefba89962](https://github.com/onegov/onegov-cloud/commit/eefba89962a70b098ad91ac6bebb74e7dd4ac7ca)
-
-## 2022.52
-
-`2022-11-03` | [8e75e5483a...f55f16d53e](https://github.com/OneGov/onegov-cloud/compare/8e75e5483a^...f55f16d53e)
-
-### Election Day
-
-##### Add provisional data for 2023.
-
-`Feature` | [OGC-237](https://linear.app/onegovcloud/issue/OGC-237) | [69e2daf81e](https://github.com/onegov/onegov-cloud/commit/69e2daf81e8ea41da62863b8038e0d1a95324025)
 

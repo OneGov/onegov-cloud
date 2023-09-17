@@ -12,6 +12,8 @@ from wtforms.fields import DateField
 from wtforms.fields import RadioField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
 from onegov.landsgemeinde.models.assembly import STATES
 
@@ -42,7 +44,8 @@ class AssemblyForm(NamedFileForm):
 
     video_url = URLField(
         label=_('Video URL'),
-        fieldset=_('General')
+        fieldset=_('General'),
+        validators=[URL(), Optional()]
     )
     extraordinary = BooleanField(
         label=_('Extraordinary'),
