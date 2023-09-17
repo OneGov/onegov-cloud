@@ -406,6 +406,8 @@ def org_content_security_policy():
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
+    policy.script_src.add('https:')
+
     return policy
 
 
