@@ -703,7 +703,11 @@ class ColorField(StringField):
 
 
 class TypeAheadField(StringField):
-    """ A string field with typeahead. """
+    """ A string field with typeahead.
+
+    Requires an url with the placeholder `%QUERY` for the search term.
+
+    """
 
     url: 'Callable[[DefaultMeta], str | None] | str | None'
 

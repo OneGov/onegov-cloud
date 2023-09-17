@@ -137,4 +137,4 @@ def get_chosen_asset() -> 'Iterator[str]':
 def get_typeahead_asset() -> 'Iterator[str]':
     yield 'typeahead-standalone.css'
     yield 'typeahead-standalone.js'
-    yield 'typeahead-init.js'
+    yield 'typeahead-standalone-init.js'
