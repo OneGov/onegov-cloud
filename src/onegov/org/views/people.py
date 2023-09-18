@@ -9,6 +9,9 @@ from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic
 from onegov.people import Person, PersonCollection
 from markupsafe import Markup
+from sqlalchemy import case, null
+from sqlalchemy import select, exists, and_
+from sqlalchemy.sql.expression import text
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
@@ -35,8 +38,8 @@ def view_people(self, request, layout=None):
 def view_person(self, request, layout=None):
 
     pages = request.session.query(Topic)
-    pages = pages.filter(Topic.people is not None).all()
-    org_to_func = person_functions_by_organization(self, pages, request)
+    # pages = pages.filter(Topic.people is not None).all()
+    org_to_func = person_functions_by_organization(self, request)
 
     return {
         'title': self.title,
@@ -46,36 +49,45 @@ def view_person(self, request, layout=None):
     }
 
 
-def person_functions_by_organization(subject_person, pages, request):
-    """ Collects 1:1 mappings of all context-specific functions and
-     organizations for a person. Organizations are pages where `subject_person`
-     is listed as a person.
-
-     Returns a List of strings in the form:
-
-        - Organization 1, Function A
-        - Organization 2, Function B
-
-    This is not necessarily the same as person.function!
-    """
+def person_functions_by_organization(subject_person, request):
+    """ ... """
 
     organization_to_function = []
 
-    for topic in pages:
-        people = topic.people
-        for person in people or []:
-            if person.id == subject_person.id:
-                try:
-                    if person.display_function_in_person_directory:
-                        func = person.context_specific_function
-                        if func:
-                            page = f"<a href=\"{request.link(topic)}\">" \
-                                   f"{topic.title}</a>"
-                            organization_to_function.append(
-                                Markup(f"<span>{page}: {func}</span>"))
-                except AttributeError:
-                    continue
+    # condition = text('CASE WHEN :attr IS NOT NULL THEN 1 ELSE 0 END').params(
+    #     attr=hasattr(subject_person, 'display_function_in_person_directory'))
+    #
+    # subquery = exists().where(
+    #     and_(
+    #         condition == 1,
+    #         Person.context_specific_function.isnot(None),
+    #         )
+    # )
+    #
+    query = (
+        request.session.query(Topic)
+        .select_from(Topic.join(Person, Topic.people == Person.id))
+        .filter(Topic.people is not None)
+        .filter(Person.id == subject_person.id)
+        .filter(getattr(Person, 'context_specific_function', None).isnot(None))
+        .filter(getattr(Person, 'display_function_in_person_directory', None).isnot(None))
+        # .add_columns(select([Person.context_specific_function]).where(
+        # subquery).as_scalar())
+        .all()
+    )
+
+
+    for topic, func in query:
+        breakpoint()
+        page = Markup('<a href="{0}">{1}</a>').format(
+            request.link(topic), topic.title
+        )
+        organization_to_function.append(
+            Markup('<span>{0}: {1}</span>').format(page, func)
+        )
+
     return organization_to_function
+
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',
