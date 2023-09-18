@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import morepath
 
 from morepath.request import Response
@@ -55,69 +57,26 @@ def person_functions_by_organization(subject_person, request):
 
     organization_to_function = []
 
-    # condition = text('CASE WHEN :attr IS NOT NULL THEN 1 ELSE 0 END').params(
-    #     attr=hasattr(subject_person, 'display_function_in_person_directory'))
-    #
-    # subquery = exists().where(
-    #     and_(
-    #         condition == 1,
-    #         Person.context_specific_function.isnot(None),
-    #         )
-    # )
-    #
-    # query = (
-    #     request.session.query(Topic)
-    #     .select_from(Topic.join(Person, Topic.people == Person.id))
-    #     .filter(Topic.people is not None)
-    #     .filter(Person.id == subject_person.id)
-    #     .filter(getattr(Person, 'context_specific_function', None).isnot(None))
-    #     .filter(getattr(Person, 'display_function_in_person_directory', None).isnot(None))
-    #     # .add_columns(select([Person.context_specific_function]).where(
-    #     # subquery).as_scalar())
-    #     .all()
-    # )
-
-    # subquery = exists().where(
-    #     and_(
-    #         Person.id == subject_person.id,
-    #         # Person.display_function_in_person_directory == True,
-    #         # Person.context_specific_function.isnot(None),
-    #     )
-    # )
-    from sqlalchemy import exists, and_, literal
     query = (
         request.session.query(Topic)
         .filter(Topic.people is not None)
-        .filter(
-            exists().where(
-                and_(
-                    Person.id == subject_person.id,
-                    Topic.content['people'].has_key("context_specific_function"),
-                    Topic.content['people'].has_key("display_function_in_person_directory")
-                )
-            )
-        )
-
-
-        # .add_columns(select([Person.context_specific_function]).where(
-        #     subquery).as_scalar())
-
-        # .filter(
-        #     # Person.display_function_in_person_directory == True,
-        #     subquery
-        # )
+        .filter(Topic.people.any(Person.id == subject_person.id))
         .all()
     )
 
     for topic in query:
-        breakpoint()
-        page = Markup('<a href="{0}">{1}</a>').format(
-            request.link(topic), topic.title
-        )
-        func = topic.people.context_specific_function
-        organization_to_function.append(
-            Markup('<span>{0}: {1}</span>').format(page, func)
-        )
+        for person in topic.people or []:
+            if person.id != subject_person.id:
+                breakpoint()
+
+            if person.display_function_in_person_directory:
+                func = person.context_specific_function
+                page = Markup('<a href="{0}">{1}</a>').format(
+                    request.link(topic), topic.title
+                )
+                organization_to_function.append(
+                    Markup('<span>{0}: {1}</span>').format(page, func)
+                )
 
     return organization_to_function
 
