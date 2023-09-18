@@ -58,8 +58,7 @@ def person_functions_by_organization(subject_person, pages, request):
 
     This is not necessarily the same as person.function!
     """
-
-    organization_to_function = []
+    mentioned_dict = {}
 
     for topic in pages:
         people = topic.people
@@ -69,13 +68,19 @@ def person_functions_by_organization(subject_person, pages, request):
                     if person.display_function_in_person_directory:
                         func = person.context_specific_function
                         if func:
-                            page = f"<a href=\"{request.link(topic)}\">" \
+                            page = f"<a href=\"{request.link(topic)}\">"\
                                    f"{topic.title}</a>"
-                            organization_to_function.append(
-                                Markup(f"<span>{page}: {func}</span>"))
+                            mentioned_dict[page] = func
                 except AttributeError:
                     continue
-    return organization_to_function
+
+    sorted_pages_with_functions = sorted(
+        zip(mentioned_dict.keys(), mentioned_dict.values()), key=lambda x: x[0]
+    )
+    return [
+        Markup(f"<span>{func}: {page}</span>")
+        for func, page in sorted_pages_with_functions
+    ]
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',
