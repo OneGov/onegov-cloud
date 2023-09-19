@@ -133,7 +133,7 @@ def test_delete_linked_person_issue_149(client):
 
 
 def test_context_specific_function(session, org_app):
-    organizations = [ "Forum der Ortsparteien und Quartiervereine", "Urnenbüro"]
+    organizations = ["Forum der Ortsparteien und Quartiervereine", "Urnenbüro"]
     context_specific_functions = [
         "Präsidentin Urnenbüro",
         "Mitglied Forum der Ortsparteien und Quartiervereine"
@@ -175,15 +175,14 @@ def test_context_specific_function(session, org_app):
 
     org_link_1 = f'<a href="{link1}">{organizations[0]}</a>'
     org_link_2 = f'<a href="{link2}">{organizations[1]}</a>'
-    second = Markup(f"<span>{org_link_1}: "
+    first_expected = Markup(f"<span>{org_link_1}: "
                             f"{context_specific_functions[0]}</span>")
 
-    first = Markup(f"<span>{org_link_2}: "
+    second_expected = Markup(f"<span>{org_link_2}: "
                              f"{context_specific_functions[1]}</span>")
-    assert organization_to_function[0] == first
-    assert organization_to_function[1] == second
+    assert organization_to_function[0] == first_expected
+    assert organization_to_function[1] == second_expected
 
-    breakpoint()
     # Now make it not visible
     person_to_function1 = [[person.id.hex, (context_specific_functions[0],
                                             False)]]
