@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import morepath
 
 from morepath.request import Response
@@ -58,38 +60,32 @@ def person_functions_by_organization(subject_person, pages, request):
 
     This is not necessarily the same as person.function!
     """
-    mentioned_dict = {}
-    topics = []
 
-    for topic in pages:
-        people = topic.people
-        for person in people or []:
-            if person.id == subject_person.id:
-                try:
-                    if person.display_function_in_person_directory:
-                        func = person.context_specific_function
-                        if func:
-                            page = f"<a href=\"{request.link(topic)}\">"\
-                                   f"{topic.title}</a>"
-                            mentioned_dict[page] = func
+    TopicFunctionPair = namedtuple("TopicFunctionPair", ["function", "topic"])
 
-                            topics.append([func, topic])
-                except AttributeError:
-                    continue
+    topics = sorted(
+        (
+            TopicFunctionPair(func, topic)
+            for topic in pages
+            for pers in (topic.people or [])
+            if (
+                pers.id == subject_person.id
+                and (func := getattr(pers, "context_specific_function", None))
+                is not None
+                and hasattr(pers, "display_function_in_person_directory")
+            )
+        ),
+        key=lambda pair: pair.topic.title,
+    )
 
-    topics.sort(key=lambda x: x[1].title)  # sort by page name
-
-    page_html = [
-        Markup('<a href="{0}">{1}</a>').format(
-            request.link(item[1]), item[1].title
-        )
-        for item in topics
+    return [
+        Markup("<span>{0}: {1}</span>".format(
+            Markup('<a href="{0}">{1}</a>').format(request.link(pair.topic),
+                                                   pair.topic.title),
+            pair.function
+        ))
+        for pair in topics
     ]
-
-    for orig, replace in zip(topics, page_html):
-        orig[1] = replace
-
-    return [Markup(f"<span>{topic}: {func}</span>") for func, topic in topics]
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',
