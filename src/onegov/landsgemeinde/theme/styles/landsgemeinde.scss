@@ -2,6 +2,11 @@ $check-list-icon: "\f0ae";
 $ordered-list-icon: "\f03a";
 $news-icon: "\f1ea";
 
+
+.globals {
+    .people::before { @include icon('\f2bb'); }
+}
+
 .edit-bar {
     .check-list-link::before { @include icon-bold($check-list-icon); }
     .news-link::before { @include icon-bold($news-icon); }

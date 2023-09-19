@@ -5,6 +5,10 @@ from onegov.landsgemeinde.collections import AssemblyCollection
 from onegov.landsgemeinde.collections import VotumCollection
 from onegov.landsgemeinde.models import AgendaItem
 from onegov.landsgemeinde.models import Assembly
+from onegov.landsgemeinde.models import PersonFunctionSuggestion
+from onegov.landsgemeinde.models import PersonNameSuggestion
+from onegov.landsgemeinde.models import PersonPlaceSuggestion
+from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
 
 
@@ -68,3 +72,35 @@ def get_votum(app, date, agenda_item_number, number):
     return VotumCollection(
         app.session(), date, agenda_item_number
     ).by_number(number)
+
+
+@LandsgemeindeApp.path(
+    model=PersonFunctionSuggestion,
+    path='/suggestion/person/function'
+)
+def get_person_function_suggestion(app, term=None):
+    return PersonFunctionSuggestion(app.session(), term)
+
+
+@LandsgemeindeApp.path(
+    model=PersonNameSuggestion,
+    path='/suggestion/person/name'
+)
+def get_person_name_suggestion(app, term=None):
+    return PersonNameSuggestion(app.session(), term)
+
+
+@LandsgemeindeApp.path(
+    model=PersonPlaceSuggestion,
+    path='/suggestion/person/place'
+)
+def get_person_place_suggestion(app, term=None):
+    return PersonPlaceSuggestion(app.session(), term)
+
+
+@LandsgemeindeApp.path(
+    model=PersonPoliticalAffiliationSuggestion,
+    path='/suggestion/person/political-affiliation'
+)
+def get_person_political_affiliation_suggestion(app, term=None):
+    return PersonPoliticalAffiliationSuggestion(app.session(), term)
