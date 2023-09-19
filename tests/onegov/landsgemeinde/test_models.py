@@ -174,7 +174,8 @@ def test_suggestions(session):
     session.flush()
 
     # test names
-    assert PersonNameSuggestion(session).query() == [
+    assert PersonNameSuggestion(session).query() == []
+    assert PersonNameSuggestion(session, 'a').query() == [
         'Annette Helena',
         'Hammurabi Gavril',
         'Hyacinth Eustace',
@@ -192,7 +193,8 @@ def test_suggestions(session):
     ]
 
     # test functions
-    assert PersonFunctionSuggestion(session).query() == [
+    assert PersonFunctionSuggestion(session).query() == []
+    assert PersonFunctionSuggestion(session, 'n').query() == [
         'Landwirt',
         'Regierungsrat',
         'Regierungsrätin',
@@ -205,10 +207,10 @@ def test_suggestions(session):
     ]
 
     # test places
-    assert PersonPlaceSuggestion(session).query() == [
+    assert PersonPlaceSuggestion(session).query() == []
+    assert PersonPlaceSuggestion(session, 'e').query() == [
         'Hengedorf',
         'Hengestadt',
-        'Kitzbruck',
         'Terschlag',
         'Mensee',
         'Vellzach',
@@ -220,8 +222,9 @@ def test_suggestions(session):
     ]
 
     # test political affiliation
-    assert PersonPoliticalAffiliationSuggestion(session).query() == [
-        'FDP', 'Grüne', 'jFDP', 'SP', 'SVP', 'Mitte'
+    assert PersonPoliticalAffiliationSuggestion(session).query() == []
+    assert PersonPoliticalAffiliationSuggestion(session, 's').query() == [
+        'SP', 'SVP',
     ]
     assert PersonPoliticalAffiliationSuggestion(session, 'p').query() == [
         'FDP', 'jFDP', 'SP', 'SVP',
