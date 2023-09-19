@@ -101,7 +101,8 @@ def person_functions_by_organization(subject_person, topics, request):
                 pers.id == subject_person.id
                 and (func := getattr(pers, "context_specific_function", None))
                 is not None
-                and hasattr(pers, "display_function_in_person_directory")
+                and getattr(pers, "display_function_in_person_directory",
+                            False) is not False
             )
         ),
         key=lambda pair: pair.topic.title,
