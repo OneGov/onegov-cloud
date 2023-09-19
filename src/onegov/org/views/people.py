@@ -59,6 +59,7 @@ def person_functions_by_organization(subject_person, pages, request):
     This is not necessarily the same as person.function!
     """
     mentioned_dict = {}
+    topics = []
 
     for topic in pages:
         people = topic.people
@@ -71,16 +72,24 @@ def person_functions_by_organization(subject_person, pages, request):
                             page = f"<a href=\"{request.link(topic)}\">"\
                                    f"{topic.title}</a>"
                             mentioned_dict[page] = func
+
+                            topics.append([func, topic])
                 except AttributeError:
                     continue
 
-    sorted_pages_with_functions = sorted(
-        zip(mentioned_dict.keys(), mentioned_dict.values()), key=lambda x: x[0]
-    )
-    return [
-        Markup(f"<span>{func}: {page}</span>")
-        for func, page in sorted_pages_with_functions
+    topics.sort(key=lambda x: x[1].title)  # sort by page name
+
+    page_html = [
+        Markup('<a href="{0}">{1}</a>').format(
+            request.link(item[1]), item[1].title
+        )
+        for item in topics
     ]
+
+    for orig, replace in zip(topics, page_html):
+        orig[1] = replace
+
+    return [Markup(f"<span>{topic}: {func}</span>") for func, topic in topics]
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',
