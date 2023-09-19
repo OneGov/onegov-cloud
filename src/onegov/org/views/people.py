@@ -1,4 +1,3 @@
-from collections import namedtuple
 import morepath
 from morepath.request import Response
 from onegov.core.security import Public, Private
@@ -11,7 +10,7 @@ from onegov.people import Person, PersonCollection
 from markupsafe import Markup
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 if TYPE_CHECKING:
     from onegov.page import Page
     from collections.abc import Iterable, Iterator
@@ -49,7 +48,7 @@ def view_person(self, request, layout=None):
             if root_id is None:
                 root_id = page.id
 
-            if isinstance(page, Topic) and page.people:
+            if isinstance(page, Topic) and page.content.get('people'):
                 yield page
             yield from visit_topics_with_people(page.children, root_id=root_id)
 
@@ -76,8 +75,9 @@ def person_functions_by_organization(subject_person, topics, request):
 
     This is not necessarily the same as person.function!
     """
-
-    TopicFunctionPair = namedtuple("TopicFunctionPair", ["function", "topic"])
+    class TopicFunctionPair(NamedTuple):
+        function: str
+        topic: Topic
 
     sorted_topics = sorted(
         (
