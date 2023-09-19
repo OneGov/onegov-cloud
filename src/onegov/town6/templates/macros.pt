@@ -2216,7 +2216,7 @@
            <span class="fa fa-edit" aria-hidden="true"></span>
            <span i18n:translate>Rename</span>
       </a>
-      <a class="button secondary delete" role="button" href="${request.link(file)}">
+      <a class="button secondary" role="button" href="${request.link(file)}">
            <span class="fa fa-download" aria-hidden="true"></span>
            <span i18n:translate>Download</span>
      </a>

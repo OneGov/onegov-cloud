@@ -105,7 +105,7 @@ class UploadWidget(FileInput):
     """)
     template = Markup("""
         <div class="upload-widget with-data{wrapper_css_class}">
-            <p>{existing_file_label}: {filename}{filesize} ✓</p>
+            <p>{existing_file_label}: {filename}{filesize} {icon}</p>
 
             {preview}
 
@@ -208,6 +208,7 @@ class UploadWidget(FileInput):
         return False, {
             'wrapper_css_class': wrapper_css_class,
             'input_html': input_html,
+            'icon': '✓',
             'preview': preview,
             'previous': previous,
             'filesize': display_size,

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-19 10:34+0200\n"
+"POT-Creation-Date: 2023-09-19 16:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1811,6 +1811,18 @@ msgstr "Mensile (il primo lunedì del mese)"
 msgid "Never"
 msgstr "Mai"
 
+msgid "Linked file"
+msgstr "File collegato"
+
+msgid "Keep link"
+msgstr "Conservare collegamento"
+
+msgid "Delete link"
+msgstr "Elimina collegamento"
+
+msgid "Replace link"
+msgstr "Sostituire collegamento"
+
 msgid "All directories"
 msgstr "Tutte le cartelle"
 
@@ -2559,9 +2571,6 @@ msgstr "Modifica collegamento"
 
 msgid "The link was deleted"
 msgstr "Il collegamento è stato cancellato"
-
-msgid "Delete link"
-msgstr "Elimina collegamento"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"

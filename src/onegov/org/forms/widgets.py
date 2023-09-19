@@ -1,5 +1,6 @@
 from markupsafe import Markup
 from onegov.form.widgets import UploadWidget, UploadMultipleWidget
+from onegov.org import _
 from wtforms import Form, SelectField, SelectMultipleField
 
 
@@ -9,7 +10,63 @@ if TYPE_CHECKING:
     from .fields import UploadOrSelectExistingMultipleFilesField
 
 
-class UploadOrSelectExistingFileWidget(UploadWidget):
+class UploadOrLinkExistingFileWidget(UploadWidget):
+
+    file_details_template = Markup("""
+        <div ic-trigger-from="#button-{file_id}"
+             ic-trigger-on="click once"
+             ic-get-from="{details_url}"
+             class="file-preview-wrapper"></div>
+    """)
+    file_details_icon_template = Markup("""
+        <a id="button-{file_id}">
+            <i class="fa fa-chevron-down" aria-hidden="true"></i>
+        </a>
+    """)
+
+    def template_data(
+        self,
+        field: 'UploadOrSelectExistingFileField',  # type:ignore[override]
+        force_simple: bool,
+        resend_upload: bool,
+        wrapper_css_class: str,
+        input_html: Markup,
+        **kwargs: Any
+    ) -> tuple[bool, dict[str, Any]]:
+
+        is_simple, data = super().template_data(
+            field,
+            force_simple=force_simple,
+            resend_upload=resend_upload,
+            wrapper_css_class=wrapper_css_class,
+            input_html=input_html,
+            **kwargs
+        )
+        data['existing_file_label'] = field.gettext(_('Linked file'))
+        data['keep_label'] = field.gettext(_('Keep link'))
+        data['delete_label'] = field.gettext(_('Delete link'))
+        data['replace_label'] = field.gettext(_('Replace link'))
+        if is_simple is True:
+            return is_simple, data
+
+        # existing_file takes precedent over object_data, but most
+        # of the time it will just be object_data
+        file = getattr(field, 'existing_file', field.object_data)
+        if file is not None:
+            # interactive preview widget
+            request = field.meta.request
+            request.include('prompt')
+            data['preview'] = self.file_details_template.format(
+                file_id=file.id,
+                details_url=request.link(file, 'details')
+            )
+            data['icon'] = self.file_details_icon_template.format(
+                file_id=file.id
+            )
+        return is_simple, data
+
+
+class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
 
     simple_template = Markup("""
         <div class="upload-widget without-data{wrapper_css_class}">
@@ -19,7 +76,9 @@ class UploadOrSelectExistingFileWidget(UploadWidget):
     """)
     template = Markup("""
         <div class="upload-widget with-data{wrapper_css_class}">
-            <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
+            <p>
+                {existing_file_label}: {filename} ({filesize}) {icon}
+            </p>
 
             {preview}
 

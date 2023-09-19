@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-09-19 10:34+0200\n"
+"POT-Creation-Date: 2023-09-19 16:20+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1803,6 +1803,18 @@ msgstr "Mensuel (le premier lundi du mois)"
 msgid "Never"
 msgstr "Jamais"
 
+msgid "Linked file"
+msgstr "Fichier lié"
+
+msgid "Keep link"
+msgstr "Conserver le lien"
+
+msgid "Delete link"
+msgstr "Supprimer le lien"
+
+msgid "Replace link"
+msgstr "Remplacer le lien"
+
 msgid "All directories"
 msgstr "Tous les dossiers"
 
@@ -2549,9 +2561,6 @@ msgstr "Modifier le lien"
 
 msgid "The link was deleted"
 msgstr "Le lien a été supprimé"
-
-msgid "Delete link"
-msgstr "Supprimer le lien"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"

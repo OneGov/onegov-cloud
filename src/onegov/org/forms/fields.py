@@ -3,6 +3,7 @@ from onegov.core.utils import binary_to_dictionary, dictionary_to_binary
 from onegov.form.fields import HtmlField as HtmlFieldBase
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.fields import UploadMultipleFilesWithORMSupport
+from onegov.org.forms.widgets import UploadOrLinkExistingFileWidget
 from onegov.org.forms.widgets import UploadOrSelectExistingFileWidget
 from onegov.org.forms.widgets import UploadOrSelectExistingMultipleFilesWidget
 from onegov.org.utils import annotate_html, remove_empty_paragraphs
@@ -59,6 +60,7 @@ class UploadOrLinkExistingFileField(UploadFileWithORMSupport):
     """
 
     existing_file: File | None
+    widget = UploadOrLinkExistingFileWidget()
 
     def __init__(
         self,
@@ -255,6 +257,7 @@ class UploadOrSelectExistingMultipleFilesField(
 
     widget = UploadOrSelectExistingMultipleFilesWidget()
     upload_field_class = UploadOrLinkExistingFileField
+    upload_widget = UploadOrLinkExistingFileWidget()
 
     def __init__(
         self,
