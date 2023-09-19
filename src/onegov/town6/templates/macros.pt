@@ -66,7 +66,7 @@
             <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/></div>
         </a>
     </tal:b>
-    <ul class="vertical menu nested"  tal:condition="children">
+    <ul class="vertical menu nested ${'is-active' if page in layout.model.ancestors else ''}"  tal:condition="children">
         <tal:b tal:repeat="(page, sublink, c) children">
             <li data-sortable-id="${page.id}">
                 <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
