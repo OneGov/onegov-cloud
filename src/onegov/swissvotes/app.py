@@ -160,6 +160,10 @@ def get_common_asset():
     yield 'common.js'
     yield 'policy-selector.jsx'
     yield 'image-gallery.js'
+
+
+@SwissvotesApp.webasset('mastodon')
+def get_mastodon_asset():
     yield 'mastodon-timeline.js'
     yield 'mastodon-timeline.css'
 

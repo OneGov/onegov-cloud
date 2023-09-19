@@ -24,7 +24,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.chat import TextModule
     from onegov.form.fields import (
-        PanelField, PreviewField, UploadField, UploadMultipleField)
+        PanelField, PreviewField, UploadField, UploadMultipleField,
+        TypeAheadField
+    )
     from wtforms import Field, StringField
     from wtforms.fields.choices import SelectFieldBase
 
@@ -467,7 +469,7 @@ class ChosenSelectWidget(Select):
 
 
 class PreviewWidget:
-    """ A widget that displays the html of a specific view whenver there's
+    """ A widget that displays the html of a specific view whenever there's
     a change in other fields. JavaScript is used to facilitate this.
 
     """
@@ -573,5 +575,25 @@ class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
         max_date = self.max_date
         if max_date is not None:
             kwargs.setdefault('max', max_date.isoformat() + 'T23:59')
+
+        return super().__call__(field, **kwargs)
+
+
+class TypeAheadInput(TextInput):
+    """ A widget with typeahead. """
+
+    def __call__(
+        self,
+        field: 'TypeAheadField',  # type:ignore[override]
+        **kwargs: Any
+    ) -> Markup:
+        field.meta.request.include('typeahead-standalone')
+
+        kwargs['class_'] = (
+            kwargs.get('class_', '') + ' typeahead-standalone-field'
+        ).strip()
+        kwargs['data-url'] = (
+            field.url(field.meta) if callable(field.url) else field.url
+        )
 
         return super().__call__(field, **kwargs)

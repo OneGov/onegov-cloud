@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-08-31 10:31+0200\n"
+"POT-Creation-Date: 2023-09-19 10:34+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1441,8 +1441,8 @@ msgstr "Afficher l'annonce uniquement pour les utilisateurs connectés"
 msgid "Header links"
 msgstr "Liens d'en-tête"
 
-msgid "Title header left side"
-msgstr "Titre dans en-tête, face gauche"
+msgid "Text header left side"
+msgstr "Texte dans en-tête, face gauche"
 
 msgid "Optional"
 msgstr "Facultatif"
@@ -1452,6 +1452,14 @@ msgstr "Couleur de la police"
 
 msgid "Relative font size"
 msgstr "Taille de police relative"
+
+msgid "Keep header links and/or header text fixed to top on scrolling"
+msgstr ""
+"Maintenir les liens d'en-tête et/ou le texte d'en-tête en haut lors du "
+"défilement"
+
+msgid "Header fixation"
+msgstr "Fixation des éléments d'en-tête"
 
 msgid "Please add an url to each link"
 msgstr "Veuillez ajouter une url à chaque lien"
@@ -1504,6 +1512,20 @@ msgstr "Personnes"
 
 msgid "Values of the location filter"
 msgstr "Valeurs du filtre de localisation"
+
+msgid "Choose the filter type for events (default is 'tags')"
+msgstr ""
+"Choisissez le type de filtre pour les événements (la valeur par défaut est "
+"'tags')"
+
+msgid "A predefined set of tags"
+msgstr "Un ensemble prédéfini de balises"
+
+msgid "Manually configurable filters"
+msgstr "Filtres configurables manuellement"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Les deux, balises prédéfinies et filtres configurables"
 
 msgid "The default map view. This should show the whole town"
 msgstr "La vue par défaut de la carte. Cela devrait montrer la ville entière"
@@ -2012,6 +2034,9 @@ msgstr "Supprimer l'allocation"
 msgid "Every ${days} until ${end}"
 msgstr "Tous les ${days} jusqu'à ${end}"
 
+msgid "Configure"
+msgstr "Configurer"
+
 msgid "This event can't be edited."
 msgstr "Cet événement ne peut pas être édité."
 
@@ -2098,9 +2123,6 @@ msgstr "Synchroniser"
 
 msgid "Directory"
 msgstr "Dossier"
-
-msgid "Configure"
-msgstr "Configurer"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -3470,8 +3492,8 @@ msgid "The following reservations have been rejected:"
 msgstr "Les réservations suivantes ont été rejetées :"
 
 msgid ""
-"This is a notification for the rejected reservations for ${organisation}. If"
-" you no longer wish to receive these notifications, please contact an "
+"This is a notification for the rejected reservations for ${organisation}. If "
+"you no longer wish to receive these notifications, please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
 "Il s'agit d'une notification concernant les réservations rejetées pour "

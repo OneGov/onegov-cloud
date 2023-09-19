@@ -161,6 +161,13 @@ msgstr ""
 "È possibile impostare un prezzo minimo totale solo se è definito almeno un "
 "campo prezzo."
 
+msgid ""
+"Invalid field type for field '{label}'. For filters only 'select' or "
+"'multiple select' fields are allowed."
+msgstr ""
+"Tipo di campo non valido per il campo '{label}'. Per i filtri "
+"solo i campi 'selezionare' o 'selezionare più volte' sono consentiti."
+
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 

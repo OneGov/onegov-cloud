@@ -7,6 +7,7 @@ from dateutil import rrule
 from dateutil.parser import parse
 from dateutil.rrule import rrulestr
 from itertools import chain
+
 from onegov.core.csv import convert_excel_to_csv
 from onegov.core.csv import CSVFile
 from onegov.event.collections import EventCollection, OccurrenceCollection
@@ -16,7 +17,8 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
-from onegov.form.validators import FileSizeLimit, ValidPhoneNumber
+from onegov.form.validators import (
+    FileSizeLimit, ValidPhoneNumber, ValidFilterFormDefinition)
 from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -266,12 +268,14 @@ class EventForm(Form):
             self.email.data = self.request.current_username
 
     def on_request(self):
-        if self.custom_tags():
-            self.tags.choices = [(tags, tags) for tags in self.custom_tags()]
+        if self.tags:
+            if self.custom_tags():
+                self.tags.choices = [(tags, tags) for tags in
+                                     self.custom_tags()]
 
-        for include in self.on_request_include:
-            self.request.include(include)
-        self.sort_tags()
+            for include in self.on_request_include:
+                self.request.include(include)
+            self.sort_tags()
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
@@ -381,6 +385,18 @@ class EventForm(Form):
         else:
             raise NotImplementedError
 
+        if self.request.app.org.event_filter_type in ['filters',
+                                                      'tags_and_filters']:
+            filter_keywords = dict()
+            for field in self.request.app.org.event_filter_fields:
+                form_field = getattr(self, field.id)
+                filter_keywords[field.id] = form_field.data
+
+            if filter_keywords:
+                model.filter_keywords = filter_keywords
+                for occ in model.occurrences:
+                    occ.filter_keywords = filter_keywords
+
     def process_obj(self, model):
         """ Stores the page values on the form. """
 
@@ -414,6 +430,18 @@ class EventForm(Form):
 
         if model.meta:
             self.email.data = model.meta.get('submitter_email')
+
+        if model.filter_keywords:
+            keywords = model.filter_keywords
+
+            for field in self.request.app.org.event_filter_fields:
+                form_field = getattr(self, field.id, None)
+
+                if form_field is None:
+                    continue
+
+                    form_field.data = keywords[field.id] if (
+                        field.id in keywords) else None
 
     @cached_property
     def parsed_dates(self):
@@ -601,3 +629,27 @@ class EventImportForm(Form):
             transaction.abort()
 
         return count, errors
+
+
+class EventConfigurationForm(Form):
+    """ Form to configure filters for events view. """
+
+    definition = TextAreaField(
+        label=_("Definition"),
+        fieldset=_("General"),
+        validators=[
+            InputRequired(),
+            ValidFilterFormDefinition(
+                require_email_field=False,
+                require_title_fields=False,
+            )
+        ],
+        render_kw={'rows': 32, 'data-editor': 'form'})
+
+    keyword_fields = TextAreaField(
+        label=_("Filters"),
+        fieldset=_("Display"),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'radio,checkbox'
+        })

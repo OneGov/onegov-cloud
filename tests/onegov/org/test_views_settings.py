@@ -84,12 +84,17 @@ def test_settings(client):
     assert text in page
     assert '' in page
     assert (
-        f'<div id="announcement_header" '
+        f'<div id="header_announcement" '
         f'style="background-color: {bg_color};">'
     ) in page
     assert (
         f'<a style="color: {color}" href="https://other-town.ch"'
     ) in page
+
+    # module settings
+    settings = client.get('/module-settings')
+    assert client.app.org.event_filter_type == 'tags'
+    assert settings.form['event_filter_type'].value == 'tags'
 
 
 def test_api_keys_create_and_delete(client):

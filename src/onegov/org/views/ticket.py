@@ -31,6 +31,7 @@ from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
 from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
@@ -126,7 +127,9 @@ def view_ticket(self, request, layout=None):
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
-        'edit_amount_url': edit_amount_url
+        'edit_amount_url': edit_amount_url,
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
