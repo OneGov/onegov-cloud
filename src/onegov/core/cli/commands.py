@@ -264,7 +264,7 @@ def transfer(
         remote: str, local: str, glob: str = '*'
     ) -> None:
         """ Transfers only changed files based on size or last-modified
-        time."""
+        time. This is rsnyc default behaviour. """
 
         send = (
             f"rsync -av --include='{glob}' --exclude='*' "
