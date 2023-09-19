@@ -1,7 +1,6 @@
 from collections import namedtuple
-
 import morepath
-
+import time
 from morepath.request import Response
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
@@ -11,6 +10,12 @@ from onegov.org.layout import PersonLayout, PersonCollectionLayout
 from onegov.org.models import AtoZ, Topic
 from onegov.people import Person, PersonCollection
 from markupsafe import Markup
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.page import Page
+    from collections.abc import Iterable, Iterator
 
 
 @OrgApp.html(model=PersonCollection, template='people.pt', permission=Public)
@@ -33,13 +38,36 @@ def view_people(self, request, layout=None):
     }
 
 
+def timed(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"{func.__name__} took {execution_time:.4f} seconds to execute")
+        return result
+    return wrapper
+
+
 @OrgApp.html(model=Person, template='person.pt', permission=Public)
+@timed
 def view_person(self, request, layout=None):
 
-    pages = request.session.query(Topic)
-    pages = pages.filter(Topic.people is not None).all()
-    org_to_func = person_functions_by_organization(self, pages, request)
+    def visit_topics_with_people(
+        pages: 'Iterable[Page]',
+        root_id: int | None = None
+    ) -> 'Iterator[Topic]':
+        for page in pages:
 
+            if root_id is None:
+                root_id = page.id
+
+            if isinstance(page, Topic) and page.people:
+                yield page
+            yield from visit_topics_with_people(page.children, root_id=root_id)
+
+    topics = visit_topics_with_people(request.app.pages_tree)
+    org_to_func = person_functions_by_organization(self, topics, request)
     return {
         'title': self.title,
         'person': self,
@@ -48,25 +76,26 @@ def view_person(self, request, layout=None):
     }
 
 
-def person_functions_by_organization(subject_person, pages, request):
+def person_functions_by_organization(subject_person, topics, request):
     """ Collects 1:1 mappings of all context-specific functions and
      organizations for a person. Organizations are pages where `subject_person`
      is listed as a person.
 
-     Returns a List of strings in the form:
+     Returns a List of Markup in the form:
 
-        - Organization 1, Function A
-        - Organization 2, Function B
+        - Organization 1: Function A
+        - Organization 2: Function B
+        - ...
 
     This is not necessarily the same as person.function!
     """
 
     TopicFunctionPair = namedtuple("TopicFunctionPair", ["function", "topic"])
 
-    topics = sorted(
+    sorted_topics = sorted(
         (
             TopicFunctionPair(func, topic)
-            for topic in pages
+            for topic in topics
             for pers in (topic.people or [])
             if (
                 pers.id == subject_person.id
@@ -78,14 +107,14 @@ def person_functions_by_organization(subject_person, pages, request):
         key=lambda pair: pair.topic.title,
     )
 
-    return [
+    return (
         Markup("<span>{0}: {1}</span>".format(
             Markup('<a href="{0}">{1}</a>').format(request.link(pair.topic),
                                                    pair.topic.title),
             pair.function
         ))
-        for pair in topics
-    ]
+        for pair in sorted_topics
+    )
 
 
 @OrgApp.form(model=PersonCollection, name='new', template='form.pt',
