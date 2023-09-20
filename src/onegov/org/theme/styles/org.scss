@@ -1053,18 +1053,28 @@ form {
     .file-preview-wrapper {
         &:not(:empty) {
             border: 1px solid $input-border-color;
-            border-radius: 5px;
             padding: .5rem;
             margin-bottom: 1rem;
         }
 
-        .file-details {
+        .row {
             /* FIXME:
                 temporary to ensure a somewhat reasonable display
                 within the form. Once this widget is more responsive
                 we may be able to get away with displaying this
             */
-            display: none;
+            .columns:first-child {
+                display: none;
+            }
+
+            .file-status {
+                margin-left: 0;
+                width: 66%;
+            }
+
+            .file-actions {
+                width: 33%;
+            }
         }
 
         .file-actions .button {

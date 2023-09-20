@@ -195,7 +195,7 @@ class UploadOrSelectExistingMultipleFilesWidget(UploadMultipleWidget):
         form = DummyForm(selected=selected)
         # FIXME: Don't hardcode the multi-select size
         select_html = form.selected(size=5, **kwargs)
-        return Markup('{}<br/>{}: {}').format(
+        return Markup('{}</label><br/><label>{}: {}').format(
             select_html,
             field.gettext(super().additional_label),
             upload_html

@@ -304,7 +304,9 @@ class UploadMultipleWidget(FileInput):
                     for error in subfield.errors
                 ) for subfield in field
             )
-            additional_html = Markup('{label}: {input_html}').format(
+            additional_html = Markup(
+                '<label>{label}: {input_html}</label>'
+            ).format(
                 label=field.gettext(self.additional_label),
                 input_html=input_html
             )
