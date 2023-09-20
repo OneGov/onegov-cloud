@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-13 12:02+0200\n"
+"POT-Creation-Date: 2023-09-20 09:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1515,6 +1515,20 @@ msgstr "Persone"
 msgid "Values of the location filter"
 msgstr "Valori del filtro posizione"
 
+msgid "Choose the filter type for events (default is 'tags')"
+msgstr ""
+"Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è "
+"'tag')"
+
+msgid "A predefined set of tags"
+msgstr "Un insieme predefinito di tag"
+
+msgid "Manually configurable filters"
+msgstr "Filtri configurabili manualmente"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Entrambi, tag predefiniti e filtri configurabili"
+
 msgid "The default map view. This should show the whole town"
 msgstr ""
 "La visualizzazione predefinita della mappa. Questo dovrebbe mostrare "
@@ -1797,6 +1811,24 @@ msgstr "Mensile (il primo lunedì del mese)"
 msgid "Never"
 msgstr "Mai"
 
+msgid "Linked file"
+msgstr "File collegato"
+
+msgid "Keep link"
+msgstr "Conservare collegamento"
+
+msgid "Delete link"
+msgstr "Elimina collegamento"
+
+msgid "Replace link"
+msgstr "Sostituire collegamento"
+
+msgid "Choose existing file"
+msgstr "Scegliere tra i file esistenti"
+
+msgid "Link additional files"
+msgstr "Collegare file aggiuntivi"
+
 msgid "All directories"
 msgstr "Tutte le cartelle"
 
@@ -2030,6 +2062,9 @@ msgstr "Elimina allocazione"
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
 
+msgid "Configure"
+msgstr "Configura"
+
 msgid "This event can't be edited."
 msgstr "Questo evento non può essere modificato."
 
@@ -2116,9 +2151,6 @@ msgstr "Sincronizza"
 
 msgid "Directory"
 msgstr "Cartella"
-
-msgid "Configure"
-msgstr "Configura"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -2239,6 +2271,9 @@ msgstr "Mostra l'immagine in anteprima nella pagina madre"
 
 msgid "Show image on page"
 msgstr "Mostra l'immagine nella pagina"
+
+msgid "Documents"
+msgstr "Documenti"
 
 msgid "This month"
 msgstr "Questo mese"
@@ -2490,8 +2525,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -2542,9 +2577,6 @@ msgstr "Modifica collegamento"
 
 msgid "The link was deleted"
 msgstr "Il collegamento è stato cancellato"
-
-msgid "Delete link"
-msgstr "Elimina collegamento"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
@@ -3708,7 +3740,7 @@ msgid "This is an imported event"
 msgstr "Questo è un evento importato"
 
 msgid "Search in Events"
-msgstr "In Events suchen"
+msgstr "Ricerca negli eventi"
 
 msgid "Tag"
 msgstr "Tag"
@@ -5362,15 +5394,3 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
-
-msgid "Choose the filter type for events (default is 'tags')"
-msgstr "Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è 'tag')"
-
-msgid "A predefined set of tags"
-msgstr "Un insieme predefinito di tag"
-
-msgid "Manually configurable filters"
-msgstr "Filtri configurabili manualmente"
-
-msgid "Both, predefined tags as well as configurable filters"
-msgstr "Entrambi, tag predefiniti e filtri configurabili"
