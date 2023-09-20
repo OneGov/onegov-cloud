@@ -131,3 +131,10 @@ def get_chosen_asset() -> 'Iterator[str]':
     yield 'chosen.fixes.css'
     yield 'chosen.jquery.js'
     yield 'chosen-init.js'
+
+
+@FormApp.webasset('typeahead-standalone')
+def get_typeahead_asset() -> 'Iterator[str]':
+    yield 'typeahead-standalone.css'
+    yield 'typeahead-standalone.js'
+    yield 'typeahead-standalone-init.js'

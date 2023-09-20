@@ -32,6 +32,9 @@ msgstr "Benutzer"
 msgid "Settings"
 msgstr "Einstellungen"
 
+msgid "People"
+msgstr "Personen"
+
 msgid "Assemblies"
 msgstr "Landsgemeinden"
 
