@@ -1052,8 +1052,8 @@ form {
 
     .file-preview-wrapper {
         &:not(:empty) {
-            border: $input-border;
-            border-radius: .7rem;
+            border: $input-border-color;
+            border-radius: 5px;
             padding: .5rem;
             margin-bottom: 1rem;
         }
