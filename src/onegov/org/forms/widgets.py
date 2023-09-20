@@ -149,7 +149,13 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
         class DummyForm(Form):
             existing = SelectField(
                 name=field.name,  # we need to use our name
-                choices=field.choices
+                choices=field.choices,
+                render_kw={
+                    'data_placeholder': field.gettext(
+                        _('Choose existing file')
+                    ),
+                    'class_': 'chosen-select'
+                }
             )
 
         form = DummyForm(existing=getattr(field, 'existing', None))
@@ -158,6 +164,8 @@ class UploadOrSelectExistingFileWidget(UploadOrLinkExistingFileWidget):
 
 
 class UploadOrSelectExistingMultipleFilesWidget(UploadMultipleWidget):
+
+    additional_label = _('Link additional files')
 
     def render_input(
         self,
@@ -170,7 +178,13 @@ class UploadOrSelectExistingMultipleFilesWidget(UploadMultipleWidget):
         class DummyForm(Form):
             selected = SelectMultipleField(
                 name=field.name,  # we need to use our name
-                choices=field.choices
+                choices=field.choices,
+                render_kw={
+                    'data_placeholder': field.gettext(
+                        _('Choose existing file')
+                    ),
+                    'class_': 'chosen-select'
+                }
             )
 
         selected = [
@@ -181,4 +195,8 @@ class UploadOrSelectExistingMultipleFilesWidget(UploadMultipleWidget):
         form = DummyForm(selected=selected)
         # FIXME: Don't hardcode the multi-select size
         select_html = form.selected(size=5, **kwargs)
-        return Markup('{}<br/>{}').format(upload_html, select_html)
+        return Markup('{}<br/>{}: {}').format(
+            select_html,
+            field.gettext(super().additional_label),
+            upload_html
+        )

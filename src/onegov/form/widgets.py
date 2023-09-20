@@ -263,6 +263,8 @@ class UploadMultipleWidget(FileInput):
 
     """
 
+    additional_label = _('Upload additional files')
+
     def __init__(self) -> None:
         self.multiple = True
 
@@ -303,7 +305,7 @@ class UploadMultipleWidget(FileInput):
                 ) for subfield in field
             )
             additional_html = Markup('{label}: {input_html}').format(
-                label=field.gettext(_('Upload additional files')),
+                label=field.gettext(self.additional_label),
                 input_html=input_html
             )
             return existing_html + simple_template.format(additional_html)

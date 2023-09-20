@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-19 16:20+0200\n"
+"POT-Creation-Date: 2023-09-20 09:02+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1822,6 +1822,12 @@ msgstr "Elimina collegamento"
 
 msgid "Replace link"
 msgstr "Sostituire collegamento"
+
+msgid "Choose existing file"
+msgstr "Scegliere tra i file esistenti"
+
+msgid "Link additional files"
+msgstr "Collegare file aggiuntivi"
 
 msgid "All directories"
 msgstr "Tutte le cartelle"
