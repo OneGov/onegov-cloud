@@ -607,7 +607,7 @@ class OccurrenceCollection(Pagination):
             # TODO translate tags
             last_change = e.last_change.strftime('%Y-%m-%d %H:%M:%S')
             event = objectify.Element('item',
-                                      dict(stautus='1',
+                                      dict(status='1',
                                            suchbar='1',
                                            mutationsdatum=last_change))
             event.id = e.id
@@ -629,8 +629,14 @@ class OccurrenceCollection(Pagination):
                 event.urlweb = e.external_event_url
             if e.tags:
                 event.rubrik = e.tags
-            if 'kalender' in e.filter_keywords:
-                event.hauptrubrik = e.filter_keywords['kalender']
+            if e.filter_keywords:
+                values = list()
+                for k, v in e.filter_keywords.items():
+                    if k in ['kalender']:
+                        event.hauptrubrik = v
+                    else:
+                        values.append(v)
+                event.rubrik = values
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
             ort.adresse = ''
