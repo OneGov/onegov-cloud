@@ -18,7 +18,9 @@
                 </div>
 
                 <div class="occurrence-filters" tal:condition="occurrence.filter_keywords and show_filters">
-                    <span tal:repeat="filter occurrence.filter_keywords.items()" class="blank-label">${filter[0].title()}: ${', '.join(item for item in filter[1]) if isinstance(filter[1], list) else filter[1]}</span>
+                    <div tal:repeat="filter occurrence.filter_keywords.items()">
+                        <span tal:condition="filter[1]" class="blank-label">${filter[0].title()}: ${', '.join(item for item in filter[1]) if isinstance(filter[1], list) else filter[1]}</span>
+                    </div>
                 </div>
 
                 <div class="occurence-link" tal:define="event_link occurrence.event.content.get('external_event_url')">
