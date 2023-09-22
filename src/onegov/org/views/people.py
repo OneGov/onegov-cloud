@@ -94,6 +94,8 @@ def person_functions_by_organization(subject_person, topics, request):
         ),
         key=lambda pair: pair.topic.title,
     )
+    if not sorted_topics:
+        return ()
 
     return (
         Markup('<span><a href="{url}">{title}</a>: {function}</span>'.format(
