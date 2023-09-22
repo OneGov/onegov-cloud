@@ -1103,8 +1103,8 @@
                 <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
             </div>
             <div tal:condition="occurrence.filter_keywords and show_filters" class="occurrence-filter">
-                <div tal:repeat="filter occurrence.filter_keywords.items()" class="blank-label-description">
-                    <span tal:condition="filter[1]">${filter[0] .title()}:</span>
+                <div tal:repeat="filter occurrence.filter_keywords.items()">
+                    <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
                     <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
                     <span tal:condition="not isinstance(filter[1], list)" class="blank-label">${filter[1]}</span>
                 </div>
