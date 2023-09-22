@@ -221,6 +221,15 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
                     attrs={'class': ('edit-link', 'border')}
                 )
             )
+            links.append(
+                Link(
+                    _("Mail templates"),
+                    url=request.link(
+                        self.translator, name='mail-templates'
+                    ),
+                    attrs={'class': 'envelope'},
+                )
+            )
             if self.state is None:
                 advanced_links.append(
                     Link(

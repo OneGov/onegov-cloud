@@ -858,5 +858,8 @@ msgstr ""
 msgid "Did not find a signature in /files."
 msgstr "Es wurde keine Unterschrift in /dateien gefunden."
 
+msgid "The image for the signature could not be recognized."
+msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
+
 msgid "Download"
 msgstr "Herunterladen"

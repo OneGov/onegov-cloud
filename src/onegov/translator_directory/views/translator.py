@@ -31,6 +31,7 @@ from onegov.translator_directory.layout import AddTranslatorLayout,\
 from onegov.translator_directory.models.translator import Translator
 from uuid import uuid4
 from xlsxwriter import Workbook
+from docx.image.exceptions import UnrecognizedImageError  # type: ignore
 
 
 @TranslatorDirectoryApp.form(
@@ -479,15 +480,19 @@ def view_mail_templates(self, request, form):
         signature_f = get_file(request.app, signature_file.id)
         signature_bytes = signature_f.reference.file.read()
 
-        __, docx = fill_docx_with_variables(
-            BytesIO(template), self, request, BytesIO(signature_bytes),
-            **additional_fields
-        )
-        return Response(
-            docx,
-            content_type='application/vnd.ms-office',
-            content_disposition=f'inline; filename={template_name}',
-        )
+        try:
+            __, docx = fill_docx_with_variables(
+                BytesIO(template), self, request, BytesIO(signature_bytes),
+                **additional_fields
+            )
+            return Response(
+                docx,
+                content_type='application/vnd.ms-office',
+                content_disposition=f'inline; filename={template_name}',
+            )
+        except UnrecognizedImageError:
+            request.alert(_('The image for the signature could not be '
+                          'recognized.'))
 
     return {
         'layout': layout,
