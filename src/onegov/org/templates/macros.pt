@@ -1453,6 +1453,28 @@
     </ul>
 </metal:tags>
 
+<metal:tags_collapsed define-macro="tags_collapsed">
+<!--?    <ul class="tags accordion" data-accordion>-->
+<!--?        <li tal:repeat="link tags[:10]" class="click-through">-->
+<!--?            <span tal:content="structure link(layout)" class="${link.active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"/>-->
+<!--?        </li>-->
+<!--?        <li tal:condition="len(tags)>10" class="click-through accordion-navigation">-->
+<!--?            <a href="#morefilters">...</a>-->
+<!--?        </li>-->
+<!--?        <li tal:repeat="link tags[10:]" class="click-through accordion-navigation" id="morefilters">-->
+<!--?            <span tal:content="structure link(layout)" class="content ${link .active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"/>-->
+<!--?        </li>-->
+<!--?    </ul>-->
+    <ul class="accordion" data-accordion>
+      <li class="accordion-navigation">
+        <a href="#panel1a">Accordion 1</a>
+        <div id="panel1a" class="content">
+          Panel 1. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        </div>
+      </li>
+    </ul>
+</metal:tags_collapsed>
+
 <metal:generic_message define-macro="generic_message" i18n:domain="onegov.org">
     <div class="title">
         <metal:b define-slot="title" />
