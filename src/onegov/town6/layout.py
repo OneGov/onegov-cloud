@@ -734,7 +734,7 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
-            if self.has_files:
+            if self.has_submission_files:
                 links.append(
                     Link(
                         text=_("Files (zip)"),
@@ -762,11 +762,9 @@ class TicketLayout(DefaultLayout):
             return links
 
     @cached_property
-    def has_files(self) -> bool:
-        form_submission = FormSubmissionCollection(self.request.session).by_id(
-            self.model.handler.id
-        )
-        return form_submission is not None and bool(form_submission.files)
+    def has_submission_files(self) -> bool:
+        submission = getattr(self.model.handler, 'submission', None)
+        return submission is not None and bool(submission.files)
 
 
 class TicketNoteLayout(DefaultLayout):

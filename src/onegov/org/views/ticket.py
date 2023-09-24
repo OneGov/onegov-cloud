@@ -753,20 +753,14 @@ def view_ticket_pdf(self, request):
 def view_ticket_files(self, request):
     """ Download the files associated with the ticket as zip. """
 
-    form_submission = FormSubmissionCollection(request.session).by_id(
-        self.handler.id
-    )
-    breakpoint()
+    form_submission = getattr(self.handler, 'submission', None)
 
-    # `form_submission` seems to be the same as self.handler.submission?
-    # well then we might just use that
     if form_submission is None:
         return request.redirect(request.link(self))
 
-    form_submission_files = form_submission.files
     buffer = BytesIO()
     with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for f in form_submission_files:
+        for f in form_submission.files:
             try:
                 # todo: delete a file and check if this is recoverable
                 zipf.writestr(f.name, f.reference.file.read())
