@@ -1980,6 +1980,9 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Download files"
+msgstr "Scarica i file"
+
 msgid "New Message"
 msgstr "Nuovo messaggio"
 
@@ -2525,8 +2528,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -5317,6 +5320,9 @@ msgstr "Il biglietto è già stato chiuso"
 
 msgid "Your message has been sent"
 msgstr "Il tuo messaggio è stato inviato"
+
+msgid "Zip archive created successfully"
+msgstr "Archivio zip creato con successo"
 
 msgid "Your request has been submitted"
 msgstr "La tua richiesta è stata inviata"

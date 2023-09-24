@@ -219,6 +219,9 @@ msgstr "Neue Notiz"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Download files"
+msgstr "Dateien herunterladen"
+
 msgid "Upload to Gever"
 msgstr "Hochladen auf Gever"
 
