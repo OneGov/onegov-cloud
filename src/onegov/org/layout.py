@@ -1197,7 +1197,7 @@ class TicketLayout(DefaultLayout):
             if self.has_submission_files:
                 links.append(
                     Link(
-                        text=_("Files (zip)"),
+                        text=_("Download files"),
                         url=self.request.link(self.model, 'files'),
                         attrs={'class': 'ticket-files'}
                     )
