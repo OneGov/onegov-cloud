@@ -759,14 +759,20 @@ def view_ticket_files(self, request):
         return request.redirect(request.link(self))
 
     buffer = BytesIO()
+    not_existing = []
     with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for f in form_submission.files:
             try:
-                # todo: delete a file and check if this is recoverable
                 zipf.writestr(f.name, f.reference.file.read())
-            except IOError:  # This is unlikely to happen, but you never know..
-                request.alert(_(f"Did not find file {f.name}"))
-                continue
+            except IOError:
+                not_existing.append(f.name)
+
+    if not_existing:
+        count = len(not_existing)
+        request.alert(_(f"{count} file(s) not found:"
+                        f" {', '.join(not_existing)}"))
+    else:
+        request.info(_("Zip archive created successfully"))
 
     buffer.seek(0)
 
