@@ -10,7 +10,9 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
-from onegov.form import Form
+import zipfile
+from io import BytesIO
+from onegov.form import Form, FormSubmissionCollection
 from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
@@ -741,6 +743,43 @@ def view_ticket_pdf(self, request):
         content.read(),
         content_type='application/pdf',
         content_disposition='inline; filename={}_{}.pdf'.format(
+            normalize_for_url(self.number),
+            date.today().strftime('%Y%m%d')
+        )
+    )
+
+
+@OrgApp.view(model=Ticket, name='files', permission=Private)
+def view_ticket_files(self, request):
+    """ Download the files associated with the ticket as zip. """
+
+    form_submission = FormSubmissionCollection(request.session).by_id(
+        self.handler.id
+    )
+    breakpoint()
+
+    # `form_submission` seems to be the same as self.handler.submission?
+    # well then we might just use that
+    if form_submission is None:
+        return request.redirect(request.link(self))
+
+    form_submission_files = form_submission.files
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for f in form_submission_files:
+            try:
+                # todo: delete a file and check if this is recoverable
+                zipf.writestr(f.name, f.reference.file.read())
+            except IOError:  # This is unlikely to happen, but you never know..
+                request.alert(_(f"Did not find file {f.name}"))
+                continue
+
+    buffer.seek(0)
+
+    return Response(
+        buffer.read(),
+        content_type='application/zip',
+        content_disposition='inline; filename=ticket-{}_{}.zip'.format(
             normalize_for_url(self.number),
             date.today().strftime('%Y%m%d')
         )

@@ -9,7 +9,8 @@ from onegov.core.utils import linkify, to_html_ul
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id
+from onegov.form import FormCollection, as_internal_id,\
+    FormSubmissionCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org.elements import QrCodeLink
 from onegov.org.exports.base import OrgExport
@@ -733,6 +734,14 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
+            if self.has_files:
+                links.append(
+                    Link(
+                        text=_("Files (zip)"),
+                        url=self.request.link(self.model, 'files'),
+                        attrs={'class': 'ticket-files'}
+                    )
+                )
             if self.request.app.org.gever_endpoint:
                 links.append(
                     Link(
@@ -751,6 +760,13 @@ class TicketLayout(DefaultLayout):
                     )
                 )
             return links
+
+    @cached_property
+    def has_files(self) -> bool:
+        form_submission = FormSubmissionCollection(self.request.session).by_id(
+            self.model.handler.id
+        )
+        return form_submission is not None and bool(form_submission.files)
 
 
 class TicketNoteLayout(DefaultLayout):
