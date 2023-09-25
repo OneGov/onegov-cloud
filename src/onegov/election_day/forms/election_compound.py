@@ -315,7 +315,7 @@ class ElectionCompoundForm(Form):
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
-            'CVP #d28b00\n'
+            'Die Mitte #d28b00\n'
             'EDU #7f6b65\n'
             'EVP #e3c700\n'
             'FDP #0084c7\n'
