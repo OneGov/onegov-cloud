@@ -151,8 +151,6 @@ p4 = re.compile(r'(.*), (.*), (.*)')
 p1 = re.compile(r'(.*), (.*)')
 p6 = re.compile(r'(.*)\n(.*)')
 p5 = re.compile(r'([A-Za-z ]*) ?(\d+[a-z]?)?')  # street name and optional
-
-
 # building number
 
 
@@ -200,9 +198,8 @@ def parse_and_split_address_field(address):
         postal_pcc = m.group(2)
         return location_addr, location_pcc, postal_addr, postal_pcc
 
-    if m := p6.match(address):
-        postal_addr = m.group(1)
-        postal_pcc = m.group(2)
+    if p6.match(address):
+        postal_addr, postal_pcc = address.rsplit('\n', 1)
         return location_addr, location_pcc, postal_addr, postal_pcc
 
     if m := p5.match(address):
