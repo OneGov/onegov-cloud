@@ -264,6 +264,57 @@ def migrate_people_address_field(dry_run):
     return _migrate
 
 
+@cli.command('onegov-migrate-people-address-field')
+@click.option('--dry-run/--no-dry-run', default=False)
+def onegov_migrate_people_address_field(dry_run):
+    """ Migrates people address field everywhere in onegov.
+
+    Migrate data from 'people' column 'address' field to
+    'location_address', 'location_code_city', 'postal_address' and
+    'postal_code_city' fields.
+
+
+    Example:
+
+        onegov-people --select /onegov_town6/ebikon onegov-migrate-people-address-field
+
+        onegov-people --select /onegov_org/risch onegov-migrate-people-address-field
+        --dry-run
+
+    """
+
+    def _migrate(request, app):
+        click.secho(f'Request url: {request.url}..')
+        session = app.session()
+        click.secho("Onegov migrate data from table 'people' column "
+                    "'address' field to 'location_address', "
+                    "'location_code_city', 'postal_address' and "
+                    "'postal_code_city ..",
+                    fg='yellow')
+        migration_count = 0
+        total_count = 0
+        for person in session.query(Person):
+            total_count += 1
+
+            if not person.address:
+                continue
+
+            person.location_address, person.location_code_city, \
+                person.postal_address, person.postal_code_city = \
+                parse_and_split_address_field(person.address)
+
+            migration_count += 1
+
+        if dry_run:
+            transaction.abort()
+            click.secho('Aborting transaction', fg='yellow')
+
+        click.secho(f'Migrated all {migration_count} address(es) of totally '
+                    f'{total_count} people', fg='green')
+
+    return _migrate
+
+
 re_postal_code_city_ch = re.compile(r'\d{4} .*')  # e.g. '1234 Mein Ort'
 re_postal_code_city_de = re.compile(r'D-\d{5} .*')  # e.g. 'D-12345 Mein Ort'
 
