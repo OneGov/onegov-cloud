@@ -8,6 +8,8 @@ def test_parse_person_address_field():
         ('', ('', '', '', '')),
         ('Leimenstrasse 1, 4001 Basel',
          ('', '', 'Leimenstrasse 1', '4001 Basel')),
+        ('Pilatusstrasse 3\n6003 Luzern',
+         ('', '', 'Pilatusstrasse 3', '6003 Luzern')),
         ('Strassburgerallee 12-18, 4055 Basel',
          ('', '', 'Strassburgerallee ' '12-18', '4055 Basel')),
         ('St. Alban-Graben 5, 4010 Basel',
