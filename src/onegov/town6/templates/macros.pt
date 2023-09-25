@@ -1458,7 +1458,7 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div tal:condition="link_mp4 or link_webm" class="homepage-video" style="max-height: ${max_height};"
+    <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}"
     >
         <video id="autoplay-video" autoplay playsinline loop muted
             data-link-mp4="${link_mp4}"
@@ -1468,7 +1468,14 @@
         >
             Your browser does not support the video tag.
         </video>
-        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer"></div>
+        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
+            <div class="dark-overlay" tal:condition="text"></div>
+            <div class="grid-container" tal:condition="text">
+                <div class="text">
+                    <span>${text}</span>
+                </div>
+            </div>
+        </div>
     </div>
 </metal:autoplay_video>
 
@@ -1507,8 +1514,8 @@
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
         <div class="orbit-wrapper">
             <div  tal:condition="images and len(images) > 1" class="orbit-controls">
-                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span>&#9664;&#xFE0E;</button>
-                <button class="orbit-next"><span class="show-for-sr">Next Slide</span>&#9654;&#xFE0E;</button>
+                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
             <ul class="orbit-container">
                 <li tal:repeat="image images" class="orbit-slide">
@@ -1594,15 +1601,15 @@
 </div></div></div>
 </metal:testimonial_slider>
 
-
-
 <metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.town6">
-    <nav class="orbit-bullets">
-        <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
-            <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
-<!--?            <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span> -->
-        </button>
-    </nav>
+    <div class="orbit-bullet-wrapper show-for-medium">
+        <nav class="orbit-bullets">
+            <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
+                <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
+                <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span>
+            </button>
+        </nav>
+    </div>
 </metal:bullets>
 
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">
