@@ -91,6 +91,11 @@ def test_settings(client):
         f'<a style="color: {color}" href="https://other-town.ch"'
     ) in page
 
+    # module settings
+    settings = client.get('/module-settings')
+    assert client.app.org.event_filter_type == 'tags'
+    assert settings.form['event_filter_type'].value == 'tags'
+
 
 def test_api_keys_create_and_delete(client):
 

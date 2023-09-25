@@ -60,13 +60,13 @@
             <!-- Gets filled by sidebar_mobile.js -->
         </div>
 
-        <div class="off-canvas position-right" id="offCanvasSearch" data-auto-focus="false" data-off-canvas>
+        <div class="off-canvas position-right"  tal:condition="not:hide_search_header|nothing" id="offCanvasSearch" data-auto-focus="false" data-off-canvas>
             <button class="off-canvas-close-button" aria-label="Close menu" type="button" data-close>
                 <i class="fa fa-times"></i>
             </button>
             <form class="searchbox header-searchbox" action="${layout.search_url}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
                 <div class="input-group">
-                    <input class="input-group-field" type="search" id="search-side" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
+                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200" placeholder="Search term" i18n:attributes="placeholder">
                     <div class="typeahead">
                         <div class="cell small-12" data-typeahead-container>
                         </div>
@@ -212,6 +212,7 @@
                                                 <div metal:define-slot="post-title"></div>
                                             </div>
                                         </h1>
+                                        <div metal:define-slot="before-content"></div>
                                         <div metal:define-slot="content"></div>
                                     </section>
                                 </div>

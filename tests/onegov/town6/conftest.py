@@ -14,7 +14,7 @@ from tests.shared.utils import create_app
 
 
 class Client(BaseClient):
-    skip_n_forms = 2
+    skip_n_forms = 1
     use_intercooler = True
 
     def bound_reserve(self, allocation):

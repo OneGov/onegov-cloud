@@ -40,7 +40,7 @@ repos:
         args: ["-c", "pyproject.toml", "--quiet"]
         additional_dependencies: [ "bandit[toml]" ]
   - repo: https://github.com/mondeja/pre-commit-po-hooks
-    rev: '2c9989ff933b17d496bcaca5a80c9f08ee6677db'
+    rev: 'v1.7.3'
     hooks:
       - id: untranslated-messages
         files: '\.po$'

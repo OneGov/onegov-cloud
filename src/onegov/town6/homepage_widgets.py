@@ -1,4 +1,7 @@
 from collections import namedtuple
+from datetime import datetime
+import requests
+import xml.etree.ElementTree as ET
 
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection
@@ -13,6 +16,14 @@ from onegov.reservation import ResourceCollection
 
 from onegov.town6 import TownApp
 from onegov.town6 import _
+
+
+from typing import NamedTuple, TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from typing import Iterator
+    from onegov.town6.layout import HomepageLayout
 
 
 @TownApp.homepage_widget(tag='row')
@@ -542,3 +553,105 @@ class TestimonialSliderWidget:
             />
         </xsl:template>
     """
+
+
+@TownApp.homepage_widget(tag='jobs')
+class JobsWidget:
+
+    template = """
+    <xsl:template match="jobs">
+        <div metal:use-macro="layout.macros['jobs-cards']"
+        tal:define="jobs_card_title '{@jobs_card_title}';
+        rss_feed '{@rss_feed}';
+        "
+        />
+    </xsl:template>
+    """
+
+    def __init__(self):
+        self.layout = None
+
+    def should_cache_fn(self, response):
+        return response.status_code == 200
+
+    def dynamic_rss_widget_builder(self, rss_feed_url):
+        """ Builds and caches widget data from the given RSS URL.
+        Note that this is called within the <?python> tag in the macro.
+
+        This is done so we can get the ``rss_feed_url`` which itself is a
+        dependency to build the actual widget.
+
+        On exception, returns an empty string and the widget isn't rendered.
+        """
+
+        try:
+            app = self.layout.request.app
+
+            response = app.cache.get_or_create(
+                'jobs_rss_feed',
+                creator=lambda: requests.get(rss_feed_url, timeout=4),
+                expiration_time=3600,
+                should_cache_fn=self.should_cache_fn
+            )
+            rss = response.content.decode('utf-8')
+            parsed = parsed_rss(rss)
+            return parsed
+
+        except Exception:
+            return ''
+
+    def get_variables(self, layout: 'HomepageLayout'):
+
+        self.layout = layout
+        return {'dynamic_rss_widget_builder': self.dynamic_rss_widget_builder}
+
+
+class RSSItem(NamedTuple):
+    """ The elements inside <item> """
+    title: str
+    description: str
+    guid: str
+    pubDate: str | None
+
+
+class RSSChannel(NamedTuple):
+    """ The elements inside <channel> """
+    title: str
+    link: str
+    description: str
+    language: str
+    copyright: str
+    items: 'Iterator[RSSItem]'
+
+
+def parsed_rss(rss):
+
+    def parse_date(date_str):
+        try:
+            return datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z')
+        except ValueError:
+            return None
+
+    def get_text(element):
+        return element.text if element is not None else ''
+
+    def extract_channel_info(channel, keys):
+        return (get_text(channel.find(key)) for key in keys)
+
+    def extract_items(channel):
+        for item in channel.findall("item"):
+            yield RSSItem(
+                title=get_text(item.find("title")),
+                description=get_text(item.find("description")),
+                guid=get_text(item.find("guid")),
+                pubDate=parse_date(get_text(item.find("pubDate")))
+            )
+
+    root = ET.fromstring(rss)
+    channel = root.find(".//channel")
+    channel_keys = [field for field in RSSChannel._fields if field != 'items']
+
+    return RSSChannel(
+        *extract_channel_info(channel, channel_keys),
+        extract_items(channel)
+    )

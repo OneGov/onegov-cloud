@@ -84,7 +84,7 @@ def attachments(swissvotes_app):
     for name, content in (
         ('ad_analysis', "Inserateanalyse"),
         ('brief_description', "Kurzbeschreibung"),
-        ('easyvote_booklet', "Easyvote"),
+        ('easyvote_booklet', "easyvote"),
         ('federal_council_message', "Message du Conseil fédéral"),
         ('foeg_analysis', "Medienanalyse fög"),
         ('parliamentary_initiative', "Initiative"),

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-08-30 15:12+0200\n"
+"POT-Creation-Date: 2023-09-19 10:38+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -345,6 +345,9 @@ msgstr "So"
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
 
+msgid "Configure"
+msgstr "Konfigurieren"
+
 msgid "Import"
 msgstr "Import"
 
@@ -465,9 +468,6 @@ msgstr "Verzeichnisse"
 
 msgid "Directory"
 msgstr "Verzeichnis"
-
-msgid "Configure"
-msgstr "Konfigurieren"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -681,23 +681,17 @@ msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
 
+msgid "Search term"
+msgstr "Suchbegriff"
+
 msgid "Skip navigation"
 msgstr "Navigation überspringen"
-
-msgid "Straight to ..."
-msgstr "Direkt zu ..."
 
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
 
 msgid "Logo"
 msgstr "Logo"
-
-msgid "Search term"
-msgstr "Suchbegriff"
-
-msgid "Perform Search"
-msgstr "Suchen"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -785,6 +779,9 @@ msgstr ""
 
 msgid "Map"
 msgstr "Karte"
+
+msgid "Documents"
+msgstr "Dokumente"
 
 msgid "More news"
 msgstr "Weitere News"
@@ -900,6 +897,9 @@ msgstr "Organisator Telefonnummer"
 
 msgid "Tags"
 msgstr "Schlagworte"
+
+msgid "Filters"
+msgstr "Filter"
 
 msgid "Date and time"
 msgstr "Datum und Zeit"
@@ -2144,6 +2144,12 @@ msgstr "Migration Links"
 
 msgid "OneGov API"
 msgstr "OneGov API"
+
+#~ msgid "Straight to ..."
+#~ msgstr "Direkt zu ..."
+
+#~ msgid "Perform Search"
+#~ msgstr "Suchen"
 
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "Das OneGov Cloud Team"

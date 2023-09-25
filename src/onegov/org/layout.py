@@ -1719,19 +1719,29 @@ class OccurrencesLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
-            return [
-                Link(
+        def links():
+            if (self.request.is_admin and self.request.app.org.
+                    event_filter_type in ['filters', 'tags_and_filters']):
+                yield Link(
+                    text=_("Configure"),
+                    url=self.request.link(self.model, '+edit'),
+                    attrs={'class': 'edit-link'}
+                )
+
+            if self.request.is_manager:
+                yield Link(
                     text=_("Import"),
                     url=self.request.link(self.model, 'import'),
                     attrs={'class': 'import-link'}
-                ),
-                Link(
+                )
+
+                yield Link(
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
                 )
-            ]
+
+        return list(links())
 
 
 class OccurrenceLayout(EventBaseLayout):
@@ -2538,7 +2548,6 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
         def links():
-
             if self.request.is_admin:
                 yield Link(
                     text=_("Configure"),

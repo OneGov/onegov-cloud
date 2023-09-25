@@ -2,6 +2,8 @@ from onegov.form import Form
 from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
 from wtforms.fields import URLField
+from wtforms.validators import Optional
+from wtforms.validators import URL
 
 
 ALLOWED_MIME_TYPES = {
@@ -22,6 +24,7 @@ class TranslatorDirectorySettingsForm(Form):
     declaration_link = URLField(
         label=_("Link to declaration of authorization"),
         fieldset=_("Accreditation"),
+        validators=[URL(), Optional()]
     )
 
     def update_model(self, app):
