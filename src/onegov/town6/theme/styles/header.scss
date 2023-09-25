@@ -600,10 +600,15 @@ $editbar-fg-color-active: $white;
             .navlink {
                 border-radius: .7rem;
                 margin-right: 3rem;
-                padding: 1rem;
                 transition: background-color 200ms linear;
 
-                &:hover {
+                span {
+                    display: block;
+                    padding: 1rem;
+                }
+
+                &:hover,
+                &.current {
                     background: rgba(250, 250, 250, .15);
                     color: $white;
                 }
