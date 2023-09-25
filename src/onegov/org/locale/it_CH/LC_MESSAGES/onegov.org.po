@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-20 09:02+0200\n"
+"POT-Creation-Date: 2023-09-25 08:37+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1441,9 +1441,6 @@ msgstr "Colore del carattere dell'annuncio"
 msgid "Only show Announcement for logged-in users"
 msgstr "Mostra solo gli annunci per gli utenti connessi"
 
-msgid "Keep header links fixed to top on scrolling"
-msgstr "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
-
 msgid "Header links"
 msgstr "Collegamenti di intestazione"
 
@@ -2528,8 +2525,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -5397,3 +5394,7 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Keep header links fixed to top on scrolling"
+#~ msgstr ""
+#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"

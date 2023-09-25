@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-09-20 09:02+0200\n"
+"POT-Creation-Date: 2023-09-25 08:37+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1438,9 +1438,6 @@ msgstr "Couleur de la police de l'annonce"
 msgid "Only show Announcement for logged-in users"
 msgstr "Afficher l'annonce uniquement pour les utilisateurs connectés"
 
-msgid "Keep header links fixed to top on scrolling"
-msgstr "Maintenir les liens de l'en-tête en haut lors du défilement"
-
 msgid "Header links"
 msgstr "Liens d'en-tête"
 
@@ -2518,7 +2515,6 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
 #.
 msgid "Event"
@@ -5403,3 +5399,6 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
+
+#~ msgid "Keep header links fixed to top on scrolling"
+#~ msgstr "Maintenir les liens de l'en-tête en haut lors du défilement"
