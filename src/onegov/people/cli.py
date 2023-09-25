@@ -276,10 +276,11 @@ def onegov_migrate_people_address_field(dry_run):
 
     Example:
 
-        onegov-people --select /onegov_town6/ebikon onegov-migrate-people-address-field
+        onegov-people --select /onegov_town6/ebikon
+        onegov-migrate-people-address-field
 
-        onegov-people --select /onegov_org/risch onegov-migrate-people-address-field
-        --dry-run
+        onegov-people --select /onegov_org/risch
+        onegov-migrate-people-address-field --dry-run
 
     """
 
