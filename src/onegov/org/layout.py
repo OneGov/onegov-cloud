@@ -1116,8 +1116,8 @@ class TicketLayout(DefaultLayout):
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
                 links = self.model.handler.get_links(self.request)
-                assert len(links) <= 2, """
-                    Models are limited to two model-specific links. Usually
+                assert len(links) <= 3, """
+                    Models are limited to three model-specific links. Usually
                     a primary single link and a link group containing the
                     other links.
                 """
