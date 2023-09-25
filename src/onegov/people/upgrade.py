@@ -238,3 +238,18 @@ def extend_agency_and_person_with_more_fields(context):
                 Column(column, Text, nullable=True),
                 default=lambda x: ''
             )
+
+
+@upgrade_task('ogc-1243 replace person address field')
+def onegov_replace_person_address_field(context):
+    people_columns = ['location_address', 'location_code_city',
+                      'postal_address', 'postal_code_city', 'website_2']
+    table = 'people'
+
+    for column in people_columns:
+        if not context.has_column(table, column):
+            context.add_column_with_defaults(
+                table,
+                Column(column, Text, nullable=True),
+                default=lambda x: ''
+            )
