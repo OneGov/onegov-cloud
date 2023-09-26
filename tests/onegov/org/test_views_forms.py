@@ -6,6 +6,8 @@ import transaction
 
 from datetime import date
 from freezegun import freeze_time
+
+from onegov.file import FileCollection
 from onegov.form import FormCollection, as_internal_id
 from onegov.people import Person
 from onegov.ticket import TicketCollection, Ticket
@@ -1123,12 +1125,13 @@ def test_file_export_for_ticket(client, temporary_directory):
 
     page.form['name'] = 'foobar'
     page.form['e_mail'] = 'foo@bar.ch'
-    page.form['datei'] = Upload('README.txt', b'first')
+    page.form['datei'] = Upload('README1.txt', b'first')
     page.form['datei2'] = Upload('README2.txt', b'second')
 
     form_page = page.form.submit().follow()
 
-    assert 'README.txt' in form_page.text
+    assert 'README1.txt' in form_page.text
+    assert 'README2.txt' in form_page.text
     assert 'Abschliessen' in form_page.text
 
     form_page.form.submit()
@@ -1143,9 +1146,47 @@ def test_file_export_for_ticket(client, temporary_directory):
     with zipfile.ZipFile(BytesIO(file_response.body), 'r') as zip_file:
         zip_file.extractall(temporary_directory)
         file_names = sorted(zip_file.namelist())
-        assert file_names == ['README.txt', 'README2.txt']
 
-        for file_name, content in zip(file_names, {b'first', b'second'}):
+        assert file_names == ['README1.txt', 'README2.txt']
+
+        for file_name, content in zip(file_names, [b'first', b'second']):
+            with zip_file.open(file_name) as file:
+                extracted_file_content = file.read()
+                assert extracted_file_content == content
+
+    # test one where the file got deleted
+    page.form['name'] = 'foobar'
+    page.form['e_mail'] = 'foo@bar.ch'
+    page.form['datei'] = Upload('README3.txt', b'third')
+    page.form['datei2'] = Upload('README4.txt', b'fourth')
+
+    form_page = page.form.submit().follow()
+
+    assert 'README3.txt' in form_page.text
+    assert 'README4.txt' in form_page.text
+    assert 'Abschliessen' in form_page.text
+
+    form_page.form.submit()
+
+    files = FileCollection(client.app.session())
+    file = files.by_filename('README3.txt').one()
+    client.app.session().delete(file)
+    client.app.session().flush()
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    # the deleted file is not in the zip
+    file_response = ticket_page.click('Dateien herunterladen')
+
+    assert file_response.content_type == 'application/zip'
+
+    with zipfile.ZipFile(BytesIO(file_response.body), 'r') as zip_file:
+        zip_file.extractall(temporary_directory)
+        file_names = sorted(zip_file.namelist())
+
+        assert 'README3.txt' not in file_names
+
+        for file_name, content in zip(file_names, [b'fourth']):
             with zip_file.open(file_name) as file:
                 extracted_file_content = file.read()
                 assert extracted_file_content == content
