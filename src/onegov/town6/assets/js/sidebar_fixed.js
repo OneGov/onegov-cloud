@@ -1,4 +1,5 @@
 if ($('.sidebar-content-wrapper').length){
+$(window).on("load", function() {
 
     var header_height = $('.nav-bar-sticky').height();
     var footer_height = $('#footer').height();
@@ -14,6 +15,6 @@ if ($('.sidebar-content-wrapper').length){
             topSpacing: header_height,
             innerWrapperSelector: '.sidebar-content-wrapper'
         });
-
     }
+})
 }
