@@ -287,7 +287,7 @@ class AtoZPages(AtoZ):
 
     def get_items(self):
 
-        topics = self.request.app.visit_topics_cached
+        topics = self.request.app.topics_cached
         topics = sorted((topic for _, topic in topics), key=self.sortkey)
 
         if self.request.is_manager:
