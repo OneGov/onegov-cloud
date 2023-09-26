@@ -139,7 +139,7 @@ def get_parameter(request, name, type_, default):
 
 
 def get_entity_filter(request, item, view, selected):
-    result = [result.name for result in item.results]
+    result = [result.name for result in item.results if result.name]
     result = sorted((
         (
             entity,

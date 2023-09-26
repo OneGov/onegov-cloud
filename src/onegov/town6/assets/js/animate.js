@@ -27,6 +27,8 @@ $('#nav-bar').on('sticky.zf.stuckto:top', function() {
     el.data('modified', true)
 });
 
+$('.side-navigation.drilldown').find('ul.current-list').removeClass( "invisible" );
+
 if ($('#page-search').length) {
     $('.search-button').click(function(){
             $('#page-search').find('#search').focus()

@@ -8,6 +8,7 @@ from onegov.file.models import (
     AssociatedFiles,
     File,
     FileSet,
+    MultiAssociatedFiles,
     NamedFile,
     SearchableFile
 )
@@ -20,6 +21,7 @@ __all__ = (
     'FileCollection',
     'FileSet',
     'FileSetCollection',
+    'MultiAssociatedFiles',
     'NamedFile',
     'SearchableFile'
 )

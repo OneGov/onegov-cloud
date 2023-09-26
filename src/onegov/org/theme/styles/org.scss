@@ -513,6 +513,14 @@ del {
 }
 
 /*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    font-size: 1.0rem;
+    display: block;
+}
+
+/*
     Click through
 */
 .click-through {
@@ -1048,6 +1056,60 @@ form {
     .ace-syntax-error {
         background: $yellow-light;
         position: absolute;
+    }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            border: 1px solid $input-border-color;
+            padding: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .row {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            .columns:first-child {
+                display: none;
+            }
+
+            .file-status {
+                margin-left: 0;
+                width: 66%;
+            }
+
+            .file-actions {
+                width: 33%;
+            }
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
     }
     /*
     <--

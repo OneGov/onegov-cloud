@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-09-13 12:02+0200\n"
+"POT-Creation-Date: 2023-09-19 10:38+0200\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -342,6 +342,9 @@ msgstr "Di"
 msgid "Every ${days} until ${end}"
 msgstr "Tous les ${days} jusqu'à ${end}"
 
+msgid "Configure"
+msgstr "Configurer"
+
 msgid "Import"
 msgstr "Imprimer"
 
@@ -460,9 +463,6 @@ msgstr "Répertoires"
 
 msgid "Directory"
 msgstr "Dossier"
-
-msgid "Configure"
-msgstr "Configurer"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -776,6 +776,9 @@ msgstr ""
 msgid "Map"
 msgstr "Carte"
 
+msgid "Documents"
+msgstr "Documents"
+
 msgid "More news"
 msgstr "Plus de nouvelles"
 
@@ -890,6 +893,9 @@ msgstr "Numéro de téléphone de l'organisateur"
 
 msgid "Tags"
 msgstr "Étiquettes"
+
+msgid "Filters"
+msgstr "Filtres"
 
 msgid "Date and time"
 msgstr "Date et heure"

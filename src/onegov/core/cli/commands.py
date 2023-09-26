@@ -161,6 +161,9 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
               help="Only transfer this schema, e.g. /town6/govikon")
 @click.option('--add-admins', default=False, is_flag=True,
               help="Add local admins (admin@example.org:test)")
+@click.option('--delta', default=False, is_flag=True,
+              help="Only transfer files where size or modification time "
+                   "changed")
 @pass_group_context
 def transfer(
     group_context: 'GroupContext',
@@ -170,7 +173,8 @@ def transfer(
     no_filestorage: bool,
     no_database: bool,
     transfer_schema: str | None,
-    add_admins: bool
+    add_admins: bool,
+    delta: bool
 ) -> None:
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
@@ -194,6 +198,15 @@ def transfer(
 
     if transfer_schema:
         transfer_schema = transfer_schema.strip('/').replace('/', '-')
+
+    if delta and not shutil.which('rsync'):
+        click.echo("")
+        click.echo("Core delta transfer requires 'rsync', please install as "
+                   "follows:")
+        click.echo("* brew install rsync")
+        click.echo("* apt-get install rsync")
+        click.echo("")
+        sys.exit(1)
 
     if not shutil.which('pv'):
         click.echo("")
@@ -245,6 +258,35 @@ def transfer(
 
         click.echo(f"Copying {remote}/{glob}")
         subprocess.check_output(f'{send} | {recv}', shell=True)
+
+    @lru_cache(maxsize=None)
+    def transfer_delta_storage(
+        remote: str, local: str, glob: str = '*'
+    ) -> None:
+        """ Transfers only changed files based on size or last-modified
+        time. This is rsnyc default behaviour. """
+
+        # '/***' means to include all files and directories under a directory
+        # recursively. Without that, it will only transfer the directory but
+        # not it's contents.
+        glob += '/***'
+
+        dry_run = (
+            f"rsync -a --include='*/' --include='{glob}' --exclude='*' "
+            f"--dry-run --itemize-changes "
+            f"{server}:{remote}/ {local}/"
+        )
+        subprocess.run(dry_run, shell=True, capture_output=False)
+
+        send = (
+            f"rsync -av --include='*/' --include='{glob}' --exclude='*' "
+            f"{server}:{remote}/ {local}/"
+        )
+
+        if shutil.which('pv'):
+            send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
+        click.echo(f"Copying {remote}/{glob}")
+        subprocess.check_output(send, shell=True)
 
     def transfer_database(
         remote_db: str,
@@ -301,7 +343,8 @@ def transfer(
 
     def transfer_storage_of_app(
         local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig'
+        remote_cfg: 'ApplicationConfig',
+        transfer_function: 'Callable[..., None]'
     ) -> None:
 
         remote_storage = remote_cfg.configuration.get('filestorage', '')
@@ -314,14 +357,15 @@ def transfer(
             remote_storage = os.path.join(remote_dir, remote_fs['root_path'])
             local_storage = os.path.join('.', local_fs['root_path'])
 
-            transfer_storage(remote_storage, local_storage, glob='global-*')
+            transfer_function(remote_storage, local_storage, glob='global-*')
 
             glob = transfer_schema or f'{local_cfg.namespace}*'
-            transfer_storage(remote_storage, local_storage, glob=glob)
+            transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_depot_storage_of_app(
         local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig'
+        remote_cfg: 'ApplicationConfig',
+        transfer_function: 'Callable[..., None]'
     ) -> None:
 
         depot_local_storage = 'depot.io.local.LocalFileStorage'
@@ -336,7 +380,7 @@ def transfer(
             local_storage = os.path.join('.', local_depot)
 
             glob = transfer_schema or f'{local_cfg.namespace}*'
-            transfer_storage(remote_storage, local_storage, glob=glob)
+            transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_database_of_app(
         local_cfg: 'ApplicationConfig',
@@ -399,8 +443,14 @@ def transfer(
                 transfer_database_of_app(local_appcfg, remote_appcfg))
 
         if not no_filestorage:
-            transfer_storage_of_app(local_appcfg, remote_appcfg)
-            transfer_depot_storage_of_app(local_appcfg, remote_appcfg)
+            transfer_strategy = (transfer_delta_storage if delta else
+                                 transfer_storage)
+            transfer_storage_of_app(
+                local_appcfg, remote_appcfg, transfer_strategy
+            )
+            transfer_depot_storage_of_app(
+                local_appcfg, remote_appcfg, transfer_strategy
+            )
 
     if add_admins:
         for schema in schemas:

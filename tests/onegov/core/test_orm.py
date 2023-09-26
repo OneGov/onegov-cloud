@@ -1720,6 +1720,13 @@ def test_associable_many_to_many(postgres_dsn):
     session.flush()
 
     assert session.query(Address).count() == 1
+    assert addresses[0].links.count() == 1
+
+    # orphans in many-to-many are fine
+    session.delete(seantis)
+    session.flush()
+    assert session.query(Address).count() == 1
+    assert addresses[0].links.count() == 0
 
 
 def test_associable_multiple(postgres_dsn):
