@@ -60,6 +60,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f382';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 
 .globals {
@@ -536,6 +537,7 @@ $editbar-fg-color-active: $white;
     .upload::before { @include icon-bold($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
+    .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
     .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
