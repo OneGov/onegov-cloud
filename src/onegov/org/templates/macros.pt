@@ -732,8 +732,17 @@
                         <span tal:condition="person.political_party and 'political_party' not in exclude">${person.political_party}</span>
                         <span tal:condition="person.parliamentary_group and 'parliamentary_group' not in exclude">${person.parliamentary_group}</span>
                     </li>
-                    <li tal:condition="person.address and 'address' not in exclude" class="person-card-address">
-                        <span>${person.address}</span>
+                    <li tal:condition="person.location_address and 'location_address' not in exclude" class="person-card-address">
+                        <span>${person.location_address}</span>
+                    </li>
+                    <li tal:condition="person.location_code_city and 'location_code_city' not in exclude" class="person-card-address">
+                        <span>${person.location_code_city}</span>
+                    </li>
+                    <li tal:condition="person.postal_address and 'postal_address' not in exclude" class="person-card-address">
+                        <span>${person.postal_address}</span>
+                    </li>
+                    <li tal:condition="person.postal_code_city and 'postal_code_city' not in exclude" class="person-card-address">
+                        <span>${person.postal_code_city}</span>
                     </li>
                     <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                         <a href="mailto:${person.email}">${person.email}</a>
@@ -746,6 +755,9 @@
                     </li>
                     <li tal:condition="person.website and 'website' not in exclude" class="person-card-website">
                         <a href="${person.website}">${person.website}</a>
+                    </li>
+                    <li tal:condition="person.website_2 and 'website_2' not in exclude" class="person-card-website">
+                        <a href="${person.website_2}">${person.website_2}</a>
                     </li>
                     <li class="person-card-notes" tal:condition="person.notes and 'notes' not in exclude">
                         <span>${person.notes}</span>

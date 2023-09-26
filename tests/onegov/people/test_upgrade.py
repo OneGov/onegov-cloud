@@ -8,6 +8,14 @@ def test_parse_person_address_field():
         ('', ('', '', '', '')),
         ('Leimenstrasse 1, 4001 Basel',
          ('', '', 'Leimenstrasse 1', '4001 Basel')),
+        ('Pilatusstrasse 3\n6003 Luzern',
+         ('', '', 'Pilatusstrasse 3', '6003 Luzern')),
+        ('Bauverwaltung Lauerz\nHusmatt 1\n6424 Lauerz',
+         ('', '', 'Bauverwaltung Lauerz\nHusmatt 1', '6424 Lauerz')),
+        ('Meier AG\nBüro für Softis\nMit viel Spass bei der Arbeit\nPostfach '
+         '41\n1234 Govikon',
+         ('', '', 'Meier AG\nBüro für Softis\nMit viel Spass bei der '
+                  'Arbeit\nPostfach 41', '1234 Govikon')),
         ('Strassburgerallee 12-18, 4055 Basel',
          ('', '', 'Strassburgerallee ' '12-18', '4055 Basel')),
         ('St. Alban-Graben 5, 4010 Basel',
