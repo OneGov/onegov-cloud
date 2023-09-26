@@ -345,7 +345,6 @@ class EventForm(Form):
             'end_time',
             'weekly',
             'email',
-            # tschupre ?
         })
 
         # clear the recurrence to avoid updating all occurrences too much
