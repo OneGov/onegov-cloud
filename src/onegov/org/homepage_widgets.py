@@ -329,7 +329,10 @@ class HrWidget:
 class SliderWidget:
     template = """
         <xsl:template match="slider">
-            <div metal:use-macro="layout.macros.slider" />
+            <div metal:use-macro="layout.macros.slider"
+             tal:define="height '{@height}'
+             "
+            />
         </xsl:template>
     """
 

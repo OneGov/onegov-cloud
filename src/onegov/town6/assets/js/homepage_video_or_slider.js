@@ -1,3 +1,6 @@
+var header_height = $('#header').height();
+
+// Video
 if (document.getElementById("autoplay-video")) {
     if (document.getElementById("autoplay-video")) {
         var parent = document.getElementById("random-video");
@@ -55,11 +58,51 @@ if (document.getElementById("autoplay-video")) {
     }
 
     // Remove height of header from video
-    var header_height = $('#header').height();
     var video_wrapper = $('.homepage-video');
     var current_height = video_wrapper.data('max-height');
     var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
-    console.log(new_height)
-    console.log(current_height)
+
     video_wrapper.css('max-height', new_height)
 }
+
+
+// Slider
+if ($('.orbit.slider').length) {
+    var orbit_slider = $('.orbit-container');
+    var current_height = orbit_slider.data('height');
+    if (current_height) {
+        var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
+    
+        orbit_slider.css('height', new_height);
+    }
+
+    // Mol luege
+    var smallest_height = 100000000;
+
+
+    $('.orbit-container .orbit-image').each(function(){
+        var url =  $(this).data('image-url');
+
+        var tempImg = '<img id="tempImg" src="' + url + '"/>';
+        $('body').append(tempImg); // add to DOM before </body>
+        $('#tempImg').hide(); //hide image
+        height = $('#tempImg').height(); //get height
+        $('#tempImg').remove(); //remove from DOM
+        console.log('height', height);
+
+        // image = new Image();
+
+        // // just in case it is not already loaded
+        // $(image).load(function () {
+        //     alert(image.width + 'x' + image.height);
+        // });
+    
+        // image.src = url;
+
+        console.log('url', url)
+    });
+
+    console.log('nochehr?')
+
+}
+

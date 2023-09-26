@@ -1509,16 +1509,16 @@
 </metal:icon_links>
 
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
-    <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
+    <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
         <div class="orbit-wrapper">
             <div  tal:condition="images and len(images) > 1" class="orbit-controls">
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
                 <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
-            <ul class="orbit-container">
+            <ul class="orbit-container" data-height="@{height}">
                 <li tal:repeat="image images" class="orbit-slide">
                     <figure class="orbit-figure">
-                        <img class="orbit-image" src="${image.src}">
+                        <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
                         <figcaption tal:condition="image.note" class="orbit-caption">${image.note}</figcaption>
                     </figure>
                 </li>
