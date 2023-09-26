@@ -1007,10 +1007,10 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul class="no-margin-bottom">
-                    <li tal:repeat="filter event.filter_keywords.items()">
-                        <span tal:condition="filter[1]" i18n:translate>${filter[0].title()}:</span>
-                        <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" i18n:translate>${tag}</span>
+                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                    <li tal:condition="filter[1]">
+                        <span i18n:translate>${filter[0].title()}:</span>
+                        <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
                         <span tal:condition="not isinstance(filter[1], list) and filter[1]" i18n:translate>${filter[1]}</span>
                     </li>
                 </ul>
