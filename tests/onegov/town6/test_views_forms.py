@@ -6,6 +6,9 @@ from onegov.ticket import Ticket
 from onegov.user import UserCollection
 from tests.onegov.town6.common import step_class
 import transaction
+import zipfile
+from webtest import Upload
+from io import BytesIO
 from freezegun import freeze_time
 from collections import namedtuple
 from unittest.mock import patch
@@ -336,3 +339,46 @@ def test_navbar_links_visibility(client):
     page = client.get("/tickets/ALL/open").click(ticket_number)
     # ... until it has been activated in settings
     assert "Hochladen auf Gever" in page
+
+
+def test_file_export_for_ticket(client, temporary_directory):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Statistics', definition=textwrap.dedent("""
+        E-Mail * = @@@
+        Name * = ___
+        Datei * = *.txt
+        Datei2 * = *.txt """), type='custom')
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/forms').click('Statistics')
+
+    page.form['name'] = 'foobar'
+    page.form['e_mail'] = 'foo@bar.ch'
+    page.form['datei'] = Upload('README.txt', b'first')
+    page.form['datei2'] = Upload('README2.txt', b'second')
+
+    form_page = page.form.submit().follow()
+
+    assert 'README.txt' in form_page.text
+    assert 'Abschliessen' in form_page.text
+
+    form_page.form.submit()
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    assert 'Dateien herunterladen' in ticket_page.text
+    file_response = ticket_page.click('Dateien herunterladen')
+
+    assert file_response.content_type == 'application/zip'
+
+    with zipfile.ZipFile(BytesIO(file_response.body), 'r') as zip_file:
+        zip_file.extractall(temporary_directory)
+        file_names = sorted(zip_file.namelist())
+
+        assert file_names == ['README.txt', 'README2.txt']
+
+        for file_name, content in zip(file_names, [b'first', b'second']):
+            with zip_file.open(file_name) as file:
+                extracted_file_content = file.read()
+                assert extracted_file_content == content

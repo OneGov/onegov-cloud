@@ -21,8 +21,7 @@ from onegov.core.utils import linkify, paragraphify
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id,\
-    FormSubmissionCollection
+from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils

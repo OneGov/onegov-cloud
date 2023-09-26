@@ -9,8 +9,7 @@ from onegov.core.utils import linkify, to_html_ul
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, as_internal_id,\
-    FormSubmissionCollection
+from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org.elements import QrCodeLink
 from onegov.org.exports.base import OrgExport

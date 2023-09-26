@@ -12,7 +12,7 @@ from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 import zipfile
 from io import BytesIO
-from onegov.form import Form, FormSubmissionCollection
+from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
