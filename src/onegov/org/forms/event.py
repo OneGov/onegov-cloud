@@ -345,6 +345,7 @@ class EventForm(Form):
             'end_time',
             'weekly',
             'email',
+            # tschupre ?
         })
 
         # clear the recurrence to avoid updating all occurrences too much
@@ -653,3 +654,20 @@ class EventConfigurationForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
+
+    def validate(self):
+        """
+        Ensures none of the active keywords is used in the `EventForm` to
+        prevent overriding data accidentally by defining filters.
+        """
+        result = super().validate()
+
+        for keyword in [k.lower() for k
+                        in self.keyword_fields.data.splitlines()]:
+            if keyword in dir(EventForm):
+                error = f'Keyword \'{keyword}\' is already in use!'
+                self.definition.errors.append(error)
+                self.keyword_fields.errors.append(error)
+                result = False
+
+        return result
