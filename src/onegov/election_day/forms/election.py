@@ -174,6 +174,7 @@ class ElectionForm(Form):
             "Shows voters counts instead of votes in the party strengths "
             "view."
         ),
+        depends_on=('election_type', 'proporz'),
     )
 
     exact_voters_counts = BooleanField(
@@ -182,6 +183,7 @@ class ElectionForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
+        depends_on=('election_type', 'proporz'),
         render_kw=dict(force_simple=True)
     )
 
@@ -214,6 +216,7 @@ class ElectionForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
+        depends_on=('election_type', 'proporz'),
         render_kw=dict(force_simple=True)
     )
 
@@ -223,6 +226,7 @@ class ElectionForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
+        depends_on=('election_type', 'proporz'),
         render_kw=dict(force_simple=True)
     )
 
