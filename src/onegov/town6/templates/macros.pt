@@ -1337,7 +1337,7 @@
                                             <div tal:repeat="filter occurrence.filter_keywords.items()">
                                                 <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
                                                 <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
-                                                <span tal:condition="not isinstance(filter[1], list)" class="blank-label">${filter[1]}</span>
+                                                <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
                                             </div>
                                         </div>
                                     </div>
