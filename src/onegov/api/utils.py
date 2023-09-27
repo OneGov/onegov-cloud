@@ -3,9 +3,16 @@ import jwt
 from webob.exc import HTTPUnauthorized, HTTPClientError
 from onegov.api.models import ApiException, ApiKey
 from onegov.api.token import try_get_encoded_token, jwt_decode
+from onegov.api import ApiApp
 
 
-def authenticate(request):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from morepath.request import Response
+
+
+def authenticate(request: 'CoreRequest') -> None:
     try:
         auth = try_get_encoded_token(request)
         data = jwt_decode(request, auth)
@@ -18,7 +25,7 @@ def authenticate(request):
         raise HTTPClientError()
 
 
-def check_rate_limit(request):
+def check_rate_limit(request: 'CoreRequest') -> dict[str, str]:
     """ Checks if the rate limit for the current client.
 
     Raises an exception if the rate limit is reached. Returns response headers
@@ -36,9 +43,12 @@ def check_rate_limit(request):
         authenticate(request)
         return {}
 
+    assert isinstance(request.app, ApiApp)
+    addr = request.client_addr or 'unknown'
+
     limit, expiration = request.app.rate_limit
     requests, timestamp = request.app.rate_limit_cache.get_or_create(
-        request.client_addr,
+        addr,
         creator=lambda: (0, datetime.utcnow()),
     )
     if (datetime.utcnow() - timestamp).seconds < expiration:
@@ -47,7 +57,7 @@ def check_rate_limit(request):
         timestamp = datetime.utcnow()
         requests = 1
     request.app.rate_limit_cache.set(
-        request.client_addr, (requests, timestamp)
+        addr, (requests, timestamp)
     )
     reset = timestamp + timedelta(seconds=expiration)
     headers = {
@@ -57,7 +67,7 @@ def check_rate_limit(request):
     }
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         for header in headers.items():
             response.headers.add(*header)
 

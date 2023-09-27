@@ -131,7 +131,7 @@ class AttachmentsForm(Form):
     )
 
     easyvote_booklet = UploadField(
-        label=_("Explanatory brochure by Easyvote"),
+        label=_("Explanatory brochure by easyvote"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)

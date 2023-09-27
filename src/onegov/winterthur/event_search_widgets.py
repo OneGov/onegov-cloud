@@ -1,5 +1,5 @@
 from functools import cached_property
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, cast, String
 
 from onegov.core.templates import render_macro
 from onegov.event import OccurrenceCollection, Event
@@ -46,7 +46,8 @@ class InlineEventSearch:
             conditions = []
             for p in search_properties:
                 conditions.append(
-                    func.lower(getattr(Event, p)).contains(word.lower()))
+                    func.lower(cast(getattr(Event, p), String)).contains(
+                        word.lower()))
             query = query.filter(or_(*conditions))
 
         return query

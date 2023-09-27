@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-09-04 12:15+0200\n"
+"POT-Creation-Date: 2023-09-25 08:37+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1443,8 +1443,8 @@ msgstr "Ankündigung nur für eingeloggte Benutzer anzeigen"
 msgid "Header links"
 msgstr "Kopfzeilenlinks"
 
-msgid "Title header left side"
-msgstr "Titel Kopfzeile links"
+msgid "Text header left side"
+msgstr "Text Kopfzeile links"
 
 msgid "Optional"
 msgstr "Optional"
@@ -1454,6 +1454,13 @@ msgstr "Schriftfarbe"
 
 msgid "Relative font size"
 msgstr "Relative Schriftgrösse"
+
+msgid "Keep header links and/or header text fixed to top on scrolling"
+msgstr ""
+"Kopfzeilenlinks und/oder Kopfzeilentext beim Scrollen oben fixiert lassen"
+
+msgid "Header fixation"
+msgstr "Fixierung der Kopfzeilenelemente"
 
 msgid "Please add an url to each link"
 msgstr "Bitte geben Sie für jeden Link eine URL ein"
@@ -1505,6 +1512,18 @@ msgstr "Personen"
 
 msgid "Values of the location filter"
 msgstr "Werte des Ortfilters"
+
+msgid "Choose the filter type for events (default is 'tags')"
+msgstr "Wählen Sie den Filtertyp für Veranstaltungen (Standard ist 'tags')"
+
+msgid "A predefined set of tags"
+msgstr "Ein vordefiniertes Set von Tags"
+
+msgid "Manually configurable filters"
+msgstr "Manuell konfigurierbare Filter"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Sowohl vordefinierte Tags als auch konfigurierbare Filter"
 
 msgid "The default map view. This should show the whole town"
 msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
@@ -1779,6 +1798,24 @@ msgstr "Monatlich (am ersten Montag des Monats)"
 msgid "Never"
 msgstr "Nie"
 
+msgid "Linked file"
+msgstr "Verknüpfte Datei"
+
+msgid "Keep link"
+msgstr "Verknüpfung behalten"
+
+msgid "Delete link"
+msgstr "Verknüpfung löschen"
+
+msgid "Replace link"
+msgstr "Verknüpfung ersetzen"
+
+msgid "Choose existing file"
+msgstr "Existierende Datei auswählen"
+
+msgid "Link additional files"
+msgstr "Zusätzliche Dateien verknüpfen"
+
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
 
@@ -1936,6 +1973,9 @@ msgstr "Neue Notiz"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Download files"
+msgstr "Dateien herunterladen"
+
 msgid "New Message"
 msgstr "Neue Nachricht"
 
@@ -2017,6 +2057,9 @@ msgstr "Einteilung löschen"
 #, python-format
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
+
+msgid "Configure"
+msgstr "Konfigurieren"
 
 msgid "This event can't be edited."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
@@ -2106,9 +2149,6 @@ msgstr "Synchronisieren"
 
 msgid "Directory"
 msgstr "Verzeichnis"
-
-msgid "Configure"
-msgstr "Konfigurieren"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -2229,6 +2269,9 @@ msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
 
 msgid "Show image on page"
 msgstr "Bild auf der Seite anzeigen"
+
+msgid "Documents"
+msgstr "Dokumente"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -2532,9 +2575,6 @@ msgstr "Verknüpfung Bearbeiten"
 
 msgid "The link was deleted"
 msgstr "Die Verknüpfung wurde gelöscht"
-
-msgid "Delete link"
-msgstr "Verknüpfung Löschen"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
@@ -5275,6 +5315,9 @@ msgstr "Das Ticket wurde bereits geschlossen"
 msgid "Your message has been sent"
 msgstr "Ihre Nachricht wurde gesendet"
 
+msgid "Zip archive created successfully"
+msgstr "ZIP-Archiv erfolgreich generiert"
+
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
@@ -5359,3 +5402,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Keep header links fixed to top on scrolling"
+#~ msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"

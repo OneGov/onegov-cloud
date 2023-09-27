@@ -77,6 +77,9 @@ class AgendaItem(
     #: The memorial of the assembly
     memorial_pdf = NamedFile(cls=LandsgemeindeFile)
 
+    #: The page number on which the agenda item can be found
+    memorial_page = content_property()
+
     #: The overview (text) over the agenda item
     overview = content_property()
 

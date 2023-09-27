@@ -1,9 +1,14 @@
 from onegov.election_day import _
+from onegov.form.fields import TypeAheadField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.landsgemeinde.layouts import DefaultLayout
+from onegov.landsgemeinde.models import PersonFunctionSuggestion
+from onegov.landsgemeinde.models import PersonNameSuggestion
+from onegov.landsgemeinde.models import PersonPlaceSuggestion
+from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.models.votum import STATES
 from onegov.org.forms.fields import HtmlField
@@ -33,16 +38,37 @@ class VotumForm(NamedFileForm):
         default=list(STATES.keys())[0]
     )
 
-    person_name = StringField(
+    person_name = TypeAheadField(
         label=_('Name'),
         fieldset=_('Person'),
-        render_kw={'rows': 5}
+        url=lambda meta: (
+            meta.request.class_link(PersonNameSuggestion) + '?term=%QUERY'
+        )
     )
 
-    person_function = StringField(
-        label=_('Function, Place & Party or parliamentary group'),
+    person_function = TypeAheadField(
+        label=_('Function'),
         fieldset=_('Person'),
-        render_kw={'rows': 5}
+        url=lambda meta: (
+            meta.request.class_link(PersonFunctionSuggestion) + '?term=%QUERY'
+        )
+    )
+
+    person_political_affiliation = TypeAheadField(
+        label=_('Party or parliamentary group'),
+        fieldset=_('Person'),
+        url=lambda meta: (
+            meta.request.class_link(PersonPoliticalAffiliationSuggestion)
+            + '?term=%QUERY'
+        )
+    )
+
+    person_place = TypeAheadField(
+        label=_('Place'),
+        fieldset=_('Person'),
+        url=lambda meta: (
+            meta.request.class_link(PersonPlaceSuggestion) + '?term=%QUERY'
+        )
     )
 
     person_picture = UploadField(

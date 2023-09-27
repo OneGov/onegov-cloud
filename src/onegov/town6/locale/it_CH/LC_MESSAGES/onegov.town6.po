@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-09-04 15:30+0200\n"
+"POT-Creation-Date: 2023-09-24 23:11+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -221,6 +221,9 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Download files"
+msgstr "Scarica i file"
+
 msgid "Upload to Gever"
 msgstr "Caricare a Gever"
 
@@ -346,6 +349,9 @@ msgstr "Do"
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
 
+msgid "Configure"
+msgstr "Configura"
+
 msgid "Import"
 msgstr "Importa"
 
@@ -465,9 +471,6 @@ msgstr "Cartelle"
 
 msgid "Directory"
 msgstr "Cartella"
-
-msgid "Configure"
-msgstr "Configura"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -681,24 +684,18 @@ msgstr "Questo album non contiene ancora nessuna immagine."
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
+msgid "Search term"
+msgstr "Termine di ricerca"
+
 #, fuzzy
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
-
-msgid "Straight to ..."
-msgstr "Direttamente a ..."
 
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
 
 msgid "Logo"
 msgstr "Logo"
-
-msgid "Search term"
-msgstr "Termine di ricerca"
-
-msgid "Perform Search"
-msgstr "Ricerca"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
@@ -784,6 +781,9 @@ msgstr ""
 
 msgid "Map"
 msgstr "Mappa"
+
+msgid "Documents"
+msgstr "Documenti"
 
 msgid "More news"
 msgstr "Altre notizie"
@@ -901,6 +901,9 @@ msgstr "Numero di telefono dell'organizzatore"
 
 msgid "Tags"
 msgstr "Tag"
+
+msgid "Filters"
+msgstr "Filtri"
 
 msgid "Date and time"
 msgstr "Data e ora"
@@ -2147,3 +2150,9 @@ msgstr "Migrazione dei link"
 
 msgid "OneGov API"
 msgstr "API OneGov"
+
+#~ msgid "Straight to ..."
+#~ msgstr "Direttamente a ..."
+
+#~ msgid "Perform Search"
+#~ msgstr "Ricerca"

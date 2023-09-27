@@ -7,6 +7,7 @@ from onegov.org.custom import logout_path
 from onegov.org.elements import LinkGroup
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFileCollection
+from onegov.people import PersonCollection
 from onegov.town6.layout import DefaultLayout
 from onegov.user import Auth
 from onegov.user import UserCollection
@@ -58,7 +59,11 @@ def get_global_tools(request):
                         _("Settings"),
                         request.link(request.app.org, 'settings'),
                         attrs={'class': 'settings'}
-                    )
+                    ),
+                    Link(
+                        _("People"), request.class_link(PersonCollection),
+                        attrs={'class': 'people'}
+                    ),
                 )
             )
 

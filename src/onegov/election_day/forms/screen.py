@@ -28,7 +28,7 @@ class ScreenForm(Form):
         label=_('Number'),
         validators=[
             InputRequired(),
-            NumberRange(min=1),
+            NumberRange(min=1, max=2147483647),
             UniqueColumnValue(Screen)
         ]
     )

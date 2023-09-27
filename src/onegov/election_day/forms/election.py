@@ -25,6 +25,7 @@ from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
@@ -173,6 +174,7 @@ class ElectionForm(Form):
             "Shows voters counts instead of votes in the party strengths "
             "view."
         ),
+        depends_on=('election_type', 'proporz'),
     )
 
     exact_voters_counts = BooleanField(
@@ -181,6 +183,7 @@ class ElectionForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
+        depends_on=('election_type', 'proporz'),
         render_kw=dict(force_simple=True)
     )
 
@@ -213,6 +216,7 @@ class ElectionForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
+        depends_on=('election_type', 'proporz'),
         render_kw=dict(force_simple=True)
     )
 
@@ -222,6 +226,7 @@ class ElectionForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
+        depends_on=('election_type', 'proporz'),
         render_kw=dict(force_simple=True)
     )
 
@@ -260,7 +265,8 @@ class ElectionForm(Form):
 
     related_link = URLField(
         label=_("Link"),
-        fieldset=_("Related link")
+        fieldset=_("Related link"),
+        validators=[URL(), Optional()]
     )
 
     related_link_label_de = StringField(
@@ -299,7 +305,7 @@ class ElectionForm(Form):
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
-            'CVP #d28b00\n'
+            'Die Mitte #d28b00\n'
             'EDU #7f6b65\n'
             'EVP #e3c700\n'
             'FDP #0084c7\n'
