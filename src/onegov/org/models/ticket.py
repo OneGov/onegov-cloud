@@ -207,12 +207,9 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def ticket_deletable(self):
-        """Todo: Finalize implementing ticket deletion """
         if self.deleted:
             return True
-        return False
-        #  ...for later when deletion will be available
-        if not self.ticket.state == 'archived':
+        if self.ticket.state != 'archived':
             return False
         if self.payment:
             # For now we do not handle this case since payment might be
