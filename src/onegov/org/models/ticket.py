@@ -1,7 +1,5 @@
 from functools import cached_property
-
 from sedate import align_date_to_day, to_timezone, utcnow
-
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
