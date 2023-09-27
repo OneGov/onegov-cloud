@@ -55,6 +55,18 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
     def deleted(self):
         return self.agency is None
 
+    def prepare_delete_ticket(self):
+        pass
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+
+        return True
+
     @cached_property
     def email(self):
         return (
@@ -153,6 +165,18 @@ class PersonMutationHandler(Handler, TicketDeletionMixin):
     @property
     def deleted(self):
         return self.person is None
+
+    def prepare_delete_ticket(self):
+        pass
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+
+        return True
 
     @cached_property
     def email(self):

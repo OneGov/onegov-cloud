@@ -1057,7 +1057,7 @@ def delete_tickets_and_related_data(
     for ticket in tickets:
         if (hasattr(
                 ticket.handler, 'ticket_deletable')
-                and ticket.handler.ticket_deletable is None):
+                and not ticket.handler.ticket_deletable):
             not_deletable.append(ticket)
             continue
 

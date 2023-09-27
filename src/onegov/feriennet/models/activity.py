@@ -138,6 +138,22 @@ class VacationActivityHandler(Handler, TicketDeletionMixin):
 
         return self.activity.state == 'proposed'
 
+    def prepare_delete_ticket(self):
+        pass
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.undecided:
+            return False
+        if self.activity.state != 'archived':
+            return False
+
+        return True
+
     def get_summary(self, request):
         from onegov.feriennet.layout import DefaultLayout
         layout = DefaultLayout(self.activity, request)

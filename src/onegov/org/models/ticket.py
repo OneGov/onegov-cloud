@@ -414,6 +414,24 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
         return True
 
+    def prepare_delete_ticket(self):
+        if self.reservations:
+            self.session.delete(self.reservations)
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.payment:
+            # For now we do not handle this case since payment might be
+            # needed for exports
+            return False
+        if self.undecided:
+            return False
+        return True
+
     @property
     def title(self):
         parts = []
@@ -662,6 +680,20 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
     def undecided(self):
         return self.event and self.event.state == 'submitted'
 
+    def prepare_delete_ticket(self):
+        if self.event:
+            self.session.delete(self.event)
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.undecided:
+            return False
+        return True
+
     @cached_property
     def group(self):
         return _("Event")
@@ -867,6 +899,20 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
             return False
 
         return self.state is None
+
+    def prepare_delete_ticket(self):
+        if self.submission:
+            self.session.delete(self.submission)
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.undecided:
+            return False
+        return True
 
     @property
     def kind(self):
