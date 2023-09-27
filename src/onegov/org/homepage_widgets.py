@@ -329,9 +329,9 @@ class HrWidget:
 class SliderWidget:
     template = """
         <xsl:template match="slider">
-            <div metal:use-macro="layout.macros.slider"
-             tal:define="height '{@height}'
-             "
+            <div metal:use-macro="layout.macros['slider']"
+            tal:define="height_m '{@height-m}';
+            height_d '{@height-d}'"
             />
         </xsl:template>
     """
@@ -373,5 +373,5 @@ class SliderWidget:
         images = tuple(self.get_images_from_sets(layout))
 
         return {
-            'images': images
+            'images': images,
         }

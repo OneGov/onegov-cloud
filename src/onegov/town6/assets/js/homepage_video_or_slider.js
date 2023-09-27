@@ -1,5 +1,8 @@
 var header_height = $('#header').height();
 
+// Find out if we're on desktop or mobile
+var w = window.matchMedia("(max-width: 700px)");
+
 // Video
 if (document.getElementById("autoplay-video")) {
     if (document.getElementById("autoplay-video")) {
@@ -29,8 +32,6 @@ if (document.getElementById("autoplay-video")) {
             spacer.style.paddingBottom = ratio + "%";
         });
 
-        // Find out if we're on desktop or mobile
-        var w = window.matchMedia("(max-width: 700px)");
         var source = document.createElement("source");
         source.id = "hvid";
         vid.appendChild(source);
@@ -69,40 +70,27 @@ if (document.getElementById("autoplay-video")) {
 // Slider
 if ($('.orbit.slider').length) {
     var orbit_slider = $('.orbit-container');
-    var current_height = orbit_slider.data('height');
-    if (current_height) {
-        var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
-    
+    var current_mobile_height = orbit_slider.data('height-m');
+    var current_desktop_height = orbit_slider.data('height-d');
+
+    if (current_mobile_height || current_desktop_height) {
+        if (w.matches) {
+            if (current_mobile_height.slice(-2) == "vh") {
+                var new_height = 'calc(' + current_mobile_height + ' - ' + header_height + 'px)';
+            } else {
+                var new_height = current_mobile_height;
+            }
+        } else {
+            if (current_desktop_height.slice(-2) == "vh") {
+                var new_height = 'calc(' + current_desktop_height + ' - ' + header_height + 'px)';
+            } else {
+                var new_height = current_desktop_height;
+            }
+        }
         orbit_slider.css('height', new_height);
+    } else {
+        orbit_slider.css('height', '40vw');
     }
-
-    // Mol luege
-    var smallest_height = 100000000;
-
-
-    $('.orbit-container .orbit-image').each(function(){
-        var url =  $(this).data('image-url');
-
-        var tempImg = '<img id="tempImg" src="' + url + '"/>';
-        $('body').append(tempImg); // add to DOM before </body>
-        $('#tempImg').hide(); //hide image
-        height = $('#tempImg').height(); //get height
-        $('#tempImg').remove(); //remove from DOM
-        console.log('height', height);
-
-        // image = new Image();
-
-        // // just in case it is not already loaded
-        // $(image).load(function () {
-        //     alert(image.width + 'x' + image.height);
-        // });
-    
-        // image.src = url;
-
-        console.log('url', url)
-    });
-
-    console.log('nochehr?')
 
 }
 

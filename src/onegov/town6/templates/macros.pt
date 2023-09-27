@@ -1515,7 +1515,7 @@
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
                 <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
-            <ul class="orbit-container" data-height="@{height}">
+            <ul class="orbit-container" data-height-m="${height_m}" data-height-d="${height_d}">
                 <li tal:repeat="image images" class="orbit-slide">
                     <figure class="orbit-figure">
                         <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
