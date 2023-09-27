@@ -1,4 +1,7 @@
 from functools import cached_property
+
+from sqlalchemy import func
+
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
@@ -376,6 +379,13 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
         return tuple(query)
 
+    def has_future_reservation(self):
+        for reservation in self.reservations:
+            if reservation.start > func.now():
+                return True
+
+        return False
+
     @cached_property
     def submission(self):
         return FormSubmissionCollection(self.session).by_id(self.id)
@@ -431,6 +441,9 @@ class ReservationHandler(Handler, TicketDeletionMixin):
             return False
         if self.undecided:
             return False
+        if self.has_future_reservation():
+            return False
+
         return True
 
     @property
@@ -693,6 +706,9 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
             return False
         if self.undecided:
             return False
+        if self.event.future_occurrences():
+            return False
+
         return True
 
     @cached_property
