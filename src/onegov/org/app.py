@@ -195,7 +195,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     @orm_cached(policy='on-table-change:pages')
     def topics_cached(self) -> tuple[tuple[int, 'Topic'], ...]:
         def visit_topics(
-            pages: 'Iterable[Page]', root_id: int | None = None
+            pages: 'Iterable[Page]',
+            root_id: int | None = None
         ) -> 'Iterator[tuple[int, Topic]]':
             for page in pages:
 
@@ -204,7 +205,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
                 yield from visit_topics(
                     page.children,
-                    root_id=root_id
+                    root_id=root_id or page.id
                 )
 
         return tuple(visit_topics(self.root_pages))
