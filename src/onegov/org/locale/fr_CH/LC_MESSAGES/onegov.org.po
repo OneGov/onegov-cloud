@@ -5382,15 +5382,6 @@ msgstr "Tous les tickets"
 msgid "All Users"
 msgstr "Tous les utilisateurs"
 
-#, python-format
-msgid "{success_count} tickets deleted, {error_count} are not deletable"
-msgstr ""
-"{success_count} tickets supprimés, {error_count} ne sont pas supprimables."
-
-#, python-format
-msgid "{success_count} tickets deleted."
-msgstr "{success_count} tickets supprimés."
-
 msgid "Submitted Requests"
 msgstr "Demandes soumises"
 
@@ -5421,5 +5412,11 @@ msgstr "Un compte a été créé pour vous"
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
 
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr "Maintenir les liens de l'en-tête en haut lors du défilement"
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"${success_count} tickets supprimés, ${error_count} ne sont pas supprimables."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} tickets supprimés."

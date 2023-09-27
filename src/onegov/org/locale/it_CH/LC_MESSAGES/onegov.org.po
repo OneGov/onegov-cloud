@@ -5377,15 +5377,6 @@ msgstr "Tutti i biglietti"
 msgid "All Users"
 msgstr "Tutti gli utenti"
 
-#, python-format
-msgid "{success_count} tickets deleted, {error_count} are not deletable"
-msgstr ""
-"{success_count} biglietti cancellati, {error_count} non sono cancellabili."
-
-#, python-format
-msgid "{success_count} tickets deleted."
-msgstr "{success_count} biglietti cancellati."
-
 msgid "Submitted Requests"
 msgstr "Richieste inoltrate"
 
@@ -5416,6 +5407,11 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr ""
-#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"$${success_count} biglietti cancellati, ${error_count} non sono cancellabili."
+
+#, python-format
+msgid "{success_count} tickets deleted."
+msgstr "{success_count} biglietti cancellati."
