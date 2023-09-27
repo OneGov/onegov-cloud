@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from sqlalchemy import func
+from sedate import align_date_to_day, to_timezone, utcnow
 
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
@@ -377,8 +377,11 @@ class ReservationHandler(Handler, TicketDeletionMixin):
         return tuple(query)
 
     def has_future_reservation(self):
+        timezone = 'Europe/Zurich'
+        today = to_timezone(utcnow(), timezone)
+        today = align_date_to_day(today, timezone, 'down')
         for reservation in self.reservations:
-            if reservation.start > func.now():
+            if reservation.start > today:
                 return True
 
         return False
@@ -424,7 +427,8 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
     def prepare_delete_ticket(self):
         if self.reservations:
-            self.session.delete(self.reservations)
+            for reservation in self.reservations:
+                self.session.delete(reservation)
 
     @property
     def ticket_deletable(self):

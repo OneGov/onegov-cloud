@@ -810,3 +810,16 @@ def migrate_publications(group_context, dry_run):
             )
 
     return mark_as_published
+
+
+@cli.command('archive-all-tickets', context_settings={'default_selector': '*'})
+def archive_all_tickts():
+    """ Archived all tickets, regardless of state. Used for testing only! """
+
+    def archive_all(request, app):
+        breakpoint()
+        # app.session().execute("""
+        #     UPDATE tickets SET state='archived';
+        # """)
+
+    return archive_all
