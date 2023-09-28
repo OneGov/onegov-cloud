@@ -17,6 +17,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.fields import UploadFileWithORMSupport
+from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import (
     FileSizeLimit, ValidPhoneNumber, ValidFilterFormDefinition)
 from onegov.form.validators import WhitelistedMimeType
@@ -643,7 +644,7 @@ class EventConfigurationForm(Form):
                 require_email_field=False,
                 require_title_fields=False,
                 reserved_fields={name for name, _ in
-                                 EventForm()._unbound_fields}
+                                 get_fields_from_class(EventForm)}
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})
