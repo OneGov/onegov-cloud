@@ -32,7 +32,7 @@ def get_fields_from_class(
 
     # often times FormMeta will have already calculated the fields
     # and stored them on the class, so we only need to calculate
-    # them fresh if this attribute doesn't exist.
+    # them fresh if this attribute is None
     if cls._unbound_fields is not None:
         return cls._unbound_fields
 
