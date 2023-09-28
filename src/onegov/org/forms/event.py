@@ -642,6 +642,8 @@ class EventConfigurationForm(Form):
             ValidFilterFormDefinition(
                 require_email_field=False,
                 require_title_fields=False,
+                reserved_fields={name for name, _ in
+                                 EventForm()._unbound_fields}
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})
@@ -653,20 +655,3 @@ class EventConfigurationForm(Form):
             'class_': 'formcode-select',
             'data-fields-include': 'radio,checkbox'
         })
-
-    def validate(self):
-        """
-        Ensures none of the active keywords is used in the `EventForm` to
-        prevent overriding data accidentally by defining filters.
-        """
-        result = super().validate()
-
-        for keyword in [k.lower() for k
-                        in self.keyword_fields.data.splitlines()]:
-            if keyword in EventForm:
-                error = f'Keyword \'{keyword}\' is already in use!'
-                self.definition.errors.append(error)
-                self.keyword_fields.errors.append(error)
-                result = False
-
-        return result
