@@ -663,7 +663,7 @@ class EventConfigurationForm(Form):
 
         for keyword in [k.lower() for k
                         in self.keyword_fields.data.splitlines()]:
-            if keyword in dir(EventForm):
+            if keyword in EventForm:
                 error = f'Keyword \'{keyword}\' is already in use!'
                 self.definition.errors.append(error)
                 self.keyword_fields.errors.append(error)
