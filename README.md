@@ -49,7 +49,7 @@ up in the release history, it needs to be written as follows:
 
     <Optional Description>
 
-    TYPE: <Feature|Bugfix>
+    TYPE: <Feature|Bugfix|Performance>
     LINK: <Ticket-Number>
     HINT: <Optional upgrade hint>
 

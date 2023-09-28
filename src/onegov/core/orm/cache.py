@@ -25,6 +25,7 @@ import inspect
 import sqlalchemy
 
 from sqlalchemy.orm.query import Query
+from time import time
 
 
 from typing import overload, Any, Generic, TypeVar, TYPE_CHECKING
@@ -59,6 +60,7 @@ if TYPE_CHECKING:
         ) -> 'OrmCacheDescriptor[_T]': ...
 
 _T = TypeVar('_T')
+unset = object()
 
 
 class OrmCacheApp:
@@ -71,6 +73,8 @@ class OrmCacheApp:
 
     """
 
+    memory_cache: dict[str, tuple[float, Any]]
+
     if TYPE_CHECKING:
         # forward declare the attributes we need from Framework
         session_manager: SessionManager
@@ -80,6 +84,16 @@ class OrmCacheApp:
         request_cache: dict[str, Any]
 
     def configure_orm_cache(self, **cfg: Any) -> None:
+        # this cache can live beyond the lifetime of a single request
+        # for complex collections of models orm_cached may invoke
+        # significant deserialization overhead, so it's better if we
+        # don't just cache this locally for the duration of a single
+        # request and instead span multiple requests. In order to
+        # avoid multiple processes from desyncing, we store a timestamp
+        # in the redis cache and memory cache which gets set every time
+        # the redis cache gets repopulated, so instances can pull the
+        # latest version
+        self.memory_cache = {}
         self.is_orm_cache_setup = getattr(self, 'is_orm_cache_setup', False)
 
     def setup_orm_cache(self) -> None:
@@ -137,6 +151,10 @@ class OrmCacheApp:
                 # Still, trust but verify:
                 assert self.schema == schema
                 self.cache.delete(descriptor.cache_key)
+                self.cache.delete(descriptor.ts_key)
+
+                if descriptor.cache_key in self.memory_cache:
+                    del self.memory_cache[descriptor.cache_key]
 
                 if descriptor.cache_key in self.request_cache:
                     del self.request_cache[descriptor.cache_key]
@@ -179,6 +197,7 @@ class OrmCacheDescriptor(Generic[_T]):
     ):
         self.cache_policy = cache_policy
         self.cache_key = creator.__qualname__
+        self.ts_key = self.cache_key + '_ts'
         self.creator = creator
 
     def create(self, app: OrmCacheApp) -> _T:
@@ -238,21 +257,32 @@ class OrmCacheDescriptor(Generic[_T]):
         if session.dirty:
             session.flush()
 
-        # we use a secondary request cache for even more lookup speed and to
-        # make sure that inside a request we always get the exact same instance
-        # (otherwise we don't see changes reflected)
-        if self.cache_key in app.request_cache:
-
+        # the tertiary request cache is there for historical reasons, since the
+        # secondary cache used to be the request cache. in order to preserve
+        # the original behavior the request cache is still there
+        obj = app.request_cache.get(self.cache_key, unset)
+        if obj is not unset:
             # it is possible for objects in the request cache to become
             # detached - in this case we need to merge them again
             # (the merge function only does this if necessary)
-            return self.merge(session, app.request_cache[self.cache_key])
+            # FIXME: This doesn't perform the same deep merge as the merge
+            #        below, so should we actually still be doing this?
+            return self.merge(session, obj)
 
-        else:
+        # we use a secondary in-memory cache for even more lookup speed
+        ts, obj = app.memory_cache.get(self.cache_key, (float('-Inf'), unset))
+
+        if ts != app.cache.get(key=self.ts_key):
+            # in-memory cache is no longer valid
             obj = app.cache.get_or_create(
                 key=self.cache_key,
                 creator=lambda: self.create(app)
             )
+            ts = app.cache.get_or_create(
+                key=self.ts_key,
+                creator=time
+            )
+            app.memory_cache[self.cache_key] = (ts, obj)
 
         # named tuples
         if isinstance(obj, tuple) and hasattr(obj.__class__, '_make'):
