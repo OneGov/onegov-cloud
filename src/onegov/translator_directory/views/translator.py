@@ -439,9 +439,16 @@ def view_mail_templates(self, request, form):
 
         user = request.current_user
         if not getattr(user, 'realname', None):
-            request.alert(_('Unfortunately, this account does not have real '
-                            'name defined, which is required for mail '
-                            'templates'))
+            request.alert(
+                request.translate(
+                    _(
+                        'Unfortunately, this account (${account}) does not '
+                        'have real name defined, which is required for mail '
+                        'templates',
+                        mapping={'account': user.username},
+                    )
+                )
+            )
             return redirect(request.link(self))
 
         signature_file = signature_for_mail_templates(request)
