@@ -568,6 +568,7 @@ class OccurrenceCollection(Pagination):
                 </termin>
                 <text>Beschreibung</text>
                 <urlweb>url</urlweb>
+                <hauptrubrik>kalender</hauptrubrik>
                 <rubrik>tag 1</rubrik>
                 <rubrik>tag 2</rubrik>
                 <veranstaltungsort>
@@ -627,16 +628,23 @@ class OccurrenceCollection(Pagination):
             event.append(text_tag(e.description))
             if e.external_event_url:
                 event.urlweb = e.external_event_url
+
+            hr_text = ''
+            tags = list()
             if e.tags:
-                event.rubrik = e.tags
+                tags = e.tags
             if e.filter_keywords:
-                values = list()
                 for k, v in e.filter_keywords.items():
                     if k in ['kalender']:
-                        event.hauptrubrik = v
+                        hr_text = v
                     else:
-                        values.append(v)
-                event.rubrik = values
+                        if isinstance(v, list):
+                            tags.extend(v)
+                        else:
+                            tags.append(v)
+            event.hauptrubrik = hr_text
+            event.rubrik = tags or None
+
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
             ort.adresse = ''
