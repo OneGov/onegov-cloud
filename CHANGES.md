@@ -1,8 +1,18 @@
 # Changes
 
+## 2023.48
+
+`2023-09-29` | [cc4d60fbac...1b59e1d108](https://github.com/OneGov/onegov-cloud/compare/cc4d60fbac^...1b59e1d108)
+
+### Events
+
+##### Winterthur anthrazit xml will now support 'rubrik' nested under 'hauptrubrik' as well as 'keyword'
+
+`Feature` | [ogc-1048](#ogc-1048) | [1b59e1d108](https://github.com/onegov/onegov-cloud/commit/1b59e1d10800e1388aef3795ed39806a1c3e5758)
+
 ## 2023.47
 
-`2023-09-28` | [07a1f518d9...2bb596ec26](https://github.com/OneGov/onegov-cloud/compare/07a1f518d9^...2bb596ec26)
+`2023-09-28` | [07a1f518d9...8c0abf7431](https://github.com/OneGov/onegov-cloud/compare/07a1f518d9^...8c0abf7431)
 
 **Upgrade hints**
 - onegov-people --select /onegov_town6/* onegov-migrate-people-address-field
@@ -2484,76 +2494,4 @@ Use paragraphs and lists instead of only lists
 ##### Fix sidebar news
 
 `Bugfix` | [OGC-811](https://linear.app/onegovcloud/issue/OGC-811) | [db933a641b](https://github.com/onegov/onegov-cloud/commit/db933a641b02a9ded958aca18d3ce22b427e5d8b)
-
-## 2022.55
-
-`2022-12-07` | [da8adc1346...ce0bf0aac4](https://github.com/OneGov/onegov-cloud/compare/da8adc1346^...ce0bf0aac4)
-
-### Ballot
-
-##### Add foreign keys to party and panachage results.
-
-`Bugfix` | [OGC-768](https://linear.app/onegovcloud/issue/OGC-768) | [6639df7046](https://github.com/onegov/onegov-cloud/commit/6639df7046aa1376071c3868ae7d8900b4c18c7b)
-
-### Directory
-
-##### Fix directory error
-
-`Bugfix` | [OGC-783](https://linear.app/onegovcloud/issue/OGC-783) | [4d0b84299f](https://github.com/onegov/onegov-cloud/commit/4d0b84299ffedc99e8f895c4aeaa476451394688)
-
-### Election Day
-
-##### Remove obsolete party color column.
-
-`Feature` | [OGC-676](https://linear.app/onegovcloud/issue/OGC-676) | [c6f8d7a351](https://github.com/onegov/onegov-cloud/commit/c6f8d7a351012c1a0fab5a41b579718098b1b133)
-
-##### Add views for superregions.
-
-`Feature` | [OGC-702](https://linear.app/onegovcloud/issue/OGC-702) | [d2f13fadb4](https://github.com/onegov/onegov-cloud/commit/d2f13fadb411041027a462671fd26478b15ed02e)
-
-##### Add entity filter to list views.
-
-`Feature` | [OGC-707](https://linear.app/onegovcloud/issue/OGC-707) | [3cab849cd6](https://github.com/onegov/onegov-cloud/commit/3cab849cd6512fe19e381e12731ece5f5b98147a)
-
-##### Add entity filter to candidates views.
-
-`Feature` | [OGC-706](https://linear.app/onegovcloud/issue/OGC-706) | [492ca66202](https://github.com/onegov/onegov-cloud/commit/492ca66202864899493f5be00b5c9552105540a8)
-
-##### Add party views configuration options to elections.
-
-`Feature` | [OGC-765](https://linear.app/onegovcloud/issue/OGC-765) | [7174ff013a](https://github.com/onegov/onegov-cloud/commit/7174ff013a3b0e4c3b1d3752f4228c59de174bb1)
-
-##### Update voters count documentation.
-
-`Feature` | [OGC-767](https://linear.app/onegovcloud/issue/OGC-767) | [983fdd465d](https://github.com/onegov/onegov-cloud/commit/983fdd465d8cef6da9da60fb1f237377f2183a8f)
-
-##### Rename list panachage result columns.
-
-`Feature` | [OGC-766](https://linear.app/onegovcloud/issue/OGC-766) | [9a6913102f](https://github.com/onegov/onegov-cloud/commit/9a6913102f1eacb655328a6cd0a58523c23db051)
-
-##### Remove party domain data migration command.
-
-`Other` | [OGC-709](https://linear.app/onegovcloud/issue/OGC-709) | [da8adc1346](https://github.com/onegov/onegov-cloud/commit/da8adc1346077e2b14c8610c0d2b827ab7a3c77a)
-
-##### Shorten filename length for csv and json
-
-`Bugfix` | [OGC-689](https://linear.app/onegovcloud/issue/OGC-689) | [4ecb615e44](https://github.com/onegov/onegov-cloud/commit/4ecb615e44a01591044b31d0314e6572ac76e552)
-
-### Town6
-
-##### Mobile optimizations
-
-`Feature` | [OGC-756](https://linear.app/onegovcloud/issue/OGC-756) | [b25607054c](https://github.com/onegov/onegov-cloud/commit/b25607054c42048395aec00bc7a5fb519446dbcc)
-
-##### Design adjustments
-
-`Feature` | [OGC-682](https://linear.app/onegovcloud/issue/OGC-682) | [43f62e2dcc](https://github.com/onegov/onegov-cloud/commit/43f62e2dcc7b38cd08de48730b7f63d49b27cc11)
-
-##### Option to hide "submit own event"
-
-`Feature` | [OGC-779](https://linear.app/onegovcloud/issue/OGC-779) | [783abfeefe](https://github.com/onegov/onegov-cloud/commit/783abfeefead47010f30fcf1923d987b00c06e3b)
-
-##### Add lead in lists on topic
-
-`Bugfix` | [OGC-801](https://linear.app/onegovcloud/issue/OGC-801) | [43fb79ed23](https://github.com/onegov/onegov-cloud/commit/43fb79ed237b5361932a72b3adc22a864d142822)
 
