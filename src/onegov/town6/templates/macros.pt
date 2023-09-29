@@ -1284,7 +1284,7 @@
         </div>
     <tal:b condition="not occurrences">
         <p i18n:translate>No events found.</p>
-        <br><a tal:condition="'range' not in request.url" href="${layout.events_url}&amp;range=past" class="button hollow" i18n:translate>Past events</a>
+        <br><a tal:condition="'range' not in request.url" href="${no_event_link}" class="button hollow" i18n:translate>Past events</a>
     </tal:b>
 </metal:occurrences>
 
