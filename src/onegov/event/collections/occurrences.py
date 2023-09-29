@@ -569,9 +569,10 @@ class OccurrenceCollection(Pagination):
                 <text>Beschreibung</text>
                 <urlweb>url</urlweb>
                 <hauptrubrik name="Naturmusuem">
-                    <rubrik>tag 1</rubrik>
-                    <rubrik>tag 2</rubrik>
+                    <rubrik>tag_1</rubrik>
+                    <rubrik>tag_2</rubrik>
                 </hauptrubrik>
+                <keyword>Naturmusuem tag_1 tag_2</keyword>
                 <veranstaltungsort>
                     <title></title>
                     <adresse></adresse>
@@ -648,6 +649,8 @@ class OccurrenceCollection(Pagination):
                                    hr_text else None)
             hr.rubrik = tags or None
             event.append(hr)
+            keywords = [hr_text] + tags if hr_text else tags
+            event.keyword = ' '.join(keywords) if keywords else None
 
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
