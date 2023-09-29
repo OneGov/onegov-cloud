@@ -33,6 +33,32 @@
             transform: translateY(-50%);
             width: 100%;
         }
+
+        .text {
+            bottom: 5rem;
+            color: $white;
+            position: absolute;
+            text-shadow: 0 0 2em $black;
+
+            span {
+                font-size: 4rem;
+            }
+
+            @media #{$small-only} {
+                bottom: 2rem;
+            }
+
+        }
+
+        .dark-overlay {
+            background: rgb(0, 0, 0);
+            background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 26%, rgba(0,0,0,0) 54%, rgba(0,0,0,0) 100%);
+            bottom: 0;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
     }
 
     .homepage-video,

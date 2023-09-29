@@ -829,6 +829,12 @@ def test_view_translator_mutation(broadcast, authenticate, connect, client):
     client.logout()
     client.login_admin()
     page = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert 'Briefvorlagen' in page
+    mail_templates_link = page.pyquery('a.envelope')[0].attrib['href']
+    resp = client.request(mail_templates_link)
+    assert resp.status_code == 200
+
     assert 'Hallo!' in page
     assert 'Vorname: Aunt' in page
     assert 'Nachname: Anny' in page
@@ -1358,6 +1364,11 @@ def test_view_accreditation(broadcast, authenticate, connect, client):
 
     # Request accredtitation
     page = request_accreditation()
+
+    assert 'Briefvorlagen' in page
+    mail_templates_link = page.pyquery('a.envelope')[0].attrib['href']
+    resp = client.request(mail_templates_link)
+    assert resp.status_code == 200
 
     # Refuse admission
     page = page.click('Zulassung verweigern').form.submit().follow()

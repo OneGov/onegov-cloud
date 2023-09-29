@@ -200,13 +200,13 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             root_id: int | None = None
         ) -> 'Iterator[tuple[int, Topic]]':
             for page in pages:
-
-                if root_id is None:
-                    root_id = page.id
-
                 if isinstance(page, Topic):
-                    yield root_id, page
-                yield from visit_topics(page.children, root_id=root_id)
+                    yield root_id or page.id, page
+
+                yield from visit_topics(
+                    page.children,
+                    root_id=root_id or page.id
+                )
 
         result = defaultdict(list)
         for root_id, topic in visit_topics(self.root_pages):

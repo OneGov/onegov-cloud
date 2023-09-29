@@ -732,8 +732,17 @@
                         <span tal:condition="person.political_party and 'political_party' not in exclude">${person.political_party}</span>
                         <span tal:condition="person.parliamentary_group and 'parliamentary_group' not in exclude">${person.parliamentary_group}</span>
                     </li>
-                    <li tal:condition="person.address and 'address' not in exclude" class="person-card-address">
-                        <span>${person.address}</span>
+                    <li tal:condition="person.location_address and 'location_address' not in exclude" class="person-card-address">
+                        <span>${person.location_address}</span>
+                    </li>
+                    <li tal:condition="person.location_code_city and 'location_code_city' not in exclude" class="person-card-address">
+                        <span>${person.location_code_city}</span>
+                    </li>
+                    <li tal:condition="person.postal_address and 'postal_address' not in exclude" class="person-card-address">
+                        <span>${person.postal_address}</span>
+                    </li>
+                    <li tal:condition="person.postal_code_city and 'postal_code_city' not in exclude" class="person-card-address">
+                        <span>${person.postal_code_city}</span>
                     </li>
                     <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                         <a href="mailto:${person.email}">${person.email}</a>
@@ -746,6 +755,9 @@
                     </li>
                     <li tal:condition="person.website and 'website' not in exclude" class="person-card-website">
                         <a href="${person.website}">${person.website}</a>
+                    </li>
+                    <li tal:condition="person.website_2 and 'website_2' not in exclude" class="person-card-website">
+                        <a href="${person.website_2}">${person.website_2}</a>
                     </li>
                     <li class="person-card-notes" tal:condition="person.notes and 'notes' not in exclude">
                         <span>${person.notes}</span>
@@ -995,8 +1007,12 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul class="no-margin-bottom">
-                    <li tal:repeat="filter event.filter_keywords" i18n:translate>${filter}</li>
+                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                    <li tal:condition="filter[1]">
+                        <span i18n:translate>${filter[0].title()}:</span>
+                        <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
+                        <span tal:condition="not isinstance(filter[1], list) and filter[1]" i18n:translate>${filter[1]}</span>
+                    </li>
                 </ul>
             </dd>
         </tal:b>
@@ -1073,7 +1089,7 @@
     </tal:b>
     <tal:b condition="not occurrences" >
         <p i18n:translate>No events found.</p>
-        <br><a tal:condition="'range=' not in request.url" href="${layout.events_url}&amp;range=past" i18n:translate>Past events</a>
+        <br><a tal:condition="'range' not in request.url" href="${no_event_link}" class="button hollow" i18n:translate>Past events</a>
     </tal:b>
 </metal:occurrences>
 
@@ -1103,10 +1119,10 @@
                 <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
             </div>
             <div tal:condition="occurrence.filter_keywords and show_filters" class="occurrence-filter">
-                <div tal:repeat="filter occurrence.filter_keywords.items()">
+                <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
                     <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
                     <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
-                    <span tal:condition="not isinstance(filter[1], list)" class="blank-label">${filter[1]}</span>
+                    <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
                 </div>
             </div>
         </div>

@@ -568,8 +568,11 @@ class OccurrenceCollection(Pagination):
                 </termin>
                 <text>Beschreibung</text>
                 <urlweb>url</urlweb>
-                <rubrik>tag 1</rubrik>
-                <rubrik>tag 2</rubrik>
+                <hauptrubrik name="Naturmusuem">
+                    <rubrik>tag_1</rubrik>
+                    <rubrik>tag_2</rubrik>
+                </hauptrubrik>
+                <keyword>Naturmusuem tag_1 tag_2</keyword>
                 <veranstaltungsort>
                     <title></title>
                     <adresse></adresse>
@@ -627,16 +630,28 @@ class OccurrenceCollection(Pagination):
             event.append(text_tag(e.description))
             if e.external_event_url:
                 event.urlweb = e.external_event_url
+
+            hr_text = ''
+            tags = list()
             if e.tags:
-                event.rubrik = e.tags
+                tags = e.tags
             if e.filter_keywords:
-                values = list()
                 for k, v in e.filter_keywords.items():
                     if k in ['kalender']:
-                        event.hauptrubrik = v
+                        hr_text = v
                     else:
-                        values.append(v)
-                event.rubrik = values
+                        if isinstance(v, list):
+                            tags.extend(v)
+                        else:
+                            tags.append(v)
+            hr = objectify.Element('hauptrubrik',
+                                   attrib=dict(name=hr_text) if
+                                   hr_text else None)
+            hr.rubrik = tags or None
+            event.append(hr)
+            keywords = [hr_text] + tags if hr_text else tags
+            event.keyword = ' '.join(keywords) if keywords else None
+
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
             ort.adresse = ''

@@ -175,6 +175,8 @@ def view_occurrences(self, request, layout=None):
         'search_widget': self.search_widget,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
+        'no_event_link': request.link(self.for_filter(
+            range='past', start=None, end=None)),
     }
 
 

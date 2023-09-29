@@ -60,6 +60,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f382';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 
 .globals {
@@ -531,6 +532,7 @@ $editbar-fg-color-active: $white;
     .upload::before { @include icon-bold($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
+    .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon-bold($new-daily-item-icon); }
     .new-resource-link::before { @include icon-bold($new-resource-link-icon); }
     .cancel::before { @include icon-bold($disabled-icon); }
@@ -595,10 +597,15 @@ $editbar-fg-color-active: $white;
             .navlink {
                 border-radius: .7rem;
                 margin-right: 3rem;
-                padding: 1rem;
                 transition: background-color 200ms linear;
 
-                &:hover {
+                span {
+                    display: block;
+                    padding: 1rem;
+                }
+
+                &:hover,
+                &.current {
                     background: rgba(250, 250, 250, .15);
                     color: $white;
                 }

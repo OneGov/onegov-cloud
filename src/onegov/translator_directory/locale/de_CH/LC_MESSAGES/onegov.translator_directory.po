@@ -848,15 +848,19 @@ msgstr "Übersetzer/in erfolgreich gelöscht"
 msgid "This file does not seem to exist."
 msgstr "Diese Datei wurde nicht gefunden."
 
+#, python-format
 msgid ""
-"Unfortunately, this account does not have real name defined, which is "
-"required for mail templates"
+"Unfortunately, this account (${account}) does not have real name defined, "
+"which is required for mail templates"
 msgstr ""
-"Für dieses Konto ist kein Name und Vorname definiert, welcher für "
-"Briefvorlagen erforderlich ist."
+"Für dieses Konto (${account}) ist kein Name und Vorname definiert, welcher "
+"für Briefvorlagen erforderlich ist."
 
 msgid "Did not find a signature in /files."
 msgstr "Es wurde keine Unterschrift in /dateien gefunden."
+
+msgid "The image for the signature could not be recognized."
+msgstr "Die Datei für die Unterschrift konnte nicht erkannt werden."
 
 msgid "Download"
 msgstr "Herunterladen"
