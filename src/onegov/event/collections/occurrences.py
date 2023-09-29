@@ -568,9 +568,10 @@ class OccurrenceCollection(Pagination):
                 </termin>
                 <text>Beschreibung</text>
                 <urlweb>url</urlweb>
-                <hauptrubrik>kalender</hauptrubrik>
-                <rubrik>tag 1</rubrik>
-                <rubrik>tag 2</rubrik>
+                <hauptrubrik name="Naturmusuem">
+                    <rubrik>tag 1</rubrik>
+                    <rubrik>tag 2</rubrik>
+                </hauptrubrik>
                 <veranstaltungsort>
                     <title></title>
                     <adresse></adresse>
@@ -642,8 +643,11 @@ class OccurrenceCollection(Pagination):
                             tags.extend(v)
                         else:
                             tags.append(v)
-            event.hauptrubrik = hr_text
-            event.rubrik = tags or None
+            hr = objectify.Element('hauptrubrik',
+                                   attrib=dict(name=hr_text) if
+                                   hr_text else None)
+            hr.rubrik = tags or None
+            event.append(hr)
 
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
