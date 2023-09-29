@@ -1,8 +1,12 @@
 # Changes
 
+## 2023.49
+
+No changes since last release
+
 ## 2023.48
 
-`2023-09-29` | [cc4d60fbac...1b59e1d108](https://github.com/OneGov/onegov-cloud/compare/cc4d60fbac^...1b59e1d108)
+`2023-09-29` | [cc4d60fbac...006cfbbb9f](https://github.com/OneGov/onegov-cloud/compare/cc4d60fbac^...006cfbbb9f)
 
 ### Events
 
@@ -2448,50 +2452,4 @@ Multiple Videos can now be added and one will randomly be chosen
 Use paragraphs and lists instead of only lists
 
 `Bugfix` | [OGC-815](https://linear.app/onegovcloud/issue/OGC-815) | [42d1cdfa1d](https://github.com/onegov/onegov-cloud/commit/42d1cdfa1d1192d28a7a2df25ccd66d4b94ff5c0)
-
-## 2022.56
-
-`2022-12-13` | [8edea2fdcc...6ab36c0639](https://github.com/OneGov/onegov-cloud/compare/8edea2fdcc^...6ab36c0639)
-
-### Directory
-
-##### Fix key format problem
-
-`Bugfix` | [OGC-814](https://linear.app/onegovcloud/issue/OGC-814) | [6042867716](https://github.com/onegov/onegov-cloud/commit/60428677168e7f9cfcf35abd692aa1118fc29476)
-
-### Election Day
-
-##### Enable voters counts for proporz elections.
-
-`Feature` | [OGC-353](https://linear.app/onegovcloud/issue/OGC-353) | [46780ffb4f](https://github.com/onegov/onegov-cloud/commit/46780ffb4fbdcc1dd9b942289b78eff82ff428df)
-
-##### Add historical party results.
-
-`Feature` | [OGC-703](https://linear.app/onegovcloud/issue/OGC-703) | [40cb21f883](https://github.com/onegov/onegov-cloud/commit/40cb21f88345c8fd954ce6ffeeed78cea96a8950)
-
-##### Show percentages instead of votes or voters counts in horziontal party strengths bar chart when having historical data.
-
-`Feature` | [OGC-828](https://linear.app/onegovcloud/issue/OGC-828) | [58a4878787](https://github.com/onegov/onegov-cloud/commit/58a4878787cf9ecba0e5010c861cbc707283fc7e)
-
-##### Remove obsolete migration step.
-
-`Other` | [OGC-768](https://linear.app/onegovcloud/issue/OGC-768) | [8edea2fdcc](https://github.com/onegov/onegov-cloud/commit/8edea2fdcc9881bc4d8e59fcd90875a31d36ac17)
-
-##### Drop owner columns of party and panachage results.
-
-`Other` | [OGC-768](https://linear.app/onegovcloud/issue/OGC-768) | [25f9dfee81](https://github.com/onegov/onegov-cloud/commit/25f9dfee81db2a61810de6e5b63b388141231207)
-
-##### Fix check for consistent total votes in party result import for results with multiple domains.
-
-`Bugfix` | [cf8ea1cda0](https://github.com/onegov/onegov-cloud/commit/cf8ea1cda0bc3686e441401719f0632eacc79e25)
-
-### Town6
-
-##### Show Hashtags and year only if they exist.
-
-`Feature` | [OGC-808](https://linear.app/onegovcloud/issue/OGC-808) | [8fc6ae7ef8](https://github.com/onegov/onegov-cloud/commit/8fc6ae7ef8c45f80f7d324abc74ac3eacb204438)
-
-##### Fix sidebar news
-
-`Bugfix` | [OGC-811](https://linear.app/onegovcloud/issue/OGC-811) | [db933a641b](https://github.com/onegov/onegov-cloud/commit/db933a641b02a9ded958aca18d3ce22b427e5d8b)
 
