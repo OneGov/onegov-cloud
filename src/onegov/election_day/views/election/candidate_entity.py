@@ -58,6 +58,8 @@ def view_election_candidate_by_entity(self, request):
 
     options = candidate_options(request, self)
     data_url = options[0][0] if options else None
+    by = request.translate(layout.label('entity'))
+    by = by.lower() if request.locale != 'de_CH' else by
 
     return {
         'election': self,
@@ -70,7 +72,12 @@ def view_election_candidate_by_entity(self, request):
             name='candidate-by-entity-chart',
             query_params={'locale': request.locale}
         ),
-        'hide_percentages': hide_candidate_entity_map_percentages(request)
+        'hide_percentages': hide_candidate_entity_map_percentages(request),
+        'figcaption': _(
+            'The map shows the percentage of votes for the selected candidate '
+            'by ${by}.',
+            mapping={'by': by}
+        )
     }
 
 

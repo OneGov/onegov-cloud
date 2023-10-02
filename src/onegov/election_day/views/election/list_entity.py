@@ -1,6 +1,7 @@
 from onegov.ballot import Election
 from onegov.ballot import List
 from onegov.core.security import Public
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -56,6 +57,8 @@ def view_election_list_by_entity(self, request):
 
     options = list_options(request, self)
     data_url = options[0][0] if options else None
+    by = request.translate(layout.label('entity'))
+    by = by.lower() if request.locale != 'de_CH' else by
 
     return {
         'election': self,
@@ -67,6 +70,11 @@ def view_election_list_by_entity(self, request):
             self,
             name='list-by-entity-chart',
             query_params={'locale': request.locale}
+        ),
+        'figcaption': _(
+            'The map shows the percentage of votes for the selected list '
+            'by ${by}.',
+            mapping={'by': by}
         )
     }
 

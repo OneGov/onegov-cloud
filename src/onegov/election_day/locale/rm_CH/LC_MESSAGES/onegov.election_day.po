@@ -699,6 +699,10 @@ msgstr "Partidas"
 msgid "Downloads"
 msgstr "Downloads"
 
+#, python-format
+msgid "By ${by}"
+msgstr ""
+
 msgid "Municipalities"
 msgstr "Vischnancas"
 
@@ -1512,6 +1516,11 @@ msgstr "Midà il pled-clav."
 msgid "Wrong username or password reset link not valid any more."
 msgstr "L'adressa è nunvalaivla u il link è nunvalaivel."
 
+#, python-format
+msgid ""
+"The map shows the percentage of votes for the selected candidate by ${by}."
+msgstr ""
+
 msgid ""
 "The figure with elected candidates will be available as soon the final "
 "results are published."
@@ -1525,6 +1534,10 @@ msgid ""
 msgstr ""
 "La grafica cun las colliaziuns da glistas è disponibla, uschespert ch'ils "
 "resultats finals èn publitgads."
+
+#, python-format
+msgid "The map shows the percentage of votes for the selected list by ${by}."
+msgstr ""
 
 msgid "Access Denied"
 msgstr "Refusà l'access"

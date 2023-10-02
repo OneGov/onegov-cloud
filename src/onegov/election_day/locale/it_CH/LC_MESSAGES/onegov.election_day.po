@@ -692,6 +692,10 @@ msgstr "Parti"
 msgid "Downloads"
 msgstr "Download"
 
+#, python-format
+msgid "By ${by}"
+msgstr ""
+
 msgid "Municipalities"
 msgstr "Comuni"
 
@@ -1499,6 +1503,11 @@ msgstr ""
 "Il collegamento per reimpostare il nuome utente o la password errati non è "
 "più valido."
 
+#, python-format
+msgid ""
+"The map shows the percentage of votes for the selected candidate by ${by}."
+msgstr ""
+
 msgid ""
 "The figure with elected candidates will be available as soon the final "
 "results are published."
@@ -1512,6 +1521,10 @@ msgid ""
 msgstr ""
 "La tabella con i elenca i collegamenti sarà disponibile non appena saranno "
 "pubblicati i risultati finali."
+
+#, python-format
+msgid "The map shows the percentage of votes for the selected list by ${by}."
+msgstr ""
 
 msgid "Access Denied"
 msgstr "Accesso Negato"
