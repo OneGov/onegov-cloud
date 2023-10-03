@@ -59,19 +59,10 @@ if (document.getElementById("autoplay-video")) {
     }
 
     // Remove height of header from video
-<<<<<<< HEAD:src/onegov/town6/assets/js/homepage_video_or_slider.js
     var video_wrapper = $('.homepage-video');
     var current_height = video_wrapper.data('max-height');
     var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
 
-=======
-    var header_height = $('#header').height();
-    var video_wrapper = $('.homepage-video');
-    var current_height = video_wrapper.data('max-height');
-    var new_height = 'calc(' + current_height + ' - ' + header_height + 'px)';
-    console.log(new_height)
-    console.log(current_height)
->>>>>>> master:src/onegov/town6/assets/js/homepage_video.js
     video_wrapper.css('max-height', new_height)
 }
 
