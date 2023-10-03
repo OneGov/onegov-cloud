@@ -11,10 +11,11 @@ from sqlalchemy import func
 
 
 def candidate_options(request, election):
+    completed = election.completed
     elected = request.translate(_("Elected")).lower()
     ordering = [func.lower(Candidate.family_name),
                 func.lower(Candidate.first_name)]
-    if election.completed:
+    if completed:
         ordering.insert(0, Candidate.elected.desc())
 
     return [
@@ -22,7 +23,7 @@ def candidate_options(request, election):
             request.link(candidate_, name='by-entity'),
             '{} {}'.format(
                 f'{candidate_.family_name} {candidate_.first_name}',
-                (f'({elected})' if election.completed
+                (f'({elected})' if completed
                     and candidate_.elected else '')
             ).strip()
         )
