@@ -266,10 +266,23 @@ def transfer(
         """ Transfers only changed files based on size or last-modified
         time. This is rsnyc default behaviour. """
 
-        send = (
-            f"rsync -av --include='{glob}' --exclude='*' "
+        # '/***' means to include all files and directories under a directory
+        # recursively. Without that, it will only transfer the directory but
+        # not it's contents.
+        glob += '/***'
+
+        dry_run = (
+            f"rsync -a --include='*/' --include='{glob}' --exclude='*' "
+            f"--dry-run --itemize-changes "
             f"{server}:{remote}/ {local}/"
         )
+        subprocess.run(dry_run, shell=True, capture_output=False)
+
+        send = (
+            f"rsync -av --include='*/' --include='{glob}' --exclude='*' "
+            f"{server}:{remote}/ {local}/"
+        )
+
         if shutil.which('pv'):
             send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
         click.echo(f"Copying {remote}/{glob}")

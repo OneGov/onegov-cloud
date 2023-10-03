@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-09-20 09:02+0200\n"
+"POT-Creation-Date: 2023-09-25 08:37+0200\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1967,6 +1967,9 @@ msgstr "Neue Notiz"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Download files"
+msgstr "Dateien herunterladen"
+
 msgid "New Message"
 msgstr "Neue Nachricht"
 
@@ -2514,8 +2517,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -5306,6 +5309,9 @@ msgstr "Das Ticket wurde bereits geschlossen"
 msgid "Your message has been sent"
 msgstr "Ihre Nachricht wurde gesendet"
 
+msgid "Zip archive created successfully"
+msgstr "ZIP-Archiv erfolgreich generiert"
+
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
@@ -5382,3 +5388,6 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+#~ msgid "Keep header links fixed to top on scrolling"
+#~ msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"

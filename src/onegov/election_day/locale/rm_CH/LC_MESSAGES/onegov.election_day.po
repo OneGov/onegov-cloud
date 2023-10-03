@@ -107,7 +107,7 @@ msgstr "Schlattaina nunvalaivla: ${value}"
 msgid "Invalid color: ${col}"
 msgstr "Colur nunvalaivla: : ${col"
 
-msgid "This format does not support separate results for expats"
+msgid "File not supported"
 msgstr ""
 
 msgid "Invalid election values"
@@ -146,25 +146,14 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} betg en list_id's"
 
 #, python-format
-msgid "Invalid domain_segment: ${domain_segment}"
-msgstr "domain_segment nunvalaivels: ${domain_segment}"
-
-msgid "Invalid values"
-msgstr "Valurs nunvalaivlas"
-
-#, python-format
 msgid "${name} was found twice"
 msgstr "${name} è avant maun duas giadas"
 
-#, python-format
-msgid "No party results for year ${year}"
-msgstr "Nagins resultats da partidas per l'onn ${year}"
-
-msgid "Panachage results ids and id not consistent"
-msgstr "Inconsistenza tranter Panachage results ids ed id"
-
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
+
+msgid "Invalid values"
+msgstr "Valurs nunvalaivlas"
 
 msgid "Unknown candidate"
 msgstr "Candidat(a) nunenconuschent(a)"
@@ -211,6 +200,20 @@ msgid "Candidate with id ${id} not in wpstatic_kandidaten"
 msgstr ""
 "La candidata u il candidat cun id ${id} n'è betg en wpstatic_kandidaten"
 
+msgid "This format does not support separate results for expats"
+msgstr ""
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment nunvalaivels: ${domain_segment}"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr "Nagins resultats da partidas per l'onn ${year}"
+
+msgid "Panachage results ids and id not consistent"
+msgstr "Inconsistenza tranter Panachage results ids ed id"
+
 msgid "Proposal"
 msgstr "Project da votaziun"
 
@@ -226,6 +229,9 @@ msgstr "Naginas persunas cun dretg da votar"
 msgid "More cast votes than eligible voters"
 msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
 
+msgid "Vote type not supported"
+msgstr ""
+
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
 
@@ -234,9 +240,6 @@ msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
 
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
-msgstr ""
-
-msgid "Vote type not supported"
 msgstr ""
 
 msgid "Term"
@@ -1029,6 +1032,12 @@ msgstr "Vuschs affirmativas"
 
 msgid "Nays"
 msgstr "Vuschs negativas"
+
+msgid "Proposal %"
+msgstr "Project da votaziun %"
+
+msgid "Counter proposal %"
+msgstr "Cuntraproposta %"
 
 msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"

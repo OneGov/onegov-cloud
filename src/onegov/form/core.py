@@ -9,6 +9,7 @@ from onegov.form import utils
 from onegov.form.display import render_field
 from onegov.form.fields import FIELDS_NO_RENDERED_PLACEHOLDER
 from onegov.form.fields import HoneyPotField
+from onegov.form.utils import get_fields_from_class
 from onegov.form.validators import If, StrictOptional
 from onegov.pay import Price
 from operator import itemgetter
@@ -207,7 +208,7 @@ class Form(BaseForm):
         class ClonedForm(cls):  # type:ignore
             pass
 
-        for key, unbound_field in cls._unbound_fields:
+        for key, unbound_field in get_fields_from_class(cls):
             setattr(ClonedForm, key, unbound_field.field_class(
                 *unbound_field.args,
                 **unbound_field.kwargs

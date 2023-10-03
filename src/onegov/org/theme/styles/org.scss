@@ -513,6 +513,14 @@ del {
 }
 
 /*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    font-size: 1.0rem;
+    display: block;
+}
+
+/*
     Click through
 */
 .click-through {
@@ -1636,6 +1644,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
 $editbar-bg-color: $topbar-link-bg-hover;
@@ -1765,6 +1774,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
+    .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }

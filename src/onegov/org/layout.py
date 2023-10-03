@@ -1116,8 +1116,8 @@ class TicketLayout(DefaultLayout):
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
                 links = self.model.handler.get_links(self.request)
-                assert len(links) <= 2, """
-                    Models are limited to two model-specific links. Usually
+                assert len(links) <= 3, """
+                    Models are limited to three model-specific links. Usually
                     a primary single link and a link group containing the
                     other links.
                 """
@@ -1193,8 +1193,21 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
+            if self.has_submission_files:
+                links.append(
+                    Link(
+                        text=_("Download files"),
+                        url=self.request.link(self.model, 'files'),
+                        attrs={'class': 'ticket-files'}
+                    )
+                )
 
             return links
+
+    @cached_property
+    def has_submission_files(self) -> bool:
+        submission = getattr(self.model.handler, 'submission', None)
+        return submission is not None and bool(submission.files)
 
 
 class TicketNoteLayout(DefaultLayout):

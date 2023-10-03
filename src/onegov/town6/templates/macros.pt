@@ -54,31 +54,33 @@
 </metal:navigation>
 
 <metal:navigation define-macro="side-navigation-nested">
-    <a tal:condition="children">
-        <div class="navlink"><span data-click-target="${link.attrs['href']}">${link.text}</span>
-        <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
-        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/></div>
+    <a tal:condition="children" tal:define="page page|None">
+        <div class="navlink ${'current' if nav_page == page else ''}"><span data-click-target="${link.attrs['href']}">${link.text}</span>
+        <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+        <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/></div>
     </a>
-    <tal:b tal:condition="not: children">
+    <tal:b tal:condition="not: children" tal:define="page page|None">
         <a href="${link.attrs['href']}">
-            <div class="navlink"><span>${link.text}</span>
-            <metal:b use-macro="layout.macros['access_hint']" tal:define="item page"/>
-            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item page"/></div>
+            <div class="navlink ${'current' if nav_page == page else ''}"><span>${link.text}</span>
+            <metal:b use-macro="layout.macros['access_hint']" tal:define="item nav_page"/>
+            <metal:b use-macro="layout.macros['publication_hint']" tal:define="item nav_page"/></div>
         </a>
     </tal:b>
-    <ul class="vertical menu nested"  tal:condition="children">
-        <tal:b tal:repeat="(page, sublink, c) children">
-            <li data-sortable-id="${page.id}">
-                <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
-            </li>
-        </tal:b>
-    </ul>
+    <tal:b tal:define="ancestors layout.model.ancestors|[]">
+        <ul class="vertical menu nested ${'is-active current-list' if nav_page in ancestors else ''}"  tal:condition="children">
+            <tal:b tal:repeat="(page, sublink, c) children">
+                <li data-sortable-id="${page.id}">
+                    <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
+                </li>
+            </tal:b>
+        </ul>
+    </tal:b>
 </metal:navigation>
 
 
 <metal:navigation define-macro="side-navigation">
     <ul class="vertical menu side-navigation"  data-responsive-menu="drilldown medium-accordion" data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
-        <li tal:repeat="(page, link, children) links" data-sortable-id="${page.id}">
+        <li tal:repeat="(nav_page, link, children) links" data-sortable-id="${nav_page.id}">
             <metal:b use-macro="layout.macros['side_navigation_nested']" />
         </li>
     </ul>
@@ -915,8 +917,18 @@
                         <span tal:condition="person.political_party and 'political_party' not in exclude">${person.political_party}</span>
                         <span tal:condition="person.parliamentary_group and 'parliamentary_group' not in exclude">${person.parliamentary_group}</span>
                     </li>
-                    <li tal:condition="person.address and 'address' not in exclude" class="person-card-address">
-                        <span>${person.address}</span>
+                    <li tal:condition="person.location_address and 'location_address' not in exclude" class="person-card-address">
+                        <span title="_('Location address')">${person .location_address}</span>
+                    </li>
+                    <li tal:condition="person.location_code_city and 'location_code_city' not in exclude" class="person-card-address">
+                        <span title="Hover text für location code and
+                        city">${person.location_code_city}</span>
+                    </li>
+                    <li tal:condition="person.postal_address and 'postal_address' not in exclude" class="person-card-address">
+                        <span>${person.postal_address}</span>
+                    </li>
+                    <li tal:condition="person.postal_code_city and 'postal_code_city' not in exclude" class="person-card-address">
+                        <span>${person.postal_code_city}</span>
                     </li>
                     <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
                         <a href="mailto:${person.email}">${person.email}</a>
@@ -929,6 +941,9 @@
                     </li>
                     <li tal:condition="person.website and 'website' not in exclude" class="person-card-website">
                         <a href="${person.website}">${person.website}</a>
+                    </li>
+                    <li tal:condition="person.website_2 and 'website_2' not in exclude" class="person-card-website">
+                        <a href="${person.website_2}">${person.website_2}</a>
                     </li>
                     <div class="person-card-context-specific-functions" tal:condition="python: organization_to_function">
                         <span i18n:translate="">Functions:</span>
@@ -1187,8 +1202,12 @@
         <tal:b condition="event.filter_keywords and show_filters">
             <dt i18n:translate>Filters</dt>
             <dd>
-                <ul class="no-margin-bottom">
-                    <li tal:repeat="filter event.filter_keywords" i18n:translate>${filter}</li>
+                <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
+                    <li tal:condition="filter[1]">
+                        <span i18n:translate>${filter[0].title()}:</span>
+                        <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
+                        <span tal:condition="not isinstance(filter[1], list) and filter[1]" i18n:translate>${filter[1]}</span>
+                    </li>
                 </ul>
             </dd>
         </tal:b>
@@ -1265,7 +1284,7 @@
         </div>
     <tal:b condition="not occurrences">
         <p i18n:translate>No events found.</p>
-        <br><a tal:condition="'range' not in request.url" href="${layout.events_url}&amp;range=past" class="button hollow" i18n:translate>Past events</a>
+        <br><a tal:condition="'range' not in request.url" href="${no_event_link}" class="button hollow" i18n:translate>Past events</a>
     </tal:b>
 </metal:occurrences>
 
@@ -1318,9 +1337,11 @@
                                         <div tal:condition="occurrence.tags and show_tags" class="occurrence-tags">
                                             <span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span>
                                         </div>
-                                        <div tal:condition="occurrence.filter_keywords and show_filters" class="occurrence-filter">
-                                            <div tal:repeat="filter occurrence.filter_keywords.items()">
-                                                <span tal:condition="filter[1]" class="blank-label">${filter[0].title()}: ${', '.join(item for item in filter[1]) if isinstance(filter[1], list) else filter[1]}</span>
+                                        <div tal:condition="occurrence.filter_keywords and show_filters">
+                                            <div tal:repeat="filter occurrence.filter_keywords_ordered().items()">
+                                                <span tal:condition="filter[1]" class="blank-label-description">${filter[0].title()}:</span>
+                                                <span tal:repeat="tag filter[1]" tal:condition="isinstance(filter[1], list)" class="blank-label">${tag}</span>
+                                                <span tal:condition="not isinstance(filter[1], list) and filter[1]" class="blank-label">${filter[1]}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1454,7 +1475,7 @@
 </metal:photoswipe>
 
 <metal:autoplay_video define-macro="autoplay_video" i18n:domain="onegov.town6">
-    <div tal:condition="link_mp4 or link_webm" class="homepage-video" style="max-height: ${max_height};"
+    <div tal:condition="link_mp4 or link_webm" class="homepage-video" data-max-height="${max_height if max_height else '100vh'}"
     >
         <video id="autoplay-video" autoplay playsinline loop muted
             data-link-mp4="${link_mp4}"
@@ -1464,7 +1485,14 @@
         >
             Your browser does not support the video tag.
         </video>
-        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer"></div>
+        <div style="height: 0; width: 100%; padding-bottom: calc(9 / 16 *100%);" id="spacer">
+            <div class="dark-overlay" tal:condition="text"></div>
+            <div class="grid-container" tal:condition="text">
+                <div class="text">
+                    <span>${text}</span>
+                </div>
+            </div>
+        </div>
     </div>
 </metal:autoplay_video>
 
@@ -1503,8 +1531,8 @@
     <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
         <div class="orbit-wrapper">
             <div  tal:condition="images and len(images) > 1" class="orbit-controls">
-                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span>&#9664;&#xFE0E;</button>
-                <button class="orbit-next"><span class="show-for-sr">Next Slide</span>&#9654;&#xFE0E;</button>
+                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
+                <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
             <ul class="orbit-container">
                 <li tal:repeat="image images" class="orbit-slide">
@@ -1590,15 +1618,15 @@
 </div></div></div>
 </metal:testimonial_slider>
 
-
-
 <metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.town6">
-    <nav class="orbit-bullets">
-        <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
-            <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
-<!--?            <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span> -->
-        </button>
-    </nav>
+    <div class="orbit-bullet-wrapper show-for-medium">
+        <nav class="orbit-bullets">
+            <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
+                <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
+                <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Image</span>
+            </button>
+        </nav>
+    </div>
 </metal:bullets>
 
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.town6">

@@ -101,6 +101,7 @@ def org_content_security_policy():
     policy.connect_src.add('https://stats.seantis.ch')
     policy.connect_src.add('https://mstdn.social')
     policy.img_src.add('https://www.emuseum.ch')
+    policy.script_src.add('https://stats.seantis.ch')
     policy.script_src.remove(UNSAFE_EVAL)
     policy.script_src.remove(UNSAFE_INLINE)
     return policy
