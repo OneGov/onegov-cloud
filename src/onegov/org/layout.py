@@ -1756,6 +1756,9 @@ class OccurrencesLayout(EventBaseLayout):
 
         return list(links())
 
+    def include_accordion(self):
+        self.request.include('accordion')
+
 
 class OccurrenceLayout(EventBaseLayout):
 
