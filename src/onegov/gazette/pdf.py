@@ -65,7 +65,7 @@ class IndexPdf(Pdf):
             numbers = []
             query = notices.query().with_entities(GazetteNotice._issues)
             query = query.filter(
-                GazetteNotice._categories.has_key(category.name)  # noqa
+                GazetteNotice._categories.has_key(category.name)
             )
             for issues in query:
                 numbers.extend([(
@@ -101,7 +101,7 @@ class IndexPdf(Pdf):
             numbers = []
             query = notices.query().with_entities(GazetteNotice._issues)
             query = query.filter(
-                GazetteNotice._organizations.has_key(organization.name)  # noqa
+                GazetteNotice._organizations.has_key(organization.name)
             )
             for issues in query:
                 numbers.extend([(
@@ -340,7 +340,7 @@ class IssuePdf(NoticesPdf):
             GazetteNotice.id
         )
         notices = notices.filter(
-            GazetteNotice._issues.has_key(issue),  # noqa
+            GazetteNotice._issues.has_key(issue),
             GazetteNotice.state == 'published',
             GazetteNotice._organizations.has_key(organization),
             GazetteNotice._categories.has_key(category)
@@ -355,25 +355,25 @@ class IssuePdf(NoticesPdf):
     def query_used_categories(cls, session, issue):
         query = session.query(GazetteNotice._categories.keys())
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),
             GazetteNotice.state == 'published',
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {result[0][0] for result in query if result[0]}
 
     @classmethod
     def query_used_organizations(cls, session, issue):
         query = session.query(GazetteNotice._organizations.keys())
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),
             GazetteNotice.state == 'published',
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {result[0][0] for result in query if result[0]}
 
     @classmethod
     def query_excluded_notices_count(cls, session, issue):
         query = session.query(GazetteNotice)
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),
             GazetteNotice.state == 'published',
             bool_is(GazetteNotice.meta['print_only'], True)
         )
@@ -529,7 +529,7 @@ class IssuePrintOnlyPdf(IssuePdf):
             GazetteNotice.id
         )
         notices = notices.filter(
-            GazetteNotice._issues.has_key(issue),  # noqa
+            GazetteNotice._issues.has_key(issue),
             GazetteNotice.state == 'published',
             GazetteNotice._organizations.has_key(organization),
             GazetteNotice._categories.has_key(category),
@@ -545,21 +545,21 @@ class IssuePrintOnlyPdf(IssuePdf):
     def query_used_categories(cls, session, issue):
         query = session.query(GazetteNotice._categories.keys())
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),
             GazetteNotice.state == 'published',
             bool_is(GazetteNotice.meta['print_only'], True)
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {result[0][0] for result in query if result[0]}
 
     @classmethod
     def query_used_organizations(cls, session, issue):
         query = session.query(GazetteNotice._organizations.keys())
         query = query.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice._issues.has_key(issue.name),
             GazetteNotice.state == 'published',
             bool_is(GazetteNotice.meta['print_only'], True)
         )
-        return set([result[0][0] for result in query if result[0]])
+        return {result[0][0] for result in query if result[0]}
 
     @classmethod
     def from_issue(cls, issue, request):

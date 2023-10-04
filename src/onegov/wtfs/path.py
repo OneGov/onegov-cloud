@@ -76,9 +76,9 @@ def get_municipalities(request: 'CoreRequest') -> MunicipalityCollection:
 @WtfsApp.path(
     model=Municipality,
     path='/municipality/{id}',
-    converters=dict(
-        id=uuid_converter
-    )
+    converters={
+        'id': uuid_converter
+    }
 )
 def get_municipality(
     request: 'CoreRequest',
@@ -90,15 +90,15 @@ def get_municipality(
 @WtfsApp.path(
     model=ScanJobCollection,
     path='/scan-jobs',
-    converters=dict(
-        page=int,
-        from_date=extended_date_converter,
-        to_date=extended_date_converter,
-        type=[str],
-        municipality_id=[str],
-        sort_by=str,
-        sort_order=str
-    )
+    converters={
+        'page': int,
+        'from_date': extended_date_converter,
+        'to_date': extended_date_converter,
+        'type': [str],
+        'municipality_id': [str],
+        'sort_by': str,
+        'sort_order': str
+    }
 )
 def get_scan_jobs(
     request: 'CoreRequest',
@@ -131,9 +131,9 @@ def get_scan_jobs(
 @WtfsApp.path(
     model=ScanJob,
     path='/scan-job/{id}',
-    converters=dict(
-        id=uuid_converter
-    )
+    converters={
+        'id': uuid_converter
+    }
 )
 def get_scan_job(request: 'CoreRequest', id: 'UUID') -> ScanJob | None:
     return ScanJobCollection(request.session).by_id(id)
@@ -150,9 +150,9 @@ def get_daily_list(request: 'CoreRequest') -> DailyList:
 @WtfsApp.path(
     model=DailyListBoxes,
     path='/daily-list/boxes/{date}',
-    converters=dict(
-        date=extended_date_converter,
-    )
+    converters={
+        'date': extended_date_converter,
+    }
 )
 def get_daily_list_boxes(
     request: 'CoreRequest',
@@ -164,9 +164,9 @@ def get_daily_list_boxes(
 @WtfsApp.path(
     model=DailyListBoxesAndForms,
     path='/daily-list/boxes-and-forms/{date}',
-    converters=dict(
-        date=extended_date_converter,
-    )
+    converters={
+        'date': extended_date_converter,
+    }
 )
 def get_daily_list_boxes_and_forms(
     request: 'CoreRequest',
@@ -186,10 +186,10 @@ def get_report(request: 'CoreRequest') -> Report:
 @WtfsApp.path(
     model=ReportBoxes,
     path='/report/boxes/{start}/{end}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+    }
 )
 def get_report_boxes(
     request: 'CoreRequest',
@@ -202,10 +202,10 @@ def get_report_boxes(
 @WtfsApp.path(
     model=ReportBoxesAndForms,
     path='/report/boxes-and-forms/{start}/{end}/{type}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+    }
 )
 def get_report_boxes_and_forms(
     request: 'CoreRequest',
@@ -219,10 +219,10 @@ def get_report_boxes_and_forms(
 @WtfsApp.path(
     model=ReportFormsAllMunicipalities,
     path='/report/all-forms/{start}/{end}/{type}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+    }
 )
 def get_report_all_forms(
     request: 'CoreRequest',
@@ -236,11 +236,11 @@ def get_report_all_forms(
 @WtfsApp.path(
     model=ReportFormsByMunicipality,
     path='/report/forms/{start}/{end}/{type}/{municipality_id}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-        municipality_id=uuid_converter
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+        'municipality_id': uuid_converter
+    }
 )
 def get_report_forms(
     request: 'CoreRequest',
@@ -259,11 +259,11 @@ def get_report_forms(
 @WtfsApp.path(
     model=ReportBoxesAndFormsByDelivery,
     path='/report/delivery/{start}/{end}/{type}/{municipality_id}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-        municipality_id=uuid_converter
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+        'municipality_id': uuid_converter
+    }
 )
 def get_report_delivery(
     request: 'CoreRequest',

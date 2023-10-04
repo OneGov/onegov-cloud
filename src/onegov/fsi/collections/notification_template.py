@@ -40,7 +40,7 @@ class CourseNotificationTemplateCollection(GenericCollection):
         assert self.course_event_id
         if not self.query().first():
             # Owner id should be set in path.py if not present
-            data = dict(course_event_id=self.course_event_id)
+            data = {'course_event_id': self.course_event_id}
             self.session.add_all((
                 InfoTemplate(**data),
                 SubscriptionTemplate(**data),

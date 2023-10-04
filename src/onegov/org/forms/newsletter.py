@@ -52,13 +52,19 @@ class NewsletterForm(Form):
 
         layout = Layout(None, request)
 
-        choices = tuple((
-            str(item.id),
-            Markup("""
-            <div class="title">{}</div><div class="date">{}</div>
-            """.format(item.title, layout.format_date(item.created,
-                                                      'relative')))
-        ) for item in news)
+        choices = tuple(
+            (
+                str(item.id),
+                Markup(
+                    '<div class="title">{}</div>'
+                    '<div class="date">{}</div>'
+                ).format(
+                    item.title,
+                    layout.format_date(item.created, 'relative')
+                )
+            )
+            for item in news
+        )
 
         if not choices:
             return cls
@@ -88,13 +94,19 @@ class NewsletterForm(Form):
 
         layout = Layout(None, request)
 
-        choices = tuple((
-            str(item.id),
-            Markup("""
-            <div class="title">{}</div><div class="date">{}</div>
-            """.format(item.title, layout.format_date(item.localized_start,
-                                                      'datetime')))
-        )for item in occurrences)
+        choices = tuple(
+            (
+                str(item.id),
+                Markup(
+                    '<div class="title">{}</div>'
+                    '<div class="date">{}</div>'
+                ).format(
+                    item.title,
+                    layout.format_date(item.localized_start, 'datetime')
+                )
+            )
+            for item in occurrences
+        )
 
         if not choices:
             return cls
@@ -124,13 +136,19 @@ class NewsletterForm(Form):
 
         layout = Layout(None, request)
 
-        choices = tuple((
-            str(item.id),
-            Markup("""
-            <div class="title">{}</div><div class="date">{}</div>
-            """.format(name_without_extension(item.name),
-                       layout.format_date(item.created, 'date')))
-        ) for item in publications)
+        choices = tuple(
+            (
+                str(item.id),
+                Markup(
+                    '<div class="title">{}</div>'
+                    '<div class="date">{}</div>'
+                ).format(
+                    name_without_extension(item.name),
+                    layout.format_date(item.created, 'date')
+                )
+            )
+            for item in publications
+        )
 
         if not choices:
             return cls
@@ -249,7 +267,7 @@ class NewsletterSubscriberImportExportForm(Form):
             }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     @property

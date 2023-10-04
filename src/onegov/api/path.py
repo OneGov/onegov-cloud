@@ -21,7 +21,7 @@ def get_api_endpoints(app: 'Framework') -> ApiEndpointCollection:
 @ApiApp.path(
     model=ApiEndpoint,
     path='/api/{endpoint}',
-    converters=dict(page=int)
+    converters={'page': int}
 )
 def get_api_endpoint(
     app: 'Framework',

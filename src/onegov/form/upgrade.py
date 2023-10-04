@@ -116,7 +116,7 @@ def add_meta_directory_to_submissions(context: 'UpgradeContext') -> None:
     context.add_column_with_defaults(
         table='submissions',
         column=Column('meta', JSON, nullable=False),
-        default=lambda submission: dict()
+        default=lambda submission: {}
     )
 
 

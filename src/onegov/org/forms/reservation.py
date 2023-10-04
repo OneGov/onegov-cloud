@@ -49,7 +49,7 @@ class FindYourSpotForm(Form):
 
     rooms = MultiCheckboxField(
         label=_("Rooms"),
-        choices=tuple(),
+        choices=(),
         coerce=lambda v: UUID(v) if isinstance(v, str) else v,
         validators=[InputRequired()],
         render_kw={

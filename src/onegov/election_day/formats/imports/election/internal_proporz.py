@@ -94,22 +94,22 @@ def parse_election_result(line, errors, entities, election, principal,
             errors.extend(entity_errors)
 
             if not errors:
-                return dict(
-                    id=uuid4(),
-                    election_id=election.id,
-                    name=name,
-                    district=district,
-                    superregion=superregion,
-                    counted=counted,
-                    entity_id=entity_id,
-                    eligible_voters=eligible_voters if counted else 0,
-                    expats=expats if counted else 0,
-                    received_ballots=received_ballots if counted else 0,
-                    blank_ballots=blank_ballots if counted else 0,
-                    invalid_ballots=invalid_ballots if counted else 0,
-                    blank_votes=blank_votes if counted else 0,
-                    invalid_votes=invalid_votes if counted else 0,
-                )
+                return {
+                    'id': uuid4(),
+                    'election_id': election.id,
+                    'name': name,
+                    'district': district,
+                    'superregion': superregion,
+                    'counted': counted,
+                    'entity_id': entity_id,
+                    'eligible_voters': eligible_voters if counted else 0,
+                    'expats': expats if counted else 0,
+                    'received_ballots': received_ballots if counted else 0,
+                    'blank_ballots': blank_ballots if counted else 0,
+                    'invalid_ballots': invalid_ballots if counted else 0,
+                    'blank_votes': blank_votes if counted else 0,
+                    'invalid_votes': invalid_votes if counted else 0,
+                }
 
     return False
 
@@ -125,13 +125,13 @@ def parse_list(line, errors, election_id, colors):
     else:
         if name and color:
             colors[name] = color
-        return dict(
-            id=uuid4(),
-            election_id=election_id,
-            list_id=id,
-            number_of_mandates=mandates,
-            name=name,
-        )
+        return {
+            'id': uuid4(),
+            'election_id': election_id,
+            'list_id': id,
+            'number_of_mandates': mandates,
+            'name': name,
+        }
 
 
 def parse_list_result(line, errors, counted):
@@ -140,10 +140,10 @@ def parse_list_result(line, errors, counted):
     except ValueError as e:
         errors.append(e.args[0])
     else:
-        return dict(
-            id=uuid4(),
-            votes=votes if counted else 0
-        )
+        return {
+            'id': uuid4(),
+            'votes': votes if counted else 0
+        }
 
 
 def parse_list_panachage_headers(csv):
@@ -203,17 +203,17 @@ def parse_candidate(line, errors, election_id, colors):
     else:
         if party and color:
             colors[party] = color
-        return dict(
-            id=uuid4(),
-            election_id=election_id,
-            candidate_id=id,
-            family_name=family_name,
-            first_name=first_name,
-            elected=elected,
-            party=party,
-            gender=gender,
-            year_of_birth=year_of_birth
-        )
+        return {
+            'id': uuid4(),
+            'election_id': election_id,
+            'candidate_id': id,
+            'family_name': family_name,
+            'first_name': first_name,
+            'elected': elected,
+            'party': party,
+            'gender': gender,
+            'year_of_birth': year_of_birth
+        }
 
 
 def parse_candidate_result(line, errors, counted):
@@ -222,10 +222,10 @@ def parse_candidate_result(line, errors, counted):
     except ValueError as e:
         errors.append(e.args[0])
     else:
-        return dict(
-            id=uuid4(),
-            votes=votes if counted else 0,
-        )
+        return {
+            'id': uuid4(),
+            'votes': votes if counted else 0,
+        }
 
 
 def parse_candidate_panachage_headers(csv):
@@ -284,16 +284,16 @@ def parse_connection(line, errors, election_id):
     except ValueError:
         errors.append(_("Invalid list connection values"))
     else:
-        connection = dict(
-            id=uuid4(),
-            election_id=election_id,
-            connection_id=connection_id,
-        ) if connection_id else None
-        subconnection = dict(
-            id=uuid4(),
-            election_id=election_id,
-            connection_id=subconnection_id,
-        ) if subconnection_id else None
+        connection = {
+            'id': uuid4(),
+            'election_id': election_id,
+            'connection_id': connection_id,
+        } if connection_id else None
+        subconnection = {
+            'id': uuid4(),
+            'election_id': election_id,
+            'connection_id': subconnection_id,
+        } if subconnection_id else None
         return connection, subconnection
 
 
@@ -457,15 +457,15 @@ def import_election_internal_proporz(
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
                 continue
-        results[entity_id] = dict(
-            id=uuid4(),
-            election_id=election_id,
-            name=name,
-            district=district,
-            superregion=superregion,
-            entity_id=entity_id,
-            counted=False
-        )
+        results[entity_id] = {
+            'id': uuid4(),
+            'election_id': election_id,
+            'name': name,
+            'district': district,
+            'superregion': superregion,
+            'entity_id': entity_id,
+            'counted': False
+        }
 
     # Aggregate candidate panachage to list panachage if missing
     if candidate_panachage and not any(list_panachage.values()):
@@ -498,12 +498,12 @@ def import_election_internal_proporz(
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())
     session.bulk_insert_mappings(ListPanachageResult, (
-        dict(
-            id=uuid4(),
-            source_id=list_uids[source],
-            target_id=list_uids[list_id],
-            votes=votes,
-        )
+        {
+            'id': uuid4(),
+            'source_id': list_uids[source],
+            'target_id': list_uids[list_id],
+            'votes': votes,
+        }
         for list_id in list_panachage
         for source, votes in list_panachage[list_id].items()
     ))
@@ -516,13 +516,13 @@ def import_election_internal_proporz(
     ))
     session.bulk_insert_mappings(CandidateResult, candidate_results)
     session.bulk_insert_mappings(CandidatePanachageResult, (
-        dict(
-            id=uuid4(),
-            election_result_id=result_uids[panachage_result['entity_id']],
-            source_id=list_uids[panachage_result['list_id']],
-            target_id=candidate_uids[panachage_result['candidate_id']],
-            votes=panachage_result['votes'],
-        )
+        {
+            'id': uuid4(),
+            'election_result_id': result_uids[panachage_result['entity_id']],
+            'source_id': list_uids[panachage_result['list_id']],
+            'target_id': candidate_uids[panachage_result['candidate_id']],
+            'votes': panachage_result['votes'],
+        }
         for panachage_result in candidate_panachage
     ))
 

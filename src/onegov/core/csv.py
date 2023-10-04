@@ -196,10 +196,10 @@ class CSVFile(Generic[_RowT]):
         """
 
         self.rowtype = rowtype or namedtuple(  # type:ignore[assignment]
-            "CSVFileRow", ['rownumber'] + list(
+            "CSVFileRow", ['rownumber'] + [
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()
-            )
+            ]
         )
 
     @staticmethod
@@ -861,7 +861,7 @@ def match_headers(
 
     for column in expected:
         normalized = normalize_header(column)
-        distances = dict((h, distance(normalized, h)) for h in headers)
+        distances = {h: distance(normalized, h) for h in headers}
 
         closest = min(distances.values())
 

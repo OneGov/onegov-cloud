@@ -49,7 +49,7 @@ class ApisMixin:
 
 def get_geo_location(item):
     geo = item.content.get('coordinates', Coordinates()) or Coordinates()
-    return dict(lon=geo.lon, lat=geo.lat, zoom=geo.zoom)
+    return {'lon': geo.lon, 'lat': geo.lat, 'zoom': geo.zoom}
 
 
 def get_modified_iso_format(item):

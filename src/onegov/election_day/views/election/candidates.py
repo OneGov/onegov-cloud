@@ -90,7 +90,7 @@ def view_election_candidates(self, request):
         object_session(self),
         entities=[entity] if entity else None
     ).all()
-    any_elected = any([candidate.elected for candidate in candidates])
+    any_elected = any(candidate.elected for candidate in candidates)
 
     return {
         'skip_rendering': hide_candidates_chart(self, request),
