@@ -24,6 +24,7 @@ cache is usually a shared redis instance, this works for multiple processes.
 import inspect
 import sqlalchemy
 
+from sqlalchemy.orm import make_transient, make_transient_to_detached
 from sqlalchemy.orm.query import Query
 from time import time
 
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from sqlalchemy.orm import Session
     from typing import Protocol
-    from typing_extensions import Self
+    from typing_extensions import Self, TypeGuard
 
     from . import Base
     from .session_manager import SessionManager
@@ -60,6 +61,7 @@ if TYPE_CHECKING:
         ) -> 'OrmCacheDescriptor[_T]': ...
 
 _T = TypeVar('_T')
+_T1 = TypeVar('_T1')
 unset = object()
 
 
@@ -216,19 +218,57 @@ class OrmCacheDescriptor(Generic[_T]):
 
         return result
 
-    def merge(self, session: 'Session', obj: '_M') -> '_M':
+    def merge(self, session: 'Session', obj: _T1) -> _T1:
         """ Merges the given obj into the given session, *if* this is possible.
 
         That is it acts like more forgiving session.merge().
 
         """
         if self.requires_merge(obj):
-            obj = session.merge(obj, load=False)
+            # the object might be already attached to a different session
+            # through the in-memory cache in which case we need to make the
+            # object transient
+            # FIXME: We could probably detect when this is necessary, so we
+            #        only have to do it then, although make_transient and
+            #        make_transient_to_detached might already contain logic
+            #        to short-circuit pre-detached instances.
+            make_transient(obj)
+            make_transient_to_detached(obj)
+            obj = session.merge(obj, load=False)  # type:ignore[assignment]
             obj.is_cached = True
 
         return obj
 
-    def requires_merge(self, obj: 'Base') -> bool:
+    def deep_merge(self, session: 'Session', obj: _T1) -> _T1:
+        """ Merges the given obj into the given session recursively, *if* this
+        is possible.
+
+        """
+
+        # named tuples
+        if isinstance(obj, tuple) and hasattr(obj.__class__, '_make'):
+            obj = obj._make(  # type:ignore[attr-defined]
+                self.deep_merge(session, o) for o in obj
+            )
+
+        # lists (we can save some memory here)
+        elif isinstance(obj, list):
+            for ix, o in enumerate(obj):
+                obj[ix] = self.deep_merge(session, o)
+
+        # generic iterables
+        elif isinstance(obj, (tuple, set)):
+            obj = obj.__class__(  # type:ignore[assignment]
+                self.deep_merge(session, o) for o in obj
+            )
+
+        # generic objects
+        else:
+            obj = self.merge(session, obj)
+
+        return obj
+
+    def requires_merge(self, obj: object) -> 'TypeGuard[Base]':
         """ Returns true if the given object requires a merge, which is the
         case if the object is detached.
 
@@ -261,49 +301,29 @@ class OrmCacheDescriptor(Generic[_T]):
         # secondary cache used to be the request cache. in order to preserve
         # the original behavior the request cache is still there
         obj = app.request_cache.get(self.cache_key, unset)
-        if obj is not unset:
-            # it is possible for objects in the request cache to become
-            # detached - in this case we need to merge them again
-            # (the merge function only does this if necessary)
-            # FIXME: This doesn't perform the same deep merge as the merge
-            #        below, so should we actually still be doing this?
-            return self.merge(session, obj)
+        if obj is unset:
 
-        # we use a secondary in-memory cache for even more lookup speed
-        ts, obj = app.memory_cache.get(self.cache_key, (float('-Inf'), unset))
-
-        if ts != app.cache.get(key=self.ts_key):
-            # in-memory cache is no longer valid
-            obj = app.cache.get_or_create(
-                key=self.cache_key,
-                creator=lambda: self.create(app)
+            # we use a secondary in-memory cache for even more lookup speed
+            ts, obj = app.memory_cache.get(
+                self.cache_key,
+                (float('-Inf'), unset)
             )
-            ts = app.cache.get_or_create(
-                key=self.ts_key,
-                creator=time
-            )
-            app.memory_cache[self.cache_key] = (ts, obj)
 
-        # named tuples
-        if isinstance(obj, tuple) and hasattr(obj.__class__, '_make'):
-            obj = obj._make(self.merge(session, o) for o in obj)  # type:ignore
+            if obj is unset or ts != app.cache.get(key=self.ts_key):
+                # in-memory cache is no longer valid
+                obj = app.cache.get_or_create(
+                    key=self.cache_key,
+                    creator=lambda: self.create(app)
+                )
+                ts = app.cache.get_or_create(
+                    key=self.ts_key,
+                    creator=time
+                )
+                app.memory_cache[self.cache_key] = (ts, obj)
 
-        # lists (we can save some memory here)
-        elif isinstance(obj, list):
-            for ix, o in enumerate(obj):
-                obj[ix] = self.merge(session, o)
+            app.request_cache[self.cache_key] = obj
 
-        # generic iterables
-        elif isinstance(obj, (tuple, set)):
-            obj = obj.__class__(self.merge(session, o) for o in obj)
-
-        # generic objects
-        else:
-            obj = self.merge(session, obj)
-
-        app.request_cache[self.cache_key] = obj
-
-        return obj
+        return self.deep_merge(session, obj)
 
     # NOTE: Technically this descriptor should only work on
     #       applications that derive from OrmCacheApp, however
