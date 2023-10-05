@@ -16,7 +16,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wp_kandidaten = UploadField(
@@ -26,7 +26,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wp_kandidatengde = UploadField(
@@ -36,7 +36,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wp_listen = UploadField(
@@ -46,7 +46,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wp_listengde = UploadField(
@@ -56,7 +56,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wp_wahl = UploadField(
@@ -66,7 +66,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wpstatic_gemeinden = UploadField(
@@ -76,7 +76,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wpstatic_kandidaten = UploadField(
@@ -86,7 +86,7 @@ class UploadWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
 
@@ -99,5 +99,5 @@ class CreateWabstiProporzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )

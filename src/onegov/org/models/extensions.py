@@ -404,8 +404,8 @@ class PersonLinkExtension(ContentExtension):
                         in self.get_people_and_function()
                     }
 
-                    old_people = dict()
-                    new_people = list()
+                    old_people = {}
+                    new_people = []
 
                     for id, function in previous_people:
                         if id in selected.keys():

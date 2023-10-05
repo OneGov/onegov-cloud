@@ -48,7 +48,7 @@ class OrderedListWidget(ListWidget):
         # require even more knowledge, so this is the better approach
 
         assert hasattr(field, '__iter__')
-        ordered = [subfield for subfield in field]
+        ordered: list['Field'] = list(field)
         ordered.sort(key=lambda f: field.gettext(f.label.text))
 
         class FakeField:
@@ -363,7 +363,7 @@ class TextAreaWithTextModules(TextArea):
             return input_html
 
         field.meta.request.include('text-module-picker')
-        return Markup(self.template.render(
+        return Markup(self.template.render(  # noqa: MS001
             id=field.id,
             label=field.gettext(_('Text modules')),
             text_modules=text_modules,
@@ -447,7 +447,7 @@ class IconWidget(TextInput):
             'data-depends-on', False) if field.render_kw else False
         depends_on = {'data-depends-on': depends_on} if depends_on else {}
 
-        return Markup(self.template.render(
+        return Markup(self.template.render(  # noqa: MS001
             iconfont=iconfont,
             icons=icons,
             id=field.id,
@@ -509,7 +509,7 @@ class PanelWidget:
 
     def __call__(self, field: 'PanelField', **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
-        return Markup(
+        return Markup(  # noqa: MS001
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
             '{text}</div>'
         ).format(

@@ -102,7 +102,7 @@ def export_election_internal_proporz(vote, locales):
     )
     list_results_grouped = {}
     for key, group in groupby(list_results, lambda x: x[1]):
-        list_results_grouped[key] = dict([(g[2], g[0]) for g in group])
+        list_results_grouped[key] = {g[2]: g[0] for g in group}
 
     # We need to collect the panachage results per list
     list_ids = session.query(List.id, List.list_id)

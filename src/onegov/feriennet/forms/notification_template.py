@@ -1,5 +1,5 @@
 from functools import cached_property
-from markupsafe import Markup
+from markupsafe import escape, Markup
 from onegov.activity import Activity
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
@@ -109,7 +109,7 @@ class NotificationTemplateSendForm(Form):
             "I hereby confirm that this message is relevant to the "
             "recipients and is not spam."
         ),
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         validators=[InputRequired()]
     )
 
@@ -291,10 +291,10 @@ class NotificationTemplateSendForm(Form):
         for record in self.request.session.execute(query):
             template = templates[record.cancelled]
             label = self.request.translate(_(template, mapping={
-                'title': record.title,
+                'title': escape(record.title),
                 'count': record.count,
                 'dates': ', '.join(
                     layout.format_datetime_range(*d) for d in record.dates
                 )
             }))
-            yield record.occasion_id.hex, Markup(label)
+            yield record.occasion_id.hex, Markup(label)  # noqa: MS001

@@ -73,7 +73,7 @@ def get_organization(app, id):
 @GazetteApp.path(
     model=OrganizationMove,
     path='/move/organization/{subject_id}/{direction}/{target_id}',
-    converters=dict(subject_id=int, target_id=int))
+    converters={'subject_id': int, 'target_id': int})
 def get_page_move(app, subject_id, direction, target_id):
     return OrganizationMove(app.session(), subject_id, target_id, direction)
 
@@ -98,14 +98,14 @@ def get_issue_pdf(request, app, name):
 @GazetteApp.path(
     model=GazetteNoticeCollection,
     path='/notices/{state}',
-    converters=dict(
-        from_date=extended_date_converter,
-        to_date=extended_date_converter,
-        categories=[str],
-        organizations=[str],
-        source=uuid_converter,
-        own=bool
-    )
+    converters={
+        'from_date': extended_date_converter,
+        'to_date': extended_date_converter,
+        'categories': [str],
+        'organizations': [str],
+        'source': uuid_converter,
+        'own': bool
+    }
 )
 def get_notices(
     app,

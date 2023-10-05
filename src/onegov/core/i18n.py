@@ -85,7 +85,7 @@ POFILE_PATH_EXPRESSION = re.compile(
 @Framework.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs() -> tuple[str, ...]:
     """ Returns the gettext locale dir. """
-    return tuple()
+    return ()
 
 
 @Framework.setting(section='i18n', name='locales')

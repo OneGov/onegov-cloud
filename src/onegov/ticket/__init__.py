@@ -1,5 +1,5 @@
 from onegov.ticket.handler import Handler, HandlerRegistry
-handlers = HandlerRegistry()  # noqa
+handlers = HandlerRegistry()
 
 from onegov.ticket.model import Ticket
 from onegov.ticket.model import TicketPermission

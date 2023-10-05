@@ -451,7 +451,7 @@ class IndexManager:
         hostname. """
 
         return set(
-            ix for ix in self.es_client.cat.indices(
+            self.es_client.cat.indices(
                 index=f'{self.normalized_hostname}-*', h='index'
             ).splitlines()
         )
@@ -541,7 +541,7 @@ class IndexManager:
         :return: The number of indices that were deleted.
 
         """
-        active_versions = set(m.version for m in current_mappings)
+        active_versions = {m.version for m in current_mappings}
 
         count = 0
         for index in self.query_indices():
