@@ -24,7 +24,7 @@ cache is usually a shared redis instance, this works for multiple processes.
 import inspect
 import sqlalchemy
 
-from sqlalchemy.orm import make_transient, make_transient_to_detached
+from onegov.core.orm.utils import make_detached
 from sqlalchemy.orm.query import Query
 from time import time
 
@@ -227,13 +227,8 @@ class OrmCacheDescriptor(Generic[_T]):
         if self.requires_merge(obj):
             # the object might be already attached to a different session
             # through the in-memory cache in which case we need to make the
-            # object transient
-            # FIXME: We could probably detect when this is necessary, so we
-            #        only have to do it then, although make_transient and
-            #        make_transient_to_detached might already contain logic
-            #        to short-circuit pre-detached instances.
-            make_transient(obj)
-            make_transient_to_detached(obj)
+            # object detached
+            make_detached(obj)
             obj = session.merge(obj, load=False)  # type:ignore[assignment]
             obj.is_cached = True
 
@@ -310,6 +305,13 @@ class OrmCacheDescriptor(Generic[_T]):
             )
 
             if obj is unset or ts != app.cache.get(key=self.ts_key):
+                def creator() -> _T:
+                    obj = self.create(app)
+                    # make sure the object gets flushed, before
+                    # we potentially detach it from the session
+                    session.flush()
+                    return obj
+
                 # in-memory cache is no longer valid
                 obj = app.cache.get_or_create(
                     key=self.cache_key,
