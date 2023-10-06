@@ -3458,12 +3458,44 @@ button {
 }
 
 .occurrence-description {
-    margin-top: 1.25em;
     margin-bottom: 1.25em;
+    margin-top: 1.25em;
+    max-width: $max-line-width;
 }
 
-.occurrence-description {
-    max-width: $max-line-width;
+.filter-panel .accordion {
+    margin-left: 0;
+
+    .accordion-navigation {
+        &> a {
+            background: transparent;
+            color: $primary-color;
+            font-size: .6rem;
+            padding: .4rem;
+            padding-top: 0;
+        }
+
+        &> .content.active {
+            padding: 0;
+            background: transparent;
+        }
+
+        & .more-items {
+            text-align: center;
+
+            i {
+                border: 1px solid;
+                border-radius: 100px;
+                padding: .2rem;
+            }
+        }
+
+        &.active > .more-items i{
+            transform: rotate(180deg);
+            transform-origin: 50% 50%;
+        }
+    }
+
 }
 
 /*
