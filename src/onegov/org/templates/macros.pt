@@ -1472,29 +1472,45 @@
 </metal:tags>
 
 <metal:tags_collapsed define-macro="tags_collapsed">
-    <tal:b define="tags_start tags[0:4]; tags_rest tags[4:-1]">
-        <ul class="tags">
-            <li tal:repeat="link tags_start" class="click-through">
-                <span tal:content="structure link(layout)"
-                    class="${link.active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
-                />
-            </li>
-        </ul>
-        <ul class="accordion" data-accordion tal:condition="len(tags_rest)">
-            <li class="accordion-navigation">
-                <a class="more-items" href="#panel-${filters.index(filter)}"><i class="fa fa-chevron-down"></i></a>
-                <div id="panel-${filters.index(filter)}" class="content">
-                    <ul class="tags">
-                        <li tal:repeat="link tags_rest" class="click-through">
-                            <span tal:content="structure link(layout)"
-                                class="${link.active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
-                            />
-                        </li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
+    <tal:b tal:switch="len(tags) >= 9">
+        <tal:b tal:case="False">
+            <p>weniger als</p>
+            <ul class="tags">
+                <li tal:repeat="link tags" class="click-through">
+                    <span tal:content="structure link(layout)"
+                        class="${link.active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
+                    />
+                </li>
+            </ul>
+        </tal:b>
+        <tal:b tal:case="True">
+            <p>me als</p>
+            <tal:b define="tags_start tags[:6]; tags_rest tags[6:]">
+                <ul class="tags">
+                    <li tal:repeat="link tags_start" class="click-through">
+                        <span tal:content="structure link(layout)"
+                            class="${link.active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
+                        />
+                    </li>
+                </ul>
+                <ul class="accordion" data-accordion tal:condition="len(tags_rest)">
+                    <li class="accordion-navigation">
+                        <a class="more-items" href="#panel-${filters.index(filter)}"><i class="fa fa-chevron-down"></i></a>
+                        <div id="panel-${filters.index(filter)}" class="content">
+                            <ul class="tags">
+                                <li tal:repeat="link tags_rest" class="click-through">
+                                    <span tal:content="structure link(layout)"
+                                        class="${link.active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
+                                    />
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </tal:b>
+        </tal:b>
     </tal:b>
+    
 </metal:tags_collapsed>
 
 <metal:generic_message define-macro="generic_message" i18n:domain="onegov.org">
