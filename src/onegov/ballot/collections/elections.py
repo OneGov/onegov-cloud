@@ -61,7 +61,7 @@ class ElectionCollection(ElectionCollectionPagination):
             desc(year)
         )
 
-        return list(r[0] for r in query.all())
+        return [year for year, in query]
 
     def by_date(self, date):
         """ Returns the elections on the given date. """

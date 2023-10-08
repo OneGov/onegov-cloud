@@ -1,6 +1,6 @@
 import logging
-log = logging.getLogger('onegov.gis')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.gis')
+log.addHandler(logging.NullHandler())
 
 from onegov.gis.forms import CoordinatesField
 from onegov.gis.integration import MapboxApp

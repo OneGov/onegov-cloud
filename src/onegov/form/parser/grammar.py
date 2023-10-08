@@ -344,7 +344,8 @@ def valid_date_range() -> ParserElement:
 
     """
 
-    today = Literal('today').setParseAction(literal(relativedelta()))
+    today = Literal('today').setParseAction(
+        literal(relativedelta()))  # noqa: MS001
     value_expr = Optional(
         today | relative_delta() | absolute_date(),
         default=None

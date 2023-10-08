@@ -24,7 +24,7 @@ class BankStatementImportForm(Form):
             WhitelistedMimeType({'text/plain', 'text/xml', 'application/xml'}),
             FileSizeLimit(10 * 1024 * 1024)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     @property

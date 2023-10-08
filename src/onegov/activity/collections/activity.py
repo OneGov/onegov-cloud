@@ -108,7 +108,7 @@ class ActivityFilter:
         return values & AVAILABILITY_VALUES
 
     def adapt_num_ranges(self, values):
-        decoded = set(v for v in map(num_range_decode, values) if v)
+        decoded = {v for v in map(num_range_decode, values) if v}
         return decoded and set(merge_ranges(decoded)) or set()
 
     def adapt_age_ranges(self, values):
@@ -118,19 +118,19 @@ class ActivityFilter:
         return self.adapt_num_ranges(values)
 
     def adapt_dateranges(self, values):
-        return set(v for v in map(date_range_decode, values) if v)
+        return {v for v in map(date_range_decode, values) if v}
 
     def adapt_weekdays(self, values):
-        return set(int(v) for v in values if v.isdigit())
+        return {int(v) for v in values if v.isdigit()}
 
     def adapt_period_ids(self, values):
-        return set(UUID(v) for v in values if is_uuid(v))
+        return {UUID(v) for v in values if is_uuid(v)}
 
     def adapt_durations(self, values):
-        return set(int(v) for v in values)
+        return {int(v) for v in values}
 
     def adapt_volunteers(self, values):
-        return set(v == 'yes' for v in values)
+        return {v == 'yes' for v in values}
 
     def encode(self, key, value):
         if isinstance(value, str):
@@ -404,7 +404,7 @@ class ActivityCollection(RangedPagination):
         q = self.query_base().with_entities(distinct(Activity.municipality))
         q = q.filter(Activity.municipality != None)
 
-        return set(r[0] for r in q)
+        return {r[0] for r in q}
 
     def get_unique_name(self, name):
         """ Given a desired name, finds a variant of that name that's not

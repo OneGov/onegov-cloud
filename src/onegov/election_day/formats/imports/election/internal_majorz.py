@@ -89,22 +89,22 @@ def parse_election_result(line, errors, entities, election, principal):
             )
 
             if not errors:
-                return dict(
-                    id=uuid4(),
-                    election_id=election.id,
-                    name=name,
-                    district=district,
-                    superregion=superregion,
-                    entity_id=entity_id,
-                    counted=counted,
-                    eligible_voters=eligible_voters if counted else 0,
-                    expats=expats if counted else 0,
-                    received_ballots=received_ballots if counted else 0,
-                    blank_ballots=blank_ballots if counted else 0,
-                    invalid_ballots=invalid_ballots if counted else 0,
-                    blank_votes=blank_votes if counted else 0,
-                    invalid_votes=invalid_votes if counted else 0,
-                )
+                return {
+                    'id': uuid4(),
+                    'election_id': election.id,
+                    'name': name,
+                    'district': district,
+                    'superregion': superregion,
+                    'entity_id': entity_id,
+                    'counted': counted,
+                    'eligible_voters': eligible_voters if counted else 0,
+                    'expats': expats if counted else 0,
+                    'received_ballots': received_ballots if counted else 0,
+                    'blank_ballots': blank_ballots if counted else 0,
+                    'invalid_ballots': invalid_ballots if counted else 0,
+                    'blank_votes': blank_votes if counted else 0,
+                    'invalid_votes': invalid_votes if counted else 0,
+                }
 
 
 def parse_candidate(line, errors, election_id, colors):
@@ -126,17 +126,17 @@ def parse_candidate(line, errors, election_id, colors):
     else:
         if party and color:
             colors[party] = color
-        return dict(
-            id=uuid4(),
-            candidate_id=id,
-            election_id=election_id,
-            family_name=family_name,
-            first_name=first_name,
-            elected=elected,
-            party=party,
-            gender=gender,
-            year_of_birth=year_of_birth
-        )
+        return {
+            'id': uuid4(),
+            'candidate_id': id,
+            'election_id': election_id,
+            'family_name': family_name,
+            'first_name': first_name,
+            'elected': elected,
+            'party': party,
+            'gender': gender,
+            'year_of_birth': year_of_birth
+        }
 
 
 def parse_candidate_result(line, errors, counted):
@@ -145,10 +145,10 @@ def parse_candidate_result(line, errors, counted):
     except ValueError as e:
         errors.append(e.args[0])
     else:
-        return dict(
-            id=uuid4(),
-            votes=votes if counted else 0,
-        )
+        return {
+            'id': uuid4(),
+            'votes': votes if counted else 0,
+        }
 
 
 def import_election_internal_majorz(election, principal, file, mimetype):
@@ -239,15 +239,15 @@ def import_election_internal_majorz(election, principal, file, mimetype):
         if election.domain in ('region', 'district'):
             if district != election.domain_segment:
                 continue
-        results[entity_id] = dict(
-            id=uuid4(),
-            election_id=election_id,
-            name=name,
-            district=district,
-            superregion=superregion,
-            entity_id=entity_id,
-            counted=False
-        )
+        results[entity_id] = {
+            'id': uuid4(),
+            'election_id': election_id,
+            'name': name,
+            'district': district,
+            'superregion': superregion,
+            'entity_id': entity_id,
+            'counted': False
+        }
 
     # Add the results to the DB
     election.clear_results()

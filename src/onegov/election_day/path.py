@@ -52,10 +52,10 @@ def get_principal(app):
 @ElectionDayApp.path(
     model=ElectionCollection,
     path='/manage/elections',
-    converters=dict(
-        page=int,
-        year=int
-    )
+    converters={
+        'page': int,
+        'year': int
+    }
 )
 def get_manage_elections(app, page=0, year=None):
     return ElectionCollection(app.session(), page=page, year=year)
@@ -64,10 +64,10 @@ def get_manage_elections(app, page=0, year=None):
 @ElectionDayApp.path(
     model=ElectionCompoundCollection,
     path='/manage/election-compounds',
-    converters=dict(
-        page=int,
-        year=int
-    )
+    converters={
+        'page': int,
+        'year': int
+    }
 )
 def get_manage_election_compsites(app, page=0, year=None):
     return ElectionCompoundCollection(app.session(), page=page, year=year)
@@ -76,10 +76,10 @@ def get_manage_election_compsites(app, page=0, year=None):
 @ElectionDayApp.path(
     model=VoteCollection,
     path='/manage/votes',
-    converters=dict(
-        page=int,
-        year=int
-    )
+    converters={
+        'page': int,
+        'year': int
+    }
 )
 def get_manage_votes(app, page=0, year=None):
     return VoteCollection(app.session(), page=page, year=year)
@@ -88,10 +88,10 @@ def get_manage_votes(app, page=0, year=None):
 @ElectionDayApp.path(
     model=SmsSubscriberCollection,
     path='/manage/subscribers/sms',
-    converters=dict(
-        page=int,
-        active_only=bool
-    )
+    converters={
+        'page': int,
+        'active_only': bool
+    }
 )
 def get_manage_sms_subscribers(app, page=0, term=None, active_only=None):
     return SmsSubscriberCollection(
@@ -102,10 +102,10 @@ def get_manage_sms_subscribers(app, page=0, term=None, active_only=None):
 @ElectionDayApp.path(
     model=EmailSubscriberCollection,
     path='/manage/subscribers/email',
-    converters=dict(
-        page=int,
-        active_only=bool
-    )
+    converters={
+        'page': int,
+        'active_only': bool
+    }
 )
 def get_manage_email_subscribers(app, page=0, term=None, active_only=None):
     return EmailSubscriberCollection(
@@ -124,9 +124,9 @@ def get_manage_upload_tokens(app):
 @ElectionDayApp.path(
     model=DataSourceCollection,
     path='/manage/sources',
-    converters=dict(
-        page=int
-    )
+    converters={
+        'page': int
+    }
 )
 def get_manage_data_sources(app, page=0):
     return DataSourceCollection(app.session(), page=page)
@@ -135,10 +135,10 @@ def get_manage_data_sources(app, page=0):
 @ElectionDayApp.path(
     model=DataSourceItemCollection,
     path='/manage/source/{id}/items',
-    converters=dict(
-        id=UUID,
-        page=int
-    )
+    converters={
+        'id': UUID,
+        'page': int
+    }
 )
 def get_manage_data_source_items(app, id, page=0):
     return DataSourceItemCollection(app.session(), id, page=page)
@@ -155,9 +155,9 @@ def get_election(app, id):
 @ElectionDayApp.path(
     model=Candidate,
     path='/candidate/{id}',
-    converters=dict(
-        id=UUID
-    )
+    converters={
+        'id': UUID
+    }
 )
 def get_candidate(app, id):
     return CandidateCollection(app.session()).by_id(id)
@@ -166,9 +166,9 @@ def get_candidate(app, id):
 @ElectionDayApp.path(
     model=List,
     path='/list/{id}',
-    converters=dict(
-        id=UUID
-    )
+    converters={
+        'id': UUID
+    }
 )
 def get_list(app, id):
     return ListCollection(app.session()).by_id(id)
@@ -214,9 +214,9 @@ def get_vote(app, id):
 @ElectionDayApp.path(
     model=Ballot,
     path='/ballot/{id}',
-    converters=dict(
-        id=UUID
-    )
+    converters={
+        'id': UUID
+    }
 )
 def get_ballot(app, id):
     return BallotCollection(app.session()).by_id(id)
@@ -225,9 +225,9 @@ def get_ballot(app, id):
 @ElectionDayApp.path(
     model=Subscriber,
     path='/subscriber/{id}',
-    converters=dict(
-        id=UUID
-    )
+    converters={
+        'id': UUID
+    }
 )
 def get_subscriber(app, id):
     return SubscriberCollection(app.session()).by_id(id)
@@ -236,9 +236,9 @@ def get_subscriber(app, id):
 @ElectionDayApp.path(
     model=UploadToken,
     path='/upload-token/{id}',
-    converters=dict(
-        id=UUID
-    )
+    converters={
+        'id': UUID
+    }
 )
 def get_upload_token(app, id):
     return UploadTokenCollection(app.session()).by_id(id)
@@ -247,9 +247,9 @@ def get_upload_token(app, id):
 @ElectionDayApp.path(
     model=DataSource,
     path='/data-source/{id}',
-    converters=dict(
-        id=UUID
-    )
+    converters={
+        'id': UUID
+    }
 )
 def get_data_source(app, id):
     return DataSourceCollection(app.session()).by_id(id)
@@ -258,9 +258,9 @@ def get_data_source(app, id):
 @ElectionDayApp.path(
     model=DataSourceItem,
     path='/data-source-item/{id}',
-    converters=dict(
-        id=UUID
-    )
+    converters={
+        'id': UUID
+    }
 )
 def get_data_source_item(app, id):
     return DataSourceItemCollection(app.session()).by_id(id)
@@ -277,13 +277,13 @@ def get_archive_by_year(app, date):
 @ElectionDayApp.path(
     model=SearchableArchivedResultCollection,
     path='archive-search/{item_type}',
-    converters=dict(
-        from_date=extended_date_converter,
-        to_date=extended_date_converter,
-        domains=[str],
-        answers=[str],
-        page=int
-    )
+    converters={
+        'from_date': extended_date_converter,
+        'to_date': extended_date_converter,
+        'domains': [str],
+        'answers': [str],
+        'page': int
+    }
 )
 def get_archive_search(
         app,
@@ -318,9 +318,9 @@ def get_locale(request, app, locale):
 @ElectionDayApp.path(
     model=ScreenCollection,
     path='/manage/screens',
-    converters=dict(
-        page=int
-    )
+    converters={
+        'page': int
+    }
 )
 def get_manage_screens(app, page=0):
     return ScreenCollection(app.session(), page)
@@ -329,9 +329,9 @@ def get_manage_screens(app, page=0):
 @ElectionDayApp.path(
     model=Screen,
     path='/screen/{number}',
-    converters=dict(
-        number=int
-    )
+    converters={
+        'number': int
+    }
 )
 def get_screen(app, number):
     return ScreenCollection(app.session()).by_number(number)

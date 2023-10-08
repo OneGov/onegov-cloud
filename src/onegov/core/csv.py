@@ -196,10 +196,10 @@ class CSVFile(Generic[_RowT]):
         """
 
         self.rowtype = rowtype or namedtuple(  # type:ignore[assignment]
-            "CSVFileRow", ['rownumber'] + list(
+            "CSVFileRow", ['rownumber'] + [
                 self.as_valid_identifier(k)
                 for k in self.headers.keys()
-            )
+            ]
         )
 
     @staticmethod
@@ -341,11 +341,9 @@ def convert_xlsx_to_csv(
             cell = sheet.cell(row, column)
 
             if cell.value is None:
-                # TODO: Verify whether this actually can never be None,
-                #       then we can skip this check
-                value = ''  # type:ignore[unreachable]
+                value = ''
             elif cell.data_type == 's':
-                value = cell.value
+                value = cell.value  # type:ignore[assignment]
             elif cell.data_type == 'n':
                 if (int_value := int(cell.value)) == cell.value:  # type:ignore
                     value = str(int_value)
@@ -861,7 +859,7 @@ def match_headers(
 
     for column in expected:
         normalized = normalize_header(column)
-        distances = dict((h, distance(normalized, h)) for h in headers)
+        distances = {h: distance(normalized, h) for h in headers}
 
         closest = min(distances.values())
 

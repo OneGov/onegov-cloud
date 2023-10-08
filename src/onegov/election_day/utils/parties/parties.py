@@ -213,7 +213,7 @@ def get_party_results_vertical_data(item):
             })
 
     return {
-        'groups': [items[1] for items in sorted(list(groups.items()))],
+        'groups': [items[1] for items in sorted(groups.items())],
         'labels': years,
         'maximum': {
             'front': item.number_of_mandates,
@@ -270,9 +270,9 @@ def get_parties_panachage_data(item, request=None):
         return {}
 
     parties = sorted(
-        set([result.source for result in results])
-        | set([result.target for result in results])
-        | set([result.party_id for result in party_results])
+        {result.source for result in results}
+        | {result.target for result in results}
+        | {result.party_id for result in party_results}
     )
 
     def left_node(party):

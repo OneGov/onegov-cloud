@@ -158,7 +158,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         if not text:
             return text
 
-        return Markup(utils.hashtag_elements(self.request, text))
+        # FIXME: utils.hashtag_elements should return Markup
+        return Markup(  # noqa: MS001
+            utils.hashtag_elements(self.request, text)
+        )
 
     @cached_property
     def page_id(self):
@@ -562,7 +565,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             #        and str, but for now we only wanted to ensure rendered
             #        fields always return Markup, so we don't have to change
             #        as many places
-            return Markup(self.linkify(str(rendered).replace('<br>', '\n')))
+            return Markup(  # noqa: MS001
+                self.linkify(str(rendered).replace('<br>', '\n'))
+            )
         return rendered
 
     @property
@@ -2654,15 +2659,15 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         if not self.request.is_logged_in:
             return {}
         if self.request.is_manager:
-            return dict(
-                published_only=_('Published'),
-                upcoming_only=_("Upcoming"),
-                past_only=_("Past"),
-            )
-        return dict(
-            published_only=_('Published'),
-            past_only=_("Past"),
-        )
+            return {
+                'published_only': _("Published"),
+                'upcoming_only': _("Upcoming"),
+                'past_only': _("Past"),
+            }
+        return {
+            'published_only': _("Published"),
+            'past_only': _("Past"),
+        }
 
     @property
     def publication_filter_title(self):

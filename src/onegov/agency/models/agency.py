@@ -113,10 +113,9 @@ class ExtendedAgency(Agency, AccessExtension, PublicationExtension):
 
         orders_for_person = session.query(
             ExtendedAgencyMembership.order_within_person
-        ).filter_by(person_id=person_id).all()
+        ).filter_by(person_id=person_id)
 
-        orders_for_person = list(
-            (o.order_within_person for o in orders_for_person))
+        orders_for_person = [orders for orders, in orders_for_person]
 
         if orders_for_person:
             try:
