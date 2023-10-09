@@ -660,9 +660,9 @@ class ModuleSettingsForm(Form):
             ('phone_direct', _("Direct Phone Number or Mobile")),
             ('website', _("Website")),
             ('website_2', _("Website 2")),
-            ('location_address', _("Location Address")),
+            ('location_address', _("Location address")),
             ('location_code_city', _("Location Code and City")),
-            ('postal_address', _("Postal Address")),
+            ('postal_address', _("Postal address")),
             ('postal_code_city', _("Postal Code and City")),
             ('notes', _("Notes")),
         ])

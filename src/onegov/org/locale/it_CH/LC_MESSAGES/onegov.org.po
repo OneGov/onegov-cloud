@@ -1512,12 +1512,6 @@ msgstr "Nascondi questi campi per gli utenti non registrati"
 msgid "People"
 msgstr "Persone"
 
-msgid "Location Address"
-msgstr ""
-
-msgid "Postal Address"
-msgstr ""
-
 msgid "Values of the location filter"
 msgstr "Valori del filtro posizione"
 

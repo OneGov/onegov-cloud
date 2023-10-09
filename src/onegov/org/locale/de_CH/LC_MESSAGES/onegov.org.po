@@ -1510,12 +1510,6 @@ msgstr "Diese Felder für nicht angemeldete Benutzer ausblenden"
 msgid "People"
 msgstr "Personen"
 
-msgid "Location Address"
-msgstr ""
-
-msgid "Postal Address"
-msgstr ""
-
 msgid "Values of the location filter"
 msgstr "Werte des Ortfilters"
 
