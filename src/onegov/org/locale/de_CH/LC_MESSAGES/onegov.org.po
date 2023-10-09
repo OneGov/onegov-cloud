@@ -3113,7 +3113,7 @@ msgid "Pay Offline later"
 msgstr "Später bezahlen"
 
 msgid "Show more"
-msgstr ""
+msgstr "Mehr anzeigen"
 
 msgid "at ${time}"
 msgstr "um ${time}"

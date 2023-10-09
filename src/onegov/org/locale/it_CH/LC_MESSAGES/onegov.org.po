@@ -3119,7 +3119,7 @@ msgid "Pay Offline later"
 msgstr "Paga offline successivamente"
 
 msgid "Show more"
-msgstr ""
+msgstr "Mostra di più"
 
 msgid "at ${time}"
 msgstr "alle ${time}"
