@@ -233,17 +233,17 @@ def import_vote_wabstic(vote, principal, number, district,
         if not errors:
             for ballot_type in used_ballot_types:
                 ballot_results[ballot_type].append(
-                    dict(
-                        entity_id=entity_id,
-                        name=entity_name,
-                        district=entity_district,
-                        counted=counted,
-                        eligible_voters=eligible_voters,
-                        invalid=invalid,
-                        yeas=yeas[ballot_type],
-                        nays=nays[ballot_type],
-                        empty=empty[ballot_type]
-                    )
+                    {
+                        'entity_id': entity_id,
+                        'name': entity_name,
+                        'district': entity_district,
+                        'counted': counted,
+                        'eligible_voters': eligible_voters,
+                        'invalid': invalid,
+                        'yeas': yeas[ballot_type],
+                        'nays': nays[ballot_type],
+                        'empty': empty[ballot_type]
+                    }
                 )
 
     if errors:
@@ -254,7 +254,7 @@ def import_vote_wabstic(vote, principal, number, district,
         remaining = set(entities.keys())
         if vote.has_expats:
             remaining.add(0)
-        remaining -= set(r['entity_id'] for r in ballot_results[ballot_type])
+        remaining -= {r['entity_id'] for r in ballot_results[ballot_type]}
         for entity_id in remaining:
             entity_name, entity_district, superregion = \
                 get_entity_and_district(
@@ -266,12 +266,12 @@ def import_vote_wabstic(vote, principal, number, district,
                         continue
 
             ballot_results[ballot_type].append(
-                dict(
-                    entity_id=entity_id,
-                    name=entity_name,
-                    district=entity_district,
-                    counted=False,
-                )
+                {
+                    'entity_id': entity_id,
+                    'name': entity_name,
+                    'district': entity_district,
+                    'counted': False,
+                }
             )
 
     # Add the results to the DB

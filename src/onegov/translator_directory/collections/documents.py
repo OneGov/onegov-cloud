@@ -49,4 +49,4 @@ class TranslatorDocumentCollection(FileCollection):
         return tuple(
             (category, tuple(files))
             for category, files in groupby(files, key=lambda f: f.note)
-        ) if files else tuple()
+        ) if files else ()

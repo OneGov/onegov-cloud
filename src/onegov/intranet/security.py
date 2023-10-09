@@ -34,23 +34,23 @@ def get_roles_setting():
     """
     return {
         # the admin role has access to everything
-        'admin': set((
+        'admin': {
             Public,
             Private,
             Personal,
             Secret
-        )),
+        },
         # the editor can do most things
-        'editor': set((
+        'editor': {
             Public,
             Private,
             Personal,
-        )),
+        },
         # registered users can do a few things
-        'member': set((
+        'member': {
             Public,
             Personal,
-        )),
+        },
         # the public has no access whatsoever
         'anonymous': set()
     }

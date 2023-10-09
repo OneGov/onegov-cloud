@@ -44,7 +44,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'xml'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     proposal = UploadField(
@@ -55,7 +55,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', '!wabsti_c', 'file_format', '!xml'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     counter_proposal = UploadField(
@@ -66,7 +66,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'default', 'type', 'complex'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     tie_breaker = UploadField(
@@ -77,7 +77,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'default', 'type', 'complex'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     sg_gemeinden = UploadField(
@@ -88,7 +88,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     sg_geschaefte = UploadField(
@@ -99,7 +99,7 @@ class UploadVoteForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     vote_number = IntegerField(

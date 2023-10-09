@@ -68,8 +68,8 @@
     </tal:b>
     <tal:b tal:define="ancestors layout.model.ancestors|[]">
         <ul class="vertical menu nested ${'is-active current-list' if nav_page in ancestors else ''}"  tal:condition="children">
-            <tal:b tal:repeat="(page, sublink, c) children">
-                <li data-sortable-id="${page.id}">
+            <tal:b tal:repeat="(nav_page, sublink, c) children">
+                <li data-sortable-id="${nav_page.id}">
                     <metal:b use-macro="layout.macros['side_navigation_nested']" tal:define="link sublink; children c" />
                 </li>
             </tal:b>

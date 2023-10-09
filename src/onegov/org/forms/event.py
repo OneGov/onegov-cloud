@@ -388,7 +388,7 @@ class EventForm(Form):
 
         if self.request.app.org.event_filter_type in ['filters',
                                                       'tags_and_filters']:
-            filter_keywords = dict()
+            filter_keywords = {}
             for field in self.request.app.org.event_filter_fields:
                 form_field = getattr(self, field.id)
                 filter_keywords[field.id] = form_field.data
@@ -510,7 +510,7 @@ class EventImportForm(Form):
             }),
             FileSizeLimit(10 * 1024 * 1024)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     @property

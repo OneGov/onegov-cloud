@@ -41,7 +41,7 @@ class Votum(
 
     @property
     def es_suggestion(self):
-        return tuple()
+        return ()
 
     #: the internal id of the votum
     id = Column(UUID, primary_key=True, default=uuid4)

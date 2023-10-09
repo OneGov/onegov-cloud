@@ -224,7 +224,7 @@ class ElectionLayout(DetailLayout):
             (_("Parties"), ('party-strengths', 'parties-panachage'))
         )
         for title, group in submenus:
-            if any([self.tab_visible(tab) for tab in group]):
+            if any(self.tab_visible(tab) for tab in group):
                 submenu = [
                     (
                         self.subtitle(tab) or self.title(tab),
@@ -237,7 +237,7 @@ class ElectionLayout(DetailLayout):
                     result.append((
                         title,
                         '',
-                        any([item[2] for item in submenu]),
+                        any(item[2] for item in submenu),
                         submenu
                     ))
                 elif len(submenu):

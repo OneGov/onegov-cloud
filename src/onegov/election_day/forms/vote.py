@@ -97,7 +97,7 @@ class VoteForm(Form):
             "Expats are uploaded and listed as a separate row in the results. "
             "Changing this option requires a new upload of the data."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     date = DateField(
@@ -277,12 +277,12 @@ class VoteForm(Form):
             (key, text) for key, text in principal.domains_vote.items()
         ]
 
-        municipalities = set([
-            entity.get('name', None)
+        municipalities = {
+            municipality
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('name', None)
-        ])
+            if (municipality := entity.get('name', None))
+        }
         self.municipality.choices = [
             (item, item) for item in sorted(municipalities)
         ]

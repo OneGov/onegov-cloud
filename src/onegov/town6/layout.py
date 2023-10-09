@@ -175,7 +175,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def top_navigation(self):
 
         def yield_children(page):
-            children = tuple()
+            children = ()
             if not isinstance(page, News):
                 children = tuple(
                     yield_children(p)
@@ -2261,15 +2261,15 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
         if not self.request.is_logged_in:
             return {}
         if self.request.is_manager:
-            return dict(
-                published_only=_('Published'),
-                upcoming_only=_("Upcoming"),
-                past_only=_("Past"),
-            )
-        return dict(
-            published_only=_('Published'),
-            past_only=_("Past"),
-        )
+            return {
+                'published_only': _('Published'),
+                'upcoming_only': _("Upcoming"),
+                'past_only': _("Past"),
+            }
+        return {
+            'published_only': _('Published'),
+            'past_only': _("Past"),
+        }
 
     @property
     def publication_filter_title(self):

@@ -197,7 +197,7 @@ class EventCollection(Pagination):
         if purge:
             query = self.session.query(Event.meta['source'].label('source'))
             query = query.filter(Event.meta['source'].astext.startswith(purge))
-            purge = set((r.source for r in query))
+            purge = {r.source for r in query}
 
         added = []
         updated = []
@@ -220,7 +220,7 @@ class EventCollection(Pagination):
             ).first()
 
             if purge:
-                purge -= set([event.source])
+                purge -= {event.source}
 
             if existing:
                 update_state = valid_state_transfers.get(

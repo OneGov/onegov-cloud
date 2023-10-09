@@ -41,7 +41,7 @@ class OccurrenceMixin(ContentMixin):
 
     @tags.setter
     def tags(self, value):
-        self._tags = dict(((key.strip(), '') for key in value))
+        self._tags = {key.strip(): '' for key in value}
 
     #: Filter keywords if organisation settings enabled filters
     filter_keywords = content_property(value_type=dict)

@@ -768,7 +768,7 @@
         </thead>
         <tbody>
             <tal:block tal:repeat="candidate candidates">
-                <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
+                <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not layout.completed or candidate.elected > 0 else ''">
                     <th class="column-candidate">${candidate.family_name} ${candidate.first_name}</th>
                     <td tal:condition="not:layout.tacit" class="column-votes right-aligned" data-text="${candidate.votes}">${layout.format_number(candidate.votes)}</td>
                     <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>

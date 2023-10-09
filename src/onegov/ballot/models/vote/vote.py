@@ -152,7 +152,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         We assume that for complex votes, every ballot has the same progress.
         """
 
-        ballot_ids = set(b.id for b in self.ballots)
+        ballot_ids = {b.id for b in self.ballots}
 
         if not ballot_ids:
             return 0, 0
@@ -173,7 +173,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     def counted_entities(self):
         """ Returns the names of the already counted entities. """
 
-        ballot_ids = set(b.id for b in self.ballots)
+        ballot_ids = {b.id for b in self.ballots}
 
         if not ballot_ids:
             return []

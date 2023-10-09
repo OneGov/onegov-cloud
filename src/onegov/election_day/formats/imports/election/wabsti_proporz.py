@@ -369,7 +369,7 @@ def import_election_wabsti_proporz(
             else:
                 error = None
         if not error:
-            indexes = dict([(item.id, key) for key, item in lists.items()])
+            indexes = {item.id: key for key, item in lists.items()}
             for line in csv.lines:
                 try:
                     candidate_id = validate_integer(line, 'liste_kandid')

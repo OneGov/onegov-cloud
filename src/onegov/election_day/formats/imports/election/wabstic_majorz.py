@@ -316,15 +316,15 @@ def import_election_wabstic_majorz(
         except ValueError as e:
             line_errors.append(e.args[0])
         else:
-            added_candidates[candidate_id] = dict(
-                id=uuid4(),
-                election_id=election_id,
-                candidate_id=candidate_id,
-                family_name=family_name,
-                first_name=first_name,
-                elected=elected,
-                party=party
-            )
+            added_candidates[candidate_id] = {
+                'id': uuid4(),
+                'election_id': election_id,
+                'candidate_id': candidate_id,
+                'family_name': family_name,
+                'first_name': first_name,
+                'elected': elected,
+                'party': party
+            }
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -409,33 +409,36 @@ def import_election_wabstic_majorz(
     session.bulk_insert_mappings(
         ElectionResult,
         (
-            dict(
-                id=result_uids[entity_id],
-                election_id=election_id,
-                name=added_entities[entity_id]['name'],
-                district=added_entities[entity_id]['district'],
-                superregion=added_entities[entity_id]['superregion'],
-                entity_id=entity_id,
-                counted=added_entities[entity_id]['counted'],
-                eligible_voters=added_entities[entity_id]['eligible_voters'],
-                received_ballots=added_entities[entity_id]['received_ballots'],
-                blank_ballots=added_entities[entity_id]['blank_ballots'],
-                invalid_ballots=added_entities[entity_id]['invalid_ballots'],
-                blank_votes=added_entities[entity_id]['blank_votes'],
-                invalid_votes=added_entities[entity_id]['invalid_votes']
-            )
+            {
+                'id': result_uids[entity_id],
+                'election_id': election_id,
+                'name': added_entities[entity_id]['name'],
+                'district': added_entities[entity_id]['district'],
+                'superregion': added_entities[entity_id]['superregion'],
+                'entity_id': entity_id,
+                'counted': added_entities[entity_id]['counted'],
+                'eligible_voters':
+                    added_entities[entity_id]['eligible_voters'],
+                'received_ballots':
+                    added_entities[entity_id]['received_ballots'],
+                'blank_ballots': added_entities[entity_id]['blank_ballots'],
+                'invalid_ballots':
+                    added_entities[entity_id]['invalid_ballots'],
+                'blank_votes': added_entities[entity_id]['blank_votes'],
+                'invalid_votes': added_entities[entity_id]['invalid_votes']
+            }
             for entity_id in added_results.keys()
         )
     )
     session.bulk_insert_mappings(
         CandidateResult,
         (
-            dict(
-                id=uuid4(),
-                election_result_id=result_uids[entity_id],
-                votes=votes,
-                candidate_id=added_candidates[candidate_id]['id']
-            )
+            {
+                'id': uuid4(),
+                'election_result_id': result_uids[entity_id],
+                'votes': votes,
+                'candidate_id': added_candidates[candidate_id]['id']
+            }
             for entity_id in added_results
             for candidate_id, votes in added_results[entity_id].items()
         )
@@ -461,15 +464,15 @@ def import_election_wabstic_majorz(
             if district != election.domain_segment:
                 continue
         result_inserts.append(
-            dict(
-                id=uuid4(),
-                election_id=election_id,
-                name=name,
-                district=district,
-                superregion=superregion,
-                entity_id=entity_id,
-                counted=False
-            )
+            {
+                'id': uuid4(),
+                'election_id': election_id,
+                'name': name,
+                'district': district,
+                'superregion': superregion,
+                'entity_id': entity_id,
+                'counted': False
+            }
         )
     session.bulk_insert_mappings(ElectionResult, result_inserts)
 

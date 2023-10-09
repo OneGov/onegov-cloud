@@ -76,7 +76,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def allowed_subtraits(self):
         if self.trait == 'link':
-            return tuple()
+            return ()
 
         if self.trait == 'page':
             return ('page', 'link')
@@ -164,7 +164,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         if self.parent is None:
             return ('news', )
         else:
-            return tuple()
+            return ()
 
     def is_supported_trait(self, trait):
         return trait in {'news'}
