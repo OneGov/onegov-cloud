@@ -8,7 +8,7 @@ from tests.onegov.town6.common import step_class
 from unittest.mock import patch
 
 
-@patch('onegov.websockets.integration.connect') 
+@patch('onegov.websockets.integration.connect')
 @patch('onegov.websockets.integration.authenticate')
 @patch('onegov.websockets.integration.broadcast')
 def test_event_steps(broadcast, authenticate, connect, client):
