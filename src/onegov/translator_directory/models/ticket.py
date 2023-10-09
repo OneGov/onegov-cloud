@@ -52,7 +52,7 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
     @property
     def ticket_deletable(self):
         # For now we don't support this because lot's of functionality
-        # depends on data in tickets
+        # depends on data in translator tickets
         if self.deleted:
             return True
         return False
