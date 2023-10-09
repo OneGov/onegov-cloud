@@ -160,8 +160,6 @@ def view_occurrences(self, request, layout=None):
         )
     ]
 
-    layout.include_accordion()
-
     return {
         'active_tags': self.tags,
         'add_link': request.link(self, name='new'),

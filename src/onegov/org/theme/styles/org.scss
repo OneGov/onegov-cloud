@@ -3469,30 +3469,35 @@ button {
     .accordion-navigation {
         &> a {
             background: transparent;
-            color: $primary-color;
-            font-size: .6rem;
-            padding: .4rem;
-            padding-top: 0;
+            border: 1px solid #cbcccc;
+            color: $aluminum;
+            display: inline-block;
+            font-size: .8rem;
+            padding: .3rem .5rem;
+
+            &:hover {
+                color: $primary-color;
+            }
         }
 
         &> .content.active {
-            padding: 0;
             background: transparent;
+            padding: 0;
         }
 
         & .more-items {
-            text-align: center;
 
             i {
                 border: 1px solid;
                 border-radius: 100px;
+                font-size: .5rem;
                 padding: .2rem;
+                margin-left: .2rem;
             }
         }
 
-        &.active > .more-items i{
-            transform: rotate(180deg);
-            transform-origin: 50% 50%;
+        &.active > .more-items {
+            display: none;
         }
     }
 

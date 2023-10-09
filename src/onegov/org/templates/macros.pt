@@ -1474,7 +1474,6 @@
 <metal:tags_collapsed define-macro="tags_collapsed">
     <tal:b tal:switch="len(tags) >= 9">
         <tal:b tal:case="False">
-            <p>weniger als</p>
             <ul class="tags">
                 <li tal:repeat="link tags" class="click-through">
                     <span tal:content="structure link(layout)"
@@ -1484,8 +1483,7 @@
             </ul>
         </tal:b>
         <tal:b tal:case="True">
-            <p>me als</p>
-            <tal:b define="tags_start tags[:6]; tags_rest tags[6:]">
+                <tal:b define="tags_start tags[:6]; tags_rest tags[6:]">
                 <ul class="tags">
                     <li tal:repeat="link tags_start" class="click-through">
                         <span tal:content="structure link(layout)"
@@ -1495,7 +1493,7 @@
                 </ul>
                 <ul class="accordion" data-accordion tal:condition="len(tags_rest)">
                     <li class="accordion-navigation">
-                        <a class="more-items" href="#panel-${filters.index(filter)}"><i class="fa fa-chevron-down"></i></a>
+                        <a class="more-items" href="#panel-${filters.index(filter)}">Mehr anzeigen <i class="fa fa-chevron-down"></i></a>
                         <div id="panel-${filters.index(filter)}" class="content">
                             <ul class="tags">
                                 <li tal:repeat="link tags_rest" class="click-through">

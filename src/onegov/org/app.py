@@ -641,10 +641,6 @@ def get_common_asset():
     yield 'tickets.js'
     yield 'items_selectable.js'
     yield 'notifications.js'
-
-
-@OrgApp.webasset('accordion')
-def get_accordion_asset():
     yield 'foundation.accordion.js'
 
 

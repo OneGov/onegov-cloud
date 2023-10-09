@@ -233,3 +233,8 @@ def get_fullcalendar_asset():
     yield 'fullcalendar.de.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@TownApp.webasset('accordion')
+def get_accordion_asset():
+    yield 'foundation.accordion.js'
