@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-25 08:37+0200\n"
+"POT-Creation-Date: 2023-10-09 10:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1511,6 +1511,12 @@ msgstr "Nascondi questi campi per gli utenti non registrati"
 
 msgid "People"
 msgstr "Persone"
+
+msgid "Location Address"
+msgstr ""
+
+msgid "Postal Address"
+msgstr ""
 
 msgid "Values of the location filter"
 msgstr "Valori del filtro posizione"
@@ -3111,6 +3117,9 @@ msgstr "Commissione sulla carta di credito"
 
 msgid "Pay Offline later"
 msgstr "Paga offline successivamente"
+
+msgid "Show more"
+msgstr ""
 
 msgid "at ${time}"
 msgstr "alle ${time}"

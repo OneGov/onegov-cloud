@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-09-25 08:37+0200\n"
+"POT-Creation-Date: 2023-10-09 10:47+0200\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1509,6 +1509,12 @@ msgstr "Masquer ces champs pour les utilisateurs non connectés"
 
 msgid "People"
 msgstr "Personnes"
+
+msgid "Location Address"
+msgstr ""
+
+msgid "Postal Address"
+msgstr ""
 
 msgid "Values of the location filter"
 msgstr "Valeurs du filtre de localisation"
@@ -3110,6 +3116,9 @@ msgstr "Frais de carte de crédit"
 
 msgid "Pay Offline later"
 msgstr "Payer hors ligne plus tard"
+
+msgid "Show more"
+msgstr "Afficher plus"
 
 msgid "at ${time}"
 msgstr "à ${time}"
