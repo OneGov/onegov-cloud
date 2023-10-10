@@ -10,6 +10,8 @@ from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
+import zipfile
+from io import BytesIO
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
@@ -741,6 +743,48 @@ def view_ticket_pdf(self, request):
         content.read(),
         content_type='application/pdf',
         content_disposition='inline; filename={}_{}.pdf'.format(
+            normalize_for_url(self.number),
+            date.today().strftime('%Y%m%d')
+        )
+    )
+
+
+@OrgApp.view(model=Ticket, name='files', permission=Private)
+def view_ticket_files(self, request):
+    """ Download the files associated with the ticket as zip. """
+
+    form_submission = getattr(self.handler, 'submission', None)
+
+    if form_submission is None:
+        return request.redirect(request.link(self))
+
+    buffer = BytesIO()
+    not_existing = []
+    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for f in form_submission.files:
+            try:
+                zipf.writestr(f.name, f.reference.file.read())
+            except IOError:
+                not_existing.append(f.name)
+
+        pdf = TicketPdf.from_ticket(request, self)
+        pdf_filename = '{}_{}.pdf'.format(normalize_for_url(self.number),
+                                          date.today().strftime('%Y%m%d'))
+        zipf.writestr(pdf_filename, pdf.read())
+
+    if not_existing:
+        count = len(not_existing)
+        request.alert(_(f"{count} file(s) not found:"
+                        f" {', '.join(not_existing)}"))
+    else:
+        request.info(_("Zip archive created successfully"))
+
+    buffer.seek(0)
+
+    return Response(
+        buffer.read(),
+        content_type='application/zip',
+        content_disposition='inline; filename=ticket-{}_{}.zip'.format(
             normalize_for_url(self.number),
             date.today().strftime('%Y%m%d')
         )

@@ -181,8 +181,8 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     @property
     def expertise_professional_guilds_all(self):
         return (
-            tuple(self.expertise_professional_guilds or tuple())
-            + tuple(self.expertise_professional_guilds_other or tuple())
+            tuple(self.expertise_professional_guilds or ())
+            + tuple(self.expertise_professional_guilds_other or ())
         )
 
     # If entry was imported, for the form and the expertise fields

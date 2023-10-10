@@ -228,11 +228,11 @@ def delete_directory(self, request):
 def get_filters(request, self, keyword_counts=None, view_name=None):
     Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
-    empty = tuple()
+    empty = ()
 
-    radio_fields = set(
+    radio_fields = {
         f.id for f in self.directory.fields if f.type == 'radio'
-    )
+    }
 
     def link_title(field_id, value):
         if keyword_counts is None:
@@ -260,7 +260,7 @@ def keyword_count(request, collection):
     self = collection
     keywords = tuple(
         as_internal_id(k)
-        for k in self.directory.configuration.keywords or tuple()
+        for k in self.directory.configuration.keywords or ()
     )
     fields = {f.id: f for f in self.directory.fields if f.id in keywords}
     counts = {}

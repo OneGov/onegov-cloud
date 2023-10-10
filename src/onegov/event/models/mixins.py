@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from onegov.core.orm.mixins import content_property, ContentMixin
 from onegov.core.orm.types import UTCDateTime
 from sedate import to_timezone
@@ -39,7 +41,7 @@ class OccurrenceMixin(ContentMixin):
 
     @tags.setter
     def tags(self, value):
-        self._tags = dict(((key.strip(), '') for key in value))
+        self._tags = {key.strip(): '' for key in value}
 
     #: Filter keywords if organisation settings enabled filters
     filter_keywords = content_property(value_type=dict)
@@ -64,3 +66,10 @@ class OccurrenceMixin(ContentMixin):
         """ The localized version of the end date/time. """
 
         return to_timezone(self.end, self.timezone)
+
+    def filter_keywords_ordered(self, order=None):
+        order = order or []
+        if order:
+            return OrderedDict((k, self.filter_keywords.get(k)) for k in order)
+
+        return OrderedDict(sorted(self.filter_keywords.items()))

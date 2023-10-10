@@ -13,7 +13,7 @@ from uuid import UUID
 
 @TranslatorDirectoryApp.path(
     model=Translator, path='/translator/{id}',
-    converters=dict(id=UUID)
+    converters={'id': UUID}
 )
 def get_translator(request, id):
     return request.session.query(Translator).filter_by(id=id).first()
@@ -21,9 +21,17 @@ def get_translator(request, id):
 
 @TranslatorDirectoryApp.path(
     model=TranslatorCollection, path='/translators',
-    converters=dict(page=int, written_langs=[str], spoken_langs=[str],
-                    monitor_langs=[str], order_desc=bool, guilds=[str],
-                    interpret_types=[str], admissions=[str], genders=[str])
+    converters={
+        'page': int,
+        'written_langs': [str],
+        'spoken_langs': [str],
+        'monitor_langs': [str],
+        'order_desc': bool,
+        'guilds': [str],
+        'interpret_types': [str],
+        'admissions': [str],
+        'genders': [str]
+    }
 )
 def get_translators(request, page=None, written_langs=None, spoken_langs=None,
                     monitor_langs=None, order_by=None, order_desc=None,
@@ -48,7 +56,7 @@ def get_translators(request, page=None, written_langs=None, spoken_langs=None,
 
 @TranslatorDirectoryApp.path(
     model=Language, path='/language/{id}',
-    converters=dict(id=UUID)
+    converters={'id': UUID}
 )
 def get_language(app, id):
     return LanguageCollection(app.session()).by_id(id)
@@ -63,7 +71,7 @@ def get_language_collection(app, page=0, letter=None):
 
 @TranslatorDirectoryApp.path(
     model=TranslatorDocumentCollection, path='/documents/{translator_id}',
-    converters=dict(translator_id=UUID)
+    converters={'translator_id': UUID}
 )
 def get_translator_documents(app, translator_id, category=None):
     result = TranslatorDocumentCollection(
@@ -77,7 +85,7 @@ def get_translator_documents(app, translator_id, category=None):
 @TranslatorDirectoryApp.path(
     model=TranslatorMutation,
     path='/mutation/{target_id}/{ticket_id}',
-    converters=dict(target_id=UUID, ticket_id=UUID)
+    converters={'target_id': UUID, 'ticket_id': UUID}
 )
 def get_translator_mutation(app, target_id, ticket_id):
     return TranslatorMutation(app.session(), target_id, ticket_id)
@@ -86,7 +94,7 @@ def get_translator_mutation(app, target_id, ticket_id):
 @TranslatorDirectoryApp.path(
     model=Accreditation,
     path='/accreditation/{target_id}/{ticket_id}',
-    converters=dict(target_id=UUID, ticket_id=UUID)
+    converters={'target_id': UUID, 'ticket_id': UUID}
 )
 def get_accreditation(app, target_id, ticket_id):
     return Accreditation(app.session(), target_id, ticket_id)

@@ -94,10 +94,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         if self.has_database_connection:
             schema_prefix = self.namespace + '-'
 
-            self.known_schemas = set(
+            self.known_schemas = {
                 s for s in self.session_manager.list_schemas()
                 if s.startswith(schema_prefix)
-            )
+            }
 
     def configure_organisation(self, **cfg):
         self.enable_user_registration = cfg.get(
@@ -200,13 +200,13 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             root_id: int | None = None
         ) -> 'Iterator[tuple[int, Topic]]':
             for page in pages:
-
-                if root_id is None:
-                    root_id = page.id
-
                 if isinstance(page, Topic):
-                    yield root_id, page
-                yield from visit_topics(page.children, root_id=root_id)
+                    yield root_id or page.id, page
+
+                yield from visit_topics(
+                    page.children,
+                    root_id=root_id or page.id
+                )
 
         result = defaultdict(list)
         for root_id, topic in visit_topics(self.root_pages):
@@ -406,6 +406,10 @@ def org_content_security_policy():
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
+    policy.connect_src.add('https://beobachten.projuventute.ch')
+    policy.connect_src.add('https://cdn.jsdelivr.net')
+    policy.connect_src.add('https://*.usercentrics.eu')
+
     policy.script_src.add('https:')
 
     return policy
@@ -471,7 +475,7 @@ def get_public_ticket_messages():
 
 @OrgApp.setting(section='org', name='disabled_extensions')
 def get_disabled_extensions():
-    return tuple()
+    return ()
 
 
 @OrgApp.webasset_path()

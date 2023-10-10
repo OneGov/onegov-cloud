@@ -16,7 +16,7 @@ class UploadWabstiVoteForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     sg_geschaefte = UploadField(
@@ -26,5 +26,5 @@ class UploadWabstiVoteForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )

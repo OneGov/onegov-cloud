@@ -130,6 +130,7 @@ def get_connections_data(election, request):
 
     nodes = OrderedDict()
     links = []
+    completed = election.completed
 
     # Add lists
     for list_ in election.lists:
@@ -137,15 +138,15 @@ def get_connections_data(election, request):
             'name': list_.name,
             'value': list_.votes,
             'display_value': list_.number_of_mandates or '' if
-            election.completed else '',
-            'active': list_.number_of_mandates > 0 and election.completed
+            completed else '',
+            'active': list_.number_of_mandates > 0 and completed
         }
         if list_.connection:
             mandates = list_.connection.total_number_of_mandates
             nodes.setdefault(list_.connection.id, {
                 'name': '',
-                'display_value': mandates or '' if election.completed else '',
-                'active': mandates > 0 and election.completed
+                'display_value': mandates or '' if completed else '',
+                'active': mandates > 0 and completed
             })
             links.append({
                 'source': list(nodes.keys()).index(list_.id),
@@ -159,14 +160,14 @@ def get_connections_data(election, request):
             mandates = connection.total_number_of_mandates
             nodes.setdefault(connection.id, {
                 'name': '',
-                'display_value': mandates or '' if election.completed else '',
-                'active': mandates > 0 and election.completed
+                'display_value': mandates or '' if completed else '',
+                'active': mandates > 0 and completed
             })
             mandates = connection.parent.total_number_of_mandates
             nodes.setdefault(connection.parent.id, {
                 'name': '',
-                'display_value': mandates or '' if election.completed else '',
-                'active': mandates > 0 and election.completed
+                'display_value': mandates or '' if completed else '',
+                'active': mandates > 0 and completed
             })
             links.append({
                 'source': list(nodes.keys()).index(connection.id),

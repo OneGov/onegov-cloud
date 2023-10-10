@@ -107,9 +107,8 @@ msgstr "Ungültiges Geschlecht: ${value}"
 msgid "Invalid color: ${col}"
 msgstr "Ungültige Farbe: ${col}"
 
-msgid "This format does not support separate results for expats"
+msgid "File not supported"
 msgstr ""
-"Dieses Format unterstützt keine separaten Ergebnisse für Auslandsschweizer"
 
 msgid "Invalid election values"
 msgstr "Ungültige Wahldaten"
@@ -147,25 +146,14 @@ msgid "Panachage results id ${id} not in list_id's"
 msgstr "Panachage results id ${id} nicht in list_id's"
 
 #, python-format
-msgid "Invalid domain_segment: ${domain_segment}"
-msgstr "domain_segment ungültig: ${domain_segment}"
-
-msgid "Invalid values"
-msgstr "Ungültige Werte"
-
-#, python-format
 msgid "${name} was found twice"
 msgstr "${name} kommt zweimal vor"
 
-#, python-format
-msgid "No party results for year ${year}"
-msgstr "Keine Parteiresultate für das Jahr ${year}"
-
-msgid "Panachage results ids and id not consistent"
-msgstr "Panachage results ids und id nicht konsistent"
-
 msgid "Elected Candidates"
 msgstr "Gewählte Kandidierende"
+
+msgid "Invalid values"
+msgstr "Ungültige Werte"
 
 msgid "Unknown candidate"
 msgstr "Unbekannter Kandidierender"
@@ -211,6 +199,21 @@ msgstr "List_id ${list_id} nicht gefunden in list numbers"
 msgid "Candidate with id ${id} not in wpstatic_kandidaten"
 msgstr "Kandidat mit id ${id} nicht in wpstatic_kandidaten"
 
+msgid "This format does not support separate results for expats"
+msgstr ""
+"Dieses Format unterstützt keine separaten Ergebnisse für Auslandsschweizer"
+
+#, python-format
+msgid "Invalid domain_segment: ${domain_segment}"
+msgstr "domain_segment ungültig: ${domain_segment}"
+
+#, python-format
+msgid "No party results for year ${year}"
+msgstr "Keine Parteiresultate für das Jahr ${year}"
+
+msgid "Panachage results ids and id not consistent"
+msgstr "Panachage results ids und id nicht konsistent"
+
 msgid "Proposal"
 msgstr "Vorlage"
 
@@ -226,6 +229,9 @@ msgstr "Keine Stimmberechtigten"
 msgid "More cast votes than eligible voters"
 msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
+msgid "Vote type not supported"
+msgstr "Abstimmungsart nicht unterstützt"
+
 msgid "Invalid ballot type"
 msgstr "Ungültige Abstimmungsart"
 
@@ -235,9 +241,6 @@ msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 #, python-format
 msgid "Error in anzpendentgde/anzgdependent: ${msg}"
 msgstr ""
-
-msgid "Vote type not supported"
-msgstr "Abstimmungsart nicht unterstützt"
 
 msgid "Term"
 msgstr "Suchbegriff"
@@ -1025,6 +1028,12 @@ msgstr "Ja-Stimmen"
 
 msgid "Nays"
 msgstr "Nein-Stimmen"
+
+msgid "Proposal %"
+msgstr "Vorlage %"
+
+msgid "Counter proposal %"
+msgstr "Gegenentwurf %"
 
 msgid "Not yet counted"
 msgstr "Noch nicht ausgezählt"

@@ -327,12 +327,8 @@ def import_ical(group_context, ical, future_events_only=False,
         ~/Veranstaltung_breit.jpg -f "kalender" "Sport Veranstaltungskalender"
 
     """
-    cat = list()
-    for e in categories:
-        cat.append(e)
-    filters = dict()
-    for k, v in keyword_filters:
-        filters[k] = v
+    cat = list(categories)
+    filters = dict(keyword_filters)
 
     def _import_ical(request, app):
         collection = EventCollection(app.session())

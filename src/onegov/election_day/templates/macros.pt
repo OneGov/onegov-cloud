@@ -167,10 +167,14 @@
                 <th data-tablesaw-priority="persist" i18n:translate="" class="column-entity left-aligned">${layout.principal.label('entity')}</th>
                 <th data-tablesaw-priority="3" i18n:translate="" class="column-district left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="column-result left-aligned">Result</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">Yeas</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">Nays</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">Yes %</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">No %</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">Yeas</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">Nays</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">Yes %</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">No %</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="column-yeas right-aligned">Proposal</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="column-nays right-aligned">Counter Proposal</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="column-yeas-percentage right-aligned">Proposal %</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="column-nays-percentage right-aligned">Counter proposal %</th>
             </tr>
         </thead>
         <tbody>
@@ -183,8 +187,10 @@
                 <tal:b condition="result.counted">
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
-                    <td class="column-result answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                    <td class="column-result answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                    <td tal:condition="ballot.type != 'tie-breaker' and result.accepted" class="column-result answer accepted" i18n:translate="">Accepted</td>
+                    <td tal:condition="ballot.type != 'tie-breaker' and not result.accepted" class="column-result answer rejected" i18n:translate="">Rejected</td>
+                    <td tal:condition="ballot.type == 'tie-breaker' and result.accepted" class="column-result answer accepted" i18n:translate="">Proposal</td>
+                    <td tal:condition="ballot.type == 'tie-breaker' and not result.accepted" class="column-result answer rejected" i18n:translate="">Counter Proposal</td>
                     <td class="column-yeas right-aligned" data-text="${result.yeas}">${layout.format_number(result.yeas)}</td>
                     <td class="column-nays right-aligned" data-text="${result.nays}">${layout.format_number(result.nays)}</td>
                     <td class="column-yeas-percentage right-aligned">${layout.format_number(result.yeas_percentage)}</td>
@@ -197,8 +203,10 @@
                 <td class="column-entity" i18n:translate="">Total</td>
                 <td class="column-district" tal:condition="layout.has_districts"></td>
                 <td class="column-result answer" tal:condition="not:ballot.vote.completed" i18n:translate="">Not yet counted</td>
-                <td class="column-result answer accepted" tal:condition="ballot.vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
-                <td class="column-result answer rejected" tal:condition="ballot.vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
+                <td tal:condition="ballot.type != 'tie-breaker' and ballot.vote.completed and ballot.accepted" class="column-result answer accepted" i18n:translate="">Accepted</td>
+                <td tal:condition="ballot.type != 'tie-breaker' and ballot.vote.completed and not ballot.accepted" class="column-result answer rejected" i18n:translate="">Rejected</td>
+                <td tal:condition="ballot.type == 'tie-breaker' and ballot.vote.completed and ballot.accepted" class="column-result answer accepted" i18n:translate="">Proposal</td>
+                <td tal:condition="ballot.type == 'tie-breaker' and ballot.vote.completed and not ballot.accepted" class="column-result answer rejected" i18n:translate="">Counter Proposal</td>
                 <td class="column-yeas right-aligned">${layout.format_number(ballot.yeas)}</td>
                 <td class="column-nays right-aligned">${layout.format_number(ballot.nays)}</td>
                 <td class="column-yeas-percentage right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
@@ -218,10 +226,14 @@
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="1" i18n:translate="" class="left-aligned">Result</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
-                <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Yes %</th>
-                <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">No %</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Yes %</th>
+                <th tal:condition="ballot.type != 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="right-aligned">No %</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Proposal</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Counter Proposal</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Proposal %</th>
+                <th tal:condition="ballot.type == 'tie-breaker'" data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Counter proposal %</th>
             </tr>
         </thead>
         <tbody>
@@ -232,8 +244,10 @@
                 </tal:b>
                 <tal:b condition="result.counted">
                     <th>${layout.format_name(result)}</th>
-                    <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                    <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                    <td tal:condition="ballot.type != 'tie-breaker' and result.accepted" class="answer accepted" i18n:translate="">Accepted</td>
+                    <td tal:condition="ballot.type != 'tie-breaker' and not result.accepted" class="answer rejected" i18n:translate="">Rejected</td>
+                    <td tal:condition="ballot.type == 'tie-breaker' and result.accepted" class="answer accepted" i18n:translate="">Proposal</td>
+                    <td tal:condition="ballot.type == 'tie-breaker' and not result.accepted" class="answer rejected" i18n:translate="">Counter Proposal</td>
                     <td class="right-aligned">${layout.format_number(result.yeas)}</td>
                     <td class="right-aligned">${layout.format_number(result.nays)}</td>
                     <td class="right-aligned">${layout.format_number(result.yeas_percentage)} %</td>
@@ -245,8 +259,10 @@
             <tr class="total">
                 <td i18n:translate="">Total</td>
                 <td class="answer" tal:condition="not:ballot.vote.completed" i18n:translate="">Not yet counted</td>
-                <td class="answer accepted" tal:condition="ballot.vote.completed and ballot.accepted" i18n:translate="">Accepted</td>
-                <td class="answer rejected" tal:condition="ballot.vote.completed and not ballot.accepted" i18n:translate="">Rejected</td>
+                <td tal:condition="ballot.type != 'tie-breaker' and ballot.vote.completed and ballot.accepted" class="answer accepted" i18n:translate="">Accepted</td>
+                <td tal:condition="ballot.type != 'tie-breaker' and ballot.vote.completed and not ballot.accepted" class="answer rejected" i18n:translate="">Rejected</td>
+                <td tal:condition="ballot.type == 'tie-breaker' and ballot.vote.completed and ballot.accepted" class="answer accepted" i18n:translate="">Proposal</td>
+                <td tal:condition="ballot.type == 'tie-breaker' and ballot.vote.completed and not ballot.accepted" class="answer rejected" i18n:translate="">Counter Proposal</td>
                 <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
                 <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)} %</td>
@@ -752,7 +768,7 @@
         </thead>
         <tbody>
             <tal:block tal:repeat="candidate candidates">
-                <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
+                <tr tal:condition="not lists or candidate.party in lists or candidate.list_name in lists" tal:attributes="class 'sticky-row' if not layout.completed or candidate.elected > 0 else ''">
                     <th class="column-candidate">${candidate.family_name} ${candidate.first_name}</th>
                     <td tal:condition="not:layout.tacit" class="column-votes right-aligned" data-text="${candidate.votes}">${layout.format_number(candidate.votes)}</td>
                     <td tal:condition="layout.majorz" class="column-party right-aligned">${candidate.party}</td>
@@ -865,11 +881,13 @@
     <div class="ballot-result-bar" tal:condition="layout.has_results and ballot">
         <ul class="percentages flex-container justify-between align-center">
             <li>
-                <span i18n:translate="">Yeas</span><br/>
+                <span tal:condition="ballot.type != 'tie-breaker'" i18n:translate="">Yeas</span>
+                <span tal:condition="ballot.type == 'tie-breaker'" i18n:translate="">Proposal</span><br/>
                 <span class="accepted" >${'{0:.2f}'.format(ballot.yeas_percentage)}%</span>
             </li>
             <li>
-                <span i18n:translate="">Nays</span><br/>
+                <span tal:condition="ballot.type != 'tie-breaker'" i18n:translate="">Nays</span>
+                <span tal:condition="ballot.type == 'tie-breaker'" i18n:translate="">Counter Proposal</span><br/>
                 <span class="rejected" >${'{0:.2f}'.format(ballot.nays_percentage)}%</span>
             </li>
         </ul>

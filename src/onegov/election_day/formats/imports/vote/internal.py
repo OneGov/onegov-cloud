@@ -159,18 +159,18 @@ def import_vote_internal(vote, principal, file, mimetype):
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
             ballot_results[ballot_type].append(
-                dict(
-                    name=name,
-                    district=district,
-                    entity_id=entity_id,
-                    counted=counted,
-                    yeas=yeas if counted else 0,
-                    nays=nays if counted else 0,
-                    eligible_voters=eligible_voters if counted else 0,
-                    expats=expats if counted else 0,
-                    empty=empty if counted else 0,
-                    invalid=invalid if counted else 0
-                )
+                {
+                    'name': name,
+                    'district': district,
+                    'entity_id': entity_id,
+                    'counted': counted,
+                    'yeas': yeas if counted else 0,
+                    'nays': nays if counted else 0,
+                    'eligible_voters': eligible_voters if counted else 0,
+                    'expats': expats if counted else 0,
+                    'empty': empty if counted else 0,
+                    'invalid': invalid if counted else 0
+                }
             )
 
     if errors:
@@ -195,12 +195,12 @@ def import_vote_internal(vote, principal, file, mimetype):
                         continue
 
             ballot_results[ballot_type].append(
-                dict(
-                    name=name,
-                    district=district,
-                    counted=False,
-                    entity_id=entity_id
-                )
+                {
+                    'name': name,
+                    'district': district,
+                    'counted': False,
+                    'entity_id': entity_id
+                }
             )
 
     # Add the results to the DB

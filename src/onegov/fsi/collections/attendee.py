@@ -97,13 +97,12 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
 
     def add_from_user(self, user):
         default = 'Default Value'
-        data = dict(
+        self.add(
             user_id=user.id,
             first_name=default,
             last_name=default,
-            email=user.username,
+            email=user.username
         )
-        self.add(**data)
 
     def by_id(self, id):
         return super().query().filter(self.primary_key == id).first()

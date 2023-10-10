@@ -380,10 +380,10 @@ def parse_subscriptions(csvfile, persons, events):
 
             if code:
                 # Add to valid subscriptions
-                subscriptions.append(dict(
-                    course_event_id=course_event.id,
-                    completed=completed
-                ))
+                subscriptions.append({
+                    'course_event_id': course_event.id,
+                    'completed': completed
+                })
                 continue
 
             if current_email:
@@ -391,10 +391,10 @@ def parse_subscriptions(csvfile, persons, events):
                 if not current_email == email:
                     # Assert full profile of the record in Personen.txt
                     assert complete_record
-                subscriptions.append(dict(
-                    course_event_id=course_event.id,
-                    completed=completed
-                ))
+                subscriptions.append({
+                    'course_event_id': course_event.id,
+                    'completed': completed
+                })
                 continue
 
             if email:
@@ -416,18 +416,18 @@ def parse_subscriptions(csvfile, persons, events):
                       'email, firstname or lastname')
                 continue
 
-            external = maybe_external_in_ldap.setdefault(email, dict(
-                id=uuid4(),
-                first_name=first_name,
-                last_name=last_name,
-                organisation=line.teilnehmer_firma,
-                subscriptions=[],
-                email=email
-            ))
-            external['subscriptions'].append(dict(
-                course_event_id=course_event.id,
-                completed=completed
-            ))
+            external = maybe_external_in_ldap.setdefault(email, {
+                'id': uuid4(),
+                'first_name': first_name,
+                'last_name': last_name,
+                'organisation': line.teilnehmer_firma,
+                'subscriptions': [],
+                'email': email
+            })
+            external['subscriptions'].append({
+                'course_event_id': course_event.id,
+                'completed': completed
+            })
 
     assert not droppped_teilnehmer_ids
     assert not emails_by_teilnehmer_id

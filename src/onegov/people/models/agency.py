@@ -115,8 +115,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
             AgencyMembership.order_within_person
         ).filter_by(person_id=person_id).all()
 
-        orders_for_person = list(
-            (o.order_within_person for o in orders_for_person))
+        orders_for_person = [order for order, in orders_for_person]
 
         if orders_for_person:
             try:

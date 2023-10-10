@@ -139,7 +139,7 @@ class Handler:
 
         """
 
-        return tuple()
+        return ()
 
     @property
     def payment(self) -> 'Payment | None':

@@ -30,6 +30,16 @@ def get_fields_from_class(
     cls: type['Form']
 ) -> list[tuple[str, 'UnboundField[Any]']]:
 
+    # often times FormMeta will have already calculated the fields
+    # and stored them on the class, so we only need to calculate
+    # them fresh if this attribute is None
+    if cls._unbound_fields is not None:
+        return cls._unbound_fields
+
+    # FIXME: this is transcribed from FormMeta.__call__, so it is
+    #        a little fragile, perhaps we can come up with a way
+    #        to safely call it regardless of what __new__/__init__
+    #        on cls looks like, so we can re-use their code.
     fields = [
         (name, field)
         for name in dir(cls)

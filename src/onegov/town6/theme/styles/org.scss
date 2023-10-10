@@ -845,11 +845,6 @@ body:not(.editor-layout) {
     }
 }
 
-@media #{$small-only} {
-    .orbit.slider {
-        margin-bottom: -2rem;
-    }
-}
 
 /*
     Accessibility
