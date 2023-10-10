@@ -313,8 +313,14 @@ input.has-field-help {
 
 .input-with-button {
 
+    input {
+        border-radius: .7rem 0 0 .7rem !important;
+    }
+
     .button {
         @include input-button;
+        border-radius: 0 10rem 10rem 0 !important;
+        height: 2.4rem !important;
     }
 
     #redactor-modal-link-insert {
