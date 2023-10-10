@@ -341,9 +341,9 @@ def convert_xlsx_to_csv(
             cell = sheet.cell(row, column)
 
             if cell.value is None:
-                value = ''
+                value = ''  # type:ignore[unreachable]
             elif cell.data_type == 's':
-                value = cell.value  # type:ignore[assignment]
+                value = cell.value
             elif cell.data_type == 'n':
                 if (int_value := int(cell.value)) == cell.value:  # type:ignore
                     value = str(int_value)
