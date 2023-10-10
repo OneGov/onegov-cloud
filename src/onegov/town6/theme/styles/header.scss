@@ -65,13 +65,8 @@ $qr-code-icon: '\f029';
 
 .globals {
     background: $tuatara;
-    position: relative;
     padding-top: 1px;
-
-
-    @include breakpoint(small only) {
-        padding: 0;
-    }
+    position: relative;
 
     .is-dropdown-submenu-parent > a {
         color: $white !important;

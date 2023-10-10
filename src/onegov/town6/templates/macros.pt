@@ -1528,17 +1528,22 @@
 </metal:icon_links>
 
 <metal:slider define-macro="slider" i18n:domain="onegov.town6">
-    <div tal:condition="images" class="orbit slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200">
+    <div tal:condition="images" class="orbit slider homepage-image-slider" role="region" aria-label="Homepage Image Slider" data-orbit data-timer-delay="7200" tal:define="height height|None;">
         <div class="orbit-wrapper">
-            <div  tal:condition="images and len(images) > 1" class="orbit-controls">
+            <div tal:condition="images and len(images) > 1" class="orbit-controls show-for-medium">
                 <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span><i class="fa fa-chevron-left"></i></button>
                 <button class="orbit-next"><span class="show-for-sr">Next Slide</span><i class="fa fa-chevron-right"></i></button>
             </div>
-            <ul class="orbit-container">
+            <ul class="orbit-container" data-height-m="${height_m}" data-height-d="${height_d}">
                 <li tal:repeat="image images" class="orbit-slide">
                     <figure class="orbit-figure">
-                        <img class="orbit-image" src="${image.src}">
-                        <figcaption tal:condition="image.note" class="orbit-caption">${image.note}</figcaption>
+                        <div class="orbit-image" style="background-image:url(${image.src})" data-image-url="${image.src}"></div>
+                        <div class="dark-overlay" tal:condition="image.note"></div>
+                        <div class="grid-container" tal:condition="image.note">
+                            <div class="text">
+                                <span>${image.note}</span>
+                            </div>
+                        </div>
                     </figure>
                 </li>
             </ul>
