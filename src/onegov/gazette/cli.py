@@ -87,7 +87,7 @@ def import_editors(ctx, file, clear, dry_run, locale):
         }
 
         added_groups = {}
-        for group in set([line.gruppe for line in lines]):
+        for group in {line.gruppe for line in lines}:
             added_groups[group] = groups.add(name=group)
         count = len(added_groups)
         click.secho(f"{count} group(s) imported", fg='green')

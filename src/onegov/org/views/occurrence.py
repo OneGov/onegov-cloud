@@ -29,11 +29,11 @@ class Filter(NamedTuple):
 
 def get_filters(request, self, keyword_counts=None, view_name=None):
     filters = []
-    empty = tuple()
+    empty = ()
 
-    radio_fields = set(
+    radio_fields = {
         f.id for f in request.app.org.event_filter_fields if f.type == 'radio'
-    )
+    }
 
     def get_count(keyword, value):
         return keyword_counts.get(keyword, {}).get(value, 0)
@@ -95,7 +95,7 @@ def view_occurrences(self, request, layout=None):
     filters = None
     tags = None
     filter_type = request.app.org.event_filter_type
-    filter_config = request.app.org.event_filter_configuration or dict()
+    filter_config = request.app.org.event_filter_configuration or {}
 
     layout = layout or OccurrencesLayout(self, request)
 
@@ -175,6 +175,8 @@ def view_occurrences(self, request, layout=None):
         'search_widget': self.search_widget,
         'show_tags': show_tags(request),
         'show_filters': show_filters(request),
+        'no_event_link': request.link(self.for_filter(
+            range='past', start=None, end=None)),
     }
 
 

@@ -113,6 +113,13 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
                     request.link(self.translator, 'edit')
                 ),
                 attrs={'class': 'edit-link'}
+            ),
+            Link(
+                _("Mail templates"),
+                url=request.link(
+                    self.translator, name='mail-templates'
+                ),
+                attrs={'class': 'envelope'},
             )
         ]
 
@@ -241,6 +248,15 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
                         )
                     ),
                     attrs={'class': ('edit-link', 'border')}
+                )
+            )
+            links.append(
+                Link(
+                    _("Mail templates"),
+                    url=request.link(
+                        self.translator, name='mail-templates'
+                    ),
+                    attrs={'class': 'envelope'},
                 )
             )
             if self.state is None:

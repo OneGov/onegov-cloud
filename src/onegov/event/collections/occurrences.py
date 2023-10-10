@@ -62,7 +62,7 @@ class OccurrenceCollection(Pagination):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
-        self.filter_keywords = filter_keywords or dict()
+        self.filter_keywords = filter_keywords or {}
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
@@ -264,7 +264,7 @@ class OccurrenceCollection(Pagination):
 
     def valid_keywords(self, parameters):
         if not self.event_filter_configuration:
-            return dict()
+            return {}
 
         return {
             as_internal_id(k): v for k, v in parameters.items()
@@ -470,7 +470,7 @@ class OccurrenceCollection(Pagination):
         vcalendar.add('version', '2.0')
 
         query = self.query().with_entities(Occurrence.event_id)
-        event_ids = set([r.event_id for r in query])
+        event_ids = {event_id for event_id, in query}
 
         query = self.session.query(Event).filter(Event.id.in_(event_ids))
         for event in query:
@@ -568,8 +568,11 @@ class OccurrenceCollection(Pagination):
                 </termin>
                 <text>Beschreibung</text>
                 <urlweb>url</urlweb>
-                <rubrik>tag 1</rubrik>
-                <rubrik>tag 2</rubrik>
+                <hauptrubrik name="Naturmusuem">
+                    <rubrik>tag_1</rubrik>
+                    <rubrik>tag_2</rubrik>
+                </hauptrubrik>
+                <keyword>Naturmusuem tag_1 tag_2</keyword>
                 <veranstaltungsort>
                     <title></title>
                     <adresse></adresse>
@@ -606,10 +609,14 @@ class OccurrenceCollection(Pagination):
 
             # TODO translate tags
             last_change = e.last_change.strftime('%Y-%m-%d %H:%M:%S')
-            event = objectify.Element('item',
-                                      dict(status='1',
-                                           suchbar='1',
-                                           mutationsdatum=last_change))
+            event = objectify.Element(
+                'item',
+                {
+                    'status': '1',
+                    'suchbar': '1',
+                    'mutationsdatum': last_change
+                }
+            )
             event.id = e.id
             event.title = e.title
             if len(e.description) > 100:
@@ -627,16 +634,28 @@ class OccurrenceCollection(Pagination):
             event.append(text_tag(e.description))
             if e.external_event_url:
                 event.urlweb = e.external_event_url
+
+            hr_text = ''
+            tags = []
             if e.tags:
-                event.rubrik = e.tags
+                tags = e.tags
             if e.filter_keywords:
-                values = list()
                 for k, v in e.filter_keywords.items():
                     if k in ['kalender']:
-                        event.hauptrubrik = v
+                        hr_text = v
                     else:
-                        values.append(v)
-                event.rubrik = values
+                        if isinstance(v, list):
+                            tags.extend(v)
+                        else:
+                            tags.append(v)
+            hr = objectify.Element('hauptrubrik',
+                                   attrib={'name': hr_text} if
+                                   hr_text else None)
+            hr.rubrik = tags or None
+            event.append(hr)
+            keywords = [hr_text] + tags if hr_text else tags
+            event.keyword = ' '.join(keywords) if keywords else None
+
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
             ort.adresse = ''

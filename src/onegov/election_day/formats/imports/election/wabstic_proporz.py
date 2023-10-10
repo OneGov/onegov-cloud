@@ -155,23 +155,23 @@ def create_election_wabstic_proporz(
                 line, 'mandate', treat_none_as_default=False
             )
 
-            election = dict(
-                id=normalize_for_url(line.gebezoffiziell),
-                type='proporz',
-                title_translations={request.locale: line.gebezoffiziell},
-                shortcode=line.gebezkurz,
-                date=date_,
-                number_of_mandates=mandates,
-                domain=domain,
-                status='unknown',
-            )
+            election = {
+                'id': normalize_for_url(line.gebezoffiziell),
+                'type': 'proporz',
+                'title_translations': {request.locale: line.gebezoffiziell},
+                'shortcode': line.gebezkurz,
+                'date': date_,
+                'number_of_mandates': mandates,
+                'domain': domain,
+                'status': 'unknown',
+            }
 
-            data_source_item = dict(
-                source_id=data_source.id,
-                district=line.sortwahlkreis,
-                number=line.sortgeschaeft,
-                election_id=election['id']
-            )
+            data_source_item = {
+                'source_id': data_source.id,
+                'district': line.sortwahlkreis,
+                'number': line.sortgeschaeft,
+                'election_id': election['id']
+            }
 
         except ValueError as ve:
             line_errors.append(ve.args[0])
@@ -215,15 +215,15 @@ def create_election_wabstic_proporz(
     if not create_compound:
         return errors
 
-    compound = dict(
-        id=normalize_for_url(compound_title),
-        title_translations={request.locale: compound_title},
-        shortcode=compound_shortcode,
-        date=elections[0]['date'],
-        domain='canton',
-        domain_elections=domain,
-        pukelsheim=pukelsheim
-    )
+    compound = {
+        'id': normalize_for_url(compound_title),
+        'title_translations': {request.locale: compound_title},
+        'shortcode': compound_shortcode,
+        'date': elections[0]['date'],
+        'domain': 'canton',
+        'domain_elections': domain,
+        'pukelsheim': pukelsheim
+    }
 
     session.add(ElectionCompound(**compound))
     session.flush()
@@ -231,10 +231,10 @@ def create_election_wabstic_proporz(
     # create associations
     session.bulk_insert_mappings(
         ElectionCompoundAssociation, (
-            dict(
-                election_compound_id=compound['id'],
-                election_id=election['id']
-            ) for election in elections
+            {
+                'election_compound_id': compound['id'],
+                'election_id': election['id']
+            } for election in elections
         )
     )
 
@@ -532,31 +532,31 @@ def import_election_wabstic_proporz(
             if subconnection:
                 parent_id = added_connections.setdefault(
                     (connection, None),
-                    dict(
-                        id=uuid4(),
-                        election_id=election_id,
-                        connection_id=connection
-                    )
+                    {
+                        'id': uuid4(),
+                        'election_id': election_id,
+                        'connection_id': connection
+                    }
                 )['id']
 
             connection_id = added_connections.setdefault(
                 (connection, subconnection),
-                dict(
-                    id=uuid4(),
-                    election_id=election_id,
-                    parent_id=parent_id,
-                    connection_id=subconnection or connection,
-                )
+                {
+                    'id': uuid4(),
+                    'election_id': election_id,
+                    'parent_id': parent_id,
+                    'connection_id': subconnection or connection,
+                }
             )['id']
 
-        added_lists[list_id] = dict(
-            id=uuid4(),
-            election_id=election_id,
-            list_id=list_id,
-            name=name,
-            number_of_mandates=number_of_mandates,
-            connection_id=connection_id
-        )
+        added_lists[list_id] = {
+            'id': uuid4(),
+            'election_id': election_id,
+            'list_id': list_id,
+            'name': name,
+            'number_of_mandates': number_of_mandates,
+            'connection_id': connection_id
+        }
 
     # Parse the list results
     added_list_results = {}
@@ -652,14 +652,14 @@ def import_election_wabstic_proporz(
             )
             continue
 
-        added_candidates[candidate_id] = dict(
-            id=uuid4(),
-            election_id=election_id,
-            candidate_id=candidate_id,
-            family_name=family_name,
-            first_name=first_name,
-            list_id=added_lists[list_id]['id']
-        )
+        added_candidates[candidate_id] = {
+            'id': uuid4(),
+            'election_id': election_id,
+            'candidate_id': candidate_id,
+            'family_name': family_name,
+            'first_name': first_name,
+            'list_id': added_lists[list_id]['id']
+        }
 
     # parse the candidate results (elected)
     for line in wp_kandidaten.lines:
@@ -778,32 +778,35 @@ def import_election_wabstic_proporz(
     session.bulk_insert_mappings(
         ElectionResult,
         (
-            dict(
-                id=result_uids[entity_id],
-                election_id=election_id,
-                name=added_entities[entity_id]['name'],
-                district=added_entities[entity_id]['district'],
-                superregion=added_entities[entity_id]['superregion'],
-                entity_id=entity_id,
-                counted=added_entities[entity_id]['counted'],
-                eligible_voters=added_entities[entity_id]['eligible_voters'],
-                received_ballots=added_entities[entity_id]['received_ballots'],
-                blank_ballots=added_entities[entity_id]['blank_ballots'],
-                invalid_ballots=added_entities[entity_id]['invalid_ballots'],
-                blank_votes=added_entities[entity_id]['blank_votes'],
-            )
+            {
+                'id': result_uids[entity_id],
+                'election_id': election_id,
+                'name': added_entities[entity_id]['name'],
+                'district': added_entities[entity_id]['district'],
+                'superregion': added_entities[entity_id]['superregion'],
+                'entity_id': entity_id,
+                'counted': added_entities[entity_id]['counted'],
+                'eligible_voters':
+                    added_entities[entity_id]['eligible_voters'],
+                'received_ballots':
+                    added_entities[entity_id]['received_ballots'],
+                'blank_ballots': added_entities[entity_id]['blank_ballots'],
+                'invalid_ballots':
+                    added_entities[entity_id]['invalid_ballots'],
+                'blank_votes': added_entities[entity_id]['blank_votes'],
+            }
             for entity_id in added_results
         )
     )
     session.bulk_insert_mappings(
         CandidateResult,
         (
-            dict(
-                id=uuid4(),
-                election_result_id=result_uids[entity_id],
-                votes=votes,
-                candidate_id=added_candidates[candidate_id]['id']
-            )
+            {
+                'id': uuid4(),
+                'election_result_id': result_uids[entity_id],
+                'votes': votes,
+                'candidate_id': added_candidates[candidate_id]['id']
+            }
             for entity_id in added_results
             for candidate_id, votes in added_results[entity_id].items()
         )
@@ -811,12 +814,12 @@ def import_election_wabstic_proporz(
     session.bulk_insert_mappings(
         ListResult,
         (
-            dict(
-                id=uuid4(),
-                election_result_id=result_uids[entity_id],
-                votes=votes,
-                list_id=added_lists[list_id]['id']
-            )
+            {
+                'id': uuid4(),
+                'election_result_id': result_uids[entity_id],
+                'votes': votes,
+                'list_id': added_lists[list_id]['id']
+            }
             for entity_id in added_results
             for list_id, votes in added_list_results[entity_id].items()
             if list_id != '999'
@@ -843,15 +846,15 @@ def import_election_wabstic_proporz(
             if district != election.domain_segment:
                 continue
         result_inserts.append(
-            dict(
-                id=uuid4(),
-                election_id=election_id,
-                name=name,
-                district=district,
-                superregion=superregion,
-                entity_id=entity_id,
-                counted=False
-            )
+            {
+                'id': uuid4(),
+                'election_id': election_id,
+                'name': name,
+                'district': district,
+                'superregion': superregion,
+                'entity_id': entity_id,
+                'counted': False
+            }
         )
     session.bulk_insert_mappings(ElectionResult, result_inserts)
 

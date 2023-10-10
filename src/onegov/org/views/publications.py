@@ -55,7 +55,7 @@ def view_publications(self, request, layout=None):
         File.name,
         File.stats,
         File.created.op('AT TIME ZONE')(
-            literal(layout.timezone.zone)
+            literal(layout.timezone.zone)  # noqa: MS001
         ).label('created'),
     ).order_by(desc(File.created))
 
@@ -65,7 +65,7 @@ def view_publications(self, request, layout=None):
     # group the publications by months, while merging empty months
     today = layout.today()
     grouped = OrderedDict()
-    spool = tuple()
+    spool = ()
 
     def apply_spool(spool):
         if spool:
@@ -76,7 +76,7 @@ def view_publications(self, request, layout=None):
 
             grouped[label] = None
 
-        return tuple()
+        return ()
 
     for ix, publications_ in enumerate(reversed(publications)):
         month = 12 - ix

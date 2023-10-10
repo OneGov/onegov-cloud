@@ -321,7 +321,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def contact(self):
         contact_config = tuple(
             as_internal_id(name) for name in
-            self.display_config.get('contact', tuple())
+            self.display_config.get('contact', ())
         )
 
         if contact_config:
@@ -343,7 +343,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def content_fields(self):
         content_config = {
             as_internal_id(k)
-            for k in self.display_config.get('content', tuple())
+            for k in self.display_config.get('content', ())
         }
 
         if content_config:
@@ -358,7 +358,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
     def hidden_label_fields(self):
         return {
             as_internal_id(k)
-            for k in self.display_config.get('content_hide_labels', tuple())
+            for k in self.display_config.get('content_hide_labels', ())
         }
 
 

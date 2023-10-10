@@ -65,7 +65,7 @@ class ElectionCompoundCollection(ElectionCompoundCollectionPagination):
         query = query(distinct(year))
         query = query.order_by(desc(year))
 
-        return list(r[0] for r in query.all())
+        return [year for year, in query]
 
     def by_date(self, date):
         """ Returns the election compounds on the given date. """

@@ -62,10 +62,10 @@ def update_votes(self, request, form):
         missing = set()
         for vote in self.query():
             for policy_area in vote.policy_areas:
-                missing |= set(
+                missing |= {
                     path for path in policy_area.label_path
                     if not isinstance(path, TranslationString)
-                )
+                }
         if missing:
             request.message(
                 _(

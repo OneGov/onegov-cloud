@@ -175,7 +175,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def top_navigation(self):
 
         def yield_children(page):
-            children = tuple()
+            children = ()
             if not isinstance(page, News):
                 children = tuple(
                     yield_children(p)
@@ -696,8 +696,8 @@ class TicketLayout(DefaultLayout):
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
                 links = self.model.handler.get_links(self.request)
-                assert len(links) <= 2, """
-                    Models are limited to two model-specific links. Usually
+                assert len(links) <= 3, """
+                    Models are limited to three model-specific links. Usually
                     a primary single link and a link group containing the
                     other links.
                 """
@@ -2301,15 +2301,15 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
         if not self.request.is_logged_in:
             return {}
         if self.request.is_manager:
-            return dict(
-                published_only=_('Published'),
-                upcoming_only=_("Upcoming"),
-                past_only=_("Past"),
-            )
-        return dict(
-            published_only=_('Published'),
-            past_only=_("Past"),
-        )
+            return {
+                'published_only': _('Published'),
+                'upcoming_only': _("Upcoming"),
+                'past_only': _("Past"),
+            }
+        return {
+            'published_only': _('Published'),
+            'past_only': _("Past"),
+        }
 
     @property
     def publication_filter_title(self):

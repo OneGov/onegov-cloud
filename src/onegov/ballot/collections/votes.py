@@ -57,7 +57,7 @@ class VoteCollection(VoteCollectionPagination):
         query = query(distinct(year))
         query = query.order_by(desc(year))
 
-        return list(r[0] for r in query.all())
+        return [year for year, in query]
 
     def by_date(self, date):
         """ Returns the votes on the given date. """

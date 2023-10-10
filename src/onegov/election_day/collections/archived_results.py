@@ -53,7 +53,7 @@ class ArchivedResultCollection:
         query = query(distinct(year))
         query = query.order_by(desc(year))
 
-        return list(r[0] for r in query.all())
+        return [year for year, in query]
 
     def group_items(self, items, request):
         """ Groups a list of archived results.

@@ -43,5 +43,5 @@ class UploadRestForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES | ALLOWED_MIME_TYPES_XML),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
