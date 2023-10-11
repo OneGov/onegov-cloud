@@ -1,14 +1,14 @@
 import json
 import os
 
-from onegov.election_day.utils.sms_processor import SmsQueueProcessor
+from onegov.core.sms_processor import SmsQueueProcessor
 from pytest import raises
 from unittest.mock import Mock
 
 
-def test_sms_queue_processor(election_day_app_zg, temporary_directory):
+def test_sms_queue_processor(temporary_directory):
     sms_path = os.path.join(
-        temporary_directory, 'sms', election_day_app_zg.schema
+        temporary_directory, 'sms', 'onegov_town6-meggen'
     )
     os.makedirs(sms_path)
 
@@ -70,9 +70,9 @@ def test_sms_queue_processor(election_day_app_zg, temporary_directory):
     ]
 
 
-def test_sms_queue_processor_failed(election_day_app_zg, temporary_directory):
+def test_sms_queue_processor_failed(temporary_directory):
     sms_path = os.path.join(
-        temporary_directory, 'sms', election_day_app_zg.schema
+        temporary_directory, 'sms', 'onegov_town6-meggen'
     )
     os.makedirs(sms_path)
 

@@ -9,8 +9,8 @@
 """
 
 import errno
-import json
 import logging
+import json
 import os
 import pycurl
 import stat
@@ -19,7 +19,13 @@ import time
 from io import BytesIO
 
 
-log = logging.getLogger('onegov.election_day')
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from onegov.core.types import JSON_ro
+
+
+log = logging.getLogger('onegov.core')
 
 
 # The below diagram depicts the operations performed while sending a message.
@@ -84,11 +90,17 @@ MAX_SEND_TIME = 60 * 60 * 3
 
 class SmsQueueProcessor:
 
-    def __init__(self, path, username, password, originator=None):
+    def __init__(
+        self,
+        path: str,
+        username: str,
+        password: str,
+        originator: str | None = None
+    ):
         self.path = path
         self.username = username
         self.password = password
-        self.originator = originator or "OneGov"
+        self.originator = originator or 'OneGov'
 
         # Keep a pycurl object around, to use HTTP keep-alive - though pycurl
         # is much worse in terms of it's API, the performance is *much* better
@@ -100,7 +112,7 @@ class SmsQueueProcessor:
         self.curl.setopt(pycurl.HTTPHEADER, ['Content-Type:application/json'])
         self.curl.setopt(pycurl.POST, 1)
 
-    def split(self, filename):
+    def split(self, filename: str) -> tuple[str, str, str]:
         """ Returns the path, the name and the suffix of the given path. """
 
         if '/' in filename:
@@ -116,7 +128,7 @@ class SmsQueueProcessor:
 
         return path, name, suffix
 
-    def message_files(self):
+    def message_files(self) -> tuple[str, ...]:
         """ Returns a tuple of full paths that need processing.
 
         The file names in the directory usually look like this:
@@ -135,7 +147,7 @@ class SmsQueueProcessor:
 
         for f in os.scandir(self.path):
 
-            if not f.is_file:
+            if not f.is_file():
                 continue
 
             # ignore .sending- .rejected-  files
@@ -148,7 +160,11 @@ class SmsQueueProcessor:
 
         return tuple(os.path.join(self.path, f.name) for f in files)
 
-    def send(self, numbers, content):
+    def send(
+        self,
+        numbers: 'Sequence[str]',
+        content: str
+    ) -> dict[str, Any] | None:
         """ Sends the SMS and returns the API response on error.
 
             On success this returns None.
@@ -170,7 +186,7 @@ class SmsQueueProcessor:
             return result
         return None
 
-    def send_request(self, parameters):
+    def send_request(self, parameters: 'JSON_ro') -> tuple[int, str]:
         """ Performes the API request using the given parameters. """
 
         body = BytesIO()
@@ -182,11 +198,15 @@ class SmsQueueProcessor:
         code = self.curl.getinfo(pycurl.RESPONSE_CODE)
 
         body.seek(0)
-        body = body.read().decode('utf-8')
+        body_str = body.read().decode('utf-8')
 
-        return code, body
+        return code, body_str
 
-    def parse(self, filename):
+    def parse(
+        self,
+        filename: str
+    ) -> tuple[tuple[str, ...] | None, str | None]:
+
         with open(filename) as f:
             try:
                 data = json.loads(f.read())
@@ -213,11 +233,11 @@ class SmsQueueProcessor:
 
         return receivers, content
 
-    def send_messages(self):
+    def send_messages(self) -> None:
         for filename in self.message_files():
             self.send_message(filename)
 
-    def send_message(self, filename):
+    def send_message(self, filename: str) -> None:
         head, tail = os.path.split(filename)
         tmp_filename = os.path.join(head, f'.sending-{tail}')
         rejected_filename = os.path.join(head, f'.rejected-{tail}')
