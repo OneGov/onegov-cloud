@@ -49,6 +49,10 @@ a > h6 {
     display: none;
 }
 
+.event-settings {
+    display: none;
+}
+
 /*
     registration on homepage
 */
@@ -3308,3 +3312,4 @@ li.unpaid {
 .visually-hidden {
     @include element-invisible;
 }
+

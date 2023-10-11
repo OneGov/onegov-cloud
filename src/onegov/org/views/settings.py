@@ -309,7 +309,7 @@ def handle_link_health_check(self, request, form, layout=None):
 @OrgApp.form(
     model=Organisation, name='event-settings', template='form.pt',
     permission=Secret, form=EventSettingsForm, setting=_("Events"),
-    icon='fa-calendar-alt', order=-700)
+    icon='fa-calendar', order=-700)
 def handle_event_settings(self, request, form, layout=None):
     return handle_generic_settings(self, request, form, _("Events"), layout)
 
