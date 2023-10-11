@@ -46,3 +46,13 @@ wtforms.fields.simple.TextAreaField.widget
 # of UnboundField.kwargs before the field actually gets constructed
 # so we have to ignore __init__ being inconsistent for all Field classes
 wtforms\.(fields\.)?([a-z]+\.)?([A-Z][a-z]+)?Field(List)?\.__init__
+
+
+# FIXME: WTforms 3.1
+wtforms.fields.datetime.WeekField
+wtforms.fields.simple.ColorField
+wtforms.validators.Disabled
+wtforms.validators.ReadOnly
+wtforms.validators.URL.__init__
+wtforms.validators.disabled
+wtforms.validators.readonly

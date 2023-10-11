@@ -88,7 +88,7 @@ _T = TypeVar('_T')
 # This should be in more.webassets:
 # https://github.com/morepath/more.webassets/blob/master/more/webassets/core.py#L55
 if not WebassetsApp.dectate._directives[0][0].kw:
-    from morepath.core import excview_tween_factory  # type:ignore[import]
+    from morepath.core import excview_tween_factory  # type:ignore
     WebassetsApp.dectate._directives[0][0].kw['over'] = excview_tween_factory
 
 
