@@ -17,10 +17,6 @@
         }
     }
 
-    .orbit-container * {
-        height: 100%;
-        max-height: 100%;
-    }
 
     .homepage-video {
         max-height: 60vh;
@@ -92,6 +88,18 @@
             position: absolute;
             right: 0;
             top: 0;
+        }
+
+        .orbit-image {
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: absolute;
+        }
+
+        .orbit-container * {
+            height: 100%;
+            max-height: 100%;
         }
     }
 
