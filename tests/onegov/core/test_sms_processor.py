@@ -1,14 +1,16 @@
 import json
 import os
 
-from onegov.election_day.utils.sms_processor import SmsQueueProcessor
+from onegov.core.framework import Framework
+from onegov.core.sms_processor import SmsQueueProcessor
+from onegov.core.sms_processor import get_sms_queue_processor
 from pytest import raises
 from unittest.mock import Mock
 
 
-def test_sms_queue_processor(election_day_app_zg, temporary_directory):
+def test_sms_queue_processor(temporary_directory):
     sms_path = os.path.join(
-        temporary_directory, 'sms', election_day_app_zg.schema
+        temporary_directory, 'sms', 'onegov_town6-meggen'
     )
     os.makedirs(sms_path)
 
@@ -70,9 +72,9 @@ def test_sms_queue_processor(election_day_app_zg, temporary_directory):
     ]
 
 
-def test_sms_queue_processor_failed(election_day_app_zg, temporary_directory):
+def test_sms_queue_processor_failed(temporary_directory):
     sms_path = os.path.join(
-        temporary_directory, 'sms', election_day_app_zg.schema
+        temporary_directory, 'sms', 'onegov_town6-meggen'
     )
     os.makedirs(sms_path)
 
@@ -113,3 +115,49 @@ def test_sms_queue_processor_send():
     processor.send_request.return_value = (
         200, '{"StatusInfo": "OK", "StatusCode": "1"}')
     assert processor.send(['1234'], 'content') == None
+
+
+def test_get_sms_queue_processor(tmpdir):
+    smsdir = tmpdir.mkdir('sms')
+    schemadir = str(smsdir.join('test'))
+    app = Framework()
+    app.schema = 'test'
+    app.application_id = 'test'
+    app.sms = {}
+    app.sms_directory = None
+    assert get_sms_queue_processor(app) is None
+
+    app.sms_directory = app.sms['directory'] = smsdir
+    assert get_sms_queue_processor(app) is None
+    assert get_sms_queue_processor(app, missing_path_ok=True) is None
+
+    app.sms['user'] = 'shared'
+    app.sms['password'] = 'sharedpw'
+
+    assert get_sms_queue_processor(app) is None
+    qp = get_sms_queue_processor(app, missing_path_ok=True)
+    assert qp.path == os.path.abspath(schemadir)
+    assert qp.username == 'shared'
+    assert qp.password == 'sharedpw'
+    assert qp.originator == 'OneGov'
+
+    app.sms['originator'] = 'shared'
+    app.sms['tenants'] = {
+        'test': {
+            'user': 'test',
+            'password': 'testpw'
+        }
+    }
+    qp = get_sms_queue_processor(app, missing_path_ok=True)
+    assert qp.path == os.path.abspath(schemadir)
+    assert qp.username == 'test'
+    assert qp.password == 'testpw'
+    assert qp.originator == 'shared'
+
+    app.sms['tenants']['test']['originator'] = 'test'
+    smsdir.mkdir('test')
+    qp = get_sms_queue_processor(app)
+    assert qp.path == os.path.abspath(schemadir)
+    assert qp.username == 'test'
+    assert qp.password == 'testpw'
+    assert qp.originator == 'test'
