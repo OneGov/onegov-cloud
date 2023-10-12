@@ -123,19 +123,16 @@ def test_get_sms_queue_processor(tmpdir):
     app = Framework()
     app.schema = 'test'
     app.application_id = 'test'
-    app.sms_directory = None
-    app.sms_user = None
-    app.sms_password = None
-    app.sms_originator = None
     app.sms = {}
+    app.sms_directory = None
     assert get_sms_queue_processor(app) is None
 
-    app.sms_directory = smsdir
+    app.sms_directory = app.sms['directory'] = smsdir
     assert get_sms_queue_processor(app) is None
     assert get_sms_queue_processor(app, missing_path_ok=True) is None
 
-    app.sms_user = 'shared'
-    app.sms_password = 'sharedpw'
+    app.sms['user'] = 'shared'
+    app.sms['password'] = 'sharedpw'
 
     assert get_sms_queue_processor(app) is None
     qp = get_sms_queue_processor(app, missing_path_ok=True)
@@ -144,11 +141,12 @@ def test_get_sms_queue_processor(tmpdir):
     assert qp.password == 'sharedpw'
     assert qp.originator == 'OneGov'
 
-    app.sms_originator = 'shared'
-    app.sms['test'] = {
-        'user': 'test',
-        'password': 'testpw',
-        'originator': None
+    app.sms['originator'] = 'shared'
+    app.sms['tenants'] = {
+        'test': {
+            'user': 'test',
+            'password': 'testpw'
+        }
     }
     qp = get_sms_queue_processor(app, missing_path_ok=True)
     assert qp.path == os.path.abspath(schemadir)
@@ -156,7 +154,7 @@ def test_get_sms_queue_processor(tmpdir):
     assert qp.password == 'testpw'
     assert qp.originator == 'shared'
 
-    app.sms['test']['originator'] = 'test'
+    app.sms['tenants']['test']['originator'] = 'test'
     smsdir.mkdir('test')
     qp = get_sms_queue_processor(app)
     assert qp.path == os.path.abspath(schemadir)

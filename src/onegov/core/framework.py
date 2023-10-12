@@ -554,37 +554,13 @@ class Framework(
     def configure_sms(
         self,
         *,
-        sms_directory: str | None = None,
-        sms_user: str | None = None,
-        sms_password: str | None = None,
-        sms_originator: str | None = None,
+        sms_directory: str | None = None,  # deprecated
+        sms: dict[str, Any] | None = None,
         **cfg: Any
     ) -> None:
 
-        self.sms_directory = sms_directory
-
-        if sms_user is not None:
-            # specifying a user without password should be an error
-            assert sms_password is not None
-
-        # these are usually specified per tenant
-        # but they may also be shared per application
-        self.sms_user = sms_user
-        self.sms_password = sms_password
-        self.sms_originator = sms_originator
-
-        # so we also keep track of tenant specific configuration
-        self.sms = {
-            tenant_id: {
-                'user': user,
-                # specifying a user without password should be an error
-                'password': tcfg['sms_password'],
-                'originator': tcfg.get('sms_originator')
-            }
-            for tenant_id, tcfg in cfg.get('tenants', {}).items()
-            # FIXME: Maybe we want to allow specifying only an originator?
-            if (user := tcfg.get('sms_user'))
-        }
+        self.sms = sms or {'directory': sms_directory}
+        self.sms_directory = self.sms['directory']
 
     def configure_hipchat(
         self,
@@ -1132,10 +1108,18 @@ class Framework(
         if not self.sms_directory:
             return False
 
-        if self.sms_user:
+        if self.sms.get('user'):
             return True
 
-        return self.application_id in self.sms or self.namespace in self.sms
+        tenants = self.sms.get('tenants', None)
+        if tenants is None:
+            return False
+
+        cfg = tenants.get(self.application_id)
+        if cfg is None:
+            cfg = tenants.get(self.namespace)
+
+        return cfg is not None and cfg.get('user')
 
     def send_sms(
         self,

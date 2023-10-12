@@ -375,14 +375,15 @@ def get_sms_queue_processor(
     if not app.can_deliver_sms:
         return None
 
-    username = app.sms_user
-    password = app.sms_password
-    originator = app.sms_originator
-    sms = app.sms.get(app.application_id, app.sms.get(app.namespace))
+    username = app.sms.get('user')
+    password = app.sms.get('password')
+    originator = app.sms.get('originator')
+    tenants = app.sms.get('tenants', {})
+    sms = tenants.get(app.application_id, tenants.get(app.namespace))
     if sms is not None:
-        username = sms['user']
-        password = sms['password']
-        originator = sms['originator'] or originator
+        username = sms.get('user', username)
+        password = sms.get('password', password)
+        originator = sms.get('originator', originator)
     elif username is None:
         return None
 

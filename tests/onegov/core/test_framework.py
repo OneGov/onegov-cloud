@@ -1059,53 +1059,6 @@ def test_send_marketing_email_batch_illegal_category(tmpdir):
         app.send_marketing_email_batch(mails)
 
 
-def test_configure_sms():
-    app = Framework()
-    app.configure_sms(**{'sms_directory': '/tmp'})
-    assert app.sms_directory == '/tmp'
-    assert app.sms_user is None
-    assert app.sms_password is None
-    assert app.sms_originator is None
-    assert app.sms == {}
-
-    app.configure_sms(**{
-        'sms_directory': '/tmp',
-        'sms_user': 'shared',
-        'sms_password': 'sharedpw',
-        'sms_originator': 'OneGov',
-        'tenants': {
-            'test': {
-                'sms_user': 'test',
-                'sms_password': 'testpw'
-            },
-            'no_sms': {}
-        }
-    })
-    assert app.sms_directory == '/tmp'
-    assert app.sms_user == 'shared'
-    assert app.sms_password == 'sharedpw'
-    assert app.sms_originator == 'OneGov'
-    assert app.sms == {
-        'test': {
-            'user': 'test',
-            'password': 'testpw',
-            'originator': None
-        }
-    }
-
-    with pytest.raises(AssertionError):
-        # user without password is an error
-        app.configure_sms(**{'sms_user': 'shared'})
-
-    with pytest.raises(KeyError):
-        # same for tenants
-        app.configure_sms(**{
-            'tenants': {
-                'test': {'sms_user': 'test'}
-            }
-        })
-
-
 def test_send_sms(tmpdir):
     smsdir = tmpdir.mkdir('sms')
     app = Framework()
