@@ -22,6 +22,7 @@ from io import BytesIO
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from onegov.core.framework import Framework
     from onegov.core.types import JSON_ro
 
 
@@ -364,3 +365,37 @@ class SmsQueueProcessor:
             else:
                 # something bad happened, log it
                 raise
+
+
+def get_sms_queue_processor(
+    app: 'Framework',
+    missing_path_ok: bool = False
+) -> SmsQueueProcessor | None:
+
+    if not app.can_deliver_sms:
+        return None
+
+    username = app.sms_user
+    password = app.sms_password
+    originator = app.sms_originator
+    sms = app.sms.get(app.application_id, app.sms.get(app.namespace))
+    if sms is not None:
+        username = sms['user']
+        password = sms['password']
+        originator = sms['originator'] or originator
+    elif username is None:
+        return None
+
+    assert app.sms_directory
+    assert username is not None and password is not None
+    path = os.path.join(app.sms_directory, app.schema)
+    path = os.path.abspath(path)
+    if missing_path_ok or os.path.exists(path):
+        return SmsQueueProcessor(
+            path,
+            username,
+            password,
+            originator
+        )
+
+    return None

@@ -576,13 +576,14 @@ class Framework(
         # so we also keep track of tenant specific configuration
         self.sms = {
             tenant_id: {
-                'user': sms_user,
+                'user': user,
                 # specifying a user without password should be an error
                 'password': tcfg['sms_password'],
                 'originator': tcfg.get('sms_originator')
             }
             for tenant_id, tcfg in cfg.get('tenants', {}).items()
-            if (sms_user := tcfg.get('sms_user'))
+            # FIXME: Maybe we want to allow specifying only an originator?
+            if (user := tcfg.get('sms_user'))
         }
 
     def configure_hipchat(

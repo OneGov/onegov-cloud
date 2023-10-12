@@ -1,7 +1,9 @@
 import json
 import os
 
+from onegov.core.framework import Framework
 from onegov.core.sms_processor import SmsQueueProcessor
+from onegov.core.sms_processor import get_sms_queue_processor
 from pytest import raises
 from unittest.mock import Mock
 
@@ -113,3 +115,51 @@ def test_sms_queue_processor_send():
     processor.send_request.return_value = (
         200, '{"StatusInfo": "OK", "StatusCode": "1"}')
     assert processor.send(['1234'], 'content') == None
+
+
+def test_get_sms_queue_processor(tmpdir):
+    smsdir = tmpdir.mkdir('sms')
+    schemadir = str(smsdir.join('test'))
+    app = Framework()
+    app.schema = 'test'
+    app.application_id = 'test'
+    app.sms_directory = None
+    app.sms_user = None
+    app.sms_password = None
+    app.sms_originator = None
+    app.sms = {}
+    assert get_sms_queue_processor(app) is None
+
+    app.sms_directory = smsdir
+    assert get_sms_queue_processor(app) is None
+    assert get_sms_queue_processor(app, missing_path_ok=True) is None
+
+    app.sms_user = 'shared'
+    app.sms_password = 'sharedpw'
+
+    assert get_sms_queue_processor(app) is None
+    qp = get_sms_queue_processor(app, missing_path_ok=True)
+    assert qp.path == os.path.abspath(schemadir)
+    assert qp.username == 'shared'
+    assert qp.password == 'sharedpw'
+    assert qp.originator == 'OneGov'
+
+    app.sms_originator = 'shared'
+    app.sms['test'] = {
+        'user': 'test',
+        'password': 'testpw',
+        'originator': None
+    }
+    qp = get_sms_queue_processor(app, missing_path_ok=True)
+    assert qp.path == os.path.abspath(schemadir)
+    assert qp.username == 'test'
+    assert qp.password == 'testpw'
+    assert qp.originator == 'shared'
+
+    app.sms['test']['originator'] = 'test'
+    smsdir.mkdir('test')
+    qp = get_sms_queue_processor(app)
+    assert qp.path == os.path.abspath(schemadir)
+    assert qp.username == 'test'
+    assert qp.password == 'testpw'
+    assert qp.originator == 'test'

@@ -13,11 +13,12 @@ from fnmatch import fnmatch
 from onegov.core import log
 from onegov.core.cache import lru_cache
 from onegov.core.cli.core import (
-    command_group, pass_group_context, abort, run_processors)
+    abort, command_group, pass_group_context, run_processors)
 from onegov.core.crypto import hash_password
 from onegov.core.mail_processor import PostmarkMailQueueProcessor
 from onegov.core.mail_processor import SMTPMailQueueProcessor
 from onegov.core.sms_processor import SmsQueueProcessor
+from onegov.core.sms_processor import get_sms_queue_processor
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
 from onegov.core.upgrade import get_upgrade_modules
@@ -150,40 +151,6 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
     else:
         click.echo(f'Unknown mailer {mailer} specified in config.', err=True)
         sys.exit(1)
-
-
-def get_sms_queue_processor(
-    app: 'Framework',
-    missing_path_ok: bool = False
-) -> SmsQueueProcessor | None:
-    if not app.can_deliver_sms:
-        return None
-
-    username = app.sms_user
-    password = app.sms_password
-    originator = app.sms_originator
-    if username is None:
-        sms = app.sms.get(app.application_id, app.sms.get(app.namespace))
-        if sms is None:
-            return None
-
-        username = sms['user']
-        password = sms['password']
-        originator = sms['originator'] or originator
-
-    assert app.sms_directory
-    assert password is not None
-    path = os.path.join(app.sms_directory, app.schema)
-    path = os.path.abspath(path)
-    if missing_path_ok or os.path.exists(path):
-        return SmsQueueProcessor(
-            path,
-            username,
-            password,
-            originator
-        )
-
-    return None
 
 
 @cli.group(context_settings={
