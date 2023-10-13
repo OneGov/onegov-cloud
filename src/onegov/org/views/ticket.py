@@ -772,6 +772,11 @@ def view_ticket_files(self, request):
             except IOError:
                 not_existing.append(f.name)
 
+        pdf = TicketPdf.from_ticket(request, self)
+        pdf_filename = '{}_{}.pdf'.format(normalize_for_url(self.number),
+                                          date.today().strftime('%Y%m%d'))
+        zipf.writestr(pdf_filename, pdf.read())
+
     if not_existing:
         count = len(not_existing)
         request.alert(_(f"{count} file(s) not found:"

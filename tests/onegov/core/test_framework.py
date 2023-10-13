@@ -1059,6 +1059,61 @@ def test_send_marketing_email_batch_illegal_category(tmpdir):
         app.send_marketing_email_batch(mails)
 
 
+def test_send_sms(tmpdir):
+    smsdir = tmpdir.mkdir('sms')
+    app = Framework()
+    app.sms_directory = smsdir
+    app.schema = 'test'
+
+    app.send_sms('+41791112233', 'text')
+    transaction.commit()
+
+    path = os.path.join(smsdir, 'test')
+    sms = os.listdir(path)
+    assert len(sms) == 1
+    assert sms[0].startswith('0.1.')
+
+    with open(os.path.join(path, sms[0])) as file:
+        data = json.loads(file.read())
+        assert data['receivers'] == ['+41791112233']
+        assert data['content'] == 'text'
+
+
+def test_send_sms_batch(tmpdir):
+    smsdir = tmpdir.mkdir('sms')
+    app = Framework()
+    app.sms_directory = smsdir
+    app.schema = 'test'
+
+    app.send_sms(
+        [f'+4179111{digits}' for digits in range(1000, 3700)],
+        'text'
+    )
+    transaction.commit()
+
+    path = os.path.join(smsdir, 'test')
+    sms = sorted(os.listdir(path))
+    assert len(sms) == 3
+    assert sms[0].startswith('0.1000.')
+    assert sms[1].startswith('1.1000.')
+    assert sms[2].startswith('2.700.')
+
+    with open(os.path.join(path, sms[0])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 1000
+        assert data['content'] == 'text'
+
+    with open(os.path.join(path, sms[1])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 1000
+        assert data['content'] == 'text'
+
+    with open(os.path.join(path, sms[2])) as file:
+        data = json.loads(file.read())
+        assert len(data['receivers']) == 700
+        assert data['content'] == 'text'
+
+
 def test_send_zulip(session):
     with patch('urllib.request.urlopen') as urlopen:
         app = Framework()
