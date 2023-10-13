@@ -262,22 +262,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         self.state = 'closed'
         self.user = user
 
-    def redact_ticket_data(self) -> None:
-        """ Redacts sensitive information from the ticket to protect personal
-        data.
-
-        In scenarios where complete deletion is not feasible, this method
-        serves as an alternative by masking sensitive information while
-        preserving the internal integrity of the system.
-
-        """
-
-        if self.state != 'archived':
-            raise InvalidStateChange()
-
-        self.snapshot = {}
-
-        # redact the handler data (todo)
 
     def create_snapshot(self, request: 'CoreRequest') -> None:
         """ Takes the current handler and stores the output of the summary
