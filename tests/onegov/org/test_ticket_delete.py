@@ -1,4 +1,8 @@
 import os
+import textwrap
+from webtest import Upload
+from onegov.file import FileCollection
+from onegov.form import FormCollection, FormSubmissionCollection
 from onegov.org.models.ticket import FormSubmissionHandler
 import transaction
 from datetime import datetime
@@ -118,6 +122,69 @@ def test_delete_ticket_without_submission(org_app, handlers):
     assert session.query(Ticket).filter_by(state='archived').count() == 2
     client.delete('/tickets-archive/ALL/delete')
     assert session.query(Ticket).filter_by(state='archived').count() == 0
+
+
+def test_files_from_ticket_form_submission_are_deleted(client):
+
+    form_submission_collection = FormCollection(client.app.session())
+    form_submission_collection.definitions.add(
+        'Statistics',
+        definition=textwrap.dedent(
+            """
+            E-Mail * = @@@
+            Name * = ___
+            Datei * = *.txt
+            Datei2 * = *.txt """
+        ),
+        type='custom',
+    )
+    transaction.commit()
+
+    client.login_admin()
+    page = client.get('/forms').click('Statistics')
+
+    page.form['name'] = 'foobar'
+    page.form['e_mail'] = 'foo@bar.ch'
+    page.form['datei'] = Upload('README1.txt', b'first')
+    page.form['datei2'] = Upload('README2.txt', b'second')
+
+    form_page = page.form.submit().follow()
+
+    assert 'README1.txt' in form_page.text
+    assert 'README2.txt' in form_page.text
+    assert 'Abschliessen' in form_page.text
+
+    form_page.form.submit()
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+
+    ticket_url = ticket_page.request.path
+    ticket_page.click('Ticket abschliessen').follow()
+
+    page = client.get('/')
+
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
+
+    ticket = client.get(ticket_url)
+    ticket.click('Ticket archivieren').follow()
+
+    session = client.app.session()
+    files = FileCollection(session).query().all()
+    assert len(files) == 2
+
+    # save the handler id for later
+    first_ticket = session.query(Ticket).one()
+    handler_id = first_ticket.handler.id
+
+    # delete archived, we expect this to also delete the associated files
+    client.delete('/tickets-archive/ALL/delete')
+    files = FileCollection(session).query().all()
+    assert len(files) == 0
+
+    form_submission = FormSubmissionCollection(session).by_id(handler_id)
+    assert form_submission is None
 
 
 def test_ticket_deleted_submission_is_resilient(client):

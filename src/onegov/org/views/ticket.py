@@ -1126,11 +1126,11 @@ def delete_messages_from_ticket(request: 'CoreRequest', number: str):
 
 def delete_files_and_submissions_from_ticket(request: 'CoreRequest',
                                              ticket: 'Ticket'):
-
-    if hasattr(ticket, 'submission') and ticket.submission is not None:
-        for file in ticket.submission.files:
+    submission = getattr(ticket.handler, 'submission', None)
+    if submission:
+        for file in submission.files:
             request.session.delete(file)
-        request.session.delete(ticket.submission)
+        request.session.delete(submission)
 
 
 @OrgApp.html(model=FindYourSpotCollection, name='tickets',
