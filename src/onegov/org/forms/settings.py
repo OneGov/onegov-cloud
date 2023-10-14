@@ -1093,10 +1093,16 @@ class EventSettingsForm(Form):
 class DataRetentionPolicyForm(Form):
     def __init__(self, *args, **kwargs):
         super(DataRetentionPolicyForm, self).__init__(*args, **kwargs)
-        self.relative_time_auto_archive.choices = list(self.generate_timespans())
-        self.relative_time_auto_delete.choices = list(self.generate_timespans())
+        self.relative_time_auto_archive.choices = list(
+            self.generate_timespans()
+        )
+        self.relative_time_auto_delete.choices = list(
+            self.generate_timespans()
+        )
 
-    def generate_timespans(self) -> 'Iterator[tuple[str | datetime, str]]':
+    def generate_timespans(self) -> (
+            'Iterator[tuple[str | datetime.datetime, str]]'
+    ):
         base_date = utcnow()
         yield '', _('Disabled')
         yield base_date + datetime.timedelta(days=180), _('6 months')
