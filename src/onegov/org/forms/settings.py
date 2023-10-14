@@ -1,11 +1,9 @@
 import datetime
 import json
 import re
-
 from functools import cached_property
 from lxml import etree
 from sedate import utcnow
-from wtforms import DateField
 from wtforms.fields import SelectField
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
@@ -16,7 +14,6 @@ from onegov.form.fields import CssField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.form.fields import TagsField
-from onegov.form.widgets import DateRangeInput
 from onegov.gever.encrypt import encrypt_symmetric
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -39,6 +36,12 @@ from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import ValidationError
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
@@ -1087,19 +1090,33 @@ class EventSettingsForm(Form):
     )
 
 
-class TicketDeletionForm(Form):
+class DataRetentionPolicyForm(Form):
+    def __init__(self, *args, **kwargs):
+        super(DataRetentionPolicyForm, self).__init__(*args, **kwargs)
+        self.relative_time_auto_archive.choices = list(self.generate_timespans())
+        self.relative_time_auto_delete.choices = list(self.generate_timespans())
 
-    """How long ticket should be kept before they are archived, and before
-    they are deleted."""
+    def generate_timespans(self) -> 'Iterator[tuple[str | datetime, str]]':
+        base_date = utcnow()
+        yield '', _('Disabled')
+        yield base_date + datetime.timedelta(days=180), _('6 months')
+        years = (
+            (
+                base_date + datetime.timedelta(days=365 * i),
+                _(f"{i} year{'s' if i > 1 else ''}"),
+            )
+            for i in range(1, 4)
+        )
+        yield from years
 
-    relative_time_for_auto_archive = SelectField(
-        label=_('The time span from ticket creation to archiving'),
-        choices=[
-            (utcnow() + datetime.timedelta(minutes=1), _("1 minute")),
-            # for test
-            (utcnow() + datetime.timedelta(days=180), _("6 months")),
-            (utcnow() + datetime.timedelta(days=365), _("1 year")),
-            (utcnow() + datetime.timedelta(days=730), ("2 years")),
-        ],
+
+    relative_time_auto_archive = SelectField(
+        label=_('Duration from opening a ticket to its automatic archival'),
+        default=_('Disabled')
+    )
+
+    relative_time_auto_delete = SelectField(
+        label=_('Duration from archived state until deleted automatically'),
+        default=_('Disabled')
     )
 
