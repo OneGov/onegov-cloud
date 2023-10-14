@@ -20,6 +20,7 @@ from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import URL
 
 
 def today():
@@ -123,4 +124,6 @@ class MissionReportVehicleForm(Form):
         ])
 
     website = URLField(
-        _("Website"))
+        _("Website"),
+        validators=[URL(), Optional()]
+    )

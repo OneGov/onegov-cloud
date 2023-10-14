@@ -12,6 +12,7 @@ from sqlalchemy import desc
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
 from onegov.ballot import Vote, Election, ElectionCompound
+from onegov.election_day.formats import export_internal
 
 
 from typing import TYPE_CHECKING
@@ -74,7 +75,7 @@ class ArchiveGenerator:
                     filename = item.id[: self.MAX_FILENAME_LENGTH] + ".csv"
                     combined_path = path.combine(year_dir, filename)
                     with self.temp_fs.open(combined_path, "w") as f:
-                        rows = item.export(sorted(self.app.locales))
+                        rows = export_internal(item, sorted(self.app.locales))
                         f.write(convert_list_of_dicts_to_csv(rows))
 
         # Additionally, create 'flat csv' containing all votes in a single file
@@ -89,7 +90,7 @@ class ArchiveGenerator:
     def get_all_rows_for_votes(self, votes):
         all_votes = []
         for v in votes:
-            vote_row = v.export(sorted(self.app.locales))
+            vote_row = export_internal(v, sorted(self.app.locales))
             all_votes.extend(vote_row)
         return all_votes
 

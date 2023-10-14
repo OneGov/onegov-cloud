@@ -4,7 +4,7 @@ import weakref
 
 from onegov.core.framework import Framework
 from onegov.core.orm import DB_CONNECTION_ERRORS
-from morepath.core import excview_tween_factory
+from morepath.core import excview_tween_factory  # type:ignore[import-untyped]
 from sentry_sdk.hub import Hub, _should_send_default_pii
 from sentry_sdk.integrations import Integration
 from sentry_sdk.integrations._wsgi_common import RequestExtractor
@@ -107,14 +107,13 @@ class OneGovCloudIntegration(Integration):
             return integration.with_wsgi_middleware
 
         # add a marker so Framework instances will add the wsgi middleware
-        Framework.with_sentry_middleware = property(with_sentry_middleware)
+        Framework.with_sentry_middleware = property(  # type:ignore
+            with_sentry_middleware
+        )
 
 
 class CoreRequestExtractor(RequestExtractor):
     request: 'CoreRequest'
-
-    def url(self) -> str:
-        return self.request.path_url
 
     def env(self) -> 'WSGIEnvironment':
         return self.request.environ
@@ -175,6 +174,11 @@ def _make_event_processor(
 
         with capture_internal_exceptions():
             CoreRequestExtractor(request).extract_into_event(event)
+            request_info = event.setdefault('request', {})
+            # we override what the base WSGIMiddleware does, since
+            # they don't take X_VHM_ROOT into account, so the url
+            # contains extra stuff we don't want
+            request_info['url'] = request.path_url
 
             app = request.app
             extra_info = event.setdefault('extra', {})

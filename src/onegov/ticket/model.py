@@ -262,7 +262,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         self.state = 'closed'
         self.user = user
 
-
     def create_snapshot(self, request: 'CoreRequest') -> None:
         """ Takes the current handler and stores the output of the summary
         as a snapshot.

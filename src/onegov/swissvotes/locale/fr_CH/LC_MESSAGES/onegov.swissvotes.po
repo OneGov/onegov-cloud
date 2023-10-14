@@ -74,11 +74,11 @@ msgstr "Initiative parlementaire"
 msgid "Parliamentary phase"
 msgstr "Au Parlement"
 
-msgid "Report of the parliamentary committee"
-msgstr "Rapport de la commission parlementaire"
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Rapport de la commission parlementaire (seulement dans Iv.Pa.)"
 
-msgid "Opinion of the Federal Council"
-msgstr "Avis du Conseil fédéral"
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Avis du Conseil fédéral (seulement dans Iv.Pa.)"
 
 msgid "Parliamentary debate"
 msgstr "Débat parlementaire"
@@ -89,7 +89,7 @@ msgstr "Brochure explicative officielle"
 msgid "Voting campaign"
 msgstr "Campagne"
 
-msgid "Explanatory brochure by Easyvote"
+msgid "Explanatory brochure by easyvote"
 msgstr "Brochure d’easyvote"
 
 msgid "Advertisment analysis"
@@ -1536,6 +1536,12 @@ msgstr "Lien Archives Sociales"
 msgid "Swissvotes database"
 msgstr "Base de données Swissvotes"
 
+msgid "Report of the parliamentary committee"
+msgstr "Rapport de la commission parlementaire"
+
+msgid "Opinion of the Federal Council"
+msgstr "Avis du Conseil fédéral"
+
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analyse APS des annonces de campagne"
 
@@ -1702,10 +1708,10 @@ msgid "Vote date"
 msgstr "Date de la votation"
 
 msgid "and ${number} out of ${total} votes of the Cantons"
-msgstr "et ${number} de ${total} voix des cantons"
+msgstr "et ${number} voix des cantons sur ${total}"
 
 msgid "% Yes votes"
-msgstr "% de votes favorables"
+msgstr "% de Oui"
 
 msgid "Vote number"
 msgstr "Votation n°"
@@ -1779,8 +1785,8 @@ msgstr "Lien département"
 msgid "Link federal office"
 msgstr "Lien office fédéral"
 
-msgid "Explainer video by Easyvote"
-msgstr "Vidéo explicative d’Easyvote"
+msgid "Explainer video by easyvote"
+msgstr "Vidéo explicative d’easyvote"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"

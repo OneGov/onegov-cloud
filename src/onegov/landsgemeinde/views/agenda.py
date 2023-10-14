@@ -24,12 +24,9 @@ def add_agenda_item(self, request, form):
 
     if form.submitted(request):
         agenda_item = self.add(**form.get_useful_data())
-        ensure_states(agenda_item)
-        update_ticker(
-            request,
-            agenda_item.assembly,
-            action='refresh'
-        )
+        updated = ensure_states(agenda_item)
+        updated.add(agenda_item.assembly)
+        update_ticker(request, updated)
         request.success(_("Added a new agenda item"))
 
         return redirect(request.link(agenda_item))
@@ -55,10 +52,12 @@ def add_agenda_item(self, request, form):
 def view_agenda_item(self, request):
 
     layout = AgendaItemLayout(self, request)
+    agenda_items = self.assembly.agenda_items
 
     return {
         'layout': layout,
         'agenda_item': self,
+        'agenda_items': agenda_items,
         'title': layout.title,
     }
 
@@ -74,13 +73,9 @@ def edit_agenda_item(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
-        ensure_states(self)
-        update_ticker(
-            request,
-            self.assembly,
-            agenda_item=self,
-            action='update'
-        )
+        updated = ensure_states(self)
+        updated.add(self)
+        update_ticker(request, updated)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
@@ -107,11 +102,7 @@ def delete_agenda_item(self, request):
 
     request.assert_valid_csrf_token()
 
-    update_ticker(
-        request,
-        self.assembly,
-        action='refresh'
-    )
+    update_ticker(request, {self.assembly})  # force refresh
 
     collection = AgendaItemCollection(request.session)
     collection.delete(self)

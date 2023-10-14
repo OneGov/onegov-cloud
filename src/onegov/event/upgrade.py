@@ -41,3 +41,13 @@ def migrate_coordinates_column(context):
 def validate_existing_rrules(context):
     for event in EventCollection(context.session).query():
         event.validate_recurrence('recurrence', event.recurrence)
+
+
+@upgrade_task('Add meta data and content columns to occurrences')
+def add_meta_data_and_content_columns_to_occurrences(context):
+    table = 'event_occurrences'
+    if not context.has_column(table, 'meta'):
+        context.operations.add_column(table, Column('meta', JSON()))
+
+    if not context.has_column(table, 'content'):
+        context.operations.add_column(table, Column('content', JSON()))

@@ -414,7 +414,7 @@ $globals-height: 2.5rem;
     }
 }
 
-#announcement_header {
+#header_announcement {
     padding: 1rem;
     text-align: center;
 
@@ -510,6 +510,14 @@ del {
     a {
         color: inherit;
     }
+}
+
+/*
+    Description for a blank (uncolored) label
+*/
+.blank-label-description {
+    font-size: 1.0rem;
+    display: block;
 }
 
 /*
@@ -1049,6 +1057,60 @@ form {
         background: $yellow-light;
         position: absolute;
     }
+
+    .file-preview-wrapper {
+        &:not(:empty) {
+            border: 1px solid $input-border-color;
+            padding: .5rem;
+            margin-bottom: 1rem;
+        }
+
+        .row {
+            /* FIXME:
+                temporary to ensure a somewhat reasonable display
+                within the form. Once this widget is more responsive
+                we may be able to get away with displaying this
+            */
+            .columns:first-child {
+                display: none;
+            }
+
+            .file-status {
+                margin-left: 0;
+                width: 66%;
+            }
+
+            .file-actions {
+                width: 33%;
+            }
+        }
+
+        .file-actions .button {
+            padding: 0.85em .15em !important;
+            margin-bottom: .5rem !important;
+
+            &.delete {
+                /* FIXME:
+                    the delete button does not work well, since we
+                    would need to remove the input after deletion
+                    in order to not cause any issues.
+
+                    All the actions assume a tabular layout, so
+                    we either need to change the widget to adhere
+                    to that layout or make the delete action more
+                    flexible, so we can specify which elements
+                    should be removed.
+
+                    The rename button also has a small issue, in
+                    that the name displayed above the file-preview-wrapper
+                    will not be updated currently, so that should
+                    be fixed as well, but it's not large enough of
+                    an issue to hide that button as well...
+                */
+                display: none;
+            }
+        }
+    }
     /*
     <--
     */
@@ -1365,7 +1427,7 @@ ul.panel-links {
 
 .side-panel {
     border: 1px solid $gray;
-    margin-bottom: 2rem;
+    padding-bottom: 2rem;
 
     h2,
     h3 {
@@ -1582,6 +1644,7 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 $pdf-icon: '\f1c1';
+$ticket-files-icon: '\f019';
 $qr-code-icon: '\f029';
 $envelope-icon: '\f0e0';
 $editbar-bg-color: $topbar-link-bg-hover;
@@ -1711,6 +1774,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
     .ticket-pdf::before { @include icon($pdf-icon); }
+    .ticket-files::before { @include icon($ticket-files-icon); }
     .new-daily-item::before { @include icon($new-daily-item-icon); }
     .new-resource-link::before { @include icon($new-resource-link-icon); }
     .qr-code-link::before { @include icon($qr-code-icon); }
@@ -3404,8 +3468,8 @@ button {
     margin-bottom: .5em;
 }
 
-.occurrence-tags,
 .occurrence-description {
+    margin-top: 1.25em;
     margin-bottom: 1.25em;
 }
 
@@ -6517,7 +6581,7 @@ a#results {
     }
 }
 
-#fieldset-header-links {
+#fieldset-header_links {
     .field-button {
         margin-top: 0 !important;
     }
@@ -6528,7 +6592,11 @@ a#results {
     }
 }
 
-#header-links {
+#fieldset-header-fixation {
+    display: none;
+}
+
+#header_links {
     .toggle-topbar {
         left: 0;
         right: 0;

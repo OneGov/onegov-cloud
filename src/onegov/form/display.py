@@ -90,7 +90,9 @@ class StringFieldRenderer(BaseRenderer):
         if field.render_kw:
             if field.render_kw.get('data-editor') == 'markdown':
                 # FIXME: This utility function should return Markup
-                return Markup(render_untrusted_markdown(field.data))
+                return Markup(  # noqa: MS001
+                    render_untrusted_markdown(field.data)
+                )
 
         return self.escape(str(field.data)).replace('\n', Markup('<br>'))
 
@@ -98,14 +100,14 @@ class StringFieldRenderer(BaseRenderer):
 @registry.register_for('PasswordField')
 class PasswordFieldRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
-        return Markup('*' * len(field.data))
+        return Markup('*' * len(field.data))  # noqa: MS001
 
 
 @registry.register_for('EmailField')
 class EmailFieldRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
         params = {'href': f'mailto:{field.data}'}
-        return Markup(
+        return Markup(  # noqa: MS001
             f'<a {html_params(**params)}>{{email}}</a>'
         ).format(email=field.data)
 
@@ -114,7 +116,7 @@ class EmailFieldRenderer(BaseRenderer):
 class URLFieldRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
         params = {'href': field.data}
-        return Markup(
+        return Markup(  # noqa: MS001
             f'<a {html_params(**params)}>{{url}}</a>'
         ).format(url=field.data)
 
@@ -143,7 +145,9 @@ class TimezoneDateTimeFieldRenderer(DateFieldRenderer):
 @registry.register_for('TimeField')
 class TimeFieldRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
-        return Markup(f'{field.data.hour:02d}:{field.data.minute:02d}')
+        return Markup(  # noqa: MS001
+            f'{field.data.hour:02d}:{field.data.minute:02d}'
+        )
 
 
 @registry.register_for('UploadField')
@@ -199,10 +203,10 @@ class NullRenderer(BaseRenderer):
 @registry.register_for('DecimalField')
 class DecimalRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
-        return Markup(f'{field.data:.2f}')
+        return Markup(f'{field.data:.2f}')  # noqa: MS001
 
 
 @registry.register_for('IntegerField')
 class IntegerRenderer(BaseRenderer):
     def __call__(self, field: 'Field') -> Markup:
-        return Markup(f'{int(field.data)}')
+        return Markup(f'{int(field.data)}')  # noqa: MS001

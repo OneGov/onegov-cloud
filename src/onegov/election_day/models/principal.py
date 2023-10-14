@@ -248,27 +248,27 @@ class Canton(Principal):
                 entities[year] = {int(k): v for k, v in json.load(f).items()}
 
         # Test if all entities have districts (use none, if ambiguous)
-        districts = set([
+        districts = {
             entity.get('district', None)
             for year in entities.values()
             for entity in year.values()
-        ])
+        }
         has_districts = None not in districts
 
         # Test if some of the entities have regions
-        regions = set([
+        regions = {
             entity.get('region', None)
             for year in entities.values()
             for entity in year.values()
-        ])
+        }
         has_regions = regions != {None}
 
         # Test if some of the entities have superregions
-        superregions = set([
+        superregions = {
             entity.get('superregion', None)
             for year in entities.values()
             for entity in year.values()
-        ])
+        }
         has_superregions = superregions != {None}
 
         domains_election = OrderedDict()
@@ -448,11 +448,11 @@ class Municipality(Principal):
         if entities:
             self.has_quarters = True
             # Test if all entities have districts (use none, if ambiguous)
-            districts = set([
+            districts = {
                 entity.get('district', None)
                 for year in entities.values()
                 for entity in year.values()
-            ])
+            }
             has_districts = None not in districts
         else:
             # ... we have no static data, autogenerate it!

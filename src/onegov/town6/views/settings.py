@@ -307,11 +307,11 @@ def town_handle_api_keys(self, request, form):
 
 @TownApp.form(
     model=Organisation, name='data-retention-settings', template='form.pt',
-    permission=Secret, form=DataRetentionPolicyForm, setting=_("Data Retention"),
-    icon='far fa-trash', order=-880,
+    permission=Secret, form=DataRetentionPolicyForm,
+    setting=_("Data Retention"), icon='far fa-trash', order=-880,
 )
 def handle_ticket_data_deletion_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Data Retention "
-                                                          "Policy"),
+    return handle_generic_settings(
+        self, request, form, _("Data Retention Policy"),
         SettingsLayout(self, request),
     )

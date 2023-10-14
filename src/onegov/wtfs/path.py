@@ -26,11 +26,18 @@ from onegov.wtfs.models import UserManual
 from webob.exc import HTTPNotFound
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+    from onegov.core.request import CoreRequest
+    from uuid import UUID
+
+
 @WtfsApp.path(
     model=Principal,
     path='/'
 )
-def get_principal(app):
+def get_principal(app: WtfsApp) -> Principal:
     return app.principal
 
 
@@ -38,7 +45,7 @@ def get_principal(app):
     model=Auth,
     path='/auth'
 )
-def get_auth(request, to='/'):
+def get_auth(request: 'CoreRequest', to: str = '/') -> Auth:
     return Auth.from_request(request, to)
 
 
@@ -46,7 +53,7 @@ def get_auth(request, to='/'):
     model=UserCollection,
     path='/users'
 )
-def get_users(request):
+def get_users(request: 'CoreRequest') -> UserCollection:
     return UserCollection(request.session)
 
 
@@ -54,7 +61,7 @@ def get_users(request):
     model=User,
     path='/user/{username}'
 )
-def get_user(request, username):
+def get_user(request: 'CoreRequest', username: str) -> User | None:
     return UserCollection(request.session).by_username(username)
 
 
@@ -62,45 +69,48 @@ def get_user(request, username):
     model=MunicipalityCollection,
     path='/municipalities'
 )
-def get_municipalities(request):
+def get_municipalities(request: 'CoreRequest') -> MunicipalityCollection:
     return MunicipalityCollection(request.session)
 
 
 @WtfsApp.path(
     model=Municipality,
     path='/municipality/{id}',
-    converters=dict(
-        id=uuid_converter
-    )
+    converters={
+        'id': uuid_converter
+    }
 )
-def get_municipality(request, id):
+def get_municipality(
+    request: 'CoreRequest',
+    id: 'UUID'
+) -> Municipality | None:
     return MunicipalityCollection(request.session).by_id(id)
 
 
 @WtfsApp.path(
     model=ScanJobCollection,
     path='/scan-jobs',
-    converters=dict(
-        page=int,
-        from_date=extended_date_converter,
-        to_date=extended_date_converter,
-        type=[str],
-        municipality_id=[str],
-        sort_by=str,
-        sort_order=str
-    )
+    converters={
+        'page': int,
+        'from_date': extended_date_converter,
+        'to_date': extended_date_converter,
+        'type': [str],
+        'municipality_id': [str],
+        'sort_by': str,
+        'sort_order': str
+    }
 )
 def get_scan_jobs(
-    request,
-    page=None,
-    from_date=None,
-    to_date=None,
-    type=None,
-    municipality_id=None,
-    term=None,
-    sort_by=None,
-    sort_order=None
-):
+    request: 'CoreRequest',
+    page: int | None = None,
+    from_date: 'date | None' = None,
+    to_date: 'date | None' = None,
+    type: list[str] | None = None,
+    municipality_id: list[str] | None = None,
+    term: str | None = None,
+    sort_by: str | None = None,
+    sort_order: str | None = None
+) -> ScanJobCollection:
     return ScanJobCollection(
         request.session,
         page=page,
@@ -121,11 +131,11 @@ def get_scan_jobs(
 @WtfsApp.path(
     model=ScanJob,
     path='/scan-job/{id}',
-    converters=dict(
-        id=uuid_converter
-    )
+    converters={
+        'id': uuid_converter
+    }
 )
-def get_scan_job(request, id):
+def get_scan_job(request: 'CoreRequest', id: 'UUID') -> ScanJob | None:
     return ScanJobCollection(request.session).by_id(id)
 
 
@@ -133,29 +143,35 @@ def get_scan_job(request, id):
     model=DailyList,
     path='/daily-list',
 )
-def get_daily_list(request):
+def get_daily_list(request: 'CoreRequest') -> DailyList:
     return DailyList()
 
 
 @WtfsApp.path(
     model=DailyListBoxes,
     path='/daily-list/boxes/{date}',
-    converters=dict(
-        date=extended_date_converter,
-    )
+    converters={
+        'date': extended_date_converter,
+    }
 )
-def get_daily_list_boxes(request, date):
+def get_daily_list_boxes(
+    request: 'CoreRequest',
+    date: 'date'
+) -> DailyListBoxes:
     return DailyListBoxes(request.session, date)
 
 
 @WtfsApp.path(
     model=DailyListBoxesAndForms,
     path='/daily-list/boxes-and-forms/{date}',
-    converters=dict(
-        date=extended_date_converter,
-    )
+    converters={
+        'date': extended_date_converter,
+    }
 )
-def get_daily_list_boxes_and_forms(request, date):
+def get_daily_list_boxes_and_forms(
+    request: 'CoreRequest',
+    date: 'date'
+) -> DailyListBoxesAndForms:
     return DailyListBoxesAndForms(request.session, date)
 
 
@@ -163,56 +179,76 @@ def get_daily_list_boxes_and_forms(request, date):
     model=Report,
     path='/report',
 )
-def get_report(request):
+def get_report(request: 'CoreRequest') -> Report:
     return Report(request.session)
 
 
 @WtfsApp.path(
     model=ReportBoxes,
     path='/report/boxes/{start}/{end}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+    }
 )
-def get_report_boxes(request, start, end):
+def get_report_boxes(
+    request: 'CoreRequest',
+    start: 'date',
+    end: 'date'
+) -> ReportBoxes:
     return ReportBoxes(request.session, start, end)
 
 
 @WtfsApp.path(
     model=ReportBoxesAndForms,
     path='/report/boxes-and-forms/{start}/{end}/{type}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+    }
 )
-def get_report_boxes_and_forms(request, start, end, type):
+def get_report_boxes_and_forms(
+    request: 'CoreRequest',
+    start: 'date',
+    end: 'date',
+    type: str
+) -> ReportBoxesAndForms:
     return ReportBoxesAndForms(request.session, start, end, type)
 
 
 @WtfsApp.path(
     model=ReportFormsAllMunicipalities,
     path='/report/all-forms/{start}/{end}/{type}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+    }
 )
-def get_report_all_forms(request, start, end, type):
+def get_report_all_forms(
+    request: 'CoreRequest',
+    start: 'date',
+    end: 'date',
+    type: str
+) -> ReportFormsAllMunicipalities:
     return ReportFormsAllMunicipalities(request.session, start, end, type)
 
 
 @WtfsApp.path(
     model=ReportFormsByMunicipality,
     path='/report/forms/{start}/{end}/{type}/{municipality_id}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-        municipality_id=uuid_converter
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+        'municipality_id': uuid_converter
+    }
 )
-def get_report_forms(request, start, end, type, municipality_id):
+def get_report_forms(
+    request: 'CoreRequest',
+    start: 'date',
+    end: 'date',
+    type: str,
+    municipality_id: 'UUID | None'
+) -> ReportFormsByMunicipality:
     if not municipality_id:
         raise HTTPNotFound()
     return ReportFormsByMunicipality(
@@ -223,13 +259,19 @@ def get_report_forms(request, start, end, type, municipality_id):
 @WtfsApp.path(
     model=ReportBoxesAndFormsByDelivery,
     path='/report/delivery/{start}/{end}/{type}/{municipality_id}',
-    converters=dict(
-        start=extended_date_converter,
-        end=extended_date_converter,
-        municipality_id=uuid_converter
-    )
+    converters={
+        'start': extended_date_converter,
+        'end': extended_date_converter,
+        'municipality_id': uuid_converter
+    }
 )
-def get_report_delivery(request, start, end, type, municipality_id):
+def get_report_delivery(
+    request: 'CoreRequest',
+    start: 'date',
+    end: 'date',
+    type: str,
+    municipality_id: 'UUID | None'
+) -> ReportBoxesAndFormsByDelivery:
     if not municipality_id:
         raise HTTPNotFound()
     return ReportBoxesAndFormsByDelivery(
@@ -241,7 +283,7 @@ def get_report_delivery(request, start, end, type, municipality_id):
     model=NotificationCollection,
     path='/notifications'
 )
-def get_notifications(request):
+def get_notifications(request: 'CoreRequest') -> NotificationCollection:
     return NotificationCollection(request.session)
 
 
@@ -249,7 +291,7 @@ def get_notifications(request):
     model=Notification,
     path='/notification/{id}'
 )
-def get_notification(request, id):
+def get_notification(request: 'CoreRequest', id: str) -> Notification | None:
     return NotificationCollection(request.session).by_id(id)
 
 
@@ -257,7 +299,7 @@ def get_notification(request, id):
     model=Invoice,
     path='/invoice',
 )
-def get_invoice(request):
+def get_invoice(request: 'CoreRequest') -> Invoice:
     return Invoice(request.session)
 
 
@@ -265,7 +307,7 @@ def get_invoice(request):
     model=PaymentTypeCollection,
     path='/payment-types'
 )
-def get_payment_types(request):
+def get_payment_types(request: 'CoreRequest') -> PaymentTypeCollection:
     return PaymentTypeCollection(request.session)
 
 
@@ -273,5 +315,5 @@ def get_payment_types(request):
     model=UserManual,
     path='/user-manual',
 )
-def get_user_manual(request):
-    return UserManual(request.app)
+def get_user_manual(request: 'CoreRequest') -> UserManual:
+    return UserManual(request.app)  # type:ignore[arg-type]

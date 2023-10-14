@@ -9,6 +9,7 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import URL
 
 
 class PageBaseForm(Form):
@@ -24,7 +25,7 @@ class LinkForm(PageBaseForm):
     """ Defines the form for pages with the 'link' trait. """
     url = URLField(
         label=_("URL"),
-        validators=[InputRequired()],
+        validators=[InputRequired(), URL(require_tld=False)],
         render_kw={'class_': 'image-url file-url internal-url'}
     )
 

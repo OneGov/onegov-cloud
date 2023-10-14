@@ -12,7 +12,6 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy import Time
 from uuid import uuid4
 
 
@@ -42,7 +41,7 @@ class Votum(
 
     @property
     def es_suggestion(self):
-        return tuple()
+        return ()
 
     #: the internal id of the votum
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -64,9 +63,6 @@ class Votum(
 
     #: Statement of reasons of the votum
     statement_of_reasons = content_property()
-
-    #: Start of the votum (localized to Europe/Zurich)
-    start = Column(Time, nullable=True)
 
     #: The name of the person
     person_name = Column(Text, nullable=True)
@@ -110,3 +106,12 @@ class Votum(
         video_url = self.agenda_item.assembly.video_url
         if video_url:
             return f'{video_url}#t={self.video_timestamp}'
+
+    @property
+    def person_details(self):
+        details = (
+            self.person_function,
+            self.person_political_affiliation,
+            self.person_place
+        )
+        return ', '.join(d for d in details if d)

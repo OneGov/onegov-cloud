@@ -18,8 +18,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from onegov.core.cli.core import GroupContext
-    from onegov.core.framework import Framework
     from onegov.core.request import CoreRequest
+    from onegov.websockets import WebsocketsApp
 
 
 cli = command_group()
@@ -90,7 +90,7 @@ def listen(
     schema: str | None,
     channel: str | None,
     private: bool
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> 'Callable[[CoreRequest, WebsocketsApp], None]':
     """ Listens for application-bound broadcasts from the websocket server.
 
     Requires either the selection of a websockets-enabled application or
@@ -100,7 +100,7 @@ def listen(
 
     """
 
-    def _listen(request: 'CoreRequest', app: 'Framework') -> None:
+    def _listen(request: 'CoreRequest', app: 'WebsocketsApp') -> None:
         nonlocal url, schema, channel
         if private and channel:
             raise click.UsageError('Use either channel or private, not both')
@@ -108,7 +108,6 @@ def listen(
             raise click.UsageError('identity_secret not set')
         url = url or app.websockets_client_url(request)
         schema = schema or app.schema
-        assert schema is not None
         channel = app.websockets_private_channel if private else channel
         schema_channel = f'{schema}-{channel}' if channel else schema
 
@@ -132,7 +131,7 @@ def status(
     group_context: 'GroupContext',
     url: str | None,
     token: str | None
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> 'Callable[[CoreRequest, WebsocketsApp], None]':
     """ Shows the global status of the websocket server.
 
     Requires either the selection of a websockets-enabled application or
@@ -142,7 +141,7 @@ def status(
 
     """
 
-    def _status(request: 'CoreRequest', app: 'Framework') -> None:
+    def _status(request: 'CoreRequest', app: 'WebsocketsApp') -> None:
         nonlocal url, token
         url = url or app.websockets_manage_url
         token = token or app.websockets_manage_token
@@ -174,7 +173,7 @@ def broadcast(
     token: str | None,
     channel: str | None,
     private: bool
-) -> 'Callable[[CoreRequest, Framework], None]':
+) -> 'Callable[[CoreRequest, WebsocketsApp], None]':
     """ Broadcast to all application-bound connected clients.
 
     Requires either the selection of a websockets-enabled application or
@@ -186,7 +185,7 @@ def broadcast(
 
     """
 
-    def _broadcast(request: 'CoreRequest', app: 'Framework') -> None:
+    def _broadcast(request: 'CoreRequest', app: 'WebsocketsApp') -> None:
         nonlocal url, schema, token, channel, private
         if private and channel:
             raise click.UsageError('Use either channel or private, not both')
@@ -194,7 +193,6 @@ def broadcast(
             raise click.UsageError('identity_secret not set')
         url = url or app.websockets_manage_url
         schema = schema or app.schema
-        assert schema is not None
         token = token or app.websockets_manage_token
         channel = app.websockets_private_channel if private else channel
         schema_channel = f'{schema}-{channel}' if channel else schema

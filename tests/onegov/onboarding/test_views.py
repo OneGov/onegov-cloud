@@ -129,8 +129,8 @@ def test_town_create(onboarding_app, temporary_directory, maildir, redis_url):
     assert "New York" in p
 
     p = c.get('/auth/login')
-    p.forms[2]['username'] = username
-    p.forms[2]['password'] = password
-    p = p.forms[2].submit().follow()
+    p.forms[1]['username'] = username
+    p.forms[1]['password'] = password
+    p = p.forms[1].submit().follow()
 
     assert 'Benutzerprofil' in p

@@ -120,10 +120,10 @@ class MarkovChain:
         for current, next in pairwise(sample):
             counts[current][next] += 1
 
-        self.totals = dict(
-            (current, sum(next_counts.values()))
+        self.totals = {
+            current: sum(next_counts.values())
             for current, next_counts in counts.items()
-        )
+        }
 
     def next(self, state: str) -> str:
         """

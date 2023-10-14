@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from onegov.ballot.models.mixins import DomainOfInfluenceMixin
 from onegov.ballot.models.mixins import ExplanationsPdfMixin
 from onegov.ballot.models.mixins import LastModifiedMixin
@@ -24,11 +23,6 @@ from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
-from xsdata_ech.e_ch_0252_1_0 import Delivery
-from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
-from xsdata.formats.dataclass.serializers import XmlSerializer
-from xsdata.formats.dataclass.serializers.config import SerializerConfig
-from xsdata.models.datatype import XmlDate
 
 
 class Vote(Base, ContentMixin, LastModifiedMixin,
@@ -158,7 +152,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         We assume that for complex votes, every ballot has the same progress.
         """
 
-        ballot_ids = set(b.id for b in self.ballots)
+        ballot_ids = {b.id for b in self.ballots}
 
         if not ballot_ids:
             return 0, 0
@@ -179,7 +173,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     def counted_entities(self):
         """ Returns the names of the already counted entities. """
 
-        ballot_ids = set(b.id for b in self.ballots)
+        ballot_ids = {b.id for b in self.ballots}
 
         if not ballot_ids:
             return []
@@ -282,64 +276,3 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
         for ballot in self.ballots:
             ballot.clear_results()
-
-    def export(self, locales):
-        """ Returns all data connected to this vote as list with dicts.
-
-        This is meant as a base for json/csv/excel exports. The result is
-        therefore a flat list of dictionaries with repeating values to avoid
-        the nesting of values. Each record in the resulting list is a single
-        ballot result.
-
-        """
-
-        rows = []
-
-        for ballot in self.ballots:
-            for result in ballot.results:
-                row = OrderedDict()
-
-                titles = (
-                    ballot.title_translations or self.title_translations or {}
-                )
-                for locale in locales:
-                    row[f'title_{locale}'] = titles.get(locale, '')
-                row['date'] = self.date.isoformat()
-                row['shortcode'] = self.shortcode
-                row['domain'] = self.domain
-                row['status'] = self.status or 'unknown'
-                row['type'] = ballot.type
-                row['district'] = result.district or ''
-                row['name'] = result.name
-                row['entity_id'] = result.entity_id
-                row['counted'] = result.counted
-                row['yeas'] = result.yeas
-                row['nays'] = result.nays
-                row['invalid'] = result.invalid
-                row['empty'] = result.empty
-                row['eligible_voters'] = result.eligible_voters
-                row['expats'] = result.expats or ''
-
-                rows.append(row)
-
-        return rows
-
-    def export_xml(self, canton_id, domain_of_influence):
-        """ Returns all data as an eCH-0252 XML. """
-
-        polling_day = XmlDate.from_date(self.date)
-        ballots = self.ballots.all()
-        delivery = Delivery(
-            vote_base_delivery=EventVoteBaseDeliveryType(
-                canton_id=canton_id,
-                polling_day=polling_day,
-                vote_info=[
-                    ballot.export_xml(canton_id, domain_of_influence)
-                    for ballot in ballots
-                ],
-                number_of_entries=len(ballots)
-            )
-        )
-        config = SerializerConfig(pretty_print=True)
-        serializer = XmlSerializer(config=config)
-        return serializer.render(delivery)

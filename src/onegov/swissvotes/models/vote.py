@@ -644,21 +644,24 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         label=_('Parliamentary initiative'),
         extension='pdf',
         static_views={
-            'de_CH': 'parlamentarische-initiative.pdf',
+            'de_CH': 'parlamentarische-initiative-de.pdf',
+            'fr_CH': 'parlamentarische-initiative-fr.pdf',
         }
     )
     parliamentary_committee_report = LocalizedFile(
         label=_('Report of the parliamentary committee'),
         extension='pdf',
         static_views={
-            'de_CH': 'bericht-parlamentarische-kommission.pdf',
+            'de_CH': 'bericht-parlamentarische-kommission-de.pdf',
+            'fr_CH': 'bericht-parlamentarische-kommission-fr.pdf',
         }
     )
     federal_council_opinion = LocalizedFile(
         label=_('Opinion of the Federal Council'),
         extension='pdf',
         static_views={
-            'de_CH': 'stellungnahme-bundesrat.pdf',
+            'de_CH': 'stellungnahme-bundesrat-de.pdf',
+            'fr_CH': 'stellungnahme-bundesrat-fr.pdf',
         }
     )
     parliamentary_debate = LocalizedFile(
@@ -677,7 +680,7 @@ class SwissVote(Base, TimestampMixin, LocalizedFiles, ContentMixin):
         }
     )
     easyvote_booklet = LocalizedFile(
-        label=_('Explanatory brochure by Easyvote'),
+        label=_('Explanatory brochure by easyvote'),
         extension='pdf',
         static_views={
             'de_CH': 'easyvote-de.pdf',

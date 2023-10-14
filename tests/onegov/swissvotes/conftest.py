@@ -84,7 +84,7 @@ def attachments(swissvotes_app):
     for name, content in (
         ('ad_analysis', "Inserateanalyse"),
         ('brief_description', "Kurzbeschreibung"),
-        ('easyvote_booklet', "Easyvote"),
+        ('easyvote_booklet', "easyvote"),
         ('federal_council_message', "Message du Conseil fédéral"),
         ('foeg_analysis', "Medienanalyse fög"),
         ('parliamentary_initiative', "Initiative"),
@@ -204,10 +204,10 @@ def attachment_urls():
             'easyvote_booklet': 'easyvote-de.pdf',
             'federal_council_message': 'botschaft-de.pdf',
             'foeg_analysis': 'medienanalyse.pdf',
-            'parliamentary_initiative': 'parlamentarische-initiative.pdf',
+            'parliamentary_initiative': 'parlamentarische-initiative-de.pdf',
             'parliamentary_committee_report':
-            'bericht-parlamentarische-kommission.pdf',
-            'federal_council_opinion': 'stellungnahme-bundesrat.pdf',
+            'bericht-parlamentarische-kommission-de.pdf',
+            'federal_council_opinion': 'stellungnahme-bundesrat-de.pdf',
             'parliamentary_debate': 'parlamentsberatung.pdf',
             'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-de.xlsx',
             'post_vote_poll_codebook': 'nachbefragung-codebuch-de.pdf',
@@ -227,6 +227,10 @@ def attachment_urls():
         'fr_CH': {
             'brief_description': 'kurzbeschreibung-fr.pdf',
             'easyvote_booklet': 'easyvote-fr.pdf',
+            'parliamentary_initiative': 'parlamentarische-initiative-fr.pdf',
+            'parliamentary_committee_report':
+            'bericht-parlamentarische-kommission-fr.pdf',
+            'federal_council_opinion': 'stellungnahme-bundesrat-fr.pdf',
             'federal_council_message': 'botschaft-fr.pdf',
             'post_vote_poll_codebook_xlsx': 'nachbefragung-codebuch-fr.xlsx',
             'post_vote_poll_codebook': 'nachbefragung-codebuch-fr.pdf',

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-06-26 08:31+0200\n"
+"POT-Creation-Date: 2023-09-06 14:16+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -32,8 +32,11 @@ msgstr "Benutzer"
 msgid "Settings"
 msgstr "Einstellungen"
 
-msgid "Archive"
-msgstr "Archiv"
+msgid "People"
+msgstr "Personen"
+
+msgid "Assemblies"
+msgstr "Landsgemeinden"
 
 msgid "Number"
 msgstr "Nummer"
@@ -53,17 +56,24 @@ msgstr "Unerheblich"
 msgid "Excerpt from the Memorial (PDF)"
 msgstr "Auszug aus dem Memorial (PDF)"
 
-msgid "Downloads"
-msgstr "Downloads"
+msgid "Memorial"
+msgstr "Memorial"
 
-msgid "Start time"
-msgstr "Startzeit"
+msgid ""
+"Links to the whole memorial (if there is one linked to the assembly), but "
+"opens it on the chosen page number"
+msgstr ""
+"Verlinkt das gesamte Memorial (sofern eines auf der Landsgemeinde "
+"hochgeladen ist), öffnet es aber auf der angegebenen Seitennummer"
 
-msgid "Progress"
-msgstr "Ablauf"
+msgid "Alternatively: Page from the Memorial"
+msgstr "Alternativ: Seite aus dem Memorial"
 
 msgid "Video timestamp"
 msgstr "Video-Zeitstempel"
+
+msgid "Progress"
+msgstr "Ablauf"
 
 msgid "Text"
 msgstr "Text"
@@ -97,6 +107,9 @@ msgstr "Video URL"
 
 msgid "Memorial part 1 (PDF)"
 msgstr "Memorial Teil 1 (PDF)"
+
+msgid "Downloads"
+msgstr "Downloads"
 
 msgid "Memorial part 2 (PDF)"
 msgstr "Memorial Teil 2 (PDF)"
@@ -189,14 +202,14 @@ msgstr "Landsgemeinde"
 msgid "States"
 msgstr "Status"
 
+msgid "Ticker"
+msgstr "Ticker"
+
 msgid "Do you really want to delete this assembly?"
 msgstr "Möchten Sie diese Landsgemeinde wirklich löschen?"
 
 msgid "Delete assembly"
 msgstr "Landsgemeinde löschen"
-
-msgid "Ticker"
-msgstr "Ticker"
 
 #, python-format
 msgid "Extraodinary assembly from ${date}"
@@ -225,20 +238,20 @@ msgstr "laufend"
 msgid "completed"
 msgstr "abgeschlossen"
 
-msgid "No assemblies defined yet."
-msgstr "Noch keine Landsgemeinden erfasst."
+msgid "Video"
+msgstr "Video"
 
 msgid "Memorial (PDF)"
 msgstr "Memorial (PDF)"
+
+msgid "No assemblies defined yet."
+msgstr "Noch keine Landsgemeinden erfasst."
 
 msgid "Audio"
 msgstr "Audio"
 
 msgid "Download audio"
 msgstr "Audio herunterladen"
-
-msgid "Video"
-msgstr "Video"
 
 msgid "Close"
 msgstr "Schliessen"
@@ -250,6 +263,9 @@ msgstr ""
 "Zeigt den Status jedes Elements einer Landsgemeinde. Die Stati aller "
 "Elemente einer Landsgemeinde werden beim Bearbeiten eines einzelnen "
 "Elementes automatisch angepasst (sofern möglich)."
+
+msgid "The assembly has ended."
+msgstr "Die Landsgemeinde ist beendet."
 
 msgid "Added a new agenda item"
 msgstr "Neues Traktandum hinzugefügt"

@@ -25,6 +25,7 @@ from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
@@ -129,7 +130,7 @@ class ElectionForm(Form):
     tacit = BooleanField(
         label=_("Tacit election"),
         fieldset=_("Properties"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     has_expats = BooleanField(
@@ -139,7 +140,7 @@ class ElectionForm(Form):
             "Expats are uploaded and listed as a separate row in the results. "
             "Changing this option requires a new upload of the data."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     date = DateField(
@@ -173,6 +174,7 @@ class ElectionForm(Form):
             "Shows voters counts instead of votes in the party strengths "
             "view."
         ),
+        depends_on=('election_type', 'proporz'),
     )
 
     exact_voters_counts = BooleanField(
@@ -181,7 +183,8 @@ class ElectionForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
-        render_kw=dict(force_simple=True)
+        depends_on=('election_type', 'proporz'),
+        render_kw={'force_simple': True}
     )
 
     horizontal_party_strengths = BooleanField(
@@ -191,7 +194,7 @@ class ElectionForm(Form):
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
         depends_on=('election_type', 'proporz', 'show_party_strengths', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     use_historical_party_results = BooleanField(
@@ -203,7 +206,7 @@ class ElectionForm(Form):
             "elections use the same party IDs."
         ),
         depends_on=('election_type', 'proporz'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_party_strengths = BooleanField(
@@ -213,7 +216,8 @@ class ElectionForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        depends_on=('election_type', 'proporz'),
+        render_kw={'force_simple': True}
     )
 
     show_party_panachage = BooleanField(
@@ -222,7 +226,8 @@ class ElectionForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        depends_on=('election_type', 'proporz'),
+        render_kw={'force_simple': True}
     )
 
     election_de = StringField(
@@ -260,7 +265,8 @@ class ElectionForm(Form):
 
     related_link = URLField(
         label=_("Link"),
-        fieldset=_("Related link")
+        fieldset=_("Related link"),
+        validators=[URL(), Optional()]
     )
 
     related_link_label_de = StringField(
@@ -299,7 +305,7 @@ class ElectionForm(Form):
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
-            'CVP #d28b00\n'
+            'Die Mitte #d28b00\n'
             'EDU #7f6b65\n'
             'EVP #e3c700\n'
             'FDP #0084c7\n'
@@ -367,29 +373,29 @@ class ElectionForm(Form):
         ]
 
         self.region.label.text = principal.label('region')
-        regions = set([
-            entity.get('region', None)
+        regions = {
+            region
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('region', None)
-        ])
+            if (region := entity.get('region', None))
+        }
         self.region.choices = [(item, item) for item in sorted(regions)]
 
         self.district.label.text = principal.label('district')
-        districts = set([
-            entity.get('district', None)
+        districts = {
+            district
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('district', None)
-        ])
+            if (district := entity.get('district', None))
+        }
         self.district.choices = [(item, item) for item in sorted(districts)]
 
-        municipalities = set([
-            entity.get('name', None)
+        municipalities = {
+            municipality
             for year in principal.entities.values()
             for entity in year.values()
-            if entity.get('name', None)
-        ])
+            if (municipality := entity.get('name', None))
+        }
         self.municipality.choices = [
             (item, item) for item in sorted(municipalities)
         ]

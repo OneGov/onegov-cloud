@@ -181,12 +181,12 @@ class NewsWidget:
         # request more than the required amount of news to account for hidden
         # items which might be in front of the queue
         news_limit = layout.org.news_limit_homepage
-        query_params = dict(
-            limit=news_limit + 2,
-            published_only=not layout.request.is_manager
-        )
         news = layout.request.exclude_invisible(
-            layout.root_pages[news_index].news_query(**query_params).all())
+            layout.root_pages[news_index].news_query(
+                limit=news_limit + 2,
+                published_only=not layout.request.is_manager
+            ).all()
+        )
 
         # limits the news, but doesn't count sticky news towards that limit
         def limited(news, limit):
@@ -291,8 +291,8 @@ class TilesWidget:
 
                 children = []
                 for child in page.children:
-                    if child.id in map(
-                        lambda n: n.id, homepage_pages[page.id]
+                    if child.id in (
+                        n.id for n in homepage_pages[page.id]
                     ):
                         children.append(child)
 
@@ -329,7 +329,10 @@ class HrWidget:
 class SliderWidget:
     template = """
         <xsl:template match="slider">
-            <div metal:use-macro="layout.macros.slider" />
+            <div metal:use-macro="layout.macros['slider']"
+            tal:define="height_m '{@height-m}';
+            height_d '{@height-d}'"
+            />
         </xsl:template>
     """
 
@@ -370,5 +373,5 @@ class SliderWidget:
         images = tuple(self.get_images_from_sets(layout))
 
         return {
-            'images': images
+            'images': images,
         }

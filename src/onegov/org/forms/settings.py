@@ -35,6 +35,8 @@ from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
+from wtforms.validators import Optional
+from wtforms.validators import URL as UrlRequired
 from wtforms.validators import ValidationError
 
 
@@ -187,7 +189,9 @@ class FooterSettingsForm(Form):
         label=_("Contact Link"),
         description=_("URL pointing to a contact page"),
         fieldset=_("Information"),
-        render_kw={'class_': 'internal-url'})
+        render_kw={'class_': 'internal-url'},
+        validators=[UrlRequired(), Optional()]
+    )
 
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
@@ -199,7 +203,9 @@ class FooterSettingsForm(Form):
         label=_("Opening Hours Link"),
         description=_("URL pointing to an opening hours page"),
         fieldset=_("Information"),
-        render_kw={'class_': 'internal-url'})
+        render_kw={'class_': 'internal-url'},
+        validators=[UrlRequired(), Optional()]
+    )
 
     hide_onegov_footer = BooleanField(
         label=_("Hide OneGov Cloud information"),
@@ -213,22 +219,30 @@ class FooterSettingsForm(Form):
     facebook_url = URLField(
         label=_("Facebook"),
         description=_("URL pointing to the Facebook site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     twitter_url = URLField(
         label=_("Twitter"),
         description=_("URL pointing to the Twitter site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     youtube_url = URLField(
         label=_("YouTube"),
         description=_("URL pointing to the YouTube site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     instagram_url = URLField(
         label=_("Instagram"),
         description=_("URL pointing to the Instagram site"),
-        fieldset=_("Social Media"))
+        fieldset=_("Social Media"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     custom_link_1_name = StringField(
         label=_("Name"),
@@ -239,7 +253,8 @@ class FooterSettingsForm(Form):
     custom_link_1_url = URLField(
         label=_("URL"),
         description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 1")
+        fieldset=_("Custom Link 1"),
+        validators=[UrlRequired(), Optional()]
     )
 
     custom_link_2_name = StringField(
@@ -251,7 +266,8 @@ class FooterSettingsForm(Form):
     custom_link_2_url = URLField(
         label=_("URL"),
         description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 2")
+        fieldset=_("Custom Link 2"),
+        validators=[UrlRequired(), Optional()]
     )
 
     custom_link_3_name = StringField(
@@ -263,7 +279,8 @@ class FooterSettingsForm(Form):
     custom_link_3_url = URLField(
         label=_("URL"),
         description=_("URL to internal/external site"),
-        fieldset=_("Custom Link 3")
+        fieldset=_("Custom Link 3"),
+        validators=[UrlRequired(), Optional()]
     )
 
     partner_1_name = StringField(
@@ -280,7 +297,9 @@ class FooterSettingsForm(Form):
     partner_1_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("First Partner"))
+        fieldset=_("First Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     partner_2_name = StringField(
         label=_("Name"),
@@ -296,7 +315,9 @@ class FooterSettingsForm(Form):
     partner_2_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("Second Partner"))
+        fieldset=_("Second Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     partner_3_name = StringField(
         label=_("Name"),
@@ -312,7 +333,9 @@ class FooterSettingsForm(Form):
     partner_3_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("Third Partner"))
+        fieldset=_("Third Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     partner_4_name = StringField(
         label=_("Name"),
@@ -328,7 +351,9 @@ class FooterSettingsForm(Form):
     partner_4_url = URLField(
         label=_("Website"),
         description=_("The partner's website"),
-        fieldset=_("Fourth Partner"))
+        fieldset=_("Fourth Partner"),
+        validators=[UrlRequired(), Optional()]
+    )
 
     def ensure_correct_footer_column_width(self):
 
@@ -440,29 +465,36 @@ class HeaderSettingsForm(Form):
     )
 
     left_header_name = StringField(
-        label=_("Name"),
+        label=_("Text"),
         description=_(""),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side")
     )
 
     left_header_url = URLField(
         label=_("URL"),
         description=_("Optional"),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side"),
+        validators=[UrlRequired(), Optional()]
     )
 
     left_header_color = ColorField(
         label=_("Font color"),
-        fieldset=_("Title header left side")
+        fieldset=_("Text header left side")
     )
 
     left_header_rem = FloatField(
         label=_("Relative font size"),
-        fieldset=_("Title header left side"),
+        fieldset=_("Text header left side"),
         validators=[
             NumberRange(0.5, 7)
         ],
         default=1
+    )
+
+    header_additions_fixed = BooleanField(
+        label=_(
+            "Keep header links and/or header text fixed to top on scrolling"),
+        fieldset=_("Header fixation")
     )
 
     @property
@@ -476,8 +508,10 @@ class HeaderSettingsForm(Form):
             'announcement': self.announcement.data,
             'announcement_url': self.announcement_url.data,
             'announcement_bg_color': self.announcement_bg_color.data,
-            'announcement_font_color': self.announcement_font_color.data,
-            'announcement_is_private': self.announcement_is_private.data
+            'announcement_font_color':
+            self.announcement_font_color.data,
+            'announcement_is_private': self.announcement_is_private.data,
+            'header_additions_fixed': self.header_additions_fixed.data
         }
 
     @header_options.setter
@@ -503,6 +537,8 @@ class HeaderSettingsForm(Form):
             'announcement_font_color', '#000000')
         self.announcement_is_private.data = options.get(
             'announcement_is_private', "")
+        self.header_additions_fixed.data = options.get(
+            'header_additions_fixed', "")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -630,13 +666,28 @@ class ModuleSettingsForm(Form):
             ('phone', _("Phone")),
             ('phone_direct', _("Direct Phone Number or Mobile")),
             ('website', _("Website")),
-            ('address', _("Address")),
+            ('website_2', _("Website 2")),
+            ('location_address', _("Location Address")),
+            ('location_code_city', _("Location Code and City")),
+            ('postal_address', _("Postal Address")),
+            ('postal_code_city', _("Postal Code and City")),
             ('notes', _("Notes")),
         ])
 
     event_locations = TagsField(
         label=_("Values of the location filter"),
         fieldset=_("Events"),)
+
+    event_filter_type = RadioField(
+        label=_('Choose the filter type for events (default is \'tags\')'),
+        choices=(
+            ('tags', _('A predefined set of tags')),
+            ('filters', _('Manually configurable filters')),
+            ('tags_and_filters', _('Both, predefined tags as well as '
+                                   'configurable filters')),
+        ),
+        default='tags'
+    )
 
 
 class MapSettingsForm(Form):
@@ -1048,7 +1099,7 @@ class GeverSettingsForm(Form):
 
     gever_endpoint = URLField(
         _("Gever API Endpoint where the documents are uploaded."),
-        [InputRequired(), validate_https],
+        [InputRequired(), UrlRequired(), validate_https],
         description=_("Website address including https://"),
     )
 
@@ -1115,7 +1166,6 @@ class DataRetentionPolicyForm(Form):
         )
         yield from years
 
-
     relative_time_auto_archive = SelectField(
         label=_('Duration from opening a ticket to its automatic archival'),
         default=_('Disabled')
@@ -1125,4 +1175,3 @@ class DataRetentionPolicyForm(Form):
         label=_('Duration from archived state until deleted automatically'),
         default=_('Disabled')
     )
-

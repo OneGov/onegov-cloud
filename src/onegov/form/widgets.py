@@ -24,7 +24,9 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from onegov.chat import TextModule
     from onegov.form.fields import (
-        PanelField, PreviewField, UploadField, UploadMultipleField)
+        PanelField, PreviewField, UploadField, UploadMultipleField,
+        TypeAheadField
+    )
     from wtforms import Field, StringField
     from wtforms.fields.choices import SelectFieldBase
 
@@ -46,7 +48,7 @@ class OrderedListWidget(ListWidget):
         # require even more knowledge, so this is the better approach
 
         assert hasattr(field, '__iter__')
-        ordered = [subfield for subfield in field]
+        ordered: list['Field'] = list(field)
         ordered.sort(key=lambda f: field.gettext(f.label.text))
 
         class FakeField:
@@ -96,6 +98,47 @@ class UploadWidget(FileInput):
 
     """
 
+    simple_template = Markup("""
+        <div class="upload-widget without-data{wrapper_css_class}">
+            {input_html}
+        </div>
+    """)
+    template = Markup("""
+        <div class="upload-widget with-data{wrapper_css_class}">
+            <p>{existing_file_label}: {filename}{filesize} {icon}</p>
+
+            {preview}
+
+            <ul>
+                <li>
+                    <input type="radio" id="{name}-0" name="{name}"
+                           value="keep" checked="">
+                    <label for="{name}-0">{keep_label}</label>
+                </li>
+                <li>
+                    <input type="radio" id="{name}-1" name="{name}"
+                           value="delete">
+                    <label for="{name}-1">{delete_label}</label>
+                </li>
+                <li>
+                    <input type="radio" id="{name}-2" name="{name}"
+                           value="replace">
+                    <label for="{name}-2">{replace_label}</label>
+                    <div>
+                        <label>
+                            <div data-depends-on="{name}/replace"
+                                 data-hide-label="false">
+                                {input_html}
+                            </div>
+                        </label>
+                    </div>
+                </li>
+            </ul>
+
+            {previous}
+        </div>
+    """)
+
     def image_source(self, field: 'UploadField') -> str | None:
         """ Returns the image source url if the field points to an image and
         if it can be done (it looks like it's possible, but I'm not super
@@ -122,6 +165,63 @@ class UploadWidget(FileInput):
             return field.meta.request.link(field.object_data)
         return None
 
+    def template_data(
+        self,
+        field: 'UploadField',
+        force_simple: bool,
+        resend_upload: bool,
+        wrapper_css_class: str,
+        input_html: Markup,
+        **kwargs: Any
+    ) -> tuple[bool, dict[str, Any]]:
+
+        if force_simple or field.errors or not field.data:
+            return True, {
+                'wrapper_css_class': wrapper_css_class,
+                'input_html': input_html,
+            }
+
+        preview = ''
+        src = self.image_source(field)
+        if src:
+            preview = Markup("""
+                <div class="uploaded-image"><img src="{src}"></div>
+            """).format(src=src)
+
+        previous = ''
+        if field.data and resend_upload:
+            previous = Markup("""
+                <input type="hidden" name="{name}" value="{filename}">
+                <input type="hidden" name="{name}" value="{data}">
+            """).format(
+                name=field.id,
+                filename=field.data.get('filename', ''),
+                data=field.data.get('data', ''),
+            )
+
+        size = field.data['size']
+        if size < 0:
+            display_size = ''
+        else:
+            display_size = f' ({humanize.naturalsize(size)})'
+
+        return False, {
+            'wrapper_css_class': wrapper_css_class,
+            'input_html': input_html,
+            'icon': '✓',
+            'preview': preview,
+            'previous': previous,
+            'filesize': display_size,
+            'filename': field.data['filename'],
+            'wrapper_css_class': wrapper_css_class,
+            'name': field.id,
+            'input_html': input_html,
+            'existing_file_label': field.gettext(_('Uploaded file')),
+            'keep_label': field.gettext(_('Keep file')),
+            'delete_label': field.gettext(_('Delete file')),
+            'replace_label': field.gettext(_('Replace file')),
+        }
+
     def __call__(
         self,
         field: 'UploadField',  # type:ignore[override]
@@ -135,78 +235,17 @@ class UploadWidget(FileInput):
             wrapper_css_class = ' ' + wrapper_css_class
         input_html = super().__call__(field, **kwargs)
 
-        if force_simple or field.errors or not field.data:
-            return Markup("""
-                <div class="upload-widget without-data{}">
-                    {}
-                </div>
-            """).format(wrapper_css_class, input_html)
-        else:
-            preview = ''
-            src = self.image_source(field)
-            if src:
-                preview = Markup("""
-                    <div class="uploaded-image"><img src="{src}"></div>
-                """).format(src=src)
-
-            previous = ''
-            if field.data and resend_upload:
-                previous = Markup("""
-                    <input type="hidden" name="{name}" value="{filename}">
-                    <input type="hidden" name="{name}" value="{data}">
-                """).format(
-                    name=field.id,
-                    filename=field.data.get('filename', ''),
-                    data=field.data.get('data', ''),
-                )
-
-            return Markup("""
-                <div class="upload-widget with-data{wrapper_css_class}">
-                    <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
-
-                    {preview}
-
-                    <ul>
-                        <li>
-                            <input type="radio" id="{name}-0" name="{name}"
-                                   value="keep" checked="">
-                            <label for="{name}-0">{keep_label}</label>
-                        </li>
-                        <li>
-                            <input type="radio" id="{name}-1" name="{name}"
-                                   value="delete">
-                            <label for="{name}-1">{delete_label}</label>
-                        </li>
-                        <li>
-                            <input type="radio" id="{name}-2" name="{name}"
-                                   value="replace">
-                            <label for="{name}-2">{replace_label}</label>
-                            <div>
-                                <label>
-                                    <div data-depends-on="{name}/replace"
-                                         data-hide-label="false">
-                                        {input_html}
-                                    </div>
-                                </label>
-                            </div>
-                        </li>
-                    </ul>
-
-                    {previous}
-                </div>
-            """).format(
-                filesize=humanize.naturalsize(field.data['size']),
-                filename=field.data['filename'],
-                wrapper_css_class=wrapper_css_class,
-                name=field.id,
-                input_html=input_html,
-                existing_file_label=field.gettext(_('Uploaded file')),
-                keep_label=field.gettext(_('Keep file')),
-                delete_label=field.gettext(_('Delete file')),
-                replace_label=field.gettext(_('Replace file')),
-                preview=preview,
-                previous=previous
-            )
+        is_simple, data = self.template_data(
+            field,
+            force_simple=force_simple,
+            resend_upload=resend_upload,
+            wrapper_css_class=wrapper_css_class,
+            input_html=input_html,
+            **kwargs
+        )
+        if is_simple:
+            return self.simple_template.format(**data)
+        return self.template.format(**data)
 
 
 class UploadMultipleWidget(FileInput):
@@ -224,8 +263,17 @@ class UploadMultipleWidget(FileInput):
 
     """
 
+    additional_label = _('Upload additional files')
+
     def __init__(self) -> None:
         self.multiple = True
+
+    def render_input(
+        self,
+        field: 'UploadMultipleField',
+        **kwargs: Any
+    ) -> Markup:
+        return super().__call__(field, **kwargs)
 
     def __call__(
         self,
@@ -235,7 +283,7 @@ class UploadMultipleWidget(FileInput):
 
         force_simple = kwargs.pop('force_simple', False)
         resend_upload = kwargs.pop('resend_upload', False)
-        input_html = super().__call__(field, **kwargs)
+        input_html = self.render_input(field, **kwargs)
         simple_template = Markup("""
             <div class="upload-widget without-data">
                 {}
@@ -256,8 +304,10 @@ class UploadMultipleWidget(FileInput):
                     for error in subfield.errors
                 ) for subfield in field
             )
-            additional_html = Markup('{label}: {input_html}').format(
-                label=field.gettext(_('Upload additional files')),
+            additional_html = Markup(
+                '<label>{label}: {input_html}</label>'
+            ).format(
+                label=field.gettext(self.additional_label),
                 input_html=input_html
             )
             return existing_html + simple_template.format(additional_html)
@@ -313,7 +363,7 @@ class TextAreaWithTextModules(TextArea):
             return input_html
 
         field.meta.request.include('text-module-picker')
-        return Markup(self.template.render(
+        return Markup(self.template.render(  # noqa: MS001
             id=field.id,
             label=field.gettext(_('Text modules')),
             text_modules=text_modules,
@@ -397,7 +447,7 @@ class IconWidget(TextInput):
             'data-depends-on', False) if field.render_kw else False
         depends_on = {'data-depends-on': depends_on} if depends_on else {}
 
-        return Markup(self.template.render(
+        return Markup(self.template.render(  # noqa: MS001
             iconfont=iconfont,
             icons=icons,
             id=field.id,
@@ -424,7 +474,7 @@ class ChosenSelectWidget(Select):
 
 
 class PreviewWidget:
-    """ A widget that displays the html of a specific view whenver there's
+    """ A widget that displays the html of a specific view whenever there's
     a change in other fields. JavaScript is used to facilitate this.
 
     """
@@ -459,7 +509,7 @@ class PanelWidget:
 
     def __call__(self, field: 'PanelField', **kwargs: Any) -> Markup:
         text = escape(field.meta.request.translate(field.text))
-        return Markup(
+        return Markup(  # noqa: MS001
             f'<div class="panel {{kind}}" {html_params(**kwargs)}>'
             '{text}</div>'
         ).format(
@@ -530,5 +580,25 @@ class DateTimeLocalRangeInput(DateRangeMixin, DateTimeLocalInput):
         max_date = self.max_date
         if max_date is not None:
             kwargs.setdefault('max', max_date.isoformat() + 'T23:59')
+
+        return super().__call__(field, **kwargs)
+
+
+class TypeAheadInput(TextInput):
+    """ A widget with typeahead. """
+
+    def __call__(
+        self,
+        field: 'TypeAheadField',  # type:ignore[override]
+        **kwargs: Any
+    ) -> Markup:
+        field.meta.request.include('typeahead-standalone')
+
+        kwargs['class_'] = (
+            kwargs.get('class_', '') + ' typeahead-standalone-field'
+        ).strip()
+        kwargs['data-url'] = (
+            field.url(field.meta) if callable(field.url) else field.url
+        )
 
         return super().__call__(field, **kwargs)

@@ -14,12 +14,22 @@ from onegov.wtfs.security import EditModel
 from onegov.wtfs.security import ViewModel
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob.response import Response
+
+
 @WtfsApp.html(
     model=NotificationCollection,
     template='notifications.pt',
     permission=ViewModel
 )
-def view_notifications(self, request):
+def view_notifications(
+    self: NotificationCollection,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ View the list of notifications. """
 
     return {'layout': NotificationsLayout(self, request)}
@@ -32,7 +42,11 @@ def view_notifications(self, request):
     permission=AddModel,
     form=NotificationForm
 )
-def add_notification(self, request, form):
+def add_notification(
+    self: NotificationCollection,
+    request: 'CoreRequest',
+    form: NotificationForm
+) -> 'Response | RenderData':
     """ Create a new notification. """
 
     layout = AddNotificationLayout(self, request)
@@ -56,7 +70,10 @@ def add_notification(self, request, form):
     template='notification.pt',
     permission=ViewModel
 )
-def view_notification(self, request):
+def view_notification(
+    self: Notification,
+    request: 'CoreRequest'
+) -> 'RenderData':
     """ View a single notification. """
 
     return {'layout': NotificationLayout(self, request)}
@@ -69,7 +86,11 @@ def view_notification(self, request):
     permission=EditModel,
     form=NotificationForm
 )
-def edit_notification(self, request, form):
+def edit_notification(
+    self: Notification,
+    request: 'CoreRequest',
+    form: NotificationForm
+) -> 'Response | RenderData':
     """ Edit a notification. """
 
     layout = EditNotificationLayout(self, request)
@@ -95,7 +116,10 @@ def edit_notification(self, request, form):
     request_method='DELETE',
     permission=DeleteModel
 )
-def delete_notification(self, request):
+def delete_notification(
+    self: Notification,
+    request: 'CoreRequest'
+) -> None:
     """ Delete a notification. """
 
     request.assert_valid_csrf_token()

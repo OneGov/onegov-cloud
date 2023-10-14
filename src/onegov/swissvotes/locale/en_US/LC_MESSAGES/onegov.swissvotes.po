@@ -72,11 +72,11 @@ msgstr "Parliamentary initiative"
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
 
-msgid "Report of the parliamentary committee"
-msgstr "Report of the parliamentary committee"
+msgid "Report of the parliamentary committee (only for Pa.Iv.)"
+msgstr "Report of the parliamentary committee (only for Pa.Iv.)"
 
-msgid "Opinion of the Federal Council"
-msgstr "Opinion of the Federal Council"
+msgid "Opinion of the Federal Council (only for Pa.Iv.)"
+msgstr "Opinion of the Federal Council (only for Pa.Iv.)"
 
 msgid "Parliamentary debate"
 msgstr "Parliamentary debate"
@@ -87,8 +87,8 @@ msgstr "Official explanatory brochure"
 msgid "Voting campaign"
 msgstr "Public campaign"
 
-msgid "Explanatory brochure by Easyvote"
-msgstr "Explanatory brochure by Easyvote"
+msgid "Explanatory brochure by easyvote"
+msgstr "Explanatory brochure by easyvote"
 
 msgid "Advertisment analysis"
 msgstr "Analysis of advertisement campaign"
@@ -1578,6 +1578,12 @@ msgstr "Link Social Archives"
 msgid "Swissvotes database"
 msgstr "Swissvotes database"
 
+msgid "Report of the parliamentary committee"
+msgstr "Report of the parliamentary committee"
+
+msgid "Opinion of the Federal Council"
+msgstr "Opinion of the Federal Council"
+
 msgid "Analysis of the advertising campaign by Année Politique"
 msgstr "Analysis of the advertising campaign by Année Politique"
 
@@ -1818,8 +1824,8 @@ msgstr "Link department"
 msgid "Link federal office"
 msgstr "Link federal office"
 
-msgid "Explainer video by Easyvote"
-msgstr "Explainer video by Easyvote"
+msgid "Explainer video by easyvote"
+msgstr "Explainer video by easyvote"
 
 msgid "Recommendations of the Parties"
 msgstr "Recommendations by parties"
@@ -1948,6 +1954,10 @@ msgid ""
 "research purposes; see the Swissvotes codebook for more details on this "
 "(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
 msgstr ""
+"Due to data protection requirements, Swissvotes publishes a slightly reduced "
+"version of this dataset. Access to the full version might be possible for "
+"research purposes; see the Swissvotes codebook for more details on this "
+"(https://swissvotes.ch/page/dataset/codebook-en.pdf)."
 
 msgid "Full-text search in all documents on this vote"
 msgstr "Full-text search in all documents on this vote"
@@ -1972,14 +1982,14 @@ msgstr "Date"
 
 #. Default: Voting result
 msgid "voting_result_hyphenated"
-msgstr ""
+msgstr "Voting result"
 
 msgid "Yeas Percentage People"
 msgstr "Yes share"
 
 #. Default: Turnout
 msgid "turnout_hyphenated"
-msgstr ""
+msgstr "Turnout"
 
 msgid "Search results in the documents on this vote"
 msgstr "Search results in the documents on this vote"

@@ -12,12 +12,13 @@ from sqlalchemy import func
 
 def candidate_options(request, election):
     elected = request.translate(_("Elected")).lower()
+    completed = election.completed
     return [
         (
             request.link(candidate_, name='by-district'),
             '{} {}'.format(
                 f'{candidate_.family_name} {candidate_.first_name}',
-                (f'({elected})' if election.completed
+                (f'({elected})' if completed
                  and candidate_.elected else '')
             ).strip()
         )

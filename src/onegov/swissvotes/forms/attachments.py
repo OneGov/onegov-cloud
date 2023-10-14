@@ -95,7 +95,7 @@ class AttachmentsForm(Form):
     )
 
     parliamentary_committee_report = UploadField(
-        label=_("Report of the parliamentary committee"),
+        label=_("Report of the parliamentary committee (only for Pa.Iv.)"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
@@ -104,7 +104,7 @@ class AttachmentsForm(Form):
     )
 
     federal_council_opinion = UploadField(
-        label=_("Opinion of the Federal Council"),
+        label=_("Opinion of the Federal Council (only for Pa.Iv.)"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)
@@ -131,7 +131,7 @@ class AttachmentsForm(Form):
     )
 
     easyvote_booklet = UploadField(
-        label=_("Explanatory brochure by Easyvote"),
+        label=_("Explanatory brochure by easyvote"),
         validators=[
             WhitelistedMimeType(PDF_MIME_TYPES),
             FileSizeLimit(120 * 1024 * 1024)

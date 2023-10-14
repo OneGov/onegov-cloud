@@ -98,7 +98,7 @@ class SharedMethods:
         if expired_sessions:
             query = session.query(Reservation).with_entities(Reservation.token)
             query = query.filter(Reservation.session_id.in_(expired_sessions))
-            tokens = set(r[0] for r in query.all())
+            tokens = {token for token, in query.all()}
 
             query = session.query(FormSubmission)
             query = query.filter(FormSubmission.name == None)

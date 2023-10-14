@@ -2,8 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-08-03 17:58+0200\n"
-"POT-Creation-Date: 2023-08-02 14:33+0200\n"
+"POT-Creation-Date: 2023-09-25 08:37+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1224,6 +1223,8 @@ msgid ""
 "If a reservation is cancelled, a notification will be sent to the above "
 "recipient."
 msgstr ""
+"Se una prenotazione viene annullata, una notifica verrà inviata al "
+"destinatario sopra indicato."
 
 msgid "Send on"
 msgstr "Invia il"
@@ -1443,8 +1444,8 @@ msgstr "Mostra solo gli annunci per gli utenti connessi"
 msgid "Header links"
 msgstr "Collegamenti di intestazione"
 
-msgid "Title header left side"
-msgstr "Lato sinistro dell'intestazione del titolo"
+msgid "Text header left side"
+msgstr "Intestazione testo a sinistra"
 
 msgid "Optional"
 msgstr "Facoltativo"
@@ -1454,6 +1455,14 @@ msgstr "Colore del carattere"
 
 msgid "Relative font size"
 msgstr "Dimensione relativa del carattere"
+
+msgid "Keep header links and/or header text fixed to top on scrolling"
+msgstr ""
+"Mantenere i link dell'intestazione e/o il testo dell'intestazione fissi in "
+"alto durante lo scorrimento"
+
+msgid "Header fixation"
+msgstr "Fissare gli elementi dell'intestazione"
 
 msgid "Please add an url to each link"
 msgstr "Aggiungere un url a ciascun link"
@@ -1505,6 +1514,20 @@ msgstr "Persone"
 
 msgid "Values of the location filter"
 msgstr "Valori del filtro posizione"
+
+msgid "Choose the filter type for events (default is 'tags')"
+msgstr ""
+"Scegliere il tipo di filtro per gli eventi (l'impostazione predefinita è "
+"'tag')"
+
+msgid "A predefined set of tags"
+msgstr "Un insieme predefinito di tag"
+
+msgid "Manually configurable filters"
+msgstr "Filtri configurabili manualmente"
+
+msgid "Both, predefined tags as well as configurable filters"
+msgstr "Entrambi, tag predefiniti e filtri configurabili"
 
 msgid "The default map view. This should show the whole town"
 msgstr ""
@@ -1800,6 +1823,24 @@ msgstr "Mensile (il primo lunedì del mese)"
 msgid "Never"
 msgstr "Mai"
 
+msgid "Linked file"
+msgstr "File collegato"
+
+msgid "Keep link"
+msgstr "Conservare collegamento"
+
+msgid "Delete link"
+msgstr "Elimina collegamento"
+
+msgid "Replace link"
+msgstr "Sostituire collegamento"
+
+msgid "Choose existing file"
+msgstr "Scegliere tra i file esistenti"
+
+msgid "Link additional files"
+msgstr "Collegare file aggiuntivi"
+
 msgid "All directories"
 msgstr "Tutte le cartelle"
 
@@ -1954,6 +1995,9 @@ msgstr "Nuova nota"
 msgid "PDF"
 msgstr "PDF"
 
+msgid "Download files"
+msgstr "Scarica i file"
+
 msgid "New Message"
 msgstr "Nuovo messaggio"
 
@@ -2035,6 +2079,9 @@ msgstr "Elimina allocazione"
 #, python-format
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
+
+msgid "Configure"
+msgstr "Configura"
 
 msgid "This event can't be edited."
 msgstr "Questo evento non può essere modificato."
@@ -2122,9 +2169,6 @@ msgstr "Sincronizza"
 
 msgid "Directory"
 msgstr "Cartella"
-
-msgid "Configure"
-msgstr "Configura"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -2245,6 +2289,9 @@ msgstr "Mostra l'immagine in anteprima nella pagina madre"
 
 msgid "Show image on page"
 msgstr "Mostra l'immagine nella pagina"
+
+msgid "Documents"
+msgstr "Documenti"
 
 msgid "This month"
 msgstr "Questo mese"
@@ -2548,9 +2595,6 @@ msgstr "Modifica collegamento"
 
 msgid "The link was deleted"
 msgstr "Il collegamento è stato cancellato"
-
-msgid "Delete link"
-msgstr "Elimina collegamento"
 
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
@@ -3369,9 +3413,10 @@ msgid ""
 "title}. If you no longer want to receive this e-mail please contact an "
 "administrator so they can remove you from the recipients list."
 msgstr ""
-"Dies ist die Benachrichtigung für Notiz zu Reservierungen für ${request.app."
-"org.title}. Wenn Sie diese E-Mail nicht mehr erhalten möchten, kontaktieren "
-"Sie bitte einen Administrator, damit dieser Sie aus der Liste entfernen kann."
+"Questa è la notifica per le note sulle prenotazioni per ${request.app.org."
+"title}. Se non si desidera più ricevere questo messaggio di posta "
+"elettronica si prega di contattare un amministratore in modo che possa "
+"rimuovervi dall'elenco dei destinatari lista"
 
 msgid "This is what happend on the ${org} website over the past month:"
 msgstr "Questo è quello che è successo sul sito web ${org} nell'ultimo mese:"
@@ -3713,7 +3758,7 @@ msgid "This is an imported event"
 msgstr "Questo è un evento importato"
 
 msgid "Search in Events"
-msgstr ""
+msgstr "Ricerca negli eventi"
 
 msgid "Tag"
 msgstr "Tag"
@@ -5288,6 +5333,9 @@ msgstr "Il biglietto è già stato chiuso"
 msgid "Your message has been sent"
 msgstr "Il tuo messaggio è stato inviato"
 
+msgid "Zip archive created successfully"
+msgstr "Archivio zip creato con successo"
+
 msgid "Your request has been submitted"
 msgstr "La tua richiesta è stata inviata"
 
@@ -5364,3 +5412,7 @@ msgstr "È stato creato un account per te"
 
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
+
+#~ msgid "Keep header links fixed to top on scrolling"
+#~ msgstr ""
+#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"

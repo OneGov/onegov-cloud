@@ -1,6 +1,5 @@
 from onegov.election_day import _
 from onegov.form.fields import TagsField
-from onegov.form.fields import TimeField
 from onegov.form.fields import UploadField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
@@ -16,7 +15,7 @@ from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import InputRequired
-from wtforms.validators import Optional
+from wtforms.validators import Optional, NumberRange
 from wtforms.validators import ValidationError
 
 
@@ -50,17 +49,22 @@ class AgendaItemForm(NamedFileForm):
 
     memorial_pdf = UploadField(
         label=_('Excerpt from the Memorial (PDF)'),
-        fieldset=_('Downloads'),
+        fieldset=_('Memorial'),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
             FileSizeLimit(100 * 1024 * 1024)
         ]
     )
 
-    start = TimeField(
-        label=_('Start time'),
-        fieldset=_('Progress'),
+    memorial_page = IntegerField(
+        description=_(
+            "Links to the whole memorial (if there is one linked to the "
+            "assembly), but opens it on the chosen page number"
+        ),
+        label=_('Alternatively: Page from the Memorial'),
+        fieldset=_('Memorial'),
         validators=[
+            NumberRange(min=1),
             Optional()
         ],
     )

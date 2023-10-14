@@ -146,47 +146,47 @@ class ZugUserSource(UserSource):
         'zgXAbteilung': 'department',
     }
 
-    schools: dict[str, 'UserSourceArgsWithoutName'] = dict(
-        PHZ={
+    schools: dict[str, 'UserSourceArgsWithoutName'] = {
+        'PHZ': {
             'default_filter': '(mail=*@phzg.ch)',
             'org': 'DBK / AMH / Pädagogische Hochschule Zug',
             'bases': ['o=KTZG', 'o=Extern']
         },
-        ABA={
+        'ABA': {
             'default_filter': '(mail=*@aba-zug.ch)',
             'org': 'VD / ABA',
             'bases': ['ou=aba,ou=SchulNet,o=Extern']
         },
-        FMS={
+        'FMS': {
             'default_filter': '(mail=*@fms-zg.ch)',
             'org': 'DBK / AMH / Fachmittelschule Zug',
             'bases': ['ou=fms,ou=SchulNet,o=Extern']
         },
-        KBZ={
+        'KBZ': {
             'default_filter': '(mail=*@kbz-zug.ch)',
             'org': 'VD / KBZ',
             'bases': ['ou=kbz,ou=SchulNet,o=Extern']
         },
-        KSM={
+        'KSM': {
             'default_filter': '(mail=*@ksmenzingen.ch)',
             'org': 'DBK / AMH / Kantonsschule Menzingen',
             'bases': ['ou=ksm,ou=SchulNet,o=Extern']
         },
-        KSZ={
+        'KSZ': {
             'default_filter': '(mail=*@ksz.ch)',
             'org': 'DBK / AMH / Kantonsschule Zug',
             'bases': ['ou=ksz,ou=SchulNet,o=Extern']
         },
-        GIBZ={
+        'GIBZ': {
             'default_filter': '(mail=*@gibz.ch)',
             'org': 'VD / GIBZ',
             'bases': ['ou=gibz,ou=SchulNet,o=Extern']
         }
-    )
+    }
 
-    ldap_users: dict[str, 'UserSourceArgsWithoutName'] = dict(
-        KTZG={'bases': ['ou=Kanton,o=KTZG']}
-    )
+    ldap_users: dict[str, 'UserSourceArgsWithoutName'] = {
+        'KTZG': {'bases': ['ou=Kanton,o=KTZG']}
+    }
 
     @property
     def ldap_attributes(self) -> list[str]:
@@ -264,7 +264,7 @@ class ZugUserSource(UserSource):
         }
 
         user['mail'] = user['mail'].lower().strip()
-        user['groups'] = set(g.lower() for g in attrs['groupMembership'])
+        user['groups'] = {g.lower() for g in attrs['groupMembership']}
         user['type'] = self.user_type(entry)
 
         if user['type'] == 'ldap':

@@ -546,6 +546,119 @@ def get_context_specific_settings(
 pass_group_context = click.make_pass_decorator(GroupContext, ensure=True)
 
 
+def run_processors(
+    group_context: GroupContext,
+    processors: 'Sequence[Callable[..., Any]]'
+) -> None:
+    """ Runs a sequence of processors either in a raw context or
+    in a fully running application within a server.
+
+    This is extracted into its own utility function, so we can create
+    commands that only require a server for the initial setup, but then
+    may go on to run forever without the additional overhead
+    (e.g. to implement a spooler)
+
+    """
+
+    if not processors:
+        return
+
+    # load all applications into the server
+    view_path = uuid4().hex
+    applications = []
+
+    # NOTE: we initialize processor here, just to absolutely make sure
+    #       the variable exists in locals() when we go to look it up
+    #       below.
+    processor = processors[0]
+
+    for appcfg in group_context.appcfgs:
+
+        class CliApplication(appcfg.application_class):  # type:ignore
+
+            def is_allowed_application_id(
+                self,
+                application_id: str
+            ) -> bool:
+
+                if group_context.creates_path:
+                    return True
+
+                return super().is_allowed_application_id(application_id)
+
+            def configure_debug(self, **cfg: Any) -> None:
+                # disable debug options in cli (like query output)
+                pass
+
+        @CliApplication.path(path=view_path)
+        class Model:
+            pass
+
+        @CliApplication.view(model=Model, permission=Public)
+        def run_command(self: Model, request: 'CoreRequest') -> None:
+            # NOTE: This is kind of fragile, this depends on the loop
+            #       variable 'processor' from the loop below, this works
+            #       because Python will look up the variable at the time
+            #       of the call and not when we define this function.
+            processor(request, request.app)
+
+        @CliApplication.setting(section='cronjobs', name='enabled')
+        def get_cronjobs_enabled() -> bool:
+            return False
+
+        @CliApplication.setting_section(section='roles')
+        def get_roles_setting() -> dict[str, set[type['Intent']]]:
+            # override the security settings -> we need the public
+            # role to work for anonymous users, even if the base
+            # application disables that
+            return {
+                'anonymous': {Public},
+            }
+
+        scan_morepath_modules(CliApplication)
+        CliApplication.commit()
+
+        applications.append({
+            'path': appcfg.path,
+            'application': CliApplication,
+            'namespace': appcfg.namespace,
+            'configuration': appcfg.configuration
+        })
+
+    server = Server(
+        Config({
+            'applications': applications,
+        }),
+        configure_morepath=False,
+        configure_logging=False
+    )
+
+    def expects_request(processor: 'Callable[..., Any]') -> bool:
+        return 'request' in processor.__code__.co_varnames
+
+    # call the matching applications
+    client = Client(server)
+    matches = list(group_context.matches)
+
+    for match in matches:
+        for processor in processors:
+            if expects_request(processor):
+                # FIXME: The way this works is a bit fragile, we depend
+                #        on the way Python looks up locals here, it would
+                #        be better if we passed the index as a query param
+                path = group_context.match_to_path(match)
+                if path is None:
+                    continue
+
+                client.get(path + '/' + view_path)
+            else:
+                appcfg_ = group_context.match_to_appcfg(match)
+                if appcfg_ is None:
+                    continue
+
+                processor(group_context, appcfg_)
+
+
 def command_group() -> click.Group:
     """ Generates a click command group for individual modules.
 
@@ -607,91 +720,12 @@ def command_group() -> click.Group:
 
         group_context = click.get_current_context().obj
 
-        # load all applications into the server
-        view_path = uuid4().hex
-        applications = []
-
-        for appcfg in group_context.appcfgs:
-
-            class CliApplication(appcfg.application_class):  # type:ignore
-
-                def is_allowed_application_id(
-                    self,
-                    application_id: str
-                ) -> bool:
-
-                    if group_context.creates_path:
-                        return True
-
-                    return super().is_allowed_application_id(application_id)
-
-                def configure_debug(self, **cfg: Any) -> None:
-                    # disable debug options in cli (like query output)
-                    pass
-
-            @CliApplication.path(path=view_path)
-            class Model:
-                pass
-
-            @CliApplication.view(model=Model, permission=Public)
-            def run_command(self: Model, request: 'CoreRequest') -> None:
-                # FIXME: Why is this assuming a single processor?
-                processor(request, request.app)  # type:ignore[operator]
-
-            @CliApplication.setting(section='cronjobs', name='enabled')
-            def get_cronjobs_enabled() -> bool:
-                return False
-
-            @CliApplication.setting_section(section='roles')
-            def get_roles_setting() -> dict[str, set[type['Intent']]]:
-                # override the security settings -> we need the public
-                # role to work for anonymous users, even if the base
-                # application disables that
-                return {
-                    'anonymous': {Public},
-                }
-
-            scan_morepath_modules(CliApplication)
-            CliApplication.commit()
-
-            applications.append({
-                'path': appcfg.path,
-                'application': CliApplication,
-                'namespace': appcfg.namespace,
-                'configuration': appcfg.configuration
-            })
-
-        server = Server(
-            Config({
-                'applications': applications,
-            }),
-            configure_morepath=False,
-            configure_logging=False
-        )
-
-        def expects_request(processor: 'Callable[..., Any]') -> bool:
-            return 'request' in processor.__code__.co_varnames
-
-        # call the matching applications
-        client = Client(server)
-        matches = list(group_context.matches)
-
-        for match in matches:
-            for processor in processors:
-                if expects_request(processor):
-                    # FIXME: This doesn't work for more than one processor
-                    #        we should also pass in the processor index!
-                    path = group_context.match_to_path(match)
-                    client.get(path + '/' + view_path)
-                else:
-                    appcfg = group_context.match_to_appcfg(match)
-                    processor(group_context, appcfg)
+        run_processors(group_context, processors)
 
     return command_group
 
 
-# FIXME: Why are we not using click.abort? If we decide to switch
-#        then we can just make this a deprecated alias
+# FIXME: raise click.Abort(msg) might accomplish the same
 def abort(msg: str) -> NoReturn:
     """ Prints the given error message and aborts the program with a return
     code of 1.

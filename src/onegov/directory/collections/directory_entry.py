@@ -112,7 +112,7 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
         To filter alphabetically, set sort_choices=True. """
         keywords = tuple(
             as_internal_id(k)
-            for k in self.directory.configuration.keywords or tuple()
+            for k in self.directory.configuration.keywords or ()
         )
         fields = {f.id: f for f in self.directory.fields if f.id in keywords}
 

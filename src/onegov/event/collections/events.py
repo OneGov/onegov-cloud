@@ -197,7 +197,7 @@ class EventCollection(Pagination):
         if purge:
             query = self.session.query(Event.meta['source'].label('source'))
             query = query.filter(Event.meta['source'].astext.startswith(purge))
-            purge = set((r.source for r in query))
+            purge = {r.source for r in query}
 
         added = []
         updated = []
@@ -220,7 +220,7 @@ class EventCollection(Pagination):
             ).first()
 
             if purge:
-                purge -= set([event.source])
+                purge -= {event.source}
 
             if existing:
                 update_state = valid_state_transfers.get(
@@ -248,6 +248,7 @@ class EventCollection(Pagination):
                         existing.title != event.title
                         or existing.location != event.location
                         or set(existing.tags) != set(event.tags)
+                        or existing.filter_keywords != event.filter_keywords
                         or existing.timezone != event.timezone
                         or existing.start != event.start
                         or existing.end != event.end
@@ -263,6 +264,7 @@ class EventCollection(Pagination):
                     existing.title = event.title
                     existing.location = event.location
                     existing.tags = event.tags
+                    existing.filter_keywords = event.filter_keywords
                     existing.timezone = event.timezone
                     existing.start = event.start
                     existing.end = event.end
@@ -307,7 +309,7 @@ class EventCollection(Pagination):
 
     def from_ical(self, ical, future_events_only=False,
                   event_image=None, event_image_name=None,
-                  default_categories=None):
+                  default_categories=None, default_filter_keywords=None):
         """ Imports the events from an iCalender string.
 
         We assume the timezone to be Europe/Zurich!
@@ -321,6 +323,9 @@ class EventCollection(Pagination):
         :type event_image_name: str
         :param default_categories: categories applied if non is given in ical
         :type default_categories: [str]
+        :param default_filter_keywords: default filter keywords, see event
+        filter settings app.org.event_filter_type
+        :type default_filter_keywords: dict(str, str)
 
         """
         items = []
@@ -375,14 +380,16 @@ class EventCollection(Pagination):
                     coordinates.latitude, coordinates.longitude
                 )
 
-            tags = vevent.get('categories') or vCategory(default_categories)
+            if default_categories == None:
+                default_categories = []
+            tags = (vevent.get('categories') or vCategory(default_categories))
             if tags:
                 # categories may be in lists or they may be single values
                 # whose 'cats' member contains the texts
                 if not hasattr(tags, '__iter__'):
                     tags = [tags]
 
-                tags = [str(c) for tag in tags for c in tag.cats]
+                tags = [str(c) for tag in tags for c in tag.cats if c]
 
             uid = str(vevent.get('uid', ''))
             title = str(escape(vevent.get('summary', '')))
@@ -404,6 +411,7 @@ class EventCollection(Pagination):
                         location=location,
                         coordinates=coordinates,
                         tags=tags or [],
+                        filter_keywords=default_filter_keywords,
                         source=f'ical-{uid}',
                     ),
                     image=event_image,

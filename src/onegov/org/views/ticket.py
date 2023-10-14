@@ -7,10 +7,11 @@ from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
 from onegov.core.orm import as_selectable
-from onegov.core.request import CoreRequest
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
+import zipfile
+from io import BytesIO
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
@@ -30,7 +31,9 @@ from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
+from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.collection import ArchivedTicketsCollection
@@ -126,7 +129,9 @@ def view_ticket(self, request, layout=None):
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
-        'edit_amount_url': edit_amount_url
+        'edit_amount_url': edit_amount_url,
+        'show_tags': show_tags(request),
+        'show_filters': show_filters(request),
     }
 
 
@@ -350,7 +355,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
 
 
 def send_new_note_notification(
-    request: CoreRequest, form: TicketNoteForm, note: TicketNote, template: str
+    request: OrgRequest, form: TicketNoteForm, note: TicketNote, template: str
 ):
     """
     Sends an E-mail notification to all resource recipients that have been
@@ -738,6 +743,48 @@ def view_ticket_pdf(self, request):
         content.read(),
         content_type='application/pdf',
         content_disposition='inline; filename={}_{}.pdf'.format(
+            normalize_for_url(self.number),
+            date.today().strftime('%Y%m%d')
+        )
+    )
+
+
+@OrgApp.view(model=Ticket, name='files', permission=Private)
+def view_ticket_files(self, request):
+    """ Download the files associated with the ticket as zip. """
+
+    form_submission = getattr(self.handler, 'submission', None)
+
+    if form_submission is None:
+        return request.redirect(request.link(self))
+
+    buffer = BytesIO()
+    not_existing = []
+    with zipfile.ZipFile(buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for f in form_submission.files:
+            try:
+                zipf.writestr(f.name, f.reference.file.read())
+            except IOError:
+                not_existing.append(f.name)
+
+        pdf = TicketPdf.from_ticket(request, self)
+        pdf_filename = '{}_{}.pdf'.format(normalize_for_url(self.number),
+                                          date.today().strftime('%Y%m%d'))
+        zipf.writestr(pdf_filename, pdf.read())
+
+    if not_existing:
+        count = len(not_existing)
+        request.alert(_(f"{count} file(s) not found:"
+                        f" {', '.join(not_existing)}"))
+    else:
+        request.info(_("Zip archive created successfully"))
+
+    buffer.seek(0)
+
+    return Response(
+        buffer.read(),
+        content_type='application/zip',
+        content_disposition='inline; filename=ticket-{}_{}.zip'.format(
             normalize_for_url(self.number),
             date.today().strftime('%Y%m%d')
         )

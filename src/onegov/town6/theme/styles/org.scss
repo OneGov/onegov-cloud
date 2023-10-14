@@ -102,6 +102,7 @@ html {
     scroll-behavior: smooth;
 }
 
+
 .off-canvas-content {
     display: flex;
     flex-direction: column;
@@ -844,11 +845,6 @@ body:not(.editor-layout) {
     }
 }
 
-@media #{$small-only} {
-    .orbit.slider {
-        margin-bottom: -2rem;
-    }
-}
 
 /*
     Accessibility
@@ -966,4 +962,50 @@ ul.recipients {
 
 .sidebar {
     box-shadow: inset 10px 0 8px -10px rgba(0, 0, 0, .07);
+
+    .sidebar-wrapper {
+        will-change: min-height;
+        margin-bottom: 4rem;
+    }
+
+    .sidebar-content-wrapper {
+        transform: translate(0, 0); /* For browsers don't support translate3d. */
+        transform: translate3d(0, 0, 0);
+        will-change: position, transform;
+    }
+}
+
+@media #{$small-only} {
+    .sidebar .sidebar-wrapper {
+        display: none;
+    }
+}
+
+.sidebar-toggler {
+    background: $black;
+    border-radius: 200px 0 0 200px;
+    display: block;
+    opacity: .5;
+    padding: .9rem .4rem .7rem 1rem;
+    position: fixed;
+    right: 0;
+    top: calc(50vh - 23px);
+    z-index: 1001;
+
+    i {
+        color: $white;
+    }
+}
+
+.rotate {
+    -moz-transition: all 200ms linear;
+    -webkit-transition: all 200ms linear;
+    transition: all 200ms linear;
+}
+
+.rotate.down {
+    -ms-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
 }

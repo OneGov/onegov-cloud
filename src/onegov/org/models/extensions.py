@@ -7,14 +7,31 @@ from onegov.org import _
 from onegov.org.forms import ResourceForm
 from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.org.forms.extensions import PublicationFormExtension
+from onegov.org.forms.fields import UploadOrSelectExistingMultipleFilesField
 from onegov.people import Person, PersonCollection
 from onegov.reservation import Resource
+from sedate import to_timezone, utcnow
 from sqlalchemy.orm import object_session
 from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.validators import ValidationError
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+    from onegov.form.types import _FormT
+    from onegov.org.request import OrgRequest
+    from typing import Protocol
+
+    class SupportsExtendForm(Protocol):
+        def extend_form(
+            self,
+            form_class: type[_FormT],
+            request: OrgRequest
+        ) -> type[_FormT]: ...
 
 
 class ContentExtension:
@@ -24,7 +41,7 @@ class ContentExtension:
     """
 
     @property
-    def content_extensions(self):
+    def content_extensions(self) -> 'Iterator[type[ContentExtension]]':
         """ Returns all base classes of the current class which themselves have
         ``ContentExtension`` as baseclass.
 
@@ -33,7 +50,12 @@ class ContentExtension:
             if ContentExtension in cls.__bases__:
                 yield cls
 
-    def with_content_extensions(self, form_class, request, extensions=None):
+    def with_content_extensions(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest',
+        extensions: 'Iterable[type[SupportsExtendForm]] | None' = None
+    ) -> type['_FormT']:
         """ Takes the given form and request and extends the form with
         all content extensions in the order in which they occur in the base
         class list.
@@ -49,7 +71,11 @@ class ContentExtension:
 
         return form_class
 
-    def extend_form(self, form_class, request):
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
         """ Must be implemented by each ContentExtension. Takes the form
         class without extension and adds the required fields to it.
 
@@ -378,8 +404,8 @@ class PersonLinkExtension(ContentExtension):
                         in self.get_people_and_function()
                     }
 
-                    old_people = dict()
-                    new_people = list()
+                    old_people = {}
+                    new_people = []
 
                     for id, function in previous_people:
                         if id in selected.keys():
@@ -511,3 +537,65 @@ class ImageExtension(ContentExtension):
             )
 
         return PageImageForm
+
+
+class GeneralFileLinkExtension(ContentExtension):
+    """ Extends any class that has a files relationship to reference files from
+    :class:`onegov.org.models.file.GeneralFileCollection`.
+
+    """
+
+    def extend_form(
+        self,
+        form_class: type['_FormT'],
+        request: 'OrgRequest'
+    ) -> type['_FormT']:
+
+        class GeneralFileForm(form_class):  # type:ignore
+            files = UploadOrSelectExistingMultipleFilesField(
+                label=_("Documents"),
+            )
+
+            def populate_obj(
+                self,
+                obj: object,
+                *args: Any,
+                **kwargs: Any
+            ) -> None:
+                super().populate_obj(obj, *args, **kwargs)
+
+                # transfer the publication settings to newly added files
+                # TODO: maybe we should take access into account as well?
+                if (
+                    self.files.added_files
+                    and 'publication_start' in self
+                    and 'publication_end' in self
+                ):
+                    start = self['publication_start'].data
+                    end = self['publication_end'].data
+                    if start is None and end is None:
+                        # nothing to do
+                        return
+
+                    now = utcnow()
+                    published = True
+                    if end is not None and to_timezone(end, 'UTC') < now:
+                        # clear both dates and set published to False
+                        published = False
+                        start = None
+                        end = None
+
+                    elif start is not None:
+                        if to_timezone(start, 'UTC') < now:
+                            # clear the date since we're already published
+                            start = None
+                        else:
+                            # otherwise set published to False
+                            published = False
+
+                    for file in self.files.added_files:
+                        file.published = published
+                        file.publish_date = start
+                        file.publish_end_date = end
+
+        return GeneralFileForm

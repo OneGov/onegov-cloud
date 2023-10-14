@@ -136,6 +136,9 @@ def view_page(self, request):
         files.extend(dataset)
     files = sorted([(f.filename, layout.get_file_url(f)) for f in files])
 
+    if self.show_timeline:
+        request.include('mastodon')
+
     return {
         'layout': layout,
         'files': files,
