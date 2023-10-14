@@ -675,11 +675,11 @@ msgstr "Musikverein"
 msgid "Organizer E-Mail address"
 msgstr "Organisator E-Mail Adresse"
 
-msgid "Organizer phone number"
-msgstr "Organisator Telefonnummer"
-
 msgid "Shown as contact E-Mail address"
 msgstr "Wird als Kontakt-Email-Adresse angezeigt"
+
+msgid "Organizer phone number"
+msgstr "Organisator Telefonnummer"
 
 msgid "Shown as contact phone number"
 msgstr "Wird als Kontakttelefonnummer angezeigt"
@@ -985,9 +985,6 @@ msgstr "Aktuelles"
 
 msgid "Events"
 msgstr "Veranstaltungen"
-
-msgid "Search in Events"
-msgstr "Suche in Veranstaltungen"
 
 msgid "Publications"
 msgstr "Publikationen"
@@ -1676,6 +1673,27 @@ msgid "Enables website visitors to submit their own events"
 msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+msgid "6 months"
+msgstr "6 Monate"
+
+msgid "1 year"
+msgstr "1 Jahr"
+
+msgid "2 years"
+msgstr "2 Jahre"
+
+msgid "3 years"
+msgstr "3 Jahre"
+
+msgid "Duration from opening a ticket to its automatic archival"
+msgstr "Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"
+
+msgid "Duration from archived state until deleted automatically"
+msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
+
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
@@ -1921,6 +1939,9 @@ msgstr "Ticket archivieren"
 
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
+
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
 
 msgid "Assign ticket"
 msgstr "Ticket zuweisen"
@@ -2648,8 +2669,9 @@ msgstr "Keine Regeln definiert."
 msgid ""
 "Api keys can be used to ensure you're not being rate limited. They are not "
 "required to use the API."
-msgstr "Api-Schlüssel können verwendet werden, um sicherzustellen, dass Sie keine Tarifbeschränkungen haben. "
-"Sie sind nicht erforderlich, um die API zu nutzen."
+msgstr ""
+"Api-Schlüssel können verwendet werden, um sicherzustellen, dass Sie keine "
+"Tarifbeschränkungen haben. Sie sind nicht erforderlich, um die API zu nutzen."
 
 msgid "Application Keys"
 msgstr "Applikations-Schlüssel"
@@ -3701,6 +3723,9 @@ msgstr "Herkunft"
 
 msgid "This is an imported event"
 msgstr "Dies ist eine importierte Veranstaltung"
+
+msgid "Search in Events"
+msgstr "Suche in Veranstaltungen"
 
 msgid "Tag"
 msgstr "Schlagwort"
@@ -5139,9 +5164,6 @@ msgstr "Textbaustein bearbeiten"
 
 msgid "The text module was deleted"
 msgstr "Der Textbaustein wurde gelöscht"
-
-msgid "Delete Ticket"
-msgstr "Ticket löschen"
 
 msgid "This ticket is not deletable."
 msgstr "Dieses Ticket kann nicht gelöscht werden."

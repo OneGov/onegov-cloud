@@ -213,6 +213,9 @@ msgstr "Ticket archivieren"
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
 
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
@@ -1633,6 +1636,9 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
+msgid "Phone number"
+msgstr ""
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -2144,6 +2150,12 @@ msgstr "Migration Links"
 
 msgid "OneGov API"
 msgstr "OneGov API"
+
+msgid "Data Retention"
+msgstr "Data Retention"
+
+msgid "Data Retention Policy"
+msgstr "Data Retention Policy"
 
 #~ msgid "The OneGov Cloud Team"
 #~ msgstr "Das OneGov Cloud Team"
