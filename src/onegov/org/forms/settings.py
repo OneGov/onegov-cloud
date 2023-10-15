@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from functools import cached_property
+from functools import cached_property, cache
 from lxml import etree
 from sedate import utcnow
 from wtforms.fields import SelectField
@@ -40,9 +40,9 @@ from wtforms.validators import URL as UrlRequired
 from wtforms.validators import ValidationError
 
 
-from typing import TYPE_CHECKING
+from typing_extensions import TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from translationstring import TranslationString
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
@@ -1141,49 +1141,34 @@ class EventSettingsForm(Form):
     )
 
 
+@cache
 def generate_timespans() -> (
-        'Iterator[tuple[str | datetime.datetime, str]]'
+        'list[tuple[str | datetime.datetime, TranslationString]]'
 ):
     base_date = utcnow()
-    yield '', _('Disabled')
-    yield base_date + datetime.timedelta(days=180), _('6 months')
-    years = (
-        (
-            base_date + datetime.timedelta(days=365 * i),
-            _(f"{i} year{'s' if i > 1 else ''}"),
-        )
-        for i in range(1, 4)
-    )
-    yield from years
+    return [
+        ('', _('Disabled')),
+        (base_date + datetime.timedelta(days=180), _('6 months')),
+        (base_date + datetime.timedelta(days=365), _('1 year')),
+        (base_date + datetime.timedelta(days=365 * 2), _('2 years')),
+        (base_date + datetime.timedelta(days=365 * 3), _('3 years')),
+    ]
 
 
 class DataRetentionPolicyForm(Form):
-    def __init__(self, *args, **kwargs):
-        super(DataRetentionPolicyForm, self).__init__(*args, **kwargs)
-
 
     relative_time_auto_archive = SelectField(
-        label=_('Duration from opening a ticket to its automatic archival'),
+        label=_(
+            'Duration from opening a ticket to its automatic archival'
+        ),
         default=_('Disabled'),
-        choices=list(generate_timespans())
-
+        choices=generate_timespans(),
     )
 
     relative_time_auto_delete = SelectField(
-        label=_('Duration from archived state until deleted automatically'),
+        label=_(
+            'Duration from archived state until deleted automatically'
+        ),
         default=_('Disabled'),
-        choices=list(generate_timespans())
-
+        choices=generate_timespans(),
     )
-
-    # def populate_obj(self, model):
-    #     super().populate_obj(model)
-    #     breakpoint()
-    #     model.relative_time_auto_delete = self.relative_time_auto_delete.data
-    #     model.relative_time_auto_archive = self.relative_time_auto_archive.data
-    #
-    # def process_obj(self, model):
-    #     super().process_obj(model)
-    #
-    #     self.relative_time_auto_archive.data = model.relative_time_auto_archive
-    #     self.relative_time_auto_archive.data = model.relative_time_auto_archive
