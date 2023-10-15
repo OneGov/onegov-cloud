@@ -1,6 +1,9 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
+
+import transaction
+
 from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
@@ -16,7 +19,8 @@ from onegov.org.views.newsletter import send_newsletter
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
-from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
+from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day,\
+    ensure_timezone
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import undefer
 from uuid import UUID
@@ -459,3 +463,28 @@ def send_daily_resource_usage_overview(request):
             receivers=(address, ),
             content=content
         )
+
+
+@OrgApp.cronjob(hour=14, minute=40, timezone='Europe/Zurich')
+def apply_archiving_and_ticket_deletion(request):
+    session = request.session
+    tickets = TicketCollection(session)
+
+    query = tickets.query().filter(Ticket.created >= start)
+
+    org = request.app.org
+    time = org.relative_time_auto_archive
+    breakpoint()
+
+
+
+    # basically check the retention policy
+
+    # if it not existsb, exit
+
+    # get `relative_time_auto_archive` from settings
+
+    # else the max_timespan is higher, get all tickets where the timespan
+    # ticked created > relative_time_auto_archive
+
+

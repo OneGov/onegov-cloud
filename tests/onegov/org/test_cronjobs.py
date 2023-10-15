@@ -695,3 +695,60 @@ def test_send_scheduled_newsletters(org_app):
         newsletter = newsletters.query().one()
         assert not newsletter.scheduled
         assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_auto_archive_tickets(org_app, handlers):
+    register_echo_handler(handlers)
+
+    session = org_app.session()
+    tz = ensure_timezone('Europe/Zurich')
+
+    transaction.begin()
+    collection = TicketCollection(session)
+
+    tickets = [
+        collection.open_ticket(
+            handler_id='1',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 2, 10, tzinfo=tz),
+        ),
+        collection.open_ticket(
+            handler_id='2',
+            handler_code='EHO',
+            title="Title",
+            group="Group",
+            email="citizen@example.org",
+            created=datetime(2016, 1, 2, 10, tzinfo=tz),
+        ),
+    ]
+
+    request = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('b', 'p@ssw0rd', request, role='admin')
+    users = UserCollection(session).query().all()
+    user = users[0]
+    for t in tickets:
+        t.created = datetime(2016, 1, 2, 10, tzinfo=tz)
+        t.accept_ticket(user)
+        t.close_ticket()
+        t.modified = datetime(2016, 1, 2, 10, tzinfo=tz)
+
+    transaction.commit()
+
+    time = org_app.org.relative_time_auto_archive
+    query = collection.query()
+    query = query.filter(Ticket.created >= start)
+
+
+    job = get_cronjob_by_name(
+        org_app, 'apply_archiving_and_ticket_deletion'
+    )
+    # todo: wtf
+    job.app = org_app
+
+    with freeze_time('2018-05-31 11:00'):
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+

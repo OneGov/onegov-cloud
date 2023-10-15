@@ -179,6 +179,10 @@ class Organisation(Base, TimestampMixin):
     gever_password = meta_property()
     gever_endpoint = meta_property()
 
+    # data retention policy
+    relative_time_auto_delete = meta_property()
+    relative_time_auto_archive = meta_property()
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

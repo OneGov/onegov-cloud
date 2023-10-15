@@ -1141,37 +1141,49 @@ class EventSettingsForm(Form):
     )
 
 
+def generate_timespans() -> (
+        'Iterator[tuple[str | datetime.datetime, str]]'
+):
+    base_date = utcnow()
+    yield '', _('Disabled')
+    yield base_date + datetime.timedelta(days=180), _('6 months')
+    years = (
+        (
+            base_date + datetime.timedelta(days=365 * i),
+            _(f"{i} year{'s' if i > 1 else ''}"),
+        )
+        for i in range(1, 4)
+    )
+    yield from years
+
+
 class DataRetentionPolicyForm(Form):
     def __init__(self, *args, **kwargs):
         super(DataRetentionPolicyForm, self).__init__(*args, **kwargs)
-        self.relative_time_auto_archive.choices = list(
-            self.generate_timespans()
-        )
-        self.relative_time_auto_delete.choices = list(
-            self.generate_timespans()
-        )
 
-    def generate_timespans(self) -> (
-            'Iterator[tuple[str | datetime.datetime, str]]'
-    ):
-        base_date = utcnow()
-        yield '', _('Disabled')
-        yield base_date + datetime.timedelta(days=180), _('6 months')
-        years = (
-            (
-                base_date + datetime.timedelta(days=365 * i),
-                _(f"{i} year{'s' if i > 1 else ''}"),
-            )
-            for i in range(1, 4)
-        )
-        yield from years
 
     relative_time_auto_archive = SelectField(
         label=_('Duration from opening a ticket to its automatic archival'),
-        default=_('Disabled')
+        default=_('Disabled'),
+        choices=list(generate_timespans())
+
     )
 
     relative_time_auto_delete = SelectField(
         label=_('Duration from archived state until deleted automatically'),
-        default=_('Disabled')
+        default=_('Disabled'),
+        choices=list(generate_timespans())
+
     )
+
+    # def populate_obj(self, model):
+    #     super().populate_obj(model)
+    #     breakpoint()
+    #     model.relative_time_auto_delete = self.relative_time_auto_delete.data
+    #     model.relative_time_auto_archive = self.relative_time_auto_archive.data
+    #
+    # def process_obj(self, model):
+    #     super().process_obj(model)
+    #
+    #     self.relative_time_auto_archive.data = model.relative_time_auto_archive
+    #     self.relative_time_auto_archive.data = model.relative_time_auto_archive
