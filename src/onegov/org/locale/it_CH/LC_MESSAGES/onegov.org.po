@@ -1712,6 +1712,15 @@ msgstr "Disattivato"
 msgid "6 months"
 msgstr "6 mesi"
 
+msgid "1 year"
+msgstr "1 anno"
+
+msgid "2 years"
+msgstr "2 anni"
+
+msgid "3 years"
+msgstr "3 anni"
+
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
 

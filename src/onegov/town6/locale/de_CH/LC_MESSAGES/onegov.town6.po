@@ -966,6 +966,9 @@ msgstr ""
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
 
+msgid "Current Image"
+msgstr "Aktuelles Bild"
+
 msgid "Has a digital seal"
 msgstr "Hat ein digitales Siegel"
 
@@ -1639,9 +1642,6 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link zur Veranstalterseite"
 
-msgid "Phone number"
-msgstr "Telefonnummer"
-
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -2159,6 +2159,9 @@ msgstr "Data Retention"
 
 msgid "Data Retention Policy"
 msgstr "Data Retention Policy"
+
+#~ msgid "Phone number"
+#~ msgstr "Telefonnummer"
 
 #~ msgid "Straight to ..."
 #~ msgstr "Direkt zu ..."

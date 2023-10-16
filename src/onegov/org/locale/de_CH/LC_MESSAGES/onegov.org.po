@@ -1710,7 +1710,8 @@ msgid "3 years"
 msgstr "3 Jahre"
 
 msgid "Duration from opening a ticket to its automatic archival"
-msgstr "Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"
+msgstr ""
+"Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"
 
 msgid "Duration from archived state until deleted automatically"
 msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"

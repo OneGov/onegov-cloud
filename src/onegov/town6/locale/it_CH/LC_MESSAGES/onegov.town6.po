@@ -959,6 +959,9 @@ msgstr ""
 "le foto, aggiungi alcune foto a un album e contrassegnalo come disponibile "
 "per la home page."
 
+msgid "Current Image"
+msgstr "Immagine corrente"
+
 msgid "Has a digital seal"
 msgstr "Ha un sigillo digitale"
 
@@ -1623,9 +1626,6 @@ msgstr ""
 msgid "Link to organizers page"
 msgstr "Link alla pagina dell'organizzatore"
 
-msgid "Phone number"
-msgstr "Numero di telefono"
-
 msgid "Export this event"
 msgstr "Esporta questo evento"
 
@@ -2153,6 +2153,9 @@ msgstr "Data Retention"
 
 msgid "Data Retention Policy"
 msgstr "Data Retention Policy"
+
+#~ msgid "Phone number"
+#~ msgstr "Numero di telefono"
 
 #~ msgid "Straight to ..."
 #~ msgstr "Direttamente a ..."
