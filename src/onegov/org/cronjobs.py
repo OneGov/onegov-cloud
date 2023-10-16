@@ -48,8 +48,6 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
-    archive_old_tickets(request)
-    delete_old_tickets(request)
 
 
 def send_scheduled_newsletter(request):
@@ -481,9 +479,11 @@ def archive_old_tickets(request):
 
     archive_timespan = parse_to_timedelta(archive_timespan)
 
+    diff = utcnow() - archive_timespan
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'closed')
-    query = query.filter(Ticket.created <= (utcnow() - archive_timespan))
+    query = query.filter(Ticket.created <= diff)
+
     for ticket in query:
         ticket.archive_ticket()
 
@@ -498,7 +498,9 @@ def delete_old_tickets(request):
 
     delete_timespan = parse_to_timedelta(delete_timespan)
 
+    diff = utcnow() - delete_timespan
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'archived')
-    query = query.filter(Ticket.created <= (utcnow() - delete_timespan))
+    query = query.filter(Ticket.created <= diff)
+
     delete_tickets_and_related_data(request, query)
