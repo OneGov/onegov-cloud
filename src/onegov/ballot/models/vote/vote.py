@@ -215,7 +215,12 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        expr = select([func.sum(getattr(Ballot, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(Ballot, attribute)),
+                0
+            )
+        ])
         expr = expr.where(Ballot.vote_id == cls.id)
         expr = expr.label(attribute)
 
