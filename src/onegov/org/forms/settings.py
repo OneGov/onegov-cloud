@@ -1,12 +1,9 @@
 import datetime
 import json
 import re
-from functools import cached_property, cache
-from typing import List, Tuple, Any
-
+from functools import cached_property
 from lxml import etree
 from sedate import utcnow
-from wtforms.fields import SelectField
 
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
@@ -41,11 +38,6 @@ from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 from wtforms.validators import URL as UrlRequired
 from wtforms.validators import ValidationError
-
-
-from typing_extensions import TYPE_CHECKING
-if TYPE_CHECKING:
-    from onegov.core.request import CoreRequest
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
@@ -1144,29 +1136,27 @@ class EventSettingsForm(Form):
     )
 
 
-def generate_timespans(request: 'CoreRequest') -> list[tuple[Any, str]]:
+def generate_timespans() -> tuple[tuple[str | datetime.datetime, str], ...]:
     base_date = utcnow()
-    time_mappings = [
+    return (
         ('', _('Disabled')),
         (base_date + datetime.timedelta(days=180), _('6 months')),
         (base_date + datetime.timedelta(days=365), _('1 year')),
         (base_date + datetime.timedelta(days=365 * 2), _('2 years')),
         (base_date + datetime.timedelta(days=365 * 3), _('3 years')),
-    ]
-    return list(map(lambda x: (x[0], request.translate(x[1])), time_mappings))
+    )
 
 
 class DataRetentionPolicyForm(Form):
 
-    def __init__(self, *args, **kwargs):
-        super(DataRetentionPolicyForm, self).__init__(*args, **kwargs)
-        self.relative_time_auto_archive = SelectField(
-            label=_('Duration from opening a ticket to its automatic archival'),
-            default=_('Disabled'),
-            choices=generate_timespans(self.request),
-        )
-        self.relative_time_auto_delete = SelectField(
-            label=_('Duration from archived state until deleted automatically'),
-            default=_('Disabled'),
-            choices=generate_timespans(self.request),
-        )
+    relative_time_auto_archive = RadioField(
+        label=_('Duration from opening a ticket to its automatic archival'),
+        default='',
+        choices=generate_timespans()
+    )
+
+    relative_time_auto_delete = RadioField(
+        label=_('Duration from archived state until deleted automatically'),
+        default='',
+        choices=generate_timespans()
+    )
