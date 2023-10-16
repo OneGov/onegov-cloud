@@ -187,6 +187,15 @@ msgstr "Person löschen"
 msgid "Tickets"
 msgstr "Tickets"
 
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
+
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -2168,6 +2177,3 @@ msgstr "Data Retention Policy"
 
 #~ msgid "Perform Search"
 #~ msgstr "Suchen"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Das OneGov Cloud Team"

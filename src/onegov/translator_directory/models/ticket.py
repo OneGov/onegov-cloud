@@ -49,6 +49,17 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
     def deleted(self):
         return self.translator is None
 
+    @property
+    def ticket_deletable(self):
+        # For now we don't support this because lot's of functionality
+        # depends on data in translator tickets
+        if self.deleted:
+            return True
+        return False
+
+    def prepare_delete_ticket(self):
+        pass
+
     @cached_property
     def email(self):
         return self.data['handler_data'].get('submitter_email', '')
@@ -153,6 +164,17 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
     @property
     def deleted(self):
         return self.translator is None
+
+    @property
+    def ticket_deletable(self):
+        # For now we don't support more because lot's of functionality
+        # depends on data in translator tickets
+        if self.deleted:
+            return True
+        return False
+
+    def prepare_delete_ticket(self):
+        pass
 
     @cached_property
     def email(self):

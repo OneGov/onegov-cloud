@@ -1957,6 +1957,12 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 msgid "Delete person"
 msgstr "Person löschen"
 
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -5411,5 +5417,11 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"${success_count} tickets gelöscht, ${error_count} sind nicht löschbar."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} tickets gelöscht."

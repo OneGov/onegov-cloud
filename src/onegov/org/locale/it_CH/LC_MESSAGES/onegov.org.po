@@ -1969,6 +1969,12 @@ msgstr "Vuoi davvero eliminare questa persona?"
 msgid "Delete person"
 msgstr "Elimina persona"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 
@@ -5422,6 +5428,11 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr ""
-#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"$${success_count} biglietti cancellati, ${error_count} non sono cancellabili."
+
+#, python-format
+msgid "{success_count} tickets deleted."
+msgstr "{success_count} biglietti cancellati."

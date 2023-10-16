@@ -1,4 +1,5 @@
 from functools import cached_property
+from sedate import align_date_to_day, to_timezone, utcnow
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
@@ -204,12 +205,9 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
     @property
     def ticket_deletable(self):
-        """Todo: Finalize implementing ticket deletion """
         if self.deleted:
             return True
-        return False
-        #  ...for later when deletion will be available
-        if not self.ticket.state == 'archived':
+        if self.ticket.state != 'archived':
             return False
         if self.payment:
             # For now we do not handle this case since payment might be
@@ -376,6 +374,16 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
         return tuple(query)
 
+    def has_future_reservation(self):
+        timezone = 'Europe/Zurich'
+        today = to_timezone(utcnow(), timezone)
+        today = align_date_to_day(today, timezone, 'down')
+        for reservation in self.reservations:
+            if reservation.start > today:
+                return True
+
+        return False
+
     @cached_property
     def submission(self):
         return FormSubmissionCollection(self.session).by_id(self.id)
@@ -412,6 +420,28 @@ class ReservationHandler(Handler, TicketDeletionMixin):
         for r in self.reservations:
             if r.data and r.data.get('accepted'):
                 return False
+
+        return True
+
+    def prepare_delete_ticket(self):
+        if self.reservations:
+            for reservation in self.reservations:
+                self.session.delete(reservation)
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.payment:
+            # For now we do not handle this case since payment might be
+            # needed for exports
+            return False
+        if self.undecided:
+            return False
+        if self.has_future_reservation():
+            return False
 
         return True
 
@@ -663,6 +693,23 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
     def undecided(self):
         return self.event and self.event.state == 'submitted'
 
+    def prepare_delete_ticket(self):
+        if self.event:
+            self.session.delete(self.event)
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.undecided:
+            return False
+        if self.event.future_occurrences():
+            return False
+
+        return True
+
     @cached_property
     def group(self):
         return _("Event")
@@ -870,6 +917,20 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
             return False
 
         return self.state is None
+
+    def prepare_delete_ticket(self):
+        if self.submission:
+            self.session.delete(self.submission)
+
+    @property
+    def ticket_deletable(self):
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.undecided:
+            return False
+        return True
 
     @property
     def kind(self):

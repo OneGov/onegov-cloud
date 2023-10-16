@@ -3,7 +3,8 @@ from onegov.form import Form
 from onegov.org.views.ticket import (
     view_ticket, handle_new_note, handle_edit_note, message_to_submitter,
     view_ticket_status, view_tickets, view_archived_tickets,
-    view_pending_tickets, assign_ticket, view_send_to_gever, delete_ticket)
+    view_pending_tickets, assign_ticket, view_send_to_gever,
+    view_delete_all_archived_tickets, delete_ticket)
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import TownApp
 from onegov.org.forms import TicketNoteForm, TicketAssignmentForm
@@ -16,7 +17,7 @@ from onegov.ticket import Ticket
 from onegov.ticket.collection import TicketCollection
 from onegov.town6.layout import (
     FindYourSpotLayout, TicketLayout, TicketNoteLayout,
-    TicketChatMessageLayout, TicketsLayout)
+    TicketChatMessageLayout, TicketsLayout, ArchivedTicketsLayout)
 
 
 @TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -76,7 +77,15 @@ def town_view_tickets(self, request):
 @TownApp.html(model=ArchivedTicketsCollection, template='archived_tickets.pt',
               permission=Private)
 def town_view_archived_tickets(self, request):
-    return view_archived_tickets(self, request, TicketsLayout(self, request))
+    return view_archived_tickets(
+        self, request, ArchivedTicketsLayout(self, request)
+    )
+
+
+@TownApp.html(model=ArchivedTicketsCollection, name='delete',
+              request_method='DELETE', permission=Secret)
+def town_view_delete_all_archived_tickets(self, request):
+    return view_delete_all_archived_tickets(self, request)
 
 
 @TownApp.html(model=FindYourSpotCollection, name='tickets',

@@ -50,10 +50,12 @@ from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from sedate import to_timezone
 from translationstring import TranslationString
+
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
@@ -1094,6 +1096,47 @@ class TicketsLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Tickets"), '#')
         ]
+
+
+class ArchivedTicketsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_admin:
+            text = self.request.translate(_("Delete archived tickets"))
+            links.append(
+                Link(
+                    text=text,
+                    url=self.csrf_protected_url(self.request.link(self.model,
+                                                                  'delete')),
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete all archived "
+                              "tickets?"),
+                            _("This cannot be undone."),
+                            _("Delete archived tickets"),
+                            _("Cancel"),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                ArchivedTicketsCollection, {'handler': 'ALL'}
+                            ),
+                        ),
+                    ),
+                    attrs={'class': 'delete-link'},
+                )
+
+            )
+        return links
 
 
 class TicketLayout(DefaultLayout):

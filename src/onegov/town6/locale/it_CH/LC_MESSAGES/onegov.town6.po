@@ -180,6 +180,15 @@ msgstr "Elimina persona"
 msgid "Tickets"
 msgstr "Biglietti"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 

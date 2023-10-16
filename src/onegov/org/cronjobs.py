@@ -1,9 +1,6 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
-
-import transaction
-
 from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
@@ -16,11 +13,11 @@ from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
+from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
-from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day,\
-    ensure_timezone
+from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import undefer
 from uuid import UUID
@@ -51,7 +48,7 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
-    apply_archiving_and_ticket_deletion(request)
+    archive_old_tickets(request)
 
 
 def send_scheduled_newsletter(request):
@@ -473,40 +470,35 @@ def parse_to_timedelta(input_str):
     return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
 
-# @OrgApp.cronjob(hour=14, minute=40, timezone='Europe/Zurich')
-def apply_archiving_and_ticket_deletion(request):
+# @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
+def archive_old_tickets(request):
+    archive_timespan = request.app.org.auto_archive_timespan
+    session = request.session
 
-    def archive_old_tickets():
-
-        archive_time = request.app.org.auto_archive_timespan
-
-        if not archive_time:
-            return
-
-        archive_time = parse_to_timedelta(archive_time)
-
-        tickets = TicketCollection(request.session)
-
-        query = tickets.query().filter(Ticket.state == 'closed')
-        query = query.filter(Ticket.created <= (utcnow() - archive_time))
-
-        for ticket in query:
-            ticket.archive_ticket()
-
-
-# @OrgApp.cronjob(hour=14, minute=40, timezone='Europe/Zurich')
-def delete_old_tickets(request):
-
-    delete_time = request.app.org.auto_delete_timespan
-
-    if not delete_time:
+    if not archive_timespan:
         return
 
-    delete_time = parse_to_timedelta(delete_time)
+    archive_timespan = parse_to_timedelta(archive_timespan)
 
-    tickets = TicketCollection(request.session)
-    query = tickets.query().filter(Ticket.state == 'archived')
-    query = query.filter(Ticket.created <= (utcnow() - delete_time))
+    query = session.query(Ticket)
+    query = query.filter(Ticket.state == 'closed')
+    query = query.filter(Ticket.created <= (utcnow() - archive_timespan))
+    for ticket in query:
+        ticket.archive_ticket()
 
-    # call the view here
 
+# @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
+def delete_old_tickets(request):
+    delete_timespan = request.app.org.auto_delete_timespan
+    session = request.session
+
+    if not delete_timespan:
+        return
+
+    delete_timespan = parse_to_timedelta(delete_timespan)
+
+    query = session.query(Ticket)
+    query = query.filter(Ticket.state == 'archived')
+    query = query.filter(Ticket.created <= (utcnow() - delete_timespan))
+
+    delete_tickets_and_related_data(request, query)
