@@ -5,7 +5,7 @@ from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionResult
 
 
-def test_candidate_percentages(session):
+def test_candidate(session):
     election = ProporzElection(
         title='Election',
         domain='federation',
@@ -188,6 +188,11 @@ def test_candidate_percentages(session):
     election.candidates.append(candidate_5)
     session.flush()
 
+    # Test hybrid properties
+    assert candidate_1.votes == 0
+    assert session.query(Candidate.votes)\
+        .filter(Candidate.id == candidate_1.id).scalar() == 0
+
     # Add the candidate results to the first entity
     election_result_1.candidate_results.append(
         CandidateResult(
@@ -243,14 +248,17 @@ def test_candidate_percentages(session):
     )
     session.flush()
 
+    # Test hybrid properties
+    assert candidate_1.votes == 90
+    assert session.query(Candidate.votes).\
+        filter(Candidate.id == candidate_1.id).scalar()
+
+    # Test percentages
     def round_(n, z):
         return round(100 * n / z, 2)
 
     tot = {t.entity_id: t.votes for t in election.votes_by_entity.all()}
     tot_d = {t.district: t.votes for t in election.votes_by_district.all()}
-
-    print(tot)
-    print(tot_d)
 
     assert candidate_1.percentage_by_entity == {
         1: {'votes': 50, 'counted': True, 'percentage': round_(50, tot[1])},

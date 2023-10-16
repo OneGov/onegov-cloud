@@ -1,3 +1,6 @@
+from sqlalchemy import case
+from sqlalchemy import cast
+from sqlalchemy import Float
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
@@ -27,3 +30,15 @@ class DerivedAttributesMixin:
 
         return self.received_ballots /\
             self.eligible_voters * 100
+
+    @turnout.expression  # type:ignore[no-redef]
+    def turnout(cls):
+        """ The turnout of the election. """
+        return case(
+            [(
+                cls.eligible_voters > 0,
+                cast(cls.received_ballots, Float)
+                / cast(cls.eligible_voters, Float) * 100
+            )],
+            else_=0
+        )
