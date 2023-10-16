@@ -2171,7 +2171,7 @@ msgid "Data Retention"
 msgstr "Data Retention"
 
 msgid "Data Retention Policy"
-msgstr "Data Retention Policy"
+msgstr "Politique de Conservation des Données"
 
 #~ msgid "Phone number"
 #~ msgstr "Téléphone"

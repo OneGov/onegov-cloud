@@ -5200,6 +5200,9 @@ msgstr "Questa azione non può essere annullata."
 msgid "ApiKey deleted."
 msgstr "Chiave API eliminata."
 
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
+
 msgid "Topics"
 msgstr "Argomenti"
 
@@ -5398,6 +5401,15 @@ msgstr "Tutti i biglietti"
 msgid "All Users"
 msgstr "Tutti gli utenti"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"$${success_count} biglietti cancellati, ${error_count} non sono cancellabili."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} biglietti eliminati."
+
 msgid "Submitted Requests"
 msgstr "Richieste inoltrate"
 
@@ -5429,10 +5441,5 @@ msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
 #, python-format
-msgid "${success_count} tickets deleted, ${error_count} are not deletable"
-msgstr ""
-"$${success_count} biglietti cancellati, ${error_count} non sono cancellabili."
-
-#, python-format
-msgid "{success_count} tickets deleted."
-msgstr "{success_count} biglietti cancellati."
+#~ msgid "{success_count} tickets deleted."
+#~ msgstr "{success_count} biglietti cancellati."

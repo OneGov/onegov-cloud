@@ -5186,6 +5186,9 @@ msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
 msgid "ApiKey deleted."
 msgstr "ApiKey gelöscht."
 
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
+
 msgid "Topics"
 msgstr "Themen"
 
@@ -5387,6 +5390,14 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr "${success_count} tickets gelöscht, ${error_count} sind nicht löschbar."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} tickets gelöscht."
+
 msgid "Submitted Requests"
 msgstr "Eingereichte Anfragen"
 
@@ -5416,12 +5427,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#, python-format
-msgid "${success_count} tickets deleted, ${error_count} are not deletable"
-msgstr ""
-"${success_count} tickets gelöscht, ${error_count} sind nicht löschbar."
-
-#, python-format
-msgid "${success_count} tickets deleted."
-msgstr "${success_count} tickets gelöscht."
