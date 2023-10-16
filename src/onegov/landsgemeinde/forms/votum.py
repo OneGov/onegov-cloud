@@ -1,6 +1,7 @@
 from onegov.election_day import _
 from onegov.form.fields import TypeAheadField
 from onegov.form.fields import UploadField
+from onegov.form.fields import ChosenSelectField
 from onegov.form.forms import NamedFileForm
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
@@ -36,6 +37,13 @@ class VotumForm(NamedFileForm):
             InputRequired()
         ],
         default=list(STATES.keys())[0]
+    )
+
+    body_font_family_ui = ChosenSelectField(
+        fieldset=_('Person'),
+        label=_('Person from person directory'),
+        description=_('Choosing a person will overwrite the fields below'),
+        choices=[]
     )
 
     person_name = TypeAheadField(
@@ -117,10 +125,15 @@ class VotumForm(NamedFileForm):
         query = query.limit(1)
         return (query.scalar() or 0) + 1
 
+    def populate_person_choices(self):
+        self.body_font_family_ui.choices = [
+        ]
+
     def on_request(self):
         DefaultLayout(self.model, self.request)
         self.request.include('redactor')
         self.request.include('editor')
+        self.populate_person_choices()
 
     def get_useful_data(self):
         data = super().get_useful_data()
