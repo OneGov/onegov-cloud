@@ -1,8 +1,79 @@
 # Changes
 
+## 2023.50
+
+`2023-10-16` | [cd3f1d4a2a...e5a991a074](https://github.com/OneGov/onegov-cloud/compare/cd3f1d4a2a^...e5a991a074)
+
+### Core
+
+##### Adds a SMS delivery queue and spooler
+
+Similar to email the delivery can be triggered using a CLI command, but
+we also add a spooler which continually monitors the queue for additions
+and delivers them more or less immediately.
+
+    onegov-core sendsms
+    onegov-core sms-spooler
+
+This replaces the old delivery queue in ElectionDay
+
+`Feature` | [OGC-1285](https://linear.app/onegovcloud/issue/OGC-1285) | [ce7a7558d4](https://github.com/onegov/onegov-cloud/commit/ce7a7558d4ec8c94764b45bdc599d12a812dae67)
+
+### Election Day
+
+##### Improve some queries.
+
+`Bugfix` | [10706b13a1](https://github.com/onegov/onegov-cloud/commit/10706b13a11769f5674ea04a02a29b1fb5d15d0c)
+
+##### Remove untested and failing view.
+
+`Bugfix` | [851159db58](https://github.com/onegov/onegov-cloud/commit/851159db58bbf01e2c72a538ac654397caec7b7a)
+
+### Events
+
+##### Fix link for 'past events' in case of no events found.
+
+`Bugfix` | [ogc-1281](#ogc-1281) | [cd3f1d4a2a](https://github.com/onegov/onegov-cloud/commit/cd3f1d4a2a10a3bf4f340e60a0c2235a8d823292)
+
+### Feriennet
+
+##### Add URLs for Analytics
+
+`Feature` | [OGC-1155](https://linear.app/onegovcloud/issue/OGC-1155) | [f13521ab60](https://github.com/onegov/onegov-cloud/commit/f13521ab6086f22ec5f4d0fb16de8451b3011787)
+
+### Org
+
+##### Make the PDF part of the ticket file download and fixes errors.
+
+`Feature` | [OGC-1271](https://linear.app/onegovcloud/issue/OGC-1271) | [23389d7630](https://github.com/onegov/onegov-cloud/commit/23389d76308564e46398e17f6173171bfc2b765a)
+
+### Town6
+
+##### Center Slider Images
+
+`Feature` | [c859421a6c](https://github.com/onegov/onegov-cloud/commit/c859421a6cbec3a42dfd032af515162af0692358)
+
+##### New sidebar
+
+The sidebar content now stays in sight even with scrolling. On mobile it is moved into an offCanvas-panel.
+
+`Feature` | [a6f8fb29a9](https://github.com/onegov/onegov-cloud/commit/a6f8fb29a9ca54625e8147eb399e6ec0e707809c)
+
+##### Fix Current Page Highlighting
+
+`Bugfix` | [b9792ace8f](https://github.com/onegov/onegov-cloud/commit/b9792ace8f8789ff7f3ceb51cc55aa572482f29d)
+
+##### Input Button Styling
+
+`Other` | [ORG-682](#ORG-682) | [5b796e54f3](https://github.com/onegov/onegov-cloud/commit/5b796e54f3945e775e135eb3e34733a244ef5d86)
+
+##### Only apply image changes to homepage-image-slider
+
+`Bugfix` | [da9fb6be22](https://github.com/onegov/onegov-cloud/commit/da9fb6be2207c537d46bc8c3d48331a423064d66)
+
 ## 2023.49
 
-No changes since last release
+`2023-09-29` | [095da96732...095da96732](https://github.com/OneGov/onegov-cloud/compare/095da96732^...095da96732)
 
 ## 2023.48
 
@@ -2412,44 +2483,4 @@ Files are set to private (via hourly cronjob) once the publication end date has 
 ##### Fix html rendering in newsletters/new view
 
 `Bugfix` | [OGC-734](https://linear.app/onegovcloud/issue/OGC-734) | [8a3b755b12](https://github.com/onegov/onegov-cloud/commit/8a3b755b12d8ca0a99c665ab9471f66d78c2d747)
-
-## 2022.57
-
-`2022-12-14` | [14496f2d9c...ee3b7e737b](https://github.com/OneGov/onegov-cloud/compare/14496f2d9c^...ee3b7e737b)
-
-### Election Day
-
-##### Remove obsolete migration command.
-
-`Other` | [OGC-703](https://linear.app/onegovcloud/issue/OGC-703) | [14496f2d9c](https://github.com/onegov/onegov-cloud/commit/14496f2d9c11fed5066a4d77443e11fa6c4c4b84)
-
-##### Only add years to labels in horizontal party strength bar charts in case of historical data.
-
-`Bugfix` | [OGC-834](https://linear.app/onegovcloud/issue/OGC-834) | [89bdd2aa39](https://github.com/onegov/onegov-cloud/commit/89bdd2aa39d417c3e678937b5b79d3408645cf12)
-
-### Town6
-
-##### Homepage tiles pretty hover effect
-
-`Feature` | [OGC-771](https://linear.app/onegovcloud/issue/OGC-771) | [b53d9287ac](https://github.com/onegov/onegov-cloud/commit/b53d9287acf5d52721d5fab28ca7fb3b9da8c42d)
-
-##### Random Video
-
-Multiple Videos can now be added and one will randomly be chosen
-
-`Feature` | [OGC-819](https://linear.app/onegovcloud/issue/OGC-819) | [bd18460e17](https://github.com/onegov/onegov-cloud/commit/bd18460e17f5995fa8cfeacc56dc0a3a4643c0a8)
-
-##### Small design adjustments
-
-`Feature` | [ca490622f2](https://github.com/onegov/onegov-cloud/commit/ca490622f23063432d09664f49748793c58bb577)
-
-##### Fix search bar suggestions
-
-`Bugfix` | [OGC-803](https://linear.app/onegovcloud/issue/OGC-803) | [ec9ab0225e](https://github.com/onegov/onegov-cloud/commit/ec9ab0225ebff8e71a4c83c25246d6fa9e5f0b66)
-
-##### Fix contact panel html
-
-Use paragraphs and lists instead of only lists
-
-`Bugfix` | [OGC-815](https://linear.app/onegovcloud/issue/OGC-815) | [42d1cdfa1d](https://github.com/onegov/onegov-cloud/commit/42d1cdfa1d1192d28a7a2df25ccd66d4b94ff5c0)
 
