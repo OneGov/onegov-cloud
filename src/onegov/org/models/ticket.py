@@ -1,5 +1,4 @@
 from functools import cached_property
-from sedate import align_date_to_day, to_timezone, utcnow
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
@@ -13,6 +12,7 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
 
@@ -375,14 +375,11 @@ class ReservationHandler(Handler, TicketDeletionMixin):
         return tuple(query)
 
     def has_future_reservation(self):
-        timezone = 'Europe/Zurich'
-        today = to_timezone(utcnow(), timezone)
-        today = align_date_to_day(today, timezone, 'down')
-        for reservation in self.reservations:
-            if reservation.start > today:
-                return True
+        exists = self.session.query(Reservation).filter(
+            Reservation.start > func.now()
+        ).limit(1).all()
 
-        return False
+        return bool(exists)
 
     @cached_property
     def submission(self):

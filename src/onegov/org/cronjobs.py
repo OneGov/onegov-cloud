@@ -48,7 +48,6 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
-    archive_old_tickets(request)
 
 
 def send_scheduled_newsletter(request):
@@ -470,7 +469,7 @@ def parse_to_timedelta(input_str):
     return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
 
-# @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
+@OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
 def archive_old_tickets(request):
     archive_timespan = request.app.org.auto_archive_timespan
     session = request.session
@@ -487,7 +486,7 @@ def archive_old_tickets(request):
         ticket.archive_ticket()
 
 
-# @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
+@OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
 def delete_old_tickets(request):
     delete_timespan = request.app.org.auto_delete_timespan
     session = request.session
@@ -500,5 +499,4 @@ def delete_old_tickets(request):
     query = session.query(Ticket)
     query = query.filter(Ticket.state == 'archived')
     query = query.filter(Ticket.created <= (utcnow() - delete_timespan))
-
     delete_tickets_and_related_data(request, query)

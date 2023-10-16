@@ -3,7 +3,6 @@ import json
 import re
 from functools import cached_property
 from lxml import etree
-from sedate import utcnow
 
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
@@ -1152,12 +1151,12 @@ class DataRetentionPolicyForm(Form):
 
     auto_archive_timespan = RadioField(
         label=_('Duration from opening a ticket to its automatic archival'),
-        default='',
+        default=None,
         choices=generate_timespans()
     )
 
     auto_delete_timespan = RadioField(
         label=_('Duration from archived state until deleted automatically'),
-        default='',
+        default=None,
         choices=generate_timespans()
     )
