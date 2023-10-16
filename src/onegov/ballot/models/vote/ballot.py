@@ -183,7 +183,12 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         """
 
-        expr = select([func.sum(getattr(BallotResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(BallotResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(BallotResult.ballot_id == cls.id)
         expr = expr.label(attribute)
 

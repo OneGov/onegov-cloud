@@ -201,7 +201,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        expr = select([func.sum(getattr(ElectionResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(ElectionResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(ElectionResult.election_id == cls.id)
         expr = expr.label(attribute)
         return expr
