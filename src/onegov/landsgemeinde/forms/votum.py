@@ -40,7 +40,7 @@ class VotumForm(NamedFileForm):
         default=list(STATES.keys())[0]
     )
 
-    body_font_family_ui = ChosenSelectField(
+    person_choices = ChosenSelectField(
         fieldset=_('Person'),
         label=_('Person from person directory'),
         description=_('Choosing a person will overwrite the fields below'),
@@ -128,9 +128,12 @@ class VotumForm(NamedFileForm):
 
     def populate_person_choices(self):
         people = PersonCollection(self.request.session).query()
-        self.body_font_family_ui.choices = [
-            (p, f'{p.first_name} {p.last_name}, {p.function}, {p.political_party}'
-             ) for p in people
+        self.person_choices.choices = [
+            (p.id, f'{p.first_name} ' + ', '.join(filter(None, [
+                p.last_name,
+                p.function,
+                p.political_party,
+                p.location_code_city]))) for p in people
         ]
 
     def on_request(self):
