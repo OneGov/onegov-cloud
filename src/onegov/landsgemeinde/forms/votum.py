@@ -13,6 +13,7 @@ from onegov.landsgemeinde.models import PersonPoliticalAffiliationSuggestion
 from onegov.landsgemeinde.models import Votum
 from onegov.landsgemeinde.models.votum import STATES
 from onegov.org.forms.fields import HtmlField
+from onegov.people.collections.people import PersonCollection
 from sqlalchemy import desc
 from wtforms.fields import IntegerField
 from wtforms.fields import RadioField
@@ -126,7 +127,10 @@ class VotumForm(NamedFileForm):
         return (query.scalar() or 0) + 1
 
     def populate_person_choices(self):
+        people = PersonCollection(self.request.session).query()
         self.body_font_family_ui.choices = [
+            (p, f'{p.first_name} {p.last_name}, {p.function}, {p.political_party}'
+             ) for p in people
         ]
 
     def on_request(self):
