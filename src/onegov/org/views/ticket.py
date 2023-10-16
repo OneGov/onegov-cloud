@@ -1106,6 +1106,8 @@ def delete_tickets_and_related_data(
                 ticket.handler, 'ticket_deletable')
                 and not ticket.handler.ticket_deletable):
             not_deletable.append(ticket)
+
+            ticket.redact_data()
             continue
 
         delete_messages_from_ticket(request, ticket.number)

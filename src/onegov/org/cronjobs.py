@@ -48,6 +48,8 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
+    archive_old_tickets(request)
+    delete_old_tickets(request)
 
 
 def send_scheduled_newsletter(request):
@@ -474,7 +476,7 @@ def archive_old_tickets(request):
     archive_timespan = request.app.org.auto_archive_timespan
     session = request.session
 
-    if not archive_timespan:
+    if archive_timespan == 'disabled':
         return
 
     archive_timespan = parse_to_timedelta(archive_timespan)
@@ -491,7 +493,7 @@ def delete_old_tickets(request):
     delete_timespan = request.app.org.auto_delete_timespan
     session = request.session
 
-    if not delete_timespan:
+    if delete_timespan == 'disabled':
         return
 
     delete_timespan = parse_to_timedelta(delete_timespan)
