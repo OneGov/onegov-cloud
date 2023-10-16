@@ -1136,26 +1136,27 @@ class EventSettingsForm(Form):
     )
 
 
-def generate_timespans() -> tuple[tuple[str | datetime.datetime, str], ...]:
-    base_date = utcnow()
+def generate_timespans() -> (
+    tuple[tuple[None | datetime.timedelta, str], ...]
+):
     return (
-        ('', _('Disabled')),
-        (base_date + datetime.timedelta(days=180), _('6 months')),
-        (base_date + datetime.timedelta(days=365), _('1 year')),
-        (base_date + datetime.timedelta(days=365 * 2), _('2 years')),
-        (base_date + datetime.timedelta(days=365 * 3), _('3 years')),
+        (None, _('Disabled')),
+        (datetime.timedelta(days=180), _('6 months')),
+        (datetime.timedelta(days=365), _('1 year')),
+        (datetime.timedelta(days=365 * 2), _('2 years')),
+        (datetime.timedelta(days=365 * 3), _('3 years')),
     )
 
 
 class DataRetentionPolicyForm(Form):
 
-    relative_time_auto_archive = RadioField(
+    auto_archive_timespan = RadioField(
         label=_('Duration from opening a ticket to its automatic archival'),
         default='',
         choices=generate_timespans()
     )
 
-    relative_time_auto_delete = RadioField(
+    auto_delete_timespan = RadioField(
         label=_('Duration from archived state until deleted automatically'),
         default='',
         choices=generate_timespans()

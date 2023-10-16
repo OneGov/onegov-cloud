@@ -180,8 +180,8 @@ class Organisation(Base, TimestampMixin):
     gever_endpoint = meta_property()
 
     # data retention policy
-    relative_time_auto_delete = meta_property()
-    relative_time_auto_archive = meta_property()
+    auto_archive_timespan = meta_property()
+    auto_delete_timespan = meta_property()
 
     @property
     def public_identity(self):

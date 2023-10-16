@@ -466,24 +466,47 @@ def send_daily_resource_usage_overview(request):
         )
 
 
+def parse_to_timedelta(input_str):
+    days, time_str = input_str.split(", ")
+    days = int(days.split(" ")[0])
+    hours, minutes, seconds = map(int, time_str.split(":"))
+    return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
+
+
 # @OrgApp.cronjob(hour=14, minute=40, timezone='Europe/Zurich')
 def apply_archiving_and_ticket_deletion(request):
-    session = request.session
-    tickets = TicketCollection(session)
 
-    org = request.app.org
-    rel = org.relative_time_auto_archive
-    breakpoint()
+    def archive_old_tickets():
 
-    query = tickets.query().filter(Ticket.created >= rel)
+        archive_time = request.app.org.auto_archive_timespan
 
-    # basically check the retention policy
+        if not archive_time:
+            return
 
-    # if it not existsb, exit
+        archive_time = parse_to_timedelta(archive_time)
 
-    # get `relative_time_auto_archive` from settings
+        tickets = TicketCollection(request.session)
 
-    # else the max_timespan is higher, get all tickets where the timespan
-    # ticked created > relative_time_auto_archive
+        query = tickets.query().filter(Ticket.state == 'closed')
+        query = query.filter(Ticket.created <= (utcnow() - archive_time))
 
+        for ticket in query:
+            ticket.archive_ticket()
+
+
+# @OrgApp.cronjob(hour=14, minute=40, timezone='Europe/Zurich')
+def delete_old_tickets(request):
+
+    delete_time = request.app.org.auto_delete_timespan
+
+    if not delete_time:
+        return
+
+    delete_time = parse_to_timedelta(delete_time)
+
+    tickets = TicketCollection(request.session)
+    query = tickets.query().filter(Ticket.state == 'archived')
+    query = query.filter(Ticket.created <= (utcnow() - delete_time))
+
+    # call the view here
 

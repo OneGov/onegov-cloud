@@ -738,14 +738,17 @@ def test_auto_archive_tickets(org_app, handlers):
 
     transaction.commit()
 
-    org_app.org.relative_time_auto_archive = json.dumps(timedelta(
-        milliseconds=1))
-    t_auto_archive = org_app.org.relative_time_auto_archive
+    # all tickets older than 1 milliseconds will apply
+    org_app.org.auto_archive_timespan = json.dumps(
+        str(timedelta(milliseconds=1))
+    )
+
+    auto_archive = org_app.org.auto_archive_timespan
 
     # this should be in the view
     query = collection.query()
     query = query.filter(
-        Ticket.created >= org_app.org.relative_time_auto_archive
+        Ticket.created >= org_app.org.auto_archive_timespan
     )
 
     # job = get_cronjob_by_name(
