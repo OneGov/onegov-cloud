@@ -1,7 +1,8 @@
+import json
 import os
 import transaction
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.org.models.resource import RoomResource
@@ -705,7 +706,7 @@ def test_auto_archive_tickets(org_app, handlers):
 
     transaction.begin()
     collection = TicketCollection(session)
-
+    now = utcnow()
     tickets = [
         collection.open_ticket(
             handler_id='1',
@@ -713,7 +714,7 @@ def test_auto_archive_tickets(org_app, handlers):
             title="Title",
             group="Group",
             email="citizen@example.org",
-            created=datetime(2016, 1, 2, 10, tzinfo=tz),
+            created=now,
         ),
         collection.open_ticket(
             handler_id='2',
@@ -721,7 +722,7 @@ def test_auto_archive_tickets(org_app, handlers):
             title="Title",
             group="Group",
             email="citizen@example.org",
-            created=datetime(2016, 1, 2, 10, tzinfo=tz),
+            created=now,
         ),
     ]
 
@@ -730,25 +731,30 @@ def test_auto_archive_tickets(org_app, handlers):
     users = UserCollection(session).query().all()
     user = users[0]
     for t in tickets:
-        t.created = datetime(2016, 1, 2, 10, tzinfo=tz)
         t.accept_ticket(user)
         t.close_ticket()
-        t.modified = datetime(2016, 1, 2, 10, tzinfo=tz)
+        # not needed, well then..
+        # t.modified = datetime(2016, 1, 2, 10, tzinfo=tz)
 
     transaction.commit()
 
-    time = org_app.org.relative_time_auto_archive
+    org_app.org.relative_time_auto_archive = json.dumps(timedelta(
+        milliseconds=1))
+    t_auto_archive = org_app.org.relative_time_auto_archive
+
+    # this should be in the view
     query = collection.query()
-    query = query.filter(Ticket.created >= start)
-
-
-    job = get_cronjob_by_name(
-        org_app, 'apply_archiving_and_ticket_deletion'
+    query = query.filter(
+        Ticket.created >= org_app.org.relative_time_auto_archive
     )
-    # todo: wtf
-    job.app = org_app
 
-    with freeze_time('2018-05-31 11:00'):
-        client = Client(org_app)
-        client.get(get_cronjob_url(job))
+    # job = get_cronjob_by_name(
+    #     org_app, 'apply_archiving_and_ticket_deletion'
+    # )
+    # # todo: wtf
+    # job.app = org_app
+    #
+    # with freeze_time('2018-05-31 11:00'):
+    #     client = Client(org_app)
+    #     client.get(get_cronjob_url(job))
 

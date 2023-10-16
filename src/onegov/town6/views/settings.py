@@ -310,7 +310,7 @@ def town_handle_api_keys(self, request, form):
     permission=Secret, form=DataRetentionPolicyForm,
     setting=_("Data Retention"), icon='far fa-trash', order=-880,
 )
-def handle_ticket_data_deletion_settings(self, request, form):
+def town_handle_ticket_data_deletion_settings(self, request, form):
     return handle_generic_settings(
         self, request, form, _("Data Retention Policy"),
         SettingsLayout(self, request),

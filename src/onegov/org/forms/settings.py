@@ -2,9 +2,12 @@ import datetime
 import json
 import re
 from functools import cached_property, cache
+from typing import List, Tuple, Any
+
 from lxml import etree
 from sedate import utcnow
 from wtforms.fields import SelectField
+
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
@@ -42,7 +45,7 @@ from wtforms.validators import ValidationError
 
 from typing_extensions import TYPE_CHECKING
 if TYPE_CHECKING:
-    from translationstring import TranslationString
+    from onegov.core.request import CoreRequest
 
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
@@ -667,9 +670,9 @@ class ModuleSettingsForm(Form):
             ('phone_direct', _("Direct Phone Number or Mobile")),
             ('website', _("Website")),
             ('website_2', _("Website 2")),
-            ('location_address', _("Location Address")),
+            ('location_address', _("Location address")),
             ('location_code_city', _("Location Code and City")),
-            ('postal_address', _("Postal Address")),
+            ('postal_address', _("Postal address")),
             ('postal_code_city', _("Postal Code and City")),
             ('notes', _("Notes")),
         ])
@@ -1141,34 +1144,29 @@ class EventSettingsForm(Form):
     )
 
 
-@cache
-def generate_timespans() -> (
-        'list[tuple[str | datetime.datetime, TranslationString]]'
-):
+def generate_timespans(request: 'CoreRequest') -> list[tuple[Any, str]]:
     base_date = utcnow()
-    return [
+    time_mappings = [
         ('', _('Disabled')),
         (base_date + datetime.timedelta(days=180), _('6 months')),
         (base_date + datetime.timedelta(days=365), _('1 year')),
         (base_date + datetime.timedelta(days=365 * 2), _('2 years')),
         (base_date + datetime.timedelta(days=365 * 3), _('3 years')),
     ]
+    return list(map(lambda x: (x[0], request.translate(x[1])), time_mappings))
 
 
 class DataRetentionPolicyForm(Form):
 
-    relative_time_auto_archive = SelectField(
-        label=_(
-            'Duration from opening a ticket to its automatic archival'
-        ),
-        default=_('Disabled'),
-        choices=generate_timespans(),
-    )
-
-    relative_time_auto_delete = SelectField(
-        label=_(
-            'Duration from archived state until deleted automatically'
-        ),
-        default=_('Disabled'),
-        choices=generate_timespans(),
-    )
+    def __init__(self, *args, **kwargs):
+        super(DataRetentionPolicyForm, self).__init__(*args, **kwargs)
+        self.relative_time_auto_archive = SelectField(
+            label=_('Duration from opening a ticket to its automatic archival'),
+            default=_('Disabled'),
+            choices=generate_timespans(self.request),
+        )
+        self.relative_time_auto_delete = SelectField(
+            label=_('Duration from archived state until deleted automatically'),
+            default=_('Disabled'),
+            choices=generate_timespans(self.request),
+        )

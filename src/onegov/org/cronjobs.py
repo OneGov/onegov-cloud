@@ -51,6 +51,7 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
+    apply_archiving_and_ticket_deletion(request)
 
 
 def send_scheduled_newsletter(request):
@@ -465,18 +466,16 @@ def send_daily_resource_usage_overview(request):
         )
 
 
-@OrgApp.cronjob(hour=14, minute=40, timezone='Europe/Zurich')
+# @OrgApp.cronjob(hour=14, minute=40, timezone='Europe/Zurich')
 def apply_archiving_and_ticket_deletion(request):
     session = request.session
     tickets = TicketCollection(session)
 
-    query = tickets.query().filter(Ticket.created >= start)
-
     org = request.app.org
-    time = org.relative_time_auto_archive
+    rel = org.relative_time_auto_archive
     breakpoint()
 
-
+    query = tickets.query().filter(Ticket.created >= rel)
 
     # basically check the retention policy
 
