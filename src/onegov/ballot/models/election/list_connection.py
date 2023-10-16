@@ -85,7 +85,12 @@ class ListConnection(Base, TimestampMixin):
 
         """
 
-        expr = select([func.sum(getattr(List, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(List, attribute)),
+                0
+            )
+        ])
         expr = expr.where(List.connection_id == cls.id)
         expr = expr.label(attribute)
         return expr
