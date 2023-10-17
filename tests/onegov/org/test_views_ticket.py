@@ -709,36 +709,3 @@ def test_assign_tickets(client):
         f'{ticket_number} / newsletter: Sie haben ein neues Ticket'
     )
     assert message['To'] == 'editor@example.org'
-
-
-def test_redact_tickets(client):
-    client.login_admin()
-
-    # add form
-    manage = client.get('/forms/new')
-    manage.form['title'] = 'newsletter'
-    manage.form['definition'] = dedent("""# Personendaten
-        Vorname *= ___
-        Name *= ___
-        Strasse/Nummer *= ___
-        PLZ *= ___
-        Ort *= ___
-        Telefon *= ___
-        Bemerkung = ...
-
-        # Versand
-        Versand * =
-            (x) Ich möchte die Bestellung am Schalter abholen.
-            ( ) Ich möchte die Bestellung mittels Post erhalten. (5 CHF!) """)
-
-    page = manage.form.submit()
-
-    client.logout()
-
-    # open a ticket
-    page = client.get('/form/newsletter')
-    page.form['e_mail'] = 'hans.maulwurf@simpsons.com'
-
-    # page = page.form.submit().follow().form.submit().follow()
-
-    # archive and delete ticket
