@@ -5404,7 +5404,7 @@ msgstr "Tutti gli utenti"
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
 msgstr ""
-"$${success_count} biglietti cancellati, ${error_count} non sono cancellabili."
+"I biglietti ${success_count} cancellati, ${error_count} non sono completamente cancellabili, ma i dati sono stati resi irriconoscibili."
 
 #, python-format
 msgid "${success_count} tickets deleted."

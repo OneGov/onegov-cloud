@@ -5392,7 +5392,7 @@ msgstr "Alle Benutzer"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
-msgstr "${success_count} tickets gelöscht, ${error_count} sind nicht löschbar."
+msgstr "${success_count} tickets gelöscht, ${error_count} sind nicht komplett löschbar, dort sind die Daten unerkennbar gemacht worden."
 
 #, python-format
 msgid "${success_count} tickets deleted."

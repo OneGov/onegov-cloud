@@ -5409,7 +5409,7 @@ msgstr "Tous les utilisateurs"
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
 msgstr ""
-"${success_count} tickets supprimés, ${error_count} ne sont pas supprimables."
+"${success_count} tickets supprimés, ${error_count} ne sont pas complètement supprimables, les données y ont été rendues méconnaissables."
 
 #, python-format
 msgid "${success_count} tickets deleted."
