@@ -1151,12 +1151,21 @@ class DataRetentionPolicyForm(Form):
 
     auto_archive_timespan = RadioField(
         label=_('Duration from opening a ticket to its automatic archival'),
-        default='',
+        validators=[InputRequired()],
+        default='disabled',
         choices=generate_timespans()
     )
 
     auto_delete_timespan = RadioField(
         label=_('Duration from archived state until deleted automatically'),
-        default='',
+        validators=[InputRequired()],
+        default='disabled',
         choices=generate_timespans()
     )
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.auto_archive_timespan.data = (model.auto_archive_timespan
+                                           or 'disabled')
+        self.auto_delete_timespan.data = (model.auto_delete_timespan
+                                          or 'disabled')

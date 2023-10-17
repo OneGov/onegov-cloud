@@ -469,10 +469,13 @@ def parse_to_timedelta(input_str):
     return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
 
-@OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
+# @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
 def archive_old_tickets(request):
     archive_timespan = request.app.org.auto_archive_timespan
     session = request.session
+
+    if archive_timespan is None:
+        return
 
     if archive_timespan == 'disabled':
         return
@@ -492,6 +495,9 @@ def archive_old_tickets(request):
 def delete_old_tickets(request):
     delete_timespan = request.app.org.auto_delete_timespan
     session = request.session
+
+    if delete_timespan is None:
+        return
 
     if delete_timespan == 'disabled':
         return
