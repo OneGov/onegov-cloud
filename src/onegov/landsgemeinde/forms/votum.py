@@ -44,6 +44,7 @@ class VotumForm(NamedFileForm):
         fieldset=_('Person'),
         label=_('Person from person directory'),
         description=_('Choosing a person will overwrite the fields below'),
+        default="what",
         choices=[]
     )
 
@@ -128,12 +129,19 @@ class VotumForm(NamedFileForm):
 
     def populate_person_choices(self):
         people = PersonCollection(self.request.session).query()
+        people_choices = [(
+            (
+                f'{p.first_name} {p.last_name}, {p.function}, '
+                f'{p.political_party}, {p.location_code_city}',
+                f'{p.first_name} ' + ', '.join(filter(None, [
+                    p.last_name,
+                    p.function,
+                    p.political_party,
+                    p.location_code_city])))
+        ) for p in people]
+        people_choices.insert(0, (', , , ', '...'))
         self.person_choices.choices = [
-            (p.id, f'{p.first_name} ' + ', '.join(filter(None, [
-                p.last_name,
-                p.function,
-                p.political_party,
-                p.location_code_city]))) for p in people
+            (v, c) for v, c in people_choices
         ]
 
     def on_request(self):
@@ -141,6 +149,7 @@ class VotumForm(NamedFileForm):
         self.request.include('redactor')
         self.request.include('editor')
         self.populate_person_choices()
+        self.request.include('person_votum')
 
     def get_useful_data(self):
         data = super().get_useful_data()
