@@ -23,9 +23,9 @@ from onegov.org.forms import TicketNoteForm
 from onegov.org.layout import FindYourSpotLayout, DefaultMailLayout,\
     ArchivedTicketsLayout
 from onegov.org.layout import TicketChatMessageLayout
-from onegov.town6.layout import TicketLayout
 from onegov.org.layout import TicketNoteLayout
 from onegov.org.layout import TicketsLayout
+from onegov.org.layout import TicketLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
     Organisation, ResourceRecipient, ResourceRecipientCollection
