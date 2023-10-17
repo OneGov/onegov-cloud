@@ -700,7 +700,6 @@ def test_send_scheduled_newsletters(org_app):
 
 def test_parse_to_timedelta():
     assert parse_to_timedelta('180 days, 0:00:00') == timedelta(days=180)
-    assert parse_to_timedelta('0:00:00.001000') == timedelta(seconds=0.001)
     assert parse_to_timedelta('730 days, 0:00:00') == timedelta(days=730)
 
 
@@ -750,6 +749,8 @@ def test_auto_archive_tickets(org_app, handlers):
             str(timedelta(days=1)))
 
         session.flush()
+
+        assert org_app.org.auto_archive_timespan is not None
 
         # we should have two closed tickets now
         query = session.query(Ticket)

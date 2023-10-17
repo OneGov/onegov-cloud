@@ -467,17 +467,14 @@ def send_daily_resource_usage_overview(request):
 
 def parse_to_timedelta(input_str):
     day_pattern = r"(\d+) days, "
-    time_pattern = r"(\d+):(\d+):([\d.]+)"
-
     match_days = re.search(day_pattern, input_str)
-    match_time = re.search(time_pattern, input_str)
 
-    if not match_time:
+    if not match_days:
         raise ValueError("Invalid time format")
 
-    days = int(match_days.group(1)) if match_days else 0
-    hours, minutes, seconds = map(float, match_time.groups())
-
+    days, time_str = input_str.split(", ")
+    days = int(days.split(" ")[0])
+    hours, minutes, seconds = map(int, time_str.split(":"))
     return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
 
