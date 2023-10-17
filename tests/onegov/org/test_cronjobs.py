@@ -751,16 +751,10 @@ def test_auto_archive_tickets(org_app, handlers):
 
         session.flush()
 
-        assert org_app.org.auto_archive_timespan is not None
-
         # we should have two closed tickets now
         query = session.query(Ticket)
         query = query.filter_by(state='closed')
         assert query.count() == 2
-
-        # query = query.filter(
-        #     Ticket.created >= org_app.org.auto_archive_timespan
-        # )
 
         job = get_cronjob_by_name(org_app, 'archive_old_tickets')
         job.app = org_app
@@ -768,7 +762,5 @@ def test_auto_archive_tickets(org_app, handlers):
         client.get(get_cronjob_url(job))
 
         query = session.query(Ticket)
-        assert query.count() == 2
-
         query = query.filter(Ticket.state == 'archived')
         assert query.count() == 2

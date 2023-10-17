@@ -504,8 +504,6 @@ def archive_old_tickets(request):
     for ticket in query:
         ticket.archive_ticket()
 
-    session.flush()
-
 
 @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
 def delete_old_tickets(request):
