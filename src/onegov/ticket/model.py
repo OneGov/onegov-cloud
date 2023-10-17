@@ -195,24 +195,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         redact_constant = '[redacted]'
 
-        submission = getattr(self.handler, 'submission', None)
-
-        # redact the submission
-        if submission and submission.data:
-            for key, value in submission.data.items():
-                if value:
-                    submission.data[key] = redact_constant
-
-        to_redact = {
-            'email',
-            'submitter_name',
-            'submitter_address',
-            'submitter_phone',
-        }
-        for key in to_redact:
-            if hasattr(submission, key):
-                setattr(submission, key, redact_constant)
-
         if self.snapshot:
             self.snapshot['summary'] = redact_constant
             # Deactivate `message_to_submitter` for redacted tickets by
@@ -222,6 +204,27 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             for info in ('name', 'address', 'phone'):
                 if self.snapshot[f'submitter_{info}']:
                     self.snapshot[f'submitter_{info}'] = redact_constant
+
+        submission = getattr(self.handler, 'submission', None)
+
+        if not submission:
+            return
+
+        # redact the submission
+        if submission.data:
+            for key, value in submission.data.items():
+                if value:
+                    submission.data[key] = redact_constant
+
+            to_redact = {
+                'email',
+                'submitter_name',
+                'submitter_address',
+                'submitter_phone',
+            }
+            for key in to_redact:
+                if hasattr(submission, key):
+                    setattr(submission, key, redact_constant)
 
     @property
     def handler(self) -> 'Handler':
