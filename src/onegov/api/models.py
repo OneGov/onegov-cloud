@@ -87,7 +87,7 @@ class ApiEndpointItem(Generic[_M]):
         return cls(self.app) if cls else None
 
     @property
-    def item(self) -> '_M | None':
+    def item(self) -> _M | None:
         if self.api_endpoint:
             return self.api_endpoint.by_id(self.id)  # for. ex. ExtendedAgency
         return None
@@ -124,7 +124,7 @@ class ApiEndpoint(Generic[_M]):
     def __init__(
         self,
         app: 'Framework',
-        extra_parameters: dict[str, 'str | int | None'] | None = None,
+        extra_parameters: dict[str, str | int | None] | None = None,
         page: int | None = None,
     ):
         self.app = app
@@ -166,9 +166,9 @@ class ApiEndpoint(Generic[_M]):
         return ApiEndpointItem(self.app, self.endpoint, target)
 
     def get_filter(
-        self, name: str, default: 'int | None' = None, empty: 'int | None' =
+        self, name: str, default: int | None = None, empty: int | None =
         None
-    ) -> 'str | int | None':
+    ) -> str | int | None:
 
         """Returns the filter value with the given name."""
 
@@ -176,7 +176,7 @@ class ApiEndpoint(Generic[_M]):
             return default
         return self.extra_parameters[name] or empty
 
-    def by_id(self, id: 'PKType') -> '_M | None':
+    def by_id(self, id: 'PKType') -> _M | None:
         """ Return the item with the given ID from the collection. """
 
         try:
@@ -213,7 +213,7 @@ class ApiEndpoint(Generic[_M]):
             for item in self.collection.batch
         }
 
-    def item_data(self, item: '_M | None') -> dict[str, Any]:
+    def item_data(self, item: _M | None) -> dict[str, Any]:
         """ Return the data properties of the collection item as a dictionary.
 
         For example:
@@ -226,7 +226,7 @@ class ApiEndpoint(Generic[_M]):
 
         raise NotImplementedError()
 
-    def item_links(self, item: '_M | None') -> dict[str, Any]:
+    def item_links(self, item: _M | None) -> dict[str, Any]:
         """ Return the link properties of the collection item as a dictionary.
         Links can either be string or a linkable object.
 

@@ -409,7 +409,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal['even'] | list[float] | None,
-        style: 'TableStyle | None' = None,
+        style: TableStyle | None = None,
         ratios: bool = False
     ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that
@@ -482,7 +482,7 @@ class Pdf(PDFDocument):
         return prefix + text.strip() + postfix
 
     @staticmethod
-    def inner_html(element: 'etree._Element') -> str:
+    def inner_html(element: 'etree._Element') -> str:  # noqa: TC201
         return '{}{}{}'.format(
             Pdf.strip(element.text or ''),
             ''.join((
