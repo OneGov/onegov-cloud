@@ -52,7 +52,7 @@ class FilestorageFile:
 
 @Framework.path(model=FilestorageFile, path='/files', absorb=True)
 def get_filestorage_file(
-    app: 'Framework',
+    app: Framework,
     absorb: str
 ) -> FilestorageFile | None:
     try:
