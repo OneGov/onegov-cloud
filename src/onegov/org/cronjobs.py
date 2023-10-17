@@ -1,3 +1,4 @@
+import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -48,6 +49,8 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
+    # for testing
+    # archive_old_tickets(request)
 
 
 def send_scheduled_newsletter(request):
@@ -463,15 +466,26 @@ def send_daily_resource_usage_overview(request):
 
 
 def parse_to_timedelta(input_str):
-    days, time_str = input_str.split(", ")
-    days = int(days.split(" ")[0])
-    hours, minutes, seconds = map(int, time_str.split(":"))
+    day_pattern = r"(\d+) days, "
+    time_pattern = r"(\d+):(\d+):([\d.]+)"
+
+    match_days = re.search(day_pattern, input_str)
+    match_time = re.search(time_pattern, input_str)
+
+    if not match_time:
+        raise ValueError("Invalid time format")
+
+    days = int(match_days.group(1)) if match_days else 0
+    hours, minutes, seconds = map(float, match_time.groups())
+
     return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
 def archive_old_tickets(request):
+
     archive_timespan = request.app.org.auto_archive_timespan
+
     session = request.session
 
     if archive_timespan is None:
@@ -489,6 +503,8 @@ def archive_old_tickets(request):
 
     for ticket in query:
         ticket.archive_ticket()
+
+    session.flush()
 
 
 @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
