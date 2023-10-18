@@ -693,8 +693,7 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
         return self.event and self.event.state == 'submitted'
 
     def prepare_delete_ticket(self):
-        if self.event:
-            self.session.delete(self.event)
+        pass
 
     @property
     def ticket_deletable(self):
