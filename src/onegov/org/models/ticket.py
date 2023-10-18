@@ -20,7 +20,17 @@ class TicketDeletionMixin:
 
     @property
     def ticket_deletable(self):
-        return self.deleted and self.ticket.state == 'archived'
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.payment:
+            # For now we do not handle this case since payment might be
+            # needed for exports
+            return False
+        if self.undecided:
+            return False
+        return True
 
     def prepare_delete_ticket(self):
         """The handler knows best what to do when a ticket is called for
@@ -133,7 +143,7 @@ class DirectoryEntryTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('FRM')
-class FormSubmissionHandler(Handler, TicketDeletionMixin):
+class FormSubmissionHandler(Handler):
 
     handler_title = _("Form Submissions")
     code_title = _("Forms")
@@ -202,20 +212,6 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
             for file in self.submission.files:
                 self.session.delete(file)
             self.session.delete(self.submission)
-
-    @property
-    def ticket_deletable(self):
-        if self.deleted:
-            return True
-        if self.ticket.state != 'archived':
-            return False
-        if self.payment:
-            # For now we do not handle this case since payment might be
-            # needed for exports
-            return False
-        if self.undecided:
-            return False
-        return True
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
@@ -349,7 +345,7 @@ class FormSubmissionHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('RSV')
-class ReservationHandler(Handler, TicketDeletionMixin):
+class ReservationHandler(Handler):
 
     handler_title = _("Reservations")
     code_title = _("Reservations")
@@ -429,20 +425,7 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
     @property
     def ticket_deletable(self):
-        if self.deleted:
-            return True
-        if self.ticket.state != 'archived':
-            return False
-        if self.payment:
-            # For now we do not handle this case since payment might be
-            # needed for exports
-            return False
-        if self.undecided:
-            return False
-        if self.has_future_reservation():
-            return False
-
-        return True
+        return not self.has_future_reservation() and super().ticket_deletable()
 
     @property
     def title(self):
@@ -633,7 +616,7 @@ class ReservationHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('EVN')
-class EventSubmissionHandler(Handler, TicketDeletionMixin):
+class EventSubmissionHandler(Handler):
 
     handler_title = _("Events")
     code_title = _("Events")
@@ -692,21 +675,11 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
     def undecided(self):
         return self.event and self.event.state == 'submitted'
 
-    def prepare_delete_ticket(self):
-        pass
-
     @property
     def ticket_deletable(self):
-        if self.deleted:
-            return True
-        if self.ticket.state != 'archived':
-            return False
-        if self.undecided:
-            return False
-        if self.event.future_occurrences():
-            return False
-
-        return True
+        # We don't want to delete the event. So we will redact the ticket
+        # instead.
+        return False
 
     @cached_property
     def group(self):
@@ -803,7 +776,7 @@ class EventSubmissionHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('DIR')
-class DirectoryEntryHandler(Handler, TicketDeletionMixin):
+class DirectoryEntryHandler(Handler):
 
     handler_title = _("Directory Entry Submissions")
     code_title = _("Directory Entry Submissions")
@@ -919,16 +892,6 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
     def prepare_delete_ticket(self):
         if self.submission:
             self.session.delete(self.submission)
-
-    @property
-    def ticket_deletable(self):
-        if self.deleted:
-            return True
-        if self.ticket.state != 'archived':
-            return False
-        if self.undecided:
-            return False
-        return True
 
     @property
     def kind(self):

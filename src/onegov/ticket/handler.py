@@ -1,3 +1,4 @@
+from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
 
@@ -17,7 +18,7 @@ _H = TypeVar('_H', bound='Handler')
 _Q = TypeVar('_Q', bound='Query[Any]')
 
 
-class Handler:
+class Handler(TicketDeletionMixin):
     """ Defines a generic handler, responsible for a subset of the tickets.
 
     onegov.ticket is meant to be a rather generic bucket of tickets, to which

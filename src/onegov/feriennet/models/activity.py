@@ -6,7 +6,7 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.ticket import OrgTicketMixin, TicketDeletionMixin
+from onegov.org.models.ticket import OrgTicketMixin
 from onegov.search import SearchableContent
 from onegov.ticket import handlers, Handler, Ticket
 
@@ -90,7 +90,7 @@ class ActivityTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('FER')
-class VacationActivityHandler(Handler, TicketDeletionMixin):
+class VacationActivityHandler(Handler):
 
     handler_title = _("Activities")
     code_title = _("Activities")
@@ -138,21 +138,9 @@ class VacationActivityHandler(Handler, TicketDeletionMixin):
 
         return self.activity.state == 'proposed'
 
-    def prepare_delete_ticket(self):
-        pass
-
     @property
     def ticket_deletable(self):
-        if self.deleted:
-            return True
-        if self.ticket.state != 'archived':
-            return False
-        if self.undecided:
-            return False
-        if self.activity.state != 'archived':
-            return False
-
-        return True
+        return self.activity.state != 'archived' and super().ticket_deletable()
 
     def get_summary(self, request):
         from onegov.feriennet.layout import DefaultLayout

@@ -10,7 +10,6 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
 from onegov.org.models.ticket import OrgTicketMixin
-from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
@@ -33,7 +32,7 @@ class PersonMutationTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('AGN')
-class AgencyMutationHandler(Handler, TicketDeletionMixin):
+class AgencyMutationHandler(Handler):
 
     handler_title = _("Agency")
     code_title = _("Agencies")
@@ -54,18 +53,6 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
     @property
     def deleted(self):
         return self.agency is None
-
-    def prepare_delete_ticket(self):
-        pass
-
-    @property
-    def ticket_deletable(self):
-        if self.deleted:
-            return True
-        if self.ticket.state != 'archived':
-            return False
-
-        return True
 
     @cached_property
     def email(self):
@@ -144,7 +131,7 @@ class AgencyMutationHandler(Handler, TicketDeletionMixin):
 
 
 @handlers.registered_handler('PER')
-class PersonMutationHandler(Handler, TicketDeletionMixin):
+class PersonMutationHandler(Handler):
 
     handler_title = _("Person")
     code_title = _("People")
@@ -165,18 +152,6 @@ class PersonMutationHandler(Handler, TicketDeletionMixin):
     @property
     def deleted(self):
         return self.person is None
-
-    def prepare_delete_ticket(self):
-        pass
-
-    @property
-    def ticket_deletable(self):
-        if self.deleted:
-            return True
-        if self.ticket.state != 'archived':
-            return False
-
-        return True
 
     @cached_property
     def email(self):

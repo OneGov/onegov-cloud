@@ -5,7 +5,6 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
 from onegov.org.models.ticket import OrgTicketMixin
-from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
@@ -27,7 +26,7 @@ class TranslatorMutationTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('TRN')
-class TranslatorMutationHandler(Handler, TicketDeletionMixin):
+class TranslatorMutationHandler(Handler):
 
     handler_title = _("Translator")
     code_title = _("Translators")
@@ -56,9 +55,6 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
         if self.deleted:
             return True
         return False
-
-    def prepare_delete_ticket(self):
-        pass
 
     @cached_property
     def email(self):
@@ -146,7 +142,7 @@ class AccreditationTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('AKK')
-class AccreditationHandler(Handler, TicketDeletionMixin):
+class AccreditationHandler(Handler):
 
     handler_title = _('Accreditation')
     code_title = _('Accreditations')
@@ -172,9 +168,6 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
         if self.deleted:
             return True
         return False
-
-    def prepare_delete_ticket(self):
-        pass
 
     @cached_property
     def email(self):
