@@ -484,8 +484,11 @@ def archive_old_tickets(request):
     query = query.filter(Ticket.state == 'closed')
     query = query.filter(Ticket.created <= diff)
 
-    for ticket in query:
-        ticket.archive_ticket()
+    now = utcnow()
+    query.update(
+        {'state': 'archived', 'last_state_change': now},
+        synchronize_session=False
+    )
 
 
 @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
