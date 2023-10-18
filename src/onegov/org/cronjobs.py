@@ -487,7 +487,6 @@ def archive_old_tickets(request):
     now = utcnow()
     query.update(
         {'state': 'archived', 'last_state_change': now},
-        synchronize_session=False
     )
 
 
