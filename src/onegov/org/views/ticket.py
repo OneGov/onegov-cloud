@@ -1102,19 +1102,13 @@ def delete_tickets_and_related_data(
     not_deletable, successfully_deleted = [], []
 
     for ticket in tickets:
-        if (hasattr(
-                ticket.handler, 'ticket_deletable')
-                and not ticket.handler.ticket_deletable):
+        if not ticket.handler.ticket_deletable:
             not_deletable.append(ticket)
 
             ticket.redact_data()
             continue
 
         delete_messages_from_ticket(request, ticket.number)
-
-        if hasattr(ticket.handler, 'prepare_delete_ticket'):
-            ticket.handler.prepare_delete_ticket()
-
         delete_files_and_submissions_from_ticket(request, ticket)
 
         request.session.delete(ticket)

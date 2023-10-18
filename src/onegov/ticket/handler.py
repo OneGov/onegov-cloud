@@ -1,4 +1,3 @@
-from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
 
@@ -18,7 +17,7 @@ _H = TypeVar('_H', bound='Handler')
 _Q = TypeVar('_Q', bound='Query[Any]')
 
 
-class Handler(TicketDeletionMixin):
+class Handler:
     """ Defines a generic handler, responsible for a subset of the tickets.
 
     onegov.ticket is meant to be a rather generic bucket of tickets, to which
@@ -212,6 +211,26 @@ class Handler(TicketDeletionMixin):
         """
 
         raise NotImplementedError
+
+    @property
+    def ticket_deletable(self) -> bool:
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.payment:
+            # For now we do not handle this case since payment might be
+            # needed for exports
+            return False
+        if self.undecided:
+            return False
+        return True
+
+    def prepare_delete_ticket(self) -> None:
+        """The handler knows best what to do when a ticket is called for
+        deletion. """
+        assert self.ticket_deletable
+        pass
 
 
 class HandlerRegistry:
