@@ -18,6 +18,7 @@ from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.user import AVAILABLE_ROLES
+from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
@@ -1135,37 +1136,20 @@ class EventSettingsForm(Form):
     )
 
 
-def generate_timespans() -> (
-    tuple[tuple[str | datetime.timedelta, str], ...]
-):
-    return (
-        ('disabled', _('Disabled')),
-        (datetime.timedelta(days=180), _('6 months')),
-        (datetime.timedelta(days=365), _('1 year')),
-        (datetime.timedelta(days=365 * 2), _('2 years')),
-        (datetime.timedelta(days=365 * 3), _('3 years')),
-    )
-
-
 class DataRetentionPolicyForm(Form):
 
     auto_archive_timespan = RadioField(
         label=_('Duration from opening a ticket to its automatic archival'),
         validators=[InputRequired()],
-        default='disabled',
-        choices=generate_timespans()
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
     )
 
     auto_delete_timespan = RadioField(
         label=_('Duration from archived state until deleted automatically'),
         validators=[InputRequired()],
-        default='disabled',
-        choices=generate_timespans()
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
     )
-
-    def process_obj(self, model):
-        super().process_obj(model)
-        self.auto_archive_timespan.data = (model.auto_archive_timespan
-                                           or 'disabled')
-        self.auto_delete_timespan.data = (model.auto_delete_timespan
-                                          or 'disabled')

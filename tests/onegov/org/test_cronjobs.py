@@ -1,10 +1,8 @@
-import json
 import os
 import transaction
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
-from onegov.org.cronjobs import parse_to_timedelta
 from onegov.org.models.resource import RoomResource
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
@@ -698,12 +696,7 @@ def test_send_scheduled_newsletters(org_app):
         assert len(os.listdir(client.app.maildir)) == 1
 
 
-def test_parse_to_timedelta():
-    assert parse_to_timedelta('180 days, 0:00:00') == timedelta(days=180)
-    assert parse_to_timedelta('730 days, 0:00:00') == timedelta(days=730)
-
-
-def test_auto_archive_tickets(org_app, handlers):
+def test_auto_archive_tickets_and_delete(org_app, handlers):
     register_echo_handler(handlers)
 
     session = org_app.session()
@@ -733,13 +726,10 @@ def test_auto_archive_tickets(org_app, handlers):
             ),
         ]
 
-        # FIXME `
-        # ticket.created is not actually the value it's set to?
-        # it is _not_ the value one_month_ago in the cronjob function somehow
-
         request = Bunch(client_addr='127.0.0.1')
-        UserCollection(session).register('b', 'p@ssw0rd',
-                                         request, role='admin')
+        UserCollection(session).register(
+            'b', 'p@ssw0rd', request, role='admin'
+        )
         users = UserCollection(session).query().all()
         user = users[0]
         for t in tickets:
@@ -749,9 +739,7 @@ def test_auto_archive_tickets(org_app, handlers):
 
         transaction.commit()
 
-        #  less than one moth ago, so this should apply
-        org_app.org.auto_archive_timespan = str(timedelta(days=10))
-
+        org_app.org.auto_archive_timespan = 10  # days
         session.flush()
 
         assert org_app.org.auto_archive_timespan is not None
@@ -774,8 +762,7 @@ def test_auto_archive_tickets(org_app, handlers):
         assert query.count() == 2
 
         # now for the deletion part
-        org_app.org.auto_delete_timespan = json.dumps(
-            str(timedelta(days=1)))
+        org_app.org.auto_delete_timespan = 1  # days
 
         session.flush()
         assert org_app.org.auto_delete_timespan is not None

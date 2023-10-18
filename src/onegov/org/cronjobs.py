@@ -464,19 +464,6 @@ def send_daily_resource_usage_overview(request):
         )
 
 
-def parse_to_timedelta(input_str):
-    # day_pattern = r"(\d+) days, "
-    # match_days = re.search(day_pattern, input_str)
-    #
-    # if not match_days:
-    #     raise ValueError("Invalid time format")
-
-    days, time_str = input_str.split(", ")
-    days = int(days.split(" ")[0])
-    hours, minutes, seconds = map(int, time_str.split(":"))
-    return timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
-
-
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
 def archive_old_tickets(request):
 
@@ -487,10 +474,10 @@ def archive_old_tickets(request):
     if archive_timespan is None:
         return
 
-    if archive_timespan == 'disabled':
+    if archive_timespan == 0:
         return
 
-    archive_timespan = parse_to_timedelta(archive_timespan)
+    archive_timespan = timedelta(days=archive_timespan)
 
     diff = utcnow() - archive_timespan
     query = session.query(Ticket)
@@ -509,10 +496,10 @@ def delete_old_tickets(request):
     if delete_timespan is None:
         return
 
-    if delete_timespan == 'disabled':
+    if delete_timespan == 0:
         return
 
-    delete_timespan = parse_to_timedelta(delete_timespan)
+    delete_timespan = timedelta(days=delete_timespan)
 
     diff = utcnow() - delete_timespan
     query = session.query(Ticket)
