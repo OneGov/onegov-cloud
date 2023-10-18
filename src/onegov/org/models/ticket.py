@@ -364,22 +364,25 @@ class ReservationHandler(Handler, TicketDeletionMixin):
         return query.one()
 
     @cached_property
-    def reservations(self):
+    def reservations_query(self):
         # libres allows for multiple reservations with a single request (token)
         # for now we don't really have that case in onegov.org, but we
         # try to be aware of it as much as possible
         query = self.session.query(Reservation)
         query = query.filter(Reservation.token == self.id)
         query = query.order_by(Reservation.start)
+        return query
 
-        return tuple(query)
+    @cached_property
+    def reservations(self):
+        return tuple(self.reservations_query)
 
     def has_future_reservation(self):
-        exists = self.session.query(Reservation).filter(
+        exists = self.reservations_query.filter(
             Reservation.start > func.now()
-        ).limit(1).all()
+        ).exists()
 
-        return bool(exists)
+        return self.session.query(exists).scalar()
 
     @cached_property
     def submission(self):
