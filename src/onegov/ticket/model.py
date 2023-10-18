@@ -207,24 +207,18 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         submission = getattr(self.handler, 'submission', None)
 
-        if not submission:
+        if not submission or not submission.data:
             return
 
         # redact the submission
-        if submission.data:
-            for key, value in submission.data.items():
-                if value:
-                    submission.data[key] = redact_constant
+        for key, value in submission.data.items():
+            if value:
+                submission.data[key] = redact_constant
 
-            to_redact = {
-                'email',
-                'submitter_name',
-                'submitter_address',
-                'submitter_phone',
-            }
-            for key in to_redact:
-                if hasattr(submission, key):
-                    setattr(submission, key, redact_constant)
+        submission.email = redact_constant
+        submission.submitter_name = redact_constant
+        submission.submitter_address = redact_constant
+        submission.submitter_phone = redact_constant
 
     @property
     def handler(self) -> 'Handler':
