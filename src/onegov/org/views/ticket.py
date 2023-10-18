@@ -1109,7 +1109,10 @@ def delete_tickets_and_related_data(
             continue
 
         delete_messages_from_ticket(request, ticket.number)
-        delete_files_and_submissions_from_ticket(request, ticket)
+
+        if submission := getattr(ticket.handler, 'submission', None):
+            # cascade delete should take care of the ticket's files
+            request.session.delete(submission)
 
         request.session.delete(ticket)
         successfully_deleted.append(ticket)
@@ -1123,15 +1126,6 @@ def delete_messages_from_ticket(request: 'CoreRequest', number: str):
     )
     for message in messages.query():
         messages.delete(message)
-
-
-def delete_files_and_submissions_from_ticket(request: 'CoreRequest',
-                                             ticket: 'Ticket'):
-    submission = getattr(ticket.handler, 'submission', None)
-    if submission:
-        for file in submission.files:
-            request.session.delete(file)
-        request.session.delete(submission)
 
 
 @OrgApp.html(model=FindYourSpotCollection, name='tickets',
