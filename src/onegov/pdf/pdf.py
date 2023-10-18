@@ -482,7 +482,7 @@ class Pdf(PDFDocument):
         return prefix + text.strip() + postfix
 
     @staticmethod
-    def inner_html(element: 'etree._Element') -> str:  # noqa: TC201
+    def inner_html(element: 'etree._Element') -> str:
         return '{}{}{}'.format(
             Pdf.strip(element.text or ''),
             ''.join((

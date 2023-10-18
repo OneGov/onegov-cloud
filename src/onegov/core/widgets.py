@@ -93,7 +93,7 @@ XML_LINE_OFFSET = 6
 def parse_structure(
     widgets: 'Collection[Widget]',
     structure: str
-) -> 'etree._Element':  # noqa: TC201
+) -> 'etree._Element':
     """ Takes the XML structure and returns the parsed etree xml.
 
     Raises a wtforms.ValidationError if there's an element which is not
