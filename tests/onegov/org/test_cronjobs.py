@@ -709,7 +709,7 @@ def test_auto_archive_tickets(org_app, handlers):
     session = org_app.session()
     transaction.begin()
 
-    with freeze_time('2023-10-17 04:30'):
+    with freeze_time('2022-10-17 04:30'):
         one_month_ago = utcnow() - timedelta(days=30)
 
         collection = TicketCollection(session)
@@ -733,6 +733,10 @@ def test_auto_archive_tickets(org_app, handlers):
             ),
         ]
 
+        # FIXME `
+        # ticket.created is not actually the value it's set to?
+        # it is _not_ the value one_month_ago in the cronjob function somehow
+
         request = Bunch(client_addr='127.0.0.1')
         UserCollection(session).register('b', 'p@ssw0rd',
                                          request, role='admin')
@@ -741,18 +745,17 @@ def test_auto_archive_tickets(org_app, handlers):
         for t in tickets:
             t.accept_ticket(user)
             t.close_ticket()
+            t.created = one_month_ago
 
         transaction.commit()
 
         #  less than one moth ago, so this should apply
-        org_app.org.auto_archive_timespan = json.dumps(
-            str(timedelta(days=1)))
+        org_app.org.auto_archive_timespan = str(timedelta(days=10))
 
         session.flush()
 
         assert org_app.org.auto_archive_timespan is not None
 
-        # we should have two closed tickets now
         query = session.query(Ticket)
         query = query.filter_by(state='closed')
         assert query.count() == 2
@@ -762,6 +765,26 @@ def test_auto_archive_tickets(org_app, handlers):
         client = Client(org_app)
         client.get(get_cronjob_url(job))
 
+        session.flush()
+
         query = session.query(Ticket)
+        assert query.count() == 2
+
         query = query.filter(Ticket.state == 'archived')
         assert query.count() == 2
+
+        # now for the deletion part
+        org_app.org.auto_delete_timespan = json.dumps(
+            str(timedelta(days=1)))
+
+        session.flush()
+        assert org_app.org.auto_delete_timespan is not None
+
+        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        # should be deleted
+        query = session.query(Ticket)
+        assert query.count() == 0

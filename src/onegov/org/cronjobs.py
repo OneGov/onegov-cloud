@@ -1,4 +1,3 @@
-import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
@@ -466,11 +465,11 @@ def send_daily_resource_usage_overview(request):
 
 
 def parse_to_timedelta(input_str):
-    day_pattern = r"(\d+) days, "
-    match_days = re.search(day_pattern, input_str)
-
-    if not match_days:
-        raise ValueError("Invalid time format")
+    # day_pattern = r"(\d+) days, "
+    # match_days = re.search(day_pattern, input_str)
+    #
+    # if not match_days:
+    #     raise ValueError("Invalid time format")
 
     days, time_str = input_str.split(", ")
     days = int(days.split(" ")[0])
