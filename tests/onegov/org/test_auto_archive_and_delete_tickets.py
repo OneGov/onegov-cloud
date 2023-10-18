@@ -1,51 +1,50 @@
-import tempfile
-from datetime import datetime, date
-from pathlib import Path
+from datetime import datetime
 import transaction
-from freezegun import freeze_time
-from openpyxl import load_workbook
 from onegov.core.utils import normalize_for_url
+from onegov.org.models.ticket import ReservationHandler
 from onegov.reservation import ResourceCollection
+from onegov.ticket import Ticket
 
 
-@freeze_time("2023-04-28", tick=True)
 def test_has_future_reservations(client):
 
-    resources = ResourceCollection(client.app.libres_context)
-    daypass_resource = resources.by_name('tageskarte')
-    daypass_resource.definition = "Vorname *= ___\nNachname *= ___"
-    daypass_resource.title = 'Tageskarte'
+    ctx = client.app.libres_context
 
-    scheduler = daypass_resource.get_scheduler(client.app.libres_context)
-    daypass_allocations = scheduler.allocate(
-        dates=(datetime(2023, 8, 28, 12, 0), datetime(2023, 8, 28, 13, 0)),
-        whole_day=False
+    def setup_resource(name, title, definition, dates, whole_day):
+        res = ResourceCollection(ctx).by_name(name)
+        res.definition, res.title = definition, title
+        alloc = res.get_scheduler(ctx).allocate(
+            dates=dates, whole_day=whole_day
+        )
+        return client.bound_reserve(alloc[0])
+
+    # Setting time to a distant future year as func.now() isn't impacted by
+    # freezegun
+    reserve_daypass = setup_resource(
+        'tageskarte',
+        'Tageskarte',
+        "Vorname *= " "___\nNachname *= ___",
+        (datetime(2100, 8, 28, 12, 0),
+         datetime(2100, 8, 28, 13, 0)),
+        False,
     )
 
-    reserve_daypass = client.bound_reserve(daypass_allocations[0])
-
-    resources.add(
-        "Conference room",
-        'Europe/Zurich',
-        type='room',
-        name='conference-room'
+    ResourceCollection(ctx).add(
+        "Conference room", 'Europe/Zurich', type='room', name='conference-room'
     )
 
-    room_resource = resources.by_name('conference-room')
-    room_resource.definition = "Name *= ___"
-    room_resource.title = normalize_for_url("Gemeindeverwaltung Sitzungszimmer "
-                                        "gross (2. OG)")
-
-    room_allocations = room_resource.scheduler.allocate(
-        dates=(datetime(2023, 8, 28), datetime(2023, 8, 28)),
-        whole_day=True
+    reserve_room = setup_resource(
+        'conference-room',
+        normalize_for_url("Gemeindeverwaltung Sitzungszimmer gross (2. OG)"),
+        "Name *= ___",
+        (datetime(2100, 8, 28),
+         datetime(2100, 8, 28)),
+        True,
     )
 
-    reserve_room = client.bound_reserve(room_allocations[0])
     transaction.commit()
     client.login_admin()
 
-    # create all reservations
     assert reserve_daypass().json == {'success': True}
     assert reserve_room().json == {'success': True}
 
@@ -66,4 +65,9 @@ def test_has_future_reservations(client):
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
     ticket.click('Alle Reservationen annehmen')
 
+    session = client.app.session()
 
+    handlers: list[ReservationHandler] = [
+        h.handler for h in session.query(Ticket)
+    ]
+    assert all(h.has_future_reservation() for h in handlers)
