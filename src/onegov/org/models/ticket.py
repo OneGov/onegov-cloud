@@ -421,9 +421,8 @@ class ReservationHandler(Handler, TicketDeletionMixin):
         return True
 
     def prepare_delete_ticket(self):
-        if self.reservations:
-            for reservation in self.reservations:
-                self.session.delete(reservation)
+        for reservation in self.reservations or ():
+            self.session.delete(reservation)
 
     @property
     def ticket_deletable(self):
