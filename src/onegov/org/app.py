@@ -4,9 +4,11 @@ import yaml
 
 import base64
 import hashlib
+import morepath
 from collections import defaultdict
 from dectate import directive
 from email.headerregistry import Address
+from functools import wraps
 from more.content_security import SELF
 from onegov.core import Framework, utils
 from onegov.core.framework import default_content_security_policy
@@ -18,6 +20,7 @@ from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.gis import MapboxApp
 from onegov.org import directives
+from onegov.org.auth import MTANAuth
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Dashboard
 from onegov.org.models import Topic, Organisation, PublicationCollection
@@ -34,11 +37,14 @@ from onegov.websockets import WebsocketsApp
 from purl import URL
 from sqlalchemy.orm import noload, undefer
 from sqlalchemy.orm.attributes import set_committed_value
+from types import MethodType
+from webob.exc import HTTPTooManyRequests
 
 
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Callable, Iterable, Iterator, Sequence
+    from reg.dispatch import _KeyLookup
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -106,6 +112,40 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         )
         self.enable_yubikey = cfg.get('enable_yubikey', False)
         self.disable_password_reset = cfg.get('disable_password_reset', False)
+
+    def configure_mtan_hook(self, **cfg: Any) -> None:
+        """
+        This inserts an mtan hook by wrapping the callable we receive
+        from the key lookup on get_view.
+
+        We only need to this once per application instance and we don't
+        risk contaminating other applications, since each instance has
+        its own dispatch callable.
+
+        This relies heavily on implementation details of reg.dispatch_method
+        and thus a little bit fragile, take care when upgrading to newer
+        versions of reg!
+        """
+
+        # the method_dispatch wraps the function in MethodType and stores
+        # it on the instance, this should be a unique instance of the function
+        # for each instance, but just in case we set the marker on the function
+        # to make sure we only patch it once
+        get_view_meth = self.get_view
+        assert isinstance(get_view_meth, MethodType)
+        get_view = get_view_meth.__func__
+        if getattr(get_view, '_mtan_hook_installed', False):
+            return
+
+        assert hasattr(get_view, 'key_lookup')
+        get_view.key_lookup = KeyLookupWithMTANHook(get_view.key_lookup)
+        # it is annoying we have to do this, but it is how reg binds these
+        # function calls to the dynamically generated function body
+        get_view.__globals__.update(
+            _component_lookup=get_view.key_lookup.component,
+            _fallback_lookup=get_view.key_lookup.fallback,
+        )
+        get_view._mtan_hook_installed = True
 
     @orm_cached(policy='on-table-change:organisations')
     def org(self):
@@ -665,3 +705,62 @@ def get_scroll_to_username_asset():
 @OrgApp.webasset('all_blank')
 def get_all_blank_asset():
     yield 'all_blank.js'
+
+
+def wrap_with_mtan_hook(
+    func: 'Callable[[OrgApp, Any, OrgRequest], Any]'
+) -> 'Callable[[OrgApp, Any, OrgRequest], Any]':
+
+    @wraps(func)
+    def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
+        if (
+            getattr(obj, 'access', None) == 'mtan'
+            # managers don't require mtan authentication
+            and not request.is_manager
+        ):
+            # no active mtan session, redirect to mtan auth view
+            if not request.active_mtan_session:
+                auth = MTANAuth(self, request.path_url)
+                return morepath.redirect(request.link(auth, name='request'))
+
+            # access limit exceeded
+            if request.mtan_access_limit_exceeded:
+                return HTTPTooManyRequests()
+
+            # record access
+            request.mtan_accesses.add(url=request.path_url)
+
+        return func(self, obj, request)
+
+    return wrapped
+
+
+class KeyLookupWithMTANHook:
+    def __init__(self, key_lookup: '_KeyLookup'):
+        self.key_lookup = key_lookup
+
+    def component(
+        self,
+        key: 'Sequence[Any]'
+    ) -> 'Callable[..., Any] | None':
+
+        result = self.key_lookup.component(key)
+        if result is None:
+            return None
+        return wrap_with_mtan_hook(result)
+
+    def fallback(
+        self,
+        key: 'Sequence[Any]'
+    ) -> 'Callable[..., Any] | None':
+
+        result = self.key_lookup.fallback(key)
+        if result is None:
+            return None
+        return wrap_with_mtan_hook(result)
+
+    def all(
+        self,
+        key: 'Sequence[Any]'
+    ) -> 'Iterator[Callable[..., Any]]':
+        return self.key_lookup.all(key)

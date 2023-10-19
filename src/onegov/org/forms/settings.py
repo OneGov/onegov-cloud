@@ -682,6 +682,33 @@ class ModuleSettingsForm(Form):
         default='tags'
     )
 
+    mtan_session_duration_seconds = IntegerField(
+        label=_('Duration of mTAN session'),
+        description=_('Specify in number of seconds'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
+
+    mtan_access_window_requests = IntegerField(
+        label=_(
+            'Prevent further accesses to protected resources '
+            'after this many have been accessed'
+        ),
+        description=_('Leave empty to disable limiting requests'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
+
+    mtan_access_window_seconds = IntegerField(
+        label=_(
+            'Prevent further accesses to protected resources '
+            'in this time frame'
+        ),
+        description=_('Specify in number of seconds'),
+        fieldset=_('mTAN Access'),
+        validators=[Optional()]
+    )
+
 
 class MapSettingsForm(Form):
 
