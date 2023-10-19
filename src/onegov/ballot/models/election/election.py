@@ -133,13 +133,17 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def counted_entities(self):
-        """ Returns the names of the already counted entities. """
+        """ Returns the names of the already counted entities.
+
+        Might contain an empty string in case of expats.
+
+        """
 
         query = object_session(self).query(ElectionResult.name)
         query = query.filter(ElectionResult.counted.is_(True))
         query = query.filter(ElectionResult.election_id == self.id)
         query = query.order_by(ElectionResult.name)
-        return [result.name for result in query.all() if result.name]
+        return [result.name for result in query.all()]
 
     @property
     def has_results(self):
