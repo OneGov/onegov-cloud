@@ -29,7 +29,7 @@ from onegov.ballot.models.vote import BallotResult
 from onegov.ballot.models.vote import ComplexVote
 from onegov.ballot.models.vote import Vote
 
-__all__ = [
+__all__ = (
     'Ballot',
     'BallotResult',
     'Candidate',
@@ -51,4 +51,4 @@ __all__ = [
     'PartyResult',
     'ProporzElection',
     'Vote',
-]
+)
