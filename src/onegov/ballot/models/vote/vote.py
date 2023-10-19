@@ -202,7 +202,11 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def counted_entities(self) -> list[str]:
-        """ Returns the names of the already counted entities. """
+        """ Returns the names of the already counted entities.
+
+        Might contain an empty string in case of expats.
+
+        """
 
         ballot_ids = {b.id for b in self.ballots}
 
@@ -214,7 +218,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
         query = query.order_by(BallotResult.name)
         query = query.distinct()
-        return [result.name for result in query if result.name]
+        return [result.name for result in query]
 
     #: the total yeas
     yeas = summarized_property('yeas')
