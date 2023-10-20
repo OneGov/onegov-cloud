@@ -94,7 +94,8 @@ class ChatSettingsForm(Form):
     chat_type = RadioField(
         label=_('Supported Chat Integrations'),
         choices=[
-            ('scoutss', 'Scoutss')
+            ('scoutss', 'Scoutss'),
+            ('human', 'Intern')
         ]
     )
 

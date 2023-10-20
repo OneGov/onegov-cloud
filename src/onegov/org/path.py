@@ -57,6 +57,7 @@ from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models import TicketNote
 from onegov.org.models import Topic
+from onegov.chat.collections import ChatCollection
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
@@ -277,6 +278,11 @@ def get_people(app):
 @OrgApp.path(model=Person, path='/person/{id}', converters={'id': UUID})
 def get_person(app, id):
     return PersonCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(model=ChatCollection, path='/chats')
+def get_chats(app):
+    return ChatCollection(app.session())
 
 
 @OrgApp.path(model=Ticket, path='/ticket/{handler_code}/{id}',

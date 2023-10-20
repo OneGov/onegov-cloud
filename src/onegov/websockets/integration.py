@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 class WebsocketsApp(WebassetsApp):
     """
 
-    Add applicatiod-bound websocket broadcast communication.
+    Add application-bound websocket broadcast communication.
 
     To receive broadcast messages using JavaScript in the browser, include the
     asset 'websockets' and call ``openWebsocket``.
