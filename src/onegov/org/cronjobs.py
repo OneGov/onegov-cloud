@@ -484,16 +484,10 @@ def archive_old_tickets(request):
     query = query.filter(Ticket.state == 'closed')
     query = query.filter(Ticket.created <= diff)
 
-    # todo : we also don't want to archive tickets which have future
-    #  reservation, even if they're closed (which is unlikely but not
-    #  impossible)
-    # This would have to be  done in python, and we can('t use the
-    #  sqlalchemy query entirely
-
-    now = utcnow()
-    query.update(
-        {'state': 'archived', 'last_state_change': now},
-    )
+    for ticket in query:
+        if getattr(ticket.handler, 'has_future_reservation', False):
+            continue
+        ticket.archive_ticket()
 
 
 @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
