@@ -1701,21 +1701,6 @@ msgstr "Soumettez votre événement"
 msgid "Enables website visitors to submit their own events"
 msgstr "Permet aux visiteurs du site web de soumettre leurs propres événements"
 
-msgid "Disabled"
-msgstr "Désactivé"
-
-msgid "6 months"
-msgstr "6 mois"
-
-msgid "1 year"
-msgstr "1 an"
-
-msgid "2 years"
-msgstr "2 ans"
-
-msgid "3 years"
-msgstr "3 ans"
-
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr "Durée entre l'ouverture d'un ticket et son archivage automatique"
 
@@ -1823,6 +1808,21 @@ msgstr "Mensuel (le premier lundi du mois)"
 
 msgid "Never"
 msgstr "Jamais"
+
+msgid "Disabled"
+msgstr "Désactivé"
+
+msgid "6 months"
+msgstr "6 mois"
+
+msgid "1 year"
+msgstr "1 an"
+
+msgid "2 years"
+msgstr "2 ans"
+
+msgid "3 years"
+msgstr "3 ans"
 
 msgid "Linked file"
 msgstr "Fichier lié"
@@ -2746,6 +2746,13 @@ msgstr "Propriétaire :"
 
 msgid "Kind:"
 msgstr "Type :"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procédez avec prudence. Les billets et les données qu'ils contiennent peuvent être irrévocablement "
+"supprimés."
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -5409,7 +5416,8 @@ msgstr "Tous les utilisateurs"
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
 msgstr ""
-"${success_count} tickets supprimés, ${error_count} ne sont pas complètement supprimables, les données y ont été rendues méconnaissables."
+"${success_count} tickets supprimés, ${error_count} ne sont pas complètement "
+"supprimables, les données y ont été rendues méconnaissables."
 
 #, python-format
 msgid "${success_count} tickets deleted."

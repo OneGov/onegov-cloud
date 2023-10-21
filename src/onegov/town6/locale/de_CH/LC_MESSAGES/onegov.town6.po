@@ -193,9 +193,6 @@ msgstr "Archivierte Tickets löschen"
 msgid "Do you really want to delete all archived tickets?"
 msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
 
-msgid "Delete archived tickets"
-msgstr "Archivierte Tickets löschen"
-
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -538,6 +535,13 @@ msgstr "Besitzer:"
 
 msgid "Kind:"
 msgstr "Art:"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können unwiderruflich "
+"gelöscht werden."
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -2163,11 +2167,11 @@ msgstr "Migration Links"
 msgid "OneGov API"
 msgstr "OneGov API"
 
-msgid "Data Retention"
-msgstr "Data Retention"
-
 msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
+
+#~ msgid "Data Retention"
+#~ msgstr "Data Retention"
 
 #~ msgid "Phone number"
 #~ msgstr "Telefonnummer"

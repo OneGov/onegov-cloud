@@ -392,9 +392,10 @@ def delete_api_key(self: ApiKey, request: CoreRequest):
 
 
 @OrgApp.form(
-    model=Organisation, name='data-retention-settings', template='form.pt',
-    permission=Secret, form=DataRetentionPolicyForm,
-    setting=_("Data Retention Policy"), icon='far fa-trash', order=-880,
+    model=Organisation, name='data-retention-settings',
+    template='cautionary_form.pt', permission=Secret,
+    form=DataRetentionPolicyForm, setting=_("Data Retention Policy"),
+    icon='far fa-trash', order=-880,
 )
 def handle_ticket_data_deletion_settings(self, request, form):
     return handle_generic_settings(

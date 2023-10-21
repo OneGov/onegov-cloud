@@ -1694,21 +1694,6 @@ msgid "Enables website visitors to submit their own events"
 msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
-msgid "Disabled"
-msgstr "Deaktiviert"
-
-msgid "6 months"
-msgstr "6 Monate"
-
-msgid "1 year"
-msgstr "1 Jahr"
-
-msgid "2 years"
-msgstr "2 Jahre"
-
-msgid "3 years"
-msgstr "3 Jahre"
-
 msgid "Duration from opening a ticket to its automatic archival"
 msgstr ""
 "Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"
@@ -1819,6 +1804,21 @@ msgstr "Monatlich (am ersten Montag des Monats)"
 
 msgid "Never"
 msgstr "Nie"
+
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+msgid "6 months"
+msgstr "6 Monate"
+
+msgid "1 year"
+msgstr "1 Jahr"
+
+msgid "2 years"
+msgstr "2 Jahre"
+
+msgid "3 years"
+msgstr "3 Jahre"
 
 msgid "Linked file"
 msgstr "Verknüpfte Datei"
@@ -2745,6 +2745,13 @@ msgstr "Besitzer:"
 
 msgid "Kind:"
 msgstr "Art:"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können unwiderruflich "
+"gelöscht werden."
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -5392,7 +5399,9 @@ msgstr "Alle Benutzer"
 
 #, python-format
 msgid "${success_count} tickets deleted, ${error_count} are not deletable"
-msgstr "${success_count} tickets gelöscht, ${error_count} sind nicht komplett löschbar, dort sind die Daten unerkennbar gemacht worden."
+msgstr ""
+"${success_count} tickets gelöscht, ${error_count} sind nicht komplett "
+"löschbar, dort sind die Daten unerkennbar gemacht worden."
 
 #, python-format
 msgid "${success_count} tickets deleted."

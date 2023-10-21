@@ -193,9 +193,6 @@ msgstr "Supprimer les tickets archivés"
 msgid "Do you really want to delete all archived tickets?"
 msgstr "Voulez-vous vraiment supprimer tous les tickets archivés ?"
 
-msgid "Delete archived tickets"
-msgstr "Supprimer les tickets archivés"
-
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
 
@@ -533,6 +530,13 @@ msgstr "Propriétaire :"
 
 msgid "Kind:"
 msgstr "Type :"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procédez avec prudence. Les billets et les données qu'ils contiennent peuvent être irrévocablement "
+"supprimés."
 
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
@@ -2167,11 +2171,11 @@ msgstr "Migration des liens"
 msgid "OneGov API"
 msgstr "API OneGov"
 
-msgid "Data Retention"
-msgstr "Data Retention"
-
 msgid "Data Retention Policy"
 msgstr "Politique de Conservation des Données"
+
+#~ msgid "Data Retention"
+#~ msgstr "Data Retention"
 
 #~ msgid "Phone number"
 #~ msgstr "Téléphone"

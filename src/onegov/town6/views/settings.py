@@ -306,7 +306,8 @@ def town_handle_api_keys(self, request, form):
 
 
 @TownApp.form(
-    model=Organisation, name='data-retention-settings', template='form.pt',
+    model=Organisation, name='data-retention-settings',
+    template='cautionary_form.pt',
     permission=Secret, form=DataRetentionPolicyForm,
     setting=_("Data Retention Policy"), icon='far fa-trash', order=-880,
 )
