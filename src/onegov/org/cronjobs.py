@@ -484,10 +484,26 @@ def archive_old_tickets(request):
     query = query.filter(Ticket.state == 'closed')
     query = query.filter(Ticket.created <= diff)
 
-    for ticket in query:
-        if getattr(ticket.handler, 'has_future_reservation', False):
-            continue
-        ticket.archive_ticket()
+    ticket_data = (
+        (ticket.id, getattr(ticket.handler, 'has_future_reservation', False))
+        for ticket in query
+    )
+
+    archivable_ticket_ids = [
+        ticket_id
+        for ticket_id, has_future_res in ticket_data
+        if not has_future_res
+    ]
+    session.flush()
+
+    if archivable_ticket_ids:
+        now = utcnow()
+        session.query(Ticket).filter(
+            Ticket.id.in_(archivable_ticket_ids)
+        ).update(
+            {'state': 'archived', 'last_state_change': now},
+            synchronize_session=False
+        )
 
 
 @OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
