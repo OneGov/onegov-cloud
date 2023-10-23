@@ -1,6 +1,5 @@
 from collections import defaultdict
 from fs import path
-from fs.subfs import SubFS
 from fs.copy import copy_dir
 from fs.copy import copy_file
 from fs.zipfs import WriteZipFS
@@ -17,6 +16,7 @@ from onegov.election_day.formats import export_internal
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from fs.subfs import SubFS
     from onegov.election_day import ElectionDayApp
 
 
@@ -27,12 +27,13 @@ class ArchiveGenerator:
         This creates a bunch of csv files, which are zipped and the path to
         the zip is returned.
     """
+    archive_dir: 'SubFS'
+
     def __init__(self, app: 'ElectionDayApp'):
         assert app.filestorage is not None
         self.app = app
         self.session = app.session()
-        self.archive_dir: SubFS = app.filestorage.makedir("archive",
-                                                          recreate=True)
+        self.archive_dir = app.filestorage.makedir("archive", recreate=True)
         self.temp_fs = TempFS()
         self.archive_parent_dir = "zip"
         self.MAX_FILENAME_LENGTH = 60
@@ -117,7 +118,7 @@ class ArchiveGenerator:
             groups[entity.date.year].append(entity)
         return list(groups.values())
 
-    def zip_dir(self, base_dir: SubFS) -> str | None:
+    def zip_dir(self, base_dir: 'SubFS') -> str | None:
         """Recursively zips a directory (base_dir).
 
         :param base_dir: is a directory in a temporary file system.

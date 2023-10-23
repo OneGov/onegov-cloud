@@ -408,7 +408,7 @@ class SiteLocale:
     @classmethod
     def for_path(
         cls,
-        app: 'Framework',
+        app: Framework,
         locale: str | str
     ) -> 'Self | None':
 

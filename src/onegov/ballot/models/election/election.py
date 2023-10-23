@@ -133,13 +133,17 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     @property
     def counted_entities(self):
-        """ Returns the names of the already counted entities. """
+        """ Returns the names of the already counted entities.
+
+        Might contain an empty string in case of expats.
+
+        """
 
         query = object_session(self).query(ElectionResult.name)
         query = query.filter(ElectionResult.counted.is_(True))
         query = query.filter(ElectionResult.election_id == self.id)
         query = query.order_by(ElectionResult.name)
-        return [result.name for result in query.all() if result.name]
+        return [result.name for result in query.all()]
 
     @property
     def has_results(self):
@@ -201,7 +205,12 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         """
 
-        expr = select([func.sum(getattr(ElectionResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(ElectionResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(ElectionResult.election_id == cls.id)
         expr = expr.label(attribute)
         return expr

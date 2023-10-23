@@ -140,13 +140,16 @@ def import_vote_internal(vote, principal, file, mimetype):
             line_errors.append(e.args[0])
 
         # now let's do some sanity checks
-        try:
-            if not eligible_voters:
-                line_errors.append(_("No eligible voters"))
-            if (yeas + nays + empty + invalid) > eligible_voters:
-                line_errors.append(_("More cast votes than eligible voters"))
-        except UnboundLocalError:
-            pass
+        if counted:
+            try:
+                if not eligible_voters:
+                    line_errors.append(_("No eligible voters"))
+                if (yeas + nays + empty + invalid) > eligible_voters:
+                    line_errors.append(
+                        _("More cast votes than eligible voters")
+                    )
+            except UnboundLocalError:
+                pass
 
         # pass the errors
         if line_errors:
