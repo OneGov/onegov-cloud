@@ -255,7 +255,7 @@ def test_many_filters(client):
     form = event.click("Bearbeiten")
     for i in range(0, 9):
         form.form.set('weitere_filter', True, index=i)
-    page.form.submit().follow()
+    form.form.submit()
 
     events = client.get('/events')
     assert "Mehr anzeigen" in events
