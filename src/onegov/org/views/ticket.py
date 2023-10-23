@@ -31,7 +31,6 @@ from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
-from onegov.org.request import OrgRequest
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
@@ -43,6 +42,11 @@ from onegov.user import User, UserCollection
 from sqlalchemy import select
 from webob import exc
 from urllib.parse import urlsplit
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -355,8 +359,11 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
 
 
 def send_new_note_notification(
-    request: OrgRequest, form: TicketNoteForm, note: TicketNote, template: str
-):
+    request: 'OrgRequest',
+    form: TicketNoteForm,
+    note: TicketNote,
+    template: str
+) -> None:
     """
     Sends an E-mail notification to all resource recipients that have been
     configured to receive notifications for new (ticket) notes.
@@ -766,6 +773,11 @@ def view_ticket_files(self, request):
                 zipf.writestr(f.name, f.reference.file.read())
             except IOError:
                 not_existing.append(f.name)
+
+        pdf = TicketPdf.from_ticket(request, self)
+        pdf_filename = '{}_{}.pdf'.format(normalize_for_url(self.number),
+                                          date.today().strftime('%Y%m%d'))
+        zipf.writestr(pdf_filename, pdf.read())
 
     if not_existing:
         count = len(not_existing)

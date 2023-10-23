@@ -99,7 +99,12 @@ class Candidate(Base, TimestampMixin):
 
         """
 
-        expr = select([func.sum(getattr(CandidateResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(CandidateResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(CandidateResult.candidate_id == cls.id)
         expr = expr.label(attribute)
         return expr

@@ -4,13 +4,13 @@ from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
+from onegov.core.sms_processor import SmsQueueProcessor
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.archive_generator import ArchiveGenerator
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
-from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
 import click
 import os
@@ -81,6 +81,8 @@ def fetch(group_context):
     return fetch_results
 
 
+# TODO: Get rid of this command, there is now an equivalent command in
+#       core as well as an option to run a daemon
 @cli.command('send-sms')
 @click.argument('username')
 @click.argument('password')

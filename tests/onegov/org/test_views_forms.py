@@ -1147,7 +1147,7 @@ def test_file_export_for_ticket(client, temporary_directory):
         zip_file.extractall(temporary_directory)
         file_names = sorted(zip_file.namelist())
 
-        assert file_names == ['README1.txt', 'README2.txt']
+        assert {'README1.txt', 'README2.txt'}.issubset(file_names)
 
         for file_name, content in zip(file_names, [b'first', b'second']):
             with zip_file.open(file_name) as file:

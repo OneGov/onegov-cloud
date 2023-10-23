@@ -121,7 +121,7 @@ def delete_screen(self, request, form):
         'message': _(
             'Do you really want to delete "${item}"?',
             mapping={
-                'item': self.id
+                'item': self.number
             }
         ),
         'layout': layout,

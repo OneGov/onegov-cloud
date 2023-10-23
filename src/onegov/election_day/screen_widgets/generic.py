@@ -1,3 +1,4 @@
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.qrcode import QrCode
 
@@ -212,9 +213,13 @@ class CountedEntitiesWidget(ModelBoundWidget):
 
     def get_variables(self, layout):
         model = self.model or layout.model
+        entities = ', '.join([
+            entity or layout.request.translate(_('Expats'))
+            for entity in model.counted_entities
+        ])
         return {
             'model': model,
-            'entities': ', '.join(model.counted_entities)
+            'entities': entities
         }
 
 

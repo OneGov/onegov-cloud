@@ -286,7 +286,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         #        make use of it or can we change this to None?
         return True
 
-    def is_past_deadline(self, dt: 'datetime.datetime') -> bool:
+    def is_past_deadline(self, dt: datetime.datetime) -> bool:
         if not self.deadline:
             return False
 
@@ -299,11 +299,11 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         n, unit = self.deadline
 
         # hours result in a simple offset
-        def deadline_using_h() -> 'datetime.datetime':
+        def deadline_using_h() -> datetime.datetime:
             return dt - datetime.timedelta(hours=n)
 
         # days require that we align the date to the beginning of the date
-        def deadline_using_d() -> 'datetime.datetime':
+        def deadline_using_d() -> datetime.datetime:
             return (
                 align_date_to_day(dt, self.timezone, 'down')
                 - datetime.timedelta(days=(n - 1))

@@ -1,4 +1,6 @@
 from sqlalchemy import case
+from sqlalchemy import cast
+from sqlalchemy import Float
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -20,10 +22,11 @@ class DerivedAttributesMixin:
         # nullif will return null if division by zero
         # => when all yeas and nays are zero the yeas percentage is 0%
         return 100 * (
-            self.yeas / (
+            cast(self.yeas, Float) / cast(
                 func.coalesce(
                     func.nullif(self.yeas + self.nays, 0), 1
-                )
+                ),
+                Float
             )
         )
 
@@ -55,3 +58,14 @@ class DerivedBallotsCountMixin:
     def turnout(self):
         return self.cast_ballots / self.eligible_voters * 100\
             if self.eligible_voters else 0
+
+    @turnout.expression  # type:ignore[no-redef]
+    def turnout(cls):
+        return case(
+            [(
+                cls.eligible_voters > 0,
+                cast(cls.cast_ballots, Float)
+                / cast(cls.eligible_voters, Float) * 100
+            )],
+            else_=0
+        )

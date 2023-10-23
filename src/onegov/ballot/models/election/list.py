@@ -93,7 +93,12 @@ class List(Base, TimestampMixin):
 
         """
 
-        expr = select([func.sum(getattr(ListResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(ListResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(ListResult.list_id == cls.id)
         expr = expr.label(attribute)
         return expr
