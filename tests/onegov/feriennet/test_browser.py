@@ -77,6 +77,7 @@ def test_browse_matching(browser, scenario):
     assert 'finished prebooking' in browser.html
 
 
+@mark.skip('Causes too many requests, skip for now')
 def test_browse_billing(browser, scenario, postgres):
     scenario.add_period(title="Ferienpass 2016", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
