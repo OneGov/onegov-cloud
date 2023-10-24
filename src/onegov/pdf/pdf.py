@@ -409,7 +409,7 @@ class Pdf(PDFDocument):
         self,
         data: 'Sequence[Sequence[str | Paragraph]]',
         columns: Literal['even'] | list[float] | None,
-        style: 'TableStyle | None' = None,
+        style: TableStyle | None = None,
         ratios: bool = False
     ) -> None:
         """ Adds a table where every cell is wrapped in a paragraph so that

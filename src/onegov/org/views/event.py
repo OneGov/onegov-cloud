@@ -60,23 +60,31 @@ def assert_anonymous_access_only_temporary(request, event):
 
 
 def event_form(model, request, form=None):
-    if request.is_manager:
-        # unlike typical extended models, the property of this is defined
-        # on the event model, while we are only using the form extension part
-        # here
-        if request.app.org.event_filter_type in ['filters',
-                                                 'tags_and_filters']:
-            # merge event filter form
-            if request.app.org.event_filter_definition:
-                form = merge_forms(form or EventForm, parse_form(
-                    request.app.org.event_filter_definition))
+    if form is None:
+        form = EventForm
+
+    # unlike typical extended models, the property of this is defined
+    # on the event model, while we are only using the form extension part
+    # here
+    if request.app.org.event_filter_type in ('filters', 'tags_and_filters'):
+        # merge event filter form
+        filter_definition = request.app.org.event_filter_definition
+        if filter_definition:
+            form = merge_forms(form, parse_form(filter_definition))
 
         if request.app.org.event_filter_type == 'filters':
+            if not filter_definition:
+                # we need to create a subclass so we're not modifying
+                # the original form class in the below statement
+                form = type('EventForm', (form, ), {})
+
             # prevent showing tags
             form.tags = None
-        return AccessExtension().extend_form(form or EventForm, request)
 
-    return form or EventForm
+    if request.is_manager:
+        return AccessExtension().extend_form(form, request)
+
+    return form
 
 
 @OrgApp.view(

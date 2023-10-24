@@ -15,9 +15,7 @@ from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.clients.msal import MSALConnections
 from onegov.user.auth.clients.saml2 import SAML2Connections
 from onegov.user.auth.clients.saml2 import finish_logout
-from onegov.user.models.user import User
 from saml2.ident import code
-from translationstring import TranslationString
 from typing import Dict
 from typing import Optional
 from webob import Response
@@ -27,8 +25,9 @@ from typing import Any, ClassVar, Literal, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
     from onegov.core.request import CoreRequest
-    from onegov.user import UserApp
+    from onegov.user import User, UserApp
     from sqlalchemy.orm import Session
+    from translationstring import TranslationString
     from typing import Protocol
     from typing_extensions import Self
 
@@ -61,8 +60,8 @@ class Conclusion:
 class Success(Conclusion):
     """ Indicates a sucessful authentication. """
 
-    user: User = attrib()
-    note: TranslationString = attrib()
+    user: 'User' = attrib()
+    note: 'TranslationString' = attrib()
 
     def __bool__(self) -> Literal[True]:
         return True
@@ -72,7 +71,7 @@ class Success(Conclusion):
 class Failure(Conclusion):
     """ Indicates a corrupt JWT """
 
-    note: TranslationString = attrib()
+    note: 'TranslationString' = attrib()
 
     def __bool__(self) -> Literal[False]:
         return False
@@ -81,7 +80,7 @@ class Failure(Conclusion):
 class InvalidJWT(Failure):
     """ Indicates a failed authentication. """
 
-    note: TranslationString = attrib()
+    note: 'TranslationString' = attrib()
 
     def __bool__(self) -> Literal[False]:
         return False
@@ -244,7 +243,7 @@ class IntegratedAuthenticationProvider(AuthenticationProvider):
         request: 'CoreRequest',
         username: str,
         password: str
-    ) -> User | None:
+    ) -> 'User | None':
         """ Authenticates the given username/password in a single step.
 
         The function is expected to return an existing user record or None.
@@ -286,7 +285,7 @@ def ensure_user(
     force_role: bool = True,
     realname: str | None = None,
     force_active: bool = False
-) -> User:
+) -> 'User':
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
     """
@@ -490,7 +489,7 @@ class LDAPProvider(
         request: 'CoreRequest',
         username: str,
         password: str
-    ) -> User | None:
+    ) -> 'User | None':
 
         if self.auth_method == 'compare':
             return self.authenticate_using_compare(request, username, password)
@@ -502,7 +501,7 @@ class LDAPProvider(
         request: 'CoreRequest',
         username: str,
         password: str
-    ) -> User | None:
+    ) -> 'User | None':
 
         # since this is turned into an LDAP query, we want to make sure this
         # is not used to make broad queries
@@ -691,7 +690,7 @@ class LDAPKerberosProvider(
         self,
         request: 'CoreRequest',
         username: str
-    ) -> User | None:
+    ) -> 'User | None':
 
         if self.suffix:
             username = username.removesuffix(self.suffix)
@@ -753,7 +752,7 @@ class OauthProvider(SeparateAuthenticationProvider):
     def do_logout(
         self,
         request: 'CoreRequest',
-        user: User,
+        user: 'User',
         to: str
     ) -> Response | None:
         """ May return a webob response that gets used instead of the default
@@ -860,7 +859,7 @@ class AzureADProvider(
     def button_text(self, request: 'CoreRequest') -> str:
         return _("Login with Microsoft")
 
-    def do_logout(self, request: 'CoreRequest', user: User, to: str) -> None:
+    def do_logout(self, request: 'CoreRequest', user: 'User', to: str) -> None:
         # global logout is deactivated for AzureAD currently
         return None
 
@@ -1104,7 +1103,7 @@ class SAML2Provider(
     def do_logout(
         self,
         request: 'CoreRequest',
-        user: User,
+        user: 'User',
         to: str
     ) -> Response | None:
 

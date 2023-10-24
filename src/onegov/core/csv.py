@@ -33,7 +33,12 @@ if TYPE_CHECKING:
     from typing import Protocol
     from typing_extensions import TypeAlias
 
+    _T = TypeVar('_T')
     _T_co = TypeVar('_T_co', covariant=True)
+    _SupportsRichComparisonT = TypeVar(
+        '_SupportsRichComparisonT',
+        bound=SupportsRichComparison
+    )
 
     class _RowType(Protocol[_T_co]):
         def __call__(
@@ -43,15 +48,10 @@ if TYPE_CHECKING:
     class _NamedTuple(Protocol):
         def __getattr__(self, name: str) -> str | Any: ...
 
-    KeyFunc: TypeAlias = Callable[['_T'], SupportsRichComparison]
+    KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
 
 
-_T = TypeVar('_T')
 _RowT = TypeVar('_RowT', bound='_RowType[Any]')
-_SupportsRichComparisonT = TypeVar(
-    '_SupportsRichComparisonT',
-    bound='SupportsRichComparison'
-)
 
 
 VALID_CSV_DELIMITERS = ',;\t'
@@ -144,7 +144,7 @@ class CSVFile(Generic[_RowT]):
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
         *,
-        rowtype: '_RowT'
+        rowtype: _RowT
     ): ...
 
     def __init__(
@@ -154,7 +154,7 @@ class CSVFile(Generic[_RowT]):
         dialect: 'type[Dialect] | Dialect | str | None' = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
-        rowtype: '_RowT | None' = None
+        rowtype: _RowT | None = None
     ):
 
         # guess the encoding if not already provided
@@ -485,7 +485,7 @@ def get_keys_from_list_of_dicts(
     rows: 'Iterable[dict[_SupportsRichComparisonT, Any]]',
     key: None = None,
     reverse: bool = False
-) -> tuple[_SupportsRichComparisonT, ...]: ...
+) -> tuple['_SupportsRichComparisonT', ...]: ...
 
 
 @overload
@@ -493,7 +493,7 @@ def get_keys_from_list_of_dicts(
     rows: 'Iterable[dict[_T, Any]]',
     key: 'KeyFunc[_T]',
     reverse: bool = False
-) -> tuple[_T, ...]: ...
+) -> tuple['_T', ...]: ...
 
 
 def get_keys_from_list_of_dicts(

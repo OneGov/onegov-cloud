@@ -77,6 +77,7 @@ def test_browse_matching(browser, scenario):
     assert 'finished prebooking' in browser.html
 
 
+@mark.skip('Causes too many requests, skip for now')
 def test_browse_billing(browser, scenario, postgres):
     scenario.add_period(title="Ferienpass 2016", confirmed=True)
     scenario.add_activity(title="Foobar", state='accepted')
@@ -238,6 +239,7 @@ def test_browse_billing(browser, scenario, postgres):
 # The parametrization is used to ensure all the volunteer states can
 # be reached by clicking in the browser and verify that the states
 # can be exported properly
+@mark.skip('Causes too many requests, skip for now')
 @pytest.mark.parametrize('to_volunteer_state', [
     ('Kontaktiert'),
     ('Bestätigt'),

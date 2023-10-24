@@ -406,7 +406,7 @@ def org_content_security_policy():
     policy.connect_src.add('https://geodesy.geo.admin.ch')
     policy.connect_src.add('https://wms.geo.admin.ch/')
 
-    policy.connect_src.add('https://beobachten.projuventute.ch')
+    policy.connect_src.add('https://*.projuventute.ch')
     policy.connect_src.add('https://cdn.jsdelivr.net')
     policy.connect_src.add('https://*.usercentrics.eu')
 
