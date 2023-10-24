@@ -140,7 +140,7 @@ class VacationActivityHandler(Handler):
 
     @property
     def ticket_deletable(self):
-        return self.activity.state != 'archived' and super().ticket_deletable()
+        return super().ticket_deletable and self.activity.state != 'archived'
 
     def get_summary(self, request):
         from onegov.feriennet.layout import DefaultLayout

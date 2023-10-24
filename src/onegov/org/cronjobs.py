@@ -11,6 +11,7 @@ from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
+from onegov.org.models.ticket import ReservationHandler
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
@@ -48,8 +49,6 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
-    # for testing
-    # archive_old_tickets(request)
 
 
 def send_scheduled_newsletter(request):
@@ -485,8 +484,9 @@ def archive_old_tickets(request):
     query = query.filter(Ticket.created <= diff)
 
     for ticket in query:
-        if getattr(ticket.handler, 'has_future_reservation', False):
-            continue
+        if isinstance(ticket.handler, ReservationHandler):
+            if ticket.handler.has_future_reservation:
+                continue
         ticket.archive_ticket()
 
 

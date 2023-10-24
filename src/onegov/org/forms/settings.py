@@ -1153,7 +1153,3 @@ class DataRetentionPolicyForm(Form):
         coerce=int,
         choices=TIMESPANS
     )
-
-    def process_obj(self, model):
-        self.auto_archive_timespan.data = model.auto_archive_timespan or 0
-        self.auto_delete_timespan.data = model.auto_delete_timespan or 0

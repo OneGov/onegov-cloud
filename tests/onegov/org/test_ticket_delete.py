@@ -337,7 +337,7 @@ def test_has_future_reservations(client):
 
     session = client.app.session()
     handlers = [h.handler for h in session.query(Ticket)]
-    assert all(h.has_future_reservation() for h in handlers)
+    assert all(h.has_future_reservation for h in handlers)
 
     # now setup a reservation which is in the past
     transaction.begin()

@@ -336,7 +336,6 @@ class ReservationHandler(Handler):
 
         return query.one()
 
-    @cached_property
     def reservations_query(self):
         # libres allows for multiple reservations with a single request (token)
         # for now we don't really have that case in onegov.org, but we
@@ -348,10 +347,11 @@ class ReservationHandler(Handler):
 
     @cached_property
     def reservations(self):
-        return tuple(self.reservations_query)
+        return tuple(self.reservations_query())
 
+    @cached_property
     def has_future_reservation(self):
-        exists = self.reservations_query.filter(
+        exists = self.reservations_query().filter(
             Reservation.start > func.now()
         ).exists()
 
@@ -402,7 +402,7 @@ class ReservationHandler(Handler):
 
     @property
     def ticket_deletable(self):
-        return not self.has_future_reservation() and super().ticket_deletable()
+        return not self.has_future_reservation and super().ticket_deletable
 
     @property
     def title(self):
