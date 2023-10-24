@@ -2747,13 +2747,6 @@ msgstr "Propriétaire :"
 msgid "Kind:"
 msgstr "Type :"
 
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Procédez avec prudence. Les billets et les données qu'ils contiennent peuvent être irrévocablement "
-"supprimés."
-
 msgid "No directories defined yet."
 msgstr "Aucun dossier défini pour l'instant."
 
@@ -5213,6 +5206,13 @@ msgstr "Clé API supprimée."
 
 msgid "Data Retention Policy"
 msgstr "Politique de Conservation des Données"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procédez avec prudence. Les billets et les données qu'ils contiennent "
+"peuvent être irrévocablement supprimés."
 
 msgid "Topics"
 msgstr "Sujets"

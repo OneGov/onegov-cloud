@@ -536,13 +536,6 @@ msgstr "Besitzer:"
 msgid "Kind:"
 msgstr "Art:"
 
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können unwiderruflich "
-"gelöscht werden."
-
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
 
@@ -2170,14 +2163,9 @@ msgstr "OneGov API"
 msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
 
-#~ msgid "Data Retention"
-#~ msgstr "Data Retention"
-
-#~ msgid "Phone number"
-#~ msgstr "Telefonnummer"
-
-#~ msgid "Straight to ..."
-#~ msgstr "Direkt zu ..."
-
-#~ msgid "Perform Search"
-#~ msgstr "Suchen"
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."

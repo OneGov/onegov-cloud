@@ -527,13 +527,6 @@ msgstr "Proprietario:"
 msgid "Kind:"
 msgstr "Tipo:"
 
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere irrevocabilmente "
-"cancellati."
-
 msgid "No directories defined yet."
 msgstr "Nessuna cartella ancora definita."
 
@@ -911,8 +904,8 @@ msgstr "Tag"
 
 msgid "Filters"
 msgstr "Filtri"
-msgid "Date and time"
 
+msgid "Date and time"
 msgstr "Data e ora"
 
 msgid "Recurrence"
@@ -2164,14 +2157,9 @@ msgstr "API OneGov"
 msgid "Data Retention Policy"
 msgstr "Politica di Conservazione dei Dati"
 
-#~ msgid "Data Retention"
-#~ msgstr "Data Retention"
-
-#~ msgid "Phone number"
-#~ msgstr "Numero di telefono"
-
-#~ msgid "Straight to ..."
-#~ msgstr "Direttamente a ..."
-
-#~ msgid "Perform Search"
-#~ msgstr "Ricerca"
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."

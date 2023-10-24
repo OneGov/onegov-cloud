@@ -2746,13 +2746,6 @@ msgstr "Besitzer:"
 msgid "Kind:"
 msgstr "Art:"
 
-msgid ""
-"Proceed with caution. Tickets and the data they contain may be irrevocable "
-"deleted."
-msgstr ""
-"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können unwiderruflich "
-"gelöscht werden."
-
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
 
@@ -5195,6 +5188,13 @@ msgstr "ApiKey gelöscht."
 
 msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."
 
 msgid "Topics"
 msgstr "Themen"

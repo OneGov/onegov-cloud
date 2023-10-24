@@ -307,11 +307,13 @@ def town_handle_api_keys(self, request, form):
 
 @TownApp.form(
     model=Organisation, name='data-retention-settings',
-    template='cautionary_form.pt',
+    template='form.pt',
     permission=Secret, form=DataRetentionPolicyForm,
     setting=_("Data Retention Policy"), icon='far fa-trash', order=-880,
 )
 def town_handle_ticket_data_deletion_settings(self, request, form):
+    request.message(_("Proceed with caution. Tickets and the data they "
+                      "contain may be irrevocable deleted."), 'alert')
     return handle_generic_settings(
         self, request, form, _("Data Retention Policy"),
         SettingsLayout(self, request),
