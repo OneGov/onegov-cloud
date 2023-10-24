@@ -1108,6 +1108,7 @@ def delete_tickets_and_related_data(
             ticket.redact_data()
             continue
 
+        ticket.handler.prepare_delete_ticket()
         delete_messages_from_ticket(request, ticket.number)
 
         if submission := getattr(ticket.handler, 'submission', None):

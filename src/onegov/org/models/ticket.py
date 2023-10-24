@@ -184,12 +184,6 @@ class FormSubmissionHandler(Handler):
 
         return False
 
-    def prepare_delete_ticket(self):
-        if self.submission:
-            for file in self.submission.files:
-                self.session.delete(file)
-            self.session.delete(self.submission)
-
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
         if self.submission is not None:
@@ -865,10 +859,6 @@ class DirectoryEntryHandler(Handler):
             return False
 
         return self.state is None
-
-    def prepare_delete_ticket(self):
-        if self.submission:
-            self.session.delete(self.submission)
 
     @property
     def kind(self):
