@@ -43,8 +43,8 @@ class Client(TestApp):
     def login_member(self, to=None):
         return self.login('member@example.org', 'hunter2', to)
 
-    def logout(self):
-        return self.get('/auth/logout')
+    def logout(self, force=False):
+        return self.get('/auth/logout', status='*' if force else None)
 
     def get_email(self, batch_index, index=0, flush_queue=False):
         """ Get the nth email from the batch at the given batch index.
