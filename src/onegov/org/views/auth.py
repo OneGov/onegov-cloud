@@ -353,6 +353,13 @@ def handle_request_mtan(
         Link(_("Enter mTAN"), request.link(self, name='authenticate'))
     ]
 
+    request.info(_(
+        'The requested resource is protected. To obtain time-limited '
+        'access, please enter your mobile phone number in the field below. '
+        'You will receive an mTAN via SMS, which will grant you access '
+        'after correct entry.'
+    ))
+
     return {
         'layout': layout,
         'title': _('Request mTAN'),

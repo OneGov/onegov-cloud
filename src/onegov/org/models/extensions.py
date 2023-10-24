@@ -116,7 +116,7 @@ class AccessExtension(ContentExtension):
             # allowing mtan restricted models makes only sense
             # if we can deliver SMS
             access_choices.append(('mtan', _(
-                "Only by priviliged users or after submitting a mTAN"
+                "Only by privileged users or after submitting a mTAN"
             )))
 
         fields: dict[str, 'Field'] = {
