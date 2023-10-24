@@ -81,16 +81,10 @@ class VotumForm(NamedFileForm):
         )
     )
 
-    person_picture = UploadField(
+    person_picture = StringField(
         label=_('Picture'),
         fieldset=_('Person'),
-        validators=[
-            WhitelistedMimeType({
-                'image/jpeg',
-                'image/png',
-            }),
-            FileSizeLimit(1 * 1024 * 1024)
-        ]
+        render_kw={'class_': 'image-url'}
     )
 
     video_timestamp = StringField(

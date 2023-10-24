@@ -77,7 +77,7 @@ class Votum(
     person_political_affiliation = Column(Text, nullable=True)
 
     #: A picture of the person
-    person_picture = NamedFile()
+    person_picture = Column(Text, nullable=True)
 
     #: The video timestamp of this agenda item
     video_timestamp = content_property()
