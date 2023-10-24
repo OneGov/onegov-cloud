@@ -394,7 +394,7 @@ class ReservationHandler(Handler):
         for reservation in self.reservations or ():
             self.session.delete(reservation)
 
-    @property
+    @cached_property
     def ticket_deletable(self):
         return not self.has_future_reservation and super().ticket_deletable
 

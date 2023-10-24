@@ -163,7 +163,7 @@ class AccreditationHandler(Handler):
 
     @property
     def ticket_deletable(self):
-        # For now we don't support more because lot's of functionality
+        # For now we don't support this because lot's of functionality
         # depends on data in translator tickets
         if self.deleted:
             return True

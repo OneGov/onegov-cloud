@@ -138,7 +138,7 @@ class VacationActivityHandler(Handler):
 
         return self.activity.state == 'proposed'
 
-    @property
+    @cached_property
     def ticket_deletable(self):
         return super().ticket_deletable and self.activity.state != 'archived'
 
