@@ -381,4 +381,4 @@ def test_has_future_reservations(client):
             Ticket.title == '28.08.2009 12:00 - 13:00'
         )
     ][0]
-    assert not handler.has_future_reservation()
+    assert not handler.has_future_reservation
