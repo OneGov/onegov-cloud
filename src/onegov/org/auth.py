@@ -18,7 +18,7 @@ class MTANAuth:
     Defines a model for mTAN authentication views.
 
     This is similar in functionality to :class:`onegov.user.auth.core.Auth`
-    but it is not tied to specific user, instead we just remember whether
+    but it is not tied to a specific user, instead we just remember whether
     or not we're still authenticated using the browser session.
 
     Even with multiple active sessions, logically we treat all sessions for

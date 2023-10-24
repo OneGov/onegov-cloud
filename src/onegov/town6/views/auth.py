@@ -71,7 +71,7 @@ def towm_handle_request_mtan(
         self,
         request,
         form,
-        DefaultLayout(self,request)
+        DefaultLayout(self, request)
     )
 
 
@@ -91,5 +91,5 @@ def towm_handle_authenticate_mtan(
         self,
         request,
         form,
-        DefaultLayout(self,request)
+        DefaultLayout(self, request)
     )

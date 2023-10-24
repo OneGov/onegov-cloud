@@ -103,7 +103,7 @@ class OrgRequest(CoreRequest):
             return False
 
         # if we already accessed this url we are also still fine
-        return self.mtan_accesses.by_url(self.path_url) is not None
+        return self.mtan_accesses.by_url(self.path_url) is None
 
     def auto_accept(self, ticket):
         if self.app.org.ticket_auto_accept_style == 'role':
