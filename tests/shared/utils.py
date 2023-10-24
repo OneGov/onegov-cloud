@@ -102,7 +102,7 @@ def random_namespace():
 
 
 def create_app(app_class, request, use_elasticsearch=False,
-               reuse_filestorage=True, use_maildir=True,
+               reuse_filestorage=True, use_maildir=True, use_smsdir=True,
                depot_backend='depot.io.local.LocalFileStorage',
                depot_storage_path=None, **kwargs):
 
@@ -188,6 +188,16 @@ def create_app(app_class, request, use_elasticsearch=False,
         }
 
         app.maildir = maildir
+
+    if use_smsdir:
+        smsdir = request.getfixturevalue('smsdir')
+        app.sms = {
+            'directory': smsdir,
+            'sender': 'Govikon',
+            'user': 'test',
+            'password': 'test'
+        }
+        app.sms_directory = smsdir
 
     return app
 

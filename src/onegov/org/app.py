@@ -118,11 +118,11 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         This inserts an mtan hook by wrapping the callable we receive
         from the key lookup on get_view.
 
-        We only need to this once per application instance and we don't
+        We only need to do this once per application instance and we don't
         risk contaminating other applications, since each instance has
         its own dispatch callable.
 
-        This relies heavily on implementation details of reg.dispatch_method
+        This relies heavily on implementation details of `reg.dispatch_method`
         and thus a little bit fragile, take care when upgrading to newer
         versions of reg!
         """
