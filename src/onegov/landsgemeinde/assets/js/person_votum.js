@@ -15,5 +15,7 @@ $(document).ready(function(){
             'person_political_affiliation').value=separated_values[2]
         document.getElementById(
             'person_place').value=separated_values[3]
+        document.getElementById(
+            'person_picture').value=separated_values[4]
     });
 })
