@@ -10,6 +10,8 @@ from uuid import uuid4
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
+
     from .election import Election
 
 
@@ -19,17 +21,21 @@ class ElectionRelationship(Base):
     __tablename__ = 'election_relationships'
 
     #: Identifies the relationship.
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
-    # FIXME: should source_id and target_id be nullable=False?
+    # FIXME: source_id should be nullable=False
     #: The source election ID.
-    source_id = Column(
+    source_id: 'Column[str]' = Column(  # type:ignore[assignment]
         Text,
         ForeignKey('elections.id', onupdate='CASCADE')
     )
 
     #: The target election ID.
-    target_id = Column(
+    target_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE'),
         primary_key=True

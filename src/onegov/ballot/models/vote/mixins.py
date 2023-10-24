@@ -5,19 +5,30 @@ from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy import Column
+    from sqlalchemy.sql import ColumnElement
+
+
 class DerivedAttributesMixin:
 
     """ A simple mixin to add commonly used functions to ballots and their
     results. """
 
-    @hybrid_property
-    def yeas_percentage(self):
+    if TYPE_CHECKING:
+        yeas_percentage: Column[float]
+        nays_percentage: Column[float]
+        accepted: Column[bool]
+
+    @hybrid_property  # type: ignore[no-redef]
+    def yeas_percentage(self) -> float:
         """ The percentage of yeas (discounts empty/invalid ballots). """
 
         return self.yeas / ((self.yeas + self.nays) or 1) * 100
 
     @yeas_percentage.expression  # type:ignore[no-redef]
-    def yeas_percentage(self):
+    def yeas_percentage(self) -> 'ColumnElement[float]':
         # coalesce will pick the first non-null result
         # nullif will return null if division by zero
         # => when all yeas and nays are zero the yeas percentage is 0%
@@ -30,18 +41,18 @@ class DerivedAttributesMixin:
             )
         )
 
-    @hybrid_property
-    def nays_percentage(self):
+    @hybrid_property  # type:ignore[no-redef]
+    def nays_percentage(self) -> float:
         """ The percentage of nays (discounts empty/invalid ballots). """
 
         return 100 - self.yeas_percentage
 
-    @hybrid_property
-    def accepted(self):
+    @hybrid_property  # type:ignore[no-redef]
+    def accepted(self) -> bool:
         return self.yeas > self.nays if self.counted else None
 
     @accepted.expression  # type:ignore[no-redef]
-    def accepted(cls):
+    def accepted(cls) -> 'ColumnElement[bool]':
         return case({True: cls.yeas > cls.nays}, cls.counted)
 
 
@@ -50,17 +61,27 @@ class DerivedBallotsCountMixin:
     """ A simple mixin to add commonly used functions to votes, ballots and
     their results. """
 
-    @hybrid_property
-    def cast_ballots(self):
+    if TYPE_CHECKING:
+        cast_ballots: Column[int]
+        turnout: Column[float]
+
+        # forward declare required columns
+        yeas: Column[int]
+        nays: Column[int]
+        empty: Column[int]
+        invalid: Column[int]
+
+    @hybrid_property  # type:ignore[no-redef]
+    def cast_ballots(self) -> int:
         return self.yeas + self.nays + self.empty + self.invalid
 
-    @hybrid_property
-    def turnout(self):
+    @hybrid_property  # type:ignore[no-redef]
+    def turnout(self) -> float:
         return self.cast_ballots / self.eligible_voters * 100\
             if self.eligible_voters else 0
 
     @turnout.expression  # type:ignore[no-redef]
-    def turnout(cls):
+    def turnout(cls) -> 'ColumnElement[float]':
         return case(
             [(
                 cls.eligible_voters > 0,

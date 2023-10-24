@@ -164,6 +164,7 @@ def enable_iframes_tween_factory(app, handler):
         r'/roadwork.*',
         r'/daycare-subsidy-calculator',
         r'/events.*',
+        r'/event.*',
     )
 
     iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
