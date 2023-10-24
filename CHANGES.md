@@ -1,8 +1,24 @@
 # Changes
 
+## 2023.54
+
+`2023-10-24` | [0e85c77c26...3e5adeeb82](https://github.com/OneGov/onegov-cloud/compare/0e85c77c26^...3e5adeeb82)
+
+### Feriennet
+
+##### Add Rega logo
+
+`Feature` | [PRO-1217](https://linear.app/projuventute/issue/PRO-1217) | [3e5adeeb82](https://github.com/onegov/onegov-cloud/commit/3e5adeeb82950c20d2b2137a9866b4c7a3c1884b)
+
+### Org
+
+##### Displays filters in event form regardless of user privileges
+
+`Bugfix` | [OGC-1308](https://linear.app/onegovcloud/issue/OGC-1308) | [0e85c77c26](https://github.com/onegov/onegov-cloud/commit/0e85c77c2620382158dc18d86219c5d529fabcd9)
+
 ## 2023.53
 
-`2023-10-23` | [b83715b9b1...f51495e900](https://github.com/OneGov/onegov-cloud/compare/b83715b9b1^...f51495e900)
+`2023-10-23` | [b83715b9b1...4d3218f204](https://github.com/OneGov/onegov-cloud/compare/b83715b9b1^...4d3218f204)
 
 ### Feriennet
 
@@ -2322,44 +2338,4 @@ More unity among all lists.
 ##### Search-Button mobile
 
 `Bugfix` | [OGC-842](https://linear.app/onegovcloud/issue/OGC-842) | [251d95fca7](https://github.com/onegov/onegov-cloud/commit/251d95fca7a2e4d56ca791d1803db61482429aa3)
-
-## 2023.4
-
-`2023-01-21` | [f5e079cd91...c270610705](https://github.com/OneGov/onegov-cloud/compare/f5e079cd91^...c270610705)
-
-### Election Day
-
-##### Add SVGs for parts of election compounds.
-
-`Feature` | [OGC-752](https://linear.app/onegovcloud/issue/OGC-752) | [a3ed30722e](https://github.com/onegov/onegov-cloud/commit/a3ed30722e6c597cb8bdf9b194e5a405ca0faabd)
-
-##### Update translations.
-
-`Feature` | [OGC-726](https://linear.app/onegovcloud/issue/OGC-726) | [78577ae649](https://github.com/onegov/onegov-cloud/commit/78577ae649ce033cf629f6d114d4baf16991a5ef)
-
-##### Improve list panaschage format description.
-
-`Feature` | [1ca8e4425f](https://github.com/onegov/onegov-cloud/commit/1ca8e4425fcb621c37aafb882bb6e5a4283a285e)
-
-##### Always gray out inactive bar chart rows.
-
-`Bugfix` | [f5e079cd91](https://github.com/onegov/onegov-cloud/commit/f5e079cd91f1297e2d49010512a85d7519b49240)
-
-##### Zeroize not yet counted results when importing majorz election from WabstiC.
-
-`Bugfix` | [OGC-894](https://linear.app/onegovcloud/issue/OGC-894) | [24c7e69e89](https://github.com/onegov/onegov-cloud/commit/24c7e69e893cc04a75004ee2c2a1c9a8df4a7fb7)
-
-##### Gray out candidates in bar charts only if any mandates have been allocated.
-
-`Bugfix` | [27a5a146af](https://github.com/onegov/onegov-cloud/commit/27a5a146af055abab06a9411f4cae3f27e29f75c)
-
-##### Fix API doc table formatting.
-
-`Bugfix` | [73c44510bd](https://github.com/onegov/onegov-cloud/commit/73c44510bd5b248eb8060d3803648e29d342a5e3)
-
-### Town6
-
-##### Display context-specific functions on person in the directory
-
-`Feature` | [OGC-731](https://linear.app/onegovcloud/issue/OGC-731) | [e7966c9fde](https://github.com/onegov/onegov-cloud/commit/e7966c9fdeddd1947a3f161894f56993832c8879)
 
