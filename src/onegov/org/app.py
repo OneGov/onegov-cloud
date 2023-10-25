@@ -128,24 +128,36 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         """
 
         # the method_dispatch wraps the function in MethodType and stores
-        # it on the instance, this should be a unique instance of the function
-        # for each instance, but just in case we set the marker on the function
-        # to make sure we only patch it once
+        # it on the instance, this should be a unique instance of the method
+        # per instance, and an unique instance of the function per class
         get_view_meth = self.get_view
         assert isinstance(get_view_meth, MethodType)
         get_view = get_view_meth.__func__
         assert hasattr(get_view, 'key_lookup')
+        key_lookup = get_view.key_lookup
+        if not isinstance(key_lookup, KeyLookupWithMTANHook):
+            get_view.key_lookup = KeyLookupWithMTANHook(key_lookup)
+            # it is annoying we have to do this, but it is how reg binds these
+            # function calls to the dynamically generated function body
+            get_view.__globals__.update(
+                _component_lookup=get_view.key_lookup.component,
+                _fallback_lookup=get_view.key_lookup.fallback,
+            )
 
-        if not getattr(get_view, '_mtan_hook_installed', False):
-            get_view.key_lookup = KeyLookupWithMTANHook(get_view.key_lookup)
-            get_view._mtan_hook_installed = True
-
-        # it is annoying we have to do this, but it is how reg binds these
-        # function calls to the dynamically generated function body
-        get_view.__globals__.update(
-            _component_lookup=get_view.key_lookup.component,
-            _fallback_lookup=get_view.key_lookup.fallback,
-        )
+            # we also need to insert ourselves into the dispatch, so that calls
+            # to .clean/.add_predicates doesn't remove our wrapper
+            # this should be safe, since each class gets its own dispatch
+            # but it is ugly that we have to access the dispatch using the
+            # __self__ on one of the methods
+            dispatch = get_view.clean.__self__
+            if not getattr(dispatch, '_mtan_hook_configured', False):
+                orig_get_key_lookup = dispatch.get_key_lookup
+                dispatch.get_key_lookup = (
+                    lambda registry:
+                    KeyLookupWithMTANHook(orig_get_key_lookup(registry))
+                )
+                dispatch.key_lookup = get_view.key_lookup
+                dispatch._mtan_hook_configured = True
 
     @orm_cached(policy='on-table-change:organisations')
     def org(self):

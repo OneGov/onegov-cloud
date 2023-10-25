@@ -279,12 +279,6 @@ def test_mtan_access(org_app, client, smsdir):
     client.get(page_url, status=200)
 
     anonymous = client.spawn()
-
-    # FIXME: remove this
-    get_view = org_app.get_view.__func__
-    assert getattr(get_view, '_mtan_hook_installed', False)
-    assert get_view.key_lookup.__class__.__name__ == 'KeyLookupWithMTANHook'
-
     mtan_page = anonymous.get(page_url, status=302).follow()
     assert 'mTAN' in mtan_page
     mtan_page.form['phone_number'] = '+41791112233'
