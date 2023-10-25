@@ -1,6 +1,6 @@
 """ Contains the model describing the organisation proper. """
 
-from datetime import date
+from datetime import date, timedelta
 from functools import lru_cache
 from hashlib import sha256
 from onegov.core.orm import Base
@@ -9,6 +9,7 @@ from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify, paragraphify
 from onegov.form import flatten_fieldsets, parse_formcode
 from onegov.org.theme import user_options
+from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
 from uuid import uuid4
@@ -178,6 +179,26 @@ class Organisation(Base, TimestampMixin):
     gever_username = meta_property()
     gever_password = meta_property()
     gever_endpoint = meta_property()
+
+    # MTAN Settings
+    mtan_access_window_seconds = meta_property()
+    mtan_access_window_requests = meta_property()
+    mtan_session_duration_seconds = meta_property()
+
+    @property
+    def mtan_access_window(self) -> timedelta:
+        seconds = self.mtan_access_window_seconds
+        if seconds is None:
+            return DEFAULT_ACCESS_WINDOW
+        return timedelta(seconds=seconds)
+
+    @property
+    def mtan_session_duration(self) -> timedelta:
+        seconds = self.mtan_session_duration_seconds
+        if seconds is None:
+            # by default we match it with the access window
+            return self.mtan_access_window
+        return timedelta(seconds=seconds)
 
     @property
     def public_identity(self):

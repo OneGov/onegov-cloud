@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-25 08:37+0200\n"
+"POT-Creation-Date: 2023-10-24 13:52+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,6 +12,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 3.0.1\n"
+
+#, python-format
+msgid ""
+"mTAN for ${organisation}:\n"
+"\n"
+"${mtan}\n"
+"\n"
+"Or continue where you left off using this link: ${url}"
+msgstr ""
+"mTAN per ${organisation}:\n"
+"\n"
+"${mtan}\n"
+"\n"
+"Oppure continuate da dove avevate interrotto, usando questo link: ${url}"
+
+msgid ""
+"We sent an mTAN to the specified number. Please enter it below or follow the "
+"instructions in the SMS."
+msgstr ""
+"Abbiamo inviato un mTAN al numero indicato. Inseritelo nello spazio "
+"sottostante o seguite le istruzioni dell'SMS."
 
 msgid "Open"
 msgstr "Aperto"
@@ -973,6 +994,12 @@ msgstr "Disposizione a griglia"
 msgid "Show images on homepage"
 msgstr "Mostra le immagini sulla pagina principale"
 
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr "Numero di telefono"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
 
@@ -1528,6 +1555,29 @@ msgstr "Filtri configurabili manualmente"
 
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Entrambi, tag predefiniti e filtri configurabili"
+
+msgid "Duration of mTAN session"
+msgstr "Durata della sessione mTAN"
+
+msgid "Specify in number of seconds"
+msgstr "Indicate il numero di secondi"
+
+msgid "mTAN Access"
+msgstr "Accesso mTAN"
+
+msgid ""
+"Prevent further accesses to protected resources after this many have been "
+"accessed"
+msgstr ""
+"Impedite ulteriori accessi alle risorse protette dopo che ne sono stati "
+"effettuati molti"
+
+msgid "Leave empty to disable limiting requests"
+msgstr "Lasciate vuoto per disabilitare la limitazione delle richieste"
+
+msgid "Prevent further accesses to protected resources in this time frame"
+msgstr ""
+"Impedite ulteriori accessi alle risorse protette in questo lasso di tempo."
 
 msgid "The default map view. This should show the whole town"
 msgstr ""
@@ -2222,6 +2272,9 @@ msgstr "L'invio della cartella è stato rifiutato"
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
 
+msgid "Only by privileged users or after submitting a mTAN"
+msgstr "Solo da utenti autorizzati o dopo l'invio di un mTAN."
+
 msgid "Members may view occupancy"
 msgstr "I membri possono visualizzare l'occupazione"
 
@@ -2528,8 +2581,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -2957,6 +3010,9 @@ msgstr "Tutte le notizie"
 
 msgid "This site is private but can also be seen by members"
 msgstr "Questo sito è privato ma può essere visto dai membri"
+
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Questo sito è pubblico ma richiede l'invio di un mTAN"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
@@ -4331,6 +4387,27 @@ msgid "Wrong username or password reset link not valid any more."
 msgstr ""
 "Il collegamento per reimpostare il nome utente o la password errati non è "
 "più valido."
+
+msgid "Enter mTAN"
+msgstr "Immettre mTAN"
+
+msgid ""
+"The requested resource is protected. To obtain time-limited access, please "
+"enter your mobile phone number in the field below. You will receive an mTAN "
+"via SMS, which will grant you access after correct entry."
+msgstr ""
+"La risorsa richiesta è protetta. Per ottenere un accesso a tempo limitato, "
+"inserite il vostro numero di cellulare nel campo sottostante. Riceverete un "
+"mTAN via SMS, che vi consentirà l'accesso dopo il suo corretto inserimento."
+
+msgid "Request mTAN"
+msgstr "Richiesta mTAN"
+
+msgid "Successfully authenticated via mTAN."
+msgstr "Autenticazione tramite mTAN riuscita."
+
+msgid "Invalid or expired mTAN provided."
+msgstr "È stato fornito un mTAN non valido o scaduto."
 
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"

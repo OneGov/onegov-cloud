@@ -6197,12 +6197,18 @@ h2 + div.timeline {
         @include icon('\f0c0');
         color: $blue-dark;
     }
+
+    input[value="mtan"] + label::before {
+        @include icon('\f10b');
+        color: $blue-dark;
+    }
 }
 
 
 .secret-hint::before,
 .private-hint::before,
 .member-hint::before,
+.mtan-hint::before,
 .unpublished-hint::before {
     font-style: normal;
 }
@@ -6219,6 +6225,11 @@ h2 + div.timeline {
 
 .member-hint::before {
     @include icon('\f0c0');
+    color: $blue-dark;
+}
+
+.mtan-hint::before {
+    @include icon('\f10b');
     color: $blue-dark;
 }
 
