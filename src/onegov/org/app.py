@@ -134,18 +134,18 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         get_view_meth = self.get_view
         assert isinstance(get_view_meth, MethodType)
         get_view = get_view_meth.__func__
-        if getattr(get_view, '_mtan_hook_installed', False):
-            return
-
         assert hasattr(get_view, 'key_lookup')
-        get_view.key_lookup = KeyLookupWithMTANHook(get_view.key_lookup)
+
+        if not getattr(get_view, '_mtan_hook_installed', False):
+            get_view.key_lookup = KeyLookupWithMTANHook(get_view.key_lookup)
+            get_view._mtan_hook_installed = True
+
         # it is annoying we have to do this, but it is how reg binds these
         # function calls to the dynamically generated function body
         get_view.__globals__.update(
             _component_lookup=get_view.key_lookup.component,
             _fallback_lookup=get_view.key_lookup.fallback,
         )
-        get_view._mtan_hook_installed = True
 
     @orm_cached(policy='on-table-change:organisations')
     def org(self):
@@ -744,9 +744,6 @@ class KeyLookupWithMTANHook:
         key: 'Sequence[Any]'
     ) -> 'Callable[..., Any] | None':
 
-        # TODO: remove me
-        from onegov.org import log
-        log.info('I am working')
         result = self.key_lookup.component(key)
         if result is None:
             return None
