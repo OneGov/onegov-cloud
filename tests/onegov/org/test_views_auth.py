@@ -279,7 +279,6 @@ def test_mtan_access(org_app, client, smsdir):
     client.get(page_url, status=200)
 
     anonymous = client.spawn()
-    anonymous.logout(force=True)  # ensure this client is logged out
     mtan_page = anonymous.get(page_url, status=302).follow()
     assert 'mTAN' in mtan_page
     mtan_page.form['phone_number'] = '+41791112233'
@@ -321,7 +320,6 @@ def test_mtan_access(org_app, client, smsdir):
 
     # a second anonymous user should not have access however
     anonymous2 = client.spawn()
-    anonymous2.logout(force=True)
     mtan_page = anonymous2.get(page_url, status=302).follow()
     assert 'mTAN' in mtan_page
     mtan_page.form['phone_number'] = '+41791112233'
