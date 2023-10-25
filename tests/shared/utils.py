@@ -198,6 +198,8 @@ def create_app(app_class, request, use_elasticsearch=False,
             'password': 'test'
         }
         app.sms_directory = smsdir
+        # FIXME: Why do we need to do this manually on the CI?
+        app.configure_mtan_hook()
 
     return app
 

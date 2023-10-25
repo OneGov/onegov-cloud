@@ -744,6 +744,9 @@ class KeyLookupWithMTANHook:
         key: 'Sequence[Any]'
     ) -> 'Callable[..., Any] | None':
 
+        # TODO: remove me
+        from onegov.org import log
+        log.info('I am working')
         result = self.key_lookup.component(key)
         if result is None:
             return None
