@@ -301,8 +301,11 @@ class ValidFormDefinition:
 
         return parsed_form
 
-    def _parse_form(self, field: 'Field',
-                    enable_indent_check: 'bool' = True) -> 'Form':
+    def _parse_form(
+        self,
+        field: 'Field',
+        enable_indent_check: bool = True
+    ) -> 'Form':
         # XXX circular import
         from onegov.form import parse_form
 

@@ -63,13 +63,16 @@ class TownForm(Form):
         default='#005ba1'
     )
 
-    def ensure_valid_name(self):
+    def ensure_valid_name(self) -> bool:
         name = self.name.data
+        assert name is not None
         if not re.match(r'^[A-Za-z\s]+$', name) or not name.strip():
+            assert isinstance(self.name.errors, list)
             self.name.errors.append(
                 _("Only characters are allowed")
             )
             return False
+        return True
 
 
 class FinishForm(Form):

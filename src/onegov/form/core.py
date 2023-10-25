@@ -3,7 +3,6 @@ import weakref
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import chain, groupby
-from markupsafe import Markup
 from onegov.core.markdown import render_untrusted_markdown as render_md
 from onegov.form import utils
 from onegov.form.display import render_field
@@ -26,6 +25,7 @@ if TYPE_CHECKING:
         Callable, Collection, Iterable, Iterator, Mapping, Sequence)
     from onegov.core.request import CoreRequest
     from onegov.form.types import PricingRules
+    from markupsafe import Markup
     from typing_extensions import Self, TypedDict
     from weakref import CallableProxyType
     from webob.multidict import MultiDict
@@ -340,7 +340,7 @@ class Form(BaseForm):
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
 
-    def render_display(self, field: 'Field') -> Markup:
+    def render_display(self, field: 'Field') -> 'Markup':
         """ Renders the given field for display (no input). May be overwritten
         by descendants to return different html, or to return None.
 
