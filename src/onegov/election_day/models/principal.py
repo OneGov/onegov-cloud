@@ -14,6 +14,7 @@ from yaml import safe_load
 
 
 from typing import Any
+from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from yaml.reader import _ReadStream
@@ -254,6 +255,8 @@ class Canton(Principal):
         'ju': 26,
     }
 
+    domain: Literal['canton']
+
     def __init__(
         self,
         canton: str,
@@ -446,6 +449,8 @@ class Canton(Principal):
 
 class Municipality(Principal):
     """ A communal instance. """
+
+    domain: Literal['municipality']
 
     def __init__(
         self,

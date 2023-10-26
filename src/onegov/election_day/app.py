@@ -36,6 +36,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from more.content_security import ContentSecurityPolicy
     from onegov.core.cache import RedisCacheRegion
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
     from webob import Response
 
 
@@ -62,14 +64,14 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
     #        for now this is easier than having assert self.principal
     #        everywhere
     @property
-    def principal(self) -> Principal:
+    def principal(self) -> 'Canton | Municipality':
         """ Returns the principal of the election day app. See
         :class:`onegov.election_day.models.principal.Principal`.
 
         """
         return self.cache.get_or_create('principal', self.load_principal)
 
-    def load_principal(self) -> Principal | None:
+    def load_principal(self) -> 'Canton | Municipality | None':
         """ The principal is defined in the ``principal.yml`` file stored
         on the applications filestorage root.
 
