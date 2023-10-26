@@ -1,3 +1,4 @@
+import typing
 from onegov.core.orm.types import JSON
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import ExprComparator
@@ -5,12 +6,14 @@ from sqlalchemy.orm import deferred
 from sqlalchemy.orm.attributes import create_proxied_attribute
 from sqlalchemy.orm.interfaces import InspectionAttrInfo
 from sqlalchemy.schema import Column
+from sys import modules
 
 
 from typing import overload, Any, Generic, Protocol, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
     from sqlalchemy.orm.attributes import QueryableAttribute
+    from sqlalchemy.sql import ColumnElement
     from typing_extensions import Self
 
     class _bound_dict_property(Protocol['_T']):
@@ -150,10 +153,9 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
 
     is_attribute = True
 
-    custom_getter: 'Callable[[Any], _T | None] | None'
-    # FIXME: Use SQLAlchemy 2.0 as reference for the allowed return types.
-    custom_expression: 'Callable[[type[Any]], Any] | None'
-    custom_setter: 'Callable[[Any, _T | None], None] | None'
+    custom_getter: 'Callable[[Any], _T] | None'
+    custom_expression: 'Callable[[type[Any]], ColumnElement[_T]] | None'
+    custom_setter: 'Callable[[Any, _T], None] | None'
     custom_deleter: 'Callable[[Any], None] | None'
 
     def __init__(
@@ -176,10 +178,6 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
                 value_type = type(default())
             else:
                 value_type = type(default)
-        elif value_type is None:
-            # FIXME: for now we default to this, but eventually
-            #        we probably want to raise a ValueError
-            value_type = str  # type:ignore[assignment]
 
         self.value_type = value_type
         self.custom_getter = None
@@ -189,23 +187,71 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         # compatibility with ExprComparator
         self.update_expr = None
 
-    def __set_name__(self, owner: type[Any], name: str) -> None:
+    def __set_name__(self, owner: type[object], name: str) -> None:
         """ Sets the dictionary key, if none is provided. """
 
         if self.key is None:
             self.key = name
 
+        try:
+            # FIXME: Ideally we would like to use typing.get_type_hints
+            #        unfortunately that only succeeds if every single
+            #        ForwardRef can be resolved, which is not very likely
+            #        so we manually do the work for one specific annotation
+            #        and rely on non-public functions, so this may break
+            #        in future versions of Python.
+            my_annotation = owner.__annotations__[name]
+            if my_annotation is None:
+                my_annotation = type(None)
+            elif isinstance(my_annotation, str):
+                my_annotation = typing.ForwardRef(
+                    my_annotation,
+                    is_argument=True,
+                    is_class=True
+                )
+            owner_module = modules.get(owner.__module__, None)
+            my_type_hint = typing._strip_annotations(  # type:ignore
+                typing._eval_type(  # type:ignore[attr-defined]
+                    my_annotation,
+                    getattr(owner_module, '__dict__', {}),
+                    dict(vars(owner))
+                )
+            )
+        except (KeyError, NameError, TypeError):
+            # TODO: Eventually we probably want to raise an error here
+            #       unless self.value_type != None, maybe even emit an
+            #       warning in every case. Although there may be some
+            #       rare cases where we cannot resolve a ForwardRef
+            #       no matter what. We may also consider writing a
+            #       mypy plugin instead.
+            return
+
+        origin = typing.get_origin(my_type_hint)
+        if not issubclass(origin, dict_property):
+            raise TypeError('Type annotation needs to be a dict_property')
+
+        value_type = typing.get_args(my_type_hint)[0]
+        union_types = typing.get_args(value_type) or (value_type, )
+        if self.default is None and type(None) not in union_types:
+            raise TypeError(
+                'The default value on this dict_property is set to None '
+                'however the type annotation is not optional'
+            )
+
+        # TODO: We should probably add further sanity checks and try
+        #       to determine self.value_type based on value_type
+
     @property
-    def getter(self) -> 'Callable[[Callable[[Any], _T | None]], Self]':
-        def wrapper(fn: 'Callable[[Any], _T | None]') -> Any:
+    def getter(self) -> 'Callable[[Callable[[Any], _T]], Self]':
+        def wrapper(fn: 'Callable[[Any], _T]') -> Any:
             self.custom_getter = fn
             return self
 
         return wrapper
 
     @property
-    def setter(self) -> 'Callable[[Callable[[Any, _T | None], None]], Self]':
-        def wrapper(fn: 'Callable[[Any, _T | None], None]') -> Any:
+    def setter(self) -> 'Callable[[Callable[[Any, _T], None]], Self]':
+        def wrapper(fn: 'Callable[[Any, _T], None]') -> Any:
             self.custom_setter = fn
             return self
 
@@ -220,8 +266,10 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         return wrapper
 
     @property
-    def expression(self) -> 'Callable[[Callable[[Any], Any]], Self]':
-        def wrapper(fn: 'Callable[[Any], Any]') -> Any:
+    def expression(
+        self
+    ) -> 'Callable[[Callable[[Any], ColumnElement[_T]]], Self]':
+        def wrapper(fn: 'Callable[[Any], ColumnElement[_T]]') -> Any:
             self.custom_expression = fn
             return self
 
@@ -232,8 +280,6 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
             column: 'Column[dict[str, Any]]' = getattr(owner, self.attribute)
             expr = column[self.key]
             if self.value_type is None:
-                # FIXME: Maybe we should return None here or raise
-                #        an Exception
                 pass
             elif issubclass(self.value_type, str):
                 expr = expr.as_string()
@@ -271,7 +317,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         self,
         instance: object,
         owner: type[object]
-    ) -> _T | None: ...
+    ) -> _T: ...
 
     def __get__(
         self,
@@ -295,7 +341,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         # fallback to the default
         return self.default() if callable(self.default) else self.default
 
-    def __set__(self, instance: object, value: _T | None) -> None:
+    def __set__(self, instance: object, value: _T) -> None:
 
         # create the dictionary if it does not exist yet
         if getattr(instance, self.attribute) is None:

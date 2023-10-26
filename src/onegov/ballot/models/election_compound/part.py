@@ -61,7 +61,7 @@ class ElectionCompoundPart(
     def __init__(
         self,
         election_compound: 'ElectionCompound',
-        domain: 'DomainOfInfluence',
+        domain: str,
         segment: str
     ):
         self.election_compound = election_compound
