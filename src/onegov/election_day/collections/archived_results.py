@@ -558,12 +558,10 @@ class SearchableArchivedResultCollection(
                 # exclude elections already covered by election compounds
                 exclude = [
                     item.split('/')[-1]
-                    for result, in self.session.query(
+                    for items, in self.session.query(
                         ArchivedResult.meta['elections']
                     )
-                    if result
-                    for items in result
-                    for item in items
+                    for item in items or ()
                 ]
                 if exclude:
                     query = query.filter(

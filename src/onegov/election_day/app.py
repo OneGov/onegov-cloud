@@ -259,7 +259,13 @@ def cache_control_tween_factory(
         if request.is_logged_in:
             response.headers.add('cache-control', 'no-store')
             if request.cookies.get('no_cache', '0') == '0':
-                response.set_cookie('no_cache', '1', samesite='lax')
+                response.set_cookie(
+                    'no_cache',
+                    '1',
+                    # TODO: This is fixed upstream, should be able to
+                    #       get rid of this type-ignore soon
+                    samesite='Lax'  # type:ignore[arg-type]
+                )
         else:
             if request.cookies.get('no_cache', '0') == '1':
                 response.delete_cookie('no_cache')
