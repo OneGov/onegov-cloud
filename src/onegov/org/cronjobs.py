@@ -10,8 +10,9 @@ from onegov.form import FormSubmission, parse_form
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
-from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
 from onegov.org.models.ticket import ReservationHandler
+from onegov.org.models import (
+    ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
@@ -22,6 +23,11 @@ from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import undefer
 from uuid import UUID
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
 
 
 MON = 0
@@ -49,6 +55,8 @@ def hourly_maintenance_tasks(request):
     publish_files(request)
     reindex_published_models(request)
     send_scheduled_newsletter(request)
+    delete_old_tans(request)
+    delete_old_tan_accesses(request)
 
 
 def send_scheduled_newsletter(request):
@@ -102,6 +110,38 @@ def reindex_published_models(request):
 
     for obj in objects:
         request.app.es_orm_events.index(request.app.schema, obj)
+
+
+def delete_old_tans(request: 'OrgRequest') -> None:
+    """
+    Deletes TANs that are older than a month.
+
+    Technically we could delete them as soon as they expire
+    but for debugging purposes it makes sense to keep them
+    around a while longer.
+    """
+
+    cutoff = utcnow() - timedelta(days=30.5)
+    query = request.session.query(TAN).filter(TAN.created < cutoff)
+    # cronjobs happen outside a regular request, so we don't need
+    # to synchronize with the session
+    query.delete(synchronize_session=False)
+
+
+def delete_old_tan_accesses(request: 'OrgRequest') -> None:
+    """
+    Deletes TAN accesses that are older than half a year.
+
+    Technically we could delete them as soon as they expire
+    but for debugging purposes it makes sense to keep them
+    around a while longer.
+    """
+
+    cutoff = utcnow() - timedelta(days=180)
+    query = request.session.query(TANAccess).filter(TAN.created < cutoff)
+    # cronjobs happen outside a regular request, so we don't need
+    # to synchronize with the session
+    query.delete(synchronize_session=False)
 
 
 @OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')

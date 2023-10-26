@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-09-19 10:38+0200\n"
+"POT-Creation-Date: 2023-10-24 13:57+0200\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -768,6 +768,9 @@ msgstr "Diese Seite ist privat"
 
 msgid "This site is private but can also be seen by members"
 msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
+
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Diese Seite ist öffentlich, aber erfordert die Eingabe eines mTANs"
 
 msgid "This site is secret"
 msgstr "Diese Seite ist geheim"

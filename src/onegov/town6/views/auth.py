@@ -1,9 +1,12 @@
 """ The authentication views. """
 
 from onegov.core.security import Public
+from onegov.org.auth import MTANAuth
+from onegov.org.forms import MTANForm, RequestMTANForm
 from onegov.org.views.auth import (
     handle_login, handle_registration, handle_password_reset,
-    handle_password_reset_request
+    handle_password_reset_request, handle_request_mtan,
+    handle_authenticate_mtan
 )
 from onegov.town6 import TownApp
 from onegov.town6.layout import DefaultLayout
@@ -14,6 +17,13 @@ from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RegistrationForm
 from onegov.user.forms import RequestPasswordResetForm
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.org.request import OrgRequest
+    from webob import Response
 
 
 @TownApp.form(model=Auth, name='login', template='login.pt', permission=Public,
@@ -43,3 +53,43 @@ def town_handle_password_reset_request(self, request, form):
 def town_handle_password_reset(self, request, form):
     return handle_password_reset(
         self, request, form, DefaultLayout(self, request))
+
+
+@TownApp.form(
+    model=MTANAuth,
+    name='request',
+    template='form.pt',
+    permission=Public,
+    form=RequestMTANForm
+)
+def towm_handle_request_mtan(
+    self: MTANAuth,
+    request: 'OrgRequest',
+    form: RequestMTANForm
+) -> 'RenderData | Response':
+    return handle_request_mtan(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
+
+
+@TownApp.form(
+    model=MTANAuth,
+    name='authenticate',
+    template='form.pt',
+    permission=Public,
+    form=MTANForm
+)
+def towm_handle_authenticate_mtan(
+    self: MTANAuth,
+    request: 'OrgRequest',
+    form: MTANForm
+) -> 'RenderData | Response':
+    return handle_authenticate_mtan(
+        self,
+        request,
+        form,
+        DefaultLayout(self, request)
+    )
