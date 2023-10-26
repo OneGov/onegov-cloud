@@ -226,19 +226,15 @@ class DummyRequest:
         self.url = url
 
     def class_link(self, model, variables=None, name=''):
-        class_name = model.__name__
-        if class_name == 'Canton' or class_name == 'Municipality':
-            class_name = 'Principal'
-
-        obj_id = (variables or {}).get('id', 'archive')
-        return f'{class_name}/{name or obj_id}'
+        return f'{model.__name__}/{name}/{variables or {}}'
 
     def link(self, obj, name='', query_params=None):
         query_params = query_params or {}
-        result = self.class_link(
-            obj.__class__,
-            {'id': getattr(obj, 'id', 'archive')},
-            name
+        class_name = obj.__class__.__name__
+        if class_name == 'Canton' or class_name == 'Municipality':
+            class_name = 'Principal'
+        result = '{}/{}'.format(
+            class_name, name or getattr(obj, 'id', 'archive')
         )
         for key, value in query_params.items():
             result = append_query_param(result, key, value)
