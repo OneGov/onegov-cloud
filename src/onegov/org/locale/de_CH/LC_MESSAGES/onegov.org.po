@@ -1745,6 +1745,13 @@ msgid "Enables website visitors to submit their own events"
 msgstr ""
 "Ermöglicht Website-Besuchern, ihre eigenen Veranstaltungen vorzuschlagen"
 
+msgid "Duration from opening a ticket to its automatic archival"
+msgstr ""
+"Dauer vom Öffnen eines Tickets bis zu seiner automatischen Archivierung"
+
+msgid "Duration from archived state until deleted automatically"
+msgstr "Dauer vom archivierten Zustand bis zum automatischen Löschen"
+
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
 
@@ -1848,6 +1855,21 @@ msgstr "Monatlich (am ersten Montag des Monats)"
 
 msgid "Never"
 msgstr "Nie"
+
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+msgid "6 months"
+msgstr "6 Monate"
+
+msgid "1 year"
+msgstr "1 Jahr"
+
+msgid "2 years"
+msgstr "2 Jahre"
+
+msgid "3 years"
+msgstr "3 Jahre"
 
 msgid "Linked file"
 msgstr "Verknüpfte Datei"
@@ -1986,6 +2008,12 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 msgid "Delete person"
 msgstr "Person löschen"
 
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -2008,6 +2036,9 @@ msgstr "Ticket archivieren"
 
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
+
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
 
 msgid "Assign ticket"
 msgstr "Ticket zuweisen"
@@ -5234,6 +5265,16 @@ msgstr "Diese Aktion kann nicht rückgängig gemacht werden"
 msgid "ApiKey deleted."
 msgstr "ApiKey gelöscht."
 
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."
+
 msgid "Topics"
 msgstr "Themen"
 
@@ -5265,9 +5306,6 @@ msgstr "Textbaustein bearbeiten"
 
 msgid "The text module was deleted"
 msgstr "Der Textbaustein wurde gelöscht"
-
-msgid "Delete Ticket"
-msgstr "Ticket löschen"
 
 msgid "This ticket is not deletable."
 msgstr "Dieses Ticket kann nicht gelöscht werden."
@@ -5438,6 +5476,16 @@ msgstr "Alle Tickets"
 msgid "All Users"
 msgstr "Alle Benutzer"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"${success_count} tickets gelöscht, ${error_count} sind nicht komplett "
+"löschbar, dort sind die Daten unerkennbar gemacht worden."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} tickets gelöscht."
+
 msgid "Submitted Requests"
 msgstr "Eingereichte Anfragen"
 
@@ -5467,6 +5515,3 @@ msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
-
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr "Kopfzeilenlinks beim Scrollen oben fixiert lassen"

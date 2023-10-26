@@ -10,10 +10,12 @@ from onegov.form import FormSubmission, parse_form
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
+from onegov.org.models.ticket import ReservationHandler
 from onegov.org.models import (
     ResourceRecipient, ResourceRecipientCollection, TAN, TANAccess)
 from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
+from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
@@ -499,3 +501,51 @@ def send_daily_resource_usage_overview(request):
             receivers=(address, ),
             content=content
         )
+
+
+@OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')
+def archive_old_tickets(request):
+
+    archive_timespan = request.app.org.auto_archive_timespan
+
+    session = request.session
+
+    if archive_timespan is None:
+        return
+
+    if archive_timespan == 0:
+        return
+
+    archive_timespan = timedelta(days=archive_timespan)
+
+    diff = utcnow() - archive_timespan
+    query = session.query(Ticket)
+    query = query.filter(Ticket.state == 'closed')
+    query = query.filter(Ticket.created <= diff)
+
+    for ticket in query:
+        if isinstance(ticket.handler, ReservationHandler):
+            if ticket.handler.has_future_reservation:
+                continue
+        ticket.archive_ticket()
+
+
+@OrgApp.cronjob(hour=5, minute=30, timezone='Europe/Zurich')
+def delete_old_tickets(request):
+    delete_timespan = request.app.org.auto_delete_timespan
+    session = request.session
+
+    if delete_timespan is None:
+        return
+
+    if delete_timespan == 0:
+        return
+
+    delete_timespan = timedelta(days=delete_timespan)
+
+    diff = utcnow() - delete_timespan
+    query = session.query(Ticket)
+    query = query.filter(Ticket.state == 'archived')
+    query = query.filter(Ticket.created <= diff)
+
+    delete_tickets_and_related_data(request, query)

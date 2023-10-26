@@ -1756,6 +1756,12 @@ msgstr "Invia il tuo evento"
 msgid "Enables website visitors to submit their own events"
 msgstr "Consente ai visitatori del sito web di presentare i propri eventi"
 
+msgid "Duration from opening a ticket to its automatic archival"
+msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
+
+msgid "Duration from archived state until deleted automatically"
+msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
+
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
 
@@ -1860,6 +1866,21 @@ msgstr "Mensile (il primo lunedì del mese)"
 
 msgid "Never"
 msgstr "Mai"
+
+msgid "Disabled"
+msgstr "Disattivato"
+
+msgid "6 months"
+msgstr "6 mesi"
+
+msgid "1 year"
+msgstr "1 anno"
+
+msgid "2 years"
+msgstr "2 anni"
+
+msgid "3 years"
+msgstr "3 anni"
 
 msgid "Linked file"
 msgstr "File collegato"
@@ -1998,6 +2019,12 @@ msgstr "Vuoi davvero eliminare questa persona?"
 msgid "Delete person"
 msgstr "Elimina persona"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 
@@ -2020,6 +2047,9 @@ msgstr "Archivia il biglietto"
 
 msgid "Recover from archive"
 msgstr "Recupera dall'archivio"
+
+msgid "Delete Ticket"
+msgstr "Cancella biglietto"
 
 msgid "Assign ticket"
 msgstr "Assegna il biglietto"
@@ -5247,6 +5277,16 @@ msgstr "Questa azione non può essere annullata."
 msgid "ApiKey deleted."
 msgstr "Chiave API eliminata."
 
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."
+
 msgid "Topics"
 msgstr "Argomenti"
 
@@ -5278,9 +5318,6 @@ msgstr "Modifica modulo di testo"
 
 msgid "The text module was deleted"
 msgstr "Il modulo di testo è stato eliminato"
-
-msgid "Delete Ticket"
-msgstr "Cancella biglietto"
 
 msgid "This ticket is not deletable."
 msgstr "Questo biglietto non è cancellabile."
@@ -5448,6 +5485,16 @@ msgstr "Tutti i biglietti"
 msgid "All Users"
 msgstr "Tutti gli utenti"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"I biglietti ${success_count} cancellati, ${error_count} non sono "
+"completamente cancellabili, ma i dati sono stati resi irriconoscibili."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} biglietti eliminati."
+
 msgid "Submitted Requests"
 msgstr "Richieste inoltrate"
 
@@ -5478,6 +5525,6 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr ""
-#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
+#, python-format
+#~ msgid "{success_count} tickets deleted."
+#~ msgstr "{success_count} biglietti cancellati."

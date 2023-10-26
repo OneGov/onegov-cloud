@@ -1,9 +1,9 @@
 import datetime
 import json
 import re
-
 from functools import cached_property
 from lxml import etree
+
 from onegov.core.widgets import transform_structure
 from onegov.core.widgets import XML_LINE_OFFSET
 from onegov.form import Form
@@ -18,6 +18,7 @@ from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.user import AVAILABLE_ROLES
+from onegov.org.forms.util import TIMESPANS
 from onegov.org.theme import user_options
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
@@ -37,6 +38,7 @@ from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 from wtforms.validators import URL as UrlRequired
 from wtforms.validators import ValidationError
+
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
@@ -1158,4 +1160,23 @@ class EventSettingsForm(Form):
         label=_('Submit your event'),
         description=_('Enables website visitors to submit their own events'),
         default=True
+    )
+
+
+class DataRetentionPolicyForm(Form):
+
+    auto_archive_timespan = RadioField(
+        label=_('Duration from opening a ticket to its automatic archival'),
+        validators=[InputRequired()],
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
+    )
+
+    auto_delete_timespan = RadioField(
+        label=_('Duration from archived state until deleted automatically'),
+        validators=[InputRequired()],
+        default=0,
+        coerce=int,
+        choices=TIMESPANS
     )

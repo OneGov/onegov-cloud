@@ -180,6 +180,12 @@ msgstr "Elimina persona"
 msgid "Tickets"
 msgstr "Biglietti"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 
@@ -205,6 +211,9 @@ msgstr "Archivia il biglietto"
 
 msgid "Recover from archive"
 msgstr "Recupera dall'archivio"
+
+msgid "Delete Ticket"
+msgstr "Cancella biglietto"
 
 msgid "New Note"
 msgstr "Nuova nota"
@@ -2148,8 +2157,12 @@ msgstr "Migrazione dei link"
 msgid "OneGov API"
 msgstr "API OneGov"
 
-#~ msgid "Straight to ..."
-#~ msgstr "Direttamente a ..."
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
 
-#~ msgid "Perform Search"
-#~ msgstr "Ricerca"
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."

@@ -180,6 +180,10 @@ class Organisation(Base, TimestampMixin):
     gever_password = meta_property()
     gever_endpoint = meta_property()
 
+    # data retention policy
+    auto_archive_timespan = meta_property(default=0)
+    auto_delete_timespan = meta_property(default=0)
+
     # MTAN Settings
     mtan_access_window_seconds = meta_property()
     mtan_access_window_requests = meta_property()
