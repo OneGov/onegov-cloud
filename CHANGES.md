@@ -1,8 +1,30 @@
 # Changes
 
+## 2023.55
+
+`2023-10-27` | [ca67f7b542...ae4ab40971](https://github.com/OneGov/onegov-cloud/compare/ca67f7b542^...ae4ab40971)
+
+### Org
+
+##### Adds an mTAN access level to resources
+
+Protected resources can only be viewed by the public after inputting a
+mTAN that was sent to their mobile device. The number of requests may
+optionally be limited as well as the duration of a mTAN session.
+
+`Feature` | [OGC-917](https://linear.app/onegovcloud/issue/OGC-917) | [ba4e930e42](https://github.com/onegov/onegov-cloud/commit/ba4e930e428665bd28d26e77297b130b2ec76c59)
+
+##### Automatic archiving and deletion of tickets.
+
+`Feature` | [OGC-58](https://linear.app/onegovcloud/issue/OGC-58) | [f7ecae3b9e](https://github.com/onegov/onegov-cloud/commit/f7ecae3b9e2b63354aefb4f7de5ab89509da0eed)
+
+##### Fixes deletion of pages with linked files
+
+`Bugfix` | [ca67f7b542](https://github.com/onegov/onegov-cloud/commit/ca67f7b54271f4e2eabefceee270fc37ad632ccd)
+
 ## 2023.54
 
-`2023-10-24` | [0e85c77c26...3e5adeeb82](https://github.com/OneGov/onegov-cloud/compare/0e85c77c26^...3e5adeeb82)
+`2023-10-24` | [0e85c77c26...4398f3fd12](https://github.com/OneGov/onegov-cloud/compare/0e85c77c26^...4398f3fd12)
 
 ### Feriennet
 
@@ -2294,48 +2316,4 @@ Hides the step sequence when adding a new directory entry as admin.
 ##### Ensure translations are applied.
 
 `Bugfix` | [2a6f73d5b5](https://github.com/onegov/onegov-cloud/commit/2a6f73d5b5ec10321a1128997313cc701acc52c1)
-
-## 2023.5
-
-`2023-01-25` | [550401978d...b49ae8b1f9](https://github.com/OneGov/onegov-cloud/compare/550401978d^...b49ae8b1f9)
-
-### Feriennet
-
-##### Increase amount of activities shown per page
-
-`Feature` | [PRO-1013](https://linear.app/projuventute/issue/PRO-1013) | [3be762ea96](https://github.com/onegov/onegov-cloud/commit/3be762ea96da4680a8c169a111cd74a90d9ad1c6)
-
-##### Replace sponsor images
-
-`Feature` | [PRO-1138](https://linear.app/projuventute/issue/PRO-1138) | [636481c58a](https://github.com/onegov/onegov-cloud/commit/636481c58a002569f1940eb8902ecde956af6440)
-
-##### Fix order of occasions in volunteer overview
-
-`Bugfix` | [OGC-1044](https://linear.app/onegovcloud/issue/OGC-1044) | [f2c282d806](https://github.com/onegov/onegov-cloud/commit/f2c282d8061c9a3dbcd06f915467132fd78b1a8f)
-
-### Org
-
-##### Multiple options for numbering on directories
-
-`Feature` | [OGC-901](https://linear.app/onegovcloud/issue/OGC-901) | [eae9a7af91](https://github.com/onegov/onegov-cloud/commit/eae9a7af9151f34644f169866c92057bdc7074fa)
-
-### Town6
-
-##### Redesign all lists
-
-More unity among all lists.
-
-`Feature` | [ce2a235252](https://github.com/onegov/onegov-cloud/commit/ce2a23525250b3ec906a37d9c95f7f8ff29ab52e)
-
-##### Open all files in new tab if set to true
-
-`Bugfix` | [OGC-864](https://linear.app/onegovcloud/issue/OGC-864) | [550401978d](https://github.com/onegov/onegov-cloud/commit/550401978d46257bb6ebe08ec45056a494fb7a79)
-
-##### Calendar Buttons
-
-`Bugfix` | [OGC-876](https://linear.app/onegovcloud/issue/OGC-876) | [e899c42614](https://github.com/onegov/onegov-cloud/commit/e899c4261439905848b00f1cc8ec129cf4ce1054)
-
-##### Search-Button mobile
-
-`Bugfix` | [OGC-842](https://linear.app/onegovcloud/issue/OGC-842) | [251d95fca7](https://github.com/onegov/onegov-cloud/commit/251d95fca7a2e4d56ca791d1803db61482429aa3)
 
