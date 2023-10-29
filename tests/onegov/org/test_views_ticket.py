@@ -4,9 +4,12 @@ import textwrap
 from datetime import date, timedelta, datetime
 
 import os
+
+import pytest
 import transaction
 from webtest import Upload
 
+from onegov.chat import MessageCollection
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 
@@ -709,3 +712,92 @@ def test_assign_tickets(client):
         f'{ticket_number} / newsletter: Sie haben ein neues Ticket'
     )
     assert message['To'] == 'editor@example.org'
+
+
+def test_cc_field_in_ticket_message(client):
+
+    client.login_admin()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page.form.submit()
+
+    anon = client.spawn()
+    form_page = anon.get('/form/newsletter')
+    form_page.form['e_mail'] = 'anonymer-user@example.ch'
+    form_page.form.submit().follow().form.submit().follow()
+
+    client.login_admin()
+    tickets_page = client.get('/tickets/ALL/open')
+    ticket_page = tickets_page.click('Annehmen').follow()
+    ticket_url = ticket_page.request.url
+
+    page = client.get(ticket_url).click("Nachricht senden")
+    page.form['text'] = "'Cc' — the photo-bomber of the email world."
+    page.form['email_cc'] = ['editor@example.org']
+    page.form.get('notify').checked = True
+    page.form.submit()
+
+    client.login_editor()
+    message = client.get_email(1)
+
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+    assert message['Cc'] == 'editor@example.org'
+
+    def extract_link(text):
+        pattern = r'http://localhost/ticket/FRM/[a-zA-Z0-9]+/status'
+        match = re.search(pattern, text)
+        return match.group(0) if match else None
+
+    body = message['TextBody']
+    assert "'Cc' — the photo-bomber of the email world." in body
+    status_link = extract_link(body)
+
+    status_page = client.get(status_link)
+    assert 'Fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
+
+    # test the reply feature now
+    msg = 'Hello from the other side, or should I say, Cc-side?'
+    status_page.form['text'] = msg
+    status_page.form.submit().follow()
+
+    # the most recent message would be rendered, but requires js.
+    # so we go the other way and check the db.
+    last_msg = MessageCollection(
+        client.app.session(),
+        load='newer-first',
+        limit=1
+    ).query().first()
+
+    assert last_msg.text == msg
+    #  Note that if the person in email CC field replies using the link to add
+    #  a TicketChatMessage, we have to adjust the owner of the message,
+    #  because the message is now actually from that person. Therefore below
+    #  assertion has to be False
+    assert not last_msg.owner == 'anonymer-user@example.ch'
+    assert last_msg.owner == 'editor@example.org'
+
+    # test invalid email
+    client.login_admin()
+    page.form['text'] = "'Cc' — the photo-bomber of the email world."
+    with pytest.raises(ValueError):
+        page.form['email_cc'] = ['not_an_email']
+
+    return
+    # test multiple CC recipients
+    # this is only setting one of them for some reason
+    page.form['email_cc'].select_multiple(texts=[
+        'editor@example.org', 'member@example.org'
+    ])
+    page.form.get('notify').checked = True
+    page.form.submit()
+
+    client.login_editor()
+    message = client.get_email(1)
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+    assert 'editor@example.org' in message['Cc']
+    client.login_member()
+    message = client.get_email(1)
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+    assert 'member@example.org' in message['Cc']

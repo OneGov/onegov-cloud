@@ -1769,6 +1769,13 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
+msgid "E-mail CC"
+msgstr "E-mail CC"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr ""
+"Sie können eine Kopie der Nachricht an einen oder mehrere Empfänger senden"
+
 msgid "User"
 msgstr "Benutzer"
 
@@ -2571,8 +2578,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
