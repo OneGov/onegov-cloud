@@ -187,6 +187,12 @@ msgstr "Person löschen"
 msgid "Tickets"
 msgstr "Tickets"
 
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -212,6 +218,9 @@ msgstr "Ticket archivieren"
 
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
+
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -2154,11 +2163,12 @@ msgstr "Migration Links"
 msgid "OneGov API"
 msgstr "OneGov API"
 
-#~ msgid "Straight to ..."
-#~ msgstr "Direkt zu ..."
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
 
-#~ msgid "Perform Search"
-#~ msgstr "Suchen"
-
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Das OneGov Cloud Team"
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."

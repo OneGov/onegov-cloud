@@ -58,3 +58,16 @@ def test_api_keys_create_and_delete(client):
     client.delete(link)
     # should be gone
     assert client.app.session().query(ApiKey).first() is None
+
+
+def test_all_settings_are_reachable(client):
+    # The purpose is to identify any broken or unreachable settings links that
+    # might happen if a view is missing
+
+    client.login_admin()
+    page = client.get('/settings')
+    links = [
+        e.attrib.get('href') for e in page.pyquery('.org-settings a[href]')
+    ]
+
+    assert all(client.get(link).status_code == 200 for link in links)

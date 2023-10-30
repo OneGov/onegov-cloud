@@ -1,7 +1,7 @@
 import base64
 import json
 import re
-import textwrap
+from textwrap import dedent
 from datetime import date, timedelta, datetime
 
 import os
@@ -253,7 +253,7 @@ def test_send_ticket_email(client):
 
     # make sure the same holds true for forms
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         Name * = ___
         E-Mail * = @@@
     """), type='custom')
@@ -322,7 +322,7 @@ def test_email_for_new_tickets(client):
 
     # fill out a form to automatically send a notification mail
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         Name * = ___
         E-Mail * = @@@
     """), type='custom')
@@ -383,7 +383,7 @@ def test_email_for_new_tickets(client):
 
 def test_ticket_notes(client):
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         First name * = ___
         Last name * = ___
         E-Mail * = @@@
@@ -462,7 +462,7 @@ def test_ticket_notes(client):
 
 def test_ticket_chat(client):
     collection = FormCollection(client.app.session())
-    collection.definitions.add('Profile', definition=textwrap.dedent("""
+    collection.definitions.add('Profile', definition=dedent("""
         First name * = ___
         Last name * = ___
         E-Mail * = @@@

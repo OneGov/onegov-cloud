@@ -1752,6 +1752,12 @@ msgstr "Soumettez votre événement"
 msgid "Enables website visitors to submit their own events"
 msgstr "Permet aux visiteurs du site web de soumettre leurs propres événements"
 
+msgid "Duration from opening a ticket to its automatic archival"
+msgstr "Durée entre l'ouverture d'un ticket et son archivage automatique"
+
+msgid "Duration from archived state until deleted automatically"
+msgstr "Durée de l'état archivé jusqu'à la suppression automatique"
+
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
 
@@ -1863,6 +1869,21 @@ msgstr "Mensuel (le premier lundi du mois)"
 
 msgid "Never"
 msgstr "Jamais"
+
+msgid "Disabled"
+msgstr "Désactivé"
+
+msgid "6 months"
+msgstr "6 mois"
+
+msgid "1 year"
+msgstr "1 an"
+
+msgid "2 years"
+msgstr "2 ans"
+
+msgid "3 years"
+msgstr "3 ans"
 
 msgid "Linked file"
 msgstr "Fichier lié"
@@ -2001,6 +2022,12 @@ msgstr "Voulez-vous vraiment supprimer cette personne ?"
 msgid "Delete person"
 msgstr "Supprimer la personne"
 
+msgid "Delete archived tickets"
+msgstr "Supprimer les tickets archivés"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Voulez-vous vraiment supprimer tous les tickets archivés ?"
+
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
 
@@ -2021,6 +2048,9 @@ msgstr "Archiver le ticket"
 
 msgid "Recover from archive"
 msgstr "Récupérer dans les archives"
+
+msgid "Delete Ticket"
+msgstr "Supprimer le ticket"
 
 msgid "Assign ticket"
 msgstr "Attribuer le ticket"
@@ -5264,6 +5294,16 @@ msgstr "Cette action ne peut pas être annulée."
 msgid "ApiKey deleted."
 msgstr "Clé API supprimée."
 
+msgid "Data Retention Policy"
+msgstr "Politique de Conservation des Données"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procédez avec prudence. Les billets et les données qu'ils contiennent "
+"peuvent être irrévocablement supprimés."
+
 msgid "Topics"
 msgstr "Sujets"
 
@@ -5295,9 +5335,6 @@ msgstr "Modifier le module de texte"
 
 msgid "The text module was deleted"
 msgstr "Le module de texte a été supprimé"
-
-msgid "Delete Ticket"
-msgstr "Supprimer le ticket"
 
 msgid "This ticket is not deletable."
 msgstr "Ce ticket n'est pas supprimable."
@@ -5466,6 +5503,16 @@ msgstr "Tous les tickets"
 msgid "All Users"
 msgstr "Tous les utilisateurs"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"${success_count} tickets supprimés, ${error_count} ne sont pas complètement "
+"supprimables, les données y ont été rendues méconnaissables."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} tickets supprimés."
+
 msgid "Submitted Requests"
 msgstr "Demandes soumises"
 
@@ -5495,9 +5542,3 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "The user was created successfully"
 msgstr "L'utilisateur a bien été créé"
-
-#~ msgid "In CC, an e-mail is copied to one or more recipients"
-#~ msgstr "Dans le CC, un e-mail est copié vers un ou plusieurs destinataires."
-
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr "Maintenir les liens de l'en-tête en haut lors du défilement"

@@ -3,7 +3,6 @@ from collections import namedtuple
 from dateutil.rrule import rrulestr
 from dateutil import rrule
 from functools import cached_property
-
 from onegov.chat import TextModuleCollection
 from onegov.core.utils import linkify, to_html_ul
 from onegov.directory import DirectoryCollection
@@ -29,6 +28,7 @@ from onegov.reservation import ResourceCollection
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.ticket import TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import _
 from onegov.core.elements import Link, Block, Confirm, Intercooler, LinkGroup
 from onegov.core.static import StaticFile
@@ -631,6 +631,46 @@ class TicketsLayout(DefaultLayout):
         ]
 
 
+class ArchivedTicketsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_admin:
+            text = self.request.translate(_("Delete archived tickets"))
+            links.append(
+                Link(
+                    text=text,
+                    url=self.csrf_protected_url(self.request.link(self.model,
+                                                                  'delete')),
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete all archived "
+                              "tickets?"),
+                            _("This cannot be undone."),
+                            _("Delete archived tickets"),
+                            _("Cancel"),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                ArchivedTicketsCollection, {'handler': 'ALL'}
+                            ),
+                        ),
+                    ),
+                    attrs={'class': 'delete-link'},
+                )
+            )
+        return links
+
+
 class TicketLayout(DefaultLayout):
 
     def __init__(self, model, request):
@@ -716,6 +756,13 @@ class TicketLayout(DefaultLayout):
                     text=_('Recover from archive'),
                     url=self.request.link(self.model, 'unarchive'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
+                ))
+                links.append(Link(
+                    text=_("Delete Ticket"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model, 'delete')
+                    ),
+                    attrs={'class': ('ticket-button', 'ticket-delete')},
                 ))
 
             # ticket notes are always enabled
