@@ -6,6 +6,7 @@ from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
+from onegov.core.mail import Attachment
 from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
@@ -293,7 +294,7 @@ def last_internal_message(session, ticket_number):
 
 
 def send_chat_message_email_if_enabled(ticket, request, message, origin,
-                                       cc=None):
+                                       cc=None, attachments=None):
     assert origin in ('internal', 'external')
 
     messages = MessageCollection(
@@ -356,7 +357,8 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin,
         receivers=receivers,
         reply_to=reply_to,
         force=True,
-        cc=cc
+        cc=cc,
+        attachments=attachments
     )
 
 
@@ -440,6 +442,7 @@ def handle_new_note(self, request, form, layout=None):
 
     if form.submitted(request):
         message = form.text.data,
+        form: TicketNoteForm
         note = TicketNote.create(self, request, message, form.file.create())
         request.success(_("Your note was added"))
 
@@ -714,10 +717,19 @@ def message_to_submitter(self, request, form, layout=None):
                 notify=form.notify.data,
                 origin='internal')
 
-            carbon_copies = form.email_cc.data
-
+            carbon_copies = form.email_cc.data or None
             send_chat_message_email_if_enabled(
-                self, request, message, origin='internal', cc=carbon_copies)
+                self,
+                request,
+                message,
+                origin='internal',
+                cc=carbon_copies,
+                attachments=(Attachment(
+                    form.email_attachment.filename,
+                    form.email_attachment.file,
+                    form.email_attachment.data['mimetype'],
+                ),),
+            )
 
             request.success(_("Your message has been sent"))
             return morepath.redirect(request.link(self))

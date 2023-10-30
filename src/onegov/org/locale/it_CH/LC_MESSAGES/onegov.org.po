@@ -1780,8 +1780,8 @@ msgstr "Avvisami delle risposte"
 msgid "Setting \"Always notify\" is active"
 msgstr "L'impostazione \"Notifica sempre\" è attiva"
 
-msgid "E-mail CC"
-msgstr "E-mail CC"
+msgid "CC"
+msgstr "CC"
 
 msgid "You can send a copy of the message to one or more recipients"
 msgstr "È possibile inviare una copia del messaggio a uno o più destinatari"

@@ -1,3 +1,4 @@
+import base64
 import json
 import re
 import textwrap
@@ -785,8 +786,8 @@ def test_cc_field_in_ticket_message(client):
         page.form['email_cc'] = ['not_an_email']
 
     return
-    # test multiple CC recipients
-    # this is only setting one of them for some reason
+    # test multiple CC
+    # this is not set correctly (Only one email is set), reason unclear
     page.form['email_cc'].select_multiple(texts=[
         'editor@example.org', 'member@example.org'
     ])
@@ -801,3 +802,40 @@ def test_cc_field_in_ticket_message(client):
     message = client.get_email(1)
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
     assert 'member@example.org' in message['Cc']
+
+
+def test_email_attachment_in_ticket_message(client):
+
+    client.login_admin()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page.form.submit()
+
+    anon = client.spawn()
+    form_page = anon.get('/form/newsletter')
+    form_page.form['e_mail'] = 'anonymous-user@example.com'
+    form_page.form.submit().follow().form.submit().follow()
+
+    client.login_admin()
+    tickets_page = client.get('/tickets/ALL/open')
+    ticket_page = tickets_page.click('Annehmen').follow()
+    ticket_url = ticket_page.request.url
+
+    page = client.get(ticket_url).click("Nachricht senden")
+    page.form['text'] = "Attachments make emails heavy."
+    page.form['email_cc'] = ['editor@example.org']
+    page.form['email_attachment'] = Upload(
+        'Test.txt', b'attached', 'text/plain')
+    page.form.submit()
+
+    client.login_editor()
+    message = client.get_email(1)
+
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+
+    msg = message['Attachments'][0]
+    assert 'Test.txt' in msg.values()
+    decoded_content = base64.b64decode(msg['Content'])
+    assert decoded_content == b'attached'

@@ -1776,8 +1776,8 @@ msgstr "M'avertir des réponses"
 msgid "Setting \"Always notify\" is active"
 msgstr "Le paramètre \"Toujours notifier\" est actif"
 
-msgid "E-mail CC"
-msgstr "E-mail CC"
+msgid "CC"
+msgstr "CC"
 
 msgid "You can send a copy of the message to one or more recipients"
 msgstr ""

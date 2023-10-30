@@ -80,11 +80,22 @@ class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
     """ Extends the form with Email CC-Fields. """
 
     email_cc = ChosenSelectMultipleEmailField(
-        label=_("E-mail CC"),
+        label=_("CC"),
+        fieldset=_('Email'),
         description=_("You can send a copy of the message to one or more "
                       "recipients"),
         validators=[StrictOptional()],
         choices=[]
+    )
+
+    email_attachment = UploadFileWithORMSupport(
+        label=_('Attachment'),
+        fieldset=_('Email'),
+        file_class=MessageFile,
+        validators=[
+            Optional(),
+            FileSizeLimit(10 * 1000 * 1000)
+        ]
     )
 
     @cached_property

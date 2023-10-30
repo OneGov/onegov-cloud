@@ -1769,8 +1769,8 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
-msgid "E-mail CC"
-msgstr "E-mail CC"
+msgid "CC"
+msgstr "CC"
 
 msgid "You can send a copy of the message to one or more recipients"
 msgstr ""
