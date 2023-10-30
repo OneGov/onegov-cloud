@@ -4,7 +4,6 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
-from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
