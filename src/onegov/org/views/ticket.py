@@ -12,6 +12,7 @@ from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 import zipfile
+import os
 from io import BytesIO
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
@@ -46,8 +47,10 @@ from urllib.parse import urlsplit
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
+    from onegov.form.fields import UploadFileWithORMSupport
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -718,17 +721,14 @@ def message_to_submitter(self, request, form, layout=None):
                 origin='internal')
 
             carbon_copies = form.email_cc.data or None
+            fe = form.email_attachment
             send_chat_message_email_if_enabled(
                 self,
                 request,
                 message,
                 origin='internal',
                 cc=carbon_copies,
-                attachments=(Attachment(
-                    form.email_attachment.filename,
-                    form.email_attachment.file,
-                    form.email_attachment.data['mimetype'],
-                ),),
+                attachments=create_attachment_from_uploaded(fe, request)
             )
 
             request.success(_("Your message has been sent"))
@@ -754,6 +754,29 @@ def message_to_submitter(self, request, form, layout=None):
             }
         )
     }
+
+
+def create_attachment_from_uploaded(
+    fe: 'UploadFileWithORMSupport', request: 'OrgRequest'
+) -> tuple[Attachment, ...]:
+    filename, storage_path = (
+        fe.data.get('filename') if fe.data else None,
+        request.app.depot_storage_path,
+    )
+
+    if not (filename and storage_path):
+        return ()
+
+    file = fe.create()
+    if not file:
+        return ()
+
+    file_path = os.path.join(storage_path, file.reference['path'])
+    attachment = Attachment(
+        file_path, file.reference.file.read(), file.reference['content_type']
+    )
+    attachment.filename = filename
+    return (attachment,)
 
 
 @OrgApp.view(model=Ticket, name='pdf', permission=Private)
@@ -845,10 +868,9 @@ def view_ticket_status(self, request, form, layout=None):
         if self.state == 'closed':
             request.alert(closed_text)
         else:
-            # Note that this assumes email CC recipients always have a
-            # `current_username`. If we allow external CC recipients,
-            # we'll have to figure something out set the correct owner of the
-            # TicketChatMessage.
+            # Note that this assumes email CC recipients are internal
+            # recipients and have `current_username` in all cases. If we allow
+            # external CC recipients, we'll have to change this
             user_is_cc_recipient = (
                 False if request.current_username == self.handler.email
                 else True

@@ -103,11 +103,10 @@ class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
         query = self.request.session.query(User.username, User.title)
         query = query.filter(User.active)
         return tuple(
-            (email, title) for email, title in query if '@' in email
+            (username, title) for username, title in query if '@' in username
         )
 
     def on_request(self):
-        # todo: change field order for better visual appeal?
         super().on_request()
         self.email_cc.choices = self.internal_email_recipients
 

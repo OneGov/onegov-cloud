@@ -5484,14 +5484,6 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "CC (Optional)"
-#~ msgstr "CC (opzionale)"
-
-#~ msgid "In CC, an e-mail is copied to one or more recipients"
-#~ msgstr ""
-#~ "In CC, un messaggio di posta elettronica viene copiato a uno o più "
-#~ "destinatari."
-
 #~ msgid "Keep header links fixed to top on scrolling"
 #~ msgstr ""
 #~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
