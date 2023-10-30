@@ -4,15 +4,6 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-<<<<<<< Updated upstream
-        <div class="grid-x">
-            <div class="medium-7 cell">
-                <p>Hauptteil</p>
-            </div>
-
-            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
-               <p>Sidebar</p>
-=======
         <div class="grid-x chat">
             <div class="medium-7 cell">
                 <div class="message-area">
@@ -78,7 +69,6 @@
                         </div>
                     </div>
                 </div>
->>>>>>> Stashed changes
             </div>
         </div>
 

@@ -19,8 +19,6 @@ async def handle_connection(websocket, path):
     finally:
         # Remove the websocket from the list of connected clients
         connected_clients.remove(websocket)
-<<<<<<< Updated upstream
-=======
 
 
 # # Start the WebSocket server
@@ -48,4 +46,3 @@ async def handle_connection(websocket, path):
 
 # # Connect the WebSocket client
 # asyncio.get_event_loop().run_until_complete(connect_to_server())
->>>>>>> Stashed changes
