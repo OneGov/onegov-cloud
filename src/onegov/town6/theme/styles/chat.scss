@@ -1,0 +1,55 @@
+.chat {
+    .chat-inputs {
+        align-items: end;
+        display: flex;
+
+        .button {
+            height: fit-content;
+            margin-left: 2rem;
+        }
+    }
+
+    .card {
+        border: 0;
+        max-width: 80%;
+
+        .card-section {
+            border-radius: .7rem;
+        }
+
+        .info {
+            color: $gainsboro;
+            margin-bottom: 0;
+            margin-left: .7rem;
+            margin-right: .7rem;
+        }
+
+        .card-section + .info {
+            text-align: right;
+        }
+
+        &.customer {
+            place-self: end;
+
+            .card-section {
+                background: $primary-color;
+                color: $white;
+            }
+        }
+
+        &.staff {
+            place-self: start;
+
+            .card-section {
+                background: $white-smoke;
+            }
+        }
+    }
+
+    .message-area {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+}

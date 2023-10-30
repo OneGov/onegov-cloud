@@ -2473,3 +2473,15 @@ class HomepageLayout(DefaultLayout):
                     ),
                 ),
             ]
+
+
+class ChatLayout(DefaultLayout):
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.request.include('websockets')
+        self.request.include('chat')
+
+        self.custom_body_attributes['data-websocket-endpoint'] = \
+            self.app.websockets_client_url(request)
+        self.custom_body_attributes['data-websocket-schema'] = \
+            self.app.schema
