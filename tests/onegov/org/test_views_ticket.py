@@ -735,8 +735,8 @@ def test_cc_field_in_ticket_message(client):
     ticket_url = ticket_page.request.url
 
     page = client.get(ticket_url).click("Nachricht senden")
-    page.form['text'] = "'Cc' — the photo-bomber of the email world."
-    page.form['email_cc'] = ['editor@example.org']
+    page.form['text'] = "'Bcc' — the photo-bomber of the email world."
+    page.form['email_bcc'] = ['editor@example.org']
     page.form.get('notify').checked = True
     page.form.submit()
 
@@ -744,7 +744,7 @@ def test_cc_field_in_ticket_message(client):
     message = client.get_email(1)
 
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
-    assert message['Cc'] == 'editor@example.org'
+    assert message['Bcc'] == 'editor@example.org'
 
     def extract_link(text):
         pattern = r'http://localhost/ticket/FRM/[a-zA-Z0-9]+/status'
@@ -752,14 +752,14 @@ def test_cc_field_in_ticket_message(client):
         return match.group(0) if match else None
 
     body = message['TextBody']
-    assert "'Cc' — the photo-bomber of the email world." in body
+    assert "'Bcc' — the photo-bomber of the email world." in body
     status_link = extract_link(body)
 
     status_page = client.get(status_link)
     assert 'Fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
 
     # test the reply feature now
-    msg = 'Hello from the other side, or should I say, Cc-side?'
+    msg = 'Hello from the other side, or should I say, Bcc-side?'
     status_page.form['text'] = msg
     status_page.form.submit().follow()
 
@@ -781,14 +781,14 @@ def test_cc_field_in_ticket_message(client):
 
     # test invalid email
     client.login_admin()
-    page.form['text'] = "'Cc' — the photo-bomber of the email world."
+    page.form['text'] = "'Bcc' — the photo-bomber of the email world."
     with pytest.raises(ValueError):
-        page.form['email_cc'] = ['not_an_email']
+        page.form['email_bcc'] = ['not_an_email']
 
     return
     # test multiple CC
     # this is not set correctly (Only one email is set), reason unclear
-    page.form['email_cc'].select_multiple(texts=[
+    page.form['email_bcc'].select_multiple(texts=[
         'editor@example.org', 'member@example.org'
     ])
     page.form.get('notify').checked = True
@@ -797,11 +797,11 @@ def test_cc_field_in_ticket_message(client):
     client.login_editor()
     message = client.get_email(1)
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
-    assert 'editor@example.org' in message['Cc']
+    assert 'editor@example.org' in message['Bcc']
     client.login_member()
     message = client.get_email(1)
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
-    assert 'member@example.org' in message['Cc']
+    assert 'member@example.org' in message['Bcc']
 
 
 def test_email_attachment_in_ticket_message(client):
@@ -825,7 +825,7 @@ def test_email_attachment_in_ticket_message(client):
 
     page = client.get(ticket_url).click("Nachricht senden")
     page.form['text'] = "Attachments make emails heavy."
-    page.form['email_cc'] = ['editor@example.org']
+    page.form['email_bcc'] = ['editor@example.org']
     page.form['email_attachment'] = Upload(
         'Test.txt', b'attached', 'text/plain')
     page.form.submit()

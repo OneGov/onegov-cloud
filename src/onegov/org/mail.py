@@ -43,7 +43,7 @@ def send_marketing_html_mail(*args, **kwargs):
 
 
 def send_ticket_mail(request, template, subject, receivers, ticket,
-                     content=None, force=False, send_self=False, cc=None,
+                     content=None, force=False, send_self=False, bcc=None,
                      attachments=None, **kwargs):
     org = request.app.org
     if not force:
@@ -94,6 +94,6 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
         subject=subject,
         receivers=receivers,
         content=content,
-        cc=cc,
+        bcc=bcc,
         attachments=attachments,
         **kwargs)

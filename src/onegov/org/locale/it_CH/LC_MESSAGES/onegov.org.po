@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-10-24 13:52+0200\n"
+"POT-Creation-Date: 2023-10-30 21:33+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1780,8 +1780,11 @@ msgstr "Avvisami delle risposte"
 msgid "Setting \"Always notify\" is active"
 msgstr "L'impostazione \"Notifica sempre\" è attiva"
 
-msgid "CC"
-msgstr "CC"
+msgid "BCC"
+msgstr "BCC"
+
+msgid "Email"
+msgstr "Email"
 
 msgid "You can send a copy of the message to one or more recipients"
 msgstr "È possibile inviare una copia del messaggio a uno o più destinatari"

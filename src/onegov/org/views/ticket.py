@@ -297,7 +297,7 @@ def last_internal_message(session, ticket_number):
 
 
 def send_chat_message_email_if_enabled(ticket, request, message, origin,
-                                       cc=None, attachments=None):
+                                       bcc=None, attachments=None):
     assert origin in ('internal', 'external')
 
     messages = MessageCollection(
@@ -360,7 +360,7 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin,
         receivers=receivers,
         reply_to=reply_to,
         force=True,
-        cc=cc,
+        bcc=bcc,
         attachments=attachments
     )
 
@@ -720,14 +720,14 @@ def message_to_submitter(self, request, form, layout=None):
                 notify=form.notify.data,
                 origin='internal')
 
-            carbon_copies = form.email_cc.data or None
+            blind_copies = form.email_bcc.data or None
             fe = form.email_attachment
             send_chat_message_email_if_enabled(
                 self,
                 request,
                 message,
                 origin='internal',
-                cc=carbon_copies,
+                bcc=blind_copies,
                 attachments=create_attachment_from_uploaded(fe, request)
             )
 

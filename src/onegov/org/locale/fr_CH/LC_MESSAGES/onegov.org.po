@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-10-24 13:52+0200\n"
+"POT-Creation-Date: 2023-10-30 21:33+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1776,8 +1776,11 @@ msgstr "M'avertir des réponses"
 msgid "Setting \"Always notify\" is active"
 msgstr "Le paramètre \"Toujours notifier\" est actif"
 
-msgid "CC"
-msgstr "CC"
+msgid "BCC"
+msgstr "BCC"
+
+msgid "Email"
+msgstr "Email"
 
 msgid "You can send a copy of the message to one or more recipients"
 msgstr ""

@@ -77,11 +77,11 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
 
 
 class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
-    """ Extends the form with Email CC-Fields. """
+    """ Extends the form with Email BCC-Fields. """
 
-    email_cc = ChosenSelectMultipleEmailField(
-        label=_("CC"),
-        fieldset=_('Email'),
+    email_bcc = ChosenSelectMultipleEmailField(
+        label=_("BCC"),
+        fieldset=('Email'),
         description=_("You can send a copy of the message to one or more "
                       "recipients"),
         validators=[StrictOptional()],
@@ -108,7 +108,7 @@ class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
 
     def on_request(self):
         super().on_request()
-        self.email_cc.choices = self.internal_email_recipients
+        self.email_bcc.choices = self.internal_email_recipients
 
 
 class TicketAssignmentForm(Form):
