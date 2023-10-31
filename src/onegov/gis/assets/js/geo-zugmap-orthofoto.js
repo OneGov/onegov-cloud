@@ -11,7 +11,7 @@ function spawnDefaultMap(target, options, cb) {
     }
 
     var crs = new L.Proj.CRS(lv95.epsg, lv95.def, {
-        resolutions: lv95.resolutions,  
+        resolutions: lv95.resolutions,
         origin: lv95.origin
     })
 
