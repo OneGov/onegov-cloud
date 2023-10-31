@@ -728,7 +728,7 @@ class MapSettingsForm(Form):
             ('geo-admin-aerial', _("Swisstopo Aerial")),
             ('geo-mapbox', "Mapbox"),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
-            ('geo-zugmap-luftbild', "ZugMap Luftbild"),
+            ('geo-zugmap-basisplan', "ZugMap Basisplan Farbig"),
             ('geo-bs', "Geoportal Basel-Stadt"),
         ])
 

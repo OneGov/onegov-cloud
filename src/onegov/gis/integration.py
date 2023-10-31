@@ -86,12 +86,11 @@ def get_geo_vermessungsamt_winterthur() -> 'Iterator[str]':
     yield 'geo-vermessungsamt-winterthur.js'
 
 
-@MapboxApp.webasset('geo-zugmap-luftbild')
+@MapboxApp.webasset('geo-zugmap-basisplan')
 def get_geo_zugmap_luftbild() -> 'Iterator[str]':
     yield 'leaflet'
     yield 'proj4js'
     yield 'geo-zugmap.js'
-    yield 'geo-zugmap-luftbild.js'
 
 
 @MapboxApp.webasset('geo-bs')
