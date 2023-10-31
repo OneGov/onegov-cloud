@@ -1,4 +1,3 @@
-import typing
 from onegov.core.orm.types import JSON
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import ExprComparator
@@ -6,7 +5,6 @@ from sqlalchemy.orm import deferred
 from sqlalchemy.orm.attributes import create_proxied_attribute
 from sqlalchemy.orm.interfaces import InspectionAttrInfo
 from sqlalchemy.schema import Column
-from sys import modules
 
 
 from typing import overload, Any, Generic, Protocol, TypeVar, TYPE_CHECKING
@@ -16,12 +14,66 @@ if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
     from typing_extensions import Self
 
-    class _bound_dict_property(Protocol['_T']):
+    class _dict_property_factory(Protocol):
+
+        @overload
         def __call__(
             self,
-            key: str | None = ...,
-            default: '_T | Callable[[], _T] | None' = ...,
-            value_type: 'type[_T] | None' = ...,
+            key: str | None = None,
+            default: None = None,
+            value_type: None = None
+        ) -> 'dict_property[Any | None]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None,
+            default: '_T | Callable[[], _T]',
+            value_type: None = None
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None = None,
+            *,
+            default: '_T | Callable[[], _T]',
+            value_type: None = None
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None,
+            default: None,
+            *,
+            value_type: 'type[_T]'
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None = None,
+            default: None = None,
+            *,
+            value_type: 'type[_T]'
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None,
+            default: '_T | Callable[[], _T]',
+            value_type: 'type[_T]'
+        ) -> 'dict_property[_T]': ...
+
+        @overload
+        def __call__(
+            self,
+            key: str | None = None,
+            *,
+            default: '_T | Callable[[], _T]',
+            value_type: 'type[_T]'
         ) -> 'dict_property[_T]': ...
 
 
@@ -158,15 +210,84 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
     custom_setter: 'Callable[[Any, _T], None] | None'
     custom_deleter: 'Callable[[Any], None] | None'
 
+    @overload
+    def __init__(
+        # TODO: We probably want to change this to `dict_property[_T | None]`
+        #       eventually so mypy complains about the missing LHS annotation
+        self: 'dict_property[Any | None]',
+        attribute: str,
+        key: str | None = None,
+        default: None = None,
+        value_type: None = None
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None,
+        default: '_T | Callable[[], _T]',
+        value_type: None = None
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None = None,
+        *,
+        default: '_T | Callable[[], _T]',
+        value_type: None = None
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None,
+        default: None,
+        *,
+        value_type: type[_T]
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None = None,
+        default: None = None,
+        *,
+        value_type: type[_T]
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None,
+        default: '_T | Callable[[], _T]',
+        value_type: type[_T]
+    ): ...
+
+    @overload
+    def __init__(
+        self: 'dict_property[_T]',
+        attribute: str,
+        key: str | None = None,
+        *,
+        default: '_T | Callable[[], _T]',
+        value_type: type[_T]
+    ): ...
+
     def __init__(
         self,
         attribute: str,
         key: str | None = None,
-        default: '_T | Callable[[], _T] | None' = None,
+        default: Any | None = None,
         # this is for coercing the result of the json access to
         # the appropriate type, otherwise the rhs of the comparison
         # needs to be casted to
-        value_type: type[_T] | None = None
+        value_type: type[Any] | None = None
     ):
         assert is_valid_default(default)
         self.attribute = attribute
@@ -192,54 +313,6 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
 
         if self.key is None:
             self.key = name
-
-        try:
-            # FIXME: Ideally we would like to use typing.get_type_hints
-            #        unfortunately that only succeeds if every single
-            #        ForwardRef can be resolved, which is not very likely
-            #        so we manually do the work for one specific annotation
-            #        and rely on non-public functions, so this may break
-            #        in future versions of Python.
-            my_annotation = owner.__annotations__[name]
-            if my_annotation is None:
-                my_annotation = type(None)
-            elif isinstance(my_annotation, str):
-                my_annotation = typing.ForwardRef(
-                    my_annotation,
-                    is_argument=True,
-                    is_class=True
-                )
-            owner_module = modules.get(owner.__module__, None)
-            my_type_hint = typing._strip_annotations(  # type:ignore
-                typing._eval_type(  # type:ignore[attr-defined]
-                    my_annotation,
-                    getattr(owner_module, '__dict__', {}),
-                    dict(vars(owner))
-                )
-            )
-        except (KeyError, NameError, TypeError):
-            # TODO: Eventually we probably want to raise an error here
-            #       unless self.value_type != None, maybe even emit an
-            #       warning in every case. Although there may be some
-            #       rare cases where we cannot resolve a ForwardRef
-            #       no matter what. We may also consider writing a
-            #       mypy plugin instead.
-            return
-
-        origin = typing.get_origin(my_type_hint)
-        if not issubclass(origin, dict_property):
-            raise TypeError('Type annotation needs to be a dict_property')
-
-        value_type = typing.get_args(my_type_hint)[0]
-        union_types = typing.get_args(value_type) or (value_type, )
-        if self.default is None and type(None) not in union_types:
-            raise TypeError(
-                'The default value on this dict_property is set to None '
-                'however the type annotation is not optional'
-            )
-
-        # TODO: We should probably add further sanity checks and try
-        #       to determine self.value_type based on value_type
 
     @property
     def getter(self) -> 'Callable[[Callable[[Any], _T]], Self]':
@@ -364,10 +437,7 @@ class dict_property(InspectionAttrInfo, Generic[_T]):
         del getattr(instance, self.attribute)[self.key]
 
 
-# FIXME: Once we have type annotations on all the models we should make
-#        this return an unbound dict_property instead so we get a type
-#        error everywhere we forgot to specify the bound type.
-def dict_property_factory(attribute: str) -> '_bound_dict_property[Any]':
+def dict_property_factory(attribute: str) -> '_dict_property_factory':
     def factory(
         key: str | None = None,
         default: Any | None = None,
