@@ -199,7 +199,6 @@ def test_view_suggestions(landsgemeinde_app):
     page.form['last_name'] = 'Müller'
     page.form['function'] = 'Landrat'
     page.form['profession'] = 'Landwirt'
-    page.form['postal_code_city'] = 'Glarus'
     page.form['location_code_city'] = 'Oberurnen'
     page.form['parliamentary_group'] = 'SVP'
     page.form['political_party'] = 'jSVP'
@@ -218,9 +217,7 @@ def test_view_suggestions(landsgemeinde_app):
 
     assert client.get('/suggestion/person/place').json == []
     assert client.get('/suggestion/person/place?term').json == []
-    assert client.get('/suggestion/person/place?term=r').json == [
-        'Glarus', 'Oberurnen'
-    ]
+    assert client.get('/suggestion/person/place?term=r').json == ['Oberurnen']
 
     assert client.get('/suggestion/person/political-affiliation').json == []
     assert client.get(

@@ -144,7 +144,7 @@ class VotumForm(NamedFileForm):
         self.request.include('person_votum')
 
     def get_useful_data(self):
-        data = super().get_useful_data()
+        data = super().get_useful_data(exclude={'person_choices'})
         data['agenda_item_id'] = self.model.agenda_item.id
         return data
 
