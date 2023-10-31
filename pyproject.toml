@@ -14,6 +14,15 @@ omit = ["*/tests/*"]
 
 [tool.coverage.report]
 ignore_errors = true
+exclude_lines = [
+    "pragma: no cover",
+    "pragma: unreachable",
+    "assert_never[(]",
+    "@overload",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__."
+]
 
 [tool.mypy]
 python_version = "3.10"
