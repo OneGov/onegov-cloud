@@ -13,4 +13,4 @@ log.addHandler(logging.NullHandler())
 
 from onegov.websockets.integration import WebsocketsApp
 
-__all__ = ['log', 'WebsocketsApp']
+__all__ = ('log', 'WebsocketsApp')

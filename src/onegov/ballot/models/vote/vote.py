@@ -10,6 +10,7 @@ from onegov.ballot.models.vote.mixins import DerivedBallotsCountMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
@@ -30,7 +31,6 @@ if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
     from onegov.ballot.types import BallotType
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.types import AppenderQuery
     from sqlalchemy.sql import ColumnElement
 
@@ -315,19 +315,19 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
         )
 
     #: may be used to store a link related to this vote
-    related_link: 'dict_property[str]' = meta_property('related_link')
+    related_link: dict_property[str | None] = meta_property('related_link')
     #: Additional, translatable label for the link
-    related_link_label: 'dict_property[str]' = meta_property(
+    related_link_label: dict_property[str | None] = meta_property(
         'related_link_label'
     )
 
     #: may be used to indicate that the vote contains expats as seperate
     #: resultas (typically with entity_id = 0)
-    has_expats: 'dict_property[bool]' = meta_property('expats', default=False)
+    has_expats: dict_property[bool] = meta_property('expats', default=False)
 
     #: The segment of the domain. This might be the municipality, if this is a
     #: communal vote.
-    domain_segment: 'dict_property[str]' = meta_property(
+    domain_segment: dict_property[str] = meta_property(
         'domain_segment',
         default=''
     )

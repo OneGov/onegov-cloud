@@ -9,6 +9,7 @@ from websockets.legacy.server import serve
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from onegov.core.types import JSON_ro
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
     from websockets.legacy.server import WebSocketServerProtocol
@@ -35,7 +36,7 @@ def get_payload(
 
 async def error(
     websocket: 'WebSocketServerProtocol',
-    message: str,
+    message: 'JSON_ro',
     close: bool = True
 ) -> None:
     """ Sends an error. """

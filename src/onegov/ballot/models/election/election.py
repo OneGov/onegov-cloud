@@ -11,6 +11,7 @@ from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column
@@ -30,11 +31,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Query
     from sqlalchemy.sql import ColumnElement
     from typing import NamedTuple
+
+    from ..election_compound import ElectionCompoundAssociation
 
     class VotesByDistrictRow(NamedTuple):
         election_id: str
@@ -117,7 +119,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return mandates and mandates[0] or 0
 
     #: Defines the type of majority (e.g. 'absolute', 'relative')
-    majority_type: 'dict_property[str]' = meta_property('majority_type')
+    majority_type: dict_property[str | None] = meta_property('majority_type')
 
     #: Absolute majority
     absolute_majority: 'Column[int | None]' = Column(Integer, nullable=True)
@@ -204,6 +206,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     if TYPE_CHECKING:
         # backrefs
+        associations: relationship[AppenderQuery[ElectionCompoundAssociation]]
         related_elections: relationship[AppenderQuery['Election']]
         referencing_elections: relationship[AppenderQuery['Election']]
 
@@ -272,29 +275,29 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return [(r.first_name, r.family_name) for r in results]
 
     #: may be used to store a link related to this election
-    related_link: 'dict_property[str]' = meta_property('related_link')
-    related_link_label: 'dict_property[str]' = meta_property(
+    related_link: dict_property[str | None] = meta_property('related_link')
+    related_link_label: dict_property[str | None] = meta_property(
         'related_link_label'
     )
 
     #: may be used to mark an election as a tacit election
-    tacit: 'dict_property[bool]' = meta_property('tacit', default=False)
+    tacit: dict_property[bool] = meta_property('tacit', default=False)
 
     #: may be used to indicate that the vote contains expats as seperate
     #: results (typically with entity_id = 0)
-    has_expats: 'dict_property[bool]' = meta_property('expats', default=False)
+    has_expats: dict_property[bool] = meta_property('expats', default=False)
 
     #: The segment of the domain. This might be the district, if this is a
     #: regional (district) election; the region, if it's a regional (region)
     #: election or the municipality, if this is a communal election.
-    domain_segment: 'dict_property[str]' = meta_property(
+    domain_segment: dict_property[str] = meta_property(
         'domain_segment',
         default=''
     )
 
     #: The supersegment of the domain. This might be superregion, if it's a
     #: regional (region) election.
-    domain_supersegment: 'dict_property[str]' = meta_property(
+    domain_supersegment: dict_property[str] = meta_property(
         'domain_supersegment',
         default=''
     )
@@ -320,7 +323,10 @@ class Election(Base, ContentMixin, LastModifiedMixin,
         return results
 
     #: Defines optional colors for lists and parties
-    colors = meta_property('colors', default=dict)
+    colors: dict_property[dict[str, str]] = meta_property(
+        'colors',
+        default=dict
+    )
 
     def clear_results(self) -> None:
         """ Clears all the results. """
