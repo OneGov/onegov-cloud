@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from functools import lru_cache
 from hashlib import sha256
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import meta_property, TimestampMixin
+from onegov.core.orm.mixins import dict_property, meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify, paragraphify
 from onegov.form import flatten_fieldsets, parse_formcode
@@ -13,6 +13,11 @@ from onegov.org.models.tan import DEFAULT_ACCESS_WINDOW
 from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
 from uuid import uuid4
+
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class Organisation(Base, TimestampMixin):
@@ -66,10 +71,14 @@ class Organisation(Base, TimestampMixin):
     locales = meta_property()
     redirect_homepage_to = meta_property()
     redirect_path = meta_property()
-    hidden_people_fields = meta_property(default=list)
-    event_locations = meta_property(default=list)
+    hidden_people_fields: dict_property[list[str]] = meta_property(
+        default=list
+    )
+    event_locations: dict_property[list[str]] = meta_property(default=list)
     geo_provider = meta_property(default='geo-mapbox')
-    holiday_settings = meta_property(default=dict)
+    holiday_settings: dict_property[dict[str, Any]] = meta_property(
+        default=dict
+    )
     hide_onegov_footer = meta_property(default=False)
     standard_image = meta_property()
     submit_events_visible = meta_property(default=True)
@@ -139,7 +148,7 @@ class Organisation(Base, TimestampMixin):
     agency_display_levels = meta_property()
 
     # Header settings that go into the div.globals
-    header_options = meta_property(default=dict)
+    header_options: dict_property[dict[str, Any]] = meta_property(default=dict)
 
     # Setting if show full agency path on people detail view
     agency_path_display_on_people = meta_property(default=False)
@@ -172,7 +181,9 @@ class Organisation(Base, TimestampMixin):
     chat_title = meta_property()
     chat_bg_color = meta_property()
     chat_customer_id = meta_property()
-    hide_chat_for_roles = meta_property(default=tuple)
+    hide_chat_for_roles: dict_property['Sequence[str]'] = meta_property(
+        default=tuple
+    )
     disable_chat = meta_property(default=False)
 
     # Required information to upload documents to a Gever instance
