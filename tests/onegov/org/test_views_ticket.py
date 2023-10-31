@@ -824,6 +824,7 @@ def test_email_attachment_in_ticket_message(client):
     ticket_url = ticket_page.request.url
 
     page = client.get(ticket_url).click("Nachricht senden")
+    # create both BCC and attachment
     page.form['text'] = "Attachments make emails heavy."
     page.form['email_bcc'] = ['editor@example.org']
     page.form['email_attachment'] = Upload(
@@ -835,6 +836,7 @@ def test_email_attachment_in_ticket_message(client):
 
     assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
 
+    assert 'editor@example.org' in message['Bcc']
     msg = message['Attachments'][0]
     assert 'Test.txt' in msg.values()
     decoded_content = base64.b64decode(msg['Content'])
