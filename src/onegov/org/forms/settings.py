@@ -729,6 +729,7 @@ class MapSettingsForm(Form):
             ('geo-mapbox', "Mapbox"),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
             ('geo-zugmap-basisplan', "ZugMap Basisplan Farbig"),
+            ('geo-zugmap-orthofoto', "ZugMap Orthofoto"),
             ('geo-bs', "Geoportal Basel-Stadt"),
         ])
 
