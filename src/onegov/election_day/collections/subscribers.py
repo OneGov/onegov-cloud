@@ -14,6 +14,7 @@ from typing import IO
 from typing import TypeVar
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from onegov.election_day.formats.imports.common import FileImportError
     from onegov.election_day.request import ElectionDayRequest
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
@@ -174,13 +175,14 @@ class SubscriberCollection(Pagination[_S]):
         file: IO[bytes],
         mimetype: str,
         delete: bool
-    ) -> tuple[list[str], int]:
+    ) -> tuple[list['FileImportError'], int]:
         """ Disables or deletes the subscribers in the given CSV. """
 
         csv, error = load_csv(file, mimetype, expected_headers=['address'])
         if error:
             return [error], 0
 
+        assert csv is not None
         addresses = [l.address.lower() for l in csv.lines if l.address]
         query = self.session.query(self.model_class)
         query = query.filter(

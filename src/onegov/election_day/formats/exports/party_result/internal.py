@@ -1,9 +1,21 @@
 from collections import OrderedDict
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from decimal import Decimal
+    from onegov.ballot.models import ElectionCompound
+    from onegov.ballot.models import ProporzElection
+
+
 def export_parties_internal(
-    item, locales, default_locale, json_serializable=False
-):
+    item: 'ElectionCompound | ProporzElection',
+    locales: 'Collection[str]',
+    default_locale: str,
+    json_serializable: bool = False
+) -> list[dict[str, Any]]:
     """ Returns all party results with the panachage as list with dicts.
 
     This is meant as a base for json/csv/excel exports. The result is
@@ -32,8 +44,14 @@ def export_parties_internal(
     return result
 
 
-def _export_parties(item, locales, default_locale, json_serializable=False,
-                    domain=None, domain_segment=None):
+def _export_parties(
+    item: 'ElectionCompound | ProporzElection',
+    locales: 'Collection[str]',
+    default_locale: str,
+    json_serializable: bool = False,
+    domain: str | None = None,
+    domain_segment: str | None = None
+) -> list[dict[str, Any]]:
     """ Returns all party results with the panachage as list with dicts.
 
     This is meant as a base for json/csv/excel exports. The result is
@@ -48,41 +66,41 @@ def _export_parties(item, locales, default_locale, json_serializable=False,
 
     """
 
-    def convert_decimal(value):
+    def convert_decimal(value: 'Decimal | None') -> float | str | None:
         if value is None:
             return value
         if json_serializable:
             return float(value)
         return str(value)
 
-    results = {}
+    results: dict[int, dict[str, dict[str, Any]]] = {}
 
     # get the party results
-    for result in item.party_results:
-        if result.domain != (domain or item.domain):
+    for party_result in item.party_results:
+        if party_result.domain != (domain or item.domain):
             continue
-        if domain_segment and result.domain_segment != domain_segment:
+        if domain_segment and party_result.domain_segment != domain_segment:
             continue
-        year = results.setdefault(result.year, {})
-        year[result.party_id] = {
-            'domain': result.domain,
-            'domain_segment': result.domain_segment,
-            'name_translations': result.name_translations,
-            'total_votes': result.total_votes,
-            'mandates': result.number_of_mandates,
-            'votes': result.votes,
-            'voters_count': result.voters_count,
-            'voters_count_percentage': result.voters_count_percentage
+        results_per_year = results.setdefault(party_result.year, {})
+        results_per_year[party_result.party_id] = {
+            'domain': party_result.domain,
+            'domain_segment': party_result.domain_segment,
+            'name_translations': party_result.name_translations,
+            'total_votes': party_result.total_votes,
+            'mandates': party_result.number_of_mandates,
+            'votes': party_result.votes,
+            'voters_count': party_result.voters_count,
+            'voters_count_percentage': party_result.voters_count_percentage
         }
 
     # get the panachage results
     if domain == item.domain:
-        for result in item.party_panachage_results:
-            year = results.setdefault(item.date.year, {})
-            target = year.setdefault(result.target, {})
-            target[result.source] = result.votes
+        for panachage_result in item.party_panachage_results:
+            results_per_year = results.setdefault(item.date.year, {})
+            target = results_per_year.setdefault(panachage_result.target, {})
+            target[panachage_result.source] = panachage_result.votes
 
-    rows = []
+    rows: list[dict[str, Any]] = []
     parties = sorted({key for r in results.values() for key in r.keys()})
     for year in sorted(results.keys(), reverse=True):
         for party_id in parties:

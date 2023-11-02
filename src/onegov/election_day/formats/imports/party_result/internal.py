@@ -12,6 +12,17 @@ from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.ballot.models import ProporzElection
+    from onegov.core.csv import DefaultCSVFile
+    from onegov.core.csv import DefaultRow
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 ELECTION_PARTY_HEADERS = (
     'year',
     'name',
@@ -25,7 +36,13 @@ ELECTION_PARTY_HEADERS = (
 )
 
 
-def parse_domain(line, errors, election, principal, election_year):
+def parse_domain(
+    line: 'DefaultRow',
+    errors: list[str],
+    election: 'ProporzElection | ElectionCompound',
+    principal: 'Canton | Municipality',
+    election_year: int
+) -> tuple[bool, str | None, str | None]:
     """ Parse domain and domain segment. Also indicate, if line should be
     skipped.
 
@@ -65,9 +82,19 @@ def parse_domain(line, errors, election, principal, election_year):
 
 
 def parse_party_result(
-    line, errors, party_results, totals, parties, election_year,
-    locales, default_locale, colors, domain, domain_segment
-):
+    line: 'DefaultRow',
+    errors: list[str],
+    party_results: dict[str, PartyResult],
+    totals: dict[int, dict[tuple[str | None, str | None], int | None]],
+    parties: set[str],
+    election_year: int,
+    locales: 'Collection[str]',
+    default_locale: str,
+    colors: dict[str, str],
+    domain: str | None,
+    domain_segment: str | None
+) -> None:
+
     totals_key = (domain, domain_segment)
     try:
         year = validate_integer(line, 'year', default=election_year)
@@ -120,7 +147,9 @@ def parse_party_result(
         if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
         else:
-            party_results[key] = PartyResult(
+            # FIXME: We seem to be relying on SQLAlchemy changing None to
+            #        to the column default value for non-nullable columns
+            party_results[key] = PartyResult(  # type:ignore[misc]
                 id=uuid4(),
                 domain=domain,
                 domain_segment=domain_segment,
@@ -138,7 +167,7 @@ def parse_party_result(
                     colors[name] = color
 
 
-def parse_panachage_headers(csv):
+def parse_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
     headers = {}
     for header in csv.headers:
         if not header.startswith('panachage_votes_from_'):
@@ -149,7 +178,14 @@ def parse_panachage_headers(csv):
     return headers
 
 
-def parse_panachage_results(line, errors, results, headers, election_year):
+def parse_panachage_results(
+    line: 'DefaultRow',
+    errors: list[str],
+    results: dict[str, dict[str, int]],
+    headers: dict[str, str],
+    election_year: int
+) -> None:
+
     try:
         target = validate_list_id(line, 'id')
         year = validate_integer(line, 'year', default=election_year)
@@ -165,8 +201,13 @@ def parse_panachage_results(line, errors, results, headers, election_year):
 
 
 def import_party_results_internal(
-    election, principal, file, mimetype, locales, default_locale
-):
+    election: 'ProporzElection | ElectionCompound',
+    principal: 'Canton | Municipality',
+    file: IO[bytes],
+    mimetype: str,
+    locales: 'Collection[str]',
+    default_locale: str
+) -> list[FileImportError]:
     """ Tries to import the given file.
 
     This is our own format used for party results. Supports per party panachage
@@ -178,10 +219,11 @@ def import_party_results_internal(
     """
 
     errors = []
-    parties = set()
-    party_results = {}
+    parties: set[str] = set()
+    party_results: dict[str, PartyResult] = {}
+    party_totals: dict[int, dict[tuple[str | None, str | None], int | None]]
     party_totals = {}
-    panachage_results = {}
+    panachage_results: dict[str, dict[str, int]] = {}
     panachage_headers = None
     colors = election.colors.copy()
 
@@ -193,9 +235,10 @@ def import_party_results_internal(
         if error:
             errors.append(error)
         else:
+            assert csv is not None
             panachage_headers = parse_panachage_headers(csv)
             for line in csv.lines:
-                line_errors = []
+                line_errors: list[str] = []
                 skip, domain, domain_segment = parse_domain(
                     line, line_errors,
                     election, principal, election.date.year
@@ -245,8 +288,8 @@ def import_party_results_internal(
     session = object_session(election)
     for result in election.party_results:
         session.delete(result)
-    for result in election.party_panachage_results:
-        session.delete(result)
+    for panachage_result in election.party_panachage_results:
+        session.delete(panachage_result)
 
     election.colors = colors
     election.last_result_change = election.timestamp()
@@ -267,4 +310,4 @@ def import_party_results_internal(
                         )
                     )
 
-    return
+    return []
