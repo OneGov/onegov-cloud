@@ -1,0 +1,74 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <div class="grid-x chat">
+            <div class="medium-7 cell">
+                <div class="message-area">
+                    <div class="card staff">
+                        <p class="info">N. Stocker</p>
+                        <div class="card-section">
+                            <p>Guten Tag<br/>
+                            Wie kann ich Ihnen helfen?</p>
+                        </div>
+                        <p class="info">12:03</p>
+                    </div>
+                    <div class="card customer">
+                        <div class="card-section">
+                            <p>Ich habe ein Problem mit XYZ. Wie kann ich das erreichen?</p>
+                        </div>
+                        <p class="info">12:04</p>
+                    </div>
+                    <div class="card staff">
+                        <p class="info">N. Stocker</p>
+                        <div class="card-section">
+                            <p>Ich werde das gleich abklären. Einen Moment bitte.</p>
+                        </div>
+                        <p class="info">12:04</p>
+                    </div>
+                    <div class="card customer">
+                        <div class="card-section">
+                            <p>Danke.</p>
+                        </div>
+                        <p class="info">12:06</p>
+                    </div>
+                </div>
+                <div id="chat-form">
+                    <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
+                    <button id="send" class="button">Senden</button>
+                </div>
+            </div>
+
+            <div class="large-4 medium-4 cell medium-offset-1 sidebar">
+                <div class="sidebar-wrapper">
+                    <div class="sidebar-content-wrapper">
+                        <div class="side-panel">
+                            <h3>Weitere Chats</h3>
+                            <ul class="more-list">
+                                <li>
+                                    <a class="list-link" href="#">
+                                        <span class="list-title">Haku von Bubendorf</span>
+                                    </a>
+                                    <a href="#">
+                                        <p class="list-lead preview">Vielen Dank.</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="list-link" href="#">
+                                        <span class="list-title">Chantal Trutmann</span>
+                                    </a>
+                                    <a href="#">
+                                        <p class="list-lead preview">Können Sie mir noch ...</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

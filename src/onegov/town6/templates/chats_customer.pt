@@ -36,10 +36,8 @@
                     </div>
                 </div>
                 <div id="chat-form">
-                    <form>
-                        <textarea id="message" name="message" placeholder="" rows="5"></textarea>
-                        <input type="submit" class="button" value="Senden"></input>
-                    </form>
+                    <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
+                    <button id="send" class="button">Senden</button>
                 </div>
             </div>
 

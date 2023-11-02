@@ -1,11 +1,19 @@
 from onegov.form import Form
 from onegov.org import _
-from wtforms.fields import TextAreaField
+from wtforms.fields import StringField, EmailField, SelectField
 
 
-class ChatForm(Form):
+class ChatInitiationForm(Form):
 
-    message = TextAreaField(
-        label=_("Message"),
-        render_kw={'rows': 5}
+    name = StringField(
+        label=_("Name"),
+    )
+
+    email = EmailField(
+        label=_("E-mail"),
+    )
+
+    topic = SelectField(
+        label=_("Topic"),
+        choices=['a', 'b', 'v']
     )

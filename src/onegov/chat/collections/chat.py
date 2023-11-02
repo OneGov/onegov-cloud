@@ -17,9 +17,10 @@ class ChatCollection(GenericCollection):
     def model_class(self):
         return Chat
 
-    def add(self, customer_name):
+    def add(self, customer_name, email):
         chat = self.model_class(
             customer_name=customer_name,
+            email=email,
         )
 
         self.session.add(chat)

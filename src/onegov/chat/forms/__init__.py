@@ -1,5 +1,5 @@
-from onegov.chat.forms.chat import ChatForm
+from onegov.chat.forms.chat import ChatInitiationForm
 
 __all__ = (
-    'ChatForm',
+    'ChatInitiationForm',
 )

@@ -1,48 +1,22 @@
-import asyncio
-import websockets
-
+from onegov.websockets import log
+import json
+# from onegov.org import OrgApp
 
 connected_clients = []
 
 
-async def handle_connection(websocket, path):
-    # Add the websocket to a list of connected clients
-    connected_clients.append(websocket)
-    try:
-        while True:
-            # Receive a message from the client
-            message = await websocket.recv()
+async def handle_chat(websocket, payload):
+    """
+    Handle chat server handler.
+    """
+    log.debug(f"Listening for chat messages for user: {websocket.id}")
 
-            # Broadcast the message to all connected clients
-            for client in connected_clients:
-                await client.send(message)
-    finally:
-        # Remove the websocket from the list of connected clients
-        connected_clients.remove(websocket)
-
-
-# # Start the WebSocket server
-# start_server = websockets.serve(handle_connection, 'localhost', 8000)
-# # Run the server indefinitely
-# asyncio.get_event_loop().run_until_complete(start_server)
-# asyncio.get_event_loop().run_forever()
-
-
-# async def connect_to_server():
-#     async with websockets.connect('ws://localhost:8000') as websocket:
-#         while True:
-#             # Get user input
-#             message = input("Enter message: ")
-
-#             # Send the message to the server
-#             await websocket.send(message)
-
-#             # Receive a message from the server
-#             response = await websocket.recv()
-
-#             # Print the received message
-#             print("Received:", response)
-
-
-# # Connect the WebSocket client
-# asyncio.get_event_loop().run_until_complete(connect_to_server())
+    while True:
+        message = await websocket.recv()
+        print(f'I got the message {message}')
+        await websocket.send(json.dumps({
+            'type': "message",
+            'message': message,
+            'user': "Haku",
+            'time': 'now',
+        }))

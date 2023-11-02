@@ -12,6 +12,6 @@ def update_ticker(request, updated):
 def send_message(request, text: str, chat_partner: str, datetime: str):
     request.app.send_websocket({
         'text': text,
-        'user': chat_partner,
+        'chat_partner': chat_partner,
         'datetime': datetime,
     })

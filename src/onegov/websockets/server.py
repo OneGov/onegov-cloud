@@ -4,6 +4,7 @@ from json import loads
 from onegov.websockets import log
 from websockets.legacy.protocol import broadcast
 from websockets.legacy.server import serve
+from onegov.chat.human_chat import handle_chat
 
 
 from typing import TYPE_CHECKING
@@ -208,6 +209,8 @@ async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
         await handle_manage(websocket, payload)
     elif payload and payload['type'] == 'register':
         await handle_listen(websocket, payload)
+    elif payload and payload['type'] == 'chat':
+        await handle_chat(websocket, payload)
     else:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
