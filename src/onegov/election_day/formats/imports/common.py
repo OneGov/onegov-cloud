@@ -99,6 +99,9 @@ class FileImportError:
             and self.line == other.line
         )
 
+    def __hash__(self) -> int:
+        return hash((self.__class__, self.filename, self.error, self.line))
+
 
 def load_csv(
     file: IO[bytes],
