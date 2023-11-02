@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 
     from .candidate_panachage_result import CandidatePanachageResult
     from .election import Election
+    from .list import List
     from .proporz_election import ProporzElection
 
     rel = relationship
@@ -106,6 +107,7 @@ class Candidate(Base, TimestampMixin):
         # backrefs
         # (we should switch over to explicit relationships with back_populates)
         election: relationship[Election]
+        list: relationship[List | None]
 
     #: the total votes
     votes = summarized_property('votes')

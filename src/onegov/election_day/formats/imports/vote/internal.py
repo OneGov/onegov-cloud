@@ -10,6 +10,21 @@ from onegov.election_day.formats.imports.common import validate_integer
 from sqlalchemy.orm import object_session
 
 
+from typing import cast
+from typing import Any
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.ballot.models import Vote
+    from onegov.ballot.types import BallotType
+    from onegov.ballot.types import Status
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+    # TODO: Add TypedDict for BallotResult
+
+
 INTERNAL_VOTE_HEADERS = (
     'status',
     'type',
@@ -23,7 +38,12 @@ INTERNAL_VOTE_HEADERS = (
 )
 
 
-def import_vote_internal(vote, principal, file, mimetype):
+def import_vote_internal(
+    vote: 'Vote',
+    principal: 'Canton | Municipality',
+    file: IO[bytes],
+    mimetype: str
+) -> list[FileImportError]:
     """ Tries to import the given csv, xls or xlsx file.
 
     This function is typically called automatically every few minutes during
@@ -39,16 +59,16 @@ def import_vote_internal(vote, principal, file, mimetype):
     if error:
         return [error]
 
-    ballot_results = {}
-    errors = []
-    added_entity_ids = {}
-    ballot_types = set()
+    ballot_results: dict[str, list[dict[str, Any]]] = {}
+    errors: list[FileImportError] = []
+    added_entity_ids: dict[str, set[int]] = {}
     status = 'unknown'
     entities = principal.entities[vote.date.year]
 
+    assert csv is not None
     for line in csv.lines:
 
-        line_errors = []
+        line_errors: list[str] = []
 
         status = line.status or 'unknown'
         if status not in STATI:
@@ -57,7 +77,7 @@ def import_vote_internal(vote, principal, file, mimetype):
         ballot_type = line.type
         if ballot_type not in BALLOT_TYPES:
             line_errors.append(_("Invalid ballot type"))
-        ballot_types.add(ballot_type)
+
         added_entity_ids.setdefault(ballot_type, set())
         ballot_results.setdefault(ballot_type, [])
 
@@ -179,8 +199,12 @@ def import_vote_internal(vote, principal, file, mimetype):
     if errors:
         return errors
 
-    if not any((len(results) for results in ballot_results.values())):
+    if not any(ballot_results.values()):
         return [FileImportError(_("No data found"))]
+
+    # if there were no errors we know we have a valid status and ballot_types
+    status = cast('Status', status)
+    ballot_types = cast('Collection[BallotType]', ballot_results.keys())
 
     # Add the missing entities
     for ballot_type in ballot_types:

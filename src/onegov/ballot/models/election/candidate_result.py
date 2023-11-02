@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     import uuid
     from sqlalchemy.orm import relationship
 
+    from .candidate import Candidate
     from .election_result import ElectionResult
 
 
@@ -46,4 +47,5 @@ class CandidateResult(Base, TimestampMixin):
 
     if TYPE_CHECKING:
         # backref
+        candidate: relationship[Candidate]
         election_result: relationship[ElectionResult]

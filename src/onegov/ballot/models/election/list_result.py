@@ -10,6 +10,10 @@ from uuid import uuid4
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
+    from sqlalchemy.orm import relationship
+
+    from .election_result import ElectionResult
+    from .list import List
 
 
 class ListResult(Base, TimestampMixin):
@@ -40,3 +44,8 @@ class ListResult(Base, TimestampMixin):
         ForeignKey('lists.id', ondelete='CASCADE'),
         nullable=False
     )
+
+    if TYPE_CHECKING:
+        # backrefs
+        election_result: relationship[ElectionResult]
+        list: relationship[List]

@@ -43,6 +43,7 @@ module = [
     "onegov.chat.*",
     "onegov.core.*",
     "onegov.election_day.collections.*",
+    "onegov.election_day.formats.*",
     "onegov.election_day.models.*",
     "onegov.file.*",
     "onegov.form.*",

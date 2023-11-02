@@ -20,6 +20,21 @@ from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
+from typing import Any
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Election
+    from onegov.ballot.types import Status
+    from onegov.core.csv import DefaultCSVFile
+    from onegov.core.csv import DefaultRow
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+    # TODO: Define TypedDict for the parsed results, so we can verify
+    #       our parser ensures correct types
+
+
 INTERNAL_PROPORZ_HEADERS = (
     'election_status',
     'entity_id',
@@ -45,7 +60,7 @@ INTERNAL_PROPORZ_HEADERS = (
 )
 
 
-def parse_election(line, errors):
+def parse_election(line: 'DefaultRow', errors: list[str]) -> 'Status | None':
     status = None
     try:
         status = line.election_status or 'unknown'
@@ -53,11 +68,18 @@ def parse_election(line, errors):
         errors.append(_("Invalid election values"))
     if status not in STATI:
         errors.append(_("Invalid status"))
-    return status
+    return status  # type:ignore[return-value]
 
 
-def parse_election_result(line, errors, entities, election, principal,
-                          ignore_extra):
+def parse_election_result(
+    line: 'DefaultRow',
+    errors: list[str],
+    entities: dict[int, dict[str, str]],
+    election: 'Election',
+    principal: 'Canton | Municipality',
+    ignore_extra: bool
+) -> dict[str, Any] | bool:
+
     try:
         entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
@@ -85,7 +107,7 @@ def parse_election_result(line, errors, entities, election, principal,
             ))
 
         else:
-            entity_errors = []
+            entity_errors: list[str] = []
             name, district, superregion = get_entity_and_district(
                 entity_id, entities, election, principal, entity_errors
             )
@@ -114,7 +136,13 @@ def parse_election_result(line, errors, entities, election, principal,
     return False
 
 
-def parse_list(line, errors, election_id, colors):
+def parse_list(
+    line: 'DefaultRow',
+    errors: list[str],
+    election_id: str,
+    colors: dict[str, str]
+) -> dict[str, Any] | None:
+
     try:
         id = validate_list_id(line, 'list_id', treat_empty_as_default=False)
         name = line.list_name
@@ -132,9 +160,15 @@ def parse_list(line, errors, election_id, colors):
             'number_of_mandates': mandates,
             'name': name,
         }
+    return None
 
 
-def parse_list_result(line, errors, counted):
+def parse_list_result(
+    line: 'DefaultRow',
+    errors: list[str],
+    counted: bool
+) -> dict[str, Any] | None:
+
     try:
         votes = validate_integer(line, 'list_votes')
     except ValueError as e:
@@ -144,9 +178,10 @@ def parse_list_result(line, errors, counted):
             'id': uuid4(),
             'votes': votes if counted else 0
         }
+    return None
 
 
-def parse_list_panachage_headers(csv):
+def parse_list_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
     headers = {}
     prefix = 'list_panachage_votes_from_list_'
     for header in csv.headers:
@@ -164,7 +199,13 @@ def parse_list_panachage_headers(csv):
     return headers
 
 
-def parse_list_panachage_results(line, errors, values, headers):
+def parse_list_panachage_results(
+    line: 'DefaultRow',
+    errors: list[str],
+    values: dict[str, dict[str, int]],
+    headers: dict[str, str]
+) -> None:
+
     try:
         target = validate_list_id(
             line, 'list_id', treat_empty_as_default=False)
@@ -174,6 +215,8 @@ def parse_list_panachage_results(line, errors, values, headers):
                 if source == target:
                     continue
                 votes = validate_integer(line, col_name, default=None)
+                # FIXME: I think this should be `if votes is not None`
+                #        why bother changing the default to None otherwise?
                 if votes:
                     values[target][source] = votes
 
@@ -183,7 +226,13 @@ def parse_list_panachage_results(line, errors, values, headers):
         errors.append(_("Invalid list results"))
 
 
-def parse_candidate(line, errors, election_id, colors):
+def parse_candidate(
+    line: 'DefaultRow',
+    errors: list[str],
+    election_id: str,
+    colors: dict[str, str]
+) -> dict[str, Any] | None:
+
     try:
         id = line.candidate_id
         family_name = line.candidate_family_name
@@ -214,9 +263,15 @@ def parse_candidate(line, errors, election_id, colors):
             'gender': gender,
             'year_of_birth': year_of_birth
         }
+    return None
 
 
-def parse_candidate_result(line, errors, counted):
+def parse_candidate_result(
+    line: 'DefaultRow',
+    errors: list[str],
+    counted: bool
+) -> dict[str, Any] | None:
+
     try:
         votes = validate_integer(line, 'candidate_votes')
     except ValueError as e:
@@ -226,9 +281,10 @@ def parse_candidate_result(line, errors, counted):
             'id': uuid4(),
             'votes': votes if counted else 0,
         }
+    return None
 
 
-def parse_candidate_panachage_headers(csv):
+def parse_candidate_panachage_headers(csv: 'DefaultCSVFile') -> dict[str, str]:
     headers = {}
     prefix = 'candidate_panachage_votes_from_list_'
     for header in csv.headers:
@@ -244,7 +300,13 @@ def parse_candidate_panachage_headers(csv):
     return headers
 
 
-def parse_candidate_panachage_results(line, errors, values, headers):
+def parse_candidate_panachage_results(
+    line: 'DefaultRow',
+    errors: list[str],
+    values: list[dict[str, Any]],
+    headers: dict[str, str]
+) -> None:
+
     try:
         entity_id = validate_integer(line, 'entity_id')
         candidate_id = line.candidate_id
@@ -263,7 +325,7 @@ def parse_candidate_panachage_results(line, errors, values, headers):
         errors.append(_("Invalid candidate results"))
 
 
-def prefix_connection_id(connection_id, parent_connection_id):
+def prefix_connection_id(connection_id: str, parent_connection_id: str) -> str:
     """Used to distinguish connection ids when they have the same id
     as a parent_connection. """
     if not len(connection_id) > len(parent_connection_id):
@@ -271,7 +333,12 @@ def prefix_connection_id(connection_id, parent_connection_id):
     return connection_id
 
 
-def parse_connection(line, errors, election_id):
+def parse_connection(
+    line: 'DefaultRow',
+    errors: list[str],
+    election_id: str
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+
     subconnection_id = None
     try:
         connection_id = line.list_connection
@@ -295,11 +362,16 @@ def parse_connection(line, errors, election_id):
             'connection_id': subconnection_id,
         } if subconnection_id else None
         return connection, subconnection
+    return None, None
 
 
 def import_election_internal_proporz(
-    election, principal, file, mimetype, ignore_extra=False
-):
+    election: 'Election',
+    principal: 'Canton | Municipality',
+    file: IO[bytes],
+    mimetype: str,
+    ignore_extra: bool = False
+) -> list[FileImportError]:
     """ Tries to import the given file (internal format).
 
     This function is typically called automatically every few minutes during
@@ -320,18 +392,19 @@ def import_election_internal_proporz(
     if error:
         return [error]
 
-    errors = []
+    assert csv is not None
+    errors: list[FileImportError] = []
 
-    candidates = {}
+    candidates: dict[str, dict[str, Any]] = {}
     candidate_results = []
-    lists = {}
-    list_results = {}
-    connections = {}
-    subconnections = {}
-    results = {}
-    list_panachage = {}
+    lists: dict[str, dict[str, Any]] = {}
+    list_results: dict[str, dict[str, Any]] = {}
+    connections: dict[str, dict[str, Any]] = {}
+    subconnections: dict[str, dict[str, Any]] = {}
+    results: dict[int, dict[str, Any]] = {}
+    list_panachage: dict[str, dict[str, Any]] = {}
     list_panachage_headers = parse_list_panachage_headers(csv)
-    candidate_panachage = []
+    candidate_panachage: list[dict[str, Any]] = []
     candidate_panachage_headers = parse_candidate_panachage_headers(csv)
     entities = principal.entities[election.date.year]
     election_id = election.id
@@ -340,7 +413,7 @@ def import_election_internal_proporz(
     # This format has one candiate per entity per line
     status = None
     for line in csv.lines:
-        line_errors = []
+        line_errors: list[str] = []
 
         # Parse the line
         result = parse_election_result(
@@ -378,6 +451,12 @@ def import_election_internal_proporz(
             )
             continue
 
+        assert result
+        assert list_ is not None
+        assert list_result is not None
+        assert candidate is not None
+        assert candidate_result is not None
+
         # Add the data
         result = results.setdefault(result['entity_id'], result)
 
@@ -399,6 +478,7 @@ def import_election_internal_proporz(
         list_result = list_results[result['entity_id']].setdefault(
             list_['list_id'], list_result
         )
+        assert list_result is not None
         list_result['list_id'] = list_['id']
 
         candidate = candidates.setdefault(candidate['candidate_id'], candidate)
@@ -470,13 +550,14 @@ def import_election_internal_proporz(
     # Aggregate candidate panachage to list panachage if missing
     if candidate_panachage and not any(list_panachage.values()):
         list_ids = {r['id']: r['list_id'] for r in lists.values()}
-        for result in candidate_panachage:
-            source = result['list_id']
-            target = list_ids[candidates[result['candidate_id']]['list_id']]
+        for panachage_result in candidate_panachage:
+            source = panachage_result['list_id']
+            candidate_id = panachage_result['candidate_id']
+            target = list_ids[candidates[candidate_id]['list_id']]
             if source == target:
                 continue
             list_panachage[target].setdefault(source, 0)
-            list_panachage[target][source] += result['votes'] or 0
+            list_panachage[target][source] += panachage_result['votes'] or 0
 
     # Add the results to the DB
     election.clear_results()
