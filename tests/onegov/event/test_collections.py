@@ -1412,3 +1412,106 @@ def test_from_ical(session):
     assert sorted(event.tags) == []
     assert (event.filter_keywords == dict(
         kalender='Sport Veranstaltungskalender'))
+
+
+def test_as_anthrazit_xml(session):
+
+    def as_anthrazit(occurrences):
+        result = occurrences.as_anthrazit_xml(future_events_only=False)
+        result = result.decode().strip().splitlines()
+        return result
+
+    events = EventCollection(session)
+    with freeze_time("2023-04-01"):
+        event = events.add(
+            title='Squirrel Park Visit',
+            start=datetime(2023, 4, 10, 9, 30),
+            end=datetime(2023, 4, 10, 18, 00),
+            # timezone='UTC',
+            timezone='Europe/Zurich',
+            content={
+                'description': '<em>Furry</em> things will happen!'
+            },
+            location='Squirrel Park',
+            tags=['fun', 'animals'],
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+                'UNTIL=20230420T220000Z'
+            ),
+            coordinates=Coordinates(47.051752750515746, 8.305739625357093)
+        )
+        event.submit()
+        event.publish()
+
+        event = events.add(
+            title='History of the Squirrel Park',
+            start=datetime(2023, 4, 18, 14, 00),
+            end=datetime(2023, 4, 18, 16, 00),
+            # timezone='UTC',
+            timezone='Europe/Zurich',
+            content={
+                'description': 'Learn how the Park got so <em>furry</em>!'
+            },
+            location='Squirrel Park',
+            tags=['history'],
+            coordinates=Coordinates(47.051752750515746, 8.305739625357093)
+        )
+        event.submit()
+        event.publish()
+
+        session.flush()
+
+    occurrences = OccurrenceCollection(session)
+    xml = occurrences.as_anthrazit_xml(future_events_only=False)
+
+    import xml.etree.ElementTree as ET
+
+    root = ET.fromstring(xml)
+    # assert len(root) == 2
+
+    for event in root.findall('item'):
+        print(event.find('title').text)
+
+    assert root[0].find('id').text
+    assert root[0].find('title').text == 'Squirrel Park Visit'
+    assert (root[0].find('textmobile').text == '<em>Furry</em> things will '
+                                               'happen!')
+    dates = root[0].findall('termin')
+    expected_dates_start = [
+        '2023-04-10 09:30:00+00:00',
+        '2023-04-11 09:30:00+00:00',
+        '2023-04-12 09:30:00+00:00',
+        '2023-04-13 09:30:00+00:00',
+        '2023-04-14 09:30:00+00:00',
+        '2023-04-15 09:30:00+00:00',
+        '2023-04-16 09:30:00+00:00',
+        '2023-04-17 09:30:00+00:00',
+        '2023-04-18 09:30:00+00:00',
+        '2023-04-19 09:30:00+00:00',
+        '2023-04-20 09:30:00+00:00',
+    ]
+    expected_dates_end = [
+        '2023-04-10 18:00:00+00:00',
+        '2023-04-11 18:00:00+00:00',
+        '2023-04-12 18:00:00+00:00',
+        '2023-04-13 18:00:00+00:00',
+        '2023-04-14 18:00:00+00:00',
+        '2023-04-15 18:00:00+00:00',
+        '2023-04-16 18:00:00+00:00',
+        '2023-04-17 18:00:00+00:00',
+        '2023-04-18 18:00:00+00:00',
+        '2023-04-19 18:00:00+00:00',
+        '2023-04-20 18:00:00+00:00',
+    ]
+    for d in dates:
+        assert d.find('von').text in expected_dates_start
+        assert d.find('bis').text in expected_dates_end
+    assert root[0].find('text').text == '<em>Furry</em> things will happen!'
+    # assert root[0].find('hauptrubrik').attrib['name] == ''
+    for rubrik in root[0].find('hauptrubrik').findall('rubrik'):
+        assert rubrik.text in ['fun', 'animals']
+    assert root[0].find('veranstaltungsort').find('title').text == ('Squirrel '
+                                                                    'Park')
+
+    # assert root[1].find('title').text == 'History Squirrel Park Visit'
