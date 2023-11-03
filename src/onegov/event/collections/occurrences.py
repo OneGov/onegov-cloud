@@ -653,8 +653,6 @@ class OccurrenceCollection(Pagination):
                                    hr_text else None)
             hr.rubrik = tags or None
             event.append(hr)
-            keywords = [hr_text] + tags if hr_text else tags
-            event.keyword = ' '.join(keywords) if keywords else None
 
             ort = objectify.Element('veranstaltungsort')
             ort.title = e.location
