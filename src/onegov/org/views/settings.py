@@ -1,11 +1,9 @@
 """ The settings view, defining things like the logo or color of the org. """
 
 from copy import copy
-
 from dectate import Query
 from markupsafe import Markup
 from webob.exc import HTTPForbidden
-
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.security import Secret
 from onegov.core.templates import render_macro
@@ -21,7 +19,7 @@ from onegov.org.forms.settings import OrgTicketSettingsForm,\
     HeaderSettingsForm, FaviconSettingsForm, LinksSettingsForm,\
     NewsletterSettingsForm, LinkMigrationForm, LinkHealthCheckForm,\
     SocialMediaSettingsForm, EventSettingsForm, GeverSettingsForm,\
-    OneGovApiSettingsForm
+    OneGovApiSettingsForm, DataRetentionPolicyForm
 from onegov.org.management import LinkHealthCheck
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
@@ -394,3 +392,18 @@ def delete_api_key(self: ApiKey, request: 'OrgRequest'):
     request.session.delete(self)
     request.session.flush()
     request.message(_("ApiKey deleted."), 'success')
+
+
+@OrgApp.form(
+    model=Organisation, name='data-retention-settings',
+    template='form.pt', permission=Secret,
+    form=DataRetentionPolicyForm, setting=_("Data Retention Policy"),
+    icon='far fa-trash', order=-880,
+)
+def handle_ticket_data_deletion_settings(self, request, form):
+    request.message(_("Proceed with caution. Tickets and the data they "
+                      "contain may be irrevocable deleted."), 'alert')
+    return handle_generic_settings(
+        self, request, form, _("Data Retention Policy"),
+        SettingsLayout(self, request),
+    )

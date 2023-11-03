@@ -181,6 +181,45 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         else:
             return self.handler.extra_data
 
+    def redact_data(self) -> None:
+        """Redact sensitive information from the ticket to protect personal
+        data.
+
+        In scenarios where complete deletion is not feasible, this method
+        serves as an alternative by masking sensitive information,
+        like addresses, phone numbers in the form submission.
+        """
+
+        if self.state != 'archived':
+            raise InvalidStateChange()
+
+        redact_constant = '[redacted]'
+
+        if self.snapshot:
+            self.snapshot['summary'] = redact_constant
+            # Deactivate `message_to_submitter` for redacted tickets by
+            # setting to falsy value
+            self.snapshot['email'] = ''
+
+            for info in ('name', 'address', 'phone'):
+                if hasattr(self.snapshot, f'submitter_{info}'):
+                    self.snapshot[f'submitter_{info}'] = redact_constant
+
+        submission = getattr(self.handler, 'submission', None)
+
+        if not submission or not submission.data:
+            return
+
+        # redact the submission
+        for key, value in submission.data.items():
+            if value:
+                submission.data[key] = redact_constant
+
+        submission.email = redact_constant
+        submission.submitter_name = redact_constant
+        submission.submitter_address = redact_constant
+        submission.submitter_phone = redact_constant
+
     @property
     def handler(self) -> 'Handler':
         """ Returns an instance of the handler associated with this ticket. """

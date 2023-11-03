@@ -13,6 +13,14 @@ from onegov.town6.initial_content import create_new_organisation
 from onegov.org.models import Organisation
 from onegov.user import UserCollection
 
+
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.core.types import RenderData
+    from webob import Response
+
+
 _valid_subdomain = re.compile(r'^[a-z0-9]+[a-z0-9-]+[a-z0-9]+$')
 
 
@@ -20,14 +28,18 @@ class TownAssistant(Assistant):
     """ An assistant guiding a user through onegov.town6 onboarding. """
 
     @Assistant.step(form=TownForm)
-    def first_step(self, request, form):
+    def first_step(
+        self,
+        request: 'CoreRequest',
+        form: TownForm
+    ) -> 'RenderData | Response':
 
         if form.submitted(request):
-            request.browser_session['name'] = form.data['name']
-            request.browser_session['user'] = form.data['user']
-            request.browser_session['user_name'] = form.data['user_name']
-            request.browser_session['phone_number'] = form.data['phone_number']
-            request.browser_session['color'] = form.data['color']
+            request.browser_session['name'] = form.name.data
+            request.browser_session['user'] = form.user.data
+            request.browser_session['user_name'] = form.user_name.data
+            request.browser_session['phone_number'] = form.phone_number.data
+            request.browser_session['color'] = form.color.data
 
             return morepath.redirect(request.link(self.for_next_step()))
 
@@ -37,7 +49,7 @@ class TownAssistant(Assistant):
         form.user_name.data = request.browser_session.get(
             "user_name", form.user_name.data
         )
-        form.color.phone_number = request.browser_session.get(
+        form.phone_number.data = request.browser_session.get(
             "phone_number", form.phone_number.data
         )
 
@@ -52,7 +64,11 @@ class TownAssistant(Assistant):
         }
 
     @Assistant.step(form=FinishForm)
-    def last_step(self, request, form):
+    def last_step(
+        self,
+        request: 'CoreRequest',
+        form: FinishForm
+    ) -> 'RenderData | Response':
 
         for key in ('name', 'user', 'color'):
             if not request.browser_session.has(key):
@@ -68,13 +84,7 @@ class TownAssistant(Assistant):
             try:
                 product = self.add_town(name, user, color, request)
                 error = None
-            except AlreadyExistsError:
-                product = None
-                error = _(
-                    "This town exists already and can't be created. Is it "
-                    "your town but you did not create it? Please contact us."
-                )
-            else:
+
                 self.app.send_zulip(
                     subject='OneGov Onboarding',
                     content='\n'.join((
@@ -84,6 +94,12 @@ class TownAssistant(Assistant):
                         f"Email: {user}",
                         f"Phone: {phone_number}"
                     ))
+                )
+            except AlreadyExistsError:
+                product = None
+                error = _(
+                    "This town exists already and can't be created. Is it "
+                    "your town but you did not create it? Please contact us."
                 )
             finally:
                 del request.browser_session['name']
@@ -128,23 +144,31 @@ class TownAssistant(Assistant):
         }
 
     @property
-    def config(self):
+    def config(self) -> dict[str, Any]:
         return self.app.onboarding['onegov.town6']
 
-    def get_subdomain(self, name):
+    def get_subdomain(self, name: str) -> str:
         return utils.normalize_for_url(name)
 
-    def get_domain(self, name):
+    def get_domain(self, name: str) -> str:
         return '{}.{}'.format(self.get_subdomain(name), self.config['domain'])
 
-    def get_schema(self, name):
+    def get_schema(self, name: str) -> str:
         return '{}-{}'.format(
             self.config['namespace'],
             self.get_subdomain(name).replace('-', '_')
         )
 
-    def add_town(self, name, user, color, request):
+    def add_town(
+        self,
+        name: str,
+        user: str,
+        color: str,
+        request: 'CoreRequest'
+    ) -> 'RenderData':
+
         current_schema = self.app.session_manager.current_schema
+        assert current_schema is not None
         password = random_password(16)
 
         try:
@@ -161,6 +185,7 @@ class TownAssistant(Assistant):
                 create_new_organisation(self.app, name=name, reply_to=user)
 
             org = session.query(Organisation).first()
+            assert org is not None and org.theme_options is not None
             org.theme_options['primary-color-ui'] = color
 
             users = UserCollection(self.app.session_manager.session())

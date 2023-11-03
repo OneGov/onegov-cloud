@@ -3,6 +3,14 @@ from onegov.core.utils import Bunch
 from sqlalchemy import func
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy import Column
+    from sqlalchemy.orm import Session
+
+    from ..election import Election
+
+
 class DerivedAttributesMixin:
 
     """ A simple mixin to add commonly used functions to election compounds
@@ -11,16 +19,25 @@ class DerivedAttributesMixin:
     Requires an elections and session attribute.
     """
 
+    if TYPE_CHECKING:
+        # forward declare required attributes
+        @property
+        def session(self) -> Session: ...
+        @property
+        def elections(self) -> list[Election]: ...
+        completes_manually: Column[bool]
+        manually_completed: Column[bool]
+
     @property
-    def number_of_mandates(self):
+    def number_of_mandates(self) -> int:
         """ The (total) number of mandates. """
 
-        return sum([
+        return sum(
             election.number_of_mandates for election in self.elections
-        ])
+        )
 
     @property
-    def allocated_mandates(self):
+    def allocated_mandates(self) -> int:
         """ Number of already allocated mandates/elected candidates. """
 
         election_ids = [e.id for e in self.elections if e.completed]
@@ -30,11 +47,11 @@ class DerivedAttributesMixin:
             func.count(func.nullif(Candidate.elected, False))
         )
         mandates = mandates.filter(Candidate.election_id.in_(election_ids))
-        mandates = mandates.first()
-        return mandates[0] if mandates else 0
+        result = mandates.first()
+        return result[0] if result else 0
 
     @property
-    def completed(self):
+    def completed(self) -> bool:
         """ Returns True, if all elections are completed. """
 
         elections = self.elections
@@ -51,7 +68,7 @@ class DerivedAttributesMixin:
         return True
 
     @property
-    def counted(self):
+    def counted(self) -> bool:
         """ True if all elections have been counted. """
 
         for election in self.elections:
@@ -61,14 +78,14 @@ class DerivedAttributesMixin:
         return True
 
     @property
-    def counted_entities(self):
+    def counted_entities(self) -> list[str | None]:
         return [
             election.domain_segment for election in self.elections
             if election.completed
         ]
 
     @property
-    def results(self):
+    def results(self) -> list[Bunch]:  # FIXME: use NamedTuple
         return [
             Bunch(
                 domain_segment=election.domain_segment,
@@ -87,10 +104,10 @@ class DerivedAttributesMixin:
         ]
 
     @property
-    def totals(self):
+    def totals(self) -> Bunch:  # FIXME: use NamedTuple
         results = [r for r in self.results if r.counted]
 
-        def _sum(attr):
+        def _sum(attr: str) -> int:
             return sum((getattr(r, attr) for r in results)) or 0
 
         result = Bunch(
