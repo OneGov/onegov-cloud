@@ -550,7 +550,7 @@ class OccurrenceCollection(Pagination):
         return etree.tostring(root, encoding='utf-8', xml_declaration=True,
                               pretty_print=True)
 
-    def as_anthrazit_xml(self, future_events_only=True):
+    def as_anthrazit_xml(self, request, future_events_only=True):
         """
         Returns all published occurrences as xml for Winterthur.
         Anthrazit format according
@@ -633,7 +633,9 @@ class OccurrenceCollection(Pagination):
             event.append(termin)
             event.append(text_tag(e.description))
             if e.external_event_url:
-                event.urlweb = e.external_event_url
+                event.url_web = e.external_event_url
+            if e.image:
+                event.url_bild = request.link(e.image)
 
             hr_text = ''
             tags = []

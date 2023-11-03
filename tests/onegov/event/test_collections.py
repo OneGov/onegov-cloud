@@ -1417,7 +1417,8 @@ def test_from_ical(session):
 def test_as_anthrazit_xml(session):
 
     def as_anthrazit(occurrences):
-        result = occurrences.as_anthrazit_xml(future_events_only=False)
+        result = occurrences.as_anthrazit_xml(DummyRequest(),
+            future_events_only=False)
         result = result.decode().strip().splitlines()
         return result
 
@@ -1455,7 +1456,7 @@ def test_as_anthrazit_xml(session):
             },
             location='Squirrel Park',
             tags=['history'],
-            coordinates=Coordinates(47.051752750515746, 8.305739625357093)
+            # coordinates=Coordinates(47.051752750515746, 8.305739625357093)
         )
         event.submit()
         event.publish()
@@ -1463,7 +1464,8 @@ def test_as_anthrazit_xml(session):
         session.flush()
 
     occurrences = OccurrenceCollection(session)
-    xml = occurrences.as_anthrazit_xml(future_events_only=False)
+    xml = occurrences.as_anthrazit_xml(DummyRequest(),
+                                       future_events_only=False)
 
     import xml.etree.ElementTree as ET
 
