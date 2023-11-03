@@ -1488,7 +1488,7 @@
             </ul>
         </tal:b>
         <tal:b tal:case="True">
-                <tal:b define="tags_start tags[:6]; tags_rest tags[6:]">
+                <tal:b define="tags_start tags[:12]; tags_rest tags[12:]">
                 <ul class="tags">
                     <li tal:repeat="link tags_start" class="click-through">
                         <span tal:content="structure link(layout)"
