@@ -1512,5 +1512,7 @@ def test_as_anthrazit_xml(session):
         assert rubrik.text in ['fun', 'animals']
     assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
                                                                     'Park')
+    assert root[0].find('veranstaltungsort').find('longitude').text == '8.305739625357093'
+    assert root[0].find('veranstaltungsort').find('latitude').text == '47.051752750515746'
 
     # assert root[1].find('titel').text == 'History Squirrel Park Visit'
