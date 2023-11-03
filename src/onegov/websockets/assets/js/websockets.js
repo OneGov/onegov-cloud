@@ -6,6 +6,7 @@ var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError, 
             schema: schema,
             channel: channel
         };
+        console.log(payload)
         websocket.send(JSON.stringify(payload));
     });
     websocket.addEventListener('message', function(message) {

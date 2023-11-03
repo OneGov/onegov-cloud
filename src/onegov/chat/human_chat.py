@@ -10,6 +10,7 @@ async def handle_chat(websocket, payload):
     Handle chat server handler.
     """
     log.debug(f"Listening for chat messages for user: {websocket.id}")
+    log.debug(payload)
 
     while True:
         message = await websocket.recv()

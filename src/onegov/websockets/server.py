@@ -83,6 +83,7 @@ async def handle_listen(
 
     schema_channel = f'{schema}-{channel}' if channel else schema
     log.debug(f'{websocket.id} listens @ {schema_channel}')
+    log.debug(payload)
     connections = CONNECTIONS.setdefault(schema_channel, set())
     connections.add(websocket)
     try:
@@ -204,7 +205,7 @@ async def handle_manage(
 async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
-    payload = get_payload(message, ('authenticate', 'register'))
+    payload = get_payload(message, ('authenticate', 'register', 'chat'))
     if payload and payload['type'] == 'authenticate':
         await handle_manage(websocket, payload)
     elif payload and payload['type'] == 'register':
@@ -214,6 +215,7 @@ async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
     else:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
+    log.debug(payload)
     log.debug(f'{websocket.id} disconnected')
 
 
