@@ -344,21 +344,6 @@ def json_export_occurences(self, request):
     ]
 
 
-@OrgApp.view(model=OccurrenceCollection, name='xml', permission=Public)
-def xml_export_all_occurrences(self, request):
-    """
-    Returns events as xml.
-    Url for xml view: ../events/xml
-
-    """
-    collection = OccurrenceCollection(request.session)
-    return Response(
-        collection.as_xml(),
-        content_type='text/xml',
-        content_disposition='inline; filename=occurrences.xml'
-    )
-
-
 @OrgApp.form(
     model=OccurrenceCollection,
     name='import',
