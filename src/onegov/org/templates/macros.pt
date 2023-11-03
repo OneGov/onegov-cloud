@@ -1477,7 +1477,7 @@
 </metal:tags>
 
 <metal:tags_collapsed i18n:domain="onegov.org" define-macro="tags_collapsed">
-    <tal:b tal:switch="len(tags) >= 9">
+    <tal:b tal:switch="len(tags) >= 15">
         <tal:b tal:case="False">
             <ul class="tags">
                 <li tal:repeat="link tags" class="click-through">
