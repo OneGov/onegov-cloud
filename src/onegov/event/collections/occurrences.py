@@ -656,9 +656,6 @@ class OccurrenceCollection(Pagination):
 
             ort = objectify.Element('veranstaltungsort')
             ort.titel = e.location
-            ort.adresse = ''
-            ort.plz = ''
-            ort.ort = ''
             event.append(ort)
             root.append(event)
 
