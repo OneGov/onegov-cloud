@@ -273,10 +273,11 @@ class EventForm(Form):
             if self.custom_tags():
                 self.tags.choices = [(tags, tags) for tags in
                                      self.custom_tags()]
-
-            for include in self.on_request_include:
-                self.request.include(include)
             self.sort_tags()
+
+        # load web assets for event form
+        for include in self.on_request_include:
+            self.request.include(include)
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
