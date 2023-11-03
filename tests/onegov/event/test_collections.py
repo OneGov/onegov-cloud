@@ -1470,14 +1470,6 @@ def test_as_anthrazit_xml(session):
     root = ET.fromstring(xml)
     # assert len(root) == 2
 
-    for event in root.findall('item'):
-        print(event.find('title').text)
-
-    assert root[0].find('id').text
-    assert root[0].find('title').text == 'Squirrel Park Visit'
-    assert (root[0].find('textmobile').text == '<em>Furry</em> things will '
-                                               'happen!')
-    dates = root[0].findall('termin')
     expected_dates_start = [
         '2023-04-10 09:30:00+00:00',
         '2023-04-11 09:30:00+00:00',
@@ -1504,6 +1496,13 @@ def test_as_anthrazit_xml(session):
         '2023-04-19 18:00:00+00:00',
         '2023-04-20 18:00:00+00:00',
     ]
+    # for event in root.findall('item'):
+    #     print(event.find('titel').text)
+    assert root[0].find('id').text
+    assert root[0].find('titel').text == 'Squirrel Park Visit'
+    assert (root[0].find('textmobile').text == '<em>Furry</em> things will '
+                                               'happen!')
+    dates = root[0].findall('termin')
     for d in dates:
         assert d.find('von').text in expected_dates_start
         assert d.find('bis').text in expected_dates_end
@@ -1511,7 +1510,7 @@ def test_as_anthrazit_xml(session):
     # assert root[0].find('hauptrubrik').attrib['name] == ''
     for rubrik in root[0].find('hauptrubrik').findall('rubrik'):
         assert rubrik.text in ['fun', 'animals']
-    assert root[0].find('veranstaltungsort').find('title').text == ('Squirrel '
+    assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
                                                                     'Park')
 
-    # assert root[1].find('title').text == 'History Squirrel Park Visit'
+    # assert root[1].find('titel').text == 'History Squirrel Park Visit'

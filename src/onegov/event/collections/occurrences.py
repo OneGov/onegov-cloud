@@ -618,7 +618,7 @@ class OccurrenceCollection(Pagination):
                 }
             )
             event.id = e.id
-            event.title = e.title
+            event.titel = e.title
             if len(e.description) > 100:
                 event.textmobile = e.description[:100] + '..'
             else:
@@ -655,7 +655,7 @@ class OccurrenceCollection(Pagination):
             event.append(hr)
 
             ort = objectify.Element('veranstaltungsort')
-            ort.title = e.location
+            ort.titel = e.location
             ort.adresse = ''
             ort.plz = ''
             ort.ort = ''
