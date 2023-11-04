@@ -7,7 +7,7 @@
         <div class="grid-x chat">
             <div class="medium-7 cell">
                 <div id="message-area" data-customer-name="${customer_name}">
-                    <div class="card staff">
+                    <div class="card left">
                         <p class="info">N. Stocker</p>
                         <div class="card-section">
                             <p>Guten Tag<br/>
@@ -15,20 +15,20 @@
                         </div>
                         <p class="info">12:03</p>
                     </div>
-                    <div class="card customer">
+                    <div class="card right">
                         <div class="card-section">
                             <p>Ich habe ein Problem mit XYZ. Wie kann ich das erreichen?</p>
                         </div>
                         <p class="info">12:04</p>
                     </div>
-                    <div class="card staff">
+                    <div class="card left">
                         <p class="info">N. Stocker</p>
                         <div class="card-section">
                             <p>Ich werde das gleich abklären. Einen Moment bitte.</p>
                         </div>
                         <p class="info">12:04</p>
                     </div>
-                    <div class="card customer">
+                    <div class="card right">
                         <div class="card-section">
                             <p>Danke.</p>
                         </div>

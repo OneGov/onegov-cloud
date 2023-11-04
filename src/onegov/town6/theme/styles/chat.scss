@@ -28,7 +28,7 @@
             text-align: right;
         }
 
-        &.customer {
+        &.right {
             place-self: end;
 
             .card-section {
@@ -37,7 +37,7 @@
             }
         }
 
-        &.staff {
+        &.left {
             place-self: start;
 
             .card-section {
