@@ -6,7 +6,7 @@
 
         <div class="grid-x chat">
             <div class="medium-7 cell">
-                <div class="message-area">
+                <div id="message-area">
                     <div class="card staff">
                         <p class="info">N. Stocker</p>
                         <div class="card-section">

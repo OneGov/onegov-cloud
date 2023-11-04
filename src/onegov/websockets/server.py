@@ -233,6 +233,7 @@ async def handle_chat(websocket, payload):
         for client in connections:
             await client.send(dumps({
                 'type': "notification",
+                'message': message,
                 'schema': payload['schema'],
                 'channel': payload['channel']
             }))
