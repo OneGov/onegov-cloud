@@ -2,10 +2,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
 
-
-    console.log(endpoint)
-    console.log(schema)
-
     function onWebsocketNotification(message, _websocket) {
         console.log('Ich ha öpis becho!')
         console.log(message)
@@ -26,12 +22,8 @@ document.addEventListener("DOMContentLoaded", function() {
             'chat'
         );
 
-        window.socket = socket
-
         document.getElementById("send").addEventListener("click", () => {
-
             const chatWindow = document.getElementById("chat");
-
             now = new Date().toUTCString()
 
             const payload = JSON.stringify({

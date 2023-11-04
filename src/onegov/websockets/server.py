@@ -4,7 +4,6 @@ from json import loads
 from onegov.websockets import log
 from websockets.legacy.protocol import broadcast
 from websockets.legacy.server import serve
-from onegov.chat.human_chat import handle_chat
 
 
 from typing import TYPE_CHECKING
@@ -16,6 +15,7 @@ if TYPE_CHECKING:
 
 
 CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
+CHAT_CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
 TOKEN = ''  # nosec: B105
 
 
@@ -83,7 +83,6 @@ async def handle_listen(
 
     schema_channel = f'{schema}-{channel}' if channel else schema
     log.debug(f'{websocket.id} listens @ {schema_channel}')
-    log.debug(payload)
     connections = CONNECTIONS.setdefault(schema_channel, set())
     connections.add(websocket)
     try:
@@ -173,6 +172,7 @@ async def handle_broadcast(
                 'message': message
             })
         )
+        log.debug('es hed immerhin en Broadcast gä')
 
     log.debug(
         f'{websocket.id} sent {message}'
@@ -202,10 +202,54 @@ async def handle_manage(
             )
 
 
+async def handle_chat(websocket, payload):
+    """
+    Starts a chat.
+    """
+    log.debug(f"Listening for chat messages for user: {websocket.id}")
+
+    assert payload.get('type') == 'chat'
+
+    schema = payload.get('schema')
+    if not schema or not isinstance(schema, str):
+        await error(websocket, f'invalid schema: {schema}')
+        return
+
+    channel = payload.get('channel')
+    if channel is not None and not isinstance(channel, str):
+        await error(websocket, f'invalid channel: {channel}')
+        return
+
+    await acknowledge(websocket)
+
+    schema_channel = f'{schema}-{channel}' if channel else schema
+    log.debug(f'{websocket.id} listens for chat @ {schema_channel}')
+    connections = CHAT_CONNECTIONS.setdefault(schema_channel, set())
+    connections.add(websocket)
+
+    while True:
+        message = await websocket.recv()
+        print(f'I got the message {message}')
+        for client in connections:
+            await client.send(dumps({
+                'type': "notification",
+                'schema': payload['schema'],
+                'channel': payload['channel']
+            }))
+
+    # try:
+    #     await websocket.wait_closed()
+    # finally:
+    #     connections = CHAT_CONNECTIONS.setdefault(schema_channel, set())
+    #     if websocket in connections:
+    #         connections.remove(websocket)
+
+
 async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
-    payload = get_payload(message, ('authenticate', 'register', 'chat'))
+    payload = get_payload(message, ('authenticate', 'register', 'chat',
+                                    'message'))
     if payload and payload['type'] == 'authenticate':
         await handle_manage(websocket, payload)
     elif payload and payload['type'] == 'register':
@@ -215,7 +259,6 @@ async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
     else:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
-    log.debug(payload)
     log.debug(f'{websocket.id} disconnected')
 
 

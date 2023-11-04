@@ -235,6 +235,11 @@ def get_fullcalendar_asset():
     yield 'reservationcalendar_custom.js'
 
 
-@TownApp.webasset('chat')
-def get_chat_asset():
-    yield 'chat.js'
+@TownApp.webasset('staff-chat')
+def get_staff_chat_asset():
+    yield 'chat-staff.js'
+
+
+@TownApp.webasset('client-chat')
+def get_staff_client_asset():
+    yield 'chat-client.js'

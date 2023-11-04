@@ -5,7 +5,7 @@ from morepath import redirect
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.chat.forms import ChatInitiationForm
-from onegov.town6.layout import ChatLayout
+from onegov.town6.layout import StaffChatLayout, ClientChatLayout
 from webob.exc import HTTPForbidden
 
 
@@ -17,7 +17,7 @@ def view_chats_staff(self, request):
 
     return {
         'title': 'Chat Staff',
-        'layout': ChatLayout(self, request),
+        'layout': StaffChatLayout(self, request),
     }
 
 
@@ -43,14 +43,14 @@ def view_chat_form(self:ChatCollection, request, form):
 
     return {
         'title': 'Chat Customer',
-        'layout': ChatLayout(self, request),
+        'layout': ClientChatLayout(self, request),
         'form': form
     }
 
 
 @TownApp.html(
     model=Chat,
-    template='chats_customer.pt',
+    template='chat_customer.pt',
     permission=Public,)
 def view_customer_chat(self, request):
 
@@ -60,5 +60,6 @@ def view_customer_chat(self, request):
 
     return {
         'title': 'Chat Customer',
-        'layout': ChatLayout(self, request),
+        'layout': ClientChatLayout(self, request),
+        'customer_name': self.customer_name
     }
