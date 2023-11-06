@@ -517,30 +517,30 @@ class OccurrenceCollection(Pagination):
 
         query = self.session.query(Occurrence)
         for occ in query:
-            occ = (self.session.query(Event).
+            e = (self.session.query(Event).
                    filter(Event.id == occ.event_id).first())
 
-            if occ.state != 'published':
+            if e.state != 'published':
                 continue
             if future_events_only and datetime.fromisoformat(str(
                     occ.end)).date() < datetime.today().date():
                 continue
 
             event = objectify.Element('event')
-            event.id = occ.id
-            event.title = occ.title
-            txs = tags(occ.tags)
+            event.id = e.id
+            event.title = e.title
+            txs = tags(e.tags)
             event.append(txs)
-            event.description = occ.description
-            event.start = occ.start
-            event.end = occ.end
-            event.location = occ.location
-            event.price = occ.price
-            event.organizer = occ.organizer
-            event.event_url = occ.external_event_url
-            event.organizer_email = occ.organizer_email
-            event.organizer_phone = occ.organizer_phone
-            event.modified = occ.last_change
+            event.description = e.description
+            event.start = e.start
+            event.end = e.end
+            event.location = e.location
+            event.price = e.price
+            event.organizer = e.organizer
+            event.event_url = e.external_event_url
+            event.organizer_email = e.organizer_email
+            event.organizer_phone = e.organizer_phone
+            event.modified = e.last_change
             root.append(event)
 
         # remove lxml annotations
