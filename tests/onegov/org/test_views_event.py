@@ -147,7 +147,7 @@ def test_view_occurrences(client):
     assert len(as_json('max=1&cat1=Politics&cat1=Party')) == 1
 
     # Test xml
-    assert len(as_xml()) == 4  # 4 events, 12 occurrences
+    assert len(as_xml()) == 12
     assert list(as_xml()[0].keys()) == ['id', 'title', 'tags', 'description',
                                         'start', 'end', 'location', 'price',
                                         'organizer', 'event_url',
