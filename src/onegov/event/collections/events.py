@@ -508,23 +508,29 @@ class EventCollection(Pagination):
             <item status="1" suchbar="1" mutationsdatum="2023-08-18 08:23:30">
                 <id>01</id>
                 <titel>Titel der Seite</titel>
-                <textmobile>2-3 Sätze des Text Feldes</textmobile>
+                <textmobile>2-3 Sätze des Text Feldes packed in
+                CDATA</textmobile>
+                <text>Beschreibung packed in CDATA</text>
                 <termin allday="1">
                     <von>2011-08-06 00:00:00</von>
                     <bis>2011-08-06 23:59:00</bis>
                 </termin>
-                <text>Beschreibung</text>
-                <urlweb>url</urlweb>
+                <termin>
+                    ...
+                </termin>
+                <url_web>url</url_web>
+                <url_bild>bild</url_bild>
                 <hauptrubrik name="Naturmusuem">
                     <rubrik>tag_1</rubrik>
                     <rubrik>tag_2</rubrik>
                 </hauptrubrik>
-                <keyword>Naturmusuem tag_1 tag_2</keyword>
+                <email></email>
+                <telefon1></telefon1>
+                <sf01>Veranstaltungspreis packed in CDATA</sf01>
                 <veranstaltungsort>
                     <title></title>
-                    <adresse></adresse>
-                    <plz></plz>
-                    <ort></ort>
+                    <longitude></longitude>
+                    <latitude></latitude>
                 </veranstaltungsort>
                 ...
             </item>
