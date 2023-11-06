@@ -518,7 +518,7 @@ class OccurrenceCollection(Pagination):
         query = self.session.query(Occurrence)
         for occ in query:
             e = (self.session.query(Event).
-                   filter(Event.id == occ.event_id).first())
+                 filter(Event.id == occ.event_id).first())
 
             if e.state != 'published':
                 continue
