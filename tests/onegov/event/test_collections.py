@@ -1415,7 +1415,6 @@ def test_from_ical(session):
 
 
 def test_as_anthrazit_xml(session):
-
     def as_anthrazit(occurrences):
         result = occurrences.as_anthrazit_xml(DummyRequest(),
                                               future_events_only=False)
@@ -1428,13 +1427,13 @@ def test_as_anthrazit_xml(session):
             title='Squirrel Park Visit',
             start=datetime(2023, 4, 10, 9, 30),
             end=datetime(2023, 4, 10, 18, 00),
-            # timezone='UTC',
             timezone='Europe/Zurich',
             content={
                 'description': '<em>Furry</em> things will happen!'
             },
             location='Squirrel Park',
             tags=['fun', 'animals'],
+            filter_keywords=dict(EventType='Park'),
             recurrence=(
                 'RRULE:FREQ=WEEKLY;'
                 'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
@@ -1451,14 +1450,13 @@ def test_as_anthrazit_xml(session):
             title='History of the Squirrel Park',
             start=datetime(2023, 4, 18, 14, 00),
             end=datetime(2023, 4, 18, 16, 00),
-            # timezone='UTC',
             timezone='Europe/Zurich',
             content={
                 'description': 'Learn how the Park got so <em>furry</em>!'
             },
             location='Squirrel Park',
             tags=['history'],
-            # coordinates=Coordinates(47.051752750515746, 8.305739625357093)
+            filter_keywords=dict(kalender='Park Calendar'),
         )
         event.submit()
         event.publish()
@@ -1473,8 +1471,9 @@ def test_as_anthrazit_xml(session):
     import xml.etree.ElementTree as ET
 
     root = ET.fromstring(xml)
-    # assert len(root) == 2
+    assert len(root) == 2
 
+    # park opening
     expected_dates_start = [
         '2023-04-10 09:30:00+02:00',
         '2023-04-11 09:30:00+02:00',
@@ -1501,8 +1500,6 @@ def test_as_anthrazit_xml(session):
         '2023-04-19 18:00:00+02:00',
         '2023-04-20 18:00:00+02:00',
     ]
-    # for event in root.findall('item'):
-    #     print(event.find('titel').text)
     assert root[0].find('id').text
     assert root[0].find('titel').text == 'Squirrel Park Visit'
     assert (root[0].find('textmobile').text == '<![CDATA[<em>Furry</em> '
@@ -1513,16 +1510,36 @@ def test_as_anthrazit_xml(session):
         assert d.find('bis').text in expected_dates_end
     assert (root[0].find('text').text == '<![CDATA[<em>Furry</em> '
                                          'things will happen!]]>')
-    # assert root[0].find('hauptrubrik').attrib['name] == ''
+    assert root[0].find('hauptrubrik').attrib == {}
     for rubrik in root[0].find('hauptrubrik').findall('rubrik'):
-        assert rubrik.text in ['fun', 'animals']
+        assert rubrik.text.lower() in ['fun', 'animals', 'park']
     assert root[0].find('email').text == 'info@squirrelpark.com'
     assert root[0].find('telefon1').text == '+1 123 456 7788'
     assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
                                                                     'Park')
-    assert (root[0].find('veranstaltungsort').
-           find('longitude').text == '8.305739625357093')
-    assert (root[0].find('veranstaltungsort').
-           find('latitude').text == '47.051752750515746')
+    assert (root[0].find('veranstaltungsort').find('longitude').
+            text == '8.305739625357093')
+    assert (root[0].find('veranstaltungsort').find('latitude').
+            text == '47.051752750515746')
 
-    # assert root[1].find('titel').text == 'History Squirrel Park Visit'
+    # history event
+    assert root[1].find('id').text
+    assert root[1].find('titel').text == 'History of the Squirrel Park'
+    assert (root[1].find('textmobile').text == '<![CDATA[Learn how the Park '
+                                               'got so <em>furry</em>!]]>')
+    assert (root[1].find('termin').find('von').
+            text == '2023-04-18 14:00:00+02:00')
+    assert (root[1].find('termin').find('bis').
+            text == '2023-04-18 16:00:00+02:00')
+    assert (root[1].find('text').text == '<![CDATA[Learn how the Park '
+                                         'got so <em>furry</em>!]]>')
+    # test special case 'kalender'
+    assert root[1].find('hauptrubrik').attrib['name'] == 'Park Calendar'
+    for rubrik in root[1].find('hauptrubrik').findall('rubrik'):
+        assert rubrik.text in ['history']
+    assert root[1].find('email') is None
+    assert root[1].find('telefon1') is None
+    assert root[1].find('veranstaltungsort').find('titel').text == ('Squirrel '
+                                                                    'Park')
+    assert root[1].find('veranstaltungsort').find('longitude') is None
+    assert root[1].find('veranstaltungsort').find('latitude') is None
