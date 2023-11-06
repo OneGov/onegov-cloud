@@ -41,8 +41,8 @@ class VotumForm(NamedFileForm):
         fieldset=_('Person'),
         label=_('Person from person directory'),
         description=_('Choosing a person will overwrite the fields below'),
-        default="what",
-        choices=[]
+        default=', , , ',
+        choices=[(', , , ', '...')]
     )
 
     person_name = TypeAheadField(
