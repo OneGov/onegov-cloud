@@ -244,6 +244,10 @@ def test_many_filters(client):
             [ ] Ballett
             [ ] Baseball
             [ ] Basketball
+            [ ] Bouldering
+            [ ] Karate
+            [ ] Ski
+            [ ] Yoga
     """
     page.form['keyword_fields'].value = 'weitere_filter'
     page.form.submit()
@@ -253,7 +257,7 @@ def test_many_filters(client):
 
     event = events.click("Generalversammlung")
     form = event.click("Bearbeiten")
-    for i in range(0, 9):
+    for i in range(0, 15):
         form.form.set('weitere_filter', True, index=i)
     form.form.submit()
 
