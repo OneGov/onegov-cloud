@@ -565,10 +565,12 @@ class EventCollection(Pagination):
             )
             event.id = e.id
             event.titel = e.title
-            if len(e.description) > 100:
-                event.textmobile = cdata.format(e.description[:100] + '..')
-            else:
-                event.textmobile = cdata.format(e.description)
+            if e.description:
+                if len(e.description) > 100:
+                    event.textmobile = cdata.format(e.description[:100] + '..')
+                else:
+                    event.textmobile = cdata.format(e.description)
+                event.append(text_tag(cdata.format(e.description)))
             for occ in e.occurrences:
                 termin = objectify.Element('termin')
                 termin.von = occ.localized_start
@@ -578,7 +580,6 @@ class EventCollection(Pagination):
             if e.price:
                 event.sf01 = cdata.format(e.price)
 
-            event.append(text_tag(cdata.format(e.description)))
             if e.external_event_url:
                 event.url_web = e.external_event_url
             if e.image:
