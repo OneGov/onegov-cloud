@@ -569,14 +569,19 @@
 </metal:newsletter>
 
 <metal:access_hint define-macro="access_hint" i18n:domain="onegov.town6">
-    <tal:b condition="item.access == 'private'|False">
-        <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
-    </tal:b>
-    <tal:b condition="item.access == 'member'|False">
-        <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
-    </tal:b>
-    <tal:b condition="item.access == 'secret'|False">
-        <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
+    <tal:b tal:switch="item.access|False">
+        <tal:b case="'private'">
+            <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
+        </tal:b>
+        <tal:b case="'member'">
+            <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
+        </tal:b>
+        <tal:b case="'mtan'">
+            <i title="This site is public but requires submitting an mTAN" i18n:attributes="title" class="mtan-hint"></i>
+        </tal:b>
+        <tal:b case="'secret'">
+            <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
+        </tal:b>
     </tal:b>
 </metal:access_hint>
 
@@ -1206,9 +1211,9 @@
             <dd>
                 <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
-                        <span i18n:translate>${filter[0].title()}:</span>
-                        <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
-                        <span tal:condition="not isinstance(filter[1], list) and filter[1]" i18n:translate>${filter[1]}</span>
+                        <span>${filter[0].title()}:</span>
+                        <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)">${tags}</span>
+                        <span tal:condition="not isinstance(filter[1], list) and filter[1]">${filter[1]}</span>
                     </li>
                 </ul>
             </dd>

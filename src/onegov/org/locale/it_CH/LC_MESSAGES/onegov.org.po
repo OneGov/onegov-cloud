@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-25 08:37+0200\n"
+"POT-Creation-Date: 2023-10-24 13:52+0200\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -12,6 +12,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 3.0.1\n"
+
+#, python-format
+msgid ""
+"mTAN for ${organisation}:\n"
+"\n"
+"${mtan}\n"
+"\n"
+"Or continue where you left off using this link: ${url}"
+msgstr ""
+"mTAN per ${organisation}:\n"
+"\n"
+"${mtan}\n"
+"\n"
+"Oppure continuate da dove avevate interrotto, usando questo link: ${url}"
+
+msgid ""
+"We sent an mTAN to the specified number. Please enter it below or follow the "
+"instructions in the SMS."
+msgstr ""
+"Abbiamo inviato un mTAN al numero indicato. Inseritelo nello spazio "
+"sottostante o seguite le istruzioni dell'SMS."
 
 msgid "Open"
 msgstr "Aperto"
@@ -973,6 +994,12 @@ msgstr "Disposizione a griglia"
 msgid "Show images on homepage"
 msgstr "Mostra le immagini sulla pagina principale"
 
+msgid "mTAN"
+msgstr "mTAN"
+
+msgid "Phone number"
+msgstr "Numero di telefono"
+
 msgid "Used in the overview and the e-mail subject"
 msgstr "Utilizzato nella panoramica e nell'oggetto dell'e-mail"
 
@@ -1529,6 +1556,29 @@ msgstr "Filtri configurabili manualmente"
 msgid "Both, predefined tags as well as configurable filters"
 msgstr "Entrambi, tag predefiniti e filtri configurabili"
 
+msgid "Duration of mTAN session"
+msgstr "Durata della sessione mTAN"
+
+msgid "Specify in number of seconds"
+msgstr "Indicate il numero di secondi"
+
+msgid "mTAN Access"
+msgstr "Accesso mTAN"
+
+msgid ""
+"Prevent further accesses to protected resources after this many have been "
+"accessed"
+msgstr ""
+"Impedite ulteriori accessi alle risorse protette dopo che ne sono stati "
+"effettuati molti"
+
+msgid "Leave empty to disable limiting requests"
+msgstr "Lasciate vuoto per disabilitare la limitazione delle richieste"
+
+msgid "Prevent further accesses to protected resources in this time frame"
+msgstr ""
+"Impedite ulteriori accessi alle risorse protette in questo lasso di tempo."
+
 msgid "The default map view. This should show the whole town"
 msgstr ""
 "La visualizzazione predefinita della mappa. Questo dovrebbe mostrare "
@@ -1706,6 +1756,12 @@ msgstr "Invia il tuo evento"
 msgid "Enables website visitors to submit their own events"
 msgstr "Consente ai visitatori del sito web di presentare i propri eventi"
 
+msgid "Duration from opening a ticket to its automatic archival"
+msgstr "Durata dall'apertura di un ticket alla sua archiviazione automatica"
+
+msgid "Duration from archived state until deleted automatically"
+msgstr "Durata dello stato di archiviazione fino alla cancellazione automatica"
+
 msgid "E-Mail Address"
 msgstr "Indirizzo e-mail"
 
@@ -1810,6 +1866,21 @@ msgstr "Mensile (il primo lunedì del mese)"
 
 msgid "Never"
 msgstr "Mai"
+
+msgid "Disabled"
+msgstr "Disattivato"
+
+msgid "6 months"
+msgstr "6 mesi"
+
+msgid "1 year"
+msgstr "1 anno"
+
+msgid "2 years"
+msgstr "2 anni"
+
+msgid "3 years"
+msgstr "3 anni"
 
 msgid "Linked file"
 msgstr "File collegato"
@@ -1948,6 +2019,12 @@ msgstr "Vuoi davvero eliminare questa persona?"
 msgid "Delete person"
 msgstr "Elimina persona"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 
@@ -1970,6 +2047,9 @@ msgstr "Archivia il biglietto"
 
 msgid "Recover from archive"
 msgstr "Recupera dall'archivio"
+
+msgid "Delete Ticket"
+msgstr "Cancella biglietto"
 
 msgid "Assign ticket"
 msgstr "Assegna il biglietto"
@@ -2221,6 +2301,9 @@ msgstr "L'invio della cartella è stato rifiutato"
 
 msgid "Through URL only (not listed)"
 msgstr "Solo tramite URL (non elencato)"
+
+msgid "Only by privileged users or after submitting a mTAN"
+msgstr "Solo da utenti autorizzati o dopo l'invio di un mTAN."
 
 msgid "Members may view occupancy"
 msgstr "I membri possono visualizzare l'occupazione"
@@ -2528,8 +2611,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#. Used in sentence: "${event} published."
 #.
+#. Used in sentence: "${event} published."
 msgid "Event"
 msgstr "Evento"
 
@@ -2957,6 +3040,9 @@ msgstr "Tutte le notizie"
 
 msgid "This site is private but can also be seen by members"
 msgstr "Questo sito è privato ma può essere visto dai membri"
+
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Questo sito è pubblico ma richiede l'invio di un mTAN"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
@@ -4332,6 +4418,27 @@ msgstr ""
 "Il collegamento per reimpostare il nome utente o la password errati non è "
 "più valido."
 
+msgid "Enter mTAN"
+msgstr "Immettre mTAN"
+
+msgid ""
+"The requested resource is protected. To obtain time-limited access, please "
+"enter your mobile phone number in the field below. You will receive an mTAN "
+"via SMS, which will grant you access after correct entry."
+msgstr ""
+"La risorsa richiesta è protetta. Per ottenere un accesso a tempo limitato, "
+"inserite il vostro numero di cellulare nel campo sottostante. Riceverete un "
+"mTAN via SMS, che vi consentirà l'accesso dopo il suo corretto inserimento."
+
+msgid "Request mTAN"
+msgstr "Richiesta mTAN"
+
+msgid "Successfully authenticated via mTAN."
+msgstr "Autenticazione tramite mTAN riuscita."
+
+msgid "Invalid or expired mTAN provided."
+msgstr "È stato fornito un mTAN non valido o scaduto."
+
 msgid "A link was added to the clipboard"
 msgstr "È stato aggiunto un collegamento agli appunti"
 
@@ -5170,6 +5277,16 @@ msgstr "Questa azione non può essere annullata."
 msgid "ApiKey deleted."
 msgstr "Chiave API eliminata."
 
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."
+
 msgid "Topics"
 msgstr "Argomenti"
 
@@ -5201,9 +5318,6 @@ msgstr "Modifica modulo di testo"
 
 msgid "The text module was deleted"
 msgstr "Il modulo di testo è stato eliminato"
-
-msgid "Delete Ticket"
-msgstr "Cancella biglietto"
 
 msgid "This ticket is not deletable."
 msgstr "Questo biglietto non è cancellabile."
@@ -5371,6 +5485,16 @@ msgstr "Tutti i biglietti"
 msgid "All Users"
 msgstr "Tutti gli utenti"
 
+#, python-format
+msgid "${success_count} tickets deleted, ${error_count} are not deletable"
+msgstr ""
+"I biglietti ${success_count} cancellati, ${error_count} non sono "
+"completamente cancellabili, ma i dati sono stati resi irriconoscibili."
+
+#, python-format
+msgid "${success_count} tickets deleted."
+msgstr "${success_count} biglietti eliminati."
+
 msgid "Submitted Requests"
 msgstr "Richieste inoltrate"
 
@@ -5401,6 +5525,6 @@ msgstr "È stato creato un account per te"
 msgid "The user was created successfully"
 msgstr "Utente creato correttamente"
 
-#~ msgid "Keep header links fixed to top on scrolling"
-#~ msgstr ""
-#~ "Mantenere i link dell'intestazione fissi in alto durante lo scorrimento"
+#, python-format
+#~ msgid "{success_count} tickets deleted."
+#~ msgstr "{success_count} biglietti cancellati."

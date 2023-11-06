@@ -1,6 +1,7 @@
 from onegov.ballot.models.party_result.party_panachage_result import (
     PartyPanachageResult)
 from onegov.ballot.models.party_result.party_result import PartyResult
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy import or_
 
@@ -8,7 +9,6 @@ from sqlalchemy import or_
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import datetime
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.types import AppenderQuery
     from sqlalchemy import Column
     from sqlalchemy.orm import relationship, Query
@@ -19,30 +19,30 @@ if TYPE_CHECKING:
 class PartyResultsOptionsMixin:
 
     #: Display voters counts instead of votes in views.
-    voters_counts: 'dict_property[bool]' = meta_property(default=False)
+    voters_counts: dict_property[bool] = meta_property(default=False)
 
     #: Display exact voters counts instead of rounded values.
-    exact_voters_counts: 'dict_property[bool]' = meta_property(default=False)
+    exact_voters_counts: dict_property[bool] = meta_property(default=False)
 
     #: may be used to enable/disable the visibility of party strengths
-    show_party_strengths: 'dict_property[bool]' = meta_property(default=False)
+    show_party_strengths: dict_property[bool] = meta_property(default=False)
 
     #: show a horizontal party strengths bar chart instead of a vertical
-    horizontal_party_strengths: 'dict_property[bool]' = meta_property(
+    horizontal_party_strengths: dict_property[bool] = meta_property(
         default=False
     )
 
     #: may be used to enable/disable the visibility of party panachage
-    show_party_panachage: 'dict_property[bool]' = meta_property(default=False)
+    show_party_panachage: dict_property[bool] = meta_property(default=False)
 
     #: may be used to enable/disable the visibility of the seat allocation
-    show_seat_allocation: 'dict_property[bool]' = meta_property(default=False)
+    show_seat_allocation: dict_property[bool] = meta_property(default=False)
 
     #: may be used to enable/disable the visibility of the list groups
-    show_list_groups: 'dict_property[bool]' = meta_property(default=False)
+    show_list_groups: dict_property[bool] = meta_property(default=False)
 
     #: may be used to enable fetching party results from previous elections
-    use_historical_party_results: 'dict_property[bool]' = meta_property(
+    use_historical_party_results: dict_property[bool] = meta_property(
         default=False
     )
 

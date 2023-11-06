@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-09-24 23:11+0200\n"
+"POT-Creation-Date: 2023-10-24 13:57+0200\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -180,6 +180,12 @@ msgstr "Elimina persona"
 msgid "Tickets"
 msgstr "Biglietti"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 
@@ -205,6 +211,9 @@ msgstr "Archivia il biglietto"
 
 msgid "Recover from archive"
 msgstr "Recupera dall'archivio"
+
+msgid "Delete Ticket"
+msgstr "Cancella biglietto"
 
 msgid "New Note"
 msgstr "Nuova nota"
@@ -752,6 +761,9 @@ msgstr "Questo sito è privato"
 msgid "This site is private but can also be seen by members"
 msgstr "Questo sito è privato ma può essere visto dai membri"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Questo sito è pubblico ma richiede l'invio di un mTAN"
+
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
 
@@ -955,6 +967,9 @@ msgstr ""
 "Questo spazio contiene le immagini dei tuoi album fotografici. Per mostrare "
 "le foto, aggiungi alcune foto a un album e contrassegnalo come disponibile "
 "per la home page."
+
+msgid "Current Image"
+msgstr "Immagine attuale"
 
 msgid "Has a digital seal"
 msgstr "Ha un sigillo digitale"
@@ -2142,8 +2157,12 @@ msgstr "Migrazione dei link"
 msgid "OneGov API"
 msgstr "API OneGov"
 
-#~ msgid "Straight to ..."
-#~ msgstr "Direttamente a ..."
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
 
-#~ msgid "Perform Search"
-#~ msgstr "Ricerca"
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."

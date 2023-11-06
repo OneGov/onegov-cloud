@@ -1,7 +1,6 @@
 import os
 import transaction
-
-from datetime import datetime
+from datetime import datetime, timedelta
 from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.org.models.resource import RoomResource
@@ -695,3 +694,84 @@ def test_send_scheduled_newsletters(org_app):
         newsletter = newsletters.query().one()
         assert not newsletter.scheduled
         assert len(os.listdir(client.app.maildir)) == 1
+
+
+def test_auto_archive_tickets_and_delete(org_app, handlers):
+    register_echo_handler(handlers)
+
+    session = org_app.session()
+    transaction.begin()
+
+    with freeze_time('2022-10-17 04:30'):
+        one_month_ago = utcnow() - timedelta(days=30)
+
+        collection = TicketCollection(session)
+
+        tickets = [
+            collection.open_ticket(
+                handler_id='1',
+                handler_code='EHO',
+                title="Title",
+                group="Group",
+                email="citizen@example.org",
+                created=one_month_ago,
+            ),
+            collection.open_ticket(
+                handler_id='2',
+                handler_code='EHO',
+                title="Title",
+                group="Group",
+                email="citizen@example.org",
+                created=one_month_ago,
+            ),
+        ]
+
+        request = Bunch(client_addr='127.0.0.1')
+        UserCollection(session).register(
+            'b', 'p@ssw0rd', request, role='admin'
+        )
+        users = UserCollection(session).query().all()
+        user = users[0]
+        for t in tickets:
+            t.accept_ticket(user)
+            t.close_ticket()
+            t.created = one_month_ago
+
+        transaction.commit()
+
+        org_app.org.auto_archive_timespan = 10  # days
+        session.flush()
+
+        assert org_app.org.auto_archive_timespan is not None
+
+        query = session.query(Ticket)
+        query = query.filter_by(state='closed')
+        assert query.count() == 2
+
+        job = get_cronjob_by_name(org_app, 'archive_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        session.flush()
+
+        query = session.query(Ticket)
+        assert query.count() == 2
+
+        query = query.filter(Ticket.state == 'archived')
+        assert query.count() == 2
+
+        # now for the deletion part
+        org_app.org.auto_delete_timespan = 1  # days
+
+        session.flush()
+        assert org_app.org.auto_delete_timespan is not None
+
+        job = get_cronjob_by_name(org_app, 'delete_old_tickets')
+        job.app = org_app
+        client = Client(org_app)
+        client.get(get_cronjob_url(job))
+
+        # should be deleted
+        query = session.query(Ticket)
+        assert query.count() == 0

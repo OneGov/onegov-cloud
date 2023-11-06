@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.mixins import meta_property, content_property
+from onegov.core.orm.mixins import (
+    ContentMixin, TimestampMixin,
+    content_property, dict_property, meta_property)
 from onegov.core.utils import normalize_for_url
 from onegov.form.models.submission import FormSubmission
 from onegov.form.models.registration_window import FormRegistrationWindow
@@ -16,7 +17,6 @@ from sqlalchemy_utils import observes
 from typing import Type, TYPE_CHECKING
 if TYPE_CHECKING:
     from datetime import date
-    from onegov.core.orm.mixins import dict_property
     from onegov.form import Form
     from onegov.form.types import SubmissionState
     from onegov.pay.types import PaymentMethod
@@ -38,7 +38,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     definition: 'Column[str]' = Column(Text, nullable=False)
 
     #: hint on how to get to the resource
-    pick_up: 'dict_property[str]' = content_property()
+    pick_up: dict_property[str | None] = content_property()
 
     #: the group to which this resource belongs to (may be any kind of string)
     group: 'Column[str | None]' = Column(Text, nullable=True)
@@ -114,13 +114,13 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     )
 
     #: lead text describing the form
-    lead: 'dict_property[str]' = meta_property()
+    lead: dict_property[str | None] = meta_property()
 
     #: content associated with the form
-    text: 'dict_property[str]' = content_property()
+    text: dict_property[str | None] = content_property()
 
     #: extensions
-    extensions: 'dict_property[list[str]]' = meta_property(default=list)
+    extensions: dict_property[list[str]] = meta_property(default=list)
 
     #: payment options ('manual' for out of band payments without cc, 'free'
     #: for both manual and cc payments, 'cc' for forced cc payments)
@@ -132,7 +132,7 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
 
     #: the minimum price total a form submission must exceed in order to
     #: be submitted
-    minimum_price_total: 'dict_property[float]' = meta_property()
+    minimum_price_total: dict_property[float | None] = meta_property()
 
     __mapper_args__ = {
         'polymorphic_on': 'type',

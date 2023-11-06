@@ -33,11 +33,17 @@ from onegov.user import Auth
 from uuid import UUID
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import date
+    from onegov.election_day.request import ElectionDayRequest
+
+
 @ElectionDayApp.path(
     model=Auth,
     path='/auth'
 )
-def get_auth(request, to='/'):
+def get_auth(request: 'ElectionDayRequest', to: str = '/') -> Auth:
     return Auth.from_request(request, to)
 
 
@@ -45,7 +51,7 @@ def get_auth(request, to='/'):
     model=Principal,
     path='/'
 )
-def get_principal(app):
+def get_principal(app: ElectionDayApp) -> Principal:
     return app.principal
 
 
@@ -57,7 +63,11 @@ def get_principal(app):
         'year': int
     }
 )
-def get_manage_elections(app, page=0, year=None):
+def get_manage_elections(
+    app: ElectionDayApp,
+    page: int = 0,
+    year: int | None = None
+) -> ElectionCollection:
     return ElectionCollection(app.session(), page=page, year=year)
 
 
@@ -69,7 +79,11 @@ def get_manage_elections(app, page=0, year=None):
         'year': int
     }
 )
-def get_manage_election_compsites(app, page=0, year=None):
+def get_manage_election_compsites(
+    app: ElectionDayApp,
+    page: int = 0,
+    year: int | None = None
+) -> ElectionCompoundCollection:
     return ElectionCompoundCollection(app.session(), page=page, year=year)
 
 
@@ -81,7 +95,11 @@ def get_manage_election_compsites(app, page=0, year=None):
         'year': int
     }
 )
-def get_manage_votes(app, page=0, year=None):
+def get_manage_votes(
+    app: ElectionDayApp,
+    page: int = 0,
+    year: int | None = None
+) -> VoteCollection:
     return VoteCollection(app.session(), page=page, year=year)
 
 
@@ -93,7 +111,12 @@ def get_manage_votes(app, page=0, year=None):
         'active_only': bool
     }
 )
-def get_manage_sms_subscribers(app, page=0, term=None, active_only=None):
+def get_manage_sms_subscribers(
+    app: ElectionDayApp,
+    page: int = 0,
+    term: str | None = None,
+    active_only: bool | None = None
+) -> SmsSubscriberCollection:
     return SmsSubscriberCollection(
         app.session(), page=page, term=term, active_only=active_only
     )
@@ -107,7 +130,12 @@ def get_manage_sms_subscribers(app, page=0, term=None, active_only=None):
         'active_only': bool
     }
 )
-def get_manage_email_subscribers(app, page=0, term=None, active_only=None):
+def get_manage_email_subscribers(
+    app: ElectionDayApp,
+    page: int = 0,
+    term: str | None = None,
+    active_only: bool | None = None
+) -> EmailSubscriberCollection:
     return EmailSubscriberCollection(
         app.session(), page=page, term=term, active_only=active_only
     )
@@ -117,7 +145,7 @@ def get_manage_email_subscribers(app, page=0, term=None, active_only=None):
     model=UploadTokenCollection,
     path='/manage/upload-tokens'
 )
-def get_manage_upload_tokens(app):
+def get_manage_upload_tokens(app: ElectionDayApp) -> UploadTokenCollection:
     return UploadTokenCollection(app.session())
 
 
@@ -128,7 +156,10 @@ def get_manage_upload_tokens(app):
         'page': int
     }
 )
-def get_manage_data_sources(app, page=0):
+def get_manage_data_sources(
+    app: ElectionDayApp,
+    page: int = 0
+) -> DataSourceCollection:
     return DataSourceCollection(app.session(), page=page)
 
 
@@ -140,7 +171,11 @@ def get_manage_data_sources(app, page=0):
         'page': int
     }
 )
-def get_manage_data_source_items(app, id, page=0):
+def get_manage_data_source_items(
+    app: ElectionDayApp,
+    id: UUID,
+    page: int = 0
+) -> DataSourceItemCollection:
     return DataSourceItemCollection(app.session(), id, page=page)
 
 
@@ -148,7 +183,7 @@ def get_manage_data_source_items(app, id, page=0):
     model=Election,
     path='/election/{id}',
 )
-def get_election(app, id):
+def get_election(app: ElectionDayApp, id: str) -> Election | None:
     return ElectionCollection(app.session()).by_id(id)
 
 
@@ -159,7 +194,7 @@ def get_election(app, id):
         'id': UUID
     }
 )
-def get_candidate(app, id):
+def get_candidate(app: ElectionDayApp, id: UUID) -> Candidate | None:
     return CandidateCollection(app.session()).by_id(id)
 
 
@@ -170,7 +205,7 @@ def get_candidate(app, id):
         'id': UUID
     }
 )
-def get_list(app, id):
+def get_list(app: ElectionDayApp, id: UUID) -> List | None:
     return ListCollection(app.session()).by_id(id)
 
 
@@ -178,7 +213,10 @@ def get_list(app, id):
     model=ElectionCompound,
     path='/elections/{id}'
 )
-def get_election_compound(app, id):
+def get_election_compound(
+    app: ElectionDayApp,
+    id: str
+) -> ElectionCompound | None:
     return ElectionCompoundCollection(app.session()).by_id(id)
 
 
@@ -186,28 +224,39 @@ def get_election_compound(app, id):
     model=ElectionCompoundPart,
     path='/elections-part/{election_compound_id}/{domain}/{id}'
 )
-def get_superregion(app, election_compound_id, domain, id):
+def get_superregion(
+    app: ElectionDayApp,
+    election_compound_id: str,
+    domain: str,
+    id: str
+) -> ElectionCompoundPart | None:
+
     compound = ElectionCompoundCollection(app.session()).by_id(
         election_compound_id
     )
-    if compound:
-        segment = id.title().replace('-', ' ')
-        segments = []
-        if domain == 'district':
-            segments = app.principal.get_districts(compound.date.year)
-        if domain == 'region':
-            segments = app.principal.get_regions(compound.date.year)
-        if domain == 'superregion':
-            segments = app.principal.get_superregions(compound.date.year)
-        if segment in segments:
-            return ElectionCompoundPart(compound, domain, segment)
+    if compound is None:
+        return None
+
+    if domain == 'district':
+        segments = app.principal.get_districts(compound.date.year)
+    elif domain == 'region':
+        segments = app.principal.get_regions(compound.date.year)
+    elif domain == 'superregion':
+        segments = app.principal.get_superregions(compound.date.year)
+    else:
+        return None
+
+    segment = id.title().replace('-', ' ')
+    if segment in segments:
+        return ElectionCompoundPart(compound, domain, segment)
+    return None
 
 
 @ElectionDayApp.path(
     model=Vote,
     path='/vote/{id}'
 )
-def get_vote(app, id):
+def get_vote(app: ElectionDayApp, id: str) -> Vote | None:
     return VoteCollection(app.session()).by_id(id)
 
 
@@ -218,7 +267,7 @@ def get_vote(app, id):
         'id': UUID
     }
 )
-def get_ballot(app, id):
+def get_ballot(app: ElectionDayApp, id: UUID) -> Ballot | None:
     return BallotCollection(app.session()).by_id(id)
 
 
@@ -229,7 +278,7 @@ def get_ballot(app, id):
         'id': UUID
     }
 )
-def get_subscriber(app, id):
+def get_subscriber(app: ElectionDayApp, id: UUID) -> Subscriber | None:
     return SubscriberCollection(app.session()).by_id(id)
 
 
@@ -240,7 +289,7 @@ def get_subscriber(app, id):
         'id': UUID
     }
 )
-def get_upload_token(app, id):
+def get_upload_token(app: ElectionDayApp, id: UUID) -> UploadToken | None:
     return UploadTokenCollection(app.session()).by_id(id)
 
 
@@ -251,7 +300,7 @@ def get_upload_token(app, id):
         'id': UUID
     }
 )
-def get_data_source(app, id):
+def get_data_source(app: ElectionDayApp, id: UUID) -> DataSource | None:
     return DataSourceCollection(app.session()).by_id(id)
 
 
@@ -262,7 +311,10 @@ def get_data_source(app, id):
         'id': UUID
     }
 )
-def get_data_source_item(app, id):
+def get_data_source_item(
+    app: ElectionDayApp,
+    id: UUID
+) -> DataSourceItem | None:
     return DataSourceItemCollection(app.session()).by_id(id)
 
 
@@ -270,7 +322,10 @@ def get_data_source_item(app, id):
     model=ArchivedResultCollection,
     path='/archive/{date}'
 )
-def get_archive_by_year(app, date):
+def get_archive_by_year(
+    app: ElectionDayApp,
+    date: str
+) -> ArchivedResultCollection:
     return ArchivedResultCollection(app.session(), date)
 
 
@@ -286,15 +341,16 @@ def get_archive_by_year(app, date):
     }
 )
 def get_archive_search(
-        app,
-        from_date=None,
-        to_date=None,
-        answers=None,
-        item_type=None,
-        domains=None,
-        term=None,
-        page=0
-):
+    app: ElectionDayApp,
+    from_date: 'date | None' = None,
+    to_date: 'date | None' = None,
+    answers: list[str] | None = None,
+    item_type: str | None = None,
+    domains: list[str] | None = None,
+    term: str | None = None,
+    page: int = 0
+) -> SearchableArchivedResultCollection | None:
+
     return SearchableArchivedResultCollection.for_item_type(
         app,
         item_type,
@@ -311,7 +367,11 @@ def get_archive_search(
     model=SiteLocale,
     path='/locale/{locale}'
 )
-def get_locale(request, app, locale):
+def get_locale(
+    request: 'ElectionDayRequest',
+    app: ElectionDayApp,
+    locale: str
+) -> SiteLocale | None:
     return SiteLocale.for_path(app, locale)
 
 
@@ -322,7 +382,7 @@ def get_locale(request, app, locale):
         'page': int
     }
 )
-def get_manage_screens(app, page=0):
+def get_manage_screens(app: ElectionDayApp, page: int = 0) -> ScreenCollection:
     return ScreenCollection(app.session(), page)
 
 
@@ -333,5 +393,5 @@ def get_manage_screens(app, page=0):
         'number': int
     }
 )
-def get_screen(app, number):
+def get_screen(app: ElectionDayApp, number: int) -> Screen | None:
     return ScreenCollection(app.session()).by_number(number)
