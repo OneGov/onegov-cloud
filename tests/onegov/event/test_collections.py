@@ -1440,6 +1440,8 @@ def test_as_anthrazit_xml(session):
                 'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
                 'UNTIL=20230420T220000Z'
             ),
+            organizer_email='info@squirrelpark.com',
+            organizer_phone='+1 123 456 7788',
             coordinates=Coordinates(47.051752750515746, 8.305739625357093)
         )
         event.submit()
@@ -1514,6 +1516,8 @@ def test_as_anthrazit_xml(session):
     # assert root[0].find('hauptrubrik').attrib['name] == ''
     for rubrik in root[0].find('hauptrubrik').findall('rubrik'):
         assert rubrik.text in ['fun', 'animals']
+    assert root[0].find('email').text == 'info@squirrelpark.com'
+    assert root[0].find('telefon1').text == '+1 123 456 7788'
     assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
                                                                     'Park')
     assert (root[0].find('veranstaltungsort').

@@ -602,7 +602,10 @@ class EventCollection(Pagination):
                                    hr_text else None)
             hr.rubrik = tags or None
             event.append(hr)
-
+            if e.organizer_email:
+                event.email = e.organizer_email
+            if e.organizer_phone:
+                event.telefon1 = e.organizer_phone
             ort = objectify.Element('veranstaltungsort')
             ort.titel = e.location
             if e.coordinates:
