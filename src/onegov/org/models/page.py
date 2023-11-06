@@ -1,5 +1,6 @@
 from datetime import datetime
-from onegov.core.orm.mixins import content_property, meta_property
+from onegov.core.orm.mixins import (
+    content_property, dict_property, meta_property)
 from onegov.file import MultiAssociatedFiles
 from onegov.form import Form, move_fields
 from onegov.org import _
@@ -124,7 +125,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     filter_years: list[int] = []
     filter_tags: list[str] = []
 
-    hashtags = meta_property(default=list)
+    hashtags: dict_property[list[str]] = meta_property(default=list)
 
     @property
     def es_public(self):

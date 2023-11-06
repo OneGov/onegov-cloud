@@ -1,7 +1,7 @@
 import html
 
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin, meta_property
+from onegov.core.orm.mixins import TimestampMixin, dict_property, meta_property
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
 from onegov.file import AssociatedFiles, File
@@ -29,7 +29,6 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     import uuid
     from datetime import datetime
-    from onegov.core.orm.mixins import dict_property
     from onegov.form import Form
     from onegov.form.models import FormDefinition, FormRegistrationWindow
     from onegov.form.types import RegistrationState, SubmissionState
@@ -82,9 +81,9 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
     meta: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
 
     #: Additional information about the submitee
-    submitter_name: 'dict_property[str]' = meta_property()
-    submitter_address: 'dict_property[str]' = meta_property()
-    submitter_phone: 'dict_property[str]' = meta_property()
+    submitter_name: dict_property[str | None] = meta_property()
+    submitter_address: dict_property[str | None] = meta_property()
+    submitter_phone: dict_property[str | None] = meta_property()
 
     #: the submission data
     data: 'Column[dict[str, Any]]' = Column(JSON, nullable=False)
@@ -124,10 +123,10 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         nullable=False,
         default='manual'
     )
-    minimum_price_total: 'dict_property[float]' = meta_property()
+    minimum_price_total: dict_property[float | None] = meta_property()
 
     #: extensions
-    extensions: 'dict_property[list[str]]' = meta_property(default=list)
+    extensions: dict_property[list[str]] = meta_property(default=list)
 
     if TYPE_CHECKING:
         # forward declare backrefs

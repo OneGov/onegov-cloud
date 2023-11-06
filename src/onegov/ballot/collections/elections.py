@@ -12,11 +12,12 @@ if TYPE_CHECKING:
     from datetime import date
     from sqlalchemy.orm import Query, Session
     from typing_extensions import Self
-    from uuid import UUID
 
 
 # FIXME: Why is this split into two classes? So it can be generic?
 class ElectionCollectionPagination(Pagination[Election]):
+
+    page: int
 
     def __init__(
         self,
@@ -102,7 +103,7 @@ class ElectionCollection(ElectionCollectionPagination):
 
         return query.all()
 
-    def by_id(self, id: 'UUID') -> Election | None:
+    def by_id(self, id: str) -> Election | None:
         """ Returns the election by id. """
 
         query = self.query()

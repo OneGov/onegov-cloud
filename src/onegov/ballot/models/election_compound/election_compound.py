@@ -13,6 +13,7 @@ from onegov.ballot.models.party_result.mixins import PartyResultsOptionsMixin
 from onegov.core.orm import Base
 from onegov.core.orm import translation_hybrid
 from onegov.core.orm.mixins import ContentMixin
+from onegov.core.orm.mixins import dict_property
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.types import HSTORE
 from onegov.core.utils import groupbylist
@@ -31,7 +32,6 @@ if TYPE_CHECKING:
     import datetime
     from collections.abc import Mapping
     from onegov.ballot.types import DomainOfInfluence
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.types import AppenderQuery
     from sqlalchemy.orm import Session
 
@@ -120,13 +120,13 @@ class ElectionCompound(
         referencing_compounds: rel[AppenderQuery['ElectionCompound']]
 
     #: Defines optional colors for parties
-    colors: 'dict_property[dict[str, str]]' = meta_property(
+    colors: dict_property[dict[str, str]] = meta_property(
         'colors',
         default=dict
     )
 
     #: Defines the domain of the elections
-    domain_elections: 'dict_property[DomainOfInfluence]' = meta_property(
+    domain_elections: dict_property['DomainOfInfluence'] = meta_property(
         'domain_elections',
         default='district'
     )
@@ -210,10 +210,10 @@ class ElectionCompound(
         return result
 
     #: may be used to store a link related to this election
-    related_link: 'dict_property[str]' = meta_property(
+    related_link: dict_property[str | None] = meta_property(
         'related_link'
     )
-    related_link_label: 'dict_property[str]' = meta_property(
+    related_link_label: dict_property[str | None] = meta_property(
         'related_link_label'
     )
 

@@ -9,15 +9,28 @@ from onegov.election_day.models import WebhookNotification
 from onegov.election_day.models import WebsocketNotification
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from collections.abc import Sequence
+    from onegov.election_day.request import ElectionDayRequest
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+
+
 class NotificationCollection:
 
-    def __init__(self, session):
+    def __init__(self, session: 'Session'):
         self.session = session
 
-    def query(self):
+    def query(self) -> 'Query[Notification]':
         return self.session.query(Notification)
 
-    def by_model(self, model, current=True):
+    def by_model(
+        self,
+        model: Election | ElectionCompound | Vote,
+        current: bool = True
+    ) -> list[Notification]:
         """ Returns the notification for the given election or vote and its
         modification times. Only returns the current by default.
 
@@ -42,8 +55,15 @@ class NotificationCollection:
 
         return query.all()
 
-    def trigger(self, request, model, options):
+    def trigger(
+        self,
+        request: 'ElectionDayRequest',
+        model: Election | ElectionCompound | Vote,
+        options: 'Collection[str]'
+    ) -> None:
         """ Triggers and adds the selected notifications. """
+
+        notification: Notification
 
         if 'websocket' in options:
             notification = WebsocketNotification()
@@ -67,8 +87,14 @@ class NotificationCollection:
 
         self.session.flush()
 
-    def trigger_summarized(self, request, elections, election_compounds, votes,
-                           options):
+    def trigger_summarized(
+        self,
+        request: 'ElectionDayRequest',
+        elections: 'Sequence[Election]',
+        election_compounds: 'Sequence[ElectionCompound]',
+        votes: 'Sequence[Vote]',
+        options: 'Collection[str]'
+    ) -> None:
         """ Triggers and adds a single notification for all given votes and
         elections.
 
@@ -76,6 +102,8 @@ class NotificationCollection:
 
         if not (elections or election_compounds or votes) or not options:
             return
+
+        notification: Notification
 
         if 'websocket' in options:
             for election in elections:

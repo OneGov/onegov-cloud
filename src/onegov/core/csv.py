@@ -41,17 +41,18 @@ if TYPE_CHECKING:
     )
 
     class _RowType(Protocol[_T_co]):
-        def __call__(
-            self, rownumber: int, **kwargs: str | Any
-        ) -> _T_co: ...
+        def __call__(self, rownumber: int, **kwargs: str) -> _T_co: ...
 
-    class _NamedTuple(Protocol):
-        def __getattr__(self, name: str) -> str | Any: ...
+    class DefaultRow(Protocol):
+        @property
+        def rownumber(self) -> int: ...
+        def __getattr__(self, name: str) -> str: ...
 
     KeyFunc: TypeAlias = Callable[[_T], SupportsRichComparison]
+    DefaultCSVFile: TypeAlias = 'CSVFile[DefaultRow]'
 
 
-_RowT = TypeVar('_RowT', bound='_RowType[Any]')
+_RowT = TypeVar('_RowT')
 
 
 VALID_CSV_DELIMITERS = ',;\t'
@@ -122,11 +123,11 @@ class CSVFile(Generic[_RowT]):
 
     """
 
-    rowtype: _RowT
+    rowtype: '_RowType[_RowT]'
 
     @overload
     def __init__(
-        self: 'CSVFile[_RowType[_NamedTuple]]',
+        self: 'DefaultCSVFile',
         csvfile: IO[bytes],
         expected_headers: 'Sequence[str] | None ' = None,
         dialect: 'type[Dialect] | Dialect | str | None' = None,
@@ -144,7 +145,7 @@ class CSVFile(Generic[_RowT]):
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
         *,
-        rowtype: _RowT
+        rowtype: '_RowType[_RowT]'
     ): ...
 
     def __init__(
@@ -154,7 +155,7 @@ class CSVFile(Generic[_RowT]):
         dialect: 'type[Dialect] | Dialect | str | None' = None,
         encoding: str | None = None,
         rename_duplicate_column_names: bool = False,
-        rowtype: _RowT | None = None
+        rowtype: '_RowType[_RowT] | None' = None
     ):
 
         # guess the encoding if not already provided

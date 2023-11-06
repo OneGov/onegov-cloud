@@ -405,7 +405,7 @@ def handle_authenticate_mtan(
 
     return {
         'layout': layout,
-        'title': _('Request mTAN'),
+        'title': _('Enter mTAN'),
         'form': form,
         'form_width': 'small'
     }

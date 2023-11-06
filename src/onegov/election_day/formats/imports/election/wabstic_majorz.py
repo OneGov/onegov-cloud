@@ -12,6 +12,16 @@ from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
+from typing import Any
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Election
+    from onegov.core.csv import DefaultRow
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 WABSTIC_MAJORZ_HEADERS_WM_WAHL = (
     'sortgeschaeft',  # provides the link to the election
     'absolutesmehr',  # absolute majority
@@ -53,20 +63,28 @@ WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE = (
 )
 
 
-def get_entity_id(line):
+def get_entity_id(line: 'DefaultRow') -> int:
     col = 'bfsnrgemeinde'
     entity_id = validate_integer(line, col)
     return 0 if entity_id in EXPATS else entity_id
 
 
 def import_election_wabstic_majorz(
-    election, principal, number, district,
-    file_wm_wahl, mimetype_wm_wahl,
-    file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
-    file_wm_gemeinden, mimetype_wm_gemeinden,
-    file_wm_kandidaten, mimetype_wm_kandidaten,
-    file_wm_kandidatengde, mimetype_wm_kandidatengde
-):
+    election: 'Election',
+    principal: 'Canton | Municipality',
+    number: str,
+    district: str,
+    file_wm_wahl: IO[bytes],
+    mimetype_wm_wahl: str,
+    file_wmstatic_gemeinden: IO[bytes],
+    mimetype_wmstatic_gemeinden: str,
+    file_wm_gemeinden: IO[bytes],
+    mimetype_wm_gemeinden: str,
+    file_wm_kandidaten: IO[bytes],
+    mimetype_wm_kandidaten: str,
+    file_wm_kandidatengde: IO[bytes],
+    mimetype_wm_kandidatengde: str
+) -> list[FileImportError]:
     """ Tries to import the given CSV files from a WabstiCExport.
 
     This function is typically called automatically every few minutes during
@@ -129,6 +147,7 @@ def import_election_wabstic_majorz(
     remaining_entities = None
     complete = None
 
+    assert wm_wahl is not None
     for line in wm_wahl.lines:
         line_errors = []
 
@@ -169,7 +188,8 @@ def import_election_wabstic_majorz(
             continue
 
     # Parse the entities
-    added_entities = {}
+    added_entities: dict[int, dict[str, Any]] = {}
+    assert wmstatic_gemeinden is not None
     for line in wmstatic_gemeinden.lines:
         line_errors = []
 
@@ -225,6 +245,7 @@ def import_election_wabstic_majorz(
             'eligible_voters': eligible_voters
         }
 
+    assert wm_gemeinden is not None
     for line in wm_gemeinden.lines:
         line_errors = []
 
@@ -301,6 +322,7 @@ def import_election_wabstic_majorz(
 
     # Parse the candidates
     added_candidates = {}
+    assert wm_kandidaten is not None
     for line in wm_kandidaten.lines:
         line_errors = []
 
@@ -337,7 +359,8 @@ def import_election_wabstic_majorz(
             continue
 
     # Parse the candidate results
-    added_results = {}
+    added_results: dict[int, dict[str, int | None]] = {}
+    assert wm_kandidatengde is not None
     for line in wm_kandidatengde.lines:
         line_errors = []
 
