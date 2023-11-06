@@ -3199,6 +3199,9 @@ msgstr "Frais de carte de crédit"
 msgid "Pay Offline later"
 msgstr "Payer hors ligne plus tard"
 
+msgid "Show more"
+msgstr "Afficher plus"
+
 msgid "at ${time}"
 msgstr "à ${time}"
 

@@ -3473,12 +3473,49 @@ button {
 }
 
 .occurrence-description {
-    margin-top: 1.25em;
     margin-bottom: 1.25em;
+    margin-top: 1.25em;
+    max-width: $max-line-width;
 }
 
-.occurrence-description {
-    max-width: $max-line-width;
+.filter-panel .accordion {
+    margin-left: 0;
+
+    .accordion-navigation {
+        &> a {
+            background: transparent;
+            border: 1px solid #cbcccc;
+            color: $aluminum;
+            display: inline-block;
+            font-size: .8rem;
+            padding: .3rem .5rem;
+
+            &:hover {
+                color: $primary-color;
+            }
+        }
+
+        &> .content.active {
+            background: transparent;
+            padding: 0;
+        }
+
+        & .more-items {
+
+            i {
+                border: 1px solid;
+                border-radius: 100px;
+                font-size: .5rem;
+                padding: .2rem;
+                margin-left: .2rem;
+            }
+        }
+
+        &.active > .more-items {
+            display: none;
+        }
+    }
+
 }
 
 /*

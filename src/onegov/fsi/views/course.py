@@ -105,7 +105,6 @@ def view_email_preview_for_course(self, request):
 )
 def view_course_collection(self, request):
     layout = CourseCollectionLayout(self, request)
-    layout.include_accordion()
     return {
         'layout': layout,
         'model': self,

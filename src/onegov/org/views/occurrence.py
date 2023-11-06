@@ -92,6 +92,7 @@ def keyword_count(request, collection):
              permission=Public)
 def view_occurrences(self, request, layout=None):
     """ View all occurrences of all events. """
+
     filters = None
     tags = None
     filter_type = request.app.org.event_filter_type

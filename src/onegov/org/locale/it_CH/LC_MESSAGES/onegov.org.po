@@ -3198,6 +3198,9 @@ msgstr "Commissione sulla carta di credito"
 msgid "Pay Offline later"
 msgstr "Paga offline successivamente"
 
+msgid "Show more"
+msgstr "Mostra di più"
+
 msgid "at ${time}"
 msgstr "alle ${time}"
 
