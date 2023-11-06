@@ -1418,7 +1418,7 @@ def test_as_anthrazit_xml(session):
 
     def as_anthrazit(occurrences):
         result = occurrences.as_anthrazit_xml(DummyRequest(),
-            future_events_only=False)
+                                              future_events_only=False)
         result = result.decode().strip().splitlines()
         return result
 
@@ -1463,9 +1463,10 @@ def test_as_anthrazit_xml(session):
 
         session.flush()
 
-    occurrences = OccurrenceCollection(session)
-    xml = occurrences.as_anthrazit_xml(DummyRequest(),
-                                       future_events_only=False)
+    # occurrences = OccurrenceCollection(session)
+    collection = EventCollection(session)
+    xml = collection.as_anthrazit_xml(DummyRequest(),
+                                      future_events_only=False)
 
     import xml.etree.ElementTree as ET
 
@@ -1502,19 +1503,22 @@ def test_as_anthrazit_xml(session):
     #     print(event.find('titel').text)
     assert root[0].find('id').text
     assert root[0].find('titel').text == 'Squirrel Park Visit'
-    assert (root[0].find('textmobile').text == '<em>Furry</em> things will '
-                                               'happen!')
+    assert (root[0].find('textmobile').text == '<![CDATA[<em>Furry</em> '
+                                               'things will happen!]]>')
     dates = root[0].findall('termin')
     for d in dates:
         assert d.find('von').text in expected_dates_start
         assert d.find('bis').text in expected_dates_end
-    assert root[0].find('text').text == '<em>Furry</em> things will happen!'
+    assert (root[0].find('text').text == '<![CDATA[<em>Furry</em> '
+                                         'things will happen!]]>')
     # assert root[0].find('hauptrubrik').attrib['name] == ''
     for rubrik in root[0].find('hauptrubrik').findall('rubrik'):
         assert rubrik.text in ['fun', 'animals']
     assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
                                                                     'Park')
-    assert root[0].find('veranstaltungsort').find('longitude').text == '8.305739625357093'
-    assert root[0].find('veranstaltungsort').find('latitude').text == '47.051752750515746'
+    assert (root[0].find('veranstaltungsort').
+           find('longitude').text == '8.305739625357093')
+    assert (root[0].find('veranstaltungsort').
+           find('latitude').text == '47.051752750515746')
 
     # assert root[1].find('titel').text == 'History Squirrel Park Visit'
