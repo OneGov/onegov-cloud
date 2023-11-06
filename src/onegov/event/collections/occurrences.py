@@ -1,11 +1,11 @@
 import sqlalchemy
 
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from functools import cached_property
 from icalendar import Calendar as vCalendar
-from lxml import etree
+from lxml import etree, objectify
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
@@ -478,6 +478,78 @@ class OccurrenceCollection(Pagination):
                 vcalendar.add_component(vevent)
 
         return vcalendar.to_ical()
+
+
+def as_xml(self, future_events_only=True):
+    """
+    Returns all published occurrences as xml.
+
+    The xml format was Winterthur's wish (no specs behind). Their mobile
+    app will consume the events from xml
+
+    Format:
+    <events>
+        <event>
+            <id></id>
+            <title></title>
+            <tags></tags>
+                <tag></tag>
+            <description></description>
+            <start></start>
+            <end></end>
+            <location></location>
+            <price></price>
+            ..
+        </event>
+        <event>
+            ..
+        </event>
+        ..
+    </events>
+
+    :param future_events_only: if set, only future events will be
+    returned, all events otherwise
+    :rtype: str
+    :return: xml string
+
+    """
+    xml = '<events></events>'
+    root = objectify.fromstring(xml)
+
+    query = self.session.query(Occurrence)
+    for occ in query:
+        occ = (self.session.query(Event).
+               filter(Event.id == occ.event_id).first())
+
+        if occ.state != 'published':
+            continue
+        if future_events_only and datetime.fromisoformat(str(
+                occ.end)).date() < datetime.today().date():
+            continue
+
+        event = objectify.Element('event')
+        event.id = occ.id
+        event.title = occ.title
+        txs = tags(occ.tags)
+        event.append(txs)
+        event.description = occ.description
+        event.start = occ.start
+        event.end = occ.end
+        event.location = occ.location
+        event.price = occ.price
+        event.organizer = occ.organizer
+        event.event_url = occ.external_event_url
+        event.organizer_email = occ.organizer_email
+        event.organizer_phone = occ.organizer_phone
+        event.modified = occ.last_change
+        root.append(event)
+
+    # remove lxml annotations
+    objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
+    etree.cleanup_namespaces(root)
+
+    return etree.tostring(root, encoding='utf-8', xml_declaration=True,
+                          pretty_print=True)
 
 
 class tags(etree.ElementBase):
