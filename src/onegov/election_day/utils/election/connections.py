@@ -130,7 +130,7 @@ def get_connection_results(
         connection_id = str(parent[0])
         subconnections: list['Subconnection'] = [(
             child[1],
-            child[2],
+            int(child[2]),
             [(l[1], l[2], l[3]) for l in sorted(
                 sublists.get(str(child[3]), []),
                 key=lambda x: to_int(x[3])
@@ -140,7 +140,7 @@ def get_connection_results(
         subconnection_votes = sum(c[1] for c in subconnections)
         connection: 'Connection' = (
             parent[1],
-            parent[2] + subconnection_votes,
+            int(parent[2] + subconnection_votes),
             [(l[1], l[2], l[3]) for l in sublists.get(connection_id, [])],
             subconnections
         )

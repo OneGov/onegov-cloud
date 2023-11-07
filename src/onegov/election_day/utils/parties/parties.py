@@ -1,6 +1,7 @@
 from decimal import Decimal
 from onegov.ballot import PartyResult
 from onegov.election_day import _
+from operator import itemgetter
 
 
 from typing import cast
@@ -222,19 +223,23 @@ def get_party_results_vertical_data(
             'title': item.title
         }
 
+    active_year = str(item.date.year)
     attribute = 'voters_count' if item.voters_counts else 'votes'
     years, parties = get_party_results(item)
     groups: dict[str, str | None] = {}
     results = []
-    for party_id, party in parties.items():
-        for year in sorted(party, reverse=True):
+    for party_id, results_per_year in parties.items():
+        for year, party in sorted(
+            results_per_year.items(),
+            key=itemgetter(0),
+            reverse=True
+        ):
             group = groups.setdefault(
-                party_id, party.get(year, {}).get('name', party_id)
+                party_id, party.get('name', party_id)
             )
-            front = party.get(year, {}).get('mandates', 0)
-            back = party.get(year, {}).get(attribute, {})
-            back = float(back.get('permille', 0) / 10)
-            color = party.get(year, {}).get('color', '#999999')
+            front = party.get('mandates', 0)
+            back = float(party.get(attribute, {}).get('permille', 0) / 10)
+            color = party.get('color', '#999999')
             results.append({
                 'group': group,
                 'item': year,
@@ -242,12 +247,12 @@ def get_party_results_vertical_data(
                     'front': front,
                     'back': back,
                 },
-                'active': year == str(item.date.year),
+                'active': year == active_year,
                 'color': color
             })
 
     return {
-        'groups': [items[1] for items in sorted(groups.items())],
+        'groups': [name for _, name in sorted(groups.items())],
         'labels': years,
         'maximum': {
             'front': item.number_of_mandates,
