@@ -1,8 +1,44 @@
 # Changes
 
+## 2023.56
+
+`2023-11-07` | [f5311dbb5a...30efa28176](https://github.com/OneGov/onegov-cloud/compare/f5311dbb5a^...30efa28176)
+
+### Events
+
+##### Winterthur: Extend xml interface Anthrazit format and rework
+
+`Feature` | [ogc-1320](#ogc-1320) | [30efa28176](https://github.com/onegov/onegov-cloud/commit/30efa28176945afa6400c490c4005c775ba38ba6)
+
+##### Add assets for event form independent of tag usage
+
+`Bugfix` | [ogc-1318](#ogc-1318) | [edc89417b7](https://github.com/onegov/onegov-cloud/commit/edc89417b74d1490c03164f98cb09fcb9086b949)
+
+### Fsi
+
+##### Adds missing file extension for vCalendar.
+
+`Bugfix` | [OGC-1319](https://linear.app/onegovcloud/issue/OGC-1319) | [07d52355b4](https://github.com/onegov/onegov-cloud/commit/07d52355b4a4d4cf8d18b9f199434236e4c626e3)
+
+### Org
+
+##### Fixes view title
+
+`Bugfix` | [e08fdc98db](https://github.com/onegov/onegov-cloud/commit/e08fdc98dbcdd277fb07c3fd374a2d979d6f6f0d)
+
+### Winterthur
+
+##### Filter items accordeon
+
+`Feature` | [OGC-1221](https://linear.app/onegovcloud/issue/OGC-1221) | [da4c4ed5cd](https://github.com/onegov/onegov-cloud/commit/da4c4ed5cdee635a332bc3e64257f1dc853a6097)
+
+##### Fix back button visibility
+
+`Bugfix` | [OGC-1047](https://linear.app/onegovcloud/issue/OGC-1047) | [0a4ad00dcc](https://github.com/onegov/onegov-cloud/commit/0a4ad00dcc79227af85658ce71b252f490ef38f2)
+
 ## 2023.55
 
-`2023-10-27` | [ca67f7b542...ae4ab40971](https://github.com/OneGov/onegov-cloud/compare/ca67f7b542^...ae4ab40971)
+`2023-10-27` | [ca67f7b542...110e196f6e](https://github.com/OneGov/onegov-cloud/compare/ca67f7b542^...110e196f6e)
 
 ### Org
 
@@ -2197,123 +2233,4 @@ mandated, but publishing it beyond that would raise privacy concerns.
 ##### Add websocket server and client.
 
 `Feature` | [OGC-935](https://linear.app/onegovcloud/issue/OGC-935) | [4d1f7ea474](https://github.com/onegov/onegov-cloud/commit/4d1f7ea474ce4925266d0aa161e3204fe6f171ca)
-
-## 2023.6
-
-`2023-02-08` | [0ea641df42...ca101f7ca1](https://github.com/OneGov/onegov-cloud/compare/0ea641df42^...ca101f7ca1)
-
-### Election Day
-
-##### Fixes horizontal party strengths bar char data.
-
-`Bugfix` | [030c1eda6a](https://github.com/onegov/onegov-cloud/commit/030c1eda6ae5c21a20a7657cc5770965d40cb9f9)
-
-##### Allow uploading intermediate party results to proporz elections.
-
-`Bugfix` | [fb9ab7bdba](https://github.com/onegov/onegov-cloud/commit/fb9ab7bdba7380e3ec20e81e02f80b8d8b9c368a)
-
-##### Fixes progress of superregions.
-
-`Bugfix` | [OGC-952](https://linear.app/onegovcloud/issue/OGC-952) | [769321a7f8](https://github.com/onegov/onegov-cloud/commit/769321a7f8f2b8656b7f0c56347ac064a40a800b)
-
-### Feriennet
-
-##### Text for Banners
-
-`Feature` | [PRO-880](https://linear.app/projuventute/issue/PRO-880) | [ecb1042703](https://github.com/onegov/onegov-cloud/commit/ecb1042703ebf259a131ce395ca74aedefcafccf)
-
-##### Replace privacy protection links
-
-`Feature` | [OGC-1072](https://linear.app/onegovcloud/issue/OGC-1072) | [9ed0040f97](https://github.com/onegov/onegov-cloud/commit/9ed0040f97657a2a919323c1c1dc46ed7a5b832d)
-
-##### Remove CS Logo
-
-`Feature` | [PRO-1131](https://linear.app/projuventute/issue/PRO-1131) | [a96b8c2ad9](https://github.com/onegov/onegov-cloud/commit/a96b8c2ad9e803ec2e05f446c5b4cb3a39e2335e)
-
-##### Banners between activities
-
-Sponsor banners appear now on the activities overview.
-
-`Feature` | [PRO-1136](https://linear.app/projuventute/issue/PRO-1136) | [3c534cce29](https://github.com/onegov/onegov-cloud/commit/3c534cce292e030c48ae859324d4d4eb689460a0)
-
-### Form
-
-##### Extends pricing options with a credit card payment flag
-
-This allows users to define custom forms where the credit card payment
-is mandatory based on whether or not the person submitting the form has
-selected a certain option or not.
-
-E.g. a delivery field where they have to pay online right away if they
-want the item to be delivered, but they can pay later in person if
-they choose to pick it up themselves instead:
-
-```
-Delivery *=
-    ( ) Pickup (0 CHF)
-    ( ) Delivery (5 CHF!)
-```
-
-`Feature` | [OGC-910](https://linear.app/onegovcloud/issue/OGC-910) | [de8388987a](https://github.com/onegov/onegov-cloud/commit/de8388987a23599982f02c67cae954c6bbd68d57)
-
-##### Adds optional pricing to integer range fields
-
-Price will be multiplied by the amount entered into the field.
-The credit card payment flag works on this field as well. E.g:
-
-```
-Number of stamps *= 0..30 (0.85 CHF!)
-```
-
-`Feature` | [OGC-942](https://linear.app/onegovcloud/issue/OGC-942) | [413ccbb518](https://github.com/onegov/onegov-cloud/commit/413ccbb5183ad8630eb0c3a88f58299e4aff837b)
-
-##### Fixes bug in price range checking.
-
-`Bugfix` | [5841945229](https://github.com/onegov/onegov-cloud/commit/584194522977f5c8d6c9ea9f09d2e61a101a9ba1)
-
-### Org
-
-##### Display edit bar with delete function for links.
-
-This makes deleting links more accessible, which
-was in fact already possible.
-
-`Feature` | [OGC-739](https://linear.app/onegovcloud/issue/OGC-739) | [8097916390](https://github.com/onegov/onegov-cloud/commit/80979163905b074a7fa80a4983da0df11a4718ac)
-
-##### Adds a minimum price field to forms, directories and resources.
-
-Treats submissions with negative price totals like free submissions.
-
-`Feature` | [OGC-944](https://linear.app/onegovcloud/issue/OGC-944) | [6821a8b20b](https://github.com/onegov/onegov-cloud/commit/6821a8b20bfa5828847a085f834c952f360f4985)
-
-### Town6
-
-##### Integration OneGov Gever.
-
-`Feature` | [OGC-618](https://linear.app/onegovcloud/issue/OGC-618) | [b6871d13c2](https://github.com/onegov/onegov-cloud/commit/b6871d13c26acdf7944a153e2eaab98ded454b95)
-
-##### Change appearance of "subit your event"
-
-`Feature` | [OGC-854](https://linear.app/onegovcloud/issue/OGC-854) | [772ebf219b](https://github.com/onegov/onegov-cloud/commit/772ebf219b7d13c3ab76f0a6163526d087c9b016)
-
-##### Allows steps in layouts to be hidden on a per view basis
-
-This allows sharing the same layout between e.g. a guest view which has
-a sequence of steps and an editor view which does not.
-
-Hides the step sequence when adding a new directory entry as admin.
-
-`Feature` | [OGC-956](https://linear.app/onegovcloud/issue/OGC-956) | [27f0c3570f](https://github.com/onegov/onegov-cloud/commit/27f0c3570fbbfda2a8dcc0ad2037eba01b24d1f0)
-
-##### Create events directly without ticket.
-
-`Feature` | [OGC-745](https://linear.app/onegovcloud/issue/OGC-745) | [ee95988a70](https://github.com/onegov/onegov-cloud/commit/ee95988a70f348a91edcb015e9c61cd12912645f)
-
-##### Fixes translations not being applied.
-
-`Bugfix` | [OGC-926](https://linear.app/onegovcloud/issue/OGC-926) | [75b1dd85c3](https://github.com/onegov/onegov-cloud/commit/75b1dd85c3027944a1d15d78f249c4949f353b6e)
-
-##### Ensure translations are applied.
-
-`Bugfix` | [2a6f73d5b5](https://github.com/onegov/onegov-cloud/commit/2a6f73d5b5ec10321a1128997313cc701acc52c1)
 
