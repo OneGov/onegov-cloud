@@ -63,8 +63,8 @@ def svg_filename(
         else:
             last_modified = item.last_modified
         assert last_modified is not None
-        ts = int(last_modified.timestamp())
 
+    ts = int(last_modified.timestamp())
     name = filename_prefix(item)
     if isinstance(item, Ballot):
         hash = str(item.id)
