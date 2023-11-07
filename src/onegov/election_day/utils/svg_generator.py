@@ -128,7 +128,7 @@ class SvgGenerator:
         assert fs is not None
         if not fs.exists(self.svg_dir):
             fs.makedir(self.svg_dir)
-        existing = fs.listdir(self.svg_dir)
+        existing = set(fs.listdir(self.svg_dir))
 
         # Generate the SVGs
         created = 0
@@ -190,7 +190,7 @@ class SvgGenerator:
                                 )
 
         # Delete obsolete SVGs
-        obsolete = set(existing) - filenames
+        obsolete = existing - filenames
         self.remove(self.svg_dir, obsolete)
 
         return created, len(obsolete)

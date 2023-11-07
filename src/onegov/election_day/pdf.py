@@ -110,7 +110,7 @@ class Pdf(PdfBase):
 
         super().figcaption(self.translate(text), style=style)
 
-    def dates_line(self, date: 'date', changed: 'datetime') -> None:
+    def dates_line(self, date: 'date', changed: 'datetime | None') -> None:
         """ Adds the given date and timespamp. """
 
         self.table(

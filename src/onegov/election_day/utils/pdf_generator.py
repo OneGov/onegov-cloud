@@ -134,8 +134,7 @@ class PdfGenerator:
 
             # Add dates
             changed = item.last_result_change
-            assert changed is not None
-            if getattr(changed, 'tzinfo', None) is not None:
+            if changed is not None and changed.tzinfo is not None:
                 tz = timezone('Europe/Zurich')
                 changed = tz.normalize(changed.astimezone(tz))
             pdf.dates_line(item.date, changed)
@@ -1117,7 +1116,7 @@ class PdfGenerator:
         assert fs is not None
         if not fs.exists(self.pdf_dir):
             fs.makedir(self.pdf_dir)
-        existing = fs.listdir(self.pdf_dir)
+        existing = set(fs.listdir(self.pdf_dir))
 
         # Generate the PDFs
         created = 0
@@ -1144,7 +1143,7 @@ class PdfGenerator:
                             fs.remove(path)
 
         # Delete obsolete PDFs
-        obsolete = set(existing) - filenames
+        obsolete = existing - filenames
         self.remove(self.pdf_dir, obsolete)
 
         return created, len(obsolete)

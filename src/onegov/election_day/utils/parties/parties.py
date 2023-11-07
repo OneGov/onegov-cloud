@@ -64,12 +64,11 @@ def get_party_results(
             'permille': votes_permille
         }
 
-        voters_count_dec = result.voters_count or Decimal(0)
-        voters_count: float
+        voters_count: Decimal | float = result.voters_count or Decimal(0)
         if not item.exact_voters_counts:
-            voters_count = int(round(voters_count_dec))
+            voters_count = int(round(voters_count))
         elif json_serializable:
-            voters_count = float(voters_count_dec)
+            voters_count = float(voters_count)
 
         voters_count_permille: Decimal | float
         voters_count_permille = result.voters_count_percentage or Decimal(0)
