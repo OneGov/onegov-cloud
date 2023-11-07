@@ -345,7 +345,11 @@ def json_export_occurences(self, request):
     ]
 
 
-@OrgApp.view(model=OccurrenceCollection, name='xml', permission=Public)
+@OrgApp.view(
+    model=OccurrenceCollection,
+    name='xml',
+    permission=Public
+)
 def xml_export_all_occurrences(self, request):
     """
     Returns events as xml.
@@ -356,7 +360,7 @@ def xml_export_all_occurrences(self, request):
     return Response(
         collection.as_xml(),
         content_type='text/xml',
-        content_disposition='inline; filename=occurrences.xml'
+        content_disposition='inline; filename=events.xml'
     )
 
 
