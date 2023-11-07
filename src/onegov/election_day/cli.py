@@ -173,6 +173,8 @@ def generate_archive() -> 'Processor':
         archive_zip = archive_generator.generate_archive()
         if not archive_zip:
             click.secho("generate_archive returned None.", fg='red')
+            return
+
         archive_filesize = archive_generator.archive_dir.getinfo(
             archive_zip, namespaces=['details']).size
 

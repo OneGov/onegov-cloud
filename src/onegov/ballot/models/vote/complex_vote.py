@@ -4,6 +4,7 @@ from onegov.ballot.models.vote.vote import Vote
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .ballot import Ballot
+    from .ballot import BallotResult
 
 
 class ComplexVote(Vote):
@@ -30,10 +31,11 @@ class ComplexVote(Vote):
     @staticmethod
     def get_answer(
         counted: bool,
-        proposal: 'Ballot | None',
-        counter_proposal: 'Ballot | None',
-        tie_breaker: 'Ballot | None'
+        proposal: 'Ballot | BallotResult | None',
+        counter_proposal: 'Ballot | BallotResult | None',
+        tie_breaker: 'Ballot | BallotResult | None'
     ) -> str | None:
+
         if not (counted and proposal and counter_proposal and tie_breaker):
             return None
 
