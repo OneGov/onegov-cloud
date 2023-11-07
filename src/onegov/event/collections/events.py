@@ -5,10 +5,10 @@ from collections import namedtuple
 from datetime import date, timezone
 from datetime import datetime
 from datetime import timedelta
-
 from icalendar import Calendar as vCalendar
 from icalendar.prop import vCategory
-from lxml import objectify, etree
+from lxml import etree
+from lxml.etree import SubElement, CDATA
 from markupsafe import escape
 
 from onegov.core.collection import Pagination
@@ -474,8 +474,6 @@ class EventCollection(Pagination):
         :return: xml string
 
         """
-        cdata = '<![CDATA[{}]]>'
-
         xml = ('<import partner="" partnerid="" passwort="" importid="">'
                '</import>')
         root = etree.XML(xml)
@@ -488,37 +486,45 @@ class EventCollection(Pagination):
                     e.end)).date() < datetime.today().date():
                 continue
 
-            # TODO translate tags
             last_change = e.last_change.strftime('%Y-%m-%d %H:%M:%S')
-            event = objectify.Element(
-                'item',
-                {
-                    'status': '1',
-                    'suchbar': '1',
-                    'mutationsdatum': last_change
-                }
-            )
-            event.id = e.id
-            event.titel = e.title
+            event = SubElement(root, 'item', attrib={
+                'status': '1',
+                'suchbar': '1',
+                'mutationsdatum': last_change,
+            })
+
+            id = SubElement(event, 'id')
+            id.text = str(e.id)
+
+            title = SubElement(event, 'titel')
+            title.text = e.title
+
+            text_mobile = SubElement(event, 'textmobile')
             if e.description:
-                if len(e.description) > 100:
-                    event.textmobile = cdata.format(e.description[:100] + '..')
+                if len(e.description) > 10000:
+                    text_mobile.text = CDATA(e.description[:9995] + '..')
                 else:
-                    event.textmobile = cdata.format(e.description)
-                event.append(text_tag(cdata.format(e.description)))
+                    text_mobile.text = CDATA(e.description)
+
             for occ in e.occurrences:
-                termin = objectify.Element('termin')
-                termin.von = occ.localized_start.replace(tzinfo=None)
-                termin.bis = occ.localized_end.replace(tzinfo=None)
-                event.append(termin)
+                termin = SubElement(event, 'termin')
+                event_start = SubElement(termin, 'von')
+                event_start.text = (
+                    str(occ.localized_start.replace(tzinfo=None)))
+                event_end = SubElement(termin, 'bis')
+                event_end.text = str(occ.localized_end.replace(tzinfo=None))
 
             if e.price:
-                event.sf01 = cdata.format(e.price)
+                price = SubElement(event, 'sf01')
+                price.text = CDATA(e.price)
 
             if e.external_event_url:
-                event.url_web = e.external_event_url
+                url = SubElement(event, 'url_web')
+                url.text = e.external_event_url
+
             if e.image:
-                event.url_bild = request.link(e.image)
+                image = SubElement(event, 'url_bild')
+                image.text = request.link(e.image)
 
             hr_text = ''
             tags = []
@@ -533,54 +539,32 @@ class EventCollection(Pagination):
                             tags.extend(v)
                         else:
                             tags.append(v)
-            hr = objectify.Element('hauptrubrik',
-                                   attrib={'name': hr_text} if
-                                   hr_text else None)
-            hr.rubrik = tags or None
-            event.append(hr)
+                top_category = SubElement(event, 'hauptrubrik',
+                                          attrib={'name': hr_text} if
+                                          hr_text else None)
+            for tag in tags:
+                category = SubElement(top_category, 'rubrik')
+                category.text = tag
+
             if e.organizer_email:
-                event.email = e.organizer_email
+                email = SubElement(event, 'email')
+                email.text = e.organizer_email
+
             if e.organizer_phone:
-                event.telefon1 = e.organizer_phone
-            ort = objectify.Element('veranstaltungsort')
-            ort.titel = e.location
+                phone = SubElement(event, 'telefon1')
+                phone.text = e.organizer_phone
+
+            location = SubElement(event, 'veranstaltungsort')
+            location_title = SubElement(location, 'titel')
+            location_title.text = e.location
+
             if e.coordinates:
-                ort.longitude = e.coordinates.lon
-                ort.latitude = e.coordinates.lat
-            event.append(ort)
-            root.append(event)
+                longitude = SubElement(location, 'longitude')
+                longitude.text = str(e.coordinates.lon)
+                latitude = SubElement(location, 'latitude')
+                latitude.text = str(e.coordinates.lat)
 
-        # remove lxml annotations
-        objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True,
-                             cleanup_namespaces=True)
-
-        return etree.tostring(root, encoding='utf-8', xml_declaration=True,
-                              pretty_print=True)
-
-
-class tags(etree.ElementBase):
-    """
-    Custom class as 'tag' is a member of class Element and cannot be
-    used as tag name.
-    """
-
-    def __init__(self, tags=()):
-        super().__init__()
-        self.tag = 'tags'
-
-        for t in tags:
-            tag = etree.Element('tag')
-            tag.text = t
-            self.append(tag)
-
-
-class text_tag(etree.ElementBase):
-    """
-    Custom class as 'text' is a member of class Element and cannot be
-    used as tag name.
-    """
-
-    def __init__(self, text):
-        super().__init__()
-        self.tag = 'text'
-        self.text = text
+        return etree.tostring(root,
+                              encoding='utf-8',
+                              xml_declaration=True,
+                              pretty_print=True).decode()
