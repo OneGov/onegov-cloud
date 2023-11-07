@@ -532,8 +532,8 @@ class OccurrenceCollection(Pagination):
             txs = tags(e.tags)
             event.append(txs)
             event.description = e.description
-            event.start = e.start
-            event.end = e.end
+            event.start = e.localized_start
+            event.end = e.localized_end
             event.location = e.location
             event.price = e.price
             event.organizer = e.organizer
