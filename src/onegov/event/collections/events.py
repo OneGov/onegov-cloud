@@ -508,8 +508,8 @@ class EventCollection(Pagination):
                 event.append(text_tag(cdata.format(e.description)))
             for occ in e.occurrences:
                 termin = objectify.Element('termin')
-                termin.von = occ.localized_start
-                termin.bis = occ.localized_end
+                termin.von = occ.localized_start.replace(tzinfo=None)
+                termin.bis = occ.localized_end.replace(tzinfo=None)
                 event.append(termin)
 
             if e.price:
