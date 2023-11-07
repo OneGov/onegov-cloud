@@ -41,8 +41,8 @@ class VotumForm(NamedFileForm):
         fieldset=_('Person'),
         label=_('Person from person directory'),
         description=_('Choosing a person will overwrite the fields below'),
-        default=', , , ',
-        choices=[(', , , ', '...')]
+        default=', , , , ',
+        choices=[(', , , , ', '...')]
     )
 
     person_name = TypeAheadField(
@@ -131,7 +131,7 @@ class VotumForm(NamedFileForm):
                     p.political_party,
                     p.location_code_city])))
         ) for p in people]
-        people_choices.insert(0, (', , , ', '...'))
+        people_choices.insert(0, (', , , , ', '...'))
         self.person_choices.choices = [
             (v, c) for v, c in people_choices
         ]
