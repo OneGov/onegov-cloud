@@ -4,7 +4,6 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
-from onegov.file import NamedFile
 from onegov.landsgemeinde import _
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -77,7 +76,7 @@ class Votum(
     person_political_affiliation = Column(Text, nullable=True)
 
     #: A picture of the person
-    person_picture = NamedFile()
+    person_picture = Column(Text, nullable=True)
 
     #: The video timestamp of this agenda item
     video_timestamp = content_property()
