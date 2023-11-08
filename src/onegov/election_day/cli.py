@@ -2,6 +2,7 @@
 from onegov.ballot import Election
 from onegov.ballot import ElectionCompound
 from onegov.ballot import Vote
+from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.sms_processor import SmsQueueProcessor
@@ -172,8 +173,7 @@ def generate_archive() -> 'Processor':
         archive_generator = ArchiveGenerator(app)
         archive_zip = archive_generator.generate_archive()
         if not archive_zip:
-            click.secho("generate_archive returned None.", fg='red')
-            return
+            abort("generate_archive returned None.")
 
         archive_filesize = archive_generator.archive_dir.getinfo(
             archive_zip, namespaces=['details']).size
