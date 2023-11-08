@@ -14,7 +14,7 @@ from onegov.election_day.utils.summaries import get_summary
 from onegov.election_day.utils.summaries import get_vote_summary
 
 
-__all__ = [
+__all__ = (
     'add_cors_header',
     'add_last_modified_header',
     'add_local_results',
@@ -29,4 +29,4 @@ __all__ = [
     'pdf_filename',
     'replace_url',
     'svg_filename',
-]
+)

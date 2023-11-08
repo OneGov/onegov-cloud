@@ -45,6 +45,7 @@ module = [
     "onegov.election_day.collections.*",
     "onegov.election_day.formats.*",
     "onegov.election_day.models.*",
+    "onegov.election_day.utils.*",
     "onegov.file.*",
     "onegov.form.*",
     "onegov.foundation.*",

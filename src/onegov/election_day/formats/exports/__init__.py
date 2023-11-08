@@ -18,16 +18,19 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.ballot.models import Election
+    from onegov.ballot.models import ElectionCompound
 
 
 def export_internal(
-    item: 'Election | Vote',
+    item: 'Election | ElectionCompound | Vote',
     locales: 'Collection[str]'
 ) -> list[dict[str, Any]]:
 
     if isinstance(item, Vote):
         return export_vote_internal(item, locales)
-    return export_election_internal(item, locales)
+    # FIXME: Shouldn't this check for ElectionCompound and use
+    #        export_election_compound_internal?
+    return export_election_internal(item, locales)  # type:ignore[arg-type]
 
 
 __all__ = (
