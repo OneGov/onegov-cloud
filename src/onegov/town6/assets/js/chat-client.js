@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const schema = document.body.dataset.websocketSchema;
 
     function onWebsocketNotification(message, _websocket) {
+        console.log('ich ha folgendes becho (OND ES LIHT ANSCHINEND AM SERVER NED DO MISA)')
+        console.log(message)
         message = JSON.parse(message)
         createChatBubble(message.text, false)
     }

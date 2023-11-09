@@ -64,7 +64,6 @@ class WebSocketServer(WebSocketServerProtocol):
         self.signed_session_id = morsel.value if morsel else None
 
     async def get_chat(self, id):
-        log.debug(CHATS)
         chat = CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
         if chat is NOTFOUND:
             chat = ChatCollection(self.session).by_id(id)
@@ -346,6 +345,7 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
     staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
 
     log.debug(f'added {websocket.id} to channel-connections')
+    log.debug(f'ws-location: {websocket}')
     # log.debug(f'CHANNELS: {CHANNELS}')
 
     for client in staff_connections:
@@ -353,15 +353,16 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
             'type': "notification",
             'message': dumps({
                 'type': 'info',
-                'text': 'Neue Chat-Anfrage'
-            }),
-            'channel': channel.hex
+                'text': 'Neue Chat-Anfrage',
+                'channel': channel.hex
+            })
         }))
 
     while websocket.open:
         try:
             message = await websocket.recv()
-            log.debug(f'I got the message {message}')
+            log.debug(f'customer {websocket.id} got the message {message}')
+            log.debug(f'known channel members {channel_connections}')
         except Exception:
             channel_connections.remove(websocket)
             log.debug(f'removed {websocket.id} from channel-connections')
@@ -369,8 +370,7 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
         for client in channel_connections:
             await client.send(dumps({
                 'type': "notification",
-                'message': message,
-                'channel': channel.hex
+                'message': message
             }))
 
         websocket.session.flush()
@@ -395,29 +395,31 @@ async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
 
     await acknowledge(websocket)
 
-    # all_channels = CHANNELS.setdefault(schema, {})
-    # channel_connections = all_channels.setdefault(channel, set())
-    # channel_connections.add(websocket)
+    all_channels = CHANNELS.setdefault(schema, {})
     staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
     staff_connections.add(websocket)
 
     log.debug(f'added {websocket.id} to staff-connections')
-    log.debug(f'STAFF_CONNECTIONS: {STAFF_CONNECTIONS}')
 
     while websocket.open:
         try:
             message = await websocket.recv()
-            log.debug(f'I got the message {message}')
+            log.debug(f'staff member {websocket.id} got the message {message}')
+
         except Exception:
             staff_connections.remove(websocket)
             log.debug(f'removed {websocket.id} from staff-connections')
 
-    # for client in channel_connections:
-    #     await client.send(dumps({
-    #         'type': "notification",
-    #         'message': message,
-    #         # 'channel': channel
-    #     }))
+        if loads(message)['type'] == 'accepted':
+            open_channel = loads(message)['channel']
+            channel_clients = all_channels[open_channel]
+            channel_clients.add(websocket)
+
+        for client in channel_clients:
+            await client.send(dumps({
+                'type': "notification",
+                'message': message,
+            }))
 
     websocket.session.flush()
 

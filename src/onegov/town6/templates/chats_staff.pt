@@ -32,7 +32,17 @@
                 <div class="sidebar-wrapper">
                     <div class="sidebar-content-wrapper">
                         <div class="side-panel">
-                            <h3>Weitere Chats</h3>
+                            <h3>Chat Anfragen</h3>
+                            <ul class="more-list" id="request-list">
+                                <li style="display: none;" id="new-request">
+                                    <a class="list-link" href="#"><span class="list-title">Neue Anfrage</span><br/></a>
+                                    <a class="button">Annehmen</a>
+                                    <p class="list-lead preview"><i class="far fa-clock"></i> 5:00</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="side-panel">
+                            <h3>Aktive Chats</h3>
                             <ul class="more-list">
                                 <li>
                                     <a class="list-link" href="#">

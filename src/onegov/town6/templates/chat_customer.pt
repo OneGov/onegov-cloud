@@ -29,31 +29,7 @@
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
-                <!-- <div class="sidebar-wrapper">
-                    <div class="sidebar-content-wrapper">
-                        <div class="side-panel">
-                            <h3>Weitere Chats</h3>
-                            <ul class="more-list">
-                                <li>
-                                    <a class="list-link" href="#">
-                                        <span class="list-title">Haku von Bubendorf</span>
-                                    </a>
-                                    <a href="#">
-                                        <p class="list-lead preview">Vielen Dank.</p>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="list-link" href="#">
-                                        <span class="list-title">Chantal Trutmann</span>
-                                    </a>
-                                    <a href="#">
-                                        <p class="list-lead preview">Können Sie mir noch ...</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div> -->
+                
             </div>
         </div>
 

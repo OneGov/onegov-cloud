@@ -21,12 +21,36 @@ document.addEventListener("DOMContentLoaded", function() {
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
 
-    function onWebsocketNotification(message, _websocket) {
+    function onWebsocketNotification(message, websocket) {
         message = JSON.parse(message)
-        if (message.type == 'message') {
+        if (message.type == 'info') {
+            notifyMe(message.text) // Browser notification
+
+            // Add request element
+            var requestElement = document.getElementById('new-request')
+            var newRequest = requestElement.cloneNode(true)
+            newRequest.id = ''
+            newRequest.style.display = 'block'
+            newRequest.children[1].id = message.channel
+            var requestList = document.getElementById('request-list')
+            console.log('list', requestList)
+            console.log('newrequest', newRequest)
+            requestList.appendChild(newRequest)
+
+            newRequest.children[1].addEventListener("click", () => {
+
+                const payload = JSON.stringify({
+                    type: "accepted",
+                    text: "Anfrage wurde angenommen",
+                    channel: message.channel
+                });
+
+                websocket.send(payload);
+            })
+        } else if (message.type == 'message') {
             createChatBubble(message.text, false)
-        } else if (message.type == 'info') {
-            notifyMe(message.text)
+        } else {
+            createChatBubble(message.text, false)
         }
     }
 
@@ -52,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
         now = new Date().toUTCString()
         const time = document.createTextNode(now);
         const text = document.createTextNode(message);
-        
+
         timeNode.appendChild(time);
         card.appendChild(section);
         section.appendChild(textNode);
@@ -81,9 +105,9 @@ document.addEventListener("DOMContentLoaded", function() {
             createChatBubble(chatWindow.value, true)
 
             const payload = JSON.stringify({
-                type: "message",
+                type: 'message',
                 text: chatWindow.value,
-                user: customerName,
+                user: 'Mitarbeitername',
                 time: now,
             });
 
