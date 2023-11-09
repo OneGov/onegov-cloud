@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const payload = JSON.stringify({
                 type: "message",
                 text: chatWindow.value,
-                user: customerName,
+                user: 'Kundenname',
                 time: now,
             });
 

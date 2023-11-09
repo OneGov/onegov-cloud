@@ -1,10 +1,33 @@
 document.addEventListener("DOMContentLoaded", function() {
+    function notifyMe(message) {
+        if (!("Notification" in window)) {
+          // Check if the browser supports notifications
+          alert("This browser does not support desktop notification");
+        } else if (Notification.permission === "granted") {
+          // Check whether notification permissions have already been granted;
+          // if so, create a notification
+          const notification = new Notification(message);
+        } else if (Notification.permission !== "denied") {
+          // We need to ask the user for permission
+          Notification.requestPermission().then((permission) => {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+              const notification = new Notification(message);
+            }
+          });
+        }
+    }
+
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
 
     function onWebsocketNotification(message, _websocket) {
         message = JSON.parse(message)
-        createChatBubble(message.text, false)
+        if (message.type == 'message') {
+            createChatBubble(message.text, false)
+        } else if (message.type == 'info') {
+            notifyMe(message.text)
+        }
     }
 
     function onWebsocketError(_event, websocket) {

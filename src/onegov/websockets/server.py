@@ -64,12 +64,13 @@ class WebSocketServer(WebSocketServerProtocol):
         self.signed_session_id = morsel.value if morsel else None
 
     async def get_chat(self, id):
+        log.debug(CHATS)
         chat = CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
         if chat is NOTFOUND:
             chat = ChatCollection(self.session).by_id(id)
             if chat and not chat.active:
                 chat = None
-            CHATS[self.schema] = chat
+            CHATS[self.schema][chat.id] = chat
         return chat
 
     @property
@@ -290,7 +291,6 @@ async def handle_broadcast(
                 'message': message
             })
         )
-        log.debug('es hed immerhin en Broadcast gä')
 
     log.debug(
         f'{websocket.id} sent {message}'
@@ -351,13 +351,20 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
     for client in staff_connections:
         await client.send(dumps({
             'type': "notification",
-            'message': dumps({'text': "initialisierung"}),
+            'message': dumps({
+                'type': 'info',
+                'text': 'Neue Chat-Anfrage'
+            }),
             'channel': channel.hex
         }))
 
     while websocket.open:
-        message = await websocket.recv()
-        log.debug(f'I got the message {message}')
+        try:
+            message = await websocket.recv()
+            log.debug(f'I got the message {message}')
+        except Exception:
+            channel_connections.remove(websocket)
+            log.debug(f'removed {websocket.id} from channel-connections')
 
         for client in channel_connections:
             await client.send(dumps({
@@ -398,17 +405,21 @@ async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
     log.debug(f'STAFF_CONNECTIONS: {STAFF_CONNECTIONS}')
 
     while websocket.open:
-        message = await websocket.recv()
-        log.debug(f'I got the message {message}')
+        try:
+            message = await websocket.recv()
+            log.debug(f'I got the message {message}')
+        except Exception:
+            staff_connections.remove(websocket)
+            log.debug(f'removed {websocket.id} from staff-connections')
 
-        # for client in channel_connections:
-        #     await client.send(dumps({
-        #         'type': "notification",
-        #         'message': message,
-        #         # 'channel': channel
-        #     }))
+    # for client in channel_connections:
+    #     await client.send(dumps({
+    #         'type': "notification",
+    #         'message': message,
+    #         # 'channel': channel
+    #     }))
 
-        websocket.session.flush()
+    websocket.session.flush()
 
 
 async def handle_start(websocket: WebSocketServerProtocol) -> None:
