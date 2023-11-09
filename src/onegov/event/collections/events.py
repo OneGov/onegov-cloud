@@ -439,7 +439,6 @@ class EventCollection(Pagination):
                 <titel>Titel der Seite</titel>
                 <textmobile>2-3 Sätze des Text Feldes packed in
                 CDATA</textmobile>
-                <text>Beschreibung packed in CDATA</text>
                 <termin allday="1">
                     <von>2011-08-06 00:00:00</von>
                     <bis>2011-08-06 23:59:00</bis>
