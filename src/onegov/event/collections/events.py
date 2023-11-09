@@ -500,10 +500,10 @@ class EventCollection(Pagination):
 
             text_mobile = SubElement(event, 'textmobile')
             if e.description:
+                desc = e.description
                 if len(e.description) > 10000:
-                    text_mobile.text = CDATA(e.description[:9995] + '..')
-                else:
-                    text_mobile.text = CDATA(e.description)
+                    desc = e.description[:9995] + '..'
+                text_mobile.text = CDATA(desc.replace('\r\n', '<br>'))
 
             for occ in e.occurrences:
                 termin = SubElement(event, 'termin')
@@ -515,7 +515,7 @@ class EventCollection(Pagination):
 
             if e.price:
                 price = SubElement(event, 'sf01')
-                price.text = CDATA(e.price)
+                price.text = CDATA(e.price.replace('\r\n', '<br>'))
 
             if e.external_event_url:
                 url = SubElement(event, 'url_web')
