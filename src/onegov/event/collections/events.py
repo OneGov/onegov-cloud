@@ -482,8 +482,7 @@ class EventCollection(Pagination):
         for e in query:
             if e.state != 'published':
                 continue
-            if future_events_only and datetime.fromisoformat(str(
-                    e.end)).date() < datetime.today().date():
+            if future_events_only and not e.future_occurrences().all():
                 continue
 
             last_change = e.last_change.strftime('%Y-%m-%d %H:%M:%S')
