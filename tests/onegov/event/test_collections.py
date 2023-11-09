@@ -1422,47 +1422,46 @@ def test_as_anthrazit_xml(session):
         return result
 
     events = EventCollection(session)
-    with freeze_time("2023-04-01"):
-        event = events.add(
-            title='Squirrel Park Visit',
-            start=datetime(2023, 4, 10, 9, 30),
-            end=datetime(2023, 4, 10, 18, 00),
-            timezone='Europe/Zurich',
-            content={
-                'description': '<em>Furry</em> things will happen!'
-            },
-            location='Squirrel Park',
-            tags=['fun', 'animals'],
-            filter_keywords=dict(EventType='Park'),
-            recurrence=(
-                'RRULE:FREQ=WEEKLY;'
-                'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
-                'UNTIL=20230420T220000Z'
-            ),
-            organizer_email='info@squirrelpark.com',
-            organizer_phone='+1 123 456 7788',
-            price='Adults: $12\nKids (>8): $4',
-            coordinates=Coordinates(47.051752750515746, 8.305739625357093)
-        )
-        event.submit()
-        event.publish()
+    event = events.add(
+        title='Squirrel Park Visit',
+        start=datetime(2023, 4, 10, 9, 30),
+        end=datetime(2023, 4, 10, 18, 00),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Furry\r\nthings will happen!'
+        },
+        location='Squirrel Park',
+        tags=['fun', 'animals'],
+        filter_keywords=dict(EventType='Park'),
+        recurrence=(
+            'RRULE:FREQ=WEEKLY;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+            'UNTIL=20230420T220000Z'
+        ),
+        organizer_email='info@squirrelpark.com',
+        organizer_phone='+1 123 456 7788',
+        price='Adults: $12\r\nKids (>8): $4',
+        coordinates=Coordinates(47.051752750515746, 8.305739625357093)
+    )
+    event.submit()
+    event.publish()
 
-        event = events.add(
-            title='History of the Squirrel Park',
-            start=datetime(2023, 4, 18, 14, 00),
-            end=datetime(2023, 4, 18, 16, 00),
-            timezone='Europe/Zurich',
-            content={
-                'description': 'Learn how the Park got so <em>furry</em>!'
-            },
-            location='Squirrel Park',
-            tags=['history'],
-            filter_keywords=dict(kalender='Park Calendar'),
-        )
-        event.submit()
-        event.publish()
+    event = events.add(
+        title='History of the Squirrel Park',
+        start=datetime(2023, 4, 18, 14, 00),
+        end=datetime(2023, 4, 18, 16, 00),
+        timezone='Europe/Zurich',
+        content={
+            'description': 'Learn how the Park got so <em>furry</em>!'
+        },
+        location='Squirrel Park',
+        tags=['history'],
+        filter_keywords=dict(kalender='Park Calendar'),
+    )
+    event.submit()
+    event.publish()
 
-        session.flush()
+    session.flush()
 
     collection = EventCollection(session)
     xml = collection.as_anthrazit_xml(DummyRequest(),
@@ -1506,8 +1505,7 @@ def test_as_anthrazit_xml(session):
     assert root[0].find('id').text
     assert root[0].find('titel').text == 'Squirrel Park Visit'
     # FYI CDATA gets stripped
-    assert (root[0].find('textmobile').text == '<em>Furry</em> '
-                                               'things will happen!')
+    assert (root[0].find('textmobile').text == 'Furry<br>things will happen!')
     dates = root[0].findall('termin')
     assert len(dates) == len(expected_dates_start)
     assert len(dates) == len(expected_dates_end)
@@ -1519,7 +1517,7 @@ def test_as_anthrazit_xml(session):
         assert rubrik.text.lower() in ['fun', 'animals', 'park']
     assert root[0].find('email').text == 'info@squirrelpark.com'
     assert root[0].find('telefon1').text == '+1 123 456 7788'
-    assert root[0].find('sf01').text == 'Adults: $12\nKids (>8): $4'
+    assert root[0].find('sf01').text == 'Adults: $12<br>Kids (>8): $4'
     assert root[0].find('veranstaltungsort').find('titel').text == ('Squirrel '
                                                                     'Park')
     assert (root[0].find('veranstaltungsort').find('longitude').
