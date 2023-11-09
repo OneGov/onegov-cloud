@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-08-30 15:12+0200\n"
+"POT-Creation-Date: 2023-11-09 09:04+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -180,6 +180,12 @@ msgstr "Elimina persona"
 msgid "Tickets"
 msgstr "Biglietti"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 
@@ -206,11 +212,17 @@ msgstr "Archivia il biglietto"
 msgid "Recover from archive"
 msgstr "Recupera dall'archivio"
 
+msgid "Delete Ticket"
+msgstr "Cancella biglietto"
+
 msgid "New Note"
 msgstr "Nuova nota"
 
 msgid "PDF"
 msgstr "PDF"
+
+msgid "Download files"
+msgstr "Scarica i file"
 
 msgid "Upload to Gever"
 msgstr "Caricare a Gever"
@@ -337,6 +349,9 @@ msgstr "Do"
 msgid "Every ${days} until ${end}"
 msgstr "Ogni ${days} fino al ${end}"
 
+msgid "Configure"
+msgstr "Configura"
+
 msgid "Import"
 msgstr "Importa"
 
@@ -456,9 +471,6 @@ msgstr "Cartelle"
 
 msgid "Directory"
 msgstr "Cartella"
-
-msgid "Configure"
-msgstr "Configura"
 
 #, python-format
 msgid "Do you really want to delete \"${title}\"?"
@@ -672,24 +684,18 @@ msgstr "Questo album non contiene ancora nessuna immagine."
 msgid "No photo albums defined yet."
 msgstr "Nessun album fotografico ancora definito."
 
+msgid "Search term"
+msgstr "Termine di ricerca"
+
 #, fuzzy
 msgid "Skip navigation"
 msgstr "Migrazione dei link"
-
-msgid "Straight to ..."
-msgstr "Direttamente a ..."
 
 msgid "Back to the homepage"
 msgstr "Torna alla pagina principale"
 
 msgid "Logo"
 msgstr "Logo"
-
-msgid "Search term"
-msgstr "Termine di ricerca"
-
-msgid "Perform Search"
-msgstr "Ricerca"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr "Il modulo contiene degli errori. Verifica i campi segnalati in rosso."
@@ -755,8 +761,14 @@ msgstr "Questo sito è privato"
 msgid "This site is private but can also be seen by members"
 msgstr "Questo sito è privato ma può essere visto dai membri"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Questo sito è pubblico ma richiede l'invio di un mTAN"
+
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Questo sito è segreto e richiede l'invio di un mTAN"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
@@ -775,6 +787,9 @@ msgstr ""
 
 msgid "Map"
 msgstr "Mappa"
+
+msgid "Documents"
+msgstr "Documenti"
 
 msgid "More news"
 msgstr "Altre notizie"
@@ -893,6 +908,9 @@ msgstr "Numero di telefono dell'organizzatore"
 msgid "Tags"
 msgstr "Tag"
 
+msgid "Filters"
+msgstr "Filtri"
+
 msgid "Date and time"
 msgstr "Data e ora"
 
@@ -952,6 +970,9 @@ msgstr ""
 "Questo spazio contiene le immagini dei tuoi album fotografici. Per mostrare "
 "le foto, aggiungi alcune foto a un album e contrassegnalo come disponibile "
 "per la home page."
+
+msgid "Current Image"
+msgstr "Immagine attuale"
 
 msgid "Has a digital seal"
 msgstr "Ha un sigillo digitale"
@@ -2138,3 +2159,13 @@ msgstr "Migrazione dei link"
 
 msgid "OneGov API"
 msgstr "API OneGov"
+
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
+
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."

@@ -69,12 +69,12 @@ def migrate_to_jsonb(
     except ImportError:
         pass
 
-    columns = list(c for cls in classes for c in json_columns(cls))
+    columns = [c for cls in classes for c in json_columns(cls)]
 
     if not columns:
         return False
 
-    text_columns = list(
+    text_columns = [
         r.identity for r in connection.execute(text("""
             SELECT concat_ws(':', table_schema, table_name, column_name)
                 AS identity
@@ -83,7 +83,7 @@ def migrate_to_jsonb(
                AND table_schema IN :schemas
                AND column_name IN :names
         """), schemas=tuple(schemas), names=tuple(c.name for c in columns))
-    )
+    ]
 
     for schema in schemas:
         for column in columns:

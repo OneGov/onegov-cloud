@@ -17,9 +17,18 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
+    from onegov.ballot.types import DistrictPercentage
+    from onegov.ballot.types import EntityPercentage
+    from onegov.ballot.types import Gender
+    from sqlalchemy.sql import ColumnElement
+
     from .candidate_panachage_result import CandidatePanachageResult
+    from .election import Election
+    from .list import List
+    from .proporz_election import ProporzElection
 
     rel = relationship
 
@@ -30,45 +39,54 @@ class Candidate(Base, TimestampMixin):
     __tablename__ = 'candidates'
 
     #: the internal id of the candidate
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: the external id of the candidate
-    candidate_id = Column(Text, nullable=False)
+    candidate_id: 'Column[str]' = Column(Text, nullable=False)
 
     #: the family name
-    family_name = Column(Text, nullable=False)
+    family_name: 'Column[str]' = Column(Text, nullable=False)
 
     #: the first name
-    first_name = Column(Text, nullable=False)
+    first_name: 'Column[str]' = Column(Text, nullable=False)
 
     #: True if the candidate is elected
-    elected = Column(Boolean, nullable=False)
+    elected: 'Column[bool]' = Column(Boolean, nullable=False)
 
     #: the gender
-    gender = Column(
-        Enum('male', 'female', 'undetermined', name='candidate_gender'),
+    gender: 'Column[Gender | None]' = Column(
+        Enum(  # type:ignore[arg-type]
+            'male',
+            'female',
+            'undetermined',
+            name='candidate_gender'
+        ),
         nullable=True
     )
 
     #: the year of birth
-    year_of_birth = Column(Integer, nullable=True)
+    year_of_birth: 'Column[int | None]' = Column(Integer, nullable=True)
 
     #: the election this candidate belongs to
-    election_id = Column(
+    election_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
     )
 
     #: the list this candidate belongs to
-    list_id = Column(
-        UUID,
+    list_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
         ForeignKey('lists.id', ondelete='CASCADE'),
         nullable=True
     )
 
     #: the party name
-    party = Column(Text, nullable=True)
+    party: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: a candidate contains n results
     results: 'rel[list[CandidateResult]]' = relationship(
@@ -85,65 +103,79 @@ class Candidate(Base, TimestampMixin):
         lazy='dynamic'
     )
 
+    if TYPE_CHECKING:
+        # backrefs
+        # (we should switch over to explicit relationships with back_populates)
+        election: relationship[Election]
+        list: relationship[List | None]
+
     #: the total votes
     votes = summarized_property('votes')
 
-    def aggregate_results(self, attribute):
+    def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
         return sum(getattr(result, attribute) for result in self.results)
 
     @staticmethod
-    def aggregate_results_expression(cls, attribute):
+    def aggregate_results_expression(
+        cls: type['Candidate'],
+        attribute: str
+    ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
         """
 
-        expr = select([func.sum(getattr(CandidateResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(CandidateResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(CandidateResult.candidate_id == cls.id)
-        expr = expr.label(attribute)
-        return expr
+        return expr.label(attribute)
 
     @property
-    def percentage_by_entity(self):
+    def percentage_by_entity(self) -> dict[int, 'EntityPercentage']:
         """ Returns the percentage of votes by the entity. Includes uncounted
         entities and entities with no results available.
 
         """
-        results = self.election.results.order_by(None)
-        results = results.join(ElectionResult.candidate_results)
-        results = results.filter(CandidateResult.candidate_id == self.id)
+        query = self.election.results.order_by(None)
+        query = query.join(ElectionResult.candidate_results)
+        query = query.filter(CandidateResult.candidate_id == self.id)
 
         if self.election.type == 'proporz':
-            totals_by_entity = self.election.votes_by_entity.subquery()
+            proporz_election = cast('ProporzElection', self.election)
+            totals_by_entity = proporz_election.votes_by_entity.subquery()
 
-            results = results.with_entities(
+            results_sub = query.with_entities(
                 ElectionResult.entity_id.label('id'),
                 ElectionResult.counted.label('counted'),
                 CandidateResult.votes.label('votes')
-            )
-            results_sub = results.subquery()
+            ).subquery()
 
             session = object_session(self)
-            query = session.query(
-                results_sub.c.id, results_sub.c.counted,
+            results = session.query(
+                results_sub.c.id,
+                results_sub.c.counted,
                 totals_by_entity.c.votes.label('total'),
                 results_sub.c.votes
             )
-            results = query.join(
+            results = results.join(
                 totals_by_entity,
                 totals_by_entity.c.entity_id == results_sub.c.id
             )
 
         else:
-            results = results.with_entities(
+            results = query.with_entities(
                 ElectionResult.entity_id.label('id'),
                 ElectionResult.counted.label('counted'),
                 ElectionResult.accounted_ballots.label('total'),
                 CandidateResult.votes.label('votes')
             )
 
-        percentage = {
+        percentage: dict[int, 'EntityPercentage'] = {
             r.id: {
                 'counted': r.counted,
                 'votes': r.votes,
@@ -152,8 +184,7 @@ class Candidate(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results
-        empty = empty.with_entities(
+        empty = self.election.results.with_entities(
             ElectionResult.entity_id.label('id'),
             ElectionResult.counted.label('counted')
         )
@@ -164,26 +195,26 @@ class Candidate(Base, TimestampMixin):
             r.id: {
                 'counted': r.counted,
                 'percentage': 0.0,
-                'votes': 0.0
+                'votes': 0
             } for r in empty}
         )
         return percentage
 
     @property
-    def percentage_by_district(self):
+    def percentage_by_district(self) -> dict[str, 'DistrictPercentage']:
         """ Returns the percentage of votes aggregated by the distict. Includes
         uncounted districts and districts with no results available.
 
         """
-        results = self.election.results
-        results = results.join(ElectionResult.candidate_results)
-        results = results.filter(CandidateResult.candidate_id == self.id)
+        query = self.election.results
+        query = query.join(ElectionResult.candidate_results)
+        query = query.filter(CandidateResult.candidate_id == self.id)
 
         if self.election.type == 'proporz':
 
             totals_by_district = self.election.votes_by_district.subquery()
 
-            results = results.with_entities(
+            query = query.with_entities(
                 ElectionResult.district.label('name'),
                 func.array_agg(ElectionResult.entity_id).label('entities'),
                 func.coalesce(
@@ -191,25 +222,26 @@ class Candidate(Base, TimestampMixin):
                 ).label('counted'),
                 func.sum(CandidateResult.votes).label('votes'),
             )
-            results = results.group_by(ElectionResult.district)
-            results = results.order_by(None)
+            query = query.group_by(ElectionResult.district)
+            query = query.order_by(None)
 
-            results_sub = results.subquery()
+            results_sub = query.subquery()
 
             session = object_session(self)
-            query = session.query(
-                results_sub.c.name, results_sub.c.entities,
+            results = session.query(
+                results_sub.c.name,
+                results_sub.c.entities,
                 results_sub.c.counted,
                 totals_by_district.c.votes.label('total'),
                 results_sub.c.votes
             )
-            results = query.join(
+            results = results.join(
                 totals_by_district,
                 totals_by_district.c.district == results_sub.c.name
             )
 
         else:
-            results = results.with_entities(
+            results = query.with_entities(
                 ElectionResult.district.label('name'),
                 func.array_agg(ElectionResult.entity_id).label('entities'),
                 func.coalesce(
@@ -221,8 +253,7 @@ class Candidate(Base, TimestampMixin):
             results = results.group_by(ElectionResult.district)
             results = results.order_by(None)
 
-        results = results.all()
-        percentage = {
+        percentage: dict[str, 'DistrictPercentage'] = {
             r.name: {
                 'counted': r.counted,
                 'entities': r.entities,
@@ -232,8 +263,7 @@ class Candidate(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results
-        empty = empty.with_entities(
+        empty = self.election.results.with_entities(
             ElectionResult.district.label('name'),
             func.array_agg(ElectionResult.entity_id).label('entities'),
             func.coalesce(
@@ -255,7 +285,7 @@ class Candidate(Base, TimestampMixin):
                     'counted': result.counted,
                     'entities': result.entities,
                     'percentage': 0.0,
-                    'votes': 0.0
+                    'votes': 0
                 }
 
         return percentage

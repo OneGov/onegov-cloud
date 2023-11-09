@@ -21,6 +21,8 @@ from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
 from wtforms.fields import URLField
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
+from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
@@ -123,14 +125,14 @@ class ElectionCompoundForm(Form):
             "is completed."
         ),
         fieldset=_("Completion"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     manually_completed = BooleanField(
         label=_("Completed"),
         fieldset=_("Completion"),
         depends_on=('completes_manually', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     election_de = StringField(
@@ -167,7 +169,8 @@ class ElectionCompoundForm(Form):
 
     related_link = URLField(
         label=_("Link"),
-        fieldset=_("Related link")
+        fieldset=_("Related link"),
+        validators=[URL(), Optional()]
     )
     related_link_label_de = StringField(
         label=_("Link label german"),
@@ -223,7 +226,7 @@ class ElectionCompoundForm(Form):
         label=_("Doppelter Pukelsheim"),
         fieldset=_("View options"),
         description=_("Allows to show the list groups and lists views."),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     voters_counts = BooleanField(
@@ -241,7 +244,7 @@ class ElectionCompoundForm(Form):
         description=_(
             "Shows exact voters counts instead of rounded values."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     horizontal_party_strengths = BooleanField(
@@ -251,7 +254,7 @@ class ElectionCompoundForm(Form):
             "Shows a horizontal bar chart instead of a vertical bar chart."
         ),
         depends_on=('show_party_strengths', 'y'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     use_historical_party_results = BooleanField(
@@ -262,7 +265,7 @@ class ElectionCompoundForm(Form):
             "legislative period with party results. Requires that both "
             "elections use the same party IDs."
         ),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_seat_allocation = BooleanField(
@@ -272,7 +275,7 @@ class ElectionCompoundForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
     )
 
     show_list_groups = BooleanField(
@@ -282,7 +285,7 @@ class ElectionCompoundForm(Form):
             "voters counts. Only if Doppelter Pukelsheim."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('pukelsheim', 'y'),
     )
 
@@ -293,7 +296,7 @@ class ElectionCompoundForm(Form):
             "chart. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     show_party_panachage = BooleanField(
@@ -302,7 +305,7 @@ class ElectionCompoundForm(Form):
             "Shows a tab with the panachage. Requires party results."
         ),
         fieldset=_("Views"),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     color_hint = PanelField(
@@ -312,7 +315,7 @@ class ElectionCompoundForm(Form):
         text=(
             'AL #a74c97\n'
             'BDP #a9cf00\n'
-            'CVP #d28b00\n'
+            'Die Mitte #d28b00\n'
             'EDU #7f6b65\n'
             'EVP #e3c700\n'
             'FDP #0084c7\n'

@@ -7,7 +7,6 @@ from onegov.election_day.formats import export_election_internal
 from onegov.election_day.formats import export_parties_internal
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.election import get_aggregated_list_results
 from onegov.election_day.utils.election import get_connection_results_api
 from webob.exc import HTTPNotFound
 
@@ -113,18 +112,6 @@ def view_election_parties_data_as_csv(self, request):
             )
         )
     }
-
-
-@ElectionDayApp.json(
-    model=Election,
-    name='data-aggregated-lists',
-    permission=Public
-)
-def view_election_aggregated_lists_data(self, request):
-
-    """" View the lists as JSON. """
-
-    return get_aggregated_list_results(self, request.session)
 
 
 @ElectionDayApp.json(

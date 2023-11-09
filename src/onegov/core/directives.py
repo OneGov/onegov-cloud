@@ -9,7 +9,7 @@ from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
-    from morepath import Request
+    from morepath.directive import _RequestT
     from webob import Response
     from wtforms import Form
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 _T = TypeVar('_T')
-_Form = TypeVar('_Form', bound='Form')
+_FormT = TypeVar('_FormT', bound='Form')
 
 
 class HtmlHandleFormAction(HtmlAction):
@@ -53,9 +53,9 @@ class HtmlHandleFormAction(HtmlAction):
         self,
         model: type | str,
         form: 'type[Form] | Callable[[Any, CoreRequest], type[Form]]',
-        render: 'Callable[[Any, Request], Response] | str | None' = None,
+        render: 'Callable[[Any, _RequestT], Response] | str | None' = None,
         template: 'StrOrBytesPath | None' = None,
-        load: 'Callable[[Request], Any] | str | None' = None,
+        load: 'Callable[[_RequestT], Any] | str | None' = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any
@@ -90,10 +90,10 @@ class HtmlHandleFormAction(HtmlAction):
 
 
 def fetch_form_class(
-    form_class: 'type[_Form] | Callable[[Any, CoreRequest], type[_Form]]',
+    form_class: 'type[_FormT] | Callable[[Any, CoreRequest], type[_FormT]]',
     model: object,
     request: 'CoreRequest'
-) -> type['_Form']:
+) -> type[_FormT]:
     """ Given the form_class defined with the form action, together with
     model and request, this function returns the actual class to be used.
 
@@ -136,8 +136,8 @@ def query_form_class(
 
 
 def wrap_with_generic_form_handler(
-    obj: 'Callable[[_T, CoreRequest, _Form], Any]',
-    form_class: 'type[_Form] | Callable[[_T, CoreRequest], type[_Form]]'
+    obj: 'Callable[[_T, CoreRequest, _FormT], Any]',
+    form_class: 'type[_FormT] | Callable[[_T, CoreRequest], type[_FormT]]'
 ) -> 'Callable[[_T, CoreRequest], Any]':
     """ Wraps a view handler with generic form handling.
 

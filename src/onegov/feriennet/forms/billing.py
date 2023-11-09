@@ -41,14 +41,14 @@ class ManualBookingForm(Form):
 
     target = RadioField(
         label=_("Target"),
-        choices=tuple()
+        choices=()
     )
 
     tags = MultiCheckboxField(
         label=_("Tags"),
         validators=(InputRequired(), ),
         depends_on=('target', 'for-users-with-tags'),
-        choices=tuple()
+        choices=()
     )
 
     username = SelectField(
@@ -171,7 +171,7 @@ class PaymentWithDateForm(Form):
         label=_("Items"),
         validators=(InputRequired(), ),
         depends_on=('target', 'specific'),
-        choices=tuple()
+        choices=()
     )
 
     def on_request(self):

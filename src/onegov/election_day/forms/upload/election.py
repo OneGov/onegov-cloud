@@ -28,7 +28,7 @@ class UploadElectionBaseForm(Form):
     complete = BooleanField(
         label=_("Complete"),
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     results = UploadField(
@@ -38,7 +38,7 @@ class UploadElectionBaseForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', '!wabsti_c'),
     )
 
@@ -49,7 +49,7 @@ class UploadElectionBaseForm(Form):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     def adjust(self, principal, election):
@@ -79,7 +79,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_kandidaten = UploadField(
@@ -90,7 +90,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_kandidatengde = UploadField(
@@ -101,7 +101,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_wahl = UploadField(
@@ -112,7 +112,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wmstatic_gemeinden = UploadField(
@@ -123,7 +123,7 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     majority = IntegerField(
@@ -153,7 +153,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     statistics = UploadField(
@@ -163,7 +163,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wp_gemeinden = UploadField(
@@ -173,7 +173,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -184,7 +184,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -195,7 +195,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -206,7 +206,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -217,7 +217,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -229,7 +229,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             FileSizeLimit(MAX_FILE_SIZE)
         ],
         depends_on=('file_format', 'wabsti_c'),
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wpstatic_gemeinden = UploadField(
@@ -239,7 +239,7 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )
 
@@ -250,6 +250,6 @@ class UploadProporzElectionForm(UploadElectionBaseForm):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True),
+        render_kw={'force_simple': True},
         depends_on=('file_format', 'wabsti_c')
     )

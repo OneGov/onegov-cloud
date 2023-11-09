@@ -7,14 +7,19 @@ from onegov.api.utils import check_rate_limit
 from onegov.core.security import Public
 
 
-@ApiApp.json(
-    model=ApiException,
-    permission=Public
-)
-def handle_exception(self, request):
+from typing import TYPE_CHECKING, Any
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from morepath.request import Response
+
+
+@ApiApp.json(model=ApiException, permission=Public)
+def handle_exception(
+    self: ApiException, request: 'CoreRequest'
+) -> dict[str, dict[str, dict[str, Any] | str]]:
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         response.status_code = self.status_code
         response.headers['Content-Type'] = 'application/vnd.collection+json'
         for header in self.headers.items():
@@ -35,10 +40,11 @@ def handle_exception(self, request):
     model=ApiEndpointCollection,
     permission=Public
 )
-def view_api_endpoints(self, request):
-
+def view_api_endpoints(
+    self: ApiEndpointCollection, request: 'CoreRequest'
+) -> dict[str, Any]:
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     return {
@@ -64,12 +70,14 @@ def view_api_endpoints(self, request):
     model=ApiEndpoint,
     permission=Public
 )
-def view_api_endpoint(self, request):
+def view_api_endpoint(
+    self: 'ApiEndpoint[Any]', request: 'CoreRequest'
+) -> dict[str, Any]:
 
     headers = check_rate_limit(request)
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
@@ -118,15 +126,18 @@ def view_api_endpoint(self, request):
     model=ApiEndpointItem,
     permission=Public
 )
-def view_api_endpoint_item(self, request):
-
+def view_api_endpoint_item(
+    self: ApiEndpointItem[Any], request: 'CoreRequest'
+) -> dict[str, Any]:
     headers = check_rate_limit(request)
 
     @request.after
-    def add_headers(response):
+    def add_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/vnd.collection+json'
 
     try:
+        links = self.links or {}
+        data = self.data or {}
         return {
             'collection': {
                 'version': '1.0',
@@ -139,7 +150,7 @@ def view_api_endpoint_item(self, request):
                                 'name': name,
                                 'value': value
                             }
-                            for name, value in self.data.items()
+                            for name, value in data.items()
                         ],
                         'links': [
                             {
@@ -149,7 +160,7 @@ def view_api_endpoint_item(self, request):
                                     else request.link(link)
                                 ),
                             }
-                            for rel, link in self.links.items()
+                            for rel, link in links.items()
                         ]
                     }
                 ],
@@ -161,7 +172,9 @@ def view_api_endpoint_item(self, request):
 
 
 @ApiApp.json(model=AuthEndpoint, permission=Public)
-def get_time_restricted_token(self, request):
+def get_time_restricted_token(
+    self: AuthEndpoint, request: 'CoreRequest'
+) -> dict[str, str]:
     try:
         return get_token(request)
     except Exception as exception:

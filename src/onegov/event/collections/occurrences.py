@@ -1,22 +1,24 @@
 import sqlalchemy
 
 from collections import defaultdict
-from functools import cached_property
 from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
+from functools import cached_property
 from icalendar import Calendar as vCalendar
-from lxml import objectify, etree
-from onegov.core.collection import Pagination
-from onegov.event.models import Event
-from onegov.event.models import Occurrence
+from lxml import etree, objectify
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
-from sqlalchemy import and_, func
-from sqlalchemy import distinct
-from sqlalchemy import or_
+from sqlalchemy import distinct, func
+from sqlalchemy import or_, and_
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import contains_eager
+
+from onegov.core.collection import Pagination
+from onegov.core.utils import toggle
+from onegov.event.models import Event
+from onegov.event.models import Occurrence
+from onegov.form import as_internal_id
 
 
 class OccurrenceCollection(Pagination):
@@ -47,9 +49,12 @@ class OccurrenceCollection(Pagination):
         end=None,
         outdated=False,
         tags=None,
+        filter_keywords=None,
         locations=None,
         only_public=False,
         search_widget=None,
+        event_filter_configuration=None,
+        event_filter_fields=None,
     ):
         self.session = session
         self.page = page
@@ -57,9 +62,12 @@ class OccurrenceCollection(Pagination):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
+        self.filter_keywords = filter_keywords or {}
         self.locations = locations if locations else []
         self.only_public = only_public
         self.search_widget = search_widget
+        self.event_filter_configuration = event_filter_configuration or None
+        self.event_filter_fields = event_filter_fields or None
 
     def __eq__(self, other):
         return self.page == other.page
@@ -88,9 +96,12 @@ class OccurrenceCollection(Pagination):
             end=self.end,
             outdated=self.outdated,
             tags=self.tags,
+            filter_keywords=self.filter_keywords,
             locations=self.locations,
             only_public=self.only_public,
-            search_widget=self.search_widget
+            search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
         )
 
     def range_to_dates(self, range, start=None, end=None):
@@ -136,7 +147,7 @@ class OccurrenceCollection(Pagination):
             return millennium, yesterday
         pass
 
-    def for_filter(self, **kwargs):
+    def for_filter(self, singular=False, **kwargs):
         """ Returns a new instance of the collection with the given filters
         and copies the current filters if not specified.
 
@@ -164,6 +175,20 @@ class OccurrenceCollection(Pagination):
             elif tag is not None:
                 tags.append(tag)
 
+        keywords = self.filter_keywords.copy()
+        for keyword, value in self.valid_keywords(kwargs).items():
+            collection = set(keywords.get(keyword, []))
+
+            if singular:
+                collection = set() if value in collection else {value}
+            else:
+                collection = toggle(collection, value)
+
+            if collection:
+                keywords[keyword] = list(collection)
+            elif keyword in keywords:
+                del keywords[keyword]
+
         locations = kwargs.get('locations', list(self.locations))
         if 'location' in kwargs:
             location = kwargs.get('location')
@@ -180,9 +205,29 @@ class OccurrenceCollection(Pagination):
             end=end,
             outdated=kwargs.get('outdated', self.outdated),
             tags=tags,
+            filter_keywords=keywords,
             locations=locations,
             only_public=self.only_public,
             search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
+        )
+
+    def without_keywords_and_tags(self):
+        return self.__class__(
+            self.session,
+            page=self.page,
+            range=self.range,
+            start=self.start,
+            end=self.end,
+            outdated=self.outdated,
+            tags=None,
+            filter_keywords=None,
+            locations=self.locations,
+            only_public=self.only_public,
+            search_widget=self.search_widget,
+            event_filter_configuration=self.event_filter_configuration,
+            event_filter_fields=self.event_filter_fields,
         )
 
     @cached_property
@@ -210,6 +255,61 @@ class OccurrenceCollection(Pagination):
                 counts[tag] += 1
 
         return counts
+
+    def set_event_filter_configuration(self, config):
+        self.event_filter_configuration = config
+
+    def set_event_filter_fields(self, fields):
+        self.event_filter_fields = fields
+
+    def valid_keywords(self, parameters):
+        if not self.event_filter_configuration:
+            return {}
+
+        return {
+            as_internal_id(k): v for k, v in parameters.items()
+            if k in {
+                as_internal_id(kw) for kw in
+                self.event_filter_configuration.get('keywords', set)
+            }
+        }
+
+    def available_filters(self, sort_choices=False, sortfunc=None):
+        """
+        Retrieve the filters with their choices. Return by default in the
+        order of how they are defined in the config structure.
+        To filter alphabetically, set sort_choices=True.
+
+        :return tuple containing tuples with keyword, label and list of values
+        :rtype tuple(tuples(keyword, title, values as list)
+
+        """
+        if not self.event_filter_configuration or not self.event_filter_fields:
+            return set()
+
+        keywords = tuple(
+            as_internal_id(k) for k in
+            self.event_filter_configuration.get('keywords', set)
+        )
+
+        fields = {
+            f.id: f for f in
+            self.event_filter_fields if (f.id in keywords)
+        }
+
+        def _sort(values):
+            if not sort_choices:
+                return values
+            values.sort(key=sortfunc)
+            return values
+
+        if not fields:
+            return set()
+
+        return (
+            (k, fields[k].label, _sort([c.label for c in fields[k].choices]))
+            for k in keywords if hasattr(fields[k], 'choices')
+        )
 
     @cached_property
     def used_tags(self):
@@ -303,6 +403,20 @@ class OccurrenceCollection(Pagination):
         if self.tags:
             query = query.filter(Occurrence._tags.has_any(array(self.tags)))
 
+        if self.filter_keywords:
+            keywords = self.valid_keywords(self.filter_keywords)
+
+            values = [val for sublist in keywords.values() for val in sublist]
+            values.sort()
+
+            values = [
+                Event.filter_keywords[keyword].has_any(array(values))
+                for keyword in keywords.keys()
+            ]
+
+            if values:
+                query = query.filter(and_(*values))
+
         if self.locations:
 
             def escape(qstring):
@@ -356,7 +470,7 @@ class OccurrenceCollection(Pagination):
         vcalendar.add('version', '2.0')
 
         query = self.query().with_entities(Occurrence.event_id)
-        event_ids = set([r.event_id for r in query])
+        event_ids = {event_id for event_id, in query}
 
         query = self.session.query(Event).filter(Event.id.in_(event_ids))
         for event in query:
@@ -403,8 +517,8 @@ class OccurrenceCollection(Pagination):
 
         query = self.session.query(Occurrence)
         for occ in query:
-            e = (self.session.query(Event)
-                 .filter(Event.id == occ.event_id).first())
+            e = (self.session.query(Event).
+                 filter(Event.id == occ.event_id).first())
 
             if e.state != 'published':
                 continue
@@ -418,8 +532,8 @@ class OccurrenceCollection(Pagination):
             txs = tags(e.tags)
             event.append(txs)
             event.description = e.description
-            event.start = occ.start
-            event.end = occ.end
+            event.start = e.localized_start
+            event.end = e.localized_end
             event.location = e.location
             event.price = e.price
             event.organizer = e.organizer
@@ -427,100 +541,6 @@ class OccurrenceCollection(Pagination):
             event.organizer_email = e.organizer_email
             event.organizer_phone = e.organizer_phone
             event.modified = e.last_change
-            root.append(event)
-
-        # remove lxml annotations
-        objectify.deannotate(root, pytype=True, xsi=True, xsi_nil=True)
-        etree.cleanup_namespaces(root)
-
-        return etree.tostring(root, encoding='utf-8', xml_declaration=True,
-                              pretty_print=True)
-
-    def as_anthrazit_xml(self, future_events_only=True):
-        """
-        Returns all published occurrences as xml for Winterthur.
-        Anthrazit format according
-        https://doc.anthrazit.org/ext/XML_Schnittstelle
-
-        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-        <import partner="???" partnerid"???" passwort"???" importid="??">
-            <item status="1" suchbar="1" mutationsdatum="2023-08-18 08:23:30">
-                <id>01</id>
-                <titel>Titel der Seite</titel>
-                <textmobile>2-3 Sätze des Text Feldes</textmobile>
-                <termin allday="1">
-                    <von>2011-08-06 00:00:00</von>
-                    <bis>2011-08-06 23:59:00</bis>
-                </termin>
-                <text>Beschreibung</text>
-                <urlweb>url</urlweb>
-                <rubrik>tag 1</rubrik>
-                <rubrik>tag 2</rubrik>
-                <veranstaltungsort>
-                    <title></title>
-                    <adresse></adresse>
-                    <plz></plz>
-                    <ort></ort>
-                </veranstaltungsort>
-                ...
-            </item>
-            <item>
-                ...
-            </item>
-        </import>
-
-        :param future_events_only: if set, only future events will be
-        returned, all events otherwise
-        :rtype: str
-        :return: xml string
-
-        """
-        xml = ('<import partner="" partnerid="" passwort="" importid="">'
-               '</import>')
-        root = objectify.fromstring(xml)
-
-        query = self.session.query(Occurrence)
-        for occ in query:
-            e = self.session.query(Event). \
-                filter(Event.id == occ.event_id).first()
-
-            if e.state != 'published':
-                continue
-            if future_events_only and datetime.fromisoformat(str(
-                    occ.end)).date() < datetime.today().date():
-                continue
-
-            # TODO translate tags
-            last_change = e.last_change.strftime('%Y-%m-%d %H:%M:%S')
-            event = objectify.Element('item',
-                                      dict(stautus='1',
-                                           suchbar='1',
-                                           mutationsdatum=last_change))
-            event.id = e.id
-            event.title = e.title
-            if len(e.description) > 100:
-                event.textmobile = e.description[:100] + '..'
-            else:
-                event.textmobile = e.description
-            termin = objectify.Element('termin')
-            termin.von = occ.start
-            termin.bis = occ.end
-            if e.price:
-                termin.beschreibung = e.price
-            else:
-                termin.beschreibung = ''
-            event.append(termin)
-            event.append(text_tag(e.description))
-            if e.external_event_url:
-                event.urlweb = e.external_event_url
-            if e.tags:
-                event.rubrik = e.tags
-            ort = objectify.Element('veranstaltungsort')
-            ort.title = e.location
-            ort.adresse = ''
-            ort.plz = ''
-            ort.ort = ''
-            event.append(ort)
             root.append(event)
 
         # remove lxml annotations
@@ -545,15 +565,3 @@ class tags(etree.ElementBase):
             tag = etree.Element('tag')
             tag.text = t
             self.append(tag)
-
-
-class text_tag(etree.ElementBase):
-    """
-    Custom class as 'text' is a member of class Element and cannot be
-    used as tag name.
-    """
-
-    def __init__(self, text):
-        super().__init__()
-        self.tag = 'text'
-        self.text = text

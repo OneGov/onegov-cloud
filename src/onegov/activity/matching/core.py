@@ -296,9 +296,9 @@ def deferred_acceptance(bookings, occasions,
         assert is_stable(attendees.values(), occasions.values())
 
     return Bunch(
-        open=set(b for a in attendees.values() for b in a.wishlist),
-        accepted=set(b for a in attendees.values() for b in a.accepted),
-        blocked=set(b for a in attendees.values() for b in a.blocked)
+        open={b for a in attendees.values() for b in a.wishlist},
+        accepted={b for a in attendees.values() for b in a.accepted},
+        blocked={b for a in attendees.values() for b in a.blocked},
     )
 
 

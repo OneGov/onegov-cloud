@@ -1,10 +1,9 @@
 from onegov.chat import Message
-from onegov.core.orm.mixins import meta_property
+from onegov.core.orm.mixins import dict_property, meta_property
 
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from onegov.core.orm.mixins import dict_property
     from onegov.core.request import CoreRequest
     from typing_extensions import Self
 
@@ -14,7 +13,7 @@ class Notification(Message):
 
     __mapper_args__ = {'polymorphic_identity': 'wtfs_notification'}
 
-    title: 'dict_property[str]' = meta_property('title')
+    title: dict_property[str | None] = meta_property('title')
 
     @classmethod
     def create(

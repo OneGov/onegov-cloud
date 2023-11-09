@@ -2,6 +2,11 @@ $check-list-icon: "\f0ae";
 $ordered-list-icon: "\f03a";
 $news-icon: "\f1ea";
 
+
+.globals {
+    .people::before { @include icon('\f2bb'); }
+}
+
 .edit-bar {
     .check-list-link::before { @include icon-bold($check-list-icon); }
     .news-link::before { @include icon-bold($news-icon); }
@@ -20,6 +25,11 @@ h6 small,
 .h5 small,
 .h6 small {
     color: inherit !important;
+}
+
+h1.main-title small {
+    display: block;
+    line-height: 1.3;
 }
 
 // Overwrite if the header has a different height
@@ -66,17 +76,60 @@ h6 small,
 .agenda-item-vota {
     .votum,
     .ticker-votum {
-        margin-bottom: 3em;
+        background: $white-smoke;
+        border-left: 2px solid $smoke;
+        border-radius: .7rem;
+        box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        padding-bottom: .5rem;
+        position: relative;
 
-        blockquote, blockquote p {
-            color: $charcoal;
+        blockquote {
+            padding-left: 0;
+            padding-top: 0;
+        }
+
+        blockquote,
+        blockquote p {
             border-left: 0;
-            box-shadow: -10px 0 10px -10px rgba(0, 0, 0, .07);
+            color: $charcoal;
+
+            span {
+                text-decoration: underline;
+            }
+        }
+
+        &.scheduled blockquote,
+        &.scheduled .person-card {
+            opacity: .5;
+        }
+
+    }
+
+    .label {
+        border-radius: 0 .7rem;
+        position: absolute;
+        right: 0;
+        top: 0;
+
+        & *:not(.scheduled) {
+            display: none;
         }
     }
 
     .edit-bar {
-        margin-bottom: .5em;
+        border-radius: .7rem .7rem 0 0;
+        margin: -1.5rem;
+        margin-bottom: 1.5rem;
+
+        li:hover {
+            border-radius: .7rem;
+        }
+
+        &> li > a {
+            border-left: 0;
+        }
     }
 }
 
@@ -84,30 +137,51 @@ h6 small,
     margin-bottom: 4rem;
 }
 
-.callout.secondary.agenda-item-resolution {
+.callout.secondary.agenda-item-resolution,
+.callout.secondary.assembly-completed {
     background: transparent;
     border: 0;
-    border-left: 2px solid rgb(227, 0, 11);
+    border-left: 2px solid $primary-color;
     border-radius: 0;
     box-shadow: -10px 0 10px -10px rgba(34, 0, 0, .11);
     font-weight: bold;
     margin-bottom: 2.5rem;
     margin-top: 1rem;
-  }
+
+    p {
+        line-height: 1.4;
+    }
+}
+
+.callout.secondary.assembly-completed {
+    background-color: transparent;
+    margin-bottom: 4rem;
+}
 
 .ticker-item {
     h2 {
-        border-top: 3px solid #d9d9d94a;
+        border-top: 3px solid $smoke;
         padding-top: 2rem;
-    }
-
-    &:first-child h2 {
-        border-top: 0;
-        padding-top: 0;
     }
 
     .callout.secondary.agenda-item-resolution {
         font-weight: normal;
+    }
+
+    .ticker-info {
+        position: relative;
+
+        .agenda-item-timestamp {
+            background-color: $smoke;
+            border-radius: 0 0 1rem 1rem;
+            color: $aluminum;
+            margin-top: 0;
+            padding: .5rem .7rem .3rem;
+            position: absolute;
+            right: 0;
+            text-align: right;
+            top: 0;
+        }
     }
 }
 
@@ -115,22 +189,54 @@ h6 small,
     list-style: none;
     margin-left: 0;
 
-    .label {
-        float: right;
+    a {
+        color: $charcoal;
+        display: flex;
+        font-weight: bold;
+        justify-content: space-between;
+        padding: .5rem 0;
+
+        &:first-child {
+            flex-grow: 10;
+        }
     }
 
+    i {
+        // color: $primary-color;
+        margin-right: .7rem;
+    }
+
+
     .agenda-item {
-        padding-left: 1em;
+        border-top: 2px solid $smoke;
     }
 
     .votum {
-        padding-left: 2em;
-    }   
+        padding-left: 2rem;
+
+    }
 
     li {
         border-top: 1px solid $white-smoke;
-        padding-bottom: .5rem;
-        padding-top: .5rem;
+        display: flex;
+        justify-content: space-between;
+        padding-left: 1rem;
+        transition: background-color 200ms linear;
+
+        .fa-edit {
+            color: $iron;
+            margin-right: 1rem;
+            opacity: 0;
+            transition: opacity 200ms linear;
+        }
+
+        &:hover {
+            background-color: $ghost;
+
+            .fa-edit {
+                opacity: 1;
+            }
+        }
     }
 }
 
@@ -159,6 +265,10 @@ h6 small,
 .person-list-card {
     align-items: center;
     color: $charcoal;
+
+    .person-card-function {
+        font-size: 1rem;
+    }
 }
 
 .person-card-portrait {
@@ -197,7 +307,7 @@ h6 small,
 .agenda-item-list.with-current {
     height: 25rem;
     overflow-y: scroll;
-    scrollbar-color: $charcoal $white-smoke;
+    scrollbar-color: $charcoal $white-smoke;  // sass-lint:disable-line no-misspelled-properties
 
     &::-webkit-scrollbar-tracK {
         background-color: $white-smoke;
@@ -342,4 +452,55 @@ h6 small,
     &:hover {
         background: $vapor;
     }
+}
+
+
+#liveticker {
+    color: $primary-color;
+    display: flex;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 1rem;
+
+
+    .blob {
+        animation: pulse-red 2s infinite;
+        background-color: rgba(255, 82, 82, 1);
+        border-radius: 50%;
+        display: block;
+        height: 30px;
+        margin-right: 1.5rem;
+        margin-top: .1rem;
+        width: 30px;
+    }
+
+    &.inactive {
+        color: $iron;
+
+        .blob {
+            animation: none;
+            background-color: $iron;
+        }
+    }
+
+    @keyframes pulse-red {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, .7);
+            transform: scale(.9);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+            transform: scale(1);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+            transform: scale(.9);
+        }
+    }
+}
+
+.tt-hint {
+    opacity: 0;
 }

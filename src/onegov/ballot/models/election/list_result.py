@@ -7,27 +7,45 @@ from sqlalchemy import Integer
 from uuid import uuid4
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    import uuid
+    from sqlalchemy.orm import relationship
+
+    from .election_result import ElectionResult
+    from .list import List
+
+
 class ListResult(Base, TimestampMixin):
     """ The election result of a list in a single political entity. """
 
     __tablename__ = 'list_results'
 
     #: identifies the list
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     # votes
-    votes = Column(Integer, nullable=False, default=lambda: 0)
+    votes: 'Column[int]' = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the election result this result belongs to
-    election_result_id = Column(
-        UUID,
+    election_result_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
         ForeignKey('election_results.id', ondelete='CASCADE'),
         nullable=False
     )
 
     #: the list this result belongs to
-    list_id = Column(
-        UUID,
+    list_id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
         ForeignKey('lists.id', ondelete='CASCADE'),
         nullable=False
     )
+
+    if TYPE_CHECKING:
+        # backrefs
+        election_result: relationship[ElectionResult]
+        list: relationship[List]

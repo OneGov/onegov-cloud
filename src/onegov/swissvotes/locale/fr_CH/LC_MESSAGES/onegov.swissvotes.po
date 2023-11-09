@@ -89,8 +89,8 @@ msgstr "Brochure explicative officielle"
 msgid "Voting campaign"
 msgstr "Campagne"
 
-msgid "Explanatory brochure by Easyvote"
-msgstr "Brochure d’Easyvote"
+msgid "Explanatory brochure by easyvote"
+msgstr "Brochure d’easyvote"
 
 msgid "Advertisment analysis"
 msgstr "Analyse des annonces de campagne"
@@ -1785,8 +1785,8 @@ msgstr "Lien département"
 msgid "Link federal office"
 msgstr "Lien office fédéral"
 
-msgid "Explainer video by Easyvote"
-msgstr "Vidéo explicative d’Easyvote"
+msgid "Explainer video by easyvote"
+msgstr "Vidéo explicative d’easyvote"
 
 msgid "Recommendations of the Parties"
 msgstr "Mots d'ordre des partis"

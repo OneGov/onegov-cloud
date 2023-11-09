@@ -186,3 +186,43 @@ def test_view_pages_cache(landsgemeinde_app):
 
     assert 'Adipiscing' in anonymous.get('/landsgemeinde/2023-05-07/ticker')
     assert 'Adipiscing' in client.get('/landsgemeinde/2023-05-07/ticker')
+
+
+def test_view_suggestions(landsgemeinde_app):
+    client = Client(landsgemeinde_app)
+
+    client.login('admin@example.org', 'hunter2')
+
+    page = client.get('/').click('Personen')
+    page = page.click('Person', index=1)
+    page.form['first_name'] = 'Hans'
+    page.form['last_name'] = 'Müller'
+    page.form['function'] = 'Landrat'
+    page.form['profession'] = 'Landwirt'
+    page.form['location_code_city'] = 'Oberurnen'
+    page.form['parliamentary_group'] = 'SVP'
+    page.form['political_party'] = 'jSVP'
+    page = page.form.submit().follow()
+    assert 'Eine neue Person wurde hinzugefügt' in page
+
+    assert client.get('/suggestion/person/name').json == []
+    assert client.get('/suggestion/person/name?term').json == []
+    assert client.get('/suggestion/person/name?term=h').json == ['Hans Müller']
+
+    assert client.get('/suggestion/person/function').json == []
+    assert client.get('/suggestion/person/function?term').json == []
+    assert client.get('/suggestion/person/function?term=l').json == [
+        'Landrat', 'Landwirt'
+    ]
+
+    assert client.get('/suggestion/person/place').json == []
+    assert client.get('/suggestion/person/place?term').json == []
+    assert client.get('/suggestion/person/place?term=r').json == ['Oberurnen']
+
+    assert client.get('/suggestion/person/political-affiliation').json == []
+    assert client.get(
+        '/suggestion/person/political-affiliation?term'
+    ).json == []
+    assert client.get(
+        '/suggestion/person/political-affiliation?term=s'
+    ).json == ['SVP', 'jSVP']

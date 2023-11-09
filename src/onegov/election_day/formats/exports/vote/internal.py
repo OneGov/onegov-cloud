@@ -1,7 +1,17 @@
 from collections import OrderedDict
 
 
-def export_vote_internal(vote, locales):
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.ballot.models import Vote
+
+
+def export_vote_internal(
+    vote: 'Vote',
+    locales: 'Collection[str]'
+) -> list[dict[str, Any]]:
     """ Returns all data connected to this vote as list with dicts.
 
     This is meant as a base for json/csv/excel exports. The result is
@@ -11,11 +21,11 @@ def export_vote_internal(vote, locales):
 
     """
 
-    rows = []
+    rows: list[dict[str, Any]] = []
 
     for ballot in vote.ballots:
         for result in ballot.results:
-            row = OrderedDict()
+            row: dict[str, Any] = OrderedDict()
 
             titles = (
                 ballot.title_translations or vote.title_translations or {}

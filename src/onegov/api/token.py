@@ -3,17 +3,18 @@ from datetime import timedelta, timezone, datetime
 import jwt
 from sedate import utcnow
 from onegov.api.models import ApiKey
-from onegov.core.request import CoreRequest
 
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
 
 
-def jwt_decode(request: CoreRequest, token: str | bytes) -> Any:
+def jwt_decode(request: 'CoreRequest', token: str | bytes) -> Any:
     return jwt.decode(token, request.identity_secret, algorithms=['HS512'])
 
 
-def jwt_encode(request: CoreRequest, payload: dict[str, Any]) -> str:
+def jwt_encode(request: 'CoreRequest', payload: dict[str, Any]) -> str:
 
     iat = datetime.now(tz=timezone.utc)  # This has to be UTC,
     # not local
@@ -24,7 +25,7 @@ def jwt_encode(request: CoreRequest, payload: dict[str, Any]) -> str:
     return jwt.encode(payload, request.identity_secret, algorithm='HS512')
 
 
-def get_token(request: CoreRequest) -> dict[str, str]:
+def get_token(request: 'CoreRequest') -> dict[str, str]:
 
     key = try_get_encoded_token(request)
 
@@ -37,7 +38,7 @@ def get_token(request: CoreRequest) -> dict[str, str]:
     return {'token': jwt_encode(request, payload)}
 
 
-def try_get_encoded_token(request: CoreRequest) -> str:
+def try_get_encoded_token(request: 'CoreRequest') -> str:
     assert request.authorization is not None
     assert request.authorization.authtype == 'Basic'
     assert isinstance(request.authorization.params, str)

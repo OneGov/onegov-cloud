@@ -426,24 +426,30 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query
         return [
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_1).union(
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_1).union(
                     query(SwissVote.descriptor_2_level_1),
                     query(SwissVote.descriptor_3_level_1)
-                ).all() if x[0]
-            ]),
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_2).union(
+                ).all()
+                if x
+            },
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_2).union(
                     query(SwissVote.descriptor_2_level_2),
                     query(SwissVote.descriptor_3_level_2)
-                ).all() if x[0]
-            ]),
-            set([
-                x[0] for x in query(SwissVote.descriptor_1_level_3).union(
+                )
+                if x
+            },
+            {
+                x
+                for x, in query(SwissVote.descriptor_1_level_3).union(
                     query(SwissVote.descriptor_2_level_3),
                     query(SwissVote.descriptor_3_level_3)
-                ).all() if x[0]
-            ]),
+                )
+                if x
+            },
         ]
 
     def update(self, votes):

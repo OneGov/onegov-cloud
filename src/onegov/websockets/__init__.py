@@ -8,9 +8,9 @@ The websocket client can be used by using the `WebsocketsApp` integration.
 
 """
 import logging
-log = logging.getLogger('onegov.websockets')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log = logging.getLogger('onegov.websockets')
+log.addHandler(logging.NullHandler())
 
 from onegov.websockets.integration import WebsocketsApp
 
-__all__ = ['log', 'WebsocketsApp']
+__all__ = ('log', 'WebsocketsApp')

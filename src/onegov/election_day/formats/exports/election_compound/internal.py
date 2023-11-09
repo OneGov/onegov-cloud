@@ -1,9 +1,20 @@
 from collections import OrderedDict
-from onegov.election_day.formats.exports.election import \
-    export_election_internal
+from itertools import chain
+from onegov.election_day.formats.exports.election import (
+    export_election_internal)
 
 
-def export_election_compound_internal(compound, locales):
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Collection
+    from onegov.ballot.models import ElectionCompound
+
+
+def export_election_compound_internal(
+    compound: 'ElectionCompound',
+    locales: 'Collection[str]'
+) -> list[dict[str, Any]]:
     """ Returns all data connected to this election compound as list with
     dicts.
 
@@ -19,7 +30,7 @@ def export_election_compound_internal(compound, locales):
 
     """
 
-    common = OrderedDict()
+    common: dict[str, Any] = OrderedDict()
     for locale in locales:
         common[f'compound_title_{locale}'] = compound.title_translations.get(
             locale, ''
@@ -27,10 +38,8 @@ def export_election_compound_internal(compound, locales):
     common['compound_date'] = compound.date.isoformat()
     common['compound_mandates'] = compound.number_of_mandates
 
-    rows = []
-    for election in compound.elections:
-        for row in export_election_internal(election, locales):
-            rows.append(
-                OrderedDict(list(common.items()) + list(row.items()))
-            )
-    return rows
+    return [
+        OrderedDict(chain(common.items(), row.items()))
+        for election in compound.elections
+        for row in export_election_internal(election, locales)
+    ]

@@ -607,7 +607,7 @@ class DaycareServicesWidget:
         self.field = field
         self.services = field.services
 
-        return Markup(self.template.render(this=self))
+        return Markup(self.template.render(this=self))  # noqa: MS001
 
     def is_selected(self, service, day):
         return self.services.is_selected(service.id, day)

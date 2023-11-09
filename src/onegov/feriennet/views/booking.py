@@ -573,11 +573,12 @@ def view_group_invite(self, request):
 
     existing = [a for a, b in self.attendees if a.username == self.username]
     external = [a for a, b in self.attendees if a.username != self.username]
-    possible = [
-        a for a in request.session.query(Attendee)
+    possible = (
+        request.session.query(Attendee)
         .filter_by(username=self.username)
         .filter(not_(Attendee.id.in_(tuple(a.id for a in existing))))
-    ]
+        .all()
+    )
 
     actionable_bookings = {
         b.attendee_id: b for b in request.session.query(Booking).filter_by(
@@ -722,10 +723,10 @@ def join_group(self, request):
         request.warning(_("The booking does not exist"))
         return
 
-    own_children = set(
-        a.id for a in request.session.query(Attendee.id)
+    own_children = {
+        a_id for a_id, in request.session.query(Attendee.id)
         .filter_by(username=self.username)
-    )
+    }
     if booking.attendee_id not in own_children:
         request.alert(
             _("Not permitted to join this attendee to the group"))
@@ -750,10 +751,10 @@ def leave_group(self, request):
         request.warning(_("The booking does not exist"))
         return
 
-    own_children = set(
-        a.id for a in request.session.query(Attendee.id)
+    own_children = {
+        a_id for a_id, in request.session.query(Attendee.id)
         .filter_by(username=self.username)
-    )
+    }
 
     if booking.attendee_id not in own_children:
         request.alert(

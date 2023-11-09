@@ -12,31 +12,46 @@ from sqlalchemy import Text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.user import User
+from onegov.core.collection import _M
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Generic, overload
 if TYPE_CHECKING:
+    from onegov.core import Framework
+    from sqlalchemy.orm import Session
+    from onegov.core.collection import PKType
+    from onegov.core.types import PaginatedGenericCollection
     import uuid
     from datetime import datetime
+    from typing_extensions import Self
 
 log = getLogger('onegov.api')
 log.addHandler(NullHandler())
 
 
 class ApiException(Exception):
-    """ Base class for all API exceptions.
+    """Base class for all API exceptions.
 
     Mainly used to ensure that all exceptions regarding the API are rendered
     with the correct content type.
 
     """
 
-    def __init__(self, message='Internal Server Error', exception=None,
-                 status_code=500, headers=None):
-        self.message = exception.message if \
-            exception and hasattr(exception, 'message') else message
-        self.status_code = exception.status_code if \
-            exception and hasattr(exception, 'status_code') else status_code
+    def __init__(
+        self,
+        message: str = 'Internal Server Error',
+        exception: Exception | None = None,
+        status_code: int = 500,
+        headers: dict[str, str] | None = None,
+    ):
+        self.message = (
+            exception.message
+            if exception and hasattr(exception, 'message') else message
+        )
+        self.status_code = (
+            exception.status_code
+            if exception and hasattr(exception, 'status_code') else status_code
+        )
 
         self.headers = headers or {}
 
@@ -45,26 +60,14 @@ class ApiException(Exception):
 
 
 class ApiInvalidParamException(ApiException):
-    def __init__(self, message='Invalid Parameter', status_code=400):
+    def __init__(
+        self, message: str = 'Invalid Parameter', status_code: int = 400
+    ):
         self.message = message
         self.status_code = status_code
 
 
-class ApiEndpointCollection:
-    """ A collection of all available API endpoints. """
-
-    def __init__(self, app):
-        self.app = app
-
-    @cached_property
-    def endpoints(self):
-        return {
-            endpoint.endpoint: endpoint
-            for endpoint in self.app.config.setting_registry.api.endpoints
-        }
-
-
-class ApiEndpointItem:
+class ApiEndpointItem(Generic[_M]):
     """ A single instance of an item of a specific endpoint.
 
     Passes all functionality to the specific API endpoint and is mainly used
@@ -72,30 +75,37 @@ class ApiEndpointItem:
 
     """
 
-    def __init__(self, app, endpoint, id):
+    def __init__(self, app: 'Framework', endpoint: str, id: str):
         self.app = app
         self.endpoint = endpoint
         self.id = id
 
     @property
-    def api_endpoint(self):
+    def api_endpoint(self) -> 'ApiEndpoint[_M] | None':
         cls = ApiEndpointCollection(self.app).endpoints.get(self.endpoint)
+        # type(cls(self.app)) == <class 'onegov.agency.api.AgencyApiEndpoint'>
         return cls(self.app) if cls else None
 
     @property
-    def item(self):
-        return self.api_endpoint.by_id(self.id)
+    def item(self) -> _M | None:
+        if self.api_endpoint:
+            return self.api_endpoint.by_id(self.id)  # for. ex. ExtendedAgency
+        return None
 
     @property
-    def data(self):
-        return self.api_endpoint.item_data(self.item)
+    def data(self) -> dict[str, Any] | None:
+        if self.api_endpoint:
+            return self.api_endpoint.item_data(self.item)
+        return None
 
     @property
-    def links(self):
-        return self.api_endpoint.item_links(self.item)
+    def links(self) -> dict[str, Any] | None:
+        if self.api_endpoint:
+            return self.api_endpoint.item_links(self.item)
+        return None
 
 
-class ApiEndpoint:
+class ApiEndpoint(Generic[_M]):
     """ An API endpoint.
 
     API endpoints wrap collection and do some filter mapping.
@@ -107,16 +117,22 @@ class ApiEndpoint:
 
     """
 
-    name = ''
+    name: str = ''
+    endpoint: str = ''
     filters: list[str] = []
 
-    def __init__(self, app, extra_parameters=None, page=None):
+    def __init__(
+        self,
+        app: 'Framework',
+        extra_parameters: dict[str, str | int | None] | None = None,
+        page: int | None = None,
+    ):
         self.app = app
         self.extra_parameters = extra_parameters or {}
         self.page = int(page) if page else page
         self.batch_size = 100
 
-    def for_page(self, page):
+    def for_page(self, page: int | None) -> 'Self | None':
         """ Return a new endpoint instance with the given page while keeping
         the current filters.
 
@@ -124,7 +140,7 @@ class ApiEndpoint:
 
         return self.__class__(self.app, self.extra_parameters, page)
 
-    def for_filter(self, **filters):
+    def for_filter(self, **filters: Any) -> 'Self':
         """ Return a new endpoint instance with the given filters while
         discarding the current filters and page.
 
@@ -132,11 +148,16 @@ class ApiEndpoint:
 
         return self.__class__(self.app, filters)
 
-    def for_item(self, item):
+    @overload
+    def for_item(self, item: None) -> None: ...
+    @overload
+    def for_item(self, item: _M) -> 'ApiEndpointItem[_M]': ...
+
+    def for_item(self, item: _M | None) -> 'ApiEndpointItem[_M] | None':
         """ Return a new endpoint item instance with the given item. """
 
         if not item:
-            return
+            return None
 
         target = str(item)
         if hasattr(item, 'id'):
@@ -144,30 +165,35 @@ class ApiEndpoint:
 
         return ApiEndpointItem(self.app, self.endpoint, target)
 
-    def get_filter(self, name, default=None, empty=None):
-        """ Returns the filter value with the given name. """
+    def get_filter(
+        self, name: str, default: int | None = None, empty: int | None =
+        None
+    ) -> str | int | None:
+
+        """Returns the filter value with the given name."""
 
         if name not in self.extra_parameters:
             return default
         return self.extra_parameters[name] or empty
 
-    def by_id(self, id_):
+    def by_id(self, id: 'PKType') -> _M | None:
         """ Return the item with the given ID from the collection. """
 
         try:
-            return self.__class__(self.app).collection.by_id(id_)
+            return self.__class__(self.app).collection.by_id(id)
         except SQLAlchemyError:
             return None
 
     @property
-    def session(self):
+    def session(self) -> 'Session':
         return self.app.session()
 
     @property
-    def links(self):
+    def links(self) -> dict[str, 'Self | None']:
         """ Returns a dictionary with pagination instances. """
 
-        result = {'prev': None, 'next': None}
+        result: dict[str, 'Self | None'] = {'prev': None, 'next': None}
+
         previous = self.collection.previous
         if previous:
             result['prev'] = self.for_page(previous.page)
@@ -177,18 +203,17 @@ class ApiEndpoint:
         return result
 
     @property
-    def batch(self):
+    def batch(self) -> dict['ApiEndpointItem[_M]', _M]:
         """ Returns a dictionary with endpoint item instances and their
         titles.
 
         """
-
         return {
             self.for_item(item): item
             for item in self.collection.batch
         }
 
-    def item_data(self, item):
+    def item_data(self, item: _M | None) -> dict[str, Any]:
         """ Return the data properties of the collection item as a dictionary.
 
         For example:
@@ -201,7 +226,7 @@ class ApiEndpoint:
 
         raise NotImplementedError()
 
-    def item_links(self, item):
+    def item_links(self, item: _M | None) -> dict[str, Any]:
         """ Return the link properties of the collection item as a dictionary.
         Links can either be string or a linkable object.
 
@@ -217,16 +242,30 @@ class ApiEndpoint:
         raise NotImplementedError()
 
     @property
-    def collection(self):
+    def collection(self) -> 'PaginatedGenericCollection[_M]':
         """ Return an instance of the collection with filters and page set.
         """
 
         raise NotImplementedError()
 
 
+class ApiEndpointCollection:
+    """ A collection of all available API endpoints. """
+
+    def __init__(self, app: 'Framework'):
+        self.app = app
+
+    @cached_property
+    def endpoints(self) -> dict[str, type[ApiEndpoint[Any]]]:
+        return {
+            endpoint.endpoint: endpoint
+            for endpoint in self.app.config.setting_registry.api.endpoints
+        }
+
+
 class AuthEndpoint:
 
-    def __init__(self, app):
+    def __init__(self, app: 'Framework'):
         self.app = app
 
 

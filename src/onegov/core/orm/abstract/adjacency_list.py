@@ -175,7 +175,9 @@ class AdjacencyList(Base):
         def sort_on_title_change(self, title: str) -> None: ...
 
     @declared_attr  # type:ignore[no-redef]
-    def sort_on_title_change(cls) -> 'Callable[[Self, str], None]':  # noqa
+    def sort_on_title_change(  # noqa: F811
+        cls
+    ) -> 'Callable[[Self, str], None]':
         """ Makes sure the A-Z sorting is kept when a title changes. """
 
         class OldItemProxy(Proxy):
@@ -412,9 +414,9 @@ class AdjacencyListCollection(Generic[_L]):
         siblings = self.query(ordered=False).filter(
             self.__listclass__.parent == parent)
 
-        names = set(
-            s[0] for s in siblings.with_entities(self.__listclass__.name).all()
-        )
+        names = {
+            n for n, in siblings.with_entities(self.__listclass__.name)
+        }
 
         while name in names:
             name = increment_name(name)

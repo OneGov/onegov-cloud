@@ -139,7 +139,7 @@ class Handler:
 
         """
 
-        return tuple()
+        return ()
 
     @property
     def payment(self) -> 'Payment | None':
@@ -211,6 +211,26 @@ class Handler:
         """
 
         raise NotImplementedError
+
+    @property
+    def ticket_deletable(self) -> bool:
+        if self.deleted:
+            return True
+        if self.ticket.state != 'archived':
+            return False
+        if self.payment:
+            # For now we do not handle this case since payment might be
+            # needed for exports
+            return False
+        if self.undecided:
+            return False
+        return True
+
+    def prepare_delete_ticket(self) -> None:
+        """The handler knows best what to do when a ticket is called for
+        deletion. """
+        assert self.ticket_deletable
+        pass
 
 
 class HandlerRegistry:

@@ -10,12 +10,12 @@ import dectate
 from dectate.sentinel import Sentinel
 from morepath.authentication import Identity, NoIdentity
 from morepath.converter import Converter, ConverterRegistry
-from morepath.path import PathRegistry  # type:ignore[import]
-from morepath.predicate import PredicateRegistry  # type:ignore[import]
+from morepath.path import PathRegistry  # type:ignore[import-untyped]
+from morepath.predicate import PredicateRegistry  # type:ignore[import-untyped]
 from morepath.request import Request
 from morepath.settings import SettingRegistry
-from morepath.template import TemplateEngineRegistry  # type:ignore[import]
-from morepath.tween import TweenRegistry  # type:ignore[import]
+from morepath.template import TemplateEngineRegistry  # type:ignore[import-untyped]
+from morepath.tween import TweenRegistry  # type:ignore[import-untyped]
 
 _T = TypeVar('_T')
 _RequestT = TypeVar('_RequestT', bound=Request, contravariant=True)
@@ -159,7 +159,7 @@ class ViewAction(dectate.Action):
     predicates: dict[str, Any]
     def __init__(
         self,
-        model,
+        model: type | str,
         render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath | None = None,
         load: Callable[[_RequestT], Any] | str | None = None,

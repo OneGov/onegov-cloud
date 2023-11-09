@@ -19,7 +19,7 @@ class ElectionCandidatesTableWidget(ModelBoundWidget):
             <div class="{@class}" tal:define="lists '{@lists}'">
                 <tal:block
                     metal:use-macro="layout.macros['election-candidates-table']"
-                    tal:define="show_percentage (model.type != 'proporz')"
+                    tal:define="show_percentage (election.type != 'proporz')"
                     />
             </div>
         </xsl:template>

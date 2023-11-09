@@ -6,8 +6,8 @@ function scrollToCurrentItem() {
         const scrollTopList = $('.agenda-item-list').scrollTop();
 
         $('.agenda-item-list').animate({
-        scrollTop: positionCurrent - listHeight/2 + currentHeight/2 + scrollTopList
-        })
+            scrollTop: positionCurrent - listHeight / 2 + currentHeight / 2 + scrollTopList
+        });
     }
 }
 
@@ -31,21 +31,21 @@ document.addEventListener("DOMContentLoaded", function() {
                     content.innerHTML = message.content;
                     agendaItem.replaceWith(content.firstChild);
                 }
-                if (message.state == 'scheduled') {
+                if (message.state === 'scheduled') {
                     agendaListItem.classList.add('scheduled');
-                    agendaListItem.id = ''
+                    agendaListItem.id = '';
                 }
-                if (message.state == 'ongoing') {
+                if (message.state === 'ongoing') {
                     agendaListItem.classList.remove('scheduled');
                     if (currentAgendaListItem) {
-                        currentAgendaListItem.id = ''
+                        currentAgendaListItem.id = '';
                     }
-                    agendaListItem.id = 'current'
+                    agendaListItem.id = 'current';
                     scrollToCurrentItem();
                 }
-                if (message.state == 'completed') {
+                if (message.state === 'completed') {
                     agendaListItem.classList.remove('scheduled');
-                    agendaListItem.id = ''
+                    agendaListItem.id = '';
                 }
             }
         }

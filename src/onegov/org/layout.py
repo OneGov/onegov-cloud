@@ -50,10 +50,12 @@ from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.user import Auth, UserCollection, UserGroupCollection
 from onegov.user.utils import password_reset_url
 from sedate import to_timezone
 from translationstring import TranslationString
+
 
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
@@ -158,7 +160,10 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         if not text:
             return text
 
-        return Markup(utils.hashtag_elements(self.request, text))
+        # FIXME: utils.hashtag_elements should return Markup
+        return Markup(  # noqa: MS001
+            utils.hashtag_elements(self.request, text)
+        )
 
     @cached_property
     def page_id(self):
@@ -567,7 +572,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
             #        and str, but for now we only wanted to ensure rendered
             #        fields always return Markup, so we don't have to change
             #        as many places
-            return Markup(self.linkify(str(rendered).replace('<br>', '\n')))
+            return Markup(  # noqa: MS001
+                self.linkify(str(rendered).replace('<br>', '\n'))
+            )
         return rendered
 
     @property
@@ -591,7 +598,7 @@ class DefaultLayoutMixin:
         if not hasattr(self.model, 'access'):
             return
 
-        if self.model.access != 'secret':
+        if self.model.access not in ('secret', 'secret_mtan'):
             return
 
         @self.request.after
@@ -1096,6 +1103,47 @@ class TicketsLayout(DefaultLayout):
         ]
 
 
+class ArchivedTicketsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_admin:
+            text = self.request.translate(_("Delete archived tickets"))
+            links.append(
+                Link(
+                    text=text,
+                    url=self.csrf_protected_url(self.request.link(self.model,
+                                                                  'delete')),
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete all archived "
+                              "tickets?"),
+                            _("This cannot be undone."),
+                            _("Delete archived tickets"),
+                            _("Cancel"),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                ArchivedTicketsCollection, {'handler': 'ALL'}
+                            ),
+                        ),
+                    ),
+                    attrs={'class': 'delete-link'},
+                )
+
+            )
+        return links
+
+
 class TicketLayout(DefaultLayout):
 
     def __init__(self, model, request):
@@ -1121,8 +1169,8 @@ class TicketLayout(DefaultLayout):
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
                 links = self.model.handler.get_links(self.request)
-                assert len(links) <= 2, """
-                    Models are limited to two model-specific links. Usually
+                assert len(links) <= 3, """
+                    Models are limited to three model-specific links. Usually
                     a primary single link and a link group containing the
                     other links.
                 """
@@ -1175,6 +1223,13 @@ class TicketLayout(DefaultLayout):
                     url=self.request.link(self.model, 'unarchive'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
+                links.append(Link(
+                    text=_("Delete Ticket"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model, 'delete')
+                    ),
+                    attrs={'class': ('ticket-button', 'ticket-delete')},
+                ))
 
             if self.model.state != 'closed':
                 links.append(Link(
@@ -1198,8 +1253,21 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
+            if self.has_submission_files:
+                links.append(
+                    Link(
+                        text=_("Download files"),
+                        url=self.request.link(self.model, 'files'),
+                        attrs={'class': 'ticket-files'}
+                    )
+                )
 
             return links
+
+    @cached_property
+    def has_submission_files(self) -> bool:
+        submission = getattr(self.model.handler, 'submission', None)
+        return submission is not None and bool(submission.files)
 
 
 class TicketNoteLayout(DefaultLayout):
@@ -1724,19 +1792,29 @@ class OccurrencesLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
-            return [
-                Link(
+        def links():
+            if (self.request.is_admin and self.request.app.org.
+                    event_filter_type in ['filters', 'tags_and_filters']):
+                yield Link(
+                    text=_("Configure"),
+                    url=self.request.link(self.model, '+edit'),
+                    attrs={'class': 'edit-link'}
+                )
+
+            if self.request.is_manager:
+                yield Link(
                     text=_("Import"),
                     url=self.request.link(self.model, 'import'),
                     attrs={'class': 'import-link'}
-                ),
-                Link(
+                )
+
+                yield Link(
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
                 )
-            ]
+
+        return list(links())
 
 
 class OccurrenceLayout(EventBaseLayout):
@@ -2543,7 +2621,6 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
         def links():
-
             if self.request.is_admin:
                 yield Link(
                     text=_("Configure"),
@@ -2634,15 +2711,15 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         if not self.request.is_logged_in:
             return {}
         if self.request.is_manager:
-            return dict(
-                published_only=_('Published'),
-                upcoming_only=_("Upcoming"),
-                past_only=_("Past"),
-            )
-        return dict(
-            published_only=_('Published'),
-            past_only=_("Past"),
-        )
+            return {
+                'published_only': _("Published"),
+                'upcoming_only': _("Upcoming"),
+                'past_only': _("Past"),
+            }
+        return {
+            'published_only': _("Published"),
+            'past_only': _("Past"),
+        }
 
     @property
     def publication_filter_title(self):

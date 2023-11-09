@@ -16,7 +16,7 @@ class UploadWabstiMajorzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_kandidaten = UploadField(
@@ -26,7 +26,7 @@ class UploadWabstiMajorzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_kandidatengde = UploadField(
@@ -36,7 +36,7 @@ class UploadWabstiMajorzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wm_wahl = UploadField(
@@ -46,7 +46,7 @@ class UploadWabstiMajorzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     wmstatic_gemeinden = UploadField(
@@ -56,5 +56,5 @@ class UploadWabstiMajorzElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )

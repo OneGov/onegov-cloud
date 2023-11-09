@@ -23,9 +23,89 @@ from time import mktime
 from time import strptime
 
 
-def groupbydict(items, keyfunc, sortfunc=None):
+from typing import overload
+from typing import Any
+from typing import Literal
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from _typeshed import SupportsRichComparison
+    from collections.abc import Callable
+    from collections.abc import Collection
+    from collections.abc import Iterable
+    from datetime import datetime
+    from onegov.election_day.app import ElectionDayApp
+    from onegov.election_day.request import ElectionDayRequest
+    from sqlalchemy.dialects.postgresql import TSVECTOR
+    from sqlalchemy.orm import Query
+    from sqlalchemy.orm import Session
+    from sqlalchemy.sql import ColumnElement
+    from typing import TypeVar
+    from typing_extensions import Self
+
+    _T1 = TypeVar('_T1')
+    _T2 = TypeVar('_T2')
+    _T3 = TypeVar('_T3')
+    _TSupportsRichComparison = TypeVar(
+        '_TSupportsRichComparison',
+        bound='SupportsRichComparison'
+    )
+
+
+@overload
+def groupbydict(
+    items: 'Iterable[_T1]',
+    keyfunc: 'Callable[[_T1], _TSupportsRichComparison]',
+    sortfunc: None = None,
+    groupfunc: 'Callable[[Iterable[_T1]], list[_T1]]' = list,
+) -> dict['_TSupportsRichComparison', list['_T1']]: ...
+
+
+@overload
+def groupbydict(
+    items: 'Iterable[_T1]',
+    keyfunc: 'Callable[[_T1], _T2]',
+    sortfunc: 'Callable[[_T1], SupportsRichComparison]',
+    groupfunc: 'Callable[[Iterable[_T1]], list[_T1]]' = list,
+) -> dict['_T2', list['_T1']]: ...
+
+
+@overload
+def groupbydict(
+    items: 'Iterable[_T1]',
+    keyfunc: 'Callable[[_T1], _TSupportsRichComparison]',
+    sortfunc: None = None,
+    *,
+    groupfunc: 'Callable[[Iterable[_T1]], _T2]',
+) -> dict['_TSupportsRichComparison', '_T2']: ...
+
+
+@overload
+def groupbydict(
+    items: 'Iterable[_T1]',
+    keyfunc: 'Callable[[_T1], _TSupportsRichComparison]',
+    sortfunc: None,
+    groupfunc: 'Callable[[Iterable[_T1]], _T2]',
+) -> dict['_TSupportsRichComparison', '_T2']: ...
+
+
+@overload
+def groupbydict(
+    items: 'Iterable[_T1]',
+    keyfunc: 'Callable[[_T1], _T2]',
+    sortfunc: 'Callable[[_T1], SupportsRichComparison]',
+    groupfunc: 'Callable[[Iterable[_T1]], _T3]',
+) -> dict['_T2', '_T3']: ...
+
+
+def groupbydict(
+    items: 'Iterable[_T1]',
+    keyfunc: 'Callable[[_T1], Any]',
+    sortfunc: 'Callable[[_T1], Any] | None' = None,
+    groupfunc: 'Callable[[Iterable[_T1]], Any]' = list
+) -> dict[Any, Any]:
+
     return OrderedDict(
-        (key, list(group))
+        (key, groupfunc(group))
         for key, group in groupby(
             sorted(items, key=sortfunc or keyfunc),
             keyfunc
@@ -35,27 +115,30 @@ def groupbydict(items, keyfunc, sortfunc=None):
 
 class ArchivedResultCollection:
 
-    def __init__(self, session, date_=None):
+    def __init__(self, session: 'Session', date_: str | None = None):
         self.session = session
         self.date = date_
 
-    def for_date(self, date_):
+    def for_date(self, date_: str) -> 'Self':
         return self.__class__(self.session, date_)
 
-    def query(self):
+    def query(self) -> 'Query[ArchivedResult]':
         return self.session.query(ArchivedResult)
 
-    def get_years(self):
+    def get_years(self) -> list[int]:
         """ Returns a list of available years. """
 
         year = cast(extract('year', ArchivedResult.date), Integer)
-        query = self.session.query
-        query = query(distinct(year))
+        query = self.session.query(distinct(year))
         query = query.order_by(desc(year))
 
-        return list(r[0] for r in query.all())
+        return [year for year, in query]
 
-    def group_items(self, items, request):
+    def group_items(
+        self,
+        items: 'Collection[ArchivedResult]',
+        request: 'ElectionDayRequest'
+    ) -> dict[date, dict[str | None, dict[str, list[ArchivedResult]]]] | None:
         """ Groups a list of archived results.
 
         Groups election compounds and elections to the same group. Removes
@@ -69,12 +152,6 @@ class ArchivedResultCollection:
         compounded = {
             url for item in items for url in getattr(item, 'elections', [])
         }
-
-        dates = groupbydict(
-            items,
-            lambda i: i.date,
-            lambda i: -(as_datetime(i.date).timestamp() or 0)
-        )
 
         order = {
             'federation': 1,
@@ -95,26 +172,22 @@ class ArchivedResultCollection:
         if request.app.principal.domain == 'municipality':
             order['municipality'] = 0
 
-        for date_, items_by_date in dates.items():
-            domains = groupbydict(
-                items_by_date,
-                lambda i: mapping.get(i.domain),
-                lambda i: order.get(i.domain, 99)
-            )
-            for domain, items_by_domain in domains.items():
-                types = groupbydict(
-                    [
-                        item for item in items_by_domain
-                        if item.url not in compounded
-                    ],
-                    lambda i: 'vote' if i.type == 'vote' else 'election'
+        return groupbydict(
+            items,
+            lambda i: i.date,
+            lambda i: -(as_datetime(i.date).timestamp() or 0),
+            lambda i: groupbydict(
+                i,
+                lambda j: mapping.get(j.domain),
+                lambda j: order.get(j.domain, 99),
+                lambda j: groupbydict(
+                    (item for item in j if item.url not in compounded),
+                    lambda k: 'vote' if k.type == 'vote' else 'election'
                 )
-                domains[domain] = types
-            dates[date_] = domains
+            )
+        )
 
-        return dates
-
-    def current(self):
+    def current(self) -> tuple[list[ArchivedResult], 'datetime | None']:
         """ Returns the current results.
 
         The current results are the results from either the next election day
@@ -122,20 +195,23 @@ class ArchivedResultCollection:
 
         """
 
-        next_date = self.query().with_entities(ArchivedResult.date)
+        next_date = self.query().with_entities(func.min(ArchivedResult.date))
         next_date = next_date.filter(ArchivedResult.date >= date.today())
-        next_date = next_date.order_by(ArchivedResult.date)
-        next_date = next_date.limit(1).scalar()
+        current_date = next_date.scalar()
 
-        last_date = self.query().with_entities(ArchivedResult.date)
-        last_date = last_date.filter(ArchivedResult.date <= date.today())
-        last_date = last_date.order_by(desc(ArchivedResult.date))
-        last_date = last_date.limit(1).scalar()
+        if current_date is None:
+            last_date = self.query().with_entities(
+                func.max(ArchivedResult.date)
+            )
+            last_date = last_date.filter(ArchivedResult.date <= date.today())
+            current_date = last_date.scalar()
 
-        current_date = next_date or last_date
         return self.by_date(current_date) if current_date else ([], None)
 
-    def by_year(self, year):
+    def by_year(
+        self,
+        year: int
+    ) -> tuple[list[ArchivedResult], 'datetime | None']:
         """ Returns the results for the given year. """
 
         query = self.query()
@@ -148,16 +224,26 @@ class ArchivedResultCollection:
             ArchivedResult.title
         )
 
+        # FIXME: This seems kind of dumb, why are we emitting a
+        #        second query for something that's part of the
+        #        result anyways, we can calculate the max in
+        #        Python...
         last_modified = self.session.query(
             func.max(query.subquery().c.last_modified)
         )
 
         return query.all(), (last_modified.first() or [None])[0]
 
-    def by_date(self, date_=None):
+    def by_date(
+        self,
+        date_: date | None = None
+    ) -> tuple[list[ArchivedResult], 'datetime | None']:
         """ Returns the results of a given/current date. """
 
         if date_ is None:
+            if self.date is None:
+                return self.current()
+
             try:
                 date_ = date.fromtimestamp(
                     mktime(strptime(self.date, '%Y-%m-%d'))
@@ -169,23 +255,31 @@ class ArchivedResultCollection:
                 except ValueError:
                     return self.current()
 
-        else:
-            query = self.query()
-            query = query.filter(ArchivedResult.date == date_)
-            query = query.order_by(
-                ArchivedResult.domain,
-                ArchivedResult.name,
-                ArchivedResult.shortcode,
-                ArchivedResult.title
-            )
+        query = self.query()
+        query = query.filter(ArchivedResult.date == date_)
+        query = query.order_by(
+            ArchivedResult.domain,
+            ArchivedResult.name,
+            ArchivedResult.shortcode,
+            ArchivedResult.title
+        )
 
-            last_modified = self.session.query(
-                func.max(query.subquery().c.last_modified)
-            )
+        # FIXME: This seems kind of dumb, why are we emitting a
+        #        second query for something that's part of the
+        #        result anyways, we can calculate the max in
+        #        Python...
+        last_modified = self.session.query(
+            func.max(query.subquery().c.last_modified)
+        )
 
-            return query.all(), (last_modified.first() or [None])[0]
+        return query.all(), (last_modified.first() or [None])[0]
 
-    def update(self, item, request, old=None):
+    def update(
+        self,
+        item: Election | ElectionCompound | Vote,
+        request: 'ElectionDayRequest',
+        old: str | None = None
+    ) -> ArchivedResult:
         """ Updates a result. """
 
         url = request.link(item)
@@ -204,7 +298,7 @@ class ArchivedResultCollection:
         result.url = url
         result.schema = self.session.info['schema']
         result.domain = item.domain
-        result.name = request.app.principal.name
+        result.name = request.app.principal.name  # type:ignore[assignment]
         result.date = item.date
         result.shortcode = item.shortcode
         result.title_translations = item.title_translations
@@ -233,7 +327,7 @@ class ArchivedResultCollection:
         if isinstance(item, Vote):
             result.type = 'vote'
             result.turnout = item.turnout
-            result.answer = item.answer
+            result.answer = item.answer or ''
             result.nays_percentage = item.nays_percentage
             result.yeas_percentage = item.yeas_percentage
 
@@ -242,7 +336,7 @@ class ArchivedResultCollection:
 
         return result
 
-    def update_all(self, request):
+    def update_all(self, request: 'ElectionDayRequest') -> None:
         """ Updates all (local) results. """
 
         schema = self.session.info['schema']
@@ -250,16 +344,20 @@ class ArchivedResultCollection:
         for item in self.query().filter_by(schema=schema):
             self.session.delete(item)
 
-        for item in ElectionCollection(self.session).query():
-            self.update(item, request)
+        for election in ElectionCollection(self.session).query():
+            self.update(election, request)
 
-        for item in ElectionCompoundCollection(self.session).query():
-            self.update(item, request)
+        for compound in ElectionCompoundCollection(self.session).query():
+            self.update(compound, request)
 
-        for item in VoteCollection(self.session).query():
-            self.update(item, request)
+        for vote in VoteCollection(self.session).query():
+            self.update(vote, request)
 
-    def add(self, item, request):
+    def add(
+        self,
+        item: Election | ElectionCompound | Vote,
+        request: 'ElectionDayRequest'
+    ) -> None:
         """ Add a new election or vote and create a result entry.  """
 
         assert (
@@ -274,7 +372,11 @@ class ArchivedResultCollection:
         self.update(item, request)
         self.session.flush()
 
-    def clear(self, item, request):
+    def clear(
+        self,
+        item: Election | ElectionCompound | Vote,
+        request: 'ElectionDayRequest'
+    ) -> None:
         """ Clears an election or vote and the associated result entry.  """
 
         assert (
@@ -290,7 +392,11 @@ class ArchivedResultCollection:
 
         self.session.flush()
 
-    def delete(self, item, request):
+    def delete(
+        self,
+        item: Election | ElectionCompound | Vote,
+        request: 'ElectionDayRequest'
+    ) -> None:
         """ Deletes an election or vote and the associated result entry.  """
 
         assert (
@@ -308,20 +414,25 @@ class ArchivedResultCollection:
         self.session.flush()
 
 
-class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
+class SearchableArchivedResultCollection(
+    ArchivedResultCollection,
+    Pagination[ArchivedResult]
+):
+
+    page: int
 
     def __init__(
             self,
-            app,
-            date_=None,
-            from_date=None,
-            to_date=None,
-            item_type=None,
-            domains=None,
-            term=None,
-            answers=None,
-            locale='de_CH',
-            page=0
+            app: 'ElectionDayApp',
+            date_: str | None = None,
+            from_date: date | None = None,
+            to_date: date | None = None,
+            item_type: str | None = None,
+            domains: list[str] | None = None,
+            term: str | None = None,
+            answers: list[str] | None = None,
+            locale: str = 'de_CH',
+            page: int = 0
     ):
         super().__init__(app.session(), date_=date_)
         self.app = app
@@ -334,17 +445,17 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
         self.locale = locale
         self.page = page
 
-    def __eq__(self, other):
-        return self.page == other.page
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, self.__class__) and self.page == other.page
 
-    def subset(self):
+    def subset(self) -> 'Query[ArchivedResult]':
         return self.query()
 
     @property
-    def page_index(self):
+    def page_index(self) -> int:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index: int) -> 'Self':
         return self.__class__(
             app=self.app,
             date_=self.date,
@@ -359,24 +470,28 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
         )
 
     @staticmethod
-    def term_to_tsquery_string(term):
+    def term_to_tsquery_string(term: str | None) -> str:
         """ Returns the current search term transformed to use within
         Postgres ``to_tsquery`` function.
         Removes all unwanted characters, replaces prefix matching, joins
         word together using FOLLOWED BY.
         """
 
-        def cleanup(word, whitelist_chars=',.-_'):
+        def cleanup(word: str, whitelist_chars: str = ',.-_') -> str:
             result = ''.join(
                 (c for c in word if c.isalnum() or c in whitelist_chars)
             )
             return f'{result}:*' if word.endswith('*') else result
 
         parts = (cleanup(part) for part in (term or '').split())
-        return ' <-> '.join(tuple(part for part in parts if part))
+        return ' <-> '.join(part for part in parts if part)
 
     @staticmethod
-    def match_term(column, language, term):
+    def match_term(
+        column: 'ColumnElement[Any]',
+        language: str,
+        term: str
+    ) -> 'ColumnElement[TSVECTOR | None]':
         """ Usage:
          model.filter(match_term(model.col, 'german', 'my search term')) """
         document_tsvector = func.to_tsvector(language, column)
@@ -384,7 +499,11 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
         return document_tsvector.op('@@')(ts_query_object)
 
     @staticmethod
-    def filter_text_by_locale(column, term, locale=None):
+    def filter_text_by_locale(
+        column: 'ColumnElement[Any]',
+        term: str,
+        locale: str = 'en'
+    ) -> 'ColumnElement[TSVECTOR | None]':
         """ Returns an SQLAlchemy filter statement based on the search term.
         If no locale is provided, it will use english as language.
 
@@ -405,13 +524,16 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
         """
 
         mapping = {'de_CH': 'german', 'fr_CH': 'french', 'it_CH': 'italian',
-                   'rm_CH': 'english'}
+                   'rm_CH': 'english', 'en': 'english'}
         return SearchableArchivedResultCollection.match_term(
             column, mapping.get(locale, 'english'), term
         )
 
     @property
-    def term_filter(self):
+    def term_filter(self) -> tuple[
+        'ColumnElement[TSVECTOR | None]',
+        'ColumnElement[TSVECTOR | None]'
+    ]:
         term = SearchableArchivedResultCollection.term_to_tsquery_string(
             self.term
         )
@@ -424,7 +546,7 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
             )
         )
 
-    def query(self):
+    def query(self) -> 'Query[ArchivedResult]':
         query = self.session.query(ArchivedResult)
 
         if self.item_type:
@@ -434,10 +556,13 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
                 ))
 
                 # exclude elections already covered by election compounds
-                exclude = self.session.query(ArchivedResult.meta['elections'])
-                exclude = [result[0] for result in exclude if result[0]]
-                exclude = [item for items in exclude for item in items]
-                exclude = [item.split('/')[-1] for item in exclude]
+                exclude = [
+                    item.split('/')[-1]
+                    for items, in self.session.query(
+                        ArchivedResult.meta['elections']
+                    )
+                    for item in items or ()
+                ]
                 if exclude:
                     query = query.filter(
                         ArchivedResult.meta['id'].notin_(exclude)
@@ -493,7 +618,7 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
         )
         return query
 
-    def reset_query_params(self):
+    def reset_query_params(self) -> None:
         self.from_date = None
         self.to_date = date.today()
         self.item_type = None
@@ -502,8 +627,67 @@ class SearchableArchivedResultCollection(ArchivedResultCollection, Pagination):
         self.answers = None
         self.locale = 'de_CH'
 
+    @overload
     @classmethod
-    def for_item_type(cls, session, item_type, **kwargs):
-        if item_type in ['vote', 'election']:
-            kwargs['item_type'] = item_type
-            return cls(session, **kwargs)
+    def for_item_type(
+        cls,
+        app: 'ElectionDayApp',
+        item_type: Literal['vote', 'election'],
+        *,
+        date_: str | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
+        domains: list[str] | None = None,
+        term: str | None = None,
+        answers: list[str] | None = None,
+        locale: str = 'de_CH',
+        page: int = 0
+    ) -> 'Self': ...
+
+    @overload
+    @classmethod
+    def for_item_type(
+        cls,
+        app: 'ElectionDayApp',
+        item_type: str | None,
+        *,
+        date_: str | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
+        domains: list[str] | None = None,
+        term: str | None = None,
+        answers: list[str] | None = None,
+        locale: str = 'de_CH',
+        page: int = 0
+    ) -> 'Self | None': ...
+
+    @classmethod
+    def for_item_type(
+        cls,
+        app: 'ElectionDayApp',
+        item_type: str | None,
+        *,
+        date_: str | None = None,
+        from_date: date | None = None,
+        to_date: date | None = None,
+        domains: list[str] | None = None,
+        term: str | None = None,
+        answers: list[str] | None = None,
+        locale: str = 'de_CH',
+        page: int = 0
+    ) -> 'Self | None':
+        if item_type in ('vote', 'election'):
+            return cls(
+                app,
+                item_type=item_type,
+                date_=date_,
+                from_date=from_date,
+                to_date=to_date,
+                domains=domains,
+                term=term,
+                answers=answers,
+                locale=locale,
+                page=page,
+
+            )
+        return None

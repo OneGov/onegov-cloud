@@ -3,7 +3,6 @@ from collections import namedtuple
 from dateutil.rrule import rrulestr
 from dateutil import rrule
 from functools import cached_property
-
 from onegov.chat import TextModuleCollection
 from onegov.core.utils import linkify, to_html_ul
 from onegov.directory import DirectoryCollection
@@ -29,6 +28,7 @@ from onegov.reservation import ResourceCollection
 from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.ticket import TicketCollection
+from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import _
 from onegov.core.elements import Link, Block, Confirm, Intercooler, LinkGroup
 from onegov.core.static import StaticFile
@@ -175,7 +175,7 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
     def top_navigation(self):
 
         def yield_children(page):
-            children = tuple()
+            children = ()
             if not isinstance(page, News):
                 children = tuple(
                     yield_children(p)
@@ -631,6 +631,46 @@ class TicketsLayout(DefaultLayout):
         ]
 
 
+class ArchivedTicketsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_admin:
+            text = self.request.translate(_("Delete archived tickets"))
+            links.append(
+                Link(
+                    text=text,
+                    url=self.csrf_protected_url(self.request.link(self.model,
+                                                                  'delete')),
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete all archived "
+                              "tickets?"),
+                            _("This cannot be undone."),
+                            _("Delete archived tickets"),
+                            _("Cancel"),
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                ArchivedTicketsCollection, {'handler': 'ALL'}
+                            ),
+                        ),
+                    ),
+                    attrs={'class': 'delete-link'},
+                )
+            )
+        return links
+
+
 class TicketLayout(DefaultLayout):
 
     def __init__(self, model, request):
@@ -656,8 +696,8 @@ class TicketLayout(DefaultLayout):
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
                 links = self.model.handler.get_links(self.request)
-                assert len(links) <= 2, """
-                    Models are limited to two model-specific links. Usually
+                assert len(links) <= 3, """
+                    Models are limited to three model-specific links. Usually
                     a primary single link and a link group containing the
                     other links.
                 """
@@ -717,6 +757,13 @@ class TicketLayout(DefaultLayout):
                     url=self.request.link(self.model, 'unarchive'),
                     attrs={'class': ('ticket-button', 'ticket-reopen')}
                 ))
+                links.append(Link(
+                    text=_("Delete Ticket"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model, 'delete')
+                    ),
+                    attrs={'class': ('ticket-button', 'ticket-delete')},
+                ))
 
             # ticket notes are always enabled
             links.append(
@@ -733,6 +780,14 @@ class TicketLayout(DefaultLayout):
                     attrs={'class': 'ticket-pdf'}
                 )
             )
+            if self.has_submission_files:
+                links.append(
+                    Link(
+                        text=_("Download files"),
+                        url=self.request.link(self.model, 'files'),
+                        attrs={'class': 'ticket-files'}
+                    )
+                )
             if self.request.app.org.gever_endpoint:
                 links.append(
                     Link(
@@ -751,6 +806,11 @@ class TicketLayout(DefaultLayout):
                     )
                 )
             return links
+
+    @cached_property
+    def has_submission_files(self) -> bool:
+        submission = getattr(self.model.handler, 'submission', None)
+        return submission is not None and bool(submission.files)
 
 
 class TicketNoteLayout(DefaultLayout):
@@ -1302,19 +1362,30 @@ class OccurrencesLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
-            return (
-                Link(
+
+        def links():
+            if (self.request.is_admin and self.request.app.org.
+                    event_filter_type in ['filters', 'tags_and_filters']):
+                yield Link(
+                    text=_("Configure"),
+                    url=self.request.link(self.model, '+edit'),
+                    attrs={'class': 'edit-link'}
+                )
+
+            if self.request.is_manager:
+                yield Link(
                     text=_("Import"),
                     url=self.request.link(self.model, 'import'),
                     attrs={'class': 'import-link'}
-                ),
-                Link(
+                )
+
+                yield Link(
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': 'export-link'}
-                ),
-                LinkGroup(
+                )
+
+                yield LinkGroup(
                     title=_("Add"),
                     links=[
                         Link(
@@ -1323,8 +1394,9 @@ class OccurrencesLayout(EventBaseLayout):
                             attrs={'class': 'new-form'}
                         ),
                     ]
-                ),
-            )
+                )
+
+        return list(links())
 
 
 class OccurrenceLayout(EventBaseLayout):
@@ -2236,15 +2308,15 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
         if not self.request.is_logged_in:
             return {}
         if self.request.is_manager:
-            return dict(
-                published_only=_('Published'),
-                upcoming_only=_("Upcoming"),
-                past_only=_("Past"),
-            )
-        return dict(
-            published_only=_('Published'),
-            past_only=_("Past"),
-        )
+            return {
+                'published_only': _('Published'),
+                'upcoming_only': _("Upcoming"),
+                'past_only': _("Past"),
+            }
+        return {
+            'published_only': _('Published'),
+            'past_only': _("Past"),
+        }
 
     @property
     def publication_filter_title(self):

@@ -15,10 +15,19 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-from typing import TYPE_CHECKING
+from typing import cast, TYPE_CHECKING
 if TYPE_CHECKING:
+    import uuid
+    from onegov.ballot.types import DistrictPercentage
+    from onegov.ballot.types import EntityPercentage
+    from onegov.core.types import AppenderQuery
+    from sqlalchemy.sql import ColumnElement
+
     from .candidate import Candidate
+    from .election import Election
+    from .list_connection import ListConnection
     from .list_panachage_result import ListPanachageResult
+    from .proporz_election import ProporzElection
 
     rel = relationship
 
@@ -29,33 +38,41 @@ class List(Base, TimestampMixin):
     __tablename__ = 'lists'
 
     #: internal id of the list
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id: 'Column[uuid.UUID]' = Column(
+        UUID,  # type:ignore[arg-type]
+        primary_key=True,
+        default=uuid4
+    )
 
     #: external id of the list
-    list_id = Column(Text, nullable=False)
+    list_id: 'Column[str]' = Column(Text, nullable=False)
 
     # number of mandates
-    number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
+    number_of_mandates: 'Column[int]' = Column(
+        Integer,
+        nullable=False,
+        default=lambda: 0
+    )
 
     #: name of the list
-    name = Column(Text, nullable=False)
+    name: 'Column[str]' = Column(Text, nullable=False)
 
     #: the election this result belongs to
-    election_id = Column(
+    election_id: 'Column[str]' = Column(
         Text,
         ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False
     )
 
     #: the list connection id
-    connection_id = Column(
-        UUID,
+    connection_id: 'Column[uuid.UUID | None]' = Column(
+        UUID,  # type:ignore[arg-type]
         ForeignKey('list_connections.id', ondelete='CASCADE'),
         nullable=True
     )
 
     #: a list contains n candidates
-    candidates: 'rel[list[Candidate]]' = relationship(
+    candidates: 'rel[AppenderQuery[Candidate]]' = relationship(
         'Candidate',
         cascade='all, delete-orphan',
         backref=backref('list'),
@@ -63,7 +80,7 @@ class List(Base, TimestampMixin):
     )
 
     #: a list contains n results
-    results: 'rel[list[ListResult]]' = relationship(
+    results: 'rel[AppenderQuery[ListResult]]' = relationship(
         'ListResult',
         cascade='all, delete-orphan',
         backref=backref('list'),
@@ -71,72 +88,86 @@ class List(Base, TimestampMixin):
     )
 
     #: a (proporz) list contains votes from other other lists
-    panachage_results: 'rel[list[ListPanachageResult]]' = relationship(
+    panachage_results: 'rel[AppenderQuery[ListPanachageResult]]'
+    panachage_results = relationship(
         'ListPanachageResult',
         foreign_keys='ListPanachageResult.target_id',
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
 
+    if TYPE_CHECKING:
+        # backref
+        election: relationship[Election]
+        election_result: relationship[ElectionResult]
+        connection: relationship[ListConnection | None]
+
     #: the total votes
     votes = summarized_property('votes')
 
-    def aggregate_results(self, attribute):
+    def aggregate_results(self, attribute: str) -> int:
         """ Gets the sum of the given attribute from the results. """
 
         return sum(getattr(result, attribute) for result in self.results)
 
     @staticmethod
-    def aggregate_results_expression(cls, attribute):
+    def aggregate_results_expression(
+        cls: 'List',
+        attribute: str
+    ) -> 'ColumnElement[int]':
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
 
         """
 
-        expr = select([func.sum(getattr(ListResult, attribute))])
+        expr = select([
+            func.coalesce(
+                func.sum(getattr(ListResult, attribute)),
+                0
+            )
+        ])
         expr = expr.where(ListResult.list_id == cls.id)
-        expr = expr.label(attribute)
-        return expr
+        return expr.label(attribute)
 
     @property
-    def percentage_by_entity(self):
+    def percentage_by_entity(self) -> dict[int, 'EntityPercentage']:
         """ Returns the percentage of votes by the entity. Includes uncounted
         entities and entities with no results available.
 
         """
-        results = self.election.results
-        results = results.join(ElectionResult.list_results)
-        results = results.filter(ListResult.list_id == self.id)
+        query = self.election.results
+        query = query.join(ElectionResult.list_results)
+        query = query.filter(ListResult.list_id == self.id)
 
         if self.election.type == 'proporz':
-            totals_by_entity = self.election.votes_by_entity.subquery()
-            results = results.with_entities(
+            proporz_election = cast('ProporzElection', self.election)
+            totals_by_entity = proporz_election.votes_by_entity.subquery()
+            results_sub = query.with_entities(
                 ElectionResult.entity_id.label('id'),
                 ElectionResult.counted.label('counted'),
                 ListResult.votes.label('votes')
-            )
-            results_sub = results.subquery()
+            ).subquery()
 
             session = object_session(self)
-            query = session.query(
-                results_sub.c.id, results_sub.c.counted,
+            results = session.query(
+                results_sub.c.id,
+                results_sub.c.counted,
                 totals_by_entity.c.votes.label('total'),
                 results_sub.c.votes
             )
-            results = query.join(
+            results = results.join(
                 totals_by_entity,
                 totals_by_entity.c.entity_id == results_sub.c.id
             )
         else:
-            results = results.with_entities(
+            results = query.with_entities(
                 ElectionResult.entity_id.label('id'),
                 ElectionResult.counted.label('counted'),
                 ElectionResult.accounted_ballots.label('total'),
                 ListResult.votes.label('votes')
             )
 
-        results = results.all()
-        percentage = {
+        percentage: dict[int, 'EntityPercentage'] = {
             r.id: {
                 'counted': r.counted,
                 'votes': r.votes,
@@ -145,8 +176,7 @@ class List(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results
-        empty = empty.with_entities(
+        empty = self.election.results.with_entities(
             ElectionResult.entity_id.label('id'),
             ElectionResult.counted.label('counted')
         )
@@ -157,46 +187,46 @@ class List(Base, TimestampMixin):
             r.id: {
                 'counted': r.counted,
                 'percentage': 0.0,
-                'votes': 0.0
+                'votes': 0
             } for r in empty}
         )
         return percentage
 
     @property
-    def percentage_by_district(self):
+    def percentage_by_district(self) -> dict[str, 'DistrictPercentage']:
         """ Returns the percentage of votes aggregated by the distict. Includes
         uncounted districts and districts with no results available.
 
         """
 
-        results = self.election.results.order_by(None)
-        results = results.join(ElectionResult.list_results)
-        results = results.filter(ListResult.list_id == self.id)
+        query = self.election.results.order_by(None)
+        query = query.join(ElectionResult.list_results)
+        query = query.filter(ListResult.list_id == self.id)
 
         if self.election.type == 'proporz':
             totals_by_district = self.election.votes_by_district.subquery()
-            results = results.with_entities(
+            query = query.with_entities(
                 ElectionResult.district.label('name'),
                 func.sum(ListResult.votes).label('votes'),
             )
-            results = results.group_by(ElectionResult.district)
-            results_sub = results.subquery()
+            query = query.group_by(ElectionResult.district)
+            results_sub = query.subquery()
 
             session = object_session(self)
-            query = session.query(
+            results = session.query(
                 results_sub.c.name,
                 totals_by_district.c.entities,
                 totals_by_district.c.counted,
                 totals_by_district.c.votes.label('total'),
                 results_sub.c.votes
             )
-            results = query.join(
+            results = results.join(
                 totals_by_district,
                 totals_by_district.c.district == results_sub.c.name
             )
 
         else:
-            results = results.with_entities(
+            results = query.with_entities(
                 ElectionResult.district.label('name'),
                 func.array_agg(ElectionResult.entity_id).label('entities'),
                 func.coalesce(
@@ -207,8 +237,7 @@ class List(Base, TimestampMixin):
             )
             results = results.group_by(ElectionResult.district)
 
-        results = results.all()
-        percentage = {
+        percentage: dict[str, 'DistrictPercentage'] = {
             r.name: {
                 'counted': r.counted,
                 'entities': r.entities,
@@ -218,8 +247,7 @@ class List(Base, TimestampMixin):
             } for r in results
         }
 
-        empty = self.election.results
-        empty = empty.with_entities(
+        empty = self.election.results.with_entities(
             ElectionResult.district.label('name'),
             func.array_agg(ElectionResult.entity_id).label('entities'),
             func.coalesce(
@@ -241,7 +269,7 @@ class List(Base, TimestampMixin):
                     'counted': result.counted,
                     'entities': result.entities,
                     'percentage': 0.0,
-                    'votes': 0.0
+                    'votes': 0
                 }
 
         return percentage

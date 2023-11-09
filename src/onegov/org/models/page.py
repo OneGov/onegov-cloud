@@ -1,5 +1,7 @@
 from datetime import datetime
-from onegov.core.orm.mixins import content_property, meta_property
+from onegov.core.orm.mixins import (
+    content_property, dict_property, meta_property)
+from onegov.file import MultiAssociatedFiles
 from onegov.form import Form, move_fields
 from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
@@ -8,8 +10,9 @@ from onegov.org.models.extensions import (
     ContactExtension, ContactHiddenOnPageExtension, ImageExtension,
     NewsletterExtension, PublicationExtension
 )
-from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
+from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import GeneralFileLinkExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.traitinfo import TraitInfo
@@ -25,7 +28,9 @@ from sqlalchemy_utils import observes
 class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             PublicationExtension, VisibleOnHomepageExtension,
             ContactExtension, ContactHiddenOnPageExtension,
-            PersonLinkExtension, CoordinatesExtension, ImageExtension):
+            PersonLinkExtension, CoordinatesExtension, ImageExtension,
+            MultiAssociatedFiles, GeneralFileLinkExtension):
+
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     es_type_name = 'topics'
@@ -72,7 +77,7 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
     @property
     def allowed_subtraits(self):
         if self.trait == 'link':
-            return tuple()
+            return ()
 
         if self.trait == 'page':
             return ('page', 'link')
@@ -106,7 +111,9 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
            AccessExtension, PublicationExtension, VisibleOnHomepageExtension,
            ContactExtension, ContactHiddenOnPageExtension, PersonLinkExtension,
-           CoordinatesExtension, ImageExtension):
+           CoordinatesExtension, ImageExtension, MultiAssociatedFiles,
+           GeneralFileLinkExtension):
+
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     es_type_name = 'news'
@@ -118,7 +125,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
     filter_years: list[int] = []
     filter_tags: list[str] = []
 
-    hashtags = meta_property(default=list)
+    hashtags: dict_property[list[str]] = meta_property(default=list)
 
     @property
     def es_public(self):
@@ -158,7 +165,7 @@ class News(Page, TraitInfo, SearchableContent, NewsletterExtension,
         if self.parent is None:
             return ('news', )
         else:
-            return tuple()
+            return ()
 
     def is_supported_trait(self, trait):
         return trait in {'news'}

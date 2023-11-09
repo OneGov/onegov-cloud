@@ -37,7 +37,7 @@ def get_roadwork_collection(app, letter=None, query=None):
 @WinterthurApp.path(
     model=Roadwork,
     path='/roadwork/{id}',
-    converters=dict(id=int))
+    converters={'id': int})
 def get_roadwork(app, id):
     return RoadworkCollection(app.roadwork_client).by_id(id)
 
@@ -45,7 +45,7 @@ def get_roadwork(app, id):
 @WinterthurApp.path(
     model=MissionReportCollection,
     path='/mission-reports',
-    converters=dict(year=int))
+    converters={'year': int})
 def get_mission_reports(request, page=0, year=None):
     year = date.today().year if year == 0 else year
 
@@ -65,7 +65,7 @@ def get_mission_report_vehicles(request):
 @WinterthurApp.path(
     model=MissionReport,
     path='/mission-reports/report/{id}',
-    converters=dict(id=UUID))
+    converters={'id': UUID})
 def get_mission_report(request, id):
     return get_mission_reports(request).by_id(id)
 
@@ -73,7 +73,7 @@ def get_mission_report(request, id):
 @WinterthurApp.path(
     model=MissionReportFileCollection,
     path='/mission-reports/report/{id}/images',
-    converters=dict(id=UUID))
+    converters={'id': UUID})
 def get_mission_report_files(request, id):
     report = get_mission_report(request, id)
 
@@ -84,7 +84,7 @@ def get_mission_report_files(request, id):
 @WinterthurApp.path(
     model=MissionReportVehicle,
     path='/mission-reports/vehicle/{id}',
-    converters=dict(id=UUID))
+    converters={'id': UUID})
 def get_mission_report_vehicle(request, id):
     return get_mission_report_vehicles(request).by_id(id)
 

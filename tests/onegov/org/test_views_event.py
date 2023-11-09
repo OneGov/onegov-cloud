@@ -159,6 +159,112 @@ def test_view_occurrences(client):
         text.startswith('BEGIN:VCALENDAR')
 
 
+def test_view_occurrences_event_filter(client):
+    """
+    This test switches the application settings event filter type between
+    'tags', 'filters' and 'tags_and_filters'
+    """
+
+    def events(query=''):
+        page = client.get(f'/events/?{query}')
+        return [event.text for event in page.pyquery('h3 a')]
+
+    def dates(query=''):
+        page = client.get(f'/events/?{query}')
+        return [
+            datetime.strptime(div.text, '%d.%m.%Y').date()
+            for div in page.pyquery('.occurrence-date')
+        ]
+
+    def text_present(query='', text=''):
+        page = client.get(f'/events/?{query}')
+        return text in page
+
+    def set_setting_event_filter_type(client, event_filter_type):
+        client.login_admin()
+        settings = client.get('/module-settings')
+        settings.form['event_filter_type'] = event_filter_type
+        settings.form.submit()
+        assert client.app.org.event_filter_type == event_filter_type
+        client.logout()
+
+    def setup_event_filter(client):
+        assert client.login_admin()
+        assert client.app.org.event_filter_type in ['filters',
+                                                    'tags_and_filters']
+        page = client.get('/events')
+        page = page.click('Konfigurieren')
+        page.form['definition'] = """
+            My Special Filter *=
+                ( ) A Filter
+                ( ) B Filter
+        """
+        page.form['keyword_fields'].value = 'My Special Filter'
+        assert page.form.submit()
+        client.logout()
+
+    assert len(events()) == 10
+    assert len(events('page=1')) == 2
+    assert dates() == sorted(dates())
+
+    # default: event filter type = 'tags'
+    client.app.org.event_filter_type = 'tags'
+    assert text_present('', '<h2>Schlagwort</h2>')
+    assert not text_present('', 'Filter Name')
+
+    # # default: event filter type = 'filters'
+    set_setting_event_filter_type(client, 'filters')
+    setup_event_filter(client)
+    assert not text_present('', '<h2>Schlagwort</h2>')
+    assert text_present('', 'My Special Filter')
+
+    # default: event filter type = 'tags_and_filters'
+    set_setting_event_filter_type(client, 'tags_and_filters')
+    assert text_present('', '<h2>Schlagwort</h2>')
+    assert text_present('', 'My Special Filter')
+
+
+def test_many_filters(client):
+    assert client.login_admin()
+    page = client.get('/module-settings')
+    page.form['event_filter_type'] = 'filters'
+    page.form.submit()
+    page = client.get('/events')
+    page = page.click('Konfigurieren')
+    page.form['definition'] = """
+        Weitere Filter =
+            [ ] Gemeinde
+            [ ] Schule
+            [ ] Akrobatik
+            [ ] American Football
+            [ ] Angeln
+            [ ] Aquacura
+            [ ] Armbrustschiessen
+            [ ] Badminton
+            [ ] Ballett
+            [ ] Baseball
+            [ ] Basketball
+            [ ] Bouldering
+            [ ] Karate
+            [ ] Ski
+            [ ] Yoga
+    """
+    page.form['keyword_fields'].value = 'weitere_filter'
+    page.form.submit()
+
+    events = client.get('/events')
+    assert "Mehr anzeigen" not in events
+
+    event = events.click("Generalversammlung")
+    form = event.click("Bearbeiten")
+    for i in range(0, 15):
+        form.form.set('weitere_filter', True, index=i)
+    form.form.submit()
+
+    events = client.get('/events')
+    assert "Mehr anzeigen" in events
+
+
 def test_view_occurrence(client):
     events = client.get('/events')
 

@@ -230,7 +230,8 @@ class DirectoryArchiveReader:
 
     def read_data_from_csv(self):
         with (self.path / 'data.csv').open('rb') as f:
-            return tuple(CSVFile(f, rowtype=dict).lines)
+            rows = tuple(CSVFile(f, rowtype=dict).lines)
+            return tuple(row for row in rows if any(row.values()))
 
     def read_data_from_xlsx(self):
         with (self.path / 'data.xlsx').open('rb') as f:

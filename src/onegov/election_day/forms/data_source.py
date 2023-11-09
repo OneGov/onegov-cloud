@@ -50,12 +50,12 @@ class DataSourceItemForm(Form):
         validators=[
             InputRequired()
         ],
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     district = StringField(
         label="'SortWahlkreis'",
-        render_kw=dict(force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     callout = ''

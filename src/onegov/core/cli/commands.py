@@ -8,12 +8,17 @@ import subprocess
 import sys
 
 from code import InteractiveConsole
+from collections import defaultdict
 from fnmatch import fnmatch
+from onegov.core import log
 from onegov.core.cache import lru_cache
-from onegov.core.cli.core import command_group, pass_group_context, abort
+from onegov.core.cli.core import (
+    abort, command_group, pass_group_context, run_processors)
 from onegov.core.crypto import hash_password
 from onegov.core.mail_processor import PostmarkMailQueueProcessor
 from onegov.core.mail_processor import SMTPMailQueueProcessor
+from onegov.core.sms_processor import SmsQueueProcessor
+from onegov.core.sms_processor import get_sms_queue_processor
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
 from onegov.core.upgrade import get_upgrade_modules
@@ -22,13 +27,17 @@ from onegov.core.upgrade import UpgradeRunner
 from onegov.server.config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import close_all_sessions
+from time import sleep
 from transaction import commit
 from uuid import uuid4
+from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers import Observer
 
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
+    from watchdog.events import FileSystemEvent
 
     from onegov.core.cli.core import GroupContext
     from onegov.core.framework import Framework
@@ -144,6 +153,111 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
         sys.exit(1)
 
 
+@cli.group(context_settings={
+    'matches_required': False,
+    'default_selector': '*'
+})
+@pass_group_context
+def sendsms(
+    group_context: 'GroupContext'
+) -> 'Callable[[CoreRequest, Framework], None]':
+    """ Sends the SMS in the smsdir for a given instance. For example:
+
+        onegov-core --select '/onegov_town6/meggen' sendsms
+
+    """
+
+    def send(request: 'CoreRequest', app: 'Framework') -> None:
+        qp = get_sms_queue_processor(app)
+        if qp is None:
+            return
+
+        qp.send_messages()
+
+    return send
+
+
+class SmsEventHandler(PatternMatchingEventHandler):
+
+    def __init__(self, queue_processors: list[SmsQueueProcessor]):
+        self.queue_processors = queue_processors
+        super().__init__(
+            ignore_patterns=['*.sending-*', '*.rejected-*'],
+            ignore_directories=True
+        )
+
+    def on_created(self, event: 'FileSystemEvent') -> None:
+        src_path = os.path.abspath(event.src_path)
+        for qp in self.queue_processors:
+            # only one queue processor should match
+            if src_path.startswith(qp.path):
+                qp.send_messages()
+                return
+
+
+@cli.group(invoke_without_command=True, context_settings={
+    'matches_required': False,
+    'default_selector': '*'
+})
+@pass_group_context
+def sms_spooler(group_context: 'GroupContext') -> None:
+    """ Continuously spools the SMS in the smsdir for all instances using
+    a watchdog that monitors the smsdir for newly created files.
+
+    For example:
+
+        onegov-core sms-spooler
+    """
+
+    queue_processors: dict[str, list[SmsQueueProcessor]] = defaultdict(list)
+
+    def create_sms_queue_processor(
+        request: 'CoreRequest',
+        app: 'Framework'
+    ) -> None:
+
+        # we're fine if the path doesn't exist yet, we only call
+        # qp.send_messages() when changes inside the path occur
+        qp = get_sms_queue_processor(app, missing_path_ok=True)
+        if qp is not None:
+            assert app.sms_directory
+            path = os.path.abspath(app.sms_directory)
+            queue_processors[path].append(qp)
+
+    run_processors(group_context, (create_sms_queue_processor,))
+    if not queue_processors:
+        abort('No SMS delivery configured for the specified selector')
+
+    observer = Observer()
+    for sms_directory, qps in queue_processors.items():
+        event_handler = SmsEventHandler(qps)
+        observer.schedule(event_handler, sms_directory, recursive=True)
+
+    observer.start()
+    log.info('Spooler initialized')
+    # make sure any setup on the observer thread has a chance to happen
+    sleep(0.1)
+
+    # after starting the observer we call send on all our queues, so we
+    # don't delay sending messages that have been queued between restarts
+    # of this spooler
+    for qps in queue_processors.values():
+        for qp in qps:
+            # the directory of the queue processor might not exist yet
+            # we only need to send messages if it exists
+            if os.path.exists(qp.path):
+                qp.send_messages()
+
+    # run observer until we receive something like a KeyboardInterrupt
+    # or a SIGKILL
+    try:
+        while True:
+            sleep(1)
+    finally:
+        observer.stop()
+        observer.join()
+
+
 @cli.command(context_settings={
     'matches_required': False,
     'default_selector': '*'
@@ -161,6 +275,9 @@ def sendmail(group_context: 'GroupContext', queue: str, limit: int) -> None:
               help="Only transfer this schema, e.g. /town6/govikon")
 @click.option('--add-admins', default=False, is_flag=True,
               help="Add local admins (admin@example.org:test)")
+@click.option('--delta', default=False, is_flag=True,
+              help="Only transfer files where size or modification time "
+                   "changed")
 @pass_group_context
 def transfer(
     group_context: 'GroupContext',
@@ -170,7 +287,8 @@ def transfer(
     no_filestorage: bool,
     no_database: bool,
     transfer_schema: str | None,
-    add_admins: bool
+    add_admins: bool,
+    delta: bool
 ) -> None:
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
@@ -194,6 +312,15 @@ def transfer(
 
     if transfer_schema:
         transfer_schema = transfer_schema.strip('/').replace('/', '-')
+
+    if delta and not shutil.which('rsync'):
+        click.echo("")
+        click.echo("Core delta transfer requires 'rsync', please install as "
+                   "follows:")
+        click.echo("* brew install rsync")
+        click.echo("* apt-get install rsync")
+        click.echo("")
+        sys.exit(1)
 
     if not shutil.which('pv'):
         click.echo("")
@@ -245,6 +372,35 @@ def transfer(
 
         click.echo(f"Copying {remote}/{glob}")
         subprocess.check_output(f'{send} | {recv}', shell=True)
+
+    @lru_cache(maxsize=None)
+    def transfer_delta_storage(
+        remote: str, local: str, glob: str = '*'
+    ) -> None:
+        """ Transfers only changed files based on size or last-modified
+        time. This is rsnyc default behaviour. """
+
+        # '/***' means to include all files and directories under a directory
+        # recursively. Without that, it will only transfer the directory but
+        # not it's contents.
+        glob += '/***'
+
+        dry_run = (
+            f"rsync -a --include='*/' --include='{glob}' --exclude='*' "
+            f"--dry-run --itemize-changes "
+            f"{server}:{remote}/ {local}/"
+        )
+        subprocess.run(dry_run, shell=True, capture_output=False)
+
+        send = (
+            f"rsync -av --include='*/' --include='{glob}' --exclude='*' "
+            f"{server}:{remote}/ {local}/"
+        )
+
+        if shutil.which('pv'):
+            send = f"{send} | pv -L 5m --name '{remote}/{glob}' -r -b"
+        click.echo(f"Copying {remote}/{glob}")
+        subprocess.check_output(send, shell=True)
 
     def transfer_database(
         remote_db: str,
@@ -301,7 +457,8 @@ def transfer(
 
     def transfer_storage_of_app(
         local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig'
+        remote_cfg: 'ApplicationConfig',
+        transfer_function: 'Callable[..., None]'
     ) -> None:
 
         remote_storage = remote_cfg.configuration.get('filestorage', '')
@@ -314,14 +471,15 @@ def transfer(
             remote_storage = os.path.join(remote_dir, remote_fs['root_path'])
             local_storage = os.path.join('.', local_fs['root_path'])
 
-            transfer_storage(remote_storage, local_storage, glob='global-*')
+            transfer_function(remote_storage, local_storage, glob='global-*')
 
             glob = transfer_schema or f'{local_cfg.namespace}*'
-            transfer_storage(remote_storage, local_storage, glob=glob)
+            transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_depot_storage_of_app(
         local_cfg: 'ApplicationConfig',
-        remote_cfg: 'ApplicationConfig'
+        remote_cfg: 'ApplicationConfig',
+        transfer_function: 'Callable[..., None]'
     ) -> None:
 
         depot_local_storage = 'depot.io.local.LocalFileStorage'
@@ -336,7 +494,7 @@ def transfer(
             local_storage = os.path.join('.', local_depot)
 
             glob = transfer_schema or f'{local_cfg.namespace}*'
-            transfer_storage(remote_storage, local_storage, glob=glob)
+            transfer_function(remote_storage, local_storage, glob=glob)
 
     def transfer_database_of_app(
         local_cfg: 'ApplicationConfig',
@@ -399,8 +557,14 @@ def transfer(
                 transfer_database_of_app(local_appcfg, remote_appcfg))
 
         if not no_filestorage:
-            transfer_storage_of_app(local_appcfg, remote_appcfg)
-            transfer_depot_storage_of_app(local_appcfg, remote_appcfg)
+            transfer_strategy = (transfer_delta_storage if delta else
+                                 transfer_storage)
+            transfer_storage_of_app(
+                local_appcfg, remote_appcfg, transfer_strategy
+            )
+            transfer_depot_storage_of_app(
+                local_appcfg, remote_appcfg, transfer_strategy
+            )
 
     if add_admins:
         for schema in schemas:

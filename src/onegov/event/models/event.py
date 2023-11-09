@@ -10,7 +10,6 @@ from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
-from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -41,8 +40,8 @@ class EventFile(File):
     __mapper_args__ = {'polymorphic_identity': 'eventfile'}
 
 
-class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
-            SearchableContent, CoordinatesMixin):
+class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
+            CoordinatesMixin):
     """ Defines an event.
 
     Occurrences are stored in a seperate table containing only a minimal set
@@ -140,7 +139,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             except DecompressionBombError:
                 setattr(self, blob, None)
 
-    #: Occurences of the event
+    #: Occurrences of the event
     occurrences: 'relationship[list[Occurrence]]' = relationship(
         "Occurrence",
         cascade="all, delete-orphan",
@@ -152,7 +151,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         'title': {'type': 'localized'},
         'description': {'type': 'localized'},
         'location': {'type': 'localized'},
-        'organizer': {'type': 'localized'}
+        'organizer': {'type': 'localized'},
+        'filter_keywords': {'type': 'keyword'}
     }
 
     @property
@@ -174,12 +174,13 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             return f"https://www.guidle.com/angebote/{guidle_id}"
 
     def __setattr__(self, name, value):
-        """ Automatically update the occurrences if shared attributes change.
+        """ Automatically update the occurrences if shared attributes change
         """
 
         super().__setattr__(name, value)
         if name in ('state', 'title', 'name', 'location', 'tags',
-                    'start', 'end', 'timezone', 'recurrence'):
+                    'filter_keywords', 'start', 'end', 'timezone',
+                    'recurrence'):
             self._update_occurrences()
 
     @property
@@ -327,6 +328,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             name=name,
             location=self.location,
             tags=self.tags,
+            filter_keywords=self.filter_keywords,
             start=start,
             end=end,
             timezone=self.timezone,
@@ -378,6 +380,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
             self.occurrences.append(self.spawn_occurrence(start))
+
+        for occ in self.occurrences:
+            occ.filter_keywords = self.filter_keywords
 
     def submit(self):
         """ Submit the event. """

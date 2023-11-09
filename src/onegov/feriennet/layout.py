@@ -590,7 +590,7 @@ class BillingCollectionLayout(DefaultLayout):
                                 "Manual bookings can only be added "
                                 "once the billing has been confirmed."
                             ), no=_("Cancel")),
-                        ) if not self.model.period.finalized else tuple()
+                        ) if not self.model.period.finalized else ()
                     ),
                     *self.family_removal_links
                 ]

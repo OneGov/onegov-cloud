@@ -99,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3, 4, 5, 6]
+        group: [1, 2, 3, 4, 5, 6, 7]
 
     runs-on: ubuntu-latest
 
@@ -202,7 +202,7 @@ jobs:
     - name: Run tests
       run: |
         py.test \
-          --splits "6" \
+          --splits "7" \
           --group "${{matrix.group}}" \
           --cov \
           --cov-config=pyproject.toml \
