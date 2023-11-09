@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-10-24 13:57+0200\n"
+"POT-Creation-Date: 2023-11-09 09:04+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -766,6 +766,9 @@ msgstr "Questo sito è pubblico ma richiede l'invio di un mTAN"
 
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Questo sito è segreto e richiede l'invio di un mTAN"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."

@@ -78,12 +78,18 @@
         @include icon-bold('\f3cd');
         color: $blue-dark;
     }
+
+    input[value="secret_mtan"] + label::before {
+        @include icon-bold('\f3cd');
+        color: $yellow-dark;
+    }
 }
 
 .secret-hint::before,
 .private-hint::before,
 .member-hint::before,
 .mtan-hint::before,
+.secret-mtan-hint::before,
 .unpublished-hint::before {
     font-size: .875rem;
     font-style: normal;
@@ -107,6 +113,11 @@
 .mtan-hint::before {
     @include icon-bold('\f3cd');
     color: $blue-dark;
+}
+
+.secret-mtan-hint::before {
+    @include icon-bold('\f3cd');
+    color: $yellow-dark;
 }
 
 .unpublished-hint::before {

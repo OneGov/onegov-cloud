@@ -6254,6 +6254,11 @@ h2 + div.timeline {
         @include icon('\f10b');
         color: $blue-dark;
     }
+
+    input[value="secret_mtan"] + label::before {
+        @include icon('\f10b');
+        color: $yellow-dark;
+    }
 }
 
 
@@ -6261,6 +6266,7 @@ h2 + div.timeline {
 .private-hint::before,
 .member-hint::before,
 .mtan-hint::before,
+.secret-mtan-hint::before,
 .unpublished-hint::before {
     font-style: normal;
 }
@@ -6283,6 +6289,11 @@ h2 + div.timeline {
 .mtan-hint::before {
     @include icon('\f10b');
     color: $blue-dark;
+}
+
+.secret-mtan-hint::before {
+    @include icon('\f10b');
+    color: $yellow-dark;
 }
 
 .unpublished-hint::before {

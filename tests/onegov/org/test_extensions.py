@@ -61,7 +61,8 @@ def test_access_extension():
 
     assert 'access' in form._fields
     assert form.access.data == 'public'
-    assert 'mtan' not in (value for value, _ in form.access.choices)
+    assert {'mtan', 'secret_mtan'}.isdisjoint(
+        value for value, _ in form.access.choices)
 
     form.access.data = 'private'
     form.populate_obj(topic)
@@ -74,7 +75,8 @@ def test_access_extension():
     }))
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
-    assert 'mtan' in (value for value, _ in form.access.choices)
+    assert {'mtan', 'secret_mtan'}.issubset(
+        value for value, _ in form.access.choices)
 
     form.process(obj=topic)
 
