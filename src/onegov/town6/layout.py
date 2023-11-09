@@ -2497,3 +2497,8 @@ class ClientChatLayout(DefaultLayout):
             self.app.websockets_client_url(request)
         self.custom_body_attributes['data-websocket-schema'] = \
             self.app.schema
+
+
+class ChatInitiationFormLayout(DefaultLayout):
+    def __init__(self, model, request):
+        super().__init__(model, request)

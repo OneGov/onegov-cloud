@@ -6,6 +6,7 @@ from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.chat.forms import ChatInitiationForm
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
+from onegov.town6.layout import DefaultLayout
 from webob.exc import HTTPForbidden
 
 
@@ -43,7 +44,7 @@ def view_chat_form(self:ChatCollection, request, form):
 
     return {
         'title': 'Chat Customer',
-        'layout': ClientChatLayout(self, request),
+        'layout': DefaultLayout(self, request),
         'form': form
     }
 

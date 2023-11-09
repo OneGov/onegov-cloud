@@ -9,32 +9,35 @@ from onegov.websockets import log
 from websockets.legacy.protocol import broadcast
 from websockets.legacy.server import serve, WebSocketServerProtocol
 from onegov.core import cache
-from uuid import UUID
+
 from onegov.user import User, UserCollection
-from onegov.chat.models import Chat
 from onegov.chat.collections import ChatCollection
 from onegov.core.orm import SessionManager, Base
 from onegov.core.browser_session import BrowserSession
 from http.cookies import SimpleCookie
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
     from sqlalchemy.orm import Session
+    from uuid import UUID
+    from onegov.chat.models import Chat
+    from collections.abc import Mapping
 
 
-CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
-
-STAFF_CONNECTIONS: dict[str, dict[str, set['WebSocketServerProtocol']]] = {}
-CUSTOMER_CONNECTIONS: dict[str, dict[str, set['WebSocketServerProtocol']]] = {}
+CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
 TOKEN = ''  # nosec: B105
-SESSIONS: dict[str, 'Session'] = {}
-STAFF: dict[str, dict[UUID, User]] = {}
-CHATS: dict[str, dict[UUID, Chat]] = {}
+
 NOTFOUND = object()
+SESSIONS: dict[str, 'Session'] = {}
+STAFF_CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
+STAFF: dict[str, dict['UUID', User]] = {}  # For Authentication of User
+CHATS: dict[str, dict['UUID', 'Chat']] = {}  # For DB
+# For Messages
+CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
 
 
 class WebSocketServer(WebSocketServerProtocol):
@@ -57,14 +60,11 @@ class WebSocketServer(WebSocketServerProtocol):
             return None
 
     async def process_request(self, path, headers):
-        # Serve iframe on non-WebSocket requests
-        ...
-
         morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
         self.signed_session_id = morsel.value if morsel else None
 
     async def get_chat(self, id):
-        chat = CHATS[self.schema].get(id, NOTFOUND)
+        chat = CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
         if chat is NOTFOUND:
             chat = ChatCollection(self.session).by_id(id)
             if chat and not chat.active:
@@ -91,7 +91,7 @@ class WebSocketServer(WebSocketServerProtocol):
         """
         # sha-1 should be enough, because even if somebody was able to get
         # the cleartext value I honestly couldn't tell you what it could be
-        # used for...
+        # used for ...
         return hashlib.new(  # nosec: B324
             'sha1',
             self.application_id.encode('utf-8'),
@@ -127,13 +127,10 @@ class WebSocketServer(WebSocketServerProtocol):
     def browser_session(self) -> 'Mapping [str, Any]':
 
         if self.signed_session_id is None:
-            log.debug(self.signed_session_id)
             return {}
         session_id = self.unsign(self.signed_session_id)
         if session_id is None:
-            log.debug(session_id)
             return {}
-
         return BrowserSession(
             cache=self.session_cache,
             token=session_id,
@@ -156,7 +153,7 @@ def get_payload(
 
 
 async def error(
-    websocket: 'WebSocketServerProtocol',
+    websocket: WebSocketServerProtocol,
     message: str,
     close: bool = True
 ) -> None:
@@ -172,7 +169,7 @@ async def error(
         await websocket.close()
 
 
-async def acknowledge(websocket: 'WebSocketServerProtocol') -> None:
+async def acknowledge(websocket: WebSocketServerProtocol) -> None:
     """ Sends an acknowledge. """
 
     await websocket.send(
@@ -183,7 +180,7 @@ async def acknowledge(websocket: 'WebSocketServerProtocol') -> None:
 
 
 async def handle_listen(
-    websocket: 'WebSocketServerProtocol',
+    websocket: WebSocketServerProtocol,
     payload: 'JSONObject_ro'
 ) -> None:
     """ Handles listening clients. """
@@ -215,7 +212,7 @@ async def handle_listen(
 
 
 async def handle_authentication(
-    websocket: 'WebSocketServerProtocol',
+    websocket: WebSocketServerProtocol,
     payload: 'JSONObject_ro'
 ) -> None:
     """ Handles authentication. """
@@ -236,7 +233,7 @@ async def handle_authentication(
 
 
 async def handle_status(
-    websocket: 'WebSocketServerProtocol',
+    websocket: WebSocketServerProtocol,
     payload: 'JSONObject_ro'
 ) -> None:
     """ Handles status requests. """
@@ -261,7 +258,7 @@ async def handle_status(
 
 
 async def handle_broadcast(
-    websocket: 'WebSocketServerProtocol',
+    websocket: WebSocketServerProtocol,
     payload: 'JSONObject_ro'
 ) -> None:
     """ Handles broadcasts. """
@@ -302,7 +299,7 @@ async def handle_broadcast(
 
 
 async def handle_manage(
-    websocket: 'WebSocketServerProtocol',
+    websocket: WebSocketServerProtocol,
     authentication_payload: 'JSONObject_ro'
 ) -> None:
     """ Handles managing clients. """
@@ -323,55 +320,98 @@ async def handle_manage(
             )
 
 
-async def handle_chat(websocket, payload):
+async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
     """
-    Starts a chat.
+    Starts a chat. Handles listening to messages on channel.
     """
-    log.debug(f"Chat messages for user: {websocket.id}")
 
     schema = payload.get('schema')
     if not schema or not isinstance(schema, str):
         await error(websocket, f'invalid schema: {schema}')
         return
 
-    channel = payload.get('channel')
-    if channel is not None and not isinstance(channel, str):
-        await error(websocket, f'invalid channel: {channel}')
-        return
+    websocket.schema = schema  # For DB Connection
+    channel = websocket.browser_session.get("active_chat_id")
 
-    websocket.schema = schema
+# Alles nochher för t DB
+    await websocket.get_chat(channel)
+    # # log.debug(f'CHATS: {CHATS}')
+    # # log.debug(f'STAFF: {STAFF}')
 
     await acknowledge(websocket)
 
-    schema_channel = f'{schema}-{channel}' if channel else schema
-    log.debug(f'{websocket.id} listens for chat @ {schema_channel}')
-    customers = CUSTOMER_CONNECTIONS.setdefault(schema_channel, set())
-    staff = STAFF_CONNECTIONS.setdefault(schema_channel, set())
-    if payload['type'] == 'customer_chat':
-        customers.add(websocket)
-        log.debug(f'added {websocket.id} to customer-list')
-    else:
-        staff.add(websocket)
-        log.debug(f'added {websocket.id} to staff-list')
+    all_channels = CHANNELS.setdefault(schema, {})
+    channel_connections = all_channels.setdefault(channel.hex, set())
+    channel_connections.add(websocket)
+    staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
+
+    log.debug(f'added {websocket.id} to channel-connections')
+    # log.debug(f'CHANNELS: {CHANNELS}')
+
+    for client in staff_connections:
+        await client.send(dumps({
+            'type': "notification",
+            'message': dumps({'text': "initialisierung"}),
+            'channel': channel.hex
+        }))
+
     while websocket.open:
         message = await websocket.recv()
         log.debug(f'I got the message {message}')
-        if payload['type'] == 'customer_chat':
-            for client in staff:
-                await client.send(dumps({
-                    'type': "notification",
-                    'message': message,
-                }))
-        else:
-            for client in customers:
-                await client.send(dumps({
-                    'type': "notification",
-                    'message': message,
-                }))
+
+        for client in channel_connections:
+            await client.send(dumps({
+                'type': "notification",
+                'message': message,
+                'channel': channel.hex
+            }))
+
         websocket.session.flush()
 
 
-async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
+async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
+    """
+    Registers staff member and listens to messages.
+    """
+
+    schema = payload.get('schema')
+    if not schema or not isinstance(schema, str):
+        await error(websocket, f'invalid schema: {schema}')
+        return
+
+    websocket.schema = schema  # For DB Connection
+
+# Alles nochher för t DB
+    # await websocket.get_chat(channel)
+    # # log.debug(f'CHATS: {CHATS}')
+    # # log.debug(f'STAFF: {STAFF}')
+
+    await acknowledge(websocket)
+
+    # all_channels = CHANNELS.setdefault(schema, {})
+    # channel_connections = all_channels.setdefault(channel, set())
+    # channel_connections.add(websocket)
+    staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
+    staff_connections.add(websocket)
+
+    log.debug(f'added {websocket.id} to staff-connections')
+    log.debug(f'STAFF_CONNECTIONS: {STAFF_CONNECTIONS}')
+
+    while websocket.open:
+        message = await websocket.recv()
+        log.debug(f'I got the message {message}')
+
+        # for client in channel_connections:
+        #     await client.send(dumps({
+        #         'type': "notification",
+        #         'message': message,
+        #         # 'channel': channel
+        #     }))
+
+        websocket.session.flush()
+
+
+async def handle_start(websocket: WebSocketServerProtocol) -> None:
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
     payload = get_payload(message, ('authenticate', 'register',
@@ -380,9 +420,10 @@ async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
         await handle_manage(websocket, payload)
     elif payload and payload['type'] == 'register':
         await handle_listen(websocket, payload)
-    elif payload and (payload['type'] == 'customer_chat'
-                      or payload['type'] == 'staff_chat'):
-        await handle_chat(websocket, payload)
+    elif payload and (payload['type'] == 'customer_chat'):
+        await handle_customer_chat(websocket, payload)
+    elif payload and (payload['type'] == 'staff_chat'):
+        await handle_staff_chat(websocket, payload)
     else:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
