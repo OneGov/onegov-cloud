@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-10-24 13:52+0200\n"
+"POT-Creation-Date: 2023-11-09 09:02+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2297,6 +2297,9 @@ msgid "Only by privileged users or after submitting a mTAN"
 msgstr ""
 "Uniquement par les utilisateurs privilégiés ou après avoir soumis un mTAN"
 
+msgid "Through URL only after submitting a mTAN (not listed)"
+msgstr "Via URL uniquement et après avoir soumis un mTAN (non répertorié)"
+
 msgid "Members may view occupancy"
 msgstr "Les membres peuvent voir l'occupation "
 
@@ -3042,6 +3045,9 @@ msgstr "Ce site est privé mais peut également être vu par les membres"
 
 msgid "This site is public but requires submitting an mTAN"
 msgstr "Ce site est public mais nécessite la soumission d'un mTAN"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Ce site est privé et nécessite la soumission d'un mTAN"
 
 msgid "This site is not published."
 msgstr "Cette page n'est pas publiée."

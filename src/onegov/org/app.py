@@ -722,7 +722,7 @@ def wrap_with_mtan_hook(
     @wraps(func)
     def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
         if (
-            getattr(obj, 'access', None) == 'mtan'
+            getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
             # managers don't require mtan authentication
             and not request.is_manager
         ):

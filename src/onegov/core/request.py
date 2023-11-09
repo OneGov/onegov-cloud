@@ -649,7 +649,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return False
 
         if not self.is_private(model) and hasattr(model, 'access'):
-            if model.access == 'secret':
+            if model.access.startswith('secret'):
                 return False
 
         return True

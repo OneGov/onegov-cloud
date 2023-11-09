@@ -451,6 +451,9 @@
         <tal:b case="'secret'">
             <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
         </tal:b>
+        <tal:b case="'secret_mtan'">
+            <i title="This site is secret and requires submitting an mTAN" i18n:attributes="title" class="secret-mtan-hint"></i>
+        </tal:b>
     </tal:b>
 </metal:access_hint>
 
@@ -1513,7 +1516,7 @@
             </tal:b>
         </tal:b>
     </tal:b>
-    
+
 </metal:tags_collapsed>
 
 <metal:generic_message define-macro="generic_message" i18n:domain="onegov.org">
