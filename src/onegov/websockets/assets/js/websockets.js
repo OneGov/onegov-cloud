@@ -1,10 +1,11 @@
-var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError, eventType) {
+var openWebsocket = function(endpoint, schema, channel, onNotifcation, onError, eventType, token) {
     const websocket = new WebSocket(endpoint);
     websocket.addEventListener("open", function() {
         const payload = {
             type: eventType||"register",
             schema: schema,
-            channel: channel
+            channel: channel,
+            token: token||null
         };
         websocket.send(JSON.stringify(payload));
     });

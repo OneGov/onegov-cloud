@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
             null,
             onWebsocketNotification,
             onWebsocketError,
-            'chat'
+            'customer_chat',
         );
 
         const chatArea = document.getElementById("message-area");
@@ -65,6 +65,8 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             socket.send(payload);
+            chatWindow.value = '';
         })
     }
+
 });

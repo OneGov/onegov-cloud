@@ -1,9 +1,21 @@
+import hashlib
+
 from asyncio import Future
+from itsdangerous import BadSignature, Signer
 from json import dumps
 from json import loads
+from functools import cached_property, partial
 from onegov.websockets import log
 from websockets.legacy.protocol import broadcast
-from websockets.legacy.server import serve
+from websockets.legacy.server import serve, WebSocketServerProtocol
+from onegov.core import cache
+from uuid import UUID
+from onegov.user import User, UserCollection
+from onegov.chat.models import Chat
+from onegov.chat.collections import ChatCollection
+from onegov.core.orm import SessionManager, Base
+from onegov.core.browser_session import BrowserSession
+from http.cookies import SimpleCookie
 
 
 from typing import TYPE_CHECKING
@@ -11,12 +23,121 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from onegov.core.types import JSONObject
     from onegov.core.types import JSONObject_ro
-    from websockets.legacy.server import WebSocketServerProtocol
+    from sqlalchemy.orm import Session
 
 
 CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
-CHAT_CONNECTIONS: dict[str, set['WebSocketServerProtocol']] = {}
+
+STAFF_CONNECTIONS: dict[str, dict[str, set['WebSocketServerProtocol']]] = {}
+CUSTOMER_CONNECTIONS: dict[str, dict[str, set['WebSocketServerProtocol']]] = {}
 TOKEN = ''  # nosec: B105
+SESSIONS: dict[str, 'Session'] = {}
+STAFF: dict[str, dict[UUID, User]] = {}
+CHATS: dict[str, dict[UUID, Chat]] = {}
+NOTFOUND = object()
+
+
+class WebSocketServer(WebSocketServerProtocol):
+    schema:str
+    signed_session_id:str
+
+    def __init__(self, config, session_manager, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.config = config
+        self.session_manager = session_manager
+
+    def unsign(self, text: str) -> str | None:
+        """ Unsigns a signed text, returning None if unsuccessful. """
+        identity_secret = self.application_config[
+            'identity_secret'] + self.application_id_hash
+        try:
+            signer = Signer(identity_secret, salt='generic-signer')
+            return signer.unsign(text).decode('utf-8')
+        except BadSignature:
+            return None
+
+    async def process_request(self, path, headers):
+        # Serve iframe on non-WebSocket requests
+        ...
+
+        morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
+        self.signed_session_id = morsel.value if morsel else None
+
+    async def get_chat(self, id):
+        chat = CHATS[self.schema].get(id, NOTFOUND)
+        if chat is NOTFOUND:
+            chat = ChatCollection(self.session).by_id(id)
+            if chat and not chat.active:
+                chat = None
+            CHATS[self.schema] = chat
+        return chat
+
+    @property
+    def session(self):
+        session = SESSIONS.get(self.schema)
+        if session is None:
+            self.session_manager.set_current_schema(self.schema)
+            session = SESSIONS[self.schema] = self.session_manager.session()
+            STAFF[self.schema] = {user.id: user for user in UserCollection(
+                session).query().filter(User.role.in_(['editor', 'admin']))}
+            CHATS[self.schema] = {}
+        return session
+
+    @property
+    def application_id_hash(self) -> str:
+        """ The application_id as hash, use this if the application_id can
+        be read by the user -> this obfuscates things slightly.
+
+        """
+        # sha-1 should be enough, because even if somebody was able to get
+        # the cleartext value I honestly couldn't tell you what it could be
+        # used for...
+        return hashlib.new(  # nosec: B324
+            'sha1',
+            self.application_id.encode('utf-8'),
+            usedforsecurity=False
+        ).hexdigest()
+
+    @property
+    def session_cache(self) -> cache.RedisCacheRegion:
+        """ A cache that is kept for a long-ish time. """
+        day = 60 * 60 * 24
+        return cache.get(
+            namespace=f'{self.application_id}:sessions',
+            expiration_time=7 * day,
+            redis_url=self.application_config.get('redis_url',
+                                                  'redis://127.0.0.1:6379/0')
+        )
+
+    @property
+    def namespace(self):
+        return self.schema.split('-', 1)[0]
+
+    @property
+    def application_id(self):
+        return '/'.join(self.schema.split('-', 1))
+
+    @property
+    def application_config(self):
+        for c in self.config.applications:
+            if c.namespace == self.namespace:
+                return c.configuration
+
+    @cached_property
+    def browser_session(self) -> 'Mapping [str, Any]':
+
+        if self.signed_session_id is None:
+            log.debug(self.signed_session_id)
+            return {}
+        session_id = self.unsign(self.signed_session_id)
+        if session_id is None:
+            log.debug(session_id)
+            return {}
+
+        return BrowserSession(
+            cache=self.session_cache,
+            token=session_id,
+        )
 
 
 def get_payload(
@@ -206,9 +327,7 @@ async def handle_chat(websocket, payload):
     """
     Starts a chat.
     """
-    log.debug(f"Listening for chat messages for user: {websocket.id}")
-
-    assert payload.get('type') == 'chat'
+    log.debug(f"Chat messages for user: {websocket.id}")
 
     schema = payload.get('schema')
     if not schema or not isinstance(schema, str):
@@ -220,40 +339,49 @@ async def handle_chat(websocket, payload):
         await error(websocket, f'invalid channel: {channel}')
         return
 
+    websocket.schema = schema
+
     await acknowledge(websocket)
 
     schema_channel = f'{schema}-{channel}' if channel else schema
     log.debug(f'{websocket.id} listens for chat @ {schema_channel}')
-    connections = CHAT_CONNECTIONS.setdefault(schema_channel, set())
-    connections.add(websocket)
-
-    while True:
+    customers = CUSTOMER_CONNECTIONS.setdefault(schema_channel, set())
+    staff = STAFF_CONNECTIONS.setdefault(schema_channel, set())
+    if payload['type'] == 'customer_chat':
+        customers.add(websocket)
+        log.debug(f'added {websocket.id} to customer-list')
+    else:
+        staff.add(websocket)
+        log.debug(f'added {websocket.id} to staff-list')
+    while websocket.open:
         message = await websocket.recv()
-        print(f'I got the message {message}')
-        for client in connections:
-            await client.send(dumps({
-                'type': "notification",
-                'message': message,
-            }))
-
-    # try:
-    #     await websocket.wait_closed()
-    # finally:
-    #     connections = CHAT_CONNECTIONS.setdefault(schema_channel, set())
-    #     if websocket in connections:
-    #         connections.remove(websocket)
+        log.debug(f'I got the message {message}')
+        if payload['type'] == 'customer_chat':
+            for client in staff:
+                await client.send(dumps({
+                    'type': "notification",
+                    'message': message,
+                }))
+        else:
+            for client in customers:
+                await client.send(dumps({
+                    'type': "notification",
+                    'message': message,
+                }))
+        websocket.session.flush()
 
 
 async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
     log.debug(f'{websocket.id} connected')
     message = await websocket.recv()
-    payload = get_payload(message, ('authenticate', 'register', 'chat',
-                                    'message'))
+    payload = get_payload(message, ('authenticate', 'register',
+                                    'customer_chat','staff_chat'))
     if payload and payload['type'] == 'authenticate':
         await handle_manage(websocket, payload)
     elif payload and payload['type'] == 'register':
         await handle_listen(websocket, payload)
-    elif payload and payload['type'] == 'chat':
+    elif payload and (payload['type'] == 'customer_chat'
+                      or payload['type'] == 'staff_chat'):
         await handle_chat(websocket, payload)
     else:
         # FIXME: technically message can be bytes
@@ -261,9 +389,15 @@ async def handle_start(websocket: 'WebSocketServerProtocol') -> None:
     log.debug(f'{websocket.id} disconnected')
 
 
-async def main(host: str, port: int, token: str) -> None:
+async def main(host: str, port: int, token: str,
+               config) -> None:
     global TOKEN
     TOKEN = token
     log.debug(f'Serving on ws://{host}:{port}')
-    async with serve(handle_start, host, port):
+    dsn = config.applications[0].configuration['dsn']
+    session_manager = SessionManager(dsn, Base, session_config={
+        'autoflush': False})
+    async with serve(handle_start, host, port,
+                     create_protocol=partial(WebSocketServer, config,
+                                             session_manager)):
         await Future()

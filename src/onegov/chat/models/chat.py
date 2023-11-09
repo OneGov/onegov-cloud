@@ -1,8 +1,10 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column
+from onegov.user import User
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy import Text, Boolean
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from uuid import uuid4
 # from sqlalchemy.orm import relationship
@@ -26,6 +28,8 @@ class Chat(Base, TimestampMixin):
 
     #: the unique id, part of the url
     id = Column(UUID, primary_key=True, default=uuid4)
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
+    user = relationship(User)
 
     customer_name = Column(Text, nullable=False)
     email = Column(Text, nullable=False)

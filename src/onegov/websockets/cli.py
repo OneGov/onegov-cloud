@@ -75,7 +75,7 @@ def serve(
             environment=sentry_environment,
         )
 
-    run(main(host, port, token))
+    run(main(host, port, token, group_context.config))
 
 
 @cli.command('listen')
