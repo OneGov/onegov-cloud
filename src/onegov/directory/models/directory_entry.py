@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
@@ -102,7 +104,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def keywords(self, value):
         self._keywords = {k: '' for k in value} if value else None
 
-    @property
+    @hybrid_property
     def text(self):
         return self.directory.configuration.extract_searchable(self.values)
 

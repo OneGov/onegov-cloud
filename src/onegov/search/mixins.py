@@ -4,9 +4,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred
 
 from onegov.core.upgrade import UpgradeContext
-from onegov.search.utils import (classproperty,
-                                 get_fts_index_localized_languages,
-                                 get_fts_index_basic_languages)
+from onegov.search.utils import classproperty, \
+    get_fts_index_localized_languages, get_fts_index_basic_languages
 from onegov.search.utils import extract_hashtags
 
 from typing import Any, TYPE_CHECKING
@@ -228,7 +227,7 @@ class Searchable:
                     prop = getattr(model, prop_name)
                     languages = get_fts_index_basic_languages()
 
-                    if prop_type.startswith('localized'):
+                    if prop_type in ['localized', 'localized_html']:
                         # only for 'localized' properties we create the
                         # index localized
                         languages.extend(get_fts_index_localized_languages())
