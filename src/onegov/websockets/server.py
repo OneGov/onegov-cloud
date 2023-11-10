@@ -352,7 +352,7 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
         await client.send(dumps({
             'type': "notification",
             'message': dumps({
-                'type': 'info',
+                'type': 'request',
                 'text': 'Neue Chat-Anfrage',
                 'channel': channel.hex
             })

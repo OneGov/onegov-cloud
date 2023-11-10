@@ -51,8 +51,7 @@ document.addEventListener("DOMContentLoaded", function() {
         );
 
         const chatArea = document.getElementById("message-area");
-        const customerName = chatArea.dataset.customerName;
-        console.log(customerName)
+        const staffName = chatArea.dataset.staffName;
         const chatWindow = document.getElementById("chat");
 
         document.getElementById("send").addEventListener("click", () => {
@@ -62,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const payload = JSON.stringify({
                 type: "message",
                 text: chatWindow.value,
-                user: 'Kundenname',
+                user: staffName,
                 time: now,
             });
 

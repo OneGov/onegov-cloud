@@ -6,7 +6,7 @@
 
         <div class="grid-x chat">
             <div class="medium-7 cell">
-                <div id="message-area" data-customer-name="${customer_name}">
+                <div id="message-area" data-cusomter-name="${customer_name}">
                     <!-- <div class="card left">
                         <p class="info">N. Stocker</p>
                         <div class="card-section">

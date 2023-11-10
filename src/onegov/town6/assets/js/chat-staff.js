@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function onWebsocketNotification(message, websocket) {
         message = JSON.parse(message)
-        if (message.type == 'info') {
+        if (message.type == 'request') {
             notifyMe(message.text) // Browser notification
 
             // Add request element
@@ -33,11 +33,21 @@ document.addEventListener("DOMContentLoaded", function() {
             newRequest.style.display = 'block'
             newRequest.children[1].id = message.channel
             var requestList = document.getElementById('request-list')
-            console.log('list', requestList)
-            console.log('newrequest', newRequest)
+            var noRequestText = document.getElementById('no-request')
+            noRequestText.style.display = 'none'
             requestList.appendChild(newRequest)
 
             newRequest.children[1].addEventListener("click", () => {
+
+                // Show chat window for open chat and remove request
+                var no_chat_open = document.getElementById('no-chat-open')
+                no_chat_open.style.display = 'none'
+                var message_area = document.getElementById("message-area");
+                message_area.style.display = 'flex'
+                var chat_form = document.getElementById('chat-form')
+                chat_form.style.display = 'block'
+                newRequest.remove()
+                noRequestText.style.display = 'block'
 
                 const payload = JSON.stringify({
                     type: "accepted",
@@ -97,7 +107,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const chatArea = document.getElementById("message-area");
         const customerName = chatArea.dataset.customerName;
-        console.log(customerName)
         const chatWindow = document.getElementById("chat");
 
         document.getElementById("send").addEventListener("click", () => {
@@ -107,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const payload = JSON.stringify({
                 type: 'message',
                 text: chatWindow.value,
-                user: 'Mitarbeitername',
+                user: customerName,
                 time: now,
             });
 

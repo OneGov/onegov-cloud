@@ -16,9 +16,22 @@ from webob.exc import HTTPForbidden
     permission=Private,)
 def view_chats_staff(self, request):
 
+    user = request.current_user
+
+    all_chats = ChatCollection(request.session).query()
+    active_chats = all_chats.filter('user_id' == user.id).filter(
+        'active' == True
+    )
+    archived_chats = all_chats.filter('user_id' == user.id).filter(
+        'active' == False
+    )
+
     return {
         'title': 'Chat Staff',
         'layout': StaffChatLayout(self, request),
+        'user': user,
+        'active_chats': active_chats.all(),
+        'archived_chats': archived_chats.all()
     }
 
 
