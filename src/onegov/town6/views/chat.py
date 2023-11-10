@@ -75,5 +75,6 @@ def view_customer_chat(self, request):
     return {
         'title': 'Chat Customer',
         'layout': ClientChatLayout(self, request),
+        'chat': self,
         'customer_name': self.customer_name
     }

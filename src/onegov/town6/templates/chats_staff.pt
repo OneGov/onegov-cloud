@@ -9,14 +9,7 @@
                 <p i18n:translate="" id="no-chat-open">Aktuell ist kein Chat geöffnet.</p>
                 <div id="message-area" style="display:none;" data-staff-name="${user.username}" data-staff-id="${user.id.hex}">
                     <p class="notification" id="accepted" style="display: none;"><i class="fas fa-info-circle"></i> Sie haben die Chatanfrage angenommen</p>
-                    <div class="card left" style="display: none;">
-                        <p class="info"></p>
-                        <div class="card-section">
-                            <p></p>
-                        </div>
-                        <p class="info"></p>
-                    </div>
-                    <div class="card right" style="display: none;">
+                    <div class="card chat-card" style="display: none;">
                         <p class="info"></p>
                         <div class="card-section">
                             <p></p>

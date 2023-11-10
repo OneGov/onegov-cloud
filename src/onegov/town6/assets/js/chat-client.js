@@ -30,14 +30,13 @@ document.addEventListener("DOMContentLoaded", function() {
             if (message.id == '') {
                 self = true
             }
-            createChatBubble(message.text, self)
+            createChatBubble(message.text, message.time, self)
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
             browserNotification(aceptedNotification.textContent)
         } else {
             console.log('unkown messaage type', message)
-            createChatBubble(message.text, false)
         }
     }
 
@@ -45,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
         websocket.close();
     }
 
-    function createChatBubble(message, self) {
+    function createChatBubble(message, time, self) {
         // Create the parts
         var card = document.createElement("div")
         if (self) {
@@ -58,11 +57,10 @@ document.addEventListener("DOMContentLoaded", function() {
         var textNode = document.createElement("p");
         var timeNode = document.createElement("p");
         timeNode.classList.add('info');
-        now = new Date().toUTCString()
-        const time = document.createTextNode(now);
+        const timeText = document.createTextNode(time);
         const text = document.createTextNode(message);
         
-        timeNode.appendChild(time);
+        timeNode.appendChild(timeText);
         card.appendChild(section);
         section.appendChild(textNode);
         textNode.appendChild(text);
@@ -83,12 +81,14 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log('i know the customer:', customerName)
 
         document.getElementById("send").addEventListener("click", () => {
+            now = new Date().toUTCString()
 
             const payload = JSON.stringify({
                 type: "message",
                 text: chatWindow.value,
                 user: customerName,
                 id: '',
+                time: now,
             });
 
             console.log('im about to send ', payload)

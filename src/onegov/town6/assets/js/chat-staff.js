@@ -66,12 +66,12 @@ document.addEventListener("DOMContentLoaded", function() {
             if (message.id == staffId) {
                 self = true
             }
-            createChatBubble(message.text, self)
+            createChatBubble(message.text, message.time, self)
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
         } else {
-            createChatBubble(message.text, false)
+            console.log('unkown messaage type', message)
         }
     }
 
@@ -79,9 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
         websocket.close();
     }
 
-
-    function createChatBubble(message, self) {
-        const chatArea = document.getElementById("message-area");
+    function createChatBubble(message, time, self) {
         
         // Create the parts
         var card = document.createElement("div")
@@ -95,16 +93,18 @@ document.addEventListener("DOMContentLoaded", function() {
         var textNode = document.createElement("p");
         var timeNode = document.createElement("p");
         timeNode.classList.add('info');
-        now = new Date().toUTCString()
-        const time = document.createTextNode(now);
+        
+        const timeText = document.createTextNode(time);
         const text = document.createTextNode(message);
 
-        timeNode.appendChild(time);
+        timeNode.appendChild(timeText);
         card.appendChild(section);
         section.appendChild(textNode);
         textNode.appendChild(text);
         card.appendChild(timeNode);
         chatArea.appendChild(card);
+
+        chatCard = document.getElementsByClassName('chat-card')[0]
     }
 
     if (endpoint && schema) {
@@ -118,12 +118,14 @@ document.addEventListener("DOMContentLoaded", function() {
         );
 
         document.getElementById("send").addEventListener("click", () => {
+            now = new Date().toUTCString()
 
             const payload = JSON.stringify({
                 type: 'message',
                 text: chatWindow.value,
                 user: staffName,
                 id: staffId,
+                time: now,
             });
 
             socket.send(payload);
