@@ -51,5 +51,13 @@
         flex-direction: column;
     }
 
+    .notification {
+        background: $white-smoke;
+        border-radius: 100px;
+        color: $base;
+        padding: .7rem 1.2rem;
+        place-self: center;
+    }
+
 
 }

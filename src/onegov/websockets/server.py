@@ -348,15 +348,16 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
     log.debug(f'ws-location: {websocket}')
     # log.debug(f'CHANNELS: {CHANNELS}')
 
-    for client in staff_connections:
-        await client.send(dumps({
-            'type': "notification",
-            'message': dumps({
-                'type': 'request',
-                'text': 'Neue Chat-Anfrage',
-                'channel': channel.hex
-            })
-        }))
+    if len(channel_connections) == 1:  # If customer is the only connection
+        for client in staff_connections:
+            await client.send(dumps({
+                'type': "notification",
+                'message': dumps({
+                    'type': 'request',
+                    'text': 'Neue Chat-Anfrage',
+                    'channel': channel.hex
+                })
+            }))
 
     while websocket.open:
         try:

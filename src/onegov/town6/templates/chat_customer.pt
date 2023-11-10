@@ -7,6 +7,7 @@
         <div class="grid-x chat">
             <div class="medium-7 cell">
                 <div id="message-area" data-cusomter-name="${customer_name}">
+                    <p class="notification" style="display: none;"><i class="fas fa-info-circle"></i> Die Chatanfrage wurde angenommen</p>
                     <!-- <div class="card left">
                         <p class="info">N. Stocker</p>
                         <div class="card-section">

@@ -59,6 +59,8 @@ document.addEventListener("DOMContentLoaded", function() {
             })
         } else if (message.type == 'message') {
             createChatBubble(message.text, false)
+        } else if (message.type == 'accepted') {
+            createNotification(message.text)
         } else {
             createChatBubble(message.text, false)
         }
@@ -66,6 +68,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function onWebsocketError(_event, websocket) {
         websocket.close();
+    }
+
+    function createNotification(message) {
+        console.log(message)
     }
 
     function createChatBubble(message, self) {
@@ -106,7 +112,8 @@ document.addEventListener("DOMContentLoaded", function() {
         );
 
         const chatArea = document.getElementById("message-area");
-        const customerName = chatArea.dataset.customerName;
+        const staffName = chatArea.dataset.staffName;
+        const staffId = chatArea.dataset.staffId;
         const chatWindow = document.getElementById("chat");
 
         document.getElementById("send").addEventListener("click", () => {
@@ -116,7 +123,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const payload = JSON.stringify({
                 type: 'message',
                 text: chatWindow.value,
-                user: customerName,
+                user: staffName,
+                id: staffId,
                 time: now,
             });
 
