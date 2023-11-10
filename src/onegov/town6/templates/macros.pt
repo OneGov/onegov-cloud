@@ -1777,10 +1777,7 @@
     </tal:b>
 
     <p i18n:translate tal:condition="ticket.state == 'closed'">
-        Your request has been completed. If you asked for documents to be
-        sent to your address, they should arrive shortly. If you asked to
-        pick up documents at the municipality, the are now ready to be
-        picked up.
+        Your request has been completed.
     </p>
 </metal:ticket_status_page_message>
 
