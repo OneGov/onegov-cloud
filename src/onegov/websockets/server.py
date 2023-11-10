@@ -363,7 +363,7 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
         try:
             message = await websocket.recv()
             log.debug(f'customer {websocket.id} got the message {message}')
-            log.debug(f'known channel members {channel_connections}')
+            # log.debug(f'known channel members {channel_connections}')
         except Exception:
             channel_connections.remove(websocket)
             log.debug(f'removed {websocket.id} from channel-connections')

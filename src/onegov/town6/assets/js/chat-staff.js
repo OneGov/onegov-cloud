@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    function notifyMe(message) {
+    function browserNotification(message) {
         if (!("Notification" in window)) {
           // Check if the browser supports notifications
           alert("This browser does not support desktop notification");
@@ -20,11 +20,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
+    const chatArea = document.getElementById("message-area");
+    const staffName = chatArea.dataset.staffName;
+    const staffId = chatArea.dataset.staffId;
+    const chatWindow = document.getElementById("chat");
 
     function onWebsocketNotification(message, websocket) {
         message = JSON.parse(message)
         if (message.type == 'request') {
-            notifyMe(message.text) // Browser notification
+            browserNotification(message.text)
 
             // Add request element
             var requestElement = document.getElementById('new-request')
@@ -58,9 +62,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 websocket.send(payload);
             })
         } else if (message.type == 'message') {
-            createChatBubble(message.text, false)
+            var self = false
+            if (message.id == staffId) {
+                self = true
+            }
+            createChatBubble(message.text, self)
         } else if (message.type == 'accepted') {
-            createNotification(message.text)
+            var aceptedNotification = document.getElementById('accepted')
+            aceptedNotification.style.display = 'flex'
         } else {
             createChatBubble(message.text, false)
         }
@@ -70,9 +79,6 @@ document.addEventListener("DOMContentLoaded", function() {
         websocket.close();
     }
 
-    function createNotification(message) {
-        console.log(message)
-    }
 
     function createChatBubble(message, self) {
         const chatArea = document.getElementById("message-area");
@@ -111,21 +117,14 @@ document.addEventListener("DOMContentLoaded", function() {
             'staff_chat'
         );
 
-        const chatArea = document.getElementById("message-area");
-        const staffName = chatArea.dataset.staffName;
-        const staffId = chatArea.dataset.staffId;
-        const chatWindow = document.getElementById("chat");
 
         document.getElementById("send").addEventListener("click", () => {
-
-            createChatBubble(chatWindow.value, true)
 
             const payload = JSON.stringify({
                 type: 'message',
                 text: chatWindow.value,
                 user: staffName,
                 id: staffId,
-                time: now,
             });
 
             socket.send(payload);

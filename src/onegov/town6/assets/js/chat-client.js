@@ -1,12 +1,41 @@
 document.addEventListener("DOMContentLoaded", function() {
+    function browserNotification(message) {
+        if (!("Notification" in window)) {
+          // Check if the browser supports notifications
+          alert("This browser does not support desktop notification");
+        } else if (Notification.permission === "granted") {
+          // Check whether notification permissions have already been granted;
+          // if so, create a notification
+          const notification = new Notification(message);
+        } else if (Notification.permission !== "denied") {
+          // We need to ask the user for permission
+          Notification.requestPermission().then((permission) => {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+              const notification = new Notification(message);
+            }
+          });
+        }
+    }
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
 
     function onWebsocketNotification(message, _websocket) {
-        console.log('ich ha folgendes becho (OND ES LIHT ANSCHINEND AM SERVER NED DO MISA)')
-        console.log(message)
         message = JSON.parse(message)
-        createChatBubble(message.text, false)
+        if (message.type == 'message') {
+            var self = false
+            if (message.id == '') {
+                self = true
+            }
+            createChatBubble(message.text, self)
+        } else if (message.type == 'accepted') {
+            var aceptedNotification = document.getElementById('accepted')
+            aceptedNotification.style.display = 'flex'
+            browserNotification(aceptedNotification.textContent)
+        } else {
+            console.log('unkown messaage type', message)
+            createChatBubble(message.text, false)
+        }
     }
 
     function onWebsocketError(_event, websocket) {
@@ -56,14 +85,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById("send").addEventListener("click", () => {
 
-            createChatBubble(chatWindow.value, true)
-
             const payload = JSON.stringify({
                 type: "message",
                 text: chatWindow.value,
                 user: customerName,
                 id: '',
-                time: now,
             });
 
             socket.send(payload);
