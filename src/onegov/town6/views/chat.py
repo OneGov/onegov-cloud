@@ -19,12 +19,10 @@ def view_chats_staff(self, request):
     user = request.current_user
 
     all_chats = ChatCollection(request.session).query()
-    active_chats = all_chats.filter('user_id' == user.id).filter(
-        'active' == True
-    )
-    archived_chats = all_chats.filter('user_id' == user.id).filter(
-        'active' == False
-    )
+    active_chats = all_chats.filter(Chat.user_id == user.id).filter(
+        Chat.active == True)
+    archived_chats = all_chats.filter(
+        Chat.active == False)
 
     return {
         'title': 'Chat Staff',

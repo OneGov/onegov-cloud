@@ -14,7 +14,7 @@ class ChatCollection(GenericCollection):
     """
 
     @property
-    def model_class(self):
+    def model_class(self) -> Chat:
         return Chat
 
     def add(self, customer_name, email):
@@ -28,6 +28,6 @@ class ChatCollection(GenericCollection):
 
         return chat
 
-    def by_id(self, id):
+    def by_id(self, id) -> Chat:
         if utils.is_uuid(id):
             return self.query().filter(self.model_class.id == id).first()

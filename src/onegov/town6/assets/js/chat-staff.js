@@ -56,16 +56,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 const payload = JSON.stringify({
                     type: "accepted",
                     text: "Anfrage wurde angenommen",
+                    id: staffId,
                     channel: message.channel
                 });
 
                 websocket.send(payload);
             })
         } else if (message.type == 'message') {
-            createChatBubble(message, message.id == '')
+            createChatBubble(message, message.id == staffId)
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
+        } else if (message.type == 'chat-history') {
+            var messages = message.text;
+            messages.forEach(m => {
+                var no_chat_open = document.getElementById('no-chat-open')
+                no_chat_open.style.display = 'none'
+                var message_area = document.getElementById("message-area");
+                message_area.style.display = 'flex'
+                var chat_form = document.getElementById('chat-form')
+                chat_form.style.display = 'block'
+                createChatBubble(m, m.id == staffId)
+            })
         } else {
             console.log('unkown messaage type', message)
         }
@@ -94,6 +106,20 @@ document.addEventListener("DOMContentLoaded", function() {
             onWebsocketError,
             'staff_chat'
         );
+
+        const activeChats = document.querySelectorAll('.active-chat');
+        activeChats.forEach(chat => {
+            var requestId = chat.dataset.chatId
+            chat.addEventListener("click", () => {
+
+                var payload = JSON.stringify({
+                    type: 'request-chat-history',
+                    id: requestId,
+                });
+
+                socket.send(payload);
+            })
+        })
 
         document.getElementById("send").addEventListener("click", () => {
             now = new Date().toUTCString()
