@@ -26,11 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function onWebsocketNotification(message, _websocket) {
         message = JSON.parse(message)
         if (message.type == 'message') {
-            var self = false
-            if (message.id == '') {
-                self = true
-            }
-            createChatBubble(message.text, message.time, self)
+            createChatBubble(message, message.id == '')
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
@@ -44,28 +40,14 @@ document.addEventListener("DOMContentLoaded", function() {
         websocket.close();
     }
 
-    function createChatBubble(message, time, self) {
-        // Create the parts
-        var card = document.createElement("div")
-        if (self) {
-            card.classList.add("card", "right");
-        } else {
-            card.classList.add("card", "left");
-        }   
-        var section = document.createElement("div")
-        section.classList.add('card-section');
-        var textNode = document.createElement("p");
-        var timeNode = document.createElement("p");
-        timeNode.classList.add('info');
-        const timeText = document.createTextNode(time);
-        const text = document.createTextNode(message);
-        
-        timeNode.appendChild(timeText);
-        card.appendChild(section);
-        section.appendChild(textNode);
-        textNode.appendChild(text);
-        card.appendChild(timeNode);
-        chatArea.appendChild(card);
+    function createChatBubble(message, self) {
+        var chatCard = document.getElementsByClassName('chat-card')[0].cloneNode(true)
+        chatCard.style.display = 'flex'
+        chatCard.classList.add(self ? 'right' : 'left')
+        chatCard.children[0].appendChild(document.createTextNode(message.user))
+        chatCard.children[1].children[0].appendChild(document.createTextNode(message.text))
+        chatCard.children[2].appendChild(document.createTextNode(message.time))
+        chatArea.appendChild(chatCard);
     }
 
     if (endpoint && schema) {
