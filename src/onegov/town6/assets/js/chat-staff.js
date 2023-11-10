@@ -117,7 +117,6 @@ document.addEventListener("DOMContentLoaded", function() {
             'staff_chat'
         );
 
-
         document.getElementById("send").addEventListener("click", () => {
 
             const payload = JSON.stringify({

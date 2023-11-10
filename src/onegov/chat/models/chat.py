@@ -34,4 +34,4 @@ class Chat(Base, TimestampMixin):
     customer_name = Column(Text, nullable=False)
     email = Column(Text, nullable=False)
     active = Column(Boolean, nullable=False, default=True)
-    messages = Column(JSONB, nullable=False, default=list)
+    chat_history = Column(JSONB, nullable=False, default=list)

@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
+    const chatArea = document.getElementById("message-area");
+    const customerName = chatArea.dataset.customerName;
+    const chatWindow = document.getElementById("chat");
 
     function onWebsocketNotification(message, _websocket) {
         message = JSON.parse(message)
@@ -43,15 +46,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function createChatBubble(message, self) {
-        const chatArea = document.getElementById("message-area");
-        
         // Create the parts
         var card = document.createElement("div")
         if (self) {
             card.classList.add("card", "right");
         } else {
             card.classList.add("card", "left");
-        }
+        }   
         var section = document.createElement("div")
         section.classList.add('card-section');
         var textNode = document.createElement("p");
@@ -79,9 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
             'customer_chat',
         );
 
-        const chatArea = document.getElementById("message-area");
-        const customerName = chatArea.dataset.customerName;
-        const chatWindow = document.getElementById("chat");
+        console.log('i know the customer:', customerName)
 
         document.getElementById("send").addEventListener("click", () => {
 
@@ -91,6 +90,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 user: customerName,
                 id: '',
             });
+
+            console.log('im about to send ', payload)
 
             socket.send(payload);
             chatWindow.value = '';

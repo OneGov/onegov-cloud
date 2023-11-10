@@ -1,6 +1,8 @@
 import hashlib
+import transaction
 
 from asyncio import Future
+from asyncio import sleep
 from itsdangerous import BadSignature, Signer
 from json import dumps
 from json import loads
@@ -63,14 +65,21 @@ class WebSocketServer(WebSocketServerProtocol):
         morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
         self.signed_session_id = morsel.value if morsel else None
 
-    async def get_chat(self, id):
+    async def get_chat(self, id) -> 'Chat':
         chat = CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
         if chat is NOTFOUND:
+            await sleep(1)
             chat = ChatCollection(self.session).by_id(id)
+            log.debug(f'searching for chat with id {id}')
+            log.debug(f'chat from collection {chat}')
             if chat and not chat.active:
                 chat = None
             CHATS[self.schema][chat.id] = chat
         return chat
+
+    async def update_database(self) -> None:
+        self.session.flush()
+        transaction.commit()
 
     @property
     def session(self):
@@ -319,7 +328,7 @@ async def handle_manage(
             )
 
 
-async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
+async def handle_customer_chat(websocket: WebSocketServer, payload):
     """
     Starts a chat. Handles listening to messages on channel.
     """
@@ -333,7 +342,7 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
     channel = websocket.browser_session.get("active_chat_id")
 
 # Alles nochher för t DB
-    await websocket.get_chat(channel)
+
     # # log.debug(f'CHATS: {CHATS}')
     # # log.debug(f'STAFF: {STAFF}')
 
@@ -374,7 +383,20 @@ async def handle_customer_chat(websocket: WebSocketServerProtocol, payload):
                 'message': message
             }))
 
-        websocket.session.flush()
+        # await websocket.get_chat(channel)
+
+        if loads(message)['type'] == 'message':
+            chat = ChatCollection(websocket.session).by_id(channel)
+            content = loads(message)
+
+            chat_history = chat.chat_history.copy()
+            chat_history.append({
+                'id': content['id'],
+                'user': content['user'],
+                'text': content['text'],
+            })
+            chat.chat_history = chat_history
+            chat = await websocket.update_database()
 
 
 async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
@@ -399,6 +421,7 @@ async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
     all_channels = CHANNELS.setdefault(schema, {})
     staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
     staff_connections.add(websocket)
+    channel_clients = []
 
     log.debug(f'added {websocket.id} to staff-connections')
 
@@ -421,6 +444,19 @@ async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
                 'type': "notification",
                 'message': message,
             }))
+
+        if loads(message)['type'] == 'message':
+            chat = ChatCollection(websocket.session).by_id(open_channel)
+            content = loads(message)
+
+            chat_history = chat.chat_history.copy()
+            chat_history.append({
+                'id': content['id'],
+                'user': content['user'],
+                'text': content['text'],
+            })
+            chat.chat_history = chat_history
+            chat = await websocket.update_database()
 
     websocket.session.flush()
 
