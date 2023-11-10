@@ -1,8 +1,46 @@
 # Changes
 
+## 2023.57
+
+`2023-11-10` | [7602e5eefc...30992412df](https://github.com/OneGov/onegov-cloud/compare/7602e5eefc^...30992412df)
+
+**Upgrade hints**
+- Change map settings of all instances from Zug
+### Events
+
+##### Anthrazit xml export: Fix missing event if series started in the past
+
+`Bugfix` | [ogc-1320](#ogc-1320) | [6cb0177c17](https://github.com/onegov/onegov-cloud/commit/6cb0177c177eb2b4936ed5ab6800a8bffe39aeb0)
+
+##### Anthrazit xml export: Replace CR, LF with html br tag
+
+`Bugfix` | [ogc-1320](#ogc-1320) | [30992412df](https://github.com/onegov/onegov-cloud/commit/30992412df8e955a2556535eb748de9091fbde71)
+
+### Feriennet
+
+##### Replace old logo, remove rega from sponsors
+
+`Bugfix` | [PRO-1217](https://linear.app/projuventute/issue/PRO-1217) | [5fd81a7a02](https://github.com/onegov/onegov-cloud/commit/5fd81a7a02c8db8d35d2ae81b3acf56f965c104f)
+
+### Landsgemeinde
+
+##### Add Dropdown for filling out people from person directory
+
+`Feature` | [OGC-1287](https://linear.app/onegovcloud/issue/OGC-1287) | [7602e5eefc](https://github.com/onegov/onegov-cloud/commit/7602e5eefc9cddcd5cb16b9a9ab810e72acd534c)
+
+### Org
+
+##### Add Zugmap
+
+`Feature` | [OGC-631](https://linear.app/onegovcloud/issue/OGC-631) | [ae9e129f87](https://github.com/onegov/onegov-cloud/commit/ae9e129f87839387016ff6079f611e876988cabe)
+
+##### Adds a secret variant of mTAN access (i.e. not listed)
+
+`Feature` | [OGC-1327](https://linear.app/onegovcloud/issue/OGC-1327) | [4bf3ac918e](https://github.com/onegov/onegov-cloud/commit/4bf3ac918ea63db5c093b3481b0ab4a5c8018e0b)
+
 ## 2023.56
 
-`2023-11-07` | [f5311dbb5a...30efa28176](https://github.com/OneGov/onegov-cloud/compare/f5311dbb5a^...30efa28176)
+`2023-11-07` | [f5311dbb5a...5bb23c1473](https://github.com/OneGov/onegov-cloud/compare/f5311dbb5a^...5bb23c1473)
 
 ### Events
 
@@ -2153,84 +2191,4 @@ security policy.
 ##### Form validation on positive Integers.
 
 `Bugfix` | [OGC-954](https://linear.app/onegovcloud/issue/OGC-954) | [4ba577d491](https://github.com/onegov/onegov-cloud/commit/4ba577d49145e87d6e78e8c0224bf16ea6f05e78)
-
-## 2023.7
-
-`2023-02-13` | [0504bce18a...a738192829](https://github.com/OneGov/onegov-cloud/compare/0504bce18a^...a738192829)
-
-### Election Day
-
-##### Allow alphanumeric list and party IDs.
-
-`Feature` | [OGC-936](https://linear.app/onegovcloud/issue/OGC-936) | [99aca42cb5](https://github.com/onegov/onegov-cloud/commit/99aca42cb59868bdff1790a0c52c6448f1147538)
-
-##### Avoid displaying bar charts with only inactive bars.
-
-Show bar chart bars as active as long as no mandate has been allocated.
-
-`Feature` | [OGC-934](https://linear.app/onegovcloud/issue/OGC-934) | [fcf926e009](https://github.com/onegov/onegov-cloud/commit/fcf926e009668fa279ef7ec54f76401b79d94e21)
-
-##### Add historical colors for party results.
-
-`Feature` | [OGC-931](https://linear.app/onegovcloud/issue/OGC-931) | [792624b1ae](https://github.com/onegov/onegov-cloud/commit/792624b1ae489b9be502cd22ed1eafb11463979f)
-
-##### Add QR-code widget.
-
-`Feature` | [OGC-884](https://linear.app/onegovcloud/issue/OGC-884) | [5bd0e8e784](https://github.com/onegov/onegov-cloud/commit/5bd0e8e784b26d128d84e87a89dd7bade150b60b)
-
-##### Add total rows to election compound and election compound part statistics.
-
-`Feature` | [OGC-975](https://linear.app/onegovcloud/issue/OGC-975) | [e27e1ca5e2](https://github.com/onegov/onegov-cloud/commit/e27e1ca5e209805b81c6143f8e83b08bae4c561c)
-
-##### Prefer AnzPendentGde instead of AnzGdePendent for WabstiC formats.
-
-`Feature` | [OGC-907](https://linear.app/onegovcloud/issue/OGC-907) | [0df166b2d9](https://github.com/onegov/onegov-cloud/commit/0df166b2d9b37e67d797774926c8b55754f1d52d)
-
-##### Hide empty party strength lines.
-
-`Bugfix` | [OGC-941](https://linear.app/onegovcloud/issue/OGC-941) | [96c78d3231](https://github.com/onegov/onegov-cloud/commit/96c78d32310b7fe793100eb0ed419a3a841b379d)
-
-##### Remove counted_eligible_voters and counted_received ballots.
-
-This was only partial solution and should have been provided for all  attributes and results. Instead of these attributes, we now make sure to zeroize uncounted entities.
-
-`Bugfix` | [OGC-893](https://linear.app/onegovcloud/issue/OGC-893) | [ad627783b5](https://github.com/onegov/onegov-cloud/commit/ad627783b53bb230ebd8be07860bea62902567aa)
-
-##### Standardize panachage diagrams.
-
-`Bugfix` | [OGC-906](https://linear.app/onegovcloud/issue/OGC-906) | [9d3ca42e1f](https://github.com/onegov/onegov-cloud/commit/9d3ca42e1f80066e6f31705c5786063027eca9c0)
-
-##### Sort entity filter by name.
-
-`Bugfix` | [OGC-974](https://linear.app/onegovcloud/issue/OGC-974) | [3f67840bb4](https://github.com/onegov/onegov-cloud/commit/3f67840bb4c06783fe9ee9afed867a8829f91826)
-
-### Org
-
-##### Allows publication dates on directory entries to be required
-
-This is useful for directories where the publication has to be limited
-e.g. for planning applications, where a public participation period is
-mandated, but publishing it beyond that would raise privacy concerns.
-
-`Feature` | [OGC-913](https://linear.app/onegovcloud/issue/OGC-913) | [0504bce18a](https://github.com/onegov/onegov-cloud/commit/0504bce18af027830c98b5c4f454bd5e77f245ba)
-
-##### Fixes rendering of external links in search results
-
-`Bugfix` | [OGC-959](https://linear.app/onegovcloud/issue/OGC-959) | [b186e5dbd8](https://github.com/onegov/onegov-cloud/commit/b186e5dbd8feffa67cf9f65066671f06af0abff2)
-
-### Town6
-
-##### Adds Missing commas in the error message.
-
-`Bugfix` | [OGC-943](https://linear.app/onegovcloud/issue/OGC-943) | [73cd1a05ce](https://github.com/onegov/onegov-cloud/commit/73cd1a05ce824cbec8330fc623c60400ffe3c04c)
-
-##### Add the translation string.
-
-`Bugfix` | [OGC-945](https://linear.app/onegovcloud/issue/OGC-945) | [6af98f0f3a](https://github.com/onegov/onegov-cloud/commit/6af98f0f3a96a6568c2489246106f9ef020e78aa)
-
-### Websockets
-
-##### Add websocket server and client.
-
-`Feature` | [OGC-935](https://linear.app/onegovcloud/issue/OGC-935) | [4d1f7ea474](https://github.com/onegov/onegov-cloud/commit/4d1f7ea474ce4925266d0aa161e3204fe6f171ca)
 
