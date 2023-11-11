@@ -54,8 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 newRequest.remove()
                 noRequestText.style.display = 'block'
 
-                var chatOptions = document.getElementById('chat-options')
-                chatOptions.style.display = 'block'
+                document.getElementById('chat-options').style.display = 'block'
 
                 const payload = JSON.stringify({
                     type: "accepted",
@@ -72,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function() {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
         } else if (message.type == 'chat-history') {
+            // Display chat history
             var templateMessage = document.getElementsByClassName('chat-card')[0].cloneNode(true)
             const previousMessages = document.querySelectorAll('.chat-card');
             console.log('pm', previousMessages)
@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 createChatBubble(m, m.id == staffId)
             })
             document.getElementById('loading').style.display = 'none'
+            document.getElementById('chat-options').style.display = 'block'
         } else {
             console.log('unkown messaage type', message)
         }
@@ -120,6 +121,7 @@ document.addEventListener("DOMContentLoaded", function() {
             'staff_chat'
         );
 
+        // Click on active chat
         const activeChats = document.querySelectorAll('.active-chat');
         activeChats.forEach(chat => {
             var requestId = chat.dataset.chatId
