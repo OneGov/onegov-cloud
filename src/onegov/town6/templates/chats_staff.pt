@@ -9,6 +9,7 @@
                 <p i18n:translate="" id="no-chat-open">Aktuell ist kein Chat geöffnet.</p>
                 <div id="message-area" style="display:none;" data-staff-name="${user.username}" data-staff-id="${user.id.hex}">
                     <p class="notification" id="accepted" style="display: none;"><i class="fas fa-info-circle"></i> Sie haben die Chatanfrage angenommen</p>
+                    <p class="notification" id="loading" style="display: none;"><i class="fas fa-hourglass-start"></i> Chat lädt</p>
                     <div class="card chat-card" style="display: none;">
                         <p class="info"></p>
                         <div class="card-section">
@@ -20,6 +21,10 @@
                 <div id="chat-form" style="display:none;">
                     <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
                     <button id="send" class="button">Senden</button>
+                </div>
+                <div id="chat-options" style="display:none;">
+                    <button id="end-chat" class="button hollow">Chat Beenden</button>
+                    <button id="create-ticket" class="button hollow">Ticket erstellen</button>
                 </div>
             </div>
 
@@ -39,7 +44,7 @@
                         </div>
                         <div class="side-panel">
                             <h3>Aktive Chats</h3>
-                            <p tal:condition="not active_chats">Noch keine aktiven Chats. </p>
+                            <p tal:condition="not active_chats">Noch keine aktiven Chats.</p>
                             <ul class="more-list" tal:condition="active_chats">
                                 <tal:b tal:repeat="chat active_chats">
                                     <li class="active-chat" data-chat-id="${chat.id.hex}">
@@ -55,7 +60,7 @@
                         </div>
                         <div class="side-panel">
                             <h3>Letzte archivierte Chats</h3>
-                            <p tal:condition="not archived_chats">Noch keine archivierten Chats. </p>
+                            <p tal:condition="not archived_chats">Noch keine archivierten Chats.</p>
                             <ul class="more-list" tal:condition="archived_chats">
                                 <li tal:repeat="chat archived_chats">
                                     <a class="list-link" href="#">

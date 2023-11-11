@@ -47,11 +47,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 var no_chat_open = document.getElementById('no-chat-open')
                 no_chat_open.style.display = 'none'
                 var message_area = document.getElementById("message-area");
+                message_area.classList.add = message.channel
                 message_area.style.display = 'flex'
                 var chat_form = document.getElementById('chat-form')
                 chat_form.style.display = 'block'
                 newRequest.remove()
                 noRequestText.style.display = 'block'
+
+                var chatOptions = document.getElementById('chat-options')
+                chatOptions.style.display = 'block'
 
                 const payload = JSON.stringify({
                     type: "accepted",
@@ -86,6 +90,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 chat_form.style.display = 'flex'
                 createChatBubble(m, m.id == staffId)
             })
+            document.getElementById('loading').style.display = 'none'
         } else {
             console.log('unkown messaage type', message)
         }
@@ -119,6 +124,8 @@ document.addEventListener("DOMContentLoaded", function() {
         activeChats.forEach(chat => {
             var requestId = chat.dataset.chatId
             chat.addEventListener("click", () => {
+                console.log(document.getElementById('loading'))
+                document.getElementById('loading').style.display = 'flex'
 
                 var payload = JSON.stringify({
                     type: 'request-chat-history',
