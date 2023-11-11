@@ -68,6 +68,14 @@ document.addEventListener("DOMContentLoaded", function() {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
         } else if (message.type == 'chat-history') {
+            var templateMessage = document.getElementsByClassName('chat-card')[0].cloneNode(true)
+            const previousMessages = document.querySelectorAll('.chat-card');
+            console.log('pm', previousMessages)
+            previousMessages.forEach(m => {
+                m.remove()
+            })
+            chatArea.appendChild(templateMessage)
+
             var messages = message.text;
             messages.forEach(m => {
                 var no_chat_open = document.getElementById('no-chat-open')
