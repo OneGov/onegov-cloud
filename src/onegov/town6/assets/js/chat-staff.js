@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 var message_area = document.getElementById("message-area");
                 message_area.style.display = 'flex'
                 var chat_form = document.getElementById('chat-form')
-                chat_form.style.display = 'block'
+                chat_form.style.display = 'flex'
                 createChatBubble(m, m.id == staffId)
             })
         } else {

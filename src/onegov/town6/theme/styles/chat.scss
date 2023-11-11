@@ -1,11 +1,15 @@
 .chat {
-    .chat-inputs {
+    #chat-form {
         align-items: end;
         display: flex;
 
-        .button {
+        #send {
             height: fit-content;
             margin-left: 2rem;
+
+            &:hover {
+                margin-left: 1.5rem;
+            }
         }
     }
 
