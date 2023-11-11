@@ -396,7 +396,7 @@ async def handle_customer_chat(websocket: WebSocketServer, payload):
             log.debug(f'removed {websocket.id} from channel-connections')
 
 
-async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
+async def handle_staff_chat(websocket: WebSocketServer, payload):
     """
     Registers staff member and listens to messages.
     """
@@ -415,6 +415,7 @@ async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
     staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
     staff_connections.add(websocket)
     channel_clients = []
+    open_channel = ''
 
     log.debug(f'added {websocket.id} to staff-connections')
 
@@ -431,7 +432,29 @@ async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
                 'message': message,
             }))
 
-        if content['type'] == 'accepted':
+        # If the type is a message, save to DB
+        if content['type'] == 'message':
+            chat = ChatCollection(websocket.session).by_id(open_channel)
+            log.debug(f'staff received message {content}')
+
+            chat_history = chat.chat_history.copy()
+            chat_history.append({
+                'id': content['id'],
+                'user': content['user'],
+                'text': content['text'],
+                'time': content['time'],
+            })
+            chat.chat_history = chat_history
+            await websocket.update_database()
+
+        elif content['type'] == 'end-chat':
+            log.debug('ending chat')
+            chat = ChatCollection(websocket.session).by_id(content['id'])
+
+            chat.active = False
+            await websocket.update_database()
+
+        elif content['type'] == 'accepted':
             open_channel = loads(message)['channel']
             channel_clients = all_channels[open_channel]
             channel_clients.add(websocket)
@@ -451,27 +474,14 @@ async def handle_staff_chat(websocket: WebSocketServerProtocol, payload):
             log.debug('staff member reconnected')
             inner = dumps({
                 'type': 'chat-history',
-                'text': chat.chat_history
+                'text': chat.chat_history,
+                'id': open_channel
             })
             await websocket.send(dumps({
                 'type': "notification",
                 'message': inner,
             }))
 
-        # If the type is a message, save to DB
-        elif content['type'] == 'message':
-            chat = ChatCollection(websocket.session).by_id(open_channel)
-            log.debug(f'staff received message {content}')
-
-            chat_history = chat.chat_history.copy()
-            chat_history.append({
-                'id': content['id'],
-                'user': content['user'],
-                'text': content['text'],
-                'time': content['time'],
-            })
-            chat.chat_history = chat_history
-            chat = await websocket.update_database()
 
         # except Exception:
         #     staff_connections.remove(websocket)

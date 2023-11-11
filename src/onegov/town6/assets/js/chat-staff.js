@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (message.type == 'request') {
             browserNotification(message.text)
 
-            // Add request element
             var requestElement = document.getElementById('new-request')
             var newRequest = requestElement.cloneNode(true)
             newRequest.id = ''
@@ -41,9 +40,9 @@ document.addEventListener("DOMContentLoaded", function() {
             noRequestText.style.display = 'none'
             requestList.appendChild(newRequest)
 
+            // Accept request
             newRequest.children[1].addEventListener("click", () => {
 
-                // Show chat window for open chat and remove request
                 var no_chat_open = document.getElementById('no-chat-open')
                 no_chat_open.style.display = 'none'
                 var message_area = document.getElementById("message-area");
@@ -52,8 +51,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 var chat_form = document.getElementById('chat-form')
                 chat_form.style.display = 'block'
                 newRequest.remove()
-                noRequestText.style.display = 'block'
-
+                // noRequestText.style.display = 'block'
+                chatArea.dataset.chatId = message.channel
                 document.getElementById('chat-options').style.display = 'block'
 
                 const payload = JSON.stringify({
@@ -72,13 +71,8 @@ document.addEventListener("DOMContentLoaded", function() {
             aceptedNotification.style.display = 'flex'
         } else if (message.type == 'chat-history') {
             // Display chat history
-            var templateMessage = document.getElementsByClassName('chat-card')[0].cloneNode(true)
-            const previousMessages = document.querySelectorAll('.chat-card');
-            console.log('pm', previousMessages)
-            previousMessages.forEach(m => {
-                m.remove()
-            })
-            chatArea.appendChild(templateMessage)
+            removePreviousChat()
+            chatArea.dataset.chatId = message.id
 
             var messages = message.text;
             messages.forEach(m => {
@@ -111,6 +105,16 @@ document.addEventListener("DOMContentLoaded", function() {
         chatArea.appendChild(chatCard);
     }
 
+    function removePreviousChat() {
+        var templateMessage = document.getElementsByClassName('chat-card')[0].cloneNode(true)
+        const previousMessages = document.querySelectorAll('.chat-card');
+        console.log('pm', previousMessages)
+        previousMessages.forEach(m => {
+            m.remove()
+        })
+        chatArea.appendChild(templateMessage)
+    }
+
     if (endpoint && schema) {
         const socket = openWebsocket(
             endpoint,
@@ -137,6 +141,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 socket.send(payload);
             })
         })
+
+        // Click on end chat
+        var endButton = document.getElementById('end-chat')
+        endButton.addEventListener("click", () => {
+            var chatId = chatArea.dataset.chatId
+            console.log('ending chat')
+            console.log(chatArea.dataset)
+            console.log(chatArea.dataset.chatId)
+            var no_chat_open = document.getElementById('no-chat-open')
+            no_chat_open.style.display = 'flex'
+
+            removePreviousChat()
+            document.getElementById('chat-form').style.display = 'none'
+            document.getElementById('chat-options').style.display = 'none'
+            document.getElementById(chatId).style.display = 'none'
+
+            var payload = JSON.stringify({
+                type: 'end-chat',
+                id: chatId,
+            });
+
+            socket.send(payload);
+        })
+
 
         document.getElementById("send").addEventListener("click", () => {
             now = new Date().toUTCString()

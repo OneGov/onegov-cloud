@@ -44,10 +44,10 @@
                         </div>
                         <div class="side-panel">
                             <h3>Aktive Chats</h3>
-                            <p tal:condition="not active_chats">Noch keine aktiven Chats.</p>
+                            <p tal:condition="not active_chats">Keine aktiven Chats.</p>
                             <ul class="more-list" tal:condition="active_chats">
                                 <tal:b tal:repeat="chat active_chats">
-                                    <li class="active-chat" data-chat-id="${chat.id.hex}">
+                                    <li class="active-chat" data-chat-id="${chat.id.hex}" id="${chat.id.hex}">
                                         <a class="list-link" href="#">
                                             <span class="list-title">${chat.customer_name}</span>
                                         </a>
@@ -60,7 +60,7 @@
                         </div>
                         <div class="side-panel">
                             <h3>Letzte archivierte Chats</h3>
-                            <p tal:condition="not archived_chats">Noch keine archivierten Chats.</p>
+                            <p tal:condition="not archived_chats">Keine archivierten Chats.</p>
                             <ul class="more-list" tal:condition="archived_chats">
                                 <li tal:repeat="chat archived_chats">
                                     <a class="list-link" href="#">
