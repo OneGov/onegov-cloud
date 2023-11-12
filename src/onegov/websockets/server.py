@@ -347,6 +347,8 @@ async def handle_customer_chat(websocket: WebSocketServer, payload):
     channel_connections.add(websocket)
     staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
 
+    chat = await websocket.get_chat(channel.hex)
+
     log.debug(f'added {websocket.id} to channel-connections')
 
     while websocket.open:

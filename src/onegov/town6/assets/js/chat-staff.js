@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function() {
         // Display and hide elements
         document.getElementById('no-chat-open').style.display = 'none'
         chatArea.classList.add = channel
-        chatArea.dataset.chatId = channel // TODO: write only in dataset or id
+        chatArea.dataset.chatId = channel
         chatArea.style.display = 'flex'
         var chat_form = document.getElementById('chat-form')
         chat_form.style.display = 'block'
@@ -110,12 +110,27 @@ document.addEventListener("DOMContentLoaded", function() {
         request.remove()
         document.getElementById('chat-options').style.display = 'block'
 
+        addActiveChat(channel)
+
         const payload = JSON.stringify({
             type: "accepted",
             userId: staffId,
             channel: channel
         });
         websocket.send(payload);
+    }
+
+    function addActiveChat(channel) {
+        var activeChatElement = document.getElementById('new-active-chat')
+        var newActiveChatElement = activeChatElement.cloneNode(true)
+        console.log(newActiveChatElement)
+        var activeChatList = document.getElementById('active-chat-list')
+        newActiveChatElement.id = 'active-chat-' + channel
+        newActiveChatElement.dataset.chatId = channel
+        newActiveChatElement.style.display = 'block'
+        userText = document.createTextNode('user')
+        newActiveChatElement.children[0].children[0].appendChild(userText)
+        activeChatList.appendChild(newActiveChatElement)
     }
 
     if (endpoint && schema) {
@@ -167,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function() {
             removePreviousChat()
             document.getElementById('chat-form').style.display = 'none'
             document.getElementById('chat-options').style.display = 'none'
-            document.getElementById('active-chat-' + chatId).style.display = 'none'
+            document.getElementById('active-chat-' + chatId).remove()
             
 
             var payload = JSON.stringify({

@@ -9,6 +9,7 @@
                 <p i18n:translate="" id="no-chat-open">Aktuell ist kein Chat geöffnet.</p>
                 <div id="message-area" style="display:none;" data-staff-name="${user.username}" data-staff-id="${user.id.hex}">
                     <p class="notification" id="accepted" style="display: none;"><i class="fas fa-info-circle"></i> Sie haben die Chatanfrage angenommen</p>
+                    <p class="notification" id="loading" style="display: none;"><i class="fas fa-hourglass-start"></i> Chat lädt ...</p>
                     <p class="notification" id="loading" style="display: none;"><i class="fas fa-hourglass-start"></i> Chat lädt</p>
                     <div class="card chat-card" style="display: none;">
                         <p class="info"></p>
@@ -51,32 +52,20 @@
                         </div>
                         <div class="side-panel">
                             <h3>Aktive Chats</h3>
-                            <p tal:condition="not active_chats">Keine aktiven Chats.</p>
-                            <ul class="more-list" tal:condition="active_chats">
+                            <p tal:condition="not active_chats" id="no-active-chats">Keine aktiven Chats.</p>
+                            <ul class="more-list" id="active-chat-list">
+                                <li class="active-chat" id="new-active-chat" style="display:none;">
+                                    <a class="list-link" href="#">
+                                        <span class="list-title"></span>
+                                    </a>
+                                </li>
                                 <tal:b tal:repeat="chat active_chats">
                                     <li class="active-chat" data-chat-id="${chat.id.hex}" id="active-chat-${chat.id.hex}">
                                         <a class="list-link" href="#">
                                             <span class="list-title">${chat.customer_name}</span>
                                         </a>
-                                        <a href="#">
-                                            <p class="list-lead preview">${layout.format_date(chat.last_change, 'datetime_short')}</p>
-                                        </a>
                                     </li>
                                 </tal:b>
-                            </ul>
-                        </div>
-                        <div class="side-panel">
-                            <h3>Letzte archivierte Chats</h3>
-                            <p tal:condition="not archived_chats">Keine archivierten Chats.</p>
-                            <ul class="more-list" tal:condition="archived_chats">
-                                <li tal:repeat="chat archived_chats">
-                                    <a class="list-link" href="#">
-                                        <span class="list-title">${chat.customer_name}</span>
-                                    </a>
-                                    <a href="#">
-                                        <p class="list-lead preview">${layout.format_date(chat.last_change, 'datetime_short')}</p>
-                                    </a>
-                                </li>
                             </ul>
                         </div>
                     </div>
