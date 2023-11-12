@@ -28,11 +28,11 @@ document.addEventListener("DOMContentLoaded", function() {
     function onWebsocketNotification(message, websocket) {
         message = JSON.parse(message)
         if (message.type == 'request') {
-            browserNotification(message.text)
+            browserNotification(message.notification)
 
             var requestElement = document.getElementById('new-request')
             var newRequest = requestElement.cloneNode(true)
-            newRequest.id = ''
+            newRequest.id = 'request-' + message.channel
             newRequest.style.display = 'block'
             newRequest.children[1].id = message.channel
             var requestList = document.getElementById('request-list')
@@ -40,41 +40,23 @@ document.addEventListener("DOMContentLoaded", function() {
             noRequestText.style.display = 'none'
             requestList.appendChild(newRequest)
 
-            // Accept request
+            // Click on new request
             newRequest.children[1].addEventListener("click", () => {
-
-                var no_chat_open = document.getElementById('no-chat-open')
-                no_chat_open.style.display = 'none'
-                var message_area = document.getElementById("message-area");
-                message_area.classList.add = message.channel
-                message_area.style.display = 'flex'
-                var chat_form = document.getElementById('chat-form')
-                chat_form.style.display = 'block'
-                newRequest.remove()
-                // noRequestText.style.display = 'block'
-                chatArea.dataset.chatId = message.channel
-                document.getElementById('chat-options').style.display = 'block'
-
-                const payload = JSON.stringify({
-                    type: "accepted",
-                    text: "Anfrage wurde angenommen",
-                    id: staffId,
-                    channel: message.channel
-                });
-
-                websocket.send(payload);
+                channel = message.channel
+                acceptRequest(channel, websocket)
             })
         } else if (message.type == 'message') {
-            createChatBubble(message, message.id == staffId)
+            createChatBubble(message, message.userId == staffId)
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
         } else if (message.type == 'chat-history') {
             // Display chat history
             removePreviousChat()
-            chatArea.dataset.chatId = message.id
+            chatArea.dataset.chatId = message.channel
+            console.log('message-history', message)
 
-            var messages = message.text;
+            var messages = message.history;
             messages.forEach(m => {
                 var no_chat_open = document.getElementById('no-chat-open')
                 no_chat_open.style.display = 'none'
@@ -82,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 message_area.style.display = 'flex'
                 var chat_form = document.getElementById('chat-form')
                 chat_form.style.display = 'flex'
-                createChatBubble(m, m.id == staffId)
+                createChatBubble(m, m.userId == staffId)
             })
             document.getElementById('loading').style.display = 'none'
             document.getElementById('chat-options').style.display = 'block'
@@ -115,6 +97,27 @@ document.addEventListener("DOMContentLoaded", function() {
         chatArea.appendChild(templateMessage)
     }
 
+    function acceptRequest(channel, websocket) {
+        console.log('accepted request with channel:' + channel)
+        // Display and hide elements
+        document.getElementById('no-chat-open').style.display = 'none'
+        chatArea.classList.add = channel
+        chatArea.dataset.chatId = channel // TODO: write only in dataset or id
+        chatArea.style.display = 'flex'
+        var chat_form = document.getElementById('chat-form')
+        chat_form.style.display = 'block'
+        var request = document.getElementById('request-' + channel)
+        request.remove()
+        document.getElementById('chat-options').style.display = 'block'
+
+        const payload = JSON.stringify({
+            type: "accepted",
+            userId: staffId,
+            channel: channel
+        });
+        websocket.send(payload);
+    }
+
     if (endpoint && schema) {
         const socket = openWebsocket(
             endpoint,
@@ -125,17 +128,26 @@ document.addEventListener("DOMContentLoaded", function() {
             'staff_chat'
         );
 
+        //Click on pre loaded request
+        const openRequests = document.querySelectorAll('.open-request');
+        openRequests.forEach(request => {
+            var channel = request.dataset.requestId
+            request.addEventListener("click", () => {
+                acceptRequest(channel, socket)
+            })
+        })
+
         // Click on active chat
         const activeChats = document.querySelectorAll('.active-chat');
         activeChats.forEach(chat => {
-            var requestId = chat.dataset.chatId
+            var channel = chat.dataset.chatId
             chat.addEventListener("click", () => {
-                console.log(document.getElementById('loading'))
+                console.log('open chat with id' + channel)
                 document.getElementById('loading').style.display = 'flex'
 
                 var payload = JSON.stringify({
                     type: 'request-chat-history',
-                    id: requestId,
+                    channel: channel,
                 });
 
                 socket.send(payload);
@@ -155,17 +167,19 @@ document.addEventListener("DOMContentLoaded", function() {
             removePreviousChat()
             document.getElementById('chat-form').style.display = 'none'
             document.getElementById('chat-options').style.display = 'none'
-            document.getElementById(chatId).style.display = 'none'
+            document.getElementById('active-chat-' + chatId).style.display = 'none'
+            
 
             var payload = JSON.stringify({
                 type: 'end-chat',
-                id: chatId,
+                channel: chatId,
             });
 
             socket.send(payload);
         })
 
 
+        // Send single chat-message
         document.getElementById("send").addEventListener("click", () => {
             now = new Date().toUTCString()
 
@@ -173,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 type: 'message',
                 text: chatWindow.value,
                 user: staffName,
-                id: staffId,
+                userId: staffId,
                 time: now,
             });
 

@@ -23,7 +23,7 @@
                     <button id="send" class="button">Senden</button>
                 </div>
                 <div id="chat-options" style="display:none;">
-                    <button id="end-chat" class="button hollow">Chat Beenden</button>
+                    <button id="end-chat" class="button hollow">Chat beenden und archivieren</button>
                     <button id="create-ticket" class="button hollow">Ticket erstellen</button>
                 </div>
             </div>
@@ -33,13 +33,20 @@
                     <div class="sidebar-content-wrapper">
                         <div class="side-panel">
                             <h3>Chat Anfragen</h3>
-                            <p id="no-request">Aktuell keine neuen Anfragen.</p>
+                            <p id="no-request" style="display: ${'none' if open_requests else 'block'}">Aktuell keine neuen Anfragen.</p>
                             <ul class="more-list" id="request-list">
                                 <li style="display: none;" id="new-request">
                                     <a class="list-link" href="#"><span class="list-title">Neue Anfrage</span><br/></a>
                                     <a class="button">Annehmen</a>
                                     <p class="list-lead preview"><i class="far fa-clock"></i> 5:00</p>
                                 </li>
+                                <tal:b tal:repeat="request open_requests">
+                                    <li class="open-request" data-request-id="${request.id.hex}" id="request-${request.id.hex}">
+                                        <a class="list-link" href="#"><span class="list-title">Neue Anfrage</span><br/></a>
+                                        <a id="${request.id.hex}" class="button">Annehmen</a>
+                                        <p class="list-lead preview"><i class="far fa-clock"></i> 5:00</p>
+                                    </li>
+                                </tal:b>
                             </ul>
                         </div>
                         <div class="side-panel">
@@ -47,7 +54,7 @@
                             <p tal:condition="not active_chats">Keine aktiven Chats.</p>
                             <ul class="more-list" tal:condition="active_chats">
                                 <tal:b tal:repeat="chat active_chats">
-                                    <li class="active-chat" data-chat-id="${chat.id.hex}" id="${chat.id.hex}">
+                                    <li class="active-chat" data-chat-id="${chat.id.hex}" id="active-chat-${chat.id.hex}">
                                         <a class="list-link" href="#">
                                             <span class="list-title">${chat.customer_name}</span>
                                         </a>

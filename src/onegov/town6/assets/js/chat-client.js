@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function onWebsocketNotification(message, _websocket) {
         message = JSON.parse(message)
         if (message.type == 'message') {
-            createChatBubble(message, message.id == '')
+            createChatBubble(message, message.userId == 'customer')
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
@@ -64,12 +64,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
         document.getElementById("send").addEventListener("click", () => {
             now = new Date().toUTCString()
+            var channelId = chatArea.dataset.chatId
 
             const payload = JSON.stringify({
                 type: "message",
                 text: chatWindow.value,
                 user: customerName,
-                id: '',
+                userId: 'customer',
+                channel: channelId,
                 time: now,
             });
 
