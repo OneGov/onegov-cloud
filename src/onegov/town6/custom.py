@@ -12,16 +12,10 @@ def get_global_tools(request):
         yield item
 
     if request.is_logged_in:
-        yield LinkGroup(_("Chats"), classes=('comments', ), links=(
+        yield LinkGroup(_("Chats"), classes=('chats', ), links=(
             Link(
                 _("My Chats"), request.link(
                     request.app.org, name='chats'
-                ), attrs={'class': 'comments'}
+                ), attrs={'class': 'chats'}
             ),
-            Link(
-                _("Chats Archive"), request.link(
-                    request.app.org, name='chats-archive'
-                ), attrs={'class': 'comments'}
-            ),
-        )) 
-
+        ))

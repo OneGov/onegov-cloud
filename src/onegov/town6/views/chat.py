@@ -37,6 +37,25 @@ def view_chats_staff(self, request):
     }
 
 
+@TownApp.html(
+    model=ChatCollection,
+    template='chats_archive.pt',
+    name='archive',
+    permission=Private,)
+def view_chats_archive(self, request):
+
+    user = request.current_user
+    all_chats = ChatCollection(request.session).query()
+    archived_chats = all_chats.filter(Chat.active == False)
+
+    return {
+        'title': 'Chat Staff',
+        'layout': StaffChatLayout(self, request),
+        'user': user,
+        'archived_chats': archived_chats.all()
+    }
+
+
 @TownApp.form(
     model=ChatCollection,
     template='form.pt',
