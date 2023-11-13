@@ -5,11 +5,10 @@ from morepath import redirect
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.chat.forms import ChatInitiationForm, ChatActionsForm
-from onegov.core.elements import Link, Confirm, Intercooler, Block
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
 from onegov.town6.layout import DefaultLayout
 from webob.exc import HTTPForbidden
-from onegov.org import _
+# from onegov.org import _
 
 
 @TownApp.form(

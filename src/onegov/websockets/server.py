@@ -11,6 +11,7 @@ from onegov.websockets import log
 from websockets.legacy.protocol import broadcast
 from websockets.legacy.server import serve, WebSocketServerProtocol
 from onegov.core import cache
+from markupsafe import escape
 
 from onegov.user import User, UserCollection
 from onegov.chat.collections import ChatCollection
@@ -387,10 +388,10 @@ async def handle_customer_chat(websocket: WebSocketServer, payload):
 
                 chat_history = chat.chat_history.copy()
                 chat_history.append({
-                    'userId': content['userId'],
-                    'user': content['user'],
-                    'text': content['text'],
-                    'time': content['time'],
+                    'userId': escape(content['userId']),
+                    'user': escape(content['user']),
+                    'text': escape(content['text']),
+                    'time': escape(content['time']),
                 })
                 chat.chat_history = chat_history
                 chat = await websocket.update_database()
@@ -438,15 +439,16 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
 
             # If the type is a message, save to DB
             if content['type'] == 'message':
+
                 chat = ChatCollection(websocket.session).by_id(open_channel)
                 log.debug(f'staff received message {content}')
 
                 chat_history = chat.chat_history.copy()
                 chat_history.append({
-                    'userId': content['userId'],
-                    'user': content['user'],
-                    'text': content['text'],
-                    'time': content['time'],
+                    'userId': escape(content['userId']),
+                    'user': escape(content['user']),
+                    'text': escape(content['text']),
+                    'time': escape(content['time']),
                 })
                 chat.chat_history = chat_history
                 await websocket.update_database()
@@ -454,7 +456,7 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
             elif content['type'] == 'end-chat':
                 log.debug(f'ending chat with id {content["channel"]}')
                 chat = ChatCollection(websocket.session).by_id(
-                    content['channel'])
+                    escape(content['channel']))
                 chat.active = False
                 await websocket.update_database()
 
@@ -477,7 +479,7 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
                 }))
                 log.debug('sent chat history')
 
-                chat.user_id = content['userId']
+                chat.user_id = escape(content['userId'])
                 log.debug(chat.user_id)
                 await websocket.update_database()
 

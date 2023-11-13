@@ -19,7 +19,7 @@
                     </div>
 
                     <tal:b tal:repeat="message chat.chat_history">
-                        <div class="card ${'left' if message.get('id') else 'right'}">
+                        <div class="card ${'left' if message.get('userId') != 'customer' else 'right'}">
                             <p class="info">${message['user']}</p>
                             <div class="card-section">
                                 <p>${message['text']}</p>
