@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Display chat history
             removePreviousChat()
             chatArea.dataset.chatId = message.channel
+            document.getElementById('chat_id').value = message.channel
             console.log('message-history', message)
 
             var messages = message.history;
@@ -68,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 createChatBubble(m, m.userId == staffId)
             })
             document.getElementById('loading').style.display = 'none'
-            document.getElementById('chat-options').style.display = 'block'
+            document.getElementById('chat-actions').style.display = 'block'
         } else {
             console.log('unkown messaage type', message)
         }
@@ -109,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function() {
         chat_form.style.display = 'block'
         var request = document.getElementById('request-' + channel)
         request.remove()
-        document.getElementById('chat-options').style.display = 'block'
+        document.getElementById('chat-actions').style.display = 'block'
 
         addActiveChat(channel)
 
@@ -159,6 +160,7 @@ document.addEventListener("DOMContentLoaded", function() {
             var channel = chat.dataset.chatId
             chat.addEventListener("click", () => {
                 console.log('open chat with id' + channel)
+                chatArea.style.display = 'flex'
                 document.getElementById('loading').style.display = 'flex'
 
                 var payload = JSON.stringify({
@@ -170,9 +172,9 @@ document.addEventListener("DOMContentLoaded", function() {
             })
         })
 
-        // Click on end chat
-        var endButton = document.getElementById('end-chat')
-        endButton.addEventListener("click", () => {
+        // Click on chat-actions
+        var chatActions = document.getElementById('chat-actions')
+        chatActions.addEventListener("submit", () => {
             var chatId = chatArea.dataset.chatId
             console.log('ending chat')
             console.log(chatArea.dataset)
@@ -182,9 +184,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
             removePreviousChat()
             document.getElementById('chat-form').style.display = 'none'
-            document.getElementById('chat-options').style.display = 'none'
+            document.getElementById('chat-actions').style.display = 'none'
             document.getElementById('active-chat-' + chatId).remove()
-            
 
             var payload = JSON.stringify({
                 type: 'end-chat',
@@ -192,6 +193,8 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             socket.send(payload);
+
+            return true;
         })
 
 

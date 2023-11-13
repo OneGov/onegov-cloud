@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.org import _
-from wtforms.fields import StringField, EmailField, SelectField
+from wtforms.fields import StringField, EmailField, SelectField, HiddenField
 from wtforms.validators import InputRequired
 
 
@@ -23,4 +23,11 @@ class ChatInitiationForm(Form):
     topic = SelectField(
         label=_("Topic"),
         choices=['a', 'b', 'v']
+    )
+
+
+class ChatActionsForm(Form):
+
+    chat_id = HiddenField(
+        label=_("Chat ID"),
     )

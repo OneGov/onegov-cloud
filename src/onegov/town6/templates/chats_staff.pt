@@ -23,10 +23,23 @@
                     <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
                     <button id="send" class="button">Senden</button>
                 </div>
-                <div id="chat-options" style="display:none;">
-                    <button id="end-chat" class="button hollow">Chat beenden und archivieren</button>
-                    <button id="create-ticket" class="button hollow">Ticket erstellen</button>
-                </div>
+                <form id="chat-actions" style="display:none;" method="POST">
+                    <tal:b repeat="fieldset form.fieldsets">
+                        <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
+                            <legend>${fieldset.label}</legend>
+                            <div class="formfields">
+                                <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                            </div>
+                        </fieldset>
+                        <tal:b condition="not:fieldset.is_visible">
+                            <div class="formfields">
+                                <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                            </div>
+                        </tal:b>
+                    </tal:b>
+                    <button name="chat-action" value="end-chat" type="submit" id="end-chat" class="button hollow">Chat beenden und archivieren</button>
+                    <button name="chat-action" value="create-ticket" type="submit" id="create-ticket" class="button hollow">Ticket erstellen</button>
+                </form>
             </div>
 
             <div class="large-4 medium-4 cell medium-offset-1 sidebar">
