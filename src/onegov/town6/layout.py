@@ -2486,6 +2486,17 @@ class StaffChatLayout(DefaultLayout):
         self.custom_body_attributes['data-websocket-schema'] = \
             self.app.schema
 
+    @cached_property
+    def breadcrumbs(self):
+        bc = [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Chats"), self.request.link(
+                self.request.app.org, name='chats'
+            ))
+        ]
+
+        return bc
+
 
 class ClientChatLayout(DefaultLayout):
     def __init__(self, model, request):

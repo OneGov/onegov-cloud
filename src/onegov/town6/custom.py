@@ -1,5 +1,6 @@
 from onegov.org.custom import get_global_tools as get_global_tools_base
 from onegov.core.elements import Link, LinkGroup
+from onegov.chat.collections import ChatCollection
 from onegov.town6 import _
 
 

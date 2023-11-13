@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
+    const endpoint = document.body.dataset.websocketEndpoint;
+    const schema = document.body.dataset.websocketSchema;
+    const chatArea = document.getElementById("message-area");
+    const staffName = chatArea.dataset.staffName;
+    const staffId = chatArea.dataset.staffId;
+    const chatWindow = document.getElementById("chat");
+
     function browserNotification(message) {
         if (!("Notification" in window)) {
           // Check if the browser supports notifications
@@ -18,25 +25,19 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    const endpoint = document.body.dataset.websocketEndpoint;
-    const schema = document.body.dataset.websocketSchema;
-    const chatArea = document.getElementById("message-area");
-    const staffName = chatArea.dataset.staffName;
-    const staffId = chatArea.dataset.staffId;
-    const chatWindow = document.getElementById("chat");
-
     function onWebsocketNotification(message, websocket) {
         message = JSON.parse(message)
         if (message.type == 'request') {
-            browserNotification(message.notification)
-
+            // browserNotification(message.notification)
             var requestElement = document.getElementById('new-request')
+            var requestList = document.getElementById('request-list')
             var newRequest = requestElement.cloneNode(true)
+            var noRequestText = document.getElementById('no-request')
+
             newRequest.id = 'request-' + message.channel
             newRequest.style.display = 'block'
             newRequest.children[1].id = message.channel
-            var requestList = document.getElementById('request-list')
-            var noRequestText = document.getElementById('no-request')
+
             noRequestText.style.display = 'none'
             requestList.appendChild(newRequest)
 

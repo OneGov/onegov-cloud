@@ -91,14 +91,6 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 class ChatSettingsForm(Form):
 
-    chat_type = RadioField(
-        label=_('Supported Chat Integrations'),
-        choices=[
-            ('scoutss', 'Scoutss'),
-            ('human', 'Intern')
-        ]
-    )
-
     chat_title = StringField(
         label=_('Chat title')
     )

@@ -5,9 +5,11 @@ from morepath import redirect
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.chat.forms import ChatInitiationForm
+from onegov.core.elements import Link, Confirm, Intercooler, Block
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
 from onegov.town6.layout import DefaultLayout
 from webob.exc import HTTPForbidden
+from onegov.org import _
 
 
 @TownApp.html(
@@ -27,12 +29,35 @@ def view_chats_staff(self, request):
     archived_chats = all_chats.filter(
         Chat.active == False)
 
+    layout = StaffChatLayout(self, request)
+
+    # def chat_actions():
+    #     yield Link(
+    #         text=_("Close and archive Chat"),
+    #         url=layout.csrf_protected_url(
+    #             request.link(self)
+    #         ),
+    #         attrs={'class': 'payment-refund'},
+    #         traits=(
+    #             Confirm(
+    #                 _("Do you really want to refund ${amount}?"),
+    #                 _("This cannot be undone."),
+    #                 _("Cancel")
+    #             ),
+    #             Intercooler(
+    #                 request_method='POST',
+    #                 redirect_after=request.url
+    #             )
+    #         )
+    #     )
+
     return {
         'title': 'Chat Staff',
         'layout': StaffChatLayout(self, request),
         'user': user,
         'open_requests': open_requests.all(),
         'active_chats': active_chats.all(),
+        # 'chat_actions': chat_actions(),
         'archived_chats': archived_chats.all()
     }
 

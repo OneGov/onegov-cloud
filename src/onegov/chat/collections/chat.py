@@ -1,9 +1,9 @@
 from onegov.core import utils
-from onegov.core.collection import GenericCollection
+from onegov.core.collection import GenericCollection, Pagination
 from onegov.chat.models import Chat
 
 
-class ChatCollection(GenericCollection):
+class ChatCollection(GenericCollection, Pagination):
     """ Manages a list of chats.
 
     Use it like this::

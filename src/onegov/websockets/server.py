@@ -429,6 +429,7 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
             log.debug(f'staff member {websocket.id} got the message {message}')
 
             # Forward each websocket message, no matter the type
+            log.debug(f'current channel connections: {channel_clients}')
             for client in channel_clients:
                 await client.send(dumps({
                     'type': "notification",
@@ -481,8 +482,6 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
                 await websocket.update_database()
 
             elif content['type'] == 'request-chat-history':
-                if websocket in channel_clients:
-                    channel_clients.remove(websocket)
                 open_channel = content['channel']
                 chat = ChatCollection(websocket.session).by_id(open_channel)
                 channel_clients = all_channels.setdefault(open_channel, set())

@@ -1,22 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    function browserNotification(message) {
-        if (!("Notification" in window)) {
-          // Check if the browser supports notifications
-          alert("This browser does not support desktop notification");
-        } else if (Notification.permission === "granted") {
-          // Check whether notification permissions have already been granted;
-          // if so, create a notification
-          const notification = new Notification(message);
-        } else if (Notification.permission !== "denied") {
-          // We need to ask the user for permission
-          Notification.requestPermission().then((permission) => {
-            // If the user accepts, let's create a notification
-            if (permission === "granted") {
-              const notification = new Notification(message);
-            }
-          });
-        }
-    }
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
     const chatArea = document.getElementById("message-area");
@@ -30,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
-            browserNotification(aceptedNotification.textContent)
+            // browserNotification(aceptedNotification.textContent)
         } else {
             console.log('unkown messaage type', message)
         }
@@ -48,6 +30,25 @@ document.addEventListener("DOMContentLoaded", function() {
         chatCard.children[1].children[0].appendChild(document.createTextNode(message.text))
         chatCard.children[2].appendChild(document.createTextNode(message.time))
         chatArea.appendChild(chatCard);
+    }
+
+    function browserNotification(message) {
+        if (!("Notification" in window)) {
+          // Check if the browser supports notifications
+            alert("This browser does not support desktop notification");
+        } else if (Notification.permission === "granted") {
+          // Check whether notification permissions have already been granted;
+          // if so, create a notification
+            const notification = new Notification(message);
+        } else if (Notification.permission !== "denied") {
+          // We need to ask the user for permission
+          Notification.requestPermission().then((permission) => {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+                const notification = new Notification(message);
+            }
+          });
+        }
     }
 
     if (endpoint && schema) {

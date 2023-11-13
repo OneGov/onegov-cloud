@@ -2517,7 +2517,9 @@
 
 
 <metal:chat define-macro="chat">
-
+    <div class="chat-button">
+        <p><i class="fas fa-comments"></i> Chat</p>
+    </div>
 </metal:chat>
 
 <metal:progress_indicator define-macro="progress_indicator">
