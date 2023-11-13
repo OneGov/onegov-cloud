@@ -1,8 +1,18 @@
 # Changes
 
+## 2023.59
+
+`2023-11-13` | [3f2cc6c3b1...3f2cc6c3b1](https://github.com/OneGov/onegov-cloud/compare/3f2cc6c3b1^...3f2cc6c3b1)
+
+### Test
+
+##### Mark occasionally failing web test as 'flaky' and fix splinter api change
+
+`Bugfix` | [None](#None) | [3f2cc6c3b1](https://github.com/onegov/onegov-cloud/commit/3f2cc6c3b142264de1ec60e9d695f95a0bed9fce)
+
 ## 2023.58
 
-`2023-11-10` | [e42602c1ec...e42602c1ec](https://github.com/OneGov/onegov-cloud/compare/e42602c1ec^...e42602c1ec)
+`2023-11-10` | [e42602c1ec...cedb02aae2](https://github.com/OneGov/onegov-cloud/compare/e42602c1ec^...cedb02aae2)
 
 ## 2023.57
 
@@ -1921,121 +1931,4 @@ the top of the login page.
 ##### Update widget in initial homepage structure.
 
 `Feature` | [OGC-600](https://linear.app/onegovcloud/issue/OGC-600) | [8981201d9d](https://github.com/onegov/onegov-cloud/commit/8981201d9d0abaa07bd4c2f04e5b5157a47cbde2)
-
-## 2023.9
-
-`2023-03-06` | [aaba33b401...978ee79f4d](https://github.com/OneGov/onegov-cloud/compare/aaba33b401^...978ee79f4d)
-
-### Election Day
-
-##### Avoid opening unneccessary websockets.
-
-`Bugfix` | [OGC-991](https://linear.app/onegovcloud/issue/OGC-991) | [aaba33b401](https://github.com/onegov/onegov-cloud/commit/aaba33b401bcbcbc0f36729a0180a3ceb578a892)
-
-##### Always enable notifications menu.
-
-`Bugfix` | [OGC-991](https://linear.app/onegovcloud/issue/OGC-991) | [22be9e47d4](https://github.com/onegov/onegov-cloud/commit/22be9e47d4f23fb1297530eb8b4fa8f93c2cad72)
-
-### Feriennet
-
-##### Dashboard improvements
-
-`Feature` | [OGC-1119](https://linear.app/onegovcloud/issue/OGC-1119) | [748eb4d007](https://github.com/onegov/onegov-cloud/commit/748eb4d007775713623237e4543c47d4290745da)
-
-##### Volunteer export add translations
-
-`Bugfix` | [PRO-1015](https://linear.app/projuventute/issue/PRO-1015) | [b134fc4018](https://github.com/onegov/onegov-cloud/commit/b134fc4018153049c8e58ae78393962e724407ac)
-
-##### Removes non-breaking whitespaces from QR bill debtor names.
-
-`Bugfix` | [PRO-1145](https://linear.app/projuventute/issue/PRO-1145) | [d41b35c474](https://github.com/onegov/onegov-cloud/commit/d41b35c47478307be37f1d70d68218cf9dbf7b4c)
-
-##### Send mail to user if not in recipient list
-
-`Bugfix` | [PRO-1021](https://linear.app/projuventute/issue/PRO-1021) | [c92779861f](https://github.com/onegov/onegov-cloud/commit/c92779861f9b1f42dee9a25abf398b1e1f5be8af)
-
-### Form
-
-##### Catches MixedTypeError in ValidFormDefinition
-
-This fixes a crash when entering a form with mixed radio/checkboxes
-
-`Bugfix` | [26b4badaa3](https://github.com/onegov/onegov-cloud/commit/26b4badaa3eb095e87b1959ac97f6f5f88dc8b81)
-
-### Gis
-
-##### Fixes flaky behavior when selecting an address from search results
-
-Specifically sometimes the marker would not move or the map would not
-complete its animation to center on the newly selected address.
-
-`Bugfix` | [OGC-995](https://linear.app/onegovcloud/issue/OGC-995) | [e4e9bc5b69](https://github.com/onegov/onegov-cloud/commit/e4e9bc5b69c0e096c06ef8d0f9ff65df322311e8)
-
-### Onboarding
-
-##### Extend form with more fields.
-
-`Feature` | [OGC-601](https://linear.app/onegovcloud/issue/OGC-601) | [e6ed967cbc](https://github.com/onegov/onegov-cloud/commit/e6ed967cbcd04626b9c8d116eb8f868db56b8789)
-
-### Org
-
-##### Fixes occupancy link in reservation calendar
-
-Depending on the start time and timezone of the allocation it sometimes
-
-`Bugfix` | [OGC-1004](https://linear.app/onegovcloud/issue/OGC-1004) | [1316739c26](https://github.com/onegov/onegov-cloud/commit/1316739c266e1599cec33448771751ac36fe0121)
-
-##### Fixes translations.
-
-`Bugfix` | [80decde7cc](https://github.com/onegov/onegov-cloud/commit/80decde7cc85691f66f999432d6bf832bf4803b8)
-
-##### Replaces the entry count in the DirectoriesWidget with the lead
-
-The entry count was misleading because it did not take the entry's
-visibility into account. Counting properly would be too slow for a
-widget, so we show the lead instead.
-
-`Bugfix` | [OGC-1006](https://linear.app/onegovcloud/issue/OGC-1006) | [5e2a9f44c5](https://github.com/onegov/onegov-cloud/commit/5e2a9f44c55840706145fcc59590283e840f0780)
-
-##### Probibit inactive user to reset password
-
-`Bugfix` | [PRO-1141](https://linear.app/projuventute/issue/PRO-1141) | [ae5e9dc806](https://github.com/onegov/onegov-cloud/commit/ae5e9dc80682c0ca924648129891bcd697a5ef51)
-
-##### Fix Forms without group not being displayed.
-
-`Bugfix` | [OGC-857](https://linear.app/onegovcloud/issue/OGC-857) | [4d998b90be](https://github.com/onegov/onegov-cloud/commit/4d998b90be087a7b5e4b29a282a6072d8490a5d0)
-
-### Town6
-
-##### Reduce events to 3 columns
-
-Reduce to 3 columns to prevent ugly word wrapping.
-
-`Feature` | [OGC-989](https://linear.app/onegovcloud/issue/OGC-989) | [94192987e9](https://github.com/onegov/onegov-cloud/commit/94192987e996f3c655b23ab1625e9e4f356a503c)
-
-##### Fix styling problem in town6
-
-`Bugfix` | [OGC-1001](https://linear.app/onegovcloud/issue/OGC-1001) | [899ea2347b](https://github.com/onegov/onegov-cloud/commit/899ea2347b5f57f86bce8220ad248ec0c5caf303)
-
-##### Make suggestion panel solely dependant on enable_submissions
-
-`Bugfix` | [OGC-955](https://linear.app/onegovcloud/issue/OGC-955) | [14193e75a9](https://github.com/onegov/onegov-cloud/commit/14193e75a9688ff12417ee20c2c48544ffb59532)
-
-##### Fixes translations.
-
-`Bugfix` | [4c9ac18f60](https://github.com/onegov/onegov-cloud/commit/4c9ac18f601f935e1888c5b945d8d8ce7d217c71)
-
-##### Hide Gever Upload in navbar if it is not set in settings
-
-`Bugfix` | [OGC-922](https://linear.app/onegovcloud/issue/OGC-922) | [cfe5a77f8d](https://github.com/onegov/onegov-cloud/commit/cfe5a77f8dd3ad5a7c27299b618f73becda3be7b)
-
-##### Improvements to list of context-specific functions.
-
-`Bugfix` | [OGC-731](https://linear.app/onegovcloud/issue/OGC-731) | [fc88d48d97](https://github.com/onegov/onegov-cloud/commit/fc88d48d972ec62f779bb2891a071c50e1b4a524)
-
-### User
-
-##### Adds missing translations.
-
-`Bugfix.` | [153cbe7645](https://github.com/onegov/onegov-cloud/commit/153cbe764558e3ecdf326b65ad2fa70060e62174)
 
