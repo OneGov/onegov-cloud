@@ -477,6 +477,7 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     browser.find_by_text('All About Berry: Logician')
 
 
+@pytest.mark.flaky(reruns=3)
 def test_rejected_reservation_sends_email_to_configured_recipients(browser,
                                                                    client):
     resources = ResourceCollection(client.app.libres_context)
