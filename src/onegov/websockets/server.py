@@ -37,7 +37,7 @@ TOKEN = ''  # nosec: B105
 NOTFOUND = object()
 SESSIONS: dict[str, 'Session'] = {}
 STAFF_CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
-STAFF: dict[str, dict['UUID', User]] = {}  # For Authentication of User
+STAFF: dict[str, dict[str, User]] = {}  # For Authentication of User
 ACTIVE_CHATS: dict[str, dict['UUID', 'Chat']] = {}  # For DB
 CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
 
@@ -45,6 +45,7 @@ CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
 class WebSocketServer(WebSocketServerProtocol):
     schema:str
     signed_session_id:str
+    user_id: str
 
     def __init__(self, config, session_manager, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,6 +65,7 @@ class WebSocketServer(WebSocketServerProtocol):
     async def process_request(self, path, headers):
         morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
         self.signed_session_id = morsel.value if morsel else None
+        self.user_id = self.browser_session.get("userid")
 
     async def get_chat(self, id) -> 'Chat':
         chat = ACTIVE_CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
@@ -87,8 +89,9 @@ class WebSocketServer(WebSocketServerProtocol):
         if session is None:
             self.session_manager.set_current_schema(self.schema)
             session = SESSIONS[self.schema] = self.session_manager.session()
-            STAFF[self.schema] = {user.id: user for user in UserCollection(
-                session).query().filter(User.role.in_(['editor', 'admin']))}
+            STAFF[self.schema] = {
+                user.username: user for user in UserCollection(session).query(
+                ).filter(User.role.in_(['editor', 'admin']))}
             ACTIVE_CHATS[self.schema] = {}
         return session
 
@@ -413,97 +416,106 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
         return
 
     websocket.schema = schema  # For DB Connection
+    websocket.session
     await acknowledge(websocket)
 
-    all_channels = CHANNELS.setdefault(schema, {})
-    staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
-    staff_connections.add(websocket)
-    channel_clients = []
-    open_channel = ''
+    if websocket.user_id in STAFF[schema]:
+        log.debug('User is in Database.')
 
-    log.debug(f'added {websocket.id} to staff-connections')
+        all_channels = CHANNELS.setdefault(schema, {})
+        staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
+        staff_connections.add(websocket)
+        channel_clients = []
+        open_channel = ''
 
-    while websocket.open:
-        try:
-            message = await websocket.recv()
-            content = loads(message)
-            log.debug(f'staff member {websocket.id} got the message {message}')
+        log.debug(f'added {websocket.id} to staff-connections')
 
-            # Forward each websocket message, no matter the type
-            log.debug(f'current channel connections: {channel_clients}')
-            for client in channel_clients:
-                await client.send(dumps({
-                    'type': "notification",
-                    'message': message,
-                }))
+        while websocket.open:
+            try:
+                message = await websocket.recv()
+                content = loads(message)
+                log.debug(f'staff member {websocket.id} got the message {message}')
 
-            # If the type is a message, save to DB
-            if content['type'] == 'message':
+                # Forward each websocket message, no matter the type
+                log.debug(f'current channel connections: {channel_clients}')
+                for client in channel_clients:
+                    await client.send(dumps({
+                        'type': "notification",
+                        'message': message,
+                    }))
 
-                chat = ChatCollection(websocket.session).by_id(open_channel)
-                log.debug(f'staff received message {content}')
+                # If the type is a message, save to DB
+                if content['type'] == 'message':
 
-                chat_history = chat.chat_history.copy()
-                chat_history.append({
-                    'userId': escape(content['userId']),
-                    'user': escape(content['user']),
-                    'text': escape(content['text']),
-                    'time': escape(content['time']),
-                })
-                chat.chat_history = chat_history
-                await websocket.update_database()
+                    chat = ChatCollection(websocket.session).by_id(
+                        open_channel)
+                    log.debug(f'staff received message {content}')
 
-            elif content['type'] == 'end-chat':
-                log.debug(f'ending chat with id {content["channel"]}')
-                chat = ChatCollection(websocket.session).by_id(
-                    escape(content['channel']))
-                chat.active = False
-                await websocket.update_database()
+                    chat_history = chat.chat_history.copy()
+                    chat_history.append({
+                        'userId': escape(content['userId']),
+                        'user': escape(content['user']),
+                        'text': escape(content['text']),
+                        'time': escape(content['time']),
+                    })
+                    chat.chat_history = chat_history
+                    await websocket.update_database()
 
-            elif content['type'] == 'accepted':
-                log.debug('staff-member accepted-request')
-                open_channel = loads(message)['channel']
-                channel_clients = all_channels.setdefault(open_channel, set())
-                channel_clients.add(websocket)
+                elif content['type'] == 'end-chat':
+                    log.debug(f'ending chat with id {content["channel"]}')
+                    chat = ChatCollection(websocket.session).by_id(
+                        escape(content['channel']))
+                    chat.active = False
+                    await websocket.update_database()
 
-                chat = ChatCollection(websocket.session).by_id(open_channel)
+                elif content['type'] == 'accepted':
+                    log.debug('staff-member accepted-request')
+                    open_channel = loads(message)['channel']
+                    channel_clients = all_channels.setdefault(open_channel,
+                                                              set())
+                    channel_clients.add(websocket)
 
-                inner = dumps({
-                    'type': 'chat-history',
-                    'history': chat.chat_history,
-                    'channel': open_channel
-                })
-                await websocket.send(dumps({
-                    'type': "notification",
-                    'message': inner,
-                }))
-                log.debug('sent chat history')
+                    chat = ChatCollection(websocket.session).by_id(
+                        open_channel)
 
-                chat.user_id = escape(content['userId'])
-                log.debug(chat.user_id)
-                await websocket.update_database()
+                    inner = dumps({
+                        'type': 'chat-history',
+                        'history': chat.chat_history,
+                        'channel': open_channel
+                    })
+                    await websocket.send(dumps({
+                        'type': "notification",
+                        'message': inner,
+                    }))
+                    log.debug('sent chat history')
 
-            elif content['type'] == 'request-chat-history':
-                open_channel = content['channel']
-                chat = ChatCollection(websocket.session).by_id(open_channel)
-                channel_clients = all_channels.setdefault(open_channel, set())
-                channel_clients.add(websocket)
-                log.debug('staff member reconnected')
-                inner = dumps({
-                    'type': 'chat-history',
-                    'history': chat.chat_history,
-                    'channel': open_channel
-                })
-                await websocket.send(dumps({
-                    'type': "notification",
-                    'message': inner,
-                }))
+                    chat.user_id = escape(content['userId'])
+                    log.debug(chat.user_id)
+                    await websocket.update_database()
 
-        except Exception as e:
-            log.exception("The debugged error message is -", exc_info=e)
-            if websocket in staff_connections:
-                staff_connections.remove(websocket)
-            log.debug(f'removed {websocket.id} from staff-connections')
+                elif content['type'] == 'request-chat-history':
+                    open_channel = content['channel']
+                    chat = ChatCollection(websocket.session).by_id(
+                        open_channel)
+                    channel_clients = all_channels.setdefault(open_channel,
+                                                              set())
+                    channel_clients.add(websocket)
+                    log.debug('staff member reconnected')
+                    inner = dumps({
+                        'type': 'chat-history',
+                        'history': chat.chat_history,
+                        'channel': open_channel
+                    })
+                    await websocket.send(dumps({
+                        'type': "notification",
+                        'message': inner,
+                    }))
+
+            except Exception as e:
+                log.exception("The debugged error message is -", exc_info=e)
+                if websocket in staff_connections:
+                    staff_connections.remove(websocket)
+                log.debug(f'removed {websocket.id} from staff-connections')
 
 
 async def handle_start(websocket: WebSocketServerProtocol) -> None:
