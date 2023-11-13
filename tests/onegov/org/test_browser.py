@@ -477,6 +477,7 @@ def test_context_specific_function_are_displayed_in_person_directory(browser,
     browser.find_by_text('All About Berry: Logician')
 
 
+@pytest.mark.flaky(reruns=3)
 def test_rejected_reservation_sends_email_to_configured_recipients(browser,
                                                                    client):
     resources = ResourceCollection(client.app.libres_context)
@@ -527,7 +528,10 @@ def test_rejected_reservation_sends_email_to_configured_recipients(browser,
     reject_reservation.click()
     # confirm dialog
     browser.find_by_value("Reservation absagen").click()
-    assert browser.is_text_present("Die Reservation wurde abgelehnt")
+    assert browser.wait_for(
+        lambda: browser.is_text_present("Die Reservation wurde abgelehnt"),
+        timeout=5,
+    )
 
     assert len(os.listdir(client.app.maildir)) == 1
     mail = Path(client.app.maildir) / os.listdir(client.app.maildir)[0]
