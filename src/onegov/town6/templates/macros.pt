@@ -2517,7 +2517,7 @@
 
 
 <metal:chat define-macro="chat">
-    <a class="sticky" data-sticky data-stick-to="bottom" href="#">
+    <a class="sticky" data-sticky data-stick-to="bottom" href="${chat_link}">
         <div class="grid-container floaty-chat">
             <div class="chat-button">
                 <p><i class="fas fa-comments"></i> Chat</p>
