@@ -2517,9 +2517,13 @@
 
 
 <metal:chat define-macro="chat">
-    <div class="chat-button">
-        <p><i class="fas fa-comments"></i> Chat</p>
-    </div>
+    <a class="sticky" data-sticky data-stick-to="bottom" href="#">
+        <div class="grid-container floaty-chat">
+            <div class="chat-button">
+                <p><i class="fas fa-comments"></i> Chat</p>
+            </div>
+        </div>
+    </a>
 </metal:chat>
 
 <metal:progress_indicator define-macro="progress_indicator">
