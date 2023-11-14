@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const staffId = chatArea.dataset.staffId;
     const chatWindow = document.getElementById("chat");
 
+    const token = document.body.dataset.websocketToken
+
     function browserNotification(message) {
         if (!("Notification" in window)) {
           // Check if the browser supports notifications
@@ -139,19 +141,15 @@ document.addEventListener("DOMContentLoaded", function() {
         activeChatList.appendChild(newActiveChatElement)
     }
 
-    if (endpoint && schema) {
-
+    if (endpoint && schema && token) {
         // NOTE: Includes schema with the WebSocket URL because the chat
         // requires the schema on initiation. This should be already done when
         // setting the data-websocket-endpoint. That however requires modifying
         // WebsocketsApp.
-        //
-        // before = 'ws:localhost:8765'
-        // after  = 'ws:localhost:8765/chat?schema=onegov_town6-meggen'
-        const endpointWithSchema = `${endpoint}/chats?schema=${schema}`
+        const chatEndpoint = `${endpoint}/chats?schema=${schema}&token=${token}`
 
         const socket = openWebsocket(
-            endpointWithSchema,
+            chatEndpoint,
             schema,
             null,
             onWebsocketNotification,

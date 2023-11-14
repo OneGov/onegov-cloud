@@ -5,21 +5,23 @@ from functools import cached_property, partial
 from http.cookies import SimpleCookie
 from json import dumps, loads
 from typing import TYPE_CHECKING, Any
-from urllib.parse import parse_qs, urlparse
 
 import transaction
 from itsdangerous import BadSignature, Signer
 from markupsafe import escape
-from websockets.exceptions import ConnectionClosed
+from websockets.exceptions import ConnectionClosed, InvalidOrigin
 from websockets.legacy.protocol import broadcast
 from websockets.legacy.server import WebSocketServerProtocol, serve
 
 from onegov.chat.collections import ChatCollection
+from onegov.chat.utils import param_from_path
 from onegov.core import cache
 from onegov.core.browser_session import BrowserSession
 from onegov.core.orm import Base, SessionManager
 from onegov.user import User, UserCollection
 from onegov.websockets import log
+from onegov.websockets.security import (WebsocketSecurityError,
+                                        consume_websocket_token)
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Mapping
@@ -40,35 +42,6 @@ STAFF_CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
 STAFF: dict[str, dict[str, User]] = {}  # For Authentication of User
 ACTIVE_CHATS: dict[str, dict['UUID', 'Chat']] = {}  # For DB
 CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
-
-
-def schema_from_path(path: str) -> str:
-    """
-    Retrieve schema query parameter from a path.
-
-    Raises ValueError if path is not a valid URL path or if it does not contain
-    exactly one schema query parameter. Multiple schema parameters are not
-    supported and will result in ValueError, as it hints to a misconfiguration.
-
-    Example:
-        >>> schema_from_path("/chats?schema=onegov_town6-meggen")
-        'onegov_town6-meggen
-
-    """
-    url = urlparse(path)
-    query = parse_qs(url.query)
-
-    if 'schema' not in query:
-        raise ValueError(
-            "No schema found in path."
-        )
-
-    if len(query['schema']) != 1:
-        raise ValueError(
-            "There must only be one instance of 'schema' in path."
-        )
-
-    return query['schema'][0]
 
 
 class WebSocketServer(WebSocketServerProtocol):
@@ -92,11 +65,12 @@ class WebSocketServer(WebSocketServerProtocol):
             return None
 
     async def process_request(self, path, headers):
+        # TODO(c): reject connection if no session is present?
         morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
         self.signed_session_id = morsel.value if morsel else None
 
         try:
-            self.schema = schema_from_path(path)
+            self.schema = param_from_path('schema', path)
         except ValueError as err:
             log.error(
                 f"Unable to retrieve schema from path: {path}",
@@ -104,7 +78,26 @@ class WebSocketServer(WebSocketServerProtocol):
             )
             return http.HTTPStatus.BAD_REQUEST, [], None
 
+        # browser_session requires self.schema
         self.user_id = self.browser_session.get("userid")
+
+        try:
+            # Consume the presented token or deny the connection. The token
+            # acts like CSRF token to protect against Cross-Site WebSocket
+            # Hijacks.
+            consume_websocket_token(path, self.browser_session)
+        except WebsocketSecurityError as err:
+            log.error("Rejecting WebSocket connection.", exc_info=err)
+            return http.HTTPStatus.UNAUTHORIZED, [], None
+
+        try:
+            # Checking the origin is done at a later stage by handshake(), this
+            # check is totally superfluous. However, rejecting clients because
+            # of a wrong origin would get unnoticed otherwise. You can safely
+            # delete this block in the future.
+            self.process_origin(headers, self.origins)
+        except InvalidOrigin as err:
+            log.debug("WebSocket connection will be rejected.", exc_info=err)
 
     async def get_chat(self, id) -> 'Chat':
         chat = ACTIVE_CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)

@@ -1,10 +1,13 @@
+import secrets
 from collections import namedtuple
-
-from dateutil.rrule import rrulestr
-from dateutil import rrule
 from functools import cached_property
 
+from dateutil import rrule
+from dateutil.rrule import rrulestr
+
 from onegov.chat import TextModuleCollection
+from onegov.core.elements import Block, Confirm, Intercooler, Link, LinkGroup
+from onegov.core.static import StaticFile
 from onegov.core.utils import linkify, to_html_ul
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
@@ -13,16 +16,19 @@ from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org.elements import QrCodeLink
 from onegov.org.exports.base import OrgExport
-from onegov.org.models import (
-    ResourceRecipientCollection, ImageFileCollection, ImageSetCollection,
-    ExportCollection, PublicationCollection, PageMove, News, Editor
-)
+from onegov.org.layout import (AdjacencyListMixin, DefaultLayoutMixin,
+                               DefaultMailLayoutMixin)
+from onegov.org.layout import Layout as OrgLayout
+from onegov.org.models import (Editor, ExportCollection, ImageFileCollection,
+                               ImageSetCollection, News, PageMove,
+                               PublicationCollection,
+                               ResourceRecipientCollection)
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection
 from onegov.org.models.form import submission_deletable
 from onegov.org.utils import IMG_URLS
 from onegov.page import PageCollection
-from onegov.pay import PaymentProviderCollection, PaymentCollection
+from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.qrcode import QrCode
 from onegov.reservation import ResourceCollection
@@ -30,13 +36,7 @@ from onegov.stepsequence import step_sequences
 from onegov.stepsequence.extension import StepsLayoutExtension
 from onegov.ticket import TicketCollection
 from onegov.town6 import _
-from onegov.core.elements import Link, Block, Confirm, Intercooler, LinkGroup
-from onegov.core.static import StaticFile
 from onegov.town6.theme import user_options
-from onegov.org.layout import (
-    Layout as OrgLayout, AdjacencyListMixin,
-    DefaultLayoutMixin, DefaultMailLayoutMixin
-)
 from onegov.user import UserCollection, UserGroupCollection
 
 PartnerCard = namedtuple('PartnerCard', ['url', 'image_url', 'lead'])
@@ -2475,7 +2475,33 @@ class HomepageLayout(DefaultLayout):
             ]
 
 
-class StaffChatLayout(DefaultLayout):
+class ChatLayout(DefaultLayout):
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+
+        token = self.make_websocket_token()
+
+        # Make token available to JavaScript when creating the WebSocket
+        # connection.
+        self.custom_body_attributes['data-websocket-token'] = token
+
+        # Store the WebSocket token in the session check when the connection is
+        # initiated.
+        request.browser_session['websocket_token'] = token
+
+    def make_websocket_token(self):
+        """
+        A user (authenticated or anonymous) attempts to create a chat
+        connection. For the connection to succeed, they must present a one-time
+        token to the WebSocket server.
+
+        TODO: Add lifespan to the token?
+        """
+        return secrets.token_hex(16)
+
+
+class StaffChatLayout(ChatLayout):
     def __init__(self, model, request):
         super().__init__(model, request)
         self.request.include('websockets')
@@ -2483,6 +2509,7 @@ class StaffChatLayout(DefaultLayout):
 
         self.custom_body_attributes['data-websocket-endpoint'] = \
             self.app.websockets_client_url(request)
+
         self.custom_body_attributes['data-websocket-schema'] = \
             self.app.schema
 
@@ -2498,7 +2525,7 @@ class StaffChatLayout(DefaultLayout):
         return bc
 
 
-class ClientChatLayout(DefaultLayout):
+class ClientChatLayout(ChatLayout):
     def __init__(self, model, request):
         super().__init__(model, request)
         self.request.include('websockets')
