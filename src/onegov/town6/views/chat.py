@@ -10,7 +10,6 @@ from onegov.town6.layout import StaffChatLayout, ClientChatLayout
 from onegov.town6.layout import DefaultLayout
 from onegov.org.layout import DefaultMailLayout
 from webob.exc import HTTPForbidden
-# from onegov.org import _
 from onegov.town6 import _
 
 
