@@ -65,9 +65,27 @@ class WebSocketServer(WebSocketServerProtocol):
             return None
 
     async def process_request(self, path, headers):
-        # TODO(c): reject connection if no session is present?
+        """ Intercept initial HTTP request.
+
+        Before establishing a WebSocket connection, a client sends a HTTP
+        request to "upgrade" the connection to a WebSocket connection.
+
+        We authenticate the user before creating the WebSocket connection. The
+        user is identified based on the session cookie. In addition to the
+        cookie, we require a one-time token that the user must have obtained
+        prior to requesting the WebSocket connection.
+        """
         morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
         self.signed_session_id = morsel.value if morsel else None
+
+        if not morsel:
+            log.error(
+                "No session cookie found in request. "
+                "Check that you sent the request from the same origin as "
+                f"the WebSocket server ({self.host})"
+            )
+
+            return http.HTTPStatus.BAD_REQUEST, [], None
 
         try:
             self.schema = param_from_path('schema', path)
@@ -105,6 +123,7 @@ class WebSocketServer(WebSocketServerProtocol):
         # Force (cached) session to fetch latest state of the database,
         # otherwise new chats are not visible to this session.
         self.session.expire_all()
+        transaction.commit()
 
         if chat is NOTFOUND:
             chat = ChatCollection(self.session).by_id(id)
@@ -121,7 +140,7 @@ class WebSocketServer(WebSocketServerProtocol):
 
     @property
     def session(self):
-        session = SESSIONS.get(self.schema)
+        session = None  # SESSIONS.get(self.schema)
 
         if session is None:
             self.session_manager.set_current_schema(self.schema)
@@ -613,8 +632,12 @@ async def main(host: str, port: int, token: str,
     TOKEN = token
     log.debug(f'Serving on ws://{host}:{port}')
     dsn = config.applications[0].configuration['dsn']
-    session_manager = SessionManager(dsn, Base, session_config={
-        'autoflush': False})
+    session_manager = SessionManager(
+        dsn,
+        Base,
+        session_config={'autoflush': False},
+        engine_config={'echo': True}
+    )
 
     async with serve(handle_start, host, port,
                      create_protocol=partial(WebSocketServer, config,
