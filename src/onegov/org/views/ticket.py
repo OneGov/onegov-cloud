@@ -869,14 +869,10 @@ def view_ticket_status(self, request, form, layout=None):
         if self.state == 'closed':
             request.alert(closed_text)
         else:
-            # Note that this assumes email CC recipients are internal
+            # Note that this assumes email BCC recipients are internal
             # recipients and have `current_username` in all cases. If we allow
-            # external CC recipients, we'll have to change this
-            user_is_cc_recipient = (
-                False if request.current_username == self.handler.email
-                else True
-            )
-            if user_is_cc_recipient:
+            # external BCC recipients, we'll have to change this
+            if request.current_username == self.handler.email:
                 owner = request.current_username or ''
             else:
                 owner = self.handler.email
