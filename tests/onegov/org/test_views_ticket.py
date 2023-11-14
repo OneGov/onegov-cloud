@@ -715,7 +715,7 @@ def test_assign_tickets(client):
     assert message['To'] == 'editor@example.org'
 
 
-def test_cc_field_in_ticket_message(client):
+def test_bcc_field_in_ticket_message(client):
 
     client.login_admin()
 

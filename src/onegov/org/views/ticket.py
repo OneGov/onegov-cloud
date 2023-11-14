@@ -872,7 +872,7 @@ def view_ticket_status(self, request, form, layout=None):
             # Note that this assumes email BCC recipients are internal
             # recipients and have `current_username` in all cases. If we allow
             # external BCC recipients, we'll have to change this
-            if request.current_username == self.handler.email:
+            if request.current_username != self.handler.email:
                 owner = request.current_username or ''
             else:
                 owner = self.handler.email
