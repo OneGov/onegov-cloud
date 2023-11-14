@@ -19,7 +19,7 @@
                     </div>
 
                     <tal:b tal:repeat="message chat.chat_history">
-                        <div class="card ${'left' if message.get('userId') != 'customer' else 'right'}">
+                        <div class="card chat-card ${'left' if message.get('userId') != 'customer' else 'right'}">
                             <p class="info">${message['user']}</p>
                             <div class="card-section">
                                 <p>${message['text']}</p>
@@ -27,6 +27,8 @@
                             <p class="info">${message['time']}</p>
                         </div>
                     </tal:b>
+
+                    <p class="notification" id="ended" style="display: ${'none' if chat.active else ''};"><i class="fas fa-info-circle"></i> Der Chat wurde beendet.</p>
                 </div>
                 <div id="chat-form">
                     <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>

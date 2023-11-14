@@ -46,11 +46,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 channel = message.channel
                 acceptRequest(channel, websocket)
             })
+
         } else if (message.type == 'message') {
             createChatBubble(message, message.userId == staffId)
+
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
             aceptedNotification.style.display = 'flex'
+
         } else if (message.type == 'chat-history') {
             // Display chat history
             removePreviousChat()
@@ -70,6 +73,7 @@ document.addEventListener("DOMContentLoaded", function() {
             })
             document.getElementById('loading').style.display = 'none'
             document.getElementById('chat-actions').style.display = 'block'
+
         } else {
             console.log('unkown messaage type', message)
         }

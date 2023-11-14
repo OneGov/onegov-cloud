@@ -4,33 +4,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const chatArea = document.getElementById("message-area");
     const customerName = chatArea.dataset.customerName;
     const chatWindow = document.getElementById("chat");
+    const connecting = document.getElementById('connecting')
+    var ended = document.getElementById('ended')
 
-    function onWebsocketNotification(message, _websocket) {
-        message = JSON.parse(message)
-        if (message.type == 'message') {
-            createChatBubble(message, message.userId == 'customer')
-        } else if (message.type == 'accepted') {
-            var aceptedNotification = document.getElementById('accepted')
-            aceptedNotification.style.display = 'flex'
-            // browserNotification(aceptedNotification.textContent)
-        } else {
-            console.log('unkown messaage type', message)
-        }
-    }
-
-    function onWebsocketError(_event, websocket) {
-        websocket.close();
-    }
-
-    function createChatBubble(message, self) {
-        var chatCard = document.getElementsByClassName('chat-card')[0].cloneNode(true)
-        chatCard.style.display = 'flex'
-        chatCard.classList.add(self ? 'right' : 'left')
-        chatCard.children[0].appendChild(document.createTextNode(message.user))
-        chatCard.children[1].children[0].appendChild(document.createTextNode(message.text))
-        chatCard.children[2].appendChild(document.createTextNode(message.time))
-        chatArea.appendChild(chatCard);
-    }
 
     function browserNotification(message) {
         if (!("Notification" in window)) {
@@ -51,6 +27,42 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    function onWebsocketNotification(message, _websocket) {
+        message = JSON.parse(message)
+        if (message.type == 'message') {
+            connecting.style.display = "none"
+            createChatBubble(message, message.userId == 'customer')
+
+        } else if (message.type == 'accepted') {
+            var aceptedNotification = document.getElementById('accepted')
+            aceptedNotification.style.display = 'flex'
+            // browserNotification(aceptedNotification.textContent)
+
+        } else if (message.type == 'end-chat') {
+            console.log('Staff ended chat')
+            ended.style.display = 'flex'
+
+        } else {
+            console.log('unkown messaage type', message)
+        }
+    }
+
+    function onWebsocketError(_event, websocket) {
+        websocket.close();
+    }
+
+    function createChatBubble(message, self) {
+        var chatCard = document.getElementsByClassName('chat-card')[0].cloneNode(true)
+        chatCard.style.display = 'flex'
+        chatCard.classList.add(self ? 'right' : 'left')
+        chatCard.children[0].appendChild(document.createTextNode(message.user))
+        chatCard.children[1].children[0].appendChild(document.createTextNode(message.text))
+        chatCard.children[2].appendChild(document.createTextNode(message.time))
+        chatArea.appendChild(chatCard);
+    }
+
+
+
     if (endpoint && schema) {
         const socket = openWebsocket(
             endpoint,
@@ -64,8 +76,14 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log('i know the customer:', customerName)
 
         document.getElementById("send").addEventListener("click", () => {
-            now = new Date().toUTCString()
+            var now = new Date().toUTCString()
             var channelId = chatArea.dataset.chatId
+
+            var messages = document.querySelectorAll('.chat-card');
+
+            if (messages.length == 1) {
+                connecting.style.display = "flex"
+            }
 
             const payload = JSON.stringify({
                 type: "message",
