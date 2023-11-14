@@ -140,7 +140,7 @@ class WebSocketServer(WebSocketServerProtocol):
 
     @property
     def session(self):
-        session = None  # SESSIONS.get(self.schema)
+        session = SESSIONS.get(self.schema)
 
         if session is None:
             self.session_manager.set_current_schema(self.schema)
@@ -635,8 +635,7 @@ async def main(host: str, port: int, token: str,
     session_manager = SessionManager(
         dsn,
         Base,
-        session_config={'autoflush': False},
-        engine_config={'echo': True}
+        session_config={'autoflush': False}
     )
 
     async with serve(handle_start, host, port,
