@@ -5,10 +5,13 @@ from morepath import redirect
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
 from onegov.chat.forms import ChatInitiationForm, ChatActionsForm
+from onegov.core.templates import render_template
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
 from onegov.town6.layout import DefaultLayout
+from onegov.org.layout import DefaultMailLayout
 from webob.exc import HTTPForbidden
 # from onegov.org import _
+from onegov.town6 import _
 
 
 @TownApp.form(
@@ -32,6 +35,28 @@ def view_chats_staff(self, request, form):
     if form.submitted(request):
         # request.POST för wele Button
         pass
+        if request.POST._items[2][1] == 'end-chat':
+            chat = ChatCollection(request.session).query().filter(
+                Chat.id == form.chat_id).one()
+
+            args = {
+                'layout': DefaultMailLayout(object(), request),
+                'title': request.translate(
+                    _("Chat History with ${org}", mapping={
+                        'org': request.app.org.title
+                    })
+                ),
+                'organisation': request.app.org.title,
+                'chat': chat,
+            }
+
+            request.app.send_transactional_email(
+                subject=args['title'],
+                receivers=(chat.email, ),
+                content=render_template(
+                    'mail_chat_customer.pt', request, args
+                )
+            )
 
     return {
         'title': 'Chat Staff',

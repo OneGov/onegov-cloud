@@ -7,7 +7,6 @@ from sqlalchemy import Text, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from uuid import uuid4
-# from sqlalchemy.orm import relationship
 
 
 class Chat(Base, TimestampMixin):
