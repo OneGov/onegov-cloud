@@ -1,34 +1,34 @@
 import hashlib
-import transaction
-
+import http
 from asyncio import Future
-from asyncio import sleep
-from itsdangerous import BadSignature, Signer
-from json import dumps
-from json import loads
 from functools import cached_property, partial
-from onegov.websockets import log
-from websockets.legacy.protocol import broadcast
-from websockets.legacy.server import serve, WebSocketServerProtocol
-from onegov.core import cache
-from markupsafe import escape
-
-from onegov.user import User, UserCollection
-from onegov.chat.collections import ChatCollection
-from onegov.core.orm import SessionManager, Base
-from onegov.core.browser_session import BrowserSession
 from http.cookies import SimpleCookie
-
-
+from json import dumps, loads
 from typing import TYPE_CHECKING, Any
+from urllib.parse import parse_qs, urlparse
+
+import transaction
+from itsdangerous import BadSignature, Signer
+from markupsafe import escape
+from websockets.exceptions import ConnectionClosed
+from websockets.legacy.protocol import broadcast
+from websockets.legacy.server import WebSocketServerProtocol, serve
+
+from onegov.chat.collections import ChatCollection
+from onegov.core import cache
+from onegov.core.browser_session import BrowserSession
+from onegov.core.orm import Base, SessionManager
+from onegov.user import User, UserCollection
+from onegov.websockets import log
+
 if TYPE_CHECKING:
-    from collections.abc import Collection
-    from onegov.core.types import JSONObject
-    from onegov.core.types import JSONObject_ro
-    from sqlalchemy.orm import Session
+    from collections.abc import Collection, Mapping
     from uuid import UUID
+
+    from sqlalchemy.orm import Session
+
     from onegov.chat.models import Chat
-    from collections.abc import Mapping
+    from onegov.core.types import JSONObject, JSONObject_ro
 
 
 CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
@@ -40,6 +40,35 @@ STAFF_CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
 STAFF: dict[str, dict[str, User]] = {}  # For Authentication of User
 ACTIVE_CHATS: dict[str, dict['UUID', 'Chat']] = {}  # For DB
 CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
+
+
+def schema_from_path(path: str) -> str:
+    """
+    Retrieve schema query parameter from a path.
+
+    Raises ValueError if path is not a valid URL path or if it does not contain
+    exactly one schema query parameter. Multiple schema parameters are not
+    supported and will result in ValueError, as it hints to a misconfiguration.
+
+    Example:
+        >>> schema_from_path("/chats?schema=onegov_town6-meggen")
+        'onegov_town6-meggen
+
+    """
+    url = urlparse(path)
+    query = parse_qs(url.query)
+
+    if 'schema' not in query:
+        raise ValueError(
+            "No schema found in path."
+        )
+
+    if len(query['schema']) != 1:
+        raise ValueError(
+            "There must only be one instance of 'schema' in path."
+        )
+
+    return query['schema'][0]
 
 
 class WebSocketServer(WebSocketServerProtocol):
@@ -65,12 +94,26 @@ class WebSocketServer(WebSocketServerProtocol):
     async def process_request(self, path, headers):
         morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
         self.signed_session_id = morsel.value if morsel else None
+
+        try:
+            self.schema = schema_from_path(path)
+        except ValueError as err:
+            log.error(
+                f"Unable to retrieve schema from path: {path}",
+                exc_info=err
+            )
+            return http.HTTPStatus.BAD_REQUEST, [], None
+
         self.user_id = self.browser_session.get("userid")
 
     async def get_chat(self, id) -> 'Chat':
         chat = ACTIVE_CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
+
+        # Force (cached) session to fetch latest state of the database,
+        # otherwise new chats are not visible to this session.
+        self.session.expire_all()
+
         if chat is NOTFOUND:
-            await sleep(1)
             chat = ChatCollection(self.session).by_id(id)
             log.debug(f'searching for chat with id {id}')
             log.debug(f'chat from collection {chat}')
@@ -86,6 +129,7 @@ class WebSocketServer(WebSocketServerProtocol):
     @property
     def session(self):
         session = SESSIONS.get(self.schema)
+
         if session is None:
             self.session_manager.set_current_schema(self.schema)
             session = SESSIONS[self.schema] = self.session_manager.session()
@@ -93,6 +137,7 @@ class WebSocketServer(WebSocketServerProtocol):
                 user.username: user for user in UserCollection(session).query(
                 ).filter(User.role.in_(['editor', 'admin']))}
             ACTIVE_CHATS[self.schema] = {}
+
         return session
 
     @property
@@ -341,7 +386,6 @@ async def handle_customer_chat(websocket: WebSocketServer, payload):
         await error(websocket, f'invalid schema: {schema}')
         return
 
-    websocket.schema = schema  # For DB Connection
     channel = websocket.browser_session.get("active_chat_id")
 
     await acknowledge(websocket)
@@ -367,11 +411,26 @@ async def handle_customer_chat(websocket: WebSocketServer, payload):
                 log.debug(f'customer received message {content}')
                 log.debug(f'Channel-connections {channel_connections}')
 
+                closed_connections = []
+
                 for client in channel_connections:
-                    await client.send(dumps({
-                        'type': "notification",
-                        'message': message
-                    }))
+
+                    try:
+                        await client.send(dumps({
+                            'type': "notification",
+                            'message': message,
+                        }))
+                    except ConnectionClosed as err:
+                        log.error(
+                            "Attempting to communicate with a closed"
+                            "connection, removing client from channels.",
+                            exc_info=err
+                        )
+
+                        closed_connections.append(client)
+
+                for connection in closed_connections:
+                    channel_connections.remove(connection)
 
                 # If customer is the only connection send chat request
                 if len(channel_connections) == 1 and not chat.user_id:
@@ -415,7 +474,6 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
         await error(websocket, f'invalid schema: {schema}')
         return
 
-    websocket.schema = schema  # For DB Connection
     websocket.session
     await acknowledge(websocket)
 
@@ -425,7 +483,7 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
         all_channels = CHANNELS.setdefault(schema, {})
         staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
         staff_connections.add(websocket)
-        channel_clients = []
+        channel_connections = []
         open_channel = ''
 
         log.debug(f'added {websocket.id} to staff-connections')
@@ -434,15 +492,33 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
             try:
                 message = await websocket.recv()
                 content = loads(message)
-                log.debug(f'staff member {websocket.id} got the message {message}')
+                log.debug(
+                    f'staff member {websocket.id} got the message {message}')
 
                 # Forward each websocket message, no matter the type
-                log.debug(f'current channel connections: {channel_clients}')
-                for client in channel_clients:
-                    await client.send(dumps({
-                        'type': "notification",
-                        'message': message,
-                    }))
+                log.debug(
+                    f'current channel connections: {channel_connections}')
+
+                closed_connections = []
+
+                for client in channel_connections:
+
+                    try:
+                        await client.send(dumps({
+                            'type': "notification",
+                            'message': message,
+                        }))
+                    except ConnectionClosed as err:
+                        log.error(
+                            "Attempting to communicate with a closed"
+                            "connection, removing client from channels.",
+                            exc_info=err
+                        )
+
+                        closed_connections.append(client)
+
+                for connection in closed_connections:
+                    channel_connections.remove(connection)
 
                 # If the type is a message, save to DB
                 if content['type'] == 'message':
@@ -464,16 +540,17 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
                 elif content['type'] == 'end-chat':
                     log.debug(f'ending chat with id {content["channel"]}')
                     chat = ChatCollection(websocket.session).by_id(
-                        escape(content['channel']))
+                        escape(content['channel'])
+                    )
                     chat.active = False
                     await websocket.update_database()
 
                 elif content['type'] == 'accepted':
                     log.debug('staff-member accepted-request')
                     open_channel = loads(message)['channel']
-                    channel_clients = all_channels.setdefault(open_channel,
-                                                              set())
-                    channel_clients.add(websocket)
+                    channel_connections = all_channels.setdefault(open_channel,
+                                                                  set())
+                    channel_connections.add(websocket)
 
                     chat = ChatCollection(websocket.session).by_id(
                         open_channel)
@@ -490,16 +567,16 @@ async def handle_staff_chat(websocket: WebSocketServer, payload):
                     log.debug('sent chat history')
 
                     chat.user_id = escape(content['userId'])
-                    log.debug(chat.user_id)
+                    log.debug(f"{chat.user_id=}")
                     await websocket.update_database()
 
                 elif content['type'] == 'request-chat-history':
                     open_channel = content['channel']
                     chat = ChatCollection(websocket.session).by_id(
                         open_channel)
-                    channel_clients = all_channels.setdefault(open_channel,
-                                                              set())
-                    channel_clients.add(websocket)
+                    channel_connections = all_channels.setdefault(open_channel,
+                                                                  set())
+                    channel_connections.add(websocket)
                     log.debug('staff member reconnected')
                     inner = dumps({
                         'type': 'chat-history',
@@ -545,6 +622,7 @@ async def main(host: str, port: int, token: str,
     dsn = config.applications[0].configuration['dsn']
     session_manager = SessionManager(dsn, Base, session_config={
         'autoflush': False})
+
     async with serve(handle_start, host, port,
                      create_protocol=partial(WebSocketServer, config,
                                              session_manager)):

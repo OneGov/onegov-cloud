@@ -61,11 +61,18 @@ document.addEventListener("DOMContentLoaded", function() {
         chatArea.appendChild(chatCard);
     }
 
-
-
     if (endpoint && schema) {
+        // NOTE: Includes schema with the WebSocket URL because the chat
+        // requires the schema on initiation. This should be already done when
+        // setting the data-websocket-endpoint. That however requires modifying
+        // WebsocketsApp.
+        //
+        // before = 'ws:localhost:8765'
+        // after  = 'ws:localhost:8765/chat?schema=onegov_town6-meggen'
+        const endpointWithSchema = `${endpoint}/chats?schema=${schema}`
+
         const socket = openWebsocket(
-            endpoint,
+            endpointWithSchema,
             schema,
             null,
             onWebsocketNotification,
