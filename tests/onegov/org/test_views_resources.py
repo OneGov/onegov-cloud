@@ -653,7 +653,7 @@ def test_auto_accept_reservations(client):
 
     # Test display of status page of ticket
     # Generic message, shown when ticket is open or closed
-    assert 'Falls Sie Dokumente über den Postweg' not in page
+    assert 'Ihre Anfrage wurde erfolgreich abgeschlossen' not in page
     assert 'You can pick it up at the counter' in page
 
 

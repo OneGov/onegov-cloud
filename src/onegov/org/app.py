@@ -697,10 +697,6 @@ def get_common_asset():
     yield 'tickets.js'
     yield 'items_selectable.js'
     yield 'notifications.js'
-
-
-@OrgApp.webasset('accordion')
-def get_accordion_asset():
     yield 'foundation.accordion.js'
 
 
@@ -726,7 +722,7 @@ def wrap_with_mtan_hook(
     @wraps(func)
     def wrapped(self: OrgApp, obj: Any, request: OrgRequest) -> Any:
         if (
-            getattr(obj, 'access', None) == 'mtan'
+            getattr(obj, 'access', None) in ('mtan', 'secret_mtan')
             # managers don't require mtan authentication
             and not request.is_manager
         ):

@@ -231,7 +231,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         return url
 
     @overload  # type:ignore[override]
-    def link(  # type:ignore[misc]
+    def link(  # type:ignore[overload-overlap]
         self,
         obj: None,
         name: str = ...,
@@ -649,7 +649,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             return False
 
         if not self.is_private(model) and hasattr(model, 'access'):
-            if model.access == 'secret':
+            if model.access in ('secret', 'secret_mtan'):
                 return False
 
         return True

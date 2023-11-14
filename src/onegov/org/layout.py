@@ -593,7 +593,7 @@ class DefaultLayoutMixin:
         if not hasattr(self.model, 'access'):
             return
 
-        if self.model.access != 'secret':
+        if self.model.access not in ('secret', 'secret_mtan'):
             return
 
         @self.request.after

@@ -13,7 +13,8 @@ if TYPE_CHECKING:
 
 class OrgRequest(CoreRequest):
 
-    app: 'OrgApp'
+    if TYPE_CHECKING:
+        app: 'OrgApp'
 
     @cached_property
     def is_manager(self):

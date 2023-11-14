@@ -21,10 +21,10 @@ function spawnDefaultMap(target, options, cb) {
         custom_map: 'map-zg'
     }));
 
-    L.tileLayer('https://services.geo.zg.ch/tc/wmts/1.0.0/zg.basisplan-farbig/default/zg/{z}/{y}/{x}.png', {
+    L.tileLayer('https://services.geo.zg.ch/tc/wmts/1.0.0/zg.orthofoto/default/zg/{z}/{y}/{x}.png', {
         tileSize: 512,
         maxZoom: lv95.resolutions.length,
-        id: 'zg.basisplan-farbig',
+        id: 'zg.orthofoto',
         }).addTo(map);
 
     cb(map);

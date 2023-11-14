@@ -92,6 +92,7 @@ def keyword_count(request, collection):
              permission=Public)
 def view_occurrences(self, request, layout=None):
     """ View all occurrences of all events. """
+
     filters = None
     tags = None
     filter_type = request.app.org.event_filter_type
@@ -344,7 +345,11 @@ def json_export_occurences(self, request):
     ]
 
 
-@OrgApp.view(model=OccurrenceCollection, name='xml', permission=Public)
+@OrgApp.view(
+    model=OccurrenceCollection,
+    name='xml',
+    permission=Public
+)
 def xml_export_all_occurrences(self, request):
     """
     Returns events as xml.
@@ -355,7 +360,7 @@ def xml_export_all_occurrences(self, request):
     return Response(
         collection.as_xml(),
         content_type='text/xml',
-        content_disposition='inline; filename=occurrences.xml'
+        content_disposition='inline; filename=events.xml'
     )
 
 

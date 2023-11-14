@@ -94,8 +94,10 @@ class AccessExtension(ContentExtension):
     * 'member' - Neither listed nor accessible except administrators, editors
                   and members.
     * 'secret' - Not listed, but available for anyone that knows the URL.
-    * 'mtan' - The model is listed but only accessible once an mTAN
-               has been sent to the person and entered correctly.
+    * 'mtan' - The model is listed but only accessible once an mTAN has been
+               sent to the person and entered correctly.
+    * 'secret_mtan' - Not listed and only accessible once an mTAN has been
+                      sent to the person and entered correctly.
 
     see :func:`onegov.core.security.rules.has_permission_not_logged_in`
 
@@ -117,6 +119,9 @@ class AccessExtension(ContentExtension):
             # if we can deliver SMS
             access_choices.append(('mtan', _(
                 "Only by privileged users or after submitting a mTAN"
+            )))
+            access_choices.append(('secret_mtan', _(
+                "Through URL only after submitting a mTAN (not listed)"
             )))
 
         fields: dict[str, 'Field'] = {

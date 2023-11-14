@@ -14,6 +14,11 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from datetime import datetime
+
+
 class ScreenType:
     types = (
         'simple_vote',
@@ -24,12 +29,12 @@ class ScreenType:
         'election_compound_part'
     )
 
-    def __init__(self, type_):
+    def __init__(self, type_: str):
         assert type_ in self.types
         self.type = type_
 
     @property
-    def categories(self):
+    def categories(self) -> tuple[str, ...]:
         if self.type == 'simple_vote':
             return ('generic', 'vote')
         if self.type == 'complex_vote':
@@ -50,65 +55,77 @@ class Screen(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'election_day_screens'
 
     #: Identifies the screen
-    id = Column(Integer, primary_key=True)
+    id: 'Column[int]' = Column(Integer, primary_key=True)
 
     #: A unique number for the path
-    number = Column(Integer, unique=True, nullable=False)
+    number: 'Column[int]' = Column(Integer, unique=True, nullable=False)
 
     #: The vote
-    vote_id = Column(
+    vote_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey(Vote.id, onupdate='CASCADE'), nullable=True
     )
-    vote = relationship('Vote', backref='screens')
+    vote: 'relationship[Vote | None]' = relationship(
+        'Vote',
+        backref='screens'
+    )
 
     #: The election
-    election_id = Column(
+    election_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey(Election.id, onupdate='CASCADE'), nullable=True
     )
-    election = relationship('Election', backref='screens')
+    election: 'relationship[Election | None]' = relationship(
+        'Election',
+        backref='screens'
+    )
 
     #: The election compound
-    election_compound_id = Column(
+    election_compound_id: 'Column[str | None]' = Column(
         Text,
         ForeignKey(ElectionCompound.id, onupdate='CASCADE'), nullable=True
     )
-    election_compound = relationship('ElectionCompound', backref='screens')
+    election_compound: 'relationship[ElectionCompound | None]' = relationship(
+        'ElectionCompound',
+        backref='screens'
+    )
 
     #: The domain of the election compound part.
-    domain = Column(Text, nullable=True)
+    domain: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The domain segment of the election compound part.
-    domain_segment = Column(Text, nullable=True)
+    domain_segment: 'Column[str | None]' = Column(Text, nullable=True)
 
     @property
-    def election_compound_part(self):
+    def election_compound_part(self) -> ElectionCompoundPart | None:
         if self.election_compound and self.domain and self.domain_segment:
             return ElectionCompoundPart(
                 self.election_compound, self.domain, self.domain_segment
             )
+        return None
 
     #: The title
-    description = Column(Text, nullable=True)
+    description: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The type
-    type = Column(Text, nullable=False)
+    type: 'Column[str]' = Column(Text, nullable=False)
 
     #: The content of the screen
-    structure = Column(Text, nullable=False)
+    structure: 'Column[str]' = Column(Text, nullable=False)
 
     #: Additional CSS
-    css = Column(Text, nullable=True)
+    css: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The group this screen belongs to, used for cycling
-    group = Column(Text, nullable=True)
+    group: 'Column[str | None]' = Column(Text, nullable=True)
 
     #: The duration this screen is presented if cycling
-    duration = Column(Integer, nullable=True)
+    duration: 'Column[int | None]' = Column(Integer, nullable=True)
 
     @property
-    def model(self):
+    def model(
+        self
+    ) -> Election | ElectionCompound | ElectionCompoundPart | Vote | None:
         if self.type in ('simple_vote', 'complex_vote'):
             return self.vote
         if self.type in ('majorz_election', 'proporz_election'):
@@ -120,19 +137,24 @@ class Screen(Base, ContentMixin, TimestampMixin):
         raise NotImplementedError()
 
     @property
-    def screen_type(self):
+    def screen_type(self) -> ScreenType:
         return ScreenType(self.type)
 
     @property
-    def last_modified(self):
-        changes = [self.last_change, self.model.last_change]
-        changes = [change for change in changes if change]
-        return max(changes) if changes else None
+    def last_modified(self) -> 'datetime | None':
+        model = self.model
+        assert model is not None
+        changes = [self.last_change, model.last_change]
+        set_changes = [change for change in changes if change]
+        return max(set_changes) if set_changes else None
 
     @property
-    def next(self):
+    def next(self) -> 'Screen | None':
         if self.group:
             session = object_session(self)
+            # FIXME: This seems a little slow, we may be better off just
+            #        loading the numbers and then fetching the single Screen
+            #        we actually need, even if that means an additional query
             query = session.query(Screen.number, Screen)
             query = query.filter_by(group=self.group).order_by(Screen.number)
             screens = OrderedDict(query.all())

@@ -7,6 +7,16 @@ from onegov.election_day.formats.imports.common import get_entity_and_district
 from onegov.election_day.formats.imports.common import load_csv
 
 
+from typing import IO
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Vote
+    from onegov.ballot.types import BallotType
+    from onegov.core.csv import DefaultRow
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 DEFAULT_VOTE_HEADER = (
     'id',
     'ja stimmen',
@@ -17,7 +27,13 @@ DEFAULT_VOTE_HEADER = (
 )
 
 
-def import_vote_default(vote, principal, ballot_type, file, mimetype):
+def import_vote_default(
+    vote: 'Vote',
+    principal: 'Canton | Municipality',
+    ballot_type: 'BallotType',
+    file: IO[bytes],
+    mimetype: str
+) -> list[FileImportError]:
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
 
@@ -46,7 +62,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
     ballot = vote.ballot(ballot_type, create=True)
 
     ballot_results = []
-    errors = []
+    errors: list[FileImportError] = []
     added_entity_ids = set()
     entities = principal.entities[vote.date.year]
 
@@ -62,7 +78,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
 
     skip_indicators = ('unknown', 'unbekannt')
 
-    def skip_line(line):
+    def skip_line(line: 'DefaultRow') -> bool:
         for column in significant_columns:
             if str(getattr(line, column, '')).lower() in skip_indicators:
                 return True
@@ -71,6 +87,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
 
     skipped = 0
 
+    assert csv is not None
     for line in csv.lines:
 
         if skip_line(line):
@@ -166,6 +183,7 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
 
         # all went well (only keep doing this as long as there are no errors)
         if not errors:
+            assert entity_id is not None
             ballot_results.append(
                 BallotResult(
                     name=name,

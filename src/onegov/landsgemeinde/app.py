@@ -63,6 +63,11 @@ def get_backend_ticker():
     yield 'ticker.js'
 
 
+@LandsgemeindeApp.webasset('person_votum')
+def get_person_votum():
+    yield 'person_votum.js'
+
+
 @LandsgemeindeApp.webasset('agenda_items')
 def get_backend_agenda_items():
     yield 'agenda_items.js'

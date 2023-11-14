@@ -51,7 +51,7 @@ def test_browse_matching(browser, scenario):
     assert not browser.is_text_present("Mike")
 
     browser.find_by_css('.matching-details > button')[0].click()
-    browser.is_element_visible_by_css('.matches')
+    browser.find_by_css('.matches').is_visible()
 
     assert browser.is_text_present("Dustin")
     assert browser.is_text_present("Mike")
