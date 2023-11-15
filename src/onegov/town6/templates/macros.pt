@@ -772,6 +772,24 @@
     </tal:b>
 </metal:display_form>
 
+
+<metal:display_chat define-macro="display_chat" i18n:domain="onegov.town6">
+    <div class="chat ticket-chat">
+        <h3  i18n:translate>Chat History</h3>
+        <div id="message-area">
+            <tal:b tal:repeat="message chat.chat_history">
+                <div class="card chat-card ${'right' if message.get('userId') != 'customer' else 'left'}">
+                    <p class="info">${message['user']}</p>
+                    <div class="card-section">
+                        <p>${message['text']}</p>
+                    </div>
+                    <p class="info">${message['time']}</p>
+                </div>
+            </tal:b>
+        </div>
+    </div>
+</metal:display_chat>
+
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.town6">
     <?python
         if fields:

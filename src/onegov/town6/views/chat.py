@@ -9,8 +9,11 @@ from onegov.core.templates import render_template
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
 from onegov.town6.layout import DefaultLayout
 from onegov.org.layout import DefaultMailLayout
+from onegov.org.mail import send_ticket_mail
 from webob.exc import HTTPForbidden
 from onegov.town6 import _
+from onegov.org.models import TicketMessage
+from onegov.ticket import TicketCollection
 
 
 @TownApp.form(
@@ -32,12 +35,10 @@ def view_chats_staff(self, request, form):
         Chat.active == False)
 
     if form.submitted(request):
-        # request.POST för wele Button
-        pass
-        if request.POST._items[2][1] == 'end-chat':
-            chat = ChatCollection(request.session).query().filter(
-                Chat.id == form.chat_id).one()
+        chat = ChatCollection(request.session).query().filter(
+            Chat.id == form.chat_id).one()
 
+        if request.POST._items[2][1] == 'end-chat':
             args = {
                 'layout': DefaultMailLayout(object(), request),
                 'title': request.translate(
@@ -57,6 +58,25 @@ def view_chats_staff(self, request, form):
                 )
             )
 
+        if request.POST._items[2][1] == 'create-ticket':
+            with all_chats.session.no_autoflush:
+                ticket = TicketCollection(request.session).open_ticket(
+                    handler_code='CHT', handler_id=chat.id.hex
+                )
+                TicketMessage.create(ticket, request, 'opened')
+
+                send_ticket_mail(
+                    request=request,
+                    template='mail_turned_chat_into_ticket.pt',
+                    subject=_("Your Chat has been turned into a ticket"),
+                    receivers=(chat.email, ),
+                    ticket=ticket,
+                    content={
+                        'model': self,
+                        'ticket': ticket
+                    }
+                )
+
     return {
         'title': 'Chat Staff',
         'form': form,
@@ -64,7 +84,6 @@ def view_chats_staff(self, request, form):
         'user': user,
         'open_requests': open_requests.all(),
         'active_chats': active_chats.all(),
-        # 'chat_actions': chat_actions(),
         'archived_chats': archived_chats.all()
     }
 

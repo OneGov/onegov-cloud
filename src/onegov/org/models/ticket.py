@@ -1,4 +1,5 @@
 from functools import cached_property
+from onegov.chat.collections import ChatCollection
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
@@ -982,3 +983,58 @@ class DirectoryEntryHandler(Handler, TicketDeletionMixin):
         ))
 
         return links
+
+
+class ChatTicket(OrgTicketMixin, Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'CHT'}  # type:ignore
+    es_type_name = 'chat_tickets'
+
+    def reference_group(self, request):
+        return self.handler.title
+
+
+@handlers.registered_handler('CHT')
+class ChatHandler(Handler, TicketDeletionMixin):
+
+    handler_title = _("Chats")
+    code_title = _("Chats")
+
+    @cached_property
+    def collection(self):
+        return ChatCollection(self.session)
+
+    @cached_property
+    def chat(self):
+        return self.collection.by_id(self.id)
+
+    @property
+    def deleted(self):
+        return self.chat is None
+
+    @property
+    def title(self):
+        return self.chat.customer_name if self.chat is not None else ''
+
+    @property
+    def subtitle(self):
+        return None
+
+    @property
+    def group(self):
+        return 'Chats'  # TODO: Chat-Groups will be implemented later
+
+    @property
+    def email(self):
+        return self.chat.email if self.chat is not None else ''
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.collection, request)
+        if self.collection is not None:
+            return render_macro(layout.macros['display_chat'], request, {
+                'chat': self.chat,
+                'layout': layout
+            })
+        return None
+
+    def get_links(self, request):
+        return []
