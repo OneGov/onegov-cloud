@@ -715,8 +715,7 @@ async def handle_start(websocket: WebSocketServerProtocol) -> None:
 
 async def main(
     host: str, port: int, token: str,
-    config: 'Config | None' = None,
-    application: str | None = None
+    config: 'Config | None' = None
 ) -> None:
 
     # Determine the application to start: ticker or chat.
@@ -733,9 +732,8 @@ async def main(
     # (never both).
     #
     # TODO: Divide ticker and chat.
-    #
-    if application == 'chat' and config:
-        log.debug(f'Serving {application} on ws://{host}:{port}/chat')
+    if config and config.applications[0].namespace == 'onegov_town6':
+        log.debug(f'Serving chat on ws://{host}:{port}/chat')
 
         dsn = config.applications[0].configuration['dsn']
 

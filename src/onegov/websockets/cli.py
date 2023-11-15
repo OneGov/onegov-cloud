@@ -35,7 +35,6 @@ cli = command_group()
 @click.option('--host')
 @click.option('--port', type=int)
 @click.option('--token')
-@click.option('--application')
 @click.option('--sentry-dsn')
 @click.option('--sentry-environment', default='testing')
 @click.option('--sentry-release')
@@ -45,7 +44,6 @@ def serve(
     host: str | None,
     port: int | None,
     token: str | None,
-    application: str | None,
     sentry_dsn: str | None,
     sentry_environment: str | None,
     sentry_release: str | None
@@ -77,7 +75,7 @@ def serve(
             environment=sentry_environment,
         )
 
-    run(main(host, port, token, group_context.config, application=application))
+    run(main(host, port, token, group_context.config))
 
 
 @cli.command('listen')
