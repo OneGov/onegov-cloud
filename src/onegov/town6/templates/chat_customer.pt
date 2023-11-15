@@ -8,7 +8,7 @@
             <div class="medium-7 cell">
                 <div id="message-area" data-customer-name="${customer_name}" data-chat-id="${chat.id.hex}" data-chat-active="${chat.active}">
                     <p class="notification" id="accepted" style="display: none;" i18n:translate=""><i class="fas fa-info-circle"></i> Die Chatanfrage wurde angenommen</p>
-                    <p class="notification" id="connecting" style="display: none;" i18n:translate=""><i class="fas fa-hourglass-start"></i> Verbinde mit Chatserver ...</p>
+                    <p class="notification" id="connecting" style="display: none;" i18n:translate=""><i class="fas fa-circle-notch fa-spin"></i> Verbinde mit Chatserver ...</p>
                     <p tal:condition="not chat.chat_history" id="start">Beschreiben Sie Ihr Anliegen um eine Anfrage zu starten.</p>
                     <div class="card chat-card" style="display: none;">
                         <p class="info"></p>

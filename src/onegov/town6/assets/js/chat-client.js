@@ -8,24 +8,30 @@ document.addEventListener("DOMContentLoaded", function() {
     var ended = document.getElementById('ended')
     var endedByTimeoutNotification = document.getElementById('ended-by-timeout')
     var startInformation = document.getElementById('start')
-
     const token = document.body.dataset.websocketToken;
-    var chatActive = document.body.dataset.chatActive;
+    var chatActive = chatArea.dataset.chatActive;
+    var messages = document.querySelectorAll('.chat-card');
+    var endChatTimer;
+    var firstMessageTimeout = 60000
+    var messageTimeout = 1800000
+
 
     function notifyChatEnded() {
-        if (chatActive == true) {
-            console.log('chat has ended');
-            clearInterval(endChatTimer);
-            var notification = endedByTimeoutNotification.cloneNode(true);
-            notification.style.display = "flex"
-        }
-        chatActive = false;
+        var notification = endedByTimeoutNotification.cloneNode(true);
+        console.log(notification)
+        notification.style.display = "block"
+        chatArea.appendChild(notification)
+
+        clearTimeout(endChatTimer);
     }
 
-    var endChatTimer = setInterval(notifyChatEnded, 1800000);
-    var messages = document.querySelectorAll('.chat-card');
-    if (messages.length == 1) {
-        endChatTimer = setInterval(notifyChatEnded, 600000);
+    console.log('chat active', chatActive, 'messages', messages.length)
+    if (chatActive == 'True' && messages.length == 2) {
+        console.log('ich be doinne')
+        endChatTimer = setTimeout(notifyChatEnded, firstMessageTimeout);
+    } else if (chatActive == 'True' && messages.length > 2) {
+        console.log('ich be onde inne')
+        endChatTimer = setTimeout(notifyChatEnded, messageTimeout);
     }
 
     function browserNotification(message) {
@@ -49,9 +55,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function onWebsocketNotification(message, _websocket) {
         message = JSON.parse(message)
-        // Clear and restart the timer 
-        clearInterval(endChatTimer);
-        endChatTimer = setInterval(notifyChatEnded, 1800000);
 
         if (message.type == 'message') {
             connecting.style.display = "none"
@@ -59,18 +62,26 @@ document.addEventListener("DOMContentLoaded", function() {
 
         } else if (message.type == 'accepted') {
             var aceptedNotification = document.getElementById('accepted')
-            aceptedNotification.style.display = 'flex'
+            aceptedNotification.style.display = 'block'
             // browserNotification(aceptedNotification.textContent)
 
         } else if (message.type == 'end-chat') {
-            clearInterval(endChatTimer);
+            clearTimeout(endChatTimer);
             console.log('Staff ended chat')
             ended = ended.cloneNode(true)
             chatArea.appendChild(ended)
-            ended.style.display = 'flex'
+            ended.style.display = 'block'
 
         } else {
             console.log('unkown messaage type', message)
+        }
+
+        // Clear and restart the timer 
+        clearTimeout(endChatTimer);
+        if (chatActive == true && messages.length == 2) {
+            endChatTimer = setTimeout(notifyChatEnded, firstMessageTimeout);
+        } else {
+            endChatTimer = setTimeout(notifyChatEnded, messageTimeout);
         }
     }
 
@@ -113,9 +124,8 @@ document.addEventListener("DOMContentLoaded", function() {
             var messages = document.querySelectorAll('.chat-card');
 
             if (messages.length == 1) {
-                connecting.style.display = "flex"
+                connecting.style.display = "block"
                 startInformation.style.display = "none"
-                endChatTimer = setInterval(notifyChatEnded, 600000);
             }
 
             const payload = JSON.stringify({

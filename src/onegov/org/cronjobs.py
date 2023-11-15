@@ -465,14 +465,15 @@ def send_daily_resource_usage_overview(request):
         )
 
 
-@OrgApp.cronjob(hour='*', minute='*/10', timezone='UTC')
+@OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
 def end_chats_and_create_tickets(request):
-    ten_minutes_ago = replace_timezone(
-        datetime.utcnow(), 'UTC') - timedelta(minutes=10)
+    half_hour_ago = replace_timezone(
+        datetime.utcnow(), 'UTC') - timedelta(minutes=30)
 
     chats = ChatCollection(request.session).query().filter(
-        Chat.active == True).filter(
-            Chat.last_change < ten_minutes_ago)
+        Chat.active == True).filter(Chat.chat_history != []).filter(
+            Chat.last_change < half_hour_ago)
+
     for chat in chats:
         chat.active = False
         with chats.session.no_autoflush:
