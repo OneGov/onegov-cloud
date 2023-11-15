@@ -4,6 +4,7 @@ from datetime import date
 
 from onegov.file import FileCollection
 from onegov.form import FormCollection
+from onegov.org.models import TicketNote
 from onegov.ticket import Ticket
 from onegov.user import UserCollection
 from tests.onegov.town6.common import step_class
@@ -194,6 +195,14 @@ def test_registration_ticket_workflow(client):
     message.form['registration_state'] = ['open', 'cancelled', 'confirmed']
     page = message.form.submit().follow()
     assert 'Erfolgreich 4 E-Mails gesendet' in page
+
+    latest_ticket_note = (
+        client.app.session().query(TicketNote)
+        .order_by(TicketNote.created.desc())
+        .first()
+    )
+    assert "Neue E-Mail" in latest_ticket_note.text
+
     mail = client.get_email(-1)
     assert 'Message for all the attendees' in mail['HtmlBody']
     assert 'Allgemeine Nachricht' in mail['Subject']
