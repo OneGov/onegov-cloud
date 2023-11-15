@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from onegov.chat.models import Chat
+    from onegov.core.cli.core import GroupContext
     from onegov.core.types import JSONObject, JSONObject_ro
 
 
@@ -44,9 +45,9 @@ ACTIVE_CHATS: dict[str, dict['UUID', 'Chat']] = {}  # For DB
 CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
 
 
-class WebSocketServer(WebSocketServerProtocol):
-    schema:str
-    signed_session_id:str
+class ChatWebSocketServer(WebSocketServerProtocol):
+    schema: str
+    signed_session_id: str
     user_id: str
 
     def __init__(self, config, session_manager, *args, **kwargs):
@@ -388,7 +389,7 @@ async def handle_manage(
             )
 
 
-async def handle_customer_chat(websocket: WebSocketServer, payload):
+async def handle_customer_chat(websocket: ChatWebSocketServer, payload):
     """
     Starts a chat. Handles listening to messages on channel.
     """
@@ -476,7 +477,7 @@ async def handle_customer_chat(websocket: WebSocketServer, payload):
             log.debug(f'removed {websocket.id} from channel-connections')
 
 
-async def handle_staff_chat(websocket: WebSocketServer, payload):
+async def handle_staff_chat(websocket: ChatWebSocketServer, payload):
     """
     Registers staff member and listens to messages.
     """
@@ -626,19 +627,46 @@ async def handle_start(websocket: WebSocketServerProtocol) -> None:
     log.debug(f'{websocket.id} disconnected')
 
 
-async def main(host: str, port: int, token: str,
-               config) -> None:
-    global TOKEN
-    TOKEN = token
-    log.debug(f'Serving on ws://{host}:{port}')
-    dsn = config.applications[0].configuration['dsn']
-    session_manager = SessionManager(
-        dsn,
-        Base,
-        session_config={'autoflush': False}
-    )
+async def main(
+    host: str, port: int, token: str,
+    config: 'GroupContext | None' = None,
+    application: str | None = None
+) -> None:
 
-    async with serve(handle_start, host, port,
-                     create_protocol=partial(WebSocketServer, config,
-                                             session_manager)):
-        await Future()
+    # Determine the application to start: ticker or chat.
+    #
+    # Chat has been built on the same foundation as the ticker. They however
+    # behave somewhat differently. Ticker uses the default WebSocketServer
+    # while the chat requires some customization. For now, we keep both
+    # applications here but we should divide them into dedicated modules. To
+    # not interfere with any existing ticker functionality, we try to refrain
+    # from making backwards-incompatible changes (for now). That way, ticker
+    # should continue to work without any modification.
+    #
+    # On any given instance, only one of the application is running anyway
+    # (never both).
+    #
+    # TODO: Divide ticker and chat.
+    #
+    if application == 'chat':
+        log.debug(f'Serving {application} on ws://{host}:{port}/chat')
+
+        dsn = config.applications[0].configuration['dsn']
+        session_manager = SessionManager(
+            dsn,
+            Base,
+            session_config={'autoflush': False}
+        )
+
+        async with serve(handle_start, host, port,
+                         create_protocol=partial(ChatWebSocketServer, config,
+                                                 session_manager)):
+            await Future()
+
+    else:
+        global TOKEN
+        TOKEN = token
+        log.debug(f'Serving on ws://{host}:{port}')
+
+        async with serve(handle_start, host, port):
+            await Future()
