@@ -6,8 +6,27 @@ document.addEventListener("DOMContentLoaded", function() {
     const chatWindow = document.getElementById("chat");
     const connecting = document.getElementById('connecting')
     var ended = document.getElementById('ended')
+    var endedByTimeoutNotification = document.getElementById('ended-by-timeout')
+    var startInformation = document.getElementById('start')
 
-    const token = document.body.dataset.websocketToken
+    const token = document.body.dataset.websocketToken;
+    var chatActive = document.body.dataset.chatActive;
+
+    function notifyChatEnded() {
+        if (chatActive == true) {
+            console.log('chat has ended');
+            clearInterval(endChatTimer);
+            var notification = endedByTimeoutNotification.cloneNode(true);
+            notification.style.display = "flex"
+        }
+        chatActive = false;
+    }
+
+    var endChatTimer = setInterval(notifyChatEnded, 1800000);
+    var messages = document.querySelectorAll('.chat-card');
+    if (messages.length == 1) {
+        endChatTimer = setInterval(notifyChatEnded, 600000);
+    }
 
     function browserNotification(message) {
         if (!("Notification" in window)) {
@@ -30,6 +49,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function onWebsocketNotification(message, _websocket) {
         message = JSON.parse(message)
+        // Clear and restart the timer 
+        clearInterval(endChatTimer);
+        endChatTimer = setInterval(notifyChatEnded, 1800000);
+
         if (message.type == 'message') {
             connecting.style.display = "none"
             createChatBubble(message, message.userId == 'customer')
@@ -40,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // browserNotification(aceptedNotification.textContent)
 
         } else if (message.type == 'end-chat') {
+            clearInterval(endChatTimer);
             console.log('Staff ended chat')
             ended = ended.cloneNode(true)
             chatArea.appendChild(ended)
@@ -83,13 +107,15 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log('i know the customer:', customerName)
 
         document.getElementById("send").addEventListener("click", () => {
-            var now = new Date().toUTCString()
+            var now = new Date().toLocaleTimeString()
             var channelId = chatArea.dataset.chatId
 
             var messages = document.querySelectorAll('.chat-card');
 
             if (messages.length == 1) {
                 connecting.style.display = "flex"
+                startInformation.style.display = "none"
+                endChatTimer = setInterval(notifyChatEnded, 600000);
             }
 
             const payload = JSON.stringify({
