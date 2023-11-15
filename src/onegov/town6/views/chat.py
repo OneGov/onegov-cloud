@@ -36,7 +36,7 @@ def view_chats_staff(self, request, form):
 
     if form.submitted(request):
         chat = ChatCollection(request.session).query().filter(
-            Chat.id == form.chat_id).one()
+            Chat.id == form.chat_id.data).one()
 
         if request.POST._items[2][1] == 'end-chat':
             args = {
@@ -73,7 +73,8 @@ def view_chats_staff(self, request, form):
                     ticket=ticket,
                     content={
                         'model': self,
-                        'ticket': ticket
+                        'ticket': ticket,
+                        'chat': chat
                     }
                 )
 

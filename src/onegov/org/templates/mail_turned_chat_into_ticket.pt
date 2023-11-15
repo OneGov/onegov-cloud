@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+<div metal:use-macro="layout.base" i18n:domain="onegov.town6">
     <tal:b metal:fill-slot="title">
         ${title}
     </tal:b>
@@ -11,7 +11,17 @@
         
         <a href="${request.link(ticket, 'status')}" i18n:translate>Check request status</a>
 
-        <tal:b metal:use-macro="layout.macros['display_chat']"></tal:b>
+        <div id="message-area">
+            <tal:b tal:repeat="message chat.chat_history">
+                <div class="card chat-card ${'left' if message.get('userId') != 'customer' else 'right'}">
+                    <p class="info">${message['user']}</p>
+                    <div class="card-section">
+                        <p>${message['text']}</p>
+                    </div>
+                    <p class="info">${message['time']}</p>
+                </div>
+            </tal:b>
+        </div>
 
     </tal:b>
 </div>
