@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const endpoint = document.body.dataset.websocketEndpoint;
     const schema = document.body.dataset.websocketSchema;
     const chatArea = document.getElementById("message-area");
+    const chatForm = document.getElementById("chat-form");
     const customerName = chatArea.dataset.customerName;
     const chatWindow = document.getElementById("chat");
     const connecting = document.getElementById('connecting')
@@ -74,7 +75,8 @@ document.addEventListener("DOMContentLoaded", function() {
             ended = ended.cloneNode(true)
             chatArea.appendChild(ended)
             ended.style.display = 'block'
-
+            chat.style.display = 'block'
+            chatForm.remove()
         } else {
             console.log('unkown messaage type', message)
         }

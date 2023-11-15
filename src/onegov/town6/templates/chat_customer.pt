@@ -33,7 +33,7 @@
                     <p class="notification" id="ended-by-timeout" style="display: ${'none'};" i18n:translate="">
                         <i class="fas fa-info-circle"></i> Aktuell scheint niemand verfügbar zu sein. Aus Ihrer Anfrage wurde ein Ticket erstellt und Sie erhalten demnächst eine Email dazu.</p>
                 </div>
-                <div id="chat-form">
+                <div id="chat-form" tal:condition="chat.active">
                     <textarea id="chat" placeholder="Ihre Nachricht ..." rows="5"></textarea>
                     <button id="send" class="button">Senden</button>
                 </div>
