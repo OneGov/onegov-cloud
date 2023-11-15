@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const connecting = document.getElementById('connecting')
     var ended = document.getElementById('ended')
     var endedByTimeoutNotification = document.getElementById('ended-by-timeout')
+    var accepted = document.getElementById('accepted')
     var startInformation = document.getElementById('start')
     const token = document.body.dataset.websocketToken;
     var chatActive = chatArea.dataset.chatActive;
@@ -61,7 +62,8 @@ document.addEventListener("DOMContentLoaded", function() {
             createChatBubble(message, message.userId == 'customer')
 
         } else if (message.type == 'accepted') {
-            var aceptedNotification = document.getElementById('accepted')
+            var notification = accepted.cloneNode(true)
+            chatArea.appendChild(notification)
             aceptedNotification.style.display = 'block'
             // browserNotification(aceptedNotification.textContent)
 
@@ -118,7 +120,10 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log('i know the customer:', customerName)
 
         document.getElementById("send").addEventListener("click", () => {
-            var now = new Date().toLocaleTimeString()
+            var now = new Date()
+            var hour =  now.getHours().toString().padStart(2, '0')
+            var minute =  now.getMinutes().toString().padStart(2, '0')
+            now = hour + ':' + minute
             var channelId = chatArea.dataset.chatId
 
             var messages = document.querySelectorAll('.chat-card');

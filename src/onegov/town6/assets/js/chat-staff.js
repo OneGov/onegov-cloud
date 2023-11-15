@@ -212,7 +212,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // Send single chat-message
         document.getElementById("send").addEventListener("click", () => {
-            now = new Date().toUTCString()
+            var now = new Date()
+            var hour =  now.getHours().toString().padStart(2, '0')
+            var minute =  now.getMinutes().toString().padStart(2, '0')
+            now = hour + ':' + minute
 
             const payload = JSON.stringify({
                 type: 'message',
