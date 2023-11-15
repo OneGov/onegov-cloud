@@ -41,6 +41,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
         } else if (message.type == 'end-chat') {
             console.log('Staff ended chat')
+            ended = ended.cloneNode(true)
+            chatArea.appendChild(ended)
             ended.style.display = 'flex'
 
         } else {
