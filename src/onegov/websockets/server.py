@@ -89,7 +89,7 @@ class ChatWebSocketServer(WebSocketServerProtocol):
         prior to requesting the WebSocket connection.
         """
         try:
-            cookie = SimpleCookie[str](headers['Cookie'])
+            cookie = SimpleCookie(headers['Cookie'])
             session_id = cookie['session_id'].value
         except KeyError:
             log.error(
