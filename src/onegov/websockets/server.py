@@ -24,14 +24,16 @@ from onegov.websockets.security import (WebsocketSecurityError,
                                         consume_websocket_token)
 
 if TYPE_CHECKING:
-    from collections.abc import Collection, Mapping
+    from collections.abc import Collection
     from uuid import UUID
 
     from sqlalchemy.orm import Session
+    from websockets import Headers
+    from websockets.legacy.server import HTTPResponse
 
     from onegov.chat.models import Chat
-    from onegov.core.cli.core import GroupContext
     from onegov.core.types import JSONObject, JSONObject_ro
+    from onegov.server.config import Config
 
 
 CONNECTIONS: dict[str, set[WebSocketServerProtocol]] = {}
@@ -47,10 +49,16 @@ CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
 
 class ChatWebSocketServer(WebSocketServerProtocol):
     schema: str
-    signed_session_id: str
-    user_id: str
+    signed_session_id: str | None
+    user_id: str | None
 
-    def __init__(self, config, session_manager, *args, **kwargs):
+    def __init__(
+        self,
+        config: 'Config',
+        session_manager: SessionManager,
+        *args: Any,
+        **kwargs: Any
+    ):
         super().__init__(*args, **kwargs)
         self.config = config
         self.session_manager = session_manager
@@ -65,7 +73,11 @@ class ChatWebSocketServer(WebSocketServerProtocol):
         except BadSignature:
             return None
 
-    async def process_request(self, path, headers):
+    async def process_request(
+        self,
+        path: str,
+        headers: 'Headers'
+    ) -> 'HTTPResponse | None':
         """ Intercept initial HTTP request.
 
         Before establishing a WebSocket connection, a client sends a HTTP
@@ -76,17 +88,19 @@ class ChatWebSocketServer(WebSocketServerProtocol):
         cookie, we require a one-time token that the user must have obtained
         prior to requesting the WebSocket connection.
         """
-        morsel = SimpleCookie(headers.get("Cookie", "")).get('session_id')
-        self.signed_session_id = morsel.value if morsel else None
-
-        if not morsel:
+        try:
+            cookie = SimpleCookie[str](headers['Cookie'])
+            session_id = cookie['session_id'].value
+        except KeyError:
             log.error(
                 "No session cookie found in request. "
                 "Check that you sent the request from the same origin as "
                 f"the WebSocket server ({self.host})"
             )
 
-            return http.HTTPStatus.BAD_REQUEST, [], None
+            return http.HTTPStatus.BAD_REQUEST, [], b""
+
+        self.signed_session_id = session_id
 
         try:
             self.schema = param_from_path('schema', path)
@@ -95,7 +109,7 @@ class ChatWebSocketServer(WebSocketServerProtocol):
                 f"Unable to retrieve schema from path: {path}",
                 exc_info=err
             )
-            return http.HTTPStatus.BAD_REQUEST, [], None
+            return http.HTTPStatus.BAD_REQUEST, [], b""
 
         # browser_session requires self.schema
         self.user_id = self.browser_session.get("userid")
@@ -107,7 +121,7 @@ class ChatWebSocketServer(WebSocketServerProtocol):
             consume_websocket_token(path, self.browser_session)
         except WebsocketSecurityError as err:
             log.error("Rejecting WebSocket connection.", exc_info=err)
-            return http.HTTPStatus.UNAUTHORIZED, [], None
+            return http.HTTPStatus.UNAUTHORIZED, [], b""
 
         try:
             # Checking the origin is done at a later stage by handshake(), this
@@ -118,7 +132,10 @@ class ChatWebSocketServer(WebSocketServerProtocol):
         except InvalidOrigin as err:
             log.debug("WebSocket connection will be rejected.", exc_info=err)
 
-    async def get_chat(self, id) -> 'Chat':
+        return None
+
+    # TODO
+    async def get_chat(self, id: 'UUID') -> 'Chat':
         chat = ACTIVE_CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
 
         # Force (cached) session to fetch latest state of the database,
@@ -128,19 +145,23 @@ class ChatWebSocketServer(WebSocketServerProtocol):
 
         if chat is NOTFOUND:
             chat = ChatCollection(self.session).by_id(id)
+
             log.debug(f'searching for chat with id {id}')
             log.debug(f'chat from collection {chat}')
+
             if chat and not chat.active:
                 chat = None
-            ACTIVE_CHATS[self.schema][chat.id] = chat
-        return chat
+
+            ACTIVE_CHATS[self.schema][chat.id] = chat  # type: ignore
+
+        return chat  # type: ignore
 
     async def update_database(self) -> None:
         self.session.flush()
         transaction.commit()
 
     @property
-    def session(self):
+    def session(self) -> 'Session':
         session = SESSIONS.get(self.schema)
 
         if session is None:
@@ -180,22 +201,23 @@ class ChatWebSocketServer(WebSocketServerProtocol):
         )
 
     @property
-    def namespace(self):
+    def namespace(self) -> str:
         return self.schema.split('-', 1)[0]
 
     @property
-    def application_id(self):
+    def application_id(self) -> str:
         return '/'.join(self.schema.split('-', 1))
 
     @property
-    def application_config(self):
+    def application_config(self) -> dict[str, Any]:
         for c in self.config.applications:
             if c.namespace == self.namespace:
                 return c.configuration
 
-    @cached_property
-    def browser_session(self) -> 'Mapping [str, Any]':
+        return {}
 
+    @cached_property
+    def browser_session(self) -> 'BrowserSession | dict[str, Any]':
         if self.signed_session_id is None:
             return {}
         session_id = self.unsign(self.signed_session_id)
@@ -389,7 +411,10 @@ async def handle_manage(
             )
 
 
-async def handle_customer_chat(websocket: ChatWebSocketServer, payload):
+async def handle_customer_chat(
+    websocket: ChatWebSocketServer,
+    payload: 'JSONObject_ro'
+) -> None:
     """
     Starts a chat. Handles listening to messages on channel.
     """
@@ -399,12 +424,23 @@ async def handle_customer_chat(websocket: ChatWebSocketServer, payload):
         await error(websocket, f'invalid schema: {schema}')
         return
 
-    channel = websocket.browser_session.get("active_chat_id")
+    if "active_chat_id" not in websocket.browser_session:
+        log.error(
+            "Unable to find active_chat_id in session, aborting."
+        )
+        return None
+
+    channel = websocket.browser_session["active_chat_id"]
 
     await acknowledge(websocket)
 
     all_channels = CHANNELS.setdefault(schema, {})
-    channel_connections = all_channels.setdefault(channel.hex, set())
+
+    channel_connections = all_channels.setdefault(
+        channel.hex,
+        set()
+    )
+
     channel_connections.add(websocket)
     staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
 
@@ -415,11 +451,16 @@ async def handle_customer_chat(websocket: ChatWebSocketServer, payload):
     while websocket.open:
         try:
             message = await websocket.recv()
-            log.debug(f'customer {websocket.id} got the message {message}')
+            log.debug(f'customer {websocket.id!r} got the message {message!r}')
 
             if loads(message)['type'] == 'message':
+                stored = ChatCollection(websocket.session).by_id(channel)
 
-                chat = ChatCollection(websocket.session).by_id(channel)
+                if not stored:
+                    log.error(f"Unable to find stored chat with {channel=}")
+                    continue
+
+                chat = stored
                 content = loads(message)
                 log.debug(f'customer received message {content}')
                 log.debug(f'Channel-connections {channel_connections}')
@@ -462,22 +503,28 @@ async def handle_customer_chat(websocket: ChatWebSocketServer, payload):
                         }))
 
                 chat_history = chat.chat_history.copy()
-                chat_history.append({
+
+                chat_history.append({  # type: ignore
                     'userId': escape(content['userId']),
                     'user': escape(content['user']),
                     'text': escape(content['text']),
                     'time': escape(content['time']),
                 })
                 chat.chat_history = chat_history
-                chat = await websocket.update_database()
+                await websocket.update_database()
 
         except Exception as e:
             log.exception("The debugged error message is -", exc_info=e)
             channel_connections.remove(websocket)
             log.debug(f'removed {websocket.id} from channel-connections')
 
+    return None
 
-async def handle_staff_chat(websocket: ChatWebSocketServer, payload):
+
+async def handle_staff_chat(
+    websocket: ChatWebSocketServer,
+    payload: 'JSONObject_ro'
+) -> None:
     """
     Registers staff member and listens to messages.
     """
@@ -496,7 +543,7 @@ async def handle_staff_chat(websocket: ChatWebSocketServer, payload):
         all_channels = CHANNELS.setdefault(schema, {})
         staff_connections = STAFF_CONNECTIONS.setdefault(schema, set())
         staff_connections.add(websocket)
-        channel_connections = []
+        channel_connections: set[WebSocketServerProtocol] = set()
         open_channel = ''
 
         log.debug(f'added {websocket.id} to staff-connections')
@@ -506,7 +553,9 @@ async def handle_staff_chat(websocket: ChatWebSocketServer, payload):
                 message = await websocket.recv()
                 content = loads(message)
                 log.debug(
-                    f'staff member {websocket.id} got the message {message}')
+                    f'staff member {websocket.id!r} '
+                    f'got the message {message!r}'
+                )
 
                 # Forward each websocket message, no matter the type
                 log.debug(
@@ -536,12 +585,21 @@ async def handle_staff_chat(websocket: ChatWebSocketServer, payload):
                 # If the type is a message, save to DB
                 if content['type'] == 'message':
 
-                    chat = ChatCollection(websocket.session).by_id(
-                        open_channel)
+                    chat = (
+                        ChatCollection(websocket.session)
+                        .by_id(open_channel)
+                    )
+
+                    if not chat:
+                        log.error(
+                            f"Unable to find stored chat with {open_channel=}"
+                        )
+                        continue
+
                     log.debug(f'staff received message {content}')
 
                     chat_history = chat.chat_history.copy()
-                    chat_history.append({
+                    chat_history.append({  # type: ignore
                         'userId': escape(content['userId']),
                         'user': escape(content['user']),
                         'text': escape(content['text']),
@@ -555,18 +613,37 @@ async def handle_staff_chat(websocket: ChatWebSocketServer, payload):
                     chat = ChatCollection(websocket.session).by_id(
                         escape(content['channel'])
                     )
+
+                    if not chat:
+                        log.error(
+                            "Unable to find stored chat"
+                            f"with {content['channel']=}"
+                        )
+
+                        continue
+
                     chat.active = False
                     await websocket.update_database()
 
                 elif content['type'] == 'accepted':
                     log.debug('staff-member accepted-request')
                     open_channel = loads(message)['channel']
-                    channel_connections = all_channels.setdefault(open_channel,
-                                                                  set())
+                    channel_connections = all_channels.setdefault(
+                        open_channel, set()
+                    )
+
                     channel_connections.add(websocket)
 
                     chat = ChatCollection(websocket.session).by_id(
                         open_channel)
+
+                    if not chat:
+                        log.error(
+                            "Unable to find stored chat"
+                            f"with {open_channel=}"
+                        )
+
+                        continue
 
                     inner = dumps({
                         'type': 'chat-history',
@@ -587,6 +664,15 @@ async def handle_staff_chat(websocket: ChatWebSocketServer, payload):
                     open_channel = content['channel']
                     chat = ChatCollection(websocket.session).by_id(
                         open_channel)
+
+                    if not chat:
+                        log.error(
+                            "Unable to find stored chat"
+                            f"with {open_channel=}"
+                        )
+
+                        continue
+
                     channel_connections = all_channels.setdefault(open_channel,
                                                                   set())
                     channel_connections.add(websocket)
@@ -618,9 +704,9 @@ async def handle_start(websocket: WebSocketServerProtocol) -> None:
     elif payload and payload['type'] == 'register':
         await handle_listen(websocket, payload)
     elif payload and (payload['type'] == 'customer_chat'):
-        await handle_customer_chat(websocket, payload)
+        await handle_customer_chat(websocket, payload)  # type: ignore
     elif payload and (payload['type'] == 'staff_chat'):
-        await handle_staff_chat(websocket, payload)
+        await handle_staff_chat(websocket, payload)  # type: ignore
     else:
         # FIXME: technically message can be bytes
         await error(websocket, f'invalid command: {message}')  # type:ignore
@@ -629,7 +715,7 @@ async def handle_start(websocket: WebSocketServerProtocol) -> None:
 
 async def main(
     host: str, port: int, token: str,
-    config: 'GroupContext | None' = None,
+    config: 'Config | None' = None,
     application: str | None = None
 ) -> None:
 
@@ -648,10 +734,11 @@ async def main(
     #
     # TODO: Divide ticker and chat.
     #
-    if application == 'chat':
+    if application == 'chat' and config:
         log.debug(f'Serving {application} on ws://{host}:{port}/chat')
 
         dsn = config.applications[0].configuration['dsn']
+
         session_manager = SessionManager(
             dsn,
             Base,

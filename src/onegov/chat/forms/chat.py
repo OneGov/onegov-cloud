@@ -1,7 +1,8 @@
+from wtforms.fields import EmailField, HiddenField, SelectField, StringField
+from wtforms.validators import InputRequired
+
 from onegov.form import Form
 from onegov.org import _
-from wtforms.fields import StringField, EmailField, SelectField, HiddenField
-from wtforms.validators import InputRequired
 
 
 class ChatInitiationForm(Form):
@@ -22,7 +23,11 @@ class ChatInitiationForm(Form):
 
     topic = SelectField(
         label=_("Topic"),
-        choices=['a', 'b', 'v']
+        choices=[
+            ('a', 'a'),
+            ('b', 'b'),
+            ('v', 'v')
+        ]
     )
 
 

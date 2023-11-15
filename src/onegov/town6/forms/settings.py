@@ -1,14 +1,13 @@
+from wtforms.fields import BooleanField, StringField
+from wtforms.validators import InputRequired
+
 from onegov.form import Form
-from onegov.org.forms.settings import (
-    GeneralSettingsForm as OrgGeneralSettingsForm)
-from onegov.form.fields import (
-    ChosenSelectField, ChosenSelectMultipleField, ColorField)
+from onegov.form.fields import (ChosenSelectField, ChosenSelectMultipleField,
+                                ColorField)
+from onegov.org.forms.settings import \
+    GeneralSettingsForm as OrgGeneralSettingsForm
 from onegov.town6 import _
 from onegov.town6.theme import user_options
-from wtforms.fields import BooleanField
-from wtforms.fields import RadioField
-from wtforms.fields import StringField
-from wtforms.validators import InputRequired
 
 
 class GeneralSettingsForm(OrgGeneralSettingsForm):

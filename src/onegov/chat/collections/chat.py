@@ -1,9 +1,10 @@
-from onegov.core import utils
-from onegov.core.collection import GenericCollection, Pagination
+from typing import Any
+
 from onegov.chat.models import Chat
+from onegov.core.collection import GenericCollection
 
 
-class ChatCollection(GenericCollection, Pagination):
+class ChatCollection(GenericCollection[Chat]):
     """ Manages a list of chats.
 
     Use it like this::
@@ -14,10 +15,15 @@ class ChatCollection(GenericCollection, Pagination):
     """
 
     @property
-    def model_class(self) -> Chat:
+    def model_class(self) -> type[Chat]:
         return Chat
 
-    def add(self, customer_name, email):
+    def add(  # type: ignore
+        self,
+        customer_name: str,
+        email: str,
+        **kwargs: Any
+    ) -> Chat:
         chat = self.model_class(
             customer_name=customer_name,
             email=email,
@@ -27,7 +33,3 @@ class ChatCollection(GenericCollection, Pagination):
         self.session.flush()
 
         return chat
-
-    def by_id(self, id) -> Chat:
-        if utils.is_uuid(id):
-            return self.query().filter(self.model_class.id == id).first()
