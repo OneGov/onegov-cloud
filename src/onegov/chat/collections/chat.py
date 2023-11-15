@@ -22,11 +22,13 @@ class ChatCollection(GenericCollection[Chat]):
         self,
         customer_name: str,
         email: str,
+        topic: str,
         **kwargs: Any
     ) -> Chat:
         chat = self.model_class(
             customer_name=customer_name,
             email=email,
+            topic=topic,
         )
 
         self.session.add(chat)

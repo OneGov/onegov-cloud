@@ -66,6 +66,44 @@
         padding: .7rem 1.2rem;
         place-self: center;
     }
+
+    .open-request {
+        cursor: pointer;
+
+        .list-lead {
+            margin-left: 2rem;
+        }
+    }
+
+    .blob {
+        animation: pulse-red 2s infinite;
+        background-color: $primary-color;
+        border-radius: 50%;
+        display: block;
+        float: left;
+        height: .9rem;
+        margin-right: 1rem;
+        margin-top: .3rem;
+        width: .9rem;
+    }
+
+    @keyframes pulse-red {
+        0% {
+            box-shadow: 0 0 0 0 scale-color($primary-color, $lightness: 70%);
+            transform: scale(.9);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+            transform: scale(1);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+            transform: scale(.9);
+        }
+    }
+
 }
 
 .ticket-chat #message-area {

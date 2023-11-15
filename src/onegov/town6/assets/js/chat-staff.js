@@ -8,6 +8,24 @@ document.addEventListener("DOMContentLoaded", function() {
     const token = document.body.dataset.websocketToken
     var aceptedNotification = document.getElementById('accepted')
     var noRequestText = document.getElementById('no-request')
+    var noActiveChatsText = document.getElementById('no-active-chats')
+    var requestList = document.getElementById('request-list')
+
+    if (endpoint && schema && token) {
+        // NOTE: Includes schema with the WebSocket URL because the chat
+        // requires the schema on initiation. This should be already done when
+        // setting the data-websocket-endpoint. That however requires modifying
+        // WebsocketsApp.
+        const chatEndpoint = `${endpoint}/chats?schema=${schema}&token=${token}`
+
+        const socket = openWebsocket(
+            chatEndpoint,
+            schema,
+            null,
+            onWebsocketNotification,
+            onWebsocketError,
+            'staff_chat'
+        );
 
     function browserNotification(message) {
         if (!("Notification" in window)) {
@@ -33,20 +51,21 @@ document.addEventListener("DOMContentLoaded", function() {
         if (message.type == 'request') {
             // browserNotification(message.notification)
             var requestElement = document.getElementById('new-request')
-            var requestList = document.getElementById('request-list')
             var newRequest = requestElement.cloneNode(true)
 
             newRequest.id = 'request-' + message.channel
             newRequest.style.display = 'block'
-            newRequest.children[1].id = message.channel
+            var userText = document.createTextNode(message.user)
+            newRequest.children[0].appendChild(userText)
+            var topicText = document.createTextNode(message.topic)
+            newRequest.children[1].appendChild(topicText)
 
             noRequestText.style.display = 'none'
             requestList.appendChild(newRequest)
 
             // Click on new request
-            newRequest.children[1].addEventListener("click", () => {
-                channel = message.channel
-                acceptRequest(channel, websocket)
+            newRequest.addEventListener("click", () => {
+                acceptRequest(message.channel, message.user, websocket)
             })
 
         } else if (message.type == 'message') {
@@ -55,7 +74,10 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (message.type == 'hide-request') {
             var request = document.getElementById('request-' + message.channel)
             request.remove()
-            noRequestText.style.display = 'block'
+            if (requestList.children.length < 2) {
+                console.log('There are no requests')
+                noRequestText.style.display = 'block'
+            }
 
         } else if (message.type == 'chat-history') {
             // Display chat history
@@ -77,6 +99,11 @@ document.addEventListener("DOMContentLoaded", function() {
             aceptedNotification.style.display = 'block'
             document.getElementById('loading').style.display = 'none'
             document.getElementById('chat-actions').style.display = 'block'
+            if (requestList.children.length < 2) {
+                console.log('there are no requests')
+                noRequestText.style.display = 'block'
+            }
+            noActiveChatsText.style.display = 'none'
 
         } else {
             console.log('unkown messaage type', message)
@@ -107,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function() {
         chatArea.appendChild(templateMessage)
     }
 
-    function acceptRequest(channel, websocket) {
+    function acceptRequest(channel, user, websocket) {
         console.log('accepted request with channel:' + channel)
         // Display and hide elements
         document.getElementById('no-chat-open').style.display = 'none'
@@ -120,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function() {
         request.remove()
         document.getElementById('chat-actions').style.display = 'block'
 
-        addActiveChat(channel)
+        addActiveChat(channel, user)
 
         const payload = JSON.stringify({
             type: "accepted",
@@ -130,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function() {
         websocket.send(payload);
     }
 
-    function addActiveChat(channel) {
+    function addActiveChat(channel, user) {
         var activeChatElement = document.getElementById('new-active-chat')
         var newActiveChatElement = activeChatElement.cloneNode(true)
         console.log(newActiveChatElement)
@@ -138,52 +165,41 @@ document.addEventListener("DOMContentLoaded", function() {
         newActiveChatElement.id = 'active-chat-' + channel
         newActiveChatElement.dataset.chatId = channel
         newActiveChatElement.style.display = 'block'
-        userText = document.createTextNode('user')
+        userText = document.createTextNode(user)
         newActiveChatElement.children[0].children[0].appendChild(userText)
         activeChatList.appendChild(newActiveChatElement)
+        requestHistory(newActiveChatElement)
     }
 
-    if (endpoint && schema && token) {
-        // NOTE: Includes schema with the WebSocket URL because the chat
-        // requires the schema on initiation. This should be already done when
-        // setting the data-websocket-endpoint. That however requires modifying
-        // WebsocketsApp.
-        const chatEndpoint = `${endpoint}/chats?schema=${schema}&token=${token}`
+    function requestHistory(chat) {
+        var channel = chat.dataset.chatId
+        chat.addEventListener("click", () => {
+            console.log('open chat with id' + channel)
+            chatArea.style.display = 'flex'
+            document.getElementById('loading').style.display = 'flex'
 
-        const socket = openWebsocket(
-            chatEndpoint,
-            schema,
-            null,
-            onWebsocketNotification,
-            onWebsocketError,
-            'staff_chat'
-        );
+            var payload = JSON.stringify({
+                type: 'request-chat-history',
+                channel: channel,
+            });
+
+            socket.send(payload);
+        })
+    }
 
         //Click on pre loaded request
         const openRequests = document.querySelectorAll('.open-request');
         openRequests.forEach(request => {
-            var channel = request.dataset.requestId
+            var requestDataset = request.dataset
             request.addEventListener("click", () => {
-                acceptRequest(channel, socket)
+                acceptRequest(requestDataset.requestId, requestDataset.user, socket)
             })
         })
 
         // Click on active chat
         const activeChats = document.querySelectorAll('.active-chat');
         activeChats.forEach(chat => {
-            var channel = chat.dataset.chatId
-            chat.addEventListener("click", () => {
-                console.log('open chat with id' + channel)
-                chatArea.style.display = 'flex'
-                document.getElementById('loading').style.display = 'flex'
-
-                var payload = JSON.stringify({
-                    type: 'request-chat-history',
-                    channel: channel,
-                });
-
-                socket.send(payload);
-            })
+            requestHistory(chat)
         })
 
         // Click on chat-actions

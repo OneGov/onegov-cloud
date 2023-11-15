@@ -493,10 +493,10 @@ async def handle_customer_chat(
                             'type': "notification",
                             'message': dumps({
                                 'type': 'request',
-                                'notification': 'Neue Chat-Anfrage',
                                 'text': content['text'],
                                 'userId': content['userId'],
                                 'user': content['user'],
+                                'topic': chat.topic,
                                 'channel': channel.hex
                             })
                         }))

@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const connecting = document.getElementById('connecting')
     var ended = document.getElementById('ended')
     var endedByTimeoutNotification = document.getElementById('ended-by-timeout')
+    var acceptedNotification = document.getElementById('accepted')
     var accepted = document.getElementById('accepted')
     var startInformation = document.getElementById('start')
     const token = document.body.dataset.websocketToken;
@@ -64,8 +65,8 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (message.type == 'accepted') {
             var notification = accepted.cloneNode(true)
             chatArea.appendChild(notification)
-            aceptedNotification.style.display = 'block'
-            // browserNotification(aceptedNotification.textContent)
+            acceptedNotification.style.display = 'block'
+            // browserNotification(acceptedNotification.textContent)
 
         } else if (message.type == 'end-chat') {
             clearTimeout(endChatTimer);

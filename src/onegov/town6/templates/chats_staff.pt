@@ -49,23 +49,22 @@
                             <h3>Chat Anfragen</h3>
                             <p id="no-request" style="display: ${'none' if open_requests else 'block'}">Aktuell keine neuen Anfragen.</p>
                             <ul class="more-list" id="request-list">
-                                <li style="display: none;" id="new-request">
-                                    <a class="list-link" href="#"><span class="list-title">Neue Anfrage</span><br/></a>
-                                    <a class="button">Annehmen</a>
-                                    <p class="list-lead preview"><i class="far fa-clock"></i> 5:00</p>
+                                <li style="display: none;" id="new-request" class="open-request">
+                                    <a class="list-link" href="#"><span class="blob"></span><span class="list-title"></span></a>
+                                    <p class="list-lead preview"></p>
                                 </li>
                                 <tal:b tal:repeat="request open_requests">
-                                    <li class="open-request" data-request-id="${request.id.hex}" id="request-${request.id.hex}">
-                                        <a class="list-link" href="#"><span class="list-title">Neue Anfrage</span><br/></a>
-                                        <a id="${request.id.hex}" class="button">Annehmen</a>
-                                        <p class="list-lead preview"><i class="far fa-clock"></i> 5:00</p>
-                                    </li>
+                                    <li class="open-request" data-request-id="${request.id.hex}" data-user="${request.customer_name}" 
+                                    id="request-${request.id.hex}">
+                                        <a class="list-link" href="#"><span class="blob"></span><span class="list-title">${request.customer_name}</span></a>
+                                        <p class="list-lead preview">${request.topic}</p>
+                                     </li>
                                 </tal:b>
                             </ul>
                         </div>
                         <div class="side-panel">
                             <h3>Aktive Chats</h3>
-                            <p tal:condition="not active_chats" id="no-active-chats">Keine aktiven Chats.</p>
+                            <p style="display: ${'none' if active_chats else ''}" id="no-active-chats">Keine aktiven Chats.</p>
                             <ul class="more-list" id="active-chat-list">
                                 <li class="active-chat" id="new-active-chat" style="display:none;">
                                     <a class="list-link" href="#">

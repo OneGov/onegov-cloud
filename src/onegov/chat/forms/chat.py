@@ -24,9 +24,9 @@ class ChatInitiationForm(Form):
     topic = SelectField(
         label=_("Topic"),
         choices=[
-            ('a', 'a'),
-            ('b', 'b'),
-            ('v', 'v')
+            ('Allgemein', 'Allgemein'),
+            ('Steuern', 'Steuern'),
+            ('Baugesuche', 'Baugesuche')
         ]
     )
 
