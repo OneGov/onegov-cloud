@@ -462,7 +462,6 @@ async def handle_customer_chat(
 
                 chat = stored
                 content = loads(message)
-                log.debug(f'customer received message {content}')
                 log.debug(f'Channel-connections {channel_connections}')
 
                 closed_connections = []
@@ -631,19 +630,32 @@ async def handle_staff_chat(
                     channel_connections = all_channels.setdefault(
                         open_channel, set()
                     )
-
                     channel_connections.add(websocket)
 
                     chat = ChatCollection(websocket.session).by_id(
                         open_channel)
-
                     if not chat:
                         log.error(
                             "Unable to find stored chat"
                             f"with {open_channel=}"
                         )
-
                         continue
+
+                    # Tell everone else you've accepted
+                    for client in staff_connections:
+                        log.debug(f'I am {websocket.id}')
+
+                        if client != websocket:
+                            log.debug(
+                                f'I should send a message to {client.id}')
+                            inner = dumps({
+                                'type': 'hide-request',
+                                'channel': open_channel
+                            })
+                            await client.send(dumps({
+                                'type': "notification",
+                                'message': inner,
+                            }))
 
                     inner = dumps({
                         'type': 'chat-history',
@@ -657,7 +669,6 @@ async def handle_staff_chat(
                     log.debug('sent chat history')
 
                     chat.user_id = escape(content['userId'])
-                    log.debug(f"{chat.user_id=}")
                     await websocket.update_database()
 
                 elif content['type'] == 'request-chat-history':

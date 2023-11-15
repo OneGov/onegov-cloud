@@ -5,8 +5,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const staffName = chatArea.dataset.staffName;
     const staffId = chatArea.dataset.staffId;
     const chatWindow = document.getElementById("chat");
-
     const token = document.body.dataset.websocketToken
+    var aceptedNotification = document.getElementById('accepted')
+    var noRequestText = document.getElementById('no-request')
 
     function browserNotification(message) {
         if (!("Notification" in window)) {
@@ -34,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function() {
             var requestElement = document.getElementById('new-request')
             var requestList = document.getElementById('request-list')
             var newRequest = requestElement.cloneNode(true)
-            var noRequestText = document.getElementById('no-request')
 
             newRequest.id = 'request-' + message.channel
             newRequest.style.display = 'block'
@@ -52,9 +52,10 @@ document.addEventListener("DOMContentLoaded", function() {
         } else if (message.type == 'message') {
             createChatBubble(message, message.userId == staffId)
 
-        } else if (message.type == 'accepted') {
-            var aceptedNotification = document.getElementById('accepted')
-            aceptedNotification.style.display = 'flex'
+        } else if (message.type == 'hide-request') {
+            var request = document.getElementById('request-' + message.channel)
+            request.remove()
+            noRequestText.style.display = 'block'
 
         } else if (message.type == 'chat-history') {
             // Display chat history
@@ -73,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 chat_form.style.display = 'flex'
                 createChatBubble(m, m.userId == staffId)
             })
+            aceptedNotification.style.display = 'block'
             document.getElementById('loading').style.display = 'none'
             document.getElementById('chat-actions').style.display = 'block'
 
