@@ -2606,8 +2606,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3180,10 +3180,8 @@ msgstr ""
 "traitement de votre demande, vous pouvez revenir sur cette page à tout "
 "moment."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"Votre demande a été traitée."
+msgid "Your request has been completed."
+msgstr "Votre demande a été traitée."
 
 msgid "Privacy"
 msgstr "Confidentialité"
@@ -4740,6 +4738,9 @@ msgstr ""
 
 msgid "General Message"
 msgstr "Message général"
+
+msgid "New e-mail (To all participants)"
+msgstr "Nouvel e-mail (A tous les participants)"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

@@ -2614,8 +2614,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3180,10 +3180,8 @@ msgstr ""
 "La tua richiesta sarà elaborata a breve. Puoi tornare a questa pagina in "
 "qualsiasi momento per visualizzare lo stato del processo."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"La tua richiesta è stata completata."
+msgid "Your request has been completed."
+msgstr "La tua richiesta è stata completata."
 
 msgid "Privacy"
 msgstr "Privacy"
@@ -4733,6 +4731,9 @@ msgstr ""
 
 msgid "General Message"
 msgstr "Messaggio generale"
+
+msgid "New e-mail (To all participants)"
+msgstr "Nuova e-mail (A tutti i partecipanti)"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

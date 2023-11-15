@@ -2605,8 +2605,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3176,10 +3176,8 @@ msgstr ""
 "Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
 "zurückkehren um den Status Ihrer Anfrage abzufragen."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen."
+msgid "Your request has been completed."
+msgstr "Ihre Anfrage wurde erfolgreich abgeschlossen."
 
 msgid "Privacy"
 msgstr "Privatsphäre"
@@ -4724,6 +4722,9 @@ msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
 
 msgid "General Message"
 msgstr "Allgemeine Nachricht"
+
+msgid "New e-mail (To all participants)"
+msgstr "Neue E-Mail (An alle Teilnehmende)"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

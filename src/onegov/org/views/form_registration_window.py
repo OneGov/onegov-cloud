@@ -107,7 +107,7 @@ def view_send_form_registration_message(
             _ticket = tickets.by_handler_id(submission.id.hex)
             if (ticket := ticket_linkable(request, _ticket)) is not None:
                 TicketNote.create(ticket, request, (
-                    _("Neue E-Mail (An alle Teilnehmende)")
+                    _("New e-mail (To all participants)")
                 ))
             if form.message.data:
                 send_form_registration_email(
