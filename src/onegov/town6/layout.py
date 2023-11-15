@@ -2220,7 +2220,7 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
         )
 
         def links():
-
+            qr_link = None
             if self.request.is_admin:
                 yield Link(
                     text=_("Configure"),
@@ -2239,6 +2239,12 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
                         }, name='+import'
                     ),
                     attrs={'class': 'import-link'}
+                )
+
+                qr_link = QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
                 )
 
             if self.request.is_admin:
@@ -2283,6 +2289,8 @@ class DirectoryEntryCollectionLayout(StepsLayoutExtension,
                         )
                     ]
                 )
+            if qr_link:
+                yield qr_link
 
         return list(links())
 
