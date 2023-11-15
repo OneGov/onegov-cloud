@@ -7,19 +7,21 @@
             Hello!
         </p>
         <p i18n:translate>
-            Below you can see your chat conversation.
+            Below you can see your chat conversation:
         </p>
 
-        <div id="message-area">
-            <tal:b tal:repeat="message chat.chat_history">
-                <div class="card chat-card ${'left' if message.get('userId') != 'customer' else 'right'}">
-                    <p class="info">${message['user']}</p>
-                    <div class="card-section">
-                        <p>${message['text']}</p>
+        <div class="chat ticket-chat">
+            <div id="message-area">
+                <tal:b tal:repeat="message chat.chat_history">
+                    <div class="card chat-card ${'left' if message.get('userId') != 'customer' else 'right'}">
+                        <p class="info">${message['user']}</p>
+                        <div class="card-section">
+                            <p>${message['text']}</p>
+                        </div>
+                        <p class="info">${message['time']}</p>
                     </div>
-                    <p class="info">${message['time']}</p>
-                </div>
-            </tal:b>
+                </tal:b>
+            </div>
         </div>
 
         <p i18n:translate>Have a great day!</p>

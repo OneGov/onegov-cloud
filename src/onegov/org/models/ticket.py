@@ -1013,7 +1013,10 @@ class ChatHandler(Handler, TicketDeletionMixin):
 
     @property
     def title(self):
-        return self.chat.customer_name if self.chat is not None else ''
+        if self.chat != None:
+            return f'{_("Chat with")} {self.chat.customer_name}'
+        else:
+            return ''
 
     @property
     def subtitle(self):

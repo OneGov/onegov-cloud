@@ -322,7 +322,13 @@
         display: flex;
         flex-direction: column;
     }
-      
+
+    .ticket-chat #message-area {
+        border: 1px solid #DDDDDD;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
     </style>
 </head>
 <body bgcolor="#f6f6f6">

@@ -74,7 +74,8 @@ def view_chats_staff(self, request, form):
                     content={
                         'model': self,
                         'ticket': ticket,
-                        'chat': chat
+                        'chat': chat,
+                        'organisation': request.app.org.title,
                     }
                 )
 
