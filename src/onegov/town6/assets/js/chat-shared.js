@@ -15,9 +15,11 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
 
-    // Hit Shift + Enter to send message while typing.
+    // Hit Ctrl / Cmd + Enter to send message while typing.
     chatInput.addEventListener("keydown", function(e) {
-        if (e.shiftKey && e.key === 'Enter') {
+        const modifier = e.ctrlKey || e.metaKey;
+
+        if (modifier && e.key === 'Enter') {
             sendButton.click();
         }
     });
