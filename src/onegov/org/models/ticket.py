@@ -1024,7 +1024,7 @@ class ChatHandler(Handler, TicketDeletionMixin):
 
     @property
     def group(self):
-        return 'Chats'  # TODO: Chat-Groups will be implemented later
+        return self.chat.topic
 
     @property
     def email(self):

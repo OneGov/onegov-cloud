@@ -365,6 +365,10 @@
 }
 
 .floaty-chat {
+    height: 0;
+}
+
+.floaty-chat div {
     display: flex;
     flex-direction: column;
 }
@@ -377,6 +381,7 @@
     font-size: 1.1rem;
     padding: 1rem;
     transition: all linear 200ms;
+    margin-top: -4rem;
 
     &:hover {
         background: scale-color($primary-color, $lightness: -10%, $saturation: -20%);

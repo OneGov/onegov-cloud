@@ -8,7 +8,6 @@ from onegov.org.app import org_content_security_policy
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
-from sedate import replace_timezone, utcnow
 from datetime import datetime
 import pytz
 
@@ -37,7 +36,7 @@ class TownApp(OrgApp, FoundationApp):
         chat_active = False
 
         tz = pytz.timezone('Europe/Zurich')
-        now = replace_timezone(utcnow(), tz)
+        now = datetime.now(tz=tz)
         morning_start = datetime(now.year, now.month, now.day, 8, tzinfo=tz)
         morning_end = datetime(now.year, now.month, now.day, 11, 45, tzinfo=tz)
         noon_start = datetime(now.year, now.month, now.day, 14, tzinfo=tz)
