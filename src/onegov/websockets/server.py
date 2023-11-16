@@ -5,6 +5,7 @@ from functools import cached_property, partial
 from http.cookies import SimpleCookie
 from json import dumps, loads
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlparse
 
 import transaction
 from itsdangerous import BadSignature, Signer
@@ -47,10 +48,24 @@ ACTIVE_CHATS: dict[str, dict['UUID', 'Chat']] = {}  # For DB
 CHANNELS: dict[str, dict[str, set[WebSocketServerProtocol]]] = {}
 
 
-class ChatWebSocketServer(WebSocketServerProtocol):
+class WebSocketServer(WebSocketServerProtocol):
+    """ A websocket server connection.
+
+    This protocol handles multiple websocket applications:
+    - Ticket notifications
+    - Ticker
+    - Chat
+
+    Chat behaves differently from the others and will eventually be carved out
+    into a separate service. To not interfere with any existing functionality,
+    we try to refrain from making backwards-incompatible changes.  That way,
+    ticker and notifications should continue to work without any modification.
+
+    TODO: Move chat to a dedicated service.
+    """
     schema: str
-    signed_session_id: str | None
     user_id: str | None
+    signed_session_id: str | None
 
     def __init__(
         self,
@@ -63,16 +78,6 @@ class ChatWebSocketServer(WebSocketServerProtocol):
         self.config = config
         self.session_manager = session_manager
 
-    def unsign(self, text: str) -> str | None:
-        """ Unsigns a signed text, returning None if unsuccessful. """
-        identity_secret = self.application_config[
-            'identity_secret'] + self.application_id_hash
-        try:
-            signer = Signer(identity_secret, salt='generic-signer')
-            return signer.unsign(text).decode('utf-8')
-        except BadSignature:
-            return None
-
     async def process_request(
         self,
         path: str,
@@ -83,11 +88,21 @@ class ChatWebSocketServer(WebSocketServerProtocol):
         Before establishing a WebSocket connection, a client sends a HTTP
         request to "upgrade" the connection to a WebSocket connection.
 
+        Chat
+        ----
         We authenticate the user before creating the WebSocket connection. The
         user is identified based on the session cookie. In addition to the
         cookie, we require a one-time token that the user must have obtained
         prior to requesting the WebSocket connection.
         """
+        url = urlparse(path)
+
+        if url.path != '/chats':
+            # For non-chat requests (e.g., ticker) we'll skip the dance below
+            # and let the protocol handle authentication
+            # (handle_authentication).
+            return None
+
         try:
             cookie = SimpleCookie(headers['Cookie'])
             session_id = cookie['session_id'].value
@@ -128,13 +143,15 @@ class ChatWebSocketServer(WebSocketServerProtocol):
             # check is totally superfluous. However, rejecting clients because
             # of a wrong origin would get unnoticed otherwise. You can safely
             # delete this block in the future.
+            #
+            # TODO: Pass in valid origins. Is there already a list of allowed
+            # origins?
             self.process_origin(headers, self.origins)
         except InvalidOrigin as err:
             log.debug("WebSocket connection will be rejected.", exc_info=err)
 
         return None
 
-    # TODO
     async def get_chat(self, id: 'UUID') -> 'Chat':
         chat = ACTIVE_CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
 
@@ -159,6 +176,16 @@ class ChatWebSocketServer(WebSocketServerProtocol):
     async def update_database(self) -> None:
         self.session.flush()
         transaction.commit()
+
+    def unsign(self, text: str) -> str | None:
+        """ Unsigns a signed text, returning None if unsuccessful. """
+        identity_secret = self.application_config[
+            'identity_secret'] + self.application_id_hash
+        try:
+            signer = Signer(identity_secret, salt='generic-signer')
+            return signer.unsign(text).decode('utf-8')
+        except BadSignature:
+            return None
 
     @property
     def session(self) -> 'Session':
@@ -412,7 +439,7 @@ async def handle_manage(
 
 
 async def handle_customer_chat(
-    websocket: ChatWebSocketServer,
+    websocket: WebSocketServer,
     payload: 'JSONObject_ro'
 ) -> None:
     """
@@ -521,7 +548,7 @@ async def handle_customer_chat(
 
 
 async def handle_staff_chat(
-    websocket: ChatWebSocketServer,
+    websocket: WebSocketServer,
     payload: 'JSONObject_ro'
 ) -> None:
     """
@@ -729,40 +756,22 @@ async def main(
     config: 'Config | None' = None
 ) -> None:
 
-    # Determine the application to start: ticker or chat.
-    #
-    # Chat has been built on the same foundation as the ticker. They however
-    # behave somewhat differently. Ticker uses the default WebSocketServer
-    # while the chat requires some customization. For now, we keep both
-    # applications here but we should divide them into dedicated modules. To
-    # not interfere with any existing ticker functionality, we try to refrain
-    # from making backwards-incompatible changes (for now). That way, ticker
-    # should continue to work without any modification.
-    #
-    # On any given instance, only one of the application is running anyway
-    # (never both).
-    #
-    # TODO: Divide ticker and chat.
-    if config and config.applications[0].namespace == 'onegov_town6':
-        log.debug(f'Serving chat on ws://{host}:{port}/chat')
+    global TOKEN
+    TOKEN = token
+    log.debug(f'Serving on ws://{host}:{port}')
 
+    if config:
         dsn = config.applications[0].configuration['dsn']
-
-        session_manager = SessionManager(
-            dsn,
-            Base,
-            session_config={'autoflush': False}
-        )
-
-        async with serve(handle_start, host, port,
-                         create_protocol=partial(ChatWebSocketServer, config,
-                                                 session_manager)):
-            await Future()
-
     else:
-        global TOKEN
-        TOKEN = token
-        log.debug(f'Serving on ws://{host}:{port}')
+        dsn = ''
 
-        async with serve(handle_start, host, port):
-            await Future()
+    session_manager = SessionManager(
+        dsn,
+        Base,
+        session_config={'autoflush': False}
+    )
+
+    async with serve(handle_start, host, port,
+                     create_protocol=partial(WebSocketServer, config,
+                                             session_manager)):
+        await Future()
