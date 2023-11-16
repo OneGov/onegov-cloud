@@ -1688,16 +1688,16 @@
     <ul tal:define="latest result.latest_occurrence">
         <li tal:condition="latest">
             ${
-            ' - '.join((
+            '{}, {} - {}'.format(
                 layout.format_date(latest.localized_start, 'event'),
+                layout.format_date(latest.localized_start, 'time'),
                 layout.format_date(latest.localized_end, 'time')
-            ))
+                )
             }
         </li>
         <li tal:condition="result.location">${result.location}</li>
 
         <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
-
             <li><span i18n:translate="">Further occurrences:</span>
                 <div class="event-child-results">
                     <ul>
@@ -1705,10 +1705,11 @@
                             <li>
                                 <a href="${request.link(occ)}">
                                     ${
-                                    ' - '.join((
+                                    '{}, {} - {}'.format(
                                         layout.format_date(occ.localized_start, 'event'),
+                                        layout.format_date(occ.localized_start, 'time'),
                                         layout.format_date(occ.localized_end, 'time')
-                                    ))
+                                        )
                                     }
                                 </a>
                             </li>
@@ -1716,7 +1717,6 @@
                     </ul>
                 </div></li>
         </tal:b>
-
     </ul>
 </metal:search_result_events>
 
