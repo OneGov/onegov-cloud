@@ -24,3 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+function isEmpty(message) {
+    return message.trim().length === 0
+}
