@@ -769,16 +769,18 @@ async def main(
 
     if config:
         dsn = config.applications[0].configuration['dsn']
+
+        session_manager = SessionManager(
+            dsn,
+            Base,
+            session_config={'autoflush': False}
+        )
+
+        async with serve(handle_start, host, port,
+                         create_protocol=partial(WebSocketServer, config,
+                                                 session_manager)):
+            await Future()
+
     else:
-        dsn = ''
-
-    session_manager = SessionManager(
-        dsn,
-        Base,
-        session_config={'autoflush': False}
-    )
-
-    async with serve(handle_start, host, port,
-                     create_protocol=partial(WebSocketServer, config,
-                                             session_manager)):
-        await Future()
+        async with serve(handle_start, host, port):
+            await Future()
