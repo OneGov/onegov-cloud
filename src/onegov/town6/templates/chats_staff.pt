@@ -68,13 +68,13 @@
                             <ul class="more-list" id="active-chat-list">
                                 <li class="active-chat" id="new-active-chat" style="display:none;">
                                     <a class="list-link" href="#">
-                                        <span class="list-title"></span>
+                                        <span class="blob"></span><span class="list-title"></span>
                                     </a>
                                 </li>
                                 <tal:b tal:repeat="chat active_chats">
-                                    <li class="active-chat" data-chat-id="${chat.id.hex}" id="active-chat-${chat.id.hex}">
+                                    <li class="active-chat" data-chat-id="${chat.id.hex}" id="active-chat-${chat.id.hex}" tal:define="last_message chat.chat_history[-1]">
                                         <a class="list-link" href="#">
-                                            <span class="list-title">${chat.customer_name}</span>
+                                            <span style="display: ${'' if last_message['userId'] == 'customer' else 'none'}" class="blob"></span><span class="list-title">${chat.customer_name}</span>
                                         </a>
                                     </li>
                                 </tal:b>

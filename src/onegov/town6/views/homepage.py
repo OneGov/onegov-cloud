@@ -14,6 +14,7 @@ def town_view_org(self, request):
     chat_link = request.link(chats, 'initiate')
 
     view['chat_link'] = chat_link
+
     return view
 
 
