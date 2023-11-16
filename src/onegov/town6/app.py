@@ -2,10 +2,11 @@ from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
+from onegov.org.app import OrgApp
+from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.app import org_content_security_policy
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
-    OrgApp, org_content_security_policy
 from onegov.town6.theme import TownTheme
 from sedate import replace_timezone, utcnow
 from datetime import datetime
@@ -274,9 +275,11 @@ def get_fullcalendar_asset():
 
 @TownApp.webasset('staff-chat')
 def get_staff_chat_asset():
+    yield 'chat-shared.js'
     yield 'chat-staff.js'
 
 
 @TownApp.webasset('client-chat')
 def get_staff_client_asset():
+    yield 'chat-shared.js'
     yield 'chat-client.js'
