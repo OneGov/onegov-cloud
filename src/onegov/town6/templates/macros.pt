@@ -1224,7 +1224,7 @@
             <dd>
                 <ul tal:repeat="filter event.filter_keywords.items()" class="no-margin-bottom">
                     <li tal:condition="filter[1]">
-                        <span i18n:translate>${filter[0].title()}:</span>
+                        <span>${filter[0].title()}:</span>
                         <span tal:define="tags ', '.join(f for f in filter[1])" tal:condition="isinstance (filter[1], list)" i18n:translate>${tags}</span>
                         <span tal:condition="not isinstance(filter[1], list) and filter[1]" i18n:translate>${filter[1]}</span>
                     </li>
@@ -2535,7 +2535,7 @@
 
 
 <metal:chat define-macro="chat">
-    <div tal:condition="layout.app.chat_active" class="sticky floaty-chat" data-sticky data-stick-to="bottom">
+    <div tal:condition="layout.app.chat_active or request.is_logged_in" class="sticky floaty-chat" data-sticky data-stick-to="bottom">
         <div class="grid-container">
             <a class="chat-button" href="${chat_link}">
                 <p><i class="fas fa-comments"></i> Chat</p>

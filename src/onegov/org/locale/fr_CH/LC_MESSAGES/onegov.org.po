@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-09-25 08:37+0200\n"
+"POT-Creation-Date: 2023-11-16 21:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -54,6 +54,9 @@ msgstr "Général"
 #, python-format
 msgid "${org} Reservation Overview"
 msgstr "Aperçu de la ${org} réservation"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr ""
 
 msgid "Account"
 msgstr "Compte"
@@ -2556,6 +2559,12 @@ msgstr "Souhaitez-vous vraiment rejeter cette entrée ?"
 msgid "Reject entry"
 msgstr "Rejeter l'entrée"
 
+msgid "Chats"
+msgstr ""
+
+msgid "Chat with"
+msgstr ""
+
 msgid "Link"
 msgstr "Lien"
 
@@ -3572,6 +3581,14 @@ msgstr "Voir le billet"
 
 msgid "Your request has been reopened"
 msgstr "Votre demande a été ré-ouverte"
+
+msgid ""
+"Your chat has been turned into a ticket. We will take care of your request "
+"and get back to you as soon as new information is available."
+msgstr ""
+
+msgid "Below you can see your chat conversation:"
+msgstr ""
 
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr "Voici ce qui s'est passé le mois dernier sur le site web de ${org} :"

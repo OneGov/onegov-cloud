@@ -6,11 +6,10 @@
 
         <div class="grid-x chat">
             <div class="medium-7 cell">
-                <p i18n:translate="" id="no-chat-open">Aktuell ist kein Chat geöffnet.</p>
+                <p i18n:translate="" id="no-chat-open">Currently no chats open.</p>
                 <div id="message-area" style="display:none;" data-staff-name="${user.username}" data-staff-id="${user.id.hex}">
-                    <p class="notification" id="accepted" style="display: none;"><i class="fas fa-info-circle"></i> Sie haben die Chatanfrage angenommen</p>
-                    <p class="notification" id="loading" style="display: none;"><i class="fas fa-hourglass-start"></i> Chat lädt ...</p>
-                    <p class="notification" id="loading" style="display: none;"><i class="fas fa-hourglass-start"></i> Chat lädt</p>
+                    <p class="notification" id="accepted" style="display: none;"><i class="fas fa-info-circle"></i> <span i18n:translate="">You accepted the chat request.</span></p>
+                    <p class="notification" id="loading" style="display: none;"><i class="fas fa-circle-notch fa-spin"></i> <span i18n:translate="">Chat is loading ...</span></p>
                     <div class="card chat-card" style="display: none;">
                         <p class="info"></p>
                         <div class="card-section">
@@ -37,8 +36,8 @@
                             </div>
                         </tal:b>
                     </tal:b>
-                    <button name="chat-action" value="end-chat" type="submit" id="end-chat" class="button hollow">Chat beenden und archivieren</button>
-                    <button name="chat-action" value="create-ticket" type="submit" id="create-ticket" class="button hollow">Ticket erstellen</button>
+                    <button name="chat-action" value="end-chat" type="submit" id="end-chat" class="button hollow" i18n:translate="">End and archive chat</button>
+                    <button name="chat-action" value="create-ticket" type="submit" id="create-ticket" class="button hollow" i18n:translate="">Create ticket</button>
                 </form>
             </div>
 
@@ -46,8 +45,8 @@
                 <div class="sidebar-wrapper">
                     <div class="sidebar-content-wrapper">
                         <div class="side-panel">
-                            <h3>Chat Anfragen</h3>
-                            <p id="no-request" style="display: ${'none' if open_requests else 'block'}">Aktuell keine neuen Anfragen.</p>
+                            <h3 i18n:translate="">Chat requests</h3>
+                            <p id="no-request" style="display: ${'none' if open_requests else 'block'}" i18n:translate="">Currently no new chat requests.</p>
                             <ul class="more-list" id="request-list">
                                 <li style="display: none;" id="new-request" class="open-request">
                                     <a class="list-link" href="#"><span class="blob"></span><span class="list-title"></span></a>
@@ -58,13 +57,13 @@
                                     id="request-${request.id.hex}">
                                         <a class="list-link" href="#"><span class="blob"></span><span class="list-title">${request.customer_name}</span></a>
                                         <p class="list-lead preview">${request.topic}</p>
-                                     </li>
+                                    </li>
                                 </tal:b>
                             </ul>
                         </div>
                         <div class="side-panel">
-                            <h3>Aktive Chats</h3>
-                            <p style="display: ${'none' if active_chats else ''}" id="no-active-chats">Keine aktiven Chats.</p>
+                            <h3 i18n:translate="">Active Chats</h3>
+                            <p style="display: ${'none' if active_chats else ''}" id="no-active-chats" i18n:translate="">No active chats.</p>
                             <ul class="more-list" id="active-chat-list">
                                 <li class="active-chat" id="new-active-chat" style="display:none;">
                                     <a class="list-link" href="#">

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-09-25 08:37+0200\n"
+"POT-Creation-Date: 2023-11-16 21:47+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -53,6 +53,9 @@ msgstr "Generale"
 #, python-format
 msgid "${org} Reservation Overview"
 msgstr "Panoramica della prenotazione di ${org}"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr ""
 
 msgid "Account"
 msgstr "Conto"
@@ -2566,6 +2569,12 @@ msgstr "Vuoi davvero rifiutare questo elemento?"
 msgid "Reject entry"
 msgstr "Rifiuta elemento"
 
+msgid "Chats"
+msgstr ""
+
+msgid "Chat with"
+msgstr ""
+
 msgid "Link"
 msgstr "Collegamento"
 
@@ -3565,6 +3574,14 @@ msgstr "Visualizza il biglietto"
 
 msgid "Your request has been reopened"
 msgstr "La tua richiesta è stata riaperta"
+
+msgid ""
+"Your chat has been turned into a ticket. We will take care of your request "
+"and get back to you as soon as new information is available."
+msgstr ""
+
+msgid "Below you can see your chat conversation:"
+msgstr ""
 
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr ""

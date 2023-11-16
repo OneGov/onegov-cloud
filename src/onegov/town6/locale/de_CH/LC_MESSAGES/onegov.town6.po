@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-09-19 10:38+0200\n"
+"POT-Creation-Date: 2023-11-16 21:55+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Chats"
+msgstr "Chats"
+
+msgid "My Chats"
+msgstr "Meine Chats"
 
 msgid "Font family serif"
 msgstr "Schriftart mit Serifen"
@@ -28,9 +34,6 @@ msgstr "Hautpschriftart sans-serif"
 
 msgid "Used for all the headings"
 msgstr "Wird für alle Titel verwendet"
-
-msgid "Supported Chat Integrations"
-msgstr "Unterstützte Chat Integration"
 
 msgid "Chat title"
 msgstr "Chat Titel"
@@ -527,6 +530,59 @@ msgstr "Besitzer:"
 msgid "Kind:"
 msgstr "Art:"
 
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat request got accepted."
+msgstr "Die Chat-Anfrage wurde angenommen."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "Connect to chatserver ..."
+msgstr "Verbinde mit Chatserver ..."
+
+msgid "Describe your request to start a chat."
+msgstr "Beschreiben Sie Ihr Anliegen, um einen Chat zu starten."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat has been ended."
+msgstr "Der Chat wurde beendet."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid ""
+"No one seems to be available at the moment. A ticket has been created from "
+"your request and you will receive an email shortly."
+msgstr ""
+"Im Moment scheint niemand verfügbar zu sein. Es wurde ein Ticket für Ihre "
+"Anfrage erstellt und Sie erhalten in Kürze eine E-Mail."
+
+msgid "Currently no chats open."
+msgstr "Derzeit keine Chats geöffnet."
+
+msgid "You accepted the chat request."
+msgstr "Sie haben die Chat-Anfrage angenommen."
+
+msgid "Chat is loading ..."
+msgstr "Chat wird geladen ..."
+
+msgid "End and archive chat"
+msgstr "Chat beenden und archivieren"
+
+msgid "Create ticket"
+msgstr "Ticket erstellen"
+
+msgid "Chat requests"
+msgstr "Chat-Anfragen"
+
+msgid "Currently no new chat requests."
+msgstr "Derzeit keine neuen Chat-Anfragen."
+
+msgid "Active Chats"
+msgstr "Aktive Chats"
+
+msgid "No active chats."
+msgstr "Keine aktiven Chats."
+
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
 
@@ -798,6 +854,9 @@ msgstr "Nächster Eintrag"
 msgid "Total Amount"
 msgstr "Totalbetrag"
 
+msgid "Chat History"
+msgstr "Chat-Verlauf"
+
 msgid "Change request"
 msgstr "Änderungsvorschlag"
 
@@ -962,6 +1021,9 @@ msgstr ""
 "Hier werden Bilder aus Ihren Fotoalben angezeigt. Dazu erstellen Sie einfach "
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
+
+msgid "Current Image"
+msgstr ""
 
 msgid "Has a digital seal"
 msgstr "Hat ein digitales Siegel"
@@ -1178,6 +1240,12 @@ msgstr ""
 "Falls Sie sich nicht bei dieser Seite angemeldet haben, können Sie diese "
 "Nachricht ignorieren. Sie erhalten dann keine weiteren E-Mails von uns."
 
+msgid "Below you can see your chat conversation:"
+msgstr "Nachfolgend sehen Sie Ihre Chat-Konversation:"
+
+msgid "Have a great day!"
+msgstr "Wir wünschen Ihnen einen schönen Tag!"
+
 msgid "Hello"
 msgstr "Grüezi"
 
@@ -1219,9 +1287,6 @@ msgstr "E-Mail"
 
 msgid "No reservations today."
 msgstr "Heute keine Reservationen."
-
-msgid "Have a great day!"
-msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -2061,6 +2126,19 @@ msgstr "Identicon"
 msgid "Password"
 msgstr "Passwort"
 
+#, python-format
+msgid "Chat History with ${org}"
+msgstr "Chat-Verlauf mit ${org}"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
+
+msgid "Archived Chats"
+msgstr "Archivierte Chats"
+
+msgid "Chat Customer"
+msgstr "Kundenchat  "
+
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
 
@@ -2147,6 +2225,9 @@ msgstr "Migration Links"
 
 msgid "OneGov API"
 msgstr "OneGov API"
+
+#~ msgid "Supported Chat Integrations"
+#~ msgstr "Unterstützte Chat Integration"
 
 #~ msgid "Straight to ..."
 #~ msgstr "Direkt zu ..."

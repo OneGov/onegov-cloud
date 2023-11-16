@@ -80,7 +80,7 @@ def view_chats_staff(self, request, form):
                 )
 
     return {
-        'title': 'Chat Staff',
+        'title': _('Chats'),
         'form': form,
         'layout': StaffChatLayout(self, request),
         'user': user,
@@ -102,7 +102,7 @@ def view_chats_archive(self, request):
     archived_chats = all_chats.filter(Chat.active == False)
 
     return {
-        'title': 'Chat Staff',
+        'title': _('Archived Chats'),
         'layout': StaffChatLayout(self, request),
         'user': user,
         'archived_chats': archived_chats.all()
@@ -134,7 +134,7 @@ def view_chat_form(self:ChatCollection, request, form):
         return redirect(request.link(chat))
 
     return {
-        'title': 'Chat Customer',
+        'title': _('Chat Customer'),
         'layout': DefaultLayout(self, request),
         'form': form
     }
@@ -151,7 +151,7 @@ def view_customer_chat(self, request):
         raise HTTPForbidden()
 
     return {
-        'title': 'Chat Customer',
+        'title': _('Chat Customer'),
         'layout': ClientChatLayout(self, request),
         'chat': self,
         'customer_name': self.customer_name

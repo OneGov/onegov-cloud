@@ -1,8 +1,9 @@
 from wtforms.fields import EmailField, HiddenField, SelectField, StringField
+from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
-from onegov.org import _
+from onegov.town6 import _
 
 
 class ChatInitiationForm(Form):
@@ -28,6 +29,15 @@ class ChatInitiationForm(Form):
             ('Steuern', 'Steuern'),
             ('Baugesuche', 'Baugesuche')
         ]
+    )
+
+    confirmation = BooleanField(
+        label=_("Confirmation"),
+        description=_(
+            "I agree that this chat will be saved and sent to me per email."),
+        validators=[
+            InputRequired()
+        ],
     )
 
 

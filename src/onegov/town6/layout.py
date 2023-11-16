@@ -149,8 +149,6 @@ class DefaultLayout(Layout, DefaultLayoutMixin):
         if self.show_chat:
             if self.org.chat_type == 'scoutss':
                 self.request.include('scoutss-chatbot')
-            elif self.org.chat_type == 'human':
-                pass  # TODO: de werklich Chat inenä
             else:
                 raise NotImplementedError
 

@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function() {
             chat.addEventListener("click", () => {
                 console.log('open chat with id' + channel);
                 chatArea.style.display = 'flex';
-                document.getElementById('loading').style.display = 'flex';
+                document.getElementById('loading').style.display = 'block';
 
                 var payload = JSON.stringify({
                     type: 'request-chat-history',
