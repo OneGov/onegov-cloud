@@ -634,6 +634,13 @@ async def handle_staff_chat(
                     chat.chat_history = chat_history
                     await websocket.update_database()
 
+                elif content['type'] == 'reconnect':
+                    log.debug(f'reconnecting to channel {content["channel"]}')
+                    channel_connections = all_channels.setdefault(
+                        content["channel"], set()
+                    )
+                    channel_connections.add(websocket)
+
                 elif content['type'] == 'end-chat':
                     log.debug(f'ending chat with id {content["channel"]}')
                     chat = ChatCollection(websocket.session).by_id(

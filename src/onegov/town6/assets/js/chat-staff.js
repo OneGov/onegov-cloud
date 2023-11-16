@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const staffId = chatArea.dataset.staffId;
     const chatWindow = document.getElementById("chat");
     const token = document.body.dataset.websocketToken
+    const activeChats = document.querySelectorAll('.active-chat');
     var aceptedNotification = document.getElementById('accepted')
     var noRequestText = document.getElementById('no-request')
     var noActiveChatsText = document.getElementById('no-active-chats')
@@ -69,7 +70,11 @@ document.addEventListener("DOMContentLoaded", function() {
             })
 
         } else if (message.type == 'message') {
-            createChatBubble(message, message.userId == staffId)
+            if (chatArea.dataset.chatId == message.channel) {
+                createChatBubble(message, message.userId == staffId)
+            }
+            activeChatBlob = document.getElementById('active-chat-' + message.channel).children[0].children[0]
+            activeChatBlob.style.display = 'block'
 
         } else if (message.type == 'hide-request') {
             var request = document.getElementById('request-' + message.channel)
@@ -104,6 +109,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 noRequestText.style.display = 'block'
             }
             noActiveChatsText.style.display = 'none'
+            activeChatBlob = document.getElementById('active-chat-' + message.channel).children[0].children[0]
+            activeChatBlob.style.display = 'none'
 
         } else {
             console.log('unkown messaage type', message)
@@ -166,7 +173,7 @@ document.addEventListener("DOMContentLoaded", function() {
         newActiveChatElement.dataset.chatId = channel
         newActiveChatElement.style.display = 'block'
         userText = document.createTextNode(user)
-        newActiveChatElement.children[0].children[0].appendChild(userText)
+        newActiveChatElement.children[0].children[1].appendChild(userText)
         activeChatList.appendChild(newActiveChatElement)
         requestHistory(newActiveChatElement)
     }
@@ -187,45 +194,74 @@ document.addEventListener("DOMContentLoaded", function() {
         })
     }
 
-        //Click on pre loaded request
-        const openRequests = document.querySelectorAll('.open-request');
-        openRequests.forEach(request => {
-            var requestDataset = request.dataset
-            request.addEventListener("click", () => {
-                acceptRequest(requestDataset.requestId, requestDataset.user, socket)
-            })
-        })
+    // Run function when websocket is ready.
+    function websocketReady(fn) {
+        if (socket.readyState == WebSocket.OPEN) {
+            fn()
+        } else {
+            socket.addEventListener("open", fn)
+        }
+    }
 
-        // Click on active chat
-        const activeChats = document.querySelectorAll('.active-chat');
+    //Click on pre loaded request
+    const openRequests = document.querySelectorAll('.open-request');
+    openRequests.forEach(request => {
+        var requestDataset = request.dataset
+        request.addEventListener("click", () => {
+            acceptRequest(requestDataset.requestId, requestDataset.user, socket)
+        })
+    })
+
+
+    // Reconnect to active chats once websocket is established.
+    websocketReady(function() {
+        // Active Chats
         activeChats.forEach(chat => {
-            requestHistory(chat)
+            if (chat.id != 'new-active-chat') {
+                var channel = chat.dataset.chatId
+                var payloadReconnect = JSON.stringify({
+                    type: 'reconnect',
+                    channel: channel,
+                });
+
+                console.log('chat with id', channel);
+                socket.send(payloadReconnect);
+            }
+
+            requestHistory(chat) // Function has an event listener
         })
+    })
 
-        // Click on chat-actions
-        var chatActions = document.getElementById('chat-actions')
-        chatActions.addEventListener("submit", () => {
-            var chatId = chatArea.dataset.chatId
-            console.log('ending chat')
-            console.log(chatArea.dataset)
-            console.log(chatArea.dataset.chatId)
-            var no_chat_open = document.getElementById('no-chat-open')
-            no_chat_open.style.display = 'flex'
 
-            removePreviousChat()
-            document.getElementById('chat-form').style.display = 'none'
-            document.getElementById('chat-actions').style.display = 'none'
-            document.getElementById('active-chat-' + chatId).remove()
+    websocketReady(function() {
+        console.debug("websocket is established")
+    })
 
-            var payload = JSON.stringify({
-                type: 'end-chat',
-                channel: chatId,
-            });
 
-            socket.send(payload);
+    // Click on chat-actions
+    var chatActions = document.getElementById('chat-actions')
+    chatActions.addEventListener("submit", () => {
+        var chatId = chatArea.dataset.chatId
+        console.log('ending chat')
+        console.log(chatArea.dataset)
+        console.log(chatArea.dataset.chatId)
+        var no_chat_open = document.getElementById('no-chat-open')
+        no_chat_open.style.display = 'flex'
 
-            return true;
-        })
+        removePreviousChat()
+        document.getElementById('chat-form').style.display = 'none'
+        document.getElementById('chat-actions').style.display = 'none'
+        document.getElementById('active-chat-' + chatId).remove()
+
+        var payload = JSON.stringify({
+            type: 'end-chat',
+            channel: chatId,
+        });
+
+        socket.send(payload);
+
+        return true;
+    })
 
 
         // Send single chat-message
