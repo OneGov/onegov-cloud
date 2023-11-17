@@ -1,14 +1,13 @@
-from onegov.form import Form
-from onegov.org.forms.settings import (
-    GeneralSettingsForm as OrgGeneralSettingsForm)
-from onegov.form.fields import (
-    ChosenSelectField, ChosenSelectMultipleField, ColorField)
-from onegov.town6 import _
-from onegov.town6.theme import user_options
 from wtforms.fields import BooleanField
-from wtforms.fields import RadioField
-from wtforms.fields import StringField
 from wtforms.validators import InputRequired
+
+from onegov.form import Form
+from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
+from onegov.org.forms.settings import \
+    GeneralSettingsForm as OrgGeneralSettingsForm
+from onegov.town6 import _
+from onegov.user import UserCollection, User
+from onegov.town6.theme import user_options
 
 
 class GeneralSettingsForm(OrgGeneralSettingsForm):
@@ -91,47 +90,37 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 class ChatSettingsForm(Form):
 
-    chat_type = RadioField(
-        label=_('Supported Chat Integrations'),
-        choices=[
-            ('scoutss', 'Scoutss')
-        ]
+    chat_staff = ChosenSelectMultipleField(
+        label=_('Show chat for chosen people'),
+        choices=[]
     )
 
-    chat_title = StringField(
-        label=_('Chat title')
-    )
-
-    chat_color = ColorField(
-        label=_('Chat background color')
-    )
-
-    chat_customer_id = StringField(
-        label=_('Customer-ID')
-    )
-
-    hide_chat_for_roles = ChosenSelectMultipleField(
-        label=_('Hide chat for chosen roles'),
-        choices=(
-            ('admin', _('Admin')),
-            ('editor', _('Editor')),
-            ('member', _('Member')),
-        )
-    )
-
-    disable_chat = BooleanField(
-        label=_('Disable the chat')
+    enable_chat = BooleanField(
+        label=_('Enable the chat'),
+        description=_('The chat is currently in an test-phase. '
+                      'Activate at your own risk.'),
+        default=False
     )
 
     def process_obj(self, obj):
         super().process_obj(obj)
-        color = obj.chat_bg_color
-        if not color:
-            color = obj.theme_options.get(
-                'primary-color-ui', user_options['primary-color-ui'])
-
-        self.chat_color.data = color
+        self.chat_staff = obj.chat_staff or {}
+        self.enable_chat = obj.enable_chat or {}
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
-        obj.chat_bg_color = self.chat_color.data
+        obj.chat_staff = self.chat_staff.data
+        obj.enable_chat = self.enable_chat.data
+
+    def populate_chat_staff(self):
+        people = UserCollection(self.request.session).query().filter(
+            User.role.in_(['editor', 'admin']))
+        staff_members = [(
+            (p.id.hex, p.username)
+        ) for p in people]
+        self.chat_staff.choices = [
+            (v, k) for v, k in staff_members
+        ]
+
+    def on_request(self):
+        self.populate_chat_staff()

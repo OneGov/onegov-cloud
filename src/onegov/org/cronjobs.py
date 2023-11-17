@@ -1,12 +1,15 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
+from onegov.chat.collections import ChatCollection
+from onegov.chat.models import Chat
 from onegov.core.cache import lru_cache
 from onegov.core.orm import find_models
 from onegov.core.orm.mixins.publication import UTCPublicationMixin
 from onegov.core.templates import render_template
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
+from onegov.org.mail import send_ticket_mail
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
@@ -18,6 +21,7 @@ from onegov.org.views.newsletter import send_newsletter
 from onegov.org.views.ticket import delete_tickets_and_related_data
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
+from onegov.org.models import TicketMessage
 from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_, or_
@@ -501,6 +505,38 @@ def send_daily_resource_usage_overview(request):
             receivers=(address, ),
             content=content
         )
+
+
+@OrgApp.cronjob(hour='*', minute='*/30', timezone='UTC')
+def end_chats_and_create_tickets(request):
+    half_hour_ago = replace_timezone(
+        datetime.utcnow(), 'UTC') - timedelta(minutes=30)
+
+    chats = ChatCollection(request.session).query().filter(
+        Chat.active == True).filter(Chat.chat_history != []).filter(
+            Chat.last_change < half_hour_ago)
+
+    for chat in chats:
+        chat.active = False
+        with chats.session.no_autoflush:
+            ticket = TicketCollection(request.session).open_ticket(
+                handler_code='CHT', handler_id=chat.id.hex
+            )
+            TicketMessage.create(ticket, request, 'opened')
+
+            send_ticket_mail(
+                request=request,
+                template='mail_turned_chat_into_ticket.pt',
+                subject=_("Your Chat has been turned into a ticket"),
+                receivers=(chat.email, ),
+                ticket=ticket,
+                content={
+                    'model': chats,
+                    'ticket': ticket,
+                    'chat': chat,
+                    'organisation': request.app.org.title,
+                }
+            )
 
 
 @OrgApp.cronjob(hour=4, minute=30, timezone='Europe/Zurich')

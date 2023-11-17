@@ -2,11 +2,22 @@ from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.utils import module_path
 from onegov.foundation6.integration import FoundationApp
+from onegov.org.app import OrgApp
+from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.app import org_content_security_policy
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs, \
-    OrgApp, org_content_security_policy
 from onegov.town6.theme import TownTheme
+from datetime import datetime
+import pytz
+
+MON = 0
+TUE = 1
+WED = 2
+THU = 3
+FRI = 4
+SAT = 5
+SUN = 6
 
 
 class TownApp(OrgApp, FoundationApp):
@@ -19,6 +30,32 @@ class TownApp(OrgApp, FoundationApp):
     @property
     def font_family(self):
         return self.theme_options.get('body-font-family-ui')
+
+    @property
+    def chat_active(self):
+        chat_active = False
+
+        tz = pytz.timezone('Europe/Zurich')
+        now = datetime.now(tz=tz)
+        morning_start = datetime(now.year, now.month, now.day, 8, tzinfo=tz)
+        morning_end = datetime(now.year, now.month, now.day, 11, 45, tzinfo=tz)
+        noon_start = datetime(now.year, now.month, now.day, 14, tzinfo=tz)
+        noon_end_monday = datetime(now.year, now.month, now.day, 18, tzinfo=tz)
+        noon_end_rest = datetime(now.year, now.month, now.day, 17, tzinfo=tz)
+
+        if now.weekday() not in (SAT, SUN):
+            if now > morning_start:
+                if now.weekday() == MON:
+                    if now < morning_end or (
+                        now > noon_start and now < noon_end_monday
+                    ):
+                        chat_active = True
+                else:
+                    if now < morning_end or (
+                        now > noon_start and now < noon_end_rest
+                    ):
+                        chat_active = True
+        return chat_active
 
 
 @TownApp.setting(section='content_security_policy', name='default')
@@ -233,3 +270,15 @@ def get_fullcalendar_asset():
     yield 'fullcalendar.de.js'
     yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
+
+
+@TownApp.webasset('staff-chat')
+def get_staff_chat_asset():
+    yield 'chat-shared.js'
+    yield 'chat-staff.js'
+
+
+@TownApp.webasset('client-chat')
+def get_staff_client_asset():
+    yield 'chat-shared.js'
+    yield 'chat-client.js'

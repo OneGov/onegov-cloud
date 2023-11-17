@@ -15,9 +15,7 @@ from sqlalchemy import Column, Text
 from uuid import uuid4
 
 
-from typing import Any, TYPE_CHECKING
-if TYPE_CHECKING:
-    from collections.abc import Sequence
+from typing import Any
 
 
 class Organisation(Base, TimestampMixin):
@@ -177,14 +175,8 @@ class Organisation(Base, TimestampMixin):
     logo_in_newsletter = meta_property(default=False)
 
     # Chat Settings
-    chat_type = meta_property()
-    chat_title = meta_property()
-    chat_bg_color = meta_property()
-    chat_customer_id = meta_property()
-    hide_chat_for_roles: dict_property['Sequence[str]'] = meta_property(
-        default=tuple
-    )
-    disable_chat = meta_property(default=False)
+    chat_staff = meta_property()
+    enable_chat = meta_property(default=False)
 
     # Required information to upload documents to a Gever instance
     gever_username = meta_property()

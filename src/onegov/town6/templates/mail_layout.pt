@@ -282,6 +282,53 @@
         height: 6em;
         margin: 0 auto;
     }
+
+    #message-area .card {
+        border: 0;
+        max-width: 80%;
+        margin-bottom: 1rem;
+    }
+    #message-area .card .card-section {
+        border-radius: 0.7rem;
+        padding: 1rem;
+    }
+    #message-area .card .card-section p {
+        white-space: pre-wrap;
+        margin-bottom: 0;
+    }
+    #message-area .card .info {
+        color: #DDDDDD;
+        margin-bottom: 0;
+        margin-left: 0.7rem;
+        margin-right: 0.7rem;
+        }
+    #message-area .card .card-section + .info {
+        text-align: right;
+    }
+    #message-area .card.right {
+        place-self: end;
+    }
+    #message-area .card.right .card-section {
+        background: <tal:b replace="primary_color" />;
+        color: #FFF;
+    }
+    #message-area .card.left {
+        place-self: start;
+    }
+    #message-area .card.left .card-section {
+        background: #F5F5F5;
+    }
+    #message-area  {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ticket-chat #message-area {
+        border: 1px solid #DDDDDD;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
     </style>
 </head>
 <body bgcolor="#f6f6f6">

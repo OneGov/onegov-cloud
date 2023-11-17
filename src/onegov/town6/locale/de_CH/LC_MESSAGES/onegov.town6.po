@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-09 09:04+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Chats"
+msgstr "Chats"
+
+msgid "My Chats"
+msgstr "Meine Chats"
 
 msgid "Font family serif"
 msgstr "Schriftart mit Serifen"
@@ -29,32 +35,16 @@ msgstr "Hautpschriftart sans-serif"
 msgid "Used for all the headings"
 msgstr "Wird für alle Titel verwendet"
 
-msgid "Supported Chat Integrations"
-msgstr "Unterstützte Chat Integration"
+msgid "Show chat for chosen people"
+msgstr "Chat für folgende Personen anzeigen"
 
-msgid "Chat title"
-msgstr "Chat Titel"
+msgid "Enable the chat"
+msgstr "Chat aktivieren"
 
-msgid "Chat background color"
-msgstr "Chat Hintegrundfarbe"
-
-msgid "Customer-ID"
-msgstr "Kunden-Identifier"
-
-msgid "Hide chat for chosen roles"
-msgstr "Chat für folgende Rollen verbergen"
-
-msgid "Admin"
-msgstr "Admin"
-
-msgid "Editor"
-msgstr "Editor"
-
-msgid "Member"
-msgstr "Mitglied"
-
-msgid "Disable the chat"
-msgstr "Chat deaktivieren"
+msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgstr ""
+"Der Chat befindet sich aktuel in einer Test-Phase. "
+"Auf eigenes Risiko aktivieren."
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -536,6 +526,59 @@ msgstr "Besitzer:"
 msgid "Kind:"
 msgstr "Art:"
 
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat request got accepted."
+msgstr "Die Chat-Anfrage wurde angenommen."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "Connect to chatserver ..."
+msgstr "Verbinde mit Chatserver ..."
+
+msgid "Describe your request to start a chat."
+msgstr "Beschreiben Sie Ihr Anliegen, um einen Chat zu starten."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat has been ended."
+msgstr "Der Chat wurde beendet."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid ""
+"No one seems to be available at the moment. A ticket has been created from "
+"your request and you will receive an email shortly."
+msgstr ""
+"Im Moment scheint niemand verfügbar zu sein. Es wurde ein Ticket für Ihre "
+"Anfrage erstellt und Sie erhalten in Kürze eine E-Mail."
+
+msgid "Currently no chats open."
+msgstr "Derzeit keine Chats geöffnet."
+
+msgid "You accepted the chat request."
+msgstr "Sie haben die Chat-Anfrage angenommen."
+
+msgid "Chat is loading ..."
+msgstr "Chat wird geladen ..."
+
+msgid "End and archive chat"
+msgstr "Chat beenden und archivieren"
+
+msgid "Create ticket"
+msgstr "Ticket erstellen"
+
+msgid "Chat requests"
+msgstr "Chat-Anfragen"
+
+msgid "Currently no new chat requests."
+msgstr "Derzeit keine neuen Chat-Anfragen."
+
+msgid "Active Chats"
+msgstr "Aktive Chats"
+
+msgid "No active chats."
+msgstr "Keine aktiven Chats."
+
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
 
@@ -813,6 +856,9 @@ msgstr "Nächster Eintrag"
 msgid "Total Amount"
 msgstr "Totalbetrag"
 
+msgid "Chat History"
+msgstr "Chat-Verlauf"
+
 msgid "Change request"
 msgstr "Änderungsvorschlag"
 
@@ -949,6 +995,12 @@ msgstr "Nach Datum filtern"
 msgid "Administrator"
 msgstr "Administrator"
 
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Member"
+msgstr "Mitglied"
+
 msgid "Administrators"
 msgstr "Administratoren"
 
@@ -1009,10 +1061,8 @@ msgstr ""
 "Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
 "zurückkehren um den Status Ihrer Anfrage abzufragen."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen."
+msgid "Your request has been completed."
+msgstr "Ihre Anfrage wurde erfolgreich abgeschlossen."
 
 msgid "Privacy"
 msgstr "Privatsphäre"
@@ -1192,6 +1242,12 @@ msgstr ""
 "Falls Sie sich nicht bei dieser Seite angemeldet haben, können Sie diese "
 "Nachricht ignorieren. Sie erhalten dann keine weiteren E-Mails von uns."
 
+msgid "Below you can see your chat conversation:"
+msgstr "Nachfolgend sehen Sie Ihre Chat-Konversation:"
+
+msgid "Have a great day!"
+msgstr "Wir wünschen Ihnen einen schönen Tag!"
+
 msgid "Hello"
 msgstr "Grüezi"
 
@@ -1233,9 +1289,6 @@ msgstr "E-Mail"
 
 msgid "No reservations today."
 msgstr "Heute keine Reservationen."
-
-msgid "Have a great day!"
-msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -2075,6 +2128,19 @@ msgstr "Identicon"
 msgid "Password"
 msgstr "Passwort"
 
+#, python-format
+msgid "Chat History with ${org}"
+msgstr "Chat-Verlauf mit ${org}"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
+
+msgid "Archived Chats"
+msgstr "Archivierte Chats"
+
+msgid "Chat Customer"
+msgstr "Kundenchat  "
+
 msgid "New Recipient"
 msgstr "Neuer Empfänger"
 
@@ -2171,3 +2237,27 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+#~ msgid "Chat title"
+#~ msgstr "Chat Titel"
+
+#~ msgid "Chat background color"
+#~ msgstr "Chat Hintegrundfarbe"
+
+#~ msgid "Customer-ID"
+#~ msgstr "Kunden-Identifier"
+
+#~ msgid "Admin"
+#~ msgstr "Admin"
+
+#~ msgid "Disable the chat"
+#~ msgstr "Chat deaktivieren"
+
+#~ msgid "Supported Chat Integrations"
+#~ msgstr "Unterstützte Chat Integration"
+
+#~ msgid "Straight to ..."
+#~ msgstr "Direkt zu ..."
+
+#~ msgid "Perform Search"
+#~ msgstr "Suchen"
