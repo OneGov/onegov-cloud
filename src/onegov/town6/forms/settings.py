@@ -90,40 +90,37 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 class ChatSettingsForm(Form):
 
-    show_chat_for = ChosenSelectMultipleField(
-        label=_('Hide chat for chosen roles'),
+    chat_staff = ChosenSelectMultipleField(
+        label=_('Show chat for chosen people'),
         choices=[]
     )
 
-    disable_chat = BooleanField(
-        label=_('Disable the chat'),
+    enable_chat = BooleanField(
+        label=_('Enable the chat'),
         description=_('The chat is currently in an test-phase. '
                       'Activate at your own risk.'),
-        default=True
+        default=False
     )
 
     def process_obj(self, obj):
         super().process_obj(obj)
-        color = obj.chat_bg_color
-        if not color:
-            color = obj.theme_options.get(
-                'primary-color-ui', user_options['primary-color-ui'])
-
-        # self.chat_color.data = color
+        self.chat_staff = obj.chat_staff or {}
+        self.enable_chat = obj.enable_chat or {}
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
-        # obj.chat_bg_color = self.chat_color.data
+        obj.chat_staff = self.chat_staff.data
+        obj.enable_chat = self.enable_chat.data
 
-    def populate_show_chat_for(self):
+    def populate_chat_staff(self):
         people = UserCollection(self.request.session).query().filter(
             User.role.in_(['editor', 'admin']))
         staff_members = [(
-            (f'{p.id} {p.username}', p.username)
+            (p.id.hex, p.username)
         ) for p in people]
-        self.show_chat_for.choices = [
+        self.chat_staff.choices = [
             (v, k) for v, k in staff_members
         ]
 
     def on_request(self):
-        self.populate_show_chat_for()
+        self.populate_chat_staff()

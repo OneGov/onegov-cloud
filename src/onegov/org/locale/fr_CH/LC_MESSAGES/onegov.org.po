@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-11-16 21:47+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2609,8 +2609,8 @@ msgstr "Refuser ${title} est irréversible."
 msgid "Reject reservation"
 msgstr "Refuser la réservation"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Événement"
 
@@ -3189,10 +3189,8 @@ msgstr ""
 "traitement de votre demande, vous pouvez revenir sur cette page à tout "
 "moment."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"Votre demande a été traitée."
+msgid "Your request has been completed."
+msgstr "Votre demande a été traitée."
 
 msgid "Privacy"
 msgstr "Confidentialité"

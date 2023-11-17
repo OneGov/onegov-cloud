@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-16 21:55+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -35,29 +35,16 @@ msgstr "Hautpschriftart sans-serif"
 msgid "Used for all the headings"
 msgstr "Wird für alle Titel verwendet"
 
-msgid "Chat title"
-msgstr "Chat Titel"
+msgid "Show chat for chosen people"
+msgstr "Chat für folgende Personen anzeigen"
 
-msgid "Chat background color"
-msgstr "Chat Hintegrundfarbe"
+msgid "Enable the chat"
+msgstr "Chat aktivieren"
 
-msgid "Customer-ID"
-msgstr "Kunden-Identifier"
-
-msgid "Hide chat for chosen roles"
-msgstr "Chat für folgende Rollen verbergen"
-
-msgid "Admin"
-msgstr "Admin"
-
-msgid "Editor"
-msgstr "Editor"
-
-msgid "Member"
-msgstr "Mitglied"
-
-msgid "Disable the chat"
-msgstr "Chat deaktivieren"
+msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgstr ""
+"Der Chat befindet sich aktuel in einer Test-Phase. "
+"Auf eigenes Risiko aktivieren."
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -1008,6 +995,12 @@ msgstr "Nach Datum filtern"
 msgid "Administrator"
 msgstr "Administrator"
 
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Member"
+msgstr "Mitglied"
+
 msgid "Administrators"
 msgstr "Administratoren"
 
@@ -1068,10 +1061,8 @@ msgstr ""
 "Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
 "zurückkehren um den Status Ihrer Anfrage abzufragen."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen."
+msgid "Your request has been completed."
+msgstr "Ihre Anfrage wurde erfolgreich abgeschlossen."
 
 msgid "Privacy"
 msgstr "Privatsphäre"
@@ -2237,15 +2228,6 @@ msgstr "Migration Links"
 msgid "OneGov API"
 msgstr "OneGov API"
 
-#~ msgid "Supported Chat Integrations"
-#~ msgstr "Unterstützte Chat Integration"
-
-#~ msgid "Straight to ..."
-#~ msgstr "Direkt zu ..."
-
-#~ msgid "Perform Search"
-#~ msgstr "Suchen"
-
 msgid "Data Retention Policy"
 msgstr "Datensparsamkeit"
 
@@ -2255,3 +2237,27 @@ msgid ""
 msgstr ""
 "Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
 "unwiderruflich gelöscht werden."
+
+#~ msgid "Chat title"
+#~ msgstr "Chat Titel"
+
+#~ msgid "Chat background color"
+#~ msgstr "Chat Hintegrundfarbe"
+
+#~ msgid "Customer-ID"
+#~ msgstr "Kunden-Identifier"
+
+#~ msgid "Admin"
+#~ msgstr "Admin"
+
+#~ msgid "Disable the chat"
+#~ msgstr "Chat deaktivieren"
+
+#~ msgid "Supported Chat Integrations"
+#~ msgstr "Unterstützte Chat Integration"
+
+#~ msgid "Straight to ..."
+#~ msgstr "Direkt zu ..."
+
+#~ msgid "Perform Search"
+#~ msgstr "Suchen"

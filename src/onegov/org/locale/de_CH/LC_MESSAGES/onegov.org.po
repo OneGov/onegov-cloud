@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-11-16 21:47+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2608,8 +2608,8 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -3185,10 +3185,8 @@ msgstr ""
 "Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
 "zurückkehren um den Status Ihrer Anfrage abzufragen."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen."
+msgid "Your request has been completed."
+msgstr "Ihre Anfrage wurde erfolgreich abgeschlossen."
 
 msgid "Privacy"
 msgstr "Privatsphäre"

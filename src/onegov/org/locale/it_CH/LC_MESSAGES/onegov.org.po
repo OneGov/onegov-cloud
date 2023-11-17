@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2023-11-16 21:47+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2022-03-15 10:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2617,8 +2617,8 @@ msgstr "Il rifiuto di ${title} non può essere annullato."
 msgid "Reject reservation"
 msgstr "Rifiuta prenotazione"
 
-#.
 #. Used in sentence: "${event} published."
+#.
 msgid "Event"
 msgstr "Evento"
 
@@ -3189,10 +3189,8 @@ msgstr ""
 "La tua richiesta sarà elaborata a breve. Puoi tornare a questa pagina in "
 "qualsiasi momento per visualizzare lo stato del processo."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"La tua richiesta è stata completata."
+msgid "Your request has been completed."
+msgstr "La tua richiesta è stata completata."
 
 msgid "Privacy"
 msgstr "Privacy"

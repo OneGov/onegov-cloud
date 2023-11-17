@@ -983,7 +983,7 @@ class ChatTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('CHT')
-class ChatHandler(Handler, TicketDeletionMixin):
+class ChatHandler(Handler):
 
     handler_title = _("Chats")
     code_title = _("Chats")

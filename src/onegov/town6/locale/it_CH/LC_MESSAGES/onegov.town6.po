@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-11-16 21:55+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,29 +26,16 @@ msgstr "Font famiglia sans-serif"
 msgid "Used for all the headings"
 msgstr "Usato per tutti i titoli"
 
-msgid "Chat title"
-msgstr "Titolo della chat"
+msgid "Show chat for chosen people"
+msgstr "Mostra la chat per le seguenti persone"
 
-msgid "Chat background color"
-msgstr "Colore di sfondo della chat"
+msgid "Enable the chat"
+msgstr "Attivare la chat"
 
-msgid "Customer-ID"
-msgstr "ID cliente"
-
-msgid "Hide chat for chosen roles"
-msgstr "Nascondi la chat per i ruoli scelti"
-
-msgid "Admin"
-msgstr "Amministratore"
-
-msgid "Editor"
-msgstr "Redattore"
-
-msgid "Member"
-msgstr "Membro"
-
-msgid "Disable the chat"
-msgstr "Disattivare la chat"
+msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgstr ""
+"a chat è attualmente in fase di test. Attivare a proprio rischio e "
+"pericolo"
 
 #, fuzzy
 msgid "Events"
@@ -1001,6 +988,12 @@ msgstr "Filtro per data"
 msgid "Administrator"
 msgstr "Amministratore"
 
+msgid "Editor"
+msgstr "Redattore"
+
+msgid "Member"
+msgstr "Membro"
+
 msgid "Administrators"
 msgstr "Amministratori"
 
@@ -1061,10 +1054,8 @@ msgstr ""
 "La tua richiesta sarà elaborata a breve. Puoi tornare a questa pagina in "
 "qualsiasi momento per visualizzare lo stato del processo."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"La tua richiesta è stata completata."
+msgid "Your request has been completed."
+msgstr "La tua richiesta è stata completata."
 
 msgid "Privacy"
 msgstr "Privacy"
@@ -2240,3 +2231,18 @@ msgid ""
 msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
+
+#~ msgid "Chat title"
+#~ msgstr "Titolo della chat"
+
+#~ msgid "Chat background color"
+#~ msgstr "Colore di sfondo della chat"
+
+#~ msgid "Customer-ID"
+#~ msgstr "ID cliente"
+
+#~ msgid "Admin"
+#~ msgstr "Amministratore"
+
+#~ msgid "Disable the chat"
+#~ msgstr "Disattivare la chat"
