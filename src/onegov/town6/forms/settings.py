@@ -90,29 +90,16 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
 class ChatSettingsForm(Form):
 
-    chat_title = StringField(
-        label=_('Chat title')
-    )
-
-    chat_color = ColorField(
-        label=_('Chat background color')
-    )
-
-    chat_customer_id = StringField(
-        label=_('Customer-ID')
-    )
-
-    hide_chat_for_roles = ChosenSelectMultipleField(
+    show_chat_for = ChosenSelectMultipleField(
         label=_('Hide chat for chosen roles'),
-        choices=(
-            ('admin', _('Admin')),
-            ('editor', _('Editor')),
-            ('member', _('Member')),
-        )
+        choices=[]
     )
 
     disable_chat = BooleanField(
-        label=_('Disable the chat')
+        label=_('Disable the chat'),
+        description=_('The chat is currently in an test-phase. '
+                      'Activate at your own risk.'),
+        default=True
     )
 
     def process_obj(self, obj):
@@ -122,8 +109,8 @@ class ChatSettingsForm(Form):
             color = obj.theme_options.get(
                 'primary-color-ui', user_options['primary-color-ui'])
 
-        self.chat_color.data = color
+        # self.chat_color.data = color
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
-        obj.chat_bg_color = self.chat_color.data
+        # obj.chat_bg_color = self.chat_color.data
