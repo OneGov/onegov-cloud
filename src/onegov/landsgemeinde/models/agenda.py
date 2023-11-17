@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -104,6 +106,18 @@ class AgendaItem(
     )
 
     last_modified = Column(UTCDateTime)
+
+    @hybrid_property
+    def overview(self):  # noqa: F811
+        return self.content['overview'].astext
+
+    @hybrid_property
+    def text(self):  # noqa: F811
+        return self.content['text'].astext
+
+    @hybrid_property
+    def resolution(self):  # noqa: F811
+        return self.content['resolution'].astext
 
     def stamp(self):
         self.last_modified = self.timestamp()
