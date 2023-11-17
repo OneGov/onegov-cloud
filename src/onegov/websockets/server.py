@@ -489,7 +489,6 @@ async def handle_customer_chat(
 
                 chat = stored
                 content = loads(message)
-                log.debug(f'Channel-connections {channel_connections}')
 
                 closed_connections = []
 
@@ -677,11 +676,7 @@ async def handle_staff_chat(
 
                     # Tell everone else you've accepted
                     for client in staff_connections:
-                        log.debug(f'I am {websocket.id}')
-
                         if client != websocket:
-                            log.debug(
-                                f'I should send a message to {client.id}')
                             inner = dumps({
                                 'type': 'hide-request',
                                 'channel': open_channel

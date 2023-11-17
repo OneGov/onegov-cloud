@@ -20,19 +20,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function notifyChatEnded() {
         var notification = endedByTimeoutNotification.cloneNode(true);
-        console.log(notification);
         notification.style.display = "block";
         chatArea.appendChild(notification);
 
         clearTimeout(endChatTimer);
     }
 
-    console.log('chat active', chatActive, 'messages', messages.length);
     if (chatActive == 'True' && messages.length == 2) {
-        console.log('ich be doinne');
         endChatTimer = setTimeout(notifyChatEnded, firstMessageTimeout);
     } else if (chatActive == 'True' && messages.length > 2) {
-        console.log('ich be onde inne');
         endChatTimer = setTimeout(notifyChatEnded, messageTimeout);
     }
 
@@ -72,14 +68,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         } else if (message.type == 'end-chat') {
             clearTimeout(endChatTimer);
-            console.log('Staff ended chat');
             ended = ended.cloneNode(true);
             chatArea.appendChild(ended);
             ended.style.display = 'block';
             chat.style.display = 'block';
             chatForm.remove();
         } else {
-            console.log('unkown messaage type', message);
+            console.log('unkown message type', message);
         }
 
         // Clear and restart the timer
@@ -121,7 +116,6 @@ document.addEventListener("DOMContentLoaded", function() {
             'customer_chat'
         );
 
-        console.log('i know the customer:', customerName);
 
         var message_area = document.getElementById('message-area');
         message_area.scrollTop = message_area.scrollHeight;
@@ -155,8 +149,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 channel: channelId,
                 time: now
             });
-
-            console.log('im about to send ', payload);
 
             socket.send(payload);
             chatWindow.value = '';

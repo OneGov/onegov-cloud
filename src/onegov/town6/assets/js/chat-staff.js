@@ -85,7 +85,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 var request = document.getElementById('request-' + message.channel);
                 request.remove();
                 if (requestList.children.length < 2) {
-                    console.log('There are no requests');
                     noRequestText.style.display = 'block';
                 }
 
@@ -94,7 +93,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 removePreviousChat();
                 chatArea.dataset.chatId = message.channel;
                 document.getElementById('chat_id').value = message.channel;
-                console.log('message-history', message);
 
                 var messages = message.history;
                 messages.forEach((m) => {
@@ -110,7 +108,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('chat-actions').style.display = 'block';
                 if (requestList.children.length < 2) {
-                    console.log('there are no requests');
                     noRequestText.style.display = 'block';
                 }
                 noActiveChatsText.style.display = 'none';
@@ -162,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function() {
         function removePreviousChat() {
             var templateMessage = document.getElementsByClassName('chat-card')[0].cloneNode(true);
             const previousMessages = document.querySelectorAll('.chat-card');
-            console.log('pm', previousMessages);
             previousMessages.forEach((m) => {
                 m.remove();
             });
@@ -170,7 +166,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         function acceptRequest(channel, user, websocket) {
-            console.log('accepted request with channel:' + channel);
             // Display and hide elements
             document.getElementById('no-chat-open').style.display = 'none';
             chatArea.classList.add = channel;
@@ -195,7 +190,6 @@ document.addEventListener("DOMContentLoaded", function() {
         function addActiveChat(channel, user) {
             var activeChatElement = document.getElementById('new-active-chat');
             var newActiveChatElement = activeChatElement.cloneNode(true);
-            console.log(newActiveChatElement);
             var activeChatList = document.getElementById('active-chat-list');
             newActiveChatElement.id = 'active-chat-' + channel;
             newActiveChatElement.dataset.chatId = channel;
@@ -251,7 +245,6 @@ document.addEventListener("DOMContentLoaded", function() {
                         channel: channel
                     });
 
-                    console.log('chat with id', channel);
                     socket.send(payloadReconnect);
                 }
 
@@ -268,8 +261,6 @@ document.addEventListener("DOMContentLoaded", function() {
         chatActions.addEventListener("submit", () => {
             var chatId = chatArea.dataset.chatId;
             console.log('ending chat');
-            console.log(chatArea.dataset);
-            console.log(chatArea.dataset.chatId);
             var no_chat_open = document.getElementById('no-chat-open');
             no_chat_open.style.display = 'flex';
 
