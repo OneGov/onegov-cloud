@@ -25,9 +25,14 @@ class ChatInitiationForm(Form):
     topic = SelectField(
         label=_("Topic"),
         choices=[
-            ('Allgemein', 'Allgemein'),
-            ('Steuern', 'Steuern'),
-            ('Baugesuche', 'Baugesuche')
+            ('Gemeindekanzlei/Einwohnerkontrolle',
+             'Gemeindekanzlei/Einwohnerkontrolle'),
+            ('Stabsstelle Gemeindeschreiber',
+             'Stabsstelle Gemeindeschreiber'),
+            ('Jugend /Sport/Vereine/Kultur',
+             'Jugend /Sport/Vereine/Kultur'),
+            ('Planung/Bau & Umwelt/Energie/Sicherheit',
+             'Planung/Bau & Umwelt/Energie/Sicherheit')
         ]
     )
 

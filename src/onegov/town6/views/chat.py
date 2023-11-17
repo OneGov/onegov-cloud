@@ -52,7 +52,7 @@ def view_chats_staff(self, request, form):
 
             request.app.send_transactional_email(
                 subject=args['title'],
-                receivers=(chat.email, ),
+                receivers=(chat.email, user.username),
                 content=render_template(
                     'mail_chat_customer.pt', request, args
                 )
