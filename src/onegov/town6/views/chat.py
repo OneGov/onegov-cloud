@@ -4,7 +4,7 @@ from morepath import redirect
 
 from onegov.chat.collections import ChatCollection
 from onegov.chat.models import Chat
-from onegov.chat.forms import ChatInitiationForm, ChatActionsForm
+from onegov.town6.forms.chat import ChatInitiationForm, ChatActionsForm
 from onegov.core.templates import render_template
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
 from onegov.town6.layout import DefaultLayout

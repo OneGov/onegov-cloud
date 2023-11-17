@@ -2650,7 +2650,7 @@ msgid "Chats"
 msgstr ""
 
 msgid "Chat with"
-msgstr ""
+msgstr "Chat mit"
 
 msgid "Link"
 msgstr "Verknüpfung"

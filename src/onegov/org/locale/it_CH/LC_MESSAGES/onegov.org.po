@@ -2659,7 +2659,7 @@ msgid "Chats"
 msgstr ""
 
 msgid "Chat with"
-msgstr ""
+msgstr "Chat con"
 
 msgid "Link"
 msgstr "Collegamento"
