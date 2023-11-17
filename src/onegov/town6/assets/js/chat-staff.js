@@ -72,6 +72,8 @@ document.addEventListener("DOMContentLoaded", function() {
             } else if (message.type == 'message') {
                 if (chatArea.dataset.chatId == message.channel) {
                     createChatBubble(message, message.userId == staffId);
+                    var message_area = document.getElementById('message-area');
+                    message_area.scrollTop = message_area.scrollHeight;
                 } else {
                     const chatBlob = getChatBlobFor(message.channel);
 
@@ -99,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     var no_chat_open = document.getElementById('no-chat-open');
                     no_chat_open.style.display = 'none';
                     var message_area = document.getElementById("message-area");
-                    message_area.style.display = 'flex';
+                    message_area.style.display = 'block';
                     var chat_form = document.getElementById('chat-form');
                     chat_form.style.display = 'flex';
                     createChatBubble(m, m.userId == staffId);
@@ -117,6 +119,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (chatBlob) {
                     hideElement(chatBlob);
                 }
+                var message_area = document.getElementById('message-area');
+                message_area.scrollTop = message_area.scrollHeight;
             } else {
                 console.log('unkown messaage type', message);
             }
@@ -147,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         function createChatBubble(message, self) {
             var chatCard = document.getElementsByClassName('chat-card')[0].cloneNode(true);
-            chatCard.style.display = 'flex';
+            chatCard.style.display = 'block';
             chatCard.classList.add(self ? 'right' : 'left');
             chatCard.children[0].appendChild(document.createTextNode(message.user));
             chatCard.children[1].children[0].appendChild(document.createTextNode(message.text));
@@ -171,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('no-chat-open').style.display = 'none';
             chatArea.classList.add = channel;
             chatArea.dataset.chatId = channel;
-            chatArea.style.display = 'flex';
+            chatArea.style.display = 'block';
             var chat_form = document.getElementById('chat-form');
             chat_form.style.display = 'block';
             var request = document.getElementById('request-' + channel);
@@ -206,7 +210,7 @@ document.addEventListener("DOMContentLoaded", function() {
             var channel = chat.dataset.chatId;
             chat.addEventListener("click", () => {
                 console.log('open chat with id' + channel);
-                chatArea.style.display = 'flex';
+                chatArea.style.display = 'block';
                 document.getElementById('loading').style.display = 'block';
 
                 var payload = JSON.stringify({

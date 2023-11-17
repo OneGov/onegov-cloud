@@ -169,7 +169,7 @@ class WebSocketServer(WebSocketServerProtocol):
             if chat and not chat.active:
                 chat = None
 
-            ACTIVE_CHATS[self.schema][chat.id] = chat  # type: ignore
+            ACTIVE_CHATS[self.schema][id] = chat  # type: ignore
 
         return chat  # type: ignore
 

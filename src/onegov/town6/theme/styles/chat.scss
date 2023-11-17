@@ -16,7 +16,9 @@
 
     .card {
         border: 0;
-        max-width: 80%;
+        display: block;
+        max-width: 70%;
+        width: fit-content;
 
         .card-section {
             border-radius: .7rem;
@@ -38,7 +40,7 @@
         }
 
         &.right {
-            place-self: end;
+            margin-left: auto;
 
             .card-section {
                 background: $primary-color;
@@ -47,7 +49,7 @@
         }
 
         &.left {
-            place-self: start;
+            margin-right: auto;
 
             .card-section {
                 background: $white-smoke;
@@ -56,8 +58,9 @@
     }
 
     #message-area {
-        display: flex;
-        flex-direction: column;
+        height: calc(60vh - 90px);
+        overflow-x: hidden;
+        overflow-y: scroll;
     }
 
     .notification {

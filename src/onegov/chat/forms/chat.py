@@ -34,7 +34,8 @@ class ChatInitiationForm(Form):
     confirmation = BooleanField(
         label=_("Confirmation"),
         description=_(
-            "I agree that this chat will be saved and sent to me per email."),
+            "Ich bestätige, dass mir bewusst ist, dass dieser Chat "
+            "gespeichert und der Verlauf an mich per Mail gesendet wird."),
         validators=[
             InputRequired()
         ],

@@ -61,6 +61,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (message.type == 'message') {
             connecting.style.display = "none";
             createChatBubble(message, message.userId == 'customer');
+            var message_area = document.getElementById('message-area');
+            message_area.scrollTop = message_area.scrollHeight;
 
         } else if (message.type == 'accepted') {
             var notification = accepted.cloneNode(true);
@@ -95,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function createChatBubble(message, self) {
         var chatCard = document.getElementsByClassName('chat-card')[0].cloneNode(true);
-        chatCard.style.display = 'flex';
+        chatCard.style.display = 'block';
         chatCard.classList.add(self ? 'right' : 'left');
         chatCard.children[0].appendChild(document.createTextNode(message.user));
         chatCard.children[1].children[0].appendChild(document.createTextNode(message.text));
@@ -120,6 +122,9 @@ document.addEventListener("DOMContentLoaded", function() {
         );
 
         console.log('i know the customer:', customerName);
+
+        var message_area = document.getElementById('message-area');
+        message_area.scrollTop = message_area.scrollHeight;
 
         document.getElementById("send").addEventListener("click", () => {
             const chatMessage = chatWindow.value;
