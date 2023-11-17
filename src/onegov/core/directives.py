@@ -9,7 +9,7 @@ from typing import Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
-    from morepath import Request
+    from morepath.directive import _RequestT
     from webob import Response
     from wtforms import Form
 
@@ -53,9 +53,9 @@ class HtmlHandleFormAction(HtmlAction):
         self,
         model: type | str,
         form: 'type[Form] | Callable[[Any, CoreRequest], type[Form]]',
-        render: 'Callable[[Any, Request], Response] | str | None' = None,
+        render: 'Callable[[Any, _RequestT], Response] | str | None' = None,
         template: 'StrOrBytesPath | None' = None,
-        load: 'Callable[[Request], Any] | str | None' = None,
+        load: 'Callable[[_RequestT], Any] | str | None' = None,
         permission: object | str | None = None,
         internal: bool = False,
         **predicates: Any

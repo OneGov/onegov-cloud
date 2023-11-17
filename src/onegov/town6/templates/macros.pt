@@ -569,14 +569,22 @@
 </metal:newsletter>
 
 <metal:access_hint define-macro="access_hint" i18n:domain="onegov.town6">
-    <tal:b condition="item.access == 'private'|False">
-        <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
-    </tal:b>
-    <tal:b condition="item.access == 'member'|False">
-        <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
-    </tal:b>
-    <tal:b condition="item.access == 'secret'|False">
-        <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
+    <tal:b tal:switch="item.access|False">
+        <tal:b case="'private'">
+            <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
+        </tal:b>
+        <tal:b case="'member'">
+            <i title="This site is private but can also be seen by members" i18n:attributes="title" class="member-hint"></i>
+        </tal:b>
+        <tal:b case="'mtan'">
+            <i title="This site is public but requires submitting an mTAN" i18n:attributes="title" class="mtan-hint"></i>
+        </tal:b>
+        <tal:b case="'secret'">
+            <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
+        </tal:b>
+        <tal:b case="'secret_mtan'">
+            <i title="This site is secret and requires submitting an mTAN" i18n:attributes="title" class="secret-mtan-hint"></i>
+        </tal:b>
     </tal:b>
 </metal:access_hint>
 
@@ -1698,16 +1706,16 @@
     <ul tal:define="latest result.latest_occurrence">
         <li tal:condition="latest">
             ${
-            ' - '.join((
+            '{}, {} - {}'.format(
                 layout.format_date(latest.localized_start, 'event'),
+                layout.format_date(latest.localized_start, 'time'),
                 layout.format_date(latest.localized_end, 'time')
-            ))
+                )
             }
         </li>
         <li tal:condition="result.location">${result.location}</li>
 
         <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
-
             <li><span i18n:translate="">Further occurrences:</span>
                 <div class="event-child-results">
                     <ul>
@@ -1715,10 +1723,11 @@
                             <li>
                                 <a href="${request.link(occ)}">
                                     ${
-                                    ' - '.join((
+                                    '{}, {} - {}'.format(
                                         layout.format_date(occ.localized_start, 'event'),
+                                        layout.format_date(occ.localized_start, 'time'),
                                         layout.format_date(occ.localized_end, 'time')
-                                    ))
+                                        )
                                     }
                                 </a>
                             </li>
@@ -1726,7 +1735,6 @@
                     </ul>
                 </div></li>
         </tal:b>
-
     </ul>
 </metal:search_result_events>
 
@@ -1787,10 +1795,7 @@
     </tal:b>
 
     <p i18n:translate tal:condition="ticket.state == 'closed'">
-        Your request has been completed. If you asked for documents to be
-        sent to your address, they should arrive shortly. If you asked to
-        pick up documents at the municipality, the are now ready to be
-        picked up.
+        Your request has been completed.
     </p>
 </metal:ticket_status_page_message>
 

@@ -159,7 +159,7 @@ class ViewAction(dectate.Action):
     predicates: dict[str, Any]
     def __init__(
         self,
-        model,
+        model: type | str,
         render: Callable[[Any, _RequestT], BaseResponse] | str | None = None,
         template: StrOrBytesPath | None = None,
         load: Callable[[_RequestT], Any] | str | None = None,

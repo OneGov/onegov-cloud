@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterator
     from onegov.core.request import CoreRequest
+    from onegov.core.types import JSON_ro
     from webob.response import Response
 
 
@@ -96,7 +97,11 @@ class WebsocketsApp(WebassetsApp):
 
         return self.sign(self.schema).replace(self.schema, '')
 
-    def send_websocket(self, message: str, channel: str | None = None) -> bool:
+    def send_websocket(
+        self,
+        message: 'JSON_ro',
+        channel: str | None = None
+    ) -> bool:
         """ Sends an application-bound broadcast message to all connected
         clients.
 

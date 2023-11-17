@@ -5,7 +5,6 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import linkify
 from onegov.org import _
 from onegov.org.models.ticket import OrgTicketMixin
-from onegov.org.models.ticket import TicketDeletionMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
@@ -27,7 +26,7 @@ class TranslatorMutationTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('TRN')
-class TranslatorMutationHandler(Handler, TicketDeletionMixin):
+class TranslatorMutationHandler(Handler):
 
     handler_title = _("Translator")
     code_title = _("Translators")
@@ -48,6 +47,14 @@ class TranslatorMutationHandler(Handler, TicketDeletionMixin):
     @property
     def deleted(self):
         return self.translator is None
+
+    @property
+    def ticket_deletable(self):
+        # For now we don't support this because lot's of functionality
+        # depends on data in translator tickets
+        if self.deleted:
+            return True
+        return False
 
     @cached_property
     def email(self):
@@ -135,7 +142,7 @@ class AccreditationTicket(OrgTicketMixin, Ticket):
 
 
 @handlers.registered_handler('AKK')
-class AccreditationHandler(Handler, TicketDeletionMixin):
+class AccreditationHandler(Handler):
 
     handler_title = _('Accreditation')
     code_title = _('Accreditations')
@@ -153,6 +160,14 @@ class AccreditationHandler(Handler, TicketDeletionMixin):
     @property
     def deleted(self):
         return self.translator is None
+
+    @property
+    def ticket_deletable(self):
+        # For now we don't support this because lot's of functionality
+        # depends on data in translator tickets
+        if self.deleted:
+            return True
+        return False
 
     @cached_property
     def email(self):

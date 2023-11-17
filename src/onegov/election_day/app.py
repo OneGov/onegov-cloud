@@ -21,11 +21,24 @@ from onegov.election_day.directives import ScreenWidgetAction
 from onegov.election_day.directives import SvgFileViewAction
 from onegov.election_day.directives import XmlFileAction
 from onegov.election_day.models import Principal
+from onegov.election_day.request import ElectionDayRequest
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.user import UserApp
 from onegov.websockets import WebsocketsApp
+
+
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from collections.abc import Iterator
+    from more.content_security import ContentSecurityPolicy
+    from onegov.core.cache import RedisCacheRegion
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+    from webob import Response
 
 
 class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
@@ -35,6 +48,8 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
     """
 
     serve_static_files = True
+    request_class = ElectionDayRequest
+
     csv_file = directive(CsvFileAction)
     json_file = directive(JsonFileAction)
     xml_file = directive(XmlFileAction)
@@ -44,15 +59,19 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
     svg_file = directive(SvgFileViewAction)
     screen_widget = directive(ScreenWidgetAction)
 
+    # FIXME: Technically this can be None as well, but since we 404
+    #        if we don't have a principal we pretend it's always there
+    #        for now this is easier than having assert self.principal
+    #        everywhere
     @property
-    def principal(self):
+    def principal(self) -> 'Canton | Municipality':
         """ Returns the principal of the election day app. See
         :class:`onegov.election_day.models.principal.Principal`.
 
         """
         return self.cache.get_or_create('principal', self.load_principal)
 
-    def load_principal(self):
+    def load_principal(self) -> 'Canton | Municipality | None':
         """ The principal is defined in the ``principal.yml`` file stored
         on the applications filestorage root.
 
@@ -63,28 +82,32 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
         class:`onegov.election_app.model.Principal`.
 
         """
-        assert self.has_filestorage
+        fs = self.filestorage
+        assert fs is not None
 
-        if self.filestorage.isfile('principal.yml'):
-            return Principal.from_yaml(
-                self.filestorage.open('principal.yml', encoding='utf-8').read()
-            )
+        if not fs.isfile('principal.yml'):
+            return None
+
+        return Principal.from_yaml(
+            fs.open('principal.yml', encoding='utf-8').read()
+        )
 
     @property
-    def logo(self):
+    def logo(self) -> FilestorageFile | None:
         """ Returns the logo as
         :class:`onegov.core.filestorage.FilestorageFile`.
 
         """
         return self.cache.get_or_create('logo', self.load_logo)
 
-    def load_logo(self):
+    def load_logo(self) -> FilestorageFile | None:
         logo = self.principal.logo
-        if logo and self.filestorage.isfile(logo):
+        if logo and self.filestorage.isfile(logo):  # type:ignore[union-attr]
             return FilestorageFile(logo)
+        return None
 
     @property
-    def theme_options(self):
+    def theme_options(self) -> dict[str, Any]:
         color = self.principal.color
         assert color is not None, """ No color defined, be
         sure to define one in your principal.yml like this:
@@ -97,7 +120,7 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
         return {'primary-color': color}
 
     @property
-    def pages_cache(self):
+    def pages_cache(self) -> 'RedisCacheRegion':
         """ A cache for pages. """
         expiration_time = 300
         if self.principal and hasattr(self.principal, 'cache_expiration_time'):
@@ -106,22 +129,22 @@ class ElectionDayApp(Framework, FormApp, UserApp, DepotApp, WebsocketsApp):
 
 
 @ElectionDayApp.static_directory()
-def get_static_directory():
+def get_static_directory() -> str:
     return 'static'
 
 
 @ElectionDayApp.template_directory()
-def get_template_directory():
+def get_template_directory() -> str:
     return 'templates'
 
 
 @ElectionDayApp.setting(section='core', name='theme')
-def get_theme():
+def get_theme() -> ElectionDayTheme:
     return ElectionDayTheme()
 
 
 @ElectionDayApp.setting(section='i18n', name='localedirs')
-def get_i18n_localedirs():
+def get_i18n_localedirs() -> list[str]:
     return [
         utils.module_path('onegov.election_day', 'locale'),
         utils.module_path('onegov.form', 'locale'),
@@ -130,32 +153,34 @@ def get_i18n_localedirs():
 
 
 @ElectionDayApp.setting(section='i18n', name='locales')
-def get_i18n_used_locales():
+def get_i18n_used_locales() -> set[str]:
     return {'de_CH', 'fr_CH', 'it_CH', 'rm_CH'}
 
 
 @ElectionDayApp.setting(section='i18n', name='default_locale')
-def get_i18n_default_locale():
+def get_i18n_default_locale() -> str:
     return 'de_CH'
 
 
 @ElectionDayApp.setting(section='content_security_policy', name='default')
-def org_content_security_policy():
+def org_content_security_policy() -> 'ContentSecurityPolicy':
     policy = default_content_security_policy()
     policy.script_src.remove(UNSAFE_EVAL)
     policy.script_src.remove(UNSAFE_INLINE)
     return policy
 
 
-@ElectionDayApp.tween_factory(
-    under=content_security_policy_tween_factory
-)
-def enable_iframes_and_analytics_tween_factory(app, handler):
+@ElectionDayApp.tween_factory(under=content_security_policy_tween_factory)
+def enable_iframes_and_analytics_tween_factory(
+    app: ElectionDayApp,
+    handler: 'Callable[[ElectionDayRequest], Response]'
+) -> 'Callable[[ElectionDayRequest], Response]':
+
     no_iframe_paths = (
         r'/auth/.*',
         r'/manage/.*'
     )
-    no_iframe_paths = re.compile(rf"({'|'.join(no_iframe_paths)})")
+    no_iframe_paths_re = re.compile(rf"({'|'.join(no_iframe_paths)})")
 
     iframe_paths = (
         r'/ballot/.*',
@@ -165,16 +190,18 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
         r'/elections-part/.*',
         r'/screen/.*',
     )
-    iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
+    iframe_paths_re = re.compile(rf"({'|'.join(iframe_paths)})")
 
-    def enable_iframes_and_analytics_tween(request):
+    def enable_iframes_and_analytics_tween(
+        request: ElectionDayRequest
+    ) -> 'Response':
         """ Enables iframes and analytics. """
 
         result = handler(request)
 
-        if no_iframe_paths.match(request.path_info):
+        if no_iframe_paths_re.match(request.path_info or '/'):
             request.content_security_policy.frame_ancestors = {NONE}
-        elif iframe_paths.match(request.path_info):
+        elif iframe_paths_re.match(request.path_info or '/'):
             request.content_security_policy.frame_ancestors.add('http://*')
             request.content_security_policy.frame_ancestors.add('https://*')
 
@@ -191,8 +218,11 @@ def enable_iframes_and_analytics_tween_factory(app, handler):
 
 
 @ElectionDayApp.tween_factory(over=current_language_tween_factory)
-def override_language_tween_factory(app, handler):
-    def override_language_tween(request):
+def override_language_tween_factory(
+    app: ElectionDayApp,
+    handler: 'Callable[[ElectionDayRequest], Response]'
+) -> 'Callable[[ElectionDayRequest], Response]':
+    def override_language_tween(request: ElectionDayRequest) -> 'Response':
         """ Allows the current language to be overwritten using a query
         parameter.
 
@@ -200,7 +230,7 @@ def override_language_tween_factory(app, handler):
 
         locale = request.params.get('locale')
         if locale in app.locales:
-            request.locale = locale
+            request.locale = locale  # type:ignore[assignment]
 
         return handler(request)
 
@@ -211,9 +241,12 @@ def override_language_tween_factory(app, handler):
     under=override_language_tween_factory,
     over=transaction_tween_factory
 )
-def cache_control_tween_factory(app, handler):
+def cache_control_tween_factory(
+    app: ElectionDayApp,
+    handler: 'Callable[[ElectionDayRequest], Response]'
+) -> 'Callable[[ElectionDayRequest], Response]':
 
-    def cache_control_tween(request):
+    def cache_control_tween(request: ElectionDayRequest) -> 'Response':
         """ Set headers and cookies for cache control.
 
         Makes sure, pages are not cached downstream when logged in by setting
@@ -242,7 +275,10 @@ def cache_control_tween_factory(app, handler):
     under=override_language_tween_factory,
     over=transaction_tween_factory
 )
-def micro_cache_anonymous_pages_tween_factory(app, handler):
+def micro_cache_anonymous_pages_tween_factory(
+    app: ElectionDayApp,
+    handler: 'Callable[[ElectionDayRequest], Response]'
+) -> 'Callable[[ElectionDayRequest], Response]':
 
     cache_paths = (
         '/ballot/.*',
@@ -255,15 +291,17 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/sitemap',
         '/sitemap.xml',
     )
-    cache_paths = re.compile(r'^({})$'.format('|'.join(cache_paths)))
+    cache_paths_re = re.compile(r'^({})$'.format('|'.join(cache_paths)))
 
-    def should_cache_fn(response):
+    def should_cache_fn(response: 'Response') -> bool:
         return (
             response.status_code == 200
             and 'Set-Cookie' not in response.headers
         )
 
-    def micro_cache_anonymous_pages_tween(request):
+    def micro_cache_anonymous_pages_tween(
+        request: ElectionDayRequest
+    ) -> 'Response':
         """ Cache all pages for 5 minutes. """
 
         # do not cache POST, DELETE etc.
@@ -275,7 +313,7 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
             return handler(request)
 
         # only cache whitelisted paths
-        if not cache_paths.match(request.path_info):
+        if not cache_paths_re.match(request.path_info or '/'):
             return handler(request)
 
         if request.method == 'HEAD':
@@ -289,7 +327,7 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
                 request.method,
                 request.host,
                 request.path_qs,
-                request.locale,
+                request.locale or '',
                 'hl' if 'headerless' in request.browser_session else 'hf'
             ))
 
@@ -303,27 +341,27 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
 
 
 @ElectionDayApp.webasset_path()
-def get_shared_assets_path():
+def get_shared_assets_path() -> str:
     return utils.module_path('onegov.shared', 'assets/js')
 
 
 @ElectionDayApp.webasset_path()
-def get_js_path():
+def get_js_path() -> str:
     return 'assets/js'
 
 
 @ElectionDayApp.webasset_path()
-def get_css_path():
+def get_css_path() -> str:
     return 'assets/css'
 
 
 @ElectionDayApp.webasset_output()
-def get_webasset_output():
+def get_webasset_output() -> str:
     return 'assets/bundles'
 
 
 @ElectionDayApp.webasset('common')
-def get_common_asset():
+def get_common_asset() -> 'Iterator[str]':
     # Common assets unlikely to change
     yield 'modernizr.js'
 
@@ -351,7 +389,7 @@ def get_common_asset():
 
 
 @ElectionDayApp.webasset('custom')
-def get_custom_asset():
+def get_custom_asset() -> 'Iterator[str]':
     # common code
     yield 'common.js'
 
@@ -377,7 +415,7 @@ def get_custom_asset():
 
 
 @ElectionDayApp.webasset('backend_common')
-def get_backend_common_asset():
+def get_backend_common_asset() -> 'Iterator[str]':
     # Common assets unlikely to change, only used in the backend
     yield 'jquery.datetimepicker.css'
     yield 'jquery.datetimepicker.js'
@@ -387,6 +425,6 @@ def get_backend_common_asset():
 
 
 @ElectionDayApp.webasset('screen')
-def get_screen_asset():
+def get_screen_asset() -> 'Iterator[str]':
     # Code used for screen update
     yield 'screen.js'

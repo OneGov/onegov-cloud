@@ -471,7 +471,7 @@ def respond_with_x_robots_tag_header(
     reference: File,
     request: 'CoreRequest'
 ) -> None:
-    if getattr(reference, 'access', None) == 'secret':
+    if getattr(reference, 'access', None) in ('secret', 'secret_mtan'):
         @request.after
         def include_x_robots_tag_header(response: 'Response') -> None:
             response.headers.add('X-Robots-Tag', 'noindex')

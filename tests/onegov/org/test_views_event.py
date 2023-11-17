@@ -224,6 +224,47 @@ def test_view_occurrences_event_filter(client):
     assert text_present('', 'My Special Filter')
 
 
+def test_many_filters(client):
+    assert client.login_admin()
+    page = client.get('/module-settings')
+    page.form['event_filter_type'] = 'filters'
+    page.form.submit()
+    page = client.get('/events')
+    page = page.click('Konfigurieren')
+    page.form['definition'] = """
+        Weitere Filter =
+            [ ] Gemeinde
+            [ ] Schule
+            [ ] Akrobatik
+            [ ] American Football
+            [ ] Angeln
+            [ ] Aquacura
+            [ ] Armbrustschiessen
+            [ ] Badminton
+            [ ] Ballett
+            [ ] Baseball
+            [ ] Basketball
+            [ ] Bouldering
+            [ ] Karate
+            [ ] Ski
+            [ ] Yoga
+    """
+    page.form['keyword_fields'].value = 'weitere_filter'
+    page.form.submit()
+
+    events = client.get('/events')
+    assert "Mehr anzeigen" not in events
+
+    event = events.click("Generalversammlung")
+    form = event.click("Bearbeiten")
+    for i in range(0, 15):
+        form.form.set('weitere_filter', True, index=i)
+    form.form.submit()
+
+    events = client.get('/events')
+    assert "Mehr anzeigen" in events
+
+
 def test_view_occurrence(client):
     events = client.get('/events')
 

@@ -27,6 +27,11 @@ h6 small,
     color: inherit !important;
 }
 
+h1.main-title small {
+    display: block;
+    line-height: 1.3;
+}
+
 // Overwrite if the header has a different height
 :target::before {
     content: "";
@@ -142,6 +147,10 @@ h6 small,
     font-weight: bold;
     margin-bottom: 2.5rem;
     margin-top: 1rem;
+
+    p {
+        line-height: 1.4;
+    }
 }
 
 .callout.secondary.assembly-completed {
@@ -490,4 +499,8 @@ h6 small,
             transform: scale(.9);
         }
     }
+}
+
+.tt-hint {
+    opacity: 0;
 }

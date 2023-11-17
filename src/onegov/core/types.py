@@ -61,6 +61,10 @@ if TYPE_CHECKING:
         mimetype: NotRequired[str]
         size: NotRequired[int]
 
+    class HasRole(Protocol):
+        @property
+        def role(self) -> str: ...
+
     class PaginatedGenericCollection(Protocol[_M]):
         """ Intersection type of GenericCollection and Pagination, as
           implemented by, for example:

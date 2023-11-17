@@ -46,8 +46,13 @@ extended_date_converter = morepath.Converter(
 )
 
 
+<<<<<<< HEAD
 @overload
 def json_decode(s: Literal['']) -> None: ...  # type:ignore[overload-overlap]
+=======
+@overload  # type:ignore[overload-overlap]
+def json_decode(s: Literal['']) -> None: ...
+>>>>>>> master
 @overload
 def json_decode(s: str) -> dict[str, Any]: ...
 

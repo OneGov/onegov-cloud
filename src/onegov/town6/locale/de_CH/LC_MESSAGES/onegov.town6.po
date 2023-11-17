@@ -6,7 +6,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2023-11-16 21:55+0100\n"
+=======
+"POT-Creation-Date: 2023-11-09 09:04+0100\n"
+>>>>>>> master
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -190,6 +194,12 @@ msgstr "Person löschen"
 msgid "Tickets"
 msgstr "Tickets"
 
+msgid "Delete archived tickets"
+msgstr "Archivierte Tickets löschen"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Möchten Sie wirklich alle archivierten Tickets löschen?"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -215,6 +225,9 @@ msgstr "Ticket archivieren"
 
 msgid "Recover from archive"
 msgstr "Aus dem Archiv holen"
+
+msgid "Delete Ticket"
+msgstr "Ticket löschen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -816,8 +829,14 @@ msgstr "Diese Seite ist privat"
 msgid "This site is private but can also be seen by members"
 msgstr "Diese Seite ist privat, kann aber auch von Mitgliedern gesehen werden"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Diese Seite ist öffentlich, aber erfordert die Eingabe eines mTANs"
+
 msgid "This site is secret"
 msgstr "Diese Seite ist geheim"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Diese Seite ist geheim und erfordert die Eingabe eines mTANs"
 
 msgid "This site is not published."
 msgstr "Diese Seite ist nicht veröffentlicht."
@@ -1023,7 +1042,11 @@ msgstr ""
 "der Startseite verfügbar."
 
 msgid "Current Image"
+<<<<<<< HEAD
 msgstr ""
+=======
+msgstr "Aktuelles Bild"
+>>>>>>> master
 
 msgid "Has a digital seal"
 msgstr "Hat ein digitales Siegel"
@@ -1054,13 +1077,9 @@ msgstr ""
 "zurückkehren um den Status Ihrer Anfrage abzufragen."
 
 msgid ""
-"Your request has been completed. If you asked for documents to be sent to "
-"your address, they should arrive shortly. If you asked to pick up documents "
-"at the municipality, the are now ready to be picked up."
+"Your request has been completed."
 msgstr ""
-"Ihre Anfrage wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
-"Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
-"Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
+"Ihre Anfrage wurde erfolgreich abgeschlossen."
 
 msgid "Privacy"
 msgstr "Privatsphäre"
@@ -2226,6 +2245,7 @@ msgstr "Migration Links"
 msgid "OneGov API"
 msgstr "OneGov API"
 
+<<<<<<< HEAD
 #~ msgid "Supported Chat Integrations"
 #~ msgstr "Unterstützte Chat Integration"
 
@@ -2234,6 +2254,14 @@ msgstr "OneGov API"
 
 #~ msgid "Perform Search"
 #~ msgstr "Suchen"
+=======
+msgid "Data Retention Policy"
+msgstr "Datensparsamkeit"
+>>>>>>> master
 
-#~ msgid "The OneGov Cloud Team"
-#~ msgstr "Das OneGov Cloud Team"
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Gehen Sie mit Vorsicht vor. Tickets und die darin enthaltenen Daten können "
+"unwiderruflich gelöscht werden."

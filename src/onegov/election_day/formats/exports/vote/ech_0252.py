@@ -4,6 +4,7 @@ from xsdata_ech.e_ch_0252_1_0 import CountingCircleType
 from xsdata_ech.e_ch_0252_1_0 import CountOfVotersInformationType
 from xsdata_ech.e_ch_0252_1_0 import DecisiveMajorityType
 from xsdata_ech.e_ch_0252_1_0 import Delivery
+from xsdata_ech.e_ch_0252_1_0 import DomainOfInfluenceType
 from xsdata_ech.e_ch_0252_1_0 import EventVoteBaseDeliveryType
 from xsdata_ech.e_ch_0252_1_0 import NamedIdType
 from xsdata_ech.e_ch_0252_1_0 import ResultDataType
@@ -17,7 +18,17 @@ from xsdata.formats.dataclass.serializers.config import SerializerConfig
 from xsdata.models.datatype import XmlDate
 
 
-def export_ballot_ech_0252(ballot, canton_id, domain_of_influence):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Ballot
+    from onegov.ballot.models import Vote
+
+
+def export_ballot_ech_0252(
+    ballot: 'Ballot',
+    canton_id: int,
+    domain_of_influence: DomainOfInfluenceType
+) -> VoteInfoType:
     """ Returns all data as an eCH-0252 VoteInfoType. """
 
     SubtotalInfo = CountOfVotersInformationType.SubtotalInfo
@@ -62,7 +73,7 @@ def export_ballot_ech_0252(ballot, canton_id, domain_of_influence):
         CountingCircleInfoType(
             counting_circle=CountingCircleType(
                 counting_circle_id=(
-                    result.entity_id if result.entity_id
+                    str(result.entity_id) if result.entity_id
                     else f'19{canton_id:02d}0'
                 ),
                 counting_circle_name=result.name,
@@ -93,7 +104,11 @@ def export_ballot_ech_0252(ballot, canton_id, domain_of_influence):
     )
 
 
-def export_vote_ech_0252(vote, canton_id, domain_of_influence):
+def export_vote_ech_0252(
+    vote: 'Vote',
+    canton_id: int,
+    domain_of_influence: DomainOfInfluenceType
+) -> str:
     """ Returns all data as an eCH-0252 XML. """
 
     polling_day = XmlDate.from_date(vote.date)

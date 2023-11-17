@@ -301,9 +301,9 @@
                 <tal:b condition="result.counted">
                     <th class="column-entity">${layout.format_name(result)}</th>
                     <td class="column-district" tal:condition="layout.has_districts">${result.district}</td>
-                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.eligible_voters)}</td>
-                    <td class="column-empty right-aligned" data-text="${result.empty}" tal:condition="expats">${layout.format_number(result.expats)}</td>
-                    <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.cast_ballots)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.expats}" tal:condition="expats">${layout.format_number(result.expats)}</td>
+                    <td class="column-empty right-aligned" data-text="${result.cast_ballots}">${layout.format_number(result.cast_ballots)}</td>
                     <td class="column-empty right-aligned" data-text="${result.empty}">${layout.format_number(result.empty)}</td>
                     <td class="column-invalid right-aligned" data-text="${result.invalid}">${layout.format_number(result.invalid)}</td>
                     <td class="column-turnout right-aligned" tal:condition="layout.completed">${'{0:.2f} %'.format(result.turnout)}</td>

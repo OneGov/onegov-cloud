@@ -23,15 +23,19 @@ def test_disable_extension():
         pass
 
     topic = Topic()
-    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    request = Bunch(app=Bunch(**{
+        'settings.org.disabled_extensions': [],
+        'can_deliver_sms': False
+    }))
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
     assert 'access' in form._fields
 
     topic = Topic()
-    request = Bunch(**{
-        'app.settings.org.disabled_extensions': ['AccessExtension']
-    })
+    request = Bunch(app=Bunch(**{
+        'settings.org.disabled_extensions': ['AccessExtension'],
+        'can_deliver_sms': False
+    }))
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
     assert 'access' not in form._fields
@@ -48,20 +52,31 @@ def test_access_extension():
     topic = Topic()
     assert topic.access == 'public'
 
-    request = Bunch(**{'app.settings.org.disabled_extensions': []})
+    request = Bunch(app=Bunch(**{
+        'settings.org.disabled_extensions': [],
+        'can_deliver_sms': False
+    }))
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
 
     assert 'access' in form._fields
     assert form.access.data == 'public'
+    assert {'mtan', 'secret_mtan'}.isdisjoint(
+        value for value, _ in form.access.choices)
 
     form.access.data = 'private'
     form.populate_obj(topic)
 
     assert topic.access == 'private'
 
+    request = Bunch(app=Bunch(**{
+        'settings.org.disabled_extensions': [],
+        'can_deliver_sms': True
+    }))
     form_class = topic.with_content_extensions(TopicForm, request=request)
     form = form_class()
+    assert {'mtan', 'secret_mtan'}.issubset(
+        value for value, _ in form.access.choices)
 
     form.process(obj=topic)
 

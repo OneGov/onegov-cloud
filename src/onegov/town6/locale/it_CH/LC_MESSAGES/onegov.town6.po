@@ -183,6 +183,12 @@ msgstr "Elimina persona"
 msgid "Tickets"
 msgstr "Biglietti"
 
+msgid "Delete archived tickets"
+msgstr "Cancellare i biglietti archiviati"
+
+msgid "Do you really want to delete all archived tickets?"
+msgstr "Volete davvero cancellare tutti i biglietti archiviati?"
+
 msgid "Accept ticket"
 msgstr "Accetta il biglietto"
 
@@ -208,6 +214,9 @@ msgstr "Archivia il biglietto"
 
 msgid "Recover from archive"
 msgstr "Recupera dall'archivio"
+
+msgid "Delete Ticket"
+msgstr "Cancella biglietto"
 
 msgid "New Note"
 msgstr "Nuova nota"
@@ -808,8 +817,14 @@ msgstr "Questo sito è privato"
 msgid "This site is private but can also be seen by members"
 msgstr "Questo sito è privato ma può essere visto dai membri"
 
+msgid "This site is public but requires submitting an mTAN"
+msgstr "Questo sito è pubblico ma richiede l'invio di un mTAN"
+
 msgid "This site is secret"
 msgstr "Questo sito è segreto"
+
+msgid "This site is secret and requires submitting an mTAN"
+msgstr "Questo sito è segreto e richiede l'invio di un mTAN"
 
 msgid "This site is not published."
 msgstr "Questo sito non è pubblicato."
@@ -1016,7 +1031,7 @@ msgstr ""
 "per la home page."
 
 msgid "Current Image"
-msgstr ""
+msgstr "Immagine attuale"
 
 msgid "Has a digital seal"
 msgstr "Ha un sigillo digitale"
@@ -1047,13 +1062,9 @@ msgstr ""
 "qualsiasi momento per visualizzare lo stato del processo."
 
 msgid ""
-"Your request has been completed. If you asked for documents to be sent to "
-"your address, they should arrive shortly. If you asked to pick up documents "
-"at the municipality, the are now ready to be picked up."
+"Your request has been completed."
 msgstr ""
-"La tua richiesta è stata completata. Se hai chiesto di inviare i documenti "
-"al tuo indirizzo, dovrebbero arrivare a breve. Se hai chiesto di ritirare i "
-"documenti presso il comune, ora sono pronti per essere ritirati."
+"La tua richiesta è stata completata."
 
 msgid "Privacy"
 msgstr "Privacy"
@@ -2220,11 +2231,12 @@ msgstr "Migrazione dei link"
 msgid "OneGov API"
 msgstr "API OneGov"
 
-#~ msgid "Supported Chat Integrations"
-#~ msgstr "Integrazioni di chat supportate"
+msgid "Data Retention Policy"
+msgstr "Politica di Conservazione dei Dati"
 
-#~ msgid "Straight to ..."
-#~ msgstr "Direttamente a ..."
-
-#~ msgid "Perform Search"
-#~ msgstr "Ricerca"
+msgid ""
+"Proceed with caution. Tickets and the data they contain may be irrevocable "
+"deleted."
+msgstr ""
+"Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
+"irrevocabilmente cancellati."

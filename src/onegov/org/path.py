@@ -28,6 +28,7 @@ from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
 from onegov.newsletter import Subscription
 from onegov.org.app import OrgApp
+from onegov.org.auth import MTANAuth
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages
 from onegov.org.models import Clipboard
@@ -88,6 +89,11 @@ def get_org(app):
 @OrgApp.path(model=Auth, path='/auth', converters={'skip': bool})
 def get_auth(app, to='/', skip=False, signup_token=None):
     return Auth(app, to=to, skip=skip, signup_token=signup_token)
+
+
+@OrgApp.path(model=MTANAuth, path='/mtan')
+def get_mtan_auth(app, to='/'):
+    return MTANAuth(app, to=to)
 
 
 @OrgApp.path(model=User, path='/benutzer/{id}', converters={'id': UUID})
