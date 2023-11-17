@@ -46,8 +46,8 @@ if TYPE_CHECKING:
     CachePolicy = str | Callable[[Base], bool]
 
     class _OrmCacheDecorator(Protocol):
-        @overload
-        def __call__(  # type:ignore[misc]
+        @overload  # type:ignore[overload-overlap]
+        def __call__(
             self,
             fn: 'Creator[Query[_T]]'
         ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
@@ -315,7 +315,7 @@ def orm_cached(policy: 'CachePolicy') -> '_OrmCacheDecorator':
     """
 
     @overload
-    def orm_cache_decorator(  # type:ignore[misc]
+    def orm_cache_decorator(    # type:ignore[overload-overlap]
         fn: 'Creator[Query[_T]]'
     ) -> 'OrmCacheDescriptor[tuple[_T, ...]]': ...
 
