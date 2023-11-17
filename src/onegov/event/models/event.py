@@ -152,7 +152,6 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         'description': {'type': 'localized'},
         'location': {'type': 'localized'},
         'organizer': {'type': 'localized'},
-        'filter_keywords': {'type': 'keyword'}
     }
 
     @property
