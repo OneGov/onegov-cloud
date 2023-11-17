@@ -6,6 +6,7 @@ from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
@@ -153,6 +154,14 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         'location': {'type': 'localized'},
         'organizer': {'type': 'localized'},
     }
+
+    @hybrid_property
+    def description(self):  # noqa: F811
+        return self.content['description'].astext
+
+    @hybrid_property
+    def organizer(self):  # noqa: F811
+        return self.content['organizer'].astext
 
     @property
     def es_public(self):
