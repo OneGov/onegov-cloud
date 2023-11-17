@@ -1,12 +1,12 @@
-from wtforms.fields import BooleanField, StringField
+from wtforms.fields import BooleanField
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
-from onegov.form.fields import (ChosenSelectField, ChosenSelectMultipleField,
-                                ColorField)
+from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
 from onegov.org.forms.settings import \
     GeneralSettingsForm as OrgGeneralSettingsForm
 from onegov.town6 import _
+from onegov.user import UserCollection, User
 from onegov.town6.theme import user_options
 
 
@@ -114,3 +114,16 @@ class ChatSettingsForm(Form):
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
         # obj.chat_bg_color = self.chat_color.data
+
+    def populate_show_chat_for(self):
+        people = UserCollection(self.request.session).query().filter(
+            User.role.in_(['editor', 'admin']))
+        staff_members = [(
+            (f'{p.id} {p.username}', p.username)
+        ) for p in people]
+        self.show_chat_for.choices = [
+            (v, k) for v, k in staff_members
+        ]
+
+    def on_request(self):
+        self.populate_show_chat_for()

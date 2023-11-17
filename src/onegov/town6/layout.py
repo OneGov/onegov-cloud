@@ -3,12 +3,8 @@ from collections import namedtuple
 from functools import cached_property
 
 from dateutil import rrule
-<<<<<<< HEAD
 from dateutil.rrule import rrulestr
 
-=======
-from functools import cached_property
->>>>>>> master
 from onegov.chat import TextModuleCollection
 from onegov.core.elements import Block, Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile

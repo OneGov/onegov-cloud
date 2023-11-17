@@ -5,11 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-<<<<<<< HEAD
 "POT-Creation-Date: 2023-11-16 21:55+0100\n"
-=======
-"POT-Creation-Date: 2023-11-09 09:04+0100\n"
->>>>>>> master
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1038,11 +1034,7 @@ msgstr ""
 "disponibles pour la page d'accueil."
 
 msgid "Current Image"
-<<<<<<< HEAD
-msgstr ""
-=======
 msgstr "Image actuelle"
->>>>>>> master
 
 msgid "Has a digital seal"
 msgstr "Possède un sceau digital"
@@ -2248,7 +2240,6 @@ msgstr "Migration des liens"
 msgid "OneGov API"
 msgstr "API OneGov"
 
-<<<<<<< HEAD
 #~ msgid "Supported Chat Integrations"
 #~ msgstr "Integrations de Chat supportées"
 
@@ -2257,10 +2248,9 @@ msgstr "API OneGov"
 
 #~ msgid "Perform Search"
 #~ msgstr "Rechercher"
-=======
+
 msgid "Data Retention Policy"
 msgstr "Politique de Conservation des Données"
->>>>>>> master
 
 msgid ""
 "Proceed with caution. Tickets and the data they contain may be irrevocable "
