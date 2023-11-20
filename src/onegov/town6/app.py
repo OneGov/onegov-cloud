@@ -9,6 +9,7 @@ from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
 from datetime import datetime
+from sedate import replace_timezone
 import pytz
 
 MON = 0
@@ -37,11 +38,16 @@ class TownApp(OrgApp, FoundationApp):
 
         tz = pytz.timezone('Europe/Zurich')
         now = datetime.now(tz=tz)
-        morning_start = datetime(now.year, now.month, now.day, 8, tzinfo=tz)
-        morning_end = datetime(now.year, now.month, now.day, 11, 45, tzinfo=tz)
-        noon_start = datetime(now.year, now.month, now.day, 14, tzinfo=tz)
-        noon_end_monday = datetime(now.year, now.month, now.day, 18, tzinfo=tz)
-        noon_end_rest = datetime(now.year, now.month, now.day, 17, tzinfo=tz)
+        morning_start = replace_timezone(
+            datetime(now.year, now.month, now.day, 8), tz)
+        morning_end = replace_timezone(
+            datetime(now.year, now.month, now.day, 11, 45), tz)
+        noon_start = replace_timezone(
+            datetime(now.year, now.month, now.day, 14), tz)
+        noon_end_monday = replace_timezone(
+            datetime(now.year, now.month, now.day, 18), tz)
+        noon_end_rest = replace_timezone(
+            datetime(now.year, now.month, now.day, 17), tz)
 
         if now.weekday() not in (SAT, SUN):
             if now > morning_start:
