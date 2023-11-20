@@ -5,6 +5,7 @@ $('#nav-bar').on('sticky.zf.unstuckfrom:top', function() {
     var nav = $(this).find('.navigation');
     var img = $(this).find('img')
     var svg = $(this).find('svg')
+    console.log($(this))
     if (el.data('modified')) {
         el.toggleClass('shrink')
         nav.toggleClass('shrink')
