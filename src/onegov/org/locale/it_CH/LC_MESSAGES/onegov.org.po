@@ -3668,9 +3668,12 @@ msgid ""
 "Your chat has been turned into a ticket. We will take care of your request "
 "and get back to you as soon as new information is available."
 msgstr ""
+"La tua chat è stata trasformata in un ticket. Ci occuperemo della sua "
+"richiesta e la ricontatteremo non appena saranno disponibili nuove "
+"informazioni."
 
 msgid "Below you can see your chat conversation:"
-msgstr ""
+msgstr "Qui di seguito potete vedere la vostra conversazione in chat:"
 
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr ""
