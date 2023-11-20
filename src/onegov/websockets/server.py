@@ -150,7 +150,24 @@ class WebSocketServer(WebSocketServerProtocol):
         except InvalidOrigin as err:
             log.debug("WebSocket connection will be rejected.", exc_info=err)
 
+        self.populate_staff()
+
         return None
+
+    def populate_staff(self) -> None:
+        """
+        Populate staff users.
+        """
+        STAFF[self.schema] = {
+            user.username: user for user in
+            (
+                UserCollection(self.session)
+                .query()
+                .filter(User.role.in_(['editor', 'admin']))
+            )
+        }
+
+        transaction.commit()
 
     async def get_chat(self, id: 'UUID') -> 'Chat':
         chat = ACTIVE_CHATS.setdefault(self.schema, {}).get(id, NOTFOUND)
@@ -171,6 +188,7 @@ class WebSocketServer(WebSocketServerProtocol):
 
             ACTIVE_CHATS[self.schema][id] = chat  # type: ignore
 
+        transaction.commit()
         return chat  # type: ignore
 
     async def update_database(self) -> None:
@@ -189,15 +207,11 @@ class WebSocketServer(WebSocketServerProtocol):
 
     @property
     def session(self) -> 'Session':
-        session = SESSIONS.get(self.schema)
+        self.session_manager.set_current_schema(self.schema)
 
-        if session is None:
-            self.session_manager.set_current_schema(self.schema)
-            session = SESSIONS[self.schema] = self.session_manager.session()
-            STAFF[self.schema] = {
-                user.username: user for user in UserCollection(session).query(
-                ).filter(User.role.in_(['editor', 'admin']))}
-            ACTIVE_CHATS[self.schema] = {}
+        session = self.session_manager.session()
+
+        ACTIVE_CHATS[self.schema] = {}
 
         return session
 
@@ -536,12 +550,13 @@ async def handle_customer_chat(
                     'time': escape(content['time']),
                 })
                 chat.chat_history = chat_history
-                await websocket.update_database()
 
         except Exception as e:
             log.exception("The debugged error message is -", exc_info=e)
             channel_connections.remove(websocket)
             log.debug(f'removed {websocket.id} from channel-connections')
+        finally:
+            await websocket.update_database()
 
     return None
 
@@ -631,7 +646,6 @@ async def handle_staff_chat(
                         'time': escape(content['time']),
                     })
                     chat.chat_history = chat_history
-                    await websocket.update_database()
 
                 elif content['type'] == 'reconnect':
                     log.debug(f'reconnecting to channel {content["channel"]}')
@@ -655,7 +669,6 @@ async def handle_staff_chat(
                         continue
 
                     chat.active = False
-                    await websocket.update_database()
 
                 elif content['type'] == 'accepted':
                     log.debug('staff-member accepted-request')
@@ -698,7 +711,6 @@ async def handle_staff_chat(
                     log.debug('sent chat history')
 
                     chat.user_id = escape(content['userId'])
-                    await websocket.update_database()
 
                 elif content['type'] == 'request-chat-history':
                     open_channel = content['channel']
@@ -732,6 +744,8 @@ async def handle_staff_chat(
                 if websocket in staff_connections:
                     staff_connections.remove(websocket)
                 log.debug(f'removed {websocket.id} from staff-connections')
+            finally:
+                await websocket.update_database()
 
 
 async def handle_start(websocket: WebSocketServerProtocol) -> None:
