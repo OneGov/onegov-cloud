@@ -97,7 +97,7 @@ class WebSocketServer(WebSocketServerProtocol):
         """
         url = urlparse(path)
 
-        if url.path != '/chats':
+        if '/chats' not in url.path:
             # For non-chat requests (e.g., ticker) we'll skip the dance below
             # and let the protocol handle authentication
             # (handle_authentication).
