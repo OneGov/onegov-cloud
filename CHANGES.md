@@ -1,8 +1,32 @@
 # Changes
 
+## 2023.60
+
+`2023-11-17` | [971ba389e7...16c237773f](https://github.com/OneGov/onegov-cloud/compare/971ba389e7^...16c237773f)
+
+### Search
+
+##### Search results for events now also show the event start time
+
+`Bugfix` | [ogc-1331](#ogc-1331) | [fa0d2b9393](https://github.com/onegov/onegov-cloud/commit/fa0d2b9393a4ee822b0faac11fe8c0087e407485)
+
+### Tickets
+
+##### Condense ticket status message when closed
+
+`Feature` | [ogc-1330](#ogc-1330) | [971ba389e7](https://github.com/onegov/onegov-cloud/commit/971ba389e7fc561db09c07ff4591e3c6541ef0ff)
+
+### Town6
+
+##### Add Test Version of Chat-Function
+
+Town6: Add Test Version of Chat-Function
+
+`Feature` | [16c237773f](https://github.com/onegov/onegov-cloud/commit/16c237773f211243a82f6382ffdb17b8a71a962f)
+
 ## 2023.59
 
-`2023-11-13` | [3f2cc6c3b1...3f2cc6c3b1](https://github.com/OneGov/onegov-cloud/compare/3f2cc6c3b1^...3f2cc6c3b1)
+`2023-11-13` | [3f2cc6c3b1...90927b7ecb](https://github.com/OneGov/onegov-cloud/compare/3f2cc6c3b1^...90927b7ecb)
 
 ### Test
 
@@ -1909,26 +1933,4 @@ the top of the login page.
 ##### Pin Chameleon and resolve build container issues
 
 `Bugfix` | [db16f8cb70](https://github.com/onegov/onegov-cloud/commit/db16f8cb70be1db510202780570d21cc4b763577)
-
-## 2023.10
-
-`2023-03-06` | [b7781dac32...f086f478b9](https://github.com/OneGov/onegov-cloud/compare/b7781dac32^...f086f478b9)
-
-### Core
-
-##### Pin Watchdog
-
-`Bugfix` | [b7781dac32](https://github.com/onegov/onegov-cloud/commit/b7781dac326d39822a0dd3675f9992795e90e129)
-
-### Feriennet
-
-##### New Google Analytics Code
-
-`Feature` | [PRO-1155](https://linear.app/projuventute/issue/PRO-1155) | [89a5fd502f](https://github.com/onegov/onegov-cloud/commit/89a5fd502faf30e2cce46db7e39fdb0f0959ac5c)
-
-### Town6
-
-##### Update widget in initial homepage structure.
-
-`Feature` | [OGC-600](https://linear.app/onegovcloud/issue/OGC-600) | [8981201d9d](https://github.com/onegov/onegov-cloud/commit/8981201d9d0abaa07bd4c2f04e5b5157a47cbde2)
 
