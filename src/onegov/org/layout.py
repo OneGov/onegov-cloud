@@ -620,13 +620,12 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         'pptx': 'fa-file-powerpoint',
     }
 
-    def get_fa_file_icon(self, filename):
+    def get_fa_file_icon(self, filename) -> str:
         """
         Returns the font awesome file icon name for the given file
         according its extension.
         """
         default_icon = 'fa-file'
-        print(f'*** tschupre get_fa_file_icon for filename {filename}')
         if '.' not in filename:
             return default_icon
 
