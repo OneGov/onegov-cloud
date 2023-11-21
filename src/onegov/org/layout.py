@@ -580,6 +580,39 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     # so we can create Markup in layouts
     Markup = Markup
 
+    @staticmethod
+    def get_fa_file_icon(filename):
+        """
+        Returns the font awesome file icon name for the given file
+        according its extension.
+        """
+        print(f'*** tschupre get_fa_file_icon for filename {filename}')
+        if '.' not in filename:
+            return 'fa-file'
+
+        ext = filename.split('.')[1].lower()
+        if ext == 'pdf':
+            return 'fa-file-pdf'
+        if ext in ['jpg', 'png', 'img', 'ico', 'svg']:
+            return 'fa-file-image'
+        if ext in ['mp3', 'mp4']:
+            return 'fa-file-music'
+        if ext in ['mp3', 'mp4', 'mov', 'vid']:
+            return 'fa-file-video'
+        if ext in ['zip', 'tar.gz']:
+            return 'fa-file-zip'
+        if ext == 'csv':
+            return 'fa-file-csv'
+        if ext == 'xlsx':
+            return 'fa-file-excel'
+        if ext == 'txt':
+            return 'fa-file-doc'
+        if ext == 'docx':
+            return 'fa-file-word'
+        if ext == 'pptx':
+            return 'fa-file-powerpoint'
+        return 'fa-file'
+
 
 class DefaultLayoutMixin:
     def hide_from_robots(self):
