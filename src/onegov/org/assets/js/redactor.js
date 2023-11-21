@@ -349,7 +349,8 @@
 
 	// Offset for toolbar for town6
 	if (document.body.classList.contains('town-6')) {
-		$.Redactor.opts.toolbarFixedTopOffset = 100;
+		var header = document.querySelector('#header .nav-bar-sticky')
+		$.Redactor.opts.toolbarFixedTopOffset = header.offsetHeight - 20;
 	}
 
 	// Functionality
