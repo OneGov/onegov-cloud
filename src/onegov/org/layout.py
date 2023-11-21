@@ -580,38 +580,58 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     # so we can create Markup in layouts
     Markup = Markup
 
-    @staticmethod
-    def get_fa_file_icon(filename):
+    file_extension_fa_icon_mapping = {
+        'pdf': 'fa-file-pdf',
+        'jpg': 'fa-file-image',
+        'jpeg': 'fa-file-image',
+        'png': 'fa-file-image',
+        'img': 'fa-file-image',
+        'ico': 'fa-file-image',
+        'svg': 'fa-file-image',
+        'bmp': 'fa-file-image',
+        'gif': 'fa-file-image',
+        'tiff': 'fa-file-image',
+        'ogg': 'fa-file-music',
+        'wav': 'fa-file-music',
+        'mpa': 'fa-file-music',
+        'mp3': 'fa-file-music',
+        'avi': 'fa-file-video',
+        'mp4': 'fa-file-video',
+        'mpg': 'fa-file-video',
+        'mpeg': 'fa-file-video',
+        'mov': 'fa-file-video',
+        'vid': 'fa-file-video',
+        'webm': 'fa-file-video',
+        'zip': 'fa-file-zip',
+        '7z': 'fa-file-zip',
+        'rar': 'fa-file-zip',
+        'pkg': 'fa-file-zip',
+        'tar.gz': 'fa-file-zip',
+        # 'txt': 'fa-file-doc',  cannot be rendered
+        # 'log': 'fa-file-doc',  cannot be rendered
+        # 'csv': 'fa-file-csv',  cannot be rendered
+        'xls': 'fa-file-excel',
+        'xlsx': 'fa-file-excel',
+        'xlsm': 'fa-file-excel',
+        'ods': 'fa-file-excel',
+        'odt': 'fa-file-word',
+        'doc': 'fa-file-word',
+        'docx': 'fa-file-word',
+        'pptx': 'fa-file-powerpoint',
+    }
+
+    def get_fa_file_icon(self, filename):
         """
         Returns the font awesome file icon name for the given file
         according its extension.
         """
+        default_icon = 'fa-file'
         print(f'*** tschupre get_fa_file_icon for filename {filename}')
         if '.' not in filename:
-            return 'fa-file'
+            return default_icon
 
         ext = filename.split('.')[1].lower()
-        if ext == 'pdf':
-            return 'fa-file-pdf'
-        if ext in ['jpg', 'png', 'img', 'ico', 'svg']:
-            return 'fa-file-image'
-        if ext in ['mp3', 'mp4']:
-            return 'fa-file-music'
-        if ext in ['mp3', 'mp4', 'mov', 'vid']:
-            return 'fa-file-video'
-        if ext in ['zip', 'tar.gz']:
-            return 'fa-file-zip'
-        if ext == 'csv':
-            return 'fa-file-csv'
-        if ext == 'xlsx':
-            return 'fa-file-excel'
-        if ext == 'txt':
-            return 'fa-file-doc'
-        if ext == 'docx':
-            return 'fa-file-word'
-        if ext == 'pptx':
-            return 'fa-file-powerpoint'
-        return 'fa-file'
+        return self.file_extension_fa_icon_mapping.get(ext, default_icon)
 
 
 class DefaultLayoutMixin:
