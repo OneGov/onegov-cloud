@@ -667,8 +667,8 @@
                     <ul class="more-list">
                         <li tal:repeat="file files">
                             <a class="list-link has-tip" title="${file.name}" href="${request.link(file)}" data-tooltip>
-                               <span class="list-title far ${layout.get_fa_file_icon(file.name)} fa-fw" aria-hidden="true"></span>
-                                ${file.name.split('.')[0]}
+                                <i class="list-title far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                                <span class="list-title">${file.name.split('.')[0]}</span>
                             </a>
                         </li>
                     </ul>
