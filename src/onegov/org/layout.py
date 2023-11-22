@@ -624,6 +624,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         """
         Returns the font awesome file icon name for the given file
         according its extension.
+
+        NOTE: Currently, org and town6 are using different font awesome
+        versions, hence this only works for town6.
         """
         default_icon = 'fa-file'
         if '.' not in filename:
