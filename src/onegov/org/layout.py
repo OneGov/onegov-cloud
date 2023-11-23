@@ -2616,6 +2616,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
         def links():
+            qr_link = None
             if self.request.is_admin:
                 yield Link(
                     text=_("Configure"),
@@ -2634,6 +2635,12 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                         }, name='+import'
                     ),
                     attrs={'class': 'import-link'}
+                )
+
+                qr_link = QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
                 )
 
             if self.request.is_admin:
@@ -2682,6 +2689,8 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
             if not self.request.is_logged_in:
                 yield export_link
 
+            if qr_link:
+                yield qr_link
         return list(links())
 
     def get_pub_link(self, text, filter=None, toggle_active=True):
