@@ -7,7 +7,7 @@ from sqlalchemy import Text
 from uuid import uuid4, UUID as UUIDType
 
 
-from typing import TYPE_CHECKING
+from typing_extensions import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.core.types import AppenderQuery
     from onegov.user import User

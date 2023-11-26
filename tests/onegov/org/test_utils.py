@@ -2,6 +2,9 @@ from datetime import date, datetime
 from onegov.org import utils
 from pytz import timezone
 
+from onegov.org.utils import ticket_directory_groups_of_type
+from onegov.ticket import Ticket
+
 
 def test_annotate_html():
     html = "<p><img/></p><p></p>"
@@ -172,3 +175,29 @@ def test_predict_next_daterange_dst_st_transitions():
         (dt_ch(2022, 3, 13, 10), dt_ch(2022, 3, 13, 12)),
         (dt_ch(2022, 3, 20, 10), dt_ch(2022, 3, 20, 12)),
     )) == (dt_ch(2022, 3, 27, 10), dt_ch(2022, 3, 27, 12))
+
+
+def test_select_ticket_groups(session):
+
+    def create_ticket(handler_code, group=''):
+        result = Ticket(
+            number=f'{handler_code}-{group}-1',
+            title=f'{handler_code}-{group}',
+            group=group,
+            handler_code=handler_code,
+            handler_id=f'{handler_code}-{group}'
+        )
+        session.add(result)
+        return result
+
+    create_ticket('EVN')
+
+    dir_groups = ticket_directory_groups_of_type(session)
+    assert tuple(dir_groups) == ()
+
+    create_ticket('DIR', 'Steuererklärung')
+    create_ticket('DIR', 'Wohnsitzbestätigung')
+    session.flush()
+
+    dir_groups = ticket_directory_groups_of_type(session)
+    assert tuple(dir_groups) == ('Steuererklärung', 'Wohnsitzbestätigung')

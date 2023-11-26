@@ -166,6 +166,9 @@ class Link(Element, AccessMixin):
 
         super().__init__(text, attrs, traits, **props)
 
+    def __repr__(self) -> str:
+        return f'<Link {self.text}>'
+
 
 class LinkGroup(AccessMixin):
     """ Represents a list of links. """

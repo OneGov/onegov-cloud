@@ -1,3 +1,4 @@
+from functools import cached_property
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.form import Form, merge_forms
 from onegov.form import FormDefinition
@@ -5,6 +6,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
+from onegov.org.utils import ticket_directory_groups_of_type
 from onegov.ticket import handlers
 from onegov.ticket import TicketPermission
 from onegov.user import User
@@ -175,7 +177,27 @@ class ManageUserGroupForm(Form):
         choices=[],
     )
 
+    directories = ChosenSelectMultipleField(
+        label=_('Directories'),
+        choices=[],
+        description=_(
+            'Verzeichnisse für welche diese Benutzergruppe zuständig ist. '
+            'Falls aktiviert, sehen alle in der Benutzergruppe nur Tickets '
+            'aus diesen Verzeichnissen. Benachrichtigungen werden ebenfalls '
+            'nur für diese Verzeichnisse versendet.'
+        ),
+    )
+
+    @cached_property
+    def get_dirs(self) -> tuple[tuple[str, ...], ...]:
+        return tuple(ticket_directory_groups_of_type(self.request.session))
+
     def on_request(self):
+        if not self.get_dirs:
+            self.hide(self.directories)
+        else:
+            self.directories.choices = tuple((d, d) for d in self.get_dirs)
+
         self.users.choices = [
             (str(u.id), u.title)
             for u in UserCollection(self.request.session).query()
@@ -219,6 +241,10 @@ class ManageUserGroupForm(Form):
                         user_group=model
                     )
                 )
+        # initialize meta field with empty dict
+        if not model.meta:
+            model.meta = {}
+        model.meta['directories'] = self.directories.data
 
     def apply_model(self, model):
         self.name.data = model.name
@@ -227,3 +253,6 @@ class ManageUserGroupForm(Form):
             f'{permission.handler_code}-{permission.group or ""}'
             for permission in model.ticket_permissions
         ]
+
+        if model.meta:
+            self.directories.data = model.meta.get('directories', '')

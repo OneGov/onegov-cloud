@@ -1,5 +1,7 @@
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
+from onegov.org.utils import ticket_directory_groups_of_type,\
+    subset_of_interest
 
 
 def send_html_mail(request, template, content, **kwargs):
@@ -42,6 +44,28 @@ def send_marketing_html_mail(*args, **kwargs):
     return send_html_mail(*args, **kwargs)
 
 
+def predicate_should_include_ticket(ticket, request):
+
+    # If the ticket is not a directory ticket, it should be included
+    if ticket.handler_code != 'DIR':
+        return True
+
+    user_group_directories = subset_of_interest(
+        request, ticket.group
+    )
+
+    # If the ticket is a directory ticket, and the user is not part of a
+    # UserGroup that defines directories, it should be included
+    if user_group_directories is None:
+        return True
+
+    # Else, it should be included if the ticket's directory group is part of
+    # the ones defined in the usergroup
+    return user_group_directories in ticket_directory_groups_of_type(
+        request.session
+    )
+
+
 def send_ticket_mail(request, template, subject, receivers, ticket,
                      content=None, force=False, send_self=False, **kwargs):
     org = request.app.org
@@ -75,6 +99,9 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
             receivers = tuple(
                 r for r in receivers if r != request.current_username
             )
+
+        if not predicate_should_include_ticket(ticket, request.session):
+            return
 
     subject = ticket.reference(request) + ': ' + request.translate(subject)
 

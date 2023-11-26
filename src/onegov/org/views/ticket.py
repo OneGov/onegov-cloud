@@ -32,6 +32,7 @@ from onegov.org.models import TicketChatMessage, TicketMessage, TicketNote,\
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.org.models.ticket import ticket_submitter
 from onegov.org.pdf.ticket import TicketPdf
+from onegov.org.utils import subset_of_interest
 from onegov.org.views.message import view_messages_feed
 from onegov.org.views.utils import show_tags, show_filters
 from onegov.ticket import handlers as ticket_handlers
@@ -938,7 +939,8 @@ def get_filters(self, request):
 def get_groups(self, request, groups, handler):
     base = self.for_handler(handler)
 
-    for group in groups[handler]:
+    subset = subset_of_interest(request.current_user.group, groups[handler])
+    for group in subset:
         yield Link(
             text=group,
             url=request.link(base.for_group(group)),
@@ -1027,6 +1029,11 @@ def view_tickets(self, request, layout=None):
     handler = next((h for h in handlers if h.active), None)
     owner = next((o for o in owners if o.active), None)
     layout = layout or TicketsLayout(self, request)
+
+    if groups_directory := groups.get('DIR'):
+        ticket_groups = subset_of_interest(request.current_user.group,
+                                           groups_directory)
+        self.set_ticket_group(ticket_groups)
 
     def archive_link(ticket):
         return layout.csrf_protected_url(request.link(ticket, name='archive'))
