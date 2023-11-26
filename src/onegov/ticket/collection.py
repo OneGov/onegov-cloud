@@ -148,29 +148,8 @@ class TicketCount(NamedTuple):
 
 class TicketCollection(TicketCollectionPagination):
 
-    def __init__(self, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
-        self.ticket_groups: set[str] | None = None
-
     def query(self) -> 'Query[Ticket]':
         return self.session.query(Ticket)
-
-    def subset(self) -> 'Query[Ticket]':
-        query = self.query()
-        if self.ticket_groups is not None:
-            query = query.filter(Ticket.group.in_(self.ticket_groups))
-
-        return query
-
-    # def transform_batch_query(self, query: 'Query[Ticket]') ->
-    # 'Query[Ticket]':
-        # # works as well, but messes up the pagination. so we do it in subset
-    #     return (
-    #         query
-    #         if self.ticket_groups is None
-    #         else query.from_self().filter(Ticket.group.in_(
-    #         self.ticket_groups))
-    #     )
 
     def random_number(self, length: int) -> int:
         range_start = 10 ** (length - 1)
@@ -283,9 +262,6 @@ class TicketCollection(TicketCollectionPagination):
     ) -> 'Query[Ticket]':
         return self.query().filter(
             Ticket.handler_data['handler_data']['id'] == str(handler_data_id))
-
-    def set_ticket_group(self, ticket_groups: set[str]) -> None:
-        self.ticket_groups = ticket_groups
 
 
 # FIXME: Why is this its own subclass? shouldn't this at least override

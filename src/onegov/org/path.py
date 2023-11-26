@@ -64,6 +64,7 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
 from onegov.org.models.resource import FindYourSpotCollection
+from onegov.org.views.ticket import groups_by_handler_code
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection
@@ -305,10 +306,19 @@ def get_ticket(app, handler_code, id):
 
 
 @OrgApp.path(model=TicketCollection, path='/tickets/{handler}/{state}')
-def get_tickets(app, handler='ALL', state='open', page=0, group=None,
+def get_tickets(request, handler='ALL', state='open', page=0, group=None,
                 owner=None, extra_parameters=None):
+    if group is None:
+        if all_groups := groups_by_handler_code(request.session).get(
+            'DIR'
+        ):
+            user_group = request.current_user.group
+            dirs = user_group.meta.get('directories', set())
+            if dirs and len(dirs) == 1:
+                group = dirs[0]
+
     return TicketCollection(
-        app.session(),
+        request.session,
         handler=handler,
         state=state,
         page=page,
