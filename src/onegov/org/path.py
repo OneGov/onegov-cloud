@@ -306,19 +306,10 @@ def get_ticket(app, handler_code, id):
 
 
 @OrgApp.path(model=TicketCollection, path='/tickets/{handler}/{state}')
-def get_tickets(request, handler='ALL', state='open', page=0, group=None,
+def get_tickets(app, handler='ALL', state='open', page=0, group=None,
                 owner=None, extra_parameters=None):
-    if group is None:
-        if all_groups := groups_by_handler_code(request.session).get(
-            'DIR'
-        ):
-            user_group = request.current_user.group
-            dirs = user_group.meta.get('directories', set())
-            if dirs and len(dirs) == 1:
-                group = dirs[0]
-
     return TicketCollection(
-        request.session,
+        app.session(),
         handler=handler,
         state=state,
         page=page,
