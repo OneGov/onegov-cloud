@@ -555,7 +555,7 @@ def test_view_vote_campaign_material(swissvotes_app, sample_vote,
     details = details.click('Abstimmungen').click('Details')
     details = details.click('Liste der Dokumente anzeigen')
     assert 'Urheberrechtsschutz' in details
-    with raises(Exception):
+    with raises(ValueError):
         assert details.click('Article').content_type == 'application/pdf'
 
     # ... delete
