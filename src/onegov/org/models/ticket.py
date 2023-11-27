@@ -1,4 +1,7 @@
 from functools import cached_property
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.templates import render_macro
 from onegov.directory import Directory, DirectoryEntry
 from onegov.event import EventCollection
@@ -12,7 +15,7 @@ from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.search.utils import extract_hashtags
 from purl import URL
-from sqlalchemy import func
+from sqlalchemy import func, select, text, Text
 from sqlalchemy.orm import object_session
 
 
@@ -137,13 +140,19 @@ class FormSubmissionHandler(Handler):
     def form(self):
         return self.submission.form_class(data=self.submission.data)
 
-    @property
+    # @property
+    @hybrid_property
     def deleted(self):
         return self.submission is None
 
-    @property
+    @hybrid_property
     def email(self):
         return self.submission.email if self.submission is not None else ''
+
+    @email.expression
+    def email(cls):
+        return select([Submission.email]).where(Submission.id == cls.id)
+
 
     @property
     def title(self):
@@ -163,12 +172,17 @@ class FormSubmissionHandler(Handler):
     def payment(self):
         return self.submission and self.submission.payment
 
-    @property
+    # @property
+    @hybrid_property
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()
             if isinstance(v, str)
         ]
+
+    @extra_data.expression
+    def extra_data(cls):
+        return Text('')
 
     @property
     def undecided(self):
@@ -359,23 +373,35 @@ class ReservationHandler(Handler):
     def payment(self):
         return self.reservations and self.reservations[0].payment
 
-    @property
+    # @property
+    @hybrid_property
     def deleted(self):
         return False if self.reservations else True
 
-    @property
+    # @property
+    @hybrid_property
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()
             if isinstance(v, str)
         ]
 
-    @property
+    @extra_data.expression
+    def extra_data(cls):
+        return ''
+
+    @hybrid_property
     def email(self):
         # the e-mail is the same over all reservations
         if self.deleted:
-            return self.ticket.snapshot.get('email')
-        return self.reservations[0].email
+            # return self.ticket.snapshot.get('email')
+            return self.ticket.snapshot['email']
+        # return self.reservations[0].email
+        return select([Reservation.email]).limit(1)
+
+    @email.expression
+    def email(cls) -> str | None:
+        return ''
 
     @property
     def undecided(self):
@@ -600,7 +626,8 @@ class EventSubmissionHandler(Handler):
     def event(self):
         return self.collection.by_id(self.id)
 
-    @property
+    # @property
+    @hybrid_property
     def deleted(self):
         return self.event is None
 
@@ -614,9 +641,14 @@ class EventSubmissionHandler(Handler):
         # values stored only when importing with cli
         return self.data.get('user')
 
-    @cached_property
+    # @cached_property
+    @hybrid_property
     def email(self):
         return self.event and self.event.meta.get('submitter_email')
+
+    @email.expression
+    def email(cls) -> str | None:
+        return cls.event.meta['submitter_email']
 
     @property
     def title(self):
@@ -634,13 +666,20 @@ class EventSubmissionHandler(Handler):
 
         return ', '.join(p for p in parts if p)
 
-    @property
+    # @property
+    @hybrid_property
     def extra_data(self):
         return [
             self.event.description,
             self.event.title,
             self.event.location
         ]
+
+    @extra_data.expression
+    def extra_data(cls):
+        return func.concat(cls.event.description,
+                           cls.event.title,
+                           cls.event.location)
 
     @property
     def undecided(self):
@@ -783,7 +822,8 @@ class DirectoryEntryHandler(Handler):
 
         return self.session.query(DirectoryEntry).filter_by(id=id).first()
 
-    @property
+    # @property
+    @hybrid_property
     def deleted(self):
         if not self.directory:
             return True
@@ -807,9 +847,13 @@ class DirectoryEntryHandler(Handler):
 
         return False
 
-    @property
+    @hybrid_property
     def email(self):
         return self.submission.email if self.submission is not None else ''
+
+    @email.expression
+    def email(cls) -> str | None:
+        return ''
 
     @property
     def submitter_name(self):
@@ -846,12 +890,17 @@ class DirectoryEntryHandler(Handler):
     def state(self):
         return self.ticket.handler_data.get('state')
 
-    @property
+    # @property
+    @hybrid_property
     def extra_data(self):
         return self.submission and [
             v for v in self.submission.data.values()
             if isinstance(v, str)
         ]
+
+    @extra_data.expression
+    def extra_data(cls):
+        return ''
 
     @property
     def undecided(self):

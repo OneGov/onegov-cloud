@@ -30,8 +30,8 @@ def reindex(group_context, fail):
         print(f"- psql indexing took {utcnow() - start}")
 
         # TODO: remove es indexing once es is gone
-        start = utcnow()
-        request.app.es_perform_reindex(fail)
-        print(f"- es indexing took {utcnow() - start}")
+        # start = utcnow()
+        # request.app.es_perform_reindex(fail)
+        # print(f"- es indexing took {utcnow() - start}")
 
     return run_reindex

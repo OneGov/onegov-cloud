@@ -7,9 +7,10 @@ from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow, to_timezone
 from sqlalchemy import (
-    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_)
+    Column, Boolean, SmallInteger, Enum, Text, Interval, ForeignKey, or_, and_,
+    select)
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, backref, object_session
+from sqlalchemy.orm import relationship, backref, object_session, join
 from uuid import uuid4
 
 from onegov.core.mail import Attachment
@@ -17,12 +18,14 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
+from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.fsi.models.course_subscription import subscription_table
 from onegov.search import ORMSearchable
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .course import Course
     from .course_notification_template import (
@@ -40,7 +43,6 @@ COURSE_EVENT_STATUSES_TRANSLATIONS = (
 
 # for forms...
 def course_status_choices(request=None, as_dict=False):
-
     if request:
         translations = (
             request.translate(v) for v in COURSE_EVENT_STATUSES_TRANSLATIONS)
@@ -54,14 +56,14 @@ def course_status_choices(request=None, as_dict=False):
 
 
 class CourseEvent(Base, TimestampMixin, ORMSearchable):
-
     default_reminder_before = datetime.timedelta(days=14)
 
     __tablename__ = 'fsi_course_events'
 
     es_properties = {
+        # expression for name and desc implementiert aber subquery issue
         'name': {'type': 'localized'},
-        'description': {'type': 'localized'},
+        # 'description': {'type': 'localized'},
         'location': {'type': 'localized'},
         'presenter_name': {'type': 'text'},
         'presenter_company': {'type': 'text'},
@@ -89,6 +91,41 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def name(self):
         return self.course.name
 
+    @name.expression
+    def name(cls):
+        # both variants lead to the same error:
+        # sqlalchemy.exc.NotSupportedError: (psycopg2.errors.FeatureNotSupported) cannot use subquery in column generation expression
+        # subquery issue probably produced due where clause
+
+        # expr = select([Course.name])
+        # expr = expr.where(Course.id == cls.course_id)
+        # expr = expr.label('name')
+        # return expr
+
+        # expr = (select([Course.name]).where(Course.id == cls.course_id).
+        #         select_from(join(cls, Course)).label('name'))
+
+        # the variant below are closer to the final version (explicit
+        # join) but throw: 'Can't find any foreign key relationships between
+        # 'Select object' and 'fsi_courses'
+        expr = select([Course.name]).select_from(cls).join(
+            Course).where(Course.id == cls.course_id).label('name')
+
+        # throws: subquery in FROM must-have an alias
+        # j = select([cls.course_id]).join(Course, Course.id ==
+        #                                  cls.course_id).alias('j')
+        # expr = select([Course.name]).select_from(j).label('name')
+
+        # example https://docs.sqlalchemy.org/en/20/orm/queryguide/select.html#joining-to-subqueries
+        # throwing: TypeError: 'DeclarativeMeta' object is not iterable
+        # subq = select(Address).where(Address.email_address == "pat999@aol.com").subquery()
+        # stmt = select(User).join(subq, User.id == subq.c.user_id)
+        # subquery = select(cls).where(cls.course_id == Course.id).subquery()
+        # expr = select(Course).join(subquery, Course.id == subquery.course_id)
+
+        print(expr)
+        return expr
+
     @property
     def lead(self):
         return (
@@ -100,6 +137,13 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     @hybrid_property
     def description(self):
         return self.course.description
+
+    @description.expression
+    def description(cls):
+        expr = select([Course.description])
+        expr = expr.where(Course.id == cls.course_id)
+        expr = expr.label('description')
+        return expr
 
     def __str__(self):
         start = to_timezone(

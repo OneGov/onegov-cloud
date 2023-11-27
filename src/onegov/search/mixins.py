@@ -1,4 +1,5 @@
 from sqlalchemy import Column, func, Computed  # type:ignore[attr-defined]
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred
@@ -217,6 +218,7 @@ class Searchable:
         :return: None
         """
 
+        print(f'\n*** tschupre tsvector for model class {model}')
         col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
         context = UpgradeContext(request)
         if not context.has_column(model.__tablename__, col_name):
@@ -242,6 +244,10 @@ class Searchable:
                             tsvector_expression = tsvector_expression.concat(
                                 expr)
 
+            print(f'*** tschupre tsvector expr of '
+                  f'model class {model}: {tsvector_expression}')
+            print(str(tsvector_expression.compile(
+                dialect=postgresql.dialect()).params))
             context.operations.add_column(
                 model.__tablename__,
                 Column(col_name,

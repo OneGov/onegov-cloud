@@ -675,6 +675,9 @@ class SessionManager:
                     base.metadata.create_all(conn)
 
                     declared_classes.update(base._decl_class_registry.values())
+                    # declared_classes.update(
+                    #     base.registry._class_registry.values())  # upgrading
+                    # to sqlalchemy 1.4.x
 
                 conn.execute('COMMIT')
             finally:

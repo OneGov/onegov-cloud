@@ -137,6 +137,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
         return (sum(1 for r in self.results if r.counted) == count)
 
+    # tschupre example for expression
     @counted.expression  # type:ignore[no-redef]
     def counted(cls) -> 'ColumnElement[bool]':
         expr = select([

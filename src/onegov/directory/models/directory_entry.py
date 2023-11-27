@@ -23,7 +23,8 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     __tablename__ = 'directory_entries'
 
     es_properties = {
-        'keywords': {'type': 'keyword'},
+        # 'keywords': {'type': 'keyword'},  # produce a literal issue when
+        # using sqlalchemy 1.4
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         '_directory_id': {'type': 'keyword'},
@@ -31,7 +32,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search
         # quality a bit
-        'text': {'type': 'localized_html'}
+        # 'text': {'type': 'localized_html'}
     }
 
     @property
@@ -103,13 +104,24 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def keywords(self, value):
         self._keywords = {k: '' for k in value} if value else None
 
+    # @property
     @hybrid_property
     def text(self):
         return self.directory.configuration.extract_searchable(self.values)
 
+    # @text.expression
+    # def text(cls):
+    #     expr = ''
+    #     print(f'*** hybrid prop text: {expr}')
+    #     return expr
+
     @property
     def values(self):
         return self.content and self.content.get('values', {})
+
+    @hybrid_property
+    def values(cls):
+        return cls.content['values']
 
     @values.setter
     def values(self, values):
