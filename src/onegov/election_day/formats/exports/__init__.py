@@ -1,4 +1,6 @@
 from onegov.ballot import Vote
+from onegov.ballot.models import Election
+from onegov.ballot.models import ElectionCompound
 from onegov.election_day.formats.exports.election import (
     export_election_internal)
 from onegov.election_day.formats.exports.election import (
@@ -17,20 +19,21 @@ from typing import Any
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from onegov.ballot.models import Election
-    from onegov.ballot.models import ElectionCompound
 
 
 def export_internal(
-    item: 'Election | ElectionCompound | Vote',
+    item: Election | ElectionCompound | Vote,
     locales: 'Collection[str]'
 ) -> list[dict[str, Any]]:
 
     if isinstance(item, Vote):
         return export_vote_internal(item, locales)
-    # FIXME: Shouldn't this check for ElectionCompound and use
-    #        export_election_compound_internal?
-    return export_election_internal(item, locales)  # type:ignore[arg-type]
+
+    if isinstance(item, ElectionCompound):
+        return export_election_compound_internal(item, locales)
+
+    if isinstance(item, Election):
+        return export_election_internal(item, locales)
 
 
 __all__ = (
