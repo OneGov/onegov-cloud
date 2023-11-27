@@ -607,9 +607,9 @@ class Layout(ChameleonLayout, OpenGraphMixin):
         'rar': 'fa-file-zip',
         'pkg': 'fa-file-zip',
         'tar.gz': 'fa-file-zip',
-        # 'txt': 'fa-file-doc',  cannot be rendered
-        # 'log': 'fa-file-doc',  cannot be rendered
-        # 'csv': 'fa-file-csv',  cannot be rendered
+        'txt': 'fa-file-alt',
+        'log': 'fa-file-alt',
+        'csv': 'fas fa-file-csv',  # hack: csv icon is a pro-icon
         'xls': 'fa-file-excel',
         'xlsx': 'fa-file-excel',
         'xlsm': 'fa-file-excel',
