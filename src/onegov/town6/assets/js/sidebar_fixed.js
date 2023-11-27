@@ -9,11 +9,6 @@ $(window).on("load", function() {
     var sidebar_lc = $('.sidebar-content-wrapper > *:last-child');
     var sidebar_bottom = sidebar_lc.offset().top + sidebar_lc.height();
 
-    console.log('content', content_lc)
-    console.log('content height', content_bottom)
-    console.log('sidebar', sidebar_lc)
-    console.log('sidebar height', sidebar_bottom)
-
     if (content_bottom > sidebar_bottom) {
         $('.sidebar-wrapper').stickySidebar({
             topSpacing: header_height,
