@@ -652,7 +652,7 @@
         <div class="sidebar-wrapper">
             <div class="sidebar-content-wrapper">
                 <div metal:define-slot="before-panels"></div>
-                <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="contact or coordinates or location">
+                <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="(not hide and contact) or coordinates or location">
                     <div tal:condition="contact and not hide">
                         <h3 i18n:translate>Contact</h3>
                         <tal:b content="structure contact" />
