@@ -1,5 +1,3 @@
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from onegov.ticket.errors import DuplicateHandlerError
 from sqlalchemy.orm import object_session
 
@@ -77,13 +75,8 @@ class Handler:
         if self.ticket.handler_data != self.data:
             self.ticket.handler_data = self.data
 
-    @hybrid_property
+    @property
     def email(self) -> str | None:
-        """ Returns the email address behind the ticket request. """
-        raise NotImplementedError
-
-    @email.expression
-    def email(cls) -> str | None:
         """ Returns the email address behind the ticket request. """
         raise NotImplementedError
 

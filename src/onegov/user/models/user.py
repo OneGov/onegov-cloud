@@ -49,7 +49,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     es_properties = {
         'username': {'type': 'text'},
         'realname': {'type': 'text'},
-        # 'userprofile': {'type': 'text'}
+        'userprofile': {'type': 'text'}
     }
     es_public = False
 
@@ -67,35 +67,6 @@ class User(Base, TimestampMixin, ORMSearchable):
             for value in self.data.values()
             if value and isinstance(value, str)
         ]
-
-    @userprofile.expression
-    def userprofile(cls) -> list[str]:
-        if not cls.data:
-            return None
-
-        # userprofile_keys = (
-        #     'organisation',
-        #     'address',
-        #     'zip_code',
-        #     'place',
-        #     'email',
-        #     'phone',
-        #     'emergency',
-        #     'website',
-        #     'bank_account',
-        #     'bank_beneficiary',
-        # )
-
-        return func.concat_ws(' ',
-                              cls.data['organisation'],
-                              cls.data['address']
-                              )
-
-        # return [
-        #     cls.data[key]
-        #     for key in userprofile_keys
-        #     if key and isinstance(key, str)
-        # ]
 
     #: the user id is a uuid because that's more secure (no id guessing)
     id: 'Column[UUIDType]' = Column(

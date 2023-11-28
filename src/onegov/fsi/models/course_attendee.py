@@ -2,19 +2,19 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
-from onegov.user import User
-from sqlalchemy import Boolean, case, select, and_, func
+from sqlalchemy import Boolean
 from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
 from uuid import uuid4
 
-from typing import TYPE_CHECKING
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.user import User
     from .course_subscription import CourseSubscription
+
 
 external_attendee_org = "Externe Kursteilnehmer"
 
@@ -43,8 +43,8 @@ class CourseAttendee(Base, ORMSearchable):
         'first_name': {'type': 'text'},
         'last_name': {'type': 'text'},
         'organisation': {'type': 'text'},
-        # 'email': {'type': 'text'},
-        # 'title': {'type': 'text'},
+        'email': {'type': 'text'},
+        'title': {'type': 'text'},
     }
 
     es_public = False
@@ -118,21 +118,6 @@ class CourseAttendee(Base, ORMSearchable):
             ) if p
         )) or self.email
 
-    @title.expression
-    def title(cls):
-        return case((
-            (
-                and_(
-                    cls.first_name != '',
-                     cls.last_name != ''
-                ),
-                # cls.first_name + ' ' + cls.last_name
-                func.concat(cls.first_name + ' ' + cls.last_name)
-            )
-        ),
-            else_=cls.email,
-        )
-
     @property
     def lead(self):
         return self.organisation
@@ -154,22 +139,6 @@ class CourseAttendee(Base, ORMSearchable):
         if not self.user_id:
             return self._email
         return self.user.username
-
-    @email.expression
-    def email(cls):
-        from onegov.user import User
-
-        return case((
-            (
-                # cls.user_id.isnot(None),
-                cls.user_id != '',
-                cls._email
-            ),
-        ), else_=(
-            select([User.username]).
-            where(cls.user_id == User.id).
-            label('email'))
-        )
 
     @email.setter
     def email(self, value):
@@ -225,7 +194,7 @@ class CourseAttendee(Base, ORMSearchable):
 
         session = object_session(self)
 
-        result = session.query(CourseEvent).join(Course) \
+        result = session.query(CourseEvent).join(Course)\
             .filter(Course.mandatory_refresh == True)
 
         result = result.join(CourseSubscription)

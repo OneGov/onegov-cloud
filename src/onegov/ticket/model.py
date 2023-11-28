@@ -1,5 +1,4 @@
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.sql.functions import coalesce, func
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -11,8 +10,7 @@ from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User
 from onegov.user import UserGroup
 from sedate import utcnow
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text, case, \
-    text
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
@@ -155,9 +153,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         'number': {'type': 'text'},
         'title': {'type': 'text'},
         'subtitle': {'type': 'text'},
-        # 'group': {'type': 'text'},
-        # 'ticket_email': {'type': 'keyword'},
-        # 'ticket_data': {'type': 'localized_html'},
+        'group': {'type': 'text'},
+        'ticket_email': {'type': 'keyword'},
+        'ticket_data': {'type': 'localized_html'},
         'extra_localized_text': {'type': 'localized'}
     }
 
@@ -168,10 +166,6 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
         """
         return None
-
-    @extra_localized_text.expression
-    def extra_localized_text(cls):
-        return text('NULL')
 
     @property
     def es_suggestion(self) -> list[str]:
@@ -187,34 +181,12 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         else:
             return self.handler.email
 
-    @ticket_email.expression
-    def ticket_email(cls) -> str | None:
-        return case(
-            [(
-                cls.handler.deleted,
-                cls.snapshot['email'].astext
-            )],
-            else_=cls.handler.email
-        )
-        # return coalesce(cls.snapshot['email'],
-        #                 cls.handler['email'])
-
     @hybrid_property
     def ticket_data(self) -> 'Sequence[str] | None':
         if self.handler.deleted:
             return self.snapshot.get('summary')
         else:
             return self.handler.extra_data
-
-    @ticket_data.expression
-    def ticket_data(cls):
-        return case(
-            [(
-                cls.snapshot['summary'],
-                cls.snapshot['summary']
-            )],
-            else_=cls.handler.extra_data
-        )
 
     def redact_data(self) -> None:
         """Redact sensitive information from the ticket to protect personal
@@ -255,25 +227,12 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         submission.submitter_address = redact_constant
         submission.submitter_phone = redact_constant
 
-    @hybrid_property
+    @property
     def handler(self) -> 'Handler':
         """ Returns an instance of the handler associated with this ticket. """
 
         return handlers.get(self.handler_code)(
             self, self.handler_id, self.handler_data)
-
-    @handler.expression
-    def handler(cls) -> 'Handler':
-        """ Returns an instance of the handler associated with this ticket. """
-        from onegov.org.models.ticket import FormSubmissionHandler, ReservationHandler, \
-            EventSubmissionHandler, DirectoryEntryHandler
-
-        return case((
-            (cls.handler_code == 'EVN', EventSubmissionHandler),
-            (cls.handler_code == 'DIR', DirectoryEntryHandler),
-            (cls.handler_code == 'FRM', FormSubmissionHandler),
-            (cls.handler_code == 'RSV', ReservationHandler),
-        ), else_=None)
 
     @property
     def current_process_time(self) -> int | None:

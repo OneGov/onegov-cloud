@@ -36,16 +36,7 @@ def get_fts_index_languages():
     NOTE: 'simple' is used for tag, label or phrase searches
 
     """
-    return (get_fts_index_basic_languages() +
-            get_fts_index_localized_languages())
-
-
-def get_fts_index_basic_languages():
-    return ['simple', 'german']
-
-
-def get_fts_index_localized_languages():
-    return ['french', 'italian', 'english']
+    return ['simple', 'german', 'french', 'italian', 'english']
 
 
 def is_valid_index_name(name):

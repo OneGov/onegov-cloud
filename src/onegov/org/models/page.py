@@ -46,10 +46,6 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     @hybrid_property
     def lead(self):  # noqa: F811
-        return self.content['lead']
-
-    @lead.expression
-    def lead(self):  # noqa: F811
         return self.content['lead'].astext
 
     @hybrid_property

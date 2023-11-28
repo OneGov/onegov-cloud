@@ -1,8 +1,6 @@
 from functools import cached_property
 
-from sqlalchemy import func, text, select, alias, Column, and_
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Query, column_property
 
 from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.activity import PublicationRequestCollection
@@ -14,7 +12,6 @@ from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.ticket import OrgTicketMixin
 from onegov.search import SearchableContent
 from onegov.ticket import handlers, Handler, Ticket
-from onegov.user import User
 
 
 class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
@@ -27,7 +24,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'text': {'type': 'localized_html'},
-        # 'organiser': {'type': 'text'}
+        'organiser': {'type': 'text'}
     }
 
     @property
@@ -43,17 +40,7 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         return self.state == 'preview'
 
     @hybrid_property
-    def lead(self):
-        return self.meta['lead'].astext
-
-    @hybrid_property
-    def text(self):
-        return self.content['text'].astext
-
-    # @property
-    @hybrid_property
     def organiser(self):
-        print('   *** tschupre property organizer()')
         organiser = [
             self.user.username,
             self.user.realname
@@ -79,18 +66,6 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
                 organiser.append(self.user.data[key])
 
         return organiser
-
-    @organiser.expression
-    def organiser(cls):
-        expr = (
-            Query(User.username, User.realname).
-            select_from(cls).join(User).
-            filter(cls.username == User.username).
-            filter(func.concat_ws(' ', User.username, User.realname)).
-            as_scalar()
-        )
-        print(expr)
-        return expr.label('organizer')
 
     def ordered_tags(self, request, durations=None):
         tags = [request.translate(_(tag)) for tag in self.tags]
