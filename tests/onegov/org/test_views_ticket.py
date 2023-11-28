@@ -689,6 +689,7 @@ def test_assign_tickets(client):
     client.login_admin()
 
     manage = client.get('/tickets/ALL/open').click(ticket_number)
+    manage = manage.click('E-Mails deaktivieren').follow()
     manage = manage.click('Ticket zuweisen')
     manage.form['user'].select(text='editor@example.org')
     manage.form.submit()

@@ -1955,8 +1955,8 @@ msgstr "Il biglietto si aggiorna tramite e-mail"
 msgid "Disable E-Mails"
 msgstr "Disabilita i messaggi e-mail"
 
-msgid "No ticket updates by e-mail"
-msgstr "Nessun aggiornamento dei biglietti tramite e-mail"
+msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
+msgstr "Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata un'e-mail quando viene assegnato un ticket."
 
 msgid "Enable E-Mails"
 msgstr "Abilita i messaggi e-mail"
