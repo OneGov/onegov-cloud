@@ -181,10 +181,9 @@ class ManageUserGroupForm(Form):
         label=_('Directories'),
         choices=[],
         description=_(
-            'Verzeichnisse für welche diese Benutzergruppe zuständig ist. '
-            'Falls aktiviert, sehen alle in der Benutzergruppe nur Tickets '
-            'aus diesen Verzeichnissen. Benachrichtigungen werden ebenfalls '
-            'nur für diese Verzeichnisse versendet.'
+            'Directories for which this user group is responsible. '
+            'If activated, ticket notifications for this group are '
+            'only sent for these directories'
         ),
     )
 
