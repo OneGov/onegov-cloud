@@ -64,7 +64,6 @@ from onegov.org.models.directory import ExtendedDirectoryEntryCollection
 from onegov.org.models.external_link import ExternalLinkCollection, \
     ExternalLink
 from onegov.org.models.resource import FindYourSpotCollection
-from onegov.org.views.ticket import groups_by_handler_code
 from onegov.page import PageCollection
 from onegov.pay import PaymentProvider, Payment, PaymentCollection
 from onegov.pay import PaymentProviderCollection

@@ -51,7 +51,7 @@ def predicate_should_include_ticket(ticket, request):
         return True
 
     user_group_directories = subset_of_interest(
-        request, ticket.group
+        request.current_user.group, ticket.group
     )
 
     # If the ticket is a directory ticket, and the user is not part of a
