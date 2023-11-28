@@ -1,8 +1,7 @@
 from datetime import date, datetime
 from onegov.org import utils
 from pytz import timezone
-
-from onegov.org.utils import ticket_directory_groups_of_type
+from onegov.org.utils import ticket_directory_groups
 from onegov.ticket import Ticket
 
 
@@ -192,12 +191,12 @@ def test_select_ticket_groups(session):
 
     create_ticket('EVN')
 
-    dir_groups = ticket_directory_groups_of_type(session)
+    dir_groups = ticket_directory_groups(session)
     assert tuple(dir_groups) == ()
 
     create_ticket('DIR', 'Steuererklärung')
     create_ticket('DIR', 'Wohnsitzbestätigung')
     session.flush()
 
-    dir_groups = ticket_directory_groups_of_type(session)
+    dir_groups = ticket_directory_groups(session)
     assert tuple(dir_groups) == ('Steuererklärung', 'Wohnsitzbestätigung')

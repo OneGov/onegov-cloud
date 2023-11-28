@@ -28,7 +28,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
     from sqlalchemy.orm import Session
-    from onegov.user import UserGroup
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser
@@ -936,7 +935,7 @@ def hashtag_elements(request, text):
     return HASHTAG.sub(replace_tag, text)
 
 
-def ticket_directory_groups_of_type(
+def ticket_directory_groups(
     session: 'Session'
 ) -> 'Iterable[tuple[str, ...]]':
     """Yields the ticket groups of the given type.
@@ -962,17 +961,3 @@ def ticket_directory_groups_of_type(
         for group in result.groups
         if group
     )
-
-
-def subset_of_interest(
-    group: 'UserGroup | None', all_groups: list[str]
-) -> set[str]:
-
-    # the user can be part of a UserGroup that limits visibility of tickets to
-    # only specific ticket groups. For now, we only support this for 'DIR'
-    groups = set(all_groups)
-    if group is not None and group.meta:
-        dirs = group.meta.get('directories', set())
-        dirs = set(dirs)
-        return dirs.intersection(groups)
-    return groups

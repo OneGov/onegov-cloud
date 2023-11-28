@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
-from onegov.org.utils import ticket_directory_groups_of_type,\
-    subset_of_interest
+
 
 if TYPE_CHECKING:
     from onegov.org.request import OrgRequest
@@ -58,19 +57,17 @@ def predicate_should_include_ticket(ticket: 'Ticket', request: 'OrgRequest'):
     if request.current_user is None:
         return True
 
-    user_group_directories = subset_of_interest(
-        request.current_user.group, [ticket.group]
-    )
+    group = request.current_user.group
 
     # If the ticket is a directory ticket, and the user is not part of a
     # UserGroup that defines directories, it should be included
-    if user_group_directories is None:
+    if group is None or not hasattr(group, 'meta'):
         return True
 
     # Else, it should be included if the ticket's directory group is part of
-    # the ones defined in the usergroup
-    return user_group_directories in set(ticket_directory_groups_of_type(
-        request.session))
+    # the ones defined in the UserGroup
+    if dirs := group.meta.get('directories', set()):
+        return ticket.group in dirs
 
 
 def send_ticket_mail(request, template, subject, receivers, ticket,
