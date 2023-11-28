@@ -265,9 +265,9 @@ class EmailNotification(Notification):
                 if subject:
                     subject_ = request.translate(subject)
                 else:
-                    subject_ = layout.subject(
-                        next(chain(election_compounds, elections, votes))
-                    )
+                    items: 'Iterator[Election | ElectionCompound | Vote]'
+                    items = chain(election_compounds, elections, votes)
+                    subject_ = layout.subject(next(items))
 
                 content = render_template(
                     'mail_results.pt',
