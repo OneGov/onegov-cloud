@@ -2,7 +2,7 @@ from functools import cached_property
 from onegov.core.utils import is_valid_yubikey_format
 from onegov.form import Form, merge_forms
 from onegov.form import FormDefinition
-from onegov.form.fields import ChosenSelectMultipleField, ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
@@ -177,7 +177,7 @@ class ManageUserGroupForm(Form):
         choices=[],
     )
 
-    directories = ChosenSelectField(
+    directories = ChosenSelectMultipleField(
         label=_('Directories'),
         choices=[],
         description=_(

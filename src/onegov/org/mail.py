@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
 from onegov.core.templates import render_template
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.utils import ticket_directory_groups_of_type,\
     subset_of_interest
+
+if TYPE_CHECKING:
+    from onegov.org.request import OrgRequest
+    from onegov.ticket import Ticket
 
 
 def send_html_mail(request, template, content, **kwargs):
@@ -44,14 +49,17 @@ def send_marketing_html_mail(*args, **kwargs):
     return send_html_mail(*args, **kwargs)
 
 
-def predicate_should_include_ticket(ticket, request):
+def predicate_should_include_ticket(ticket: 'Ticket', request: 'OrgRequest'):
 
     # If the ticket is not a directory ticket, it should be included
     if ticket.handler_code != 'DIR':
         return True
 
+    if request.current_user is None:
+        return True
+
     user_group_directories = subset_of_interest(
-        request.current_user.group, ticket.group
+        request.current_user.group, [ticket.group]
     )
 
     # If the ticket is a directory ticket, and the user is not part of a
@@ -61,9 +69,8 @@ def predicate_should_include_ticket(ticket, request):
 
     # Else, it should be included if the ticket's directory group is part of
     # the ones defined in the usergroup
-    return user_group_directories in ticket_directory_groups_of_type(
-        request.session
-    )
+    return user_group_directories in set(ticket_directory_groups_of_type(
+        request.session))
 
 
 def send_ticket_mail(request, template, subject, receivers, ticket,
@@ -100,7 +107,7 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
                 r for r in receivers if r != request.current_username
             )
 
-        if not predicate_should_include_ticket(ticket, request.session):
+        if not predicate_should_include_ticket(ticket, request):
             return
 
     subject = ticket.reference(request) + ': ' + request.translate(subject)
