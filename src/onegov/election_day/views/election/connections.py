@@ -10,6 +10,15 @@ from onegov.election_day.utils.election import get_connections_data
 from sqlalchemy.orm import object_session
 from onegov.election_day import _
 
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 election_incomplete_text = _(
     'The figure with the list connections will be available '
     'as soon the final results are published.'
@@ -21,8 +30,10 @@ election_incomplete_text = _(
     name='connections-data',
     permission=Public
 )
-def view_election_connections_data(self, request):
-
+def view_election_connections_data(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """" View the list connections as JSON.
 
     Used to for the connection sankey chart.
@@ -37,12 +48,14 @@ def view_election_connections_data(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_connections_chart(self, request):
-
+def view_election_connections_chart(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the connections as sankey chart. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     skip_rendering = hide_connections_chart(self, request)
@@ -62,12 +75,14 @@ def view_election_connections_chart(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_connections_table(self, request):
-
+def view_election_connections_table(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the connections tables as widget. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -85,8 +100,10 @@ def view_election_connections_table(self, request):
     template='election/connections.pt',
     permission=Public
 )
-def view_election_connections(self, request):
-
+def view_election_connections(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'connections')
@@ -100,8 +117,10 @@ def view_election_connections(self, request):
 
 
 @ElectionDayApp.svg_file(model=Election, name='connections-svg')
-def view_election_connections_svg(self, request):
-
+def view_election_connections_svg(
+    self: Election,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View the connections as SVG. """
 
     layout = ElectionLayout(self, request, 'connections')

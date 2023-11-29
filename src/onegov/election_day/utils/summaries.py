@@ -7,8 +7,12 @@ from onegov.election_day.models import ArchivedResult
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from onegov.ballot.models import ElectionCompoundPart
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.request import ElectionDayRequest
+    from typing_extensions import TypeAlias
+
+    ElectionCompoundOrPart: TypeAlias = ElectionCompound | ElectionCompoundPart
 
 
 def get_election_summary(
@@ -39,7 +43,7 @@ def get_election_summary(
 
 
 def get_election_compound_summary(
-    election_compound: ElectionCompound | ArchivedResult,
+    election_compound: 'ElectionCompoundOrPart | ArchivedResult',
     request: 'ElectionDayRequest | None',
     url: str | None = None,
     type_: str = 'election_compound'

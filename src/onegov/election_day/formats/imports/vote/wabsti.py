@@ -36,7 +36,7 @@ WABSTI_VOTE_HEADERS = (
 def import_vote_wabsti(
     vote: 'Vote',
     principal: 'Canton | Municipality',
-    vote_number: str,
+    vote_number: int,
     file: IO[bytes],
     mimetype: str
 ) -> list[FileImportError]:

@@ -7,13 +7,23 @@ from onegov.election_day.utils.election_compound import get_list_groups
 from onegov.election_day.utils.election_compound import get_list_groups_data
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.json(
     model=ElectionCompound,
     name='list-groups-data',
     permission=Public
 )
-def view_election_compound_list_groups_data(self, request):
-
+def view_election_compound_list_groups_data(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """" View the list groups as JSON. Used to for the lists bar chart. """
 
     return get_list_groups_data(self)
@@ -25,12 +35,14 @@ def view_election_compound_list_groups_data(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_compound_list_groups_chart(self, request):
-
+def view_election_compound_list_groups_chart(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the list groups as bar chart. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -46,12 +58,14 @@ def view_election_compound_list_groups_chart(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_compound_list_groups_table(self, request):
-
+def view_election_compound_list_groups_table(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View the list groups as table. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -69,8 +83,10 @@ def view_election_compound_list_groups_table(self, request):
     template='election_compound/list_groups.pt',
     permission=Public
 )
-def view_election_compound_list_groups(self, request):
-
+def view_election_compound_list_groups(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view. """
 
     layout = ElectionCompoundLayout(self, request, 'list-groups')
@@ -83,8 +99,10 @@ def view_election_compound_list_groups(self, request):
 
 
 @ElectionDayApp.svg_file(model=ElectionCompound, name='list-groups-svg')
-def view_election_compound_list_groups_svg(self, request):
-
+def view_election_compound_list_groups_svg(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """ View the list groups as SVG. """
 
     layout = ElectionCompoundLayout(self, request, 'list-groups')

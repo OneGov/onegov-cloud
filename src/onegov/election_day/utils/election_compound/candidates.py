@@ -9,7 +9,9 @@ from statistics import mean
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from onegov.ballot.models import ElectionCompound
+    from onegov.ballot.models import ElectionCompoundPart
     from onegov.ballot.types import Gender
     from sqlalchemy.orm import Query
     from sqlalchemy.orm import Session
@@ -32,7 +34,7 @@ if TYPE_CHECKING:
 
 
 def get_elected_candidates(
-    election_compound: 'ElectionCompound',
+    election_compound: 'ElectionCompound | ElectionCompoundPart',
     session: 'Session'
 ) -> 'Query[ElectedCandidateRow]':
     """ Returns the elected candidates of an election compound. """
@@ -64,8 +66,8 @@ def get_elected_candidates(
 
 
 def get_candidate_statistics(
-    election_compound: 'ElectionCompound',
-    elected_candidates: 'Query[ElectedCandidateRow] | None' = None
+    election_compound: 'ElectionCompound | ElectionCompoundPart',
+    elected_candidates: 'Iterable[ElectedCandidateRow] | None' = None
 ) -> dict[str, 'CandidateStatistics']:
 
     if elected_candidates is None:

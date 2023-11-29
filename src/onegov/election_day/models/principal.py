@@ -17,15 +17,42 @@ from typing import Any
 from typing import Literal
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from yaml.reader import _ReadStream
+    from onegov.ballot.types import DomainOfInfluence
+    from onegov.core.orm.mixins.content import dict_property
+    from sqlalchemy import Column
+    from translationstring import TranslationString
+    from typing import overload
     from typing import Protocol
+    from typing import TypeVar
     from typing_extensions import Never
+    from typing_extensions import Self
+    from typing_extensions import TypeAlias
+    from yaml.reader import _ReadStream
 
-    class HasDomainAndSegment(Protocol):
+    _T_co = TypeVar('_T_co', covariant=True)
+
+    class ReadableDescriptor(Protocol[_T_co]):
+        @overload
+        def __get__(self, obj: None, owner: type[object], /) -> Self: ...
+        @overload
+        def __get__(self, obj: object, owner: type[object], /) -> _T_co: ...
+
+    class _HasDomainAndSegment(Protocol):
         @property
         def domain(self) -> str | None: ...
         @property
         def domain_segment(self) -> str | None: ...
+
+    class _ModelWithDomainAndSegment(Protocol):
+        domain: Column[DomainOfInfluence]
+        domain_segment: dict_property[str]
+
+    # HACK: To get around the fact that custom descriptors can't
+    #       fulfil a readable property, we could maybe fix this
+    #       by defining a covariant protocol for domain and domain_segment
+    #       but it seems pretty tough to do
+    HasDomainAndSegment: TypeAlias = (
+        _HasDomainAndSegment | _ModelWithDomainAndSegment)
 
 
 # FIXME: Since these are loaded from YAML it would probably be a good
@@ -84,8 +111,8 @@ class Principal:
         self,
         id_: str,
         domain: str,
-        domains_election: dict[str, str],
-        domains_vote: dict[str, str],
+        domains_election: dict[str, 'TranslationString'],
+        domains_vote: dict[str, 'TranslationString'],
         entities: dict[int, dict[int, dict[str, str]]],
         name: str | None = None,
         logo: str | None = None,
@@ -304,7 +331,7 @@ class Canton(Principal):
         }
         has_superregions = superregions != {None}
 
-        domains_election: dict[str, str] = OrderedDict()
+        domains_election: dict[str, 'TranslationString'] = OrderedDict()
         domains_election['federation'] = _("Federal")
         domains_election['canton'] = _("Cantonal")
         if has_regions:
@@ -323,7 +350,7 @@ class Canton(Principal):
         )
         domains_election['municipality'] = _("Communal")
 
-        domains_vote: dict[str, str] = OrderedDict()
+        domains_vote: dict[str, 'TranslationString'] = OrderedDict()
         domains_vote['federation'] = _("Federal")
         domains_vote['canton'] = _("Cantonal")
         domains_vote['municipality'] = _("Communal")
@@ -465,7 +492,7 @@ class Municipality(Principal):
         self.canton_name = canton_name
         self.canton_id = Canton.CANTONS[canton]  # official BFS number
 
-        domains: dict[str, str] = OrderedDict((
+        domains: dict[str, 'TranslationString'] = OrderedDict((
             ('federation', _("Federal")),
             ('canton', _("Cantonal")),
             ('municipality', _("Communal"))
