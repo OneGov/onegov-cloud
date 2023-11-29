@@ -155,7 +155,7 @@ def format_address(addresses: 'SequenceOrScalar[Address | str]') -> str:
 
 class Attachment:
     """
-    Represents a mail attachment that can be passed to prepare_mail
+    Represents a mail attachment that can be passed to prepare_email
     """
 
     __slots__ = ('filename', 'content', 'content_type')

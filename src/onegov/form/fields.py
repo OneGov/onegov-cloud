@@ -4,6 +4,8 @@ import sedate
 
 from cssutils.css import CSSStyleSheet
 from itertools import zip_longest
+from email_validator import validate_email, EmailNotValidError
+
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.core.utils import dictionary_to_binary
@@ -563,6 +565,21 @@ class ChosenSelectMultipleField(SelectMultipleField):
     """ A multiple select field with chosen.js support. """
 
     widget = ChosenSelectWidget(multiple=True)
+
+
+class ChosenSelectMultipleEmailField(SelectMultipleField):
+
+    widget = ChosenSelectWidget(multiple=True)
+
+    def pre_validate(self, form: 'BaseForm') -> None:
+        super().pre_validate(form)
+        if not self.data:
+            return
+        for email in self.data:
+            try:
+                validate_email(email)
+            except EmailNotValidError as e:
+                raise ValidationError(_("Not a valid email")) from e
 
 
 class PreviewField(Field):

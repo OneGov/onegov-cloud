@@ -34,7 +34,8 @@ from onegov.org.forms.settings import MapSettingsForm
 from onegov.org.forms.settings import ModuleSettingsForm
 from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.text_module import TextModuleForm
-from onegov.org.forms.ticket import InternalTicketChatMessageForm
+from onegov.org.forms.ticket import InternalTicketChatMessageForm,\
+    ExtendedInternalTicketChatMessageForm
 from onegov.org.forms.ticket import TicketAssignmentForm
 from onegov.org.forms.ticket import TicketChatMessageForm
 from onegov.org.forms.ticket import TicketNoteForm
@@ -65,6 +66,7 @@ __all__ = [
     'HomepageSettingsForm',
     'ImageSetForm',
     'InternalTicketChatMessageForm',
+    'ExtendedInternalTicketChatMessageForm',
     'LinkForm',
     'ManageUserForm',
     'ManageUserGroupForm',

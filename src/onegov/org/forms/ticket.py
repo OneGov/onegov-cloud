@@ -1,11 +1,12 @@
 from onegov.chat import MessageFile
 from onegov.core.security import Private
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import (ChosenSelectField,
+                                ChosenSelectMultipleEmailField)
 from onegov.form.fields import TextAreaFieldWithTextModules
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.filters import strip_whitespace
-from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import FileSizeLimit, StrictOptional
 from onegov.form.widgets import TextAreaWithTextModules
 from onegov.org import _
 from onegov.pdf.pdf import TABLE_CELL_CHAR_LIMIT
@@ -13,6 +14,7 @@ from onegov.user import User
 from onegov.user import UserCollection
 from wtforms.fields import BooleanField
 from wtforms.fields import TextAreaField
+from functools import cached_property
 from wtforms.validators import InputRequired
 from wtforms.validators import Length
 from wtforms.validators import Optional
@@ -61,6 +63,7 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
 
     notify = BooleanField(
         label=_("Notify me about replies"),
+        default=True,
     )
 
     def on_request(self):
@@ -71,6 +74,41 @@ class InternalTicketChatMessageForm(TicketChatMessageForm):
             else:
                 self.notify.render_kw = {'disabled': True}
             self.notify.description = _('Setting "Always notify" is active')
+
+
+class ExtendedInternalTicketChatMessageForm(InternalTicketChatMessageForm):
+    """ Extends the form with Email BCC-Fields. """
+
+    email_bcc = ChosenSelectMultipleEmailField(
+        label=_("BCC"),
+        fieldset=('Email'),
+        description=_("You can send a copy of the message to one or more "
+                      "recipients"),
+        validators=[StrictOptional()],
+        choices=[]
+    )
+
+    email_attachment = UploadFileWithORMSupport(
+        label=_('Attachment'),
+        fieldset=_('Email'),
+        file_class=MessageFile,
+        validators=[
+            Optional(),
+            FileSizeLimit(10 * 1000 * 1000)
+        ]
+    )
+
+    @cached_property
+    def internal_email_recipients(self) -> tuple[tuple[str, str], ...]:
+        query = self.request.session.query(User.username, User.title)
+        query = query.filter(User.active)
+        return tuple(
+            (username, title) for username, title in query if '@' in username
+        )
+
+    def on_request(self):
+        super().on_request()
+        self.email_bcc.choices = self.internal_email_recipients
 
 
 class TicketAssignmentForm(Form):

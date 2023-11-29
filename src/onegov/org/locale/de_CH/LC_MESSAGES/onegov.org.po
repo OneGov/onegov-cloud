@@ -1779,6 +1779,16 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
+msgid "BCC"
+msgstr "BCC"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr ""
+"Sie können eine Kopie der Nachricht an einen oder mehrere Empfänger senden"
+
 msgid "User"
 msgstr "Benutzer"
 

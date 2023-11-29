@@ -6,17 +6,19 @@ from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.elements import Link, Intercooler, Confirm
 from onegov.core.html import html_to_text
+from onegov.core.mail import Attachment
 from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private, Secret
 from onegov.core.templates import render_template
 from onegov.core.utils import normalize_for_url
 import zipfile
+import os
 from io import BytesIO
 from onegov.form import Form
 from onegov.gever.encrypt import decrypt_symmetric
 from onegov.org import _, OrgApp
 from onegov.org.constants import TICKET_STATES
-from onegov.org.forms import InternalTicketChatMessageForm
+from onegov.org.forms import ExtendedInternalTicketChatMessageForm
 from onegov.org.forms import TicketAssignmentForm
 from onegov.org.forms import TicketChatMessageForm
 from onegov.org.forms import TicketNoteForm
@@ -46,10 +48,12 @@ from urllib.parse import urlsplit
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from onegov.core.request import CoreRequest
     from sqlalchemy.orm import Query
     from onegov.org.request import OrgRequest
+    from onegov.form.fields import UploadFileWithORMSupport
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -293,7 +297,8 @@ def last_internal_message(session, ticket_number):
         .first()
 
 
-def send_chat_message_email_if_enabled(ticket, request, message, origin):
+def send_chat_message_email_if_enabled(ticket, request, message, origin,
+                                       bcc=None, attachments=None):
     assert origin in ('internal', 'external')
 
     messages = MessageCollection(
@@ -355,7 +360,9 @@ def send_chat_message_email_if_enabled(ticket, request, message, origin):
         ticket=ticket,
         receivers=receivers,
         reply_to=reply_to,
-        force=True
+        force=True,
+        bcc=bcc,
+        attachments=attachments
     )
 
 
@@ -439,6 +446,7 @@ def handle_new_note(self, request, form, layout=None):
 
     if form.submitted(request):
         message = form.text.data,
+        form: TicketNoteForm
         note = TicketNote.create(self, request, message, form.file.create())
         request.success(_("Your note was added"))
 
@@ -694,7 +702,7 @@ def assign_ticket(self, request, form, layout=None):
 
 
 @OrgApp.form(model=Ticket, name='message-to-submitter', permission=Private,
-             form=InternalTicketChatMessageForm, template='form.pt')
+             form=ExtendedInternalTicketChatMessageForm, template='form.pt')
 def message_to_submitter(self, request, form, layout=None):
     recipient = self.snapshot.get('email') or self.handler.email
 
@@ -714,8 +722,16 @@ def message_to_submitter(self, request, form, layout=None):
                 notify=form.notify.data,
                 origin='internal')
 
+            blind_copies = form.email_bcc.data or None
+            fe = form.email_attachment
             send_chat_message_email_if_enabled(
-                self, request, message, origin='internal')
+                self,
+                request,
+                message,
+                origin='internal',
+                bcc=blind_copies,
+                attachments=create_attachment_from_uploaded(fe, request)
+            )
 
             request.success(_("Your message has been sent"))
             return morepath.redirect(request.link(self))
@@ -740,6 +756,29 @@ def message_to_submitter(self, request, form, layout=None):
             }
         )
     }
+
+
+def create_attachment_from_uploaded(
+    fe: 'UploadFileWithORMSupport', request: 'OrgRequest'
+) -> tuple[Attachment, ...]:
+    filename, storage_path = (
+        fe.data.get('filename') if fe.data else None,
+        request.app.depot_storage_path,
+    )
+
+    if not (filename and storage_path):
+        return ()
+
+    file = fe.create()
+    if not file:
+        return ()
+
+    file_path = os.path.join(storage_path, file.reference['path'])
+    attachment = Attachment(
+        file_path, file.reference.file.read(), file.reference['content_type']
+    )
+    attachment.filename = filename
+    return (attachment,)
 
 
 @OrgApp.view(model=Ticket, name='pdf', permission=Private)
@@ -831,10 +870,18 @@ def view_ticket_status(self, request, form, layout=None):
         if self.state == 'closed':
             request.alert(closed_text)
         else:
+            # Note that this assumes email BCC recipients are internal
+            # recipients and have `current_username` in all cases. If we allow
+            # external BCC recipients, we'll have to change this
+            if request.current_username != self.handler.email:
+                owner = request.current_username or ''
+            else:
+                owner = self.handler.email
+
             message = TicketChatMessage.create(
                 self, request,
                 text=form.text.data,
-                owner=self.handler.email,
+                owner=owner,
                 origin='external')
 
             send_chat_message_email_if_enabled(

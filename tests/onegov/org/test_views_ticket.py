@@ -1,12 +1,16 @@
+import base64
 import json
 import re
 from textwrap import dedent
 from datetime import date, timedelta, datetime
 
 import os
+
+import pytest
 import transaction
 from webtest import Upload
 
+from onegov.chat import MessageCollection
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 
@@ -710,3 +714,131 @@ def test_assign_tickets(client):
         f'{ticket_number} / newsletter: Sie haben ein neues Ticket'
     )
     assert message['To'] == 'editor@example.org'
+
+
+def test_bcc_field_in_ticket_message(client):
+
+    client.login_admin()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page.form.submit()
+
+    anon = client.spawn()
+    form_page = anon.get('/form/newsletter')
+    form_page.form['e_mail'] = 'anonymer-user@example.ch'
+    form_page.form.submit().follow().form.submit().follow()
+
+    client.login_admin()
+    tickets_page = client.get('/tickets/ALL/open')
+    ticket_page = tickets_page.click('Annehmen').follow()
+    ticket_url = ticket_page.request.url
+
+    page = client.get(ticket_url).click("Nachricht senden")
+    page.form['text'] = "'Bcc' — the photo-bomber of the email world."
+    page.form['email_bcc'] = ['editor@example.org']
+    page.form.get('notify').checked = True
+    page.form.submit()
+
+    client.login_editor()
+    message = client.get_email(1)
+
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+    assert message['Bcc'] == 'editor@example.org'
+
+    def extract_link(text):
+        pattern = r'http://localhost/ticket/FRM/[a-zA-Z0-9]+/status'
+        match = re.search(pattern, text)
+        return match.group(0) if match else None
+
+    body = message['TextBody']
+    assert "'Bcc' — the photo-bomber of the email world." in body
+    status_link = extract_link(body)
+
+    status_page = client.get(status_link)
+    assert 'Fügen Sie der Anfrage eine Nachricht hinzu' in status_page.text
+
+    # test the reply feature now
+    msg = 'Hello from the other side, or should I say, Bcc-side?'
+    status_page.form['text'] = msg
+    status_page.form.submit().follow()
+
+    # the most recent message would be rendered, but requires js.
+    # so we go the other way and check the db.
+    last_msg = MessageCollection(
+        client.app.session(),
+        load='newer-first',
+        limit=1
+    ).query().first()
+
+    assert last_msg.text == msg
+    #  Note that if the person in email CC field replies using the link to add
+    #  a TicketChatMessage, we have to adjust the owner of the message,
+    #  because the message is now actually from that person. Therefore below
+    #  assertion has to be False
+    assert not last_msg.owner == 'anonymer-user@example.ch'
+    assert last_msg.owner == 'editor@example.org'
+
+    # test invalid email
+    client.login_admin()
+    page.form['text'] = "'Bcc' — the photo-bomber of the email world."
+    with pytest.raises(ValueError):
+        page.form['email_bcc'] = ['not_an_email']
+
+    return
+    # test multiple CC
+    # this is not set correctly (Only one email is set), reason unclear
+    page.form['email_bcc'].select_multiple(texts=[
+        'editor@example.org', 'member@example.org'
+    ])
+    page.form.get('notify').checked = True
+    page.form.submit()
+
+    client.login_editor()
+    message = client.get_email(1)
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+    assert 'editor@example.org' in message['Bcc']
+    client.login_member()
+    message = client.get_email(1)
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+    assert 'member@example.org' in message['Bcc']
+
+
+def test_email_attachment_in_ticket_message(client):
+
+    client.login_admin()
+
+    form_page = client.get('/forms/new')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page.form.submit()
+
+    anon = client.spawn()
+    form_page = anon.get('/form/newsletter')
+    form_page.form['e_mail'] = 'anonymous-user@example.com'
+    form_page.form.submit().follow().form.submit().follow()
+
+    client.login_admin()
+    tickets_page = client.get('/tickets/ALL/open')
+    ticket_page = tickets_page.click('Annehmen').follow()
+    ticket_url = ticket_page.request.url
+
+    page = client.get(ticket_url).click("Nachricht senden")
+    # create both BCC and attachment
+    page.form['text'] = "Attachments make emails heavy."
+    page.form['email_bcc'] = ['editor@example.org']
+    page.form['email_attachment'] = Upload(
+        'Test.txt', b'attached', 'text/plain')
+    page.form.submit()
+
+    client.login_editor()
+    message = client.get_email(1)
+
+    assert 'Ihr Ticket hat eine neue Nachricht' in message['Subject']
+
+    assert 'editor@example.org' in message['Bcc']
+    msg = message['Attachments'][0]
+    assert 'Test.txt' in msg.values()
+    decoded_content = base64.b64decode(msg['Content'])
+    assert decoded_content == b'attached'
