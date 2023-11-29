@@ -235,8 +235,8 @@ def test_user_group_emails_for_new_ticket(session):
     )
     ticket1 = Ticket(handler_code="DIR", group="Sports")
 
-    result = list(user_group_emails_for_new_ticket(request, ticket1))
-    assert result == ["user1@example.org"]
+    result = user_group_emails_for_new_ticket(request, ticket1)
+    assert result == {"user1@example.org"}
 
     session.query(User).delete()
 
@@ -257,5 +257,5 @@ def test_user_group_emails_for_new_ticket(session):
         session=session,
     )
     ticket1 = Ticket(handler_code="DIR")
-    result = list(user_group_emails_for_new_ticket(request, ticket1))
-    assert result == []
+    result = user_group_emails_for_new_ticket(request, ticket1)
+    assert result == set()

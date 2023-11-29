@@ -973,7 +973,6 @@ def user_group_emails_for_new_ticket(
     """The user can be part of a UserGroup that sets notification of
     tickets to only specific ticket groups.
 
-
     This allows for more granular control over who gets notified.
 
     """
@@ -982,18 +981,13 @@ def user_group_emails_for_new_ticket(
         # For now, we implement this special case just for 'DIR' tickets.
         return set()
 
-    users_with_groups = (
-        request.session.query(User)
-        .filter(User.group_id.isnot(None))
-        .filter(User.group.users is not None)
-    )
-
     return {
         u.username
-        for user in users_with_groups if user.group is not None
+        for user in request.session.query(User).filter(
+            User.group_id.isnot(None)
+        ) if user.group is not None
         for u in user.group.users
         if user.group.meta
         and (dirs := user.group.meta.get('directories')) is not None
         and ticket.group in dirs
-        and u is not None
     }
