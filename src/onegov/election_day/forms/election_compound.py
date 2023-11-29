@@ -28,8 +28,8 @@ from wtforms.validators import ValidationError
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from depot.fields.upload import UploadedFile
     from onegov.election_day.request import ElectionDayRequest
+    from onegov.file import File
     from wtforms.fields.choices import _Choice
 
 
@@ -601,7 +601,7 @@ class ElectionCompoundForm(Form):
             'lower_apportionment_pdf'
         ):
             field = getattr(self, file_attr)
-            file: 'UploadedFile' = getattr(model, file_attr)
+            file: 'File' = getattr(model, file_attr)
             if file:
                 field.data = {
                     'filename': file.reference.filename,
