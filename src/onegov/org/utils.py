@@ -941,11 +941,11 @@ def hashtag_elements(request, text):
 def ticket_directory_groups(
     session: 'Session'
 ) -> 'Iterable[tuple[str, ...]]':
-    """Yields the ticket groups of the given type.
+    """Yields all ticket groups.
 
     For example: ('Sportanbieter', 'Verein')
 
-    If the groups do not exist, returns an empty generator.
+    If no groups exist, returns an empty generator.
     """
     query = as_selectable(
         """
