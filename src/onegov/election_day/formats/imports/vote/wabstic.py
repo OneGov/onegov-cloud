@@ -64,6 +64,8 @@ def parse_domain(domain: str) -> str | None:
 def line_is_relevant(
     line: 'DefaultRow',
     domain: str,
+    # FIXME: Are these allowed to be None? For now we have some assertions
+    #        that they shouldn't be
     district: str,
     number: str
 ) -> bool:

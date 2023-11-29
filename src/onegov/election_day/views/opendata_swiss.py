@@ -16,7 +16,20 @@ from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
 
 
-def sub(parent, tag, attrib=None, text=None):
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+    from translationstring import TranslationString
+    from webob.response import Response
+
+
+def sub(
+    parent: Element,
+    tag:str,
+    attrib: dict[str, str] | None = None,
+    text: str | None = None
+) -> Element:
+
     element = SubElement(parent, tag, attrib=attrib or {})
     element.text = text or ''
     return element
@@ -27,7 +40,7 @@ def sub(parent, tag, attrib=None, text=None):
     name='catalog.rdf',
     permission=Public
 )
-def view_rdf(self, request):
+def view_rdf(self: Principal, request: 'ElectionDayRequest') -> bytes:
 
     """ Returns an XML / RDF / DCAT-AP for Switzerland format for
     opendata.swiss.
@@ -45,7 +58,7 @@ def view_rdf(self, request):
         raise HTTPNotImplemented()
 
     @request.after
-    def set_headers(response):
+    def set_headers(response: 'Response') -> None:
         response.headers['Content-Type'] = 'application/rdf+xml; charset=UTF-8'
 
     layout = DefaultLayout(self, request)
@@ -69,13 +82,14 @@ def view_rdf(self, request):
     catalog = sub(rdf, 'dcat:Catalog')
 
     session = request.session
-    items = session.query(Election).all()
-    items.extend(session.query(ElectionCompound).all())
-    items.extend(session.query(Vote).all())
+    items: list[Election | ElectionCompound | Vote]
+    items = session.query(Election).all()  # type:ignore[assignment]
+    items.extend(session.query(ElectionCompound))
+    items.extend(session.query(Vote))
 
     translations = request.app.translations
 
-    def translate(text, locale):
+    def translate(text: 'TranslationString', locale: str) -> str:
         translator = translations.get(locale)
         if translator:
             return text.interpolate(translator.gettext(text))
@@ -104,10 +118,13 @@ def view_rdf(self, request):
                 item.date.year, item.date.month, item.date.day
             ).isoformat()
         )
+        last_modified = item.last_modified
+        # FIXME: Should we handle items without a last_modified datetime?
+        assert last_modified is not None
         sub(
             ds, 'dct:modified',
             {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-            item.last_modified.replace(microsecond=0).isoformat()
+            last_modified.replace(microsecond=0).isoformat()
         )
         sub(
             ds, 'dct:accrualPeriodicity',
@@ -221,8 +238,8 @@ def view_rdf(self, request):
                             'principal': principal_name
                         }
                     )
-            des = translate(des, locale)
-            sub(ds, 'dct:description', {'xml:lang': lang}, des)
+            translated_des = translate(des, locale)
+            sub(ds, 'dct:description', {'xml:lang': lang}, translated_des)
 
         # Format description
         for locale, lang in locales.items():
@@ -268,19 +285,15 @@ def view_rdf(self, request):
             ('parties-json', 'json', 'application/json', True),
         ):
             if party_result:
-                if not hasattr(item, 'party_results'):
-                    continue
-                if not item.has_party_results:
+                if not getattr(item, 'has_party_results', False):
                     continue
 
-            url = request.link(item, 'data-{}'.format(fmt))
+            url = request.link(item, f'data-{fmt}')
 
             # IDs
             dist = sub(ds, 'dcat:distribution')
             dist = sub(dist, 'dcat:Distribution', {
-                'rdf:about': 'http://{}/{}/{}'.format(
-                    publisher_id, item_id, fmt
-                )
+                'rdf:about': f'http://{publisher_id}/{item_id}/{fmt}'
             })
             sub(dist, 'dct:identifier', {}, fmt)
 
@@ -289,7 +302,7 @@ def view_rdf(self, request):
                 title = item.get_title(locale, default_locale) or item.id
                 if party_result:
                     title += ' ({})'.format(translate(_('Parties'), locale))
-                title = '{}.{}'.format(normalize_for_url(title), extension)
+                title = f'{normalize_for_url(title)}.{extension}'
                 sub(dist, 'dct:title', {'xml:lang': lang}, title)
 
             # Dates
@@ -301,7 +314,7 @@ def view_rdf(self, request):
             sub(
                 dist, 'dct:modified',
                 {'rdf:datatype': 'http://www.w3.org/2001/XMLSchema#dateTime'},
-                item.last_modified.replace(microsecond=0).isoformat()
+                last_modified.replace(microsecond=0).isoformat()
             )
 
             # URLs
@@ -320,5 +333,4 @@ def view_rdf(self, request):
 
     out = BytesIO()
     ElementTree(rdf).write(out, encoding='utf-8', xml_declaration=True)
-    out.seek(0)
-    return out.read()
+    return out.getvalue()

@@ -16,14 +16,26 @@ from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.views.upload import unsupported_year_error
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from onegov.ballot.types import BallotType
+    from onegov.core.types import RenderData
+    from onegov.election_day.models import DataSourceItem
+    from onegov.election_day.request import ElectionDayRequest
+
+
 @ElectionDayApp.manage_form(
     model=Vote,
     name='upload',
     template='upload_vote.pt',
     form=UploadVoteForm
 )
-def view_upload(self, request, form):
-
+def view_upload(
+    self: Vote,
+    request: 'ElectionDayRequest',
+    form: UploadVoteForm
+) -> 'RenderData':
     """ Uploads votes results. """
 
     errors = []
@@ -43,6 +55,8 @@ def view_upload(self, request, form):
                 self.date.year, principal.use_maps
             )
             if form.file_format.data == 'internal':
+                assert form.proposal.data is not None
+                assert form.proposal.file is not None
                 errors = import_vote_internal(
                     self,
                     principal,
@@ -50,12 +64,16 @@ def view_upload(self, request, form):
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'xml':
+                assert form.xml.file is not None
                 errors = import_vote_ech_0252(
                     self,
                     principal,
                     form.xml.file
                 )
             elif form.file_format.data == 'wabsti':
+                assert form.vote_number.data is not None
+                assert form.proposal.data is not None
+                assert form.proposal.file is not None
                 errors = import_vote_wabsti(
                     self,
                     principal,
@@ -64,7 +82,15 @@ def view_upload(self, request, form):
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti_c':
-                for source in self.data_sources:
+                assert form.sg_geschaefte.data is not None
+                assert form.sg_geschaefte.file is not None
+                assert form.sg_gemeinden.data is not None
+                assert form.sg_gemeinden.file is not None
+                source: 'DataSourceItem'
+                # FIXME: Yet another dynamic backref accross modules
+                for source in self.data_sources:  # type:ignore[attr-defined]
+                    assert source.number is not None
+                    assert source.district is not None
                     errors.extend(
                         import_vote_wabstic(
                             self,
@@ -78,6 +104,8 @@ def view_upload(self, request, form):
                         )
                     )
             elif form.file_format.data == 'wabsti_m':
+                assert form.proposal.data is not None
+                assert form.proposal.file is not None
                 errors = import_vote_wabstim(
                     self,
                     principal,
@@ -85,7 +113,7 @@ def view_upload(self, request, form):
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'default':
-                ballot_types = ('proposal', )
+                ballot_types: 'Iterable[BallotType]' = ('proposal',)
                 if self.type == 'complex':
                     ballot_types = BALLOT_TYPES
 
@@ -113,7 +141,8 @@ def view_upload(self, request, form):
             last_change = self.last_result_change
             request.app.pages_cache.flush()
             request.app.send_zulip(
-                request.app.principal.name,
+                # FIXME: Should we assert that the principal has a name?
+                request.app.principal.name,  # type:ignore[arg-type]
                 'New results available: [{}]({})'.format(
                     self.title, request.link(self)
                 )

@@ -7,14 +7,24 @@ from onegov.election_day.utils.election_compound import get_superregions
 from onegov.election_day.utils.election_compound import get_superregions_data
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import JSON_ro
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.html(
     model=ElectionCompound,
     name='superregions',
     template='election_compound/superregions.pt',
     permission=Public
 )
-def view_election_compound_superregions(self, request):
-
+def view_election_compound_superregions(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The superregions view. """
 
     return {
@@ -29,8 +39,10 @@ def view_election_compound_superregions(self, request):
     name='by-superregion',
     permission=Public
 )
-def view_election_compound_by_superregion(self, request):
-
+def view_election_compound_by_superregion(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'JSON_ro':
     """" View the superregions/regions/municipalities as JSON for the map. """
 
     return get_superregions_data(self, request.app.principal, request)
@@ -42,12 +54,14 @@ def view_election_compound_by_superregion(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_list_by_superregion_chart(self, request):
-
+def view_election_list_by_superregion_chart(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" Embed the heatmap. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
@@ -72,12 +86,14 @@ def view_election_list_by_superregion_chart(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_compound_superregions_table(self, request):
-
+def view_election_compound_superregions_table(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" Displays the superregions as standalone table. """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {

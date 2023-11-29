@@ -5,6 +5,7 @@ from operator import itemgetter
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from onegov.ballot.models import ElectionCompound
+    from onegov.ballot.models import ElectionCompoundPart
     from onegov.core.types import JSONObject_ro
     from onegov.election_day.models import Canton
     from onegov.election_day.models import Municipality
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
 
 
 def get_districts_data(
-    compound: 'ElectionCompound',
+    compound: 'ElectionCompound | ElectionCompoundPart',
     principal: 'Canton | Municipality',
     request: 'ElectionDayRequest | None' = None
 ) -> 'JSONObject_ro':

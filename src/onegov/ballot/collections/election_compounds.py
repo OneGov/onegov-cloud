@@ -56,7 +56,7 @@ class ElectionCompoundCollectionPagination(Pagination[ElectionCompound]):
     def page_by_index(self, index: int) -> 'Self':
         return self.__class__(self.session, index, self.year)
 
-    def for_year(self, year: int) -> 'Self':
+    def for_year(self, year: int | None) -> 'Self':
         return self.__class__(self.session, 0, year)
 
 
