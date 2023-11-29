@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2023-11-29 11:14+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1273,9 +1273,6 @@ msgstr "Link zum Logo"
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
 
-msgid "Standard Image"
-msgstr "Standardbild"
-
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "E-Mail Antwort Adresse (Reply-To)"
 
@@ -1302,6 +1299,9 @@ msgstr "Italienisch"
 
 msgid "Additional CSS"
 msgstr "Zusätzliches CSS"
+
+msgid "Standard Image"
+msgstr "Standardbild"
 
 msgid "Column width left side"
 msgstr "Breite linke Seite"
@@ -2354,6 +2354,12 @@ msgstr "Bild in der Vorschau auf der Seitenübersicht anzeigen"
 
 msgid "Show image on page"
 msgstr "Bild auf der Seite anzeigen"
+
+msgid "As first element of the content"
+msgstr "Als erstes Element des Inhalts"
+
+msgid "As a full width header"
+msgstr "Als ein Header-Bild mit voller Breite"
 
 msgid "Documents"
 msgstr "Dokumente"
@@ -4102,8 +4108,12 @@ msgstr "Ticket Updates via E-Mail"
 msgid "Disable E-Mails"
 msgstr "E-Mails deaktivieren"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, wenn ein Ticket zugewiesen wird."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, "
+"wenn ein Ticket zugewiesen wird."
 
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
