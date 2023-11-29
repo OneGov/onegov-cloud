@@ -104,7 +104,7 @@ def view_upload_rest(
                 Vote.external_id == form.id.data,
             )
         ).first()
-        if not item:
+        if item is None:
             errors.setdefault('id', []).append(_("Invalid id"))
     elif form.type.data in ('election', 'parties'):
         item = session.query(ElectionCompound).filter(
@@ -113,18 +113,18 @@ def view_upload_rest(
                 ElectionCompound.external_id == form.id.data,
             )
         ).first()
-        if not item:
+        if item is None:
             item = session.query(Election).filter(
                 or_(
                     Election.id == form.id.data,
                     Election.external_id == form.id.data,
                 )
             ).first()
-        if not item:
+        if item is None:
             errors.setdefault('id', []).append(_("Invalid id"))
 
     # Check the type
-    if item and form.type.data == 'parties':
+    if item is not None and form.type.data == 'parties':
         if not (
             isinstance(item, ElectionCompound)
             or isinstance(item, ProporzElection)
@@ -134,21 +134,24 @@ def view_upload_rest(
             )
 
     # Check if the year is supported
-    if item:
+    if item is not None:
         if not self.is_year_available(item.date.year, False):
             errors.setdefault('id', []).append(
                 unsupported_year_error(item.date.year)
             )
 
     if not errors:
-        assert item is not None
         assert form.results.data is not None
         file = form.results.file
         assert file is not None
         mimetype = form.results.data['mimetype']
 
         err = []
-        updated: 'Collection[Election | ElectionCompound | Vote]' = [item]
+        updated: 'Collection[Election | ElectionCompound | Vote]'
+        # NOTE: Technically item should only be none for type xml
+        #       which in turn replaces this list but it's better
+        #       to be safe than sorry
+        updated = [item] if item is not None else []
         if form.type.data == 'vote':
             item = cast('Vote', item)
             err = import_vote_internal(item, self, file, mimetype)
