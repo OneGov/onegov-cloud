@@ -32,7 +32,9 @@ class ChatInitiationForm(Form):
             ('Jugend /Sport/Vereine/Kultur',
              'Jugend /Sport/Vereine/Kultur'),
             ('Planung/Bau & Umwelt/Energie/Sicherheit',
-             'Planung/Bau & Umwelt/Energie/Sicherheit')
+             'Planung/Bau & Umwelt/Energie/Sicherheit'),
+            ('Soziales/Gesundheit',
+             'Soziales/Gesundheit')
         ]
     )
 
