@@ -473,7 +473,7 @@ class ElectionForm(Form):
 
     def update_model(self, model: Election) -> None:
         principal = self.request.app.principal
-        if self.id.data:
+        if self.id and self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
         assert self.date.data is not None

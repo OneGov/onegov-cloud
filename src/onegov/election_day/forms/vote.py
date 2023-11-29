@@ -319,7 +319,7 @@ class VoteForm(Form):
             self.vote_rm.validators.append(InputRequired())
 
     def update_model(self, model: Vote) -> None:
-        if self.id.data:
+        if self.id and self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
         assert self.date.data is not None
