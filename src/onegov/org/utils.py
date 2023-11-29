@@ -970,8 +970,9 @@ def user_group_emails_for_new_ticket(
     request: 'CoreRequest',
     ticket: 'Ticket',
 ) -> 'set[str]':
-    """The user can be part of a UserGroup that sets notification of
-    tickets to only specific ticket groups.
+    """The user can be part of a UserGroup that defines directories. This
+    means the users in this group are interested in a subset of tickets.
+    The group is determined by the Ticket group.
 
     This allows for more granular control over who gets notified.
 

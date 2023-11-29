@@ -238,10 +238,9 @@ def handle_complete_submission(self, request):
                     'show_submission': self.meta['show_submission']
                 }
             )
-            emails_for_directory_groups = list(
-                user_group_emails_for_new_ticket(request, ticket)
+            directory_user_group_recipients = user_group_emails_for_new_ticket(
+                request, ticket
             )
-
             if request.email_for_new_tickets:
                 send_ticket_mail(
                     request=request,
@@ -250,7 +249,7 @@ def handle_complete_submission(self, request):
                     ticket=ticket,
                     receivers=(
                         request.email_for_new_tickets,
-                        *emails_for_directory_groups,
+                        *directory_user_group_recipients,
                     ),
                     content={'model': ticket},
                 )
