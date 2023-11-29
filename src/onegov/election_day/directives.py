@@ -19,14 +19,14 @@ if TYPE_CHECKING:
     from _typeshed import StrOrBytesPath
     from collections.abc import Callable
     from collections.abc import Iterable
-    from morepath.directive import _RequestT
+    from onegov.core.directives import _RequestT
     from onegov.core.request import CoreRequest
     from typing import Protocol
     from typing_extensions import TypeAlias
     from webob import Response as BaseResponse
     from wtforms import Form
 
-    FormCallable: TypeAlias = Callable[[Any, CoreRequest], type[Form]]
+    FormCallable: TypeAlias = Callable[[Any, _RequestT], type[Form]]
 
     class InputScreenWidget(Protocol):
         @property
@@ -79,7 +79,7 @@ class ManageFormAction(HtmlHandleFormAction):
     def __init__(
         self,
         model: type | str,
-        form: 'type[Form] | FormCallable' = EmptyForm,
+        form: 'type[Form] | FormCallable[_RequestT]' = EmptyForm,
         render: 'Callable[[Any, _RequestT], BaseResponse] | str | None' = None,
         template: 'StrOrBytesPath' = 'form.pt',
         load: 'Callable[[_RequestT], Any] | str | None' = None,
