@@ -4762,6 +4762,10 @@ msgid "General Message"
 msgstr "Messaggio generale"
 
 #, python-format
+msgid "New e-mail: ${message}"
+msgstr "Nuova e-mail: ${message}"
+
+#, python-format
 msgid "Successfully sent ${count} emails"
 msgstr "${count} e-mail inviate correttamente"
 

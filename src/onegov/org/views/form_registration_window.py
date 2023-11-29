@@ -11,10 +11,17 @@ from onegov.org.layout import FormSubmissionLayout
 from onegov.core.elements import Link, Confirm, Intercooler, Block
 from sqlalchemy import desc
 
+from onegov.org.models import TicketNote
 from onegov.org.views.form_submission import handle_submission_action
 from onegov.org.mail import send_transactional_html_mail
 from onegov.org.views.ticket import accept_ticket, send_email_if_enabled
-from onegov.ticket import TicketCollection
+from onegov.ticket import TicketCollection, Ticket
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.request import CoreRequest
+    from onegov.org.layout import Layout
 
 
 @OrgApp.form(
@@ -67,6 +74,17 @@ def send_form_registration_email(request, receivers, content, action):
     )
 
 
+def ticket_linkable(
+    request: 'CoreRequest',
+    ticket: Ticket | None
+) -> Ticket | None:
+    if ticket is None:
+        return None
+    if not request.link(ticket):
+        return None
+    return ticket
+
+
 @OrgApp.form(
     model=FormRegistrationWindow,
     permission=Private,
@@ -74,10 +92,31 @@ def send_form_registration_email(request, receivers, content, action):
     template='form.pt',
     form=FormRegistrationMessageForm
 )
-def view_send_form_registration_message(self, request, form, layout=None):
+def view_send_form_registration_message(
+    self: FormRegistrationWindow,
+    request: 'CoreRequest',
+    form: FormRegistrationMessageForm,
+    layout: 'Layout | None' = None,
+):
     if form.submitted(request):
         count = 0
+        tickets = TicketCollection(request.session)  # type: ignore[abstract]
+
         for email, submission in form.receivers.items():
+            _ticket = tickets.by_handler_id(submission.id.hex)
+
+            if not form.message.data:
+                continue
+
+            # be extra safe and check for missing ticket of submission
+            if (ticket := ticket_linkable(request, _ticket)) is not None:
+                TicketNote.create(ticket, request, (
+                    request.translate(_(
+                        "New e-mail: ${message}",
+                        mapping={'message': form.message.data.strip()}
+                    ))
+                ))
+
             send_form_registration_email(
                 request=request,
                 receivers=(email,),
@@ -89,6 +128,7 @@ def view_send_form_registration_message(self, request, form, layout=None):
                 }
             )
             count += 1
+
         request.success(
             _("Successfully sent ${count} emails", mapping={'count': count})
         )
