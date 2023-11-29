@@ -1,22 +1,22 @@
-import click
-
 from asyncio import run
 from json import loads
-from onegov.core.cli import command_group
-from onegov.core.cli import pass_group_context
+from typing import TYPE_CHECKING
+from urllib.parse import urlparse
+
+import click
+from sentry_sdk import init as init_sentry
+from websockets.legacy.client import connect
+
+from onegov.core.cli import command_group, pass_group_context
 from onegov.websockets.client import authenticate
 from onegov.websockets.client import broadcast as broadast_message
 from onegov.websockets.client import register
 from onegov.websockets.client import status as get_status
 from onegov.websockets.server import main
-from sentry_sdk import init as init_sentry
-from urllib.parse import urlparse
-from websockets.legacy.client import connect
 
-
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Callable
+
     from onegov.core.cli.core import GroupContext
     from onegov.core.request import CoreRequest
     from onegov.websockets import WebsocketsApp
@@ -75,7 +75,7 @@ def serve(
             environment=sentry_environment,
         )
 
-    run(main(host, port, token))
+    run(main(host, port, token, group_context.config))
 
 
 @cli.command('listen')

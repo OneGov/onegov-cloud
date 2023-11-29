@@ -1,12 +1,18 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-11-09 09:04+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
+
+msgid "Chats"
+msgstr "Chat"
+
+msgid "My Chats"
+msgstr "Le mie chat"
 
 msgid "Font family serif"
 msgstr "Font famiglia serif"
@@ -20,32 +26,16 @@ msgstr "Font famiglia sans-serif"
 msgid "Used for all the headings"
 msgstr "Usato per tutti i titoli"
 
-msgid "Supported Chat Integrations"
-msgstr "Integrazioni di chat supportate"
+msgid "Show chat for chosen people"
+msgstr "Mostra la chat per le seguenti persone"
 
-msgid "Chat title"
-msgstr "Titolo della chat"
+msgid "Enable the chat"
+msgstr "Attivare la chat"
 
-msgid "Chat background color"
-msgstr "Colore di sfondo della chat"
-
-msgid "Customer-ID"
-msgstr "ID cliente"
-
-msgid "Hide chat for chosen roles"
-msgstr "Nascondi la chat per i ruoli scelti"
-
-msgid "Admin"
-msgstr "Amministratore"
-
-msgid "Editor"
-msgstr "Redattore"
-
-msgid "Member"
-msgstr "Membro"
-
-msgid "Disable the chat"
-msgstr "Disattivare la chat"
+msgid "The chat is currently in an test-phase. Activate at your own risk."
+msgstr ""
+"a chat è attualmente in fase di test. Attivare a proprio rischio e "
+"pericolo"
 
 #, fuzzy
 msgid "Events"
@@ -527,6 +517,59 @@ msgstr "Proprietario:"
 msgid "Kind:"
 msgstr "Tipo:"
 
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat request got accepted."
+msgstr "La richiesta di chat è stata accettata."
+
+msgid "<dynamic element> <dynamic element>"
+msgstr ""
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "Connect to chatserver ..."
+msgstr "Connettersi a chatserver ..."
+
+msgid "Describe your request to start a chat."
+msgstr "Descrivete la vostra richiesta di avviare una chat."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid "The chat has been ended."
+msgstr "La chat è terminata."
+
+#. Used in sentence: "<dynamic element> <dynamic element>"
+msgid ""
+"No one seems to be available at the moment. A ticket has been created from "
+"your request and you will receive an email shortly."
+msgstr ""
+"Nessuno sembra essere disponibile al momento. È stato creato un ticket per "
+"la sua richiesta e riceverà un'e-mail a breve."
+
+msgid "Currently no chats open."
+msgstr "Attualmente non ci sono chat aperte."
+
+msgid "You accepted the chat request."
+msgstr "Avete accettato la richiesta di chat."
+
+msgid "Chat is loading ..."
+msgstr "La chat è in fase di caricamento ..."
+
+msgid "End and archive chat"
+msgstr "Terminare e archiviare la chat"
+
+msgid "Create ticket"
+msgstr "Creare un biglietto"
+
+msgid "Chat requests"
+msgstr "Richieste di chat"
+
+msgid "Currently no new chat requests."
+msgstr "Attualmente non ci sono nuove richieste di chat"
+
+msgid "Active Chats"
+msgstr "Chat attive"
+
+msgid "No active chats."
+msgstr "Nessuna chat attiva."
+
 msgid "No directories defined yet."
 msgstr "Nessuna cartella ancora definita."
 
@@ -803,6 +846,9 @@ msgstr "Prossima voce"
 msgid "Total Amount"
 msgstr "Importo totale"
 
+msgid "Chat History"
+msgstr "Storia della chat"
+
 msgid "Change request"
 msgstr "Richiesta di modifica"
 
@@ -941,6 +987,12 @@ msgstr "Filtro per data"
 
 msgid "Administrator"
 msgstr "Amministratore"
+
+msgid "Editor"
+msgstr "Redattore"
+
+msgid "Member"
+msgstr "Membro"
 
 msgid "Administrators"
 msgstr "Amministratori"
@@ -1182,6 +1234,12 @@ msgstr ""
 "Se ritieni che si tratti di un errore, ignora questo messaggio e non ti "
 "disturberemo mai più."
 
+msgid "Below you can see your chat conversation:"
+msgstr "Di seguito potete vedere la vostra conversazione in chat:"
+
+msgid "Have a great day!"
+msgstr "Ti auguro una buona giornata!"
+
 msgid "Hello"
 msgstr "Ciao"
 
@@ -1221,9 +1279,6 @@ msgstr "E-mail"
 
 msgid "No reservations today."
 msgstr "Nessuna prenotazione oggi."
-
-msgid "Have a great day!"
-msgstr "Ti auguro una buona giornata!"
 
 msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
@@ -1900,8 +1955,8 @@ msgstr "Il biglietto si aggiorna tramite e-mail"
 msgid "Disable E-Mails"
 msgstr "Disabilita i messaggi e-mail"
 
-msgid "No ticket updates by e-mail"
-msgstr "Nessun aggiornamento dei biglietti tramite e-mail"
+msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
+msgstr "Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata un'e-mail quando viene assegnato un ticket."
 
 msgid "Enable E-Mails"
 msgstr "Abilita i messaggi e-mail"
@@ -2067,6 +2122,19 @@ msgstr "Icona identificativa"
 msgid "Password"
 msgstr "Password"
 
+#, python-format
+msgid "Chat History with ${org}"
+msgstr "Cronologia delle chat con ${org}"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr "È stato creato un ticket dalla loro chat"
+
+msgid "Archived Chats"
+msgstr "Chat archiviate"
+
+msgid "Chat Customer"
+msgstr "Chat con i clienti"
+
 msgid "New Recipient"
 msgstr "Nuovo destinatario"
 
@@ -2163,3 +2231,18 @@ msgid ""
 msgstr ""
 "Procedere con cautela. I biglietti e i dati in essi contenuti possono essere "
 "irrevocabilmente cancellati."
+
+#~ msgid "Chat title"
+#~ msgstr "Titolo della chat"
+
+#~ msgid "Chat background color"
+#~ msgstr "Colore di sfondo della chat"
+
+#~ msgid "Customer-ID"
+#~ msgstr "ID cliente"
+
+#~ msgid "Admin"
+#~ msgstr "Amministratore"
+
+#~ msgid "Disable the chat"
+#~ msgstr "Disattivare la chat"

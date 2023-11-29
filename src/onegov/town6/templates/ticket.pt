@@ -66,8 +66,8 @@
                     <div tal:condition="ticket.muted" class="ticket-submitter-notification-status nowrap">
                         <i class="fa fa-fw fa-times" aria-hidden="true"></i>
 
-                        <span i18n:translate>
-                            No ticket updates by e-mail
+                        <span i18n:translate class="prevent-text-overflow">
+                              No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned.
                         </span>
 
                         <tal:b condition="not event_source">

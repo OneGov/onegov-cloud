@@ -680,6 +680,7 @@ def assign_ticket(self, request, form, layout=None):
             subject=_("You have a new ticket"),
             receivers=(form.username, ),
             ticket=self,
+            force=True
         )
         self.user_id = form.user.data
         request.success(_("Ticket assigned"))

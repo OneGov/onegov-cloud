@@ -133,7 +133,8 @@ class TownTheme(BaseTheme):
             'healthcheck',
             'qrcode',
             'leaflet',
-            'tags'
+            'tags',
+            'chat'
         ]
 
     @property

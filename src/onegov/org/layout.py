@@ -580,6 +580,61 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     # so we can create Markup in layouts
     Markup = Markup
 
+    file_extension_fa_icon_mapping = {
+        'pdf': 'fa-file-pdf',
+        'jpg': 'fa-file-image',
+        'jpeg': 'fa-file-image',
+        'png': 'fa-file-image',
+        'img': 'fa-file-image',
+        'ico': 'fa-file-image',
+        'svg': 'fa-file-image',
+        'bmp': 'fa-file-image',
+        'gif': 'fa-file-image',
+        'tiff': 'fa-file-image',
+        'ogg': 'fa-file-music',
+        'wav': 'fa-file-music',
+        'mpa': 'fa-file-music',
+        'mp3': 'fa-file-music',
+        'avi': 'fa-file-video',
+        'mp4': 'fa-file-video',
+        'mpg': 'fa-file-video',
+        'mpeg': 'fa-file-video',
+        'mov': 'fa-file-video',
+        'vid': 'fa-file-video',
+        'webm': 'fa-file-video',
+        'zip': 'fa-file-zip',
+        '7z': 'fa-file-zip',
+        'rar': 'fa-file-zip',
+        'pkg': 'fa-file-zip',
+        'tar.gz': 'fa-file-zip',
+        'txt': 'fa-file-alt',
+        'log': 'fa-file-alt',
+        'csv': 'fas fa-file-csv',  # hack: csv icon is a pro-icon
+        'xls': 'fa-file-excel',
+        'xlsx': 'fa-file-excel',
+        'xlsm': 'fa-file-excel',
+        'ods': 'fa-file-excel',
+        'odt': 'fa-file-word',
+        'doc': 'fa-file-word',
+        'docx': 'fa-file-word',
+        'pptx': 'fa-file-powerpoint',
+    }
+
+    def get_fa_file_icon(self, filename) -> str:
+        """
+        Returns the font awesome file icon name for the given file
+        according its extension.
+
+        NOTE: Currently, org and town6 are using different font awesome
+        versions, hence this only works for town6.
+        """
+        default_icon = 'fa-file'
+        if '.' not in filename:
+            return default_icon
+
+        ext = filename.split('.')[1].lower()
+        return self.file_extension_fa_icon_mapping.get(ext, default_icon)
+
 
 class DefaultLayoutMixin:
     def hide_from_robots(self):
@@ -2616,6 +2671,7 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
         )
 
         def links():
+            qr_link = None
             if self.request.is_admin:
                 yield Link(
                     text=_("Configure"),
@@ -2634,6 +2690,12 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
                         }, name='+import'
                     ),
                     attrs={'class': 'import-link'}
+                )
+
+                qr_link = QrCodeLink(
+                    text=_("QR"),
+                    url=self.request.link(self.model),
+                    attrs={'class': 'qr-code-link'}
                 )
 
             if self.request.is_admin:
@@ -2682,6 +2744,8 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
             if not self.request.is_logged_in:
                 yield export_link
 
+            if qr_link:
+                yield qr_link
         return list(links())
 
     def get_pub_link(self, text, filter=None, toggle_active=True):

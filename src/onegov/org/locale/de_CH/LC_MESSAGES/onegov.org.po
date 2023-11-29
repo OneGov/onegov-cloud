@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-11-09 09:02+0100\n"
+"POT-Creation-Date: 2023-11-17 11:54+0100\n"
 "PO-Revision-Date: 2022-03-15 10:21+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -74,6 +74,9 @@ msgstr "Allgemein"
 #, python-format
 msgid "${org} Reservation Overview"
 msgstr "${org} Reservations-Übersicht"
+
+msgid "Your Chat has been turned into a ticket"
+msgstr ""
 
 msgid "Account"
 msgstr "Konto"
@@ -2643,6 +2646,12 @@ msgstr "Möchten Sie diesen Eintrag wirklich abweisen?"
 msgid "Reject entry"
 msgstr "Eintrag abweisen"
 
+msgid "Chats"
+msgstr ""
+
+msgid "Chat with"
+msgstr "Chat mit"
+
 msgid "Link"
 msgstr "Verknüpfung"
 
@@ -3660,6 +3669,16 @@ msgstr "Ticket ansehen"
 msgid "Your request has been reopened"
 msgstr "Ihre Anfrage wurde wieder eröffnet"
 
+msgid ""
+"Your chat has been turned into a ticket. We will take care of your request "
+"and get back to you as soon as new information is available."
+msgstr ""
+"Ihr Chat wurde in ein Ticket umgewandelt. Wir werden uns um Ihre Anfrage "
+"kümmern und uns bei Ihnen melden, sobald neue Informationen verfügbar sind."
+
+msgid "Below you can see your chat conversation:"
+msgstr "Unten sehen Sie Ihr Chat-Gespräch:"
+
 msgid "This is what happend on the ${org} website over the past week:"
 msgstr ""
 "Folgendes ist während der letzten Woche auf der ${org} Webseite geschehen:"
@@ -4083,8 +4102,8 @@ msgstr "Ticket Updates via E-Mail"
 msgid "Disable E-Mails"
 msgstr "E-Mails deaktivieren"
 
-msgid "No ticket updates by e-mail"
-msgstr "Keine Ticket Updates via E-Mail"
+msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
+msgstr "Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, wenn ein Ticket zugewiesen wird."
 
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
