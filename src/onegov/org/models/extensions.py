@@ -553,6 +553,17 @@ class ImageExtension(ContentExtension):
                 default=True,
             )
 
+            position_choices = [
+                ('in_content', _("As first element of the content")),
+                ('header', _("As a full width header")),
+            ]
+
+            page_image_position = RadioField(
+                label=_('Show image on page'),
+                choices=position_choices,
+                default='in_content',
+            )
+
         return PageImageForm
 
 

@@ -46,15 +46,6 @@
 
         }
 
-        .dark-overlay {
-            background: rgb(0, 0, 0);
-            background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 26%, rgba(0,0,0,0) 54%, rgba(0,0,0,0) 100%);
-            bottom: 0;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-        }
     }
 
     .homepage-video,
@@ -63,7 +54,7 @@
         .text {
             bottom: 5rem;
             color: $white;
-            height: auto;
+            height: fit-content !important;
             position: absolute;
             text-shadow: 0 0 2em $black;
 
@@ -78,16 +69,6 @@
                 bottom: 2rem;
             }
 
-        }
-
-        .dark-overlay {
-            background: rgb(0, 0, 0);
-            background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 26%, rgba(0,0,0,0) 54%, rgba(0,0,0,0) 100%);
-            bottom: 0;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
         }
 
         .orbit-image {

@@ -1,4 +1,4 @@
-from wtforms.fields import BooleanField
+from wtforms.fields import BooleanField, RadioField
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
@@ -13,7 +13,18 @@ from onegov.town6.theme import user_options
 class GeneralSettingsForm(OrgGeneralSettingsForm):
     """ Defines the settings form for onegov org. """
 
+    page_image_position = RadioField(
+        fieldset=_('Images'),
+        description=_("Choose the position of the page images"),
+        label=_("Page image position"),
+        choices=(
+            ('as_content', _("As content image")),
+            ('header', _("As header"))
+        ),
+    )
+
     body_font_family_ui = ChosenSelectField(
+        fieldset=_('Fonts'),
         label=_('Font family serif'),
         description=_('Used for text in html body'),
         choices=[],
@@ -21,6 +32,7 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
     )
 
     header_font_family_ui = ChosenSelectField(
+        fieldset=_('Fonts'),
         label=_('Font family sans-serif'),
         description=_('Used for all the headings'),
         choices=[],
@@ -35,6 +47,12 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
             options['primary-color-ui'] = user_options['primary-color-ui']
         else:
             options['primary-color-ui'] = self.primary_color.data
+
+        if self.page_image_position.data is None:
+            options['page-image-position'] = user_options[
+                'page-image-position']
+        else:
+            options['page-image-position'] = self.page_image_position.data
 
         body_family = self.body_font_family_ui.data
         if body_family not in self.theme.font_families.values():
@@ -57,6 +75,7 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
     @theme_options.setter
     def theme_options(self, options):
         self.primary_color.data = options.get('primary-color-ui')
+        self.page_image_position.data = options.get('page-image-position')
         self.body_font_family_ui.data = options.get(
             'body-font-family-ui') or self.default_font_family
         self.header_font_family_ui.data = options.get(
