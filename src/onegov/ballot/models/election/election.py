@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from sqlalchemy.sql import ColumnElement
     from typing import NamedTuple
 
+    from .relationship import ElectionRelationship
     from ..election_compound import ElectionCompoundAssociation
 
     class VotesByDistrictRow(NamedTuple):
@@ -207,8 +208,9 @@ class Election(Base, ContentMixin, LastModifiedMixin,
     if TYPE_CHECKING:
         # backrefs
         associations: relationship[AppenderQuery[ElectionCompoundAssociation]]
-        related_elections: relationship[AppenderQuery['Election']]
-        referencing_elections: relationship[AppenderQuery['Election']]
+        related_elections: relationship[AppenderQuery[ElectionRelationship]]
+        referencing_elections: relationship[
+            AppenderQuery[ElectionRelationship]]
 
     #: The total eligible voters
     eligible_voters = summarized_property('eligible_voters')
@@ -276,7 +278,7 @@ class Election(Base, ContentMixin, LastModifiedMixin,
 
     #: may be used to store a link related to this election
     related_link: dict_property[str | None] = meta_property('related_link')
-    related_link_label: dict_property[str | None] = meta_property(
+    related_link_label: dict_property[dict[str, str] | None] = meta_property(
         'related_link_label'
     )
 

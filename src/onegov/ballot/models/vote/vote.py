@@ -317,7 +317,7 @@ class Vote(Base, ContentMixin, LastModifiedMixin,
     #: may be used to store a link related to this vote
     related_link: dict_property[str | None] = meta_property('related_link')
     #: Additional, translatable label for the link
-    related_link_label: dict_property[str | None] = meta_property(
+    related_link_label: dict_property[dict[str, str] | None] = meta_property(
         'related_link_label'
     )
 

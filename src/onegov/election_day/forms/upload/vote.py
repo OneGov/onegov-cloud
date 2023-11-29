@@ -13,6 +13,13 @@ from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Vote
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 class UploadVoteForm(Form):
 
     type = RadioField(
@@ -111,7 +118,7 @@ class UploadVoteForm(Form):
         ]
     )
 
-    def adjust(self, principal, vote):
+    def adjust(self, principal: 'Canton | Municipality', vote: 'Vote') -> None:
         """ Adjusts the form to the given principal and vote. """
 
         if principal.domain == 'municipality':
@@ -129,6 +136,10 @@ class UploadVoteForm(Form):
                 ('wabsti', "Wabsti"),
             ]
 
+        # FIXME: We rely on a dynamic backref that only exists if ballot
+        #        and election_day are both used together, maybe this should
+        #        be factored diferently...
+        assert hasattr(vote, 'data_sources')
         if vote.data_sources:
             self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
 
