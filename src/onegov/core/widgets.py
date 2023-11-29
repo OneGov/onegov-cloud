@@ -43,8 +43,10 @@ if TYPE_CHECKING:
     from .layout import Layout
 
     class Widget(Protocol):
-        tag: str
-        template: str
+        @property
+        def tag(self) -> str: ...
+        @property
+        def template(self) -> str: ...
 
 
 XSLT_BASE = """<?xml version="1.0" encoding="UTF-8"?>
