@@ -497,9 +497,7 @@ class ElectionCompoundForm(Form):
             )
 
     def update_model(self, model: ElectionCompound) -> None:
-        # FIXME: Was this meant to be if self.id.data?
-        if self.id:
-            assert self.id.data is not None
+        if self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
         model.domain = self.domain.data
