@@ -8,8 +8,8 @@ from onegov.form.filters import yubikey_identifier
 from onegov.org import _
 from onegov.org.utils import ticket_directory_groups
 from onegov.ticket import handlers
-from onegov.ticket import TicketPermission
 from onegov.user import User
+from onegov.ticket import TicketPermission
 from onegov.user import UserCollection
 from re import match
 from wtforms.fields import BooleanField

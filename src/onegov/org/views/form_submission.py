@@ -13,6 +13,7 @@ from onegov.form import (
 from onegov.org import _, OrgApp
 from onegov.org.layout import FormSubmissionLayout
 from onegov.org.mail import send_ticket_mail
+from onegov.org.utils import user_group_emails_for_new_ticket
 from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.pay import Price
 from purl import URL
@@ -237,16 +238,21 @@ def handle_complete_submission(self, request):
                     'show_submission': self.meta['show_submission']
                 }
             )
+            emails_for_directory_groups = list(
+                user_group_emails_for_new_ticket(request, ticket)
+            )
+
             if request.email_for_new_tickets:
                 send_ticket_mail(
                     request=request,
                     template='mail_ticket_opened_info.pt',
                     subject=_("New ticket"),
                     ticket=ticket,
-                    receivers=(request.email_for_new_tickets, ),
-                    content={
-                        'model': ticket
-                    }
+                    receivers=(
+                        request.email_for_new_tickets,
+                        *emails_for_directory_groups,
+                    ),
+                    content={'model': ticket},
                 )
 
             request.app.send_websocket(

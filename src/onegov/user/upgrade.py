@@ -261,9 +261,3 @@ def make_user_models_polymorphic_type_non_nullable(
             """)
 
             context.operations.alter_column(table, 'type', nullable=False)
-
-
-@upgrade_task('drop column')
-def remove_directories_from_user_group(context: 'UpgradeContext') -> None:
-    if context.has_column('groups', 'directories'):
-        context.operations.drop_column('groups', 'directories')
