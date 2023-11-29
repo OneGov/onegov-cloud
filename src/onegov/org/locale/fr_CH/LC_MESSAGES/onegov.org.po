@@ -4739,8 +4739,9 @@ msgstr ""
 msgid "General Message"
 msgstr "Message général"
 
-msgid "New e-mail (To all participants)"
-msgstr "Nouvel e-mail (A tous les participants)"
+#, python-format
+msgid "New e-mail: ${message}"
+msgstr "Nouvel e-mail: ${message}"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

@@ -103,24 +103,32 @@ def view_send_form_registration_message(
         tickets = TicketCollection(request.session)  # type: ignore[abstract]
 
         for email, submission in form.receivers.items():
-            # be extra safe and check for missing ticket of submission
             _ticket = tickets.by_handler_id(submission.id.hex)
+
+            if not form.message.data:
+                continue
+
+            # be extra safe and check for missing ticket of submission
             if (ticket := ticket_linkable(request, _ticket)) is not None:
                 TicketNote.create(ticket, request, (
-                    request.translate(_("New e-mail (To all participants)"))
+                    request.translate(_(
+                        "New e-mail: ${message}",
+                        mapping={'message': form.message.data.strip()}
+                    ))
                 ))
-            if form.message.data:
-                send_form_registration_email(
-                    request=request,
-                    receivers=(email,),
-                    action='general-message',
-                    content={
-                        'model': submission,
-                        'action': 'general-message',
-                        'message': form.message.data.strip(),
-                    }
-                )
-                count += 1
+
+            send_form_registration_email(
+                request=request,
+                receivers=(email,),
+                action='general-message',
+                content={
+                    'model': submission,
+                    'action': 'general-message',
+                    'message': form.message.data.strip(),
+                }
+            )
+            count += 1
+
         request.success(
             _("Successfully sent ${count} emails", mapping={'count': count})
         )

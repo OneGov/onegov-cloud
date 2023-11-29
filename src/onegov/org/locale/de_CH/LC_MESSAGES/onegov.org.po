@@ -4723,8 +4723,9 @@ msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
 msgid "General Message"
 msgstr "Allgemeine Nachricht"
 
-msgid "New e-mail (To all participants)"
-msgstr "Neue E-Mail (An alle Teilnehmende)"
+#, python-format
+msgid "New e-mail: ${message}"
+msgstr "Neue E-Mail: ${message}"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

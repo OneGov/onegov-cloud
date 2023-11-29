@@ -1005,10 +1005,8 @@ msgstr ""
 "Votre demande sera traitée sous peu. Pour connaître l'état d'avancement de "
 "votre demande, vous pouvez revenir à tout moment sur cette page."
 
-msgid ""
-"Your request has been completed."
-msgstr ""
-"Votre demande a été traitée."
+msgid "Your request has been completed."
+msgstr "Votre demande a été traitée."
 
 msgid "Privacy"
 msgstr "Confidentialité"
