@@ -10,9 +10,11 @@ from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
+
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
-from onegov.search.indexer import Indexer
+from onegov.search.indexer import Indexer, PostgresIndexer, \
+    PostgresORMEventTranslator
 from onegov.search.indexer import ORMEventTranslator
 from onegov.search.indexer import TypeMappingRegistry
 from onegov.search.utils import searchable_sqlalchemy_models
@@ -186,19 +188,36 @@ class ElasticsearchApp(morepath.App):
                 self.es_mappings,
                 max_queue_size=max_queue_size
             )
+            self.postgres_orm_events = PostgresORMEventTranslator(
+                self.es_mappings,
+                max_queue_size=max_queue_size
+            )
 
             self.es_indexer = Indexer(
                 self.es_mappings,
                 self.es_orm_events.queue,
                 es_client=self.es_client
             )
+            self.psql_indexer = PostgresIndexer(
+                self.es_mappings,
+                self.postgres_orm_events.queue,
+                self.session_manager.engine
+            )
 
             self.session_manager.on_insert.connect(
                 self.es_orm_events.on_insert)
+            self.session_manager.on_insert.connect(
+                self.postgres_orm_events.on_insert)
+
             self.session_manager.on_update.connect(
                 self.es_orm_events.on_update)
+            self.session_manager.on_update.connect(
+                self.postgres_orm_events.on_update)
+
             self.session_manager.on_delete.connect(
                 self.es_orm_events.on_delete)
+            self.session_manager.on_delete.connect(
+                self.postgres_orm_events.on_delete)
 
     def es_configure_client(self, usage='default'):
         usages = {
@@ -376,6 +395,13 @@ class ElasticsearchApp(morepath.App):
 
                 for obj in q:
                     self.es_orm_events.index(self.schema, obj)
+
+                # FIXME: for working example limit to a few models
+                if model.__tablename__ in ['pages']:
+                    print(f'*** tschupre psql indexing model '
+                          f'{self.schema} {model}')
+                    self.postgres_orm_events.delete(self.schema, model)
+                    self.postgres_orm_events.index(self.schema, model)
             finally:
                 session.invalidate()
                 session.bind.dispose()
@@ -393,6 +419,7 @@ class ElasticsearchApp(morepath.App):
                 tuple(results)
 
         self.es_indexer.bulk_process()
+        self.psql_indexer.bulk_process()
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)

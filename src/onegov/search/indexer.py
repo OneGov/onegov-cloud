@@ -1,8 +1,12 @@
 import platform
 import re
+import time
 
 from collections import namedtuple
+from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
+from random import random
+
 from elasticsearch.helpers import streaming_bulk
 from elasticsearch.exceptions import NotFoundError
 from langdetect.lang_detect_exception import LangDetectException
@@ -304,6 +308,54 @@ class Indexer:
                     )
                 except NotFoundError:
                     pass
+
+
+class PostgresIndexer(Indexer):
+
+    def __init__(self, mappings, queue, psql_client, hostname=None):
+        self.psql_client = psql_client
+        self.queue = queue
+        self.hostname = hostname or platform.node()
+        self.mappings = mappings
+        self.failed_task = None
+
+    def bulk_process(self):
+        """
+
+        :return:
+        """
+
+        def action(task):
+            if task['action'] == 'index':
+                self.index(task)
+            elif task['action'] == 'delete':
+                self.delete(task)
+            else:
+                raise NotImplementedError
+
+        # with ThreadPoolExecutor(max_workers=multiprocessing.cpu_count())
+        #     as executor:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            while True:
+                try:
+                    task = self.queue.get(block=False, timeout=None)
+                    print('*** tschupre submit task')
+                    executor.submit(action, task)
+                except Empty:
+                    break
+
+    def index(self, task):
+        print('*** tschupre processing index..')
+        time.sleep(random() * 5)
+        print('*** tschupre indexing done')
+        # create tsvector
+        # add index column
+
+    def delete(self, task):
+        print('*** tschupre processing delete..')
+        time.sleep(random() * 5)
+        print('*** tschupre delete done')
+        # delete index column
 
 
 class TypeMapping:
@@ -746,6 +798,41 @@ class ORMEventTranslator:
             'schema': schema,
             'type_name': obj.es_type_name,
             'id': getattr(obj, obj.es_id)
+        }
+
+        self.put(translation)
+
+
+class PostgresORMEventTranslator(ORMEventTranslator):
+
+    def __init__(self, mappings, max_queue_size=0):
+        self.mappings = mappings
+        self.queue = Queue(maxsize=max_queue_size)
+        self.stopped = False
+
+    def index(self, schema, model):
+        print(f'*** tschupre initiate task to index {schema} {model}')
+        # create index translation
+        translation = {
+            'action': 'index',
+            'schema': schema,
+            'model': model,
+        }
+        self.put(translation)
+
+    def delete(self, schema, model):
+        """
+        Creates a delete index column translation and adds it to the queue.
+        :param schema: db schema
+        :param model: db model
+        :return: None
+        """
+        print(f'*** tschupre initiate task to delete {schema} {model}')
+        # create delete index translation
+        translation = {
+            'action': 'delete',
+            'schema': schema,
+            'model': model,
         }
 
         self.put(translation)
