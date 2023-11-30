@@ -78,7 +78,7 @@ msgid "${org} Reservation Overview"
 msgstr "Aperçu de la ${org} réservation"
 
 msgid "Your Chat has been turned into a ticket"
-msgstr ""
+msgstr "Un ticket a été créé à partir de votre chat"
 
 msgid "Account"
 msgstr "Compte"
@@ -1858,6 +1858,17 @@ msgstr "Autorisation des tickets"
 msgid "Restricts access and gives permission to these ticket categories"
 msgstr "Restreint l'accès et donne la permission à ces catégories de tickets"
 
+msgid "Directories"
+msgstr "Répertoires"
+
+msgid ""
+"Directories for which this user group is responsible. If activated, ticket "
+"notifications for this group are only sent for these directories"
+msgstr ""
+"Annuaires dont ce groupe d'utilisateurs est responsable. Si cette option est "
+"activée, les les notifications de tickets pour ce groupe ne sont envoyées "
+"que pour ces annuaires"
+
 msgid "Send a periodic status e-mail."
 msgstr "Envoyer un e-mail d'état périodique."
 
@@ -1908,9 +1919,6 @@ msgstr "Lier des fichiers supplémentaires"
 
 msgid "All directories"
 msgstr "Tous les dossiers"
-
-msgid "Directories"
-msgstr "Répertoires"
 
 msgid "All events"
 msgstr "Tous les événements"
@@ -2658,7 +2666,7 @@ msgid "Reject entry"
 msgstr "Rejeter l'entrée"
 
 msgid "Chats"
-msgstr ""
+msgstr "Chats"
 
 msgid "Chat with"
 msgstr "Chat avec"
@@ -4121,8 +4129,12 @@ msgstr "Mises à jour de tickets par e-mail"
 msgid "Disable E-Mails"
 msgstr "Désactiver les e-mails"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Aucune mise à jour de tickets par e-mail. Un e-mail continue d'être envoyé lorsqu'un ticket est attribué."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Aucune mise à jour de tickets par e-mail. Un e-mail continue d'être envoyé "
+"lorsqu'un ticket est attribué."
 
 msgid "Enable E-Mails"
 msgstr "Activer les e-mails"
