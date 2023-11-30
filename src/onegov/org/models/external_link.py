@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.collection import GenericCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, \
@@ -48,9 +50,17 @@ class ExternalLink(Base, ContentMixin, TimestampMixin, AccessExtension,
 
     lead = meta_property()
 
+    @property
+    def search_score(self):
+        return 8
+
     @observes('title')
     def title_observer(self, title):
         self.order = normalize_for_url(title)
+
+    @hybrid_property
+    def lead(self):  # noqa: F811
+        return self.meta['lead'].astext
 
 
 class ExternalLinkCollection(GenericCollection):

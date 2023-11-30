@@ -1,11 +1,12 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.mixins import UTCPublicationMixin
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
-from sqlalchemy import Column
-from sqlalchemy import Text
+from sqlalchemy import Column, Text
 from uuid import uuid4
 from vobject import vCard
 from vobject.vcard import Address
@@ -38,9 +39,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     @property
     def es_suggestion(self):
-        return (self.title, f"{self.first_name} {self.last_name}")
+        return self.title
 
-    @property
+    @hybrid_property
     def title(self):
         """ Returns the Estern-ordered name. """
 
@@ -128,6 +129,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable,
 
     #: some remarks about the person
     notes = Column(Text, nullable=True)
+
+    @property
+    def search_score(self):
+        return 3
 
     def vcard_object(self, exclude=None, include_memberships=True):
         """ Returns the person as vCard (3.0) object.

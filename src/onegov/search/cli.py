@@ -5,7 +5,6 @@ import click
 from onegov.core.cli import command_group, pass_group_context
 from sedate import utcnow
 
-
 cli = command_group()
 
 
@@ -13,18 +12,26 @@ cli = command_group()
 @click.option('--fail', is_flag=True, default=False, help='Fail on errors')
 @pass_group_context
 def reindex(group_context, fail):
-    """ Reindexes all objects in the elasticsearch database. """
+    """ Reindexes all objects in the postgresql database. """
 
     def run_reindex(request, app):
-        if not hasattr(request.app, 'es_client'):
-            return
+        """
+        Looping over all models in project deleting all full text search (
+        fts) indexes in postgresql and re-creating them
 
+        :param request: request
+        :param app: application context
+        """
         title = f"Reindexing {request.app.application_id}"
         print(click.style(title, underline=True))
 
         start = utcnow()
-        request.app.es_perform_reindex(fail)
+        app.psql_perform_reindex(request)
+        print(f"- psql indexing took {utcnow() - start}")
 
-        print(f"took {utcnow() - start}")
+        # TODO: remove es indexing once es is gone
+        start = utcnow()
+        request.app.es_perform_reindex(fail)
+        print(f"- es indexing took {utcnow() - start}")
 
     return run_reindex

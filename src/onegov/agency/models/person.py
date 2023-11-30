@@ -21,8 +21,6 @@ class ExtendedPerson(Person, AccessExtension, PublicationExtension):
         'title': {'type': 'text'},
         'function': {'type': 'localized'},
         'email': {'type': 'text'},
-        'phone_internal': {'type': 'text'},
-        'phone_es': {'type': 'text'}
     }
 
     @property

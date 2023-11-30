@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -93,6 +95,10 @@ class Assembly(
     )
 
     last_modified = Column(UTCDateTime)
+
+    @hybrid_property
+    def overview(self):  # noqa: F811
+        return self.content['overview'].astext
 
     def stamp(self):
         self.last_modified = self.timestamp()

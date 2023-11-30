@@ -17,10 +17,8 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
 from onegov.search import SearchableContent
-from sqlalchemy import Column
+from sqlalchemy import Column, Text, Integer
 from sqlalchemy import func, exists, and_
-from sqlalchemy import Integer
-from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -102,6 +100,10 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         order_by='DirectoryEntry.order',
         backref='directory'
     )
+
+    @property
+    def search_score(self):
+        return 7
 
     @property
     def entry_cls_name(self):

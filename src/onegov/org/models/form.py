@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.form.models import FormDefinition
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
@@ -20,6 +22,14 @@ class BuiltinFormDefinition(FormDefinition, AccessExtension,
     @property
     def extensions(self):
         return tuple(set(super().extensions + ['honeypot']))
+
+    @hybrid_property
+    def lead(self):
+        return self.meta['lead'].astext
+
+    @hybrid_property
+    def text(self):
+        return self.content['text'].astext
 
 
 class CustomFormDefinition(FormDefinition, AccessExtension,

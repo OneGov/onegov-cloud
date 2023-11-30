@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from .file import File
 

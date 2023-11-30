@@ -10,6 +10,8 @@ from elasticsearch import Transport
 from elasticsearch import TransportError
 from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
+
+from onegov.core.orm import Base
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
 from onegov.search.indexer import Indexer
@@ -90,8 +92,9 @@ def is_5xx_error(error):
     return error.status_code and str(error.status_code).startswith('5')
 
 
-class ElasticsearchApp(morepath.App):
-    """ Provides elasticsearch integration for
+# TODO: remove all es specific things ones es is gone
+class SearchApp(morepath.App):
+    """ Provides elasticsearch and postgres integration for
     :class:`onegov.core.framework.Framework` based applications.
 
     The application must be connected to a database.
@@ -326,6 +329,7 @@ class ElasticsearchApp(morepath.App):
         else:
             languages = '*'
 
+        print(f'es_suggestion_by_request language: {languages}')
         return self.es_suggestions(
             query,
             languages=languages,
@@ -394,8 +398,20 @@ class ElasticsearchApp(morepath.App):
 
         self.es_indexer.bulk_process()
 
+    def psql_perform_reindex(self, request):
+        """ Re-indexes all `searchable' models in postgresql db ensuring
+        each table will be indexed only once.
 
-@ElasticsearchApp.tween_factory(over=transaction_tween_factory)
+        """
+        done = []
+
+        for model in searchable_sqlalchemy_models(Base):
+            if model.__tablename__ not in done:
+                model.reindex(request, model)
+                done.append(model.__tablename__)
+
+
+@SearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(app, handler):
     def process_indexer_tween(request):
 

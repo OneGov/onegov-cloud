@@ -7,6 +7,9 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from functools import cached_property
 from itertools import chain, groupby
+
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import as_selectable
 from onegov.core.orm.mixins import meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
@@ -152,6 +155,14 @@ class ImageSet(FileSet, AccessExtension, ORMSearchable):
     view = meta_property()
 
     show_images_on_homepage = meta_property()
+
+    @hybrid_property
+    def lead(self):  # noqa: F811
+        return self.meta['lead'].astext
+
+    @hybrid_property
+    def view(self):  # noqa: F811
+        return self.meta['view'].astext
 
 
 class ImageSetCollection(FileSetCollection):

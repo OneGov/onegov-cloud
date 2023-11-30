@@ -1,4 +1,5 @@
 from arrow import utcnow
+
 from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
@@ -31,6 +32,10 @@ class Course(Base, ORMSearchable):
 
     # hides the course in the collection for non-admins
     hidden_from_public = Column(Boolean, nullable=False, default=False)
+
+    @property
+    def search_score(self):
+        return 2
 
     @property
     def title(self):

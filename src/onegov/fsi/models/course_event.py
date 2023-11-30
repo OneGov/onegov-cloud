@@ -22,13 +22,15 @@ from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.fsi.models.course_subscription import subscription_table
 from onegov.search import ORMSearchable
 
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .course import Course
     from .course_notification_template import (
-        CancellationTemplate, CourseNotificationTemplate, InfoTemplate,
-        ReminderTemplate, SubscriptionTemplate
+        CancellationTemplate,
+        CourseNotificationTemplate,
+        InfoTemplate,
+        ReminderTemplate,
+        SubscriptionTemplate
     )
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
@@ -83,7 +85,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def title(self):
         return str(self)
 
-    @property
+    @hybrid_property
     def name(self):
         return self.course.name
 
@@ -95,7 +97,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
             f'{self.presenter_company}'
         )
 
-    @property
+    @hybrid_property
     def description(self):
         return self.course.description
 

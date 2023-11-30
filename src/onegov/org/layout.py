@@ -26,7 +26,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.exports.base import OrgExport
-from onegov.org.models import ExportCollection, Editor
+from onegov.org.models import ExportCollection, Editor, SearchPostgres
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import ImageFile
 from onegov.org.models import ImageFileCollection
@@ -290,11 +290,16 @@ class Layout(ChameleonLayout, OpenGraphMixin):
     @cached_property
     def search_url(self):
         """ Returns the url to the search page. """
+        if 'search_postgres' in self.request.path_info:
+            return self.request.link(SearchPostgres(self.request, None, None))
         return self.request.link(Search(self.request, None, None))
 
     @cached_property
     def suggestions_url(self):
         """ Returns the url to the suggestions json view. """
+        if 'search_postgres' in self.request.path_info:
+            return self.request.link(SearchPostgres(self.request, None,
+                                                    None), 'suggest')
         return self.request.link(Search(self.request, None, None), 'suggest')
 
     @cached_property

@@ -1,5 +1,14 @@
-from onegov.search.utils import classproperty
+from sqlalchemy import Column, func, Computed  # type:ignore[attr-defined]
+from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import deferred
+
+from onegov.core.upgrade import UpgradeContext
+from onegov.search.utils import classproperty, \
+    get_fts_index_localized_languages, get_fts_index_basic_languages
 from onegov.search.utils import extract_hashtags
+
+from typing import Any, TYPE_CHECKING
 
 
 class Searchable:
@@ -38,6 +47,18 @@ class Searchable:
     identity is a completely different model.
 
     """
+    TEXT_SEARCH_COLUMN_NAME = 'fts_idx'
+
+    if TYPE_CHECKING:
+        fts_idx: 'Column[dict[str, Any]]'
+
+    # column for full text search index
+    @declared_attr  # type:ignore[no-redef]
+    def fts_idx(cls) -> 'Column[dict[str, Any]]':
+        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
+        if hasattr(cls, '__table__') and hasattr(cls.__table__.c, col_name):
+            return deferred(cls.__table__.c.fts_idx)
+        return deferred(Column(col_name, TSVECTOR))
 
     @classproperty
     def es_properties(self):
@@ -134,7 +155,106 @@ class Searchable:
         """ Returns a list of tags associated with this content. """
         return None
 
+    @property
+    def search_score(self):
+        """
+        the lower the score the higher the class type will be shown in search
+        results. Default is 10 (lowest)
+        """
+        return 10
 
+    @staticmethod
+    def psql_tsvector_expression(model):
+        """
+        Provides the tsvector expression for postgres for the defined
+        model. Depending on the model columns and properties are used for full
+        text search index.
+
+        :return: tsvector expression
+        """
+        objects = [getattr(model, p) for p in model.es_properties if
+                   not p.startswith('es_')]
+        return Searchable.create_tsvector_expression(*objects)
+
+    @staticmethod
+    def reindex(request, model):
+        """
+        Re-indexes the table by dropping and adding the full text search
+        column.
+        """
+        Searchable.drop_fts_column(request, model)
+        Searchable.add_fts_column(request, model)
+
+    @staticmethod
+    def drop_fts_column(request, model):
+        """
+        Drops the full text search column
+
+        :param request: request object
+        :param model: model to drop the index from
+        :return: None
+        """
+
+        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
+        context = UpgradeContext(request)
+
+        if context.has_column(model.__tablename__, col_name):
+            context.operations.drop_column(model.__tablename__, col_name)
+
+    @staticmethod
+    def add_fts_column(request, model):
+
+        """
+        This function is used for re-indexing and as migration step moving to
+        postgresql full text search (fts), OGC-508.
+
+        It adds a separate column for the tsvector to `schema`.`table`
+        creating a multilingual gin index on the columns/data defined per
+        model.
+
+        :param request: request object
+        :param model: model to add the index
+        :return: None
+        """
+
+        col_name = Searchable.TEXT_SEARCH_COLUMN_NAME
+        context = UpgradeContext(request)
+        if not context.has_column(model.__tablename__, col_name):
+            tsvector_expression = None
+            for prop_name, type_info in model.es_properties.items():
+                if not prop_name.startswith('es_'):
+                    prop_type = type_info.get('type', None)
+                    prop = getattr(model, prop_name)
+                    languages = get_fts_index_basic_languages()
+
+                    if prop_type in ['localized', 'localized_html']:
+                        # only for 'localized' properties we create the
+                        # index localized
+                        languages.extend(get_fts_index_localized_languages())
+
+                    for language in languages:
+                        expr = func.to_tsvector(language,
+                                                func.coalesce(prop, ''))
+
+                        if tsvector_expression is None:
+                            tsvector_expression = expr
+                        else:
+                            tsvector_expression = tsvector_expression.concat(
+                                expr)
+
+            context.operations.add_column(
+                model.__tablename__,
+                Column(col_name,
+                       TSVECTOR,
+                       Computed(
+                           tsvector_expression,
+                           persisted=True),
+                       )
+            )
+            context.operations.execute("COMMIT")
+
+
+# TODO: rename prefix 'es' to 'ts' for text search
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults
     for SQLAlchemy orm models.
@@ -154,6 +274,7 @@ class ORMSearchable(Searchable):
         return getattr(self, 'last_change', None)
 
 
+# TODO: rename prefix 'es' to 'ts' for text search
 class SearchableContent(ORMSearchable):
     """ Adds search to all classes using the core's content mixin:
     :class:`onegov.core.orm.mixins.content.ContentMixin`

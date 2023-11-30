@@ -2,6 +2,11 @@ import logging
 import pytest
 
 from datetime import datetime
+
+from onegov.core.orm import Base
+from onegov.directory import DirectoryEntry
+from onegov.org.models import Topic
+from onegov.people import Agency
 from onegov.search import Searchable, SearchOfflineError, utils
 from onegov.search.indexer import parse_index_name
 from onegov.search.indexer import (
@@ -13,6 +18,10 @@ from onegov.search.indexer import (
 )
 from queue import Queue
 from unittest.mock import Mock
+
+from onegov.search.utils import searchable_sqlalchemy_models
+from onegov.ticket import Ticket
+from onegov.user import User
 
 
 def test_index_manager_assertions(es_client):
@@ -717,3 +726,88 @@ def test_elasticsearch_outage(es_client, es_url):
     indexer.es_client.indices.refresh(index='_all')
     assert indexer.es_client\
         .search(index='_all')['hits']['total']['value'] == 2
+
+
+def test_psql_tsvector_string():
+    assert Searchable.create_tsvector_string(('col_lower')) == \
+        "'func.coalesce(col_lower, '')'"
+
+    # FIXME: implement lower
+    # assert Searchable.create_tsvector_string(['Col_Higher']) == \
+    #        'coalesce("\'col_higher\'", \'\')'
+
+    assert Searchable.create_tsvector_string('col_a', 'col_b') == \
+        "'func.coalesce(col_a, '')' || ' ' || 'func.coalesce(col_b, '')'"
+
+    assert Searchable.create_tsvector_string('a', 'b', 'c') == \
+        "'func.coalesce(a, '')' || ' ' || 'func.coalesce(b, '')' || ' ' || " \
+        "'func.coalesce(c, '')'"
+
+    cols = ['col_a', 'col_b']
+    assert Searchable.create_tsvector_string(*cols) == \
+           "'func.coalesce(col_a, '')' || ' ' || 'func.coalesce(col_b, '')'"
+
+
+def test_multi_language_tsvector_expression(monkeypatch):
+    tsvector_string = "'func.coalesce(my_col, '')'"
+    x = Searchable.multi_language_tsvector_expression(tsvector_string)
+    assert x == "to_tsvector('simple', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('german', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('french', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('italian', 'func.coalesce(my_col, '')') || " \
+                "to_tsvector('english', 'func.coalesce(my_col, '')')"
+
+    def fake():
+        return ['simple']
+    tsvector_string = "'func.coalesce(group, '')'"
+    monkeypatch.setattr(utils, 'get_fts_index_languages', fake)
+    assert Searchable.multi_language_tsvector_expression(
+        tsvector_string) == "to_tsvector('simple', 'func.coalesce(group, '')')"
+
+
+def test_psql_tsvector_string_generation_models():
+    count = 0
+
+    for model in searchable_sqlalchemy_models(Base):
+        print(f'model {model}..')
+        tsvector = model.psql_tsvector_string(model)
+        for p in getattr(model, 'es_properties', []):
+            if p in model.__dict__ and not p.startswith('_es'):
+                # verify all properties are reflected in the tsvector
+                assert p in tsvector
+
+        # random sample
+        if model == Agency:
+            count += 1
+            assert tsvector == "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(description, '')' || ' ' || " \
+                               "'func.coalesce(portrait, '')'"
+        elif model == User:
+            count += 1
+            assert tsvector == "'func.coalesce(username, '')' || ' ' || " \
+                               "'func.coalesce(realname, '')' || ' ' || " \
+                               "'func.coalesce(userprofile, '')'"
+        elif model == DirectoryEntry:
+            count += 1
+            assert tsvector == "'func.coalesce(keywords, '')' || ' ' || " \
+                               "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(lead, '')' || ' ' || " \
+                               "'func.coalesce(directory_id, '')' || ' ' || " \
+                               "'func.coalesce(text, '')'"
+        elif model == Ticket:
+            count += 1
+            assert tsvector == "'func.coalesce(number, '')' || ' ' || " \
+                               "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(subtitle, '')' || ' ' || " \
+                               "'func.coalesce(group, '')' || ' ' || " \
+                               "'func.coalesce(ticket_email, '')' || ' ' || " \
+                               "'func.coalesce(ticket_data, '')' || ' ' || " \
+                               "'func.coalesce(extra_localized_text, '')'"
+        elif model == Topic:
+            count += 1
+            assert tsvector == "'func.coalesce(title, '')' || ' ' || " \
+                               "'func.coalesce(lead, '')' || ' ' || " \
+                               "'func.coalesce(text, '')'"
+
+    # verify if statements reached and tested
+    assert count == 5

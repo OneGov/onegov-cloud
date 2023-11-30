@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from onegov.core.orm.mixins import (
     content_property, dict_property, meta_property)
 from onegov.file import MultiAssociatedFiles
@@ -21,6 +22,7 @@ from onegov.search import SearchableContent
 from sedate import replace_timezone
 from sqlalchemy import desc, func, or_, and_
 from sqlalchemy.dialects.postgresql import array, JSON
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import undefer, object_session
 from sqlalchemy_utils import observes
 
@@ -41,6 +43,30 @@ class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
 
     # Show the lead on topics page
     lead_when_child = content_property(default=True)
+
+    @hybrid_property
+    def lead(self):  # noqa: F811
+        return self.content['lead']
+
+    @lead.expression
+    def lead(cls):
+        return cls.content['lead'].astext
+
+    @hybrid_property
+    def text(self):  # noqa: F811
+        return self.content['text']
+
+    @text.expression
+    def text(cls):
+        return cls.content['text'].astext
+
+    @hybrid_property
+    def url(self):  # noqa: F811
+        return self.content['url']
+
+    @url.expression
+    def url(cls):
+        return cls.content['url'].astext
 
     @property
     def es_skip(self):

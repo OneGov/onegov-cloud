@@ -6,12 +6,13 @@ from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
-from sqlalchemy import Column
+from sqlalchemy import Column, cast
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
 
@@ -25,7 +26,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
         'keywords': {'type': 'keyword'},
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
-        'directory_id': {'type': 'keyword'},
+        '_directory_id': {'type': 'keyword'},
 
         # since the searchable text might include html, we remove it
         # even if there's no html -> possibly decreasing the search
@@ -86,6 +87,10 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def external_link_visible(self):
         return self.directory.configuration.link_visible
 
+    @hybrid_property
+    def _directory_id(self):
+        return cast(self.directory_id, Text)
+
     @property
     def directory_name(self):
         return self.directory.name
@@ -98,7 +103,7 @@ class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
     def keywords(self, value):
         self._keywords = {k: '' for k in value} if value else None
 
-    @property
+    @hybrid_property
     def text(self):
         return self.directory.configuration.extract_searchable(self.values)
 

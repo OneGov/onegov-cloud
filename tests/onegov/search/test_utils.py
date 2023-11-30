@@ -1,5 +1,6 @@
-from onegov.search import ORMSearchable, Searchable
+from onegov.search import ORMSearchable
 from onegov.search import utils
+from onegov.search.mixins import Searchable
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -101,3 +102,13 @@ def test_related_types_unsearchable_base():
         es_type_name = 'news'
 
     assert utils.related_types(Page) == {'news', 'topic'}
+
+
+def test_create_tsvector_string():
+    assert Searchable.create_tsvector_string('username') == \
+           "coalesce(username, '')"
+    assert Searchable.create_tsvector_string('title', 'body') == \
+           "coalesce(title, '') || ' ' || coalesce(body, '')"
+    assert Searchable.create_tsvector_string('alpha', 'beta', 'gamma') == \
+           "coalesce(alpha, '') || ' ' || coalesce(beta, '') || ' ' || " \
+           "coalesce(gamma, '')"

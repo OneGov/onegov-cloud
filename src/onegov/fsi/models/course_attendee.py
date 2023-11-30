@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean
@@ -107,7 +109,7 @@ class CourseAttendee(Base, ORMSearchable):
         cascade='all, delete-orphan'
     )
 
-    @property
+    @hybrid_property
     def title(self):
         return ' '.join((
             p for p in (
@@ -131,7 +133,7 @@ class CourseAttendee(Base, ORMSearchable):
             return 'member'
         return self.user.role
 
-    @property
+    @hybrid_property
     def email(self):
         """Needs a switch for external users"""
         if not self.user_id:

@@ -140,6 +140,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     }
 
     @property
+    def search_score(self) -> int:
+        return 7
+
     def form_class(self) -> Type['Form']:
         """ Parses the form definition and returns a form class. """
 

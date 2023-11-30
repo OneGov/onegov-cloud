@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from .language import Language
 
 
+# TODO rename to ts (text search)
 class ESMixin(ORMSearchable):
 
     es_properties = {
@@ -181,6 +182,10 @@ class Translator(Base, TimestampMixin, AssociatedFiles, ContentMixin,
     expertise_professional_guilds = meta_property(default=tuple)
     expertise_professional_guilds_other: 'dict_property[Sequence[str]]'
     expertise_professional_guilds_other = meta_property(default=tuple)
+
+    @property
+    def search_score(self):
+        return 4
 
     @property
     def expertise_professional_guilds_all(self):

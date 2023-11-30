@@ -8,7 +8,6 @@ from langdetect import DetectorFactory, PROFILES_DIRECTORY
 from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
 
-
 # XXX this is doubly defined in onegov.org.utils, maybe move to a common
 # regex module in in onegov.core
 HASHTAG = re.compile(r'#\w{3,}')
@@ -28,6 +27,16 @@ def searchable_sqlalchemy_models(base):
 
 
 _invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')
+
+
+def get_fts_index_languages():
+    """ Define index creation languages for full text search as we have a
+    limited set of used languages.
+
+    NOTE: 'simple' is used for tag, label or phrase searches
+
+    """
+    return ['simple', 'german', 'french', 'italian', 'english']
 
 
 def is_valid_index_name(name):

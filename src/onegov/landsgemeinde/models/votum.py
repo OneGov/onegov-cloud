@@ -1,3 +1,5 @@
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
@@ -91,6 +93,18 @@ class Votum(
         ),
         nullable=False
     )
+
+    @hybrid_property
+    def text(self):  # noqa: F811
+        return self.content['text'].astext
+
+    @hybrid_property
+    def motion(self):  # noqa: F811
+        return self.content['motion'].astext
+
+    @hybrid_property
+    def statement_of_reasons(self):  # noqa: F811
+        return self.content['statement_of_reasons'].astext
 
     @property
     def date(self):

@@ -1,4 +1,5 @@
 from datetime import date
+
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -11,7 +12,6 @@ from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
-from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
@@ -42,6 +42,10 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         'notes': {'type': 'localized'}
     }
     es_public = False
+
+    @property
+    def search_score(self):
+        return 3
 
     @property
     def es_suggestion(self):
@@ -178,8 +182,4 @@ class Attendee(Base, TimestampMixin, ORMSearchable):
         'Booking',
         order_by='Booking.created',
         backref='attendee'
-    )
-
-    __table_args__ = (
-        Index('unique_child_name', 'username', 'name', unique=True),
     )

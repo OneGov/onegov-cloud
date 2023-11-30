@@ -6,6 +6,7 @@ import isodate
 from contextlib import contextmanager
 from collections import defaultdict
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
+
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import Associable
@@ -261,6 +262,10 @@ class File(Base, Associable, TimestampMixin):
     __table_args__ = (
         Index('files_by_type_and_order', 'type', 'order'),
     )
+
+    @property
+    def search_score(self) -> int:
+        return 10
 
     @hybrid_property
     def signature_timestamp(self) -> 'datetime | None':

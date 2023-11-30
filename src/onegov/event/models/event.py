@@ -6,6 +6,7 @@ from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
@@ -109,6 +110,10 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
     )
 
+    @property
+    def search_score(self):
+        return 1
+
     def set_image(self, content, filename=None):
         self.set_blob('image', content, filename)
 
@@ -148,8 +153,15 @@ class Event(Base, OccurrenceMixin, TimestampMixin, SearchableContent,
         'description': {'type': 'localized'},
         'location': {'type': 'localized'},
         'organizer': {'type': 'localized'},
-        'filter_keywords': {'type': 'keyword'}
     }
+
+    @hybrid_property
+    def description(self):  # noqa: F811
+        return self.content['description'].astext
+
+    @hybrid_property
+    def organizer(self):  # noqa: F811
+        return self.content['organizer'].astext
 
     @property
     def es_public(self):

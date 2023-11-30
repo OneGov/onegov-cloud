@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import data_property, dict_property, TimestampMixin
@@ -9,8 +10,7 @@ from onegov.core.utils import remove_repeated_spaces
 from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
-from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import Boolean, Column, Text, func, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4, UUID as UUIDType
@@ -57,7 +57,7 @@ class User(Base, TimestampMixin, ORMSearchable):
     def es_suggestion(self) -> tuple[str, str]:
         return (self.realname or self.username, self.username)
 
-    @property
+    @hybrid_property
     def userprofile(self) -> list[str]:
         if not self.data:
             return []
@@ -150,10 +150,9 @@ class User(Base, TimestampMixin, ORMSearchable):
     signup_token: 'Column[str | None]' = Column(
         Text, nullable=True, default=None)
 
-    __table_args__ = (
-        Index('lowercase_username', func.lower(username), unique=True),
-        UniqueConstraint('source', 'source_id', name='unique_source_id'),
-    )
+    @property
+    def search_score(self) -> int:
+        return 5
 
     if TYPE_CHECKING:
         # HACK: This probably won't be necessary in SQLAlchemy 2.0, but
