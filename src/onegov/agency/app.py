@@ -12,6 +12,7 @@ from onegov.agency.request import AgencyRequest
 from onegov.agency.theme import AgencyTheme
 from onegov.api import ApiApp
 from onegov.core import utils
+from onegov.core.framework import transaction_tween_factory
 from onegov.org import OrgApp
 from onegov.org.app import get_editor_asset as editor_assets
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
@@ -169,3 +170,28 @@ def get_api_endpoints():
         PersonApiEndpoint,
         MembershipApiEndpoint
     ]
+
+
+@AgencyApp.tween_factory(
+    over=transaction_tween_factory
+)
+def cache_control_tween_factory(
+        app: AgencyApp,
+        handler: 'Callable[[AgencyRequest], Response]'
+) -> 'Callable[[AgencyRequest], Response]':
+
+    def cache_control_tween(request: AgencyRequest) -> 'Response':
+        """ Set headers and cookies for cache control.
+
+        Makes sure, pages are not cached downstream when logged in by setting
+        the cache-control header accordingly.
+
+        """
+
+        response = handler(request)
+        if request.is_logged_in:
+            response.headers.add('cache-control', 'no-store')
+
+        return response
+
+    return cache_control_tween
