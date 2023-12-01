@@ -26,9 +26,11 @@
                                                 ${submission.title}
                                             </tal:b>
                                         </strong>
-                                    </div>
-                                    <div>
-                                        ${layout.format_date(submission.received, 'relative')}
+                                        <span class="tiny-text">
+                                            <tal:b i18n:translate>
+                                                (angemeldet ${layout.format_date(submission.received, 'relative')})
+                                            </tal:b>
+                                        </span>
                                     </div>
                                 </li>
                             </ul>
