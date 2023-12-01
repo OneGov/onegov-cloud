@@ -141,7 +141,8 @@ class ExtendedAgencyForm(Form):
             if self.organigram.data:
                 # with this the new file gets a new storage id and therefore
                 # a browser refresh is not required as the html changes
-                del model.organigram
+                if model.organigram:
+                    del model.organigram
                 model.organigram_file = self.organigram.file
         model.coordinates = self.coordinates.data
         if hasattr(self, 'access'):
