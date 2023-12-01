@@ -27,9 +27,7 @@
                                             </tal:b>
                                         </strong>
                                         <span class="tiny-text">
-                                            <tal:b i18n:translate>
-                                                (angemeldet ${layout.format_date(submission.received, 'relative')})
-                                            </tal:b>
+                                            (<tal:b i18n:translate>submitted</tal:b> ${layout.format_date(submission.received, 'relative')})
                                         </span>
                                     </div>
                                 </li>

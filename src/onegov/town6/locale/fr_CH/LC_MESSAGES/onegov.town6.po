@@ -918,6 +918,9 @@ msgstr "Initié"
 msgid "Submitted"
 msgstr "Soumis"
 
+msgid "submitted"
+msgstr "soumis"
+
 msgid "Withdrawn"
 msgstr "Retiré"
 

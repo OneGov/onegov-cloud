@@ -923,6 +923,9 @@ msgstr "Initiiert"
 msgid "Submitted"
 msgstr "Gemeldet"
 
+msgid "submitted"
+msgstr "angemeldet"
+
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
