@@ -9,7 +9,6 @@ from onegov.org.forms import FormRegistrationWindowForm
 from onegov.org.forms.form_registration import FormRegistrationMessageForm
 from onegov.org.layout import FormSubmissionLayout
 from onegov.core.elements import Link, Confirm, Intercooler, Block
-from sqlalchemy import desc
 
 from onegov.org.views.form_submission import handle_submission_action
 from onegov.org.mail import send_transactional_html_mail
@@ -122,7 +121,12 @@ def view_registration_window(self, request, layout=None):
     q = request.session.query(FormSubmission)
     q = q.filter_by(registration_window_id=self.id)
     q = q.filter_by(state='complete')
-    q = q.order_by(desc(FormSubmission.received))
+    # ogc-1345 order after family name first
+    q = q.order_by(
+        FormSubmission.data['nachname'],
+        FormSubmission.data['name'],
+        FormSubmission.data['vorname'],
+    )
     has_pending_or_confirmed = False
 
     for submission in q:
