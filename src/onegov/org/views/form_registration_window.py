@@ -23,7 +23,6 @@ from onegov.ticket import TicketCollection
     form=FormRegistrationWindowForm,
     template='form.pt')
 def handle_new_registration_form(self, request, form, layout=None):
-
     title = _("New Registration Window")
 
     layout = layout or FormSubmissionLayout(self, request)
@@ -31,7 +30,6 @@ def handle_new_registration_form(self, request, form, layout=None):
     layout.breadcrumbs.append(Link(title, '#'))
 
     if form.submitted(request):
-
         form.populate_obj(self.add_registration_window(
             form.start.data,
             form.end.data
@@ -52,7 +50,6 @@ def handle_new_registration_form(self, request, form, layout=None):
 
 
 def send_form_registration_email(request, receivers, content, action):
-
     if action == 'general-message':
         subject = _("General Message")
     else:
@@ -110,7 +107,6 @@ def view_send_form_registration_message(self, request, form, layout=None):
     permission=Private,
     template='registration_window.pt')
 def view_registration_window(self, request, layout=None):
-
     layout = layout or FormSubmissionLayout(self.form, request)
     title = layout.format_date_range(self.start, self.end)
 
@@ -234,7 +230,6 @@ def view_registration_window(self, request, layout=None):
     template='form.pt',
     name='edit')
 def handle_edit_registration_form(self, request, form, layout=None):
-
     title = _("Edit Registration Window")
 
     layout = layout or FormSubmissionLayout(self.form, request)
