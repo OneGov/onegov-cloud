@@ -9,6 +9,8 @@ from onegov.chat import TextModuleCollection
 from onegov.core.elements import Block, Confirm, Intercooler, Link, LinkGroup
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify, to_html_ul
+from onegov.chat.collections import ChatCollection
+from onegov.chat.models import Chat
 from onegov.directory import DirectoryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
@@ -2573,3 +2575,27 @@ class ClientChatLayout(ChatLayout):
 class ChatInitiationFormLayout(DefaultLayout):
     def __init__(self, model, request):
         super().__init__(model, request)
+
+
+class ArchivedChatsLayout(DefaultLayout):
+    def __init__(self, model, request, chat:Chat = None):
+        super().__init__(model, request)
+        self.chat = chat
+
+    @cached_property
+    def breadcrumbs(self):
+        bc = [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Chat Archive"), self.request.link(
+                ChatCollection(self.request.session), name='archive'
+            ))
+        ]
+
+        if self.chat:
+            bc.append(
+                Link(self.chat.customer_name, self.request.link(
+                    self.chat, 'staff-view'
+                ))
+            )
+
+        return bc

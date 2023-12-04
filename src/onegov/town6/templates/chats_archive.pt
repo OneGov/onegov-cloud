@@ -7,7 +7,7 @@
         <div class="grid-x chat">
             <div class="medium-7 cell">
                 <p tal:repeat="chat archived_chats">
-                    <a href="${request.link(chat)}">${chat.customer_name}</a>
+                    <a href="${request.link(chat, 'staff-view')}">${chat.customer_name}</a>
                 </p>
 
                 <div class="pagination-centered">

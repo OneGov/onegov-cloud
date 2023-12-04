@@ -7,7 +7,7 @@ from onegov.chat.models import Chat
 from onegov.town6.forms.chat import ChatInitiationForm, ChatActionsForm
 from onegov.core.templates import render_template
 from onegov.town6.layout import StaffChatLayout, ClientChatLayout
-from onegov.town6.layout import DefaultLayout
+from onegov.town6.layout import DefaultLayout, ArchivedChatsLayout
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.mail import send_ticket_mail
 from webob.exc import HTTPForbidden
@@ -98,12 +98,10 @@ def view_chats_staff(self, request, form):
 def view_chats_archive(self, request):
 
     user = request.current_user
-    all_chats = ChatCollection(request.session).query()
-    # archived_chats = all_chats.filter(Chat.active == False)
 
     return {
         'title': _('Archived Chats'),
-        'layout': StaffChatLayout(self, request),
+        'layout': ArchivedChatsLayout(self, request),
         'user': user,
         'archived_chats': self.batch
     }
@@ -153,6 +151,28 @@ def view_customer_chat(self, request):
     return {
         'title': _('Chat Customer'),
         'layout': ClientChatLayout(self, request),
+        'chat': self,
+        'customer_name': self.customer_name
+    }
+
+
+@TownApp.html(
+    model=Chat,
+    template='chat_staff.pt',
+    name='staff-view',
+    permission=Public,)
+def view_staff_chat(self, request):
+
+    active_chat_id = request.browser_session.get('active_chat_id')
+    if not request.is_manager and self.id != active_chat_id:
+        raise HTTPForbidden()
+
+    title = _('Chat with')
+    title = f'{title} {self.customer_name}'
+
+    return {
+        'title': title,
+        'layout': ArchivedChatsLayout(self, request, self),
         'chat': self,
         'customer_name': self.customer_name
     }
