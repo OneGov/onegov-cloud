@@ -4548,7 +4548,7 @@ msgstr ""
 "Export filtern."
 
 msgid "Exports all entries of this directory."
-msgstr "Exportiert alle Einträge dieses Verzeichniseses."
+msgstr "Exportiert alle Einträge dieses Verzeichnisses."
 
 msgid ""
 "The resulting zipfile contains the selected format as well as metadata and "
