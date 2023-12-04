@@ -99,13 +99,13 @@ def view_chats_archive(self, request):
 
     user = request.current_user
     all_chats = ChatCollection(request.session).query()
-    archived_chats = all_chats.filter(Chat.active == False)
+    # archived_chats = all_chats.filter(Chat.active == False)
 
     return {
         'title': _('Archived Chats'),
         'layout': StaffChatLayout(self, request),
         'user': user,
-        'archived_chats': archived_chats.all()
+        'archived_chats': self.batch
     }
 
 

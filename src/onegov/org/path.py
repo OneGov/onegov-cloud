@@ -288,8 +288,11 @@ def get_person(app, id):
 
 
 @OrgApp.path(model=ChatCollection, path='/chats')
-def get_chats(app):
-    return ChatCollection(app.session())
+def get_chats(app, page=0):
+    return ChatCollection(
+        app.session(),
+        page=page,
+    )
 
 
 @OrgApp.path(model=Chat, path='/chat/{id}', converters={'id': UUID})

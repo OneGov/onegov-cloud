@@ -1,6 +1,7 @@
 from onegov.core.elements import Link, LinkGroup
 from onegov.org.custom import get_global_tools as get_global_tools_base
 from onegov.town6 import _
+from onegov.chat.collections import ChatCollection
 
 
 def get_global_tools(request):
@@ -20,4 +21,9 @@ def get_global_tools(request):
                         request.app.org, name='chats'
                     ), attrs={'class': 'chats'}
                 ),
+                Link(
+                    _("Archived Chats"),
+                    request.link(ChatCollection(request.session), 'archive'),
+                    attrs={'class': 'chats'}
+                )
             ))
