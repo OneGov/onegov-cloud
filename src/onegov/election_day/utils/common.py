@@ -56,6 +56,7 @@ class LastUpdatedOrderedDict(OrderedDict[_KT, _VT]):
         super().move_to_end(key)
 
 
+# TODO: move to general utils
 def add_last_modified_header(
     response: 'Response',
     last_modified: 'datetime | None'
