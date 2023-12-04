@@ -305,6 +305,12 @@ class Pagination(Generic[_M]):
         return int(math.ceil(self.subset_count / self.batch_size))
 
     @property
+    def name_of_view(self) -> str:
+        """The name of the view to link to. If omitted, the
+           the default view is looked up.."""
+        return ''
+
+    @property
     def pages(self) -> 'Iterator[Self]':
         """ Yields all page objects of this Pagination. """
         for page in range(0, self.pages_count):

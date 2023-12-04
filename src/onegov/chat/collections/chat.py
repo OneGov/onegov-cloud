@@ -34,6 +34,7 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
         return self.page == other.page
 
     def subset(self):
+        # return self.query().filter(Chat.active == False)
         return self.query()
 
     @property
@@ -53,6 +54,10 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
             self.session,
             page=index
         )
+
+    @property
+    def name_of_view(self) -> str:
+        return 'archive'
 
     @property
     def model_class(self) -> type[Chat]:
