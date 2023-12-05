@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2023-12-05 15:03+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -22,6 +22,29 @@ msgstr "Chats"
 
 msgid "My Chats"
 msgstr "Mes chats"
+
+msgid "Archived Chats"
+msgstr "Chats archivés"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "E-mail"
+msgstr ""
+
+msgid "Topic"
+msgstr ""
+
+msgid "Confirmation"
+msgstr "Confirmation"
+
+msgid ""
+"Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
+"Verlauf an mich per Mail gesendet wird."
+msgstr ""
+
+msgid "Chat ID"
+msgstr ""
 
 msgid "Font family serif"
 msgstr "Police serif"
@@ -230,9 +253,6 @@ msgstr ""
 
 msgid "Upload Ticket"
 msgstr "Télécharger le ticket"
-
-msgid "Confirmation"
-msgstr "Confirmation"
 
 msgid "New Message"
 msgstr "Nouveau message"
@@ -508,6 +528,9 @@ msgstr "Supprimer lien externe"
 msgid "Sort"
 msgstr "Trier"
 
+msgid "Chat Archive"
+msgstr "Archives des chats"
+
 msgid "No rules defined."
 msgstr "Aucune règle définie."
 
@@ -683,9 +706,6 @@ msgstr "Télécharger"
 
 msgid "Just Uploaded"
 msgstr "Mis en ligne à l'instant"
-
-msgid "Name"
-msgstr "Nom"
 
 msgid "Extension"
 msgstr "Extension"
@@ -1963,8 +1983,12 @@ msgstr "Mises à jour de tickets par e-mail"
 msgid "Disable E-Mails"
 msgstr "Désactiver les e-mails"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Aucune mise à jour de tickets par e-mail. Un e-mail continue d'être envoyé lorsqu'un ticket est attribué."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Aucune mise à jour de tickets par e-mail. Un e-mail continue d'être envoyé "
+"lorsqu'un ticket est attribué."
 
 msgid "Enable E-Mails"
 msgstr "Activer les e-mails"
@@ -2137,11 +2161,11 @@ msgstr "Historique des discussions avec ${org}"
 msgid "Your Chat has been turned into a ticket"
 msgstr "Un ticket a été créé à partir de votre chat"
 
-msgid "Archived Chats"
-msgstr "Chats archivés"
-
 msgid "Chat Customer"
 msgstr "Chat avec les clients"
+
+msgid "Chat with"
+msgstr "Chat avec"
 
 msgid "New Recipient"
 msgstr "Nouveau destinataire"

@@ -15,7 +15,10 @@
                         </a>
                         
                         <a href="${request.link(chat, 'staff-view')}">
-                            <p class="list-lead preview">${chat.topic}</p>
+                            <p class="list-lead preview">
+                                <span>${layout.format_date(chat.created, 'datetime')}</span>,
+                                <span>${chat.topic}</span>
+                            </p>
                         </a>
                     </li>
                 </ul>

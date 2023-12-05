@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2023-12-05 15:03+0100\n"
 "PO-Revision-Date: 2021-03-03 16:24+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -22,6 +22,29 @@ msgstr "Chats"
 
 msgid "My Chats"
 msgstr "Meine Chats"
+
+msgid "Archived Chats"
+msgstr "Archivierte Chats"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "E-mail"
+msgstr ""
+
+msgid "Topic"
+msgstr ""
+
+msgid "Confirmation"
+msgstr "Bestätigung"
+
+msgid ""
+"Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
+"Verlauf an mich per Mail gesendet wird."
+msgstr ""
+
+msgid "Chat ID"
+msgstr ""
 
 msgid "Font family serif"
 msgstr "Schriftart mit Serifen"
@@ -43,8 +66,8 @@ msgstr "Chat aktivieren"
 
 msgid "The chat is currently in an test-phase. Activate at your own risk."
 msgstr ""
-"Der Chat befindet sich aktuel in einer Test-Phase. "
-"Auf eigenes Risiko aktivieren."
+"Der Chat befindet sich aktuel in einer Test-Phase. Auf eigenes Risiko "
+"aktivieren."
 
 msgid "Events"
 msgstr "Veranstaltungen"
@@ -234,9 +257,6 @@ msgstr ""
 
 msgid "Upload Ticket"
 msgstr "Ticket hochladen"
-
-msgid "Confirmation"
-msgstr "Bestätigung"
 
 msgid "New Message"
 msgstr "Neue Nachricht"
@@ -514,6 +534,9 @@ msgstr "Verknüpfung löschen"
 msgid "Sort"
 msgstr "Sortieren"
 
+msgid "Chat Archive"
+msgstr "Chat-Archiv"
+
 msgid "No rules defined."
 msgstr "Keine Regeln definiert."
 
@@ -688,9 +711,6 @@ msgstr "Hochladen"
 
 msgid "Just Uploaded"
 msgstr "Soeben hochgeladen"
-
-msgid "Name"
-msgstr "Name"
 
 msgid "Extension"
 msgstr "Erweiterung"
@@ -1964,8 +1984,12 @@ msgstr "Ticket Updates via E-Mail"
 msgid "Disable E-Mails"
 msgstr "E-Mails deaktivieren"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, wenn ein Ticket zugewiesen wird."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, "
+"wenn ein Ticket zugewiesen wird."
 
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
@@ -2135,11 +2159,11 @@ msgstr "Chat-Verlauf mit ${org}"
 msgid "Your Chat has been turned into a ticket"
 msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
-msgid "Archived Chats"
-msgstr "Archivierte Chats"
-
 msgid "Chat Customer"
 msgstr "Kundenchat  "
+
+msgid "Chat with"
+msgstr "Chat mit"
 
 msgid "New Recipient"
 msgstr "Neuer Empfänger"

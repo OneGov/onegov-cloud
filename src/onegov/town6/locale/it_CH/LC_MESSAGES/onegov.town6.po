@@ -1,7 +1,7 @@
 # This file was generated from translations.town6.xlsx
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2023-12-05 15:03+0100\n"
 "PO-Revision-Date: 2021-09-27 16:02+0200\n"
 "Language: it_CH\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,6 +13,29 @@ msgstr "Chat"
 
 msgid "My Chats"
 msgstr "Le mie chat"
+
+msgid "Archived Chats"
+msgstr "Chat archiviate"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "E-mail"
+msgstr ""
+
+msgid "Topic"
+msgstr ""
+
+msgid "Confirmation"
+msgstr "Conferma"
+
+msgid ""
+"Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
+"Verlauf an mich per Mail gesendet wird."
+msgstr ""
+
+msgid "Chat ID"
+msgstr ""
 
 msgid "Font family serif"
 msgstr "Font famiglia serif"
@@ -34,8 +57,7 @@ msgstr "Attivare la chat"
 
 msgid "The chat is currently in an test-phase. Activate at your own risk."
 msgstr ""
-"a chat è attualmente in fase di test. Attivare a proprio rischio e "
-"pericolo"
+"a chat è attualmente in fase di test. Attivare a proprio rischio e pericolo"
 
 #, fuzzy
 msgid "Events"
@@ -225,9 +247,6 @@ msgstr "Questo caricherà il ticket nell'istanza di Gever, se configurata."
 
 msgid "Upload Ticket"
 msgstr "Caricare il biglietto"
-
-msgid "Confirmation"
-msgstr "Conferma"
 
 msgid "New Message"
 msgstr "Nuovo messaggio"
@@ -505,6 +524,9 @@ msgstr "Elimina collegamento esterno"
 msgid "Sort"
 msgstr "Ordinare"
 
+msgid "Chat Archive"
+msgstr "Archivio chat"
+
 msgid "No rules defined."
 msgstr "Nessuna regola definita."
 
@@ -679,9 +701,6 @@ msgstr "Carica"
 
 msgid "Just Uploaded"
 msgstr "Appena caricato"
-
-msgid "Name"
-msgstr "Nome"
 
 msgid "Extension"
 msgstr "Estensione"
@@ -1955,8 +1974,12 @@ msgstr "Il biglietto si aggiorna tramite e-mail"
 msgid "Disable E-Mails"
 msgstr "Disabilita i messaggi e-mail"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata un'e-mail quando viene assegnato un ticket."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Nessun aggiornamento dei biglietti tramite e-mail. Viene comunque inviata "
+"un'e-mail quando viene assegnato un ticket."
 
 msgid "Enable E-Mails"
 msgstr "Abilita i messaggi e-mail"
@@ -2129,11 +2152,11 @@ msgstr "Cronologia delle chat con ${org}"
 msgid "Your Chat has been turned into a ticket"
 msgstr "È stato creato un ticket dalla loro chat"
 
-msgid "Archived Chats"
-msgstr "Chat archiviate"
-
 msgid "Chat Customer"
 msgstr "Chat con i clienti"
+
+msgid "Chat with"
+msgstr "Chat con"
 
 msgid "New Recipient"
 msgstr "Nuovo destinatario"

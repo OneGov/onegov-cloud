@@ -168,8 +168,7 @@ def view_staff_chat(self, request):
     if not request.is_manager and self.id != active_chat_id:
         raise HTTPForbidden()
 
-    title = _('Chat with')
-    title = f'{title} {self.customer_name}'
+    title = f'Chat {self.customer_name}'
     staff = request.session.query(User).filter_by(
         id=self.user_id).first()
     staff = staff.username if staff else ''
