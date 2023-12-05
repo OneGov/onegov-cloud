@@ -89,6 +89,8 @@ class GeneralSettingsForm(Form):
     )
 
     standard_image = StringField(
+        description=_(
+            'Will be used if an image is needed, but none has been set'),
         fieldset=_('Images'),
         label=_("Standard Image"),
         render_kw={'class_': 'image-url'}

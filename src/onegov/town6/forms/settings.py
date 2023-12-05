@@ -15,7 +15,8 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
 
     page_image_position = RadioField(
         fieldset=_('Images'),
-        description=_("Choose the position of the page images"),
+        description=_(
+            "Choose the position of the page images on the content pages"),
         label=_("Page image position"),
         choices=(
             ('as_content', _("As content image")),

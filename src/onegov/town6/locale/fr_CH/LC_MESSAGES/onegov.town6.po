@@ -49,7 +49,7 @@ msgid "Images"
 msgstr "Images"
 
 msgid "Choose the position of the page images"
-msgstr "Choisir la position des images de la page"
+msgstr "Choisir la position des images de page sur les pages de contenu"
 
 msgid "Page image position"
 msgstr "Position de l'image de la page"

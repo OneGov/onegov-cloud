@@ -48,8 +48,8 @@ msgstr "Chat ID"
 msgid "Images"
 msgstr "Bilder"
 
-msgid "Choose the position of the page images"
-msgstr "Position der Seiten-Bilder"
+msgid "Choose the position of the page images on the content pages"
+msgstr "Wählen Sie die Position der Seiten-Bilder auf den Inhaltsseiten"
 
 msgid "Page image position"
 msgstr "Position der Seiten-Bilder"

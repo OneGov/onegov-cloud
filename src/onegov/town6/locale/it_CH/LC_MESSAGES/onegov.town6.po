@@ -39,8 +39,10 @@ msgstr "Chat ID "
 msgid "Images"
 msgstr "Immagini"
 
-msgid "Choose the position of the page images"
-msgstr "Scegliere la posizione delle immagini della pagina"
+msgid "Choose the position of the page images on the content pages"
+msgstr ""
+"Scegliere la posizione delle immagini di pagina nelle pagine di "
+"contenuto"
 
 msgid "Page image position"
 msgstr "Posizione dell'immagine della pagina"

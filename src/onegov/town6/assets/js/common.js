@@ -315,7 +315,7 @@ console.log(header_height)
 if ($('.header-image .page-image').length) {
     var page_image = $('.header-image .page-image');
     if (w.matches) {
-            var new_height = 'calc(90vw - ' + header_height + 'px)';
+            var new_height = '60vw';
     } else {
             var new_height = 'calc(80vh - ' + header_height + 'px)';
     }
