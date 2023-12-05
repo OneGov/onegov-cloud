@@ -9,11 +9,20 @@ from onegov.election_day.utils.parties import get_party_results_deltas
 from onegov.election_day.utils.parties import get_party_results_seat_allocation
 
 
+from typing import Any
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot import ElectionCompound  # noqa: F401
+    from onegov.election_day.layouts import DefaultLayout
+
+ElectionCompoundWidget = ModelBoundWidget['ElectionCompound']
+
+
 @ElectionDayApp.screen_widget(
     tag='election-compound-seat-allocation-table',
     category='election_compound'
 )
-class ElectionCompoundSeatAllocationTableWidget(ModelBoundWidget):
+class ElectionCompoundSeatAllocationTableWidget(ElectionCompoundWidget):
     tag = 'election-compound-seat-allocation-table'
     template = """
         <xsl:template match="election-compound-seat-allocation-table">
@@ -26,7 +35,7 @@ class ElectionCompoundSeatAllocationTableWidget(ModelBoundWidget):
     """
     usage = '<election-compound-seat-allocation-table class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         party_years, parties = get_party_results(model)
         seat_allocations = get_party_results_seat_allocation(
@@ -43,7 +52,7 @@ class ElectionCompoundSeatAllocationTableWidget(ModelBoundWidget):
     tag='election-compound-candidates-table',
     category='election_compound'
 )
-class ElectionCompoundCandidatesTableWidget(ModelBoundWidget):
+class ElectionCompoundCandidatesTableWidget(ElectionCompoundWidget):
     tag = 'election-compound-candidates-table'
     template = """
         <xsl:template match="election-compound-candidates-table">
@@ -56,7 +65,7 @@ class ElectionCompoundCandidatesTableWidget(ModelBoundWidget):
     """
     usage = '<election-compound-candidates-table class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         request = layout.request
         session = request.session
@@ -80,7 +89,7 @@ class ElectionCompoundCandidatesTableWidget(ModelBoundWidget):
     tag='election-compound-list-groups-table',
     category='election_compound'
 )
-class ElectionCompoundListGroupsTableWidget(ModelBoundWidget):
+class ElectionCompoundListGroupsTableWidget(ElectionCompoundWidget):
     tag = 'election-compound-list-groups-table'
     template = """
         <xsl:template match="election-compound-list-groups-table">
@@ -93,7 +102,7 @@ class ElectionCompoundListGroupsTableWidget(ModelBoundWidget):
     """
     usage = '<election-compound-list-groups-table class="" />'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         groups = get_list_groups(model)
         return {
@@ -106,7 +115,7 @@ class ElectionCompoundListGroupsTableWidget(ModelBoundWidget):
     tag='election-compound-party-strengths-table',
     category='election_compound'
 )
-class ElectionCompoundPartyStrengthsTableWidget(ModelBoundWidget):
+class ElectionCompoundPartyStrengthsTableWidget(ElectionCompoundWidget):
     tag = 'election-compound-party-strengths-table'
     template = """
         <xsl:template match="election-compound-party-strengths-table">
@@ -119,7 +128,7 @@ class ElectionCompoundPartyStrengthsTableWidget(ModelBoundWidget):
     """
     usage = '<election-compound-party-strengths-table year="" class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         party_years, parties = get_party_results(model)
         party_deltas, party_results = get_party_results_deltas(
@@ -137,7 +146,7 @@ class ElectionCompoundPartyStrengthsTableWidget(ModelBoundWidget):
     tag='election-compound-districts-table',
     category='election_compound'
 )
-class ElectionCompoundDistrictsTableWidget(ModelBoundWidget):
+class ElectionCompoundDistrictsTableWidget(ElectionCompoundWidget):
     tag = 'election-compound-districts-table'
     template = """
         <xsl:template match="election-compound-districts-table">
@@ -150,7 +159,7 @@ class ElectionCompoundDistrictsTableWidget(ModelBoundWidget):
     """
     usage = '<election-compound-districts-table class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'election_compound': model,
@@ -161,7 +170,7 @@ class ElectionCompoundDistrictsTableWidget(ModelBoundWidget):
     tag='election-compound-districts-map',
     category='election_compound'
 )
-class ElectionCompoundDistrictsMapWidget(ModelBoundWidget):
+class ElectionCompoundDistrictsMapWidget(ElectionCompoundWidget):
     tag = 'election-compound-districts-map'
     template = """
         <xsl:template match="election-compound-districts-map">
@@ -174,7 +183,7 @@ class ElectionCompoundDistrictsMapWidget(ModelBoundWidget):
     """
     usage = '<election-compound-districts-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -186,7 +195,7 @@ class ElectionCompoundDistrictsMapWidget(ModelBoundWidget):
     tag='election-compound-superregions-table',
     category='election_compound'
 )
-class ElectionCompoundSuperregionsTableWidget(ModelBoundWidget):
+class ElectionCompoundSuperregionsTableWidget(ElectionCompoundWidget):
     tag = 'election-compound-superregions-table'
     template = """
         <xsl:template match="election-compound-superregions-table">
@@ -199,7 +208,7 @@ class ElectionCompoundSuperregionsTableWidget(ModelBoundWidget):
     """
     usage = '<election-compound-superregions-table class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         superregions = get_superregions(model, layout.app.principal)
         return {
@@ -212,7 +221,7 @@ class ElectionCompoundSuperregionsTableWidget(ModelBoundWidget):
     tag='election-compound-superregions-map',
     category='election_compound'
 )
-class ElectionCompoundSuperregionsMapWidget(ModelBoundWidget):
+class ElectionCompoundSuperregionsMapWidget(ElectionCompoundWidget):
     tag = 'election-compound-superregions-map'
     template = """
         <xsl:template match="election-compound-superregions-map">
@@ -225,7 +234,7 @@ class ElectionCompoundSuperregionsMapWidget(ModelBoundWidget):
     """
     usage = '<election-compound-superregions-map class=""/>'
 
-    def get_variables(self, layout):
+    def get_variables(self, layout: 'DefaultLayout') -> dict[str, Any]:
         model = self.model or layout.model
         return {
             'embed': False,
@@ -237,7 +246,7 @@ class ElectionCompoundSuperregionsMapWidget(ModelBoundWidget):
     tag='election-compound-list-groups-chart',
     category='election_compound'
 )
-class ElectionCompoundListGroupsChartWidget(ChartWidget):
+class ElectionCompoundListGroupsChartWidget(ChartWidget['ElectionCompound']):
     tag = 'election-compound-list-groups-chart'
     template = """
         <xsl:template match="election-compound-list-groups-chart">
@@ -255,7 +264,9 @@ class ElectionCompoundListGroupsChartWidget(ChartWidget):
     tag='election-compound-seat-allocation-chart',
     category='election_compound'
 )
-class ElectionCompoundSeatAllocationChartWidget(ChartWidget):
+class ElectionCompoundSeatAllocationChartWidget(
+    ChartWidget['ElectionCompound']
+):
     tag = 'election-compound-seat-allocation-chart'
     template = """
         <xsl:template match="election-compound-seat-allocation-chart">
@@ -273,7 +284,9 @@ class ElectionCompoundSeatAllocationChartWidget(ChartWidget):
     tag='election-compound-party-strengths-chart',
     category='election_compound'
 )
-class ElectionCompoundPartyStrengthsChartWidget(ChartWidget):
+class ElectionCompoundPartyStrengthsChartWidget(
+    ChartWidget['ElectionCompound']
+):
     tag = 'election-compound-party-strengths-chart'
     template = """
         <xsl:template match="election-compound-party-strengths-chart">

@@ -8,6 +8,13 @@ from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models import Principal
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
+
+
 @ElectionDayApp.manage_form(
     model=Principal,
     name='update-results',
@@ -15,8 +22,11 @@ from onegov.election_day.models import Principal
     form=EmptyForm,
     permission=Secret
 )
-def view_update_results(self, request, form):
-
+def view_update_results(
+    self: Principal,
+    request: 'ElectionDayRequest',
+    form: EmptyForm
+) -> 'RenderData | Response':
     """ Updates all archived results. """
 
     layout = DefaultLayout(self, request)

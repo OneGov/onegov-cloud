@@ -1199,21 +1199,21 @@ def test_model_column_mapper_metadata():
 
     mapper.set_value(data, 'n:f:bfs_number', Decimal('100.1'))
     mapper.set_value(data, 't:f:filename', 'Dateiname')
-    mapper.set_value(data, 't:t:title', 'Titel'),
-    mapper.set_value(data, 't:t:position', 'Ja'),
-    mapper.set_value(data, 't:t:author', 'Autor'),
-    mapper.set_value(data, 't:t:editor', 'Herausgeber'),
-    mapper.set_value(data, 'i:t:date_year', 1970),
-    mapper.set_value(data, 'i:t:date_month', None),
-    mapper.set_value(data, 'i:t:date_day', 31),
-    mapper.set_value(data, 't:t:language!de', 'x'),
-    mapper.set_value(data, 't:t:language!en', True),
-    mapper.set_value(data, 't:t:language!fr', ''),
-    mapper.set_value(data, 't:t:language!it', None),
-    mapper.set_value(data, 't:t:doctype!argument', 'x'),
-    mapper.set_value(data, 't:t:doctype!article', True),
-    mapper.set_value(data, 't:t:doctype!release', ''),
-    mapper.set_value(data, 't:t:doctype!lecture', None),
+    mapper.set_value(data, 't:t:title', 'Titel')
+    mapper.set_value(data, 't:t:position', 'Ja')
+    mapper.set_value(data, 't:t:author', 'Autor')
+    mapper.set_value(data, 't:t:editor', 'Herausgeber')
+    mapper.set_value(data, 'i:t:date_year', 1970)
+    mapper.set_value(data, 'i:t:date_month', None)
+    mapper.set_value(data, 'i:t:date_day', 31)
+    mapper.set_value(data, 't:t:language!de', 'x')
+    mapper.set_value(data, 't:t:language!en', True)
+    mapper.set_value(data, 't:t:language!fr', '')
+    mapper.set_value(data, 't:t:language!it', None)
+    mapper.set_value(data, 't:t:doctype!argument', 'x')
+    mapper.set_value(data, 't:t:doctype!article', True)
+    mapper.set_value(data, 't:t:doctype!release', '')
+    mapper.set_value(data, 't:t:doctype!lecture', None)
 
     assert data == {
         'author': 'Autor',
