@@ -403,7 +403,14 @@ if TYPE_CHECKING:
     from typing_extensions import Self, TypeAlias
     from yaml.nodes import ScalarNode
 
-    # tagged union so we can type narrow by type field
+    # tagged unions so we can type narrow by type field
+    BasicParsedField: TypeAlias = (
+        'PasswordField | EmailField | UrlField | DateField | '
+        'DatetimeField | TimeField | StringField | TextAreaField | '
+        'CodeField | StdnumField | IntegerRangeField | '
+        'DecimalRangeField | RadioField | CheckboxField'
+    )
+    FileParsedField: TypeAlias = 'FileinputField | MultipleFileinputField'
     ParsedField: TypeAlias = (
         'PasswordField | EmailField | UrlField | DateField | '
         'DatetimeField | TimeField | StringField | TextAreaField | '
