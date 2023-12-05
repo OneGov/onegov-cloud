@@ -737,7 +737,7 @@
     <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False; show_page_image page.show_page_image|None; files files|None;">
         <tal:b condition="not: people or files or contact or coordinates or location or show_side_panel or more_entries|False">
             <div class="small-12 cell page-content-main">
-                <img class="page-image" tal:condition="show_page_image and layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image" src="${page.page_image}">
+                <img class="page-image" tal:condition="show_page_image and (layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image) or page.type == 'news'" src="${page.page_image}">
                 <div metal:define-slot="before-lead"></div>
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
@@ -750,7 +750,7 @@
         </tal:b>
         <tal:b condition="people or files or contact or coordinates or show_side_panel or more_entries|False">
             <div class="small-12 medium-7 cell page-content-main">
-                <img class="page-image" tal:condition="show_page_image and layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image" src="${page.page_image}">
+                <img class="page-image" tal:condition="show_page_image and (layout.org.theme_options.get('page-image-position', 'as_content') ==  'as_content' and page.page_image) or page.type == 'news'" src="${page.page_image}">
                 <div class="limit-line-width">
                     <span class="page-lead h5" tal:condition="lead" tal:content="structure lead" />
                 </div>
