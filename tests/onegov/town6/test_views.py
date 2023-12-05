@@ -217,3 +217,17 @@ def test_header_links(client):
 
     assert '<a href="https://www.govikon-castle.ch">Castle Govikon</a>' in page
     assert '<a href="https://www.govikon-school.ch">Govikon School</a>' in page
+
+
+def test_header_image(client):
+    client.login_admin()
+
+    page = client.get('/topics/themen')
+    assert 'class="header-image"' not in page
+
+    settings = client.get('/general-settings')
+    settings.form['standard_image'] = 'standard_image.png'
+    settings.form['page_image_position'] = 'header'
+    page = settings.form.submit().follow()
+
+    assert 'class="header-image"' in page
