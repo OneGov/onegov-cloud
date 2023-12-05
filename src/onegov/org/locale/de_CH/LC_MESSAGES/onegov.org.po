@@ -76,7 +76,7 @@ msgid "${org} Reservation Overview"
 msgstr "${org} Reservations-Übersicht"
 
 msgid "Your Chat has been turned into a ticket"
-msgstr ""
+msgstr "Aus ihrem Chat wurde ein Ticket erstellt"
 
 msgid "Account"
 msgstr "Konto"
@@ -1779,6 +1779,16 @@ msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 msgid "Setting \"Always notify\" is active"
 msgstr "Einstellung \"Immer benachrichtigen\" ist eingeschaltet"
 
+msgid "BCC"
+msgstr "BCC"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr ""
+"Sie können eine Kopie der Nachricht an einen oder mehrere Empfänger senden"
+
 msgid "User"
 msgstr "Benutzer"
 
@@ -1844,6 +1854,17 @@ msgstr ""
 "Schränkt den Zugriff ein und erteilt Berechtigungen für diese "
 "Ticketkategorien"
 
+msgid "Directories"
+msgstr "Verzeichnisse"
+
+msgid ""
+"Directories for which this user group is responsible. If activated, ticket "
+"notifications for this group are only sent for these directories"
+msgstr ""
+"Verzeichnisse für welche diese Benutzergruppe zuständig ist. Falls "
+"aktiviert, werden Ticket Benachrichtigungen nur für diese Verzeichnisse "
+"gesendet."
+
 msgid "Send a periodic status e-mail."
 msgstr "Ein periodisches Status E-Mail senden."
 
@@ -1894,9 +1915,6 @@ msgstr "Zusätzliche Dateien verknüpfen"
 
 msgid "All directories"
 msgstr "Alle Verzeichnisse"
-
-msgid "Directories"
-msgstr "Verzeichnisse"
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"
@@ -2653,7 +2671,7 @@ msgid "Reject entry"
 msgstr "Eintrag abweisen"
 
 msgid "Chats"
-msgstr ""
+msgstr "Chats"
 
 msgid "Chat with"
 msgstr "Chat mit"
@@ -4536,7 +4554,7 @@ msgstr ""
 "Export filtern."
 
 msgid "Exports all entries of this directory."
-msgstr "Exportiert alle Einträge dieses Verzeichniseses."
+msgstr "Exportiert alle Einträge dieses Verzeichnisses."
 
 msgid ""
 "The resulting zipfile contains the selected format as well as metadata and "
@@ -4751,6 +4769,10 @@ msgstr "Anmeldezeiträume limitieren Formulareingaben nach Anzahl und Zeitraum."
 
 msgid "General Message"
 msgstr "Allgemeine Nachricht"
+
+#, python-format
+msgid "New e-mail: ${message}"
+msgstr "Neue E-Mail: ${message}"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

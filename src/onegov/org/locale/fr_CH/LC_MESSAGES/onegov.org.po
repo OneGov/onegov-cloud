@@ -78,7 +78,7 @@ msgid "${org} Reservation Overview"
 msgstr "Aperçu de la ${org} réservation"
 
 msgid "Your Chat has been turned into a ticket"
-msgstr ""
+msgstr "Un ticket a été créé à partir de votre chat"
 
 msgid "Account"
 msgstr "Compte"
@@ -1785,6 +1785,16 @@ msgstr "M'avertir des réponses"
 msgid "Setting \"Always notify\" is active"
 msgstr "Le paramètre \"Toujours notifier\" est actif"
 
+msgid "BCC"
+msgstr "BCC"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "You can send a copy of the message to one or more recipients"
+msgstr ""
+"Vous pouvez envoyer une copie du message à un ou plusieurs destinataires"
+
 msgid "User"
 msgstr "Utilisateur"
 
@@ -1848,6 +1858,17 @@ msgstr "Autorisation des tickets"
 msgid "Restricts access and gives permission to these ticket categories"
 msgstr "Restreint l'accès et donne la permission à ces catégories de tickets"
 
+msgid "Directories"
+msgstr "Répertoires"
+
+msgid ""
+"Directories for which this user group is responsible. If activated, ticket "
+"notifications for this group are only sent for these directories"
+msgstr ""
+"Annuaires dont ce groupe d'utilisateurs est responsable. Si cette option est "
+"activée, les les notifications de tickets pour ce groupe ne sont envoyées "
+"que pour ces annuaires"
+
 msgid "Send a periodic status e-mail."
 msgstr "Envoyer un e-mail d'état périodique."
 
@@ -1898,9 +1919,6 @@ msgstr "Lier des fichiers supplémentaires"
 
 msgid "All directories"
 msgstr "Tous les dossiers"
-
-msgid "Directories"
-msgstr "Répertoires"
 
 msgid "All events"
 msgstr "Tous les événements"
@@ -2654,7 +2672,7 @@ msgid "Reject entry"
 msgstr "Rejeter l'entrée"
 
 msgid "Chats"
-msgstr ""
+msgstr "Chats"
 
 msgid "Chat with"
 msgstr "Chat avec"
@@ -4768,6 +4786,10 @@ msgstr ""
 
 msgid "General Message"
 msgstr "Message général"
+
+#, python-format
+msgid "New e-mail: ${message}"
+msgstr "Nouvel e-mail: ${message}"
 
 #, python-format
 msgid "Successfully sent ${count} emails"

@@ -62,7 +62,7 @@ class QrCode:
         return file
 
     @cached_property
-    def encoded_image(self) -> str | bytes:
+    def encoded_image(self) -> bytes:
         if self.encoding == 'base64':
             return b64encode(self.image.read())
         return self.image.read()

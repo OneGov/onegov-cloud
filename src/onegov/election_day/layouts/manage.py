@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from onegov.ballot import ElectionCompound
     from onegov.ballot import Vote
     from onegov.election_day.models import DataSource
+    from onegov.election_day.models import Subscriber
     from onegov.election_day.models import UploadToken
     from onegov.election_day.request import ElectionDayRequest
 
@@ -224,11 +225,11 @@ class ManageLayout(DefaultLayout):
 
 class ManageElectionsLayout(ManageLayout):
 
-    model: 'Election'
+    model: 'Election | ElectionCompound | ElectionCollection'
 
     def __init__(
         self,
-        model: 'Election',
+        model: 'Election | ElectionCompound | ElectionCollection',
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -244,17 +245,22 @@ class ManageElectionsLayout(ManageLayout):
         )
 
     def clear_media(self) -> int:  # type:ignore[override]
-        layout = ElectionLayout(self.model, self.request)
+        # FIXME: This should not be on the layout, since it only works
+        #        for Election context...
+        layout = ElectionLayout(
+            self.model,  # type:ignore[arg-type]
+            self.request
+        )
         return super().clear_media(tabs=layout.all_tabs)
 
 
 class ManageElectionCompoundsLayout(ManageLayout):
 
-    model: 'ElectionCompound'
+    model: 'ElectionCompound | ElectionCompoundCollection'
 
     def __init__(
         self,
-        model: 'ElectionCompound',
+        model: 'ElectionCompound | ElectionCompoundCollection',
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -270,17 +276,22 @@ class ManageElectionCompoundsLayout(ManageLayout):
         )
 
     def clear_media(self) -> int:  # type:ignore[override]
-        layout = ElectionCompoundLayout(self.model, self.request)
+        # FIXME: This should not be on the layout, since it only works
+        #        for ElectionCompound context...
+        layout = ElectionCompoundLayout(
+            self.model,  # type:ignore[arg-type]
+            self.request
+        )
         return super().clear_media(tabs=layout.all_tabs)
 
 
 class ManageVotesLayout(ManageLayout):
 
-    model: 'Vote'
+    model: 'Vote | VoteCollection'
 
     def __init__(
         self,
-        model: 'Vote',
+        model: 'Vote | VoteCollection',
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -296,10 +307,12 @@ class ManageVotesLayout(ManageLayout):
         )
 
     def clear_media(self) -> int:  # type:ignore[override]
-        layout = VoteLayout(self.model, self.request)
+        # FIXME: This should not be on the layout, since it only works
+        #        for Vote context...
+        layout = VoteLayout(self.model, self.request)  # type:ignore
         additional = [
             'svg/{}'.format(svg_filename(ballot, prefix, locale))
-            for ballot in self.model.ballots
+            for ballot in self.model.ballots  # type:ignore
             for prefix in ('entities-map', 'districts-map')
             for locale in self.request.app.locales
         ]
@@ -308,11 +321,11 @@ class ManageVotesLayout(ManageLayout):
 
 class ManageSubscribersLayout(ManageLayout):
 
-    model: SubscriberCollection[Any] | SmsSubscriber | EmailSubscriber
+    model: 'SubscriberCollection[Any] | Subscriber'
 
     def __init__(
         self,
-        model: SubscriberCollection[Any] | SmsSubscriber | EmailSubscriber,
+        model: 'SubscriberCollection[Any] | Subscriber',
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -349,11 +362,11 @@ class ManageSubscribersLayout(ManageLayout):
 
 class ManageUploadTokensLayout(ManageLayout):
 
-    model: 'UploadToken'
+    model: 'UploadToken | UploadTokenCollection'
 
     def __init__(
         self,
-        model: 'UploadToken',
+        model: 'UploadToken | UploadTokenCollection',
         request: 'ElectionDayRequest'
     ) -> None:
 
@@ -387,11 +400,11 @@ class ManageDataSourcesLayout(ManageLayout):
 
 class ManageDataSourceItemsLayout(ManageLayout):
 
-    model: 'DataSource'
+    model: 'DataSource | DataSourceItemCollection'
 
     def __init__(
         self,
-        model: 'DataSource',
+        model: 'DataSource | DataSourceItemCollection',
         request: 'ElectionDayRequest'
     ) -> None:
 
