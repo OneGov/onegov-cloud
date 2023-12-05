@@ -88,7 +88,9 @@ def view_topic(self, request, layout=None):
             )
             for child in children
         ],
-        'children_images': any(child.page_image for child in children)
+        'children_images': any(
+            (child.page_image and child.show_preview_image
+             ) for child in children)
     }
 
 
