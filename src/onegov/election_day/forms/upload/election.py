@@ -14,6 +14,13 @@ from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.ballot.models import Election
+    from onegov.election_day.models import Canton
+    from onegov.election_day.models import Municipality
+
+
 class UploadElectionBaseForm(Form):
 
     file_format = RadioField(
@@ -52,7 +59,11 @@ class UploadElectionBaseForm(Form):
         render_kw={'force_simple': True}
     )
 
-    def adjust(self, principal, election):
+    def adjust(
+        self,
+        principal: 'Canton | Municipality',
+        election: 'Election'
+    ) -> None:
         """ Adjusts the form to the given principal and election. """
 
         if principal.domain == 'municipality':
@@ -65,6 +76,10 @@ class UploadElectionBaseForm(Form):
                 ('wabsti', "Wabsti"),
             ]
 
+        # FIXME: We rely on a dynamic backref that only exists if ballot
+        #        and election_day are both used together, maybe this should
+        #        be factored diferently...
+        assert hasattr(election, 'data_sources')
         if election.data_sources:
             self.file_format.choices.append(('wabsti_c', "WabstiCExport"))
 
@@ -135,12 +150,17 @@ class UploadMajorzElectionForm(UploadElectionBaseForm):
         ]
     )
 
-    def adjust(self, principal, election):
+    def adjust(
+        self,
+        principal: 'Canton | Municipality',
+        election: 'Election'
+    ) -> None:
         """ Adjusts the form to the given principal and election. """
 
-        super(UploadMajorzElectionForm, self).adjust(principal, election)
+        super().adjust(principal, election)
 
         if principal.domain == 'municipality':
+            assert isinstance(self.file_format.choices, list)
             self.file_format.choices.append(('wabsti_m', "Wabsti"))
 
 

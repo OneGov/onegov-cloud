@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from typing import NamedTuple
 
     from .election import VotesByDistrictRow
+    from .relationship import ElectionRelationship
     from ..election_compound import ElectionCompound
     from ..election_compound import ElectionCompoundAssociation
 
@@ -189,7 +190,7 @@ class ProporzElection(
     @property
     def relationships_for_historical_party_results(
         self
-    ) -> 'AppenderQuery[Election]':
+    ) -> 'AppenderQuery[ElectionRelationship]':
         return self.related_elections
 
     def clear_results(self) -> None:

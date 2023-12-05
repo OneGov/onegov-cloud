@@ -165,7 +165,7 @@ def _capture_exception(hub: Hub, exc_info: 'ExcInfo') -> None:
 
 def _make_event_processor(
     weak_request: 'Callable[[], CoreRequest | None]',
-    integration: 'OneGovCloudIntegration'
+    integration: OneGovCloudIntegration
 ) -> 'EventProcessor':
     def event_processor(event: 'Event', hint: 'Hint') -> 'Event':
         request = weak_request()

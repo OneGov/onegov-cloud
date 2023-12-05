@@ -7,9 +7,9 @@ from onegov.org.views.ticket import (
     view_delete_all_archived_tickets, delete_ticket)
 from onegov.ticket.collection import ArchivedTicketsCollection
 from onegov.town6 import TownApp
-from onegov.org.forms import TicketNoteForm, TicketAssignmentForm
+from onegov.org.forms import TicketNoteForm, TicketAssignmentForm,\
+    ExtendedInternalTicketChatMessageForm
 from onegov.org.forms import TicketChatMessageForm
-from onegov.org.forms import InternalTicketChatMessageForm
 from onegov.org.models import TicketNote
 from onegov.org.models.resource import FindYourSpotCollection
 from onegov.town6 import _
@@ -55,7 +55,7 @@ def town_assign_ticket(self, request, form):
 
 
 @TownApp.form(model=Ticket, name='message-to-submitter', permission=Private,
-              form=InternalTicketChatMessageForm, template='form.pt')
+              form=ExtendedInternalTicketChatMessageForm, template='form.pt')
 def town_message_to_submitter(self, request, form):
     return message_to_submitter(
         self, request, form, TicketChatMessageLayout(self, request))

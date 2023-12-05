@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from sqlalchemy.orm import Query, Session
 
     from .election_compound import ElectionCompound
+    from .relationship import ElectionCompoundRelationship
     from ..election import Election
     from ..party_result import PartyResult
 
@@ -146,5 +147,5 @@ class ElectionCompoundPart(
     @property
     def relationships_for_historical_party_results(
         self
-    ) -> 'Query[ElectionCompound]':
+    ) -> 'Query[ElectionCompoundRelationship]':
         return self.election_compound.related_compounds

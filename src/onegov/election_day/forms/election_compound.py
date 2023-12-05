@@ -26,7 +26,16 @@ from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+    from onegov.file import File
+    from wtforms.fields.choices import _Choice
+
+
 class ElectionCompoundForm(Form):
+
+    request: 'ElectionDayRequest'
 
     id_hint = PanelField(
         label=_("Identifier"),
@@ -334,7 +343,7 @@ class ElectionCompoundForm(Form):
         render_kw={'rows': 12},
     )
 
-    def parse_colors(self, text):
+    def parse_colors(self, text: str | None) -> dict[str, str]:
         if not text:
             return {}
         result = {
@@ -345,7 +354,7 @@ class ElectionCompoundForm(Form):
             raise ValueError('Could not parse colors')
         return result
 
-    def validate_colors(self, field):
+    def validate_colors(self, field: TextAreaField) -> None:
         try:
             self.parse_colors(field.data)
         except Exception as exception:
@@ -353,8 +362,8 @@ class ElectionCompoundForm(Form):
                 _('Invalid color definitions')
             ) from exception
 
-    def validate_id(self, field):
-        if normalize_for_url(field.data) != field.data:
+    def validate_id(self, field: StringField) -> None:
+        if normalize_for_url(field.data or '') != field.data:
             raise ValidationError(_('Invalid ID'))
         if self.model.id != field.data:
             query = self.request.session.query(ElectionCompound.id)
@@ -362,7 +371,7 @@ class ElectionCompoundForm(Form):
             if query.first():
                 raise ValidationError(_('ID already exists'))
 
-    def validate_external_id(self, field):
+    def validate_external_id(self, field: StringField) -> None:
         if field.data:
             if (
                 not hasattr(self.model, 'external_id')
@@ -374,7 +383,7 @@ class ElectionCompoundForm(Form):
                     if query.first():
                         raise ValidationError(_('ID already exists'))
 
-    def on_request(self):
+    def on_request(self) -> None:
         principal = self.request.app.principal
 
         self.domain_elections.choices = []
@@ -389,7 +398,7 @@ class ElectionCompoundForm(Form):
         self.election_fr.validators = []
         self.election_it.validators = []
         self.election_rm.validators = []
-        default_locale = self.request.default_locale
+        default_locale = self.request.default_locale or ''
         if default_locale.startswith('de'):
             self.election_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
@@ -440,7 +449,7 @@ class ElectionCompoundForm(Form):
             ElectionCompound.date.desc(),
             ElectionCompound.shortcode
         )
-        choices = [
+        choices: list['_Choice'] = [
             (
                 compound.id,
                 "{} {} {}".format(
@@ -453,7 +462,12 @@ class ElectionCompoundForm(Form):
         self.related_compounds_historical.choices = choices
         self.related_compounds_other.choices = choices
 
-    def update_realtionships(self, model, type_):
+    def update_realtionships(
+        self,
+        model: ElectionCompound,
+        type_: str
+    ) -> None:
+
         # use symetric relationships
         session = self.request.session
         query = session.query(ElectionCompoundRelationship)
@@ -482,12 +496,13 @@ class ElectionCompoundForm(Form):
                 )
             )
 
-    def update_model(self, model):
-        if self.id:
+    def update_model(self, model: ElectionCompound) -> None:
+        if self.id and self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
         model.domain = self.domain.data
         model.domain_elections = self.domain_elections.data
+        assert self.date.data is not None
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
@@ -501,24 +516,26 @@ class ElectionCompoundForm(Form):
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
-        model.use_historical_party_results = self.\
-            use_historical_party_results.data
+        model.use_historical_party_results = (
+            self.use_historical_party_results.data)
 
         model.elections = []
         query = self.request.session.query(Election)
         if self.domain_elections.data == 'region':
             if self.region_elections.data:
-                model.elections = query.filter(
+                # NOTE: asymmetric properties are not allowed, we would need
+                #       to change this to a custom descriptor
+                model.elections = query.filter(  # type:ignore[assignment]
                     Election.id.in_(self.region_elections.data)
                 )
         if self.domain_elections.data == 'district':
             if self.district_elections.data:
-                model.elections = query.filter(
+                model.elections = query.filter(  # type:ignore[assignment]
                     Election.id.in_(self.district_elections.data)
                 )
         if self.domain_elections.data == 'municipality':
             if self.municipality_elections.data:
-                model.elections = query.filter(
+                model.elections = query.filter(  # type:ignore[assignment]
                     Election.id.in_(self.municipality_elections.data)
                 )
 
@@ -562,7 +579,7 @@ class ElectionCompoundForm(Form):
             self.update_realtionships(model, 'historical')
             self.update_realtionships(model, 'other')
 
-    def apply_model(self, model):
+    def apply_model(self, model: ElectionCompound) -> None:
         self.id.data = model.id
         self.external_id.data = model.external_id
 
@@ -578,13 +595,13 @@ class ElectionCompoundForm(Form):
         self.related_link_label_it.data = link_labels.get('it_CH', '')
         self.related_link_label_rm.data = link_labels.get('rm_CH', '')
 
-        for file in (
+        for file_attr in (
             'explanations_pdf',
             'upper_apportionment_pdf',
             'lower_apportionment_pdf'
         ):
-            field = getattr(self, file)
-            file = getattr(model, file)
+            field = getattr(self, file_attr)
+            file: 'File' = getattr(model, file_attr)
             if file:
                 field.data = {
                     'filename': file.reference.filename,

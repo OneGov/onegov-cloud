@@ -25,6 +25,7 @@ def test_archive_create(session, temporary_path):
             Name *= ___
             Employees = 0..1000
             Logo = *.png
+            Images = *.png (multiple)
 
         """,
         configuration=DirectoryConfiguration(
@@ -33,21 +34,36 @@ def test_archive_create(session, temporary_path):
         )
     )
 
-    output = NamedTemporaryFile(suffix='.png')
+    logo = NamedTemporaryFile(suffix='.png')
+    image1 = NamedTemporaryFile(suffix='.png')
+    image2 = NamedTemporaryFile(suffix='.png')
     businesses.add(values=dict(
         name="Initech",
         employees=250,
         logo=Bunch(
             data=object(),
-            file=create_image(output=output).file,
+            file=create_image(output=logo).file,
             filename='logo.png'
+        ),
+        images=(
+            Bunch(
+                data=object(),
+                file=create_image(output=image1).file,
+                filename='image1.png'
+            ),
+            Bunch(
+                data=object(),
+                file=create_image(output=image2).file,
+                filename='image2.png'
+            ),
         )
     ))
 
     businesses.add(values=dict(
         name="Evilcorp",
         employees=1000,
-        logo=None
+        logo=None,
+        images=()
     ))
 
     transaction.commit()
@@ -79,6 +95,7 @@ def test_archive_create(session, temporary_path):
             'Name': 'Evilcorp',
             'Employees': 1000,
             'Logo': None,
+            'Images': None,
             'Latitude': None,
             'Longitude': None,
         },
@@ -86,13 +103,17 @@ def test_archive_create(session, temporary_path):
             'Name': 'Initech',
             'Employees': 250,
             'Logo': 'logo/initech.png',
+            'Images': 'images/initech_1.png:images/initech_2.png',
             'Latitude': None,
             'Longitude': None,
         }
     ]
 
     assert (temporary_path / 'logo/initech.png').is_file()
+    assert (temporary_path / 'images/initech_1.png').is_file()
+    assert (temporary_path / 'images/initech_2.png').is_file()
     assert not (temporary_path / 'logo/evilcorp.png').is_file()
+    assert not (temporary_path / 'images/evilcorp_1.png').is_file()
 
 
 @pytest.mark.parametrize('archive_format', ['json', 'csv', 'xlsx'])
@@ -105,6 +126,7 @@ def test_archive_import(session, temporary_path, archive_format):
             Name *= ___
             Employees = 0..1000
             Logo = *.png
+            Images = *.png (multiple)
             Founded = YYYY.MM.DD
             Sectors =
                 [ ] IT
@@ -116,14 +138,28 @@ def test_archive_import(session, temporary_path, archive_format):
         )
     )
 
-    output = NamedTemporaryFile(suffix='.png')
+    logo = NamedTemporaryFile(suffix='.png')
+    image1 = NamedTemporaryFile(suffix='.png')
+    image2 = NamedTemporaryFile(suffix='.png')
     businesses.add(values=dict(
         name="Initech",
         employees=250,
         logo=Bunch(
             data=object(),
-            file=create_image(output=output).file,
+            file=create_image(output=logo).file,
             filename='logo.png'
+        ),
+        images=(
+            Bunch(
+                data=object(),
+                file=create_image(output=image1).file,
+                filename='image1.png'
+            ),
+            Bunch(
+                data=object(),
+                file=create_image(output=image2).file,
+                filename='image2.png'
+            ),
         ),
         founded=date(2000, 1, 1),
         sectors=['IT', 'SMB']
@@ -133,6 +169,7 @@ def test_archive_import(session, temporary_path, archive_format):
         name="Evilcorp",
         employees=1000,
         logo=None,
+        images=(),
         founded=date(2014, 2, 3),
         sectors=['IT']
     ))
@@ -175,8 +212,10 @@ def test_archive_import(session, temporary_path, archive_format):
     assert initech.values['employees'] == 250
     assert initech.values['founded'] == date(2000, 1, 1)
     assert initech.values['sectors'] == ['IT', 'SMB']
-    assert len(initech.files) == 1
+    assert len(initech.files) == 3
     assert initech.files[0].name == 'initech.png'
+    assert initech.files[1].name == 'initech_1.png'
+    assert initech.files[2].name == 'initech_2.png'
 
 
 def test_zip_archive_from_buffer(session, temporary_path):

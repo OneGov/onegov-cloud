@@ -28,7 +28,7 @@ def view_chats_staff(self, request, form):
     all_chats = ChatCollection(request.session).query()
     open_requests = all_chats.filter(Chat.user_id == None).filter(
         Chat.chat_history != []
-    )
+    ).filter(Chat.active == True)
     active_chats = all_chats.filter(Chat.user_id == user.id).filter(
         Chat.active == True)
     archived_chats = all_chats.filter(

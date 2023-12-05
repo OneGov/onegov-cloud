@@ -6072,6 +6072,11 @@ h2 + div.timeline {
         display: inline-block;
         margin-bottom: .5rem;
     }
+
+    .ticket-submitter-notification-status .prevent-text-overflow {
+        white-space: normal;
+        display: inline;
+    }
 }
 
 /*

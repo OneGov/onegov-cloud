@@ -1964,8 +1964,8 @@ msgstr "Ticket Updates via E-Mail"
 msgid "Disable E-Mails"
 msgstr "E-Mails deaktivieren"
 
-msgid "No ticket updates by e-mail"
-msgstr "Keine Ticket Updates via E-Mail"
+msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
+msgstr "Keine Ticket Updates via E-Mail. Es wird weiterhin eine E-Mail gesendet, wenn ein Ticket zugewiesen wird."
 
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"

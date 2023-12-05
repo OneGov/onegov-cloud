@@ -29,7 +29,15 @@ from wtforms.validators import URL
 from wtforms.validators import ValidationError
 
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.election_day.request import ElectionDayRequest
+    from wtforms.fields.choices import _Choice
+
+
 class ElectionForm(Form):
+
+    request: 'ElectionDayRequest'
 
     id_hint = PanelField(
         label=_("Identifier"),
@@ -324,7 +332,7 @@ class ElectionForm(Form):
         render_kw={'rows': 12},
     )
 
-    def parse_colors(self, text):
+    def parse_colors(self, text: str | None) -> dict[str, str]:
         if not text:
             return {}
         result = {
@@ -335,7 +343,7 @@ class ElectionForm(Form):
             raise ValueError('Could not parse colors')
         return result
 
-    def validate_colors(self, field):
+    def validate_colors(self, field: TextAreaField) -> None:
         try:
             self.parse_colors(field.data)
         except Exception as exception:
@@ -343,8 +351,8 @@ class ElectionForm(Form):
                 _('Invalid color definitions')
             ) from exception
 
-    def validate_id(self, field):
-        if normalize_for_url(field.data) != field.data:
+    def validate_id(self, field: StringField) -> None:
+        if normalize_for_url(field.data or '') != field.data:
             raise ValidationError(_('Invalid ID'))
         if self.model.id != field.data:
             query = self.request.session.query(Election)
@@ -352,7 +360,7 @@ class ElectionForm(Form):
             if query.first():
                 raise ValidationError(_('ID already exists'))
 
-    def validate_external_id(self, field):
+    def validate_external_id(self, field: StringField) -> None:
         if field.data:
             if (
                 not hasattr(self.model, 'external_id')
@@ -364,7 +372,7 @@ class ElectionForm(Form):
                     if query.first():
                         raise ValidationError(_('ID already exists'))
 
-    def on_request(self):
+    def on_request(self) -> None:
         principal = self.request.app.principal
 
         self.domain.choices = [
@@ -400,13 +408,14 @@ class ElectionForm(Form):
             (item, item) for item in sorted(municipalities)
         ]
         if principal.domain == 'municipality':
+            assert principal.name is not None
             self.municipality.choices = [(principal.name, principal.name)]
 
         self.election_de.validators = []
         self.election_fr.validators = []
         self.election_it.validators = []
         self.election_rm.validators = []
-        default_locale = self.request.default_locale
+        default_locale = self.request.default_locale or ''
         if default_locale.startswith('de'):
             self.election_de.validators.append(InputRequired())
         if default_locale.startswith('fr'):
@@ -420,7 +429,7 @@ class ElectionForm(Form):
 
         query = self.request.session.query(Election)
         query = query.order_by(Election.date.desc(), Election.shortcode)
-        choices = [
+        choices: list['_Choice'] = [
             (
                 election.id,
                 "{} {} {}".format(
@@ -433,7 +442,7 @@ class ElectionForm(Form):
         self.related_elections_historical.choices = choices
         self.related_elections_other.choices = choices
 
-    def update_realtionships(self, model, type_):
+    def update_realtionships(self, model: Election, type_: str) -> None:
         # use symetric relationships
         session = self.request.session
         query = session.query(ElectionRelationship)
@@ -462,12 +471,12 @@ class ElectionForm(Form):
                 )
             )
 
-    def update_model(self, model):
+    def update_model(self, model: Election) -> None:
         principal = self.request.app.principal
-
-        if self.id:
+        if self.id and self.id.data:
             model.id = self.id.data
         model.external_id = self.external_id.data
+        assert self.date.data is not None
         model.date = self.date.data
         model.domain = self.domain.data
         model.domain_supersegment = ''
@@ -482,6 +491,7 @@ class ElectionForm(Form):
             model.domain_segment = self.municipality.data
         model.type = self.election_type.data
         model.shortcode = self.shortcode.data
+        assert self.mandates.data is not None
         model.number_of_mandates = self.mandates.data
         model.majority_type = self.majority_type.data
         model.absolute_majority = self.absolute_majority.data or None
@@ -491,8 +501,8 @@ class ElectionForm(Form):
         model.voters_counts = self.voters_counts.data
         model.exact_voters_counts = self.exact_voters_counts.data
         model.horizontal_party_strengths = self.horizontal_party_strengths.data
-        model.use_historical_party_results = \
-            self.use_historical_party_results.data
+        model.use_historical_party_results = (
+            self.use_historical_party_results.data)
         model.show_party_strengths = self.show_party_strengths.data
         model.show_party_panachage = self.show_party_panachage.data
 
@@ -522,6 +532,7 @@ class ElectionForm(Form):
         if action == 'delete':
             del model.explanations_pdf
         if action == 'replace' and self.explanations_pdf.data:
+            assert self.explanations_pdf.file is not None
             model.explanations_pdf = (
                 self.explanations_pdf.file,
                 self.explanations_pdf.filename,
@@ -533,7 +544,7 @@ class ElectionForm(Form):
             self.update_realtionships(model, 'historical')
             self.update_realtionships(model, 'other')
 
-    def apply_model(self, model):
+    def apply_model(self, model: Election) -> None:
         self.id.data = model.id
         self.external_id.data = model.external_id
 

@@ -652,7 +652,7 @@
         <div class="sidebar-wrapper">
             <div class="sidebar-content-wrapper">
                 <div metal:define-slot="before-panels"></div>
-                <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="contact or coordinates or location">
+                <div tal:define="hide page.hide_contact|False" class="side-panel contact-panel" tal:condition="not hide and contact or coordinates or location">
                     <div tal:condition="contact and not hide">
                         <h3 i18n:translate>Contact</h3>
                         <tal:b content="structure contact" />
@@ -666,8 +666,9 @@
                     <h3 i18n:translate>Documents</h3>
                     <ul class="more-list">
                         <li tal:repeat="file files">
-                            <a class="list-link" href="${request.link(file)}">
-                                <span class="list-title">${file.name}</span>
+                            <a class="list-link" title="${file.name}" href="${request.link(file)}">
+                                <i class="far ${layout.get_fa_file_icon(file.name)}" aria-hidden="true"></i>
+                                <span class="list-title">${file.name.split('.')[0]}</span>
                             </a>
                         </li>
                     </ul>
@@ -2540,7 +2541,7 @@
 
 
 <metal:chat define-macro="chat">
-    <div tal:condition="layout.org.meta.get('enable_chat', False) and (layout.app.chat_active or request.is_logged_in)" class="sticky floaty-chat" data-sticky data-stick-to="bottom">
+    <div tal:condition="layout.org.meta.get('enable_chat', False) and (layout.app.chat_active or request.is_logged_in)" class="sticky floaty-chat" data-sticky  data-sticky-on="small" data-stick-to="bottom">
         <div class="grid-container">
             <a class="chat-button" href="${chat_link}">
                 <p><i class="fas fa-comments"></i> Chat</p>

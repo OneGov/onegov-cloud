@@ -3,9 +3,16 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.election_compound import \
-    get_candidate_statistics
+from onegov.election_day.utils.election_compound import (
+    get_candidate_statistics)
 from onegov.election_day.utils.election_compound import get_elected_candidates
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from onegov.core.types import RenderData
+    from onegov.election_day.request import ElectionDayRequest
+    from webob.response import Response
 
 
 @ElectionDayApp.html(
@@ -14,8 +21,10 @@ from onegov.election_day.utils.election_compound import get_elected_candidates
     template='election_compound/statistics.pt',
     permission=Public
 )
-def view_election_statistics(self, request):
-
+def view_election_statistics(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" The main view. """
 
     elected_candidates = get_elected_candidates(self, request.session).all()
@@ -34,12 +43,14 @@ def view_election_statistics(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_statistics_table(self, request):
-
+def view_election_statistics_table(
+    self: ElectionCompound,
+    request: 'ElectionDayRequest'
+) -> 'RenderData':
     """" View for the standalone statistics table.  """
 
     @request.after
-    def add_last_modified(response):
+    def add_last_modified(response: 'Response') -> None:
         add_last_modified_header(response, self.last_modified)
 
     return {
