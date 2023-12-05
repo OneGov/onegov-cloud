@@ -14,6 +14,7 @@ from webob.exc import HTTPForbidden
 from onegov.town6 import _
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
+from onegov.user import User
 
 
 @TownApp.form(
@@ -169,10 +170,14 @@ def view_staff_chat(self, request):
 
     title = _('Chat with')
     title = f'{title} {self.customer_name}'
+    staff = request.session.query(User).filter_by(
+        id=self.user_id).first()
+    staff = staff.username if staff else ''
 
     return {
         'title': title,
         'layout': ArchivedChatsLayout(self, request, self),
         'chat': self,
-        'customer_name': self.customer_name
+        'customer_name': self.customer_name,
+        'staff': staff
     }

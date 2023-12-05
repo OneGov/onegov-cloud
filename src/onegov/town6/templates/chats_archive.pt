@@ -6,10 +6,20 @@
 
         <div class="grid-x chat">
             <div class="medium-7 cell">
-                <p tal:repeat="chat archived_chats">
-                    <a href="${request.link(chat, 'staff-view')}">${chat.customer_name}</a>
-                </p>
-
+                <ul class="more-list grid-x grid-padding-x">
+                    <li class="small-12 cell" tal:repeat="chat archived_chats">
+                        <a class="list-link" href="${request.link(chat, 'staff-view')}">
+                            <span class="h5 list-title">
+                                ${chat.customer_name}
+                            </span>
+                        </a>
+                        
+                        <a href="${request.link(chat, 'staff-view')}">
+                            <p class="list-lead preview">${chat.topic}</p>
+                        </a>
+                    </li>
+                </ul>
+                <br/>
                 <div class="pagination-centered">
                     <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
                 </div>

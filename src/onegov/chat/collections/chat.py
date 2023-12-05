@@ -20,13 +20,13 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
         self,
         session: 'Session',
         page: int = 0,
-        handler: str = 'ALL',
+        state: str = 'active',
         group: str | None = None,
         owner: str = '*',
     ):
         self.session = session
         self.page = page
-        self.handler = handler
+        self.state = state
         self.group = group
         self.owner = owner
 
@@ -34,8 +34,13 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
         return self.page == other.page
 
     def subset(self):
-        # return self.query().filter(Chat.active == False)
-        return self.query()
+        query = self.query().filter(Chat.chat_history != [])
+        if self.state == 'active':
+            return query.filter(Chat.active == True)
+        elif self.state == 'archived':
+            return query.filter(Chat.active == False)
+        else:
+            return query
 
     @property
     def search(self):
@@ -52,7 +57,8 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
     def page_by_index(self, index):
         return self.__class__(
             self.session,
-            page=index
+            page=index,
+            state=self.state
         )
 
     @property

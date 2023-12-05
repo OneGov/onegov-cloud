@@ -2586,9 +2586,18 @@ class ArchivedChatsLayout(DefaultLayout):
     def breadcrumbs(self):
         bc = [
             Link(_("Homepage"), self.homepage_url),
-            Link(_("Chat Archive"), self.request.link(
-                ChatCollection(self.request.session), name='archive'
-            ))
+            Link(
+                _("Chat Archive"),
+                self.request.class_link(
+                    ChatCollection, {
+                        'state': 'archived',
+                    },
+                    name='archive'
+                ),
+                attrs={
+                    'class': ('chats'),
+                }
+            )
         ]
 
         if self.chat:

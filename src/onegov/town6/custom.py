@@ -23,7 +23,14 @@ def get_global_tools(request):
                 ),
                 Link(
                     _("Archived Chats"),
-                    request.link(ChatCollection(request.session), 'archive'),
-                    attrs={'class': 'chats'}
+                    request.class_link(
+                        ChatCollection, {
+                            'state': 'archived',
+                        },
+                        name='archive'
+                    ),
+                    attrs={
+                        'class': ('chats'),
+                    }
                 )
             ))

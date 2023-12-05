@@ -288,10 +288,11 @@ def get_person(app, id):
 
 
 @OrgApp.path(model=ChatCollection, path='/chats')
-def get_chats(app, page=0):
+def get_chats(app, page=0, state='active'):
     return ChatCollection(
         app.session(),
         page=page,
+        state=state,
     )
 
 
