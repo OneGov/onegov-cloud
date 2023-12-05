@@ -3,19 +3,6 @@ from xml.etree.ElementTree import tostring
 from onegov.api.models import ApiKey
 
 
-def test_settings(client):
-    client.login_admin()
-
-    # general settings
-    settings = client.get('/general-settings')
-    settings.form['reply_to'] = 'info@govikon.ch'
-    settings.form['custom_css'] = 'h2 { text-decoration: underline; }'
-    settings.form.submit()
-
-    settings = client.get('/general-settings')
-    assert '<style>h2 { text-decoration: underline; }</style>' in settings
-
-
 def test_gever_settings_only_https_allowed(client):
 
     client.login_admin()
@@ -71,3 +58,21 @@ def test_all_settings_are_reachable(client):
     ]
 
     assert all(client.get(link).status_code == 200 for link in links)
+
+
+def test_general_settings(client):
+    client.login_admin()
+
+    page = client.get('/topics/themen')
+    assert 'class="header-image"' not in page
+
+    settings = client.get('/general-settings')
+    settings.form['standard_image'] = 'standard_image.png'
+    settings.form['page_image_position'] = 'header'
+    settings.form['reply_to'] = 'info@govikon.ch'
+    settings.form['custom_css'] = 'h2 { text-decoration: underline; }'
+    page = settings.form.submit().follow()
+
+    assert '<style>h2 { text-decoration: underline; }</style>' in page
+
+    assert 'class="header-image"' in page
