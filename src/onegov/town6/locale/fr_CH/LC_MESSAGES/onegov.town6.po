@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OneGov Cloud 1.0\n"
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2023-11-29 11:18+0100\n"
 "PO-Revision-Date: 2021-03-03 14:04+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: French\n"
@@ -22,6 +22,47 @@ msgstr "Chats"
 
 msgid "My Chats"
 msgstr "Mes chats"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "E-mail"
+msgstr "E-mail"
+
+msgid "Topic"
+msgstr "Rubrique"
+
+msgid "Confirmation"
+msgstr "Confirmation"
+
+msgid ""
+"I confirm that I am aware that this chat will be saved and the history will "
+"be sent to me by email."
+msgstr ""
+"Je confirme que je suis conscient(e) que ce chat est enregistré et que "
+"l'historique m'est envoyé par e-mail."
+
+msgid "Chat ID"
+msgstr "Chat ID"
+
+msgid "Images"
+msgstr "Images"
+
+msgid "Choose the position of the page images on the content pages"
+msgstr "Choisir la position des images de page sur les pages de contenu"
+
+msgid "Page image position"
+msgstr "Position de l'image de la page"
+
+msgid "As a content image (between the title and text of a content page)"
+msgstr ""
+"Comme image de contenu (entre le titre et le texte d'une page de contenu)"
+
+msgid "As header image (wide above the page content)"
+msgstr "Comme image d'en-tête (large au-dessus du contenu de la page)"
+
+msgid "Fonts"
+msgstr "Polices de caractères"
 
 msgid "Font family serif"
 msgstr "Police serif"
@@ -230,9 +271,6 @@ msgstr ""
 
 msgid "Upload Ticket"
 msgstr "Télécharger le ticket"
-
-msgid "Confirmation"
-msgstr "Confirmation"
 
 msgid "New Message"
 msgstr "Nouveau message"
@@ -683,9 +721,6 @@ msgstr "Télécharger"
 
 msgid "Just Uploaded"
 msgstr "Mis en ligne à l'instant"
-
-msgid "Name"
-msgstr "Nom"
 
 msgid "Extension"
 msgstr "Extension"
@@ -1963,8 +1998,12 @@ msgstr "Mises à jour de tickets par e-mail"
 msgid "Disable E-Mails"
 msgstr "Désactiver les e-mails"
 
-msgid "No ticket updates via e-mail. An e-mail is still sent when a ticket is assigned."
-msgstr "Aucune mise à jour de tickets par e-mail. Un e-mail continue d'être envoyé lorsqu'un ticket est attribué."
+msgid ""
+"No ticket updates via e-mail. An e-mail is still sent when a ticket is "
+"assigned."
+msgstr ""
+"Aucune mise à jour de tickets par e-mail. Un e-mail continue d'être envoyé "
+"lorsqu'un ticket est attribué."
 
 msgid "Enable E-Mails"
 msgstr "Activer les e-mails"

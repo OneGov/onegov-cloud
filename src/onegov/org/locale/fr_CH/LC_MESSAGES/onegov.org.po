@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2023-11-17 11:54+0100\n"
+"POT-Creation-Date: 2023-12-05 08:58+0100\n"
 "PO-Revision-Date: 2022-03-15 10:50+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1272,9 +1272,6 @@ msgstr "URL pointant vers le logo"
 msgid "Logo (Square)"
 msgstr "Logo (carré)"
 
-msgid "Standard Image"
-msgstr "Image standard"
-
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "Adresse e-mail de réponse (Reply-To)"
 
@@ -1301,6 +1298,13 @@ msgstr "Italien"
 
 msgid "Additional CSS"
 msgstr "CSS additionnel"
+
+msgid "Will be used if an image is needed, but none has been set"
+msgstr ""
+"Sera utilisée si une image est nécessaire, mais qu'aucune n'a été définie."
+
+msgid "Standard Image"
+msgstr "Image standard"
 
 msgid "Column width left side"
 msgstr "Largeur de la colonne côté gauche"
@@ -1788,12 +1792,12 @@ msgstr "Le paramètre \"Toujours notifier\" est actif"
 msgid "BCC"
 msgstr "BCC"
 
-msgid "Email"
-msgstr "Email"
-
 msgid "You can send a copy of the message to one or more recipients"
 msgstr ""
 "Vous pouvez envoyer une copie du message à un ou plusieurs destinataires"
+
+msgid "Email"
+msgstr "Email"
 
 msgid "User"
 msgstr "Utilisateur"
@@ -2373,6 +2377,12 @@ msgstr "Afficher l'image sur l'aperçu de la page parent"
 
 msgid "Show image on page"
 msgstr "Afficher l'image sur la page"
+
+msgid "As first element of the content"
+msgstr "Come primo elemento del contenuto"
+
+msgid "As a full width header"
+msgstr "Come immagine di intestazione a tutta larghezza"
 
 msgid "Documents"
 msgstr "Documents"
