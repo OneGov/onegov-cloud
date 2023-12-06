@@ -364,7 +364,7 @@ class DirectoryArchiveWriter:
     def write_directory_metadata(self, directory: Directory) -> None:
         """ Writes the metadata. """
 
-        metadata = {
+        metadata: 'JSON_ro' = {
             'configuration': directory.configuration.to_dict(),
             'structure': directory.structure.replace('\r\n', '\n'),
             'title': directory.title,

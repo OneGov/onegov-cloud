@@ -14,8 +14,8 @@ from onegov.directory.errors import MissingColumnError
 from onegov.directory.errors import MissingFileError
 from onegov.directory.errors import ValidationError
 from onegov.form import FormCollection, as_internal_id
-from onegov.form.errors import InvalidFormSyntax, MixedTypeError, \
-    DuplicateLabelError
+from onegov.form.errors import (
+    InvalidFormSyntax, MixedTypeError, DuplicateLabelError)
 from onegov.form.fields import UploadField
 from onegov.org import OrgApp, _
 from onegov.org.forms import DirectoryForm, DirectoryImportForm
@@ -32,6 +32,12 @@ from webob.exc import HTTPForbidden
 from wtforms.validators import InputRequired
 
 from onegov.org.models.directory import ExtendedDirectoryEntryCollection
+
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+    from onegov.org.request import OrgRequest
 
 
 def get_directory_form_class(model, request):
@@ -225,32 +231,49 @@ def delete_directory(self, request):
     request.success(_("The directory was deleted"))
 
 
-def get_filters(request, self, keyword_counts=None, view_name=None):
+def get_filters(
+    request: 'OrgRequest',
+    self: ExtendedDirectoryEntryCollection,
+    keyword_counts: 'Mapping[str, Mapping[str, int]] | None' = None,
+    view_name: str = ''
+):
     Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
     empty = ()
 
+    # FIXME: It seems kind of strange to make this dependent on the fields
+    #        of the directory, shouldn't this depend on the type of the
+    #        filter instead? Even if a directory can only have one value
+    #        you should still be able to filter for two distinct types of
+    #        entries. One could even argue that this should always be a
+    #        multi-select, regardless of what the filter form declares.
     radio_fields = {
         f.id for f in self.directory.fields if f.type == 'radio'
     }
 
-    def link_title(field_id, value):
+    def link_title(field_id: str, value: str) -> str:
         if keyword_counts is None:
             return value
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
 
     for keyword, title, values in self.available_filters(sort_choices=False):
+        singular = keyword in radio_fields
         filters.append(Filter(title=title, tags=tuple(
             Link(
                 text=link_title(keyword, value),
                 active=value in self.keywords.get(keyword, empty),
-                url=request.link(self.for_filter(
-                    singular=keyword in radio_fields,
-                    **{keyword: value}
-                ), name=view_name),
-                rounded=keyword in radio_fields
-            ) for value in values
+                url=request.link(
+                    self.for_toggled_keyword_value(
+                        keyword,
+                        value,
+                        singular=singular
+                    ),
+                    name=view_name
+                ),
+                rounded=singular
+            )
+            for value in values
         )))
 
     return filters

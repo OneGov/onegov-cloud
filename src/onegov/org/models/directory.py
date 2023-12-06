@@ -362,11 +362,22 @@ class ExtendedDirectoryEntry(DirectoryEntry, PublicationExtension,
         }
 
 
-class ExtendedDirectoryEntryCollection(DirectoryEntryCollection):
+class ExtendedDirectoryEntryCollection(
+    DirectoryEntryCollection[ExtendedDirectoryEntry]
+):
 
-    def __init__(self, directory, type='extended', keywords=None, page=0,
-                 search_widget=None, published_only=None, past_only=None,
-                 upcoming_only=None):
+    def __init__(
+        self,
+        directory,
+        # FIXME: We should probably disallow the type argument here
+        type='extended',
+        keywords=None,
+        page=0,
+        search_widget=None,
+        published_only=None,
+        past_only=None,
+        upcoming_only=None
+    ):
         super().__init__(directory, type, keywords, page, search_widget)
         self.published_only = published_only
         self.past_only = past_only

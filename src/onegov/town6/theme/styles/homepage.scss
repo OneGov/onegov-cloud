@@ -170,7 +170,6 @@
 
     .icon-link {
         background: $white;
-        border: 2px solid transparent !important;
         border-radius: 1rem;
         display: flex;
         flex: 0 0 auto;
@@ -307,10 +306,6 @@
             overflow: hidden;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-        }
-
-        .card {
-            border: 0;
         }
     }
 
