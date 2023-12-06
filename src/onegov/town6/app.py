@@ -1,3 +1,8 @@
+from datetime import datetime
+
+import pytz
+from sedate import replace_timezone
+
 from onegov.core import utils
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.utils import module_path
@@ -8,9 +13,6 @@ from onegov.org.app import org_content_security_policy
 from onegov.town6.custom import get_global_tools
 from onegov.town6.initial_content import create_new_organisation
 from onegov.town6.theme import TownTheme
-from datetime import datetime
-from sedate import replace_timezone
-import pytz
 
 MON = 0
 TUE = 1
@@ -234,6 +236,7 @@ def get_common_asset():
     yield 'lazysizes.js'
     yield 'common.js'
     yield '_blank.js'
+    yield 'homepage_video_or_slider.js'
     yield 'animate.js'
     yield 'forms.js'
     yield 'internal_link_check.js'
@@ -242,7 +245,6 @@ def get_common_asset():
     yield 'aos.js'
     yield 'aos-init.js'
     yield 'aos.css'
-    yield 'homepage_video_or_slider.js'
     yield 'notifications.js'
     yield 'sidebar_mobile.js'
     yield 'jquery.sticky-sidebar.js'
