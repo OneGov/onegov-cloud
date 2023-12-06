@@ -30,7 +30,7 @@ def get_global_tools(request):
                         name='archive'
                     ),
                     attrs={
-                        'class': ('chats'),
+                        'class': ('chats-archive'),
                     }
                 )
             ))

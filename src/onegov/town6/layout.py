@@ -2578,9 +2578,8 @@ class ChatInitiationFormLayout(DefaultLayout):
 
 
 class ArchivedChatsLayout(DefaultLayout):
-    def __init__(self, model, request, chat:Chat = None):
+    def __init__(self, model, request):
         super().__init__(model, request)
-        self.chat = chat
 
     @cached_property
     def breadcrumbs(self):
@@ -2600,10 +2599,10 @@ class ArchivedChatsLayout(DefaultLayout):
             )
         ]
 
-        if self.chat:
+        if isinstance(self.model, Chat):
             bc.append(
-                Link(self.chat.customer_name, self.request.link(
-                    self.chat, 'staff-view'
+                Link(self.model.customer_name, self.request.link(
+                    self.model, 'staff-view'
                 ))
             )
 

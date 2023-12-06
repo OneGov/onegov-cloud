@@ -3,7 +3,7 @@ from onegov.core.collection import GenericCollection, Pagination
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
+    from sqlalchemy.orm import Session, Query, Self
 
 
 class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
@@ -30,10 +30,10 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
         self.group = group
         self.owner = owner
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.page == other.page
 
-    def subset(self):
+    def subset(self) -> 'Query[Chat]':
         query = self.query().filter(Chat.chat_history != [])
         if self.state == 'active':
             return query.filter(Chat.active == True)
@@ -43,18 +43,10 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
             return query
 
     @property
-    def search(self):
-        return self.search_widget and self.search_widget.name
-
-    @property
-    def search_query(self):
-        return self.search_widget and self.search_widget.search_query
-
-    @property
-    def page_index(self):
+    def page_index(self) -> str:
         return self.page
 
-    def page_by_index(self, index):
+    def page_by_index(self, index:int) -> 'Self':
         return self.__class__(
             self.session,
             page=index,

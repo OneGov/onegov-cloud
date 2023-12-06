@@ -175,7 +175,7 @@ def view_staff_chat(self, request):
 
     return {
         'title': title,
-        'layout': ArchivedChatsLayout(self, request, self),
+        'layout': ArchivedChatsLayout(self, request),
         'chat': self,
         'customer_name': self.customer_name,
         'staff': staff
