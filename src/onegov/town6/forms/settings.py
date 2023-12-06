@@ -19,8 +19,9 @@ class GeneralSettingsForm(OrgGeneralSettingsForm):
             "Choose the position of the page images on the content pages"),
         label=_("Page image position"),
         choices=(
-            ('as_content', _("As content image")),
-            ('header', _("As header"))
+            ('as_content', _("As a content image (between the title and text "
+                             "of a content page)")),
+            ('header', _("As header image (wide above the page content)"))
         ),
     )
 

@@ -189,7 +189,7 @@
                 </header>
 
                 <tal:b tal:define="on_homepage layout.on_homepage; sidebar_links layout.sidebar_links">
-                    <div class="header-image" tal:condition="not on_homepage and layout.org.theme_options.get('page-image-position', False) ==  'header'">
+                    <div class="header-image" tal:condition="not on_homepage and layout.org.theme_options.get('page-image-position', False) == 'header'">
                         <div class="dark-overlay"></div> 
                         <div metal:define-slot="header-image"></div>
                         <div class="grid-container">

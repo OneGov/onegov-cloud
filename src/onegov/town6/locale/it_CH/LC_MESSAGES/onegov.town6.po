@@ -47,11 +47,13 @@ msgstr ""
 msgid "Page image position"
 msgstr "Posizione dell'immagine della pagina"
 
-msgid "As content image"
-msgstr "Come immagine di contenuto"
+msgid "As a content image (between the title and text of a content page)"
+msgstr ""
+"Come immagine di contenuto (tra il titolo e il testo di una pagina di "
+"contenuto)"
 
-msgid "As header"
-msgstr "Come immagine di intestazione"
+msgid "As header image (wide above the page content)"
+msgstr "Come immagine di intestazione (ampia sopra il contenuto della pagina)"
 
 msgid "Fonts"
 msgstr "Caratteri"

@@ -54,11 +54,11 @@ msgstr "Wählen Sie die Position der Seiten-Bilder auf den Inhaltsseiten"
 msgid "Page image position"
 msgstr "Position der Seiten-Bilder"
 
-msgid "As content image"
-msgstr "Als Inhaltsbild"
+msgid "As a content image (between the title and text of a content page)"
+msgstr "Als Inhaltsbild (zwischen Titel und Text einer Inhaltseite)"
 
-msgid "As header"
-msgstr "Als Headerbild"
+msgid "As header image (wide above the page content)"
+msgstr "Als Headerbild (breit oberhalb des Seiteninhaltes)"
 
 msgid "Fonts"
 msgstr "Schriften"
