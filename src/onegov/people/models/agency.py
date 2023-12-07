@@ -96,14 +96,10 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable,
             normalize_for_url(self.title),
             extension_for_content_type(content_type_from_fileobj(value))
         )
-        if self.organigram:
-            self.organigram.reference = as_fileintent(value, filename)
-            self.organigram.name = filename
-        else:
-            organigram = AgencyOrganigram(id=random_token())
-            organigram.reference = as_fileintent(value, filename)
-            organigram.name = filename
-            self.organigram = organigram
+        organigram = AgencyOrganigram(id=random_token())
+        organigram.reference = as_fileintent(value, filename)
+        organigram.name = filename
+        self.organigram = organigram
 
     def add_person(self, person_id, title, **kwargs):
         """ Appends a person to the agency with the given title. """
