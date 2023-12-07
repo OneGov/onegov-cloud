@@ -19,7 +19,6 @@ from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
-from onegov.election_day.utils import add_last_modified_header
 from onegov.form import Form
 from onegov.org.elements import Link
 from onegov.org.forms.generic import ChangeAdjacencyListUrlForm
@@ -96,29 +95,12 @@ def view_agencies_sort(self, request):
 )
 def view_agency(self, request):
 
-    @request.after
-    def add_headers(response):
-        add_last_modified_header(response, self.last_change)
-
     return {
         'title': self.title,
         'agency': self,
         'layout': AgencyLayout(self, request),
         'coordinates': self.coordinates
     }
-
-
-@AgencyApp.view(
-    model=ExtendedAgency,
-    request_method='HEAD',
-    permission=Public,
-)
-def view_agency_head(self, request):
-    """ Get the last modification date. """
-
-    @request.after
-    def add_headers(response) -> None:
-        add_last_modified_header(response, self.last_modified)
 
 
 @AgencyApp.html(

@@ -44,6 +44,7 @@ from typing import overload, Any, TypeVar, TYPE_CHECKING
 if TYPE_CHECKING:
     from _typeshed import SupportsRichComparison
     from collections.abc import Callable, Collection, Iterator
+    from datetime import datetime
     from fs.base import FS, SubFS
     from re import Match
     from sqlalchemy import Column
@@ -1181,3 +1182,17 @@ def batched(
             return
 
         yield batch
+
+
+# copied from election_day/common.py
+def add_last_modified_header(
+        response: 'Response',
+        last_modified: 'datetime | None'
+) -> None:
+    """ Adds the give date to the response as Last-Modified header. """
+
+    if last_modified:
+        response.headers.add(
+            'Last-Modified',
+            last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        )

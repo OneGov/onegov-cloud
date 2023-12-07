@@ -14,7 +14,8 @@ from more.transaction.main import transaction_tween_factory
 from morepath import App
 from onegov.core.custom import json
 from onegov.core.security import Private, Public
-from onegov.core.utils import is_valid_yubikey, yubikey_public_id
+from onegov.core.utils import is_valid_yubikey, yubikey_public_id, \
+    add_last_modified_header
 from onegov.file.collection import FileCollection
 from onegov.file.errors import AlreadySignedError
 from onegov.file.errors import InvalidTokenError
@@ -429,6 +430,7 @@ def configure_depot_tween_factory(
     app: DepotApp,
     handler: 'Callable[[CoreRequest], Response]'
 ) -> 'Callable[[CoreRequest], Response]':
+    print('*** tschupre configure depot tween')
 
     assert app.has_database_connection, "This module requires a db backed app."
 
@@ -443,6 +445,7 @@ def render_depot_file(
     file: 'StoredFile',
     request: 'CoreRequest'
 ) -> 'Response':
+    print('*** tschupre render depot file')
     return request.get_response(
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
 
@@ -479,11 +482,13 @@ def respond_with_x_robots_tag_header(
 
 @DepotApp.path(model=File, path='/storage/{id}')
 def get_file(app: DepotApp, id: str) -> File | None:
+    print('*** tschupre get file by id')
     return FileCollection(app.session()).by_id(id)
 
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
 def view_file(self: File, request: 'CoreRequest') -> 'StoredFile':
+    print('*** tschupre view_file')  # only on browser 'force refresh'
     respond_with_alt_text(self, request)
     respond_with_caching_header(self, request)
     respond_with_x_robots_tag_header(self, request)
@@ -500,6 +505,7 @@ def view_thumbnail(
     self: File,
     request: 'CoreRequest'
 ) -> 'StoredFile | Response':
+    print('*** tschupre view thumbnail')
     if request.view_name in ('small', 'medium'):
         size = request.view_name
     else:
@@ -520,10 +526,16 @@ def view_thumbnail(
 @DepotApp.view(model=File, render=render_depot_file, permission=Public,
                request_method='HEAD')
 def view_file_head(self: File, request: 'CoreRequest') -> 'StoredFile':
+    print('*** tschupre view file head')
 
     @request.after
     def set_cache(response: 'Response') -> None:
         response.cache_control.max_age = 60
+
+    @request.after
+    def add_headers(response: 'Response') -> None:
+        print('*** tschupre add last modified header')
+        add_last_modified_header(response, self.last_change)
 
     return view_file(self, request)
 
@@ -534,6 +546,7 @@ def view_thumbnail_head(
     self: File,
     request: 'CoreRequest'
 ) -> 'StoredFile | Response':
+    print('*** tschupre view thumbnail head')
 
     @request.after
     def set_cache(response: 'Response') -> None:
@@ -545,6 +558,7 @@ def view_thumbnail_head(
 @DepotApp.view(model=File, name='note', request_method='POST',
                permission=Private)
 def handle_note_update(self: File, request: 'CoreRequest') -> None:
+    print('*** tschupre handle note update')
     request.assert_valid_csrf_token()
     note = request.POST.get('note')
 
@@ -562,6 +576,7 @@ def handle_note_update(self: File, request: 'CoreRequest') -> None:
 @DepotApp.view(model=File, name='rename', request_method='POST',
                permission=Private)
 def handle_rename(self: File, request: 'CoreRequest') -> None:
+    print('*** tschupre handle rename')
     request.assert_valid_csrf_token()
     name = request.POST.get('name')
 
@@ -596,6 +611,7 @@ def delete_file(self: File, request: 'CoreRequest') -> None:
     New tokens can be acquired through ``request.new_csrf_token``.
 
     """
+    print('*** tschupre delete file')
     request.assert_valid_csrf_token()
 
     if self.signed:
