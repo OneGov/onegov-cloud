@@ -60,11 +60,6 @@ class GeneralSettingsForm(Form):
         description=_("URL pointing to the logo"),
         render_kw={'class_': 'image-url'})
 
-    standard_image = StringField(
-        label=_("Standard Image"),
-        render_kw={'class_': 'image-url'}
-    )
-
     reply_to = EmailField(
         _("E-Mail Reply Address (Reply-To)"), [InputRequired()],
         description=_("Replies to automated e-mails go to this address."))
@@ -91,6 +86,14 @@ class GeneralSettingsForm(Form):
     custom_css = CssField(
         label=_('Additional CSS'),
         render_kw={'rows': 8},
+    )
+
+    standard_image = StringField(
+        description=_(
+            'Will be used if an image is needed, but none has been set'),
+        fieldset=_('Images'),
+        label=_("Standard Image"),
+        render_kw={'class_': 'image-url'}
     )
 
     @property

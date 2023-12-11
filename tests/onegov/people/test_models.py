@@ -69,7 +69,7 @@ def test_vcard(session):
         phone_direct="11122334456",
         website="https://thats.me/hans-maulwurf",
         postal_address="Fakestreet 1",
-        postal_code_city="1234 Springfield",
+        postal_code_city="1234 Kappel am Albis",
         notes="Has bad vision.",
     )
     session.add(person)
@@ -82,7 +82,7 @@ def test_vcard(session):
     vcard = person.vcard()
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
-    assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Springfield;;1234;" in vcard
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Kappel am Albis;;1234;" in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
     assert "FN;CHARSET=utf-8:Dr. Hans Maulwurf" in vcard
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard
@@ -127,7 +127,7 @@ def test_vcard(session):
     vcard = person.memberships[0].vcard()
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
-    assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Springfield;;1234;" in vcard
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 1;Kappel am Albis;;1234;" in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
     assert "FN;CHARSET=utf-8:Dr. Hans Maulwurf" in vcard
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard

@@ -30,21 +30,41 @@ msgid "Name"
 msgstr "Name"
 
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 msgid "Topic"
-msgstr ""
+msgstr "Thema"
 
 msgid "Confirmation"
 msgstr "Bestätigung"
 
 msgid ""
+"I confirm that I am aware that this chat will be saved and the history will "
+"be sent to me by email."
+msgstr ""
 "Ich bestätige, dass mir bewusst ist, dass dieser Chat gespeichert und der "
 "Verlauf an mich per Mail gesendet wird."
-msgstr ""
 
 msgid "Chat ID"
-msgstr ""
+msgstr "Chat ID"
+
+msgid "Images"
+msgstr "Bilder"
+
+msgid "Choose the position of the page images on the content pages"
+msgstr "Wählen Sie die Position der Seiten-Bilder auf den Inhaltsseiten"
+
+msgid "Page image position"
+msgstr "Position der Seiten-Bilder"
+
+msgid "As a content image (between the title and text of a content page)"
+msgstr "Als Inhaltsbild (zwischen Titel und Text einer Inhaltseite)"
+
+msgid "As header image (wide above the page content)"
+msgstr "Als Headerbild (breit oberhalb des Seiteninhaltes)"
+
+msgid "Fonts"
+msgstr "Schriften"
 
 msgid "Font family serif"
 msgstr "Schriftart mit Serifen"

@@ -42,6 +42,7 @@ module = [
     "onegov.ballot.*",
     "onegov.chat.*",
     "onegov.core.*",
+    "onegov.directory.*",
     "onegov.election_day.*",
     "onegov.file.*",
     "onegov.form.*",

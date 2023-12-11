@@ -147,7 +147,7 @@ footer {
 
 .main-title {
     line-height: 1.2;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     max-width: 30ex;
 }
 
@@ -937,6 +937,7 @@ ul.recipients {
 
 .page-image {
     padding-bottom: 2rem;
+    background-position: center;
 }
 
 .cancel-link {
@@ -1010,4 +1011,28 @@ ul.recipients {
 
 .icon-left-of-text {
     width: 1.5rem;
+}
+.header-image {
+    margin-bottom: .5rem;
+    position: relative;
+
+    .text {
+        bottom: .5rem;
+        color: $white;
+        height: fit-content !important;
+        position: absolute;
+        text-shadow: 0 0 2em $black;
+    }
+}
+
+.dark-overlay {
+    background: rgb(0, 0, 0);
+    background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.4) 26%, rgba(0,0,0,0) 54%, rgba(0,0,0,0) 100%);
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    max-height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
 }

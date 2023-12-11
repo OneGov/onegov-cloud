@@ -1272,9 +1272,6 @@ msgstr "URL pointant vers le logo"
 msgid "Logo (Square)"
 msgstr "Logo (carré)"
 
-msgid "Standard Image"
-msgstr "Image standard"
-
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "Adresse e-mail de réponse (Reply-To)"
 
@@ -1301,6 +1298,13 @@ msgstr "Italien"
 
 msgid "Additional CSS"
 msgstr "CSS additionnel"
+
+msgid "Will be used if an image is needed, but none has been set"
+msgstr ""
+"Sera utilisée si une image est nécessaire, mais qu'aucune n'a été définie."
+
+msgid "Standard Image"
+msgstr "Image standard"
 
 msgid "Column width left side"
 msgstr "Largeur de la colonne côté gauche"
@@ -2374,6 +2378,12 @@ msgstr "Afficher l'image sur l'aperçu de la page parent"
 msgid "Show image on page"
 msgstr "Afficher l'image sur la page"
 
+msgid "As first element of the content"
+msgstr "Come primo elemento del contenuto"
+
+msgid "As a full width header"
+msgstr "Come immagine di intestazione a tutta larghezza"
+
 msgid "Documents"
 msgstr "Documents"
 
@@ -2642,7 +2652,7 @@ msgid "Reject event"
 msgstr "Refuser l'événement"
 
 msgid "Do you really want to reject this event?"
-msgstr "Voulez-vous vraiment refuser cet événement ?"
+msgstr "Voulez-vous vraiment refuser cet événement?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Rejeter cet événement est irréversible."

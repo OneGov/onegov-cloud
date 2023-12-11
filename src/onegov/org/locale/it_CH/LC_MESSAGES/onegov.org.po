@@ -1274,9 +1274,6 @@ msgstr "URL che punta al logo"
 msgid "Logo (Square)"
 msgstr "Logo (quadrato)"
 
-msgid "Standard Image"
-msgstr "Immagine standard"
-
 msgid "E-Mail Reply Address (Reply-To)"
 msgstr "Indirizzo di risposta dell'e-mail (Rispondi a)"
 
@@ -1303,6 +1300,14 @@ msgstr "Italiano"
 
 msgid "Additional CSS"
 msgstr "CSS aggiuntivo"
+
+msgid "Will be used if an image is needed, but none has been set"
+msgstr ""
+"Verrà utilizzato se è necessaria un'immagine, ma non è stata impostata "
+"alcuna immagine."
+
+msgid "Standard Image"
+msgstr "Immagine standard"
 
 msgid "Column width left side"
 msgstr "Larghezza colonna lato sinistro"
@@ -2380,6 +2385,12 @@ msgstr "Mostra l'immagine in anteprima nella pagina madre"
 
 msgid "Show image on page"
 msgstr "Mostra l'immagine nella pagina"
+
+msgid "As first element of the content"
+msgstr "En tant que premier élément du contenu"
+
+msgid "As a full width header"
+msgstr "En tant qu'image d'en-tête pleine largeur"
 
 msgid "Documents"
 msgstr "Documenti"
