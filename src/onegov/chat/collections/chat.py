@@ -3,7 +3,8 @@ from onegov.core.collection import GenericCollection, Pagination
 
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from sqlalchemy.orm import Session, Query, Self
+    from sqlalchemy.orm import Session, Query
+    from typing_extensions import Self
 
 
 class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
@@ -30,7 +31,7 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
         self.group = group
         self.owner = owner
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other:object) -> bool:
         return self.page == other.page
 
     def subset(self) -> 'Query[Chat]':
@@ -43,7 +44,7 @@ class ChatCollection(GenericCollection[Chat], Pagination[Chat]):
             return query
 
     @property
-    def page_index(self) -> str:
+    def page_index(self) -> int:
         return self.page
 
     def page_by_index(self, index:int) -> 'Self':
